@@ -162,45 +162,50 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 ;;
 ;;
 (defclass helm-source ()
-  ((name                           :initarg :name
-                                   :initform ""
-                                   :custom string
-                                   :documentation
-                                   "The name of the source.
+  ((name
+    :initarg :name
+    :initform ""
+    :custom string
+    :documentation
+    "The name of the source.
 A string which is also the heading which appears
 above the list of matches from the source. Must be unique.")
 
-   (header-name                    :initarg :header-name
-                                   :initform nil
-                                   :custom function
-                                   :documentation
-                                   "A function returning the display string of the header.
+   (header-name
+    :initarg :header-name
+    :initform nil
+    :custom function
+    :documentation
+    "A function returning the display string of the header.
 Its argument is the name of the source. This attribute is useful to
 add an additional information with the source name.
 It doesn't modify the name of the source.")
    
-   (init                           :initarg :init
-                                   :initform nil
-                                   :custom function
-                                   :documentation
-                                   "Function called with no parameters when helm is started.
+   (init
+    :initarg :init
+    :initform nil
+    :custom function
+    :documentation
+    "Function called with no parameters when helm is started.
 It is useful for collecting current state information which can be
 used to create the list of candidates later.
 Initialization of `candidates-in-buffer' is done here
 with `helm-init-candidates-in-buffer'.")
 
-   (update                         :initarg :update
-                                   :initform nil
-                                   :custom function
-                                   :documentation
-                                   "Function called with no parameters at end of reinitialization
+   (update
+    :initarg :update
+    :initform nil
+    :custom function
+    :documentation
+    "Function called with no parameters at end of reinitialization
 when `helm-force-update' is called.")
    
-   (candidates                     :initarg :candidates
-                                   :initform nil
-                                   :custom (choice function list)
-                                   :documentation
-                                   "  Specifies how to retrieve candidates from the source.
+   (candidates
+    :initarg :candidates
+    :initform nil
+    :custom (choice function list)
+    :documentation
+    "  Specifies how to retrieve candidates from the source.
 It can either be a variable name, a function called with no parameters
 or the actual list of candidates.
 
@@ -235,176 +240,218 @@ Note that currently results from asynchronous sources appear
 last in the helm buffer regardless of their position in
 `helm-sources'.")
 
-   (candidates-process             :initarg :candidates-process
-                                   :initform nil
-                                   :custom function
-                                   :documentation
-                                   "You should use this attribute when using a function involving
+   (candidates-process
+    :initarg :candidates-process
+    :initform nil
+    :custom function
+    :documentation
+    "You should use this attribute when using a function involving
 an async process instead of `candidates'.
 The function must return a process.")
 
-   (match                          :initarg :match
-                                   :initform nil
-                                   :custom function)
+   (match
+    :initarg :match
+    :initform nil
+    :custom function)
 
-   (search                         :initarg :search
-                                   :initform nil
-                                   :custom function)
+   (search
+    :initarg :search
+    :initform nil
+    :custom function)
 
-   (search-from-end                :initarg :search-from-end
-                                   :initform nil
-                                   :custom boolean)
+   (search-from-end
+    :initarg :search-from-end
+    :initform nil
+    :custom boolean)
 
-   (cleanup                        :initarg :cleanup
-                                   :initform nil
-                                   :custom function)
+   (cleanup
+    :initarg :cleanup
+    :initform nil
+    :custom function)
 
-   (volatile                       :initarg :volatile
-                                   :initform nil
-                                   :custom boolean)
+   (volatile
+    :initarg :volatile
+    :initform nil
+    :custom boolean)
 
-   (delayed                        :initarg :delayed
-                                   :initform nil
-                                   :custom (choice null integer))
+   (delayed
+    :initarg :delayed
+    :initform nil
+    :custom (choice null integer))
 
-   (candidates-in-buffer           :initarg :candidates-in-buffer
-                                   :initform nil
-                                   :custom (choice boolean function))
+   (candidates-in-buffer
+    :initarg :candidates-in-buffer
+    :initform nil
+    :custom (choice boolean function))
 
-   (get-line                       :initarg :get-line
-                                   :initform nil
-                                   :custom function)
+   (get-line
+    :initarg :get-line
+    :initform nil
+    :custom function)
 
-   (keymap                         :initarg :keymap
-                                   :initform nil
-                                   :custom sexp)
+   (keymap
+    :initarg :keymap
+    :initform nil
+    :custom sexp)
    
-   (action                         :initarg :action
-                                   :initform 'identity
-                                   :custom (alist :key-type string
-                                                  :value-type function))
+   (action
+    :initarg :action
+    :initform 'identity
+    :custom (alist :key-type string
+                   :value-type function))
 
-   (persistent-action              :initarg :persistent-action
-                                   :initform nil
-                                   :custom function)
+   (persistent-action
+    :initarg :persistent-action
+    :initform nil
+    :custom function)
 
-   (persistent-help                :initarg :persistent-help
-                                   :initform nil
-                                   :custom string)
+   (persistent-help
+    :initarg :persistent-help
+    :initform nil
+    :custom string)
 
-   (help-message                   :initarg :help-message
-                                   :initform nil
-                                   :custom (choice string function))
+   (help-message
+    :initarg :help-message
+    :initform nil
+    :custom (choice string function))
    
-   (type                           :initarg :type
-                                   :initform nil
-                                   :type symbol)
+   (type
+    :initarg :type
+    :initform nil
+    :type symbol)
 
-   (multiline                      :initarg :multiline
-                                   :initform nil
-                                   :custom boolean)
+   (multiline
+    :initarg :multiline
+    :initform nil
+    :custom boolean)
    
-   (requires-pattern               :initarg :requires-pattern
-                                   :initform nil
-                                   :custom integer)
+   (requires-pattern
+    :initarg :requires-pattern
+    :initform nil
+    :custom integer)
 
-   (candidate-transformer          :initarg :candidate-transformer
-                                   :initform nil
-                                   :custom function)
+   (candidate-transformer
+    :initarg :candidate-transformer
+    :initform nil
+    :custom function)
 
-   (filtered-candidate-transformer :initarg :filtered-candidate-transformer
-                                   :initform nil
-                                   :custom function)
+   (filtered-candidate-transformer
+    :initarg :filtered-candidate-transformer
+    :initform nil
+    :custom function)
 
-   (filter-one-by-one              :initarg :filter-one-by-one
-                                   :initform nil
-                                   :custom function)
+   (filter-one-by-one
+    :initarg :filter-one-by-one
+    :initform nil
+    :custom function)
 
-   (display-to-real                :initarg :display-to-real
-                                   :initform nil
-                                   :custom function)
+   (display-to-real
+    :initarg :display-to-real
+    :initform nil
+    :custom function)
 
-   (real-to-display                :initarg :real-to-display
-                                   :initform nil
-                                   :custom function)
+   (real-to-display
+    :initarg :real-to-display
+    :initform nil
+    :custom function)
 
-   (action-transformer             :initarg :action-transformer
-                                   :initform nil
-                                   :custom function)
+   (action-transformer
+    :initarg :action-transformer
+    :initform nil
+    :custom function)
 
-   (pattern-transformer            :initarg :pattern-transformer
-                                   :initform nil
-                                   :custom function)
+   (pattern-transformer
+    :initarg :pattern-transformer
+    :initform nil
+    :custom function)
 
-   (candidate-number-limit         :initarg :candidate-number-limit
-                                   :initform nil
-                                   :custom integer)
+   (candidate-number-limit
+    :initarg :candidate-number-limit
+    :initform nil
+    :custom integer)
 
-   (nomark                         :initarg :nomark
-                                   :initform nil
-                                   :custom boolean)
+   (nomark
+    :initarg :nomark
+    :initform nil
+    :custom boolean)
    
-   (nohighlight                    :initarg :nohighlight
-                                   :initform nil
-                                   :custom boolean)
+   (nohighlight
+    :initarg :nohighlight
+    :initform nil
+    :custom boolean)
    
-   (no-matchplugin                 :initarg :no-matchplugin
-                                   :initform nil
-                                   :custom boolean)
+   (no-matchplugin
+    :initarg :no-matchplugin
+    :initform nil
+    :custom boolean)
 
-   (allow-dups                     :initarg :allow-dups
-                                   :initform nil
-                                   :custom boolean)
+   (allow-dups
+    :initarg :allow-dups
+    :initform nil
+    :custom boolean)
 
-   (recenter                       :initarg :recenter
-                                   :initform nil
-                                   :custom boolean)
+   (recenter
+    :initarg :recenter
+    :initform nil
+    :custom boolean)
 
-   (history                        :initarg :history
-                                   :initform nil
-                                   :custom symbol)
+   (history
+    :initarg :history
+    :initform nil
+    :custom symbol)
    
-   (coerce                         :initarg :coerce
-                                   :initform nil
-                                   :custom function)
+   (coerce
+    :initarg :coerce
+    :initform nil
+    :custom function)
 
-   (dummy                          :initarg :dummy
-                                   :initform nil
-                                   :custom boolean)
+   (dummy
+    :initarg :dummy
+    :initform nil
+    :custom boolean)
 
-   (mode-line                      :initarg :mode-line
-                                   :initform nil
-                                   :custom (choice string sexp))
+   (mode-line
+    :initarg :mode-line
+    :initform nil
+    :custom (choice string sexp))
 
-   (header-line                    :initarg :header-line
-                                   :initform nil
-                                   :custom (choice string sexp))
+   (header-line
+    :initarg :header-line
+    :initform nil
+    :custom (choice string sexp))
 
-   (resume                         :initarg :resume
-                                   :initform nil
-                                   :custom function)
+   (resume
+    :initarg :resume
+    :initform nil
+    :custom function)
 
-   (match-part                     :initarg :match-part
-                                   :initform nil
-                                   :custom function)
+   (match-part
+    :initarg :match-part
+    :initform nil
+    :custom function)
 
-   (match-strict                   :initarg :match-part
-                                   :initform nil
-                                   :custom function)
+   (match-strict
+    :initarg :match-part
+    :initform nil
+    :custom function)
 
-   (follow                         :initarg :follow
-                                   :initform nil
-                                   :custom integer)
+   (follow
+    :initarg :follow
+    :initform nil
+    :custom integer)
 
-   (follow-delay                   :initarg :follow-delay
-                                   :initform nil
-                                   :custom integer)
+   (follow-delay
+    :initarg :follow-delay
+    :initform nil
+    :custom integer)
 
-   (candidates-file                :initarg :candidates-file
-                                   :initform nil
-                                   :custom file)))
+   (candidates-file
+    :initarg :candidates-file
+    :initform nil
+    :custom file)))
 
 (defmethod helm--create-source ((object helm-source))
+  "[INTERNAL] Build a helm source from an `helm-source' OBJECT."
   (cl-loop for s in (object-slots object)
            for slot = (class-slot-initarg 'helm-source s)
            for slot-val = (slot-value object slot)
@@ -412,6 +459,15 @@ The function must return a process.")
            collect (cons s (unless (eq t slot-val) slot-val))))
 
 (defun helm-make-source (name &rest args)
+  "Build a `helm' source named NAME with ARGS.
+Argument NAME is a string which define the source name, so no need to use
+the keyword :name in your source, NAME will be used instead.
+Arguments ARGS are keyword value pairs as defined in `helm-source' which see.
+
+Example:
+
+\(helm :sources (helm-make-source \"test\" :candidates '(a b c d))
+      :buffer \"*helm test*\")."
   (let ((source (apply #'make-instance 'helm-source name args)))
     (oset source :name name)
     (helm--create-source source)))
