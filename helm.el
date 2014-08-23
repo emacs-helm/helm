@@ -2511,7 +2511,8 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 (defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
   "Execute `filter-one-by-one' function(s) on CANDIDATE in SOURCE."
   `(helm-aif (assoc-default 'filter-one-by-one ,source)
-       (if (listp it)
+       (if (and (listp it)
+                (not (functionp it))) ;; Don't treat lambda's as list.
            (cl-loop for f in it
                  do (setq ,candidate (funcall f ,candidate)))
          (setq ,candidate (funcall it ,candidate)))))
