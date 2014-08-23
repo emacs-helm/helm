@@ -1158,11 +1158,6 @@ HELM-ATTRIBUTE should be a symbol."
   `helm-buffer' and the current directory can be different
   there.")
 
-(helm-document-attribute 'delayed-init "optional"
-  "  Function called with no parameters before candidate function
-  is called.  It is similar with `init' attribute, but its
-  evaluation is deferred. It is useful to combine with ")
-
 (helm-document-attribute 'match "optional"
   "  List of functions called with one parameter: a candidate. The
   function should return non-nil if the candidate matches the
