@@ -164,27 +164,84 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
 (defclass helm-source ()
   ((name                           :initarg :name
                                    :initform ""
-                                   :custom string)
+                                   :custom string
+                                   :documentation
+                                   "The name of the source.
+A string which is also the heading which appears
+above the list of matches from the source. Must be unique.")
 
    (header-name                    :initarg :header-name
                                    :initform nil
-                                   :custom function)
+                                   :custom function
+                                   :documentation
+                                   "A function returning the display string of the header.
+Its argument is the name of the source. This attribute is useful to
+add an additional information with the source name.
+It doesn't modify the name of the source.")
    
    (init                           :initarg :init
                                    :initform nil
-                                   :custom function)
+                                   :custom function
+                                   :documentation
+                                   "Function called with no parameters when helm is started.
+It is useful for collecting current state information which can be
+used to create the list of candidates later.
+Initialization of `candidates-in-buffer' is done here
+with `helm-init-candidates-in-buffer'.")
 
    (update                         :initarg :update
                                    :initform nil
-                                   :custom function)
+                                   :custom function
+                                   :documentation
+                                   "Function called with no parameters at end of reinitialization
+when `helm-force-update' is called.")
    
    (candidates                     :initarg :candidates
                                    :initform nil
-                                   :custom (choice function list))
+                                   :custom (choice function list)
+                                   :documentation
+                                   "  Specifies how to retrieve candidates from the source.
+It can either be a variable name, a function called with no parameters
+or the actual list of candidates.
+
+The list must be a list whose members are strings, symbols
+or (DISPLAY . REAL) pairs.
+
+In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+in the Helm buffer, but the REAL one is used as action
+argument when the candidate is selected. This allows a more
+readable presentation for candidates which would otherwise be,
+for example, too long or have a common part shared with other
+candidates which can be safely replaced with an abbreviated
+string for display purposes.
+
+Note that if the (DISPLAY . REAL) form is used then pattern
+matching is done on the displayed string, not on the real
+value.
+
+If the candidates have to be retrieved asynchronously (for
+example, by an external command which takes a while to run)
+then the function should start the external command
+asynchronously and return the associated process object.
+Helm will take care of managing the process (receiving the
+output from it, killing it if necessary, etc.). The process
+should return candidates matching the current pattern (see
+variable `helm-pattern'.)
+You should use instead `candidates-process' attribute for
+async processes, a warning will popup when using async process
+in a `candidates' attribute.
+
+Note that currently results from asynchronous sources appear
+last in the helm buffer regardless of their position in
+`helm-sources'.")
 
    (candidates-process             :initarg :candidates-process
                                    :initform nil
-                                   :custom function)
+                                   :custom function
+                                   :documentation
+                                   "You should use this attribute when using a function involving
+an async process instead of `candidates'.
+The function must return a process.")
 
    (match                          :initarg :match
                                    :initform nil
