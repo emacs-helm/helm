@@ -337,4 +337,10 @@ Example:
 
 (provide 'helm-source)
 
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions obsolete)
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; End:
+
 ;;; helm-source ends here
