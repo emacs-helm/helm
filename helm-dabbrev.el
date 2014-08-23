@@ -157,9 +157,19 @@ but the initial search for all candidates in buffer(s)."
                               (setq pos-before pos)
                               (search-backward pattern pos t))))
                 (let* ((match-1 (helm-aif (thing-at-point 'symbol)
-                                    (substring-no-properties it)))
+                                    ;; `thing-at-point' returns
+                                    ;; the quote outside of e-lisp mode,
+                                    ;; e.g in message mode,
+                                    ;; `foo' => foo'
+                                    ;; but in e-lisp like modes:
+                                    ;; `foo' => foo
+                                    ;; so remove it [1].
+                                    (replace-regexp-in-string
+                                     "[']\\'" "" (substring-no-properties it))))
                        (match-2 (helm-aif (thing-at-point 'filename)
-                                    (substring-no-properties it)))
+                                    ;; Same as in [1].
+                                    (replace-regexp-in-string
+                                     "[']\\'" "" (substring-no-properties it))))
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
                               (list match-1 match-2))))

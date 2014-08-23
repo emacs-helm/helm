@@ -1339,7 +1339,7 @@ or when `helm-pattern' is equal to \"~/\"."
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
   (when (and (helm-file-completion-source-p)
-             (string-match "/\\./\\|/\\.\\./\\|/~/\\|//\\|/[[:alpha:]]:/"
+             (string-match "/\\./\\|/\\.\\./\\|/~.*/\\|//\\|/[[:alpha:]]:/"
                            helm-pattern)
              (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
              (not (string-match helm-ff-url-regexp helm-pattern)))
@@ -1369,7 +1369,7 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
     (insert fname)
     (goto-char (point-min))
     (skip-chars-forward "//") ;; Avoid infloop in UNC paths Issue #424
-    (if (re-search-forward "~/\\|//\\|/[[:alpha:]]:/" nil t)
+    (if (re-search-forward "~.*/\\|//\\|/[[:alpha:]]:/" nil t)
         (let ((match (match-string 0)))
           (goto-char (if (or (string= match "//")
                              (string-match-p "/[[:alpha:]]:/" match))
@@ -1383,8 +1383,9 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
-  (dired (file-name-directory file))
-  (dired-goto-file file))
+  (let ((target (expand-file-name (substitute-in-file-name file))))
+    (dired (file-name-directory target))
+    (dired-goto-file target)))
 
 (defun helm-create-tramp-name (fname)
   "Build filename for `helm-pattern' like /su:: or /sudo::."
@@ -2320,7 +2321,8 @@ Ask to kill buffers associated with that file, too."
   (when (and error-if-dot-file-p
              (helm-ff-dot-file-p file))
     (error "Error: Cannot operate on `.' or `..'"))
-  (let ((buffers (helm-file-buffers file)))
+  (let ((buffers (helm-file-buffers file))
+        (helm--reading-passwd-or-string t))
     (if (or (< emacs-major-version 24) synchro)
         ;; `dired-delete-file' in Emacs versions < 24
         ;; doesn't support delete-by-moving-to-trash
@@ -2402,7 +2404,8 @@ Ask to kill buffers associated with that file, too."
         ;; ask for creating it.
         (let ((dir (file-name-directory candidate)))
           (if (or (and dir (file-directory-p dir)) url-p)
-              (find-file-at-point (car marked))
+              (find-file-at-point (substitute-in-file-name
+                                   (car marked)))
             (and (funcall make-dir-fn dir)
                  (find-file-at-point candidate))))))))
 

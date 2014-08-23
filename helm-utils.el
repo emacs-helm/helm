@@ -435,7 +435,9 @@ from its directory."
        (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
-                          (helm-grep-split-line sel))))
+                          (helm-grep-split-line sel)))
+          (bmk-name  (replace-regexp-in-string "\\`\\*" "" sel))
+          (bmk       (assoc bmk-name bookmark-alist)))
      (if (stringp sel)
          (helm-aif (get-buffer (or (get-text-property
                                     (1- (length sel)) 'buffer-name sel)
@@ -450,6 +452,11 @@ from its directory."
            (cond ((or (file-remote-p sel)
                       (file-exists-p sel))
                   (expand-file-name sel))
+                 (bmk (helm-aif (bookmark-get-filename bmk)
+                          (if (and ffap-url-regexp
+                                   (string-match ffap-url-regexp it))
+                              it (expand-file-name it))
+                        default-directory))
                  ((and grep-line (file-exists-p (car grep-line)))
                   (expand-file-name (car grep-line)))
                  ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)

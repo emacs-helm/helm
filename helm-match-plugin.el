@@ -89,7 +89,8 @@ Default is multi3."
   :group 'helm-match-plugin)
 
 (defface helm-match
-    '((t (:inherit match)))
+  '((((background light)) :foreground "#b00000")
+    (((background dark))  :foreground "gold1"))
   "Face used to highlight matches."
   :group 'helm-match-plugin)
 
