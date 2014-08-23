@@ -194,6 +194,14 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :custom function)
 
+   (search-from-end                :initarg :search-from-end
+                                   :initform nil
+                                   :custom boolean)
+
+   (cleanup                        :initarg :cleanup
+                                   :initform nil
+                                   :custom function)
+
    (volatile                       :initarg :volatile
                                    :initform nil
                                    :custom boolean)
@@ -227,6 +235,10 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :initform nil
                                    :custom string)
 
+   (help-message                   :initarg :help-message
+                                   :initform nil
+                                   :custom (choice string function))
+   
    (type                           :initarg :type
                                    :initform nil
                                    :type symbol)
@@ -248,6 +260,14 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                                    :custom function)
 
    (filter-one-by-one              :initarg :filter-one-by-one
+                                   :initform nil
+                                   :custom function)
+
+   (display-to-real                :initarg :display-to-real
+                                   :initform nil
+                                   :custom function)
+
+   (real-to-display                :initarg :real-to-display
                                    :initform nil
                                    :custom function)
 
