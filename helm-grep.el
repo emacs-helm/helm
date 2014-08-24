@@ -878,15 +878,14 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
             ;; to make it available in further resuming.
             (keymap . ,helm-grep-map)
             (history . ,'helm-grep-history)
-            (action . ,(delq
-                        nil
-                        `(("Find File" . helm-grep-action)
-                          ("Find file other frame" . helm-grep-other-frame)
-                          ,(and (locate-library "elscreen")
-                                '("Find file in Elscreen"
-                                  . helm-grep-jump-elscreen))
-                          ("Save results in grep buffer" . helm-grep-save-results)
-                          ("Find file other window" . helm-grep-other-window))))
+            (action . ,(helm-make-actions
+                        "Find File" 'helm-grep-action
+                        "Find file other frame" 'helm-grep-other-frame
+                        (lambda () (and (locate-library "elscreen")
+                                        "Find file in Elscreen"))
+                        'helm-grep-jump-elscreen
+                        "Save results in grep buffer" 'helm-grep-save-results
+                        "Find file other window" 'helm-grep-other-window))
             (persistent-action . helm-grep-persistent-action)
             (persistent-help . "Jump to line (`C-u' Record in mark ring)")
             (requires-pattern . 2)))
