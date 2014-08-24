@@ -310,7 +310,7 @@ The function must return a process.")))
     :custom boolean)))
 
 (defun helm--create-source (object class)
-  "[INTERNAL] Build a helm source from an `helm-source' OBJECT."
+  "[INTERNAL] Build a helm source from a CLASS OBJECT."
   (cl-loop for s in (object-slots object)
            for slot = (class-slot-initarg class s)
            for slot-val = (slot-value object slot)
