@@ -1408,7 +1408,7 @@ When helm is alive use `make-local-variable' as usual on `helm-buffer'.
 
 (defun helm-make-actions (&rest args)
   "Build an alist with (name . action) elements with each pairs in ARGS.
-Where NAME is a string or a function returning a string or nil and action
+Where NAME is a string or a function returning a string or nil and ACTION
 a function.
 If NAME returns nil the pair is skipped."
   (cl-loop for i on args by #'cddr
