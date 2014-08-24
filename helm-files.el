@@ -53,26 +53,27 @@
 ;;
 ;;
 (define-helm-type-attribute 'file
-    `((action
-       ("Find file" . helm-find-many-files)
-       ("Find file as root" . helm-find-file-as-root)
-       ("Find file other window" . find-file-other-window)
-       ("Find file other frame" . find-file-other-frame)
-       ("Open dired in file's directory" . helm-open-dired)
-       ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
-       ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
-       ("Pdfgrep File(s)" . helm-ff-pdfgrep)
-       ("Insert as org link" . helm-files-insert-as-org-link)
-       ("Checksum File" . helm-ff-checksum)
-       ("Ediff File" . helm-find-files-ediff-files)
-       ("Ediff Merge File" . helm-find-files-ediff-merge-files)
-       ("Etags `M-., C-u tap, C-u C-u reload tag file'" . helm-ff-etags-select)
-       ("View file" . view-file)
-       ("Insert file" . insert-file)
-       ("Delete file(s)" . helm-delete-marked-files)
-       ("Open file externally (C-u to choose)" . helm-open-file-externally)
-       ("Open file with default tool" . helm-open-file-with-default-tool)
-       ("Find file in hex dump" . hexl-find-file))
+    `((action . ,(helm-make-actions
+                  "Find file"                            'helm-find-many-files
+                  "Find file as root"                    'helm-find-file-as-root
+                  "Find file other window"               'find-file-other-window
+                  "Find file other frame"                'find-file-other-frame
+                  "Open dired in file's directory"       'helm-open-dired
+                  "Grep File(s) `C-u recurse'"           'helm-find-files-grep
+                  "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
+                  "Pdfgrep File(s)"                      'helm-ff-pdfgrep
+                  "Insert as org link"                   'helm-files-insert-as-org-link
+                  "Checksum File"                        'helm-ff-checksum
+                  "Ediff File"                           'helm-find-files-ediff-files
+                  "Ediff Merge File"                     'helm-find-files-ediff-merge-files
+                  "Etags `M-., C-u tap, C-u C-u reload tag file'"
+                  'helm-ff-etags-select
+                  "View file"                            'view-file
+                  "Insert file"                          'insert-file
+                  "Delete file(s)"                       'helm-delete-marked-files
+                  "Open file externally (C-u to choose)" 'helm-open-file-externally
+                  "Open file with default tool"          'helm-open-file-with-default-tool
+                  "Find file in hex dump"                'hexl-find-file))
       (persistent-help . "Show this file")
       (action-transformer helm-transform-file-load-el
                           helm-transform-file-browse-url)
@@ -423,46 +424,43 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
     (candidate-number-limit . 9999)
     (action-transformer . helm-find-files-action-transformer)
     (action
-     . ,(delq
-         nil
-         `(("Find File" . helm-find-file-or-marked)
-           ("Find file in Dired" . helm-point-file-in-dired)
-           ,(and (locate-library "elscreen")
-                 '("Find file in Elscreen"  . helm-elscreen-find-file))
-           ("View file" . view-file)
-           ("Checksum File" . helm-ff-checksum)
-           ("Query replace on marked" . helm-ff-query-replace-on-marked)
-           ("Serial rename files" . helm-ff-serial-rename)
-           ("Serial rename by symlinking files" . helm-ff-serial-rename-by-symlink)
-           ("Serial rename by copying files" . helm-ff-serial-rename-by-copying)
-           ("Open file with default tool" . helm-open-file-with-default-tool)
-           ("Find file in hex dump" . hexl-find-file)
-           ("Complete at point `C-c i'"
-            . helm-insert-file-name-completion-at-point)
-           ("Insert as org link `C-c @'" . helm-files-insert-as-org-link)
-           ("Find shell command `C-c /'" . helm-ff-find-sh-command)
-           ("Open file externally `C-c C-x, C-u to choose'"
-            . helm-open-file-externally)
-           ("Grep File(s) `C-s, C-u Recurse'" . helm-find-files-grep)
-           ("Zgrep File(s) `M-g z, C-u Recurse'" . helm-ff-zgrep)
-           ("Switch to Eshell `M-e'" . helm-ff-switch-to-eshell)
-           ("Etags `M-., C-u reload tag file'" . helm-ff-etags-select)
-           ("Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
-            . helm-find-files-eshell-command-on-file)
-           ("Find file as root `C-x @'" . helm-find-file-as-root)
-           ("Ediff File `C-='" . helm-find-files-ediff-files)
-           ("Ediff Merge File `C-c ='" . helm-find-files-ediff-merge-files)
-           ("Delete File(s) `M-D'" . helm-delete-marked-files)
-           ("Copy file(s) `M-C, C-u to follow'" . helm-find-files-copy)
-           ("Rename file(s) `M-R, C-u to follow'" . helm-find-files-rename)
-           ("Symlink files(s) `M-S, C-u to follow'" . helm-find-files-symlink)
-           ("Relsymlink file(s) `C-u to follow'" . helm-find-files-relsymlink)
-           ("Hardlink file(s) `M-H, C-u to follow'" . helm-find-files-hardlink)
-           ("Find file other window `C-c o'" . find-file-other-window)
-           ("Switch to history `M-p'" . helm-find-files-switch-to-hist)
-           ("Find file other frame `C-c C-o'" . find-file-other-frame)
-           ("Print File `C-c p, C-u to refresh'" . helm-ff-print)
-           ("Locate `C-x C-f, C-u to specify locate db'" . helm-ff-locate)))))
+     . ,(helm-make-actions
+         "Find File" 'helm-find-file-or-marked
+         "Find file in Dired" 'helm-point-file-in-dired
+         (lambda () (and (locate-library "elscreen") "Find file in Elscreen"))
+         'helm-elscreen-find-file
+         "View file" 'view-file
+         "Checksum File" 'helm-ff-checksum
+         "Query replace on marked" 'helm-ff-query-replace-on-marked
+         "Serial rename files" 'helm-ff-serial-rename
+         "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
+         "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
+         "Open file with default tool" 'helm-open-file-with-default-tool
+         "Find file in hex dump" 'hexl-find-file
+         "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
+         "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
+         "Find shell command `C-c /'" 'helm-ff-find-sh-command
+         "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
+         "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
+         "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
+         "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
+         "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
+         "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
+         'helm-find-files-eshell-command-on-file
+         "Find file as root `C-x @'" 'helm-find-file-as-root
+         "Ediff File `C-='" 'helm-find-files-ediff-files
+         "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
+         "Delete File(s) `M-D'" 'helm-delete-marked-files
+         "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
+         "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
+         "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
+         "Relsymlink file(s) `C-u to follow'" 'helm-find-files-relsymlink
+         "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
+         "Find file other window `C-c o'" 'find-file-other-window
+         "Switch to history `M-p'" 'helm-find-files-switch-to-hist
+         "Find file other frame `C-c C-o'" 'find-file-other-frame
+         "Print File `C-c p, C-u to refresh'" 'helm-ff-print
+         "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)))
   "The main source to browse files.
 Should not be used among other sources.")
 
