@@ -709,15 +709,15 @@ words from the buffer into the new bookmark name."
 ;;
 (define-helm-type-attribute 'bookmark
     `((coerce . helm-bookmark-get-bookmark-from-name)
-      (action
-       ("Jump to bookmark" . helm-bookmark-jump)
-       ("Jump to BM other window" . helm-bookmark-jump-other-window)
-       ("Bookmark edit annotation" . bookmark-edit-annotation)
-       ("Bookmark show annotation" . bookmark-show-annotation)
-       ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
-       ("Edit Bookmark" . helm-bookmark-edit-bookmark)
-       ("Rename bookmark" . helm-bookmark-rename)
-       ("Relocate bookmark" . bookmark-relocate))
+      (action . ,(helm-make-actions
+                  "Jump to bookmark" 'helm-bookmark-jump
+                  "Jump to BM other window" 'helm-bookmark-jump-other-window
+                  "Bookmark edit annotation" 'bookmark-edit-annotation
+                  "Bookmark show annotation" 'bookmark-show-annotation
+                  "Delete bookmark(s)" 'helm-delete-marked-bookmarks
+                  "Edit Bookmark" 'helm-bookmark-edit-bookmark
+                  "Rename bookmark" 'helm-bookmark-rename
+                  "Relocate bookmark" 'bookmark-relocate))
       (keymap . ,helm-bookmark-map)
       (mode-line . helm-bookmark-mode-line-string))
   "Bookmark name.")
