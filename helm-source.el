@@ -269,7 +269,7 @@ The function must return a process.")))
 (defclass helm-source-in-buffer (helm-source)
   ((candidates-in-buffer
     :initarg :candidates-in-buffer
-    :initform nil
+    :initform t
     :custom (choice boolean function))
 
    (get-line
@@ -327,8 +327,20 @@ Arguments ARGS are keyword value pairs as defined in CLASS which see."
     (oset source :name name)
     (helm--create-source source class)))
 
-(defun helm-build-candidate-source (name &rest args)
-  (helm--make-source name 'helm-source-sync args))
+(defmacro helm-build-sync-source (name &rest args)
+  `(helm--make-source ,name 'helm-source-sync ,@args))
+
+(defmacro helm-build-async-source (name &rest args)
+  `(helm--make-source ,name 'helm-source-async ,@args))
+
+(defmacro helm-build-in-buffer-source (name &rest args)
+  `(helm--make-source ,name 'helm-source-in-buffer ,@args))
+
+(defmacro helm-build-candidate-file-source (name &rest args)
+  `(helm--make-source ,name 'helm-source-candidate-file ,@args))
+
+(defmacro helm-build-dummy-source (name &rest args)
+  `(helm--make-source ,name 'helm-source-dummy ,@args))
 
 (provide 'helm-source)
 
