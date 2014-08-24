@@ -61,70 +61,6 @@ with `helm-init-candidates-in-buffer'.")
     :documentation
     "Function called with no parameters at end of reinitialization
 when `helm-force-update' is called.")
-   
-   (candidates
-    :initarg :candidates
-    :initform nil
-    :custom (choice function list)
-    :documentation
-    "  Specifies how to retrieve candidates from the source.
-It can either be a variable name, a function called with no parameters
-or the actual list of candidates.
-
-The list must be a list whose members are strings, symbols
-or (DISPLAY . REAL) pairs.
-
-In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
-in the Helm buffer, but the REAL one is used as action
-argument when the candidate is selected. This allows a more
-readable presentation for candidates which would otherwise be,
-for example, too long or have a common part shared with other
-candidates which can be safely replaced with an abbreviated
-string for display purposes.
-
-Note that if the (DISPLAY . REAL) form is used then pattern
-matching is done on the displayed string, not on the real
-value.
-
-If the candidates have to be retrieved asynchronously (for
-example, by an external command which takes a while to run)
-then the function should start the external command
-asynchronously and return the associated process object.
-Helm will take care of managing the process (receiving the
-output from it, killing it if necessary, etc.). The process
-should return candidates matching the current pattern (see
-variable `helm-pattern'.)
-You should use instead `candidates-process' attribute for
-async processes, a warning will popup when using async process
-in a `candidates' attribute.
-
-Note that currently results from asynchronous sources appear
-last in the helm buffer regardless of their position in
-`helm-sources'.")
-
-   (candidates-process
-    :initarg :candidates-process
-    :initform nil
-    :custom function
-    :documentation
-    "You should use this attribute when using a function involving
-an async process instead of `candidates'.
-The function must return a process.")
-
-   (match
-    :initarg :match
-    :initform nil
-    :custom function)
-
-   (search
-    :initarg :search
-    :initform nil
-    :custom function)
-
-   (search-from-end
-    :initarg :search-from-end
-    :initform nil
-    :custom boolean)
 
    (cleanup
     :initarg :cleanup
@@ -140,17 +76,7 @@ The function must return a process.")
     :initarg :delayed
     :initform nil
     :custom (choice null integer))
-
-   (candidates-in-buffer
-    :initarg :candidates-in-buffer
-    :initform nil
-    :custom (choice boolean function))
-
-   (get-line
-    :initarg :get-line
-    :initform nil
-    :custom function)
-
+   
    (keymap
     :initarg :keymap
     :initform nil
@@ -266,12 +192,7 @@ The function must return a process.")
     :initarg :coerce
     :initform nil
     :custom function)
-
-   (dummy
-    :initarg :dummy
-    :initform nil
-    :custom boolean)
-
+   
    (mode-line
     :initarg :mode-line
     :initform nil
@@ -286,17 +207,7 @@ The function must return a process.")
     :initarg :resume
     :initform nil
     :custom function)
-
-   (match-part
-    :initarg :match-part
-    :initform nil
-    :custom function)
-
-   (match-strict
-    :initarg :match-part
-    :initform nil
-    :custom function)
-
+   
    (follow
     :initarg :follow
     :initform nil
@@ -305,34 +216,119 @@ The function must return a process.")
    (follow-delay
     :initarg :follow-delay
     :initform nil
-    :custom integer)
+    :custom integer))
+  
+  "Main interface to define helm sources."
+  :abstract t)
 
-   (candidates-file
+(defclass helm-source-sync (helm-source)
+  ((candidates
+    :initarg :candidates
+    :initform nil
+    :custom (choice function list)
+    :documentation
+    "  Specifies how to retrieve candidates from the source.
+It can either be a variable name, a function called with no parameters
+or the actual list of candidates.
+
+The list must be a list whose members are strings, symbols
+or (DISPLAY . REAL) pairs.
+
+In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+in the Helm buffer, but the REAL one is used as action
+argument when the candidate is selected. This allows a more
+readable presentation for candidates which would otherwise be,
+for example, too long or have a common part shared with other
+candidates which can be safely replaced with an abbreviated
+string for display purposes.
+
+Note that if the (DISPLAY . REAL) form is used then pattern
+matching is done on the displayed string, not on the real
+value.")
+
+   (match
+    :initarg :match
+    :initform nil
+    :custom function)
+
+   (match-strict
+    :initarg :match-strict
+    :initform nil
+    :custom function)))
+
+(defclass helm-source-async (helm-source)
+  ((candidates-process
+    :initarg :candidates-process
+    :initform nil
+    :custom function
+    :documentation
+    "You should use this attribute when using a function involving
+an async process instead of `candidates'.
+The function must return a process.")))
+
+(defclass helm-source-in-buffer (helm-source)
+  ((candidates-in-buffer
+    :initarg :candidates-in-buffer
+    :initform nil
+    :custom (choice boolean function))
+
+   (get-line
+    :initarg :get-line
+    :initform nil
+    :custom function)
+
+   (search
+    :initarg :search
+    :initform nil
+    :custom function)
+
+   (search-from-end
+    :initarg :search-from-end
+    :initform nil
+    :custom boolean)
+
+   (search-strict
+    :initarg :search-strict
+    :initform nil
+    :custom function)
+
+   (match-part
+    :initarg :match-part
+    :initform nil
+    :custom function)))
+
+(defclass helm-source-candidate-file (helm-source)
+  ((candidates-file
     :initarg :candidates-file
     :initform nil
     :custom file)))
 
-(defmethod helm--create-source ((object helm-source))
+(defclass helm-source-dummy (helm-source)
+  ((dummy
+    :initarg :dummy
+    :initform nil
+    :custom boolean)))
+
+(defun helm--create-source (object class)
   "[INTERNAL] Build a helm source from an `helm-source' OBJECT."
   (cl-loop for s in (object-slots object)
-           for slot = (class-slot-initarg 'helm-source s)
+           for slot = (class-slot-initarg class s)
            for slot-val = (slot-value object slot)
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
-(defun helm-make-source (name &rest args)
-  "Build a `helm' source named NAME with ARGS.
+(defun helm--make-source (name class &rest args)
+  "Build a `helm' source named NAME with ARGS for CLASS.
 Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
-Arguments ARGS are keyword value pairs as defined in `helm-source' which see.
-
-Example:
-
-\(helm :sources (helm-make-source \"test\" :candidates '(a b c d))
-      :buffer \"*helm test*\")."
-  (let ((source (apply #'make-instance 'helm-source name args)))
+Argument CLASS is an eieio class object.
+Arguments ARGS are keyword value pairs as defined in `helm-source' which see."
+  (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
-    (helm--create-source source)))
+    (helm--create-source source class)))
+
+(defun helm-build-candidate-source (name &rest args)
+  (helm--make-source name 'helm-source-sync args))
 
 (provide 'helm-source)
 
