@@ -195,8 +195,8 @@ when `helm-force-update' is called.")
 
    (header-line
     :initarg :header-line
-    :initform nil
-    :custom (choice string sexp))
+    :initform 'helm-persistent-help-string
+    :custom (choice string function))
 
    (resume
     :initarg :resume
@@ -267,20 +267,22 @@ an async process instead of `candidates'.
 The function must return a process.")))
 
 (defclass helm-source-in-buffer (helm-source)
-  ((candidates :initarg :candidates
-               :initform (lambda ()
-                           (helm-candidates-in-buffer
-                            (helm-get-current-source)))
-               :custom function)
+  ((candidates
+    :initarg :candidates
+    :initform (lambda ()
+                (helm-candidates-in-buffer
+                 (helm-get-current-source)))
+    :custom function)
 
    (volatile
     :initarg :volatile
     :initform t
     :custom boolean)
    
-   (match :initarg :match
-          :initform 'identity
-          :custom function)
+   (match
+    :initarg :match
+    :initform 'identity
+    :custom function)
    
    (get-line
     :initarg :get-line
@@ -307,15 +309,24 @@ The function must return a process.")))
     :initform nil
     :custom function)))
 
-(defclass helm-source-candidate-file (helm-source)
-  ((candidates-file
-    :initarg :candidates-file
-    :initform nil
-    :custom file)))
-
 (defclass helm-source-dummy (helm-source)
-  ((dummy
-    :initarg :dummy
+  ((candidates
+    :initarg :candidates
+    :initform "dummy"
+    :custom string)
+
+   (accept-empty
+    :initarg :accept-empty
+    :initform t
+    :custom boolean)
+
+   (match
+    :initarg :match
+    :initform 'identity
+    :custom function)
+   
+   (volatile
+    :initarg :volatile
     :initform t
     :custom boolean)))
 
@@ -345,9 +356,6 @@ Arguments ARGS are keyword value pairs as defined in CLASS which see."
 
 (defmacro helm-build-in-buffer-source (name &rest args)
   `(helm--make-source ,name 'helm-source-in-buffer ,@args))
-
-(defmacro helm-build-candidate-file-source (name &rest args)
-  `(helm--make-source ,name 'helm-source-candidate-file ,@args))
 
 (defmacro helm-build-dummy-source (name &rest args)
   `(helm--make-source ,name 'helm-source-dummy ,@args))
