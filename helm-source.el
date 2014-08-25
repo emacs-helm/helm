@@ -306,7 +306,7 @@ The function must return a process.")))
 (defclass helm-source-dummy (helm-source)
   ((dummy
     :initarg :dummy
-    :initform nil
+    :initform t
     :custom boolean)))
 
 (defun helm--create-source (object class)
