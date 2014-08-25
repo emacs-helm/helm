@@ -233,7 +233,8 @@
 ;;
 ;; Add help about persistent action in `helm-buffer' header.
 (defun helm-compile-source--persistent-help (source)
-  (append source '((header-line . helm-persistent-help-string))))
+  (unless (assoc 'header-line source)
+    (append source '((header-line . helm-persistent-help-string)))))
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--persistent-help)
 
 (defun helm-persistent-help-string ()
