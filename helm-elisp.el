@@ -569,9 +569,12 @@ First call indent, second complete symbol, third complete fname."
 
 (defun helm-set-variable (var)
   "Set value to VAR interactively."
-  (let ((sym (helm-symbolify var)))
-    (set sym (eval-minibuffer (format "Set %s: " var)
-                              (prin1-to-string (symbol-value sym))))))
+  (let* ((sym (helm-symbolify var))
+         (val (symbol-value sym)))
+    (set sym (eval-minibuffer (format "Set `%s': " var)
+                              (if (or (stringp val) (memq val '(nil t)))
+                                  (prin1-to-string val)
+                                  (format "'%s" (prin1-to-string val)))))))
 
 
 ;;; Type attributes
