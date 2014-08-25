@@ -66,12 +66,7 @@ when `helm-force-update' is called.")
     :initarg :cleanup
     :initform nil
     :custom function)
-
-   (volatile
-    :initarg :volatile
-    :initform nil
-    :custom boolean)
-
+   
    (delayed
     :initarg :delayed
     :initform nil
@@ -246,6 +241,11 @@ Note that if the (DISPLAY . REAL) form is used then pattern
 matching is done on the displayed string, not on the real
 value.")
 
+   (volatile
+    :initarg :volatile
+    :initform nil
+    :custom boolean)
+   
    (match
     :initarg :match
     :initform nil
@@ -267,19 +267,29 @@ an async process instead of `candidates'.
 The function must return a process.")))
 
 (defclass helm-source-in-buffer (helm-source)
-  ((candidates-in-buffer
-    :initarg :candidates-in-buffer
-    :initform t
-    :custom (choice boolean function))
+  ((candidates :initarg :candidates
+               :initform (lambda ()
+                           (helm-candidates-in-buffer
+                            (helm-get-current-source)))
+               :custom function)
 
+   (volatile
+    :initarg :volatile
+    :initform t
+    :custom boolean)
+   
+   (match :initarg :match
+          :initform 'identity
+          :custom function)
+   
    (get-line
     :initarg :get-line
-    :initform nil
+    :initform 'buffer-substring-no-properties
     :custom function)
 
    (search
     :initarg :search
-    :initform nil
+    :initform 'helm-candidates-in-buffer-search-from-start
     :custom function)
 
    (search-from-end
