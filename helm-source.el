@@ -279,7 +279,7 @@ The function must return a process.")))
     :initform t
     :custom boolean
     :documentation
-    "It is just here to notify the match-plugin we are using `candidates-in-buffer',
+    "It is just here to notify to the match-plugin we are using `candidates-in-buffer',
 so there is no need to change the value of this slot.")
 
    (dont-plug
