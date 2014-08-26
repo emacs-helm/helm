@@ -116,7 +116,7 @@ when `helm-force-update' is called.")
    (candidate-transformer
     :initarg :candidate-transformer
     :initform nil
-    :custom function)
+    :custom (choice function list))
 
    (filtered-candidate-transformer
     :initarg :filtered-candidate-transformer
@@ -126,7 +126,7 @@ when `helm-force-update' is called.")
    (filter-one-by-one
     :initarg :filter-one-by-one
     :initform nil
-    :custom function)
+    :custom (choice function list))
 
    (display-to-real
     :initarg :display-to-real
@@ -141,12 +141,12 @@ when `helm-force-update' is called.")
    (action-transformer
     :initarg :action-transformer
     :initform nil
-    :custom function)
+    :custom (choice function list))
 
    (pattern-transformer
     :initarg :pattern-transformer
     :initform nil
-    :custom function)
+    :custom (choice function list))
 
    (candidate-number-limit
     :initarg :candidate-number-limit
@@ -267,7 +267,12 @@ an async process instead of `candidates'.
 The function must return a process.")))
 
 (defclass helm-source-in-buffer (helm-source)
-  ((candidates
+  ((candidates-in-buffer
+    :initarg :candidates-in-buffer
+    :initform t
+    :custom boolean)
+   
+   (candidates
     :initarg :candidates
     :initform 'helm-candidates-in-buffer
     :custom function)
@@ -279,8 +284,8 @@ The function must return a process.")))
    
    (match
     :initarg :match
-    :initform 'identity
-    :custom function)
+    :initform '(identity)
+    :custom (choice function list))
    
    (get-line
     :initarg :get-line
@@ -289,8 +294,8 @@ The function must return a process.")))
 
    (search
     :initarg :search
-    :initform 'helm-candidates-in-buffer-search-from-start
-    :custom function)
+    :initform '(helm-candidates-in-buffer-search-from-start)
+    :custom (choice function list))
 
    (search-from-end
     :initarg :search-from-end
