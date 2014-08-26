@@ -1160,11 +1160,12 @@ The checksum is copied to kill-ring."
          (sha1 (current-buffer)))))
     (message "Checksum copied to kill-ring.")))
 
-(defun helm-ff-toggle-basename (candidate)
+(defun helm-ff-toggle-basename (_candidate)
   (setq helm-ff-transformer-show-only-basename
         (not helm-ff-transformer-show-only-basename))
-  (let ((target (if helm-ff-transformer-show-only-basename
-                    (helm-basename candidate) candidate)))
+  (let* ((cand   (helm-get-selection nil t))
+         (target (if helm-ff-transformer-show-only-basename
+                    (helm-basename cand) cand)))
     (helm-force-update (regexp-quote target))))
 
 (defun helm-ff-run-toggle-basename ()

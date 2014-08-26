@@ -373,10 +373,8 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                                    (defsearch
                                     (append searchers defsearch))
                                    (t searchers))))
-      `(,(if (or (assoc 'candidates-in-buffer source)
-                 (equal '(identity) matchfns))
-             '(match identity) `(match ,@matchfns))
-         (search ,@searchfns)
+      `(,(if (assoc 'candidates-in-buffer source)
+             `(search ,@searchfns) `(match ,@matchfns))
          ,@source))))
 
 
