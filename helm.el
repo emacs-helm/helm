@@ -1410,7 +1410,9 @@ When helm is alive use `make-local-variable' as usual on `helm-buffer'.
   "Build an alist with (NAME . ACTION) elements with each pairs in ARGS.
 Where NAME is a string or a function returning a string or nil and ACTION
 a function.
-If NAME returns nil the pair is skipped."
+If NAME returns nil the pair is skipped.
+
+\(fn NAME ACTION ...)"
   (cl-loop for i on args by #'cddr
            for name  = (car i)
            when (functionp name)
