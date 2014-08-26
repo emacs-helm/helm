@@ -121,7 +121,7 @@ when `helm-force-update' is called.")
    (filtered-candidate-transformer
     :initarg :filtered-candidate-transformer
     :initform nil
-    :custom function)
+    :custom (choice function list))
 
    (filter-one-by-one
     :initarg :filter-one-by-one
@@ -269,9 +269,7 @@ The function must return a process.")))
 (defclass helm-source-in-buffer (helm-source)
   ((candidates
     :initarg :candidates
-    :initform (lambda ()
-                (helm-candidates-in-buffer
-                 (helm-get-current-source)))
+    :initform 'helm-candidates-in-buffer
     :custom function)
 
    (volatile
@@ -312,9 +310,12 @@ The function must return a process.")))
 (defclass helm-source-dummy (helm-source)
   ((candidates
     :initarg :candidates
-    :initform "dummy"
-    :custom string)
+    :initform '("dummy")
+    :custom list)
 
+   (filtered-candidate-transformer
+    :initform 'helm-dummy-candidate)
+   
    (accept-empty
     :initarg :accept-empty
     :initform t
