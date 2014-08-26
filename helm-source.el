@@ -211,7 +211,14 @@ when `helm-force-update' is called.")
    (follow-delay
     :initarg :follow-delay
     :initform nil
-    :custom integer))
+    :custom integer)
+
+   (dont-plug
+    :initarg :dont-plug
+    :initform nil
+    :custom list
+    :documentation
+    "A list of compile functions plugin to ignore."))
   
   "Main interface to define helm sources."
   :abstract t)
@@ -270,7 +277,13 @@ The function must return a process.")))
   ((candidates-in-buffer
     :initarg :candidates-in-buffer
     :initform t
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "It is just here to notify the match-plugin we are using `candidates-in-buffer',
+so there is no need to change the value of this slot.")
+
+   (dont-plug
+    :initform '(helm-compile-source--candidates-in-buffer))
    
    (candidates
     :initarg :candidates

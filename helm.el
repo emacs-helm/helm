@@ -2424,9 +2424,11 @@ Helm plug-ins are realized by this function."
   (mapcar
    (lambda (source)
      (cl-loop with src = (if (listp source) source (symbol-value source))
-           for f in funcs
-           do (setq src (funcall f src))
-           finally (cl-return src)))
+              for noplug = (assoc 'dont-plug src)
+              for f in funcs
+              unless (and noplug (memq f (cdr noplug)))
+              do (setq src (funcall f src))
+              finally (cl-return src)))
    sources))
 
 
