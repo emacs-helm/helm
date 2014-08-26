@@ -536,7 +536,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
-    (when (buffer-file-name) (revert-buffer t t))))
+    (helm-aif (buffer-file-name)
+        (and (file-exists-p it) (revert-buffer t t)))))
 
 (defun helm-revert-marked-buffers (_ignore)
   (mapc 'helm-revert-buffer (helm-marked-candidates)))
