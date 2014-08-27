@@ -1,4 +1,4 @@
-;;; helm-source.el  -- Source creation.
+;;; helm-source.el --- Helm source creation.
 
 ;; Copyright (C) 2014  Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -17,6 +17,17 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Interface to create helm sources easily.
+;; Actually the eieo object are transformed in alist for compatibility.
+;; In the future this package should allow creating source as eieo objects
+;; without conversion to alist, teaching helm to read such a structure.
+;; The compatibility with alists would be kept.
+;; This would allow faster access to sources, getting rid of the actual hackish
+;; plugin interface (the plugins will be embeded in classes) and a better
+;; access to documentation.
 
 ;;; Code:
 
@@ -54,6 +65,30 @@ used to create the list of candidates later.
 Initialization of `candidates-in-buffer' is done here
 with `helm-init-candidates-in-buffer'.")
 
+   (candidates
+    :initarg :candidates
+    :initform nil
+    :custom (choice function list)
+    :documentation
+    "  Specifies how to retrieve candidates from the source.
+It can either be a variable name, a function called with no parameters
+or the actual list of candidates.
+
+The list must be a list whose members are strings, symbols
+or (DISPLAY . REAL) pairs.
+
+In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
+in the Helm buffer, but the REAL one is used as action
+argument when the candidate is selected. This allows a more
+readable presentation for candidates which would otherwise be,
+for example, too long or have a common part shared with other
+candidates which can be safely replaced with an abbreviated
+string for display purposes.
+
+Note that if the (DISPLAY . REAL) form is used then pattern
+matching is done on the displayed string, not on the real
+value.")
+   
    (update
     :initarg :update
     :initform nil
@@ -153,6 +188,16 @@ when `helm-force-update' is called.")
     :initform nil
     :custom integer)
 
+   (volatile
+    :initarg :volatile
+    :initform nil
+    :custom boolean)
+
+   (match
+    :initarg :match
+    :initform nil
+    :custom (choice function list))
+
    (nomark
     :initarg :nomark
     :initform nil
@@ -224,41 +269,7 @@ when `helm-force-update' is called.")
   :abstract t)
 
 (defclass helm-source-sync (helm-source)
-  ((candidates
-    :initarg :candidates
-    :initform nil
-    :custom (choice function list)
-    :documentation
-    "  Specifies how to retrieve candidates from the source.
-It can either be a variable name, a function called with no parameters
-or the actual list of candidates.
-
-The list must be a list whose members are strings, symbols
-or (DISPLAY . REAL) pairs.
-
-In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
-in the Helm buffer, but the REAL one is used as action
-argument when the candidate is selected. This allows a more
-readable presentation for candidates which would otherwise be,
-for example, too long or have a common part shared with other
-candidates which can be safely replaced with an abbreviated
-string for display purposes.
-
-Note that if the (DISPLAY . REAL) form is used then pattern
-matching is done on the displayed string, not on the real
-value.")
-
-   (volatile
-    :initarg :volatile
-    :initform nil
-    :custom boolean)
-   
-   (match
-    :initarg :match
-    :initform nil
-    :custom function)
-
-   (match-strict
+  ((match-strict
     :initarg :match-strict
     :initform nil
     :custom function)))
@@ -279,21 +290,17 @@ The function must return a process.")))
     :initform t
     :custom boolean
     :documentation
-    "It is just here to notify to the match-plugin we are using `candidates-in-buffer',
-so there is no need to change the value of this slot.")
+    "It is just here to notify to the match-plugin we are using
+`candidates-in-buffer',so there is no need to change the value of this slot.")
 
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer))
    
    (candidates
-    :initarg :candidates
-    :initform 'helm-candidates-in-buffer
-    :custom function)
+    :initform 'helm-candidates-in-buffer)
 
    (volatile
-    :initarg :volatile
-    :initform t
-    :custom boolean)
+    :initform t)
    
    (match
     :initarg :match
@@ -327,9 +334,7 @@ so there is no need to change the value of this slot.")
 
 (defclass helm-source-dummy (helm-source)
   ((candidates
-    :initarg :candidates
-    :initform '("dummy")
-    :custom list)
+    :initform '("dummy"))
 
    (filtered-candidate-transformer
     :initform 'helm-dummy-candidate)
@@ -340,14 +345,10 @@ so there is no need to change the value of this slot.")
     :custom boolean)
 
    (match
-    :initarg :match
-    :initform 'identity
-    :custom function)
+    :initform 'identity)
    
    (volatile
-    :initarg :volatile
-    :initform t
-    :custom boolean)))
+    :initform t)))
 
 (defun helm--create-source (object class)
   "[INTERNAL] Build a helm source from a CLASS OBJECT."
