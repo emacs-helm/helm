@@ -299,7 +299,16 @@ The function must return a process.")))
    (init
     :initform (lambda ()
                 (helm-init-candidates-in-buffer 'global
-                  '("ERROR: You must build a buffer handling your data with a function in the `init' slot"))))
+                  '("ERROR: You must build a buffer handling your data with a function in the `init' slot or use the `data' slot."))))
+
+   (data
+    :initarg :data
+    :initform nil
+    :custom (choice list string)
+    :documentation
+    "A string or a list that will be used to initialize the buffer that handle this data.
+This data will be passed to the init slot function and the buffer will be build with
+`helm-init-candidates-in-buffer'.")
    
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer))
@@ -372,6 +381,12 @@ Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS which see."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
+    (helm-aif (condition-case nil
+                   (oref source :data)
+                 (invalid-slot-name nil))
+        (oset source :init `(lambda () (helm-init-candidates-in-buffer
+                                          'global
+                                        ',it))))
     (helm--create-source source class)))
 
 (defmacro helm-build-sync-source (name &rest args)
