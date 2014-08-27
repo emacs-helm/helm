@@ -230,11 +230,6 @@ i.e `helm-read-file-name'."
   :group 'helm-files
   :type  'boolean)
 
-(defcustom helm-findutils-find-program "find"
-  "The program used for the Unix shell command 'find'."
-  :group 'helm-files
-  :type 'string)
-
 (defcustom helm-findutils-search-full-path nil
   "Search in full path with shell command find when non--nil.
 I.e use the -path/ipath arguments of find instead of -name/iname."
