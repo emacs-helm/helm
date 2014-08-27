@@ -4075,8 +4075,7 @@ Returns the resulting buffer."
       (erase-buffer)
       (if (listp data)
           (cl-loop for i in data
-                   for str = (if (stringp i)
-                                 i (prin1-to-string i))
+                   for str = (if (symbolp i) (symbol-name i) i)
                    do (insert (concat str "\n")))
         (and (stringp data) (insert data))))
     buf))
