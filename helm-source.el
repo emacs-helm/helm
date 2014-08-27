@@ -269,7 +269,10 @@ when `helm-force-update' is called.")
   :abstract t)
 
 (defclass helm-source-sync (helm-source)
-  ((match-strict
+  ((candidates
+    :initform '("ERROR: You must specify the `candidates' slot, either with a list or a function"))
+   
+   (match-strict
     :initarg :match-strict
     :initform nil
     :custom function)))
@@ -293,6 +296,11 @@ The function must return a process.")))
     "It is just here to notify to the match-plugin we are using
 `candidates-in-buffer',so there is no need to change the value of this slot.")
 
+   (init
+    :initform (lambda ()
+                (helm-init-candidates-in-buffer 'global
+                  '("ERROR: You must build a buffer handling your data with a function in the `init' slot"))))
+   
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer))
    
@@ -303,9 +311,7 @@ The function must return a process.")))
     :initform t)
    
    (match
-    :initarg :match
-    :initform '(identity)
-    :custom (choice function list))
+    :initform '(identity))
    
    (get-line
     :initarg :get-line
