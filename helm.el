@@ -4063,7 +4063,8 @@ Acceptable values of CREATE-OR-BUFFER:
   "Register BUFFER with DATA for a helm candidates-in-buffer session.
 Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
 either 'local or 'global which is passed to `helm-candidate-buffer'.
-Arg DATA can be either a list or a plain string."
+Arg DATA can be either a list or a plain string.
+Returns the resulting buffer."
   (declare (indent 1))
   (let ((buf (helm-candidate-buffer
               (if (or (stringp buffer)
@@ -4073,9 +4074,12 @@ Arg DATA can be either a list or a plain string."
     (with-current-buffer buf
       (erase-buffer)
       (if (listp data)
-          (cl-loop for i in data do (insert (concat i "\n")))
-        (and (stringp data) (insert data)))))
-  buffer)
+          (cl-loop for i in data
+                   for str = (if (stringp i)
+                                 i (prin1-to-string i))
+                   do (insert (concat str "\n")))
+        (and (stringp data) (insert data))))
+    buf))
 
 (defun helm-compile-source--candidates-in-buffer (source)
   (helm-aif (assoc 'candidates-in-buffer source)

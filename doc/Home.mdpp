@@ -704,6 +704,30 @@ helm-locate, you will need his command line named `es`. Be sure to
 modify the PATH environment variable, to include path to the directory
 that contain `es`.
 
+# Helm findutils
+
+You can use the `gnu find` command easily from `helm-find-files` when you want
+to search in subdirectories instead of using helm locate, it is bound to `C-c /`
+by default in `helm-find-files`.
+The search with this command is actually performed literally, however you can use a space to
+match multiple pattern within a line.
+
+- Note: In Windows the Gnuw32 version is not working, you will have to install the msys version.
+
+However the msys `find` isn't available as standalone program,
+it can be installed as part of [msys](http://www.mingw.org/wiki/MSYS).
+And msys, by itself, is installed using [mingw installer](http://www.mingw.org/).
+
+So one would need to:
+
+1) [download and install mingw installer from here](http://sourceforge.net/projects/mingw/files/latest/download?source=files)
+
+2) install msys `find` using that installer
+
+3) add msys bin directory to PATH (e.g. "C:\MinGW\msys\1.0\bin")
+
+I believe mingw itself wouldn't be required to be installed, but I might be mistaken.
+
 # Helm Etags
 
 ## Create the tag file
