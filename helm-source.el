@@ -382,8 +382,8 @@ Arguments ARGS are keyword value pairs as defined in CLASS which see."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
     (helm-aif (condition-case nil
-                   (oref source :data)
-                 (invalid-slot-name nil))
+                  (oref source :data)
+                (invalid-slot-name nil))
         (oset source :init `(lambda () (helm-init-candidates-in-buffer
                                           'global
                                         ',it))))
