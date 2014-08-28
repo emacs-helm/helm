@@ -100,17 +100,34 @@
    (cleanup
     :initarg :cleanup
     :initform nil
-    :custom function)
+    :custom function
+    :documentation
+    "  Function called with no parameters when *helm* buffer is
+  closed. It is useful for killing unneeded candidates buffer.
+
+  Note that the function is executed BEFORE performing action.")
    
    (delayed
     :initarg :delayed
     :initform nil
-    :custom (choice null integer))
+    :custom (choice null integer)
+    :documentation
+    "  Candidates from the source are shown only if the user stops
+  typing and is idle for `helm-idle-delay' seconds.
+  If a value is given to delayed attr, this value is used instead only
+  if it is > to `helm-idle-delay'.")
    
    (keymap
     :initarg :keymap
     :initform nil
-    :custom sexp)
+    :custom sexp
+    :documentation
+    "  Specific keymap for this source.
+  It is useful to have a keymap per source when using more than
+  one source.  Otherwise, a keymap can be set per command with
+  `helm' argument KEYMAP.  NOTE: when a source have `helm-map' as
+  keymap attr, the global value of `helm-map' will override the
+  actual local one.")
    
    (action
     :initarg :action
@@ -143,22 +160,38 @@
    (persistent-help
     :initarg :persistent-help
     :initform nil
-    :custom string)
+    :custom string
+    :documentation
+    "  A string to explain persistent-action of this source. It also
+  accepts a function or a variable name.
+  It will be displayed in source header.")
 
    (help-message
     :initarg :help-message
     :initform nil
-    :custom (choice string function))
+    :custom (choice string function)
+    :documentation
+    "  Help message for this source.
+  If not present, `helm-help-message' value will be used.")
    
    (type
     :initarg :type
     :initform nil
-    :type symbol)
+    :type symbol
+    :documentation
+    "  Indicates the type of the items the source returns.
+
+  Merge attributes not specified in the source itself from
+  `helm-type-attributes'.
+
+  This attribute is implemented by plug-in.")
 
    (multiline
     :initarg :multiline
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Enable to selection multiline candidates.")
    
    (requires-pattern
     :initarg :requires-pattern
@@ -237,12 +270,31 @@
    (display-to-real
     :initarg :display-to-real
     :initform nil
-    :custom function)
+    :custom function
+    :documentation
+    "  Function called with one parameter; the selected candidate.
+
+  The function transforms the selected candidate, and the result
+  is passed to the action function.  The display-to-real
+  attribute provides another way to pass to action other string than
+  the one shown in Helm buffer.
+
+  Traditionally, it is possible to make candidates,
+  candidate-transformer or filtered-candidate-transformer
+  function return a list with (DISPLAY . REAL) pairs. But if REAL
+  can be generated from DISPLAY, display-to-real is more
+  convenient and faster.
+
+  NOTE: This is deprecated and you have better time using `filter-one-by-one'.")
 
    (real-to-display
     :initarg :real-to-display
     :initform nil
-    :custom function)
+    :custom function
+    :documentation
+    "  Function called with one parameter; the selected candidate.
+  The real value of candidates will be shown in display.
+  See `display-to-real'.")
 
    (action-transformer
     :initarg :action-transformer
@@ -274,7 +326,9 @@
    (candidate-number-limit
     :initarg :candidate-number-limit
     :initform nil
-    :custom integer)
+    :custom integer
+    :documentation
+    "  Override `helm-candidate-number-limit' only for this source.")
 
    (volatile
     :initarg :volatile
@@ -320,32 +374,45 @@
    (nomark
     :initarg :nomark
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Don't allow marking candidates when this attribute is present.")
    
    (nohighlight
     :initarg :nohighlight
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Disable highlight match in this source.")
    
    (no-matchplugin
     :initarg :no-matchplugin
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Disable matchplugin for this source.")
 
    (allow-dups
     :initarg :allow-dups
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Allow helm collecting duplicates candidates.")
 
    (recenter
     :initarg :recenter
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  `recenter' after jumping to candidate.")
 
    (history
     :initarg :history
     :initform nil
-    :custom symbol)
+    :custom symbol
+    :documentation
+    "  Allow passing history variable to helm from source.
+  It should be a quoted symbol.")
    
    (coerce
     :initarg :coerce
@@ -365,12 +432,18 @@
    (mode-line
     :initarg :mode-line
     :initform nil
-    :custom (choice string sexp))
+    :custom (choice string sexp)
+    :documentation
+    "  Source local `helm-mode-line-string' (included in
+  `mode-line-format'). It accepts also variable/function name.")
 
    (header-line
     :initarg :header-line
     :initform 'helm-persistent-help-string
-    :custom (choice string function))
+    :custom (choice string function)
+    :documentation
+    "  Source local `header-line-format'.
+  It accepts also variable/function name.")
 
    (resume
     :initarg :resume
@@ -386,12 +459,22 @@
    (follow
     :initarg :follow
     :initform nil
-    :custom integer)
+    :custom integer
+    :documentation
+    "  Enable `helm-follow-mode' for this source only.
+  You must give it a value of 1 or -1, though giving a -1 value
+  is surely not what you want, e.g: (follow . 1)
+
+  See `helm-follow-mode' for more infos.")
 
    (follow-delay
     :initarg :follow-delay
     :initform nil
-    :custom integer)
+    :custom integer
+    :documentation
+    "  `helm-follow-mode' will execute persistent-action after this delay.
+Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
+If none of these are found fallback to `helm-input-idle-delay'.")
 
    (dont-plug
     :initarg :dont-plug
@@ -410,7 +493,14 @@
    (match-strict
     :initarg :match-strict
     :initform nil
-    :custom function)))
+    :custom function
+    :documentation
+    "  When specifying a match function within a source and
+  helm-match-plugin is enabled, the result of all matching
+  functions will be concatened, which in some cases is not what
+  is wanted. When using `match-strict' only this or these
+  functions will be used. You can specify those functions as a
+  list of functions or a single symbol function.")))
 
 (defclass helm-source-async (helm-source)
   ((candidates-process
@@ -460,27 +550,69 @@
    (get-line
     :initarg :get-line
     :initform 'buffer-substring-no-properties
-    :custom function)
+    :custom function
+    :documentation
+    "  A function like `buffer-substring-no-properties' or `buffer-substring'.
+  This function converts point of line-beginning and point of line-end,
+  which represents a candidate computed by `helm-candidates-in-buffer'.
+  By default, `helm-candidates-in-buffer' uses
+  `buffer-substring-no-properties'.")
 
    (search
     :initarg :search
     :initform '(helm-candidates-in-buffer-search-from-start)
-    :custom (choice function list))
+    :custom (choice function list)
+    :documentation
+    "  List of functions like `re-search-forward' or `search-forward'.
+  Buffer search function used by `helm-candidates-in-buffer'.
+  By default, `helm-candidates-in-buffer' uses `re-search-forward'.")
 
    (search-from-end
     :initarg :search-from-end
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Make `helm-candidates-in-buffer' search from the end of buffer.
+  If this attribute is specified, `helm-candidates-in-buffer'
+  uses `re-search-backward' instead.
+
+  NOTE: This is here for compatibilty, but it is not used anymore.")
 
    (search-strict
     :initarg :search-strict
     :initform nil
-    :custom function)
+    :custom function
+    :documentation
+    "  When specifying a search function within a source and
+  helm-match-plugin is enabled, the result of all searching
+  functions will be concatened, which in some cases is not what
+  is wanted. When using `search-strict' only this or these
+  functions will be used. You can specify those functions as a
+  list of functions or a single symbol function.")
 
    (match-part
     :initarg :match-part
     :initform nil
-    :custom function)))
+    :custom function
+    :documentation
+    "  Allow matching candidate in the line with `candidates-in-buffer'.
+  In candidates-in-buffer sources, match is done with
+  `re-search-forward' which allow matching only a regexp on the
+  `helm-buffer'; when this search is done, match-part allow
+  matching only a specific part of the current line e.g with a
+  line like this:
+
+  filename:candidate-containing-the-word-filename
+
+  What you want is to ignore "filename" part and match only
+  "candidate-containing-the-word-filename"
+
+  So give a function matching only the part of candidate after ":"
+
+  If source contain match-part attribute, match is computed only
+  on part of candidate returned by the call of function provided
+  by this attribute. The function should have one arg, candidate,
+  and return only a specific part of candidate.")))
 
 (defclass helm-source-dummy (helm-source)
   ((candidates
@@ -492,7 +624,10 @@
    (accept-empty
     :initarg :accept-empty
     :initform t
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Allow exiting with an empty string.
+  You should keep the default value.")
 
    (match
     :initform 'identity)
