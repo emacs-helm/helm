@@ -481,7 +481,14 @@ If none of these are found fallback to `helm-input-idle-delay'.")
     :initform nil
     :custom list
     :documentation
-    "  A list of compile functions plugin to ignore."))
+    "  A list of compile functions plugin to ignore.")
+
+   (migemo
+    :initarg :migemo
+    :initform nil
+    :custom boolean
+    :documentation
+    "If you are not Japonese, ignore this."))
   
   "Main interface to define helm sources."
   :abstract t)
