@@ -650,9 +650,19 @@ If none of these are found fallback to `helm-input-idle-delay'.")
       (oset source :init `(lambda ()
                             (helm-init-candidates-in-buffer
                                 'global
-                              ',it)))))
+                              ',it))))
+  (let ((mtc (slot-value source :match)))
+    (cl-assert (or (equal '(identity) mtc)
+                   (eq 'identity mtc))
+               nil "Invalid slot value for `match'")
+    (cl-assert (eq (slot-value source :candidates-in-buffer) t)
+               nil "Invalid slot value for `candidates-in-buffer'")
+    (cl-assert (eq (slot-value source :volatile) t)
+               nil "Invalid slot value for `volatile'")))
 
-(defmethod helm--setup-source ((source helm-source-async)))
+(defmethod helm--setup-source ((source helm-source-async))
+  (cl-assert (null (slot-value source :candidates))
+             nil "Incorrect use of `candidates' use `candidates-process' instead"))
 
 (defmethod helm--setup-source ((source helm-source-dummy)))
 
