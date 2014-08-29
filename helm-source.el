@@ -1,4 +1,4 @@
-;;; helm-source.el --- Helm source creation.
+;;; helm-source.el --- Helm source creation. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014  Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -21,13 +21,10 @@
 ;;; Commentary:
 
 ;; Interface to create helm sources easily.
-;; Actually the eieo object are transformed in alist for compatibility.
+;; Actually the eieo objects are transformed in alist for compatibility.
 ;; In the future this package should allow creating source as eieo objects
 ;; without conversion to alist, teaching helm to read such a structure.
 ;; The compatibility with alists would be kept.
-;; This would allow faster access to sources, getting rid of the actual hackish
-;; plugin interface (the plugins will be embeded in classes) and a better
-;; access to documentation.
 
 ;;; Code:
 
@@ -650,7 +647,7 @@ If none of these are found fallback to `helm-input-idle-delay'.")
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
-(defmethod helm--setup-source ((source helm-source-sync)))
+(defmethod helm--setup-source ((_source helm-source-sync)))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (helm-aif (slot-value source :data)
@@ -671,7 +668,7 @@ If none of these are found fallback to `helm-input-idle-delay'.")
   (cl-assert (null (slot-value source :candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead"))
 
-(defmethod helm--setup-source ((source helm-source-dummy)))
+(defmethod helm--setup-source ((_source helm-source-dummy)))
 
 (defun helm--make-source (name class &rest args)
   "Build a `helm' source named NAME with ARGS for CLASS.
