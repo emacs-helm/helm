@@ -643,6 +643,19 @@ If none of these are found fallback to `helm-input-idle-delay'.")
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
+(defmethod helm--setup-source ((source helm-source-sync)))
+
+(defmethod helm--setup-source ((source helm-source-in-buffer))
+  (helm-aif (slot-value source :data)
+      (oset source :init `(lambda ()
+                            (helm-init-candidates-in-buffer
+                                'global
+                              ',it)))))
+
+(defmethod helm--setup-source ((source helm-source-async)))
+
+(defmethod helm--setup-source ((source helm-source-dummy)))
+
 (defun helm--make-source (name class &rest args)
   "Build a `helm' source named NAME with ARGS for CLASS.
 Argument NAME is a string which define the source name, so no need to use
@@ -651,13 +664,8 @@ Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS which see."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
-    (helm-aif (condition-case nil
-                  (oref source :data)
-                (invalid-slot-name nil))
-        (oset source :init `(lambda () (helm-init-candidates-in-buffer
-                                          'global
-                                        ',it))))
-    (helm--create-source source class)))
+    (helm--setup-source source)
+    (helm--create-source source (eieio-object-class source))))
 
 (defmacro helm-build-sync-source (name &rest args)
   `(helm--make-source ,name 'helm-source-sync ,@args))
