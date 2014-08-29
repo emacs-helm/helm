@@ -678,7 +678,7 @@ If none of these are found fallback to `helm-input-idle-delay'.")
 Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
 Argument CLASS is an eieio class object.
-Arguments ARGS are keyword value pairs as defined in CLASS which see."
+Arguments ARGS are keyword value pairs as defined in CLASS."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
     (helm--setup-source source)
