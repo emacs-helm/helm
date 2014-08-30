@@ -31,6 +31,10 @@
 (require 'cl-lib)
 (require 'eieio)
 
+
+;;; Classes for sources
+;;
+;;
 (defclass helm-source ()
   ((name
     :initarg :name
@@ -639,6 +643,56 @@ If none of these are found fallback to `helm-input-idle-delay'.")
    (volatile
     :initform t)))
 
+
+;;; Classes for types.
+;;
+;;
+(defclass helm-type (helm-source)
+  ((name        :initform nil)
+   (header-line :initform nil))
+  "Main source to create types."
+  :abstract t)
+
+(defclass helm-type-file (helm-type)
+    ((action
+      :initform
+      (helm-make-actions
+       "Find file"                            'helm-find-many-files
+       "Find file as root"                    'helm-find-file-as-root
+       "Find file other window"               'find-file-other-window
+       "Find file other frame"                'find-file-other-frame
+       "Open dired in file's directory"       'helm-open-dired
+       "Grep File(s) `C-u recurse'"           'helm-find-files-grep
+       "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
+       "Pdfgrep File(s)"                      'helm-ff-pdfgrep
+       "Insert as org link"                   'helm-files-insert-as-org-link
+       "Checksum File"                        'helm-ff-checksum
+       "Ediff File"                           'helm-find-files-ediff-files
+       "Ediff Merge File"                     'helm-find-files-ediff-merge-files
+       "Etags `M-., C-u tap, C-u C-u reload tag file'"
+       'helm-ff-etags-select
+       "View file"                            'view-file
+       "Insert file"                          'insert-file
+       "Delete file(s)"                       'helm-delete-marked-files
+       "Open file externally (C-u to choose)" 'helm-open-file-externally
+       "Open file with default tool"          'helm-open-file-with-default-tool
+       "Find file in hex dump"                'hexl-find-file))
+     
+     (persistent-help
+      :initform "Show this file")
+
+     (action-transformer
+      :initform '(helm-transform-file-load-el
+                  helm-transform-file-browse-url))
+
+     (candidate-transformer
+      :initform '(helm-skip-boring-files
+                  helm-highlight-files
+                  helm-w32-pathname-transformer))))
+
+;;; Internal Builder functions.
+;;
+;;
 (defun helm--create-source (object class)
   "[INTERNAL] Build a helm source from a CLASS OBJECT."
   (cl-loop for s in (object-slots object)
@@ -647,6 +701,30 @@ If none of these are found fallback to `helm-input-idle-delay'.")
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
 
+(defun helm--make-source (name class &rest args)
+  "Build a `helm' source named NAME with ARGS for CLASS.
+Argument NAME is a string which define the source name, so no need to use
+the keyword :name in your source, NAME will be used instead.
+Argument CLASS is an eieio class object.
+Arguments ARGS are keyword value pairs as defined in CLASS."
+  (let ((source (apply #'make-instance class name args)))
+    (oset source :name name)
+    (helm--setup-source source)
+    (helm--create-source source (eieio-object-class source))))
+
+(defun helm--make-type (class &rest args)
+  (let ((source (apply #'make-instance class args)))
+    (helm--create-source source (eieio-object-class source))))
+
+
+;;; Methods to access types slots.
+(defmethod helm-source-get-action-from-type ((object helm-type-file))
+  (oref object :action))
+
+
+;;; Method to build sources.
+;;
+;;
 (defmethod helm--setup-source ((_source helm-source-sync)))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
@@ -670,17 +748,10 @@ If none of these are found fallback to `helm-input-idle-delay'.")
 
 (defmethod helm--setup-source ((_source helm-source-dummy)))
 
-(defun helm--make-source (name class &rest args)
-  "Build a `helm' source named NAME with ARGS for CLASS.
-Argument NAME is a string which define the source name, so no need to use
-the keyword :name in your source, NAME will be used instead.
-Argument CLASS is an eieio class object.
-Arguments ARGS are keyword value pairs as defined in CLASS."
-  (let ((source (apply #'make-instance class name args)))
-    (oset source :name name)
-    (helm--setup-source source)
-    (helm--create-source source (eieio-object-class source))))
-
+
+;;; User functions
+;;
+;;  Sources
 (defmacro helm-build-sync-source (name &rest args)
   "Build a synchronous helm source with name NAME.
 Args ARGS are keywords provided by `helm-source-sync'."
@@ -700,6 +771,12 @@ Args ARGS are keywords provided by `helm-source-in-buffer'."
   "Build a helm source with name NAME using `dummy' method.
 Args ARGS are keywords provided by `helm-source-dummy'."
   `(helm--make-source ,name 'helm-source-dummy ,@args))
+
+;; Types
+(defun helm-actions-from-type-file ()
+  (let ((source (make-instance 'helm-type-file)))
+    (helm-source-get-action-from-type source)))
+
 
 (provide 'helm-source)
 
