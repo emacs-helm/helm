@@ -720,11 +720,11 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
     (helm--setup-source source)
-    (helm--create-source source (eieio-object-class source))))
+    (helm--create-source source (object-class source))))
 
 (defun helm--make-type (class &rest args)
   (let ((source (apply #'make-instance class args)))
-    (helm--create-source source (eieio-object-class source))))
+    (helm--create-source source (object-class source))))
 
 
 ;;; Methods to access types slots.
