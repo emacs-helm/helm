@@ -489,7 +489,17 @@ If none of these are found fallback to `helm-input-idle-delay'.")
     :initform nil
     :custom boolean
     :documentation
-    "If you are not Japonese, ignore this."))
+    "If you are not Japonese, ignore this.")
+
+   (before-init-hook
+    :initarg :before-init-hook
+    :initform nil
+    :custom symbol)
+
+   (after-init-hook
+    :initarg :after-init-hook
+    :initform nil
+    :custom symbol))
   
   "Main interface to define helm sources."
   :abstract t)
@@ -777,6 +787,8 @@ Args ARGS are keywords provided by `helm-source-dummy'."
   (let ((source (make-instance 'helm-type-file)))
     (helm-source-get-action-from-type source)))
 
+(defun helm-build-type-file ()
+  (helm--make-type 'helm-type-file))
 
 (provide 'helm-source)
 

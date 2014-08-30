@@ -2111,6 +2111,9 @@ It is intended to use this only in `helm-initial-setup'."
 (defun helm-initial-setup (any-default)
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
+  (cl-loop for s in (helm-get-sources)
+           for hook = (assoc-default 'before-init-hook s)
+           when hook do (helm-log-run-hook hook))
   (setq helm-current-prefix-arg nil)
   (setq helm-suspend-update-flag nil)
   (setq helm-current-buffer (helm--current-buffer))
@@ -2145,7 +2148,10 @@ It is intended to use this only in `helm-initial-setup'."
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
-  (helm-log-run-hook 'helm-after-initialize-hook))
+  (helm-log-run-hook 'helm-after-initialize-hook)
+  (cl-loop for s in (helm-get-sources)
+           for hook = (assoc-default 'after-init-hook s)
+           when hook do (helm-log-run-hook hook)))
 
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
