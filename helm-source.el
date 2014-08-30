@@ -494,12 +494,18 @@ If none of these are found fallback to `helm-input-idle-delay'.")
    (before-init-hook
     :initarg :before-init-hook
     :initform nil
-    :custom symbol)
+    :custom symbol
+    :documentation
+    "  A local hook that run at beginning of initilization of this source.
+i.e Before the creation of `helm-buffer'.")
 
    (after-init-hook
     :initarg :after-init-hook
     :initform nil
-    :custom symbol))
+    :custom symbol
+    :documentation
+    "  A local hook that run at end of initilization of this source.
+i.e After the creation of `helm-buffer'."))
   
   "Main interface to define helm sources."
   :abstract t)
