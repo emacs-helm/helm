@@ -83,21 +83,13 @@
     map)
   "Generic Keymap for emacs bookmark sources.")
 
-(defvar helm-bookmarks-cache nil)
 (defvar helm-source-bookmarks
-  '((name . "Bookmarks")
-    (init . (lambda ()
-              (require 'bookmark)
-              (setq helm-bookmark-mode-line-string
-                    (list (car helm-bookmark-mode-line-string)
-                          (replace-regexp-in-string "Sort:\\[.*\\] " ""
-                                                    (cadr helm-bookmark-mode-line-string))))                          
-              (setq helm-bookmarks-cache
-                    (bookmark-all-names))))
-    (candidates . helm-bookmarks-cache)
-    (filtered-candidate-transformer . helm-bookmark-transformer)
-    (match . helm-bookmark-match-fn)
-    (type . bookmark))
+  (helm-build-in-buffer-source
+   "Bookmarks"
+   :data (bookmark-all-names)
+   :filtered-candidate-transformer 'helm-bookmark-transformer
+   :search 'helm-bookmark-search-fn
+   :type 'bookmark)
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)
@@ -163,11 +155,6 @@
 (defvar helm-source-pp-bookmarks
   '((name . "PP-Bookmarks")
     (init . (lambda ()
-              (require 'bookmark)
-              (setq helm-bookmark-mode-line-string
-                    (list (car helm-bookmark-mode-line-string)
-                          (replace-regexp-in-string "Sort:\\[.*\\] " ""
-                                                    (cadr helm-bookmark-mode-line-string))))
               (helm-init-candidates-in-buffer
                   'global (cl-loop for b in (bookmark-all-names) collect
                                 (propertize b 'location (bookmark-location b))))))
