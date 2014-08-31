@@ -165,8 +165,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defvar helm-source-occur nil)
 (defun helm-occur-init-source ()
   (unless helm-source-occur
-    (setq helm-source-occur (copy-alist helm-source-moccur))
-    (helm-attrset 'name "Occur" helm-source-occur)))
+    (setq helm-source-occur
+          (helm--make-source "Occur" 'helm-source-multi-occur))))
 
 
 ;;; Multi occur
@@ -283,29 +283,27 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (helm-attrset 'no-matchplugin nil helm-source-moccur)
     (setq helm-source-occur helm-source-moccur)))
 
-(defvar helm-source-moccur
-  `((name . "Moccur")
-    (init . (lambda ()
-              (require 'helm-grep)
-              (helm-moccur-init)))
-    (candidates-in-buffer)
-    (filter-one-by-one . helm-moccur-filter-one-by-one)
-    (get-line . helm-moccur-get-line)
-    (nohighlight)
-    (migemo)
-    (action . (("Go to Line" . helm-moccur-goto-line)
-               ("Goto line other window" . helm-moccur-goto-line-ow)
-               ("Goto line new frame" . helm-moccur-goto-line-of)))
-    (persistent-action . helm-moccur-persistent-action)
-    (persistent-help . "Go to line")
-    (recenter)
-    (resume . helm-moccur-resume-fn)
-    (candidate-number-limit . 9999)
-    (mode-line . helm-moccur-mode-line)
-    (keymap . ,helm-moccur-map)
-    (history . ,'helm-grep-history)
-    (requires-pattern . 2))
-  "Helm source for multi occur.")
+(defvar helm-source-moccur nil)
+(defclass helm-source-multi-occur (helm-source-in-buffer)
+  ((init :initform (lambda ()
+                     (require 'helm-grep)
+                     (helm-moccur-init)))
+   (filter-one-by-one :initform 'helm-moccur-filter-one-by-one)
+   (get-line :initform helm-moccur-get-line)
+   (nohighlight :initform t)
+   (migemo :initform t)
+   (action :initform '(("Go to Line" . helm-moccur-goto-line)
+                       ("Goto line other window" . helm-moccur-goto-line-ow)
+                       ("Goto line new frame" . helm-moccur-goto-line-of)))
+   (persistent-action :initform 'helm-moccur-persistent-action)
+   (persistent-help :initform "Go to line")
+   (recenter :initform t)
+   (resume :initform 'helm-moccur-resume-fn)
+   (candidate-number-limit :initform 9999)
+   (mode-line :initform helm-moccur-mode-line)
+   (keymap :initform helm-moccur-map)
+   (history :initform 'helm-grep-history)
+   (requires-pattern :initform 2)))
 
 (defun helm-moccur-resume-fn ()
   (with-helm-buffer
@@ -381,6 +379,9 @@ Same as `helm-moccur-goto-line' but go in new frame."
                    (buffer-name (current-buffer))
                    (remove helm-current-buffer helm-multi-occur-buffer-list))
                   buffers)))
+    (unless helm-source-moccur
+      (setq helm-source-moccur
+            (helm--make-source "Moccur" 'helm-source-multi-occur)))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
     (helm-set-local-variable

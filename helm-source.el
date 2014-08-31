@@ -741,6 +741,10 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 ;;; Method to build sources.
 ;;
 ;;
+(defmethod helm--setup-source :before ((source helm-source))
+  (helm-aif (slot-value source :keymap)
+      (and (symbolp it) (set-slot-value source :keymap (symbol-value it)))))
+
 (defmethod helm--setup-source ((_source helm-source-sync)))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
