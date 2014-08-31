@@ -86,7 +86,11 @@
 (defvar helm-source-bookmarks
   (helm-build-in-buffer-source
    "Bookmarks"
-   :data (bookmark-all-names)
+   :init (lambda ()
+           (bookmark-maybe-load-default-file)
+           (helm-init-candidates-in-buffer
+               'global
+             (bookmark-all-names)))
    :filtered-candidate-transformer 'helm-bookmark-transformer
    :search 'helm-bookmark-search-fn
    :type 'bookmark)
@@ -155,6 +159,7 @@
 (defvar helm-source-pp-bookmarks
   '((name . "PP-Bookmarks")
     (init . (lambda ()
+              (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
                   'global (cl-loop for b in (bookmark-all-names) collect
                                 (propertize b 'location (bookmark-location b))))))
