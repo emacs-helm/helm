@@ -863,35 +863,36 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                                    (t helm-grep-default-command)))
     ;; Setup the source.
     (setq helm-source-grep
-          `((name . ,(if zgrep "Zgrep" (capitalize (if recurse
-                                                       (helm-grep-command t)
-                                                     (helm-grep-command)))))
-            (header-name . (lambda (name)
-                             (concat name "(C-c ? Help)")))
-            (candidates-process . helm-grep-collect-candidates)
-            (filter-one-by-one . helm-grep-filter-one-by-one)
-            (candidate-number-limit . 9999)
-            (no-matchplugin)
-            (nohighlight)
-            (mode-line . helm-grep-mode-line-string)
+          (helm-build-async-source
+           (if zgrep "Zgrep" (capitalize (if recurse
+                                             (helm-grep-command t)
+                                             (helm-grep-command))))
+            :header-name (lambda (name)
+                           (concat name "(C-c ? Help)"))
+            :candidates-process 'helm-grep-collect-candidates
+            :filter-one-by-one 'helm-grep-filter-one-by-one
+            :candidate-number-limit 9999
+            :no-matchplugin t
+            :nohighlight t
+            :mode-line helm-grep-mode-line-string
             ;; We need to specify keymap here and as :keymap arg [1]
             ;; to make it available in further resuming.
-            (keymap . ,helm-grep-map)
-            (history . ,'helm-grep-history)
-            (action . ,(helm-make-actions
-                        "Find File" 'helm-grep-action
-                        "Find file other frame" 'helm-grep-other-frame
-                        (lambda () (and (locate-library "elscreen")
-                                        "Find file in Elscreen"))
-                        'helm-grep-jump-elscreen
-                        "Save results in grep buffer" 'helm-grep-save-results
-                        "Find file other window" 'helm-grep-other-window))
-            (persistent-action . helm-grep-persistent-action)
-            (persistent-help . "Jump to line (`C-u' Record in mark ring)")
-            (requires-pattern . 2)))
-    (and follow (helm-attrset 'follow follow helm-source-grep))
+            :keymap helm-grep-map
+            :history 'helm-grep-history
+            :action (helm-make-actions
+                     "Find File" 'helm-grep-action
+                     "Find file other frame" 'helm-grep-other-frame
+                     (lambda () (and (locate-library "elscreen")
+                                     "Find file in Elscreen"))
+                     'helm-grep-jump-elscreen
+                     "Save results in grep buffer" 'helm-grep-save-results
+                     "Find file other window" 'helm-grep-other-window)
+            :persistent-action 'helm-grep-persistent-action
+            :persistent-help "Jump to line (`C-u' Record in mark ring)"
+            :requires-pattern 2
+            :follow follow))
     (helm
-     :sources '(helm-source-grep)
+     :sources 'helm-source-grep
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
      :default-directory helm-ff-default-directory
      :keymap helm-grep-map ; [1]
