@@ -563,7 +563,7 @@ i.e After the creation of `helm-buffer'."))
   it will be overhidden by the new function passed to the init slot, so
   if you have something else to define at initialization
   \(apart building the candidates buffer\) use the init slot only or
-  create a hook and add it to the `before-init-hook' slot.")
+  create a hook and add it to the `:before-init-hook' slot.")
    
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer))
