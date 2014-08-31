@@ -79,12 +79,8 @@
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
     (define-key map (kbd "C-]")   'helm-bookmark-toggle-filename)
     (define-key map (kbd "M-e")   'helm-bookmark-run-edit)
-    (when (locate-library "bookmark-extensions")
-      (define-key map (kbd "M-F") 'helm-bmkext-run-sort-by-frequency)
-      (define-key map (kbd "M-V") 'helm-bmkext-run-sort-by-last-visit)
-      (define-key map (kbd "M-A") 'helm-bmkext-run-sort-alphabetically))
     (define-key map (kbd "C-c ?") 'helm-bookmark-help)
-    (delq nil map))
+    map)
   "Generic Keymap for emacs bookmark sources.")
 
 (defvar helm-bookmarks-cache nil)
