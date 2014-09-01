@@ -83,28 +83,17 @@
     map)
   "Generic Keymap for emacs bookmark sources.")
 
+(defclass helm-source-basic-bookmarks (helm-source-in-buffer helm-type-bookmark)
+   ((init :initform (lambda ()
+                      (bookmark-maybe-load-default-file)
+                      (helm-init-candidates-in-buffer
+                          'global
+                        (bookmark-all-names))))
+    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)
+    (search :initform 'helm-bookmark-search-fn)))
+
 (defvar helm-source-bookmarks
-  (helm-build-in-buffer-source
-   "Bookmarks"
-   :init (lambda ()
-           (bookmark-maybe-load-default-file)
-           (helm-init-candidates-in-buffer
-               'global
-             (bookmark-all-names)))
-   :filtered-candidate-transformer 'helm-bookmark-transformer
-   :search 'helm-bookmark-search-fn
-   :coerce 'helm-bookmark-get-bookmark-from-name
-   :action (helm-make-actions
-            "Jump to bookmark" 'helm-bookmark-jump
-            "Jump to BM other window" 'helm-bookmark-jump-other-window
-            "Bookmark edit annotation" 'bookmark-edit-annotation
-            "Bookmark show annotation" 'bookmark-show-annotation
-            "Delete bookmark(s)" 'helm-delete-marked-bookmarks
-            "Edit Bookmark" 'helm-bookmark-edit-bookmark
-            "Rename bookmark" 'helm-bookmark-rename
-            "Relocate bookmark" 'bookmark-relocate)
-   :keymap helm-bookmark-map
-   :mode-line helm-bookmark-mode-line-string)
+  (helm--make-source "Bookmarks" 'helm-source-basic-bookmarks)
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)

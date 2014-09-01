@@ -650,48 +650,54 @@ i.e After the creation of `helm-buffer'."))
 ;;; Classes for types.
 ;;
 ;;
-(defclass helm-type (helm-source)
-  ((name        :initform nil)
-   (header-line :initform nil))
-  "Main source to create types."
-  :abstract t)
+(defclass helm-type-file (helm-source) ()
+  "A class to define helm type file.")
 
-(defclass helm-type-file (helm-type)
-    ((action
-      :initform
-      (helm-make-actions
-       "Find file"                            'helm-find-many-files
-       "Find file as root"                    'helm-find-file-as-root
-       "Find file other window"               'find-file-other-window
-       "Find file other frame"                'find-file-other-frame
-       "Open dired in file's directory"       'helm-open-dired
-       "Grep File(s) `C-u recurse'"           'helm-find-files-grep
-       "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
-       "Pdfgrep File(s)"                      'helm-ff-pdfgrep
-       "Insert as org link"                   'helm-files-insert-as-org-link
-       "Checksum File"                        'helm-ff-checksum
-       "Ediff File"                           'helm-find-files-ediff-files
-       "Ediff Merge File"                     'helm-find-files-ediff-merge-files
-       "Etags `M-., C-u tap, C-u C-u reload tag file'"
-       'helm-ff-etags-select
-       "View file"                            'view-file
-       "Insert file"                          'insert-file
-       "Delete file(s)"                       'helm-delete-marked-files
-       "Open file externally (C-u to choose)" 'helm-open-file-externally
-       "Open file with default tool"          'helm-open-file-with-default-tool
-       "Find file in hex dump"                'hexl-find-file))
-     
-     (persistent-help
-      :initform "Show this file")
+(defmethod helm--setup-source :before ((source helm-type-file))
+    (oset source :action
+          (helm-make-actions
+           "Find file"                            'helm-find-many-files
+           "Find file as root"                    'helm-find-file-as-root
+           "Find file other window"               'find-file-other-window
+           "Find file other frame"                'find-file-other-frame
+           "Open dired in file's directory"       'helm-open-dired
+           "Grep File(s) `C-u recurse'"           'helm-find-files-grep
+           "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
+           "Pdfgrep File(s)"                      'helm-ff-pdfgrep
+           "Insert as org link"                   'helm-files-insert-as-org-link
+           "Checksum File"                        'helm-ff-checksum
+           "Ediff File"                           'helm-find-files-ediff-files
+           "Ediff Merge File"                     'helm-find-files-ediff-merge-files
+           "Etags `M-., C-u tap, C-u C-u reload tag file'"
+           'helm-ff-etags-select
+           "View file"                            'view-file
+           "Insert file"                          'insert-file
+           "Delete file(s)"                       'helm-delete-marked-files
+           "Open file externally (C-u to choose)" 'helm-open-file-externally
+           "Open file with default tool"          'helm-open-file-with-default-tool
+           "Find file in hex dump"                'hexl-find-file))
+    (oset source :persistent-help "Show this file")
+    (oset source :action-transformer '(helm-transform-file-load-el
+                                       helm-transform-file-browse-url))
+    (oset source :candidate-transformer '(helm-skip-boring-files
+                                          helm-highlight-files
+                                          helm-w32-pathname-transformer)))
 
-     (action-transformer
-      :initform '(helm-transform-file-load-el
-                  helm-transform-file-browse-url))
+(defclass helm-type-bookmark (helm-source) ()
+  "A class to define type bookmarks.")
 
-     (candidate-transformer
-      :initform '(helm-skip-boring-files
-                  helm-highlight-files
-                  helm-w32-pathname-transformer))))
+(defmethod helm--setup-source :before ((source helm-type-bookmark))
+  (oset source :action (helm-make-actions
+                        "Jump to bookmark" 'helm-bookmark-jump
+                        "Jump to BM other window" 'helm-bookmark-jump-other-window
+                        "Bookmark edit annotation" 'bookmark-edit-annotation
+                        "Bookmark show annotation" 'bookmark-show-annotation
+                        "Delete bookmark(s)" 'helm-delete-marked-bookmarks
+                        "Edit Bookmark" 'helm-bookmark-edit-bookmark
+                        "Rename bookmark" 'helm-bookmark-rename
+                        "Relocate bookmark" 'bookmark-relocate))
+  (oset source :keymap helm-bookmark-map)
+  (oset source :mode-line helm-bookmark-mode-line-string))
 
 
 ;;; Error functions
@@ -726,6 +732,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 
 (defun helm--make-type (class &rest args)
   (let ((source (apply #'make-instance class args)))
+    (helm--setup-source source)
     (helm--create-source source (object-class source))))
 
 
@@ -798,6 +805,7 @@ Args ARGS are keywords provided by `helm-source-dummy'."
 ;; Types
 (defun helm-actions-from-type-file ()
   (let ((source (make-instance 'helm-type-file)))
+    (helm--setup-source source)
     (helm-source-get-action-from-type source)))
 
 (defun helm-build-type-file ()
