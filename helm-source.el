@@ -546,24 +546,17 @@ i.e After the creation of `helm-buffer'."))
 `candidates-in-buffer',so there is no need to change the value of this slot.")
 
    (init
-    :initform (lambda ()
-                (helm-init-candidates-in-buffer 'global
-                  '("ERROR: You must build a buffer handling your data with a function in the `init' slot or use the `data' slot."))))
+    :initform 'helm-default-init-source-in-buffer-function)
 
    (data
     :initarg :data
     :initform nil
     :custom (choice list string)
     :documentation
-    "  A string or a list that will be used to initialize the buffer that handle this data.
-  This data will be passed to the init slot function and the buffer will be build with
-  `helm-init-candidates-in-buffer'.
-  This is an easy and fast method to build a `candidates-in-buffer' source,
-  however NOTE that when using this, if you had a function in the init slot,
-  it will be overhidden by the new function passed to the init slot, so
-  if you have something else to define at initialization
-  \(apart building the candidates buffer\) use the init slot only or
-  create a hook and add it to the `:before-init-hook' slot.")
+    "  A string or a list that will be used to feed the `helm-candidates-buffer'.
+  This data will be passed in a function added to the init slot and
+  the buffer will be build with `helm-init-candidates-in-buffer'.
+  This is an easy and fast method to build a `candidates-in-buffer' source.")
    
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer))
@@ -712,6 +705,16 @@ i.e After the creation of `helm-buffer'."))
                   helm-highlight-files
                   helm-w32-pathname-transformer))))
 
+
+;;; Error functions
+;;
+;;
+(defun helm-default-init-source-in-buffer-function ()
+  (helm-init-candidates-in-buffer 'global
+    '("ERROR: You must build a buffer handling your data with a function
+\in the `init' slot or use the `data' slot.")))
+  
+
 ;;; Internal Builder functions.
 ;;
 ;;
@@ -755,10 +758,16 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (helm-aif (slot-value source :data)
-      (oset source :init `(lambda ()
-                            (helm-init-candidates-in-buffer
-                                'global
-                              ',it))))
+      (oset source
+            :init (delq
+                   nil
+                   `(,(and (null (eq 'helm-default-init-source-in-buffer-function
+                                     (slot-value source :init)))
+                           (slot-value source :init))
+                      (lambda ()
+                        (helm-init-candidates-in-buffer
+                            'global
+                          ',it))))))
   (let ((mtc (slot-value source :match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
