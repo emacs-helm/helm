@@ -756,17 +756,18 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defmethod helm--setup-source ((_source helm-source-sync)))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
-  (helm-aif (slot-value source :data)
-      (oset source
-            :init (delq
-                   nil
-                   `(,(and (null (eq 'helm-default-init-source-in-buffer-function
-                                     (slot-value source :init)))
-                           (slot-value source :init))
-                      (lambda ()
-                        (helm-init-candidates-in-buffer
-                            'global
-                          ',it))))))
+  (let ((cur-init (slot-value source :init)))
+    (helm-aif (slot-value source :data)
+        (oset source
+              :init (delq
+                     nil
+                     `(,(and (null (eq 'helm-default-init-source-in-buffer-function
+                                       cur-init))
+                             cur-init)
+                        (lambda ()
+                          (helm-init-candidates-in-buffer
+                              'global
+                            ',it)))))))
   (let ((mtc (slot-value source :match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
