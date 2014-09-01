@@ -711,8 +711,7 @@ i.e After the creation of `helm-buffer'."))
 ;;
 (defun helm-default-init-source-in-buffer-function ()
   (helm-init-candidates-in-buffer 'global
-    '("ERROR: You must build a buffer handling your data with a function
-\in the `init' slot or use the `data' slot.")))
+    '("ERROR: No buffer handling your data, use either the `init' slot or the `data' slot.")))
   
 
 ;;; Internal Builder functions.
