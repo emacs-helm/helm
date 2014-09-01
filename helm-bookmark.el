@@ -93,7 +93,18 @@
              (bookmark-all-names)))
    :filtered-candidate-transformer 'helm-bookmark-transformer
    :search 'helm-bookmark-search-fn
-   :type 'bookmark)
+   :coerce 'helm-bookmark-get-bookmark-from-name
+   :action (helm-make-actions
+            "Jump to bookmark" 'helm-bookmark-jump
+            "Jump to BM other window" 'helm-bookmark-jump-other-window
+            "Bookmark edit annotation" 'bookmark-edit-annotation
+            "Bookmark show annotation" 'bookmark-show-annotation
+            "Delete bookmark(s)" 'helm-delete-marked-bookmarks
+            "Edit Bookmark" 'helm-bookmark-edit-bookmark
+            "Rename bookmark" 'helm-bookmark-rename
+            "Relocate bookmark" 'bookmark-relocate)
+   :keymap helm-bookmark-map
+   :mode-line helm-bookmark-mode-line-string)
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)

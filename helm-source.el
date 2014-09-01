@@ -175,18 +175,6 @@
     "  Help message for this source.
   If not present, `helm-help-message' value will be used.")
    
-   (type
-    :initarg :type
-    :initform nil
-    :type symbol
-    :documentation
-    "  Indicates the type of the items the source returns.
-
-  Merge attributes not specified in the source itself from
-  `helm-type-attributes'.
-
-  This attribute is implemented by plug-in.")
-
    (multiline
     :initarg :multiline
     :initform nil
