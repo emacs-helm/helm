@@ -38,7 +38,7 @@
 (defclass helm-source ()
   ((name
     :initarg :name
-    :initform ""
+    :initform nil
     :custom string
     :documentation
     "  The name of the source.
