@@ -31,6 +31,9 @@
 (require 'cl-lib)
 (require 'eieio)
 
+(defgeneric helm--setup-source (source)
+  "Prepare slots and handle slot errors before creating a helm source.")
+
 
 ;;; Classes for sources
 ;;
