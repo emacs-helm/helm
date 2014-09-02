@@ -374,13 +374,6 @@
     :documentation
     "  Disable highlight match in this source.")
    
-   (no-matchplugin
-    :initarg :no-matchplugin
-    :initform nil
-    :custom boolean
-    :documentation
-    "  Disable matchplugin for this source.")
-
    (allow-dups
     :initarg :allow-dups
     :initform nil
@@ -479,6 +472,11 @@ If none of these are found fallback to `helm-input-idle-delay'.")
     :documentation
     "If you are not Japonese, ignore this.")
 
+   (matchplugin
+    :initarg :matchplugin
+    :initform t
+    :custom boolean)
+
    (before-init-hook
     :initarg :before-init-hook
     :initform nil
@@ -501,6 +499,9 @@ i.e After the creation of `helm-buffer'."))
 (defclass helm-source-sync (helm-source)
   ((candidates
     :initform '("ERROR: You must specify the `candidates' slot, either with a list or a function"))
+
+   (dont-plug
+    :initform '(helm-compile-source--match-plugin))
    
    (match-strict
     :initarg :match-strict
@@ -525,15 +526,7 @@ i.e After the creation of `helm-buffer'."))
   The function must return a process.")))
 
 (defclass helm-source-in-buffer (helm-source)
-  ((candidates-in-buffer
-    :initarg :candidates-in-buffer
-    :initform t
-    :custom boolean
-    :documentation
-    "It is just here to notify to the match-plugin we are using
-`candidates-in-buffer',so there is no need to change the value of this slot.")
-
-   (init
+  ((init
     :initform 'helm-default-init-source-in-buffer-function)
 
    (data
@@ -547,7 +540,8 @@ i.e After the creation of `helm-buffer'."))
   This is an easy and fast method to build a `candidates-in-buffer' source.")
    
    (dont-plug
-    :initform '(helm-compile-source--candidates-in-buffer))
+    :initform '(helm-compile-source--candidates-in-buffer
+                helm-compile-source--match-plugin))
    
    (candidates
     :initform 'helm-candidates-in-buffer)
@@ -735,6 +729,31 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
     (helm--setup-source source)
     (helm--create-source source (object-class source))))
 
+(defun helm-source-mp-get-search-or-match-fns (source method)
+  (let* ((searchers        (and (eq method 'search)
+                                (if (eq t (oref source :search-from-end))
+                                    helm-mp-default-search-backward-functions
+                                    helm-mp-default-search-functions)))
+         (defmatch         (helm-aif (slot-value source :match)
+                               (helm-mklist it)))
+         (defmatch-strict  (helm-aif (and (eq method 'match)
+                                          (slot-value source :match-strict))
+                               (helm-mklist it)))
+         (defsearch        (helm-aif (and (eq method 'search)
+                                          (slot-value source :search))
+                               (helm-mklist it)))
+         (defsearch-strict (helm-aif (and (eq method 'search-strict)
+                                          (slot-value source :search-strict))
+                               (helm-mklist it))))
+    (cl-case method
+      (match (cond (defmatch-strict)
+                   (defmatch
+                    (append helm-mp-default-match-functions defmatch))
+                   (t helm-mp-default-match-functions)))
+      (search (cond (defsearch-strict)
+                    (defsearch
+                     (append searchers defsearch))
+                    (t searchers))))))
 
 ;;; Methods to access types slots.
 (defmethod helm-source-get-action-from-type ((object helm-type-file))
@@ -748,7 +767,10 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   (helm-aif (slot-value source :keymap)
       (and (symbolp it) (set-slot-value source :keymap (symbol-value it)))))
 
-(defmethod helm--setup-source ((_source helm-source-sync)))
+(defmethod helm--setup-source ((source helm-source-sync))
+  (when (slot-value source :matchplugin)
+    (oset source :match
+          (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source :init)))
@@ -763,12 +785,12 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                           (helm-init-candidates-in-buffer
                               'global
                             ',it)))))))
+  (when (slot-value source :matchplugin)
+    (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
                nil "Invalid slot value for `match'")
-    (cl-assert (eq (slot-value source :candidates-in-buffer) t)
-               nil "Invalid slot value for `candidates-in-buffer'")
     (cl-assert (eq (slot-value source :volatile) t)
                nil "Invalid slot value for `volatile'")))
 
