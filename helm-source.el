@@ -611,10 +611,10 @@ i.e After the creation of `helm-buffer'."))
 
   filename:candidate-containing-the-word-filename
 
-  What you want is to ignore "filename" part and match only
-  "candidate-containing-the-word-filename"
+  What you want is to ignore \"filename\" part and match only
+  \"candidate-containing-the-word-filename\"
 
-  So give a function matching only the part of candidate after ":"
+  So give a function matching only the part of candidate after \":\"
 
   If source contain match-part attribute, match is computed only
   on part of candidate returned by the call of function provided
