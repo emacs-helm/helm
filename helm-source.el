@@ -523,7 +523,9 @@ i.e After the creation of `helm-buffer'."))
     :documentation
     "  You should use this attribute when using a function involving
   an async process instead of `candidates'.
-  The function must return a process.")))
+  The function must return a process.")
+
+   (matchplugin :initform nil)))
 
 (defclass helm-source-in-buffer (helm-source)
   ((init
@@ -643,7 +645,7 @@ i.e After the creation of `helm-buffer'."))
 
 ;;; Classes for types.
 ;;
-;;
+;;  Files
 (defclass helm-type-file (helm-source) ()
   "A class to define helm type file.")
 
@@ -677,6 +679,7 @@ i.e After the creation of `helm-buffer'."))
                                           helm-highlight-files
                                           helm-w32-pathname-transformer)))
 
+;; Bookmarks
 (defclass helm-type-bookmark (helm-source) ()
   "A class to define type bookmarks.")
 
@@ -692,6 +695,37 @@ i.e After the creation of `helm-buffer'."))
                         "Relocate bookmark" 'bookmark-relocate))
   (oset source :keymap helm-bookmark-map)
   (oset source :mode-line helm-bookmark-mode-line-string))
+
+;; Buffers
+(defclass helm-type-buffer (helm-source) ()
+  "A class to define type buffer.")
+
+(defmethod helm--setup-source :before ((source helm-type-buffer))
+  (oset source :action (helm-make-actions
+                        "Switch to buffer" 'helm-switch-to-buffer
+                        (lambda () (and (locate-library "popwin") "Switch to buffer in popup window"))
+                        'popwin:popup-buffer
+                        "Switch to buffer other window" 'switch-to-buffer-other-window
+                        "Switch to buffer other frame" 'switch-to-buffer-other-frame
+                        (lambda () (and (locate-library "elscreen") "Display buffer in Elscreen"))
+                        'helm-find-buffer-on-elscreen
+                        "Query replace regexp" 'helm-buffer-query-replace-regexp
+                        "Query replace" 'helm-buffer-query-replace
+                        "View buffer" 'view-buffer
+                        "Display buffer" 'display-buffer
+                        "Grep buffers (C-u grep all buffers)" 'helm-zgrep-buffers
+                        "Multi occur buffer(s)" 'helm-multi-occur-as-action
+                        "Revert buffer(s)" 'helm-revert-marked-buffers
+                        "Insert buffer" 'insert-buffer
+                        "Kill buffer(s)" 'helm-kill-marked-buffers
+                        "Diff with file" 'diff-buffer-with-file
+                        "Ediff Marked buffers" 'helm-ediff-marked-buffers
+                        "Ediff Merge marked buffers" (lambda (candidate)
+                                                       (helm-ediff-marked-buffers candidate t))))
+      (oset source :persistent-help "Show this buffer")
+      (oset source :filtered-candidate-transformer '(helm-skip-boring-buffers
+                                                     helm-buffers-sort-transformer
+                                                     helm-highlight-buffers)))
 
 
 ;;; Error functions

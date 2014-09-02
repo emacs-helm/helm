@@ -872,7 +872,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
             :candidates-process 'helm-grep-collect-candidates
             :filter-one-by-one 'helm-grep-filter-one-by-one
             :candidate-number-limit 9999
-            :no-matchplugin t
             :nohighlight t
             :mode-line helm-grep-mode-line-string
             ;; We need to specify keymap here and as :keymap arg [1]
