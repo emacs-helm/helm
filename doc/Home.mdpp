@@ -8,6 +8,31 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 ------
 
 !TOC
+# FAQ
+
+## I have updated from melpa and I have errors
+
+1. Uninstall `helm` from `list-packages`
+
+2. Close emacs
+
+3. Start `emacs -Q`
+
+4. Reinstall `helm` from `list-packages`
+
+5. Restart emacs
+
+If you still have errors report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
+
+## I have warnings when compiling from emacs-24.3.1
+
+Helm have no warning when compiling with >=emacs-24.4, but when compiling
+with 24.3 you may have many warnings (due to bugs in emacs itself relative
+to lexical-binding and eieio), don't be afraid, just ignore them ;-).
+
+## Void function function-put
+
+Bad installation of helm, please reinstall, See [Here](#ihaveupdatedfrommelpaandihaveerrors) how to do.
 
 # Wiki maintainer instructions
 
