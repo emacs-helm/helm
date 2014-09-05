@@ -102,7 +102,7 @@ The demo starts when you see `Eval: START` in the minibuffer.
 
 - All the C buffers are selected using the regexp `*C`. In the demo, I also select Tcl buffers with `*Tcl` and then switched back to C buffers with `*C`.
 - I only want to have buffers that contains only the string "crash". To do that, I add a space, then add the pattern `@crash`.
-- After the initial search pattern, I hand over the current matching buffers to `helm-moccur` - `moccur` with Helm interface. 
+- After the initial search pattern, I hand over the current matching buffers to `helm-moccur` - `moccur` with Helm interface. In the above demo, I only switch to one file, that is `kexec.c`. However, you can select multiple buffers with `C-SPC` or select all buffers with `M-a`.
 - Candidates can be filtered gradually by adding more pattern, i.e. I added `memory` to filtered down to buffers that contain the string "memory" among the buffers that are containing "crash".
 
 As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.
