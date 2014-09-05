@@ -144,7 +144,7 @@ discover some of the commands provided by helm.</p>
 <ul>
 <li>All the C buffers are selected using the regexp <code>*C</code>. In the demo, I also select Tcl buffers with <code>*Tcl</code> and then switched back to C buffers with <code>*C</code>.</li>
 <li>I only want to have buffers that contains only the string "crash". To do that, I add a space, then add the pattern <code>@crash</code>.</li>
-<li>After the initial search pattern, I hand over the current matching buffers to <code>helm-moccur</code> - <code>moccur</code> with Helm interface. </li>
+<li>After the initial search pattern, I hand over the current matching buffers to <code>helm-moccur</code> - <code>moccur</code> with Helm interface. In the above demo, I only switch to one file, that is <code>kexec.c</code>. However, you can select multiple buffers with <code>C-SPC</code> or select all buffers with <code>M-a</code>.</li>
 <li>Candidates can be filtered gradually by adding more pattern, i.e. I added <code>memory</code> to filtered down to buffers that contain the string "memory" among the buffers that are containing "crash".</li>
 </ul><p>As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.</p>
 
