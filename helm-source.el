@@ -630,6 +630,9 @@ i.e After the creation of `helm-buffer'."))
 
    (filtered-candidate-transformer
     :initform 'helm-dummy-candidate)
+
+   (matchplugin
+    :initform nil)
    
    (accept-empty
     :initarg :accept-empty
@@ -835,7 +838,17 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   (cl-assert (null (slot-value source :candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead"))
 
-(defmethod helm--setup-source ((_source helm-source-dummy)))
+(defmethod helm--setup-source ((source helm-source-dummy))
+  (let ((mtc (slot-value source :match)))
+    (cl-assert (or (equal '(identity) mtc)
+                   (eq 'identity mtc))
+               nil "Invalid slot value for `match'")
+    (cl-assert (eq (slot-value source :volatile) t)
+               nil "Invalid slot value for `volatile'")
+    (cl-assert (equal (slot-value source :candidates) '("dummy"))
+               nil "Invalid slot value for `candidates'")
+    (cl-assert (eq (slot-value source :accept-empty) t)
+               nil "Invalid slot value for `accept-empty'")))
 
 
 ;;; User functions
