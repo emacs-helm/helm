@@ -47,11 +47,11 @@
           (Info-goto-node node)
           (goto-char (point-min))
           (while (search-forward "\n* " nil t)
-            (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
+            (unless (search-forward "Menu:\n" (1+ (line-end-position)) t)
               (save-current-buffer (buffer-substring-no-properties
-                                    (point-at-bol) (point-at-eol)))
-              (setq s (point-at-bol)
-                    e (point-at-eol))
+                                    (line-beginning-position) (line-end-position)))
+              (setq s (line-beginning-position)
+                    e (line-end-position))
               (with-current-buffer tobuf
                 (insert-buffer-substring infobuf s e)
                 (insert "\n")))))))))
@@ -181,8 +181,8 @@
                  (if (numberp subexp)
                      (cons (match-string-no-properties subexp)
                            (match-beginning subexp))
-                   (cons (buffer-substring (point-at-bol) (point-at-eol))
-                         (point-at-bol)))))
+                   (cons (buffer-substring (line-beginning-position) (line-end-position))
+                         (line-beginning-position)))))
             (arrange
              #'(lambda (headlines)
                  (unless (null headlines) ; FIX headlines empty bug!

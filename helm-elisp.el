@@ -149,7 +149,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
                     (or
                      (and (eq (char-before) ?\ )
                           (save-excursion
-                            (skip-syntax-backward " " (point-at-bol))
+                            (skip-syntax-backward " " (line-beginning-position))
                             (memq (symbol-at-point)
                                   helm-lisp-unquoted-function-list)))
                      (and (eq (char-before) ?\')
@@ -167,7 +167,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
                     (and (eq (char-before) ?\')
                          (save-excursion
                            (forward-char (if (funcall fn-sym-p) -2 -1))
-                           (skip-syntax-backward " " (point-at-bol))
+                           (skip-syntax-backward " " (line-beginning-position))
                            (memq (symbol-at-point)
                                  helm-lisp-quoted-function-list)))
                     (eq (char-before) ?\())) ; no paren before str.
@@ -189,7 +189,7 @@ of symbol before point."
   (save-excursion
     (let (beg
           (end (point))
-          (boundary (field-beginning nil nil (point-at-bol))))
+          (boundary (field-beginning nil nil (line-beginning-position))))
       (if (re-search-backward (or regexp "\\_<") boundary t)
           (setq beg (match-end 0))
         (setq beg boundary))
@@ -324,7 +324,7 @@ If SYM is not documented, return \"Not documented\"."
                     (or force
                         (save-excursion
                           (end-of-line)
-                          (search-backward tap (point-at-bol) t)
+                          (search-backward tap (line-beginning-position) t)
                           (setq beg (point))
                           (looking-back "[^'`( ]")))
                     (expand-file-name
@@ -359,7 +359,7 @@ Filename completion happen if string start after or between a double quote."
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
                    (end-of-line)
-                   (search-backward tap (point-at-bol) t)
+                   (search-backward tap (line-beginning-position) t)
                    (looking-back "[^'`( ]")))
         (helm-complete-file-name-at-point)
       (helm-lisp-completion-at-point))))

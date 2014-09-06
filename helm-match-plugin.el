@@ -294,13 +294,13 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
 This is the search function for `candidates-in-buffer' enabled sources.
 Use the same method as `helm-mp-3-match' except it search in buffer
 instead of matching on a string.
-i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
+i.e (identity (re-search-forward \"foo\" (line-end-position) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mp-3-get-patterns pattern)
                         pattern)
         while (funcall searchfn1 (or (cdar pat) "") nil t)
-        for bol = (point-at-bol)
-        for eol = (point-at-eol)
+        for bol = (line-beginning-position)
+        for eol = (line-end-position)
         if (cl-loop for (pred . str) in (cdr pat) always
                  (progn (goto-char bol)
                         (funcall pred (funcall searchfn2 str eol t))))

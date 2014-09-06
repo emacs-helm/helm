@@ -51,7 +51,7 @@
             (goto-char (point-min))
             (prog1
                 (when (search-forward "Path=" nil t)
-                  (buffer-substring-no-properties (point) (point-at-eol)))
+                  (buffer-substring-no-properties (point) (line-end-position)))
               (kill-buffer)))))
     (file-name-as-directory (concat moz-dir moz-user-dir))))
 

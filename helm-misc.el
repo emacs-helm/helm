@@ -387,7 +387,7 @@ It is added to `extended-command-history'.
   (when (derived-mode-p 'comint-mode)
     (helm :sources 'helm-source-comint-input-ring
           :input (buffer-substring-no-properties (comint-line-beginning-position)
-                                                 (point-at-eol))
+                                                 (line-end-position))
           :buffer "*helm comint history*")))
 
 

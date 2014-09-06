@@ -451,7 +451,7 @@ WHERE can be one of other-window, elscreen, other-frame."
                                (if (eq major-mode 'helm-grep-mode)
                                    (current-buffer)
                                  helm-buffer)
-                             (get-text-property (point-at-bol) 'help-echo))
+                             (get-text-property (line-beginning-position) 'help-echo))
                            (car split)))
          (tramp-method (file-remote-p (or helm-ff-default-directory
                                           default-directory) 'method))
@@ -513,7 +513,7 @@ If N is positive go forward otherwise go backward."
   (let* ((allow-mode (or (eq major-mode 'helm-grep-mode)
                          (eq major-mode 'helm-moccur-mode)))
          (sel (if allow-mode
-                  (buffer-substring (point-at-bol) (point-at-eol))
+                  (buffer-substring (line-beginning-position) (line-end-position))
                 (helm-get-selection nil t)))
          (current-line-list  (if (eq type 'etags)
                                  (split-string sel ": +" t)
@@ -529,13 +529,13 @@ If N is positive go forward otherwise go backward."
         (forward-line n) ; Go forward or backward depending of n value.
         ;; Exit when current-fname is not matched or in `helm-grep-mode'
         ;; the line is not a grep line i.e 'fname:num:tag'.
-        (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
+        (setq sel (buffer-substring (line-beginning-position) (line-end-position)))
         (unless (or (string= current-fname
                              (car (if (eq type 'etags)
                                       (split-string sel ": +" t)
                                     (helm-grep-split-line sel))))
                     (and (eq major-mode 'helm-grep-mode)
-                         (not (get-text-property (point-at-bol) 'help-echo))))
+                         (not (get-text-property (line-beginning-position) 'help-echo))))
           (funcall mark-maybe)
           (throw 'break nil))))
     (cond ((and (> n 0) (eobp))
@@ -543,7 +543,7 @@ If N is positive go forward otherwise go backward."
            (forward-line 0)
            (funcall mark-maybe))
           ((and (< n 0) (bobp))
-           (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
+           (helm-aif (next-single-property-change (line-beginning-position) 'help-echo)
                (goto-char it)
              (forward-line 1))
            (funcall mark-maybe)))))
@@ -679,13 +679,13 @@ Special commands:
 ;;;###autoload
 (defun helm-grep-mode-jump ()
   (interactive)
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+  (let ((candidate (buffer-substring (line-beginning-position) (line-end-position))))
     (condition-case nil
         (progn (helm-grep-action candidate) (delete-other-windows))
       (error nil))))
 
 (defun helm-grep-mode-jump-other-window-1 (arg)
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+  (let ((candidate (buffer-substring (line-beginning-position) (line-end-position))))
     (condition-case nil
         (progn
           (save-selected-window
@@ -707,7 +707,7 @@ Special commands:
 ;;;###autoload
 (defun helm-grep-mode-jump-other-window ()
   (interactive)
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+  (let ((candidate (buffer-substring (line-beginning-position) (line-end-position))))
     (condition-case nil
         (helm-grep-action candidate 'other-window)
       (error nil))))

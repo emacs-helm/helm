@@ -220,7 +220,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
           when (save-excursion
-                 (re-search-forward reg (point-at-eol) t))
+                 (re-search-forward reg (line-end-position) t))
           collect (match-beginning 0) into pos-ls
           finally (when pos-ls (goto-char (apply #'min pos-ls))))
     (when mark
@@ -418,12 +418,12 @@ Same as `helm-moccur-goto-line' but go in new frame."
 (defun helm-moccur-mode-goto-line ()
   (interactive)
   (helm-moccur-goto-line
-   (buffer-substring (point-at-bol) (point-at-eol))))
+   (buffer-substring (line-beginning-position) (line-end-position))))
 
 (defun helm-moccur-mode-goto-line-ow ()
   (interactive)
   (helm-moccur-goto-line-ow
-   (buffer-substring (point-at-bol) (point-at-eol))))
+   (buffer-substring (line-beginning-position) (line-end-position))))
 
 (defun helm-moccur-save-results (_candidate)
   "Save helm moccur results in a `helm-moccur-mode' buffer."
@@ -494,7 +494,7 @@ Special commands:
              "\n")
             (goto-char (point-min))
             (cl-loop while (re-search-forward pattern nil t)
-                     for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
+                     for line = (helm-moccur-get-line (line-beginning-position) (line-end-position))
                      when line
                      do (with-current-buffer buffer
                           (insert

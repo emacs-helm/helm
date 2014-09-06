@@ -217,7 +217,7 @@ Handle multibyte characters by moving by columns."
     (save-excursion
       (insert str))
     (move-to-column width)
-    (buffer-substring (point-at-bol) (point))))
+    (buffer-substring (line-beginning-position) (point))))
 
 (cl-defun helm-substring-by-width (str width &optional (endstr "..."))
   "Truncate string STR to end at column WIDTH.
@@ -313,7 +313,7 @@ With a numeric prefix arg show only the ARG number of candidates."
     (cl-loop with pos
           while (setq pos (next-single-property-change (point) 'helm-header))
           do (goto-char pos)
-          collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
+          collect (buffer-substring-no-properties (line-beginning-position)(line-end-position))
           do (forward-line 1))))
 
 (defun helm-files-match-only-basename (candidate)

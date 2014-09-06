@@ -1434,7 +1434,7 @@ of a source is deleted without updating the source."
   (with-helm-window
     (or (helm-empty-buffer-p)
         (and (helm-end-of-source-p)
-             (eq (point-at-bol) (point-at-eol))
+             (eq (line-beginning-position) (line-end-position))
              (or
               (save-excursion
                 (forward-line -1)
@@ -1445,7 +1445,7 @@ of a source is deleted without updating the source."
 ;; Core: tools
 (defun helm-current-line-contents ()
   "Current line string without properties."
-  (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
+  (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
 
 (defun helm-funcall-with-source (source functions &rest args)
   "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
@@ -2943,12 +2943,12 @@ and store the real value in a text property."
       ;; 'helm-realvalue property when creating candidate buffer.
       (unless (get-text-property start 'helm-realvalue)
         (and realvalue
-             (put-text-property start (point-at-eol)
+             (put-text-property start (line-end-position)
                                 'helm-realvalue realvalue)))
       (when num
-        (put-text-property start (point-at-eol) 'helm-cand-num num))
+        (put-text-property start (line-end-position) 'helm-cand-num num))
       (when helm-source-in-each-line-flag
-        (put-text-property start (point-at-eol) 'helm-source source))
+        (put-text-property start (line-end-position) 'helm-source source))
       (funcall insert-function "\n"))))
 
 (defun helm-insert-header-from-source (source)
@@ -2971,10 +2971,10 @@ after the source name by overlay."
       (put-text-property start (point) 'helm-header-separator t)))
   (let ((start (point)))
     (insert name)
-    (put-text-property (point-at-bol)
-                       (point-at-eol) 'helm-header t)
+    (put-text-property (line-beginning-position)
+                       (line-end-position) 'helm-header t)
     (when display-string
-      (overlay-put (make-overlay (point-at-bol) (point-at-eol))
+      (overlay-put (make-overlay (line-beginning-position) (line-end-position))
                    'display display-string))
     (insert "\n")
     (put-text-property start (point) 'face 'helm-source-header)))
@@ -2982,8 +2982,8 @@ after the source name by overlay."
 (defun helm-insert-candidate-separator ()
   "Insert separator of candidates into the helm buffer."
   (insert (propertize helm-candidate-separator 'face 'helm-separator))
-  (put-text-property (point-at-bol)
-                     (point-at-eol) 'helm-candidate-separator t)
+  (put-text-property (line-beginning-position)
+                     (line-end-position) 'helm-candidate-separator t)
   (insert "\n"))
 
 
@@ -3239,7 +3239,7 @@ Possible value of DIRECTION are 'next or 'previous."
               (or (helm-pos-header-line-p)
                   (helm-pos-candidate-separator-p)))
     (forward-line (if (and (eq direction 'previous)
-                           (not (eq (point-at-bol) (point-min))))
+                           (not (eq (line-beginning-position) (point-min))))
                       -1 1)))))
 
 (defun helm-display-mode-line (source &optional force)
@@ -3524,7 +3524,7 @@ to mark candidates."
     (when resumep
       (goto-char helm-selection-point))
     (move-overlay
-     helm-selection-overlay (point-at-bol)
+     helm-selection-overlay (line-beginning-position)
      (if (helm-pos-multiline-p)
          (let ((header-pos (helm-get-next-header-pos))
                (separator-pos (helm-get-next-candidate-separator-pos)))
@@ -3534,7 +3534,7 @@ to mark candidates."
                     separator-pos)
                header-pos
                (point-max)))
-       (1+ (point-at-eol))))
+       (1+ (line-end-position))))
     (setq helm-selection-point (overlay-start helm-selection-overlay)))
   (helm-follow-execute-persistent-action-maybe))
 
@@ -3649,12 +3649,12 @@ If action buffer is displayed, kill it."
 
 (defun helm-pos-header-line-p ()
   "Return t if the current line is a header line."
-  (or (get-text-property (point-at-bol) 'helm-header)
-      (get-text-property (point-at-bol) 'helm-header-separator)))
+  (or (get-text-property (line-beginning-position) 'helm-header)
+      (get-text-property (line-beginning-position) 'helm-header-separator)))
 
 (defun helm-pos-candidate-separator-p ()
   "Return t if the current line is a candidate separator."
-  (get-text-property (point-at-bol) 'helm-candidate-separator))
+  (get-text-property (line-beginning-position) 'helm-candidate-separator))
 
 
 ;;; Debugging
@@ -3708,17 +3708,17 @@ to a list of forms.\n\n")
   (with-helm-window
     (cond ((helm-pos-multiline-p)
            (helm-aif (helm-get-next-candidate-separator-pos)
-               (delete-region (point-at-bol)
-                              (1+ (progn (goto-char it) (point-at-eol))))
+               (delete-region (line-beginning-position)
+                              (1+ (progn (goto-char it) (line-end-position))))
              ;; last candidate
              (goto-char (helm-get-previous-candidate-separator-pos))
-             (delete-region (point-at-bol) (point-max)))
+             (delete-region (line-beginning-position) (point-max)))
            (when (helm-end-of-source-p)
              (goto-char (or (helm-get-previous-candidate-separator-pos)
                             (point-min)))
              (forward-line 1)))
           (t
-           (delete-region (point-at-bol) (1+ (point-at-eol)))
+           (delete-region (line-beginning-position) (1+ (line-end-position)))
            (when (helm-end-of-source-p t)
              (let ((headp (save-excursion
                             (forward-line -1)
@@ -3733,7 +3733,7 @@ to a list of forms.\n\n")
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
       (forward-line (if at-point 0 1))
-      (or (eq (point-at-bol) (point-at-eol))
+      (or (eq (line-beginning-position) (line-end-position))
           (helm-pos-header-line-p)
           (eobp)))))
 
@@ -3745,10 +3745,10 @@ to a list of forms.\n\n")
       (funcall func)
       (forward-line 0)
       (and realvalue
-           (put-text-property (point) (point-at-eol)
+           (put-text-property (point) (line-end-position)
                               'helm-realvalue realvalue))
       (and multiline
-           (put-text-property (point) (point-at-eol)
+           (put-text-property (point) (line-end-position)
                               'helm-multiline multiline))
       (helm-mark-current-line))))
 
@@ -3958,7 +3958,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
          (setq newmatches nil)
          (cl-loop with item-count = 0
                while (funcall searcher pattern)
-               for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
+               for cand = (funcall get-line-fn (line-beginning-position) (line-end-position))
                when (and (not (gethash cand helm-cib-hash))
                          (or
                           ;; Always collect when cand is matched by searcher funcs
@@ -3972,7 +3972,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                unless (helm-point-is-moved
                        (lambda ()
                          (if search-from-end
-                             (goto-char (1- (point-at-bol)))
+                             (goto-char (1- (line-beginning-position)))
                            (forward-line 1))))
                return nil)
          (setq matches (append matches (nreverse newmatches))))
@@ -3991,11 +3991,11 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                                       limit search-from-end)
   (delq nil (cl-loop with next-line-fn =
                   (if search-from-end
-                      (lambda (_x) (goto-char (max (1- (point-at-bol)) 1)))
+                      (lambda (_x) (goto-char (max (1- (line-beginning-position)) 1)))
                     #'forward-line)
                   until (funcall endp)
                   for i from 1 to limit
-                  collect (funcall get-line-fn (point-at-bol) (point-at-eol))
+                  collect (funcall get-line-fn (line-beginning-position) (line-end-position))
                   do (funcall next-line-fn 1))))
 
 (defun helm-search-from-candidate-buffer-internal (search-fn)
@@ -4392,7 +4392,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
 
 (defun helm-this-visible-mark ()
   (cl-loop for o in helm-visible-mark-overlays
-        when (equal (point-at-bol) (overlay-start o))
+        when (equal (line-beginning-position) (overlay-start o))
         return o))
 
 (defun helm-delete-visible-mark (overlay)
@@ -4405,11 +4405,11 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (delq overlay helm-visible-mark-overlays)))
 
 (defun helm-make-visible-mark ()
-  (let ((o (make-overlay (point-at-bol)
+  (let ((o (make-overlay (line-beginning-position)
                           (if (helm-pos-multiline-p)
                               (or (helm-get-next-candidate-separator-pos)
                                   (point-max))
-                            (1+ (point-at-eol))))))
+                            (1+ (line-end-position))))))
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
@@ -4454,7 +4454,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                         (maxpoint  (or end (point-max))))
                    (while (< (point) maxpoint)
                      (helm-mark-current-line)
-                     (let* ((prefix (get-text-property (point-at-bol) 'display))
+                     (let* ((prefix (get-text-property (line-beginning-position) 'display))
                             (cand   (helm-get-selection))
                             (bn     (and (helm-file-completion-source-p)
                                          (helm-basename cand)))
