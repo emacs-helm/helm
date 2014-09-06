@@ -1299,7 +1299,7 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
                                  (string-match-p "/[[:alpha:]]:/" match))
                              (1+ (match-beginning 0))
                              (match-beginning 0)))
-              (buffer-substring-no-properties (point) (point-at-eol)))
+              (buffer-substring-no-properties (point) (line-end-position)))
             fname))))
 
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
@@ -2173,8 +2173,8 @@ Use it for non--interactive calls of `helm-find-files'."
   "Try to find library path at point.
 Find inside `require' and `declare-function' sexp."
   (require 'find-func)
-  (let* ((beg-sexp (save-excursion (search-backward "(" (point-at-bol) t)))
-         (end-sexp (save-excursion (search-forward ")" (point-at-eol) t)))
+  (let* ((beg-sexp (save-excursion (search-backward "(" (line-beginning-position) t)))
+         (end-sexp (save-excursion (search-forward ")" (line-end-position) t)))
          (sexp     (and beg-sexp end-sexp
                         (buffer-substring-no-properties
                          (1+ beg-sexp) (1- end-sexp)))))

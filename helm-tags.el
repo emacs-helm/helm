@@ -100,16 +100,16 @@ one match."
       (goto-char (point-min))
       (forward-line 2)
       (delete-region (point-min) (point))
-      (cl-loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
+      (cl-loop while (and (not (eobp)) (search-forward "\001" (line-end-position) t))
             for lineno-start = (point)
             for lineno = (buffer-substring
                           lineno-start
-                          (1- (search-forward "," (point-at-eol) t)))
+                          (1- (search-forward "," (line-end-position) t)))
             do
             (forward-line 0)
             (insert (format "%5s:" lineno))
-            (search-forward "\177" (point-at-eol) t)
-            (delete-region (1- (point)) (point-at-eol))
+            (search-forward "\177" (line-end-position) t)
+            (delete-region (1- (point)) (line-end-position))
             (forward-line 1)))))
 
 (defvar helm-source-ctags
