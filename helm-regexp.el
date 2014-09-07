@@ -166,7 +166,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 (defun helm-occur-init-source ()
   (unless helm-source-occur
     (setq helm-source-occur
-          (helm--make-source "Occur" 'helm-source-multi-occur))))
+          (helm-make-source "Occur" 'helm-source-multi-occur))))
 
 
 ;;; Multi occur
@@ -381,7 +381,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
                   buffers)))
     (unless helm-source-moccur
       (setq helm-source-moccur
-            (helm--make-source "Moccur" 'helm-source-multi-occur)))
+            (helm-make-source "Moccur" 'helm-source-multi-occur)))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
     (helm-set-local-variable

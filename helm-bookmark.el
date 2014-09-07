@@ -93,7 +93,7 @@
     (search :initform 'helm-bookmark-search-fn)))
 
 (defvar helm-source-bookmarks
-  (helm--make-source "Bookmarks" 'helm-source-basic-bookmarks)
+  (helm-make-source "Bookmarks" 'helm-source-basic-bookmarks)
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)

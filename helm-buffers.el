@@ -169,7 +169,7 @@ Only buffer names are fuzzy matched when this is enabled,
     :initform
     "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
 
-(defvar helm-source-buffers-list (helm--make-source "Buffers" 'helm-source-buffers))
+(defvar helm-source-buffers-list (helm-make-source "Buffers" 'helm-source-buffers))
 
 (defvar helm-source-buffer-not-found
   (helm-build-dummy-source
