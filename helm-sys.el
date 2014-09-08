@@ -26,6 +26,12 @@
   "System related helm library."
   :group 'helm)
 
+(defface helm-top-columns
+    '((t :inherit helm-header))
+  "Face for helm help string in minibuffer."
+  :group 'helm-sys)
+
+
 (defun helm-top-command-set-fn (var _value)
   (set var
        (cl-case system-type
@@ -80,7 +86,10 @@ A format string where %s will be replaced with `frame-width'."
   "Transformer for `helm-top'.
 Return empty string for non--valid candidates."
   (cl-loop for disp in candidates collect
-        (if (string-match "^ *[0-9]+" disp) disp (cons disp ""))))
+        (cond ((string-match "^ *[0-9]+" disp) disp)
+              ((string-match "^ *PID" disp)
+               (cons (propertize disp 'face 'helm-top-columns) ""))
+              (t (cons disp "")))))
 
 (defun helm-top-action-transformer (actions _candidate)
   "Action transformer for `top'.
@@ -137,13 +146,13 @@ Show actions only on line starting by a PID."
   (helm-top-transformer
    (if helm-top-sort-fn
        (cl-loop for c in candidates
-             if (string-match "^ *[0-9]+" c) collect c into pid-cands
-             else collect c into header-cands
-             finally return (append (if (cdr header-cands)
-                                        (butlast header-cands)
-                                      header-cands)
-                                    (sort pid-cands helm-top-sort-fn)))
-     candidates)
+                if (string-match "^ *[0-9]+" c)
+                collect c into pid-cands
+                else collect c into header-cands
+                finally return (append
+                                header-cands
+                                (sort pid-cands helm-top-sort-fn)))
+       candidates)
    source))
 
 (defun helm-top-sort-by-com (s1 s2)
