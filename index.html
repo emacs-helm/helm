@@ -76,6 +76,8 @@ the trap of backward compatibility. </p>
 <div class="highlight highlight-elisp"><pre><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'load-path</span> <span class="s">"/path/to/helm/directory"</span><span class="p">)</span>
 <span class="p">(</span><span class="nb">require</span> <span class="ss">'helm-config</span><span class="p">)</span>
 </pre></div>
+
+<p><em>NOTE:</em> Installing helm like this (i.e from git+make) is the safest way.</p>
 </li>
 </ol><p>Alternatively, you can have a quick try to helm by launching from the helm directory:</p>
 
@@ -89,10 +91,11 @@ the trap of backward compatibility. </p>
 <p>Helm is now available on Melpa at <code>http://melpa.milkbox.net/</code>
 You will find there instructions to install.</p>
 
-<p><em>WARNING:</em> For any upgrade after Version 1.5.6 using package.el, you will have to remove all your helm*.elc files
-and recompile from a clean Emacs, expect failures if you don't do that.
-Users that are installing from git will not have this problem
-by recompiling their helm copy with "make".</p>
+<p><em>WARNING:</em> Due to a bad concept of package.el which is in charge of fetching helm files
+and compiling them, expect errors most of the time when upgrading from melpa and <code>list-package</code>.
+To avoid this you will have to compile your new files outside of your current emacs running helm.
+People installing from git and using make file will not suffer from this problem.
+See <a href="https://github.com/emacs-helm/helm/wiki#faq">FAQ</a> for more infos.</p>
 
 <p><strong>Note to Linux Distributions Maintainers</strong></p>
 
