@@ -39,6 +39,7 @@ You need a recent Emacs to use latest helm, at least Emacs-24.3.
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
     ```
+_NOTE:_ Installing helm like this (i.e from git+make) is the safest way.
 
 Alternatively, you can have a quick try to helm by launching from the helm directory:
 
@@ -51,10 +52,11 @@ Note that this will not work on Windows systems.
 Helm is now available on Melpa at `http://melpa.milkbox.net/`
 You will find there instructions to install.
 
-_WARNING:_ For any upgrade after Version 1.5.6 using package.el, you will have to remove all your helm*.elc files
-and recompile from a clean Emacs, expect failures if you don't do that.
-Users that are installing from git will not have this problem
-by recompiling their helm copy with "make".
+_WARNING:_ Due to a bad concept of package.el which is in charge of fetching helm files
+and compiling them, expect errors most of the time when upgrading from melpa and `list-package`.
+To avoid this you will have to compile your new files outside of your current emacs running helm.
+People installing from git and using make file will not suffer from this problem.
+See [FAQ](https://github.com/emacs-helm/helm/wiki#faq) for more infos.
 
 **Note to Linux Distributions Maintainers**
 
