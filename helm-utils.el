@@ -449,14 +449,14 @@ from its directory."
                       org-directory
                       (expand-file-name org-directory))
                  (with-current-buffer it default-directory))
-           (cond ((or (file-remote-p sel)
-                      (file-exists-p sel))
-                  (expand-file-name sel))
-                 (bmk (helm-aif (bookmark-get-filename bmk)
+           (cond (bmk (helm-aif (bookmark-get-filename bmk)
                           (if (and ffap-url-regexp
                                    (string-match ffap-url-regexp it))
                               it (expand-file-name it))
                         default-directory))
+                 ((or (file-remote-p sel)
+                      (file-exists-p sel))
+                  (expand-file-name sel))
                  ((and grep-line (file-exists-p (car grep-line)))
                   (expand-file-name (car grep-line)))
                  ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
