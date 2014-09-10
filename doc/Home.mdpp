@@ -25,35 +25,16 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 If you still have errors report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
 
 
-You can workaround the problem using this piece of code (Need [emacs-async](https://github.com/jwiegley/emacs-async)) in your init file:
+You can fix the problem (for helm and all other packages you install and upgrade from (m)elpa)
+by installing[emacs-async](https://github.com/jwiegley/emacs-async)) and adding in your init file:
 
 ```lisp
 
-(defun async-byte-recompile-directory (directory &optional arg force)
-  (cl-loop with dir = (directory-files directory t "\\.elc\\'")
-           unless dir return nil
-           for f in dir
-           when (file-exists-p f) do (delete-file f))
-  (let ((proc
-         (async-start
-          `(lambda ()
-             (require 'bytecomp)
-             ,(async-inject-variables "\\`load-path\\'")
-             (let ((default-directory (file-name-as-directory ,directory)))
-               (add-to-list 'load-path default-directory)
-               (byte-recompile-directory ,directory ,arg ,force))))))
-    (unless (condition-case err
-                (async-get proc)
-              (error
-               (ignore (message "Error: %s" (car err)))))
-      (ignore (message "Recompiling %s...FAILED" directory)))))
+(require 'async-bytecomp)
 
-(defadvice package--compile (around byte-compile-async activate)
-  (package-activate-1 pkg-desc)
-  (async-byte-recompile-directory (package-desc-dir pkg-desc) 0 t))
 ```
 
-_Note:_ After upgrading as usual you will have anyway to restart emacs.
+_Note:_ After upgrading as usual you will have anyway to restart emacs for the changes take effect.
 
 ## I have warnings when compiling from emacs-24.3.1
 
