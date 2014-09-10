@@ -26,7 +26,7 @@ If you still have errors report bug on [emacs helm issues](https://github.com/em
 
 
 You can fix the problem (for helm and all other packages you install and upgrade from (m)elpa)
-by installing[emacs-async](https://github.com/jwiegley/emacs-async)) and adding in your init file:
+by installing [emacs-async](https://github.com/jwiegley/emacs-async) and adding in your init file:
 
 ```lisp
 
@@ -35,6 +35,8 @@ by installing[emacs-async](https://github.com/jwiegley/emacs-async)) and adding 
 ```
 
 _Note:_ After upgrading as usual you will have anyway to restart emacs for the changes take effect.
+
+_Note:_ [emacs-async](https://github.com/jwiegley/emacs-async) is available as "async" in melpa.
 
 ## I have warnings when compiling from emacs-24.3.1
 
