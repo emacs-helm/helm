@@ -176,28 +176,24 @@ Show actions only on line starting by a PID."
          (user-2 (nth 1 split-2)))
     (string< user-1 user-2)))
 
-;;;###autoload
 (defun helm-top-run-sort-by-com ()
   (interactive)
   (helm-top-set-mode-line "COM")
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
   (helm-force-update))
 
-;;;###autoload
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
   (helm-top-set-mode-line "CPU")
   (setq helm-top-sort-fn nil)
   (helm-force-update))
 
-;;;###autoload
 (defun helm-top-run-sort-by-mem ()
   (interactive)
   (helm-top-set-mode-line "MEM")
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
   (helm-force-update))
 
-;;;###autoload
 (defun helm-top-run-sort-by-user ()
   (interactive)
   (helm-top-set-mode-line "USER")
@@ -279,7 +275,8 @@ Show actions only on line starting by a PID."
     (unless helm-alive-p (delete-other-windows))
     (helm :sources 'helm-source-top
           :buffer "*helm top*" :full-frame t
-          :candidate-number-limit 9999)))
+          :candidate-number-limit 9999
+          :preselect "^\\s-*[0-9]+")))
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
