@@ -23,6 +23,7 @@
 ;;
 (require 'easymenu)
 (require 'helm-aliases)
+(require 'async-bytecomp)
 
 
 (defgroup helm-config nil
