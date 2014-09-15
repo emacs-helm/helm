@@ -37,6 +37,11 @@ case $1 in
         ;;
 esac
 
+if [ ! -f "helm-autoloads.el" ]; then
+    echo No autoloads found, please run make first to generate autoload file
+    exit 2
+fi
+
 cat > $TMP <<EOF
 (setq initial-scratch-message (concat initial-scratch-message
 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\
@@ -75,3 +80,4 @@ cat > $TMP <<EOF
 EOF
 
 $EMACS -Q -l $TMP $@
+
