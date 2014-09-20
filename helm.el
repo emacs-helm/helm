@@ -872,53 +872,6 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
        (message "Helm issued errors: %s"
                 (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
-;; [FIXME] It seem it is no more needed to have cursor at end of
-;;         insertion, so I keep the advices fo now but don't activate
-;;         them, need to clarify why I needed that IIRC it was
-;;         a problem with keybinding not activated.
-
-;; These advices are needed to fix cursor position in minibuffer
-;; after insertion, otherwise cursor stay at beginning of insertion.
-;; Using a timer ensure `minibuffer-temporary-goal-position' is set
-;; to nil in `goto-history-element' because `last-command'
-;; will be one of `next-history-element' or `previous-history-element'.
-;; Activate deactivate them by hook because they may not work outside
-;; of helm (Issue #338).
-(defadvice next-history-element (around helm-delay-next-history-element)
-  (interactive "p")
-  (or (zerop n)
-      (run-with-timer
-       0.01 nil
-       `(lambda ()
-          (condition-case _err
-              (goto-history-element (- minibuffer-history-position ,n))
-            (user-error (message "End of history; no default available")
-                        (sit-for 0.5) (message nil)))))))
-
-(defadvice previous-history-element (around helm-delay-previous-history-element)
-  (interactive "p")
-  (or (zerop n)
-      (run-with-timer
-       0.01 nil
-       `(lambda ()
-          (condition-case _err
-              (goto-history-element (+ minibuffer-history-position ,n))
-            (user-error (message "Beginning of history; no preceding item")
-                        (sit-for 0.5) (message nil)))))))
-
-;; (add-hook 'helm-before-initialize-hook
-;;           (lambda ()
-;;             (ad-enable-advice 'next-history-element 'around
-;;                               'helm-delay-next-history-element)
-;;             (ad-enable-advice 'previous-history-element 'around
-;;                               'helm-delay-previous-history-element)))
-;; (add-hook 'helm-cleanup-hook
-;;           (lambda ()
-;;             (ad-disable-advice 'next-history-element 'around
-;;                                'helm-delay-next-history-element)
-;;             (ad-disable-advice 'previous-history-element 'around
-;;                                'helm-delay-previous-history-element)))
-
 
 ;; Programming Tools
 (defmacro helm-aif (test-form then-form &rest else-forms)
@@ -1753,10 +1706,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log "any-default = %S" any-default)
     (helm-log "any-history = %S" any-history)
     (let ((old-overriding-local-map overriding-terminal-local-map)
-          ;; #163 no cursor in minibuffer in <=Emacs-24.2.
-          ;; Apart this bug in <=24.2, this is needed for
-          ;; messages in minibuffer on top of helm prompt. 
-          (cursor-in-echo-area t)
           (non-essential t)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input

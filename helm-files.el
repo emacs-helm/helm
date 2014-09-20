@@ -651,7 +651,7 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
       (funcall cd-eshell))))
 
 (defun helm-ff-serial-rename-action (method)
-  "Rename all marked files to `helm-ff-default-directory' with METHOD.
+  "Rename all marked files in `helm-ff-default-directory' with METHOD.
 See `helm-ff-serial-rename-1'."
   (let* ((cands     (helm-marked-candidates :with-wildcard t))
          (def-name  (car cands))
