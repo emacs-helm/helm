@@ -23,7 +23,9 @@ the trap of backward compatibility.
 You need a recent Emacs to use latest helm, at least Emacs-24.3.
 
 [async](https://github.com/jwiegley/emacs-async) will be installed as dependency
-when installing from melpa but is facultative when installing from git (recommended though).
+when installing from melpa but is facultative when installing from git (recommended though
+as it may fix installation of all packages from (m)elpa and will allow you to
+copy/rename asynchronously your files from helm and/or dired if needed).
 
 ## Getting Started
 
