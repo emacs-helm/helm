@@ -21,7 +21,9 @@ the trap of backward compatibility.
 ## Requirements
 
 You need a recent Emacs to use latest helm, at least Emacs-24.3.
-You will need [async](https://github.com/jwiegley/emacs-async) as dependency.
+
+[async](https://github.com/jwiegley/emacs-async) will be installed as dependency
+when installing from melpa but is facultative when installing from git (recommended though).
 
 ## Getting Started
 
@@ -33,7 +35,7 @@ You will need [async](https://github.com/jwiegley/emacs-async) as dependency.
     $ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory
     ```
 
-  2. Clone the `async` repository to some directory
+  2. Clone the `async` repository to some directory (facultative)
 
     ```elisp
     $ git clone git@github.com:jwiegley/emacs-async.git /path/to/async/directory
@@ -43,7 +45,9 @@ You will need [async](https://github.com/jwiegley/emacs-async) as dependency.
   3. Add to `.emacs.el` (or equivalent):
 
     ```elisp
+    ;; [Facultative] Only if you have installed async.
     (add-to-list 'load-path "/path/to/async/directory")
+    
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
     ```
@@ -72,7 +76,9 @@ _WARNING:_ Due to a bad concept of package.el which is in charge of fetching hel
 and compiling them, users had errors most of the time when upgrading from melpa and `list-package`.
 To avoid this [Async](https://github.com/jwiegley/emacs-async) have been added as dependency to
 helm to force package.el compiling its files in a clean environment.
-People installing from git and using make file will not suffer from this problem.
+People installing from git and using the make file will not suffer from this problem and don't need
+[Async](https://github.com/jwiegley/emacs-async) though it is recommended as it fix installation
+of all other packages you may install with package.el from (m)elpa.
 See [FAQ](https://github.com/emacs-helm/helm/wiki#faq) for more infos.
 
 **Note to Linux Distributions Maintainers**
