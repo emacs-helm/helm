@@ -12,6 +12,10 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 
 ## I have updated from melpa and I have errors
 
+Normally since helm, when installed from (m)elpa force dependency to
+[Async](https://github.com/jwiegley/emacs-async) you should not have this problem
+anymore, however if it happen, do like this:
+
 1. Uninstall `helm` from `list-packages`
 
 2. Close emacs
@@ -22,17 +26,8 @@ welcomed by submitting a Pull Request for [Home.mdpp][1].
 
 5. Restart emacs
 
-If you still have errors report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
+And report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
 
-
-You can fix the problem (for helm and all other packages you install and upgrade from (m)elpa)
-by installing [emacs-async](https://github.com/jwiegley/emacs-async) and adding in your init file:
-
-```lisp
-
-(require 'async-bytecomp)
-
-```
 
 _Note:_ After upgrading as usual you will have anyway to restart emacs for the changes take effect.
 

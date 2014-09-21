@@ -81,6 +81,8 @@ People installing from git and using the make file will not suffer from this pro
 of all other packages you may install with package.el from (m)elpa.
 See [FAQ](https://github.com/emacs-helm/helm/wiki#faq) for more infos.
 
+_Note:_ After upgrading from the emacs packaging system you should restart emacs for the changes take effect.
+
 **Note to Linux Distributions Maintainers**
 
 `Only the extensions present in the github emacs-helm organisation are supported.`
