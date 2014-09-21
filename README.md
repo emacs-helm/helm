@@ -21,40 +21,57 @@ the trap of backward compatibility.
 ## Requirements
 
 You need a recent Emacs to use latest helm, at least Emacs-24.3.
+You will need [async](https://github.com/jwiegley/emacs-async) as dependency.
 
 ## Getting Started
 
-### Quick install
+### Quick install from git
 
   1. Clone the `helm` repository to some directory:
   
     ```elisp
     $ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory
     ```
+
+  2. Clone the `async` repository to some directory
+
+    ```elisp
+    $ git clone git@github.com:jwiegley/emacs-async.git /path/to/async/directory
+    ```
+  3. Run `make` from the `helm` directory.
   
-  2. Run `make` from this directory.
   3. Add to `.emacs.el` (or equivalent):
 
     ```elisp
+    (add-to-list 'load-path "/path/to/async/directory")
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
     ```
+    
 _NOTE:_ Installing helm like this (i.e from git+make) is the safest way.
 
-Alternatively, you can have a quick try to helm by launching from the helm directory:
+You can have a quick try to `helm` by launching from the helm directory:
 
 `./emacs-helm.sh`
 
-Note that this will not work on Windows systems.
+It is also recommended to use this when reporting bug.
+
+_NOTE:_ That this will not work on Windows systems.
 
 ### Install from Emacs packaging system
 
 Helm is now available on Melpa at `http://melpa.milkbox.net/`
 You will find there instructions to install.
+Then you should need only in your init file:
+
+```elisp
+(require 'helm-config)
+```
 
 _WARNING:_ Due to a bad concept of package.el which is in charge of fetching helm files
-and compiling them, expect errors most of the time when upgrading from melpa and `list-package`.
-To avoid this you will have to compile your new files outside of your current emacs running helm.
+and compiling them, users had errors most of the time when upgrading from melpa and `list-package`.
+To avoid this [Async](https://github.com/jwiegley/emacs-async) have been added as dependency to
+helm to force package.el compiling its files in a clean environment.
 People installing from git and using make file will not suffer from this problem.
 See [FAQ](https://github.com/emacs-helm/helm/wiki#faq) for more infos.
 
@@ -128,7 +145,8 @@ development of Helm.
 ## Bugs & Improvements
 
 Bug reports and suggestions for improvements are always
-welcome. GitHub pull requests are even better! :-)
+welcome, be sure though they are related to helm, many bugs are coming from emacs itself
+or other packages. GitHub pull requests are even better! :-)
 
 NOTE: When trying if something is working or not, be sure to start helm from `Emacs -Q` or even better
 Start it from your helm directory with `./emacs-helm.sh`.
