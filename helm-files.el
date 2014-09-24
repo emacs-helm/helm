@@ -2203,7 +2203,8 @@ Find inside `require' and `declare-function' sexp."
   "Execute ACTION on FILES to CANDIDATE.
 Where ACTION is a symbol that can be one of:
 'copy, 'rename, 'symlink,'relsymlink, 'hardlink.
-Argument FOLLOW when non--nil specify to follow FILES to destination."
+Argument FOLLOW when non--nil specify to follow FILES to destination for the actions
+copy and rename."
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   (let ((fn     (cl-case action
                   (copy       'dired-copy-file)
@@ -2240,7 +2241,9 @@ Argument FOLLOW when non--nil specify to follow FILES to destination."
              (file-name-directory candidate)))
           helm-ff-history)
     ;; If follow is non--nil we should not be in async mode.
-    (when (and follow (not (get-buffer dired-log-buffer)))
+    (when (and follow
+               (not (memq action '(symlink relsymlink hardlink)))
+               (not (get-buffer dired-log-buffer)))
       (let ((target (directory-file-name candidate)))
         (unwind-protect
              (progn
