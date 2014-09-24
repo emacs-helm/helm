@@ -37,9 +37,16 @@ case $1 in
         ;;
 esac
 
-if [ ! -f "helm-autoloads.el" ]; then
-    echo No autoloads found, please run make first to generate autoload file
-    exit 2
+# Check if autoload file exists.
+# It is maybe in a different directory if
+# emacs-helm.sh is a symlink.
+LS=$(ls -ld $0 | awk '{print $11}')
+if [ ! -z $LS ]; then
+    DIR=$(dirname $LS)
+    if [ ! -f "$DIR/helm-autoloads.el" ]; then
+        echo No autoloads found, please run make first to generate autoload file
+        exit 2
+    fi
 fi
 
 cat > $TMP <<EOF
