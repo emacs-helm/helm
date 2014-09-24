@@ -37,10 +37,12 @@ case $1 in
         ;;
 esac
 
+cd $(dirname "$0")
+
 # Check if autoload file exists.
 # It is maybe in a different directory if
 # emacs-helm.sh is a symlink.
-LS=$(readlink -f $0)
+LS=$(ls -l $0 | awk '{print $11}')
 if [ ! -z $LS ]; then
     AUTO_FILE="$(dirname $LS)/helm-autoloads.el"
 else
