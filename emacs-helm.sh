@@ -42,12 +42,15 @@ esac
 # emacs-helm.sh is a symlink.
 LS=$(ls -ld $0 | awk '{print $11}')
 if [ ! -z $LS ]; then
-    DIR=$(dirname $LS)
-    if [ ! -f "$DIR/helm-autoloads.el" ]; then
-        echo No autoloads found, please run make first to generate autoload file
-        exit 2
-    fi
+    AUTO_FILE="$(dirname $LS)/helm-autoloads.el"
+else
+    AUTO_FILE="helm-autoloads.el"
 fi
+if [ ! -f "$AUTO_FILE" ]; then
+    echo No autoloads found, please run make first to generate autoload file
+    exit 2
+fi
+
 
 cat > $TMP <<EOF
 (setq initial-scratch-message (concat initial-scratch-message
