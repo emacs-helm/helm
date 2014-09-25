@@ -4,3 +4,4 @@ patch*
 *.diff
 Home.md
 TAGS
+helm-autoloads.el
