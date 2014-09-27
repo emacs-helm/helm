@@ -483,6 +483,10 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                  unless (or (and ,default (string= sym ,default))
                                             (keywordp s))
                                  do (insert (concat sym "\n"))))))
+               ;; FIXME for some reason I have to reload keymap
+               ;; here because it is overhidden by minibuf loc map.
+               ;; This shouldn't be needed.
+               (keymap . ,helm-map)
                (persistent-action . helm-lisp-completion-persistent-action)
                (persistent-help . "Show brief doc in mode-line")
                (candidates-in-buffer)
