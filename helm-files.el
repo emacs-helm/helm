@@ -2667,6 +2667,46 @@ Colorize only symlinks, directories and files."
     (type . file)))
 
 
+;;; Files in configured list of dirs
+;;
+;;
+(defvar helm-source-files-in-configured-dirs
+  `((name . "Files from a Customized List of Directories")
+    (candidates . (lambda ()
+                    (with-helm-current-buffer
+		      (reduce
+		       (lambda (d1 d2)
+                         (let ((dir (car-safe d2))
+                               (recurse (car-safe (cdr-safe d2)))
+                               (matchre (car-safe (cdr-safe (cdr-safe d2)))))
+                           (append
+                            (when (file-accessible-directory-p dir)
+                              ;; predicting that 100 directories deep is enough for most uses
+                              (helm-directory-files-recursive dir
+                                                              (if (eq matchre nil) "" matchre)
+                                                              (if recurse 100 0)
+                                                              nil))
+                            d1)))
+		       helm-source-files-in-configured-dirs-list
+		       :initial-value '())
+		      )))
+    (match . helm-files-match-only-basename)
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (type . file)))
+
+(defcustom helm-source-files-in-configured-dirs-list
+  '()
+  "Your preferred custom directories to find files."
+  :type '(repeat (list
+                  (directory :tag "Directory name")
+                  (boolean :tag "Recurse?")
+                  (regexp :tag "Only files matching")
+                  ))
+  :group 'helm-files)
+
+
 ;;; External searching file tools.
 ;;
 ;; Tracker desktop search

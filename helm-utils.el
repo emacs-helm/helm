@@ -943,6 +943,60 @@ grabs the entire symbol."
         (forward-line)))
     (nreverse bookmarks-alist)))
 
+;;; Copied from https://gist.github.com/dmgerman/5675462
+;;; "This code snippet is licensed under the same terms of Emacs (currently GPL v3 or LATER).
+;;; –dmg"
+;;;
+;;; Adjusted only to add helm- prefix - gcla
+;;;
+;;; Recursively list files in a given directory
+;;;
+;;; Author:    daniel m german dmg at uvic dot ca
+;;; Copyright: daniel m german
+;;; License:   Same as Emacs
+;;;
+(defun helm-directory-files-recursive (directory match maxdepth ignore)
+  "List files in DIRECTORY and in its sub-directories.
+   Return files that match the regular expression MATCH but ignore
+   files and directories that match IGNORE (IGNORE is tested before MATCH. Recurse only
+   to depth MAXDEPTH. If zero or negative, then do not recurse"
+  (let* ((files-list '())
+         (current-directory-list
+          (directory-files directory t)))
+    ;; while we are in the current directory
+    (while current-directory-list
+      (let ((f (car current-directory-list)))
+        (cond
+         ((and
+           ignore ;; make sure it is not nil
+           (string-match ignore f))
+                                        ; ignore
+          nil
+          )
+         ((and
+           (file-regular-p f)
+           (file-readable-p f)
+           (string-match match f))
+          (setq files-list (cons f files-list))
+          )
+         ((and
+           (file-directory-p f)
+           (file-readable-p f)
+           (not (string-equal ".." (substring f -2)))
+           (not (string-equal "." (substring f -1)))
+           (> maxdepth 0))
+          ;; recurse only if necessary
+          (setq files-list (append files-list (helm-directory-files-recursive f match (- maxdepth -1) ignore)))
+          (setq files-list (cons f files-list))
+          )
+         (t)
+         )
+        )
+      (setq current-directory-list (cdr current-directory-list))
+      )
+    files-list
+    )
+  )
 
 (provide 'helm-utils)
 
