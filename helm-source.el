@@ -826,7 +826,8 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                         (lambda ()
                           (helm-init-candidates-in-buffer
                               'global
-                            ',it)))))))
+                            (if (functionp ,it) (funcall ,it)
+                                (if (stringp ,it) ,it ',it)))))))))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
