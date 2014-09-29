@@ -2084,6 +2084,7 @@ Use it for non--interactive calls of `helm-find-files'."
                       "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
                       "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
                       "Find shell command `C-c /'" 'helm-ff-find-sh-command
+                      "Add marked files to file-cache" 'helm-ff-cache-add-file
                       "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
                       "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
                       "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
@@ -2490,6 +2491,12 @@ Else return ACTIONS unmodified."
                      :match match
                      :skip-subdirs ignore-dirs) 
            do (file-cache-add-file f)))
+
+(defun helm-ff-cache-add-file (_candidate)
+  (require 'filecache)
+  (let ((mkd (helm-marked-candidates)))
+    (mapc 'file-cache-add-file mkd)))
+
 
 ;;; File name history
 ;;

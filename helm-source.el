@@ -674,6 +674,7 @@ i.e After the creation of `helm-buffer'."))
            'helm-ff-etags-select
            "View file"                            'view-file
            "Insert file"                          'insert-file
+           "Add marked files to file-cache"       'helm-ff-cache-add-file
            "Delete file(s)"                       'helm-delete-marked-files
            "Open file externally (C-u to choose)" 'helm-open-file-externally
            "Open file with default tool"          'helm-open-file-with-default-tool
