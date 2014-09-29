@@ -2474,12 +2474,14 @@ Else return ACTIONS unmodified."
    (mode-line :initform helm-generic-file-mode-line-string)))
 
 (defvar helm-source-file-cache
-  (helm-make-source "File Cache" 'helm-file-cache
-                                 :data (lambda ()
-                                         (cl-loop for (bn dir) in file-cache-alist
-                                                  collect (expand-file-name bn dir)))))
+  (helm-make-source
+   "File Cache" 'helm-file-cache
+   :data (lambda ()
+           (cl-loop for (bn dir) in file-cache-alist
+                    collect (expand-file-name bn dir)))))
 
-(cl-defun helm-file-cache-add-directory-recursively (dir &optional match (ignore-dirs t))
+(cl-defun helm-file-cache-add-directory-recursively
+    (dir &optional match (ignore-dirs t))
   (require 'filecache)
   (cl-loop for f in (helm-walk-directory
                      dir
