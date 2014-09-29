@@ -2465,29 +2465,29 @@ Else return ACTIONS unmodified."
 ;;; File Cache
 ;;
 ;;
-(defvar helm-file-cache-initialized-p nil)
-(defvar helm-file-cache-files nil)
+(defvar file-cache-alist)
+
+(defclass helm-file-cache (helm-source-in-buffer helm-type-file)
+  ((init :initform (lambda () (require 'filecache)))
+   (keymap :initform helm-generic-files-map)
+   (help-message :initform helm-generic-file-help-message)
+   (mode-line :initform helm-generic-file-mode-line-string)))
 
 (defvar helm-source-file-cache
-  `((name . "File Cache")
-    (init
-     . (lambda ()
-         (require 'filecache nil t)
-         (unless helm-file-cache-initialized-p
-           (setq helm-file-cache-files
-                 (cl-loop for item in file-cache-alist append
-                       (cl-destructuring-bind (base &rest dirs) item
-                         (cl-loop for dir in dirs collect
-                               (concat dir base)))))
-           (defadvice file-cache-add-file (after file-cache-list activate)
-             (add-to-list 'helm-file-cache-files (expand-file-name file)))
-           (setq helm-file-cache-initialized-p t))))
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (candidates . helm-file-cache-files)
-    (type . file)))
+  (helm-make-source "File Cache" 'helm-file-cache
+                                 :data (lambda ()
+                                         (cl-loop for (bn dir) in file-cache-alist
+                                                  collect (expand-file-name bn dir)))))
 
+(cl-defun helm-file-cache-add-directory-recursively (dir &optional match (ignore-dirs t))
+  (require 'filecache)
+  (cl-loop for f in (helm-walk-directory
+                     dir
+                     :path 'full
+                     :directories nil
+                     :match match
+                     :skip-subdirs ignore-dirs) 
+           do (file-cache-add-file f)))
 
 ;;; File name history
 ;;
