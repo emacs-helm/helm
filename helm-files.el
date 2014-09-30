@@ -345,7 +345,6 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action)
-      (define-key map (kbd "C-o")         nil)
       (define-key map (kbd "<M-left>")    'helm-previous-source)
       (define-key map (kbd "<M-right>")   'helm-next-source))
     (delq nil map))
