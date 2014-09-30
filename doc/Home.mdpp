@@ -41,7 +41,7 @@ to lexical-binding and eieio), don't be afraid, just ignore them ;-).
 
 ## Void function function-put
 
-Bad installation of helm, please reinstall, See [Here](#ihaveupdatedfrommelpaandihaveerrors) how to do.
+Bad installation of helm, please reinstall, See [Here](https://github.com/emacs-helm/helm/wiki#ihaveupdatedfrommelpaandihaveerrors) how to do.
 
 # Wiki maintainer instructions
 
