@@ -1125,7 +1125,9 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
     (if test-only                       ; debug
         (delq nil (append (list transformer) action-transformers))
       (helm-attrset 'action-transformer
-                    (delq nil (append (list transformer) action-transformers))
+                    (helm-fast-remove-dups
+                     (delq nil (append (list transformer) action-transformers))
+                     :test 'equal)
                     source))))
 
 (defun helm-set-source-filter (sources)
