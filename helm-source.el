@@ -473,7 +473,8 @@ If none of these are found fallback to `helm-input-idle-delay'.")
     :initform nil
     :custom boolean
     :documentation
-    "If you are not Japonese, ignore this.")
+    "Needed for Japanese input with helm-migemo.el.
+If you are not Japanese, ignore this.")
 
    (matchplugin
     :initarg :matchplugin
