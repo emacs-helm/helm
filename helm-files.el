@@ -385,6 +385,73 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "The main source to browse files.
 Should not be used among other sources.")
 
+(defclass helm-source-ffiles (helm-source-sync)
+  ((header-name
+    :initform (lambda (name)
+                (concat name helm-find-files-doc-header)))
+   (init
+    :initform (lambda ()
+                (setq helm-ff-auto-update-flag
+                      helm-ff-auto-update-initial-value)
+                (setq helm-ff--auto-update-state
+                      helm-ff-auto-update-flag)
+                (helm-set-local-variable 'helm-in-file-completion-p t)))
+   (candidates :initform 'helm-find-files-get-candidates)
+   (filtered-candidate-transformer :initform 'helm-ff-sort-candidates)
+   (filter-one-by-one :initform 'helm-ff-filter-candidate-one-by-one)
+   (persistent-action :initform 'helm-find-files-persistent-action)
+   (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
+   (mode-line :initform helm-ff-mode-line-string)
+   (volatile :initform t)
+   (keymap :initform helm-find-files-map)
+   (nohighlight :initform t)
+   (candidate-number-limit
+    :initform 9999)
+   (action-transformer
+    :initform 'helm-find-files-action-transformer)
+   (action
+    :initform
+    (helm-make-actions
+     "Find File" 'helm-find-file-or-marked
+     "Find file in Dired" 'helm-point-file-in-dired
+     (lambda () (and (locate-library "elscreen") "Find file in Elscreen"))
+     'helm-elscreen-find-file
+     "View file" 'view-file
+     "Checksum File" 'helm-ff-checksum
+     "Query replace on marked" 'helm-ff-query-replace-on-marked
+     "Serial rename files" 'helm-ff-serial-rename
+     "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
+     "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
+     "Open file with default tool" 'helm-open-file-with-default-tool
+     "Find file in hex dump" 'hexl-find-file
+     "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
+     "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
+     "Find shell command `C-c /'" 'helm-ff-find-sh-command
+     "Add marked files to file-cache" 'helm-ff-cache-add-file
+     "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
+     "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
+     "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
+     "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
+     "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
+     "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
+     'helm-find-files-eshell-command-on-file
+     "Find file as root `C-x @'" 'helm-find-file-as-root
+     "Ediff File `C-='" 'helm-find-files-ediff-files
+     "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
+     "Delete File(s) `M-D'" 'helm-delete-marked-files
+     "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
+     "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
+     "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
+     "Relsymlink file(s) `C-u to follow'" 'helm-find-files-relsymlink
+     "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
+     "Find file other window `C-c o'" 'find-file-other-window
+     "Switch to history `M-p'" 'helm-find-files-switch-to-hist
+     "Find file other frame `C-c C-o'" 'find-file-other-frame
+     "Print File `C-c p, C-u to refresh'" 'helm-ff-print
+     "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate))
+   (before-init-hook :initform 'helm-find-files-before-init-hook)
+   (after-init-hook :initform 'helm-find-files-after-init-hook)))
+
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
 If there is only one window return the value ot `default-directory'
@@ -2045,68 +2112,8 @@ Use it for non--interactive calls of `helm-find-files'."
          (tap (thing-at-point 'filename))
          (def (and tap (expand-file-name tap))))
     (unless helm-source-find-files
-      (setq helm-source-find-files
-            (helm-build-sync-source
-             "Find Files"
-             :header-name (lambda (name)
-                            (concat name helm-find-files-doc-header))
-             :init (lambda ()
-                     (setq helm-ff-auto-update-flag
-                           helm-ff-auto-update-initial-value)
-                     (setq helm-ff--auto-update-state
-                           helm-ff-auto-update-flag)
-                     (helm-set-local-variable 'helm-in-file-completion-p t))
-             :candidates 'helm-find-files-get-candidates
-             :filtered-candidate-transformer 'helm-ff-sort-candidates
-             :filter-one-by-one 'helm-ff-filter-candidate-one-by-one
-             :persistent-action 'helm-find-files-persistent-action
-             :persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file"
-             :mode-line helm-ff-mode-line-string
-             :volatile t
-             :keymap helm-find-files-map
-             :nohighlight t
-             :candidate-number-limit 9999
-             :action-transformer 'helm-find-files-action-transformer
-             :action (helm-make-actions
-                      "Find File" 'helm-find-file-or-marked
-                      "Find file in Dired" 'helm-point-file-in-dired
-                      (lambda () (and (locate-library "elscreen") "Find file in Elscreen"))
-                      'helm-elscreen-find-file
-                      "View file" 'view-file
-                      "Checksum File" 'helm-ff-checksum
-                      "Query replace on marked" 'helm-ff-query-replace-on-marked
-                      "Serial rename files" 'helm-ff-serial-rename
-                      "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
-                      "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
-                      "Open file with default tool" 'helm-open-file-with-default-tool
-                      "Find file in hex dump" 'hexl-find-file
-                      "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
-                      "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
-                      "Find shell command `C-c /'" 'helm-ff-find-sh-command
-                      "Add marked files to file-cache" 'helm-ff-cache-add-file
-                      "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
-                      "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
-                      "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
-                      "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
-                      "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
-                      "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
-                      'helm-find-files-eshell-command-on-file
-                      "Find file as root `C-x @'" 'helm-find-file-as-root
-                      "Ediff File `C-='" 'helm-find-files-ediff-files
-                      "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
-                      "Delete File(s) `M-D'" 'helm-delete-marked-files
-                      "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
-                      "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
-                      "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
-                      "Relsymlink file(s) `C-u to follow'" 'helm-find-files-relsymlink
-                      "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
-                      "Find file other window `C-c o'" 'find-file-other-window
-                      "Switch to history `M-p'" 'helm-find-files-switch-to-hist
-                      "Find file other frame `C-c C-o'" 'find-file-other-frame
-                      "Print File `C-c p, C-u to refresh'" 'helm-ff-print
-                      "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)
-             :before-init-hook 'helm-find-files-before-init-hook
-             :after-init-hook 'helm-find-files-after-init-hook)))
+      (setq helm-source-find-files (helm-make-source
+                                    "Find Files" 'helm-source-ffiles)))
     (helm :sources 'helm-source-find-files
           :input fname
           :case-fold-search helm-file-name-case-fold-search
