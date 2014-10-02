@@ -424,6 +424,7 @@ Should not be used among other sources.")
      "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
      "Open file with default tool" 'helm-open-file-with-default-tool
      "Find file in hex dump" 'hexl-find-file
+     "Browse project" 'helm-ff-browse-project
      "Complete at point `C-c i'" 'helm-insert-file-name-completion-at-point
      "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
      "Find shell command `C-c /'" 'helm-ff-find-sh-command
