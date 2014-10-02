@@ -34,6 +34,9 @@
 (defgeneric helm--setup-source (source)
   "Prepare slots and handle slot errors before creating a helm source.")
 
+(defgeneric helm-setup-user-source (source)
+  "Allow users modifying slots in SOURCE just before creation.")
+
 
 ;;; Classes for sources
 ;;
@@ -763,6 +766,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
     (helm--setup-source source)
+    (helm-setup-user-source source)
     (helm--create-source source (object-class source))))
 
 (defun helm-make-type (class &rest args)
@@ -833,6 +837,8 @@ an eieio class."
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source :keymap)
       (and (symbolp it) (set-slot-value source :keymap (symbol-value it)))))
+
+(defmethod helm-setup-user-source ((_source helm-source)))
 
 (defmethod helm--setup-source ((source helm-source-sync))
   (when (slot-value source :matchplugin)
