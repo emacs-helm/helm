@@ -923,7 +923,12 @@ grabs the entire symbol."
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))
 
-(add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
+;; FIXME why do we run this after PA?
+;; Seems it is not needed, thus it create a bug
+;; when we want to hit repetitively C-w and follow-mode is enabled,
+;; or if we run a PA between to hits on C-w.
+;; Keep this commented for now.
+;(add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
 (add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
