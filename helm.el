@@ -4583,13 +4583,9 @@ is what is used to perform actions."
   "Copy selection or marked candidates to `helm-current-buffer'."
   (interactive)
   (with-helm-buffer
-    (cl-loop with mkd = (helm-marked-candidates)
-             with last = (car (last mkd))
-             for cand in (butlast mkd)
+    (cl-loop for cand in (helm-marked-candidates)
              do (with-helm-current-buffer
-                  (insert cand "\n"))
-             ;; Don't add new line to last inserted (#645)
-             finally (with-helm-current-buffer (insert last)))))
+                  (insert cand "\n")))))
 
 
 ;;; Follow-mode: Automatical execution of persistent-action
