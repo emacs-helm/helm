@@ -3200,9 +3200,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  (let ((follow (and (or helm-follow-mode
-                         (eq (cdr (assq 'follow source)) 1))
-                     "(HF) ")))
+  (let ((follow (and (eq (cdr (assq 'follow source)) 1) "(HF) ")))
     ;; Setup mode-line.
     (if helm-mode-line-string
         (setq mode-line-format
