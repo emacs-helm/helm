@@ -4621,13 +4621,17 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
                                              'name (symbol-value s)))
                            thereis (and sname (string= sname name) s)))
            (fol-attr (assq 'follow src))
-           (enabled  (or (< arg 0)      ; Assume follow is enabled.
-                         (eq (cdr fol-attr) 1)
-                         helm-follow-mode)))
+           (enabled  (or
+                      ;; If `helm-follow-mode' is called with a negative
+                      ;; ARG, assume follow is already enabled.
+                      ;; i.e turn it off now.
+                      (< arg 0)
+                      (eq (cdr fol-attr) 1)
+                      helm-follow-mode)))
       (if (eq (cdr fol-attr) 'never)
           (message "helm-follow-mode not allowed in this source")
         (if (or fol-attr (and helm-follow-mode-persistent sym))
-            ;; Make follow attr persistent for this session.
+            ;; Make follow attr persistent for this emacs session.
             (helm-attrset 'follow (if enabled -1 1) src)
             (delete (assq 'follow src) src))
         (setq helm-follow-mode (not enabled))
