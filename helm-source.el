@@ -684,7 +684,8 @@
            "Find file in hex dump"                'hexl-find-file))
     (oset source :persistent-help "Show this file")
     (oset source :action-transformer '(helm-transform-file-load-el
-                                       helm-transform-file-browse-url))
+                                       helm-transform-file-browse-url
+                                       helm-transform-file-cache))
     (oset source :candidate-transformer '(helm-skip-boring-files
                                           helm-highlight-files
                                           helm-w32-pathname-transformer)))
