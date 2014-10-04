@@ -2506,7 +2506,7 @@ Else return ACTIONS unmodified."
   (let ((mkd (helm-marked-candidates)))
     (mapc 'file-cache-add-file mkd)))
 
-(defun helm-ff-file-cache-remove-file (file)
+(defun helm-ff-file-cache-remove-file-1 (file)
   "Remove FILE from `file-cache-alist'."
   (let ((entry (assoc (helm-basename file) file-cache-alist))
         (dir   (helm-basedir file))
@@ -2516,6 +2516,11 @@ Else return ACTIONS unmodified."
       (setq new-entry nil))
     (setq file-cache-alist
           (cons new-entry (remove entry file-cache-alist)))))
+
+(defun helm-ff-file-cache-remove-file (_file)
+  "Remove marked files from `file-cache-alist.'"
+  (let ((mkd (helm-marked-candidates)))
+    (mapc 'helm-ff-file-cache-remove-file-1 mkd)))
 
 (defun helm-transform-file-cache (actions _candidate)
   (let ((source (helm-get-current-source)))
