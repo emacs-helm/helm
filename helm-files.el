@@ -2485,8 +2485,10 @@ Else return ACTIONS unmodified."
   (helm-make-source
    "File Cache" 'helm-file-cache
    :data (lambda ()
-           (cl-loop for (bn dir) in file-cache-alist
-                    collect (expand-file-name bn dir)))))
+           (cl-loop for item in file-cache-alist append
+                    (cl-destructuring-bind (base &rest dirs) item
+                      (cl-loop for dir in dirs collect
+                               (concat dir base)))))))
 
 (cl-defun helm-file-cache-add-directory-recursively
     (dir &optional match (ignore-dirs t))
