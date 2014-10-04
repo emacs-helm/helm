@@ -2526,7 +2526,7 @@ Else return ACTIONS unmodified."
   (let ((source (helm-get-current-source)))
     (if (string= (assoc-default 'name source) "File Cache")
         (append actions
-                '(("Remove file from file-cache"
+                '(("Remove marked files from file-cache"
                    . helm-ff-file-cache-remove-file)))
         actions)))
 
