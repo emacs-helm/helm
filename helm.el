@@ -4635,8 +4635,8 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
                    (if helm-follow-mode
                        "enabled" "disabled"))
           (helm-display-mode-line src))
-      (unless (and helm-follow-mode-persistent sym)
-        (set sym (remove (assq 'follow src) src))))))
+      (unless helm-follow-mode-persistent
+        (and sym (set sym (remove (assq 'follow src) src)))))))
 
 (defvar helm-follow-input-idle-delay nil
   "`helm-follow-mode' will execute its persistent action after this delay.
