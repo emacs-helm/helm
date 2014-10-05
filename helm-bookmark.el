@@ -630,7 +630,8 @@ BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
       (helm-bookmark-edit-bookmark-1 bookmark-name handler))))
 
 (defun helm-bookmark-edit-bookmark-1 (bookmark-name handler)
-  (let* ((bookmark-fname (bookmark-get-filename bookmark-name))
+  (let* ((helm--reading-passwd-or-string t)
+         (bookmark-fname (bookmark-get-filename bookmark-name))
          (bookmark-loc   (bookmark-prop-get bookmark-name 'location))
          (new-name       (read-from-minibuffer "Name: " bookmark-name))
          (new-loc        (read-from-minibuffer "FileName or Location: "
