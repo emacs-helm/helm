@@ -720,7 +720,8 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
 See `helm-ff-serial-rename-1'."
-  (let* ((cands     (helm-marked-candidates :with-wildcard t))
+  (let* ((helm--reading-passwd-or-string t)
+         (cands     (helm-marked-candidates :with-wildcard t))
          (def-name  (car cands))
          (name      (helm-read-string "NewName: "
                                       (replace-regexp-in-string
