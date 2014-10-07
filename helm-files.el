@@ -2112,7 +2112,8 @@ Use it for non--interactive calls of `helm-find-files'."
           (and helm-ff-auto-update-initial-value
                (not (minibuffer-window-active-p (minibuffer-window)))))
          (tap (thing-at-point 'filename))
-         (def (and tap (expand-file-name tap))))
+         (def (and tap (or (file-remote-p tap)
+                           (expand-file-name tap)))))
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
@@ -2137,31 +2138,32 @@ Use it for non--interactive calls of `helm-find-files'."
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
-  (let* ((def-dir (helm-current-directory))
+  (let* ((non-essential t)
+         (remp (or (and file-at-pt (file-remote-p file-at-pt))
+                   (and thing-at-pt (file-remote-p thing-at-pt))))
+         (def-dir (helm-current-directory))
          (urlp (and file-at-pt ffap-url-regexp
                     (string-match ffap-url-regexp file-at-pt)))
-         (abs (and file-at-pt
-                   (not urlp)
-                   (expand-file-name file-at-pt def-dir)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
          (hlink   (helm-ff-find-url-at-point))
-         (remp    (and abs (file-remote-p abs)))
-         (file-p  (and (not remp)
-                       file-at-pt
+         (file-p  (and file-at-pt
                        (not (string= file-at-pt ""))
+                       (not remp)
                        (file-exists-p file-at-pt)
-                       thing-at-pt (not (string= thing-at-pt ""))
+                       thing-at-pt
+                       (not (string= thing-at-pt ""))
                        (file-exists-p
                         (file-name-directory
                          (expand-file-name thing-at-pt def-dir))))))
     (cond (lib)      ; e.g we are inside a require sexp.
           (hlink)    ; String at point is an hyperlink.
-          (remp abs) ; A remote file
           (file-p    ; a regular file
            (helm-aif (ffap-file-at-point) (expand-file-name it)))
           (urlp file-at-pt) ; possibly an url or email.
-          ((and file-at-pt (file-exists-p file-at-pt))
+          ((and file-at-pt
+                (not remp)
+                (file-exists-p file-at-pt))
            file-at-pt))))
 
 (defun helm-ff-find-url-at-point ()
