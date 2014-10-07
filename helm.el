@@ -4626,17 +4626,20 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
                       (< arg 0)
                       (eq (cdr fol-attr) 1)
                       helm-follow-mode)))
-      (if (eq (cdr fol-attr) 'never)
-          (message "helm-follow-mode not allowed in this source")
-          ;; Make follow attr persistent for this emacs session.
-          (helm-attrset 'follow (if enabled -1 1) src)
-          (setq helm-follow-mode (not enabled))
-          (message "helm-follow-mode is %s"
-                   (if helm-follow-mode
-                       "enabled" "disabled"))
-          (helm-display-mode-line src))
-      (unless helm-follow-mode-persistent
-        (and sym (set sym (remove (assq 'follow src) src)))))))
+      (if src
+          (progn
+            (if (eq (cdr fol-attr) 'never)
+                (message "helm-follow-mode not allowed in this source")
+                ;; Make follow attr persistent for this emacs session.
+                (helm-attrset 'follow (if enabled -1 1) src)
+                (setq helm-follow-mode (not enabled))
+                (message "helm-follow-mode is %s"
+                         (if helm-follow-mode
+                             "enabled" "disabled"))
+                (helm-display-mode-line src))
+            (unless helm-follow-mode-persistent
+              (and sym (set sym (remove (assq 'follow src) src)))))
+          (message "Not enough candidates for helm-follow-mode")))))
 
 (defvar helm-follow-input-idle-delay nil
   "`helm-follow-mode' will execute its persistent action after this delay.
