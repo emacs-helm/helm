@@ -69,7 +69,12 @@
               (semantic-tag-components tag) (1+ depth) class)))
 
           ;; Don't do anything with packages or includes for now
-          ((package include))
+          ((package include)
+           (insert
+            (propertize (semantic-format-tag-summarize tag nil t)
+                        'semantic-tag tag)
+            "\n")
+           )
           ;; Catch-all
           (t))))))
 
