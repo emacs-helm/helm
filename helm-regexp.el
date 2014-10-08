@@ -144,7 +144,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
      ;; match beginning
      ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
      ;; It is implementation problem of candidates-in-buffer.
-     'helm-real-value (1- s))))
+     'helm-realvalue (1- s))))
 
 (defun helm-regexp-persistent-action (pt)
   (helm-goto-char pt)
