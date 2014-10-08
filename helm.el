@@ -2569,7 +2569,8 @@ Default function to match candidates according to `helm-pattern'."
   (let ((matchfns (or (assoc-default 'match source)
                       (assoc-default 'match-strict source)
                       #'helm-default-match-function)))
-    (if (listp matchfns) matchfns (list matchfns))))
+    (if (and (listp matchfns) (not (functionp matchfns)))
+        matchfns (list matchfns))))
 
 (defmacro helm--accumulate-candidates (candidate newmatches
                                        hash item-count limit source)
