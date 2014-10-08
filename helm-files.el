@@ -2130,12 +2130,13 @@ Use it for non--interactive calls of `helm-find-files'."
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (unless (eq major-mode 'image-mode)
-    (or (and input (or (and (file-remote-p input) input)
-                       (expand-file-name input)))
-        (helm-find-files-input
-         (ffap-guesser)
-         (thing-at-point 'filename)))))
+  (let ((ffap-machine-p-known 'reject))
+    (unless (eq major-mode 'image-mode)
+      (or (and input (or (and (file-remote-p input) input)
+                         (expand-file-name input)))
+          (helm-find-files-input
+           (ffap-guesser)
+           (thing-at-point 'filename))))))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
