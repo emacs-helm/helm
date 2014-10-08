@@ -460,11 +460,12 @@ for current buffer."
   (with-helm-current-buffer
     (let ((num-windows (length (remove (get-buffer-window helm-marked-buffer-name)
                                        (window-list)))))
-      (if (> num-windows 1)
-          (save-selected-window
-            (other-window 1)
-            default-directory)
-        (car helm-ff-history)))))
+      (expand-file-name
+       (if (> num-windows 1)
+           (save-selected-window
+             (other-window 1)
+             default-directory)
+           (car helm-ff-history))))))
 
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
