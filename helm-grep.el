@@ -210,8 +210,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
     (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
     (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
-    (define-key map (kbd "n")        'helm-grep-mode-jump-other-window-forward)
-    (define-key map (kbd "p")        'helm-grep-mode-jump-other-window-backward)
     map))
 
 
