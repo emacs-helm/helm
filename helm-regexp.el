@@ -20,6 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-plugin)
 
 
 (defgroup helm-regexp nil
