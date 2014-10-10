@@ -333,11 +333,18 @@ that use `helm-comp-read' See `helm-M-x' for example."
                              (let ((cands (helm-comp-read-get-candidates
                                            collection test sort alistp)))
                                (setq helm-cr-unknown-pattern-flag nil)
-                               (unless (or (eq must-match t) (string= helm-pattern "")
+                               (unless (or (eq must-match t)
+                                           (string= helm-pattern "")
                                            (assoc helm-pattern cands)
                                            (assoc (intern helm-pattern) cands)
                                            (member helm-pattern cands))
-                                 (setq cands (append (list helm-pattern) cands))
+                                 (setq cands (append (list
+                                                      ;; Unquote helm-pattern
+                                                      ;; when it is added
+                                                      ;; as candidate.
+                                                      (replace-regexp-in-string
+                                                       "\\s\\" "" helm-pattern))
+                                                     cands))
                                  (setq helm-cr-unknown-pattern-flag t))
                                (if (and default (not (string= default "")))
                                    (delq nil (cons default (delete default cands)))
