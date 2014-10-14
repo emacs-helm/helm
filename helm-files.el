@@ -1647,10 +1647,9 @@ Note that only existing directories are saved here."
 
 (defun helm-files-save-file-name-history (&optional force)
   "Save selected file to `file-name-history'."
-  (let ((helm-file-completion-sources
-         (append helm-files-save-history-extra-sources
-                 helm-file-completion-sources)))
-    (when (or force (helm-file-completion-source-p))
+  (let ((src-name (assoc-default 'name (helm-get-current-source))))
+    (when (or force (helm-file-completion-source-p)
+              (member src-name helm-files-save-history-extra-sources))
       (let ((mkd (helm-marked-candidates))
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
