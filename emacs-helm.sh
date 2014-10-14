@@ -23,7 +23,7 @@
 # Run it from this directory.
 
 TMP="/tmp/helm-cfg.el"
-EMACS=emacs
+EMACS=${EMACS:-emacs}
 
 case $1 in
     -P)
