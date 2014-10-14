@@ -246,7 +246,6 @@ If no entry in cache, create one."
                         (cadr (helm-etags-split-line candidate))
                       candidate)))
     (mode-line . helm-etags-mode-line-string)
-    (keymap . ,helm-etags-map)
     (action . (("Go to tag" . (lambda (c)
                                 (helm-etags-action-goto 'find-file c)))
                ("Go to tag in other window" . (lambda (c)
