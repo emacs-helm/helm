@@ -91,7 +91,9 @@ copy/rename asynchronously your files from helm and/or dired if needed).</p>
 <span class="p">(</span><span class="nb">require</span> <span class="ss">'helm-config</span><span class="p">)</span>
 </pre></div>
 </li>
-</ol><p><em>NOTE:</em> Installing helm like this (i.e from git+make) is the safest way.</p>
+</ol>
+
+<p><em>NOTE:</em> Installing helm like this (i.e from git+make) is the safest way.</p>
 
 <p>You can have a quick try to <code>helm</code> by launching from the helm directory:</p>
 
@@ -174,7 +176,9 @@ discover some of the commands provided by helm.</p>
 <li>I only want to have buffers that contains only the string "crash". To do that, I add a space, then add the pattern <code>@crash</code>.</li>
 <li>After the initial search pattern, I hand over the current matching buffers to <code>helm-moccur</code> - <code>moccur</code> with Helm interface. In the above demo, I only switch to one file, that is <code>kexec.c</code>. However, you can select multiple buffers with <code>C-SPC</code> or select all buffers with <code>M-a</code>.</li>
 <li>Candidates can be filtered gradually by adding more pattern, i.e. I added <code>memory</code> to filtered down to buffers that contain the string "memory" among the buffers that are containing "crash".</li>
-</ul><p>As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.</p>
+</ul>
+
+<p>As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.</p>
 
 <p>You can read <a href="http://tuhdo.github.io/helm-intro.html">this guide</a> to quickly get started with Helm.</p>
 
@@ -212,10 +216,6 @@ on <a href="https://groups.google.com/group/emacs-helm?hl=en">emacs-helm google 
 
 <p>Cheers,<br>
 The Helm Team</p>
-
-
-
-<p><a href="http://www.opendns.com/" target="_blank"><img src="http://images.opendns.com/buttons/use_opendns_155x52.gif" alt="OpenDNS" title="Use OpenDNS to make your Internet faster, safer, and smarter." width="155" height="52" border="0" hspace="10" vspace="10" align="Middle"></a></p>
       </section>
     </div>
 
