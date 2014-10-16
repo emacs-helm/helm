@@ -113,7 +113,9 @@ If nil default `helm-apt-cache-show-1' will be used."
                          ((and install
                                (memq helm-apt-show-only '(all installed)))
                           (propertize cand 'face 'helm-apt-installed))
-                         (t cand))
+                         ((and (eq helm-apt-show-only 'noinstalled)
+                               (not install)) cand)
+                         ((eq helm-apt-show-only 'all) cand))
         when show collect show))
 
 (defun helm-apt-show-only-installed ()
