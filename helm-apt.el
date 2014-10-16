@@ -113,9 +113,7 @@ If nil default `helm-apt-cache-show-1' will be used."
                          ((and install
                                (memq helm-apt-show-only '(all installed)))
                           (propertize cand 'face 'helm-apt-installed))
-                         ((and (eq helm-apt-show-only 'noinstalled)
-                               (not install)) cand)
-                         ((eq helm-apt-show-only 'all) cand))
+                         (t cand))
         when show collect show))
 
 (defun helm-apt-show-only-installed ()
@@ -145,7 +143,6 @@ If nil default `helm-apt-cache-show-1' will be used."
 (defun helm-apt-init ()
   "Initialize list of debian packages."
   (let ((query ""))
-    (setq helm-apt-show-only 'all)
     (unless (and helm-apt-installed-packages
                  helm-apt-all-packages)
       (message "Loading package list...")
@@ -252,6 +249,7 @@ Support install, remove and purge actions."
   "Preconfigured `helm' : frontend of APT package manager.
 With a prefix arg reload cache."
   (interactive "P")
+  (setq helm-apt-show-only 'all)
   (let ((query (read-string "Search Package: " nil 'helm-apt-input-history)))
     (when arg (helm-apt-refresh))
     (helm :sources 'helm-source-apt
