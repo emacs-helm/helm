@@ -264,11 +264,14 @@ With a prefix arg reload cache."
   (setq helm-apt-show-only 'all)
   (unless helm-apt-default-archs
     (setq helm-apt-default-archs
-          (cl-loop for arch in (list (shell-command-to-string
-                                      "dpkg --print-architecture")
-                                     (shell-command-to-string
-                                      "dpkg --print-foreign-architectures"))
-                   collect (substring arch 0 (1- (length arch))))))
+          (append (split-string
+                   (shell-command-to-string
+                    "dpkg --print-architecture")
+                   "\n" t)
+                  (split-string
+                   (shell-command-to-string
+                    "dpkg --print-foreign-architectures")
+                   "\n" t)))) 
   (let ((query (read-string "Search Package: " nil 'helm-apt-input-history)))
     (when arg (helm-apt-refresh))
     (helm :sources 'helm-source-apt
