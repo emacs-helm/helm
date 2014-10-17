@@ -271,7 +271,7 @@ With a prefix arg reload cache."
                   (split-string
                    (shell-command-to-string
                     "dpkg --print-foreign-architectures")
-                   "\n" t)))) 
+                   "\n" t))))
   (let ((query (read-string "Search Package: " nil 'helm-apt-input-history)))
     (when arg (helm-apt-refresh))
     (helm :sources 'helm-source-apt
