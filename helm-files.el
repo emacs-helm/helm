@@ -2406,11 +2406,12 @@ Ask to kill buffers associated with that file, too."
         ;; If the basedir of candidate doesn't exists,
         ;; ask for creating it.
         (let ((dir (file-name-directory candidate)))
-          (if (or (and dir (file-directory-p dir)) url-p)
-              (find-file-at-point (helm-substitute-in-filename
-                                   (car marked)))
-            (and (funcall make-dir-fn dir)
-                 (find-file-at-point candidate))))))))
+          (find-file-at-point
+           (cond ((and dir (file-directory-p dir))
+                  (substitute-in-file-name (car marked)))
+                 ;; FIXME Why do we use this on urls ?
+                 (url-p (helm-substitute-in-filename (car marked)))
+                 ((funcall make-dir-fn dir) candidate))))))))
 
 (defun helm-shadow-boring-files (files)
   "Files matching `helm-boring-file-regexp' will be
