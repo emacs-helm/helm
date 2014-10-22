@@ -462,7 +462,6 @@ or when `helm-split-window-default-side' is set to 'same."
   :type 'boolean)
 
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
-                                                 helm-source-semantic
                                                  helm-source-info-elisp
                                                  helm-source-etags-select)
   "List of helm sources that need to use `helm-maybe-use-default-as-input'.
@@ -3639,7 +3638,11 @@ to a list of forms.\n\n")
 (add-hook 'kill-buffer-hook 'helm-kill-buffer-hook)
 
 (defun helm-preselect (candidate-or-regexp &optional source)
-  "Move `helm-selection-overlay' to CANDIDATE-OR-REGEXP on startup."
+  "Move `helm-selection-overlay' to CANDIDATE-OR-REGEXP on startup.
+Arg CANDIDATE-OR-REGEXP can be a string or a cons cell of two strings.
+When it is a cons cell helm will try to jump first to first element of cons cell
+and then to second, allowing a finer preselection when possible duplicates are
+before the candidate we want to preselect."
   (with-helm-window
     (when candidate-or-regexp
       (if helm-force-updating-p
@@ -3647,8 +3650,12 @@ to a list of forms.\n\n")
         (goto-char (point-min))
         (forward-line 1))
       (let ((start (point)))
-        (or (re-search-forward candidate-or-regexp nil t)
-            (goto-char start))))
+        (or
+         (if (consp candidate-or-regexp)
+             (and (re-search-forward (car candidate-or-regexp) nil t)
+                  (re-search-forward (cdr candidate-or-regexp) nil t))
+             (re-search-forward candidate-or-regexp nil t))
+         (goto-char start))))
     (forward-line 0) ; Avoid scrolling right on long lines.
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
