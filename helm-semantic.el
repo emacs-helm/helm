@@ -91,7 +91,7 @@
       (unless persistent
         (pulse-momentary-highlight-one-line (point))))))
 
-(defun helm-semanatic-get-candidates ()
+(defun helm-semantic-get-candidates ()
   "Get a list of candidates in the current buffer."
   (let ((tags (semantic-fetch-tags)))
     (split-string (with-temp-buffer
@@ -103,7 +103,7 @@
                     :header-name "Semantic Tags"
                     :candidates (lambda ()
                                   (with-helm-current-buffer
-                                    (helm-semanatic-get-candidates)))
+                                    (helm-semantic-get-candidates)))
                     :persistent-help "Show this entry"
                     :keymap 'helm-semantic-map
                     :mode-line helm-semantic-mode-line
@@ -116,13 +116,16 @@
 (defun helm-semantic (arg)
   "Preconfigured `helm' for `semantic'.
 If ARG is supplied, pre-select symbol at point instead of current"
-  (interactive)
-  (let ((tag (semantic-current-tag)))
+  (interactive "P")
+  (let ((tag (helm-aif (semantic-current-tag-parent)
+                  (cons (format "\\_<%s\\_>" (car it))
+                        (format "\\_<%s\\_>" (car (semantic-current-tag))))
+                (format "\\_<%s\\_>" (car (semantic-current-tag))))))
     (helm :sources 'helm-source-semantic
           :candidate-number-limit 9999
           :preselect (if arg
                          (thing-at-point 'symbol)
-                       (concat "\\_<" (car tag) "\\_>"))
+                       tag)
           :buffer "*helm semantic*")))
 
 ;;;###autoload
@@ -142,12 +145,16 @@ Fill in the symbol at point by default."
          (imenu-auto-rescan imenu-p)
          (helm-execute-action-at-once-if-one
           (and imenu-p
-               helm-imenu-execute-action-at-once-if-one)))
+               helm-imenu-execute-action-at-once-if-one))
+         (tag (helm-aif (semantic-current-tag-parent)
+                  (cons (format "\\_<%s\\_>" (car it))
+                        (format "\\_<%s\\_>" (car (semantic-current-tag))))
+                (format "\\_<%s\\_>" (car (semantic-current-tag))))))
     (helm :sources source
           :candidate-number-limit 9999
           :preselect (if (or arg imenu-p)
                          (thing-at-point 'symbol)
-                       (concat "\\_<" (car (semantic-current-tag)) "\\_>"))
+                       tag)
           :buffer "*helm semantic/imenu*")))
 
 (provide 'helm-semantic)
