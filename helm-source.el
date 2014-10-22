@@ -858,7 +858,7 @@ an eieio class."
                         (lambda ()
                           (helm-init-candidates-in-buffer
                               'global
-                            (if (functionp ,it) (funcall ,it)
+                            (if (functionp ',it) (funcall ',it)
                                 (if (stringp ,it) ,it ',it)))))))))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
