@@ -180,7 +180,9 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar helm-source-buffer-not-found
   (helm-build-dummy-source
    "Create buffer"
-   :action (lambda (candidate)
+   :action (helm-make-actions
+            "Create buffer (C-u choose mode)"
+            (lambda (candidate)
              (let ((mjm (and helm-current-prefix-arg
                              (intern-soft (helm-comp-read
                                            "Major-mode: "
@@ -189,7 +191,7 @@ Only buffer names are fuzzy matched when this is enabled,
                (if mjm
                    (with-current-buffer buffer (funcall mjm))
                    (set-buffer-major-mode buffer))
-               (helm-switch-to-buffer buffer)))))
+               (helm-switch-to-buffer buffer))))))
 
 (defvar ido-temp-list)
 (defvar ido-ignored-list)
