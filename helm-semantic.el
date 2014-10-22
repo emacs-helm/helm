@@ -43,7 +43,10 @@
       (define-key map (kbd "<right>") 'helm-execute-persistent-action))
     (delq nil map)))
 
-(defun helm-semantic-init-candidates (tags depth &optional class)
+;; Internals vars
+(defvar helm-semantic--tags-cache nil)
+
+(defun helm-semantic--fetch-candidates (tags depth &optional class)
   "Write the contents of TAGS to the current buffer."
   (let ((class class) cur-type)
     (cl-dolist (tag tags)
@@ -65,7 +68,7 @@
               "\n")
              (and type-p (setq class (car tag)))
              ;; Recurse to children
-             (helm-semantic-init-candidates
+             (helm-semantic--fetch-candidates
               (semantic-tag-components tag) (1+ depth) class)))
 
           ;; Don't do anything with packages or includes for now
@@ -91,12 +94,10 @@
       (unless persistent
         (pulse-momentary-highlight-one-line (point))))))
 
-(defvar helm-semantic-tags nil)
-
 (defun helm-semantic-get-candidates ()
   "Get a list of candidates in the current buffer."
   (split-string (with-temp-buffer
-                  (helm-semantic-init-candidates helm-semantic-tags 0)
+                  (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)
                   (buffer-string)) "\n"))
 
 (defun helm-semantic--maybe-set-needs-update ()
@@ -111,9 +112,9 @@
                     :header-name "Semantic Tags"
                     :init (lambda ()
                             (helm-semantic--maybe-set-needs-update)
-                            (setq helm-semantic-tags (semantic-fetch-tags))
+                            (setq helm-semantic--tags-cache (semantic-fetch-tags))
                             (with-current-buffer (helm-candidate-buffer 'global)
-                              (helm-semantic-init-candidates helm-semantic-tags 0)))
+                              (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))
                     :candidates 'helm-semantic-get-candidates
                     :persistent-help "Show this entry"
                     :keymap 'helm-semantic-map
