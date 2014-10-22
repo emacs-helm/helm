@@ -53,7 +53,7 @@ Should take one arg: the string to display."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
-    (define-key map (kbd "<tab>")      'lisp-indent-line)
+    (define-key map (kbd "<M-tab>")      'lisp-indent-line)
     (define-key map (kbd "<C-tab>")    'helm-lisp-completion-at-point)
     (define-key map (kbd "C-p")        'previous-line)
     (define-key map (kbd "C-n")        'next-line)
