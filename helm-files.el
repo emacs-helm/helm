@@ -2508,7 +2508,7 @@ Else return ACTIONS unmodified."
 
 (defun helm-ff-cache-add-file (_candidate)
   (require 'filecache)
-  (let ((mkd (helm-marked-candidates)))
+  (let ((mkd (helm-marked-candidates :with-wildcard t)))
     (mapc 'file-cache-add-file mkd)))
 
 (defun helm-ff-file-cache-remove-file-1 (file)
