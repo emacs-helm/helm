@@ -1362,7 +1362,7 @@ On windows system substitute from start up to \"/[[:lower:]]:/\"."
         (insert fname)
         (goto-char (point-min))
         (skip-chars-forward "/") ;; Avoid infloop in UNC paths Issue #424
-        (if (re-search-forward "~.*/?\\|//\\|/[[:alpha:]]:/" nil t)
+        (if (re-search-forward "~/\\|~.+/?\\|//\\|/[[:alpha:]]:/" nil t)
             (let ((match (match-string 0)))
               (goto-char (if (or (string= match "//")
                                  (string-match-p "/[[:alpha:]]:/" match))
