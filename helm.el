@@ -3240,7 +3240,7 @@ it is \"Candidate\(s\)\" by default."
       (let ((nc (helm-get-candidate-number 'in-current-source)))
         (propertize
          (format "[%s %s]" nc
-                 (or name (concat "Candidate" (if (> nc 1) "s"))))
+                 (or name (concat "Candidate" (if (= nc 1) "s"))))
         'face 'helm-candidate-number)))))
 
 (cl-defun helm-move-selection-common (&key where direction)
