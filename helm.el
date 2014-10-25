@@ -3237,11 +3237,11 @@ You can specify NAME of candidates e.g \"Buffers\" otherwise
 it is \"Candidate\(s\)\" by default."
   (when helm-alive-p
     (unless (helm-empty-source-p)
-      (propertize
-       (format "[%s %s]"
-               (helm-get-candidate-number 'in-current-source)
-               (or name "Candidate(s)"))
-       'face 'helm-candidate-number))))
+      (let ((nc (helm-get-candidate-number 'in-current-source)))
+        (propertize
+         (format "[%s %s]" nc
+                 (or name (concat "Candidate" (if (= nc 1) "s"))))
+        'face 'helm-candidate-number)))))
 
 (cl-defun helm-move-selection-common (&key where direction)
   "Move the selection marker to a new position.
