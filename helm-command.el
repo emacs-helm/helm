@@ -171,7 +171,8 @@ You can get help on each command by persistent action."
                         :nomark t
                         :keymap helm-M-x-map
                         :candidates-in-buffer t
-                        :fc-transformer 'helm-M-x-transformer))
+                        :fc-transformer 'helm-M-x-transformer
+                        :hist-fc-transformer 'helm-M-x-transformer))
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))

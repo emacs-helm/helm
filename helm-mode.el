@@ -226,6 +226,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (volatile t)
                             sort
                             (fc-transformer 'helm-cr-default-transformer)
+                            hist-fc-transformer
                             marked-candidates
                             nomark
                             (alistp t))
@@ -292,6 +293,9 @@ Keys description:
 - SORT: A predicate to give to `sort' e.g `string-lessp'.
 
 - FC-TRANSFORMER: A `filtered-candidate-transformer' function.
+
+- HIST-FC-TRANSFORMER: A `filtered-candidate-transformer'
+  function for the history source.
 
 - MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
 
@@ -366,21 +370,24 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                                (delete default all)))
                                              all)
                                            :test 'equal))))))
-           (src-hist `((name . ,(format "%s History" name))
-                       (candidates . ,history-get-candidates)
-                       (filtered-candidate-transformer
-                        . (lambda (candidates sources)
-                            (cl-loop for i in candidates
-                                  ;; Input is added to history in completing-read's
-                                  ;; and may be regexp-quoted, so unquote it.
-                                  for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                  do (set-text-properties 0 (length cand) nil cand)
-                                  collect cand)))
-                       (persistent-action . ,persistent-action)
-                       (persistent-help . ,persistent-help)
-                       (keymap . ,loc-map)
-                       (mode-line . ,mode-line)
-                       (action . ,action-fn)))
+           (src-hist (helm-build-sync-source
+                      (format "%s History" name)
+                      :candidates history-get-candidates
+                      :filtered-candidate-transformer
+                      (append '((lambda (candidates sources)
+                                  (cl-loop for i in candidates
+                                           ;; Input is added to history in completing-read's
+                                           ;; and may be regexp-quoted, so unquote it.
+                                           for cand = (replace-regexp-in-string "\\s\\" "" i)
+                                           do (set-text-properties 0 (length cand) nil cand)
+                                           collect cand)))
+                              (and hist-fc-transformer
+                                   (list hist-fc-transformer)))
+                      :persistent-action persistent-action
+                      :persistent-help persistent-help
+                      :keymap loc-map
+                      :mode-line mode-line
+                      :action action-fn))
            (src `((name . ,name)
                   (candidates . ,get-candidates)
                   (filtered-candidate-transformer . ,fc-transformer)
