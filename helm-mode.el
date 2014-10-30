@@ -370,24 +370,23 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                                (delete default all)))
                                              all)
                                            :test 'equal))))))
-           (src-hist (helm-build-sync-source
-                      (format "%s History" name)
-                      :candidates history-get-candidates
-                      :filtered-candidate-transformer
-                      (append '((lambda (candidates sources)
-                                  (cl-loop for i in candidates
-                                           ;; Input is added to history in completing-read's
-                                           ;; and may be regexp-quoted, so unquote it.
-                                           for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                           do (set-text-properties 0 (length cand) nil cand)
-                                           collect cand)))
-                              (and hist-fc-transformer
-                                   (list hist-fc-transformer)))
-                      :persistent-action persistent-action
-                      :persistent-help persistent-help
-                      :keymap loc-map
-                      :mode-line mode-line
-                      :action action-fn))
+           (src-hist (helm-build-sync-source (format "%s History" name)
+                       :candidates history-get-candidates
+                       :filtered-candidate-transformer
+                       (append '((lambda (candidates sources)
+                                   (cl-loop for i in candidates
+                                            ;; Input is added to history in completing-read's
+                                            ;; and may be regexp-quoted, so unquote it.
+                                            for cand = (replace-regexp-in-string "\\s\\" "" i)
+                                            do (set-text-properties 0 (length cand) nil cand)
+                                            collect cand)))
+                               (and hist-fc-transformer
+                                    (list hist-fc-transformer)))
+                       :persistent-action persistent-action
+                       :persistent-help persistent-help
+                       :keymap loc-map
+                       :mode-line mode-line
+                       :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :filtered-candidate-transformer fc-transformer
@@ -397,16 +396,15 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :keymap loc-map
                   :mode-line mode-line
                   :action action-fn))
-           (src-1 (helm-build-in-buffer-source
-                   name
-                   :data `(lambda () (funcall ',get-candidates))
-                   :filtered-candidate-transformer fc-transformer
-                   :requires-pattern requires-pattern
-                   :persistent-action persistent-action
-                   :persistent-help persistent-help
-                   :keymap loc-map
-                   :mode-line mode-line
-                   :action action-fn))
+           (src-1 (helm-build-in-buffer-source name
+                    :data `(lambda () (funcall ',get-candidates))
+                    :filtered-candidate-transformer fc-transformer
+                    :requires-pattern requires-pattern
+                    :persistent-action persistent-action
+                    :persistent-help persistent-help
+                    :keymap loc-map
+                    :mode-line mode-line
+                    :action action-fn))
            (src-list (list src-hist
                            (if candidates-in-buffer
                                src-1

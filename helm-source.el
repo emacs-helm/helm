@@ -892,21 +892,25 @@ an eieio class."
 (defmacro helm-build-sync-source (name &rest args)
   "Build a synchronous helm source with name NAME.
 Args ARGS are keywords provided by `helm-source-sync'."
+  (declare (indent 1))
   `(helm-make-source ,name 'helm-source-sync ,@args))
 
 (defmacro helm-build-async-source (name &rest args)
   "Build a asynchronous helm source with name NAME.
 Args ARGS are keywords provided by `helm-source-async'."
+  (declare (indent 1))
   `(helm-make-source ,name 'helm-source-async ,@args))
 
 (defmacro helm-build-in-buffer-source (name &rest args)
   "Build a helm source with name NAME using `candidates-in-buffer' method.
 Args ARGS are keywords provided by `helm-source-in-buffer'."
+  (declare (indent 1))
   `(helm-make-source ,name 'helm-source-in-buffer ,@args))
 
 (defmacro helm-build-dummy-source (name &rest args)
   "Build a helm source with name NAME using `dummy' method.
 Args ARGS are keywords provided by `helm-source-dummy'."
+  (declare (indent 1))
   `(helm-make-source ,name 'helm-source-dummy ,@args))
 
 ;; Types
