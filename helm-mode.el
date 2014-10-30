@@ -388,27 +388,25 @@ that use `helm-comp-read' See `helm-M-x' for example."
                       :keymap loc-map
                       :mode-line mode-line
                       :action action-fn))
-           (src `((name . ,name)
-                  (candidates . ,get-candidates)
-                  (filtered-candidate-transformer . ,fc-transformer)
-                  (requires-pattern . ,requires-pattern)
-                  (persistent-action . ,persistent-action)
-                  (persistent-help . ,persistent-help)
-                  (keymap . ,loc-map)
-                  (mode-line . ,mode-line)
-                  (action . ,action-fn)))
-           (src-1 `((name . ,name)
-                    (init . (lambda ()
-                              (helm-init-candidates-in-buffer
-                                  'global (funcall ',get-candidates))))
-                    (candidates-in-buffer)
-                    (filtered-candidate-transformer . ,fc-transformer)
-                    (requires-pattern . ,requires-pattern)
-                    (persistent-action . ,persistent-action)
-                    (persistent-help . ,persistent-help)
-                    (keymap . ,loc-map)
-                    (mode-line . ,mode-line)
-                    (action . ,action-fn)))
+           (src (helm-build-sync-source name
+                  :candidates get-candidates
+                  :filtered-candidate-transformer fc-transformer
+                  :requires-pattern requires-pattern
+                  :persistent-action persistent-action
+                  :persistent-help persistent-help
+                  :keymap loc-map
+                  :mode-line mode-line
+                  :action action-fn))
+           (src-1 (helm-build-in-buffer-source
+                   name
+                   :data `(lambda () (funcall ',get-candidates))
+                   :filtered-candidate-transformer fc-transformer
+                   :requires-pattern requires-pattern
+                   :persistent-action persistent-action
+                   :persistent-help persistent-help
+                   :keymap loc-map
+                   :mode-line mode-line
+                   :action action-fn))
            (src-list (list src-hist
                            (if candidates-in-buffer
                                src-1
