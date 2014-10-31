@@ -93,9 +93,10 @@ Return nil if no mode-map found."
       (helm-M-x-get-major-mode-command-alist (symbol-value map)))))
 
 
-(defun helm-M-x-transformer (candidates _source)
+(defun helm-M-x-transformer-1 (candidates &optional sort)
   "filtered-candidate-transformer to show bindings in emacs commands.
-Show global bindings and local bindings according to current `major-mode'."
+Show global bindings and local bindings according to current `major-mode'.
+If SORT is non nil sort list with `helm-generic-sort-fn'."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
@@ -115,7 +116,15 @@ Show global bindings and local bindings according to current `major-mode'."
                 cand)
           into ls
           finally return
-          (sort ls #'helm-generic-sort-fn))))
+          (if sort (sort ls #'helm-generic-sort-fn) ls))))
+
+(defun helm-M-x-transformer (candidates _source)
+  "Transformer function for `helm-M-x' candidates."
+  (helm-M-x-transformer-1 candidates 'sort))
+
+(defun helm-M-x-transformer-hist (candidates _source)
+  "Transformer function for `helm-M-x' candidates history."
+  (helm-M-x-transformer-1 candidates))
 
 (defun helm-M-x--notify-prefix-arg ()
   ;; Notify a prefix-arg set AFTER calling M-x.
@@ -172,7 +181,7 @@ You can get help on each command by persistent action."
                         :keymap helm-M-x-map
                         :candidates-in-buffer t
                         :fc-transformer 'helm-M-x-transformer
-                        :hist-fc-transformer 'helm-M-x-transformer))
+                        :hist-fc-transformer 'helm-M-x-transformer-hist))
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
