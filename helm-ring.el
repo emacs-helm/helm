@@ -367,6 +367,34 @@ First call open the kill-ring browser, next calls move to next line."
         :resume 'noresume
         :allow-nest t))
 
+;;;###autoload
+(defun helm-execute-kmacro ()
+  "Keyboard macros with helm interface.
+Define your macros with `f3' and `f4'.
+See (info \"(emacs) Keyboard Macros\") for detailed infos.
+This command is useful when used with persistent action."
+  (interactive)
+  (helm :sources
+        (helm-build-sync-source "Kmacro"
+          :candidates (lambda ()
+                        (helm-fast-remove-dups
+                         (cons (kmacro-ring-head)
+                               kmacro-ring)
+                         :test 'equal))
+          :multiline t
+          :candidate-transformer
+          (lambda (candidates)
+            (cl-loop for c in candidates collect
+                     (propertize (help-key-description (car c) nil)
+                                 'helm-realvalue c)))
+          :action
+          (helm-make-actions
+           "Execute kmacro (`C-u <n>' to execute <n> times)"
+           (lambda (candidate)
+             (interactive)
+             (kmacro-exec-ring-item
+              candidate helm-current-prefix-arg))))))
+
 (provide 'helm-ring)
 
 ;; Local Variables:
