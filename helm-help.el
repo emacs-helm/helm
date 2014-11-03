@@ -981,7 +981,7 @@ f1/f2/f-n:NthAct \
 ;;;###autoload
 (defvar helm-comp-read-mode-line "\
 \\<helm-comp-read-map>\
-\\[helm-cr-empty-string]:Empty \
+C/\\[helm-cr-empty-string]:Empty \
 \\<helm-map>\
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
