@@ -387,6 +387,7 @@ This command is useful when used with persistent action."
             (cl-loop for c in candidates collect
                      (propertize (help-key-description (car c) nil)
                                  'helm-realvalue c)))
+          :persistent-help "Execute kmacro"
           :action
           (helm-make-actions
            "Execute kmacro (`C-u <n>' to execute <n> times)"
