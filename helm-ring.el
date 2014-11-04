@@ -394,12 +394,7 @@ This command is useful when used with persistent action."
            (lambda (candidate)
              (interactive)
              (kmacro-exec-ring-item
-              candidate helm-current-prefix-arg))
-           "Delete kmacro"
-           (lambda (candidate)
-             (if (> (length kmacro-ring) 1)
-                 (setq kmacro-ring (delete candidate kmacro-ring))
-                 (kmacro-delete-ring-head)))))))
+              candidate helm-current-prefix-arg))))))
 
 (provide 'helm-ring)
 
