@@ -70,7 +70,14 @@ You can ommit the %e spec if you don't want to be prompted for types.
 independents, so you can enable `helm-grep-default-command' with ack-grep
 and `helm-grep-default-recurse-command' with grep if you want to be faster
 on recursive grep.
-NOTE: remote grepping is not available with ack-grep."
+
+NOTE: Remote grepping is not available with ack-grep,
+      and badly supported with grep because tramp handle badly
+      repeated remote processes in a short delay (< to 5s).
+
+      When using ack-grep, don't forget to customize
+      `helm-ack-grep-executable' if a different name is used on your
+      system."
   :group 'helm-grep
   :type  'string)
 
