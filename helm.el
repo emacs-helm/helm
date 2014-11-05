@@ -898,7 +898,14 @@ not `exit-minibuffer' or unwanted functions."
         for count from 1 to 50
         for btf = (backtrace-frame count)
         for fn = (cl-second btf)
-        if (and (commandp fn) (not (memq fn bl))) return fn
+        if (and
+            ;; In some case we may have in the way an
+            ;; advice compiled resulting in byte-code,
+            ;; ignore it (Issue #691).
+            (symbolp fn)
+            (commandp fn)
+            (not (memq fn bl)))
+        return fn
         else
         if (and (eq fn 'call-interactively)
                 (> (length btf) 2))
