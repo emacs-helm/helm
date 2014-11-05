@@ -80,6 +80,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                (search-backward helm-ec-target nil t)
                (string= (buffer-substring (point) pt) helm-ec-target))
       (delete-region (point) pt)))
+  (when (string-match "\\`\\*" helm-ec-target) (insert "*"))
   (cond ((string-match "\\`~/?" helm-ec-target)
          (insert (helm-quote-whitespace (abbreviate-file-name candidate))))
         ((string-match "\\`/" helm-ec-target)
@@ -193,8 +194,10 @@ The function that call this should set `helm-ec-target' to thing at point."
           ;; which is calling `lisp-complete-symbol',
           ;; calling it before would popup the
           ;; *completions* buffer.
-          (t (setq last (car (last (ignore-errors
-                                     (pcomplete-parse-arguments)))))
+          (t (setq last (replace-regexp-in-string
+                         "\\`\\*" ""
+                         (car (last (ignore-errors
+                                      (pcomplete-parse-arguments))))))
              (with-helm-show-completion beg end
                (helm :sources 'helm-source-esh
                      :buffer "*helm pcomplete*"
