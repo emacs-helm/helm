@@ -393,6 +393,10 @@ This command is useful when used with persistent action."
            "Execute kmacro (`C-u <n>' to execute <n> times)"
            (lambda (candidate)
              (interactive)
+             ;; Move candidate on top of list for next use.
+             (setq kmacro-ring (delete candidate kmacro-ring))
+             (kmacro-push-ring)
+             (kmacro-split-ring-element candidate)
              (kmacro-exec-ring-item
               candidate helm-current-prefix-arg))))))
 
