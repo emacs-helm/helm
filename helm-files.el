@@ -1669,6 +1669,8 @@ Note that only existing directories are saved here."
 
 (defun helm-ff-valid-symlink-p (file)
   (helm-aif (condition-case-unless-debug nil
+                ;; `file-truename' send error
+                ;; on cyclic symlinks (Issue #692).
                 (file-truename file)
               (error nil))
       (file-exists-p it)))
