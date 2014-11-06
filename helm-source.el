@@ -852,14 +852,14 @@ an eieio class."
         (oset source
               :init (delq
                      nil
-                     `(,(and (null (eq 'helm-default-init-source-in-buffer-function
-                                       cur-init))
-                             cur-init)
-                        (lambda ()
-                          (helm-init-candidates-in-buffer
-                              'global
-                            (if (functionp ',it) (funcall ',it)
-                                (if (stringp ,it) ,it ',it)))))))))
+                     (list
+                      (and (null (eq 'helm-default-init-source-in-buffer-function
+                                     cur-init))
+                           cur-init)
+                      (lambda ()
+                        (helm-init-candidates-in-buffer
+                            'global
+                          (if (functionp it) (funcall it) it))))))))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
