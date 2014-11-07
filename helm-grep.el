@@ -73,11 +73,7 @@ on recursive grep.
 
 NOTE: Remote grepping is not available with ack-grep,
       and badly supported with grep because tramp handle badly
-      repeated remote processes in a short delay (< to 5s).
-
-      When using ack-grep, don't forget to customize
-      `helm-ack-grep-executable' if a different name is used on your
-      system."
+      repeated remote processes in a short delay (< to 5s)."
   :group 'helm-grep
   :type  'string)
 
@@ -92,11 +88,6 @@ See `helm-grep-default-command' for format specs and infos about ack-grep."
   "zgrep -a -n%cH -e %p %f"
   "Default command for Zgrep.
 See `helm-grep-default-command' for infos on format specs."
-  :group 'helm-grep
-  :type  'string)
-
-(defcustom helm-ack-grep-executable "ack-grep"
-  "Default ack-grep command."
   :group 'helm-grep
   :type  'string)
 
@@ -307,21 +298,17 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
     (if (and exe (string= exe "git")) "git-grep" exe)))
 
 (cl-defun helm-grep-use-ack-p (&key where)
-  (let ((rec-com (helm-grep-command t))
-        (norm-com (helm-grep-command)))
+  (let* ((rec-com (helm-grep-command t))
+         (norm-com (helm-grep-command))
+         (norm-com-ack-p (string-match "\\`ack" norm-com))
+         (rec-com-ack-p (string-match "\\`ack" rec-com)))
     (cl-case where
-      (default   (and norm-com
-                      (string= norm-com helm-ack-grep-executable)))
-      (recursive (and rec-com
-                      (string= rec-com helm-ack-grep-executable)))
-      (strict    (and norm-com rec-com
-                      (string= rec-com helm-ack-grep-executable)
-                      (string= norm-com helm-ack-grep-executable)))
+      (default   (and norm-com norm-com-ack-p))
+      (recursive (and rec-com rec-com-ack-p))
+      (strict    (and norm-com rec-com rec-com-ack-p norm-com-ack-p))
       (t         (and (not (and norm-com (string= norm-com "git-grep")))
-                      (or (and norm-com
-                               (string= norm-com helm-ack-grep-executable))
-                          (and rec-com
-                               (string= rec-com helm-ack-grep-executable))))))))
+                      (or (and norm-com norm-com-ack-p)
+                          (and rec-com rec-com-ack-p)))))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
   (let* ((default-directory (or helm-default-directory
@@ -727,17 +714,21 @@ Special commands:
   "Return a list of known ack-grep types."
   (with-temp-buffer
     ;; "--help-types" works with both 1.96 and 2.1+, while
-    ;; "--help types" works only with 1.96 Issue #422
-    (call-process helm-ack-grep-executable nil t nil "--help-types")
+    ;; "--help types" works only with 1.96 Issue #422.
+    ;; `helm-grep-command' should return the ack executable
+    ;; when this function is used in the right context
+    ;; i.e After checking is we are using ack-grep with
+    ;; `helm-grep-use-ack-p'.
+    (call-process (helm-grep-command t) nil t nil "--help-types")
     (goto-char (point-min))
     (cl-loop while (re-search-forward
                     "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
-          collect (cons (concat (match-string 2)
-                                " [" (match-string 3) "]")
-                        (match-string 2))
-          collect (cons (concat "no" (match-string 2)
-                                " [" (match-string 3) "]")
-                        (concat "no" (match-string 2))))))
+             collect (cons (concat (match-string 2)
+                                   " [" (match-string 3) "]")
+                           (match-string 2))
+             collect (cons (concat "no" (match-string 2)
+                                   " [" (match-string 3) "]")
+                           (concat "no" (match-string 2))))))
 
 (defun helm-grep-ack-types-transformer (candidates _source)
   (cl-loop for i in candidates
