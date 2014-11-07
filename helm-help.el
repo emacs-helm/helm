@@ -760,7 +760,8 @@ the command is called once for each file like this:
 
 You can get help on any command with persistent action (C-j).
 
-All the prefix args passed BEFORE running `helm-M-x' are ignored.
+All the prefix args passed BEFORE running `helm-M-x' are ignored,
+you should have an error message if you do so.
 When you want to pass prefix args, pass them AFTER starting `helm-M-x',
 you will have a prefix arg counter appearing in mode-line notifying you
 the amount of prefix args entered.

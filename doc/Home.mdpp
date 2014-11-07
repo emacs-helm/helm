@@ -43,6 +43,43 @@ to lexical-binding and eieio), don't be afraid, just ignore them ;-).
 
 Bad installation of helm, please reinstall, See [Here](https://github.com/emacs-helm/helm/wiki#ihaveupdatedfrommelpaandihaveerrors) how to do.
 
+## I have an error message when starting helm-M-x with a prefix arg
+
+Please pass your prefix args AFTER starting helm-M-x.
+Read the embeded documentation for more infos (C-c ?).
+
+## I want to modify source attributes but source is nil (e.g helm-occur)
+
+If the source is `nil`, it is probably setup when command starts, and probably
+it is defined using new `helm-make-source` with its own class.
+If the source is defined with a specialized class (not a generic class like
+`helm-source-sync`, `helm-source-async`, `helm-source-in-buffer`, `helm-source-dummy`)
+You can add a new defmethod in your init file e.g:
+
+```emacs-lisp
+(defmethod helm-setup-user-source ((source helm-source-ffiles))
+  (helm-source-add-action-to-source-if
+   "Byte compile file(s) async"
+   'async-byte-compile-file
+   source
+   'helm-ff-candidates-lisp-p))
+```
+or
+
+```emacs-lisp
+(defmethod helm-setup-user-source ((source helm-source-multi-occur))
+  (oset source :follow 1))
+```
+You can also setup the source yourself:
+
+```emacs-lisp
+(with-eval-after-load "helm-regexp.el"
+  (setq helm-source-occur (helm-make-source "Occur" 'helm-source-multi-occur))
+  (setq helm-source-occur (helm-make-source "Moccur" 'helm-source-multi-occur)))
+```
+
+NOTE: Don't define a new `defmethod` `helm-setup-user-source` with generic classes as specified above.
+
 # Wiki maintainer instructions
 
 1. Checkout wiki repo at `git@github.com:emacs-helm/helm.wiki.git`
