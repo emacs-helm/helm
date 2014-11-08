@@ -2600,15 +2600,15 @@ e.g helm.el$
                          candidate))
     (string-match (funcall fun helm-pattern) candidate))))
 
-(defun helm-fuzzy-search (candidate)
+(defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for source using `candidates-in-buffer'."
-  (let ((fun (if (string-match "\\`\\^" helm-pattern)
+  (let ((fun (if (string-match "\\`\\^" pattern)
                  #'identity
                  #'helm--mapconcat-candidate)))
-  (if (string-match "\\`!" helm-pattern)
-      (not (re-search-forward (funcall fun (substring helm-pattern 1))
+  (if (string-match "\\`!" pattern)
+      (not (re-search-forward (funcall fun (substring pattern 1))
                               nil t))
-    (re-search-forward (funcall fun helm-pattern) nil t))))
+    (re-search-forward (funcall fun pattern) nil t))))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
