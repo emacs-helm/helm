@@ -2606,8 +2606,9 @@ e.g helm.el$
                  #'identity
                  #'helm--mapconcat-candidate)))
   (if (string-match "\\`!" pattern)
-      (not (re-search-forward (funcall fun (substring pattern 1))
-                              nil t))
+      ;; FIXME this is totally wrong!
+      ;; I need a negation regexp returned by helm--mapconcat-candidate.
+      (not (re-search-forward (funcall fun (substring pattern 1)) nil t))
     (re-search-forward (funcall fun pattern) nil t))))
 
 (defun helm-match-functions (source)
