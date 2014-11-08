@@ -48,7 +48,12 @@ Bad installation of helm, please reinstall, See [Here](https://github.com/emacs-
 Please pass your prefix args AFTER starting helm-M-x.
 Read the embeded documentation for more infos (C-c ?).
 
-## I want to modify source attributes but source is nil (e.g helm-occur)
+## I cannot exit with empty string in completing-read's
+
+The answer is in your mode-line:
+`C-RET` or `M-RET`.
+
+## I want to modify source attributes but source is nil e.g helm-occur
 
 If the source is `nil`, it is probably setup when command starts, and probably
 it is defined using new `helm-make-source` with its own class.
@@ -77,12 +82,8 @@ You can also setup the source yourself:
   (setq helm-source-occur (helm-make-source "Occur" 'helm-source-multi-occur))
   (setq helm-source-occur (helm-make-source "Moccur" 'helm-source-multi-occur)))
 ```
+_Note:_ Don't define a new `defmethod` `helm-setup-user-source` with generic classes as specified above.
 
-NOTE: Don't define a new `defmethod` `helm-setup-user-source` with generic classes as specified above.
-
-## I cannot exit with empty string in completing-read's
-
-The answer is in your mode-line: `C-RET` or `M-RET`
 
 # Wiki maintainer instructions
 

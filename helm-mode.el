@@ -492,6 +492,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
    (helm
     :sources (helm-build-in-buffer-source name
                :init `(lambda ()
+                        (require 'helm-elisp)
                         (with-current-buffer (helm-candidate-buffer 'global)
                           (goto-char (point-min))
                           (when (and ,default (stringp ,default)
