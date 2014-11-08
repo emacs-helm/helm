@@ -80,6 +80,10 @@ You can also setup the source yourself:
 
 NOTE: Don't define a new `defmethod` `helm-setup-user-source` with generic classes as specified above.
 
+## I cannot exit with empty string in completing-read's
+
+The answer is in your mode-line: `C-RET` or `M-RET`
+
 # Wiki maintainer instructions
 
 1. Checkout wiki repo at `git@github.com:emacs-helm/helm.wiki.git`

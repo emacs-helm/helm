@@ -334,11 +334,13 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
+    (define-key map (kbd "<M-RET>")       'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
+    (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c ?")         'helm-read-file-name-help)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   nil nil 'helm-ff-delete-char-backward--exit-fn)

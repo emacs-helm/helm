@@ -409,11 +409,11 @@ By default `helm-read-file-name' use the persistent actions of `helm-find-files'
 \nSpecific commands for helm-read-file-name:
 \\<helm-read-file-map>
 \\[helm-find-files-up-one-level]\t\t->Go down precedent directory.
-\\[helm-ff-run-toggle-auto-update]\t->Toggle auto expansion of directories.
+\\[helm-ff-run-toggle-auto-update]\t\t->Toggle auto expansion of directories.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
 \\[helm-ff-file-name-history]\t\t->File name history.
-\\[helm-cr-empty-string]\t->Maybe return empty string (unless `must-match').
-\\[helm-next-source]\t->Goto next source.
+C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
+\\[helm-next-source]\t\t->Goto next source.
 \\[helm-previous-source]\t->Goto previous source.
 \\[helm-read-file-name-help]\t\t->Display this help info.
 \n== Helm Map ==
@@ -886,7 +886,7 @@ f1/f2/f-n:NthAct"
 (defvar helm-read-file-name-mode-line-string "\
 \\<helm-read-file-map>\
 \\[helm-read-file-name-help]:Help \
-\\[helm-cr-empty-string]:Empty \
+C/\\[helm-cr-empty-string]:Empty \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
