@@ -490,30 +490,24 @@ that use `helm-comp-read' See `helm-M-x' for example."
   "Specialized function for fast symbols completion in `helm-mode'."
   (or
    (helm
-    :sources `((name . ,name)
-               (init . (lambda ()
-                         (with-current-buffer (helm-candidate-buffer 'global)
-                           (goto-char (point-min))
-                           (when (and ,default (stringp ,default)
-                                      ;; Some defaults args result as
-                                      ;; (symbol-name nil) == "nil".
-                                      ;; e.g debug-on-entry.
-                                      (not (string= ,default "nil"))
-                                      (not (string= ,default "")))
-                             (insert (concat ,default "\n")))
-                           (cl-loop for sym in (all-completions "" obarray ',test)
-                                 for s = (intern sym)
-                                 unless (or (and ,default (string= sym ,default))
-                                            (keywordp s))
-                                 do (insert (concat sym "\n"))))))
-               ;; FIXME for some reason I have to reload keymap
-               ;; here because it is overhidden by minibuf loc map.
-               ;; This shouldn't be needed.
-               (keymap . ,helm-map)
-               (persistent-action . helm-lisp-completion-persistent-action)
-               (persistent-help . "Show brief doc in mode-line")
-               (candidates-in-buffer)
-               (action . identity))
+    :sources (helm-build-in-buffer-source name
+               :init `(lambda ()
+                        (with-current-buffer (helm-candidate-buffer 'global)
+                          (goto-char (point-min))
+                          (when (and ,default (stringp ,default)
+                                     ;; Some defaults args result as
+                                     ;; (symbol-name nil) == "nil".
+                                     ;; e.g debug-on-entry.
+                                     (not (string= ,default "nil"))
+                                     (not (string= ,default "")))
+                            (insert (concat ,default "\n")))
+                          (cl-loop for sym in (all-completions "" obarray ',test)
+                                   for s = (intern sym)
+                                   unless (or (and ,default (string= sym ,default))
+                                              (keywordp s))
+                                   do (insert (concat sym "\n")))))
+               :persistent-action 'helm-lisp-completion-persistent-action
+               :persistent-help "Show brief doc in mode-line")
     :prompt prompt
     :buffer buffer
     :input init
