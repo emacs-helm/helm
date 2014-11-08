@@ -366,6 +366,15 @@
   attribute `candidates'), since they perform pattern matching
   themselves.")
 
+   (fuzzy-match
+    :initarg :fuzzy-match
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Enable fuzzy matching in this source.
+  This will overwrite settings in MATCH slot, and for
+  sources build with child class `helm-source-in-buffer' the SEARCH slot.")
+
    (nomark
     :initarg :nomark
     :initform nil
@@ -842,11 +851,15 @@ an eieio class."
 (defmethod helm-setup-user-source ((_source helm-source)))
 
 (defmethod helm--setup-source ((source helm-source-sync))
+  (when (slot-value source :fuzzy-match)
+    (oset source :match 'helm-fuzzy-match))
   (when (slot-value source :matchplugin)
     (oset source :match
           (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
+  (when (slot-value source :fuzzy-match)
+    (oset source :search 'helm-fuzzy-search))
   (let ((cur-init (slot-value source :init)))
     (helm-aif (slot-value source :data)
         (oset source

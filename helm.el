@@ -2571,6 +2571,26 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
 Default function to match candidates according to `helm-pattern'."
   (string-match helm-pattern candidate))
 
+(defun helm-fuzzy-match (candidate)
+  "Check if `helm-pattern' fuzzy match CANDIDATE."
+  (let ((fun (if (string-match "\\`\\^" helm-pattern)
+                 #'identity
+                 #'helm--mapconcat-candidate)))
+  (if (string-match "\\`!" helm-pattern)
+      (not (string-match (funcall fun (substring helm-pattern 1))
+                         candidate))
+    (string-match (funcall fun helm-pattern) candidate))))
+
+(defun helm-fuzzy-search (candidate)
+  "Same as `helm-fuzzy-match' but for source using `candidates-in-buffer'."
+  (let ((fun (if (string-match "\\`\\^" helm-pattern)
+                 #'identity
+                 #'helm--mapconcat-candidate)))
+  (if (string-match "\\`!" helm-pattern)
+      (not (re-search-forward (funcall fun (substring helm-pattern 1))
+                              nil t))
+    (re-search-forward (funcall fun helm-pattern) nil t))))
+
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
                       (assoc-default 'match-strict source)
