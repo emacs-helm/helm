@@ -2571,6 +2571,25 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
 Default function to match candidates according to `helm-pattern'."
   (string-match helm-pattern candidate))
 
+(defun helm--mapconcat-candidate (candidate)
+  "Transform string CANDIDATE in regexp for further fuzzy matching.
+e.g helm.el$
+    => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
+    ^helm.el$
+    => \"helm[.]el$\"."
+  (let ((ls (split-string candidate "" t)))
+    (if (string= "^" (car ls))
+        (mapconcat (lambda (c)
+                     (if (string= c ".")
+                         (concat "[" c "]") c))
+                   (cdr ls) "")
+      (mapconcat (lambda (c)
+                   (cond ((string= c ".")
+                          (concat "[^" c "]*" (concat "[" c "]")))
+                         ((string= c "$") c)
+                         (t (concat "[^" c "]*" (regexp-quote c)))))
+                 ls ""))))
+
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
   (let ((fun (if (string-match "\\`\\^" helm-pattern)
