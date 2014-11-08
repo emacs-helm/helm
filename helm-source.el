@@ -364,7 +364,9 @@
 
   This attribute has no effect for asynchronous sources (see
   attribute `candidates'), since they perform pattern matching
-  themselves.")
+  themselves.
+
+  Note that FUZZY-MATCH slot will overhide value of this slot.")
 
    (fuzzy-match
     :initarg :fuzzy-match
@@ -587,7 +589,10 @@
     :documentation
     "  List of functions like `re-search-forward' or `search-forward'.
   Buffer search function used by `helm-candidates-in-buffer'.
-  By default, `helm-candidates-in-buffer' uses `re-search-forward'.")
+  By default, `helm-candidates-in-buffer' uses `re-search-forward'.
+  The function should take one arg PATTERN.
+
+  Note that FUZZY-MATCH slot wiil overhide value of this slot.")
 
    (search-from-end
     :initarg :search-from-end
