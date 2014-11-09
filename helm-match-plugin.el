@@ -301,6 +301,7 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
         while (funcall searchfn1 (or (cdar pat) "") nil t)
         for bol = (point-at-bol)
         for eol = (point-at-eol)
+        ;; FIXME: Negation (!) is broken (never worked indeed).
         if (cl-loop for (pred . str) in (cdr pat) always
                  (progn (goto-char bol)
                         (funcall pred (funcall searchfn2 str eol t))))
