@@ -863,8 +863,6 @@ an eieio class."
           (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
-  (when (slot-value source :fuzzy-match)
-    (oset source :search 'helm-fuzzy-search))
   (let ((cur-init (slot-value source :init)))
     (helm-aif (slot-value source :data)
         (oset source
@@ -878,6 +876,8 @@ an eieio class."
                         (helm-init-candidates-in-buffer
                             'global
                           (if (functionp it) (funcall it) it))))))))
+  (when (slot-value source :fuzzy-match)
+    (oset source :search '(helm-fuzzy-search)))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
