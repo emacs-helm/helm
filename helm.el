@@ -3988,11 +3988,14 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN."
-  (let ((part (funcall match-part-fn candidate)))
+  (let ((part (funcall match-part-fn candidate))
+        (fuzzy-p (assoc 'fuzzy-match (helm-get-current-source))))
     (if (string-match " " pattern)
         (cl-loop for i in (split-string pattern " " t)
-              always (string-match i part))
-      (string-match pattern part))))
+              always (string-match
+                      (if fuzzy-p (helm--mapconcat-candidate i) i) part))
+      (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
+                    part))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn
