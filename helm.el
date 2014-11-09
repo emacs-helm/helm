@@ -2601,14 +2601,16 @@ e.g helm.el$
     (string-match (funcall fun helm-pattern) candidate))))
 
 (defun helm-fuzzy-search (pattern)
-  "Same as `helm-fuzzy-match' but for source using `candidates-in-buffer'."
+  "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
   (let ((fun (if (string-match "\\`\\^" pattern)
                  #'identity
                  #'helm--mapconcat-candidate)))
   (if (string-match "\\`!" pattern)
-      ;; FIXME this is totally wrong!
-      ;; I need a negation regexp returned by helm--mapconcat-candidate.
-      (not (re-search-forward (funcall fun (substring pattern 1)) nil t))
+      ;; FIXME: Approch is better but it still broken.
+      ;; Note: match-plugin never worked too for this feature.
+      (prog1 (not (re-search-forward
+                   (funcall fun (substring pattern 1)) (point-at-eol) t))
+        (forward-line 1))
     (re-search-forward (funcall fun pattern) nil t))))
 
 (defun helm-match-functions (source)
