@@ -3947,17 +3947,14 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
            pattern get-line-fn search-fns limit search-from-end
            start-point match-part-fn source))))))
 
-(defun helm-point-is-moved (proc)
-  "If point is moved after executing PROC, return t, otherwise nil."
-  (/= (point) (save-excursion (funcall proc) (point))))
-
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit search-from-end
                                           start-point match-part-fn source)
   (let (buffer-read-only
         matches 
         newmatches
-        (case-fold-search (helm-set-case-fold-search)))
+        (case-fold-search (helm-set-case-fold-search))
+        (stopper (if search-from-end #'bobp #'eobp)))
     (helm-search-from-candidate-buffer-internal
      (lambda ()
        (clrhash helm-cib-hash)
@@ -3965,7 +3962,8 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
          (goto-char start-point)
          (setq newmatches nil)
          (cl-loop with item-count = 0
-               while (funcall searcher pattern)
+               while (and (funcall searcher pattern)
+                          (not (funcall stopper)))
                for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
                when (and (not (gethash cand helm-cib-hash))
                          (or
@@ -3976,13 +3974,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                           ;; match the part of CAND specified by the match-part func.
                           (helm-search-match-part cand pattern match-part-fn)))
                do (helm--accumulate-candidates
-                   cand newmatches helm-cib-hash item-count limit source)
-               unless (helm-point-is-moved
-                       (lambda ()
-                         (if search-from-end
-                             (goto-char (1- (point-at-bol)))
-                           (forward-line 1))))
-               return nil)
+                   cand newmatches helm-cib-hash item-count limit source))
          (setq matches (append matches (nreverse newmatches))))
        (delq nil matches)))))
 
