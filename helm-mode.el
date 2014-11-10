@@ -488,34 +488,40 @@ that use `helm-comp-read' See `helm-M-x' for example."
     (prompt _collection test _require-match init
      hist default _inherit-input-method name buffer)
   "Specialized function for fast symbols completion in `helm-mode'."
-  (or
-   (helm
-    :sources (helm-build-in-buffer-source name
-               :init `(lambda ()
-                        (require 'helm-elisp)
-                        (with-current-buffer (helm-candidate-buffer 'global)
-                          (goto-char (point-min))
-                          (when (and ,default (stringp ,default)
-                                     ;; Some defaults args result as
-                                     ;; (symbol-name nil) == "nil".
-                                     ;; e.g debug-on-entry.
-                                     (not (string= ,default "nil"))
-                                     (not (string= ,default "")))
-                            (insert (concat ,default "\n")))
-                          (cl-loop for sym in (all-completions "" obarray ',test)
-                                   for s = (intern sym)
-                                   unless (or (and ,default (string= sym ,default))
-                                              (keywordp s))
-                                   do (insert (concat sym "\n")))))
-               :persistent-action 'helm-lisp-completion-persistent-action
-               :persistent-help "Show brief doc in mode-line")
-    :prompt prompt
-    :buffer buffer
-    :input init
-    :history hist
-    :resume 'noresume
-    :default (or default ""))
-   (helm-mode--keyboard-quit)))
+  (let ((sources
+         (list (helm-build-in-buffer-source name
+                 :init `(lambda ()
+                          (require 'helm-elisp)
+                          (with-current-buffer (helm-candidate-buffer 'global)
+                            (goto-char (point-min))
+                            (when (and ,default (stringp ,default)
+                                       ;; Some defaults args result as
+                                       ;; (symbol-name nil) == "nil".
+                                       ;; e.g debug-on-entry.
+                                       (not (string= ,default "nil"))
+                                       (not (string= ,default "")))
+                              (insert (concat ,default "\n")))
+                            (cl-loop for sym in (all-completions "" obarray ',test)
+                                     for s = (intern sym)
+                                     unless (or (and ,default (string= sym ,default))
+                                                (keywordp s))
+                                     do (insert (concat sym "\n")))))
+                 :persistent-action 'helm-lisp-completion-persistent-action
+                 :persistent-help "Show brief doc in mode-line")
+               (helm-build-sync-source (concat name " history")
+                 :candidates hist
+                 :persistent-action 'helm-lisp-completion-persistent-action
+                 :persistent-help "Show brief doc in mode-line"))))
+    (or
+     (helm
+      :sources (if helm-mode-reverse-history sources (reverse sources))
+      :prompt prompt
+      :buffer buffer
+      :input init
+      :history hist
+      :resume 'noresume
+      :default (or default ""))
+     (helm-mode--keyboard-quit))))
 
 
 ;;; Generic completing read
