@@ -619,7 +619,7 @@
 
    (match-part
     :initarg :match-part
-    :initform nil
+    :initform 'identity
     :custom function
     :documentation
     "  Allow matching candidate in the line with `candidates-in-buffer'.
