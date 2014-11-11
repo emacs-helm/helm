@@ -2606,10 +2606,11 @@ e.g helm.el$
                  #'identity
                  #'helm--mapconcat-candidate)))
   (if (string-match "\\`!" pattern)
-      ;; FIXME: Approch is better but it still broken.
-      ;; Note: match-plugin never worked too for this feature.
-      (prog1 (not (re-search-forward
-                   (funcall fun (substring pattern 1)) (point-at-eol) t))
+      ;; Don't try to search here, just return
+      ;; the position of line and go ahead,
+      ;; letting match-part fn checking if
+      ;; pattern match against this line.
+      (prog1 (list (point-at-bol) (point-at-eol))
         (forward-line 1))
     (re-search-forward (funcall fun pattern) nil t))))
 
@@ -3961,20 +3962,24 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
        (cl-dolist (searcher search-fns)
          (goto-char start-point)
          (setq newmatches nil)
-         (cl-loop with item-count = 0
-               while (and (funcall searcher pattern)
-                          (not (funcall stopper)))
-               for cand = (funcall get-line-fn (point-at-bol) (point-at-eol))
-               when (and (not (gethash cand helm-cib-hash))
-                         (or
-                          ;; Always collect when cand is matched by searcher funcs
-                          ;; and match-part attr is not present.
-                          (not match-part-fn)
-                          ;; If match-part attr is present, collect only if PATTERN
-                          ;; match the part of CAND specified by the match-part func.
-                          (helm-search-match-part cand pattern match-part-fn)))
-               do (helm--accumulate-candidates
-                   cand newmatches helm-cib-hash item-count limit source))
+         (cl-loop with pos-lst
+                  with item-count = 0
+                  while (and (setq pos-lst (funcall searcher pattern))
+                             (not (funcall stopper)))
+                  for cand = (apply get-line-fn
+                                    (if (and pos-lst (listp pos-lst))
+                                        pos-lst
+                                        (list (point-at-bol) (point-at-eol))))
+                  when (and (not (gethash cand helm-cib-hash))
+                            (or
+                             ;; Always collect when cand is matched by searcher funcs
+                             ;; and match-part attr is not present.
+                             (not match-part-fn)
+                             ;; If match-part attr is present, collect only if PATTERN
+                             ;; match the part of CAND specified by the match-part func.
+                             (helm-search-match-part cand pattern match-part-fn)))
+                  do (helm--accumulate-candidates
+                      cand newmatches helm-cib-hash item-count limit source))
          (setq matches (append matches (nreverse newmatches))))
        (delq nil matches)))))
 
@@ -3983,11 +3988,16 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
   (let ((part (funcall match-part-fn candidate))
         (fuzzy-p (assoc 'fuzzy-match (helm-get-current-source))))
     (if (string-match " " pattern)
+        ;; If pattern contain spaces assume
+        ;; we stop fuzzy matching and use multi pattern matching.
         (cl-loop for i in (split-string pattern " " t)
-              always (string-match
-                      (if fuzzy-p (helm--mapconcat-candidate i) i) part))
-      (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
-                    part))))
+                 always (string-match i part))
+      (if (string-match "\\`!" pattern)
+          (let ((reg (substring pattern 1)))
+            (not (string-match (if fuzzy-p (helm--mapconcat-candidate reg) reg)
+                               part)))
+          (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
+                    part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn
