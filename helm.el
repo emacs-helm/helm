@@ -4003,12 +4003,12 @@ When using fuzzy matching, this function should be always called."
                       (if fuzzy-p
                           (helm--mapconcat-candidate i) i)
                       part)))
-      (if (string-match "\\`!" pattern)
-          (let ((reg (substring pattern 1)))
-            (not (string-match (if fuzzy-p (helm--mapconcat-candidate reg) reg)
-                               part)))
-          (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
-                    part)))))
+        (if (string-match "\\`!" pattern)
+            (let ((reg (substring pattern 1)))
+              (not (string-match (if fuzzy-p (helm--mapconcat-candidate reg) reg)
+                                 part)))
+            (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
+                          part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
                                                       get-line-fn
