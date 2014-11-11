@@ -2605,7 +2605,9 @@ e.g helm.el$
   (let ((fun (if (string-match "\\`\\^" pattern)
                  #'identity
                  #'helm--mapconcat-candidate)))
-  (if (string-match "\\`!" pattern)
+  (if (or (string-match "\\`!" pattern)
+          (cl-loop for p in (split-string pattern " " t)
+                   thereis (string-match "\\`!" p)))
       ;; Don't try to search here, just return
       ;; the position of line and go ahead,
       ;; letting match-part fn checking if
@@ -3984,14 +3986,17 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
        (delq nil matches)))))
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
-  "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN."
+  "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
+When using fuzzy matching, this function should be always called."
   (let ((part (funcall match-part-fn candidate))
         (fuzzy-p (assoc 'fuzzy-match (helm-get-current-source))))
     (if (string-match " " pattern)
         ;; If pattern contain spaces assume
         ;; we stop fuzzy matching and use multi pattern matching.
         (cl-loop for i in (split-string pattern " " t)
-                 always (string-match i part))
+                 always (if (string-match "\\`!" i)
+                            (not (string-match (substring i 1) part))
+                            (string-match i part)))
       (if (string-match "\\`!" pattern)
           (let ((reg (substring pattern 1)))
             (not (string-match (if fuzzy-p (helm--mapconcat-candidate reg) reg)
