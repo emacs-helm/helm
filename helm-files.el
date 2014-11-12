@@ -1591,7 +1591,7 @@ systems."
   "Maybe return PATTERN with it's basename modified as a regexp.
 This happen only when `helm-ff-smart-completion' is enabled.
 This provide a similar behavior as `ido-enable-flex-matching'.
-See also `helm--mapconcat-candidate'.
+See also `helm--mapconcat-pattern'.
 If PATTERN is an url returns it unmodified.
 When PATTERN contain a space fallback to match-plugin.
 If basename contain one or more space fallback to match-plugin.
@@ -1632,7 +1632,7 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
                (replace-regexp-in-string "[*]" "[*]" bn)))
       (t
        (setq bn (if (>= (length bn) 2) ; wait 2nd char before concating.
-                    (helm--mapconcat-candidate bn)
+                    (helm--mapconcat-pattern bn)
                   (concat ".*" (regexp-quote bn))))
        (concat (regexp-quote bd) bn)))))
 
