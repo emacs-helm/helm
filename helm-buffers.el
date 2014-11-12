@@ -412,7 +412,7 @@ i.e same color."
 (defun helm-buffer--match-pattern (pattern candidate)
   (let ((fun (if (and helm-buffers-fuzzy-matching
                       (not (string-match "\\`\\^" pattern)))
-                 #'helm--mapconcat-candidate
+                 #'helm--mapconcat-pattern
                #'identity)))
   (if (string-match "\\`!" pattern)
       (not (string-match (funcall fun (substring pattern 1))

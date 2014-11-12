@@ -2571,30 +2571,32 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
 Default function to match candidates according to `helm-pattern'."
   (string-match helm-pattern candidate))
 
-(defun helm--mapconcat-candidate (candidate)
-  "Transform string CANDIDATE in regexp for further fuzzy matching.
+(defun helm--mapconcat-pattern (pattern)
+  "Transform string PATTERN in regexp for further fuzzy matching.
 e.g helm.el$
     => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
     ^helm.el$
     => \"helm[.]el$\"."
-  (let ((ls (split-string candidate "" t)))
+  (let ((ls (split-string pattern "" t)))
     (if (string= "^" (car ls))
+        ;; Exact match.
         (mapconcat (lambda (c)
-                     (if (string= c ".")
-                         (concat "[" c "]") c))
+                     (if (and (string= c "$")
+                              (string-match "$\\'" pattern))
+                         c (regexp-quote c)))
                    (cdr ls) "")
-      (mapconcat (lambda (c)
-                   (cond ((string= c ".")
-                          (concat "[^" c "]*" (concat "[" c "]")))
-                         ((string= c "$") c)
-                         (t (concat "[^" c "]*" (regexp-quote c)))))
-                 ls ""))))
+        ;; Fuzzy match.
+        (mapconcat (lambda (c)
+                     (if (and (string= c "$")
+                              (string-match "$\\'" pattern))
+                         c (format "[^%s]*%s" c (regexp-quote c))))
+                   ls ""))))
 
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
   (let ((fun (if (string-match "\\`\\^" helm-pattern)
                  #'identity
-                 #'helm--mapconcat-candidate)))
+                 #'helm--mapconcat-pattern)))
   (if (string-match "\\`!" helm-pattern)
       (not (string-match (funcall fun (substring helm-pattern 1))
                          candidate))
@@ -2604,7 +2606,7 @@ e.g helm.el$
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
   (let ((fun (if (string-match "\\`\\^" pattern)
                  #'identity
-                 #'helm--mapconcat-candidate)))
+                 #'helm--mapconcat-pattern)))
   (if (or (string-match "\\`!" pattern)
           (cl-loop for p in (split-string pattern " " t)
                    thereis (string-match "\\`!" p)))
@@ -3995,19 +3997,19 @@ When using fuzzy matching, this function should be always called."
                  (if (string-match "\\`!" i)
                      (not (string-match
                            (if fuzzy-p
-                               (helm--mapconcat-candidate
+                               (helm--mapconcat-pattern
                                 (substring i 1))
                                (substring i 1))
                            part))
                      (string-match
                       (if fuzzy-p
-                          (helm--mapconcat-candidate i) i)
+                          (helm--mapconcat-pattern i) i)
                       part)))
         (if (string-match "\\`!" pattern)
             (let ((reg (substring pattern 1)))
-              (not (string-match (if fuzzy-p (helm--mapconcat-candidate reg) reg)
+              (not (string-match (if fuzzy-p (helm--mapconcat-pattern reg) reg)
                                  part)))
-            (string-match (if fuzzy-p (helm--mapconcat-candidate pattern) pattern)
+            (string-match (if fuzzy-p (helm--mapconcat-pattern pattern) pattern)
                           part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
