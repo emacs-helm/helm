@@ -3557,9 +3557,11 @@ don't exit and send message 'no match'."
              (sit-for 0.5) (message nil))
       (let* ((empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
+             (sel (helm-get-selection))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
-                                     0 'display (helm-get-selection nil 'withprop))
+                                     0 'display
+                                     (helm-get-selection nil 'withprop))
                                     "[?]"))))
         (cond ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm 'confirm))
@@ -3567,7 +3569,11 @@ don't exit and send message 'no match'."
                      'confirm)
                (setq minibuffer-completion-confirm nil)
                (minibuffer-message " [confirm]"))
-              ((and (or empty-buffer-p unknown)
+              ((and (or empty-buffer-p
+                        (unless (and minibuffer-completion-predicate
+                                     (funcall minibuffer-completion-predicate
+                                              sel))
+                          unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
               (t

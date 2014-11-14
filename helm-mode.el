@@ -341,6 +341,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                         (make-composed-keymap
                          must-match-map (or keymap helm-map))
                       (or keymap helm-map)))
+           (minibuffer-completion-predicate test)
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
@@ -748,6 +749,7 @@ Keys description:
                    (make-composed-keymap
                     must-match-map helm-read-file-map)
                  helm-read-file-map))
+         (minibuffer-completion-predicate test)
          (helm-read-file-name-mode-line-string
           (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"
