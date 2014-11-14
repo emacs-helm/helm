@@ -2616,7 +2616,15 @@ e.g helm.el$
       ;; pattern match against this line.
       (prog1 (list (point-at-bol) (point-at-eol))
         (forward-line 1))
-    (re-search-forward (funcall fun pattern) nil t))))
+    (cl-loop while (re-search-forward
+                    (funcall fun (substring pattern 0 1)) nil t)
+             for bol = (point-at-bol)
+             for eol = (point-at-eol)
+             when (progn (goto-char bol)
+                         (re-search-forward (funcall fun pattern) eol t))
+             do (goto-char eol) and return t
+             else do (goto-char eol)
+             finally return nil))))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
