@@ -342,6 +342,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          must-match-map (or keymap helm-map))
                       (or keymap helm-map)))
            (minibuffer-completion-predicate test)
+           (minibuffer-completion-table collection)
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
