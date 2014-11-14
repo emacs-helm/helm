@@ -438,6 +438,19 @@ than `w3m-browse-url' use it."
 ;;; Addressbook.
 ;;
 ;;
+(defun helm-bookmark-addressbook-send-mail-1 (_candidate &optional cc)
+  (let* ((contacts (helm-marked-candidates))
+         (bookmark      (helm-bookmark-get-bookmark-from-name
+                         (car contacts)))
+         (append   (message-buffers)))
+    (addressbook-set-mail-buffer-1 bookmark append)
+    (helm-aif (cdr contacts)
+        (progn
+          (when cc (addressbook-set-mail-buffer-1 (car it) nil cc))
+          (cl-loop for bmk in (cdr it) do
+                   (addressbook-set-mail-buffer-1
+                    (helm-bookmark-get-bookmark-from-name bmk) 'append cc))))))
+
 (defvar helm-source-bookmark-addressbook
   '((name . "Bookmark Addressbook")
     (init . (lambda ()
@@ -469,19 +482,11 @@ than `w3m-browse-url' use it."
                             (cl-loop for bmk in it do
                                   (bookmark-jump
                                    (helm-bookmark-get-bookmark-from-name bmk))))))))
-               ("Send Mail"
-                . (lambda (candidate)
-                    (let* ((contacts (helm-marked-candidates))
-                           (bmk      (helm-bookmark-get-bookmark-from-name
-                                      (car contacts)))
-                           (append   (message-buffers)))
-                      (if append
-                          (addressbook-set-mail-buffer-1 bmk 'append)
-                        (addressbook-set-mail-buffer-1 bmk))
-                      (setq contacts (cdr contacts))
-                      (when contacts
-                        (cl-loop for bmk in contacts do
-                              (addressbook-set-mail-buffer-1 bmk 'append))))))
+               ("Mail To" . helm-bookmark-addressbook-send-mail-1)
+               ("Mail Cc" . (lambda (_candidate)
+                              (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
+               ("Mail Bcc" . (lambda (_candidate)
+                               (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
                ("Edit Bookmark"
                 . (lambda (candidate)
                     (let ((bmk (helm-bookmark-get-bookmark-from-name
