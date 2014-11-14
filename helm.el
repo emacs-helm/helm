@@ -2616,15 +2616,25 @@ e.g helm.el$
       ;; pattern match against this line.
       (prog1 (list (point-at-bol) (point-at-eol))
         (forward-line 1))
-    (cl-loop while (re-search-forward
-                    (funcall fun (substring pattern 0 1)) nil t)
-             for bol = (point-at-bol)
-             for eol = (point-at-eol)
-             when (progn (goto-char bol)
-                         (re-search-forward (funcall fun pattern) eol t))
-             do (goto-char eol) and return t
-             else do (goto-char eol)
-             finally return nil))))
+      ;; We could use here directly `re-search-forward'
+      ;; on the regexp produced by `helm--mapconcat-pattern',
+      ;; but it is very slow because emacs have to do an incredible
+      ;; amount of loops to match e.g "[^f]*o[^o]..." in the whole buffer,
+      ;; more the regexp is long more the amount of loops grow.
+      ;; (Probably leading to a max-lisp-eval-depth error if both
+      ;; regexp and buffer are too big)
+      ;; So just search the first bit of pattern e.g "[^f]*f", and
+      ;; then search the corresponding line with the whole regexp,
+      ;; which increase dramatically the speed of the search.
+      (cl-loop while (re-search-forward
+                      (funcall fun (substring pattern 0 1)) nil t)
+               for bol = (point-at-bol)
+               for eol = (point-at-eol)
+               when (progn (goto-char bol)
+                           (re-search-forward (funcall fun pattern) eol t))
+               do (goto-char eol) and return t
+               else do (goto-char eol)
+               finally return nil))))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
