@@ -877,9 +877,7 @@ an eieio class."
                             'global
                           (if (functionp it) (funcall it) it))))))))
   (when (slot-value source :fuzzy-match)
-    (oset source :search '(helm-fuzzy-search))
-    (unless (oref source :match-part)
-      (oset source :match-part 'identity)))
+    (oset source :search '(helm-fuzzy-search)))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
