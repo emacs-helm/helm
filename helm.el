@@ -3996,10 +3996,12 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                             (or
                              ;; Always collect when cand is matched by searcher funcs
                              ;; and match-part attr is not present.
-                             (not match-part-fn)
-                             ;; If match-part attr is present, collect only if PATTERN
+                             (and (not match-part-fn)
+                                  (not (consp pos-lst)))
+                             ;; If match-part attr is present, or if SEARCHER fn
+                             ;; returns a cons cell, collect PATTERN only if it
                              ;; match the part of CAND specified by the match-part func.
-                             (helm-search-match-part cand pattern match-part-fn)))
+                             (helm-search-match-part cand pattern (or match-part-fn #'identity))))
                   do (helm--accumulate-candidates
                       cand newmatches helm-cib-hash item-count limit source))
          (setq matches (append matches (nreverse newmatches))))
@@ -4007,7 +4009,9 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
-When using fuzzy matching, this function should be always called."
+Because `helm-search-match-part' maybe called even if unspecified
+in source (negation), MATCH-PART-FN default to `identity' to match whole candidate.
+When using fuzzy matching and negation (i.e \"!\"), this function is always called."
   (let ((part (funcall match-part-fn candidate))
         (fuzzy-p (assoc 'fuzzy-match (helm-get-current-source))))
     (if (string-match " " pattern)
