@@ -274,7 +274,7 @@ e.g ((identity . \"foo\") (identity . \"bar\"))."
                       (cons 'not (substring pat 1))
                     (cons 'identity pat)))))
 
-(defun helm-mp-3-match (str &optional pattern)
+(cl-defun helm-mp-3-match (str &optional (pattern helm-pattern))
   "Check if PATTERN match STR.
 When PATTERN contain a space, it is splitted and matching is done
 with the several resulting regexps against STR.
@@ -285,9 +285,9 @@ e.g \"foo bar\"=>((identity . \"foo\") (identity . \"bar\")).
 Then each predicate of cons cell(s) is called with regexp of same
 cons cell against STR (a candidate).
 i.e (identity (string-match \"foo\" \"foo bar\")) => t."
-  (let ((pat (helm-mp-3-get-patterns (or pattern helm-pattern))))
+  (let ((pat (helm-mp-3-get-patterns pattern)))
     (cl-loop for (predicate . regexp) in pat
-          always (funcall predicate (string-match regexp str)))))
+             always (funcall predicate (string-match regexp str)))))
 
 (defun helm-mp-3-search-base (pattern searchfn1 searchfn2)
   "Try to find PATTERN in `helm-buffer' with SEARCHFN1 and SEARCHFN2.

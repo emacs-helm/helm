@@ -2630,8 +2630,8 @@ e.g helm.el$
                       (funcall fun (substring pattern 0 1)) nil t)
                for bol = (point-at-bol)
                for eol = (point-at-eol)
-               when (progn (goto-char bol)
-                           (re-search-forward (funcall fun pattern) eol t))
+               if (progn (goto-char bol)
+                         (re-search-forward (funcall fun pattern) eol t))
                do (goto-char eol) and return t
                else do (goto-char eol)
                finally return nil))))
