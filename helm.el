@@ -2686,12 +2686,11 @@ and `helm-pattern'."
              (if (string-match "[[:upper:]]" pattern) nil t)))
     (t helm-case-fold-search)))
 
-(defun helm-match-from-candidates (cands matchfns limit source)
+(defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
   (let (matches)
     (condition-case err
         (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search))
-              (match-part-fn (assoc-default 'match-part source)))
+              (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
             (let (newmatches)
@@ -2716,6 +2715,7 @@ and `helm-pattern'."
   "Start computing candidates in SOURCE."
   (save-current-buffer
     (let ((matchfns (helm-match-functions source))
+          (matchpartfn (assoc-default 'match-part source))
           (helm-source-name (assoc-default 'name source))
           (helm-current-source source)
           (limit (helm-candidate-number-limit source))
@@ -2732,7 +2732,7 @@ and `helm-pattern'."
             (helm-get-cached-candidates source) limit)
          ;; Compute candidates according to pattern with their match fns.
          (helm-match-from-candidates
-          (helm-get-cached-candidates source) matchfns limit source))
+          (helm-get-cached-candidates source) matchfns matchpartfn limit source))
        source))))
 
 (defun helm-render-source (source matches)
