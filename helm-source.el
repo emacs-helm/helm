@@ -494,6 +494,17 @@
     :initform t
     :custom boolean)
 
+   (match-part
+    :initarg :match-part
+    :initform nil
+    :custom function
+    :documentation
+    "  Allow matching only one part of candidate.
+  If source contain match-part attribute, match is computed only
+  on part of candidate returned by the call of function provided
+  by this attribute. The function should have one arg, candidate,
+  and return only a specific part of candidate.")
+   
    (before-init-hook
     :initarg :before-init-hook
     :initform nil
@@ -615,31 +626,7 @@
   functions will be concatened, which in some cases is not what
   is wanted. When using `search-strict' only this or these
   functions will be used. You can specify those functions as a
-  list of functions or a single symbol function.")
-
-   (match-part
-    :initarg :match-part
-    :initform nil
-    :custom function
-    :documentation
-    "  Allow matching candidate in the line with `candidates-in-buffer'.
-  In candidates-in-buffer sources, match is done with
-  `re-search-forward' which allow matching only a regexp on the
-  `helm-buffer'; when this search is done, match-part allow
-  matching only a specific part of the current line e.g with a
-  line like this:
-
-  filename:candidate-containing-the-word-filename
-
-  What you want is to ignore \"filename\" part and match only
-  \"candidate-containing-the-word-filename\"
-
-  So give a function matching only the part of candidate after \":\"
-
-  If source contain match-part attribute, match is computed only
-  on part of candidate returned by the call of function provided
-  by this attribute. The function should have one arg, candidate,
-  and return only a specific part of candidate.")))
+  list of functions or a single symbol function.")))
 
 (defclass helm-source-dummy (helm-source)
   ((candidates

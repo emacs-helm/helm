@@ -2690,17 +2690,20 @@ and `helm-pattern'."
   (let (matches)
     (condition-case err
         (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search)))
+              (case-fold-search (helm-set-case-fold-search))
+              (match-part-fn (assoc-default 'match-part source)))
           (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
             (let (newmatches)
               (cl-dolist (candidate cands)
                 (unless (gethash candidate helm-match-hash)
-                  (when (funcall match
-                                 (helm-candidate-get-display candidate))
-                    (helm--accumulate-candidates
-                     candidate newmatches
-                     helm-match-hash item-count limit source))))
+                  (let ((target (helm-candidate-get-display candidate)))
+                    (when (funcall match
+                                   (if match-part-fn
+                                       (funcall match-part-fn target) target)) 
+                      (helm--accumulate-candidates
+                       candidate newmatches
+                       helm-match-hash item-count limit source)))))
               ;; filter-one-by-one may return nil candidates, so delq them if some.
               (setq matches (nconc matches (nreverse (delq nil newmatches)))))))
       (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
@@ -2740,7 +2743,7 @@ and `helm-pattern'."
     (if (not (assq 'multiline source))
         (cl-loop for m in matches
                  for count from 1
-                 do (helm-insert-match m 'insert source count)) 
+                 do (helm-insert-match m 'insert source count))
       (let ((start (point))
             (count 0)
             separate)
