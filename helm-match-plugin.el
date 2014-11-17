@@ -297,17 +297,23 @@ instead of matching on a string.
 i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mp-3-get-patterns pattern)
-                        pattern)
-        while (funcall searchfn1 (or (cdar pat) "") nil t)
-        for bol = (point-at-bol)
-        for eol = (point-at-eol)
-        ;; FIXME: Negation (!) is broken (never worked indeed).
-        if (cl-loop for (pred . str) in (cdr pat) always
-                 (progn (goto-char bol)
-                        (funcall pred (funcall searchfn2 str eol t))))
-        do (goto-char eol) and return t
-        else do (goto-char eol)
-        finally return nil))
+                          pattern)
+           when (eq (caar pat) 'not) return
+           (prog1 (list (point-at-bol) (point-at-eol))
+             (forward-line 1))
+           while (condition-case _err
+                     (funcall searchfn1 (or (cdar pat) "") nil t)
+                   (invalid-regexp nil))
+           for bol = (point-at-bol)
+           for eol = (point-at-eol)
+           if (cl-loop for (pred . str) in (cdr pat) always
+                       (progn (goto-char bol)
+                              (funcall pred (condition-case _err
+                                                (funcall searchfn2 str eol t)
+                                              (invalid-regexp nil)))))
+           do (goto-char eol) and return t
+           else do (goto-char eol)
+           finally return nil))
 
 (defun helm-mp-3-search (pattern &rest _ignore)
   (when (stringp pattern)
