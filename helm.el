@@ -3592,7 +3592,8 @@ don't exit and send message 'no match'."
                (minibuffer-message " [confirm]"))
               ((and (or empty-buffer-p
                         (unless (if minibuffer-completing-file-name
-                                    (funcall minibuffer-completion-predicate sel)
+                                    (and minibuffer-completion-predicate
+                                         (funcall minibuffer-completion-predicate sel))
                                     (try-completion sel minibuffer-completion-table
                                                     minibuffer-completion-predicate))
                           unknown))
