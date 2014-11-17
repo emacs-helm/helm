@@ -24,6 +24,9 @@
 (require 'helm-adaptive)
 
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
+(declare-function message-buffers "message.el")
+(declare-function addressbook-set-mail-buffer-1 "ext:addressbook-bookmark.el"
+                  (&optional bookmark-name append cc))
 
 
 (defgroup helm-bookmark nil
