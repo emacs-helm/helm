@@ -751,6 +751,7 @@ Keys description:
                     must-match-map helm-read-file-map)
                  helm-read-file-map))
          (minibuffer-completion-predicate test)
+         (minibuffer-completing-file-name t)
          (helm-read-file-name-mode-line-string
           (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"
