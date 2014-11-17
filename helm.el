@@ -3579,12 +3579,6 @@ don't exit and send message 'no match'."
       (let* ((empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
              (sel (helm-get-selection))
-             (hash-val (and (hash-table-p minibuffer-completion-table)
-                            (gethash sel minibuffer-completion-table)))
-             (type-cand (and minibuffer-completion-table
-                             (cl-typecase (elt minibuffer-completion-table 0)
-                               (symbolp 'symbol)
-                               (t 'string))))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
                                      0 'display
@@ -3597,15 +3591,10 @@ don't exit and send message 'no match'."
                (setq minibuffer-completion-confirm nil)
                (minibuffer-message " [confirm]"))
               ((and (or empty-buffer-p
-                        (unless
-                            (and minibuffer-completion-predicate
-                                 (or (and hash-val
-                                          (apply
-                                           minibuffer-completion-predicate
-                                           (list sel hash-val)))
-                                     (funcall minibuffer-completion-predicate
-                                              (if (eq type-cand 'symbol)
-                                                  (intern-soft sel) sel))))
+                        (unless (if minibuffer-completing-file-name
+                                    (funcall minibuffer-completion-predicate sel)
+                                    (try-completion sel minibuffer-completion-table
+                                                    minibuffer-completion-predicate))
                           unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
