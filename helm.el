@@ -2608,6 +2608,8 @@ e.g helm.el$
                  #'identity
                  #'helm--mapconcat-pattern)))
   (if (or (string-match "\\`!" pattern)
+          ;; FIXME: Returning only if the first
+          ;; pattern have "!" would be much faster. 
           (cl-loop for p in (split-string pattern " " t)
                    thereis (string-match "\\`!" p)))
       ;; Don't try to search here, just return
