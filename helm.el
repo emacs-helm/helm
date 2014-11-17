@@ -3578,6 +3578,10 @@ don't exit and send message 'no match'."
              (sel (helm-get-selection))
              (hash-val (and (hash-table-p minibuffer-completion-table)
                             (gethash sel minibuffer-completion-table)))
+             (type-cand (and minibuffer-completion-table
+                             (cl-typecase (elt minibuffer-completion-table 0)
+                               (symbolp 'symbol)
+                               (t 'string))))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
                                      0 'display
@@ -3597,7 +3601,8 @@ don't exit and send message 'no match'."
                                            minibuffer-completion-predicate
                                            (list sel hash-val)))
                                      (funcall minibuffer-completion-predicate
-                                              sel)))
+                                              (if (eq type-cand 'symbol)
+                                                  (intern-soft sel) sel))))
                           unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
