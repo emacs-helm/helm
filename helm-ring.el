@@ -90,21 +90,23 @@ If nil or zero (disabled), don't truncate candidate, show all."
 (defun helm-kill-ring-transformer (candidates _source)
   "Display only the `helm-kill-ring-max-lines-number' lines of candidate."
   (cl-loop for i in candidates
-        for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
-        if (and helm-kill-ring-max-lines-number
-                (> nlines helm-kill-ring-max-lines-number))
-        collect (cons
-                 (with-temp-buffer
-                   (insert i)
-                   (goto-char (point-min))
-                   (concat
-                    (buffer-substring
-                     (point-min)
-                     (save-excursion
-                       (forward-line helm-kill-ring-max-lines-number)
-                       (point)))
-                    "[...]")) i)
-        else collect i))
+           when (get-text-property 0 'read-only i)
+           do (set-text-properties 0 (length i) '(read-only nil) i)
+           for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
+           if (and helm-kill-ring-max-lines-number
+                   (> nlines helm-kill-ring-max-lines-number))
+           collect (cons
+                    (with-temp-buffer
+                      (insert i)
+                      (goto-char (point-min))
+                      (concat
+                       (buffer-substring
+                        (point-min)
+                        (save-excursion
+                          (forward-line helm-kill-ring-max-lines-number)
+                          (point)))
+                       "[...]")) i)
+           else collect i))
 
 (defun helm-kill-ring-action (str)
   "Insert STR in `kill-ring' and set STR to the head.
