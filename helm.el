@@ -1703,8 +1703,11 @@ For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   ;; Activate the advice for `tramp-read-passwd'.
   (if (fboundp 'advice-add)
-      (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
-    (ad-activate 'tramp-read-passwd))
+      (progn
+        (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+        (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd))
+    (ad-activate 'tramp-read-passwd)
+    (ad-activate 'ange-ftp-get-passwd))
   (catch 'exit ; `exit-minibuffer' use this tag on exit.
     (helm-log (concat "[Start session] " (make-string 41 ?+)))
     (helm-log "any-prompt = %S" any-prompt)
@@ -2281,7 +2284,28 @@ This can be useful for e.g writing quietly a complex regexp."
   (setq helm--reading-passwd-or-string t)
   (unwind-protect
        ;; No need to suspend timer in emacs-24.4
+       ;; it is fixed upstream.
        (apply old--fn args)
+    (setq helm--reading-passwd-or-string nil)
+    (setq helm-suspend-update-flag nil)))
+
+(defun helm--advice-ange-ftp-get-passwd (old--fn &rest args)
+  ;; Suspend update when prompting for a ange password.
+  (setq helm-suspend-update-flag t)
+  (setq overriding-terminal-local-map nil)
+  (setq helm--reading-passwd-or-string t)
+  (unwind-protect
+       (apply old--fn args)
+    (setq helm--reading-passwd-or-string nil)
+    (setq helm-suspend-update-flag nil)))
+
+(defadvice ange-ftp-get-passwd (around disable-helm-update)
+  ;; Suspend update when prompting for a ange password.
+  (setq helm-suspend-update-flag t)
+  (setq overriding-terminal-local-map nil)
+  (setq helm--reading-passwd-or-string t)
+  (unwind-protect
+       ad-do-it
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
 
