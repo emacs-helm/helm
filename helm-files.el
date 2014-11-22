@@ -438,7 +438,7 @@ Should not be used among other sources.")
      "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
      "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
      'helm-find-files-eshell-command-on-file
-     "Find file as root `C-x @'" 'helm-find-file-as-root
+     "Find file as root `C-c r'" 'helm-find-file-as-root
      "Ediff File `C-='" 'helm-find-files-ediff-files
      "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
      "Delete File(s) `M-D'" 'helm-delete-marked-files
