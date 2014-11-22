@@ -4645,7 +4645,7 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
           (if real
               ;; Check if real value of current candidate is the same
               ;; that the one stored in overlay.
-              (and (string= (overlay-get o 'real) real)
+              (and (equal (overlay-get o 'real) real)
                    (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
             (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))))
 (add-hook 'helm-update-hook 'helm-revive-visible-mark)
