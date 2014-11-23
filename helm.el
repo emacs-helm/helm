@@ -4644,8 +4644,11 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
         (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
           (if real
               ;; Check if real value of current candidate is the same
-              ;; that the one stored in overlay.
-              (and (string= (overlay-get o 'real) real)
+              ;; than the one stored in overlay.
+              ;; This is needed when some cands have same display names.
+              ;; Using equal allow testing any type of value for real cand.
+              ;; Issue (#706).
+              (and (equal (overlay-get o 'real) real)
                    (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
             (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))))
 (add-hook 'helm-update-hook 'helm-revive-visible-mark)
