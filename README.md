@@ -102,14 +102,26 @@ out Helm - have NO FEAR. Have a look at
 [Emacs Prelude](https://github.com/bbatsov/prelude) - it has
 Helm built-in and properly set-up.
 
+For a minimal helm configuration, run `./emacs-helm.sh` and look at the file
+`/tmp/helm-cfg.el`.
+
 ### Basic usage
 
-Just type `M-x helm-mini` and enjoy. You might want to bind that command to
-a keyboard shortcut. Here's a suggestion:
+Just type `M-x helm-M-x RET helm-`, you will have completion on all helm commands.
 
-```elisp
-(global-set-key (kbd "C-c h") 'helm-mini)
-```
+You can bind this to `M-x` like this:
+
+`(global-set-key (kbd "M-x") 'helm-M-x)`
+
+- _IMPORTANT:_
+
+Once you are in the helm session (of `helm-M-x` or any one else) you can hit either `C-h m` or
+`C-c ?`, the former is will popup a general info buffer about helm while the second will
+popup a specialized info of the current source you are into.
+Sometime `C-c ?` is not available, in this case you will see in mode-line `C-h m` instead of `C-c ?`.
+PLEASE USE and ABUSE of these `helm` embeded infos before reporting a bug about how to do things
+in `helm`, you will find also useful infos in mode-line.
+
 You can also start with `M-x helm-mode` and enjoy helm completion in your favourites
 Emacs commands (e.g `M-x`, `C-x C-f`, etc...).
 You can enable this by adding in your init file:
@@ -118,8 +130,16 @@ You can enable this by adding in your init file:
 (helm-mode 1)
 ```
 
+- _NOTE_ that the helmized emacs commands are different and much more basics than the helm ones.
+
 As a startup point you can also look at the helm section in Emacs menu to
 discover some of the commands provided by helm.
+
+For those who have a system able to run shell scripts, a convenient way to discover helm
+is to run `./emacs-helm.sh` from the helm directory, you will find interesting infos in
+your scratch buffer.
+`emacs-helm.sh` accept all emacs command line options, see `emacs-helm.sh -h` for more
+infos.
 
 ### Advanced usage
 
