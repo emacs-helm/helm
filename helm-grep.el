@@ -233,14 +233,14 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 ;;; Init
 ;;
 ;;
-(defun helm-grep-prepare-candidates (candidates)
+(defun helm-grep-prepare-candidates (candidates in-directory)
   "Prepare filenames and directories CANDIDATES for grep command line."
   ;; If one or more candidate is a directory, search in all files
   ;; of this candidate (e.g /home/user/directory/*).
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
-  (setq candidates (if (file-remote-p default-directory)
+  (setq candidates (if (file-remote-p in-directory)
                        ;; Grep don't understand tramp filenames
                        ;; use the local name.
                        (mapcar #'(lambda (x)
@@ -310,7 +310,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                           (and rec-com rec-com-ack-p)))))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
-  (let* ((fnargs            (helm-grep-prepare-candidates only-files))
+  (let* ((default-directory (or helm-default-directory
+                                (expand-file-name helm-ff-default-directory)))
+         (fnargs            (helm-grep-prepare-candidates only-files default-directory))
          (ignored-files     (unless (helm-grep-use-ack-p)
                               (mapconcat
                                #'(lambda (x)
@@ -1043,7 +1045,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                         (mapcar #'(lambda (x)
                                     (file-remote-p x 'localname))
                                 only-files)
-                      only-files)))
+                      only-files)
+                    default-directory))
          (cmd-line (format helm-pdfgrep-default-command
                            helm-pattern
                            fnargs))
