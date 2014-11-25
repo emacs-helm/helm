@@ -505,6 +505,12 @@ This happen when using `helm-next/previous-line'."
 ;;; Faces
 ;;
 ;;
+(defgroup helm-faces nil
+  "Customize the appearance of helm."
+  :prefix "helm-"
+  :group 'faces
+  :group 'helm)
+
 (defface helm-source-header
     '((((background dark))
        :background "#22083397778B"
@@ -515,7 +521,7 @@ This happen when using `helm-next/previous-line'."
        :foreground "black"
        :weight bold :height 1.3 :family "Sans Serif"))
   "Face for source header in the helm buffer."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-visible-mark
     '((((min-colors 88) (background dark))
@@ -527,40 +533,40 @@ This happen when using `helm-next/previous-line'."
        (:background "green1"))
       (t (:background "green")))
   "Face for visible mark."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-header
     '((t (:inherit header-line)))
   "Face for header lines in the helm buffer."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-candidate-number
     '((((background dark)) :background "Yellow" :foreground "black")
       (((background light)) :background "#faffb5" :foreground "black"))
-  "Face for candidate number in mode-line." :group 'helm)
+  "Face for candidate number in mode-line." :group 'helm-faces)
 
 (defface helm-selection
     '((((background dark)) :background "ForestGreen" :underline t)
       (((background light)) :background "#b5ffd1" :underline t))
   "Face for currently selected item in the helm buffer."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-separator
     '((((background dark)) :foreground "red")
       (((background light)) :foreground "#ffbfb5"))
   "Face for multiline source separator."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-action
     '((t (:underline t)))
   "Face for action lines in the helm action buffer."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-prefarg
     '((((background dark)) :foreground "green")
       (((background light)) :foreground "red"))
   "Face for showing prefix arg in mode-line."
-  :group 'helm)
+  :group 'helm-faces)
 
 
 ;;; Variables.
