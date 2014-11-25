@@ -240,13 +240,6 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
   ;; If r option is enabled search also in subdidrectories.
   ;; We need here to expand wildcards to support crap windows filenames
   ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
-  (setq candidates (if (file-remote-p in-directory)
-                       ;; Grep don't understand tramp filenames
-                       ;; use the local name.
-                       (mapcar #'(lambda (x)
-                                   (file-remote-p x 'localname))
-                               candidates)
-                     candidates))
   (if helm-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
     ;; When candidate is a directory, search in all its files.
@@ -285,9 +278,15 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                 ;; here too in case we are called from elsewhere.
                 (t (file-expand-wildcards i t))) into all-files ; [1]
           finally return
-          (if (string-match "^git" helm-grep-default-command)
-              (mapconcat 'identity all-files " ")
-            (mapconcat 'shell-quote-argument all-files " ")))))
+          (let ((files (if (file-remote-p in-directory)
+                       ;; Grep don't understand tramp filenames
+                       ;; use the local name.
+                       (mapcar #'(lambda (x) (file-remote-p x 'localname))
+                               all-files)
+                       all-files)))
+            (if (string-match "^git" helm-grep-default-command)
+                (mapconcat 'identity files " ")
+                (mapconcat 'shell-quote-argument files " "))))))
 
 (defun helm-grep-command (&optional recursive)
   (let* ((com (if recursive
