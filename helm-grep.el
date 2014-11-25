@@ -301,7 +301,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
   (let* ((rec-com (helm-grep-command t))
          (norm-com (helm-grep-command))
          (norm-com-ack-p (string-match "\\`ack" norm-com))
-         (rec-com-ack-p (string-match "\\`ack" rec-com)))
+         (rec-com-ack-p (and rec-com (string-match "\\`ack" rec-com))))
     (cl-case where
       (default   (and norm-com norm-com-ack-p))
       (recursive (and rec-com rec-com-ack-p))
@@ -311,9 +311,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                           (and rec-com rec-com-ack-p)))))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
-  (let* ((default-directory (or helm-default-directory
-                                (expand-file-name helm-ff-default-directory)))
-         (fnargs            (helm-grep-prepare-candidates only-files))
+  (let* ((fnargs            (helm-grep-prepare-candidates only-files))
          (ignored-files     (unless (helm-grep-use-ack-p)
                               (mapconcat
                                #'(lambda (x)
@@ -356,7 +354,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
-  (let* ((zgrep (string-match "\\`zgrep" cmd-line))
+  (let* ((default-directory (or helm-default-directory
+                                (expand-file-name helm-ff-default-directory)))
+         (zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose))
@@ -851,7 +851,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                              'helm-grep-include-files (or include-files types)
                              'helm-grep-in-recurse recurse
                              'helm-grep-use-zgrep zgrep
-                             'helm-grep-last-default-directory helm-ff-default-directory
                              'helm-grep-default-command
                              (cond (zgrep helm-default-zgrep-command)
                                    (recurse helm-grep-default-recurse-command)
