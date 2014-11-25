@@ -222,7 +222,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 (defvar helm-grep-include-files nil)
 (defvar helm-grep-in-recurse nil)
 (defvar helm-grep-use-zgrep nil)
-(defvar helm-grep-last-default-directory nil)
 (defvar helm-grep-default-directory-fn nil
   "A function that should return a directory to expand candidate to.
 It is intended to use as a let-bound variable, DON'T set this globaly.")
