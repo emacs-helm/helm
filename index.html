@@ -39,7 +39,7 @@
 </code></pre>
 
 <h2>
-<a name="abstract" class="anchor" href="#abstract"><span class="octicon octicon-link"></span></a>Abstract</h2>
+<a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h2>
 
 <p><code>Helm</code> is incremental completion and selection narrowing framework for
 Emacs. It will help steer you in the right direction when you're looking
@@ -52,7 +52,7 @@ and provide a cleaner, leaner and more modular tool, that's not tied in
 the trap of backward compatibility. </p>
 
 <h2>
-<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
 <p>You need a recent Emacs to use latest helm, at least Emacs-24.3.</p>
 
@@ -62,34 +62,31 @@ as it may fix installation of all packages from (m)elpa and will allow you to
 copy/rename asynchronously your files from helm and/or dired if needed).</p>
 
 <h2>
-<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h2>
 
 <h3>
-<a name="quick-install-from-git" class="anchor" href="#quick-install-from-git"><span class="octicon octicon-link"></span></a>Quick install from git</h3>
+<a id="quick-install-from-git" class="anchor" href="#quick-install-from-git" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick install from git</h3>
 
 <ol>
 <li>
 <p>Clone the <code>helm</code> repository to some directory:</p>
 
-<div class="highlight highlight-elisp"><pre><span class="nv">$</span> <span class="nv">git</span> <span class="nv">clone</span> <span class="nv">https://github.com/emacs-helm/helm.git</span> <span class="nv">/path/to/helm/directory</span>
-</pre></div>
+<div class="highlight highlight-elisp"><pre>$ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory</pre></div>
 </li>
 <li>
 <p>Clone the <code>async</code> repository to some directory (facultative)</p>
 
-<div class="highlight highlight-elisp"><pre><span class="nv">$</span> <span class="nv">git</span> <span class="nv">clone</span> <span class="nv">git@github.com:jwiegley/emacs-async.git</span> <span class="nv">/path/to/async/directory</span>
-</pre></div>
+<div class="highlight highlight-elisp"><pre>$ git clone git@github.com:jwiegley/emacs-async.git /path/to/async/directory</pre></div>
 </li>
 <li><p>Run <code>make</code> from the <code>helm</code> directory.</p></li>
 <li>
 <p>Add to <code>.emacs.el</code> (or equivalent):</p>
 
-<div class="highlight highlight-elisp"><pre><span class="c1">;; [Facultative] Only if you have installed async.</span>
-<span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'load-path</span> <span class="s">"/path/to/async/directory"</span><span class="p">)</span>
+<div class="highlight highlight-elisp"><pre><span class="pl-c">;; [Facultative] Only if you have installed async.</span>
+(add-to-<span class="pl-s3">list</span> '<span class="pl-s3">load</span>-path <span class="pl-s1"><span class="pl-pds">"</span>/path/to/async/directory<span class="pl-pds">"</span></span>)
 
-<span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'load-path</span> <span class="s">"/path/to/helm/directory"</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">require</span> <span class="ss">'helm-config</span><span class="p">)</span>
-</pre></div>
+(add-to-<span class="pl-s3">list</span> '<span class="pl-s3">load</span>-path <span class="pl-s1"><span class="pl-pds">"</span>/path/to/helm/directory<span class="pl-pds">"</span></span>)
+(require 'helm-config)</pre></div>
 </li>
 </ol>
 
@@ -104,14 +101,13 @@ copy/rename asynchronously your files from helm and/or dired if needed).</p>
 <p><em>NOTE:</em> That this will not work on Windows systems.</p>
 
 <h3>
-<a name="install-from-emacs-packaging-system" class="anchor" href="#install-from-emacs-packaging-system"><span class="octicon octicon-link"></span></a>Install from Emacs packaging system</h3>
+<a id="install-from-emacs-packaging-system" class="anchor" href="#install-from-emacs-packaging-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install from Emacs packaging system</h3>
 
 <p>Helm is now available on Melpa at <code>http://melpa.milkbox.net/</code>
 You will find there instructions to install.
 Then you should need only in your init file:</p>
 
-<div class="highlight highlight-elisp"><pre><span class="p">(</span><span class="nb">require</span> <span class="ss">'helm-config</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-elisp"><pre>(require 'helm-config)</pre></div>
 
 <p><em>WARNING:</em> Due to a bad concept of package.el which is in charge of fetching helm files
 and compiling them, users had errors most of the time when upgrading from melpa and <code>list-package</code>.
@@ -129,41 +125,65 @@ See <a href="https://github.com/emacs-helm/helm/wiki#faq">FAQ</a> for more infos
 <p><code>Only the extensions present in the github emacs-helm organisation are supported.</code></p>
 
 <h3>
-<a name="alternate-install-warning" class="anchor" href="#alternate-install-warning"><span class="octicon octicon-link"></span></a>Alternate install warning</h3>
+<a id="alternate-install-warning" class="anchor" href="#alternate-install-warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternate install warning</h3>
 
 <p>Some people are installing <code>helm</code> with their own config using diverses <code>require</code>, <code>autoload</code>
 and other hacks, not using <code>helm-config</code>.
 Expect failures and slowdown at startup unless you really know what you are doing when you do so.</p>
 
 <h3>
-<a name="emacs-prelude" class="anchor" href="#emacs-prelude"><span class="octicon octicon-link"></span></a>Emacs Prelude</h3>
+<a id="emacs-prelude" class="anchor" href="#emacs-prelude" aria-hidden="true"><span class="octicon octicon-link"></span></a>Emacs Prelude</h3>
 
 <p>If you're afraid to play with Emacs's configuration, but want to try
 out Helm - have NO FEAR. Have a look at
 <a href="https://github.com/bbatsov/prelude">Emacs Prelude</a> - it has
 Helm built-in and properly set-up.</p>
 
+<p>For a minimal helm configuration, run <code>./emacs-helm.sh</code> and look at the file
+<code>/tmp/helm-cfg.el</code>.</p>
+
 <h3>
-<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic usage</h3>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic usage</h3>
 
-<p>Just type <code>M-x helm-mini</code> and enjoy. You might want to bind that command to
-a keyboard shortcut. Here's a suggestion:</p>
+<p>Just type <code>M-x helm-M-x RET helm-</code>, you will have completion on all helm commands.</p>
 
-<div class="highlight highlight-elisp"><pre><span class="p">(</span><span class="nv">global-set-key</span> <span class="p">(</span><span class="nv">kbd</span> <span class="s">"C-c h"</span><span class="p">)</span> <span class="ss">'helm-mini</span><span class="p">)</span>
-</pre></div>
+<p>You can bind this to <code>M-x</code> like this:</p>
+
+<p><code>(global-set-key (kbd "M-x") 'helm-M-x)</code></p>
+
+<ul>
+<li><em>IMPORTANT:</em></li>
+</ul>
+
+<p>Once you are in the helm session (of <code>helm-M-x</code> or any one else) you can hit either <code>C-h m</code> or
+<code>C-c ?</code>, the former is will popup a general info buffer about helm while the second will
+popup a specialized info of the current source you are into.
+Sometime <code>C-c ?</code> is not available, in this case you will see in mode-line <code>C-h m</code> instead of <code>C-c ?</code>.
+PLEASE USE and ABUSE of these <code>helm</code> embeded infos before reporting a bug about how to do things
+in <code>helm</code>, you will find also useful infos in mode-line.</p>
 
 <p>You can also start with <code>M-x helm-mode</code> and enjoy helm completion in your favourites
 Emacs commands (e.g <code>M-x</code>, <code>C-x C-f</code>, etc...).
 You can enable this by adding in your init file:</p>
 
-<div class="highlight highlight-elisp"><pre><span class="p">(</span><span class="nv">helm-mode</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-elisp"><pre>(helm-mode <span class="pl-c1">1</span>)</pre></div>
+
+<ul>
+<li>
+<em>NOTE</em> that the helmized emacs commands are different and much more basics than the helm ones.</li>
+</ul>
 
 <p>As a startup point you can also look at the helm section in Emacs menu to
 discover some of the commands provided by helm.</p>
 
+<p>For those who have a system able to run shell scripts, a convenient way to discover helm
+is to run <code>./emacs-helm.sh</code> from the helm directory, you will find interesting infos in
+your scratch buffer.
+<code>emacs-helm.sh</code> accept all emacs command line options, see <code>emacs-helm.sh -h</code> for more
+infos.</p>
+
 <h3>
-<a name="advanced-usage" class="anchor" href="#advanced-usage"><span class="octicon octicon-link"></span></a>Advanced usage</h3>
+<a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced usage</h3>
 
 <p>Helm is capable of a lot. Here is a demo of <code>helm-buffers-list</code>:</p>
 
@@ -185,7 +205,7 @@ discover some of the commands provided by helm.</p>
 <p>You can find all the gory details on the <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a>.</p>
 
 <h2>
-<a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known issues</h2>
+<a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known issues</h2>
 
 <p>Check out the project's
 <a href="https://github.com/emacs-helm/helm/issues?sort=created&amp;direction=desc&amp;state=open">issue list</a>
@@ -193,13 +213,13 @@ a list of unresolved issues. By the way - feel free to fix any of them
 and sent us a pull request. :-)</p>
 
 <h2>
-<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h2>
+<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h2>
 
 <p>Here's a <a href="https://github.com/emacs-helm/helm/contributors">list</a> of all the people who have contributed to the
 development of Helm.</p>
 
 <h2>
-<a name="bugs--improvements" class="anchor" href="#bugs--improvements"><span class="octicon octicon-link"></span></a>Bugs &amp; Improvements</h2>
+<a id="bugs--improvements" class="anchor" href="#bugs--improvements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs &amp; Improvements</h2>
 
 <p>Bug reports and suggestions for improvements are always
 welcome, be sure though they are related to helm, many bugs are coming from emacs itself
@@ -209,7 +229,7 @@ or other packages. GitHub pull requests are even better! :-)</p>
 Start it from your helm directory with <code>./emacs-helm.sh</code>.</p>
 
 <h2>
-<a name="getting-help" class="anchor" href="#getting-help"><span class="octicon octicon-link"></span></a>Getting help</h2>
+<a id="getting-help" class="anchor" href="#getting-help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting help</h2>
 
 <p>If <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a> is not enough, you can ask for help
 on <a href="https://groups.google.com/group/emacs-helm?hl=en">emacs-helm google group</a>.</p>
