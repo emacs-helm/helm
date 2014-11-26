@@ -138,37 +138,43 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 ;;; Faces
 ;;
 ;;
+(defgroup helm-grep-faces nil
+  "Customize the appearance of helm-grep."
+  :prefix "helm-"
+  :group 'helm-grep
+  :group 'helm-faces)
+
 (defface helm-grep-match
   '((((background light)) :foreground "#b00000")
     (((background dark))  :foreground "gold1"))
   "Face used to highlight grep matches."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 (defface helm-grep-file
     '((t (:foreground "BlueViolet"
           :underline t)))
   "Face used to highlight grep results filenames."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 (defface helm-grep-lineno
     '((t (:foreground "Darkorange1")))
   "Face used to highlight grep number lines."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 (defface helm-grep-running
     '((t (:foreground "Red")))
   "Face used in mode line when grep is running."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 (defface helm-grep-finish
     '((t (:foreground "Green")))
   "Face used in mode line when grep is finish."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 (defface helm-grep-cmd-line
     '((t (:inherit diff-added)))
   "Face used to highlight grep command line when no results."
-  :group 'helm-grep)
+  :group 'helm-grep-faces)
 
 
 ;;; Keymaps

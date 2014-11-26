@@ -67,15 +67,21 @@ e.g give only function names after \(function ."
 ;;; Faces
 ;;
 ;;
+(defgroup helm-elisp-faces nil
+  "Customize the appearance of helm-elisp."
+  :prefix "helm-"
+  :group 'helm-elisp
+  :group 'helm-faces)
+
 (defface helm-lisp-show-completion
     '((t (:background "DarkSlateGray")))
   "Face used for showing candidates in `helm-lisp-completion'."
-  :group 'helm-elisp)
+  :group 'helm-elisp-faces)
 
 (defface helm-lisp-completion-info
     '((t (:foreground "red")))
   "Face used for showing info in `helm-lisp-completion'."
-  :group 'helm-elisp)
+  :group 'helm-elisp-faces)
 
 
 ;;; Show completion.
