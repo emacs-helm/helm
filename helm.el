@@ -501,6 +501,21 @@ This happen when using `helm-next/previous-line'."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-default-fuzzy-match-fn 'helm-fuzzy-match
+  "The default function for fuzzy matching in `helm-source-sync' based sources."
+  :group 'helm
+  :type 'function)
+
+(defcustom helm-default-fuzzy-search-fn 'helm-fuzzy-search
+  "The default function for fuzzy matching in `helm-source-in-buffer' based sources."
+  :group 'helm
+  :type 'function)
+
+(defcustom helm-default-fuzzy-sort-fn 'helm-fuzzy-matching-default-sort-fn
+  "The default sort transformer function used in fuzzy matching."
+  :group 'helm
+  :type 'function)
+
 
 ;;; Faces
 ;;
