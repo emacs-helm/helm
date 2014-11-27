@@ -846,7 +846,12 @@ an eieio class."
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other match fns to this ?
     (oset source :match 'helm-fuzzy-match)
-    (oset source :nohighlight t))
+    (oset source :nohighlight t)
+    (oset source :filtered-candidate-transformer
+          (helm-aif (oref source :filtered-candidate-transformer)
+              (append (if (listp it) it (list it))
+                      (list 'helm-fuzzy-matching-default-sort-fn))
+            (list 'helm-fuzzy-matching-default-sort-fn))))
   (when (slot-value source :matchplugin)
     (oset source :match
           (helm-source-mp-get-search-or-match-fns source 'match))))
@@ -868,7 +873,12 @@ an eieio class."
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other search fns to this ?
     (oset source :search '(helm-fuzzy-search))
-    (oset source :nohighlight t))
+    (oset source :nohighlight t)
+    (oset source :filtered-candidate-transformer
+          (helm-aif (oref source :filtered-candidate-transformer)
+              (append (if (listp it) it (list it))
+                      (list 'helm-fuzzy-matching-default-sort-fn))
+            (list 'helm-fuzzy-matching-default-sort-fn))))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
