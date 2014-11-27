@@ -2660,6 +2660,28 @@ e.g helm.el$
                else do (goto-char eol)
                finally return nil))))
 
+(defun helm-score-string-for-pattern (string pattern)
+  "Give a score to STRING according to number of contiguous matches found with PATTERN."
+  (let* ((pat-lookup (cl-loop for str on (split-string pattern "" t) by 'cdr
+                              when (cdr str)
+                              collect (list (car str) (cadr str))))
+         (str-lookup (cl-loop for str on (split-string string "" t) by 'cdr
+                              when (cdr str)
+                              collect (list (car str) (cadr str))))
+         (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0)))
+    (+ bonus (length (cl-nintersection pat-lookup str-lookup :test 'equal)))))
+
+(defun helm-fuzzy-matching-default-sort-fn (candidates _source)
+  (sort candidates
+        (lambda (s1 s2)
+          (let ((scr1 (helm-score-string-for-pattern s1 helm-pattern))
+                (scr2 (helm-score-string-for-pattern s2 helm-pattern))
+                (len1 (length s1))
+                (len2 (length s2)))
+            (cond ((= scr1 scr2)
+                   (< len1 len2))
+                  ((> scr1 scr2)))))))
+
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
                       (assoc-default 'match-strict source)
