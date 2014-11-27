@@ -71,36 +71,42 @@ Only buffer names are fuzzy matched when this is enabled,
 ;;; Faces
 ;;
 ;;
+(defgroup helm-buffers-faces nil
+  "Customize the appearance of helm-buffers."
+  :prefix "helm-"
+  :group 'helm-buffers
+  :group 'helm-faces)
+
 (defface helm-buffer-saved-out
     '((t (:foreground "red" :background "black")))
   "Face used for buffer files modified outside of emacs."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 (defface helm-buffer-not-saved
     '((t (:foreground "Indianred2")))
   "Face used for buffer files not already saved on disk."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 (defface helm-buffer-size
     '((((background dark)) :foreground "RosyBrown")
       (((background light)) :foreground "SlateGray"))
   "Face used for buffer size."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 (defface helm-buffer-process
     '((t (:foreground "Sienna3")))
   "Face used for process status in buffer."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 (defface helm-buffer-directory
     '((t (:foreground "DarkRed" :background "LightGray")))
   "Face used for directories in `helm-buffers-list'."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 (defface helm-buffer-file
     '((t :inherit font-lock-type-face))
   "Face for buffer file names in `helm-buffers-list'."
-  :group 'helm-buffers)
+  :group 'helm-buffers-faces)
 
 
 ;;; Buffers keymap
