@@ -110,7 +110,7 @@ text to be displayed in BUFNAME."
 
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
-                 "[SPC,C-v,down:NextPage  b,M-v,up:PrevPage  C-s/r:Isearch Other:Exit]"
+                 "[SPC,C-v,down:NextPage  b,M-v,up:PrevPage]"
                  'face 'helm-helper))
         (scroll-error-top-bottom t))
     (condition-case _err
@@ -118,8 +118,6 @@ text to be displayed in BUFNAME."
               (cl-case event
                 ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
                 ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
-                ((?\C-s)        (isearch-forward))
-                ((?\C-r)        (isearch-backward))
                 (t (cl-return))))
       (beginning-of-buffer (message "Beginning of buffer"))
       (end-of-buffer       (message "End of Buffer")))))
