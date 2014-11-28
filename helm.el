@@ -516,6 +516,11 @@ This happen when using `helm-next/previous-line'."
   :group 'helm
   :type 'function)
 
+(defcustom helm-default-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
+  "The default function to highlight matches in fuzzy matching."
+  :group 'helm
+  :type 'function)
+
 
 ;;; Faces
 ;;
@@ -2702,6 +2707,22 @@ e.g helm.el$
             (cond ((= scr1 scr2)
                    (< len1 len2))
                   ((> scr1 scr2)))))))
+
+(defun helm-fuzzy-default-highlight-match (candidate)
+  "The default function to highlight matches in fuzzy matching.
+It is meant to use with `filter-one-by-one' slot."
+  (with-temp-buffer
+    (insert candidate)
+    (goto-char (point-min))
+    (cl-loop with pattern = (if (string-match-p " " helm-pattern)
+                                (split-string helm-pattern)
+                                (split-string helm-pattern "" t))
+             for p in pattern
+             do
+             (when (re-search-forward p nil t)
+               (add-text-properties
+                (match-beginning 0) (match-end 0) '(face helm-match))))
+    (buffer-string)))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)

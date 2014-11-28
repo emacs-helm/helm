@@ -375,7 +375,7 @@
     :documentation
     "  Enable fuzzy matching in this source.
   This will overwrite settings in MATCH slot, and for
-  sources build with child class `helm-source-in-buffer' the SEARCH slot.")
+  sources built with child class `helm-source-in-buffer' the SEARCH slot.")
 
    (nomark
     :initarg :nomark
@@ -389,7 +389,10 @@
     :initform nil
     :custom boolean
     :documentation
-    "  Disable highlight match in this source.")
+    "  Disable highlight match in this source.
+  This will disable generic highlighting done by matchplugin,
+  but some specialized highlighting can be done from elsewhere,
+  i.e `filtered-candidate-transformer' or `filter-one-by-one' slots.")
    
    (allow-dups
     :initarg :allow-dups
@@ -838,20 +841,26 @@ an eieio class."
 ;;
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source :keymap)
-      (and (symbolp it) (set-slot-value source :keymap (symbol-value it)))))
+      (and (symbolp it) (set-slot-value source :keymap (symbol-value it))))
+  (when (slot-value source :fuzzy-match)
+    (oset source :nohighlight t)
+    (oset source :filter-one-by-one
+          (helm-aif (oref source :filter-one-by-one)
+              (append (if (listp it) it (list it))
+                      (list helm-default-fuzzy-matching-highlight-fn))
+            (list helm-default-fuzzy-matching-highlight-fn)))
+    (oset source :filtered-candidate-transformer
+          (helm-aif (oref source :filtered-candidate-transformer)
+              (append (if (listp it) it (list it))
+                      (list helm-default-fuzzy-sort-fn))
+            (list helm-default-fuzzy-sort-fn)))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
 (defmethod helm--setup-source ((source helm-source-sync))
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other match fns to this ?
-    (oset source :match helm-default-fuzzy-match-fn)
-    (oset source :nohighlight t)
-    (oset source :filtered-candidate-transformer
-          (helm-aif (oref source :filtered-candidate-transformer)
-              (append (if (listp it) it (list it))
-                      (list helm-default-fuzzy-sort-fn))
-            (list 'helm-fuzzy-matching-default-sort-fn))))
+    (oset source :match helm-default-fuzzy-match-fn))
   (when (slot-value source :matchplugin)
     (oset source :match
           (helm-source-mp-get-search-or-match-fns source 'match))))
@@ -872,13 +881,7 @@ an eieio class."
                           (if (functionp it) (funcall it) it))))))))
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other search fns to this ?
-    (oset source :search `(,helm-default-fuzzy-search-fn))
-    (oset source :nohighlight t)
-    (oset source :filtered-candidate-transformer
-          (helm-aif (oref source :filtered-candidate-transformer)
-              (append (if (listp it) it (list it))
-                      (list helm-default-fuzzy-sort-fn))
-            (list 'helm-fuzzy-matching-default-sort-fn))))
+    (oset source :search `(,helm-default-fuzzy-search-fn)))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
