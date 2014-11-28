@@ -392,7 +392,9 @@
     "  Disable highlight match in this source.
   This will disable generic highlighting done by matchplugin,
   but some specialized highlighting can be done from elsewhere,
-  i.e `filtered-candidate-transformer' or `filter-one-by-one' slots.")
+  i.e `filtered-candidate-transformer' or `filter-one-by-one' slots,
+  so even if non--nil this may have no effect if highlighting is handled
+  from somewhere else.")
    
    (allow-dups
     :initarg :allow-dups
