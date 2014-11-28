@@ -220,17 +220,6 @@ but the initial search for all candidates in buffer(s)."
             (append lst (funcall dabbrev-get abbrev 'all-bufs)))
         lst))))
 
-(defvar helm-source-dabbrev
-  `((name . "Dabbrev Expand")
-    (init . (lambda ()
-              (helm-init-candidates-in-buffer 'global
-                helm-dabbrev--cache)))
-    (candidates-in-buffer)
-    (persistent-action . (lambda (_candidate) (ignore)))
-    (persistent-help . "DoNothing")
-    (keymap . ,helm-dabbrev-map)
-    (action . helm-dabbrev-default-action)))
-
 (defun helm-dabbrev-default-action (candidate)
   (with-helm-current-buffer
     (let* ((limits (helm-bounds-of-thing-before-point
@@ -304,7 +293,12 @@ but the initial search for all candidates in buffer(s)."
           (setq helm-dabbrev--data nil)
           (insert dabbrev))
         (with-helm-show-completion (car limits) (cdr limits)
-          (helm :sources 'helm-source-dabbrev
+          (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
+                           :data helm-dabbrev--cache
+                           :persistent-action 'ignore
+                           :persistent-help "DoNothing"
+                           :keymap helm-dabbrev-map
+                           :action 'helm-dabbrev-default-action)
                 :buffer "*helm dabbrev*"
                 :input (concat "^" dabbrev " ")
                 :resume 'noresume

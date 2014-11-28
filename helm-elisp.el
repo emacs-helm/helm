@@ -255,21 +255,18 @@ Return a cons \(beg . end\)."
         (with-helm-show-completion beg end
           ;; Overlay is initialized now in helm-current-buffer.
           (helm
-           :sources `((name . "Lisp completion")
-                      (init . (lambda ()
-                                (helm-init-candidates-in-buffer 'global
-                                  helm-lisp-completion--cache)))
-                      (candidates-in-buffer)
-                      (persistent-action . helm-lisp-completion-persistent-action)
-                      (nomark)
-                      (persistent-help . "Show brief doc in mode-line")
-                      (filtered-candidate-transformer . helm-lisp-completion-transformer)
-                      (action . (lambda (candidate)
-                                  (with-helm-current-buffer
-                                    (run-with-timer
-                                     0.01 nil
-                                     'helm-insert-completion-at-point
-                                     ,beg ,end candidate)))))
+           :sources (helm-build-in-buffer-source "Lisp completion"
+                      :data helm-lisp-completion--cache
+                      :persistent-action 'helm-lisp-completion-persistent-action
+                      :nomark t
+                      :persistent-help "Show brief doc in mode-line"
+                      :filtered-candidate-transformer 'helm-lisp-completion-transformer
+                      :action `(lambda (candidate)
+                                 (with-helm-current-buffer
+                                   (run-with-timer
+                                    0.01 nil
+                                    'helm-insert-completion-at-point
+                                    ,beg ,end candidate))))
            :input (if helm-match-plugin-enabled (concat target " ") target)
            :resume 'noresume
            :buffer "*helm lisp completion*"
