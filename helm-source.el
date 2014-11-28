@@ -375,7 +375,10 @@
     :documentation
     "  Enable fuzzy matching in this source.
   This will overwrite settings in MATCH slot, and for
-  sources built with child class `helm-source-in-buffer' the SEARCH slot.")
+  sources built with child class `helm-source-in-buffer' the SEARCH slot.
+  This is an easy way of enabling fuzzy matching, but you can use the MATCH
+  or SEARCH slots yourself if you want something more elaborated, mixing
+  different type of match (See `helm-source-buffers' class for example).")
 
    (nomark
     :initarg :nomark
