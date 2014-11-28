@@ -196,7 +196,7 @@ See
     (init . (lambda () (require 'lacarte)))
     (candidates . (lambda ()
                     (with-helm-current-buffer
-                      (delete '(nil) (lacarte-get-overall-menu-item-alist ,@maps)))))
+                      (delete '(nil) (lacarte-get-overall-menu-item-alist ',maps)))))
     (candidate-transformer . helm-lacarte-candidate-transformer)
     (candidate-number-limit . 9999)
     (type . command)))
