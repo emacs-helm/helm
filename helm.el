@@ -512,12 +512,14 @@ This happen when using `helm-next/previous-line'."
   :type 'function)
 
 (defcustom helm-default-fuzzy-sort-fn 'helm-fuzzy-matching-default-sort-fn
-  "The default sort transformer function used in fuzzy matching."
+  "The default sort transformer function used in fuzzy matching.
+When nil no sorting will be done."
   :group 'helm
   :type 'function)
 
 (defcustom helm-default-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
-  "The default function to highlight matches in fuzzy matching."
+  "The default function to highlight matches in fuzzy matching.
+When nil no highlighting will be done."
   :group 'helm
   :type 'function)
 
