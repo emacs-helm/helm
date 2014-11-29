@@ -2769,7 +2769,7 @@ It is meant to use with `filter-one-by-one' slot."
                                 (split-string helm-pattern "" t))
              for p in pattern
              do
-             (when (re-search-forward p nil t)
+             (when (search-forward p nil t)
                (add-text-properties
                 (match-beginning 0) (match-end 0) '(face helm-match))))
     (buffer-string)))
