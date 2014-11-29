@@ -747,6 +747,35 @@
                                                      helm-buffers-sort-transformer
                                                      helm-highlight-buffers)))
 
+;; Functions
+(defclass helm-type-function (helm-source) ()
+  "A class to define helm type function.")
+
+(defmethod helm--setup-source :before ((source helm-type-function))
+  (oset source :action (helm-make-actions
+                         "Describe command" 'describe-function
+                         "Add command to kill ring" 'helm-kill-new
+                          "Go to command's definition" 'find-function
+                          "Debug on entry" 'debug-on-entry
+                          "Cancel debug on entry" 'cancel-debug-on-entry
+                          "Trace function" 'trace-function
+                          "Trace function (background)" 'trace-function-background
+                          "Untrace function" 'untrace-function))
+  (oset source :action-transformer 'helm-transform-function-call-interactively)
+  (oset source :candidate-transformer 'helm-mark-interactive-functions)
+  (oset source :coerce 'helm-symbolify))
+
+;; Commands
+(defclass helm-type-command (helm-source) ()
+  "A class to define helm type command.")
+
+(defmethod helm--setup-source :before ((source helm-type-command))
+  (oset source :action (append (helm-make-actions
+                                "Call interactively" 'helm-call-interactively)
+                               (helm-actions-from-type-function)))
+  (oset source :coerce 'helm-symbolify)
+  (oset source :persistent-action 'describe-function))
+
 
 ;;; Error functions
 ;;
@@ -773,6 +802,7 @@ Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
 Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
+  (declare (indent 2))  
   (let ((source (apply #'make-instance class name args)))
     (oset source :name name)
     (helm--setup-source source)
@@ -837,7 +867,18 @@ an eieio class."
           (delq nil (append (list transformer) action-transformers)))))
 
 ;;; Methods to access types slots.
+;;
+;;
 (defmethod helm-source-get-action-from-type ((object helm-type-file))
+  (oref object :action))
+
+(defmethod helm-source-get-action-from-type ((object helm-type-buffer))
+  (oref object :action))
+
+(defmethod helm-source-get-action-from-type ((object helm-type-bookmark))
+  (oref object :action))
+
+(defmethod helm-source-get-action-from-type ((object helm-type-function))
   (oref object :action))
 
 
@@ -950,6 +991,22 @@ Args ARGS are keywords provided by `helm-source-dummy'."
 
 (defun helm-build-type-file ()
   (helm-make-type 'helm-type-file))
+
+(defun helm-actions-from-type-function ()
+  (let ((source (make-instance 'helm-type-function)))
+    (helm--setup-source source)
+    (helm-source-get-action-from-type source)))
+
+(defun helm-build-type-function ()
+  (helm-make-type 'helm-type-function))
+
+(defun helm-actions-from-type-command ()
+  (let ((source (make-instance 'helm-type-command)))
+    (helm--setup-source source)
+    (helm-source-get-action-from-type source)))
+
+(defun helm-build-type-command ()
+  (helm-make-type 'helm-type-command))
 
 (provide 'helm-source)
 

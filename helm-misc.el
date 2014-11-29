@@ -187,19 +187,7 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;; LaCarte
 ;;
 ;;
-(defun helm-create-lacarte-source (name &optional maps)
-  "Create lacarte source named NAME for MAPS.
-MAPS is like in `lacarte-get-overall-menu-item-alist'.
-See
-    http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el"
-  `((name . ,name)
-    (init . (lambda () (require 'lacarte)))
-    (candidates . (lambda ()
-                    (with-helm-current-buffer
-                      (delete '(nil) (lacarte-get-overall-menu-item-alist ,@maps)))))
-    (candidate-transformer . helm-lacarte-candidate-transformer)
-    (candidate-number-limit . 9999)
-    (type . command)))
+(declare-function lacarte-get-overall-menu-item-alist "ext:lacarte.el" (&optional MAPS))
 
 (defun helm-lacarte-candidate-transformer (cands)
   (mapcar (lambda (cand)
@@ -211,17 +199,39 @@ See
               cand))
           cands))
 
-(defvar helm-source-lacarte (helm-create-lacarte-source "Lacarte")
-  "Helm interface for lacarte.el.
-See
-    http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el")
+(defclass helm-lacarte (helm-source-sync helm-type-command)
+    ((init :initform (lambda () (require 'lacarte)))
+     (candidates :initform 'helm-lacarte-get-candidates)
+     (candidate-transformer :initform 'helm-lacarte-candidate-transformer)
+     (candidate-number-limit :initform 9999)))
+
+(defun helm-lacarte-get-candidates (&optional maps)
+  "Extract candidates for menubar using lacarte.el.
+See http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el.
+Optional argument MAPS is a list specifying which keymaps to use: it
+can contain the symbols `local', `global', and `minor', mean the
+current local map, current global map, and all current minor maps."
+  (with-helm-current-buffer
+    ;; FIXME: do we still need to remove possible '(nil) candidates.
+    (lacarte-get-overall-menu-item-alist maps)))
 
 ;;;###autoload
-(defun helm-browse-menubar ()
-  "Helm interface to the menubar using lacarte.el."
-  (interactive)
+(defun helm-browse-menubar (arg)
+  "Helm interface to the menubar using lacarte.el.
+With no prefix arg call the local current major-mode menu,
+with one prefix arg call the global menu,
+with two prefix args call the menu for the possible minor-mode in effect."
+  (interactive "P")
   (require 'lacarte)
-  (helm :sources 'helm-source-lacarte :buffer "*helm lacarte*"))
+  (helm :sources (helm-make-source "Lacarte" 'helm-lacarte
+                   :candidates (lambda ()
+                                 (helm-lacarte-get-candidates
+                                  (cond ((equal arg '(4))
+                                         '(global))
+                                        ((equal arg '(16))
+                                         '(minor))
+                                        (t '(local))))))
+        :buffer "*helm lacarte*"))
 
 (defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
