@@ -2683,7 +2683,7 @@ e.g helm.el$
       (clrhash helm--fuzzy-regexp-cache)
       (if (string-match "\\`!" helm-pattern)
           (puthash 'helm-pattern
-                   (if (> (length helm-pattern) 0)
+                   (if (> (length helm-pattern) 1)
                        (list (funcall fun (substring helm-pattern 1 2))
                              (funcall fun (substring helm-pattern 1)))
                        '("" ""))
