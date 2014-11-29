@@ -2669,7 +2669,7 @@ e.g helm.el$
                          c (format "[^%s]*%s" c (regexp-quote c))))
                    ls ""))))
 
-(defvar helm--fuzzy-matching-regexp-cache (make-hash-table :test 'equal))
+(defvar helm--fuzzy-regexp-cache (make-hash-table :test 'eq))
 (defun helm--fuzzy-match-maybe-set-pattern ()
   ;; Computing helm-pattern with helm--mapconcat-pattern
   ;; is costly, so cache it once time for all and reuse it
@@ -2678,16 +2678,25 @@ e.g helm.el$
     (let ((fun (if (string-match "\\`\\^" helm-pattern)
                    #'identity
                    #'helm--mapconcat-pattern)))
-      (clrhash helm--fuzzy-matching-regexp-cache)
+      (clrhash helm--fuzzy-regexp-cache)
       (if (string-match "\\`!" helm-pattern)
-          (puthash helm-pattern (funcall fun (substring helm-pattern 1))
-                   helm--fuzzy-matching-regexp-cache)
-          (puthash helm-pattern (funcall fun helm-pattern)
-                   helm--fuzzy-matching-regexp-cache)))))
+          (puthash 'helm-pattern
+                   (if (> (length helm-pattern) 0)
+                       (list (funcall fun (substring helm-pattern 1 2))
+                             (funcall fun (substring helm-pattern 1)))
+                       '("" ""))
+                   helm--fuzzy-regexp-cache)
+          (puthash 'helm-pattern
+                   (if (> (length helm-pattern) 0)
+                       (list (funcall fun (substring helm-pattern 0 1))
+                             (funcall fun helm-pattern))
+                       '("" ""))
+                   helm--fuzzy-regexp-cache)))))
 
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
-  (let ((regexp (gethash helm-pattern helm--fuzzy-matching-regexp-cache)))
+  (let ((regexp (cadr (gethash 'helm-pattern
+                               helm--fuzzy-regexp-cache))))
     (if (string-match "\\`!" helm-pattern)
         (not (string-match regexp candidate))
         (string-match regexp candidate))))
