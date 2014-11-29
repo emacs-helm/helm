@@ -2055,7 +2055,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (when any-input
     (setq helm-input any-input
           helm-pattern any-input)
-    (helm-fuzzy-match-maybe-set-pattern))
+    (helm--fuzzy-match-maybe-set-pattern))
   ;; If a `resume' attribute is present `helm-funcall-foreach'
   ;; will run its function.
   (when (helm-resume-p any-resume)
@@ -2423,7 +2423,7 @@ If no map is found in current source do nothing (keep previous map)."
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
-    (helm-fuzzy-match-maybe-set-pattern)
+    (helm--fuzzy-match-maybe-set-pattern)
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
     (helm-log "helm-pattern = %S" helm-pattern)
@@ -2654,24 +2654,28 @@ e.g helm.el$
                          c (format "[^%s]*%s" c (regexp-quote c))))
                    ls ""))))
 
-(defvar helm-fuzzy-matching-regexp-cache (make-hash-table :test 'equal))
-(defun helm-fuzzy-match-maybe-set-pattern ()
+(defvar helm--fuzzy-matching-regexp-cache (make-hash-table :test 'equal))
+(defun helm--fuzzy-match-maybe-set-pattern ()
+  ;; Computing helm-pattern with helm--mapconcat-pattern
+  ;; is costly, so cache it once time for all and reuse it
+  ;; until pattern change.
   (when helm--in-fuzzy
     (let ((fun (if (string-match "\\`\\^" helm-pattern)
                    #'identity
                    #'helm--mapconcat-pattern)))
-      (clrhash helm-fuzzy-matching-regexp-cache)
+      (clrhash helm--fuzzy-matching-regexp-cache)
       (if (string-match "\\`!" helm-pattern)
           (puthash helm-pattern (funcall fun (substring helm-pattern 1))
-                   helm-fuzzy-matching-regexp-cache)
+                   helm--fuzzy-matching-regexp-cache)
           (puthash helm-pattern (funcall fun helm-pattern)
-                   helm-fuzzy-matching-regexp-cache)))))
+                   helm--fuzzy-matching-regexp-cache)))))
 
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
-  (if (string-match "\\`!" helm-pattern)
-      (not (string-match (gethash helm-pattern helm-fuzzy-matching-regexp-cache) candidate))
-      (string-match (gethash helm-pattern helm-fuzzy-matching-regexp-cache) candidate)))
+  (let ((regexp (gethash helm-pattern helm--fuzzy-matching-regexp-cache)))
+    (if (string-match "\\`!" helm-pattern)
+        (not (string-match regexp candidate))
+        (string-match regexp candidate))))
 
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
