@@ -810,7 +810,7 @@ when `helm' is keyboard-quitted.")
   "[INTERNAL] A simple flag to notify persistent action we are following.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
-
+(defvar helm--in-fuzzy nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -938,6 +938,21 @@ not `exit-minibuffer' or unwanted functions."
         if (and (eq fn 'call-interactively)
                 (> (length btf) 2))
         return (cadr (cdr btf))))
+
+
+;; Test tools
+(defmacro with-helm-time-after-update (&rest body)
+  `(let ((start-time (float-time)) time-elapsed)
+     (add-hook 'helm-after-update-hook
+               (lambda ()
+                 (setq time-elapsed (- (float-time) start-time))
+                 (keyboard-quit)))
+     (unwind-protect ,@body
+       (remove-hook 'helm-after-update-hook
+                    (lambda ()
+                      (setq  time-elapsed (- (float-time) start-time))
+                      (keyboard-quit))))
+     time-elapsed))
 
 
 ;; Helm API
@@ -2036,6 +2051,15 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
             any-resume any-input)
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
+  (setq helm--in-fuzzy
+        (cl-loop for s in helm-sources
+                 for matchfns = (helm-match-functions
+                                 (if (symbolp s) (symbol-value s) s))
+                 for searchfns = (helm-search-functions
+                                  (if (symbolp s) (symbol-value s) s))
+                 when (or (member 'helm-fuzzy-match matchfns)
+                          (member 'helm-fuzzy-search searchfns))
+                 return t))
   (helm-log "sources = %S" helm-sources)
   (helm-current-position 'save)
   (if (helm-resume-p any-resume)
@@ -2045,8 +2069,10 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (unless (eq any-resume 'noresume)
     (helm-recent-push helm-buffer 'helm-buffers)
     (setq helm-last-buffer helm-buffer))
-  (when any-input (setq helm-input any-input
-                        helm-pattern any-input))
+  (when any-input
+    (setq helm-input any-input
+          helm-pattern any-input)
+    (helm--fuzzy-match-maybe-set-pattern))
   ;; If a `resume' attribute is present `helm-funcall-foreach'
   ;; will run its function.
   (when (helm-resume-p any-resume)
@@ -2414,6 +2440,7 @@ If no map is found in current source do nothing (keep previous map)."
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
+    (helm--fuzzy-match-maybe-set-pattern)
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
     (helm-log "helm-pattern = %S" helm-pattern)
@@ -2644,21 +2671,43 @@ e.g helm.el$
                          c (format "[^%s]*%s" c (regexp-quote c))))
                    ls ""))))
 
+(defvar helm--fuzzy-regexp-cache (make-hash-table :test 'eq))
+(defun helm--fuzzy-match-maybe-set-pattern ()
+  ;; Computing helm-pattern with helm--mapconcat-pattern
+  ;; is costly, so cache it once time for all and reuse it
+  ;; until pattern change.
+  (when helm--in-fuzzy
+    (let ((fun (if (string-match "\\`\\^" helm-pattern)
+                   #'identity
+                   #'helm--mapconcat-pattern)))
+      (clrhash helm--fuzzy-regexp-cache)
+      (if (string-match "\\`!" helm-pattern)
+          (puthash 'helm-pattern
+                   (if (> (length helm-pattern) 0)
+                       (list (funcall fun (substring helm-pattern 1 2))
+                             (funcall fun (substring helm-pattern 1)))
+                       '("" ""))
+                   helm--fuzzy-regexp-cache)
+          (puthash 'helm-pattern
+                   (if (> (length helm-pattern) 0)
+                       (list (funcall fun (substring helm-pattern 0 1))
+                             (funcall fun helm-pattern))
+                       '("" ""))
+                   helm--fuzzy-regexp-cache)))))
+
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
-  (let ((fun (if (string-match "\\`\\^" helm-pattern)
-                 #'identity
-                 #'helm--mapconcat-pattern)))
-  (if (string-match "\\`!" helm-pattern)
-      (not (string-match (funcall fun (substring helm-pattern 1))
-                         candidate))
-    (string-match (funcall fun helm-pattern) candidate))))
+  (let ((regexp (cadr (gethash 'helm-pattern
+                               helm--fuzzy-regexp-cache))))
+    (if (string-match "\\`!" helm-pattern)
+        (not (string-match regexp candidate))
+        (string-match regexp candidate))))
 
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
-  (let ((fun (if (string-match "\\`\\^" pattern)
-                 #'identity
-                 #'helm--mapconcat-pattern)))
+  (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
+         (partial-regexp (car regexps))
+         (regexp (cadr regexps)))
   (if (or (string-match "\\`!" pattern)
           (cl-loop for p in (split-string pattern " " t)
                    thereis (string-match "\\`!" p)))
@@ -2678,12 +2727,11 @@ e.g helm.el$
       ;; So just search the first bit of pattern e.g "[^f]*f", and
       ;; then search the corresponding line with the whole regexp,
       ;; which increase dramatically the speed of the search.
-      (cl-loop while (re-search-forward
-                      (funcall fun (substring pattern 0 1)) nil t)
+      (cl-loop while (re-search-forward partial-regexp nil t)
                for bol = (point-at-bol)
                for eol = (point-at-eol)
                if (progn (goto-char bol)
-                         (re-search-forward (funcall fun pattern) eol t))
+                         (re-search-forward regexp eol t))
                do (goto-char eol) and return t
                else do (goto-char eol)
                finally return nil))))
@@ -2732,6 +2780,11 @@ It is meant to use with `filter-one-by-one' slot."
                       #'helm-default-match-function)))
     (if (and (listp matchfns) (not (functionp matchfns)))
         matchfns (list matchfns))))
+
+(defun helm-search-functions (source)
+  (let ((searchfns (assoc-default 'search source)))
+    (if (and (listp searchfns) (not (functionp searchfns)))
+        searchfns (list searchfns))))
 
 (defmacro helm--accumulate-candidates (candidate newmatches
                                        hash item-count limit source)
