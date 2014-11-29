@@ -940,6 +940,21 @@ not `exit-minibuffer' or unwanted functions."
         return (cadr (cdr btf))))
 
 
+;; Test tools
+(defmacro with-helm-time-after-update (&rest body)
+  `(let ((start-time (float-time)) time-elapsed)
+     (add-hook 'helm-after-update-hook
+               (lambda ()
+                 (setq time-elapsed (- (float-time) start-time))
+                 (keyboard-quit)))
+     (unwind-protect ,@body
+       (remove-hook 'helm-after-update-hook
+                    (lambda ()
+                      (setq  time-elapsed (- (float-time) start-time))
+                      (keyboard-quit))))
+     time-elapsed))
+
+
 ;; Helm API
 
 (defun helm-buffer-get ()
