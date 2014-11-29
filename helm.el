@@ -2055,8 +2055,10 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
         (cl-loop for s in helm-sources
                  for matchfns = (helm-match-functions
                                  (if (symbolp s) (symbol-value s) s))
+                 for searchfns = (helm-search-functions
+                                  (if (symbolp s) (symbol-value s) s))
                  when (or (member 'helm-fuzzy-match matchfns)
-                          (member 'helm-fuzzy-search matchfns))
+                          (member 'helm-fuzzy-search searchfns))
                  return t))
   (helm-log "sources = %S" helm-sources)
   (helm-current-position 'save)
@@ -2703,13 +2705,9 @@ e.g helm.el$
 
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
-  (let ((fun (if (string-match "\\`\\^" pattern)
-                 #'identity
-                 #'helm--mapconcat-pattern))
-        (partial-regexp (car (gethash 'helm-pattern
-                                      helm--fuzzy-regexp-cache)))
-        (regexp (cadr (gethash 'helm-pattern
-                               helm--fuzzy-regexp-cache))))
+  (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
+         (partial-regexp (car regexps))
+         (regexp (cadr regexps)))
   (if (or (string-match "\\`!" pattern)
           (cl-loop for p in (split-string pattern " " t)
                    thereis (string-match "\\`!" p)))
@@ -2782,6 +2780,11 @@ It is meant to use with `filter-one-by-one' slot."
                       #'helm-default-match-function)))
     (if (and (listp matchfns) (not (functionp matchfns)))
         matchfns (list matchfns))))
+
+(defun helm-search-functions (source)
+  (let ((searchfns (assoc-default 'search source)))
+    (if (and (listp searchfns) (not (functionp searchfns)))
+        searchfns (list searchfns))))
 
 (defmacro helm--accumulate-candidates (candidate newmatches
                                        hash item-count limit source)
