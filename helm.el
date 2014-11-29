@@ -2705,7 +2705,11 @@ e.g helm.el$
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
   (let ((fun (if (string-match "\\`\\^" pattern)
                  #'identity
-                 #'helm--mapconcat-pattern)))
+                 #'helm--mapconcat-pattern))
+        (partial-regexp (car (gethash 'helm-pattern
+                                      helm--fuzzy-regexp-cache)))
+        (regexp (cadr (gethash 'helm-pattern
+                               helm--fuzzy-regexp-cache))))
   (if (or (string-match "\\`!" pattern)
           (cl-loop for p in (split-string pattern " " t)
                    thereis (string-match "\\`!" p)))
@@ -2725,12 +2729,11 @@ e.g helm.el$
       ;; So just search the first bit of pattern e.g "[^f]*f", and
       ;; then search the corresponding line with the whole regexp,
       ;; which increase dramatically the speed of the search.
-      (cl-loop while (re-search-forward
-                      (funcall fun (substring pattern 0 1)) nil t)
+      (cl-loop while (re-search-forward partial-regexp nil t)
                for bol = (point-at-bol)
                for eol = (point-at-eol)
                if (progn (goto-char bol)
-                         (re-search-forward (funcall fun pattern) eol t))
+                         (re-search-forward regexp eol t))
                do (goto-char eol) and return t
                else do (goto-char eol)
                finally return nil))))
