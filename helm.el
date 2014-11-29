@@ -810,7 +810,7 @@ when `helm' is keyboard-quitted.")
   "[INTERNAL] A simple flag to notify persistent action we are following.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
-
+(defvar helm--in-fuzzy nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2036,6 +2036,13 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
             any-resume any-input)
   (helm-frame-or-window-configuration 'save)
   (setq helm-sources (helm-normalize-sources any-sources))
+  (setq helm--in-fuzzy
+        (cl-loop for s in helm-sources
+                 for matchfns = (helm-match-functions
+                                 (if (symbolp s) (symbol-value s) s))
+                 when (or (member 'helm-fuzzy-match matchfns)
+                          (member 'helm-fuzzy-search matchfns))
+                 return t))
   (helm-log "sources = %S" helm-sources)
   (helm-current-position 'save)
   (if (helm-resume-p any-resume)
@@ -2045,8 +2052,10 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (unless (eq any-resume 'noresume)
     (helm-recent-push helm-buffer 'helm-buffers)
     (setq helm-last-buffer helm-buffer))
-  (when any-input (setq helm-input any-input
-                        helm-pattern any-input))
+  (when any-input
+    (setq helm-input any-input
+          helm-pattern any-input)
+    (helm-fuzzy-match-maybe-set-pattern))
   ;; If a `resume' attribute is present `helm-funcall-foreach'
   ;; will run its function.
   (when (helm-resume-p any-resume)
@@ -2414,6 +2423,7 @@ If no map is found in current source do nothing (keep previous map)."
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
+    (helm-fuzzy-match-maybe-set-pattern)
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
     (helm-log "helm-pattern = %S" helm-pattern)
@@ -2644,15 +2654,24 @@ e.g helm.el$
                          c (format "[^%s]*%s" c (regexp-quote c))))
                    ls ""))))
 
+(defvar helm-fuzzy-matching-regexp-cache (make-hash-table :test 'equal))
+(defun helm-fuzzy-match-maybe-set-pattern ()
+  (when helm--in-fuzzy
+    (let ((fun (if (string-match "\\`\\^" helm-pattern)
+                   #'identity
+                   #'helm--mapconcat-pattern)))
+      (clrhash helm-fuzzy-matching-regexp-cache)
+      (if (string-match "\\`!" helm-pattern)
+          (puthash helm-pattern (funcall fun (substring helm-pattern 1))
+                   helm-fuzzy-matching-regexp-cache)
+          (puthash helm-pattern (funcall fun helm-pattern)
+                   helm-fuzzy-matching-regexp-cache)))))
+
 (defun helm-fuzzy-match (candidate)
   "Check if `helm-pattern' fuzzy match CANDIDATE."
-  (let ((fun (if (string-match "\\`\\^" helm-pattern)
-                 #'identity
-                 #'helm--mapconcat-pattern)))
   (if (string-match "\\`!" helm-pattern)
-      (not (string-match (funcall fun (substring helm-pattern 1))
-                         candidate))
-    (string-match (funcall fun helm-pattern) candidate))))
+      (not (string-match (gethash helm-pattern helm-fuzzy-matching-regexp-cache) candidate))
+      (string-match (gethash helm-pattern helm-fuzzy-matching-regexp-cache) candidate)))
 
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
