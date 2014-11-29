@@ -187,7 +187,23 @@ http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
 ;;; LaCarte
 ;;
 ;;
+<<<<<<< HEAD
 (declare-function lacarte-get-overall-menu-item-alist "ext:lacarte.el" (&optional MAPS))
+=======
+(defun helm-create-lacarte-source (name &optional maps)
+  "Create lacarte source named NAME for MAPS.
+MAPS is like in `lacarte-get-overall-menu-item-alist'.
+See
+    http://www.emacswiki.org/cgi-bin/wiki/download/lacarte.el"
+  `((name . ,name)
+    (init . (lambda () (require 'lacarte)))
+    (candidates . (lambda ()
+                    (with-helm-current-buffer
+                      (delete '(nil) (lacarte-get-overall-menu-item-alist ',maps)))))
+    (candidate-transformer . helm-lacarte-candidate-transformer)
+    (candidate-number-limit . 9999)
+    (type . command)))
+>>>>>>> master
 
 (defun helm-lacarte-candidate-transformer (cands)
   (mapcar (lambda (cand)
