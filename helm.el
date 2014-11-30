@@ -2696,15 +2696,15 @@ e.g helm.el$
                    helm--fuzzy-regexp-cache)))))
 
 (defun helm-fuzzy-match (candidate)
-  "Check if `helm-pattern' fuzzy match CANDIDATE."
-  (let ((regexp (cadr (gethash 'helm-pattern
-                               helm--fuzzy-regexp-cache))))
+  "Check if `helm-pattern' fuzzy match CANDIDATE.
+This function is used with sources build with `helm-source-sync'."
+  (let ((regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache))))
     (if (string-match "\\`!" helm-pattern)
         (not (string-match regexp candidate))
         (string-match regexp candidate))))
 
 (defun helm-fuzzy-search (pattern)
-  "Same as `helm-fuzzy-match' but for sources using `candidates-in-buffer'."
+  "Same as `helm-fuzzy-match' but for sources build with `helm-source-in-buffer'."
   (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
          (partial-regexp (car regexps))
          (regexp (cadr regexps)))
