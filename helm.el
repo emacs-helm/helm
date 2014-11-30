@@ -2681,6 +2681,9 @@ e.g helm.el$
                    #'identity
                    #'helm--mapconcat-pattern)))
       (clrhash helm--fuzzy-regexp-cache)
+      ;; FIXME: Splitted part are not handled here,
+      ;; I must compute them in `helm-search-match-part'
+      ;; when negation and in-buffer are used.
       (if (string-match "\\`!" helm-pattern)
           (puthash 'helm-pattern
                    (if (> (length helm-pattern) 1)
