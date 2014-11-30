@@ -287,7 +287,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
           (let ((files (if (file-remote-p in-directory)
                        ;; Grep don't understand tramp filenames
                        ;; use the local name.
-                       (mapcar #'(lambda (x) (file-remote-p x 'localname))
+                       (mapcar #'(lambda (x)
+                                   (helm-basename (file-remote-p x 'localname)))
                                all-files)
                        all-files)))
             (if (string-match "^git" helm-grep-default-command)
@@ -360,12 +361,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
-  (let* ((default-directory (or helm-default-directory
-                                (expand-file-name helm-ff-default-directory)))
+  (let* ((default-directory (or (expand-file-name helm-ff-default-directory)
+                                helm-default-directory))
          (zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
-         (tramp-verbose helm-tramp-verbose))
+         (tramp-verbose helm-tramp-verbose)
+         non-essential)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
@@ -447,19 +449,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
-         (loc-fname    (or (with-current-buffer
+         (fname        (or (with-current-buffer
                                (if (eq major-mode 'helm-grep-mode)
                                    (current-buffer)
-                                 helm-buffer)
+                                   helm-buffer)
                              (get-text-property (point-at-bol) 'help-echo))
-                           (car split)))
-         (tramp-method (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'method))
-         (tramp-host   (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'host))
-         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host
-                           (concat tramp-prefix loc-fname) loc-fname)))
+                           (car split))))
     (cl-case where
       (other-window (find-file-other-window fname))
       (elscreen     (helm-elscreen-find-file fname))
@@ -820,7 +815,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
-  (let* ((exts (and recurse
+  (let* (non-essential
+         (exts (and recurse
                     ;; [FIXME] I could handle this from helm-walk-directory.
                     (not zgrep) ; zgrep doesn't handle -r opt.
                     (not (helm-grep-use-ack-p :where 'recursive))
