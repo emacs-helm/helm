@@ -4167,25 +4167,28 @@ Because `helm-search-match-part' maybe called even if unspecified
 in source (negation), MATCH-PART-FN default to `identity' to match whole candidate.
 When using fuzzy matching and negation (i.e \"!\"), this function is always called."
   (let ((part (funcall match-part-fn candidate))
-        (fuzzy-p (assoc 'fuzzy-match (helm-get-current-source))))
+        (fuzzy-regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache))))
     (if (string-match " " pattern)
+        ;; FIXME: The fuzzy regexp cache is not handling splitted
+        ;; patterns actually, so I must compute the splitted regexp here
+        ;; at each turn of the loop which is costly.
         (cl-loop for i in (split-string pattern " " t) always
                  (if (string-match "\\`!" i)
                      (not (string-match
-                           (if fuzzy-p
+                           (if helm--in-fuzzy
                                (helm--mapconcat-pattern
                                 (substring i 1))
                                (substring i 1))
                            part))
                      (string-match
-                      (if fuzzy-p
+                      (if helm--in-fuzzy
                           (helm--mapconcat-pattern i) i)
                       part)))
         (if (string-match "\\`!" pattern)
             (let ((reg (substring pattern 1)))
-              (not (string-match (if fuzzy-p (helm--mapconcat-pattern reg) reg)
+              (not (string-match (if helm--in-fuzzy fuzzy-regexp reg)
                                  part)))
-            (string-match (if fuzzy-p (helm--mapconcat-pattern pattern) pattern)
+            (string-match (if helm--in-fuzzy fuzzy-regexp pattern)
                           part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (endp
