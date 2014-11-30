@@ -287,7 +287,8 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
           (let ((files (if (file-remote-p in-directory)
                        ;; Grep don't understand tramp filenames
                        ;; use the local name.
-                       (mapcar #'(lambda (x) (file-remote-p x 'localname))
+                       (mapcar #'(lambda (x)
+                                   (helm-basename (file-remote-p x 'localname)))
                                all-files)
                        all-files)))
             (if (string-match "^git" helm-grep-default-command)
@@ -360,12 +361,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
-  (let* ((default-directory (or helm-default-directory
-                                (expand-file-name helm-ff-default-directory)))
+  (let* ((default-directory (or (expand-file-name helm-ff-default-directory)
+                                helm-default-directory))
          (zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
-         (tramp-verbose helm-tramp-verbose))
+         (tramp-verbose helm-tramp-verbose)
+         non-essential)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
