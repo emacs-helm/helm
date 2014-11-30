@@ -449,19 +449,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
-         (loc-fname    (or (with-current-buffer
+         (fname        (or (with-current-buffer
                                (if (eq major-mode 'helm-grep-mode)
                                    (current-buffer)
-                                 helm-buffer)
+                                   helm-buffer)
                              (get-text-property (point-at-bol) 'help-echo))
-                           (car split)))
-         (tramp-method (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'method))
-         (tramp-host   (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'host))
-         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host
-                           (concat tramp-prefix loc-fname) loc-fname)))
+                           (car split))))
     (cl-case where
       (other-window (find-file-other-window fname))
       (elscreen     (helm-elscreen-find-file fname))
@@ -822,7 +815,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
-  (let* ((exts (and recurse
+  (let* (non-essential
+         (exts (and recurse
                     ;; [FIXME] I could handle this from helm-walk-directory.
                     (not zgrep) ; zgrep doesn't handle -r opt.
                     (not (helm-grep-use-ack-p :where 'recursive))
