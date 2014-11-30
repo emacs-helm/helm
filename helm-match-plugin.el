@@ -287,7 +287,10 @@ cons cell against STR (a candidate).
 i.e (identity (string-match \"foo\" \"foo bar\")) => t."
   (let ((pat (helm-mp-3-get-patterns pattern)))
     (cl-loop for (predicate . regexp) in pat
-             always (funcall predicate (string-match regexp str)))))
+             always (funcall predicate
+                             (condition-case _err
+                                 (string-match regexp str)
+                               (invalid-regexp nil))))))
 
 (defun helm-mp-3-search-base (pattern searchfn1 searchfn2)
   "Try to find PATTERN in `helm-buffer' with SEARCHFN1 and SEARCHFN2.
