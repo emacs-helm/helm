@@ -288,7 +288,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        ;; Grep don't understand tramp filenames
                        ;; use the local name.
                        (mapcar #'(lambda (x)
-                                   (helm-basename (file-remote-p x 'localname)))
+                                   (file-remote-p x 'localname))
                                all-files)
                        all-files)))
             (if (string-match "^git" helm-grep-default-command)
