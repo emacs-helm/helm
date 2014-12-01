@@ -2702,16 +2702,22 @@ e.g helm.el$
   "Check if `helm-pattern' fuzzy match CANDIDATE.
 This function is used with sources build with `helm-source-sync'."
   (let ((regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache))))
-    (if (string-match "\\`!" helm-pattern)
-        (not (string-match regexp candidate))
-        (string-match regexp candidate))))
+    (if (string-match " " helm-pattern)
+        (cl-loop for p in (split-string helm-pattern) always
+                 (if (string-match "\\`!" p)
+                     (not (string-match (helm--mapconcat-pattern
+                                         (substring p 1)) candidate))
+                     (string-match (helm--mapconcat-pattern p) p)))
+        (if (string-match "\\`!" helm-pattern)
+            (not (string-match regexp candidate))
+            (string-match regexp candidate)))))
 
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources build with `helm-source-in-buffer'."
   (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
          (partial-regexp (car regexps))
          (regexp (cadr regexps)))
-  (if (cl-loop for p in (split-string pattern " " t)
+  (if (cl-loop for p in (split-string pattern)
                    thereis (string-match "\\`!" p))
       ;; Don't try to search here, just return
       ;; the position of line and go ahead,
@@ -4174,7 +4180,7 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
         ;; FIXME: The fuzzy regexp cache is not handling splitted
         ;; patterns actually, so I must compute the splitted regexp here
         ;; at each turn of the loop which is costly.
-        (cl-loop for i in (split-string pattern " " t) always
+        (cl-loop for i in (split-string pattern) always
                  (if (string-match "\\`!" i)
                      (not (string-match
                            (if helm--in-fuzzy
