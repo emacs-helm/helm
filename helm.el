@@ -2703,6 +2703,7 @@ e.g helm.el$
 This function is used with sources build with `helm-source-sync'."
   (let ((regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache))))
     (if (string-match " " helm-pattern)
+        ;; FIXME: cache the splitted parts.
         (cl-loop for p in (split-string helm-pattern) always
                  (if (string-match "\\`!" p)
                      (not (string-match (helm--mapconcat-pattern

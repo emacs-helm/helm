@@ -289,6 +289,9 @@ i.e (identity (string-match \"foo\" \"foo bar\")) => t."
     (cl-loop for (predicate . regexp) in pat
              always (funcall predicate
                              (condition-case _err
+                                 ;; FIXME: Probably do nothing when
+                                 ;; using fuzzy leaving the job
+                                 ;; to the fuzzy fn.
                                  (string-match regexp str)
                                (invalid-regexp nil))))))
 
