@@ -2711,9 +2711,8 @@ This function is used with sources build with `helm-source-sync'."
   (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
          (partial-regexp (car regexps))
          (regexp (cadr regexps)))
-  (if (or (string-match "\\`!" pattern)
-          (cl-loop for p in (split-string pattern " " t)
-                   thereis (string-match "\\`!" p)))
+  (if (cl-loop for p in (split-string pattern " " t)
+                   thereis (string-match "\\`!" p))
       ;; Don't try to search here, just return
       ;; the position of line and go ahead,
       ;; letting match-part fn checking if
