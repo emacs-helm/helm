@@ -305,6 +305,7 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
                           (helm-mp-3-get-patterns pattern)
                           pattern)
            when (eq (caar pat) 'not) return
+           ;; Pass the job to `helm-search-match-part'.
            (prog1 (list (point-at-bol) (point-at-eol))
              (forward-line 1))
            while (condition-case _err
