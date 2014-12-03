@@ -380,14 +380,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                                (delete default all)))
                                              all)
                                            :test 'equal))))))
-           (src-hist (let ((helm-default-fuzzy-sort-fn
-                            ;; Assume history should not be fuzzy sorted on startup.
-                            (lambda (candidates source)
-                              (if (string= helm-pattern "")
-                                  candidates
-                                  (helm-fuzzy-matching-default-sort-fn
-                                   candidates source)))))
-                       (helm-build-sync-source (format "%s History" name)
+           (src-hist (helm-build-sync-source (format "%s History" name)
                          :candidates history-get-candidates
                          :fuzzy-match fuzzy
                          :filtered-candidate-transformer
@@ -403,7 +396,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :persistent-help persistent-help
                          :keymap loc-map
                          :mode-line mode-line
-                         :action action-fn)))
+                         :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :filtered-candidate-transformer fc-transformer

@@ -2753,21 +2753,20 @@ This function is used with sources build with `helm-source-sync'."
     (+ bonus (length (cl-nintersection pat-lookup str-lookup :test 'equal)))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
-  ;; FIXME: Should we sort right on startup or
-  ;; do no sorting until something is entered in minibuffer
-  ;; (Like in helm-comp-read).
-  (sort candidates
-        (lambda (s1 s2)
-          ;; Sort on real part of candidate.
-          (let* ((cand1 (if (consp s1) (cdr s1) s1))
-                 (cand2 (if (consp s2) (cdr s2) s2))
-                 (scr1 (helm-score-candidate-for-pattern cand1 helm-pattern))
-                 (scr2 (helm-score-candidate-for-pattern cand2 helm-pattern))
-                 (len1 (length cand1))
-                 (len2 (length cand2)))
-            (cond ((= scr1 scr2)
-                   (< len1 len2))
-                  ((> scr1 scr2)))))))
+  (if (string= helm-pattern "")
+      candidates
+      (sort candidates
+            (lambda (s1 s2)
+              ;; Sort on real part of candidate.
+              (let* ((cand1 (if (consp s1) (cdr s1) s1))
+                     (cand2 (if (consp s2) (cdr s2) s2))
+                     (scr1 (helm-score-candidate-for-pattern cand1 helm-pattern))
+                     (scr2 (helm-score-candidate-for-pattern cand2 helm-pattern))
+                     (len1 (length cand1))
+                     (len2 (length cand2)))
+                (cond ((= scr1 scr2)
+                       (< len1 len2))
+                      ((> scr1 scr2))))))))
 
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
