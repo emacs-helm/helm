@@ -143,6 +143,7 @@ It have no effect when locate command is 'es'.
 INIT is a string to use as initial input in prompt.
 See `helm-locate-with-db' and `helm-locate'."
   (require 'helm-mode)
+  (helm-locate-set-command)
   (let ((pfn #'(lambda (candidate)
                  (if (file-directory-p candidate)
                      (message "Error: The locate Db should be a file")
