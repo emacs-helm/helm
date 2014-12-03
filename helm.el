@@ -2756,6 +2756,7 @@ This function is used with sources build with `helm-source-sync'."
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
   (sort candidates
         (lambda (s1 s2)
+          ;; Sort display part of candidate.
           (let* ((cand1 (if (consp s1) (car s1) s1))
                  (cand2 (if (consp s2) (car s2) s2))
                  (scr1 (helm-score-candidate-for-pattern cand1 helm-pattern))
