@@ -893,13 +893,17 @@ an eieio class."
     (when helm-default-fuzzy-matching-highlight-fn
       (oset source :filter-one-by-one
             (helm-aif (oref source :filter-one-by-one)
-                (append (if (listp it) it (list it))
+                (append (if (and (listp it)
+                                 (not (functionp it)))
+                            it (list it))
                         (list helm-default-fuzzy-matching-highlight-fn))
               (list helm-default-fuzzy-matching-highlight-fn))))
     (when helm-default-fuzzy-sort-fn
       (oset source :filtered-candidate-transformer
             (helm-aif (oref source :filtered-candidate-transformer)
-                (append (if (listp it) it (list it))
+                (append (if (and (listp it)
+                                 (not (functionp it)))
+                            it (list it))
                         (list helm-default-fuzzy-sort-fn))
               (list helm-default-fuzzy-sort-fn))))))
 
