@@ -2440,7 +2440,6 @@ If no map is found in current source do nothing (keep previous map)."
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
-    (helm--fuzzy-match-maybe-set-pattern)
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
     (helm-log "helm-pattern = %S" helm-pattern)
@@ -2873,6 +2872,7 @@ and `helm-pattern'."
           (limit (helm-candidate-number-limit source))
           (helm-pattern (helm-process-pattern-transformer
                          helm-pattern source)))
+      (helm--fuzzy-match-maybe-set-pattern)
       ;; If source have a `filtered-candidate-transformer' attr
       ;; Filter candidates with this func, otherwise just compute
       ;; candidates.
