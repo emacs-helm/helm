@@ -216,6 +216,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             preselect
                             (buffer "*Helm Completions*")
                             must-match
+                            fuzzy
                             reverse-history
                             (requires-pattern 0)
                             history
@@ -379,29 +380,32 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                                (delete default all)))
                                              all)
                                            :test 'equal))))))
-           (src-hist (helm-build-sync-source (format "%s History" name)
-                       :candidates history-get-candidates
-                       :filtered-candidate-transformer
-                       (append '((lambda (candidates sources)
-                                   (cl-loop for i in candidates
-                                            ;; Input is added to history in completing-read's
-                                            ;; and may be regexp-quoted, so unquote it.
-                                            for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                            do (set-text-properties 0 (length cand) nil cand)
-                                            collect cand)))
-                               (and hist-fc-transformer
-                                    (list hist-fc-transformer)))
-                       :persistent-action persistent-action
-                       :persistent-help persistent-help
-                       :keymap loc-map
-                       :mode-line mode-line
-                       :action action-fn))
+           (src-hist (let (helm-default-fuzzy-sort-fn)
+                       ;; Assume history should not be fuzzy sorted.
+                       (helm-build-sync-source (format "%s History" name)
+                         :candidates history-get-candidates
+                         :fuzzy-match fuzzy
+                         :filtered-candidate-transformer
+                         (append '((lambda (candidates sources)
+                                     (cl-loop for i in candidates
+                                              ;; Input is added to history in completing-read's
+                                              ;; and may be regexp-quoted, so unquote it.
+                                              for cand = (replace-regexp-in-string "\\s\\" "" i)
+                                              do (set-text-properties 0 (length cand) nil cand)
+                                              collect cand)))
+                                 (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
+                         :persistent-action persistent-action
+                         :persistent-help persistent-help
+                         :keymap loc-map
+                         :mode-line mode-line
+                         :action action-fn)))
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :filtered-candidate-transformer fc-transformer
                   :requires-pattern requires-pattern
                   :persistent-action persistent-action
                   :persistent-help persistent-help
+                  :fuzzy-match fuzzy
                   :keymap loc-map
                   :mode-line mode-line
                   :action action-fn))
@@ -410,6 +414,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :filtered-candidate-transformer fc-transformer
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
+                    :fuzzy-match fuzzy
                     :persistent-help persistent-help
                     :keymap loc-map
                     :mode-line mode-line

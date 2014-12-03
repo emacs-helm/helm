@@ -126,10 +126,6 @@ If SORT is non nil sort list with `helm-generic-sort-fn'."
 
 (defun helm-M-x-transformer (candidates _source)
   "Transformer function for `helm-M-x' candidates."
-  (helm-M-x-transformer-1 candidates 'sort))
-
-(defun helm-M-x-transformer-hist (candidates _source)
-  "Transformer function for `helm-M-x' candidates history."
   (helm-M-x-transformer-1 candidates))
 
 (defun helm-M-x--notify-prefix-arg ()
@@ -190,11 +186,12 @@ You can get help on each command by persistent action."
                           :del-input nil
                           :mode-line helm-M-x-mode-line
                           :must-match t
+                          :fuzzy t
                           :nomark t
                           :keymap helm-M-x-map
                           :candidates-in-buffer t
                           :fc-transformer 'helm-M-x-transformer
-                          :hist-fc-transformer 'helm-M-x-transformer-hist)))
+                          :hist-fc-transformer 'helm-M-x-transformer)))
       (cancel-timer tm)
       (setq helm--mode-line-display-prefarg nil))
     (setq sym-com (intern command))
