@@ -2753,6 +2753,9 @@ This function is used with sources build with `helm-source-sync'."
     (+ bonus (length (cl-nintersection pat-lookup str-lookup :test 'equal)))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
+  ;; FIXME: Should we sort right on startup or
+  ;; do no sorting until something is entered in minibuffer
+  ;; (Like in helm-comp-read).
   (sort candidates
         (lambda (s1 s2)
           ;; Sort on real part of candidate.
