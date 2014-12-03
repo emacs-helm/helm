@@ -2608,23 +2608,37 @@ Don't use it in your own code unless you know what you are doing.")
 ;;; Recentf files
 ;;
 ;;
+(defvar helm-recentf--basename-flag nil)
+(defvar recentf-list)
+
+(defun helm-recentf-pattern-transformer (pattern)
+  (if (string-match "\\([^ ]*\\) -b\\'" pattern)
+      (prog1 (match-string 1 pattern)
+        (setq helm-recentf--basename-flag t))
+      (setq helm-recentf--basename-flag nil)
+      pattern))
+
 (defvar helm-source-recentf
-  `((name . "Recentf")
-    (init . (lambda ()
-              (require 'recentf)
-              (recentf-mode 1)))
-    (candidates . recentf-list)
-    (match . helm-files-match-only-basename)
-    (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (cl-loop for i in candidates
-                                              if helm-ff-transformer-show-only-basename
-                                              collect (cons (helm-basename i) i)
-                                              else collect i)))
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (action . ,(cdr (helm-get-actions-from-type
-                     helm-source-locate))))
+  (helm-build-sync-source "Recentf"
+    :init (lambda ()
+            (require 'recentf)
+            (recentf-mode 1))
+    :candidates (lambda () recentf-list)
+    :pattern-transformer 'helm-recentf-pattern-transformer
+    :match-part (lambda (candidate)
+                  (if (or helm-ff-transformer-show-only-basename
+                          helm-recentf--basename-flag)
+                      (helm-basename candidate) candidate))
+    :fuzzy-match t
+    :filtered-candidate-transformer (lambda (candidates _source)
+                                      (cl-loop for i in candidates
+                                               if helm-ff-transformer-show-only-basename
+                                               collect (cons (helm-basename i) i)
+                                               else collect i))
+    :keymap helm-generic-files-map
+    :help-message helm-generic-file-help-message
+    :mode-line helm-generic-file-mode-line-string
+    :action (helm-actions-from-type-file))
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
