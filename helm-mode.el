@@ -381,12 +381,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                              all)
                                            :test 'equal))))))
            (src-hist (let ((helm-default-fuzzy-sort-fn
-                            (lambda (candidates _source)
+                            ;; Assume history should not be fuzzy sorted on startup.
+                            (lambda (candidates source)
                               (if (string= helm-pattern "")
                                   candidates
                                   (helm-fuzzy-matching-default-sort-fn
-                                   candidates _source)))))
-                       ;; Assume history should not be fuzzy sorted.
+                                   candidates source)))))
                        (helm-build-sync-source (format "%s History" name)
                          :candidates history-get-candidates
                          :fuzzy-match fuzzy
