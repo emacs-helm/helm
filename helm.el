@@ -2649,6 +2649,15 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
 Default function to match candidates according to `helm-pattern'."
   (string-match helm-pattern candidate))
 
+
+;;; Fuzzy matching
+;;
+;;
+(define-minor-mode helm-fuzzy-match-mode
+    "Enable Fuzzy matching in all sources built with fuzzy matching."
+  :group 'helm
+  :global t)
+
 (defun helm--mapconcat-pattern (pattern)
   "Transform string PATTERN in regexp for further fuzzy matching.
 e.g helm.el$
