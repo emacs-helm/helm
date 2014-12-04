@@ -41,11 +41,6 @@ If nil or zero (disabled), don't truncate candidate, show all."
           (integer :tag "Max number of lines"))
   :group 'helm-ring)
 
-(defcustom helm-kill-ring-show-completion t
-  "Show yank contents with an overlay in current buffer."
-  :group 'helm-ring
-  :type 'boolean)
-
 (defcustom helm-register-max-offset 160
   "Max size of string register entries before truncating."
   :group 'helm-ring
