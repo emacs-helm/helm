@@ -259,6 +259,7 @@ Return a cons \(beg . end\)."
                       :data helm-lisp-completion--cache
                       :persistent-action 'helm-lisp-completion-persistent-action
                       :nomark t
+                      :fuzzy-match t
                       :persistent-help "Show brief doc in mode-line"
                       :filtered-candidate-transformer 'helm-lisp-completion-transformer
                       :action `(lambda (candidate)
