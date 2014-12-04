@@ -563,18 +563,10 @@ First call indent, second complete symbol, third complete fname."
 ;;; Locate elisp library
 ;;
 ;;
-(defvar helm-source-locate-library
-  `((name . "Elisp libraries (Scan)")
-    (init . (helm-locate-library-scan-init))
-    (candidates-in-buffer)
-    (candidate-number-limit . 9999)
-    (keymap . ,helm-generic-files-map)
-    (type . file)))
-
-(defun helm-locate-library-scan-init ()
-  "Init helm buffer status."
-  (helm-init-candidates-in-buffer
-      'global (helm-locate-library-scan-list)))
+(defclass helm-locate-library-class (helm-source-in-buffer helm-type-file)
+  ((data :initform (lambda () (helm-locate-library-scan-list)))
+   (fuzzy-match :initform t)
+   (keymap :initform helm-generic-files-map)))
 
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
@@ -587,7 +579,8 @@ First call indent, second complete symbol, third complete fname."
 ;;;###autoload
 (defun helm-locate-library ()
   (interactive)
-  (helm :sources 'helm-source-locate-library
+  (helm :sources (helm-make-source "Elisp libraries (Scan)"
+                     'helm-locate-library-class)
         :buffer "*helm locate library*"))
 
 (defun helm-set-variable (var)
