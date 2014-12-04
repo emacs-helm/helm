@@ -112,17 +112,15 @@ fuzzy matching is running its own sort function with a different algorithm."
           for key        = (substitute-command-keys (format "\\[%s]" cand))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (propertize cand 'display
-                                   (format "%s (%s)"
-                                           cand (propertize
-                                                 local-key
-                                                 'face 'helm-M-x-key))))
+                       (format "%s (%s)"
+                               cand (propertize
+                                     local-key
+                                     'face 'helm-M-x-key)))
                       ((string-match "^M-x" key) cand)
-                      (t (propertize cand 'display
-                                     (format "%s (%s)"
-                                             cand (propertize
-                                                   key
-                                                   'face 'helm-M-x-key)))))
+                      (t (format "%s (%s)"
+                                 cand (propertize
+                                       key
+                                       'face 'helm-M-x-key))))
                 cand)
           into ls
           finally return
@@ -155,6 +153,9 @@ You can get help on each command by persistent action."
   (let* ((history (cl-loop for i in extended-command-history
                         when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
+         (helm-default-fuzzy-sort-fn (lambda (candidates _source)
+                                       (helm-fuzzy-matching-default-sort-fn-1
+                                        candidates 'real)))
          (helm--mode-line-display-prefarg t)
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))
