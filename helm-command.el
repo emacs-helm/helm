@@ -43,6 +43,9 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
+(defcustom helm-M-x-fuzzy-match t
+  "Enable fuzzy matching in `helm-M-x' when non--nil.")
+
 
 ;;; Faces
 ;;
@@ -195,7 +198,7 @@ You can get help on each command by persistent action."
                           :del-input nil
                           :mode-line helm-M-x-mode-line
                           :must-match t
-                          :fuzzy helm-fuzzy-match-mode
+                          :fuzzy helm-M-x-fuzzy-match
                           :nomark t
                           :keymap helm-M-x-map
                           :candidates-in-buffer t

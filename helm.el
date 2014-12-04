@@ -2653,11 +2653,6 @@ Default function to match candidates according to `helm-pattern'."
 ;;; Fuzzy matching
 ;;
 ;;
-(define-minor-mode helm-fuzzy-match-mode
-    "Enable Fuzzy matching in all sources built with fuzzy matching."
-  :group 'helm
-  :global t)
-
 (defun helm--mapconcat-pattern (pattern)
   "Transform string PATTERN in regexp for further fuzzy matching.
 e.g helm.el$
