@@ -2563,28 +2563,7 @@ Else return ACTIONS unmodified."
     (action . ,(cdr (helm-get-actions-from-type
                      helm-source-locate)))))
 
-(defvar helm-source--ff-file-name-history
-  '((name . "File name history")
-    (init . (lambda ()
-              (with-helm-alive-p
-                (when helm-ff-file-name-history-use-recentf
-                  (require 'recentf)
-                  (or recentf-mode (recentf-mode 1))))))
-    (candidates . (lambda ()
-                    (if helm-ff-file-name-history-use-recentf
-                        recentf-list
-                      file-name-history)))
-    (persistent-action . ignore)
-    (filtered-candidate-transformer . helm-file-name-history-transformer)
-    (action . (("Find file"
-                . (lambda (candidate)
-                    (helm-set-pattern
-                     (expand-file-name candidate))
-                    (with-helm-after-update-hook (helm-exit-minibuffer))))
-               ("Find file in helm"
-                . (lambda (candidate)
-                    (helm-set-pattern
-                     (expand-file-name candidate)))))))
+(defvar helm-source--ff-file-name-history nil
   "[Internal] This source is build to be used with `helm-find-files'.
 Don't use it in your own code unless you know what you are doing.")
 
@@ -2599,6 +2578,29 @@ Don't use it in your own code unless you know what you are doing.")
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
+  (unless helm-source--ff-file-name-history
+    (setq helm-source--ff-file-name-history
+          (helm-build-sync-source "File name history"
+            :init (lambda ()
+                    (with-helm-alive-p
+                      (when helm-ff-file-name-history-use-recentf
+                        (require 'recentf)
+                        (or recentf-mode (recentf-mode 1)))))
+            :candidates (lambda ()
+                          (if helm-ff-file-name-history-use-recentf
+                              recentf-list
+                              file-name-history))
+            :fuzzy-match t
+            :persistent-action 'ignore
+            :filtered-candidate-transformer 'helm-file-name-history-transformer
+            :action (helm-make-actions
+                     "Find file" (lambda (candidate)
+                                   (helm-set-pattern
+                                    (expand-file-name candidate))
+                                   (with-helm-after-update-hook (helm-exit-minibuffer)))
+                      "Find file in helm" (lambda (candidate)
+                                            (helm-set-pattern
+                                             (expand-file-name candidate)))))))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
           :buffer "*helm-file-name-history*"

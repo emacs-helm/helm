@@ -100,9 +100,11 @@ Return nil if no mode-map found."
 
 
 (defun helm-M-x-transformer-1 (candidates &optional sort)
-  "filtered-candidate-transformer to show bindings in emacs commands.
+  "Transformer function to show bindings in emacs commands.
 Show global bindings and local bindings according to current `major-mode'.
-If SORT is non nil sort list with `helm-generic-sort-fn'."
+If SORT is non nil sort list with `helm-generic-sort-fn'.
+Note that SORT should not be used when fuzzy matching because
+fuzzy matching is running its own sort function with a different algorithm."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
