@@ -48,6 +48,8 @@
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 
+(defvar recentf-list)
+
 
 ;;; Type attributes
 ;;
@@ -2611,8 +2613,6 @@ Don't use it in your own code unless you know what you are doing.")
 ;;
 ;;
 (defvar helm-recentf--basename-flag nil)
-(defvar recentf-list)
-
 (defun helm-recentf-pattern-transformer (pattern)
   (if (string-match "\\([^ ]*\\) -b\\'" pattern)
       (prog1 (match-string 1 pattern)
