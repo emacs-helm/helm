@@ -242,10 +242,7 @@ Return a cons \(beg . end\)."
          (candidates (append loc-vars glob-syms))
          (helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
-         (enable-recursive-minibuffers t)
-         (helm-match-plugin-enabled
-          (member 'helm-compile-source--match-plugin
-                  helm-compile-source-functions)))
+         (enable-recursive-minibuffers t))
     (setq helm-lisp-completion--cache (cl-loop for sym in candidates
                                             for len = (length sym)
                                             when (> len helm-lgst-len)
