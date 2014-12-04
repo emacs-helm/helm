@@ -2757,9 +2757,9 @@ This function is used with sources build with `helm-source-sync'."
       candidates
       (sort candidates
             (lambda (s1 s2)
-              ;; Sort on real part of candidate.
-              (let* ((cand1 (if (consp s1) (cdr s1) s1))
-                     (cand2 (if (consp s2) (cdr s2) s2))
+              ;; Score and measure the length on display part of candidate.
+              (let* ((cand1 (if (consp s1) (car s1) s1))
+                     (cand2 (if (consp s2) (car s2) s2))
                      (scr1 (helm-score-candidate-for-pattern cand1 helm-pattern))
                      (scr2 (helm-score-candidate-for-pattern cand2 helm-pattern))
                      (len1 (length cand1))
@@ -2771,18 +2771,22 @@ This function is used with sources build with `helm-source-sync'."
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
-  (with-temp-buffer
-    (insert candidate)
-    (goto-char (point-min))
-    (cl-loop with pattern = (if (string-match-p " " helm-pattern)
-                                (split-string helm-pattern)
-                                (split-string helm-pattern "" t))
-             for p in pattern
-             do
-             (when (search-forward p nil t)
-               (add-text-properties
-                (match-beginning 0) (match-end 0) '(face helm-match))))
-    (buffer-string)))
+  (let* ((pair (and (consp candidate) candidate))
+         (display (if pair (car pair) candidate))
+         (real (cdr pair)))
+    (with-temp-buffer
+      (insert display)
+      (goto-char (point-min))
+      (cl-loop with pattern = (if (string-match-p " " helm-pattern)
+                                  (split-string helm-pattern)
+                                  (split-string helm-pattern "" t))
+               for p in pattern
+               do
+               (when (search-forward p nil t)
+                 (add-text-properties
+                  (match-beginning 0) (match-end 0) '(face helm-match))))
+      (setq display (buffer-string)))
+    (if real (cons display real) display)))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)

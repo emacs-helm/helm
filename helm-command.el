@@ -112,15 +112,17 @@ fuzzy matching is running its own sort function with a different algorithm."
           for key        = (substitute-command-keys (format "\\[%s]" cand))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (format "%s (%s)"
-                               cand (propertize
-                                     local-key
-                                     'face 'helm-M-x-key)))
+                       (propertize cand 'display
+                                   (format "%s (%s)"
+                                           cand (propertize
+                                                 local-key
+                                                 'face 'helm-M-x-key))))
                       ((string-match "^M-x" key) cand)
-                      (t (format "%s (%s)"
-                                 cand (propertize
-                                       key
-                                       'face 'helm-M-x-key))))
+                      (t (propertize cand 'display
+                                     (format "%s (%s)"
+                                             cand (propertize
+                                                   key
+                                                   'face 'helm-M-x-key)))))
                 cand)
           into ls
           finally return
