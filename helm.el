@@ -2653,7 +2653,7 @@ Default function to match candidates according to `helm-pattern'."
 ;;; Fuzzy matching
 ;;
 ;;
-(defun helm--mapconcat-pattern (pattern)
+(defsubst helm--mapconcat-pattern (pattern)
   "Transform string PATTERN in regexp for further fuzzy matching.
 e.g helm.el$
     => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
@@ -2745,7 +2745,7 @@ This function is used with sources build with `helm-source-sync'."
                    else do (goto-char eol)
                    finally return nil)))))
 
-(defun helm-score-candidate-for-pattern (candidate pattern)
+(defsubst helm-score-candidate-for-pattern (candidate pattern)
   "Give a score to CANDIDATE according to number of contiguous matches found with PATTERN."
   (let* ((pat-lookup (cl-loop for str on (split-string pattern "" t) by 'cdr
                               when (cdr str)
