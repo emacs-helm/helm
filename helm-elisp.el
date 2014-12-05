@@ -63,6 +63,11 @@ e.g give only function names after \(function ."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
+(defcustom helm-apropos-fuzzy-match t
+  "Enable fuzzy matching for `helm-apropos' when non-nil."
+  :group 'helm-elisp
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -89,9 +94,6 @@ e.g give only function names after \(function ."
 ;; Provide show completion with macro `with-helm-show-completion'.
 
 (defvar helm-show-completion-overlay nil)
-
-(defcustom helm-apropos-fuzzy-match t
-  "Enable fuzzy matching for `helm-apropos' when non-nil.")
 
 ;; Called each time cursor move in helm-buffer.
 (defun helm-show-completion ()
