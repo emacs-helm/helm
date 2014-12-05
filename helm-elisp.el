@@ -409,7 +409,7 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'boundp ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Variable" . helm-describe-variable)
@@ -422,7 +422,7 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'facep ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (cons (and helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (cons (and (null helm-apropos-fuzzy-match)
                                                'helm-apropos-default-sort-fn)
                                           (list
                                            (lambda (candidates _source)
@@ -450,7 +450,7 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'commandp ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Function" . helm-describe-function)
@@ -465,7 +465,7 @@ First call indent, second complete symbol, third complete fname."
                                          (not (commandp x))))
                                 ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Function" . helm-describe-function)
