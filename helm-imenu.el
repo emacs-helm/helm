@@ -66,16 +66,16 @@
 
 
 (defvar helm-source-imenu
-  `((name . "Imenu")
-    (candidates . helm-imenu-candidates)
-    (allow-dups)
-    (candidate-transformer . helm-imenu-transformer)
-    (persistent-action . helm-imenu-persistent-action)
-    (persistent-help . "Show this entry")
-    (keymap . ,helm-imenu-map)
-    (mode-line . helm-imenu-mode-line)
-    (action . helm-imenu-action)
-    "See (info \"(emacs)Imenu\")"))
+  (helm-build-sync-source "Imenu"
+    :candidates'helm-imenu-candidates
+    :fuzzy-match t
+    :candidate-transformer 'helm-imenu-transformer
+    :persistent-action 'helm-imenu-persistent-action
+    :persistent-help "Show this entry"
+    :keymap helm-imenu-map
+    :mode-line helm-imenu-mode-line
+    :action 'helm-imenu-action)
+  "See (info \"(emacs)Imenu\")")
 
 
 (defun helm-imenu-action (candidate)
