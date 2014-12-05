@@ -399,11 +399,18 @@ First call indent, second complete symbol, third complete fname."
                        (keywordp s))
             do (insert (concat sym "\n"))))))
 
+(defun helm-apropos-default-sort-fn (candidates _source)
+  (if (string= helm-pattern "")
+      candidates
+      (sort candidates #'helm-generic-sort-fn)))
+
 (defun helm-def-source--emacs-variables (&optional default)
   (helm-build-in-buffer-source "Variables"
     :init `(lambda ()
              (helm-apropos-init 'boundp ,default))
     :fuzzy-match helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+                                         'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Variable" . helm-describe-variable)
               ("Find Variable" . helm-find-variable)
@@ -415,9 +422,12 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'facep ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (lambda (candidates _source)
-                                      (cl-loop for c in candidates
-                                               collect (propertize c 'face (intern c))))
+    :filtered-candidate-transformer (cons (and helm-apropos-fuzzy-match
+                                               'helm-apropos-default-sort-fn)
+                                          (list
+                                           (lambda (candidates _source)
+                                             (cl-loop for c in candidates
+                                                      collect (propertize c 'face (intern c))))))
     :nomark t
     :action (lambda (candidate)
               (describe-face (intern candidate)))))
@@ -440,6 +450,8 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'commandp ,default))
     :fuzzy-match helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+                                         'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Function" . helm-describe-function)
               ("Find Function" . helm-find-function)
@@ -453,6 +465,8 @@ First call indent, second complete symbol, third complete fname."
                                          (not (commandp x))))
                                 ,default))
     :fuzzy-match helm-apropos-fuzzy-match
+    :filtered-candidate-transformer (and helm-apropos-fuzzy-match
+                                         'helm-apropos-default-sort-fn)
     :nomark t
     :action '(("Describe Function" . helm-describe-function)
               ("Find Function" . helm-find-function)
