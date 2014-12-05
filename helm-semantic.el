@@ -109,20 +109,21 @@
 
 (defvar helm-source-semantic
   (helm-make-source "Semantic Tags" 'helm-source-sync
-                    :header-name "Semantic Tags"
-                    :init (lambda ()
-                            (helm-semantic--maybe-set-needs-update)
-                            (setq helm-semantic--tags-cache (semantic-fetch-tags))
-                            (with-current-buffer (helm-candidate-buffer 'global)
-                              (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))
-                    :candidates 'helm-semantic-get-candidates
-                    :persistent-help "Show this entry"
-                    :keymap 'helm-semantic-map
-                    :mode-line helm-semantic-mode-line
-                    :persistent-action (lambda (elm)
-                                         (helm-semantic-default-action elm t)
-                                         (helm-highlight-current-line))
-                    :action 'helm-semantic-default-action))
+    :header-name "Semantic Tags"
+    :init (lambda ()
+            (helm-semantic--maybe-set-needs-update)
+            (setq helm-semantic--tags-cache (semantic-fetch-tags))
+            (with-current-buffer (helm-candidate-buffer 'global)
+              (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))
+    :candidates 'helm-semantic-get-candidates
+    :fuzzy-match t
+    :persistent-help "Show this entry"
+    :keymap 'helm-semantic-map
+    :mode-line helm-semantic-mode-line
+    :persistent-action (lambda (elm)
+                         (helm-semantic-default-action elm t)
+                         (helm-highlight-current-line))
+    :action 'helm-semantic-default-action))
 
 ;;;###autoload
 (defun helm-semantic (arg)
