@@ -26,6 +26,8 @@
 (require 'helm-regexp)
 
 (declare-function ido-make-buffer-list "ido" (default))
+(declare-function ido-add-virtual-buffers-to-list "ido")
+
 
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
@@ -202,6 +204,8 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar ido-temp-list)
 (defvar ido-ignored-list)
 (defvar ido-process-ignore-lists)
+(defvar ido-use-virtual-buffers)
+(defvar ido-virtual-buffers)
 
 (defvar helm-source-ido-virtual-buffers
   (helm-build-sync-source "Ido virtual buffers"
