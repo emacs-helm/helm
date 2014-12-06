@@ -33,6 +33,11 @@
   :group 'helm-imenu
   :type  'boolean)
 
+(defcustom helm-semantic-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-semantic'."
+  :group 'helm-imenu
+  :type  'boolean)
+
 ;;; keymap
 (defvar helm-semantic-map
   (let ((map (make-sparse-keymap)))
@@ -116,7 +121,7 @@
             (with-current-buffer (helm-candidate-buffer 'global)
               (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))
     :candidates 'helm-semantic-get-candidates
-    :fuzzy-match t
+    :fuzzy-match helm-semantic-fuzzy-match
     :persistent-help "Show this entry"
     :keymap 'helm-semantic-map
     :mode-line helm-semantic-mode-line

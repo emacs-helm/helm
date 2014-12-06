@@ -42,6 +42,11 @@
   :group 'helm-imenu
   :type  'boolean)
 
+(defcustom helm-imenu-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-imenu'."
+  :group 'helm-imenu
+  :type  'boolean)
+
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -68,7 +73,7 @@
 (defvar helm-source-imenu
   (helm-build-sync-source "Imenu"
     :candidates'helm-imenu-candidates
-    :fuzzy-match t
+    :fuzzy-match helm-imenu-fuzzy-match
     :candidate-transformer 'helm-imenu-transformer
     :persistent-action 'helm-imenu-persistent-action
     :persistent-help "Show this entry"
