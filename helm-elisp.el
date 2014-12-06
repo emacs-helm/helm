@@ -63,11 +63,18 @@ e.g give only function names after \(function ."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
-(defcustom helm-apropos-fuzzy-match t
+(defcustom helm-apropos-fuzzy-match nil
   "Enable fuzzy matching for `helm-apropos' when non-nil."
   :group 'helm-elisp
   :type 'boolean)
 
+(defcustom helm-lisp-fuzzy-completion nil
+  "Enable fuzzy matching in emacs-lisp completion when non-nil.
+NOTE: This enable fuzzy matching in helm native implementation of
+elisp completion, but not on helmized elisp completion, i.e
+fuzzy completion is not available in `completion-at-point'."
+  :group 'helm-elisp
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -262,7 +269,7 @@ Return a cons \(beg . end\)."
                       :data helm-lisp-completion--cache
                       :persistent-action 'helm-lisp-completion-persistent-action
                       :nomark t
-                      :fuzzy-match t
+                      :fuzzy-match helm-lisp-fuzzy-completion
                       :persistent-help "Show brief doc in mode-line"
                       :filtered-candidate-transformer 'helm-lisp-completion-transformer
                       :action `(lambda (candidate)

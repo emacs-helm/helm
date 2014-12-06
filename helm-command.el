@@ -43,7 +43,7 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-fuzzy-match t
+(defcustom helm-M-x-fuzzy-match nil
   "Enable fuzzy matching in `helm-M-x' when non--nil.")
 
 
