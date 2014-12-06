@@ -173,13 +173,10 @@ See http://orgmode.org for the latest version.")
   (unless max-depth (setq max-depth 8))
   (helm-build-sync-source "Org Headings"
     :candidates (helm-org-get-candidates filenames min-depth max-depth)
-    :action 'helm-org-goto-marker
-    :action-transformer
-    (lambda (actions candidate)
-      '(("Go to line" . helm-org-goto-marker)
-        ("Refile to this heading" . helm-org-heading-refile)
-        ("Insert link to this heading"
-         . helm-org-insert-link-to-heading-at-marker)))))
+    :action '(("Go to line" . helm-org-goto-marker)
+              ("Refile to this heading" . helm-org-heading-refile)
+              ("Insert link to this heading"
+               . helm-org-insert-link-to-heading-at-marker))))
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
   (with-current-buffer (marker-buffer marker)
@@ -203,7 +200,7 @@ See http://orgmode.org for the latest version.")
     (org-paste-subtree (+ target-level 1))))
 
 (defun helm-org-get-candidates (filenames min-depth max-depth)
-  (-flatten
+  (apply #'append
    (mapcar (lambda (filename)
              (helm-get-org-candidates-in-file
               filename min-depth max-depth))
@@ -212,7 +209,7 @@ See http://orgmode.org for the latest version.")
 (defun helm-get-org-candidates-in-file (filename min-depth max-depth)
   (with-current-buffer (find-file-noselect filename)
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
                if (let ((num-stars (length (match-string-no-properties 1))))
                     (and (>= num-stars min-depth) (<= num-stars max-depth)))
@@ -236,7 +233,7 @@ See http://orgmode.org for the latest version.")
 ;;;###autoload
 (defun helm-org-agenda-files-headings (&optional min-depth max-depth)
   (interactive)
-  (helm :sources (helm-source-org-headings-for-files org-agenda-files)))
+  (helm :sources (helm-source-org-headings-for-files org-agenda-files min-depth max-depth)))
 
 (provide 'helm-org)
 
