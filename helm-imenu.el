@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'imenu)
 (require 'helm-utils)
+(require 'helm-help)
 
 
 (defgroup helm-imenu nil
