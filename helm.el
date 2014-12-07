@@ -939,6 +939,21 @@ not `exit-minibuffer' or unwanted functions."
                 (> (length btf) 2))
         return (cadr (cdr btf))))
 
+(defun helm-flatten-list (seq)
+  "Return a list of all single elements of sublists in SEQ."
+  (let (result)
+    (cl-labels ((flatten (seq)
+                  (cl-loop 
+                        for elm in seq
+                        if (or (atom elm)
+                               (and (consp elm)
+                                    (cdr elm)
+                                    (atom (cdr elm))))
+                        do (push elm result)
+                        else do (flatten elm))))
+      (flatten seq))
+    (nreverse result)))
+
 
 ;; Test tools
 (defmacro with-helm-time-after-update (&rest body)
