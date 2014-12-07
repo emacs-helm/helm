@@ -2732,18 +2732,25 @@ Colorize only symlinks, directories and files."
                                    'help-echo (expand-file-name i))
                        i)))))
 
+(defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
+  ((candidates :initform (lambda ()
+                           (with-helm-current-buffer
+                             (let ((dir (helm-current-directory)))
+                               (when (file-accessible-directory-p dir)
+                                 (directory-files dir t))))))
+   (pattern-transformer :initform 'helm-recentf-pattern-transformer)
+   (match-part :initform (lambda (candidate)
+                           (if (or helm-ff-transformer-show-only-basename
+                                   helm-recentf--basename-flag)
+                               (helm-basename candidate) candidate)))
+   (fuzzy-match :initform t)
+   (keymap :initform helm-generic-files-map)
+   (help-message :initform helm-generic-file-help-message)
+   (mode-line :initform helm-generic-file-mode-line-string)))
+
 (defvar helm-source-files-in-current-dir
-  `((name . "Files from Current Directory")
-    (candidates . (lambda ()
-                    (with-helm-current-buffer
-                      (let ((dir (helm-current-directory)))
-                        (when (file-accessible-directory-p dir)
-                          (directory-files dir t))))))
-    (match . helm-files-match-only-basename)
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (type . file)))
+  (helm-make-source "Files from Current Directory"
+      helm-files-in-current-dir-source))
 
 
 ;;; External searching file tools.
