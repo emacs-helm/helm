@@ -300,6 +300,8 @@ Return a cons \(beg . end\)."
         for sym = (intern c)
         for annot = (cl-typecase sym
                       (command " (Com)")
+                      (class   " (Class)")
+                      (generic " (Gen)")
                       (fbound  " (Fun)")
                       (bound   " (Var)")
                       (face    " (Face)"))
