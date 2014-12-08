@@ -2632,11 +2632,9 @@ Don't use it in your own code unless you know what you are doing.")
                           helm-recentf--basename-flag)
                       (helm-basename candidate) candidate))
     :fuzzy-match t
-    :filtered-candidate-transformer (lambda (candidates _source)
-                                      (cl-loop for i in candidates
-                                               if helm-ff-transformer-show-only-basename
-                                               collect (cons (helm-basename i) i)
-                                               else collect i))
+    :filter-one-by-one (lambda (c)
+                         (if helm-ff-transformer-show-only-basename
+                             (cons (helm-basename c) c) c))
     :keymap helm-generic-files-map
     :help-message helm-generic-file-help-message
     :mode-line helm-generic-file-mode-line-string
