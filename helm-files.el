@@ -2939,8 +2939,11 @@ This is the starting point for nearly all actions you can do on files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
-    (helm-other-buffer helm-for-files-preferred-list "*helm for files*")))
+    (helm :sources helm-for-files-preferred-list :buffer "*helm for files*")))
 
 ;;;###autoload
 (defun helm-recentf ()

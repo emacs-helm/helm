@@ -379,6 +379,9 @@ It is added to `extended-command-history'.
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (require 'helm-files)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
     (helm-other-buffer helm-mini-default-sources "*helm mini*")))
 
