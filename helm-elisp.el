@@ -432,12 +432,13 @@ First call indent, second complete symbol, third complete fname."
     :init `(lambda ()
              (helm-apropos-init 'facep ,default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (cons (and (null helm-apropos-fuzzy-match)
-                                               'helm-apropos-default-sort-fn)
-                                          (list
-                                           (lambda (candidates _source)
-                                             (cl-loop for c in candidates
-                                                      collect (propertize c 'face (intern c))))))
+    :filtered-candidate-transformer
+    (append (and (null helm-apropos-fuzzy-match)
+                 '(helm-apropos-default-sort-fn))
+            (list
+             (lambda (candidates _source)
+               (cl-loop for c in candidates
+                        collect (propertize c 'face (intern c))))))
     :nomark t
     :action (lambda (candidate)
               (describe-face (intern candidate)))))
