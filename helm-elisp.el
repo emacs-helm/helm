@@ -278,7 +278,8 @@ Return a cons \(beg . end\)."
                                     0.01 nil
                                     'helm-insert-completion-at-point
                                     ,beg ,end candidate))))
-           :input target
+           :input (if helm-lisp-fuzzy-completion
+                      target (concat target " "))
            :resume 'noresume
            :buffer "*helm lisp completion*"
            :allow-nest t))
