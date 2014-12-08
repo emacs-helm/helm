@@ -43,11 +43,6 @@
   :group 'helm-imenu
   :type  'boolean)
 
-(defcustom helm-imenu-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-imenu'."
-  :group 'helm-imenu
-  :type  'boolean)
-
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -71,18 +66,26 @@
 (make-variable-buffer-local 'helm-cached-imenu-tick)
 
 
-(defvar helm-source-imenu
-  (helm-build-sync-source "Imenu"
-    :candidates'helm-imenu-candidates
-    :fuzzy-match helm-imenu-fuzzy-match
-    :candidate-transformer 'helm-imenu-transformer
-    :persistent-action 'helm-imenu-persistent-action
-    :persistent-help "Show this entry"
-    :keymap helm-imenu-map
-    :mode-line helm-imenu-mode-line
-    :action 'helm-imenu-action)
-  "See (info \"(emacs)Imenu\")")
+(defvar helm-source-imenu nil "See (info \"(emacs)Imenu\")")
 
+(defclass helm-imenu-source (helm-source-sync)
+  ((candidates :initform 'helm-imenu-candidates)
+    (candidate-transformer :initform 'helm-imenu-transformer)
+    (persistent-action :initform 'helm-imenu-persistent-action)
+    (persistent-help :initform "Show this entry")
+    (keymap :initform helm-imenu-map)
+    (mode-line :initform helm-imenu-mode-line)
+    (action :initform 'helm-imenu-action)))
+
+(defcustom helm-imenu-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-imenu'."
+  :group 'helm-imenu
+  :type  'boolean
+  :set (lambda (var val)
+         (set var val)
+         (setq helm-source-imenu
+               (helm-make-source "Imenu" 'helm-imenu-source
+                 :fuzzy-match helm-imenu-fuzzy-match))))
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
@@ -156,6 +159,10 @@
 (defun helm-imenu ()
   "Preconfigured `helm' for `imenu'."
   (interactive)
+  (unless helm-source-imenu
+    (setq helm-source-imenu
+          (helm-make-source "Imenu" 'helm-imenu-source
+            :fuzzy-match helm-imenu-fuzzy-match)))
   (let ((imenu-auto-rescan t)
         (str (thing-at-point 'symbol))
         (helm-execute-action-at-once-if-one
