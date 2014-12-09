@@ -939,17 +939,19 @@ not `exit-minibuffer' or unwanted functions."
                 (> (length btf) 2))
         return (cadr (cdr btf))))
 
-(defun helm-flatten-list (seq)
+(defun helm-flatten-list (seq &optional omit-nulls)
   "Return a list of all single elements of sublists in SEQ."
   (let (result)
     (cl-labels ((flatten (seq)
                   (cl-loop 
                         for elm in seq
-                        if (or (atom elm)
-                               (functionp elm)
-                               (and (consp elm)
-                                    (cdr elm)
-                                    (atom (cdr elm))))
+                        if (and (or elm
+                                    (null omit-nulls))
+                                (or (atom elm)
+                                    (functionp elm)
+                                    (and (consp elm)
+                                         (cdr elm)
+                                         (atom (cdr elm)))))
                         do (push elm result)
                         else do (flatten elm))))
       (flatten seq))
