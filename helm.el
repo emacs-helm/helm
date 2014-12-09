@@ -946,6 +946,7 @@ not `exit-minibuffer' or unwanted functions."
                   (cl-loop 
                         for elm in seq
                         if (or (atom elm)
+                               (functionp elm)
                                (and (consp elm)
                                     (cdr elm)
                                     (atom (cdr elm))))
