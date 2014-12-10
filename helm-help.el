@@ -148,8 +148,9 @@ text to be displayed in BUFNAME."
 ;;
 ;;
 (defvar helm-buffer-help-message
-  "\n* Helm Buffer
-\n** Tips:
+  "\n* Helm Buffer\n
+
+** Tips:
 
 *** Completion:
 
@@ -263,8 +264,9 @@ Italic     => A non--file buffer.
 ;;
 ;;
 (defvar helm-ff-help-message
-  "\n* Helm Find Files
-\n** Tips:
+  "\n* Helm Find Files\n
+
+** Tips:
 \n*** Enter `~/' at end of pattern to quickly reach home directory.
 
 *** Enter `/' at end of pattern to quickly reach root of your file system.
@@ -366,8 +368,10 @@ Italic     => A non--file buffer.
 ;;
 ;;
 (defvar helm-read-file-name-help-message
-  "\n* Helm read file name\
-\n** Tips:
+  "\n* Helm read file name\n
+
+** Tips:
+
 \n*** Enter `~/' at end of pattern to quickly reach home directory.
 
 *** Enter `/' at end of pattern to quickly reach root of your file system.
@@ -435,9 +439,9 @@ C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 ;;
 ;;
 (defvar helm-generic-file-help-message
-  "\n* Helm Generic files Map\
+  "\n* Helm Generic files\n
 
-\n** Locate tips:
+** Tips:\n
 
 You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.
@@ -477,8 +481,8 @@ support the -b flag for compatibility with locate when they are used with it.
 ;;
 ;;
 (defvar helm-grep-help-message
-  "\n* Helm Grep Map\n
-\n** Helm Grep tips:
+  "\n* Helm Grep\n
+** Tips:\n
 *** You can start grep with a prefix arg to recurse in subdirectories.
 *** You can use wild card when selecting files (e.g *.el)
 *** You can grep in many differents directories by marking files or wild cards.
@@ -605,7 +609,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-esh-help-message
   "\n* Helm eshell on file\n
-\n** Tips:
+** Tips:
 
 *** Passing extra args after filename:
 
@@ -679,7 +683,7 @@ the command is called once for each file like this:
 ;;
 (defvar helm-moccur-help-message
   "\n* Helm Moccur\n
-\n** Helm Moccur tips:
+** Helm Moccur tips:
 
 Multiple regexp matching is allowed, just enter a space to separate your regexps.
 
@@ -748,7 +752,7 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
 ;;
 ;;
 (defvar helm-el-package-help-message
-  "\n* Helm elisp package Map\n
+  "\n* Helm elisp package\n
 \n** Helm elisp package tips:
 
 \n* Specific commands for Helm elisp package:\n
