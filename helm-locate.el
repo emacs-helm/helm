@@ -83,6 +83,11 @@ the opposite of \"locate\" command."
   :group 'helm-locate
   :type 'symbol)
 
+(defcustom helm-locate-fuzzy-match nil
+  "Enable fuzzy matching in `helm-locate'."
+  :group 'helm-locate
+  :type 'boolean)
+
 
 (defvar helm-generic-files-map
   (let ((map (make-sparse-keymap)))
@@ -262,19 +267,29 @@ See also `helm-locate'."
              (helm-log "Error: Locate %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
+(defclass helm-locate-source (helm-source-async helm-type-file)
+  ((init :initform 'helm-locate-set-command)
+   (candidates-process :initform 'helm-locate-init)
+   (requires-pattern :initform 3)
+   (history :initform 'helm-file-name-history)
+   (keymap :initform helm-generic-files-map)
+   (help-message :initform helm-generic-file-help-message)
+   (candidate-number-limit :initform 9999)
+   (mode-line :initform helm-generic-file-mode-line-string)))
+
+(defun helm-locate-pattern-transformer (pattern)
+  (if helm-locate-fuzzy-match
+      (cond ((string-match
+              " " (replace-regexp-in-string " -b" "" p)) p)
+            ((string-match "\\([^ ]*\\) -b" p)
+             (concat (helm--mapconcat-pattern
+                      (match-string 1 p)) " -b"))
+            (t (helm--mapconcat-pattern p)))
+      pattern))
+
 (defvar helm-source-locate
-  `((name . "Locate")
-    (init . helm-locate-set-command)
-    (candidates-process . helm-locate-init)
-    (type . file)
-    (requires-pattern . 3)
-    (history . ,'helm-file-name-history)
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (candidate-number-limit . 9999)
-    (no-matchplugin)
-    (mode-line . helm-generic-file-mode-line-string))
-  "Find files matching the current input pattern with locate.")
+  (helm-make-source "Locate" 'helm-locate-source
+    :pattern-transformer 'helm-locate-pattern-transformer))
 
 ;;;###autoload
 (defun helm-locate-read-file-name (prompt)
