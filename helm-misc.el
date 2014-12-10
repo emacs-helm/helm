@@ -67,81 +67,6 @@
                 (call-interactively candidate)))))
 
 
-;;;; <Headline Extraction>
-(defvar helm-source-fixme
-  '((name . "TODO/FIXME/DRY comments")
-    (headline . "^.*\\<\\(TODO\\|FIXME\\|DRY\\)\\>.*$")
-    (adjust)
-    (recenter))
-  "Show TODO/FIXME/DRY comments in current file.")
-
-(defvar helm-source-rd-headline
-  '((name . "RD HeadLine")
-    (headline  "^= \\(.+\\)$" "^== \\(.+\\)$" "^=== \\(.+\\)$" "^==== \\(.+\\)$")
-    (condition . (memq major-mode '(rdgrep-mode rd-mode)))
-    (migemo)
-    (subexp . 1))
-  "Show RD headlines.
-
-RD is Ruby's POD.
-http://en.wikipedia.org/wiki/Ruby_Document_format")
-
-(defvar helm-source-oddmuse-headline
-  '((name . "Oddmuse HeadLine")
-    (headline  "^= \\(.+\\) =$" "^== \\(.+\\) ==$"
-     "^=== \\(.+\\) ===$" "^==== \\(.+\\) ====$")
-    (condition . (memq major-mode '(oddmuse-mode yaoddmuse-mode)))
-    (migemo)
-    (subexp . 1))
-  "Show Oddmuse headlines, such as EmacsWiki.")
-
-(defvar helm-source-emacs-source-defun
-  '((name . "Emacs Source DEFUN")
-    (headline . "DEFUN\\|DEFVAR")
-    (condition . (string-match "/emacs2[0-9].+/src/.+c$"
-                  (or buffer-file-name ""))))
-  "Show DEFUN/DEFVAR in Emacs C source file.")
-
-(defvar helm-source-emacs-lisp-expectations
-  '((name . "Emacs Lisp Expectations")
-    (headline . "(desc[ ]\\|(expectations")
-    (condition . (eq major-mode 'emacs-lisp-mode)))
-  "Show descriptions (desc) in Emacs Lisp Expectations.
-
-http://www.emacswiki.org/cgi-bin/wiki/download/el-expectations.el")
-
-(defvar helm-source-emacs-lisp-toplevels
-  '((name . "Emacs Lisp Toplevel / Level 4 Comment / Linkd Star")
-    (headline . "^(\\|(@\\*\\|^;;;;")
-    (get-line . buffer-substring)
-    (condition . (eq major-mode 'emacs-lisp-mode))
-    (adjust))
-  "Show top-level forms, level 4 comments and linkd stars (optional) in Emacs Lisp.
-linkd.el is optional because linkd stars are extracted by regexp.
-http://www.emacswiki.org/cgi-bin/wiki/download/linkd.el")
-
-
-;;; Eev anchors
-(defvar helm-source-eev-anchor
-  '((name . "Anchors")
-    (candidates
-     . (lambda ()
-         (ignore-errors
-           (with-helm-current-buffer
-             (cl-loop initially (goto-char (point-min))
-                   while (re-search-forward
-                          (format ee-anchor-format "\\([^\.].+\\)") nil t)
-                   for anchor = (match-string-no-properties 1)
-                   collect (cons (format "%5d:%s"
-                                         (line-number-at-pos (match-beginning 0))
-                                         (format ee-anchor-format anchor))
-                                 anchor))))))
-    (persistent-action . (lambda (item)
-                           (ee-to item)
-                           (helm-highlight-current-line)))
-    (persistent-help . "Show this entry")
-    (action . (("Goto link" . ee-to)))))
-
 ;;; Jabber Contacts (jabber.el)
 (defun helm-jabber-online-contacts ()
   "List online Jabber contacts."
@@ -355,12 +280,6 @@ It is added to `extended-command-history'.
   (helm-other-buffer 'helm-source-latex-math "*helm latex*"))
 
 ;;;###autoload
-(defun helm-eev-anchors ()
-  "Preconfigured `helm' for eev anchors."
-  (interactive)
-  (helm-other-buffer 'helm-source-eev-anchor "*Helm eev anchors*"))
-
-;;;###autoload
 (defun helm-ratpoison-commands ()
   "Preconfigured `helm' to execute ratpoison commands."
   (interactive)
@@ -379,6 +298,9 @@ It is added to `extended-command-history'.
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (require 'helm-files)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
     (helm-other-buffer helm-mini-default-sources "*helm mini*")))
 

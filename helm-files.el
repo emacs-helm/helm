@@ -2613,34 +2613,50 @@ Don't use it in your own code unless you know what you are doing.")
 ;;
 ;;
 (defvar helm-recentf--basename-flag nil)
-(defun helm-recentf-pattern-transformer (pattern)
-  (if (string-match "\\([^ ]*\\) -b\\'" pattern)
-      (prog1 (match-string 1 pattern)
-        (setq helm-recentf--basename-flag t))
-      (setq helm-recentf--basename-flag nil)
-      pattern))
 
-(defvar helm-source-recentf
-  (helm-build-sync-source "Recentf"
-    :init (lambda ()
-            (require 'recentf)
-            (recentf-mode 1))
-    :candidates (lambda () recentf-list)
-    :pattern-transformer 'helm-recentf-pattern-transformer
-    :match-part (lambda (candidate)
-                  (if (or helm-ff-transformer-show-only-basename
-                          helm-recentf--basename-flag)
-                      (helm-basename candidate) candidate))
-    :fuzzy-match t
-    :filter-one-by-one (lambda (c)
-                         (if helm-ff-transformer-show-only-basename
-                             (cons (helm-basename c) c) c))
-    :keymap helm-generic-files-map
-    :help-message helm-generic-file-help-message
-    :mode-line helm-generic-file-mode-line-string
-    :action (helm-actions-from-type-file))
+(defun helm-recentf-pattern-transformer (pattern)
+  (let ((pattern-no-flag (replace-regexp-in-string " -b" "" pattern)))
+    (cond ((and (string-match " " pattern-no-flag)
+                (string-match " -b\\'" pattern))
+           (setq helm-recentf--basename-flag t)
+           pattern-no-flag)
+        ((string-match "\\([^ ]*\\) -b\\'" pattern)
+         (prog1 (match-string 1 pattern)
+           (setq helm-recentf--basename-flag t)))
+        (t (setq helm-recentf--basename-flag nil)
+           pattern))))
+
+(defclass helm-recentf-source (helm-source-sync)
+  ((init :initform (lambda ()
+                     (require 'recentf)
+                     (recentf-mode 1)))
+   (candidates :initform (lambda () recentf-list))
+   (pattern-transformer :initform 'helm-recentf-pattern-transformer)
+   (match-part :initform (lambda (candidate)
+                           (if (or helm-ff-transformer-show-only-basename
+                                   helm-recentf--basename-flag)
+                               (helm-basename candidate) candidate)))
+   (filter-one-by-one :initform (lambda (c)
+                                  (if helm-ff-transformer-show-only-basename
+                                      (cons (helm-basename c) c) c)))
+   (keymap :initform helm-generic-files-map)
+   (help-message :initform helm-generic-file-help-message)
+   (mode-line :initform helm-generic-file-mode-line-string)
+   (action :initform (helm-actions-from-type-file))))
+
+(defvar helm-source-recentf nil 
   "See (info \"(emacs)File Conveniences\").
 Set `recentf-max-saved-items' to a bigger value if default is too small.")
+
+(defcustom helm-recentf-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-recentf' when non--nil."
+  :group 'helm-files
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (setq helm-source-recentf
+               (helm-make-source "Recentf" 'helm-recentf-source
+                 :fuzzy-match helm-recentf-fuzzy-match))))
 
 ;;; Browse project
 ;; Need dependencies:
@@ -2939,8 +2955,11 @@ This is the starting point for nearly all actions you can do on files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
-    (helm-other-buffer helm-for-files-preferred-list "*helm for files*")))
+    (helm :sources helm-for-files-preferred-list :buffer "*helm for files*")))
 
 ;;;###autoload
 (defun helm-recentf ()
