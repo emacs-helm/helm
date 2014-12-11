@@ -21,145 +21,6 @@
 (require 'helm-plugin)
 (require 'org)
 
-(declare-function org-get-current-options "ext:org-exp.el")
-
-;;; Org headlines
-;;
-;;
-(defvar helm-source-org-headline
-  `((name . "Org Headline")
-    (headline
-     ,@(mapcar
-        (lambda (num)
-          (format "^\\*\\{%d\\} \\(.+?\\)\\([ \t]*:[[:lower:][:upper:]0-9_@:]+:\\)?[ \t]*$"
-                  num))
-        (number-sequence 1 8)))
-    (condition . (eq major-mode 'org-mode))
-    (migemo)
-    (subexp . 1)
-    (persistent-action . (lambda (elm)
-                           (helm-action-line-goto elm)
-                           (org-cycle)))
-    (action-transformer
-     . (lambda (actions candidate)
-         '(("Go to line" . helm-action-line-goto)
-           ("Refile to this headline" . helm-org-headline-refile)
-           ("Insert link to this headline"
-            . helm-org-headline-insert-link-to-headline)))))
-  "Show Org headlines.
-org-mode is very very much extended text-mode/outline-mode.
-
-See (find-library \"org.el\")
-See http://orgmode.org for the latest version.")
-
-(defun helm-org-headline-insert-link-to-headline (lineno-and-content)
-  (insert
-   (save-excursion
-     (helm-goto-line (car lineno-and-content))
-     (and (looking-at org-complex-heading-regexp)
-          (org-make-link-string (concat "*" (match-string 4)))))))
-
-(defun helm-org-headline-refile (lineno-and-content)
-  "Refile current org entry to LINENO-AND-CONTENT."
-  (with-helm-current-buffer
-    (org-cut-subtree)
-    (helm-goto-line (car lineno-and-content))
-    (org-end-of-subtree t t)
-    (let ((org-yank-adjusted-subtrees t))
-      (org-yank))))
-
-
-;;; Org keywords
-;;
-;;  Stop supporting this in emacs-24.3.50.1.
-(when (boundp 'org-additional-option-like-keywords)
-  (defvar helm-source-org-keywords
-    '((name . "Org Keywords")
-      (init . helm-org-keywords-init)
-      (candidates . helm-org-keywords-candidates)
-      (action . helm-org-keywords-insert)
-      (persistent-action . helm-org-keywords-show-help)
-      (persistent-help . "Show an example and info page to describe this keyword.")
-      (keywords-examples)
-      (keywords)))
-
-  (defvar helm-org-keywords-info-location
-    '(("#+TITLE:" . "(org)Export options")
-      ("#+AUTHOR:" . "(org)Export options")
-      ("#+DATE:" . "(org)Export options")
-      ("#+EMAIL:" . "(org)Export options")
-      ("#+DESCRIPTION:" . "(org)Export options")
-      ("#+KEYWORDS:" . "(org)Export options")
-      ("#+LANGUAGE:" . "(org)Export options")
-      ("#+TEXT:" . "(org)Export options")
-      ("#+TEXT:" . "(org)Export options")
-      ("#+OPTIONS:" . "(org)Export options")
-      ("#+BIND:" . "(org)Export options")
-      ("#+LINK_UP:" . "(org)Export options")
-      ("#+LINK_HOME:" . "(org)Export options")
-      ("#+LATEX_HEADER:" . "(org)Export options")
-      ("#+EXPORT_SELECT_TAGS:" . "(org)Export options")
-      ("#+EXPORT_EXCLUDE_TAGS:" . "(org)Export options")
-      ("#+INFOJS_OPT" . "(org)Javascript support")
-      ("#+BEGIN_HTML" . "(org)Quoting HTML tags")
-      ("#+BEGIN_LaTeX" . "(org)Quoting LaTeX code")
-      ("#+ORGTBL" . "(org)Radio tables")
-      ("#+HTML:" . "(org)Quoting HTML tags")
-      ("#+LaTeX:" . "(org)Quoting LaTeX code")
-      ("#+BEGIN:" . "(org)Dynamic blocks") ;clocktable columnview
-      ("#+BEGIN_EXAMPLE" . "(org)Literal examples")
-      ("#+BEGIN_QUOTE" . "(org)Paragraphs")
-      ("#+BEGIN_VERSE" . "(org)Paragraphs")
-      ("#+BEGIN_SRC" . "(org)Literal examples")
-      ("#+CAPTION" . "(org)Tables in HTML export")
-      ("#+LABEL" . "(org)Tables in LaTeX export")
-      ("#+ATTR_HTML" . "(org)Links")
-      ("#+ATTR_LaTeX" . "(org)Images in LaTeX export")))
-
-  (defun helm-org-keywords-init ()
-    (unless (helm-attr 'keywords-examples)
-      (require 'org)
-      (helm-attrset 'keywords-examples
-                    (append
-                     (mapcar
-                      (lambda (x)
-                        (string-match "^#\\+\\(\\([[:upper:]_]+:?\\).*\\)" x)
-                        (cons (match-string 2 x) (match-string 1 x)))
-                      (org-split-string (org-get-current-options) "\n"))
-                     (mapcar 'list org-additional-option-like-keywords)))
-      (helm-attrset 'keywords (mapcar 'car (helm-attr 'keywords-examples)))))
-
-  (defun helm-org-keywords-candidates ()
-    (and (or (eq (buffer-local-value 'major-mode helm-current-buffer) 'org-mode)
-             (eq (buffer-local-value 'major-mode helm-current-buffer) 'message-mode))
-         (helm-attr 'keywords)))
-
-  (defun helm-org-keywords-insert (keyword)
-    (cond ((and (string-match "BEGIN" keyword)
-                (helm-region-active-p))
-           (let ((beg (region-beginning))
-                 (end (region-end)))
-             (goto-char end)
-             (insert "\n#+" (replace-regexp-in-string
-                             "BEGIN" "END" keyword) "\n")
-             (goto-char beg)
-             (insert "#+" keyword " ")
-             (save-excursion (insert "\n"))))
-          ((string-match "BEGIN" keyword)
-           (insert "#+" keyword " ")
-           (save-excursion
-             (insert "\n#+" (replace-regexp-in-string
-                             "BEGIN" "END" keyword) "\n")))
-          (t (insert "#+" keyword " "))))
-
-  (defun helm-org-keywords-show-help (keyword)
-    (info (or (assoc-default (concat "#+" keyword) helm-org-keywords-info-location)
-              "(org)In-buffer settings"))
-    (search-forward (concat "#+" keyword) nil t)
-    (helm-highlight-current-line)
-    (message "%s" (or (cdr (assoc keyword (helm-attr 'keywords-examples))) ""))))
-
-
 ;;; Org headings
 ;;
 ;;
@@ -168,9 +29,8 @@ See http://orgmode.org for the latest version.")
   (goto-char (marker-position marker))
   (org-show-entry))
 
-(defun helm-source-org-headings-for-files (filenames &optional min-depth max-depth)
-  (unless min-depth (setq min-depth 1))
-  (unless max-depth (setq max-depth 8))
+(cl-defun helm-source-org-headings-for-files (filenames
+                                              &optional (min-depth 1) (max-depth 8))
   (helm-build-sync-source "Org Headings"
     :candidates (helm-org-get-candidates filenames min-depth max-depth)
     :action '(("Go to line" . helm-org-goto-marker)
@@ -187,7 +47,7 @@ See http://orgmode.org for the latest version.")
       (message file-name)
       (with-helm-current-buffer
         (org-insert-link
-         file-name (concat "file:" file-name "::*"heading-name))))))
+         file-name (concat "file:" file-name "::*" heading-name))))))
 
 (defun helm-org-heading-refile (marker)
   (with-helm-current-buffer
@@ -215,25 +75,32 @@ See http://orgmode.org for the latest version.")
                     (and (>= num-stars min-depth) (<= num-stars max-depth)))
                collect `(,(match-string-no-properties 0) . ,(point-marker))))))
 
+;;;###autoload
+(defun helm-org-agenda-files-headings ()
+  (interactive)
+  (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
+        :candidate-number-limit 99999
+        :buffer "*helm org headings*"))
 
 ;;;###autoload
-(defun helm-org-keywords ()
-  "Preconfigured `helm' for org keywords."
+(defun helm-org-in-buffer-headings ()
   (interactive)
-  (cl-assert (boundp 'org-additional-option-like-keywords) nil
-             "Helm-org-keyword not supported in %s" emacs-version)
-  (helm-other-buffer 'helm-source-org-keywords "*org keywords*"))
+  (helm :sources (helm-source-org-headings-for-files
+                  (list (buffer-file-name (current-buffer))))
+        :candidate-number-limit 99999
+        :buffer "*helm org inbuffer*"))
 
-;;;###autoload
-(defun helm-org-headlines ()
-  "Preconfigured helm to show org headlines."
-  (interactive)
-  (helm-other-buffer 'helm-source-org-headline "*org headlines*"))
-
-;;;###autoload
-(defun helm-org-agenda-files-headings (&optional min-depth max-depth)
-  (interactive)
-  (helm :sources (helm-source-org-headings-for-files org-agenda-files min-depth max-depth)))
+;; (defvar helm-documentation-filecache nil)
+;; (defvar helm-documentation-directory "~/.emacs.d/helm-documentation/")
+;; (defun helm-documentation ()
+;;   (interactive)
+;;   (unless helm-documentation-filecache
+;;     (setq helm-documentation-filecache
+;;           (directory-files helm-documentation-directory t "\\.org\\'")))
+;;   (helm :sources (helm-source-org-headings-for-files
+;;                   (list (buffer-file-name (current-buffer))))
+;;         :candidate-number-limit 99999
+;;         :buffer "*helm org doc*"))
 
 (provide 'helm-org)
 
