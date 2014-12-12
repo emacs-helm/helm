@@ -34,19 +34,20 @@
 (defvar helm-help-message
   (lambda ()
     (concat
+     "\n* Helm generic help\n"
      "\\<helm-map>"
-     "\n* `helm' is an Emacs incremental completion and selection narrowing framework.
+     "\n`helm' is an Emacs incremental completion and selection narrowing framework.
 
 Narrow the list by typing some pattern,
 Multiple patterns are allowed by splitting by space.
 Select with natural Emacs operations, choose with RET.
 
-* Help
+** Help
 
 C-h m : Run this generic help for helm.
 C-c ? : Run specific helm help for current source.
 
-* Basic Operations
+** Basic Operations
 
 C-p, Up: Previous Line
 C-n, Down : Next Line
@@ -64,11 +65,11 @@ Right, C-o : Next Source
 C-k : Delete pattern (with prefix arg delete from point to end)
 C-j or C-z: Persistent Action (Execute action with helm session kept)
 
-* Shortcuts For nth Action
+** Shortcuts For nth Action
 
 f1-12: Execute nth 1 to 12 Action(s).
 
-* Visible Marks
+** Visible Marks
 
 Visible marks store candidate. Some actions uses marked candidates.
 
@@ -76,7 +77,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-prev-visible-mark] : Previous Mark
 \\[helm-next-visible-mark] : Next Mark
 
-* Miscellaneous Commands
+** Miscellaneous Commands
 
 \\[helm-toggle-resplit-window] : Toggle vertical/horizontal split helm window.
 \\[helm-quit-and-find-file] : Drop into `find-file'.
@@ -88,7 +89,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-follow-action-backward] : Run persistent action and goto previous line.
 \\[helm-force-update] : Recalculate and redisplay candidates.
 
-* Global Commands
+** Global Commands
 
 \\<global-map>\\[helm-resume] revives last `helm' session.
 It is very useful, so you should bind any key."))
@@ -250,7 +251,7 @@ Italic     => A non--file buffer.
 \\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers.
 \\[helm-buffers-mark-similar-buffers]\t\t->Mark all buffers with same type (color) than current.
 \\[helm-buffer-help]\t\t->Display this help.
-\n* Helm Map
+\n** Helm Map
 \\{helm-map}")
 
 ;;;###autoload
@@ -310,7 +311,7 @@ Italic     => A non--file buffer.
   exists, you will be prompted for its creation, if it exists and you want to refresh it,
   give two prefix args.
 
-\n* Specific commands for `helm-find-files':\n
+\n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
 \\[helm-ff-run-find-sh-command]\t\t->Run Find shell command from this directory.
@@ -354,7 +355,7 @@ Italic     => A non--file buffer.
 \\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
 \\[helm-ff-help]\t\t->Display this help info.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -416,7 +417,7 @@ By default `helm-read-file-name' use the persistent actions of `helm-find-files'
 
 **** To create a new file just write the filename not ending with \"/\".
 
-\n* Specific commands for helm-read-file-name:\n
+\n** Specific commands for helm-read-file-name:\n
 \\<helm-read-file-map>
 \\[helm-find-files-up-one-level]\t\t->Go down precedent directory.
 \\[helm-ff-run-toggle-auto-update]\t\t->Toggle auto expansion of directories.
@@ -426,7 +427,7 @@ C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 \\[helm-next-source]\t\t->Goto next source.
 \\[helm-previous-source]\t->Goto previous source.
 \\[helm-read-file-name-help]\t\t->Display this help info.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -452,7 +453,7 @@ See Man locate for more infos.
 Some other sources (at the moment recentf and file in current directory sources)
 support the -b flag for compatibility with locate when they are used with it.
 
-\n* Specific commands for helm locate and others files sources:
+\n** Specific commands for helm locate and others files sources:
 
 \\<helm-generic-files-map>
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
@@ -468,7 +469,7 @@ support the -b flag for compatibility with locate when they are used with it.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -498,7 +499,7 @@ your regexp is ready to send to remote process, even if helm is handling
 this by delaying each process at 5s. 
 Or even better don't use tramp at all and mount your remote file system on SSHFS.
 
-\n* Specific commands for Helm Grep:\n
+\n** Specific commands for Helm Grep:\n
 \\<helm-grep-map>
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
@@ -509,7 +510,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
 \\[helm-grep-help]\t\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -523,13 +524,13 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-pdfgrep-help-message
   "\n* Helm PdfGrep Map\n
-\n* Specific commands for Pdf Grep:\n
+\n** Specific commands for Pdf Grep:\n
 \\<helm-pdfgrep-map>
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-pdfgrep-help]\t\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -543,13 +544,13 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-etags-help-message
   "\n* Helm Etags Map\n
-\n* Specific commands for Etags:\n
+\n** Specific commands for Etags:\n
 \\<helm-etags-map>
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-etags-help]\t\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -564,7 +565,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-ucs-help-message
   "\n* Helm Ucs\n
-\n* Specific commands for `helm-ucs':\n
+\n** Specific commands for `helm-ucs':\n
 \\<helm-ucs-map>
 \\[helm-ucs-persistent-insert]\t->Insert char.
 \\[helm-ucs-persistent-forward]\t->Forward char.
@@ -572,7 +573,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 \\[helm-ucs-persistent-delete]\t->Delete char backward.
 \\[helm-ucs-help]\t\t->Show this help.
 
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -587,14 +588,14 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-bookmark-help-message
   "\n* Helm bookmark name\n
-\n* Specific commands for bookmarks:\n
+\n** Specific commands for bookmarks:\n
 \\<helm-bookmark-map>
 \\[helm-bookmark-run-jump-other-window]\t\t->Jump other window.
 \\[helm-bookmark-run-delete]\t\t->Delete bookmark.
 \\[helm-bookmark-run-edit]\t\t->Edit bookmark.
 \\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.
 \\[helm-bookmark-help]\t\t->Run this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -641,10 +642,10 @@ the command is called once for each file like this:
 
 <command> file1 <command> file2 etc...
 
-\n* Specific commands for `helm-find-files-eshell-command-on-file':\n
+\n** Specific commands for `helm-find-files-eshell-command-on-file':\n
 \\<helm-esh-on-file-map>
 \\[helm-esh-help]\t\t->Display this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -659,7 +660,7 @@ the command is called once for each file like this:
 ;;
 (defvar helm-buffers-ido-virtual-help-message
   "\n* Helm ido virtual buffers\n
-\n* Specific commands for ido virtuals buffers:\n
+\n** Specific commands for ido virtuals buffers:\n
 \\<helm-buffers-ido-virtual-map>
 \\[helm-ff-run-switch-other-window]\t\t->Switch other window.
 \\[helm-ff-run-switch-other-frame]\t\t->Switch other frame.
@@ -668,7 +669,7 @@ the command is called once for each file like this:
 \\[helm-ff-run-delete-file]\t\t->Delete file.
 \\[helm-ff-run-open-file-externally]\t\t->Open file externally.
 \\[helm-buffers-ido-virtual-help]\t\t->Display this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -687,7 +688,7 @@ the command is called once for each file like this:
 
 Multiple regexp matching is allowed, just enter a space to separate your regexps.
 
-\n* Specific commands for Helm Moccur:\n
+\n** Specific commands for Helm Moccur:\n
 \\<helm-moccur-map>
 \\[helm-goto-next-file]\t->Next Buffer.
 \\[helm-goto-precedent-file]\t\t->Precedent Buffer.
@@ -695,7 +696,7 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
 \\[helm-moccur-run-goto-line-ow]\t\t->Goto line in other window.
 \\[helm-moccur-run-goto-line-of]\t\t->Goto line in new frame.
 \\[helm-moccur-help]\t\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -711,13 +712,13 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
   "\n* Helm Top\n
 \n** Helm Top tips:
 
-\n* Specific commands for Helm Top:\n
+\n** Specific commands for Helm Top:\n
 \\<helm-top-map>
 \\[helm-top-run-sort-by-com]\t->Sort by commands.
 \\[helm-top-run-sort-by-cpu]\t->Sort by cpu usage.
 \\[helm-top-run-sort-by-user]\t->Sort alphabetically by user.
 \\[helm-top-run-sort-by-mem]\t->Sort by memory.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -733,13 +734,13 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
   "\n* Helm Apt\n
 \n** Helm Apt tips:
 
-\n* Specific commands for Helm Apt:\n
+\n** Specific commands for Helm Apt:\n
 \\<helm-apt-map>
 \\[helm-apt-show-all]\t->Show all packages.
 \\[helm-apt-show-only-installed]\t->Show installed packages only.
 \\[helm-apt-show-only-not-installed]\t->Show not installed packages only.
 \\[helm-apt-show-only-deinstalled]\t-Show deinstalled (not purged yet) packages only.>
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -755,13 +756,13 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
   "\n* Helm elisp package\n
 \n** Helm elisp package tips:
 
-\n* Specific commands for Helm elisp package:\n
+\n** Specific commands for Helm elisp package:\n
 \\<helm-el-package-map>
 \\[helm-el-package-show-all]\t->Show all packages.
 \\[helm-el-package-show-installed]\t->Show installed packages only.
 \\[helm-el-package-show-uninstalled]\t->Show not installed packages only.
 \\[helm-el-package-help]\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -785,10 +786,10 @@ When you want to pass prefix args, pass them AFTER starting `helm-M-x',
 you will have a prefix arg counter appearing in mode-line notifying you
 the amount of prefix args entered.
 
-\n* Specific commands for Helm M-x:\n
+\n** Specific commands for Helm M-x:\n
 \\<helm-M-x-map>
 \\[helm-M-x-help]\t\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -804,10 +805,10 @@ the amount of prefix args entered.
   "\n* Helm imenu\n
 \n** Helm imenu tips:
 
-\n* Specific commands for Helm imenu:\n
+\n** Specific commands for Helm imenu:\n
 \\<helm-imenu-map>
 \\[helm-imenu-help]\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -821,14 +822,14 @@ the amount of prefix args entered.
 ;;
 (defvar helm-colors-help-message
   "\n* Helm colors\n
-\n* Specific commands for Helm colors:\n
+\n** Specific commands for Helm colors:\n
 \\<helm-color-map>
 \\[helm-color-run-insert-name]\t\tInsert the entry'name.
 \\[helm-color-run-kill-name]\t\tKill the entry's name.
 \\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
 \\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.
 \\[helm-color-help]\t\tShow this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
@@ -844,10 +845,10 @@ the amount of prefix args entered.
   "\n* Helm semantic\n
 \n** Helm semantic tips:
 
-\n* Specific commands for Helm semantic:\n
+\n** Specific commands for Helm semantic:\n
 \\<helm-semantic-map>
 \\[helm-semantic-help]\t->Show this help.
-\n* Helm Map\n
+\n** Helm Map\n
 \\{helm-map}")
 
 ;;;###autoload
