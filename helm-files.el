@@ -2701,6 +2701,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 Only hg and git are supported for now.
 Fall back to `helm-find-files' if directory is not under
 control of one of those vcs.
+With a prefix ARG browse files recursively.
 Need dependencies:
 <https://github.com/emacs-helm/helm-ls-git.git>
 and
