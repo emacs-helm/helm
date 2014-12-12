@@ -280,11 +280,11 @@ See also `helm-locate'."
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
       (cond ((string-match
-              " " (replace-regexp-in-string " -b" "" p)) p)
-            ((string-match "\\([^ ]*\\) -b" p)
+              " " (replace-regexp-in-string " -b" "" pattern)) pattern)
+            ((string-match "\\([^ ]*\\) -b" pattern)
              (concat (helm--mapconcat-pattern
-                      (match-string 1 p)) " -b"))
-            (t (helm--mapconcat-pattern p)))
+                      (match-string 1 pattern)) " -b"))
+            (t (helm--mapconcat-pattern pattern)))
       pattern))
 
 (defvar helm-source-locate
