@@ -69,6 +69,10 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers
   :type 'boolean)
 
+(defcustom helm-buffer-skip-remote-checking nil
+  "Ignore checking for `file-exists-p' on remote files."
+  :group 'helm-buffers
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -270,6 +274,11 @@ See `ido-make-buffer-list' for more infos."
                  (format "(in `%s')" dir))
                'face face2)))))
 
+(defun helm-buffers--skip-remote-p (prefix-p)
+  (or (null prefix-p)
+      (and helm-buffer-skip-remote-checking
+           prefix-p)))
+
 (defun helm-buffer--details (buffer &optional details)
   (let* ((mode (with-current-buffer buffer (format-mode-line mode-name)))
          (buf (get-buffer buffer))
@@ -288,13 +297,17 @@ See `ido-make-buffer-list' for more infos."
         name name-prefix dir size mode dir
         'helm-buffer-directory 'helm-buffer-process nil details 'dired))
       ;; A buffer file modified somewhere outside of emacs.=>red
-      ((and file-name (file-exists-p file-name)
+      ((and (helm-buffers--skip-remote-p name-prefix)
+            file-name
+            (file-exists-p file-name)
             (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
         'helm-buffer-saved-out 'helm-buffer-process nil details 'modout))
       ;; A new buffer file not already saved on disk.=>indianred2
-      ((and file-name (not (verify-visited-file-modtime buf)))
+      ((and (helm-buffers--skip-remote-p name-prefix)
+            file-name
+            (not (verify-visited-file-modtime buf)))
        (helm-buffer--show-details
         name name-prefix file-name size mode dir
         'helm-buffer-not-saved 'helm-buffer-process nil details 'notsaved))
