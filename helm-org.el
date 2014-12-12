@@ -98,7 +98,7 @@
 ;;     (setq helm-documentation-filecache
 ;;           (directory-files helm-documentation-directory t "\\.org\\'")))
 ;;   (helm :sources (helm-source-org-headings-for-files
-;;                   (list (buffer-file-name (current-buffer))))
+;;                   helm-documentation-filecache)
 ;;         :candidate-number-limit 99999
 ;;         :buffer "*helm org doc*"))
 
