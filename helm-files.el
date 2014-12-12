@@ -1483,7 +1483,8 @@ purpose."
 
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-source-find-files'."
-  (let* ((path          (helm-ff-set-pattern helm-pattern))
+  (let* ((path          (expand-file-name
+                         (helm-ff-set-pattern helm-pattern)))
          (dir-p         (file-accessible-directory-p path))
          basedir
          invalid-basedir
