@@ -457,11 +457,12 @@ instead of `helm-walk-ignore-directories'."
                    (cl-loop with ls = (directory-files
                                        dir t directory-files-no-dot-files-regexp)
                          for f in ls
-                         if (file-directory-p f)
+                         for type = (car (file-attributes f))
+                         if (eq type t)
                          do (progn (when directories
                                      (push (funcall fn f) result))
                                    ;; Don't recurse in directory symlink.
-                                   (unless (file-symlink-p f)
+                                   (unless (stringp type)
                                      (funcall ls-R f)))
                          else do
                          (if match
