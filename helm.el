@@ -1816,8 +1816,13 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               nil))
         (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
         (if (fboundp 'advice-add)
-            (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
-          (ad-deactivate 'tramp-read-passwd))
+            (progn
+              (advice-remove 'tramp-read-passwd
+                             #'helm--advice-tramp-read-passwd)
+              (advice-remove 'ange-ftp-get-passwd
+                             #'helm--advice-ange-ftp-get-passwd))
+          (ad-deactivate 'tramp-read-passwd)
+          (ad-deactivate 'ange-ftp-get-passwd))
         (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
         (setq overriding-terminal-local-map old-overriding-local-map)
         (setq helm-alive-p nil)
