@@ -2504,14 +2504,24 @@ Else return ACTIONS unmodified."
    (help-message :initform helm-generic-file-help-message)
    (mode-line :initform helm-generic-file-mode-line-string)))
 
-(defvar helm-source-file-cache
-  (helm-make-source
-   "File Cache" 'helm-file-cache
-   :data (lambda ()
-           (cl-loop for item in file-cache-alist append
-                    (cl-destructuring-bind (base &rest dirs) item
-                      (cl-loop for dir in dirs collect
-                               (concat dir base)))))))
+(defun helm-file-cache-get-candidates ()
+  (cl-loop for item in file-cache-alist append
+           (cl-destructuring-bind (base &rest dirs) item
+             (cl-loop for dir in dirs collect
+                      (concat dir base)))))
+
+(defvar helm-source-file-cache nil)
+
+(defcustom helm-file-cache-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-file-cache' when non--nil."
+  :group 'helm-files
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (setq helm-source-file-cache
+               (helm-make-source "File Cache" 'helm-file-cache
+                 :fuzzy-match helm-file-cache-fuzzy-match
+                 :data 'helm-file-cache-get-candidates))))
 
 (cl-defun helm-file-cache-add-directory-recursively
     (dir &optional match (ignore-dirs t))
