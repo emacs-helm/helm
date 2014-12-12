@@ -2674,9 +2674,29 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;; <https://github.com/emacs-helm/helm-ls-git.git>
 ;; <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>
 ;; Only hg and git are supported for now.
+(defvar helm--browse-project-cache (make-hash-table :test 'equal))
+(defun helm-browse-project-find-files (directory)
+  (unless (gethash directory helm--browse-project-cache)
+    (puthash directory (helm-walk-directory
+                        directory
+                        :directories nil :path 'full :skip-subdirs t)
+             helm--browse-project-cache))
+  (helm :sources (helm-build-in-buffer-source "Browse project"
+                   :data (gethash directory helm--browse-project-cache)
+                   :match-part (lambda (c)
+                                 (if helm-ff-transformer-show-only-basename
+                                     (helm-basename c) c))
+                   :filter-one-by-one (lambda (c)
+                                        (if helm-ff-transformer-show-only-basename
+                                            (cons (propertize (helm-basename c)
+                                                              'face 'helm-ff-file) c)
+                                            (propertize c 'face 'helm-ff-file)))
+                   :keymap helm-generic-files-map
+                   :action (helm-actions-from-type-file))
+        :buffer "*helm browse project*"))
 
 ;;;###autoload
-(defun helm-browse-project ()
+(defun helm-browse-project (arg)
   "Browse files and see status of project with its vcs.
 Only hg and git are supported for now.
 Fall back to `helm-find-files' if directory is not under
@@ -2685,20 +2705,22 @@ Need dependencies:
 <https://github.com/emacs-helm/helm-ls-git.git>
 and
 <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>."
-  (interactive)
+  (interactive "P")
   (cond ((and (fboundp 'helm-ls-git-root-dir)
               (helm-ls-git-root-dir))
          (helm-ls-git-ls))
         ((and (fboundp 'helm-hg-root)
               (helm-hg-root))
          (helm-hg-find-files-in-project))
-        (t (helm-find-files nil))))
+        (t (if arg
+               (helm-browse-project-find-files (helm-current-directory))
+               (helm-find-files nil)))))
 
 (defun helm-ff-browse-project (_candidate)
   (with-helm-default-directory helm-ff-default-directory
       ;; `helm-browse-project' will call `helm-ls-git-ls'
       ;; which will set locally `helm-default-directory'
-      (helm-browse-project)))
+      (helm-browse-project helm-current-prefix-arg)))
 
 (defun helm-ff-run-browse-project ()
   (interactive)

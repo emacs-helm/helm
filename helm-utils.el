@@ -430,7 +430,7 @@ from its directory."
 ;; Same as `vc-directory-exclusion-list'.
 (defvar helm-walk-ignore-directories
   '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr"
-    "_MTN" "_darcs" "{arch}"))
+    "_MTN" "_darcs" "{arch}" ".gvfs"))
 
 (cl-defun helm-walk-directory (directory &key path (directories t) match skip-subdirs)
   "Walk through DIRECTORY tree.
