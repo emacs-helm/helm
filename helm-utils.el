@@ -432,9 +432,12 @@ from its directory."
   '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr"
     "_MTN" "_darcs" "{arch}" ".gvfs"))
 
-(cl-defun helm-walk-directory (directory &key path (directories t) match skip-subdirs)
+(cl-defun helm-walk-directory (directory &key (path 'basename)
+                                           (directories t)
+                                           match skip-subdirs)
   "Walk through DIRECTORY tree.
-Argument PATH can be one of basename, relative, or full, default to basename.
+Argument PATH can be one of basename, relative, full, or a function
+called on file name, default to basename.
 Argument DIRECTORIES when non--nil (default) return also directories names,
 otherwise skip directories names.
 Argument MATCH can be a predicate or a regexp.
@@ -446,7 +449,7 @@ instead of `helm-walk-ignore-directories'."
                (basename 'file-name-nondirectory)
                (relative 'file-relative-name)
                (full     'identity)
-               (t        'file-name-nondirectory)))
+               (t        path)))
          ls-R)
     (setq ls-R (lambda (dir)
                  (unless (and skip-subdirs
