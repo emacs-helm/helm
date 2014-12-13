@@ -27,7 +27,7 @@
 (defun helm-org-goto-marker (marker)
   (switch-to-buffer (marker-buffer marker))
   (goto-char (marker-position marker))
-  (org-show-entry))
+  (org-show-context))
 
 (cl-defun helm-source-org-headings-for-files (filenames
                                               &optional (min-depth 1) (max-depth 8))
