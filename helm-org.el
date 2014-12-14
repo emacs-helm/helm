@@ -18,8 +18,18 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
-(require 'helm-plugin)
 (require 'org)
+
+(defgroup helm-org nil
+  "Org related functions for helm."
+  :group 'helm)
+
+(defcustom helm-org-headings-fontify nil
+  "Fontify org buffers before parsing them.
+This reflect fontification in helm-buffer when non--nil.
+NOTE: This will be slow on large org buffers."
+  :group 'helm-org
+  :type 'boolean)
 
 ;;; Org headings
 ;;
@@ -27,6 +37,7 @@
 (defun helm-org-goto-marker (marker)
   (switch-to-buffer (marker-buffer marker))
   (goto-char (marker-position marker))
+  (org-show-context)
   (org-show-entry))
 
 (cl-defun helm-source-org-headings-for-files (filenames
@@ -63,17 +74,20 @@
   (apply #'append
    (mapcar (lambda (filename)
              (helm-get-org-candidates-in-file
-              filename min-depth max-depth))
+              filename min-depth max-depth helm-org-headings-fontify))
            filenames)))
 
-(defun helm-get-org-candidates-in-file (filename min-depth max-depth)
+(defun helm-get-org-candidates-in-file (filename min-depth max-depth
+                                        &optional fontify)
   (with-current-buffer (find-file-noselect filename)
-    (save-excursion
-      (goto-char (point-min))
-      (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
-               if (let ((num-stars (length (match-string-no-properties 1))))
-                    (and (>= num-stars min-depth) (<= num-stars max-depth)))
-               collect `(,(match-string-no-properties 0) . ,(point-marker))))))
+    (and fontify (jit-lock-fontify-now))
+    (let ((match-fn (if fontify 'match-string 'match-string-no-properties)))
+      (save-excursion
+        (goto-char (point-min))
+        (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
+              if (let ((num-stars (length (match-string-no-properties 1))))
+                   (and (>= num-stars min-depth) (<= num-stars max-depth)))
+              collect `(,(funcall match-fn 0) . ,(point-marker)))))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
@@ -90,17 +104,6 @@
         :candidate-number-limit 99999
         :buffer "*helm org inbuffer*"))
 
-;; (defvar helm-documentation-filecache nil)
-;; (defvar helm-documentation-directory "~/.emacs.d/helm-documentation/")
-;; (defun helm-documentation ()
-;;   (interactive)
-;;   (unless helm-documentation-filecache
-;;     (setq helm-documentation-filecache
-;;           (directory-files helm-documentation-directory t "\\.org\\'")))
-;;   (helm :sources (helm-source-org-headings-for-files
-;;                   helm-documentation-filecache)
-;;         :candidate-number-limit 99999
-;;         :buffer "*helm org doc*"))
 
 (provide 'helm-org)
 
