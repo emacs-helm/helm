@@ -17,7 +17,9 @@
 
 ;;; Code:
 (require 'helm)
+(require 'helm-org)
 
+
 (defgroup helm-help nil
   "Embedded help for `helm'."
   :group 'helm)
@@ -27,6 +29,55 @@
   "Face for helm help string in minibuffer."
   :group 'helm-help)
 
+(defcustom helm-documentation-file "~/.emacs.d/helm-doc.org"
+  "The file where you want to save helm documentation."
+  :group 'helm-help
+  :type 'string)
+
+(defvar helm-help--string-list '(helm-help-message
+                                helm-buffer-help-message
+                                helm-ff-help-message
+                                helm-read-file-name-help-message
+                                helm-generic-file-help-message
+                                helm-grep-help-message
+                                helm-pdfgrep-help-message
+                                helm-etags-help-message
+                                helm-ucs-help-message
+                                helm-bookmark-help-message
+                                helm-esh-help-message
+                                helm-buffers-ido-virtual-help-message
+                                helm-moccur-help-message
+                                helm-top-help-message
+                                helm-apt-help-message
+                                helm-el-package-help-message
+                                helm-M-x-help-message
+                                helm-imenu-help-message
+                                helm-colors-help-message
+                                helm-semantic-help-message))
+
+
+;;;###autoload
+(defun helm-documentation (arg)
+  "Helm documentation.
+With a prefix arg refresh the documentation.
+
+Find here the documentation of all sources actually documented."
+  (interactive "P")
+  (when arg (delete-file helm-documentation-file)
+        (helm-aif (get-file-buffer helm-documentation-file)
+          (kill-buffer it)))
+  (unless (file-exists-p helm-documentation-file)
+    (with-temp-file helm-documentation-file
+      (erase-buffer)
+      (cl-loop for elm in helm-help--string-list
+            for str = (symbol-value elm)
+            do (if (functionp str)
+                   (insert (funcall str))
+                 (insert str)))))
+  (helm :sources (helm-source-org-headings-for-files
+                  (list helm-documentation-file))
+        :candidate-number-limit 99999
+        :buffer "*helm documentation*"))
 
 ;;; Global help message - Used by `helm-help'
 ;;
@@ -151,7 +202,7 @@ text to be displayed in BUFNAME."
 (defvar helm-buffer-help-message
   "\n* Helm Buffer\n
 
-** Tips:
+** Helm buffers tips:
 
 *** Completion:
 
@@ -267,7 +318,7 @@ Italic     => A non--file buffer.
 (defvar helm-ff-help-message
   "\n* Helm Find Files\n
 
-** Tips:
+** Helm find files tips:
 \n*** Enter `~/' at end of pattern to quickly reach home directory.
 
 *** Enter `/' at end of pattern to quickly reach root of your file system.
@@ -371,7 +422,7 @@ Italic     => A non--file buffer.
 (defvar helm-read-file-name-help-message
   "\n* Helm read file name\n
 
-** Tips:
+** Helm read file name tips:
 
 \n*** Enter `~/' at end of pattern to quickly reach home directory.
 
@@ -442,7 +493,7 @@ C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 (defvar helm-generic-file-help-message
   "\n* Helm Generic files\n
 
-** Tips:\n
+** Helm generic file tips:\n
 
 You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.
@@ -483,7 +534,7 @@ support the -b flag for compatibility with locate when they are used with it.
 ;;
 (defvar helm-grep-help-message
   "\n* Helm Grep\n
-** Tips:\n
+** Helm grep tips:\n
 *** You can start grep with a prefix arg to recurse in subdirectories.
 *** You can use wild card when selecting files (e.g *.el)
 *** You can grep in many differents directories by marking files or wild cards.
@@ -610,7 +661,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 ;;
 (defvar helm-esh-help-message
   "\n* Helm eshell on file\n
-** Tips:
+** Helm eshell on file tips:
 
 *** Passing extra args after filename:
 
@@ -755,6 +806,15 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
 (defvar helm-el-package-help-message
   "\n* Helm elisp package\n
 \n** Helm elisp package tips:
+*** Upgrade elisp packages
+Upgrading is not yet implemented, but you can easily achieve this like this:
+
+1) Show only installed packages
+   You should see two versions of package(s) if a new version
+   is available.
+2) Delete the installed version
+3) Run `helm-resume'
+4) Install the new version
 
 \n** Specific commands for Helm elisp package:\n
 \\<helm-el-package-map>
