@@ -470,7 +470,8 @@ instead of `helm-walk-ignore-directories'."
                                      (push (funcall
                                             fn (directory-file-name file))
                                            result))
-                                   (and (not (file-symlink-p file))
+                                   (and (not (file-symlink-p
+                                              (directory-file-name file)))
                                         (funcall ls-R file)))
                          else do
                          (if match
