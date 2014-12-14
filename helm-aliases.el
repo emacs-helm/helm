@@ -535,6 +535,8 @@
 (make-obsolete 'helm-c-get-first-line-documentation 'helm-get-first-line-documentation "1.5.1")
 (defalias 'helm-approximate-candidate-number 'helm-get-candidate-number)
 (make-obsolete 'helm-approximate-candidate-number 'helm-get-candidate-number "1.5.5")
+(defalias 'helm-org-headlines 'helm-org-in-buffer-headings)
+(make-obsolete 'helm-org-headlines 'helm-org-in-buffer-headings "1.6.5")
 
 
 ;;; variables
