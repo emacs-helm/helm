@@ -457,15 +457,12 @@ instead of `helm-walk-ignore-directories'."
                                       (if (listp skip-subdirs)
                                           skip-subdirs
                                         helm-walk-ignore-directories)))
-                   (cl-loop with ls = (sort (cl-delete-if
-                                             (lambda (x)
-                                               (member x '("./" "../")))
-                                              (file-name-all-completions
-                                               "" dir))
+                   (cl-loop with ls = (sort (file-name-all-completions "" dir)
                                             'string-lessp)
                          for f in ls
                          for file = (directory-file-name
                                      (expand-file-name f dir))
+                         unless (member f '("./" "../"))
                          if (string-match "/\\'" f)
                          do (progn (when directories
                                      (push (funcall fn file) result))
@@ -476,8 +473,7 @@ instead of `helm-walk-ignore-directories'."
                              (and (if (functionp match)
                                       (funcall match f)
                                     (and (stringp match)
-                                         (string-match
-                                          match f)))
+                                         (string-match match f)))
                                   (push (funcall fn file) result))
                            (push (funcall fn file) result))))))
     (funcall ls-R directory)
