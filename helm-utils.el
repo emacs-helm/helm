@@ -460,12 +460,20 @@ instead of `helm-walk-ignore-directories'."
                    (cl-loop with ls = (sort (file-name-all-completions "" dir)
                                             'string-lessp)
                          for f in ls
+                         ;; Use `directory-file-name' to remove the final slash.
+                         ;; Needed to avoid infloop on symlinks symlinking
+                         ;; a directory inside it [1].
                          for file = (directory-file-name
                                      (expand-file-name f dir))
                          unless (member f '("./" "../"))
-                         if (string-match "/\\'" f)
+                         ;; A directory.
+                         if (char-equal (aref f (1- (length f))) ?/)
                          do (progn (when directories
                                      (push (funcall fn file) result))
+                                   ;; Don't recurse in symlinks.
+                                   ;; `file-symlink-p' have to be called
+                                   ;; on the directory with its final
+                                   ;; slash removed [1].
                                    (and (not (file-symlink-p file))
                                         (funcall ls-R file)))
                          else do
