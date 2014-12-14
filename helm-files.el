@@ -2694,11 +2694,13 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                    :match-part (lambda (c)
                                  (if helm-ff-transformer-show-only-basename
                                      (helm-basename c) c))
-                   :filter-one-by-one (lambda (c)
-                                        (if helm-ff-transformer-show-only-basename
-                                            (cons (propertize (helm-basename c)
-                                                              'face 'helm-ff-file) c)
-                                            (propertize c 'face 'helm-ff-file)))
+                   :filter-one-by-one
+                   (lambda (c)
+                     (if helm-ff-transformer-show-only-basename
+                         (cons (propertize (helm-basename c)
+                                           'face 'helm-ff-file)
+                               c)
+                       (propertize c 'face 'helm-ff-file)))
                    :keymap helm-generic-files-map
                    :action (helm-actions-from-type-file))
         :buffer "*helm browse project*"))
