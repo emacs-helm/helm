@@ -457,24 +457,26 @@ instead of `helm-walk-ignore-directories'."
                                       (if (listp skip-subdirs)
                                           skip-subdirs
                                         helm-walk-ignore-directories)))
-                   (cl-loop with ls = (directory-files
-                                       dir t directory-files-no-dot-files-regexp)
+                   (cl-loop with ls = (sort (cl-delete-if (lambda (x)
+                                                            (member x '("./" "../")))
+                                              (file-name-all-completions "" dir))
+                                            'string-lessp)
                          for f in ls
-                         for type = (car (file-attributes f))
-                         if (eq type t)
-                         ;; Directory is a valid directory and not a symlink.
+                         for file = (expand-file-name f dir)
+                         if (string-match "/\\'" f)
                          do (progn (when directories
-                                     (push (funcall fn f) result))
-                                   (funcall ls-R f))
+                                     (push (funcall fn (directory-file-name file)) result))
+                                   (and (not (file-symlink-p file))
+                                        (funcall ls-R file)))
                          else do
                          (if match
                              (and (if (functionp match)
                                       (funcall match f)
                                     (and (stringp match)
                                          (string-match
-                                          match (file-name-nondirectory f))))
-                                  (push (funcall fn f) result))
-                           (push (funcall fn f) result))))))
+                                          match f)))
+                                  (push (funcall fn file) result))
+                           (push (funcall fn file) result))))))
     (funcall ls-R directory)
     (nreverse result)))
 
