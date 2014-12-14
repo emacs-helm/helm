@@ -462,11 +462,10 @@ instead of `helm-walk-ignore-directories'."
                          for f in ls
                          for type = (car (file-attributes f))
                          if (eq type t)
+                         ;; Directory is a valid directory and not a symlink.
                          do (progn (when directories
                                      (push (funcall fn f) result))
-                                   ;; Don't recurse in directory symlink.
-                                   (unless (stringp type)
-                                     (funcall ls-R f)))
+                                   (funcall ls-R f))
                          else do
                          (if match
                              (and (if (functionp match)
