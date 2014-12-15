@@ -2678,8 +2678,8 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 ;;; Browse project
 ;; Need dependencies:
-;; <https://github.com/emacs-helm/helm-ls-git.git>
-;; <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>
+;; <https://github.com/emacs-helm/helm-ls-git>
+;; <https://github.com/emacs-helm/helm-ls-hg>
 ;; Only hg and git are supported for now.
 (defvar helm--browse-project-cache (make-hash-table :test 'equal))
 (defun helm-browse-project-find-files (directory &optional refresh)

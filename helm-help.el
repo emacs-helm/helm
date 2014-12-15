@@ -357,7 +357,24 @@ Italic     => A non--file buffer.
 
 *** To create a new file just write the filename not ending with \"/\".
 
-*** You can start a recursive search with Locate of Find (See commands below).
+*** Recursive search from helm find files
+
+**** You can use helm browse project (see binding below).
+
+- With no prefix arg
+  If your current directory is under version control
+  with one of git or hg and you have installed helm-ls-git and/or helm-ls-hg
+  https://github.com/emacs-helm/helm-ls-git.git
+  https://github.com/emacs-helm/helm-ls-hg
+  you will see all your files under version control, otherwise
+  you will be back to helm-find-files.
+- With one prefix arg
+  You will see all the files under this directory
+  and other subdirectories (recursion) and this list of files will be cached.
+- With two prefix args
+  same but the cache will be refreshed.
+
+**** You can start a recursive search with Locate of Find (See commands below).
   With Locate you can use a local db with a prefix arg; If the localdb doesn't already
   exists, you will be prompted for its creation, if it exists and you want to refresh it,
   give two prefix args.
@@ -365,6 +382,7 @@ Italic     => A non--file buffer.
 \n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
+\\[helm-ff-run-browse-project]\t\t->Browse project (`C-u' recurse, `C-u C-u' recurse and refresh db)
 \\[helm-ff-run-find-sh-command]\t\t->Run Find shell command from this directory.
 \\[helm-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
