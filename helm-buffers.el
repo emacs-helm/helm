@@ -274,11 +274,6 @@ See `ido-make-buffer-list' for more infos."
                  (format "(in `%s')" dir))
                'face face2)))))
 
-(defun helm-buffers--skip-remote-p (prefix-p)
-  (or (null prefix-p)
-      (and helm-buffer-skip-remote-checking
-           prefix-p)))
-
 (defun helm-buffer--details (buffer &optional details)
   (let* ((mode (with-current-buffer buffer (format-mode-line mode-name)))
          (buf (get-buffer buffer))
@@ -290,42 +285,45 @@ See `ido-make-buffer-list' for more infos."
          (name (buffer-name buf))
          (name-prefix (when (file-remote-p dir)
                         (propertize "@ " 'face 'helm-ff-prefix))))
-    (cond
-      ( ;; A dired buffer.
-       (rassoc buf dired-buffers)
-       (helm-buffer--show-details
-        name name-prefix dir size mode dir
-        'helm-buffer-directory 'helm-buffer-process nil details 'dired))
-      ;; A buffer file modified somewhere outside of emacs.=>red
-      ((and (helm-buffers--skip-remote-p name-prefix)
-            file-name
-            (file-exists-p file-name)
-            (not (verify-visited-file-modtime buf)))
-       (helm-buffer--show-details
-        name name-prefix file-name size mode dir
-        'helm-buffer-saved-out 'helm-buffer-process nil details 'modout))
-      ;; A new buffer file not already saved on disk.=>indianred2
-      ((and (helm-buffers--skip-remote-p name-prefix)
-            file-name
-            (not (verify-visited-file-modtime buf)))
-       (helm-buffer--show-details
-        name name-prefix file-name size mode dir
-        'helm-buffer-not-saved 'helm-buffer-process nil details 'notsaved))
-      ;; A buffer file modified and not saved on disk.=>orange
-      ((and file-name (buffer-modified-p buf))
-       (helm-buffer--show-details
-        name name-prefix file-name size mode dir
-        'helm-ff-symlink 'helm-buffer-process nil details 'mod))
-      ;; A buffer file not modified and saved on disk.=>green
-      (file-name
-       (helm-buffer--show-details
-        name name-prefix file-name size mode dir
-        'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
-      ;; Any non--file buffer.=>grey italic
-      (t
-       (helm-buffer--show-details
-        name (and proc name-prefix) dir size mode dir
-        'italic 'helm-buffer-process proc details 'nofile)))))
+    ;; No fancy things on remote buffers.
+    (if (and name-prefix helm-buffer-skip-remote-checking)
+        (helm-buffer--show-details
+         name name-prefix file-name size mode dir
+         'helm-buffer-file 'helm-buffer-process nil details 'filebuf)
+      (cond
+        ( ;; A dired buffer.
+         (rassoc buf dired-buffers)
+         (helm-buffer--show-details
+          name name-prefix dir size mode dir
+          'helm-buffer-directory 'helm-buffer-process nil details 'dired))
+        ;; A buffer file modified somewhere outside of emacs.=>red
+        ((and file-name
+              (file-exists-p file-name)
+              (not (verify-visited-file-modtime buf)))
+         (helm-buffer--show-details
+          name name-prefix file-name size mode dir
+          'helm-buffer-saved-out 'helm-buffer-process nil details 'modout))
+        ;; A new buffer file not already saved on disk.=>indianred2
+        ((and file-name
+              (not (verify-visited-file-modtime buf)))
+         (helm-buffer--show-details
+          name name-prefix file-name size mode dir
+          'helm-buffer-not-saved 'helm-buffer-process nil details 'notsaved))
+        ;; A buffer file modified and not saved on disk.=>orange
+        ((and file-name (buffer-modified-p buf))
+         (helm-buffer--show-details
+          name name-prefix file-name size mode dir
+          'helm-ff-symlink 'helm-buffer-process nil details 'mod))
+        ;; A buffer file not modified and saved on disk.=>green
+        (file-name
+         (helm-buffer--show-details
+          name name-prefix file-name size mode dir
+          'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
+        ;; Any non--file buffer.=>grey italic
+        (t
+         (helm-buffer--show-details
+          name (and proc name-prefix) dir size mode dir
+          'italic 'helm-buffer-process proc details 'nofile))))))
 
 (defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
