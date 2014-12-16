@@ -445,7 +445,7 @@
 
    (header-line
     :initarg :header-line
-    :initform 'helm-persistent-help-string
+    :initform nil
     :custom (choice string function)
     :documentation
     "  Source local `header-line-format'.
