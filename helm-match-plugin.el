@@ -415,7 +415,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                       (< (point) end)
                       (< 0 (- (match-end 0) (match-beginning 0))))
             (unless (helm-pos-header-line-p)
-              (put-text-property (match-beginning 0) me 'face face)))
+              (add-face-text-property (match-beginning 0) me face)))
         (invalid-regexp nil)))))
 
 (defun helm-mp-highlight-match-internal (end)
