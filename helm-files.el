@@ -2580,8 +2580,7 @@ Else return ACTIONS unmodified."
     (candidates . file-name-history)
     (persistent-action . ignore)
     (filtered-candidate-transformer . helm-file-name-history-transformer)
-    (action . ,(cdr (helm-get-actions-from-type
-                     helm-source-locate)))))
+    (action . ,(helm-actions-from-type-file))))
 
 (defvar helm-source--ff-file-name-history nil
   "[Internal] This source is build to be used with `helm-find-files'.
@@ -2760,8 +2759,7 @@ See `helm-browse-project'."
     (keymap . ,helm-generic-files-map)
     (help-message . helm-generic-file-help-message)
     (mode-line . helm-generic-file-mode-line-string)
-    (action . ,(cdr (helm-get-actions-from-type
-                     helm-source-locate))))
+    (action . ,(helm-actions-from-type-file)))
   "File list from emacs-session.")
 
 
