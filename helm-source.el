@@ -445,7 +445,7 @@
 
    (header-line
     :initarg :header-line
-    :initform 'helm-persistent-help-string
+    :initform nil
     :custom (choice string function)
     :documentation
     "  Source local `header-line-format'.
@@ -484,7 +484,7 @@
 
    (dont-plug
     :initarg :dont-plug
-    :initform nil
+    :initform '(helm-compile-source--persistent-help)
     :custom list
     :documentation
     "  A list of compile functions plugin to ignore.")
@@ -537,7 +537,8 @@
     :initform '("ERROR: You must specify the `candidates' slot, either with a list or a function"))
 
    (dont-plug
-    :initform '(helm-compile-source--match-plugin))
+    :initform '(helm-compile-source--match-plugin
+                helm-compile-source--persistent-help))
    
    (match-strict
     :initarg :match-strict
@@ -579,7 +580,8 @@
    
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer
-                helm-compile-source--match-plugin))
+                helm-compile-source--match-plugin
+                helm-compile-source--persistent-help))
    
    (candidates
     :initform 'helm-candidates-in-buffer)
@@ -885,9 +887,30 @@ an eieio class."
 ;;; Methods to build sources.
 ;;
 ;;
+(defun helm-source--persistent-help-string (string source)
+  (substitute-command-keys
+   (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
+           (or (format "%s (keeping session)" string)
+               (oref source :header-line)))))
+
+(defun helm-source--header-line (source)
+  (substitute-command-keys
+   (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
+           (helm-aif (or (oref source :persistent-action)
+                         (oref source :action))
+               (cond ((symbolp it)
+                      (symbol-name it))
+                     ((listp it)
+                      (or (ignore-errors (caar it))  "")))
+             "")
+           " (keeping session)")))
+
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source :keymap)
       (and (symbolp it) (set-slot-value source :keymap (symbol-value it))))
+  (oset source :header-line (helm-source--header-line source))
+  (helm-aif (slot-value source :persistent-help)
+      (oset source :header-line (helm-source--persistent-help-string it source)))
   (when (slot-value source :fuzzy-match)
     (oset source :nohighlight t)
     (when helm-default-fuzzy-matching-highlight-fn
