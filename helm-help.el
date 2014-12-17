@@ -830,14 +830,20 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
   "\n* Helm elisp package\n
 \n** Helm elisp package tips:
 *** Upgrade elisp packages
-Upgrading is not yet implemented, but you can easily achieve this like this:
+Upgrading is not yet implemented, but you can easily achieve this task like this:
 
 1) Show only installed packages
    You should see two versions of package(s) if a new version
    is available.
-2) Delete the installed version
+2) Delete the installed package(s) version (Mark them and delete).
 3) Run `helm-resume'
-4) Install the new version
+4) Install the new package(s) version not already installed (Mark them and install).
+
+So if for example you have bound helm-resume to `f1', you can do:
+
+1) Mark the installed package(s) version and hit `f3'.
+2) Hit `f1'.
+3) Mark the new package(s) version not already installed and hit `f2'.
 
 \n** Specific commands for Helm elisp package:\n
 \\<helm-el-package-map>
