@@ -2690,6 +2690,10 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
              helm--browse-project-cache))
   (helm :sources (helm-build-in-buffer-source "Browse project"
                    :data (gethash directory helm--browse-project-cache)
+                   :header-name (lambda (name)
+                                  (format
+                                   "%s (%s)"
+                                   name (abbreviate-file-name directory)))
                    :match-part (lambda (c)
                                  (if helm-ff-transformer-show-only-basename
                                      (helm-basename c) c))
