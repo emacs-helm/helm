@@ -2700,6 +2700,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                                            'face 'helm-ff-file)
                                c)
                        (propertize c 'face 'helm-ff-file)))
+                   :mode-line helm-generic-file-mode-line-string
                    :keymap helm-generic-files-map
                    :action (helm-actions-from-type-file))
         :buffer "*helm browse project*"))

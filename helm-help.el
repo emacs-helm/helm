@@ -513,14 +513,18 @@ C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 
 ** Helm generic file tips:\n
 
+*** Locate
 You can add after writing search pattern any of the locate command line options.
 e.g -b, -e, -n <number>...etc.
 See Man locate for more infos.
 
-*** Note:
-
 Some other sources (at the moment recentf and file in current directory sources)
 support the -b flag for compatibility with locate when they are used with it.
+
+*** Browse project
+
+When your directory is not under version control,
+don't forget to refresh your cache when files have been added/removed in your directory.
 
 \n** Specific commands for helm locate and others files sources:
 
@@ -538,6 +542,7 @@ support the -b flag for compatibility with locate when they are used with it.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
+\\[helm-generic-file-help]\t\t->Show this help.
 \n** Helm Map\n
 \\{helm-map}")
 
