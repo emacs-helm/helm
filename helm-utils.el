@@ -444,48 +444,47 @@ Argument MATCH can be a predicate or a regexp.
 Argument SKIP-SUBDIRS when non--nil will skip `helm-walk-ignore-directories'
 unless it is given as a list of directories, in this case this list will be used
 instead of `helm-walk-ignore-directories'."
-  (let* (result
+  (let* ((result '())
          (fn (cl-case path
                (basename 'file-name-nondirectory)
                (relative 'file-relative-name)
                (full     'identity)
-               (t        path)))
-         ls-R)
-    (setq ls-R (lambda (dir)
-                 (unless (and skip-subdirs
-                              (member (helm-basename dir)
-                                      (if (listp skip-subdirs)
-                                          skip-subdirs
-                                        helm-walk-ignore-directories)))
-                   (cl-loop with ls = (sort (file-name-all-completions "" dir)
-                                            'string-lessp)
-                         for f in ls
-                         ;; Use `directory-file-name' to remove the final slash.
-                         ;; Needed to avoid infloop on symlinks symlinking
-                         ;; a directory inside it [1].
-                         for file = (directory-file-name
-                                     (expand-file-name f dir))
-                         unless (member f '("./" "../"))
-                         ;; A directory.
-                         if (char-equal (aref f (1- (length f))) ?/)
-                         do (progn (when directories
-                                     (push (funcall fn file) result))
-                                   ;; Don't recurse in symlinks.
-                                   ;; `file-symlink-p' have to be called
-                                   ;; on the directory with its final
-                                   ;; slash removed [1].
-                                   (and (not (file-symlink-p file))
-                                        (funcall ls-R file)))
-                         else do
-                         (if match
-                             (and (if (functionp match)
-                                      (funcall match f)
-                                    (and (stringp match)
-                                         (string-match match f)))
-                                  (push (funcall fn file) result))
-                           (push (funcall fn file) result))))))
-    (funcall ls-R directory)
-    (nreverse result)))
+               (t        path))))
+    (cl-labels ((ls-rec (dir)
+                  (unless (and skip-subdirs
+                               (member (helm-basename dir)
+                                       (if (listp skip-subdirs)
+                                           skip-subdirs
+                                         helm-walk-ignore-directories)))
+                    (cl-loop with ls = (sort (file-name-all-completions "" dir)
+                                             'string-lessp)
+                          for f in ls
+                          ;; Use `directory-file-name' to remove the final slash.
+                          ;; Needed to avoid infloop on symlinks symlinking
+                          ;; a directory inside it [1].
+                          for file = (directory-file-name
+                                      (expand-file-name f dir))
+                          unless (member f '("./" "../"))
+                          ;; A directory.
+                          if (char-equal (aref f (1- (length f))) ?/)
+                          do (progn (when directories
+                                      (push (funcall fn file) result))
+                                    ;; Don't recurse in symlinks.
+                                    ;; `file-symlink-p' have to be called
+                                    ;; on the directory with its final
+                                    ;; slash removed [1].
+                                    (and (not (file-symlink-p file))
+                                         (ls-rec file)))
+                          else do
+                          (if match
+                              (and (if (functionp match)
+                                       (funcall match f)
+                                     (and (stringp match)
+                                          (string-match match f)))
+                                   (push (funcall fn file) result))
+                            (push (funcall fn file) result))))))
+      (ls-rec directory)
+      (nreverse result))))
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
