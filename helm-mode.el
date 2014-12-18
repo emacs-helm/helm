@@ -837,7 +837,9 @@ Keys description:
 Don't use it directly, use instead `helm-read-file-name' in your programs."
   (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
-         (str-command (symbol-name current-command))
+         (str-command (if (consp current-command) ; Maybe a lambda.
+                          "Anonymous"
+                          (symbol-name current-command)))
          (helm-file-completion-sources
           (cons str-command
                 (remove str-command helm-file-completion-sources)))
