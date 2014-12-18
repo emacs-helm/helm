@@ -2882,7 +2882,7 @@ and `helm-pattern'."
 
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
   (let (matches)
-    (condition-case err
+    (condition-case-unless-debug err
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
