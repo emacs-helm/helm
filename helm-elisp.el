@@ -260,9 +260,9 @@ Return a cons \(beg . end\)."
          (beg        (car (helm-bounds-of-thing-before-point)))
          (end        (point))
          (pred       (and beg (helm-lisp-completion--predicate-at-point beg)))
-         (loc-vars   (and (fboundp 'lisp--local-variables)
+         (loc-vars   (and (fboundp 'elisp--local-variables)
                           (ignore-errors
-                            (mapcar #'symbol-name (lisp--local-variables)))))
+                            (mapcar #'symbol-name (elisp--local-variables)))))
          (glob-syms  (and target pred (all-completions target obarray pred)))
          (candidates (append loc-vars glob-syms))
          (helm-quit-if-no-candidate t)
