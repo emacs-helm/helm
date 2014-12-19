@@ -550,7 +550,14 @@
   functions will be concatened, which in some cases is not what
   is wanted. When using `match-strict' only this or these
   functions will be used. You can specify those functions as a
-  list of functions or a single symbol function.")))
+  list of functions or a single symbol function.
+
+  NOTE: This have the same effect as using :MATCHPLUGIN nil."))
+
+  "Use this class to make helm sources using a list of candidates.
+This list should be given as a normal list, a variable handling a list
+or a function returning a list.
+Matching is done basically with `string-match' against each candidate.")
 
 (defclass helm-source-async (helm-source)
   ((candidates-process
@@ -562,7 +569,11 @@
   an async process instead of `candidates'.
   The function must return a process.")
 
-   (matchplugin :initform nil)))
+   (matchplugin :initform nil))
+
+  "Use this class to define a helm source calling an external process.
+The :candidates slot is not allowed even if described because this class
+inherit from `helm-source'.")
 
 (defclass helm-source-in-buffer (helm-source)
   ((init
@@ -612,8 +623,13 @@
   Buffer search function used by `helm-candidates-in-buffer'.
   By default, `helm-candidates-in-buffer' uses `re-search-forward'.
   The function should take one arg PATTERN.
+  If your search function needs to handle negation like matchplugin,
+  this function should returns in such case a cons cell of two integers defining
+  the beg and end positions to match in the line previously matched by
+  `re-search-forward' or similar, and move point to next line
+  (See how the `helm-mp-3-search-base' and `helm-fuzzy-search' functions are working).
 
-  Note that FUZZY-MATCH slot wiil overhide value of this slot.")
+  NOTE: FUZZY-MATCH slot will overhide value of this slot.")
 
    (search-from-end
     :initarg :search-from-end
@@ -624,7 +640,7 @@
   If this attribute is specified, `helm-candidates-in-buffer'
   uses `re-search-backward' instead.
 
-  NOTE: This is here for compatibilty, but it is not used anymore.")
+  NOTE: This is here for compatibilty, but it is deprecated and not used anymore.")
 
    (search-strict
     :initarg :search-strict
@@ -636,7 +652,14 @@
   functions will be concatened, which in some cases is not what
   is wanted. When using `search-strict' only this or these
   functions will be used. You can specify those functions as a
-  list of functions or a single symbol function.")))
+  list of functions or a single symbol function.
+
+  NOTE: This have the same effect as using a nil value for
+        :MATCHPLUGIN slot."))
+
+  "Use this source to make helm sources storing candidates inside a buffer.
+Contrarily to `helm-source-sync' candidates are matched using a function
+like `re-search-forward', see below documentation of :search slot.")
 
 (defclass helm-source-dummy (helm-source)
   ((candidates
