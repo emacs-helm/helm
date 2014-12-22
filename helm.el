@@ -2801,8 +2801,7 @@ This function is used with sources build with `helm-source-sync'."
                             (len2 (caddr s2)))
                         (cond ((= scr1 scr2)
                                (< len1 len2))
-                              ((> scr1 scr2))))))))
-    ))
+                              ((> scr1 scr2))))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
   "The default-function for sorting candidates in fuzzy matching.
