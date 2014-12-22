@@ -2786,7 +2786,7 @@ This function is used with sources build with `helm-source-sync'."
            (mapcar
             (lambda (c)
               (let* ((cand (if (consp c)
-                               (if (eq real-or-display 'display) (car s1) (cdr s1))
+                               (if (eq real-or-display 'display) (car c) (cdr c))
                              c))
                      (scr (helm-score-candidate-for-pattern cand helm-pattern))
                      (len (length cand)))
