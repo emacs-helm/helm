@@ -501,24 +501,24 @@ This happen when using `helm-next/previous-line'."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-default-fuzzy-match-fn 'helm-fuzzy-match
-  "The default function for fuzzy matching in `helm-source-sync' based sources."
+(defcustom helm-fuzzy-match-fn 'helm-fuzzy-match
+  "The function for fuzzy matching in `helm-source-sync' based sources."
   :group 'helm
   :type 'function)
 
-(defcustom helm-default-fuzzy-search-fn 'helm-fuzzy-search
-  "The default function for fuzzy matching in `helm-source-in-buffer' based sources."
+(defcustom helm-fuzzy-search-fn 'helm-fuzzy-search
+  "The function for fuzzy matching in `helm-source-in-buffer' based sources."
   :group 'helm
   :type 'function)
 
-(defcustom helm-default-fuzzy-sort-fn 'helm-fuzzy-matching-default-sort-fn
-  "The default sort transformer function used in fuzzy matching.
+(defcustom helm-fuzzy-sort-fn 'helm-fuzzy-matching-default-sort-fn
+  "The sort transformer function used in fuzzy matching.
 When nil no sorting will be done."
   :group 'helm
   :type 'function)
 
-(defcustom helm-default-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
-  "The default function to highlight matches in fuzzy matching.
+(defcustom helm-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
+  "The function to highlight matches in fuzzy matching.
 When nil no highlighting will be done."
   :group 'helm
   :type 'function)
