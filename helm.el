@@ -2782,23 +2782,27 @@ This function is used with sources build with `helm-source-sync'."
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional real-or-display)
   (if (string= helm-pattern "")
       candidates
-      (sort candidates
-            (lambda (s1 s2)
-              ;; Score and measure the length on real or display part of candidate
-              ;; according to `real-or-display'.
-              (let* ((cand1 (if (consp s1)
-                                (if (eq real-or-display 'display) (car s1) (cdr s1))
-                                s1))
-                     (cand2 (if (consp s2)
-                                (if (eq real-or-display 'display) (car s2) (cdr s2))
-                                s2))
-                     (scr1 (helm-score-candidate-for-pattern cand1 helm-pattern))
-                     (scr2 (helm-score-candidate-for-pattern cand2 helm-pattern))
-                     (len1 (length cand1))
-                     (len2 (length cand2)))
-                (cond ((= scr1 scr2)
-                       (< len1 len2))
-                      ((> scr1 scr2))))))))
+    (let ((scored-candidates
+           (mapcar
+            (lambda (c)
+              (let* ((cand (if (consp c)
+                               (if (eq real-or-display 'display) (car c) (cdr c))
+                             c))
+                     (scr (helm-score-candidate-for-pattern cand helm-pattern))
+                     (len (length cand)))
+                (list c scr len)))
+            candidates)))
+      (mapcar (lambda (x) (car x))
+              (sort scored-candidates
+                    (lambda (s1 s2)
+                      (let ((scr1 (cadr s1))
+                            (scr2 (cadr s2))
+                            (len1 (caddr s1))
+                            (len2 (caddr s2)))
+                        (cond ((= scr1 scr2)
+                               (< len1 len2))
+                              ((> scr1 scr2))))))))
+    ))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
   "The default-function for sorting candidates in fuzzy matching.
