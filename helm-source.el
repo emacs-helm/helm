@@ -936,25 +936,25 @@ an eieio class."
       (oset source :header-line (helm-source--persistent-help-string it source)))
   (when (slot-value source :fuzzy-match)
     (oset source :nohighlight t)
-    (when helm-default-fuzzy-matching-highlight-fn
+    (when helm-fuzzy-matching-highlight-fn
       (oset source :filter-one-by-one
             (helm-aif (oref source :filter-one-by-one)
                 (append (helm-mklist it)
-                        (list helm-default-fuzzy-matching-highlight-fn))
-              (list helm-default-fuzzy-matching-highlight-fn))))
-    (when helm-default-fuzzy-sort-fn
+                        (list helm-fuzzy-matching-highlight-fn))
+              (list helm-fuzzy-matching-highlight-fn))))
+    (when helm-fuzzy-sort-fn
       (oset source :filtered-candidate-transformer
             (helm-aif (oref source :filtered-candidate-transformer)
                 (append (helm-mklist it)
-                        (list helm-default-fuzzy-sort-fn))
-              (list helm-default-fuzzy-sort-fn))))))
+                        (list helm-fuzzy-sort-fn))
+              (list helm-fuzzy-sort-fn))))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
 (defmethod helm--setup-source ((source helm-source-sync))
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other match fns to this ?
-    (oset source :match helm-default-fuzzy-match-fn))
+    (oset source :match helm-fuzzy-match-fn))
   (when (slot-value source :matchplugin)
     (oset source :match
           (helm-source-mp-get-search-or-match-fns source 'match))))
@@ -975,7 +975,7 @@ an eieio class."
                           (if (functionp it) (funcall it) it))))))))
   (when (slot-value source :fuzzy-match)
     ;; FIXME should I allow appending other search fns to this ?
-    (oset source :search `(,helm-default-fuzzy-search-fn)))
+    (oset source :search `(,helm-fuzzy-search-fn)))
   (when (slot-value source :matchplugin)
     (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
