@@ -2768,16 +2768,23 @@ This function is used with sources build with `helm-source-sync'."
                    else do (goto-char eol)
                    finally return nil)))))
 
+(defsubst helm--collect-pairs-in-string (string)
+  (cl-loop for str on (split-string string "" t) by 'cdr
+           when (cdr str)
+           collect (list (car str) (cadr str))))
+
 (defsubst helm-score-candidate-for-pattern (candidate pattern)
-  "Give a score to CANDIDATE according to number of contiguous matches found with PATTERN."
-  (let* ((pat-lookup (cl-loop for str on (split-string pattern "" t) by 'cdr
-                              when (cdr str)
-                              collect (list (car str) (cadr str))))
-         (str-lookup (cl-loop for str on (split-string candidate "" t) by 'cdr
-                              when (cdr str)
-                              collect (list (car str) (cadr str))))
-         (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0)))
-    (+ bonus (length (cl-nintersection pat-lookup str-lookup :test 'equal)))))
+  "Give a score to CANDIDATE according to PATTERN.
+Score is calculated against number of contiguous matches found with PATTERN.
+If PATTERN is fully matched in CANDIDATE score a maximal score (100) is given.
+A bonus of one point is given when PATTERN prefix match CANDIDATE."
+  (let* ((pat-lookup (helm--collect-pairs-in-string pattern))
+         (str-lookup (helm--collect-pairs-in-string candidate))
+         (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0))
+         (bonus1 (and (string-match (concat "\\<" pattern "\\>") candidate)
+                      100)))
+    (+ bonus (or bonus1 (length (cl-nintersection
+                                 pat-lookup str-lookup :test 'equal))))))
 
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional real-or-display)
   (if (string= helm-pattern "")
