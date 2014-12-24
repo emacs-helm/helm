@@ -98,12 +98,6 @@
       (unless persistent
         (pulse-momentary-highlight-one-line (point))))))
 
-(defun helm-semantic-get-candidates ()
-  "Get a list of candidates in the current buffer."
-  (split-string (with-temp-buffer
-                  (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)
-                  (buffer-string)) "\n"))
-
 (defun helm-semantic--maybe-set-needs-update ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))
@@ -112,14 +106,19 @@
         (semantic-parse-tree-set-needs-update)))))
 
 (defvar helm-source-semantic nil)
+(defvar helm-semantic-tags-string nil)
 
 (defclass helm-semantic-source (helm-source-sync)
   ((init :initform (lambda ()
-                     (helm-semantic--maybe-set-needs-update)
-                     (setq helm-semantic--tags-cache (semantic-fetch-tags))
-                     (with-current-buffer (helm-candidate-buffer 'global)
-                       (helm-semantic--fetch-candidates helm-semantic--tags-cache 0))))
-   (candidates :initform 'helm-semantic-get-candidates)
+                     (let ((m major-mode))
+                       (helm-semantic--maybe-set-needs-update)
+                       (setq helm-semantic--tags-cache (semantic-fetch-tags))
+                       (setq helm-semantic-tags-string (with-current-buffer (helm-candidate-buffer 'global)
+                                                         (setq major-mode m)
+                                                         (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)
+                                                         (buffer-string))))))
+   (candidates :initform (lambda ()
+                           (split-string helm-semantic-tags-string "\n")))
    (persistent-help :initform "Show this entry")
    (keymap :initform 'helm-semantic-map)
    (mode-line :initform helm-semantic-mode-line)
