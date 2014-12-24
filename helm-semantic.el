@@ -98,12 +98,6 @@
       (unless persistent
         (pulse-momentary-highlight-one-line (point))))))
 
-(defun helm-semantic-get-candidates ()
-  "Get a list of candidates in the current buffer."
-  (split-string (with-temp-buffer
-                  (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)
-                  (buffer-string)) "\n"))
-
 (defun helm-semantic--maybe-set-needs-update ()
   (with-helm-current-buffer
     (let ((tick (buffer-modified-tick)))
@@ -113,13 +107,14 @@
 
 (defvar helm-source-semantic nil)
 
-(defclass helm-semantic-source (helm-source-sync)
+(defclass helm-semantic-source (helm-source-in-buffer)
   ((init :initform (lambda ()
                      (helm-semantic--maybe-set-needs-update)
                      (setq helm-semantic--tags-cache (semantic-fetch-tags))
                      (with-current-buffer (helm-candidate-buffer 'global)
-                       (helm-semantic--fetch-candidates helm-semantic--tags-cache 0))))
-   (candidates :initform 'helm-semantic-get-candidates)
+                       (let ((major-mode (with-helm-current-buffer major-mode)))
+                         (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))))
+   (get-line :initform 'buffer-substring)
    (persistent-help :initform "Show this entry")
    (keymap :initform 'helm-semantic-map)
    (mode-line :initform helm-semantic-mode-line)
