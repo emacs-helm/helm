@@ -2776,7 +2776,7 @@ This function is used with sources build with `helm-source-sync'."
 (defsubst helm-score-candidate-for-pattern (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
 Score is calculated against number of contiguous matches found with PATTERN.
-If PATTERN is fully matched in CANDIDATE score a maximal score (100) is given.
+If PATTERN is fully matched in CANDIDATE a maximal score (100) is given.
 A bonus of one point is given when PATTERN prefix match CANDIDATE."
   (let* ((pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string candidate))
