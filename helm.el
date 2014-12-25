@@ -2788,6 +2788,13 @@ A bonus of one point is given when PATTERN prefix match CANDIDATE."
                                  pat-lookup str-lookup :test 'equal))))))
 
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional real-or-display)
+  "The sort function used for fuzzy-matching in helm.
+Sort CANDIDATES according to their score calculated by
+`helm-score-candidate-for-pattern'.
+When two candidates have the same score sort is made by length.
+Argument REAL-OR-DISPLAY define if sort is made on the real or the display
+part of candidate, if its value is 'display use the display part, any other value
+will use the real part."
   (if (string= helm-pattern "")
       candidates
       (let ((table-scr (make-hash-table :test 'equal)))
@@ -2821,8 +2828,9 @@ A bonus of one point is given when PATTERN prefix match CANDIDATE."
                         ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
-  "The default-function for sorting candidates in fuzzy matching.
-It is sorting on the display part of candidate."
+  "The default transformer for sorting candidates in fuzzy matching.
+It is sorting on the display part of candidate.
+See `helm-fuzzy-matching-default-sort-fn-1'."
   (helm-fuzzy-matching-default-sort-fn-1 candidates 'display))
 
 (defun helm-fuzzy-default-highlight-match (candidate)
