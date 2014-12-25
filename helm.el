@@ -2781,7 +2781,8 @@ A bonus of one point is given when PATTERN prefix match CANDIDATE."
   (let* ((pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string candidate))
          (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0))
-         (bonus1 (and (string-match (concat "\\<" pattern "\\>") candidate)
+         (bonus1 (and (string-match (concat "\\<" (regexp-quote pattern) "\\>")
+                                    candidate)
                       100)))
     (+ bonus (or bonus1 (length (cl-nintersection
                                  pat-lookup str-lookup :test 'equal))))))
