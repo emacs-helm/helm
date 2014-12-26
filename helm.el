@@ -4179,11 +4179,15 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
 
 (defun helm-candidates-in-buffer-search-from-start (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
-  (re-search-forward pattern nil t))
+  (condition-case _err
+      (re-search-forward pattern nil t)
+    (invalid-regexp nil)))
 
 (defun helm-candidates-in-buffer-search-from-end (pattern)
   "Search PATTERN with `re-search-backward' with bound and noerror args."
-  (re-search-backward pattern nil t))
+  (condition-case _err
+      (re-search-backward pattern nil t)
+    (invalid-regexp nil)))
 
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
                                     search-fns limit search-from-end
