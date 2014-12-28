@@ -157,8 +157,8 @@ You can get help on each command by persistent action."
                         when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
          (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
-         (helm-fuzzy-sort-fn (lambda (candidates _source)
-                               (funcall orig-fuzzy-sort-fn candidates _source 'real)))
+         (helm-fuzzy-sort-fn (lambda (candidates source)
+                               (funcall orig-fuzzy-sort-fn candidates source 'real)))
          (helm--mode-line-display-prefarg t)
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))
