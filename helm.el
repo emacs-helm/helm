@@ -2298,6 +2298,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                (unwind-protect
                     (minibuffer-with-setup-hook
                         #'(lambda ()
+                            (set-input-method (with-current-buffer helm-current-buffer current-input-method))
                             (setq timer (run-with-idle-timer
                                          (max helm-input-idle-delay 0.001) 'repeat
                                          #'(lambda ()
