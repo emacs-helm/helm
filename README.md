@@ -167,6 +167,23 @@ You can read [this guide](http://tuhdo.github.io/helm-intro.html) to quickly get
 
 You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
 
+#### Fuzzy matching
+
+Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
+
+- `helm-recentf`: Enabled by setting `helm-recentf-fuzzy-match` to `t`.
+- `helm-mini`: Enable by setting `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
+- `helm-buffers-list`: Enable by setting `helm-buffers-fuzzy-matching` to `t`.
+- `helm-find-files`: Enabled by default.
+- `helm-locate`: Enable by setting `helm-locate-fuzzy-match` to `t`.
+- `helm-M-x`: Enabled by setting `helm-M-x-fuzzy-match` to `t`.
+- `helm-semantic`: Enabled by setting `helm-semantic-fuzzy-match` to `t`.
+- `helm-imenu`: Enabled by setting `helm-imenu-fuzzy-match` to `t`.
+- `helm-apropos`: Enabled by setting `helm-apropos-fuzzy-match` to `t`.
+- `helm-lisp-completion-at-point`: Enabled by setting `helm-lisp-fuzzy-completion` to `t`.
+
+**IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` to high. It is recommended that you leave variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching.
+
 ## Known issues
 
 Check out the project's
