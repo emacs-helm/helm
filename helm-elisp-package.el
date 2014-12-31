@@ -38,7 +38,7 @@
     (with-current-buffer (get-buffer "*Packages*")
       (setq helm-el-package--tabulated-list tabulated-list-entries)
       (buffer-string)))
-  (setq helm-el-package--upgrades (helm-package-menu--find-upgrades))
+  (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
   (setq helm-el-package--show-only 'all)
   (kill-buffer "*Packages*"))
 
@@ -112,7 +112,7 @@
 (defun helm-el-package-uninstall (_candidate)
   (helm-el-package-uninstall-1 (helm-marked-candidates)))
 
-(defun helm-package-menu--find-upgrades ()
+(defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
            for status = (aref (cadr entry) 2)
@@ -131,6 +131,25 @@
                                                (cdr avail-pkg))))
                     collect avail-pkg)))
 
+(defun helm-el-package-upgrade ()
+  (when helm-el-package--upgrades
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
+      (when (y-or-n-p "Upgrade package(s)? ")
+        (cl-loop for p in helm-el-package--tabulated-list
+                 for pkg-desc = (car p)
+                 for upgrade = (cdr (assq (package-desc-name pkg-desc)
+                                          helm-el-package--upgrades))
+                 do
+                 (cond ((null upgrade)
+                        (ignore))
+                       ((equal pkg-desc upgrade)
+                        ;;Install.
+                        (package-install pkg-desc))
+                       (t
+                        ;; Delete.
+                        (package-delete pkg-desc))))))))
+
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
         for id = (get-text-property 0 'tabulated-list-id c)
@@ -148,6 +167,12 @@
                       (eq helm-el-package--show-only 'uninstalled)) 
                  (eq helm-el-package--show-only 'all))
         collect cand))
+
+(defun helm-el-package-show-upgrade ()
+  (interactive)
+  (with-helm-alive-p
+    (setq helm-el-package--show-only 'upgrade)
+    (helm-update)))
 
 (defun helm-el-package-show-installed ()
   (interactive)
@@ -171,7 +196,7 @@
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-I") 'helm-el-package-show-installed)
-    (define-key map (kbd "M-U") 'helm-el-package-show-uninstalled)
+    (define-key map (kbd "M-U") 'helm-el-package-show-upgrade)
     (define-key map (kbd "M-A") 'helm-el-package-show-all)
     (define-key map (kbd "C-c ?") 'helm-el-package-help)
     map))
