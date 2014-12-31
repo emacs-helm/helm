@@ -152,11 +152,15 @@
             collect (get-text-property 0 'tabulated-list-id c))))
 
 (defun helm-el-package-upgrade-all ()
-  (when helm-el-package--upgrades
-    (with-helm-display-marked-candidates
-      helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
-      (when (y-or-n-p "Upgrade all packages? ")
-        (helm-el-package-upgrade-1 helm-el-package--tabulated-list)))))
+  (if helm-el-package--upgrades
+      (with-helm-display-marked-candidates
+        helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
+        (when (y-or-n-p "Upgrade all packages? ")
+          (helm-el-package-upgrade-1 helm-el-package--tabulated-list)))
+      (message "No packages to upgrade actually!")))
+
+(defun helm-el-package-upgrade-all-action (_candidate)
+  (helm-el-package-upgrade-all))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
@@ -216,12 +220,20 @@
     (match-part . (lambda (c) (car (split-string c))))
     (filtered-candidate-transformer . helm-el-package--transformer)
     (candidates-in-buffer)
+    (action-transformer . (lambda (actions candidate)
+                            (let ((pkg-desc (get-text-property
+                                             0 'tabulated-list-id candidate)))
+                              (if (cdr (assq (package-desc-name pkg-desc)
+                                             helm-el-package--upgrades))
+                                  (append '(("Upgrade package" . helm-el-package-upgrade)) actions)
+                                  actions))))
     (mode-line . helm-el-package-mode-line)
     (keymap . ,helm-el-package-map)
     (candidate-number-limit . 9999)
     (action . (("Describe" . helm-el-package-describe)
                ("Install" . helm-el-package-install)
-               ("Uninstall" . helm-el-package-uninstall)))))
+               ("Uninstall" . helm-el-package-uninstall)
+               ("Upgrade all packages" . helm-el-package-upgrade-all-action)))))
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)
