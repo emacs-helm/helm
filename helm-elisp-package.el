@@ -24,6 +24,7 @@
 (defvar helm-el-package--show-only 'all)
 (defvar helm-el-package--initialized-p nil)
 (defvar helm-el-package--tabulated-list nil)
+(defvar helm-el-package--upgrades nil)
 
 (defun helm-el-package--init ()
   (when (null package-alist)
@@ -37,6 +38,7 @@
     (with-current-buffer (get-buffer "*Packages*")
       (setq helm-el-package--tabulated-list tabulated-list-entries)
       (buffer-string)))
+  (setq helm-el-package--upgrades (helm-package-menu--find-upgrades))
   (setq helm-el-package--show-only 'all)
   (kill-buffer "*Packages*"))
 
@@ -110,15 +112,37 @@
 (defun helm-el-package-uninstall (_candidate)
   (helm-el-package-uninstall-1 (helm-marked-candidates)))
 
+(defun helm-package-menu--find-upgrades ()
+  (cl-loop for entry in helm-el-package--tabulated-list
+           for pkg-desc = (car entry)
+           for status = (aref (cadr entry) 2)
+           when (member status '("installed" "unsigned"))
+           collect pkg-desc
+           into installed
+           when (member status '("available" "new"))
+           collect (cons (package-desc-name pkg-desc) pkg-desc)
+           into available
+           finally return
+           (cl-loop for pkg in installed
+                    for avail-pkg = (assq (package-desc-name pkg) available)
+                    when (and avail-pkg
+                              (version-list-< (package-desc-version pkg)
+                                              (package-desc-version
+                                               (cdr avail-pkg))))
+                    collect avail-pkg)))
+
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
-        for id = (get-text-property 0 'tabulated-list-id c) 
-        for installed-p = (assq (if (fboundp 'package-desc-name)
-                                    (package-desc-name id)
-                                  (car id))
-                                package-alist)
+        for id = (get-text-property 0 'tabulated-list-id c)
+        for name = (if (fboundp 'package-desc-name)
+                       (package-desc-name id)
+                       (car id))
+        for installed-p = (assq name package-alist)
+        for upgrade-p = (assq name helm-el-package--upgrades)
         for cand = (cons c (car (split-string c)))
-        when (or (and installed-p
+        when (or (and upgrade-p
+                      (eq helm-el-package--show-only 'upgrade))
+                 (and installed-p
                       (eq helm-el-package--show-only 'installed))
                  (and (not installed-p)
                       (eq helm-el-package--show-only 'uninstalled)) 
