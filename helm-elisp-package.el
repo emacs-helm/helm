@@ -131,7 +131,7 @@
                                                (cdr avail-pkg))))
                     collect avail-pkg)))
 
-(defun helm-el-package-upgrade ()
+(defun helm-el-package-upgrade-all ()
   (when helm-el-package--upgrades
     (with-helm-display-marked-candidates
       helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
