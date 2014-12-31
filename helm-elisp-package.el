@@ -23,6 +23,7 @@
 ;; internals vars
 (defvar helm-el-package--show-only 'all)
 (defvar helm-el-package--initialized-p nil)
+(defvar helm-el-package--tabulated-list nil)
 
 (defun helm-el-package--init ()
   (when (null package-alist)
@@ -34,6 +35,7 @@
   (helm-init-candidates-in-buffer
       'global
     (with-current-buffer (get-buffer "*Packages*")
+      (setq helm-el-package--tabulated-list tabulated-list-entries)
       (buffer-string)))
   (setq helm-el-package--show-only 'all)
   (kill-buffer "*Packages*"))
@@ -44,8 +46,8 @@
                           (package-desc-name id)
                         (car id)))))
 
-(defun helm-el-package-install (_candidate)
-  (cl-loop with mkd = (helm-marked-candidates)
+(defun helm-el-package-install-1 (pkg-list)
+  (cl-loop with mkd = pkg-list
         for p in mkd
         for id = (get-text-property 0 'tabulated-list-id p)
         do (package-install
@@ -65,8 +67,11 @@
                                       (length installed-list)
                                       (mapconcat 'symbol-name installed-list ", "))))))
 
-(defun helm-el-package-uninstall (_candidate)
-  (cl-loop with mkd = (helm-marked-candidates)
+(defun helm-el-package-install (_candidate)
+  (helm-el-package-install-1 (helm-marked-candidates)))
+
+(defun helm-el-package-uninstall-1 (pkg-list)
+  (cl-loop with mkd = pkg-list
         for p in mkd
         for id = (get-text-property 0 'tabulated-list-id p)
         do
@@ -101,6 +106,9 @@
                      (cl-loop for p in package-alist
                            when (assq (symbol-name (car p)) delete-list)
                            do (setq package-alist (delete p package-alist))))))
+
+(defun helm-el-package-uninstall (_candidate)
+  (helm-el-package-uninstall-1 (helm-marked-candidates)))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
