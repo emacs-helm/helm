@@ -131,12 +131,8 @@
                                                (cdr avail-pkg))))
                     collect avail-pkg)))
 
-(defun helm-el-package-upgrade-all ()
-  (when helm-el-package--upgrades
-    (with-helm-display-marked-candidates
-      helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
-      (when (y-or-n-p "Upgrade package(s)? ")
-        (cl-loop for p in helm-el-package--tabulated-list
+(defun helm-el-package-upgrade-1 (pkg-list)
+  (cl-loop for p in pkg-list
                  for pkg-desc = (car p)
                  for upgrade = (cdr (assq (package-desc-name pkg-desc)
                                           helm-el-package--upgrades))
@@ -148,7 +144,19 @@
                         (package-install pkg-desc))
                        (t
                         ;; Delete.
-                        (package-delete pkg-desc))))))))
+                        (package-delete pkg-desc)))))
+
+(defun helm-el-package-upgrade (_candidate)
+  (helm-el-package-upgrade
+   (cl-loop for c in (helm-marked-candidates)
+            collect (get-text-property 0 'tabulated-list-id c))))
+
+(defun helm-el-package-upgrade-all ()
+  (when helm-el-package--upgrades
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name (mapcar 'car helm-el-package--upgrades)
+      (when (y-or-n-p "Upgrade all packages? ")
+        (helm-el-package-upgrade-1 helm-el-package--tabulated-list)))))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
