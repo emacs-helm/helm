@@ -133,23 +133,26 @@
 
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
-                 for pkg-desc = (car p)
-                 for upgrade = (cdr (assq (package-desc-name pkg-desc)
-                                          helm-el-package--upgrades))
-                 do
-                 (cond ((null upgrade)
-                        (ignore))
-                       ((equal pkg-desc upgrade)
-                        ;;Install.
-                        (package-install pkg-desc))
-                       (t
-                        ;; Delete.
-                        (package-delete pkg-desc)))))
+           for pkg-desc = (car p)
+           for upgrade = (cdr (assq (package-desc-name pkg-desc)
+                                    helm-el-package--upgrades))
+           do
+           (cond ((null upgrade)
+                  (ignore))
+                 ((equal pkg-desc upgrade)
+                  ;;Install.
+                  (package-install pkg-desc))
+                 (t
+                  ;; Delete.
+                  (package-delete pkg-desc)))))
 
 (defun helm-el-package-upgrade (_candidate)
   (helm-el-package-upgrade-1
-   (cl-loop for c in (helm-marked-candidates)
-            collect (get-text-property 0 'tabulated-list-id c))))
+   (cl-loop with pkgs = (helm-marked-candidates)
+            for p in helm-el-package--tabulated-list
+            for pkg = (car p)
+            if (member (symbol-name (package-desc-name pkg)) pkgs)
+            collect p)))
 
 (defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
