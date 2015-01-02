@@ -1463,6 +1463,11 @@ of a source is deleted without updating the source."
                 (helm-pos-header-line-p))
               (bobp))))))
 
+(defun helm-symbol-name (obj)
+  (if (or (consp obj) (byte-code-function-p obj))
+      "Anonymous"
+      (symbol-name obj)))
+
 
 ;; Core: tools
 (defun helm-current-line-contents ()
@@ -4356,7 +4361,9 @@ Returns the resulting buffer."
       (erase-buffer)
       (if (listp data)
           (cl-loop for i in data
-                   for str = (if (symbolp i) (symbol-name i) i)
+                   for str = (cond ((symbolp i) (symbol-name i))
+                                   ((numberp i) (number-to-string i))
+                                   (t i))
                    do (insert (concat str "\n")))
         (and (stringp data) (insert data))))
     buf))
