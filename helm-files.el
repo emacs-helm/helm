@@ -1555,7 +1555,8 @@ purpose."
                    ;; "Invalid tramp file name" is now printed
                    ;; in `helm-buffer'.
                    (list path))))
-          ((or (file-regular-p path)
+          ((or (and (file-regular-p path)
+                    (eq last-repeatable-command 'helm-execute-persistent-action))
                ;; `ffap-url-regexp' don't match until url is complete.
                (string-match helm-ff-url-regexp path)
                invalid-basedir
@@ -2045,10 +2046,10 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
              (setq helm-ff-last-expanded helm-ff-default-directory))
            (funcall insert-in-minibuffer (file-name-as-directory
                                           (expand-file-name candidate))))
-          ;; A symlink file, expand to it's true name. (cl-first hit)
+          ;; A symlink file, expand to it's true name. (first hit)
           ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
            (funcall insert-in-minibuffer (file-truename candidate)))
-          ;; A regular file, expand it, (cl-first hit)
+          ;; A regular file, expand it, (first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
            (funcall insert-in-minibuffer new-pattern))
           ;; An image file and it is the second hit on C-j,
