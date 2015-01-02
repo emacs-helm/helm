@@ -594,9 +594,7 @@ Don't use it directly, use instead `helm-comp-read' in your programs.
 
 See documentation of `completing-read' and `all-completions' for details."
   (let* ((current-command (or (helm-this-command) this-command))
-         (str-command     (if (consp current-command) ; Maybe a lambda.
-                              "Anonymous"
-                            (symbol-name current-command)))
+         (str-command     (helm-symbol-name current-command))
          (buf-name        (format "*helm-mode-%s*" str-command))
          (entry           (assq current-command
                                 helm-completing-read-handlers-alist))
@@ -837,9 +835,7 @@ Keys description:
 Don't use it directly, use instead `helm-read-file-name' in your programs."
   (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
-         (str-command (if (consp current-command) ; Maybe a lambda.
-                          "Anonymous"
-                          (symbol-name current-command)))
+         (str-command (helm-symbol-name current-command))
          (helm-file-completion-sources
           (cons str-command
                 (remove str-command helm-file-completion-sources)))
