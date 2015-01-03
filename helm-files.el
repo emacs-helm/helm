@@ -1832,34 +1832,37 @@ return FNAME prefixed with [?]."
           ((or new-file (not (file-exists-p fname)))
            (concat prefix-new " " fname)))))
 
+(defun helm-ff-score-candidate-for-pattern (str pattern)
+  (if (member str '("." ".."))
+      200
+      (helm-score-candidate-for-pattern str pattern)))
+
 (defun helm-ff-sort-candidates (candidates _source)
   "Sort function for `helm-source-find-files'.
 Return candidates prefixed with basename of `helm-input' first."
-  (if (or (file-directory-p helm-input)
-          (null candidates))
+  (if (null candidates)
       candidates
-    (let* ((c1        (car candidates))
-           (cand1real (if (consp c1) (cdr c1) c1))
-           (cand1     (unless (file-exists-p cand1real)
-                        c1))
-           (rest-cand (if cand1 (cdr candidates) candidates))
-           (memo-src  (make-hash-table :test 'equal))
-           (all (sort rest-cand
-                      #'(lambda (s1 s2)
-                          (let* ((score (lambda (str)
-                                          (helm-score-candidate-for-pattern
-                                           str (helm-basename helm-input))))
-                                 (bn1 (helm-basename (if (consp s1) (cdr s1) s1)))
-                                 (bn2 (helm-basename (if (consp s2) (cdr s2) s2)))
-                                 (sc1 (or (gethash bn1 memo-src)
-                                          (puthash bn1 (funcall score bn1) memo-src)))
-                                 (sc2 (or (gethash bn2 memo-src)
-                                          (puthash bn2 (funcall score bn2) memo-src))))
-                            (cond ((= sc1 sc2)
-                                   (< (string-width bn1)
-                                      (string-width bn2)))
-                                  ((> sc1 sc2))))))))
-      (if cand1 (cons cand1 all) all))))
+      (let* ((c1        (car candidates))
+             (cand1real (if (consp c1) (cdr c1) c1))
+             (cand1     (unless (file-exists-p cand1real) c1))
+             (rest-cand (if cand1 (cdr candidates) candidates))
+             (memo-src  (make-hash-table :test 'equal))
+             (all (sort rest-cand
+                        #'(lambda (s1 s2)
+                            (let* ((score (lambda (str)
+                                            (helm-ff-score-candidate-for-pattern
+                                             str (helm-basename helm-input))))
+                                   (bn1 (helm-basename (if (consp s1) (cdr s1) s1)))
+                                   (bn2 (helm-basename (if (consp s2) (cdr s2) s2)))
+                                   (sc1 (or (gethash bn1 memo-src)
+                                            (puthash bn1 (funcall score bn1) memo-src)))
+                                   (sc2 (or (gethash bn2 memo-src)
+                                            (puthash bn2 (funcall score bn2) memo-src))))
+                              (cond ((= sc1 sc2)
+                                     (< (string-width bn1)
+                                        (string-width bn2)))
+                                    ((> sc1 sc2))))))))
+        (if cand1 (cons cand1 all) all))))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
