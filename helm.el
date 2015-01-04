@@ -458,7 +458,9 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
 That is one window to display `helm-buffer' and one to display
 `helm-current-buffer'.
 Note: this have no effect when `helm-split-window-in-side-p' is non--nil,
-or when `helm-split-window-default-side' is set to 'same."
+or when `helm-split-window-default-side' is set to 'same.
+When `helm-autoresize-mode' is enabled, setting this to nil
+will have no effect until this mode will be disabled."
   :group 'helm
   :type 'boolean)
 
@@ -5023,6 +5025,8 @@ This happen after `helm-input-idle-delay' secs."
     "Auto resize helm window when enabled.
 Helm window is resized according to values of `helm-autoresize-max-height'
 and `helm-autoresize-min-height'.
+Note that when this mode is enabled, helm behave like when
+`helm-always-two-windows' is enabled.
 
 See `fit-window-to-buffer' for more infos."
   :group 'helm
