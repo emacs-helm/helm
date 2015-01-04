@@ -49,6 +49,20 @@ one match."
   :type 'boolean
   :group 'helm-tags)
 
+
+(defgroup helm-tags-faces nil
+  "Customize the appearance of helm-tags faces."
+  :prefix "helm-"
+  :group 'helm-tags
+  :group 'helm-faces)
+
+(defface helm-etags-file
+    '((t (:foreground "Lightgoldenrod4"
+          :underline t)))
+  "Face used to highlight etags filenames."
+  :group 'helm-tags-faces)
+
+
 (defun helm-etags-run-switch-other-window ()
   "Run switch to other window action from `helm-source-etags-select'."
   (interactive)
@@ -200,7 +214,8 @@ If not found in CURRENT-DIR search in upper directory."
                           (substring i 0 it)
                         i))
           do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
-                    (setq fname (match-string 1 elm)))
+                    (setq fname (propertize (match-string 1 elm)
+                                            'face 'helm-etags-file)))
                    (elm (setq cand (concat fname ": " elm)))
                    (t (setq cand nil)))
           when cand do (progn
@@ -239,6 +254,7 @@ If no entry in cache, create one."
     (header-name . helm-etags-get-header-name)
     (init . helm-etags-init)
     (candidates-in-buffer)
+    (get-line . buffer-substring)
     (match-part . (lambda (candidate)
                     ;; Match only the tag part of CANDIDATE
                     ;; and not the filename.
