@@ -1124,6 +1124,9 @@ Not complete.
 
 You can have infos about helm on Github.
  <https://github.com/emacs-helm/helm>
+ 
+ And a very detailed tutorial about the possibilities of Helm by the user Tuhdo:
+  <http://tuhdo.github.io/helm-intro.html>
 
 You can ask on the helm mailing-list by subscribing at:
  <https://groups.google.com/group/emacs-helm?hl=en>
