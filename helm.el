@@ -524,6 +524,21 @@ When nil no highlighting will be done."
   :group 'helm
   :type 'function)
 
+(defcustom helm-autoresize-max-height 20
+  "Specifies a maximum height and defaults to the height of helm window's frame.
+
+See `fit-window-to-buffer' for more infos."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-autoresize-min-height nil
+  "Specifies a minimum height and defaults to the height of helm window's frame.
+
+If nil the default of `window-min-height' is used
+See `fit-window-to-buffer' for more infos."
+  :group 'helm
+  :type 'integer)
+
 
 ;;; Faces
 ;;
@@ -2063,7 +2078,7 @@ It uses `switch-to-buffer' or `pop-to-buffer' depending of value of
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
       (progn (delete-other-windows) (switch-to-buffer buffer))
-    (when (and helm-always-two-windows
+    (when (and (or helm-always-two-windows helm-autoresize-mode)
                (not (eq helm-split-window-default-side 'same))
                (not (minibufferp helm-current-buffer))
                (not helm-split-window-in-side-p))
@@ -4994,6 +5009,27 @@ This happen after `helm-input-idle-delay' secs."
          (helm-get-selection)
          (save-excursion
            (helm-execute-persistent-action)))))
+
+
+;;; Auto-resize mode
+;;
+(defun helm--autoresize-hook ()
+  (with-helm-window
+    (fit-window-to-buffer
+     nil helm-autoresize-max-height
+     helm-autoresize-min-height)))
+
+(define-minor-mode helm-autoresize-mode
+    "Auto resize helm window when enabled.
+Helm window is resized according to values of `helm-autoresize-max-height'
+and `helm-autoresize-min-height'.
+
+See `fit-window-to-buffer' for more infos."
+  :group 'helm
+  :global t
+  (if helm-autoresize-mode
+      (add-hook 'helm-after-update-hook 'helm--autoresize-hook)
+      (remove-hook 'helm-after-update-hook 'helm--autoresize-hook)))
 
 
 (provide 'helm)
