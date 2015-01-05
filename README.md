@@ -199,7 +199,7 @@ You can customize the minimum and maximum height that Helm can resize with these
 - `helm-autoresize-max-height`
 - `helm-autoresize-min-height`
 
-By default, `helm-autoresize-max-height` is set to 20, which Helm candidate buffer has the maximum height of 20 lines. Note that the top two lines are used by Helm and one line is used for the modeline at the bottom, so that only 17 candidates can be displayed. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
+By default, `helm-autoresize-max-height` is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
 
 If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-max-height` equal to `helm-autoresize-max-height`.
 
