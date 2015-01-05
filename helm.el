@@ -526,15 +526,15 @@ When nil no highlighting will be done."
   :group 'helm
   :type 'function)
 
-(defcustom helm-autoresize-max-height 20
-  "Specifies a maximum height and defaults to the height of helm window's frame.
+(defcustom helm-autoresize-max-height 40
+  "Specifies a maximum height and defaults to the height of helm window's frame in percentage.
 
 See `fit-window-to-buffer' for more infos."
   :group 'helm
   :type 'integer)
 
-(defcustom helm-autoresize-min-height nil
-  "Specifies a minimum height and defaults to the height of helm window's frame.
+(defcustom helm-autoresize-min-height 10
+  "Specifies a minimum height and defaults to the height of helm window's frame in percentage.
 
 If nil the default of `window-min-height' is used
 See `fit-window-to-buffer' for more infos."
@@ -5017,9 +5017,11 @@ This happen after `helm-input-idle-delay' secs."
 ;;
 (defun helm--autoresize-hook ()
   (with-helm-window
-    (fit-window-to-buffer
-     nil helm-autoresize-max-height
-     helm-autoresize-min-height)))
+    (fit-window-to-buffer nil
+                          (/ (* (frame-height) helm-autoresize-max-height)
+                             100)
+                          (/ (* (frame-height) helm-autoresize-min-height)
+                             100))))
 
 (define-minor-mode helm-autoresize-mode
     "Auto resize helm window when enabled.
