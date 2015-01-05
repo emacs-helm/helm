@@ -105,7 +105,6 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
   "Return next elm of ITERATOR."
   (funcall iterator))
 
-;;;###autoload
 (helm-multi-key-defun helm-toggle-resplit-and-swap-windows
     "Multi key command to resplit and swap helm window.
 First call run `helm-toggle-resplit-window',
