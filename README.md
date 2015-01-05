@@ -184,6 +184,25 @@ Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy mat
 
 **IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` to high. It is recommended that you leave variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching.
 
+#### Autoresize
+
+Helm can now resize according to the number of candidates with `helm-autoresize-mode`:
+
+    (helm-autoresize-mode 1)
+
+Here is a demo:
+
+![helm-buffers-list](doc/helm-autoresize-mode.gif)
+
+You can customize the minimum and maximum height that Helm can resize with these two variable:
+
+- `helm-autoresize-max-height`
+- `helm-autoresize-min-height`
+
+By default, `helm-autoresize-max-height` is set to 20, which Helm candidate buffer has the maximum height of 20 lines. Note that the top two lines are used by Helm and one line is used for the modeline at the bottom, so that only 17 candidates can be displayed. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
+
+If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-max-height` equal to `helm-autoresize-max-height`.
+
 ## Known issues
 
 Check out the project's
