@@ -880,9 +880,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
             :candidate-number-limit 9999
             :nohighlight t
             :mode-line helm-grep-mode-line-string
-            ;; We need to specify keymap here and as :keymap arg [1]
-            ;; to make it available in further resuming.
-            :keymap helm-grep-map
             :history 'helm-grep-history
             :action (helm-make-actions
                      "Find File" 'helm-grep-action
@@ -900,7 +897,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
      :sources 'helm-source-grep
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
      :default-directory helm-ff-default-directory
-     :keymap helm-grep-map ; [1]
+     :keymap helm-grep-map
      :history 'helm-grep-history
      :truncate-lines t)))
 

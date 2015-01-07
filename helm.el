@@ -638,12 +638,16 @@ See also `helm-set-source-filter'.")
 
 (defvar helm-before-initialize-hook nil
   "Run before helm initialization.
-This hook is run before init functions in `helm-sources'.")
+This hook is run before init functions in `helm-sources',
+that is before creation of `helm-buffer'.
+Local variables for `helm-buffer' that need a value from `current-buffer'
+can be set here with `helm-set-local-variable'.")
 
 (defvar helm-after-initialize-hook nil
   "Run after helm initialization.
-Global variables are initialized and the helm buffer is created.
-But the helm buffer has no contents.")
+This hook run inside `helm-buffer' once created.
+Variables are initialized and the `helm-buffer' is created.
+But the `helm-buffer' has no contents.")
 
 (defvar helm-update-hook nil
   "Run after the helm buffer was updated according the new input pattern.
@@ -2173,6 +2177,9 @@ It is intended to use this only in `helm-initial-setup'."
   (cl-loop for s in (helm-get-sources)
            for hook = (assoc-default 'before-init-hook s)
            when hook do (helm-log-run-hook hook))
+  ;; For initialization of helm locals vars that need
+  ;; a value from current buffer, it is here.
+  (helm-set-local-variable 'current-input-method current-input-method)
   (setq helm-current-prefix-arg nil)
   (setq helm-suspend-update-flag nil)
   (setq helm-current-buffer (helm--current-buffer))
