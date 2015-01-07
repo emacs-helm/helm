@@ -2334,7 +2334,10 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                (unwind-protect
                     (minibuffer-with-setup-hook
                         #'(lambda ()
+                            ;; Start minor-mode with global value of helm-map.
                             (helm-minor-mode 1)
+                            ;; Now overhide the global value of helm-map with
+                            ;; the local one.
                             (setq minor-mode-overriding-map-alist
                                   `((helm-minor-mode
                                      . ,(with-helm-buffer helm-map))))
