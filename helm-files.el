@@ -419,7 +419,6 @@ Should not be used among other sources.")
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (mode-line :initform helm-ff-mode-line-string)
    (volatile :initform t)
-   (keymap :initform helm-find-files-map)
    (nohighlight :initform t)
    (candidate-number-limit
     :initform 9999)

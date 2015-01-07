@@ -394,7 +394,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                  (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                          :persistent-action persistent-action
                          :persistent-help persistent-help
-                         :keymap loc-map
                          :mode-line mode-line
                          :action action-fn))
            (src (helm-build-sync-source name
@@ -404,7 +403,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :persistent-action persistent-action
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
-                  :keymap loc-map
                   :mode-line mode-line
                   :action action-fn))
            (src-1 (helm-build-in-buffer-source name
@@ -414,7 +412,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
                     :persistent-help persistent-help
-                    :keymap loc-map
                     :mode-line mode-line
                     :action action-fn))
            (src-list (list src-hist
@@ -763,7 +760,6 @@ Keys description:
                                                helm-find-files-doc-header)))
                       (mode-line . ,mode-line)
                       (candidates . ,hist)
-                      (keymap . ,cmap)
                       (persistent-action . ,persistent-action)
                       (persistent-help . ,persistent-help)
                       (action . ,action-fn))
@@ -792,7 +788,6 @@ Keys description:
                                      (helm-find-files-get-candidates ',must-match)))))
                       (filtered-candidate-transformer . helm-ff-sort-candidates)
                       (filter-one-by-one . helm-ff-filter-candidate-one-by-one)
-                      (keymap . ,cmap)
                       (persistent-action . ,persistent-action)
                       (candidate-number-limit . 9999)
                       (persistent-help . ,persistent-help)
@@ -805,6 +800,7 @@ Keys description:
                              src-list)
                   :input initial-input
                   :prompt prompt
+                  :keymap cmap
                   :resume 'noresume
                   :case-fold-search case-fold
                   :default default
