@@ -2251,12 +2251,15 @@ It is intended to use this only in `helm-initial-setup'."
     (helm-initialize-overlays helm-buffer)
     (get-buffer helm-buffer)))
 
-(define-minor-mode helm-minor-mode
-    "Enable keymap in helm minibuffer.
+(define-minor-mode helm--minor-mode
+    "[INTERNAL] Enable keymap in helm minibuffer.
+This mode have no effect when run outside of helm context.
+Please don't use it.
 
 \\{helm-map}"
   :group 'helm
-  :keymap helm-map)
+  :keymap (and helm-alive-p helm-map)
+  (unless helm-alive-p (setq helm--minor-mode nil)))
 
 (defun helm-read-pattern-maybe (any-prompt any-input
                                 any-preselect any-resume any-keymap
@@ -2335,11 +2338,11 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                     (minibuffer-with-setup-hook
                         #'(lambda ()
                             ;; Start minor-mode with global value of helm-map.
-                            (helm-minor-mode 1)
+                            (helm--minor-mode 1)
                             ;; Now overhide the global value of helm-map with
                             ;; the local one.
                             (setq minor-mode-overriding-map-alist
-                                  `((helm-minor-mode
+                                  `((helm--minor-mode
                                      . ,(with-helm-buffer helm-map))))
                             (setq timer (run-with-idle-timer
                                          (max helm-input-idle-delay 0.001) 'repeat
@@ -2437,7 +2440,7 @@ If no map is found in current source do nothing (keep previous map)."
   (with-helm-window
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
         (with-current-buffer (window-buffer (minibuffer-window))
-          (setq minor-mode-overriding-map-alist `((helm-minor-mode . ,it)))))))
+          (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
 
 
 ;; Core: clean up
