@@ -830,24 +830,14 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
   "\n* Helm elisp package\n
 \n** Helm elisp package tips:
 *** Upgrade elisp packages
-Upgrading is not yet implemented, but you can easily achieve this task like this:
 
-1) Show only installed packages
-   You should see two versions of package(s) if a new version
-   is available.
-2) Delete the installed package(s) version (Mark them and delete).
-3) Run `helm-resume' [1]
-4) Install the new package(s) version not already installed (Mark them and install).
+To see upgradables packages hit <M-U>.
 
-So if for example you have bound helm-resume to `f1', you can do:
-
-1) Mark the installed package(s) version and hit `f3'.
-2) Hit `f1'.[1]
-3) Mark the new package(s) version not already installed and hit `f2'.
-
-**** NOTE [1]: If you restart `helm-list-elisp-packages' instead of using `helm-resume'
-you will NOT see anymore the packages to install and you will have to retrieve them
-manually, which can be a pain if you have many.
+Then you can install all upgradables packages with the upgrade all action,
+or upgrade only the specific packages by marking them (the new ones) and running
+the upgrade action (visible only when there is upgradables packages).
+Of course you can upgrade a single package by just running the upgrade action
+without marking it.
 
 \n** Specific commands for Helm elisp package:\n
 \\<helm-el-package-map>
