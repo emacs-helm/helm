@@ -783,7 +783,9 @@ On Windows you should use Everything program that mimics locate, it is very
 fast and you don't need to update database manually. To use with
 helm-locate, you will need his command line named `es`. Be sure to
 modify the PATH environment variable, to include path to the directory
-that contain `es`.
+that contain `es`. And be sure too that helm-locate-fuzzy-match is unset. Or 
+Everything will not give any results. 
+
 
 # Helm findutils
 
