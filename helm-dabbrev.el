@@ -59,7 +59,7 @@ no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
   :group 'helm-dabbrev
   :type 'integer)
 
-(defcustom helm-dabbrev-cycle-thresold nil
+(defcustom helm-dabbrev-cycle-threshold nil
   "Number of time helm-dabbrev cycle before displaying helm completion.
 When nil or 0 disable cycling."
   :group 'helm-dabbrev
@@ -237,8 +237,8 @@ but the initial search for all candidates in buffer(s)."
   (let ((dabbrev (helm-thing-before-point nil helm-dabbrev--regexp))
         (limits (helm-bounds-of-thing-before-point helm-dabbrev--regexp))
         (enable-recursive-minibuffers t)
-        (cycling-disabled-p (or (null helm-dabbrev-cycle-thresold)
-                                (zerop helm-dabbrev-cycle-thresold)))
+        (cycling-disabled-p (or (null helm-dabbrev-cycle-threshold)
+                                (zerop helm-dabbrev-cycle-threshold)))
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
          #'(lambda ()
@@ -268,13 +268,13 @@ but the initial search for all candidates in buffer(s)."
                                        collect i into selection
                                        when (and selection
                                                  (= (length selection)
-                                                    helm-dabbrev-cycle-thresold))
+                                                    helm-dabbrev-cycle-threshold))
                                        ;; When selection len reach
-                                       ;; `helm-dabbrev-cycle-thresold'
+                                       ;; `helm-dabbrev-cycle-threshold'
                                        ;; return selection.
                                        return selection
                                        ;; selection len never reach
-                                       ;; `helm-dabbrev-cycle-thresold'
+                                       ;; `helm-dabbrev-cycle-threshold'
                                        ;; return selection.
                                        finally return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
