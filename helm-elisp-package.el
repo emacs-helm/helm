@@ -217,32 +217,36 @@
     (define-key map (kbd "C-c ?") 'helm-el-package-help)
     map))
 
-(defvar helm-source-list-el-package
-  `((name . "list packages")
-    (init . helm-el-package--init)
-    (get-line . buffer-substring)
-    (match-part . (lambda (c) (car (split-string c))))
-    (filtered-candidate-transformer . helm-el-package--transformer)
-    (candidates-in-buffer)
-    (action-transformer . (lambda (actions candidate)
-                            (let ((pkg-desc (get-text-property
-                                             0 'tabulated-list-id candidate)))
-                              (if (cdr (assq (package-desc-name pkg-desc)
-                                             helm-el-package--upgrades))
-                                  (append '(("Upgrade package" . helm-el-package-upgrade)) actions)
-                                  actions))))
-    (mode-line . helm-el-package-mode-line)
-    (keymap . ,helm-el-package-map)
-    (candidate-number-limit . 9999)
-    (action . (("Describe" . helm-el-package-describe)
-               ("Install" . helm-el-package-install)
-               ("Uninstall" . helm-el-package-uninstall)
-               ("Upgrade all packages" . helm-el-package-upgrade-all-action)))))
+(defvar helm-source-list-el-package nil)
+(defclass helm-list-el-package-source (helm-source-in-buffer)
+  ((init :initform 'helm-el-package--init)
+   (get-line :initform 'buffer-substring)
+   (match-part :initform (lambda (c) (car (split-string c))))
+   (filtered-candidate-transformer :initform 'helm-el-package--transformer)
+   (action-transformer
+    :initform
+    (lambda (actions candidate)
+      (let ((pkg-desc (get-text-property
+                       0 'tabulated-list-id candidate)))
+        (if (cdr (assq (package-desc-name pkg-desc)
+                       helm-el-package--upgrades))
+            (append '(("Upgrade package" . helm-el-package-upgrade)) actions)
+            actions))))
+   (mode-line :initform helm-el-package-mode-line)
+   (keymap :initform helm-el-package-map)
+   (candidate-number-limit :initform 9999)
+   (action :initform '(("Describe" . helm-el-package-describe)
+                       ("Install" . helm-el-package-install)
+                       ("Uninstall" . helm-el-package-uninstall)
+                       ("Upgrade all packages" . helm-el-package-upgrade-all-action)))))
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)
   (interactive "P")
   (when arg (setq helm-el-package--initialized-p nil))
+  (unless helm-source-list-el-package
+    (setq helm-source-list-el-package
+          (helm-make-source "list packages" 'helm-list-el-package-source)))
   (helm :sources 'helm-source-list-el-package
         :buffer "*helm list packages*"))
 
