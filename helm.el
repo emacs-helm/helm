@@ -2816,7 +2816,7 @@ This function is used with sources build with `helm-source-sync'."
            when (cdr str)
            collect (list (car str) (cadr str))))
 
-(defsubst helm-score-candidate-for-pattern (candidate pattern)
+(defun helm-score-candidate-for-pattern (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
 Score is calculated against number of contiguous matches found with PATTERN.
 If PATTERN is fully matched in CANDIDATE a maximal score (100) is given.
