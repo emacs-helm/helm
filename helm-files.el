@@ -258,6 +258,11 @@ Note that this will be much slower."
   "Face used for directories in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-dotted-directory
+    '((t (:foreground "black" :background "DimGray")))
+  "Face used for directories in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-symlink
     '((t (:foreground "DarkOrange")))
   "Face used for symlinks in `helm-find-files'."
@@ -1914,6 +1919,11 @@ Return candidates prefixed with basename of `helm-input' first."
               ((stringp type)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-symlink) t)
+                     file))
+              ;; A dotted directory.
+              ((and (eq t type) (helm-ff-dot-file-p file))
+               (cons (helm-ff-prefix-filename
+                      (propertize disp 'face 'helm-ff-dotted-directory) t)
                      file))
               ;; A directory.
               ((eq t type)
