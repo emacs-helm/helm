@@ -1267,8 +1267,11 @@ or hitting C-j on \"..\"."
                  (helm-get-selection))
       (unless (or (and (string-match helm-tramp-file-name-regexp it)
                        (not (file-remote-p it nil t)))
-                  (file-exists-p it))
-        (helm-next-line))))
+                  (and (file-exists-p it)
+                       (null (helm-ff-dot-file-p it))))
+        (helm-next-line)
+        (while (helm-ff-dot-file-p (helm-get-selection))
+          (helm-next-line)))))
 (add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
 ;;; Auto-update - helm-find-files auto expansion of directories.
