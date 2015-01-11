@@ -1004,7 +1004,7 @@ not `exit-minibuffer' or unwanted functions."
 
 (defun helm-window ()
   "Window of `helm-buffer'."
-  (get-buffer-window (helm-buffer-get) 'visible))
+  (get-buffer-window (helm-buffer-get) 0))
 
 (defun helm-action-window ()
   "Window of `helm-action-buffer'."
@@ -1013,8 +1013,12 @@ not `exit-minibuffer' or unwanted functions."
 (defmacro with-helm-window (&rest body)
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
-  `(with-selected-window (helm-window)
-     ,@body))
+  `(let ((frame (if (minibufferp helm-current-buffer)
+                    (selected-frame)
+                  (last-nonminibuffer-frame))))
+     (with-selected-window (helm-window)
+       (select-frame-set-input-focus frame)
+       ,@body)))
 
 (defmacro with-helm-current-buffer (&rest body)
   "Eval BODY inside `helm-current-buffer'."
