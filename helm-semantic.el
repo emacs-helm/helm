@@ -109,6 +109,7 @@
 
 (defclass helm-semantic-source (helm-source-in-buffer)
   ((init :initform (lambda ()
+                     (semantic-mode 1)
                      (helm-semantic--maybe-set-needs-update)
                      (setq helm-semantic--tags-cache (semantic-fetch-tags))
                      (with-current-buffer (helm-candidate-buffer 'global)
