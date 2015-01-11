@@ -168,19 +168,29 @@ text to be displayed in BUFNAME."
       (setq helm-suspend-update-flag nil)
       (set-frame-configuration winconf))))
 
+(defun helm-help-scroll-up (amount)
+  (condition-case _err
+      (scroll-up-command amount)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-scroll-down (amount)
+  (condition-case _err
+      (scroll-down-command amount)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
-                 "[SPC,C-v,down:NextPage  b,M-v,up:PrevPage]"
+                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage q:Quit]"
                  'face 'helm-helper))
-        (scroll-error-top-bottom t))
-    (condition-case _err
-        (cl-loop for event = (read-key prompt) do
-              (cl-case event
-                ((?\C-v ? down) (scroll-up-command helm-scroll-amount))
-                ((?\M-v ?b up)  (scroll-down-command helm-scroll-amount))
-                (t (cl-return))))
-      (beginning-of-buffer (message "Beginning of buffer"))
-      (end-of-buffer       (message "End of Buffer")))))
+        scroll-error-top-bottom)
+    (cl-loop for event = (read-key prompt) do
+             (cl-case event
+               ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
+               ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
+               (?q (cl-return))
+               (t (ignore))))))
 
 ;;;###autoload
 (defun helm-help ()
