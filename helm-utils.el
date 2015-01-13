@@ -672,8 +672,7 @@ Useful in dired buffers when there is inserted subdirs."
 
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
-  (let ((buffer (make-symbol "buffer"))
-        (window (make-symbol "window")))
+  (helm-with-gensyms (buffer window)
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
             ,window)
        (unwind-protect
