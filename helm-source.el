@@ -31,10 +31,6 @@
 (require 'cl-lib)
 (require 'eieio)
 
-;; Fix compatibility with emacs-25 (Issue #815).
-(unless (fboundp 'class-slot-initarg)
-  (defalias 'class-slot-initarg 'eieio--class-slot-initarg))
-
 
 (defgeneric helm--setup-source (source)
   "Prepare slots and handle slot errors before creating a helm source.")
