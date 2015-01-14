@@ -3183,6 +3183,7 @@ is done on whole `helm-buffer' and not on current source."
   "Wheter SOURCE is a delayed source or not."
   (or (assoc 'delayed source)
       (and helm-quick-update
+           (> (length helm-sources) 1)
            (< (window-height (get-buffer-window (current-buffer)))
               (line-number-at-pos (point-max))))))
 
