@@ -1837,8 +1837,7 @@ return FNAME prefixed with [?]."
            (concat prefix-new " " fname)))))
 
 (defun helm-ff-score-candidate-for-pattern (str pattern)
-  (if (and (member str '("." ".."))
-           helm-find-files-sort-directories)
+  (if (member str '("." ".."))
       200
       (helm-score-candidate-for-pattern str pattern)))
 
