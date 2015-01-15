@@ -91,6 +91,12 @@ when non--nil."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-completion-in-region-fuzzy-match nil
+  "Whether `helm-completion-in-region' use fuzzy matching or not.
+Affect among others `completion-at-point', `completing-read-multiple'."
+  :group 'helm-mode
+  :type 'boolean)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -939,6 +945,7 @@ Can be used as value for `completion-in-region-function'."
                   ;; See Issue #407.
                   (afun (plist-get completion-extra-properties :annotation-function))
                   (data (all-completions input collection predicate))
+                  (init-space-suffix (unless helm-completion-in-region-fuzzy-match " "))
                   (file-comp-p (helm-mode--in-file-completion-p input (car data)))
                   ;; Completion-at-point and friends have no prompt.
                   (result (helm-comp-read
@@ -964,17 +971,19 @@ Can be used as value for `completion-in-region-function'."
                                            data)
                                    data))
                            :name str-command
+                           :fuzzy helm-completion-in-region-fuzzy-match
                            :nomark t
                            :initial-input
                            (cond ((and file-comp-p
                                        (not (string-match "/\\'" input)))
                                   (concat (helm-basename input)
-                                          (unless (string= input "") " ")))
+                                          (unless (string= input "")
+                                            init-space-suffix)))
                                  ((string-match "/\\'" input) nil)
                                  ((or (null require-match)
                                       (stringp require-match))
                                   input)
-                                 (t (concat input " ")))
+                                 (t (concat input init-space-suffix)))
                            :buffer buf-name
                            :fc-transformer (append (list 'helm-cr-default-transformer)
                                                    (list (lambda (candidates _source)
