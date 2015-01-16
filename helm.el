@@ -2898,14 +2898,17 @@ It is meant to use with `filter-one-by-one' slot."
     (with-temp-buffer
       (insert display)
       (goto-char (point-min))
-      (cl-loop with pattern = (if (string-match-p " " helm-pattern)
-                                  (split-string helm-pattern)
-                                  (split-string helm-pattern "" t))
-               for p in pattern
-               do
-               (when (search-forward p nil t)
-                 (add-text-properties
-                  (match-beginning 0) (match-end 0) '(face helm-match))))
+      (if (search-forward helm-pattern nil t)
+          (add-text-properties
+           (match-beginning 0) (match-end 0) '(face helm-match))
+          (cl-loop with pattern = (if (string-match-p " " helm-pattern)
+                                      (split-string helm-pattern)
+                                      (split-string helm-pattern "" t))
+                   for p in pattern
+                   do
+                   (when (search-forward p nil t)
+                     (add-text-properties
+                      (match-beginning 0) (match-end 0) '(face helm-match)))))
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
