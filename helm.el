@@ -1868,6 +1868,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
         (setq overriding-terminal-local-map old-overriding-local-map)
         (setq helm-alive-p nil)
+        ;; Reset helm-pattern so that lambda's using it
+        ;; before running helm will not start with its old value.
+        (setq helm-pattern "")
         (setq helm-in-file-completion-p nil)
         (and old--cua (cua-mode 1))
         (helm-log-save-maybe)))))
