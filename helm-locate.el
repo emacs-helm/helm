@@ -230,25 +230,29 @@ See also `helm-locate'."
          (ignore-case-flag (if (or locate-is-es
                                    (not real-locate)) "" "-i"))
          process-connection-type
-         (args (split-string helm-pattern " ")))
+         (args (split-string helm-pattern " "))
+         (cmd (format helm-locate-command
+                      (cl-case helm-locate-case-fold-search
+                        (smart (let ((case-fold-search nil))
+                                 (if (string-match "[[:upper:]]" helm-pattern)
+                                     case-sensitive-flag
+                                     ignore-case-flag)))
+                        (t (if helm-locate-case-fold-search
+                               ignore-case-flag
+                               case-sensitive-flag)))
+                      (concat
+                       ;; The pattern itself.
+                       (shell-quote-argument (car args)) " "
+                       ;; Possible locate args added
+                       ;; after pattern, don't quote them.
+                       (mapconcat 'identity (cdr args) " ")))))
+    (helm-log "Starting helm-locate process")
+    (helm-log "Command line used was:\n\n%s"
+              (concat ">>> " (propertize cmd 'face 'font-lock-comment-face) "\n\n"))
     (prog1
         (start-process-shell-command
          "locate-process" helm-buffer
-         (format helm-locate-command
-                 (cl-case helm-locate-case-fold-search
-                   (smart (let ((case-fold-search nil))
-                            (if (string-match "[[:upper:]]" helm-pattern)
-                                case-sensitive-flag
-                              ignore-case-flag)))
-                   (t (if helm-locate-case-fold-search
-                          ignore-case-flag
-                        case-sensitive-flag)))
-                 (concat
-                  ;; The pattern itself.
-                  (shell-quote-argument (car args)) " "
-                  ;; Possible locate args added
-                  ;; after pattern, don't quote them.
-                  (mapconcat 'identity (cdr args) " "))))
+         cmd)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
        #'(lambda (_process event)
