@@ -2932,7 +2932,7 @@ if ITEM-COUNT reaches LIMIT, exit from inner loop."
   `(unless (gethash ,candidate ,hash)
      (unless (assq 'allow-dups ,source)
        (puthash ,candidate t ,hash))
-     (helm--maybe-process-filter-one-by-one-candidate ,candidate source)
+     (helm--maybe-process-filter-one-by-one-candidate ,candidate ,source)
      (push ,candidate ,newmatches)
      (cl-incf ,item-count)
      (when (= ,item-count ,limit) (cl-return))))
