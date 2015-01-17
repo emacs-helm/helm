@@ -293,6 +293,7 @@ Note that this will be much slower."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
+    (define-key map (kbd "C-r")           'helm-ff-run-find)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -445,6 +446,7 @@ Should not be used among other sources.")
      "Find shell command `C-c /'" 'helm-ff-find-sh-command
      "Add marked files to file-cache" 'helm-ff-cache-add-file
      "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
+     "Find File recursively" 'helm-find-1
      "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
      "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
      "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
@@ -930,6 +932,12 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (when (helm-file-completion-source-p)
       (helm-quit-and-execute-action 'helm-find-files-switch-to-hist))))
+
+(defun helm-ff-run-find ()
+  "Run Grep action from `helm-source-find-files'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-find-1)))
 
 (defun helm-ff-run-grep ()
   "Run Grep action from `helm-source-find-files'."
