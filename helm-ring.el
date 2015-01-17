@@ -359,10 +359,11 @@ It is drop-in replacement of `yank-pop'.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
-  (helm :sources helm-source-kill-ring
-        :buffer "*helm kill ring*"
-        :resume 'noresume
-        :allow-nest t))
+  (let ((enable-recursive-minibuffers t))
+    (helm :sources helm-source-kill-ring
+          :buffer "*helm kill ring*"
+          :resume 'noresume
+          :allow-nest t)))
 
 ;;;###autoload
 (defun helm-execute-kmacro ()
