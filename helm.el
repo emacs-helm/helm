@@ -547,6 +547,17 @@ See `fit-window-to-buffer' for more infos."
   :group 'helm
   :type 'integer)
 
+(defcustom helm-input-method-verbose-flag nil
+  "The default value of `input-method-verbose-flag' to use in helm minibuffer.
+It is nil by default to allow helm updating and exiting without turning off
+the input method when complex methods are in use, if you set it to any other
+value allowed by `input-method-verbose-flag' you will have at each time you want
+to exit or helm update to disable the `current-input-method' with `C-\\'."
+  :group 'helm
+  :type '(radio :tag "A flag to control extra guidance given by input methods in helm."
+          (const :tag "Never provide guidance" nil)
+          (const :tag "Always provide guidance" t)
+          (const :tag "Provide guidance only in complex methods" complex-only)))
 
 ;;; Faces
 ;;
@@ -1821,6 +1832,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log "any-history = %S" any-history)
     (let ((old-overriding-local-map overriding-terminal-local-map)
           (non-essential t)
+          (input-method-verbose-flag helm-input-method-verbose-flag)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input
            (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
