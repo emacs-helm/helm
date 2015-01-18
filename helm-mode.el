@@ -210,7 +210,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                       c)
               c)
         into lst
-        else collect (if (string-match "\n" c)
+        else collect (if (and (stringp c)
+                              (string-match "\n" c))
                          (cons (replace-regexp-in-string "\n" "->" c) c)
                          c)
         into lst
