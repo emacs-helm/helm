@@ -1033,13 +1033,6 @@ not `exit-minibuffer' or unwanted functions."
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
-     ;; This fix Issue when iconifying emacs frame
-     ;; but it seems it cause problems depending of the
-     ;; window-manager windows configuration.
-     ;; So I am disabling this for now, see Issue (#822).
-     ;; (select-frame-set-input-focus (if (minibufferp helm-current-buffer)
-     ;;                                   (selected-frame)
-     ;;                                   (last-nonminibuffer-frame)))
      ,@body))
 
 (defmacro with-helm-current-buffer (&rest body)
