@@ -400,8 +400,11 @@ from its directory."
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
                           (helm-grep-split-line sel)))
-          (bmk-name  (replace-regexp-in-string "\\`\\*" "" sel))
-          (bmk       (assoc bmk-name bookmark-alist)))
+          (bmk-name  (and (stringp sel)
+                          (replace-regexp-in-string "\\`\\*" "" sel)))
+          (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
+          (default-preselection (or (buffer-file-name helm-current-buffer)
+                                    default-directory)))
      (if (stringp sel)
          (helm-aif (get-buffer (or (get-text-property
                                     (1- (length sel)) 'buffer-name sel)
@@ -424,8 +427,8 @@ from its directory."
                  ((and grep-line (file-exists-p (car grep-line)))
                   (expand-file-name (car grep-line)))
                  ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
-                 (t default-directory)))
-       default-directory))))
+                 (t default-preselection)))
+       default-preselection))))
 
 ;; Same as `vc-directory-exclusion-list'.
 (defvar helm-walk-ignore-directories
