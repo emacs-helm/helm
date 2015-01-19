@@ -231,22 +231,6 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
-    ;; Disable usage of the mouse while in helm.
-    (define-key map (kbd "<down-mouse-1>")   'ignore)
-    (define-key map (kbd "<drag-mouse-1>")   'ignore)
-    (define-key map (kbd "<mouse-1>")        'ignore)
-    (define-key map (kbd "<double-mouse-1>") 'ignore)
-    (define-key map (kbd "<triple-mouse-1>") 'ignore)
-    (define-key map (kbd "<down-mouse-2>")   'ignore)
-    (define-key map (kbd "<drag-mouse-2>")   'ignore)
-    (define-key map (kbd "<mouse-2>")        'ignore)
-    (define-key map (kbd "<double-mouse-2>") 'ignore)
-    (define-key map (kbd "<triple-mouse-2>") 'ignore)
-    (define-key map (kbd "<down-mouse-3>")   'ignore)
-    (define-key map (kbd "<drag-mouse-3>")   'ignore)
-    (define-key map (kbd "<mouse-3>")        'ignore)
-    (define-key map (kbd "<double-mouse-3>") 'ignore)
-    (define-key map (kbd "<triple-mouse-3>") 'ignore)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
@@ -1823,8 +1807,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log "any-keymap = %S" any-keymap)
     (helm-log "any-default = %S" any-default)
     (helm-log "any-history = %S" any-history)
-    (let ((old-overriding-local-map overriding-terminal-local-map)
-          (non-essential t)
+    (helm--remap-mouse-events 'undefined) ; disable mouse.
+    (let ((non-essential t)
           (input-method-verbose-flag helm-input-method-verbose-flag)
           (old--cua cua-mode)
           (helm-maybe-use-default-as-input
@@ -1871,7 +1855,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           (ad-deactivate 'tramp-read-passwd)
           (ad-deactivate 'ange-ftp-get-passwd))
         (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-        (setq overriding-terminal-local-map old-overriding-local-map)
+        (helm--remap-mouse-events nil)
         (setq helm-alive-p nil)
         ;; Reset helm-pattern so that lambda's using it
         ;; before running helm will not start with its old value.
@@ -2465,6 +2449,22 @@ If no map is found in current source do nothing (keep previous map)."
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
         (with-current-buffer (window-buffer (minibuffer-window))
           (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
+
+(defun helm--remap-mouse-events (binding)
+  "Remap all mouse events to BINDING.
+When BINDING is nil remap all mouse events to their original value."
+  (cl-loop for k in '([mouse-1] [down-mouse-1] [drag-mouse-1]
+                      [double-mouse-1] [triple-mouse-1]
+                      [mouse-2] [down-mouse-2] [drag-mouse-2]
+                      [double-mouse-2] [triple-mouse-2]
+                      [mouse-3] [down-mouse-3] [drag-mouse-3]
+                      [double-mouse-3] [triple-mouse-3]
+                      [mouse-4] [down-mouse-4] [drag-mouse-4]
+                      [double-mouse-4] [triple-mouse-4]
+                      [mouse-5] [down-mouse-5] [drag-mouse-5]
+                      [double-mouse-5] [triple-mouse-5])
+           do
+           (define-key global-map (vector 'remap (lookup-key global-map k)) binding)))
 
 
 ;; Core: clean up
