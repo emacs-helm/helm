@@ -2740,10 +2740,12 @@ Need dependencies for VCS:
 and
 <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>."
   (interactive "P")
-  (cond ((and (fboundp 'helm-ls-git-root-dir)
+  (cond ((and (require 'helm-ls-git nil t)
+              (fboundp 'helm-ls-git-root-dir)
               (helm-ls-git-root-dir))
          (helm-ls-git-ls))
-        ((and (fboundp 'helm-hg-root)
+        ((and (require 'helm-ls-hg nil t)
+              (fboundp 'helm-hg-root)
               (helm-hg-root))
          (helm-hg-find-files-in-project))
         (t (let ((cur-dir (helm-current-directory)))
