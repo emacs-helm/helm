@@ -950,6 +950,33 @@ the amount of prefix args entered.
   (let ((helm-help-message helm-semantic-help-message))
     (helm-help)))
 
+;;; helm kmacro
+;;
+;;
+(defvar helm-kmacro-help-message
+  "\n* Helm kmacro\n
+\n** Helm kmacro tips:
+- Start recording some keys with `f3'
+- Record new kmacro with `f4'
+- Start `helm-execute-kmacro' to list all your macros.
+
+Use persistent action to run your kmacro as many time as needed,
+you can change of kmacro with `helm-next-line' `helm-previous-line'.
+
+NOTE: You can't record keys running helm commands.
+
+\n** Specific commands for Helm kmacro:\n
+\\<helm-kmacro-map>
+\\[helm-kmacro-help]\t->Show this help.
+\n** Helm Map\n
+\\{helm-map}")
+
+;;;###autoload
+(defun helm-kmacro-help ()
+  (interactive)
+  (let ((helm-help-message helm-kmacro-help-message))
+    (helm-help)))
+
 
 ;;; Mode line strings
 ;;
