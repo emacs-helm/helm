@@ -2726,7 +2726,12 @@ If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
 (defun helm-candidate-get-display (candidate)
   "Get searched display part from CANDIDATE.
 CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
-  (format "%s" (or (car-safe candidate) candidate)))
+  (cond ((car-safe candidate))
+        ((symbolp candidate)
+         (symbol-name candidate))
+        ((numberp candidate)
+         (number-to-string candidate))
+        (candidate)))
 
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute PATTERN function in SOURCE."
