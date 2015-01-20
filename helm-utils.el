@@ -817,13 +817,16 @@ directory, open this directory."
 
 (defun helm-find-file-as-root (candidate)
   (let ((buf (helm-basename candidate))
+        (host (file-remote-p candidate 'host))
+        (path (concat "/" helm-su-or-sudo
+                      ":%s:" (expand-file-name candidate)))
+        (remote-path (format path (or host "")))
         non-essential)
     (if (buffer-live-p (get-buffer buf))
         (progn
           (set-buffer buf)
-          (find-alternate-file (concat "/" helm-su-or-sudo
-                                       "::" (expand-file-name candidate))))
-      (find-file (concat "/" helm-su-or-sudo "::" (expand-file-name candidate))))))
+          (find-alternate-file remote-path))
+      (find-file remote-path))))
 
 (defun helm-find-many-files (_ignore)
   (let ((helm--reading-passwd-or-string t))
