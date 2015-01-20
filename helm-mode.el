@@ -780,7 +780,7 @@ Keys description:
                       (init . (lambda ()
                                 (setq helm-ff-auto-update-flag
                                       helm-ff-auto-update-initial-value)
-                                (setq helm-ff-auto-update--state
+                                (setq helm-ff--auto-update-state
                                       helm-ff-auto-update-flag)
                                 (helm-set-local-variable 'helm-in-file-completion-p t)))
                       (mode-line . ,mode-line)
