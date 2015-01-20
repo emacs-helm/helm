@@ -816,12 +816,12 @@ directory, open this directory."
     (helm-highlight-current-line)))
 
 (defun helm-find-file-as-root (candidate)
-  (let ((buf (helm-basename candidate))
-        (host (file-remote-p candidate 'host))
-        (path (concat "/" helm-su-or-sudo
-                      ":%s:" (expand-file-name candidate)))
-        (remote-path (format path (or host "")))
-        non-essential)
+  (let* ((buf (helm-basename candidate))
+         (host (file-remote-p candidate 'host))
+         (path (concat "/" helm-su-or-sudo
+                       ":%s:" (expand-file-name candidate)))
+         (remote-path (format path (or host "")))
+         non-essential)
     (if (buffer-live-p (get-buffer buf))
         (progn
           (set-buffer buf)
