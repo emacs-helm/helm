@@ -2731,7 +2731,7 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
          (symbol-name candidate))
         ((numberp candidate)
          (number-to-string candidate))
-        (candidate)))
+        (t candidate)))
 
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute PATTERN function in SOURCE."
