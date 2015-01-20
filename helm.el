@@ -3249,14 +3249,10 @@ if specified."
 If MATCH is a list then insert the string intended to appear on the display
 and store the real value in a text property."
   (let ((start     (point-at-bol (point)))
-        (dispvalue (or (car-safe match) match))
+        (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match)))
-    (setq dispvalue
-          (cond ((symbolp dispvalue) (symbol-name dispvalue))
-                ((numberp dispvalue) (number-to-string dispvalue))
-                ((string= "" dispvalue))
-                (t dispvalue)))
-    (when (stringp dispvalue)
+    (when (and (stringp dispvalue)
+             (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)
       ;; Some sources with candidates-in-buffer have already added
       ;; 'helm-realvalue property when creating candidate buffer.
