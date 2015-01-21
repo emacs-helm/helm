@@ -4867,17 +4867,6 @@ visible or invisible in all sources of current helm session"
         (helm-unmark-all)
       (helm-mark-all))))
 
-(defun helm-display-all-visible-marks ()
-  "Show all `helm' visible marks strings.
-Only useful for debugging."
-  (interactive)
-  (with-helm-window
-    (let ((overlays (reverse helm-visible-mark-overlays)))
-      (helm-run-after-quit
-       (lambda ()
-         (with-output-to-temp-buffer "*helm visible marks*"
-           (cl-dolist (o overlays) (princ (overlay-get o 'string)))))))))
-
 (cl-defun helm-marked-candidates (&key with-wildcard)
   "Return marked candidates of current source if any.
 Otherwise one element list of current selection.
