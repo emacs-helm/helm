@@ -834,7 +834,6 @@ when `helm' is keyboard-quitted.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
 (defvar helm--in-fuzzy nil)
-(defvar helm--old-mouse-bindings nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -1831,7 +1830,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-initialize
                     any-resume any-input any-default any-sources)
                    (helm-display-buffer helm-buffer)
-                   (helm--remap-mouse-mode 1) ; Disable mouse bindings.
+                   (when helm-prevent-escaping-from-minibuffer
+                     (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                    (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                    (helm-log "show prompt")
                    (unwind-protect
@@ -2454,30 +2454,26 @@ If no map is found in current source do nothing (keep previous map)."
 
 ;;; Prevent loosing focus when using mouse.
 ;;
-(define-minor-mode helm--remap-mouse-mode
-    "Prevent escaping minibuffer with mouse clicks.
-Do nothing when used outside helm context.
-Have no effect when `helm-prevent-escaping-from-minibuffer' is nil."
-  :group 'helm
-  :global t
-  (let ((mouse-events '([mouse-1] [mouse-2] [mouse-3]
+(defvar helm--remap-mouse-mode-map
+  (let ((map (make-sparse-keymap)))
+    (cl-loop for k in '([mouse-1] [mouse-2] [mouse-3]
                         [down-mouse-1] [down-mouse-2] [down-mouse-3]
                         [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
                         [double-mouse-1] [double-mouse-2] [double-mouse-3]
-                        [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])))
-    (if (and helm-prevent-escaping-from-minibuffer
-             helm-alive-p
-             helm--remap-mouse-mode)
-        (cl-loop for k in mouse-events
-              for com = (lookup-key global-map k)
-              unless (assoc k helm--old-mouse-bindings)
-              do (push (cons k com) helm--old-mouse-bindings)
-              do (define-key global-map k 'undefined))
-      (when helm--old-mouse-bindings
-        (cl-loop for k in mouse-events
-              for com = (assoc-default k helm--old-mouse-bindings)
-              do (define-key global-map k com)
-              finally (setq helm--old-mouse-bindings nil))))))
+                        [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
+             do (define-key map k 'undefined))
+    map))
+
+(define-minor-mode helm--remap-mouse-mode
+    "[INTERNAL] Prevent escaping helm minibuffer with mouse clicks.
+Do nothing when used outside of helm context.
+
+WARNING: Do not use this mode yourself, it is internal to helm."
+  :group 'helm
+  :global t
+  :keymap helm--remap-mouse-mode-map
+  (unless helm-alive-p
+    (setq helm--remap-mouse-mode-map nil)))
 
 ;; Core: clean up
 
