@@ -31,7 +31,7 @@
 (require 'cl-lib)
 (require 'helm-source)
 
-(defmacro helm-with-gensyms (symbols &rest body) 
+(defmacro helm-with-gensyms (symbols &rest body)
   "Bind the SYMBOLS to fresh uninterned symbols and eval BODY."
   (declare (indent 1))
   `(let ,(mapcar (lambda (s) `(,s (make-symbol (concat "--" (symbol-name ',s)))))
@@ -834,6 +834,7 @@ when `helm' is keyboard-quitted.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
 (defvar helm--in-fuzzy nil)
+(defvar helm--old-mouse-bindings nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -966,7 +967,7 @@ not `exit-minibuffer' or unwanted functions."
   "Return a list of all single elements of sublists in SEQ."
   (let (result)
     (cl-labels ((flatten (seq)
-                  (cl-loop 
+                  (cl-loop
                         for elm in seq
                         if (and (or elm
                                     (null omit-nulls))
@@ -1104,7 +1105,7 @@ if SRC is omitted, use current source."
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
 If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE.
 If ALTER-TYPE is non--nil alter the value of ATTRIBUTE-NAME in `helm-attributes'
-if it exists. 
+if it exists.
 If SRC is omitted, use current source.
 If operation succeed, return value, otherwise nil."
   (let ((from-type (helm-get-attribute-from-source-type attribute-name src))
@@ -1734,7 +1735,7 @@ to 10 as session local variable.
             (prog1
                 (message "Aborting an helm session running in background")
               ;; `helm-alive-p' will be reset in unwind-protect forms.
-              (helm-keyboard-quit)))) 
+              (helm-keyboard-quit))))
       (if (keywordp (car plist))
           ;; Parse `plist' and move not regular `helm-argument-keys'
           ;; to `helm--local-variables', then calling helm on itself
@@ -1774,7 +1775,7 @@ in source.
                      :buffer \"toto\"
                      :candidate-number-limit 4))
   ==> ((helm-candidate-number-limit . 4))."
-  
+
   (cl-loop for (key value) on keys by #'cddr
            for symname = (substring (symbol-name key) 1)
            for sym = (intern (if (string-match "^helm-" symname)
@@ -1807,7 +1808,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (helm-log "any-keymap = %S" any-keymap)
     (helm-log "any-default = %S" any-default)
     (helm-log "any-history = %S" any-history)
-    (helm--remap-mouse-events 'undefined) ; disable mouse.
     (let ((non-essential t)
           (input-method-verbose-flag helm-input-method-verbose-flag)
           (old--cua cua-mode)
@@ -1831,6 +1831,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-initialize
                     any-resume any-input any-default any-sources)
                    (helm-display-buffer helm-buffer)
+                   (helm--remap-mouse-mode 1) ; Disable mouse bindings.
                    (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                    (helm-log "show prompt")
                    (unwind-protect
@@ -1855,7 +1856,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
           (ad-deactivate 'tramp-read-passwd)
           (ad-deactivate 'ange-ftp-get-passwd))
         (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-        (helm--remap-mouse-events nil)
+        (helm--remap-mouse-mode -1) ; Reenable mouse bindings.
         (setq helm-alive-p nil)
         ;; Reset helm-pattern so that lambda's using it
         ;; before running helm will not start with its old value.
@@ -2081,7 +2082,8 @@ Arg ENABLE will be the value of the `no-other-window' window property."
   (walk-windows
    #'(lambda (w)
        (unless (window-dedicated-p w)
-         (set-window-parameter w 'no-other-window enabled))) 0))
+         (set-window-parameter w 'no-other-window enabled)))
+   0))
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
@@ -2284,7 +2286,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
            (hist       (or (and any-history (symbolp any-history) any-history)
-                           ;; Needed for resuming. 
+                           ;; Needed for resuming.
                            (assoc-default 'history src)))
            (timer nil)
            blink-matching-paren
@@ -2450,22 +2452,31 @@ If no map is found in current source do nothing (keep previous map)."
         (with-current-buffer (window-buffer (minibuffer-window))
           (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
 
-(defun helm--remap-mouse-events (binding)
-  "Remap all mouse events to BINDING.
-When BINDING is nil remap all mouse events to their original value."
-  (cl-loop for k in '([mouse-1] [down-mouse-1] [drag-mouse-1]
-                      [double-mouse-1] [triple-mouse-1]
-                      [mouse-2] [down-mouse-2] [drag-mouse-2]
-                      [double-mouse-2] [triple-mouse-2]
-                      [mouse-3] [down-mouse-3] [drag-mouse-3]
-                      [double-mouse-3] [triple-mouse-3]
-                      [mouse-4] [down-mouse-4] [drag-mouse-4]
-                      [double-mouse-4] [triple-mouse-4]
-                      [mouse-5] [down-mouse-5] [drag-mouse-5]
-                      [double-mouse-5] [triple-mouse-5])
-           do
-           (define-key global-map (vector 'remap (lookup-key global-map k)) binding)))
-
+;;; Prevent loosing focus when using mouse.
+;;
+(define-minor-mode helm--remap-mouse-mode
+    "Prevent escaping minibuffer with mouse clicks.
+Do nothing when used outside helm context.
+Have no effect when `helm-prevent-escaping-from-minibuffer' is nil."
+  :group 'helm
+  :global t
+  (let ((mouse-events '([mouse-1] [mouse-2] [mouse-3]
+                        [down-mouse-1] [down-mouse-2] [down-mouse-3]
+                        [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
+                        [double-mouse-1] [double-mouse-2] [double-mouse-3]
+                        [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])))
+    (if (and helm-prevent-escaping-from-minibuffer
+             helm--remap-mouse-mode)
+        (cl-loop for k in mouse-events
+              for com = (lookup-key global-map k)
+              unless (assoc k helm--old-mouse-bindings)
+              do (push (cons k com) helm--old-mouse-bindings)
+              do (define-key global-map k 'undefined))
+      (when helm--old-mouse-bindings
+        (cl-loop for k in mouse-events
+              for com = (assoc-default k helm--old-mouse-bindings)
+              do (define-key global-map k com)
+              finally (setq helm--old-mouse-bindings nil))))))
 
 ;; Core: clean up
 
@@ -2609,7 +2620,7 @@ Helm plug-ins are realized by this function."
 Cache the candidates if there is not yet a cached value."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (gethash name helm-candidate-cache)))
-    (helm-aif candidate-cache 
+    (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
       (helm-log "No cached candidates, calculate candidates")
       (let ((candidates (helm-get-candidates source)))
@@ -2990,7 +3001,7 @@ and `helm-pattern'."
                   (let ((target (helm-candidate-get-display candidate)))
                     (when (funcall match
                                    (if match-part-fn
-                                       (funcall match-part-fn target) target)) 
+                                       (funcall match-part-fn target) target))
                       (helm--accumulate-candidates
                        candidate newmatches
                        helm-match-hash item-count limit source)))))
@@ -4278,7 +4289,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                           limit search-from-end
                                           start-point match-part-fn source)
   (let (buffer-read-only
-        matches 
+        matches
         newmatches
         (case-fold-search (helm-set-case-fold-search))
         (stopper (if search-from-end #'bobp #'eobp)))
@@ -4605,7 +4616,7 @@ In this case you have to add this new attribute to your source.
 When `helm-full-frame' or SPLIT-ONEWINDOW are non--nil,
 and `helm-buffer' is displayed in only one window,
 the helm window is splitted to display
-`helm-select-persistent-action-window' in other window 
+`helm-select-persistent-action-window' in other window
 and keep its visibility."
   (interactive)
   (helm-log "executing persistent-action")
