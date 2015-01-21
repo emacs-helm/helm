@@ -502,22 +502,22 @@ that use `helm-comp-read' See `helm-M-x' for example."
   (or
    (helm
     :sources (helm-build-in-buffer-source name
-               :init `(lambda ()
-                        (require 'helm-elisp)
-                        (with-current-buffer (helm-candidate-buffer 'global)
-                          (goto-char (point-min))
-                          (when (and ,default (stringp ,default)
-                                     ;; Some defaults args result as
-                                     ;; (symbol-name nil) == "nil".
-                                     ;; e.g debug-on-entry.
-                                     (not (string= ,default "nil"))
-                                     (not (string= ,default "")))
-                            (insert (concat ,default "\n")))
-                          (cl-loop for sym in (all-completions "" obarray ',test)
-                                   for s = (intern sym)
-                                   unless (or (and ,default (string= sym ,default))
-                                              (keywordp s))
-                                   do (insert (concat sym "\n")))))
+               :init (lambda ()
+                       (require 'helm-elisp)
+                       (with-current-buffer (helm-candidate-buffer 'global)
+                         (goto-char (point-min))
+                         (when (and default (stringp default)
+                                    ;; Some defaults args result as
+                                    ;; (symbol-name nil) == "nil".
+                                    ;; e.g debug-on-entry.
+                                    (not (string= default "nil"))
+                                    (not (string= default "")))
+                           (insert (concat default "\n")))
+                         (cl-loop for sym in (all-completions "" obarray test)
+                                  for s = (intern sym)
+                                  unless (or (and default (string= sym default))
+                                             (keywordp s))
+                                  do (insert (concat sym "\n")))))
                :persistent-action 'helm-lisp-completion-persistent-action
                :persistent-help "Show brief doc in mode-line")
     :prompt prompt
