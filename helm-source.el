@@ -693,6 +693,8 @@ like `re-search-forward', see below documentation of :search slot.")
 (defclass helm-type-file (helm-source) ()
   "A class to define helm type file.")
 
+(defmethod helm--setup-source :primary ((_source helm-type-file)))
+
 (defmethod helm--setup-source :before ((source helm-type-file))
     (oset source :action
           (helm-make-actions
@@ -729,6 +731,8 @@ like `re-search-forward', see below documentation of :search slot.")
 (defclass helm-type-bookmark (helm-source) ()
   "A class to define type bookmarks.")
 
+(defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
+
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
   (oset source :action (helm-make-actions
                         "Jump to bookmark" 'helm-bookmark-jump
@@ -745,6 +749,8 @@ like `re-search-forward', see below documentation of :search slot.")
 ;; Buffers
 (defclass helm-type-buffer (helm-source) ()
   "A class to define type buffer.")
+
+(defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
   (oset source :action (helm-make-actions
@@ -777,6 +783,8 @@ like `re-search-forward', see below documentation of :search slot.")
 (defclass helm-type-function (helm-source) ()
   "A class to define helm type function.")
 
+(defmethod helm--setup-source :primary ((_source helm-type-function)))
+
 (defmethod helm--setup-source :before ((source helm-type-function))
   (oset source :action (helm-make-actions
                          "Describe command" 'describe-function
@@ -794,6 +802,8 @@ like `re-search-forward', see below documentation of :search slot.")
 ;; Commands
 (defclass helm-type-command (helm-source) ()
   "A class to define helm type command.")
+
+(defmethod helm--setup-source :primary ((_source helm-type-command)))
 
 (defmethod helm--setup-source :before ((source helm-type-command))
   (oset source :action (append (helm-make-actions
@@ -938,6 +948,8 @@ an eieio class."
              "")
            " (keeping session)")))
 
+(defmethod helm--setup-source :primary ((_source helm-source)))
+  
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source :keymap)
       (and (symbolp it) (set-slot-value source :keymap (symbol-value it))))
