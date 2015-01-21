@@ -416,7 +416,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :mode-line mode-line
                   :action action-fn))
            (src-1 (helm-build-in-buffer-source name
-                    :data `(lambda () (funcall ',get-candidates))
+                    :data get-candidates
                     :filtered-candidate-transformer fc-transformer
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
