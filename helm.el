@@ -2466,6 +2466,7 @@ Have no effect when `helm-prevent-escaping-from-minibuffer' is nil."
                         [double-mouse-1] [double-mouse-2] [double-mouse-3]
                         [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])))
     (if (and helm-prevent-escaping-from-minibuffer
+             helm-alive-p
              helm--remap-mouse-mode)
         (cl-loop for k in mouse-events
               for com = (lookup-key global-map k)
