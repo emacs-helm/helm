@@ -521,12 +521,12 @@ with name matching pattern."
               (t (helm-buffer--match-pattern i candidate)))))
 
 
-(defun helm-buffer-query-replace-1 (&optional regexp-flag)
+(defun helm-buffer-query-replace-1 (&optional regexp-flag buffers)
   "Query replace in marked buffers.
 If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
-        (bufs   (helm-marked-candidates))
+        (bufs   (or buffers (helm-marked-candidates)))
         (helm--reading-passwd-or-string t))
     (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
           with tostring = (unless (consp replace)

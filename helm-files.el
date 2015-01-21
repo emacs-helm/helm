@@ -432,7 +432,9 @@ Should not be used among other sources.")
      'helm-elscreen-find-file
      "View file" 'view-file
      "Checksum File" 'helm-ff-checksum
-     "Query replace on marked" 'helm-ff-query-replace-on-marked
+     "Query replace fnames on marked" 'helm-ff-query-replace-on-marked
+     "Query replace contents on marked" 'helm-ff-query-replace
+     "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
      "Serial rename files" 'helm-ff-serial-rename
      "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
      "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
@@ -897,6 +899,24 @@ See `helm-ff-serial-rename-1'."
 (defun helm-ff-run-query-replace-on-marked ()
   (interactive)
   (helm-ff-query-replace-on-marked nil))
+
+(defun helm-ff-query-replace (_candidate)
+  (let ((bufs (cl-loop for f in (helm-marked-candidates)
+                       collect (buffer-name (find-file-noselect f)))))
+    (helm-run-after-quit #'helm-buffer-query-replace-1 nil bufs)))
+
+(defun helm-ff-query-replace-regexp (_candidate)
+  (let ((bufs (cl-loop for f in (helm-marked-candidates)
+                       collect (buffer-name (find-file-noselect f)))))
+    (helm-run-after-quit #'helm-buffer-query-replace-1 'regexp bufs)))
+
+(defun helm-ff-run-query-replace ()
+  (interactive)
+  (helm-ff-query-replace nil))
+
+(defun helm-ff-run-query-replace-regexp ()
+  (interactive)
+  (helm-ff-query-replace-regexp nil))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
