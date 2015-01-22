@@ -110,7 +110,7 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-file
-    '((t :inherit font-lock-type-face))
+    '((t :inherit font-lock-builtin-face))
   "Face for buffer file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
