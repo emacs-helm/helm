@@ -2948,12 +2948,17 @@ utility mdfind.")
                       (t (cons (propertize disp 'face 'helm-ff-file) abs)))))
 
 (defun helm-find-shell-command-fn ()
-  "Asynchronously fetch candidates for `helm-find'."
+  "Asynchronously fetch candidates for `helm-find'.
+Additional find options can be sepcified after a \"*\"
+separator."
   (require 'find-cmd)
   (let ((case-fold-search (helm-set-case-fold-search helm-pattern)))
     (with-helm-default-directory (helm-default-directory)
         (let* (process-connection-type
-               (pattern (mapconcat 'identity (split-string helm-pattern) "*"))
+               (patterns+options (split-string helm-pattern "\\(\\`\\| +\\)\\* +"))
+               (patterns (split-string (car patterns+options)))
+               (additional-options (and (cdr patterns+options)
+                             (list (concat (cadr patterns+options) " "))))
                (ignored-dirs ())
                (ignored-files (when helm-findutils-skip-boring-files
                                 (cl-loop for f in completion-ignored-extensions
@@ -2969,8 +2974,11 @@ utility mdfind.")
                                    `(prune (name ,@ignored-dirs)))
                               (and ignored-files
                                    `(not (name ,@ignored-files)))
-                              `(and (,name-or-iname ,(concat "*" pattern "*"))
-                                    (type "d" "f"))))
+                              `(and ,@(mapcar
+                                       (lambda (pattern)
+                                         `(,name-or-iname ,(concat "*" pattern "*")))
+                                       patterns)
+                                    ,@additional-options)))
                (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
           (helm-log "Find command:\n%s" cmd)
           (prog1 proc
