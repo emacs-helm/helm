@@ -118,7 +118,8 @@ fuzzy completion is not available in `completion-at-point'."
 (defun helm-show-completion ()
   (with-helm-current-buffer
     (overlay-put helm-show-completion-overlay
-                 'display (helm-get-selection))))
+                 'display (substring-no-properties
+                           (helm-get-selection)))))
 
 (defun helm-show-completion-init-overlay (beg end)
   (when (and helm-turn-on-show-completion beg end)
