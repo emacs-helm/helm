@@ -141,13 +141,15 @@ In this example, `C-x v n' will run `git-gutter:next-hunk'
 subsequent hits on \"n\" will run this command again
 and subsequent hits on \"p\" will run `git-gutter:previous-hunk'.
 
-Arg MENU is a string to display in minibuffer to describe SUBKEY and OTHER-SUBKEYS.
+Arg MENU is a string to display in minibuffer
+to describe SUBKEY and OTHER-SUBKEYS.
 Arg EXIT-FN specify a function to run on exit.
 
-Any other keys pressed run their assigned command defined in MAP and exit the loop
-running EXIT-FN if specified.
+Any other keys pressed run their assigned command defined in MAP
+and exit the loop running EXIT-FN if specified.
 
-NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax actually (e.g ?n)
+NOTE: SUBKEY and OTHER-SUBKEYS bindings support
+only char syntax actually (e.g ?n)
 so don't use strings, vectors or whatever to define them."
   (declare (indent 1))
   (let ((other-keys (and other-subkeys
