@@ -144,25 +144,26 @@ Any other keys pressed run their assigned command defined in MAP and exit the lo
                          (cl-loop for (x . y) in other-subkeys
                                collect (list x (list 'call-interactively y) t)))))
     `(define-key ,map ,key
-       #'(lambda ()
-           (interactive)
-           (unwind-protect
-                (progn
-                  (call-interactively ,command)
-                  (while (let ((input (read-key ,menu)) kb com)
-                           (cl-case input
-                             (,subkey (call-interactively ,command) t)
-                             ,@other-keys
-                             (t (setq kb  (this-command-keys-vector))
-                                (setq com (lookup-key ,map kb))
-                                (if (commandp com)
-                                    (call-interactively com)
-                                  (setq unread-command-events
-                                        (nconc (mapcar 'identity
-                                                       (this-single-command-raw-keys))
-                                               unread-command-events)))
-                                nil)))))
-             (and ,exit-fn (funcall ,exit-fn)))))))
+       (lambda ()
+         (interactive)
+         (unwind-protect
+              (progn
+                (call-interactively ,command)
+                (while (let ((input (read-key ,menu)) kb com)
+                         (setq last-command-event input)
+                         (cl-case input 
+                           (,subkey (call-interactively ,command) t)
+                           ,@other-keys
+                           (t
+                            (setq kb  (this-command-keys-vector))
+                            (setq com (lookup-key ,map kb))
+                            (if (commandp com)
+                                (call-interactively com)
+                              (setq unread-command-events
+                                    (nconc (mapcar 'identity kb)
+                                           unread-command-events)))
+                            nil)))))
+           (and ,exit-fn (funcall ,exit-fn)))))))
 
 
 ;;; Keymap
