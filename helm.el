@@ -121,7 +121,7 @@ second call within 0.5s run `helm-swap-windows'."
 ;;;###autoload
 (defmacro helm-define-key-with-subkeys (map key subkey command
                                         &optional other-subkeys menu exit-fn)
-  "Allow defining a KEY and SUBKEY to COMMAND.
+  "Allow defining in MAP a KEY and SUBKEY to COMMAND.
 
 This allow typing KEY to call COMMAND the first time and
 type only SUBKEY on subsequent calls.
