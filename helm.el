@@ -121,28 +121,38 @@ second call within 0.5s run `helm-swap-windows'."
 ;;;###autoload
 (defmacro helm-define-key-with-subkeys (map key subkey command
                                         &optional other-subkeys menu exit-fn)
-  "Allow defining a KEY without having to type its prefix again on next calls.
-Arg MAP is the keymap to use, SUBKEY is the initial long keybinding to
+  "Allow defining a KEY and SUBKEY to COMMAND.
+
+This allow typing KEY to call COMMAND the first time and
+type only SUBKEY on subsequent calls.
+
+Arg MAP is the keymap to use, SUBKEY is the initial short keybinding to
 call COMMAND.
+
 Arg OTHER-SUBKEYS is an unquoted alist specifying other short keybindings
 to use once started.
 e.g:
 
 \(helm-define-key-with-subkeys global-map
-      \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p . 'git-gutter:previous-hunk))\)
+   \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p . git-gutter:previous-hunk))\)
 
 
-In this example, `C-x v n' will run `git-gutter:next-hunk' subsequent hit on \"n\"
-will run this command again and subsequent hit on \"p\" will run `git-gutter:previous-hunk'.
+In this example, `C-x v n' will run `git-gutter:next-hunk'
+subsequent hits on \"n\" will run this command again
+and subsequent hits on \"p\" will run `git-gutter:previous-hunk'.
 
 Arg MENU is a string to display in minibuffer to describe SUBKEY and OTHER-SUBKEYS.
 Arg EXIT-FN specify a function to run on exit.
 
-Any other keys pressed run their assigned command defined in MAP and exit the loop."
+Any other keys pressed run their assigned command defined in MAP and exit the loop
+running EXIT-FN if specified.
 
+NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax actually (e.g ?n)
+so don't use strings, vectors or whatever to define them."
+  (declare (indent 1))
   (let ((other-keys (and other-subkeys
                          (cl-loop for (x . y) in other-subkeys
-                               collect (list x (list 'call-interactively y) t)))))
+                               collect (list x `(call-interactively ',y) t)))))
     `(define-key ,map ,key
        (lambda ()
          (interactive)
