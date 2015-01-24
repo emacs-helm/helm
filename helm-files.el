@@ -2952,41 +2952,41 @@ utility mdfind.")
 Additional find options can be sepcified after a \"*\"
 separator."
   (require 'find-cmd)
-  (let ((case-fold-search (helm-set-case-fold-search helm-pattern)))
-    (with-helm-default-directory (helm-default-directory)
-        (let* (process-connection-type
-               (patterns+options (split-string helm-pattern "\\(\\`\\| +\\)\\* +"))
-               (patterns (split-string (car patterns+options)))
-               (additional-options (and (cdr patterns+options)
-                             (list (concat (cadr patterns+options) " "))))
-               (ignored-dirs ())
-               (ignored-files (when helm-findutils-skip-boring-files
-                                (cl-loop for f in completion-ignored-extensions
-                                         if (string-match "/$" f)
-                                         do (push (replace-match "" nil t f)
-                                                  ignored-dirs)
-                                         else collect (concat "*" f))))
-               (path-or-name (if helm-findutils-search-full-path
-                                 '(ipath path) '(iname name)))
-               (name-or-iname (if case-fold-search
-                                  (car path-or-name) (cadr path-or-name)))
-               (cmd (find-cmd (and ignored-dirs
-                                   `(prune (name ,@ignored-dirs)))
-                              (and ignored-files
-                                   `(not (name ,@ignored-files)))
-                              `(and ,@(mapcar
-                                       (lambda (pattern)
-                                         `(,name-or-iname ,(concat "*" pattern "*")))
-                                       patterns)
-                                    ,@additional-options)))
-               (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
-          (helm-log "Find command:\n%s" cmd)
-          (prog1 proc
-            (set-process-sentinel
-             proc
-             #'(lambda (process event)
-                 (helm-process-deferred-sentinel-hook
-                  process event (helm-default-directory)))))))))
+  (with-helm-default-directory (helm-default-directory)
+      (let* (process-connection-type
+             (patterns+options (split-string helm-pattern "\\(\\`\\| +\\)\\* +"))
+             (fold-case (helm-set-case-fold-search (car patterns+options)))
+             (patterns (split-string (car patterns+options)))
+             (additional-options (and (cdr patterns+options)
+                                      (list (concat (cadr patterns+options) " "))))
+             (ignored-dirs ())
+             (ignored-files (when helm-findutils-skip-boring-files
+                              (cl-loop for f in completion-ignored-extensions
+                                       if (string-match "/$" f)
+                                       do (push (replace-match "" nil t f)
+                                                ignored-dirs)
+                                       else collect (concat "*" f))))
+             (path-or-name (if helm-findutils-search-full-path
+                               '(ipath path) '(iname name)))
+             (name-or-iname (if fold-case
+                                (car path-or-name) (cadr path-or-name)))
+             (cmd (find-cmd (and ignored-dirs
+                                 `(prune (name ,@ignored-dirs)))
+                            (and ignored-files
+                                 `(not (name ,@ignored-files)))
+                            `(and ,@(mapcar
+                                     (lambda (pattern)
+                                       `(,name-or-iname ,(concat "*" pattern "*")))
+                                     patterns)
+                                  ,@additional-options)))
+             (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
+        (helm-log "Find command:\n%s" cmd)
+        (prog1 proc
+          (set-process-sentinel
+           proc
+           #'(lambda (process event)
+               (helm-process-deferred-sentinel-hook
+                process event (helm-default-directory))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-source-findutils
