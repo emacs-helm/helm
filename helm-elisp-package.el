@@ -86,28 +86,31 @@
                 (package-delete (symbol-name (car id))
                                 (package-version-join (cdr id)))))
           (error (message (cadr err))))
-        and collect (if (fboundp 'package-desc-full-name)
+        unless (assoc (elt id 1) package-alist)
+        collect (if (fboundp 'package-desc-full-name)
                         id
                       (cons (symbol-name (car id))
                             (package-version-join (cdr id))))
         into delete-list
-        finally do (if (fboundp 'package-desc-full-name)
-                       ;; emacs 24.4
-                       (message (format "%d packages deleted:\n(%s)"
-                                        (length delete-list)
-                                        (mapconcat #'package-desc-full-name
-                                                   delete-list ", ")))
-                     ;; emacs 24.3
-                     (message (format "%d packages deleted:\n(%s)"
-                                      (length delete-list)
-                                      (mapconcat (lambda (x)
-                                                   (concat (car x) "-" (cdr x)))
-                                                 delete-list ", ")))
-                     ;; emacs 24.3 doesn't update
-                     ;; its `package-alist' after deleting.
-                     (cl-loop for p in package-alist
-                           when (assq (symbol-name (car p)) delete-list)
-                           do (setq package-alist (delete p package-alist))))))
+        finally do (if delete-list
+                       (if (fboundp 'package-desc-full-name)
+                           ;; emacs 24.4
+                           (message (format "%d packages deleted:\n(%s)"
+                                            (length delete-list)
+                                            (mapconcat #'package-desc-full-name
+                                                       delete-list ", ")))
+                           ;; emacs 24.3
+                           (message (format "%d packages deleted:\n(%s)"
+                                            (length delete-list)
+                                            (mapconcat (lambda (x)
+                                                         (concat (car x) "-" (cdr x)))
+                                                       delete-list ", ")))
+                           ;; emacs 24.3 doesn't update
+                           ;; its `package-alist' after deleting.
+                           (cl-loop for p in package-alist
+                                    when (assq (symbol-name (car p)) delete-list)
+                                    do (setq package-alist (delete p package-alist))))
+                       "No package deleted")))
 
 (defun helm-el-package-uninstall (_candidate)
   (helm-el-package-uninstall-1 (helm-marked-candidates)))
