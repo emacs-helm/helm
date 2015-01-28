@@ -71,7 +71,7 @@ _NOTE:_ That this will not work on Windows systems.
 
 ### Install from Emacs packaging system
 
-Helm is now available on Melpa at http://melpa.milkbox.net/
+Helm is now available on Melpa at http://melpa.org/
 You will find there instructions to install.
 See also https://github.com/milkypostman/melpa#usage to startup correctly
 with the emacs packaging system.
