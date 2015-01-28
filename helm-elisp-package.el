@@ -56,18 +56,24 @@
             (if (fboundp 'package-desc-name)
                 (package-desc-name id)
               (car id)))
-        and collect (if (fboundp 'package-desc-full-name)
+        collect (if (fboundp 'package-desc-full-name)
                         id
                       (car id))
         into installed-list
-        finally do (if (fboundp 'package-desc-full-name)
-                       (message (format "%d packages installed:\n(%s)"
-                                        (length installed-list)
-                                        (mapconcat #'package-desc-full-name
-                                                   installed-list ", ")))
-                     (message (format "%d packages installed:\n(%s)"
-                                      (length installed-list)
-                                      (mapconcat 'symbol-name installed-list ", "))))))
+        finally do (progn
+                     (when (boundp 'packages-installed-directly)
+                       (customize-save-variable
+                        'packages-installed-directly
+                        (append (mapcar 'package-desc-name installed-list)
+                                packages-installed-directly)))
+                     (if (fboundp 'package-desc-full-name)
+                         (message (format "%d packages installed:\n(%s)"
+                                          (length installed-list)
+                                          (mapconcat #'package-desc-full-name
+                                                     installed-list ", ")))
+                         (message (format "%d packages installed:\n(%s)"
+                                          (length installed-list)
+                                          (mapconcat 'symbol-name installed-list ", ")))))))
 
 (defun helm-el-package-install (_candidate)
   (helm-el-package-install-1 (helm-marked-candidates)))
