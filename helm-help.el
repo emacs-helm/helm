@@ -536,6 +536,20 @@ support the -b flag for compatibility with locate when they are used with it.
 When your directory is not under version control,
 don't forget to refresh your cache when files have been added/removed in your directory.
 
+*** Find command
+
+Recursively search files using \"find\" shell command.
+
+Candidates are all filenames that match all given globbing patterns.
+This respects the options `helm-case-fold-search' and
+`helm-findutils-search-full-path'.
+
+You can pass arbitrary options directly to find after a \"*\" separator.
+For example, this would find all files matching \"book\" that are larger
+than 1 megabyte:
+
+book * -size +1M
+
 \n** Specific commands for helm locate and others files sources:
 
 \\<helm-generic-files-map>
