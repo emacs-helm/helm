@@ -703,7 +703,7 @@ and before performing action.")
 (defvar helm-move-selection-after-hook nil
   "Run after moving selection in `helm-buffer'.")
 
-(defvar helm-restored-variables
+(defconst helm-restored-variables
   '(helm-candidate-number-limit
     helm-source-filter
     helm-source-in-each-line-flag
@@ -1047,17 +1047,12 @@ not `exit-minibuffer' or unwanted functions."
   `(with-current-buffer (helm-buffer-get)
      ,@body))
 
-(defmacro with-helm-restore-variables(&rest body)
+(defmacro with-helm-restore-variables (&rest body)
   "Restore `helm-restored-variables' after executing BODY."
   (declare (indent 0) (debug t))
-  (helm-with-gensyms (orig-vars)
-    `(let ((,orig-vars (mapcar (lambda (v)
-                                (cons v (symbol-value v)))
-                              helm-restored-variables)))
-       (unwind-protect (progn ,@body)
-         (cl-loop for (var . value) in ,orig-vars
-                  do (set var value))
-         (helm-log "restore variables")))))
+  `(let ,(mapcar (lambda (symbol) (list symbol symbol))
+                 helm-restored-variables)
+     ,@body))
 
 (defmacro with-helm-default-directory (directory &rest body)
   (declare (indent 2) (debug t))
