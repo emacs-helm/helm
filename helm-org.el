@@ -34,6 +34,7 @@ NOTE: This will be slow on large org buffers."
 ;;; Org capture templates
 ;;
 ;;
+(defvar org-capture-templates)
 (defun helm-source-org-capture-templates ()
   (helm-build-sync-source "Org Capture Templates:"
     :candidates (cl-loop for template in org-capture-templates
