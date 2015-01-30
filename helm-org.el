@@ -31,6 +31,16 @@ NOTE: This will be slow on large org buffers."
   :group 'helm-org
   :type 'boolean)
 
+;;; Org capture templates
+;;
+;;
+(defun helm-source-org-capture-templates ()
+  (helm-build-sync-source "Org Capture Templates:"
+    :candidates (cl-loop for template in org-capture-templates
+                         collect `(,(nth 1 template) . ,(nth 0 template)))
+    :action '(("Do capture" . (lambda (template-shortcut)
+                                (org-capture nil template-shortcut))))))
+
 ;;; Org headings
 ;;
 ;;
@@ -103,6 +113,13 @@ NOTE: This will be slow on large org buffers."
                   (list (buffer-file-name (current-buffer))))
         :candidate-number-limit 99999
         :buffer "*helm org inbuffer*"))
+
+;;;###autoload
+(defun helm-org-capture-templates ()
+  (interactive)
+  (helm :sources (helm-source-org-capture-templates)
+        :candidate-number-limit 99999
+        :buffer "*helm org capture templates*"))
 
 
 (provide 'helm-org)
