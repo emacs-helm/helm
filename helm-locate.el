@@ -229,7 +229,6 @@ See also `helm-locate'."
          (case-sensitive-flag (if locate-is-es "-i" ""))
          (ignore-case-flag (if (or locate-is-es
                                    (not real-locate)) "" "-i"))
-         process-connection-type
          (args (split-string helm-pattern " "))
          (cmd (format helm-locate-command
                       (cl-case helm-locate-case-fold-search
