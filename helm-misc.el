@@ -302,7 +302,9 @@ It is added to `extended-command-history'.
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
-    (helm-other-buffer helm-mini-default-sources "*helm mini*")))
+    (helm :sources helm-mini-default-sources
+          :buffer "*helm mini*"
+          :truncate-lines t)))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
