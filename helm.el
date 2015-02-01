@@ -4040,8 +4040,8 @@ and then to second, allowing a finer preselection when possible duplicates are
 before the candidate we want to preselect."
   (with-helm-window
     (when candidate-or-regexp
-      (if helm-force-updating-p
-          (and source (helm-goto-source source))
+      (if (and helm-force-updating-p source)
+          (helm-goto-source source)
         (goto-char (point-min))
         (forward-line 1))
       (let ((start (point)))
@@ -4054,6 +4054,7 @@ before the candidate we want to preselect."
     (forward-line 0) ; Avoid scrolling right on long lines.
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
+    (when (helm-pos-header-line-p) (forward-line 1))
     (helm-mark-current-line)))
 
 (defun helm-delete-current-selection ()
