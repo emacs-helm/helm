@@ -236,18 +236,31 @@
     :initform
     (lambda (actions candidate)
       (let ((pkg-desc (get-text-property
-                       0 'tabulated-list-id candidate)))
-        (if (cdr (assq (package-desc-name pkg-desc)
-                       helm-el-package--upgrades))
-            (append '(("Upgrade package" . helm-el-package-upgrade)) actions)
-            actions))))
+                       0 'tabulated-list-id candidate))
+            (acts (if helm-el-package--upgrades
+                      (append actions '(("Upgrade all packages"
+                                         . helm-el-package-upgrade-all-action)))
+                      actions)))
+        (cond ((cdr (assq (package-desc-name pkg-desc)
+                          helm-el-package--upgrades))
+               (append '(("Upgrade package" . helm-el-package-upgrade)) acts))
+              ((package-installed-p (package-desc-name pkg-desc))
+               (append acts '(("Reinstall package" . helm-el-package-reinstall)
+                              ("Uninstall" . helm-el-package-uninstall))))
+              (t (append acts '(("Install" . helm-el-package-install))))))))
    (mode-line :initform helm-el-package-mode-line)
    (keymap :initform helm-el-package-map)
    (candidate-number-limit :initform 9999)
-   (action :initform '(("Describe" . helm-el-package-describe)
-                       ("Install" . helm-el-package-install)
-                       ("Uninstall" . helm-el-package-uninstall)
-                       ("Upgrade all packages" . helm-el-package-upgrade-all-action)))))
+   (action :initform '(("Describe" . helm-el-package-describe)))))
+
+(defun helm-el-package-reinstall (_pkg)
+  (cl-loop for p in (helm-marked-candidates)
+           for pkg-desc = (get-text-property 0 'tabulated-list-id p)
+           for name = (package-desc-name pkg-desc)
+           do (if (fboundp 'package-reinstall)
+                  (package-reinstall name)
+                  (package-delete pkg-desc)
+                  (package-install name))))
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)
