@@ -61,11 +61,11 @@
                       (car id))
         into installed-list
         finally do (progn
-                     (when (boundp 'packages-installed-directly)
+                     (when (boundp 'package-selected-packages)
                        (customize-save-variable
-                        'packages-installed-directly
+                        'package-selected-packages
                         (append (mapcar 'package-desc-name installed-list)
-                                packages-installed-directly)))
+                                package-selected-packages)))
                      (if (fboundp 'package-desc-full-name)
                          (message (format "%d packages installed:\n(%s)"
                                           (length installed-list)
