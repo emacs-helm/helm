@@ -2874,14 +2874,13 @@ A bonus of one point is given when PATTERN prefix match CANDIDATE."
     (+ bonus (or bonus1 (length (cl-nintersection
                                  pat-lookup str-lookup :test 'equal))))))
 
-(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+(defun helm-fuzzy-matching-default-sort-fn (candidates _source)
   "The transformer for sorting candidates in fuzzy matching.
 It is sorting on the display part of by default.
 
 Sort CANDIDATES according to their score calculated by
 `helm-score-candidate-for-pattern'.  When two candidates have the
-same score sort is made by length.  Set USE-REAL to non-nil to
-sort on the real part."
+same score sort is made by length."
   (if (string= helm-pattern "")
       candidates
     (let ((table-scr (make-hash-table :test 'equal)))
