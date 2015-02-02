@@ -407,12 +407,14 @@ Filename completion happen if string start after or between a double quote."
                                (intern-soft default))))
       (when (and default-symbol (funcall test default-symbol))
         (insert (concat default "\n")))
-      (cl-loop with all = (all-completions "" obarray test)
-            for sym in all
-            for s = (intern sym)
-            unless (or (and default (string= sym default))
-                       (keywordp s))
-            do (insert (concat sym "\n"))))))
+      (insert
+       (mapconcat
+        (lambda (name) (if (or (and default (string= name default))
+                          (keywordp (intern name)))
+                      ""
+                    name))
+        (all-completions "" obarray test)
+        "\n")))))
 
 (defun helm-apropos-default-sort-fn (candidates _source)
   (if (string= helm-pattern "")
