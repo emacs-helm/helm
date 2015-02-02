@@ -523,12 +523,6 @@ When nil no sorting will be done."
   :group 'helm
   :type 'function)
 
-(defcustom helm-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
-  "The function to highlight matches in fuzzy matching.
-When nil no highlighting will be done."
-  :group 'helm
-  :type 'function)
-
 (defcustom helm-autoresize-max-height 40
   "Specifies a maximum height and defaults to the height of helm window's frame in percentage.
 
@@ -2921,15 +2915,16 @@ sort on the real part."
                       ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-default-highlight-match (candidate)
-  "The default function to highlight matches in fuzzy matching.
-It is meant to use with `filter-one-by-one' slot."
-  (let* ((pair (and (consp candidate) candidate))
+  "The default function to highlight matches in fuzzy matching."
+  (let* ((pair candidate)
          (display (if pair (car pair) candidate))
-         (real (cdr pair)))
+         (real (cdr pair))
+         (start (next-single-property-change 0 'helm-original-display display))
+         (end (next-single-property-change start 'helm-original-display display)))
     (with-temp-buffer
       (insert display)
-      (goto-char (point-min))
-      (if (search-forward helm-pattern nil t)
+      (goto-char start)
+      (if (search-forward helm-pattern end t)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match))
           (cl-loop with pattern = (if (string-match-p " " helm-pattern)
@@ -2937,7 +2932,7 @@ It is meant to use with `filter-one-by-one' slot."
                                       (split-string helm-pattern "" t))
                    for p in pattern
                    do
-                   (when (search-forward p nil t)
+                   (when (search-forward p end t)
                      (add-text-properties
                       (match-beginning 0) (match-end 0) '(face helm-match)))))
       (setq display (buffer-string)))
