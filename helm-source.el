@@ -958,18 +958,13 @@ an eieio class."
       (oset source :header-line (helm-source--persistent-help-string it source)))
   (when (slot-value source :fuzzy-match)
     (oset source :nohighlight t)
-    (when helm-fuzzy-matching-highlight-fn
-      (oset source :filter-one-by-one
-            (helm-aif (oref source :filter-one-by-one)
-                (append (helm-mklist it)
-                        (list helm-fuzzy-matching-highlight-fn))
-              (list helm-fuzzy-matching-highlight-fn))))
     (when helm-fuzzy-sort-fn
       (oset source :filtered-candidate-transformer
-            (helm-aif (oref source :filtered-candidate-transformer)
-                (append (helm-mklist it)
-                        (list helm-fuzzy-sort-fn))
-              (list helm-fuzzy-sort-fn))))))
+            (append (list 'helm-propertize-original-display)
+                    (helm-aif (oref source :filtered-candidate-transformer)
+                        (append (helm-mklist it)
+                                (list helm-fuzzy-sort-fn))
+                      (list helm-fuzzy-sort-fn)))))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 

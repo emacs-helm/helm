@@ -2914,6 +2914,15 @@ sort on the real part."
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
 
+(defun helm-propertize-original-display (candidates)
+  (cl-loop for c in candidates
+           collect (let* ((pair (if (consp c)
+                                   c
+                                 (cons (helm-candidate-get-display c) c)))
+                          (text (car c)))
+                     (put-text-property 0 (length text) 'helm-original-display t text)
+                     c)))
+
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching."
   (let* ((pair candidate)
