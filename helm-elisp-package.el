@@ -154,7 +154,8 @@
                  (t
                   ;; Delete.
                   (if (boundp 'package-selected-packages)
-                      (package-delete pkg-desc t t)
+                      (with-no-warnings
+                        (package-delete pkg-desc t t))
                       (package-delete pkg-desc))))))
 
 (defun helm-el-package-upgrade (_candidate)
