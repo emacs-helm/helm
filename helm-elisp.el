@@ -407,12 +407,31 @@ Filename completion happen if string start after or between a double quote."
                                (intern-soft default))))
       (when (and default-symbol (funcall test default-symbol))
         (insert (concat default "\n")))
-      (cl-loop with all = (all-completions "" obarray test)
-            for sym in all
-            for s = (intern sym)
-            unless (or (and default (string= sym default))
-                       (keywordp s))
-            do (insert (concat sym "\n"))))))
+      (insert
+       (mapconcat
+        (lambda (name) (if (or (and default (string= name default))
+                          (keywordp (intern name)))
+                      ""
+                    name))
+        (all-completions "" obarray test)
+        "\n")))))
+
+(defun helm-apropos-init-faces (default)
+  "Init candidates buffer for faces for `helm-apropos'."
+  (require 'helm-help)
+  (with-current-buffer (helm-candidate-buffer 'global)
+    (goto-char (point-min))
+    (let ((default-symbol (and (stringp default)
+                               (intern-soft default)))
+          (faces (face-list)))
+      (when (and default-symbol (facep default-symbol))
+        (insert (concat default "\n")))
+      (insert
+       (mapconcat #'prin1-to-string
+                  (if default
+                      (cl-remove-if (lambda (sym) (string= sym default)) faces)
+                    faces)
+                  "\n")))))
 
 (defun helm-apropos-default-sort-fn (candidates _source)
   (if (string= helm-pattern "")
@@ -434,8 +453,7 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--emacs-faces (&optional default)
   (helm-build-in-buffer-source "Faces"
-    :init `(lambda ()
-             (helm-apropos-init 'facep ,default))
+    :init (lambda () (helm-apropos-init-faces default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer
     (append (and (null helm-apropos-fuzzy-match)
