@@ -434,7 +434,8 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-def-source--emacs-variables (&optional default)
   (helm-build-in-buffer-source "Variables"
     :init `(lambda ()
-             (helm-apropos-init 'boundp ,default))
+             (helm-apropos-init
+              (lambda (x) (and (boundp x) (not (keywordp x)))) ,default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
