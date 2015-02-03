@@ -153,7 +153,9 @@
                   (package-install pkg-desc))
                  (t
                   ;; Delete.
-                  (package-delete pkg-desc)))))
+                  (if (boundp 'package-selected-packages)
+                      (package-delete pkg-desc t t)
+                      (package-delete pkg-desc))))))
 
 (defun helm-el-package-upgrade (_candidate)
   (helm-el-package-upgrade-1
