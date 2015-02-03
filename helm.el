@@ -4451,11 +4451,11 @@ Returns the resulting buffer."
     (with-current-buffer buf
       (erase-buffer)
       (if (listp data)
-          (cl-loop for i in data
-                   for str = (cond ((symbolp i) (symbol-name i))
-                                   ((numberp i) (number-to-string i))
-                                   (t i))
-                   do (insert (concat str "\n")))
+          (insert (mapconcat (lambda (i)
+                               (cond ((symbolp i) (symbol-name i))
+                                     ((numberp i) (number-to-string i))
+                                     (t i)))
+                             data "\n"))
         (and (stringp data) (insert data))))
     buf))
 

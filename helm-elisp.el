@@ -401,20 +401,13 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-apropos-init (test default)
   "Init candidates buffer for `helm-apropos' sources."
   (require 'helm-help)
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (goto-char (point-min))
+  (helm-init-candidates-in-buffer 'global
     (let ((default-symbol (and (stringp default)
-                               (intern-soft default))))
-      (when (and default-symbol (funcall test default-symbol))
-        (insert (concat default "\n")))
-      (insert
-       (mapconcat
-        (lambda (name) (if (or (and default (string= name default))
-                          (keywordp (intern name)))
-                      ""
-                    name))
-        (all-completions "" obarray test)
-        "\n")))))
+                               (intern-soft default)))
+          (symbols (all-completions "" obarray test)))
+      (if (and default-symbol (funcall test default-symbol))
+          (cons default-symbol symbols)
+        symbols))))
 
 (defun helm-apropos-init-faces (default)
   "Init candidates buffer for faces for `helm-apropos'."
