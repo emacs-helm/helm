@@ -145,10 +145,11 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-transformer (candidates source)
   (helm-top-transformer
    (if helm-top-sort-fn
-       (cl-loop for c in candidates
-                if (string-match "^ *[0-9]+" c)
-                collect c into pid-cands
-                else collect c into header-cands
+       (cl-loop for cand in candidates
+                for real = (cdr cand)
+                if (string-match "^ *[0-9]+" real)
+                collect cand into pid-cands
+                else collect cand into header-cands
                 finally return (append
                                 header-cands
                                 (sort pid-cands helm-top-sort-fn)))
