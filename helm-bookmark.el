@@ -100,18 +100,19 @@
   "See (info \"(emacs)Bookmarks\").")
 
 (defun helm-bookmark-transformer (candidates _source)
-  (cl-loop for i in candidates
-        for loc = (bookmark-location i)
-        for len =  (string-width i)
+  (cl-loop for cand in candidates
+           for real = (cdr cand)
+        for loc = (bookmark-location real)
+        for len =  (string-width real)
         for trunc = (if (> len bookmark-bmenu-file-column)
-                        (helm-substring i bookmark-bmenu-file-column)
-                      i)
+                        (helm-substring real bookmark-bmenu-file-column)
+                      real)
         for sep = (make-string (- (+ bookmark-bmenu-file-column 2)
                                   (length trunc))
                                ? )
         if helm-bookmark-show-location
-        collect (cons (concat trunc sep (if (listp loc) (car loc) loc)) i)
-        else collect i))
+        collect (helm-normalize-candidate (cons (concat trunc sep (if (listp loc) (car loc) loc)) real))
+        else collect cand))
 
 (defun helm-bookmark-match-fn (candidate)
   "Match function for bookmark sources using `candidates'."
