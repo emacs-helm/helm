@@ -87,11 +87,15 @@
 (defun helm-firefox-bookmarks-get-value (elm)
   (assoc-default elm helm-firefox-bookmarks-alist))
 
-(defun helm-highlight-firefox-bookmarks (bookmarks _source)
-  (cl-loop for i in bookmarks
-        collect (propertize
-                 i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-firefox-bookmarks-get-value i))))
+(defun helm-highlight-firefox-bookmarks (candidates _source)
+  (cl-loop for cand in candidates
+           for display = (car cand)
+           for real = (cdr cand)
+           collect (cons
+                    (propertize
+                     i 'face '((:foreground "YellowGreen"))
+                     'help-echo (helm-firefox-bookmarks-get-value display))
+                    real)))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()
