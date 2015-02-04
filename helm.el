@@ -2931,12 +2931,9 @@ Used in the filtered-candidate-transformer slot."
   (let* ((pair (if (consp candidate)
                    candidate
                  (cons (helm-candidate-get-display candidate) candidate)))
-         (display (car pair))
-         (properties (if helm-fuzzy-sort-fn
-                         '(helm-original-display t)
-                       nil)))
-    ;; clear out other text propertiex as well
-    (set-text-properties 0 (length display) properties display)
+         (display (car pair)))
+    (when helm-fuzzy-sort-fn
+      (put-text-property 0 (length display) 'helm-original-display t display))
     (cons display (cdr pair))))
 
 (defun helm-fuzzy-default-highlight-match (candidate-data)
