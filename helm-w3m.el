@@ -91,11 +91,15 @@ http://emacs-w3m.namazu.org/")
          (arg (and (eq fn 'w3m-browse-url) new-tab)))
     (funcall fn (helm-w3m-bookmarks-get-value elm) arg)))
 
-(defun helm-highlight-w3m-bookmarks (bookmarks _source)
-  (cl-loop for i in bookmarks
-        collect (propertize
-                 i 'face 'helm-w3m-bookmarks
-                 'help-echo (helm-w3m-bookmarks-get-value i))))
+(defun helm-highlight-w3m-bookmarks (candidates _source)
+  (cl-loop for cand in candidates
+           for display = (car cand)
+           for real = (cdr cand)
+           collect (cons
+                    (propertize
+                     display 'face 'helm-w3m-bookmarks
+                     'help-echo (helm-w3m-bookmarks-get-value display))
+                    real)))
 
 
 (defun helm-w3m-delete-bookmark (elm)
