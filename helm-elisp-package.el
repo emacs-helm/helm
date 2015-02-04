@@ -25,10 +25,14 @@
 (defvar helm-el-package--initialized-p nil)
 (defvar helm-el-package--tabulated-list nil)
 (defvar helm-el-package--upgrades nil)
+(defvar helm-el-package--removable-packages nil)
 
 (defun helm-el-package--init ()
   (when (null package-alist)
     (setq helm-el-package--show-only 'all))
+  (when (fboundp 'package--removable-packages)
+    (setq helm-el-package--removable-packages
+          (package--removable-packages)))
   (save-selected-window
     (list-packages helm-el-package--initialized-p)
     (setq helm-el-package--initialized-p t)
@@ -189,6 +193,11 @@
            for user-installed-p = (and (boundp 'package-selected-packages)
                                        (memq name package-selected-packages))
            do (when user-installed-p (put-text-property 0 2 'display "S " c))
+           do (when (memq name helm-el-package--removable-packages)
+                (put-text-property 0 2 'display "U " c)
+                (put-text-property
+                 2 (+ (length (symbol-name name)) 2)
+                 'face 'font-lock-variable-name-face c))
            for cand = (cons c (car (split-string c)))
            when (or (and upgrade-p
                          (eq helm-el-package--show-only 'upgrade))
