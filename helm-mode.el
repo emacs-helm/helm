@@ -395,12 +395,13 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :fuzzy-match fuzzy
                          :filtered-candidate-transformer
                          (append '((lambda (candidates sources)
-                                     (cl-loop for i in candidates
+                                     (cl-loop for cand in candidates
+                                              for display = (helm-candidate-get-display cand)
+                                              for real = (helm-candidate-get-real cand)
                                               ;; Input is added to history in completing-read's
                                               ;; and may be regexp-quoted, so unquote it.
-                                              for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                              do (set-text-properties 0 (length cand) nil cand)
-                                              collect cand)))
+                                              for display = (replace-regexp-in-string "\\s\\" "" display)
+                                              collect (cons display real))))
                                  (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                          :persistent-action persistent-action
                          :persistent-help persistent-help
