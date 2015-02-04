@@ -325,10 +325,11 @@ See `ido-make-buffer-list' for more infos."
           name (and proc name-prefix) dir size mode dir
           'italic 'helm-buffer-process proc details 'nofile))))))
 
-(defun helm-highlight-buffers (buffers _source)
+(defun helm-highlight-buffers (candidates _source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (cl-loop for i in buffers
+  (cl-loop for candidate in candidates
+           for i = (car candidate)
         for (name size mode meta) = (if helm-buffer-details-flag
                                         (helm-buffer--details i 'details)
                                       (helm-buffer--details i))
@@ -351,7 +352,7 @@ Should be called after others transformers i.e (boring buffers)."
                           (concat truncbuf "\t" formatted-size
                                   "  " fmode "  " meta)
                         name)
-                      i)))
+                      (cdr candidate))))
 
 (defun helm-buffer--get-preselection (buffer-name)
   (concat "^"
@@ -378,8 +379,9 @@ Should be called after others transformers i.e (boring buffers)."
   (if (string= helm-pattern "")
       candidates
     (sort candidates
-          #'(lambda (s1 s2)
-              (< (string-width s1) (string-width s2))))))
+          #'(lambda (c1 c2)
+              (< (string-width (helm-candidate-get-real c1))
+                 (string-width (helm-candidate-get-real c2)))))))
 
 (defun helm-buffers-mark-similar-buffers-1 ()
   (with-helm-window
