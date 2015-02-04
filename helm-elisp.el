@@ -309,8 +309,10 @@ Return a cons \(beg . end\)."
 
 (defun helm-lisp-completion-transformer (candidates _source)
   "Helm candidates transformer for lisp completion."
-  (cl-loop for c in candidates
-        for sym = (intern c)
+  (cl-loop for cand in candidates
+           for display = (car cand)
+           for real = (cdr cand)
+        for sym = (intern real)
         for annot = (cl-typecase sym
                       (command " (Com)")
                       (class   " (Class)")
@@ -318,8 +320,8 @@ Return a cons \(beg . end\)."
                       (fbound  " (Fun)")
                       (bound   " (Var)")
                       (face    " (Face)"))
-        for spaces = (make-string (- helm-lgst-len (length c)) ? )
-        collect (cons (concat c spaces annot) c) into lst
+        for spaces = (make-string (- helm-lgst-len (length real)) ? )
+        collect (cons (concat real spaces annot) real) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
 (defun helm-get-first-line-documentation (sym)
@@ -761,8 +763,9 @@ Filename completion happen if string start after or between a double quote."
     (candidates . timer-list)
     (filtered-candidate-transformer
      . (lambda (candidates _source)
-         (cl-loop for timer in candidates
-               collect (cons (helm-elisp--format-timer timer) timer))))
+         (cl-loop for candidate in candidates
+                  for real = (cdr candidate)
+                  collect (helm-normalize-candidate (cons (helm-elisp--format-timer real) real)))))
     (allow-dups)
     (volatile)
     (type . timer)))
@@ -774,8 +777,9 @@ Filename completion happen if string start after or between a double quote."
     (volatile)
     (filtered-candidate-transformer
      . (lambda (candidates _source)
-         (cl-loop for timer in candidates
-               collect (cons (helm-elisp--format-timer timer) timer))))
+         (cl-loop for candidate in candidates
+                  for real = (cdr candidate)
+                  collect (cons (helm-elisp--format-timer real) real))))
     (type . timer)))
 
 (defun helm-elisp--format-timer (timer)
