@@ -960,11 +960,10 @@ an eieio class."
     (oset source :nohighlight t)
     (when helm-fuzzy-sort-fn
       (oset source :filtered-candidate-transformer
-            (append (list 'helm-propertize-original-display)
-                    (helm-aif (oref source :filtered-candidate-transformer)
-                        (append (helm-mklist it)
-                                (list helm-fuzzy-sort-fn))
-                      (list helm-fuzzy-sort-fn)))))))
+            (helm-aif (oref source :filtered-candidate-transformer)
+                (append (helm-mklist it)
+                        (list helm-fuzzy-sort-fn))
+              (list helm-fuzzy-sort-fn))))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
