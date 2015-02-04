@@ -1333,7 +1333,7 @@ or when `helm-pattern' is equal to \"~/\"."
                  (not history-p)) ; Don't try to auto complete in history.
         (with-helm-window
           (let ((cur-cand (prog2
-                              (unless completed-p
+                              (unless (or completed-p (file-exists-p pat))
                                 ;; Only one non--existing candidate
                                 ;; and one directory candidate, move to it.
                                 (helm-next-line))
