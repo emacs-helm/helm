@@ -2619,12 +2619,13 @@ Else return ACTIONS unmodified."
 Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
-  (cl-loop for c in candidates collect
-        (cond ((file-remote-p c)
-               (cons (propertize c 'face 'helm-history-remote) c))
-              ((file-exists-p c)
-               (cons (propertize c 'face 'helm-ff-file) c))
-              (t (cons (propertize c 'face 'helm-history-deleted) c)))))
+  (cl-loop for candidate in candidates collect
+           for real (helm-candidate-get-real candidate)
+        (cond ((file-remote-p real)
+               (cons (propertize real 'face 'helm-history-remote) c))
+              ((file-exists-p real)
+               (cons (propertize real 'face 'helm-ff-file) c))
+              (t (cons (propertize real 'face 'helm-history-deleted) c)))))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
@@ -2864,12 +2865,13 @@ Colorize only symlinks, directories and files."
 (defvar helm-source-tracker-cand-incomplete nil "Contains incomplete candidate")
 (defun helm-source-tracker-transformer (candidates _source)
   (helm-log "received: %S" candidates)
-  (cl-loop for cand in candidates
+  (cl-loop for candidate in candidates
+           for real = (cdr candidate)
            for path = (when (stringp helm-source-tracker-cand-incomplete)
                         (caar (helm-highlight-files
                                (list helm-source-tracker-cand-incomplete))))
-           for built = (if (not (stringp cand)) cand
-                         (let ((snippet cand))
+           for built = (if (not (stringp real)) real
+                         (let ((snippet real))
                            (unless (or (null path)
                                       (string= "" path)
                                       (not (string-match-p
@@ -2880,10 +2882,10 @@ Colorize only symlinks, directories and files."
                                (setq helm-source-tracker-cand-incomplete nil)
                                (helm-log "built: %S" complete-candidate)
                                complete-candidate))))
-           when (and (stringp cand)
-                   (string-match "\\`[[:space:]]*file://" cand))
+           when (and (stringp real)
+                   (string-match "\\`[[:space:]]*file://" real))
            do (setq helm-source-tracker-cand-incomplete ; save path
-                    (replace-match "" t t cand)) end
+                    (replace-match "" t t real)) end
            collect built))
 
 (defvar helm-source-tracker-search
@@ -2935,12 +2937,14 @@ utility mdfind.")
     (requires-pattern . 3)))
 
 (defun helm-findutils-transformer (candidates _source)
-  (cl-loop for i in candidates
-           for type = (car (file-attributes i))    
-        for abs = (expand-file-name i helm-default-directory)
-        for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (string-match "[.]\\{1,2\\}$" i)))
-                       (helm-basename i) abs)
+  (cl-loop for candidate in candidates
+           for real = (cdr candidate)
+           for type = (car (file-attributes real))
+        for abs = (expand-file-name real helm-default-directory)
+        for disp = (car (helm-normalize-candidate
+                         (if (and helm-ff-transformer-show-only-basename
+                                (not (string-match "[.]\\{1,2\\}$" real)))
+                             (helm-basename real) abs)))
         collect (cond ((eq t type)
                        (cons (propertize disp 'face 'helm-ff-directory) abs))
                       ((stringp type)
