@@ -2667,7 +2667,7 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 (defun helm-process-filtered-candidate-transformer (candidates source)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (let ((transformers (assoc-default 'filtered-candidate-transformer source)))
-    (helm-composed-funcall-with-source source (append (list 'helm-normalize-candidate-to-cons)
+    (helm-composed-funcall-with-source source (append (list 'helm-normalize-candidates)
                                                       (helm-mklist transformers))
                                        candidates source)))
 
@@ -2920,20 +2920,24 @@ same score sort is made by length."
                                              ((> scr1 scr2))))))
                collect (helm-fuzzy-default-highlight-match c-datum)))))
 
-(defun helm-normalize-candidate-to-cons (candidates _source)
+(defun helm-normalize-candidates (candidates _source)
   "Normalize candidate to be cons cell of (display . real).
 Used in the filtered-candidate-transformer slot."
-  (cl-loop for c in candidates
-           collect (let* ((pair (if (consp c)
-                                   c
-                                 (cons (helm-candidate-get-display c) c)))
-                          (display (car pair))
-                          (properties (if helm-fuzzy-sort-fn
-                                          '(helm-original-display t)
-                                        nil)))
-                     ;; clear out other text propertiex as well
-                     (set-text-properties 0 (length display) properties display)
-                     (cons display (cdr pair)))))
+  (cl-loop for candidate in candidates
+           collect (helm-normalize-candidate candidate)))
+
+(defun helm-normalize-candidate (candidate)
+  "Normalize single candidate."
+  (let* ((pair (if (consp candidate)
+                   candidate
+                 (cons (helm-candidate-get-display candidate) candidate)))
+         (display (car pair))
+         (properties (if helm-fuzzy-sort-fn
+                         '(helm-original-display t)
+                       nil)))
+    ;; clear out other text propertiex as well
+    (set-text-properties 0 (length display) properties display)
+    (cons display (cdr pair))))
 
 (defun helm-fuzzy-default-highlight-match (candidate-data)
   "The default function to highlight matches in fuzzy matching.
