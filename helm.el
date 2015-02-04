@@ -2748,6 +2748,20 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
          (number-to-string candidate))
         (t candidate)))
 
+(defun helm-candidate-get-real (candidate)
+  "Get real part from CANDIDATE.
+CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
+  (cond ((cdr-safe candidate))
+        (t candidate)))
+
+(defun helm-candidate-get-display-start-end (candidate)
+  "Return (START . END) of candidate based on 'helm-original-display text property."
+  (let* ((display (car candidate))
+         (start (or (text-property-not-all 0 (length display) 'helm-original-display nil display)
+                   0))
+         (end (text-property-not-all start (length display) 'helm-original-display t display)))
+    (cons start end)))
+
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute PATTERN function in SOURCE."
   (helm-aif (assoc-default 'pattern-transformer source)
@@ -2883,54 +2897,47 @@ Sort CANDIDATES according to their score calculated by
 same score sort is made by length."
   (if (string= helm-pattern "")
       candidates
-    (let ((table-scr (make-hash-table :test 'equal)))
+    (let ((candidate-data
+           (cl-loop for candidate in candidates
+                    collect (cl-destructuring-bind (start . end)
+                                (helm-candidate-get-display-start-end candidate)
+                              (let* ((match-str (substring (car candidate) start end))
+                                     (score (helm-score-candidate-for-pattern match-str helm-pattern))
+                                     (len (length match-str)))
+                                (list candidate start end score len))))))
       (cl-loop for x below helm-candidate-number-limit
-               for candidate in (sort candidates
-                                      (lambda (s1 s2)
-                                        ;; Score and measure the length on real or display part of candidate
-                                        ;; according to `use-real'.
-                                        (let* ((real-or-disp-fn (if use-real #'cdr #'car))
-                                               (cand1 (if (consp s1)
-                                                          (funcall real-or-disp-fn s1)
-                                                        s1))
-                                               (cand2 (if (consp s2)
-                                                          (funcall real-or-disp-fn s2)
-                                                        s2))
-                                               (data1 (or (gethash cand1 table-scr)
-                                                         (puthash cand1 (list (helm-score-candidate-for-pattern
-                                                                               cand1 helm-pattern)
-                                                                              (length cand1))
-                                                                  table-scr)))
-                                               (data2 (or (gethash cand2 table-scr)
-                                                         (puthash cand2 (list (helm-score-candidate-for-pattern
-                                                                               cand2 helm-pattern)
-                                                                              (length cand2))
-                                                                  table-scr)))
-                                               (len1 (cadr data1))
-                                               (len2 (cadr data2))
-                                               (scr1 (car data1))
-                                               (scr2 (car data2)))
-                                          (cond ((= scr1 scr2)
-                                                 (< len1 len2))
-                                                ((> scr1 scr2))))))
-               collect (helm-fuzzy-default-highlight-match candidate)))))
+               for c-datum in (sort candidate-data
+                                    (lambda (s1 s2)
+                                     (let* ((data1 (cdddr s1))
+                                            (data2 (cddr s2))
+                                            (len1 (cadr data1))
+                                            (len2 (cadr data2))
+                                            (scr1 (car data1))
+                                            (scr2 (car data2)))
+                                       (cond ((= scr1 scr2)
+                                              (< len1 len2))
+                                             ((> scr1 scr2))))))
+               collect (helm-fuzzy-default-highlight-match c-datum)))))
 
-(defun helm-propertize-original-display (candidates)
+(defun helm-propertize-original-display (candidates _source)
   (cl-loop for c in candidates
            collect (let* ((pair (if (consp c)
                                    c
                                  (cons (helm-candidate-get-display c) c)))
-                          (text (car c)))
+                          (text (car pair)))
                      (put-text-property 0 (length text) 'helm-original-display t text)
-                     c)))
+                     pair)))
 
-(defun helm-fuzzy-default-highlight-match (candidate)
-  "The default function to highlight matches in fuzzy matching."
-  (let* ((pair candidate)
-         (display (if pair (car pair) candidate))
+(defun helm-fuzzy-default-highlight-match (candidate-data)
+  "The default function to highlight matches in fuzzy matching.
+
+CANDIDATE-DATA is encoded with information from `helm-fuzzy-matching-default-sort-fn'.
+Returns a candidate intended for helm use."
+  (let* ((pair (car candidate-data))
+         (display (car pair))
          (real (cdr pair))
-         (start (next-single-property-change 0 'helm-original-display display))
-         (end (next-single-property-change start 'helm-original-display display)))
+         (start (cadr candidate-data))
+         (end (caddr candidate-data)))
     (with-temp-buffer
       (insert display)
       (goto-char start)
@@ -2946,7 +2953,7 @@ same score sort is made by length."
                      (add-text-properties
                       (match-beginning 0) (match-end 0) '(face helm-match)))))
       (setq display (buffer-string)))
-    (if real (cons display real) display)))
+    (cons display real)))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
