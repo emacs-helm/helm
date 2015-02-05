@@ -128,8 +128,8 @@
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
-           for status = (aref (cadr entry) 2)
-           when (member status '("installed" "unsigned"))
+           for status = (package-desc-status pkg-desc)
+           when (member status '("installed" "unsigned" "dependency"))
            collect pkg-desc
            into installed
            when (member status '("available" "new"))
