@@ -2928,13 +2928,14 @@ Used in the filtered-candidate-transformer slot."
 
 (defun helm-normalize-candidate (candidate)
   "Normalize single candidate."
-  (let* ((pair (if (consp candidate)
-                   candidate
-                 (cons (helm-candidate-get-display candidate) candidate)))
-         (display (car pair)))
-    (when helm-fuzzy-sort-fn
-      (put-text-property 0 (length display) 'helm-original-display t display))
-    (cons display (cdr pair))))
+  (when candidate
+    (let* ((pair (if (consp candidate)
+                     candidate
+                   (cons (helm-candidate-get-display candidate) candidate)))
+           (display (car pair)))
+      (when helm-fuzzy-sort-fn
+        (put-text-property 0 (length display) 'helm-original-display t display))
+      (cons display (cdr pair)))))
 
 (defun helm-fuzzy-default-highlight-match (candidate-data)
   "The default function to highlight matches in fuzzy matching.
