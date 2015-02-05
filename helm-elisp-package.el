@@ -184,6 +184,7 @@
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for cand in candidates
+           for display = (car cand)
            for real = (cdr cand)
 
            for id = (get-text-property 0 'tabulated-list-id real)
@@ -196,11 +197,10 @@
                                        (memq name package-selected-packages))
            do (when user-installed-p (put-text-property 0 2 'display "S " real))
            do (when (memq name helm-el-package--removable-packages)
-                (put-text-property 0 2 'display "U " real)
+                (put-text-property 0 2 'display "U " display)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
-                 'face 'font-lock-variable-name-face real))
-           for cand = (cons real (car (split-string real)))
+                 'face 'font-lock-variable-name-face display))
            when (or (and upgrade-p
                          (eq helm-el-package--show-only 'upgrade))
                     (and installed-p
@@ -208,7 +208,7 @@
                     (and (not installed-p)
                          (eq helm-el-package--show-only 'uninstalled)) 
                     (eq helm-el-package--show-only 'all))
-           collect (helm-normalize-candidate cand)))
+           collect (helm-normalize-candidate (cons display (car (split-string real))))))
 
 (defun helm-el-package-show-upgrade ()
   (interactive)

@@ -93,7 +93,7 @@
            for real = (cdr cand)
            collect (cons
                     (propertize
-                     i 'face '((:foreground "YellowGreen"))
+                     display 'face '((:foreground "YellowGreen"))
                      'help-echo (helm-firefox-bookmarks-get-value display))
                     real)))
 

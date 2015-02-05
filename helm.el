@@ -2909,7 +2909,7 @@ same score sort is made by length."
       (cl-loop for x below helm-candidate-number-limit
                for c-datum in (sort candidate-data
                                     (lambda (s1 s2)
-                                     (let* ((data1 (cdddr s1))
+                                      (let* ((data1 (cdr (cddr s1)))
                                             (data2 (cddr s2))
                                             (len1 (cadr data1))
                                             (len2 (cadr data2))
@@ -2945,7 +2945,7 @@ Returns a candidate intended for helm use."
          (display (car pair))
          (real (cdr pair))
          (start (cadr candidate-data))
-         (end (caddr candidate-data)))
+         (end (car (cddr candidate-data))))
     (with-temp-buffer
       (insert display)
       (goto-char start)

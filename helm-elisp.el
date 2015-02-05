@@ -321,7 +321,7 @@ Return a cons \(beg . end\)."
                       (bound   " (Var)")
                       (face    " (Face)"))
         for spaces = (make-string (- helm-lgst-len (length real)) ? )
-        collect (cons (concat real spaces annot) real) into lst
+        collect (cons (concat display spaces annot) real) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
 (defun helm-get-first-line-documentation (sym)

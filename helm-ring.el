@@ -85,7 +85,6 @@ If nil or zero (disabled), don't truncate candidate, show all."
 (defun helm-kill-ring-transformer (candidates _source)
   "Display only the `helm-kill-ring-max-lines-number' lines of candidate."
   (cl-loop for cand in candidates
-           for display = (car cand)
            for real = (cdr cand)
 
            when (get-text-property 0 'read-only real)

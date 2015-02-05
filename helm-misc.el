@@ -93,7 +93,7 @@
 (defun helm-time-zone-transformer (candidates _source)
   (cl-loop for cand in candidates
            for display = (car cand)
-           for real = (cde cand)
+           for real = (cdr cand)
            collect
            (cons (cond ((string-match (format-time-string "%H:%M" (current-time)) display)
                         (propertize display 'face 'helm-time-zone-current))

@@ -2619,13 +2619,16 @@ Else return ACTIONS unmodified."
 Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
-  (cl-loop for candidate in candidates collect
-           for real (helm-candidate-get-real candidate)
-        (cond ((file-remote-p real)
-               (cons (propertize real 'face 'helm-history-remote) c))
-              ((file-exists-p real)
-               (cons (propertize real 'face 'helm-ff-file) c))
-              (t (cons (propertize real 'face 'helm-history-deleted) c)))))
+  (cl-loop for candidate in candidates
+           for display = (car candidate)
+           for real = (cdr candidate)
+           collect
+           (helm-normalize-candidate
+            (cond ((file-remote-p real)
+                   (cons (propertize display 'face 'helm-history-remote) real))
+                  ((file-exists-p real)
+                   (cons (propertize display 'face 'helm-ff-file) real))
+                  (t (cons (propertize display 'face 'helm-history-deleted) real))))))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
