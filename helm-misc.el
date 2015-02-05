@@ -91,13 +91,16 @@
 ;;; World time
 ;;
 (defun helm-time-zone-transformer (candidates _source)
-  (cl-loop for i in candidates
-        collect
-        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
-               (propertize i 'face 'helm-time-zone-current))
-              ((string-match helm-time-zone-home-location i)
-               (propertize i 'face 'helm-time-zone-home))
-              (t i))))
+  (cl-loop for cand in candidates
+           for display = (car cand)
+           for real = (cde cand)
+           collect
+           (cons (cond ((string-match (format-time-string "%H:%M" (current-time)) display)
+                        (propertize display 'face 'helm-time-zone-current))
+                       ((string-match helm-time-zone-home-location display)
+                        (propertize display 'face 'helm-time-zone-home))
+                       (t display))
+                 real)))
 
 (defvar helm-source-time-world
   '((name . "Time World List")

@@ -183,8 +183,10 @@
   (helm-el-package-upgrade-all))
 
 (defun helm-el-package--transformer (candidates _source)
-  (cl-loop for c in candidates
-           for id = (get-text-property 0 'tabulated-list-id c)
+  (cl-loop for cand in candidates
+           for real = (cdr cand)
+
+           for id = (get-text-property 0 'tabulated-list-id real)
            for name = (if (fboundp 'package-desc-name)
                           (package-desc-name id)
                           (car id))
@@ -192,13 +194,13 @@
            for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (and (boundp 'package-selected-packages)
                                        (memq name package-selected-packages))
-           do (when user-installed-p (put-text-property 0 2 'display "S " c))
+           do (when user-installed-p (put-text-property 0 2 'display "S " real))
            do (when (memq name helm-el-package--removable-packages)
-                (put-text-property 0 2 'display "U " c)
+                (put-text-property 0 2 'display "U " real)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
-                 'face 'font-lock-variable-name-face c))
-           for cand = (cons c (car (split-string c)))
+                 'face 'font-lock-variable-name-face real))
+           for cand = (cons real (car (split-string real)))
            when (or (and upgrade-p
                          (eq helm-el-package--show-only 'upgrade))
                     (and installed-p
@@ -206,7 +208,7 @@
                     (and (not installed-p)
                          (eq helm-el-package--show-only 'uninstalled)) 
                     (eq helm-el-package--show-only 'all))
-           collect cand))
+           collect (helm-normalize-candidate cand)))
 
 (defun helm-el-package-show-upgrade ()
   (interactive)

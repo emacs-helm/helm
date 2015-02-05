@@ -133,7 +133,7 @@ All other actions are removed."
     (filtered-candidate-transformer . (lambda (candidates _source)
                                         (setq helm-bbdb-name helm-pattern)
                                         (if (not candidates)
-                                            (list "*Add to contacts*")
+                                            (list (helm-normalize-candidate "*Add to contacts*"))
                                           candidates)))
     (action-transformer . (lambda (actions candidate)
                             (helm-bbdb-create-contact actions candidate))))

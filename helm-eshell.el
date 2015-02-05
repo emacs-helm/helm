@@ -61,13 +61,16 @@
     :initform
     (lambda (candidates _sources)
       (cl-loop 
-       for i in candidates
+       for cand in candidates
+       for real = (cdr cand)
        collect
-       (cond ((string-match "\\`~/?" helm-ec-target)
-              (abbreviate-file-name i))
-             ((string-match "\\`/" helm-ec-target) i)
-             (t
-              (file-relative-name i)))
+       (helm-normalize-candidate
+        (cons (cond ((string-match "\\`~/?" helm-ec-target)
+                     (abbreviate-file-name real))
+                    ((string-match "\\`/" helm-ec-target) real)
+                    (t
+                     (file-relative-name real)))
+              real))
        into lst
        finally return (sort lst 'helm-generic-sort-fn))))
    (action :initform 'helm-ec-insert))

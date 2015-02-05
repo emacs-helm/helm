@@ -111,20 +111,23 @@ fuzzy matching is running its own sort function with a different algorithm."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
-          for local-key  = (car (rassq cand local-map))
-          for key        = (substitute-command-keys (format "\\[%s]" cand))
+          for real = (helm-candidate-get-real cand)
+          for display = (helm-candidate-get-display cand)
+          for local-key  = (car (rassq real local-map))
+          for key        = (substitute-command-keys (format "\\[%s]" real))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
                        (format "%s (%s)"
-                               cand (propertize
-                                     local-key
-                                     'face 'helm-M-x-key)))
-                      ((string-match "^M-x" key) cand)
+                               display (propertize
+                                        local-key
+                                        'face 'helm-M-x-key)))
+                      ((string-match "^M-x" key)
+                       display)
                       (t (format "%s (%s)"
-                                 cand (propertize
+                                 display (propertize
                                        key
                                        'face 'helm-M-x-key))))
-                cand)
+                real)
           into ls
           finally return
           (if sort (sort ls #'helm-generic-sort-fn) ls))))
@@ -156,9 +159,6 @@ You can get help on each command by persistent action."
   (let* ((history (cl-loop for i in extended-command-history
                         when (commandp (intern i)) collect i))
          command sym-com in-help help-cand
-         (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
-         (helm-fuzzy-sort-fn (lambda (candidates source)
-                               (funcall orig-fuzzy-sort-fn candidates source 'real)))
          (helm--mode-line-display-prefarg t)
          (pers-help #'(lambda (candidate)
                         (let ((hbuf (get-buffer (help-buffer))))

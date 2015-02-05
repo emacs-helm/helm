@@ -785,21 +785,22 @@ directory, open this directory."
                     candidates)))
 
 (defun helm-filtered-candidate-transformer-file-line-1 (candidate)
-  (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" candidate)
-    (let ((filename (match-string 1 candidate))
-          (lineno (match-string 2 candidate))
-          (content (match-string 3 candidate)))
-      (cons (format "%s:%s\n %s"
-                    (propertize filename 'face compilation-info-face)
-                    (propertize lineno 'face compilation-line-face)
-                    content)
-            (list (string-to-number lineno) content
-                  (expand-file-name
-                   filename
-                   (or (helm-interpret-value (helm-attr 'default-directory))
+  (let ((display (car candidate)))
+   (when (string-match "^\\(.+?\\):\\([0-9]+\\):\\(.*\\)$" display)
+     (let ((filename (match-string 1 display))
+           (lineno (match-string 2 display))
+           (content (match-string 3 display)))
+       (cons (format "%s:%s\n %s"
+                     (propertize filename 'face compilation-info-face)
+                     (propertize lineno 'face compilation-line-face)
+                     content)
+             (list (string-to-number lineno) content
+                   (expand-file-name
+                    filename
+                    (or (helm-interpret-value (helm-attr 'default-directory))
                        (and (helm-candidate-buffer)
-                            (buffer-local-value
-                             'default-directory (helm-candidate-buffer))))))))))
+                          (buffer-local-value
+                           'default-directory (helm-candidate-buffer)))))))))))
 
 (cl-defun helm-goto-file-line (lineno &optional content file (find-file-function #'find-file))
   (helm-aif (helm-attr 'before-jump-hook)
