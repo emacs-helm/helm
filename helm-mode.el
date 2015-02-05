@@ -399,7 +399,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                               ;; Input is added to history in completing-read's
                                               ;; and may be regexp-quoted, so unquote it.
                                               for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                              do (set-text-properties 0 (length cand) nil cand)
                                               collect cand)))
                                  (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                          :persistent-action persistent-action

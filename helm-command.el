@@ -154,7 +154,9 @@ the prefix args if needed, are passed AFTER starting `helm-M-x'.
 You can get help on each command by persistent action."
   (interactive)
   (let* ((history (cl-loop for i in extended-command-history
-                        when (commandp (intern i)) collect i))
+                        when (commandp (intern i))
+                        do (set-text-properties 0 (length i) nil i)
+                        collect i))
          command sym-com in-help help-cand
          (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
          (helm-fuzzy-sort-fn (lambda (candidates source)
