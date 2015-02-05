@@ -691,13 +691,20 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((marked (helm-marked-candidates)))
     (unwind-protect
          (cl-loop for b in marked
-               do (progn (helm-preselect (format "^%s\\_>" b))
+               do (progn (helm-preselect (format "^%s"
+                                                 (regexp-quote
+                                                  (if helm-buffer-max-length
+                                                      (helm-substring-by-width
+                                                       b helm-buffer-max-length
+                                                       "")
+                                                    b))))
                          (when (y-or-n-p (format "kill buffer (%s)? " b))
-                           (helm-buffers-persistent-kill-1 b)
-                           (message nil))))
+                           (helm-buffers-persistent-kill-1 b))
+                         (message nil)))
       (with-helm-buffer
         (setq helm-marked-candidates nil
-              helm-visible-mark-overlays nil)))))
+              helm-visible-mark-overlays nil))
+      (helm-force-update))))
 
 (defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
