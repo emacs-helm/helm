@@ -380,8 +380,8 @@ Should be called after others transformers i.e (boring buffers)."
       candidates
     (sort candidates
           #'(lambda (c1 c2)
-              (< (string-width (helm-candidate-get-real c1))
-                 (string-width (helm-candidate-get-real c2)))))))
+              (< (string-width (cdr c1))
+                 (string-width (cdr c2)))))))
 
 (defun helm-buffers-mark-similar-buffers-1 ()
   (with-helm-window

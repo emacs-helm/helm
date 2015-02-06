@@ -2749,12 +2749,6 @@ CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
          (number-to-string candidate))
         (t candidate)))
 
-(defun helm-candidate-get-real (candidate)
-  "Get real part from CANDIDATE.
-CANDIDATE is a string, a symbol, or \(DISPLAY . REAL\) cons cell."
-  (cond ((cdr-safe candidate))
-        (t candidate)))
-
 (defun helm-candidate-get-display-start-end (candidate)
   "Return (START . END) of candidate based on 'helm-original-display text property."
   (let* ((display (car candidate))

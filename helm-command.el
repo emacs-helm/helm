@@ -111,8 +111,8 @@ fuzzy matching is running its own sort function with a different algorithm."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
-          for real = (helm-candidate-get-real cand)
-          for display = (helm-candidate-get-display cand)
+          for real = (cdr cand)
+          for display = (car cand)
           for local-key  = (car (rassq real local-map))
           for key        = (substitute-command-keys (format "\\[%s]" real))
           collect

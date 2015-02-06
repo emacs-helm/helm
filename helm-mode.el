@@ -396,8 +396,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :filtered-candidate-transformer
                          (append '((lambda (candidates sources)
                                      (cl-loop for cand in candidates
-                                              for display = (helm-candidate-get-display cand)
-                                              for real = (helm-candidate-get-real cand)
+                                              for display = (car cand)
+                                              for real = (cdr cand)
                                               ;; Input is added to history in completing-read's
                                               ;; and may be regexp-quoted, so unquote it.
                                               for display = (replace-regexp-in-string "\\s\\" "" display)
