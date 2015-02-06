@@ -683,7 +683,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           (kill-buffer buffer))
       (kill-buffer buffer)))
   (helm-delete-current-selection)
-  (when (helm-empty-source-p) (helm-next-source))
   (with-helm-temp-hook 'helm-after-persistent-action-hook
     (helm-force-update (regexp-quote (helm-get-selection nil t)))))
 
