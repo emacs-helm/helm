@@ -574,10 +574,11 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffer-revert-and-update (_candidate)
   (let ((marked (helm-marked-candidates))
-        (preselect (helm-get-selection nil t)))
+        (preselect (helm-buffers--quote-truncated-buffer
+                    (helm-get-selection))))
     (cl-loop for buf in marked do (helm-revert-buffer buf))
     (when (> (length marked) 1) (helm-unmark-all))
-    (helm-force-update (regexp-quote preselect))))
+    (helm-force-update preselect)))
 
 (defun helm-buffer-revert-persistent ()
   "Revert buffer without quitting helm."
