@@ -2092,6 +2092,9 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ((string-match (image-file-name-regexp) candidate)
            (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
              (kill-buffer image-dired-display-image-buffer))
+           ;; Fix emacs bug never fixed upstream.
+           (unless (file-directory-p image-dired-dir)
+             (make-directory image-dired-dir))
            (image-dired-display-image candidate)
            (message nil)
            (helm-switch-to-buffer image-dired-display-image-buffer)
