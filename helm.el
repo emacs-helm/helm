@@ -2162,7 +2162,8 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
 
     (setq helm-selection-overlay
           (make-overlay (point-min) (point-min) (get-buffer buffer)))
-    (overlay-put helm-selection-overlay 'face 'helm-selection)))
+    (overlay-put helm-selection-overlay 'face 'helm-selection)
+    (overlay-put helm-selection-overlay 'priority 1)))
 
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."
@@ -4790,6 +4791,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                               (or (helm-get-next-candidate-separator-pos)
                                   (point-max))
                             (1+ (point-at-eol))))))
+    (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
