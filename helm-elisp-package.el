@@ -43,7 +43,9 @@
       (setq helm-el-package--tabulated-list tabulated-list-entries)
       (buffer-string)))
   (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
-  (setq helm-el-package--show-only 'all)
+  (if helm-force-updating-p
+      (message "Refreshinging packages list done")
+    (setq helm-el-package--show-only 'all))
   (kill-buffer "*Packages*"))
 
 (defun helm-el-package-describe (candidate)
@@ -265,8 +267,12 @@
               (t (append acts '(("Install" . helm-el-package-install))))))))
    (mode-line :initform helm-el-package-mode-line)
    (keymap :initform helm-el-package-map)
+   (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe" . helm-el-package-describe)))))
+
+(defun helm-el-package--update ()
+  (setq helm-el-package--initialized-p nil))
 
 (defun helm-el-package-reinstall (_pkg)
   (cl-loop for p in (helm-marked-candidates)
