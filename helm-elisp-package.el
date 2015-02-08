@@ -44,7 +44,7 @@
       (buffer-string)))
   (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
   (if helm-force-updating-p
-      (message "Refreshinging packages list done")
+      (message "Refreshing packages list done")
     (setq helm-el-package--show-only 'all))
   (kill-buffer "*Packages*"))
 
