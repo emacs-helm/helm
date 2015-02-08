@@ -600,8 +600,8 @@ to exit or helm update to disable the `current-input-method' with `C-\\'."
   "Face for candidate number in mode-line." :group 'helm-faces)
 
 (defface helm-selection
-    '((((background dark)) :background "ForestGreen" :underline t)
-      (((background light)) :background "#b5ffd1" :underline t))
+    '((((background dark)) :background "ForestGreen")
+      (((background light)) :background "#b5ffd1"))
   "Face for currently selected item in the helm buffer."
   :group 'helm-faces)
 
