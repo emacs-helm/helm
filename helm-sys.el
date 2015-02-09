@@ -261,7 +261,6 @@ Show actions only on line starting by a PID."
     (persistent-action . (lambda (elm)
                            (delete-process (get-process elm))
                            (helm-delete-current-selection)))
-    (update . list-processes--refresh)
     (persistent-help . "Kill Process")
     (action ("Kill Process" . (lambda (elm)
                                 (delete-process (get-process elm)))))))
