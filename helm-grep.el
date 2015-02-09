@@ -1020,7 +1020,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
           (helm-do-grep-1 bufs))
       ;; bufs is empty, thats mean we have only CANDIDATE
       ;; and it is not a buffer-filename, fallback to occur.
-      (helm-switch-to-buffer candidate)
+      (switch-to-buffer candidate)
       (when (get-buffer helm-action-buffer)
         (kill-buffer helm-action-buffer))
       (helm-occur)

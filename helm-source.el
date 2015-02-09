@@ -754,10 +754,11 @@ like `re-search-forward', see below documentation of :search slot.")
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
   (oset source :action (helm-make-actions
-                        "Switch to buffer" 'helm-switch-to-buffer
+                        "Switch to buffer(s)" 'helm-switch-to-buffers
                         (lambda () (and (locate-library "popwin") "Switch to buffer in popup window"))
                         'popwin:popup-buffer
-                        "Switch to buffer other window `C-c o'" 'switch-to-buffer-other-window
+                        "Switch to buffer(s) other window `C-c o'"
+                        'helm-switch-to-buffers-other-window
                         "Switch to buffer other frame `C-c C-o'" 'switch-to-buffer-other-frame
                         (lambda () (and (locate-library "elscreen") "Display buffer in Elscreen"))
                         'helm-find-buffer-on-elscreen

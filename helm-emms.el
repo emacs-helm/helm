@@ -62,7 +62,7 @@
         (emms-stream-add-bookmark name url (string-to-number fd) type)
         (emms-stream-save-bookmarks-file)
         (emms-stream-quit)
-        (helm-switch-to-buffer cur-buf)))))
+        (switch-to-buffer cur-buf)))))
 
 (defun helm-emms-stream-delete-bookmark (_candidate)
   "Delete emms-streams bookmarks from helm."

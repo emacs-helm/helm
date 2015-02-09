@@ -190,11 +190,33 @@ Return nil if DIR is not an existing directory."
             when printer
             collect printer))))
 
-;; Shut up byte compiler in emacs24*.
-(defun helm-switch-to-buffer (buffer-or-name)
-  "Same as `switch-to-buffer' whithout warnings at compile time."
-  (with-no-warnings
-    (switch-to-buffer buffer-or-name)))
+(defun helm-switch-to-buffers (buffer-or-name &optional other-window)
+  "Switch to buffer BUFFER-OR-NAME.
+If more than one buffer marked switch to these buffers in separate windows.
+If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
+in separate windows."
+  (let* ((mkds (helm-marked-candidates))
+         (size (/ (window-height) (length mkds))))
+    (or (<= window-min-height size)
+        (error "Too many buffers to visit simultaneously."))
+    (helm-aif (cdr mkds)
+        (progn
+          (if other-window
+              (switch-to-buffer-other-window (car mkds))
+            (switch-to-buffer (car mkds)))
+          (save-selected-window
+            (cl-loop for b in it
+                  do (progn
+                       (select-window (split-window))
+                       (switch-to-buffer b)))))
+      (if other-window
+          (switch-to-buffer-other-window buffer-or-name)
+        (switch-to-buffer buffer-or-name)))))
+
+(defun helm-switch-to-buffers-other-window (buffer-or-name)
+  "switch to buffer BUFFER-OR-NAME in other window.
+See `helm-switch-to-buffers' for switching to marked buffers."
+  (helm-switch-to-buffers buffer-or-name t))
 
 (cl-defmacro helm-position (item seq &key (test 'eq) all)
   "A simple and faster replacement of CL `position'.

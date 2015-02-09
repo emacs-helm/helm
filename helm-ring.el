@@ -176,11 +176,11 @@ replace with STR as yanked string."
     (action . (("Goto line"
                 . (lambda (candidate)
                     (let ((items (split-string candidate ":")))
-                      (helm-switch-to-buffer (cl-second items))
+                      (switch-to-buffer (cl-second items))
                       (helm-goto-line (string-to-number (car items))))))))
     (persistent-action . (lambda (candidate)
                            (let ((items (split-string candidate ":")))
-                             (helm-switch-to-buffer (cl-second items))
+                             (switch-to-buffer (cl-second items))
                              (helm-goto-line (string-to-number (car items)))
                              (helm-highlight-current-line))))
     (persistent-help . "Show this line")))

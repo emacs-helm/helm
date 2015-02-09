@@ -505,8 +505,6 @@
 (make-obsolete 'helm-c-bookmark-run-jump-other-window 'helm-bookmark-run-jump-other-window "1.5.1")
 (defalias 'helm-c-elisp-library-scan-list 'helm-elisp-library-scan-list)
 (make-obsolete 'helm-c-elisp-library-scan-list 'helm-elisp-library-scan-list "1.5.1")
-(defalias 'helm-c-switch-to-buffer 'helm-switch-to-buffer)
-(make-obsolete 'helm-c-switch-to-buffer 'helm-switch-to-buffer "1.5.1")
 (defalias 'helm-c-bookmark-man-setup-alist 'helm-bookmark-man-setup-alist)
 (make-obsolete 'helm-c-bookmark-man-setup-alist 'helm-bookmark-man-setup-alist "1.5.1")
 (defalias 'helm-c-etags-find-tag-file-directory 'helm-etags-find-tag-file-directory)

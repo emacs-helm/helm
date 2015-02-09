@@ -200,7 +200,7 @@ package name - description."
 (defun helm-apt-cache-show-1 (package)
   (let* ((command (format helm-apt-show-command package))
          (buf     (get-buffer-create "*helm apt show*")))
-    (helm-switch-to-buffer buf)
+    (switch-to-buffer buf)
     (unless (string= package helm-apt-show-current-package)
       (let ((inhibit-read-only t))
         (erase-buffer)

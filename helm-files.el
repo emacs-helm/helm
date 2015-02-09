@@ -729,7 +729,7 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
                         (format "cd '%s'" helm-ff-default-directory))
                        (eshell-send-input))))
     (if (get-buffer "*eshell*")
-        (helm-switch-to-buffer "*eshell*")
+        (switch-to-buffer "*eshell*")
       (call-interactively 'eshell))
     (unless (get-buffer-process (current-buffer))
       (funcall cd-eshell))))
@@ -2097,7 +2097,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
              (make-directory image-dired-dir))
            (image-dired-display-image candidate)
            (message nil)
-           (helm-switch-to-buffer image-dired-display-image-buffer)
+           (switch-to-buffer image-dired-display-image-buffer)
            (with-current-buffer image-dired-display-image-buffer
              (let ((exif-data (helm-ff-exif-data candidate)))
                (setq default-directory helm-ff-default-directory)

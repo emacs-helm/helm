@@ -102,7 +102,7 @@
   "Gentoo default action that use `helm-gentoo-buffer'."
   (if (member elm helm-cache-world)
       (progn
-        (helm-switch-to-buffer helm-gentoo-buffer)
+        (switch-to-buffer helm-gentoo-buffer)
         (erase-buffer)
         (let ((com-list (append args (list elm))))
           (apply #'call-process command nil t nil
@@ -120,7 +120,7 @@
     (candidate-transformer helm-highlight-local-use)
     (action . (("Description"
                 . (lambda (elm)
-                    (helm-switch-to-buffer helm-gentoo-buffer)
+                    (switch-to-buffer helm-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "euse" nil t nil
                            `("-i"
@@ -138,7 +138,7 @@
                     (helm-gentoo-eshell-action elm "*sudo -p Password: euse -P")))
                ("Show which dep use this flag"
                 . (lambda (elm)
-                    (helm-switch-to-buffer helm-gentoo-buffer)
+                    (switch-to-buffer helm-gentoo-buffer)
                     (erase-buffer)
                     (apply #'call-process "equery" nil t nil
                            `("-C"
