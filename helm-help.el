@@ -1525,7 +1525,7 @@ HELM-ATTRIBUTE should be a symbol."
 
 (helm-document-attribute 'update "optional"
   (substitute-command-keys
-   "  Function called with no parameters at end of reinitialization when \
+   "  Function called with no parameters at before \"init\" when \
 \\<helm-map>\\[helm-force-update] is pressed."))
 
 (helm-document-attribute 'mode-line "optional"
