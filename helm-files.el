@@ -2426,7 +2426,8 @@ Ask to kill buffers associated with that file, too."
         (message "%s File(s) deleted" len)))))
 
 (defun helm-find-file-or-marked (candidate)
-  "Open file CANDIDATE or open helm marked files in background."
+  "Open file CANDIDATE or open helm marked files in separate windows.
+Called with a prefix arg open files in background without selecting them."
   (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
@@ -2450,12 +2451,8 @@ Ask to kill buffers associated with that file, too."
                  (push helm-ff-default-directory helm-ff-history))
                (or (and helm-ff (helm-find-files-1 dir)) t))))
         (helm--reading-passwd-or-string t))
-    (if (> (length marked) 1)
-        ;; Open all marked files in background and display
-        ;; the first one.
-        (progn
-          (mapc 'find-file-noselect (cdr marked))
-          (find-file (car marked)))
+    (if (cdr marked)
+        (dired-simultaneous-find-file marked helm-current-prefix-arg)
       (if (and (not (file-exists-p candidate))
                (not url-p)
                (string-match "/$" candidate))
