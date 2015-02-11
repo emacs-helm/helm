@@ -35,7 +35,7 @@
   :group 'helm)
 
 (defcustom helm-grep-default-command
-  "grep -a -d skip %e -n%cH -e %p %f"
+  "grep --color=never -a -d skip %e -n%cH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
 Where:
 '%e' format spec is for --exclude or --include grep options or
@@ -65,7 +65,12 @@ here a default command example for ack-grep:
 \(setq helm-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
        helm-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
 
+NOTE: Helm for ack-grep support ANSI sequences, so you can remove
+the \"--no-color\" option safely (recommended).
+On the other hand If you add \"--color=always\" expect errors, it is not supported yet.
+ 
 You can ommit the %e spec if you don't want to be prompted for types.
+
 `helm-grep-default-command' and `helm-grep-default-recurse-command'are
 independents, so you can enable `helm-grep-default-command' with ack-grep
 and `helm-grep-default-recurse-command' with grep if you want to be faster
@@ -78,7 +83,7 @@ NOTE: Remote grepping is not available with ack-grep,
   :type  'string)
 
 (defcustom helm-grep-default-recurse-command
-  "grep -a -d recurse %e -n%cH -e %p %f"
+  "grep --color=never -a -d recurse %e -n%cH -e %p %f"
   "Default recursive grep format command for `helm-do-grep-1'.
 See `helm-grep-default-command' for format specs and infos about ack-grep."
   :group 'helm-grep
@@ -447,7 +452,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
-  (let* ((split        (helm-grep-split-line candidate))
+  (let* ((split        (helm-grep-split-line (ansi-color-apply candidate)))
          (lineno       (string-to-number (nth 1 split)))
          (loc-fname        (or (with-current-buffer
                                    (if (eq major-mode 'helm-grep-mode)
@@ -942,7 +947,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 (defun helm-grep--filter-candidate-1 (candidate &optional dir)
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
-         (split  (helm-grep-split-line candidate))
+         (split  (helm-grep-split-line (ansi-color-apply candidate)))
          (fname  (if (and root split)
                      (expand-file-name (car split) root)
                    (car-safe split)))
@@ -951,9 +956,11 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (when (and fname lineno str)
       (cons (concat (propertize (file-name-nondirectory fname)
                                 'face 'helm-grep-file
-                                'help-echo fname) ":"
-                                (propertize lineno 'face 'helm-grep-lineno) ":"
-                                (helm-grep-highlight-match str))
+                                'help-echo fname)
+                    ":"
+                    (propertize lineno 'face 'helm-grep-lineno)
+                    ":"
+                    (if ansi-color-context str (helm-grep-highlight-match str)))
             candidate))))
 
 (defun helm-grep-filter-one-by-one (candidate)
