@@ -53,7 +53,7 @@ When nil, fallback to `browse-url-browser-function'."
   :group 'helm-net)
 
 (defcustom helm-google-suggest-search-url
-  "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
+  "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
   "URL used for Google searching."
   :type 'string
   :group 'helm-net)
@@ -71,7 +71,7 @@ Otherwise `url-retrieve-synchronously' is used."
   :group 'helm-net)
 
 (defcustom helm-yahoo-suggest-search-url
-  "http://search.yahoo.com/search?&ei=UTF-8&fr&h=c&p="
+  "http://search.yahoo.com/search?&ei=UTF-8&fr&h=c&p=%s"
   "Url used for Yahoo searching."
   :type 'string
   :group 'helm-net)
@@ -271,7 +271,7 @@ Return an alist with elements like (data . number_results)."
 
 (defun helm-google-suggest-action (candidate)
   "Default action to jump to a google suggested candidate."
-  (let ((arg (concat helm-google-suggest-search-url
+  (let ((arg (format helm-google-suggest-search-url
                      (url-hexify-string candidate))))
     (helm-aif helm-google-suggest-default-browser-function
         (funcall it arg)
@@ -325,7 +325,7 @@ Return an alist with elements like (data . number_results)."
 
 (defun helm-yahoo-suggest-action (candidate)
   "Default action to jump to a Yahoo suggested candidate."
-  (helm-browse-url (concat helm-yahoo-suggest-search-url
+  (helm-browse-url (format helm-yahoo-suggest-search-url
                            (url-hexify-string candidate))))
 
 (defvar helm-source-yahoo-suggest
