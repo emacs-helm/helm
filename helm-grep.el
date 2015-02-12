@@ -65,12 +65,15 @@ here a default command example for ack-grep:
 \(setq helm-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
        helm-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
 
-NOTE: Helm for ack-grep support ANSI sequences, so you can remove
-the \"--no-color\" option safely (recommended).
-On the other hand If you add \"--color=always\" expect errors, it is not supported yet.
- 
 You can ommit the %e spec if you don't want to be prompted for types.
 
+NOTE: Helm for ack-grep support ANSI sequences, so you can remove
+the \"--no-color\" option safely (recommended).
+To enable ANSI in grep it is a little more difficult:
+    1) Modify env var
+      \(setenv \"GREP_COLORS\" \"ms=01;31:mc=01;31:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
+    2) Add the option \"--color=always\".
+ 
 `helm-grep-default-command' and `helm-grep-default-recurse-command'are
 independents, so you can enable `helm-grep-default-command' with ack-grep
 and `helm-grep-default-recurse-command' with grep if you want to be faster
