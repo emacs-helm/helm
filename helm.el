@@ -4040,10 +4040,12 @@ to a list of forms.\n\n")
 
 ;; Core: misc
 (defun helm-kill-buffer-hook ()
-  "Remove tick entry from `helm-tick-hash' when killing a buffer."
+  "Remove tick entry from `helm-tick-hash' and remove buffer from
+`helm-buffers' when killing a buffer."
   (cl-loop for key being the hash-keys in helm-tick-hash
         if (string-match (format "^%s/" (regexp-quote (buffer-name))) key)
-        do (remhash key helm-tick-hash)))
+        do (remhash key helm-tick-hash))
+  (setq helm-buffers (remove (buffer-name) helm-buffers)))
 (add-hook 'kill-buffer-hook 'helm-kill-buffer-hook)
 
 (defun helm-preselect (candidate-or-regexp &optional source)
