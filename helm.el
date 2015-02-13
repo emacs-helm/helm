@@ -167,7 +167,7 @@ so don't use strings, vectors or whatever to define them."
                            (,subkey (call-interactively ,command) t)
                            ,@other-keys
                            (t
-                            (setq kb  (this-command-keys-vector))
+                            (setq kb (vector last-command-event))
                             (setq com (lookup-key ,map kb))
                             (if (commandp com)
                                 (call-interactively com)
