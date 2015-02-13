@@ -455,7 +455,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
-  (let* ((split        (helm-grep-split-line (ansi-color-apply candidate)))
+  (let* ((split        (helm-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
          (loc-fname        (or (with-current-buffer
                                    (if (eq major-mode 'helm-grep-mode)
@@ -951,9 +951,8 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
          (ansi-p (string-match-p ansi-color-regexp candidate))
-         (split  (helm-grep-split-line (if ansi-p
-                                           (ansi-color-apply candidate)
-                                         candidate)))
+         (line   (if ansi-p (ansi-color-apply candidate) candidate))
+         (split  (helm-grep-split-line line))
          (fname  (if (and root split)
                      (expand-file-name (car split) root)
                    (car-safe split)))
@@ -967,7 +966,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                     (propertize lineno 'face 'helm-grep-lineno)
                     ":"
                     (if ansi-p str (helm-grep-highlight-match str)))
-            candidate))))
+            line))))
 
 (defun helm-grep-filter-one-by-one (candidate)
   "`filter-one-by-one' transformer function for `helm-do-grep'."
