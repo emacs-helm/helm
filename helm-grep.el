@@ -950,7 +950,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 (defun helm-grep--filter-candidate-1 (candidate &optional dir)
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
-         (ansi-p (string-match-p ansi-color-parameter-regexp candidate))
+         (ansi-p (string-match-p ansi-color-regexp candidate))
          (split  (helm-grep-split-line (if ansi-p
                                            (ansi-color-apply candidate)
                                          candidate)))
