@@ -1008,8 +1008,10 @@ Can be used as value for `completion-in-region-function'."
 (defun helm-mode--in-file-completion-p (target candidate)
   (when (and candidate target)
     (or (string-match "/\\'" candidate)
-        (string-match "/\\'" target)
-        (if (string-match "~?/" target)
+        (string-match "\\`~?/.*/\\'" target)
+        (string-match "\\`[a-zA-Z]:/.*/\\'" target)
+        (if (or (string-match "\\`~?/" target)
+                (string-match "\\`[a-zA-Z]:/" target))
             (file-exists-p (expand-file-name candidate (helm-basedir target)))
           (file-exists-p (expand-file-name
                           candidate (with-helm-current-buffer
