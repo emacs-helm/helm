@@ -102,7 +102,7 @@
     :initform nil
     :custom function
     :documentation
-    "  Function called with no parameters at end of reinitialization
+    "  Function called with no parameters at before \"init\" function
   when `helm-force-update' is called.")
 
    (cleanup
