@@ -69,6 +69,7 @@ You can ommit the %e spec if you don't want to be prompted for types.
 
 NOTE: Helm for ack-grep support ANSI sequences, so you can remove
 the \"--no-color\" option safely (recommended).
+
 To enable ANSI in grep it is a little more difficult:
     1) Modify env var
       \(setenv \"GREP_COLORS\" \"ms=01;31:mc=01;31:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
@@ -95,13 +96,18 @@ See `helm-grep-default-command' for format specs and infos about ack-grep."
 (defcustom helm-default-zgrep-command
   "zgrep -a -n%cH -e %p %f"
   "Default command for Zgrep.
-See `helm-grep-default-command' for infos on format specs."
+See `helm-grep-default-command' for infos on format specs.
+Option --color=always is supported and can be used safely
+to replace the helm internal match highlighting,
+see `helm-grep-default-command' for more infos."
   :group 'helm-grep
   :type  'string)
 
 (defcustom helm-pdfgrep-default-command
   "pdfgrep --color never -niH %s %s"
-  "Default command for pdfgrep."
+  "Default command for pdfgrep.
+Option --color always is not supported, expect
+errors when executing actions."
   :group 'helm-grep
   :type  'string)
 
