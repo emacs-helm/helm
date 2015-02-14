@@ -4909,7 +4909,8 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
           for (source . real) in
           (or (reverse helm-marked-candidates)
               (list (cons current-src (helm-get-selection))))
-          when (equal current-src source)
+          when (equal (assoc 'name current-src)
+                      (assoc 'name source))
           ;; When real is a normal filename without wildcard
           ;; file-expand-wildcards returns a list of one file.
           ;; When real is a non--existent file it return nil.

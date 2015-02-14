@@ -180,6 +180,11 @@ Only buffer names are fuzzy matched when this is enabled,
    (matchplugin :initform nil)
    (match :initform 'helm-buffers-list--match-fn)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
+   (resume :initform (lambda ()
+                       (run-with-idle-timer
+                        0.1 nil (lambda ()
+                                  (with-helm-buffer
+                                    (helm-force-update))))))
    (keymap :initform helm-buffer-map)
    (volatile :initform t)
    (mode-line :initform helm-buffer-mode-line-string)
@@ -612,7 +617,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-execute-persistent-action 'kill-action)))
 
 (defun helm-kill-marked-buffers (_ignore)
-  (mapc 'kill-buffer (helm-marked-candidates)))
+  (mapc 'kill-buffer (helm-marked-candidates))
+  (with-helm-buffer
+    (setq helm-marked-candidates nil
+          helm-visible-mark-overlays nil)))
 
 (defun helm-buffer-run-kill-buffers ()
   "Run kill buffer action from `helm-source-buffers-list'."
