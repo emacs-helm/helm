@@ -119,8 +119,8 @@ second call within 0.5s run `helm-swap-windows'."
   '(helm-toggle-resplit-window helm-swap-windows) 1)
 
 ;;;###autoload
-(defmacro helm-define-key-with-subkeys (map key subkey command
-                                        &optional other-subkeys menu exit-fn)
+(defun helm-define-key-with-subkeys (map key subkey command
+                                         &optional other-subkeys menu exit-fn)
   "Allow defining in MAP a KEY and SUBKEY to COMMAND.
 
 This allow typing KEY to call COMMAND the first time and
@@ -129,12 +129,12 @@ type only SUBKEY on subsequent calls.
 Arg MAP is the keymap to use, SUBKEY is the initial short keybinding to
 call COMMAND.
 
-Arg OTHER-SUBKEYS is an unquoted alist specifying other short keybindings
+Arg OTHER-SUBKEYS is an alist specifying other short keybindings
 to use once started.
 e.g:
 
 \(helm-define-key-with-subkeys global-map
-   \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk ((?p . git-gutter:previous-hunk))\)
+   \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk '((?p . git-gutter:previous-hunk))\)
 
 
 In this example, `C-x v n' will run `git-gutter:next-hunk'
@@ -152,30 +152,31 @@ NOTE: SUBKEY and OTHER-SUBKEYS bindings support
 only char syntax actually (e.g ?n)
 so don't use strings, vectors or whatever to define them."
   (declare (indent 1))
-  (let ((other-keys (and other-subkeys
-                         (cl-loop for (x . y) in other-subkeys
-                               collect (list x `(call-interactively ',y) t)))))
-    `(define-key ,map ,key
-       (lambda ()
-         (interactive)
-         (unwind-protect
-              (progn
-                (call-interactively ,command)
-                (while (let ((input (read-key ,menu)) kb com)
-                         (setq last-command-event input)
-                         (cl-case input 
-                           (,subkey (call-interactively ,command) t)
-                           ,@other-keys
-                           (t
-                            (setq kb (vector last-command-event))
-                            (setq com (lookup-key ,map kb))
-                            (if (commandp com)
-                                (call-interactively com)
-                              (setq unread-command-events
-                                    (nconc (mapcar 'identity kb)
-                                           unread-command-events)))
-                            nil)))))
-           (and ,exit-fn (funcall ,exit-fn)))))))
+  (define-key map key
+    (lambda ()
+      (interactive)
+      (unwind-protect
+          (progn
+            (call-interactively command)
+            (while (let ((input (read-key menu)) other kb com)
+                     (setq last-command-event input)
+                     (cond
+                      ((eq input subkey)
+                       (call-interactively command)
+                       t)
+                      ((setq other (assoc input other-subkeys))
+                       (call-interactively (cdr other))
+                       t)
+                      (t
+                       (setq kb (vector last-command-event))
+                       (setq com (lookup-key map kb))
+                       (if (commandp com)
+                           (call-interactively com)
+                         (setq unread-command-events
+                               (nconc (mapcar 'identity kb)
+                                      unread-command-events)))
+                       nil)))))
+        (and exit-fn (funcall exit-fn))))))
 
 
 ;;; Keymap
