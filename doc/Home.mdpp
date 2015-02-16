@@ -612,6 +612,42 @@ _NOTE:_ You can save differents named helm grep buffers.
 Editing the `helm-grep-mode` buffer is possible with [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep).
 Saving this buffer will apply changes to corresponding files.
 
+## Highlighting grep matched results
+
+By default helm have its own implementation to highlight matched items, however it is better to
+use the backend way to highlight result with ANSI sequences e.g:
+
+For ack-grep:
+
+    (setq helm-grep-default-command
+              "ack-grep -Hn --smart-case --no-group %e %p %f"
+              helm-grep-default-recurse-command
+              "ack-grep -H --smart-case --no-group %e %p %f")
+
+For grep:
+
+    (setq helm-grep-default-command
+              "grep --color=always -d skip %e -n%cH -e %p %f"
+              helm-grep-default-recurse-command
+              "grep --color=always -d recurse %e -n%cH -e %p %f")
+
+For git-grep
+
+    (setq helm-ls-git-grep-command
+          "git grep -n%cH --color=always --full-name -e %p %f")
+
+
+The color of git-grep can be customized from global .gitconfig file.
+
+See the docstring of `helm-grep-default-command` for more infos.
+
+NOTE: The non--matched part of the resulting lines in grep will be hidden
+when using "--color=always", to fix this you have to set the env var "GREP_COLORS" for emacs:
+
+    (setenv "GREP_COLORS" "ms=30;43:mc=30;43:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36")
+
+This will colorize in black/yellow matched items.
+
 # Helm M-x
 
  It is bound to `helm-command-prefix-key` `M-x`, you should bind it to `M-x`.
