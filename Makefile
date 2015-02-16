@@ -35,7 +35,7 @@ PKGDIR := .
 LOADPATH	:= -L .
 
 # Files to compile
-EL			:= $(wildcard helm*.el)
+EL			:= $(sort $(wildcard helm*.el))
 
 # Compiled files
 ELC			:= $(EL:.el=.elc)
