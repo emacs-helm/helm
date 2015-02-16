@@ -247,7 +247,6 @@
 (defclass helm-list-el-package-source (helm-source-in-buffer)
   ((init :initform 'helm-el-package--init)
    (get-line :initform 'buffer-substring)
-   (match-part :initform (lambda (c) (car (split-string c))))
    (filtered-candidate-transformer :initform 'helm-el-package--transformer)
    (action-transformer
     :initform
