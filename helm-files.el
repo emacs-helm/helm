@@ -3038,7 +3038,8 @@ This is the starting point for nearly all actions you can do on files."
                                (expand-file-name org-directory))
                               ((and (eq major-mode 'dired-mode) default-input)
                                (file-name-directory default-input))
-                              (default-input)
+                              ((and (not (string= default-input ""))
+                                    default-input))
                               (t (expand-file-name (helm-current-directory)))))
          (presel        (helm-aif (or hist
                                       (buffer-file-name (current-buffer))
