@@ -2130,17 +2130,29 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
              (guess       (and (stringp tap) (substring-no-properties tap)))
              (beg         (- (point) (length guess)))
              (full-path-p (and (stringp guess)
-                               (or (string-match-p (concat "^" (getenv "HOME")) guess)
-                                   (string-match-p "^[^\~]" guess)))))
+                               (or (string-match-p
+                                    (concat "^" (getenv "HOME"))
+                                    guess)
+                                   (string-match-p
+                                    "\\`\\(/\\|[[:lower:][:upper:]]:/\\)"
+                                    guess)))))
         (set-text-properties 0 (length candidate) nil candidate)
         (if (and guess (not (string= guess ""))
-                 (string-match-p "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)" guess))
+                 (or (string-match "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
+                                   guess)
+                     (file-exists-p candidate)))
             (progn
               (delete-region beg end)
-              (insert (if full-path-p
-                          (expand-file-name candidate)
-                        (abbreviate-file-name candidate))))
-          (insert candidate))))))
+              (insert (cond (full-path-p
+                             (expand-file-name candidate))
+                            ((string= (match-string 1 guess) "~/")
+                              (abbreviate-file-name candidate))
+                            (t (file-relative-name candidate)))))
+            (insert (cond ((equal helm-current-prefix-arg '(4))
+                           (abbreviate-file-name candidate))
+                          ((equal helm-current-prefix-arg '(16))
+                           (file-relative-name candidate))
+                          (t candidate))))))))
 
 (cl-defun helm-find-files-history (&key (comp-read t))
   "The `helm-find-files' history.
