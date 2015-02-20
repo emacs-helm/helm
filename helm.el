@@ -2602,7 +2602,7 @@ Helm plug-ins are realized by this function."
                        (error
                         "`%s' must either be a function, a variable or a list"
                         (or candidate-fn candidate-proc))))
-         (candidates (condition-case err
+         (candidates (condition-case-unless-debug err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
