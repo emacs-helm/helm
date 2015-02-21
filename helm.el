@@ -1581,12 +1581,14 @@ in the source where point is."
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
   (declare (indent 0) (debug t))
-  `(let (inhibit-quit)
-     (condition-case _v
-         (progn ,@body)
-       (quit (setq helm-quit t)
-             (exit-minibuffer)
-             (keyboard-quit)))))
+  `(condition-case _v
+       (let (inhibit-quit)
+         ,@body)
+     (quit (setq quit-flag t)
+           (setq helm-quit t)
+           (exit-minibuffer)
+           (keyboard-quit)
+           (eval '(ignore nil)))))
 
 (defun helm-compose (arg-lst func-lst)
   "Apply arguments specified in ARG-LST with each function of FUNC-LST.
@@ -3341,7 +3343,8 @@ after the source name by overlay."
 ;;
 (defun helm-output-filter (process output-string)
   "The `process-filter' function for helm async sources."
-  (helm-output-filter-1 (assoc process helm-async-processes) output-string))
+  (with-helm-quittable
+    (helm-output-filter-1 (assoc process helm-async-processes) output-string)))
 
 (defun helm-output-filter-1 (process-assoc output-string)
   (helm-log "output-string = %S" output-string)
