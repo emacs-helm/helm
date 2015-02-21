@@ -74,7 +74,17 @@ To enable ANSI in grep it is a little more difficult:
     1) Modify env var
       \(setenv \"GREP_COLORS\" \"ms=01;31:mc=01;31:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
     2) Add the option \"--color=always\".
- 
+
+To enable ANSI color in git-grep just add \"--color=always\".
+To customize the ANSI color in git-grep, GREP_COLORS have no effect,
+you will have to setup this in your .gitconfig:
+
+    [color \"grep\"]
+	match = black yellow
+
+where \"black\" is the foreground and \"yellow\" the background.
+See the git documentation for more infos.
+
 `helm-grep-default-command' and `helm-grep-default-recurse-command'are
 independents, so you can enable `helm-grep-default-command' with ack-grep
 and `helm-grep-default-recurse-command' with grep if you want to be faster
