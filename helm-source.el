@@ -570,7 +570,9 @@ Matching is done basically with `string-match' against each candidate.")
   an async process instead of `candidates'.
   The function must return a process.")
 
-   (matchplugin :initform nil))
+   (matchplugin :initform nil)
+   (dont-plug :initform '(helm-compile-source--match-plugin
+                          helm-compile-source--persistent-help)))
 
   "Use this class to define a helm source calling an external process.
 The :candidates slot is not allowed even if described because this class
@@ -1014,7 +1016,9 @@ an eieio class."
 
 (defmethod helm--setup-source ((source helm-source-async))
   (cl-assert (null (slot-value source :candidates))
-             nil "Incorrect use of `candidates' use `candidates-process' instead"))
+             nil "Incorrect use of `candidates' use `candidates-process' instead")
+  (cl-assert (null (slot-value source :matchplugin))
+             nil "`matchplugin' not allowed in async sources."))
 
 (defmethod helm--setup-source ((source helm-source-dummy))
   (let ((mtc (slot-value source :match)))
