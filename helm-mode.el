@@ -217,6 +217,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
+(defun helm-comp-read--move-to-first-real-candidate ()
+  (helm-aif (helm-get-selection nil 'withprop)
+      (when (string= (get-text-property 0 'display it) "[?]")
+        (helm-next-line))))
+
 ;;;###autoload
 (cl-defun helm-comp-read (prompt collection
                           &key
@@ -436,17 +441,20 @@ that use `helm-comp-read' See `helm-M-x' for example."
         (setq src-list (cl-loop for src in src-list
                              collect (cons '(nomark) src))))
       (when reverse-history (setq src-list (nreverse src-list)))
-      (setq result (helm
-                    :sources src-list
-                    :input initial-input
-                    :default default
-                    :preselect preselect
-                    :prompt prompt
-                    :resume 'noresume
-                    :case-fold-search case-fold
-                    :keymap loc-map
-                    :history (and (symbolp input-history) input-history)
-                    :buffer buffer))
+      (add-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate)
+      (unwind-protect
+           (setq result (helm
+                         :sources src-list
+                         :input initial-input
+                         :default default
+                         :preselect preselect
+                         :prompt prompt
+                         :resume 'noresume
+                         :case-fold-search case-fold
+                         :keymap loc-map
+                         :history (and (symbolp input-history) input-history)
+                         :buffer buffer))
+        (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
       ;; Avoid adding an incomplete input to history.
       (when (and result history del-input)
         (cond ((and (symbolp history) ; History is a symbol.
