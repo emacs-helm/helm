@@ -389,6 +389,20 @@ Italic     => A non--file buffer.
   exists, you will be prompted for its creation, if it exists and you want to refresh it,
   give two prefix args.
 
+*** Insert filename at point or complete filename at point
+
+On insertion (no completion, i.e nothing at point):
+
+- `C-c i'         => insert absolute file name.
+- `C-u C-c i'     => insert abbreviate file name.
+- `C-u C-u C-c i' => insert relative file name.
+
+On completion:
+
+- target starts by ~/           => insert abbreviate file name.
+- target starts by / or [a-z]:/ => insert full path.
+- otherwise                     => insert relative file name.
+
 \n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
