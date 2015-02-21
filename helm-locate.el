@@ -273,12 +273,17 @@ See also `helm-locate'."
 (defclass helm-locate-source (helm-source-async helm-type-file)
   ((init :initform 'helm-locate-set-command)
    (candidates-process :initform 'helm-locate-init)
+   (nohighlight :initform t)
    (requires-pattern :initform 3)
    (history :initform 'helm-file-name-history)
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)
    (candidate-number-limit :initform 9999)
    (mode-line :initform helm-generic-file-mode-line-string)))
+
+(defvar helm-source-locate
+  (helm-make-source "Locate" 'helm-locate-source
+    :pattern-transformer 'helm-locate-pattern-transformer))
 
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
@@ -289,10 +294,6 @@ See also `helm-locate'."
                       (match-string 1 pattern)) " -b"))
             (t (helm--mapconcat-pattern pattern)))
       pattern))
-
-(defvar helm-source-locate
-  (helm-make-source "Locate" 'helm-locate-source
-    :pattern-transformer 'helm-locate-pattern-transformer))
 
 ;;;###autoload
 (defun helm-locate-read-file-name (prompt)

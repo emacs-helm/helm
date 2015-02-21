@@ -1835,8 +1835,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; disable this stupid thing if enabled.
       (and cua-mode (cua-mode -1))
       (unwind-protect
-           (condition-case _v
-               (let (;; `helm-source-name' is non-nil
+           (condition-case-unless-debug _v
+               (let ( ;; `helm-source-name' is non-nil
                      ;; when `helm' is invoked by action, reset it.
                      helm-source-name
                      helm-current-source
@@ -1870,10 +1870,10 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                              #'helm--advice-tramp-read-passwd)
               (advice-remove 'ange-ftp-get-passwd
                              #'helm--advice-ange-ftp-get-passwd))
-          (ad-deactivate 'tramp-read-passwd)
-          (ad-deactivate 'ange-ftp-get-passwd))
+            (ad-deactivate 'tramp-read-passwd)
+            (ad-deactivate 'ange-ftp-get-passwd))
         (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-        (helm--remap-mouse-mode -1) ; Reenable mouse bindings.
+        (helm--remap-mouse-mode -1)     ; Reenable mouse bindings.
         (setq helm-alive-p nil)
         ;; Reset helm-pattern so that lambda's using it
         ;; before running helm will not start with its old value.
