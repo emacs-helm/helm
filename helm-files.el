@@ -2933,18 +2933,18 @@ utility mdfind.")
 ;;
 ;;
 (defvar helm-source-findutils
-  `((name . "Find")
-    (header-name . (lambda (name)
-                     (concat name " in [" helm-default-directory "]")))
-    (candidates-process . helm-find-shell-command-fn)
-    (filtered-candidate-transformer . helm-findutils-transformer)
-    (action-transformer helm-transform-file-load-el)
-    (action . ,(cdr (helm-inherit-attribute-from-source
-                     'action helm-source-locate)))
-    (mode-line  . helm-generic-file-mode-line-string)
-    (keymap . ,helm-generic-files-map)
-    (candidate-number-limit . 9999)
-    (requires-pattern . 3)))
+  (helm-build-async-source "Find"
+    :header-name (lambda (name)
+                   (concat name " in [" helm-default-directory "]"))
+    :candidates-process 'helm-find-shell-command-fn
+    :nohighlight t
+    :filtered-candidate-transformer 'helm-findutils-transformer
+    :action-transformer 'helm-transform-file-load-el
+    :action (helm-actions-from-type-file)
+    :mode-line  helm-generic-file-mode-line-string
+    :keymap helm-generic-files-map
+    :candidate-number-limit 9999
+    :requires-pattern 3))
 
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
