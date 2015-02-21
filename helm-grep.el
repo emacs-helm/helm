@@ -892,7 +892,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
             :candidates-process 'helm-grep-collect-candidates
             :filter-one-by-one 'helm-grep-filter-one-by-one
             :candidate-number-limit 9999
-            :nohighlight t
             :mode-line helm-grep-mode-line-string
             :history 'helm-grep-history
             :action (helm-make-actions

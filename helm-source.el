@@ -571,6 +571,7 @@ Matching is done basically with `string-match' against each candidate.")
   The function must return a process.")
 
    (matchplugin :initform nil)
+   (nohighlight :initform t)
    (dont-plug :initform '(helm-compile-source--match-plugin
                           helm-compile-source--persistent-help)))
 
@@ -1018,7 +1019,9 @@ an eieio class."
   (cl-assert (null (slot-value source :candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead")
   (cl-assert (null (slot-value source :matchplugin))
-             nil "`matchplugin' not allowed in async sources."))
+             nil "`matchplugin' not allowed in async sources.")
+  (cl-assert (slot-value source :nohighlight)
+             nil "Highlighting defeat async purpose, use own highlighting for source."))
 
 (defmethod helm--setup-source ((source helm-source-dummy))
   (let ((mtc (slot-value source :match)))

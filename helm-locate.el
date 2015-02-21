@@ -273,7 +273,6 @@ See also `helm-locate'."
 (defclass helm-locate-source (helm-source-async helm-type-file)
   ((init :initform 'helm-locate-set-command)
    (candidates-process :initform 'helm-locate-init)
-   (nohighlight :initform t)
    (requires-pattern :initform 3)
    (history :initform 'helm-file-name-history)
    (keymap :initform helm-generic-files-map)

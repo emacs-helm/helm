@@ -2937,7 +2937,6 @@ utility mdfind.")
     :header-name (lambda (name)
                    (concat name " in [" helm-default-directory "]"))
     :candidates-process 'helm-find-shell-command-fn
-    :nohighlight t
     :filtered-candidate-transformer 'helm-findutils-transformer
     :action-transformer 'helm-transform-file-load-el
     :action (helm-actions-from-type-file)
