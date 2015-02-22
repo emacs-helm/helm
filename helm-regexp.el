@@ -378,7 +378,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
                   (cons
                    ;; will become helm-current-buffer later.
                    (buffer-name (current-buffer))
-                   (remove helm-current-buffer helm-multi-occur-buffer-list))
+                   (remove helm-current-buffer buffers))
                   buffers)))
     (unless helm-source-moccur
       (setq helm-source-moccur
