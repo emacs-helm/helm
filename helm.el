@@ -1276,7 +1276,7 @@ existing Helm function names."
     (setq helm-source-filter sources)
     (helm-log "helm-source-filter = %S" helm-source-filter)
     ;; Use force-update to run init/update functions.
-    (helm-force-update (regexp-quote cur-disp-sel))))
+    (helm-force-update (and cur-disp-sel (regexp-quote cur-disp-sel)))))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
