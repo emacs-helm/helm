@@ -1268,15 +1268,21 @@ Shift+A shows all results:
 
 The -my- part is added to avoid collisions with
 existing Helm function names."
-  (unless (and (listp sources)
-               (cl-loop for name in sources always (stringp name)))
-    (error "Invalid data in `helm-set-source-filter': %S" sources))
   (let ((cur-disp-sel (with-current-buffer helm-buffer
                         (helm-get-selection nil t))))
-    (setq helm-source-filter sources)
+    (setq helm-source-filter (helm--normalize-filter-sources sources))
     (helm-log "helm-source-filter = %S" helm-source-filter)
     ;; Use force-update to run init/update functions.
-    (helm-force-update (and cur-disp-sel (regexp-quote cur-disp-sel)))))
+    (helm-force-update (and (stringp cur-disp-sel)
+                            (regexp-quote cur-disp-sel)))))
+
+(defun helm--normalize-filter-sources (sources)
+  (cl-loop for s in sources collect
+           (cond ((symbolp s)
+                  (assoc-default 'name (symbol-value s)))
+                 ((listp s)
+                  (assoc-default 'name s))
+                 ((stringp s) s))))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
