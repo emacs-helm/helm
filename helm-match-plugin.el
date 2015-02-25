@@ -380,47 +380,38 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 ;;; Highlight matches.
 ;;
 ;;
-(defun helm-mp-highlight-match ()
-  "Highlight matches after `helm-mp-highlight-delay' seconds."
-  (unless (or (assoc 'nohighlight (helm-get-current-source))
-              (not helm-mp-highlight-delay)
-              (helm-empty-buffer-p)
-              (string= helm-pattern ""))
-    (helm-mp-highlight-match-internal (window-end (helm-window)))
-    (run-with-idle-timer helm-mp-highlight-delay nil
-                         'helm-mp-highlight-match-internal
-                         (with-current-buffer helm-buffer (point-max)))))
+(defun helm--highlight-match (str &optional multi-match)
+  "Highlight in string STR all occurences matching `helm-pattern'."
+  (require 'helm-match-plugin)
+  (let (beg end)
+    (condition-case nil
+        (with-temp-buffer
+          (insert str)
+          (goto-char (point-min))
+          (cl-loop for reg in (if multi-match
+                                  (cl-loop for r in (helm-mp-split-pattern
+                                                     helm-pattern)
+                                        unless (string-match "\\`!" r)
+                                        collect r)
+                                (list helm-pattern))
+                do
+                (while (and (re-search-forward reg nil t)
+                            (> (- (setq end (match-end 0))
+                                  (setq beg (match-beginning 0))) 0))
+                  (add-text-properties beg end '(face helm-grep-match)))
+                do (goto-char (point-min))) 
+          (buffer-string))
+      (error nil))))
 
-(defun helm-mp-highlight-region (start end regexp face)
-  (save-excursion
-    (goto-char start)
-    (let ((case-fold-search (helm-set-case-fold-search regexp)) me)
-      (condition-case _err
-          (while (and (setq me (re-search-forward regexp nil t))
-                      (< (point) end)
-                      (< 0 (- (match-end 0) (match-beginning 0))))
-            (unless (helm-pos-header-line-p)
-              (if (fboundp 'add-face-text-property) ;Emacs >= 24.4
-                  (add-face-text-property (match-beginning 0) me face)
-                (put-text-property (match-beginning 0) me 'face face))))
-        (invalid-regexp nil)))))
+(defun helm--highlight-matches (candidates _source)
+  "Highlight in string STR all occurences matching `helm-pattern'."
+  (cl-loop for c in candidates
+           for disp = (if (consp c) (car c) c)
+           for real = (if (consp c) (cdr c) c)
+           collect
+           (cons (helm--highlight-match disp t)
+                 real)))
 
-(defun helm-mp-highlight-match-internal (end)
-  (when helm-alive-p
-    (set-buffer helm-buffer)
-    (let ((requote (cl-loop for (pred . re) in
-                         (helm-mp-3-get-patterns helm-pattern)
-                         when (and (eq pred 'identity)
-                                   (>= (length re)
-                                       helm-mp-highlight-threshold))
-                         collect re into re-list
-                         finally return
-                         (if (and re-list (>= (length re-list) 1))
-                             (mapconcat 'identity re-list "\\|")
-                           (regexp-quote helm-pattern)))))
-      (when (>= (length requote) helm-mp-highlight-threshold)
-        (helm-mp-highlight-region
-         (point-min) end requote 'helm-match)))))
 
 ;; Enable match-plugin by default.
 (helm-match-plugin-mode 1)

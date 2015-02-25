@@ -901,6 +901,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                            (concat name "(C-c ? Help)"))
             :candidates-process 'helm-grep-collect-candidates
             :filter-one-by-one 'helm-grep-filter-one-by-one
+            :nohighlight t
             :candidate-number-limit 9999
             :mode-line helm-grep-mode-line-string
             :history 'helm-grep-history

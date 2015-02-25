@@ -571,7 +571,6 @@ Matching is done basically with `string-match' against each candidate.")
   The function must return a process.")
 
    (matchplugin :initform nil)
-   (nohighlight :initform t)
    (dont-plug :initform '(helm-compile-source--match-plugin
                           helm-compile-source--persistent-help)))
 
@@ -960,20 +959,27 @@ an eieio class."
   (oset source :header-line (helm-source--header-line source))
   (helm-aif (slot-value source :persistent-help)
       (oset source :header-line (helm-source--persistent-help-string it source)))
-  (when (slot-value source :fuzzy-match)
-    (oset source :nohighlight t)
-    (when helm-fuzzy-matching-highlight-fn
-      (oset source :filter-one-by-one
-            (helm-aif (oref source :filter-one-by-one)
-                (append (helm-mklist it)
-                        (list helm-fuzzy-matching-highlight-fn))
-              (list helm-fuzzy-matching-highlight-fn))))
-    (when helm-fuzzy-sort-fn
-      (oset source :filtered-candidate-transformer
-            (helm-aif (oref source :filtered-candidate-transformer)
-                (append (helm-mklist it)
-                        (list helm-fuzzy-sort-fn))
-              (list helm-fuzzy-sort-fn))))))
+  (if (slot-value source :fuzzy-match)
+      (progn
+        (oset source :nohighlight t)
+        (when helm-fuzzy-matching-highlight-fn
+          (oset source :filter-one-by-one
+                (helm-aif (oref source :filter-one-by-one)
+                    (append (helm-mklist it)
+                            (list helm-fuzzy-matching-highlight-fn))
+                  (list helm-fuzzy-matching-highlight-fn))))
+        (when helm-fuzzy-sort-fn
+          (oset source :filtered-candidate-transformer
+                (helm-aif (oref source :filtered-candidate-transformer)
+                    (append (helm-mklist it)
+                            (list helm-fuzzy-sort-fn))
+                  (list helm-fuzzy-sort-fn)))))
+      (unless (oref source :nohighlight)
+        (oset source :filtered-candidate-transformer
+              (helm-aif (oref source :filtered-candidate-transformer)
+                  (append (helm-mklist it)
+                          (list #'helm--highlight-matches))
+                (list #'helm--highlight-matches))))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
@@ -1019,9 +1025,7 @@ an eieio class."
   (cl-assert (null (slot-value source :candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead")
   (cl-assert (null (slot-value source :matchplugin))
-             nil "`matchplugin' not allowed in async sources.")
-  (cl-assert (slot-value source :nohighlight)
-             nil "Highlighting defeat async purpose, use own highlighting for source."))
+             nil "`matchplugin' not allowed in async sources."))
 
 (defmethod helm--setup-source ((source helm-source-dummy))
   (let ((mtc (slot-value source :match)))

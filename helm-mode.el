@@ -737,7 +737,6 @@ Keys description:
                            (if ,marked-candidates
                                (helm-marked-candidates :with-wildcard t)
                              (identity candidate))))))
-         (helm-mp-highlight-delay nil)
          ;; Be sure we don't erase the underlying minibuffer if some.
          (helm-ff-auto-update-initial-value
           (and helm-ff-auto-update-initial-value
@@ -769,6 +768,7 @@ Keys description:
                             (concat hname helm-find-files-doc-header))
              :mode-line mode-line
              :candidates hist
+             :nohighlight t
              :persistent-action persistent-action
              :persistent-help persistent-help
              :nomark nomark
@@ -784,6 +784,7 @@ Keys description:
                            helm-ff-auto-update-flag)
                      (helm-set-local-variable 'helm-in-file-completion-p t))
              :mode-line mode-line
+             :nohighlight t
              :candidates
              (lambda ()
                (append (and (not (file-exists-p helm-pattern))
