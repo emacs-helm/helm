@@ -94,18 +94,6 @@ Default is multi3."
   "Face used to highlight matches."
   :group 'helm-match-plugin)
 
-(defcustom helm-mp-highlight-delay 0.7
-  "Highlight matches with `helm-match' face after this many seconds.
- If nil, no highlight. "
-  :type  'integer
-  :group 'helm-match-plugin)
-
-(defcustom helm-mp-highlight-threshold 2
-  "Minimum length of pattern to highlight.
-The smaller  this value is, the slower highlight is."
-  :type  'integer
-  :group 'helm-match-plugin)
-
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
     "Add more flexible regexp matching for helm.
@@ -114,13 +102,10 @@ See `helm-mp-matching-method' for the behavior of each method."
   :require 'helm-match-plugin
   :global t
   (if helm-match-plugin-mode
-      (progn
-        (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
-        (add-hook 'helm-update-hook 'helm-mp-highlight-match))
+      (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
     (setq helm-compile-source-functions
           (delq 'helm-compile-source--match-plugin
-                helm-compile-source-functions))
-    (remove-hook 'helm-update-hook 'helm-mp-highlight-match)))
+                helm-compile-source-functions))))
 
 
 ;;; Build regexps
