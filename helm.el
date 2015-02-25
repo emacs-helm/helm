@@ -2964,6 +2964,12 @@ It is meant to use with `filter-one-by-one' slot."
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
+(defun helm-fuzzy-highlight-matches (candidates _source)
+  "The filtered-candidate-transformer function to highlight matches in fuzzy.
+See helm-fuzzy-default-highlight-match."
+  (cl-loop for c in candidates
+           collect (helm-fuzzy-default-highlight-match c)))
+
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
                       (assoc-default 'match-strict source)

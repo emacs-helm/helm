@@ -178,6 +178,7 @@ Only buffer names are fuzzy matched when this is enabled,
                          (setq helm-buffer-max-len-mode (cdr result))))))
    (candidates :initform helm-buffers-list-cache)
    (matchplugin :initform nil)
+   (nohighlight :initform t)
    (match :initform 'helm-buffers-list--match-fn)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
    (resume :initform (lambda ()
