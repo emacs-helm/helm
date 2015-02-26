@@ -62,11 +62,9 @@ NOTE: This will be slow on large org buffers."
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
   (with-current-buffer (marker-buffer marker)
-    (goto-char (marker-position marker))
-    (let ((heading-name (nth 4 (org-heading-components)))
-          (file-name buffer-file-name))
-      (message heading-name)
-      (message file-name)
+    (let ((heading-name (save-excursion (goto-char (marker-position marker))
+                                        (nth 4 (org-heading-components))))
+          (file-name (buffer-file-name)))
       (with-helm-current-buffer
         (org-insert-link
          file-name (concat "file:" file-name "::*" heading-name))))))
