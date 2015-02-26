@@ -35,25 +35,26 @@
   :type 'string)
 
 (defvar helm-help--string-list '(helm-help-message
-                                helm-buffer-help-message
-                                helm-ff-help-message
-                                helm-read-file-name-help-message
-                                helm-generic-file-help-message
-                                helm-grep-help-message
-                                helm-pdfgrep-help-message
-                                helm-etags-help-message
-                                helm-ucs-help-message
-                                helm-bookmark-help-message
-                                helm-esh-help-message
-                                helm-buffers-ido-virtual-help-message
-                                helm-moccur-help-message
-                                helm-top-help-message
-                                helm-apt-help-message
-                                helm-el-package-help-message
-                                helm-M-x-help-message
-                                helm-imenu-help-message
-                                helm-colors-help-message
-                                helm-semantic-help-message))
+                                 helm-buffer-help-message
+                                 helm-ff-help-message
+                                 helm-read-file-name-help-message
+                                 helm-generic-file-help-message
+                                 helm-grep-help-message
+                                 helm-pdfgrep-help-message
+                                 helm-etags-help-message
+                                 helm-ucs-help-message
+                                 helm-bookmark-help-message
+                                 helm-esh-help-message
+                                 helm-buffers-ido-virtual-help-message
+                                 helm-moccur-help-message
+                                 helm-top-help-message
+                                 helm-apt-help-message
+                                 helm-el-package-help-message
+                                 helm-M-x-help-message
+                                 helm-imenu-help-message
+                                 helm-colors-help-message
+                                 helm-semantic-help-message
+                                 helm-kmacro-help-message))
 
 
 ;;;###autoload
