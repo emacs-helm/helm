@@ -393,12 +393,16 @@
     :initform nil
     :custom boolean
     :documentation
-    "  Disable highlight match in this source.
-  This will disable generic highlighting done by matchplugin,
+    "  Disable highlighting matches in this source.
+  This will disable generic highlighting of matches,
   but some specialized highlighting can be done from elsewhere,
-  i.e `filtered-candidate-transformer' or `filter-one-by-one' slots,
-  so even if non--nil this may have no effect if highlighting is handled
-  from somewhere else.")
+  i.e from `filtered-candidate-transformer' or `filter-one-by-one' slots.
+  So use this to either disable completely highlighting in your source,
+  or to disable highlighting and use a specialized highlighting matches
+  function for this source.
+  Remember that this function should run AFTER all filter functions if those
+  filter functions are modifying face properties, though it is possible to
+  avoid this by using new `add-face-text-property' in your filter functions.")
    
    (allow-dups
     :initarg :allow-dups
