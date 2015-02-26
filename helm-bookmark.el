@@ -317,130 +317,180 @@ than `w3m-browse-url' use it."
 
 
 ;;;; Filtered bookmark sources
+;;
+;;
+(defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
+  ((search :initform #'helm-bookmark-search-fn)
+   (match-part :initform #'helm-pp-bookmark-match-fn)
+   (filtered-candidate-transformer
+    :initform '(helm-adaptive-sort
+                helm-highlight-bookmark))))
 
 ;;; W3m bookmarks.
 ;;
-(defvar helm-source-bookmark-w3m
-  '((name . "Bookmark W3m")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-w3m-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-w3m-setup-alist ()
   "Specialized filter function for bookmarks w3m."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-w3m-bookmark-p))
 
+(defvar helm-source-bookmark-w3m
+  (helm-make-source "Bookmark W3m" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-w3m-setup-alist)))))
+
 ;;; Images
 ;;
-(defvar helm-source-bookmark-images
-  '((name . "Bookmark Images")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-images-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-images-setup-alist ()
   "Specialized filter function for images bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-image-bookmark-p))
 
+(defvar helm-source-bookmark-images
+  (helm-make-source "Bookmark Images" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-images-setup-alist)))))
+
 ;;; Woman Man
 ;;
-(defvar helm-source-bookmark-man
-  '((name . "Bookmark Woman&Man")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-man-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-man-setup-alist ()
   "Specialized filter function for bookmarks w3m."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-woman-man-bookmark-p))
 
+(defvar helm-source-bookmark-man
+  (helm-make-source "Bookmark Woman&Man" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-man-setup-alist)))))
+
 ;;; Gnus
 ;;
-(defvar helm-source-bookmark-gnus
-  '((name . "Bookmark Gnus")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-gnus-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-gnus-setup-alist ()
   "Specialized filter function for bookmarks gnus."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-gnus-bookmark-p))
 
+(defvar helm-source-bookmark-gnus
+  (helm-make-source "Bookmark Gnus" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-gnus-setup-alist)))))
+
 ;;; Info
 ;;
-(defvar helm-source-bookmark-info
-  '((name . "Bookmark Info")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-info-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-info-setup-alist ()
   "Specialized filter function for bookmarks info."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-info-bookmark-p))
 
+(defvar helm-source-bookmark-info
+  (helm-make-source "Bookmark Info" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-info-setup-alist)))))
+
 ;;; Files and directories
 ;;
-(defvar helm-source-bookmark-files&dirs
-  '((name . "Bookmark Files&Directories")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-local-files-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
 (defun helm-bookmark-local-files-setup-alist ()
   "Specialized filter function for bookmarks locals files."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-file-p))
 
+(defvar helm-source-bookmark-files&dirs
+  (helm-make-source "Bookmark Files&Directories" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-local-files-setup-alist)))))
+
+;;; Uncategorized bookmarks
+;;
+(defun helm-bookmark-uncategorized-setup-alist ()
+  "Specialized filter function for uncategorized bookmarks."
+  (helm-bookmark-filter-setup-alist 'helm-bookmark-uncategorized-bookmark-p))
+
+(defvar helm-source-bookmark-uncategorized
+  (helm-make-source "Bookmark uncategorized" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-uncategorized-setup-alist)))))
+
 ;;; Addressbook.
 ;;
 ;;
+(defclass helm-bookmark-addressbook-class (helm-source-in-buffer)
+  ((init :initform (lambda ()
+                     (require 'addressbook-bookmark nil t)
+                     (bookmark-maybe-load-default-file)
+                     (helm-init-candidates-in-buffer
+                         'global
+                       (helm-bookmark-addressbook-setup-alist))))
+   (search :initform #'helm-bookmark-search-fn)
+   (match-part :initform #'helm-pp-bookmark-match-fn)
+   (persistent-action :initform
+                      (lambda (candidate)
+                        (let ((bmk (helm-bookmark-get-bookmark-from-name
+                                    candidate)))
+                          (bookmark--jump-via bmk 'switch-to-buffer))))
+   (persistent-help :initform "Show contact - Prefix with C-u to append")
+   (filtered-candidate-transformer :initform
+                                   '(helm-adaptive-sort
+                                     helm-highlight-bookmark))
+   (action :initform (("Show Contact(s)"
+                       . (lambda (candidate)
+                           (let* ((contacts (helm-marked-candidates))
+                                  (current-prefix-arg helm-current-prefix-arg))
+                             (bookmark-jump
+                              (helm-bookmark-get-bookmark-from-name (car contacts)))
+                             (helm-aif (cdr contacts)
+                                 (let ((current-prefix-arg '(4)))
+                                   (cl-loop for bmk in it do
+                                            (bookmark-jump
+                                             (helm-bookmark-get-bookmark-from-name bmk))))))))
+                      ("Mail To" . helm-bookmark-addressbook-send-mail-1)
+                      ("Mail Cc" . (lambda (_candidate)
+                                     (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
+                      ("Mail Bcc" . (lambda (_candidate)
+                                      (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
+                      ("Edit Bookmark"
+                       . (lambda (candidate)
+                           (let ((bmk (helm-bookmark-get-bookmark-from-name
+                                       candidate)))
+                             (addressbook-bookmark-edit
+                              (assoc bmk bookmark-alist)))))
+                      ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
+                      ("Insert Email at point"
+                       . (lambda (candidate)
+                           (let* ((bmk   (helm-bookmark-get-bookmark-from-name
+                                          candidate))
+                                  (mlist (split-string
+                                          (assoc-default
+                                           'email (assoc bmk bookmark-alist))
+                                          ", ")))
+                             (insert
+                              (if (> (length mlist) 1)
+                                  (helm-comp-read
+                                   "Insert Mail Address: " mlist :must-match t)
+                                  (car mlist))))))
+                      ("Show annotation"
+                       . (lambda (candidate)
+                           (let ((bmk (helm-bookmark-get-bookmark-from-name
+                                       candidate)))
+                             (bookmark-show-annotation bmk))))
+                      ("Edit annotation"
+                       . (lambda (candidate)
+                           (let ((bmk (helm-bookmark-get-bookmark-from-name
+                                       candidate)))
+                             (bookmark-edit-annotation bmk))))
+                      ("Show Google map"
+                       . (lambda (candidate)
+                           (let* ((bmk (helm-bookmark-get-bookmark-from-name
+                                        candidate))
+                                  (full-bmk (assoc bmk bookmark-alist)))
+                             (addressbook-google-map full-bmk))))))))
+
 (defun helm-bookmark-addressbook-send-mail-1 (_candidate &optional cc)
   (let* ((contacts (helm-marked-candidates))
          (bookmark      (helm-bookmark-get-bookmark-from-name
@@ -454,100 +504,12 @@ than `w3m-browse-url' use it."
                    (addressbook-set-mail-buffer-1
                     (helm-bookmark-get-bookmark-from-name bmk) 'append cc))))))
 
-(defvar helm-source-bookmark-addressbook
-  '((name . "Bookmark Addressbook")
-    (init . (lambda ()
-              (require 'addressbook-bookmark nil t)
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global
-                (helm-bookmark-addressbook-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (persistent-action
-     . (lambda (candidate)
-         (let ((bmk (helm-bookmark-get-bookmark-from-name
-                     candidate)))
-           (bookmark--jump-via bmk 'switch-to-buffer))))
-    (persistent-help . "Show contact - Prefix with C-u to append")
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (action . (("Show Contact(s)"
-                . (lambda (candidate)
-                    (let* ((contacts (helm-marked-candidates))
-                           (current-prefix-arg helm-current-prefix-arg))
-                      (bookmark-jump
-                       (helm-bookmark-get-bookmark-from-name (car contacts)))
-                      (helm-aif (cdr contacts)
-                          (let ((current-prefix-arg '(4)))
-                            (cl-loop for bmk in it do
-                                  (bookmark-jump
-                                   (helm-bookmark-get-bookmark-from-name bmk))))))))
-               ("Mail To" . helm-bookmark-addressbook-send-mail-1)
-               ("Mail Cc" . (lambda (_candidate)
-                              (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
-               ("Mail Bcc" . (lambda (_candidate)
-                               (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
-               ("Edit Bookmark"
-                . (lambda (candidate)
-                    (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                candidate)))
-                      (addressbook-bookmark-edit
-                       (assoc bmk bookmark-alist)))))
-               ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
-               ("Insert Email at point"
-                . (lambda (candidate)
-                    (let* ((bmk   (helm-bookmark-get-bookmark-from-name
-                                   candidate))
-                           (mlist (split-string
-                                   (assoc-default
-                                    'email (assoc bmk bookmark-alist))
-                                   ", ")))
-                      (insert
-                       (if (> (length mlist) 1)
-                           (helm-comp-read
-                            "Insert Mail Address: " mlist :must-match t)
-                         (car mlist))))))
-               ("Show annotation"
-                . (lambda (candidate)
-                    (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                candidate)))
-                      (bookmark-show-annotation bmk))))
-               ("Edit annotation"
-                . (lambda (candidate)
-                    (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                candidate)))
-                      (bookmark-edit-annotation bmk))))
-               ("Show Google map"
-                . (lambda (candidate)
-                    (let* ((bmk (helm-bookmark-get-bookmark-from-name
-                                 candidate))
-                           (full-bmk (assoc bmk bookmark-alist)))
-                      (addressbook-google-map full-bmk))))))))
-
 (defun helm-bookmark-addressbook-setup-alist ()
   "Specialized filter function for addressbook bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-addressbook-p))
 
-(defvar helm-source-bookmark-uncategorized
-  '((name . "Bookmark uncategorized")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-uncategorized-setup-alist))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark)))
-
-(defun helm-bookmark-uncategorized-setup-alist ()
-  "Specialized filter function for uncategorized bookmarks."
-  (helm-bookmark-filter-setup-alist 'helm-bookmark-uncategorized-bookmark-p))
+(defvar helm-source-bookmark-addressbook
+  (helm-make-source "Bookmark Addressbook" 'helm-bookmark-addressbook-class))
 
 ;;; Transformer
 ;;
