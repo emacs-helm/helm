@@ -2537,7 +2537,8 @@ Else return ACTIONS unmodified."
                             (cons 'helm-source-locate helm-sources)))
         (helm-set-source-filter '(helm-source-locate)))
       (helm-kill-async-processes)
-      (helm-set-sources helm-for-files-preferred-list)
+      (helm-set-sources (remove 'helm-source-locate
+                                helm-for-files-preferred-list))
       (helm-set-source-filter nil))))
 
 
