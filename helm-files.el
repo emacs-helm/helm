@@ -391,6 +391,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-marked-buffer-name "*helm marked*")
 (defvar helm-ff--auto-update-state nil)
 (defvar helm-ff--deleting-char-backward nil)
+(defvar helm-multi-files--toggle-locate nil)
 
 
 ;;; Helm-find-files
@@ -2525,6 +2526,20 @@ Else return ACTIONS unmodified."
            (append actions (list browse-action)))
           (t actions))))
 
+(defun helm-multi-files-toggle-to-locate ()
+  (interactive)
+  (with-helm-buffer
+  (if (setq helm-multi-files--toggle-locate
+            (not helm-multi-files--toggle-locate))
+      (progn
+        (helm-set-sources (unless (memq 'helm-source-locate
+                                        helm-sources)
+                            (cons 'helm-source-locate helm-sources)))
+        (helm-set-source-filter '(helm-source-locate)))
+      (helm-kill-async-processes)
+      (helm-set-sources helm-for-files-preferred-list)
+      (helm-set-source-filter nil))))
+
 
 ;;; List of files gleaned from every dired buffer
 ;;
@@ -3071,6 +3086,24 @@ Run all sources defined in `helm-for-files-preferred-list'."
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (let ((helm-ff-transformer-show-only-basename nil))
     (helm :sources helm-for-files-preferred-list :buffer "*helm for files*")))
+
+;;; FIXME Don't hardcode toggle locate binding.
+;;;###autoload
+(defun helm-multi-files ()
+  "Same as `helm-for-files' but allow toggling from locate to others sources."
+  (interactive)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
+  (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
+        (helm-ff-transformer-show-only-basename nil)
+        (old-key (lookup-key helm-map (read-kbd-macro "C-c l"))))
+    (with-helm-temp-hook 'helm-after-initialize-hook
+      (define-key helm-map (kbd "C-c l") 'helm-multi-files-toggle-to-locate))
+    (unwind-protect
+         (helm :sources sources
+               :buffer "*helm multi files*")
+      (define-key helm-map (kbd "C-c l") old-key))))
 
 ;;;###autoload
 (defun helm-recentf ()

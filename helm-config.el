@@ -90,7 +90,7 @@
     (define-key map (kbd "M-y")       'helm-show-kill-ring)
     (define-key map (kbd "C-c <SPC>") 'helm-all-mark-rings)
     (define-key map (kbd "C-x C-f")   'helm-find-files)
-    (define-key map (kbd "f")         'helm-for-files)
+    (define-key map (kbd "f")         'helm-multi-files)
     (define-key map (kbd "C-:")       'helm-eval-expression-with-eldoc)
     (define-key map (kbd "C-,")       'helm-calcul-expression)
     (define-key map (kbd "M-x")       'helm-M-x)
@@ -124,7 +124,7 @@
 (easy-menu-add-item
  nil '("Tools")
  '("Helm"
-   ["Find any Files/Buffers" helm-for-files t]
+   ["Find any Files/Buffers" helm-multi-files t]
    ["Helm Everywhere (Toggle)" helm-mode t]
    ["Helm resume" helm-resume t]
    "----"
