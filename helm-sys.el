@@ -68,19 +68,18 @@ A format string where %s will be replaced with `frame-width'."
     map))
 
 (defvar helm-source-top
-  `((name . "Top")
-    (header-name . (lambda (name) (concat name " (Press C-c C-u to refresh)"))) 
-    (init . helm-top-init)
-    (candidates-in-buffer)
-    (nomark)
-    (display-to-real . helm-top-display-to-real)
-    (persistent-action . helm-top-sh-persistent-action)
-    (persistent-help . "SIGTERM")
-    (mode-line . helm-top-mode-line)
-    (follow . never)
-    (keymap . ,helm-top-map)
-    (filtered-candidate-transformer . helm-top-sort-transformer)
-    (action-transformer . helm-top-action-transformer)))
+  (helm-build-in-buffer-source "Top"
+    :header-name (lambda (name) (concat name " (Press C-c C-u to refresh)"))
+    :init #'helm-top-init
+    :nomark t
+    :display-to-real #'helm-top-display-to-real
+    :persistent-action #'helm-top-sh-persistent-action
+    :persistent-help "SIGTERM"
+    :mode-line helm-top-mode-line
+    :follow 'never
+    :keymap helm-top-map
+    :filtered-candidate-transformer #'helm-top-sort-transformer
+    :action-transformer #'helm-top-action-transformer))
 
 (defun helm-top-transformer (candidates _source)
   "Transformer for `helm-top'.
