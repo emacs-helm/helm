@@ -959,27 +959,18 @@ an eieio class."
   (oset source :header-line (helm-source--header-line source))
   (helm-aif (slot-value source :persistent-help)
       (oset source :header-line (helm-source--persistent-help-string it source)))
-  (if (slot-value source :fuzzy-match)
-      (progn
-        (oset source :nohighlight t)
-        (when helm-fuzzy-matching-highlight-fn
-          (oset source :filter-one-by-one
-                (helm-aif (oref source :filter-one-by-one)
-                    (append (helm-mklist it)
-                            (list helm-fuzzy-matching-highlight-fn))
-                  (list helm-fuzzy-matching-highlight-fn))))
-        (when helm-fuzzy-sort-fn
-          (oset source :filtered-candidate-transformer
-                (helm-aif (oref source :filtered-candidate-transformer)
-                    (append (helm-mklist it)
-                            (list helm-fuzzy-sort-fn))
-                  (list helm-fuzzy-sort-fn)))))
-      (unless (oref source :nohighlight)
-        (oset source :filtered-candidate-transformer
-              (helm-aif (oref source :filtered-candidate-transformer)
-                  (append (helm-mklist it)
-                          (list #'helm-fuzzy-highlight-matches))
-                (list #'helm-fuzzy-highlight-matches))))))
+  (when (and (slot-value source :fuzzy-match) helm-fuzzy-sort-fn)
+      (oset source :filtered-candidate-transformer
+            (helm-aif (oref source :filtered-candidate-transformer)
+                (append (helm-mklist it)
+                        (list helm-fuzzy-sort-fn))
+              (list helm-fuzzy-sort-fn))))
+  (unless (oref source :nohighlight)
+    (oset source :filtered-candidate-transformer
+          (helm-aif (oref source :filtered-candidate-transformer)
+              (append (helm-mklist it)
+                      (list #'helm-fuzzy-highlight-matches))
+            (list #'helm-fuzzy-highlight-matches)))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
