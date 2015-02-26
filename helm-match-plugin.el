@@ -88,12 +88,6 @@ Default is multi3."
   :set   'helm-mp-set-matching-method
   :group 'helm-match-plugin)
 
-(defface helm-match
-  '((((background light)) :foreground "#b00000")
-    (((background dark))  :foreground "gold1"))
-  "Face used to highlight matches."
-  :group 'helm-match-plugin)
-
 ;;;###autoload
 (define-minor-mode helm-match-plugin-mode
     "Add more flexible regexp matching for helm.

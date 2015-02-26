@@ -623,6 +623,12 @@ to exit or helm update to disable the `current-input-method' with `C-\\'."
   "Face for showing prefix arg in mode-line."
   :group 'helm-faces)
 
+(defface helm-match
+  '((((background light)) :foreground "#b00000")
+    (((background dark))  :foreground "gold1"))
+  "Face used to highlight matches."
+  :group 'helm)
+
 
 ;;; Variables.
 ;;
