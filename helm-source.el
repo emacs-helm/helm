@@ -780,8 +780,7 @@ like `re-search-forward', see below documentation of :search slot.")
       (oset source :persistent-help "Show this buffer")
       (oset source :filtered-candidate-transformer '(helm-skip-boring-buffers
                                                      helm-buffers-sort-transformer
-                                                     helm-highlight-buffers
-                                                     helm-fuzzy-highlight-matches)))
+                                                     helm-highlight-buffers)))
 
 ;; Functions
 (defclass helm-type-function (helm-source) ()
@@ -979,8 +978,8 @@ an eieio class."
         (oset source :filtered-candidate-transformer
               (helm-aif (oref source :filtered-candidate-transformer)
                   (append (helm-mklist it)
-                          (list #'helm--highlight-matches))
-                (list #'helm--highlight-matches))))))
+                          (list #'helm-fuzzy-highlight-matches))
+                (list #'helm-fuzzy-highlight-matches))))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 

@@ -376,42 +376,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
              `(search ,@searchfns) `(match ,@matchfns))
          ,@source))))
 
-
-;;; Highlight matches.
-;;
-;;
-(defun helm--highlight-match (str &optional multi-match)
-  "Highlight in string STR all occurences matching `helm-pattern'."
-  (require 'helm-match-plugin)
-  (let (beg end)
-    (condition-case nil
-        (with-temp-buffer
-          (insert str)
-          (goto-char (point-min))
-          (cl-loop for reg in (if multi-match
-                                  (cl-loop for r in (helm-mp-split-pattern
-                                                     helm-pattern)
-                                        unless (string-match "\\`!" r)
-                                        collect r)
-                                (list helm-pattern))
-                do
-                (while (and (re-search-forward reg nil t)
-                            (> (- (setq end (match-end 0))
-                                  (setq beg (match-beginning 0))) 0))
-                  (add-text-properties beg end '(face helm-grep-match)))
-                do (goto-char (point-min))) 
-          (buffer-string))
-      (error nil))))
-
-(defun helm--highlight-matches (candidates _source)
-  "Highlight in string STR all occurences matching `helm-pattern'."
-  (cl-loop for c in candidates
-           for disp = (if (consp c) (car c) c)
-           for real = (if (consp c) (cdr c) c)
-           collect
-           (cons (helm--highlight-match disp t)
-                 real)))
-
 
 ;; Enable match-plugin by default.
 (helm-match-plugin-mode 1)
