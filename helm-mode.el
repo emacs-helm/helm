@@ -950,7 +950,7 @@ Can be used as value for `completion-in-region-function'."
                   (afun (plist-get completion-extra-properties :annotation-function))
                   (data (all-completions input collection predicate))
                   (init-space-suffix (unless helm-completion-in-region-fuzzy-match " "))
-                  (file-comp-p (helm-mode--in-file-completion-p input (car-safe data)))
+                  (file-comp-p (helm-mode--in-file-completion-p))
                   ;; Completion-at-point and friends have no prompt.
                   (result (if (stringp data)
                               data
@@ -1016,17 +1016,9 @@ Can be used as value for `completion-in-region-function'."
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables))))
 
-(defun helm-mode--in-file-completion-p (target candidate)
-  (when (and candidate target)
-    (or (string-match "/\\'" target)
-        (string-match "\\`~?/.*/\\'" target)
-        (string-match "\\`[a-zA-Z]:/.*/\\'" target)
-        (if (or (string-match "\\`~?/" target)
-                (string-match "\\`[a-zA-Z]:/" target))
-            (file-exists-p (expand-file-name candidate (helm-basedir target)))
-          (file-exists-p (expand-file-name
-                          candidate (with-helm-current-buffer
-                                      default-directory)))))))
+(defun helm-mode--in-file-completion-p ()
+  (with-helm-current-buffer
+    (run-hook-with-args-until-success 'file-name-at-point-functions)))
 
 (when (boundp 'completion-in-region-function)
   (defconst helm--old-completion-in-region-function completion-in-region-function))
