@@ -950,7 +950,10 @@ Can be used as value for `completion-in-region-function'."
                   (afun (plist-get completion-extra-properties :annotation-function))
                   (data (all-completions input collection predicate))
                   (init-space-suffix (unless helm-completion-in-region-fuzzy-match " "))
-                  (file-comp-p (helm-mode--in-file-completion-p))
+                  ;; Assume that when `afun' and `predicate' are null
+                  ;; we are in filename completion.
+                  (file-comp-p (or (helm-mode--in-file-completion-p)
+                                   (and (null afun) (null predicate)))) 
                   ;; Completion-at-point and friends have no prompt.
                   (result (if (stringp data)
                               data
@@ -1010,9 +1013,7 @@ Can be used as value for `completion-in-region-function'."
                                          (re-search-backward "~?/" start t)))
                                   (match-end 0) start)
                               end)
-               (insert (if file-comp-p
-                           (shell-quote-argument result)
-                           result))))
+               (insert result)))
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables))))
 
