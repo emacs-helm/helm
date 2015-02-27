@@ -1018,7 +1018,7 @@ Can be used as value for `completion-in-region-function'."
 
 (defun helm-mode--in-file-completion-p (target candidate)
   (when (and candidate target)
-    (or (string-match "/\\'" candidate)
+    (or (string-match "/\\'" target)
         (string-match "\\`~?/.*/\\'" target)
         (string-match "\\`[a-zA-Z]:/.*/\\'" target)
         (if (or (string-match "\\`~?/" target)
