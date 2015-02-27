@@ -199,15 +199,16 @@ text to be displayed in BUFNAME."
 (defun helm-help ()
   "Help of `helm'."
   (interactive)
-  (save-selected-window
-    (helm-help-internal
-     "*Helm Help*"
-     (lambda ()
-       (insert (substitute-command-keys
-                (helm-interpret-value (or (assoc-default
-                                           'help-message
-                                           (helm-get-current-source))
-                                          helm-help-message))))))))
+  (with-helm-alive-p
+    (save-selected-window
+      (helm-help-internal
+       "*Helm Help*"
+       (lambda ()
+         (insert (substitute-command-keys
+                  (helm-interpret-value (or (assoc-default
+                                             'help-message
+                                             (helm-get-current-source))
+                                            helm-help-message)))))))))
 
 ;;; `helm-buffer-list' help
 ;;
