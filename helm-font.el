@@ -96,6 +96,7 @@ Only math* symbols are collected."
                       ;; call `insert-char' with nil nil
                       ;; to shutup byte compiler in 24.1.
                       (insert-char v nil nil))
+                    (insert (format " #x%x" v))
                     (insert "\n")))))
 
 (defun helm-ucs-forward-char (_candidate)
