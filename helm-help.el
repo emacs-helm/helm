@@ -183,13 +183,15 @@ text to be displayed in BUFNAME."
 
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
-                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage q:Quit]"
+                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
         scroll-error-top-bottom)
     (cl-loop for event = (read-key prompt) do
              (cl-case event
                ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
                ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
+               (?\C-s (isearch-forward))
+               (?\C-r (isearch-backward))
                (?q (cl-return))
                (t (ignore))))))
 
