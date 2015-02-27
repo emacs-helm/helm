@@ -227,6 +227,11 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'hook)
 
+(defcustom helm-multi-files-toggle-locate-binding "C-c p"
+  "Default binding to switch back and forth locate in `helm-multi-files'."
+  :group 'helm-files
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -3088,7 +3093,6 @@ Run all sources defined in `helm-for-files-preferred-list'."
   (let ((helm-ff-transformer-show-only-basename nil))
     (helm :sources helm-for-files-preferred-list :buffer "*helm for files*")))
 
-;;; FIXME Don't hardcode toggle locate binding.
 ;;;###autoload
 (defun helm-multi-files ()
   "Same as `helm-for-files' but allow toggling from locate to others sources."
@@ -3096,15 +3100,20 @@ Run all sources defined in `helm-for-files-preferred-list'."
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
+  (setq helm-multi-files--toggle-locate nil)
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
         (helm-ff-transformer-show-only-basename nil)
-        (old-key (lookup-key helm-map (read-kbd-macro "C-c l"))))
+        (old-key (lookup-key
+                  helm-map
+                  (read-kbd-macro helm-multi-files-toggle-locate-binding))))
     (with-helm-temp-hook 'helm-after-initialize-hook
-      (define-key helm-map (kbd "C-c l") 'helm-multi-files-toggle-to-locate))
+      (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
+        'helm-multi-files-toggle-to-locate))
     (unwind-protect
          (helm :sources sources
                :buffer "*helm multi files*")
-      (define-key helm-map (kbd "C-c l") old-key))))
+      (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
+        old-key))))
 
 ;;;###autoload
 (defun helm-recentf ()
