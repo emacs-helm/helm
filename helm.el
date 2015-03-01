@@ -2482,8 +2482,11 @@ It will override `helm-map' with the local map of current source.
 If no map is found in current source do nothing (keep previous map)."
   (with-helm-buffer
     (helm-aif (assoc-default 'keymap (helm-get-current-source))
-        (with-current-buffer (window-buffer (minibuffer-window))
-          (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
+        (run-with-idle-timer
+         0.01 nil
+         (lambda ()
+           (with-current-buffer (window-buffer (minibuffer-window))
+             (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))))
 
 ;;; Prevent loosing focus when using mouse.
 ;;
