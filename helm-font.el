@@ -111,12 +111,19 @@ Only math* symbols are collected."
   (with-helm-current-buffer
     (delete-char -1)))
 
-(defun helm-ucs-insert-char (candidate)
+(defun helm-ucs-insert (candidate n)
   (with-helm-current-buffer
-    (insert
-     (replace-regexp-in-string
-      " " ""
-      (cadr (split-string candidate ":"))))))
+    (string-match "^\\([^:]+\\): +\\(.\\) #x\\([a-f0-9]+\\)$" candidate)
+    (insert (match-string n candidate))))
+
+(defun helm-ucs-insert-name (candidate)
+  (helm-ucs-insert candidate 1))
+
+(defun helm-ucs-insert-char (candidate)
+  (helm-ucs-insert candidate 2))
+
+(defun helm-ucs-insert-code (candidate)
+  (helm-ucs-insert candidate 3))
 
 (defun helm-ucs-persistent-insert ()
   (interactive)
@@ -148,7 +155,9 @@ Only math* symbols are collected."
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (mode-line . helm-ucs-mode-line-string)
-    (action . (("Insert" . helm-ucs-insert-char)
+    (action . (("Insert character" . helm-ucs-insert-char)
+               ("Insert character name" . helm-ucs-insert-name)
+               ("Insert character code in hex" . helm-ucs-insert-code)
                ("Forward char" . helm-ucs-forward-char)
                ("Backward char" . helm-ucs-backward-char)
                ("Delete char backward" . helm-ucs-delete-backward))))
