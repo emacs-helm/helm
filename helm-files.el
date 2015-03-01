@@ -1378,7 +1378,9 @@ or when `helm-pattern' is equal to \"~/\"."
            (input (cond ((string= match "/./") default-directory)
                         ((string= helm-pattern "/../") "/")
                         ((string-match-p "\\`/\\$" match)
-                         (substitute-in-file-name match))
+                         (let ((sub (substitute-in-file-name match)))
+                           (if (file-directory-p sub)
+                               sub (replace-regexp-in-string "/\\'" "" sub))))
                         (t (expand-file-name
                             (helm-substitute-in-filename helm-pattern)
                             ;; [Windows] On UNC paths "/" expand to current machine,
