@@ -141,21 +141,16 @@ current local map, current global map, and all current minor maps."
     (lacarte-get-overall-menu-item-alist maps)))
 
 ;;;###autoload
-(defun helm-browse-menubar (arg)
-  "Helm interface to the menubar using lacarte.el.
-With no prefix arg call the local current major-mode menu,
-with one prefix arg call the global menu,
-with two prefix args call the menu for the possible minor-mode in effect."
-  (interactive "P")
+(defun helm-browse-menubar ()
+  "Helm interface to the menubar using lacarte.el."
+  (interactive)
   (require 'lacarte)
-  (helm :sources (helm-make-source "Lacarte" 'helm-lacarte
-                   :candidates (lambda ()
-                                 (helm-lacarte-get-candidates
-                                  (cond ((equal arg '(4))
-                                         '(global))
-                                        ((equal arg '(16))
-                                         '(minor))
-                                        (t '(local))))))
+  (helm :sources (mapcar 
+                  (lambda (spec) (helm-make-source (car spec) 'helm-lacarte
+                              :candidates (lambda () (helm-lacarte-get-candidates (cdr spec)))))
+                  '(("Major Mode"  . (local))
+                    ("Minor Modes" . (minor))
+                    ("Global Map"  . (global))))
         :buffer "*helm lacarte*"))
 
 (defun helm-call-interactively (cmd-or-name)
