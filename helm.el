@@ -2959,7 +2959,7 @@ sort on the real part."
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
-         (display (if pair (car pair) candidate))
+         (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair)))
     (with-temp-buffer
       (insert display)
