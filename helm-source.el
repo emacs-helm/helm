@@ -1082,7 +1082,7 @@ used as candidates in buffer.
 Args ARGS are keywords provided by `helm-source-in-file'."
   (declare (indent 1))
   `(helm-make-source ,name 'helm-source-in-file
-     :candidates-file ,file))
+     :candidates-file ,file ,@args))
 
 ;; Types
 (defun helm-actions-from-type-file ()
