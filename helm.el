@@ -3961,8 +3961,12 @@ don't exit and send message 'no match'."
                         (unless (if minibuffer-completing-file-name
                                     (and minibuffer-completion-predicate
                                          (funcall minibuffer-completion-predicate sel))
-                                    (try-completion sel minibuffer-completion-table
-                                                    minibuffer-completion-predicate))
+                                    (and (stringp sel)
+                                         ;; SEL may be a cons cell when helm-comp-read
+                                         ;; is called directly with a collection composed
+                                         ;; of (display . real) and real is a cons cell.
+                                         (try-completion sel minibuffer-completion-table
+                                                         minibuffer-completion-predicate)))
                           unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
