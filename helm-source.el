@@ -692,6 +692,19 @@ like `re-search-forward', see below documentation of :search slot.")
    (volatile
     :initform t)))
 
+(defclass helm-source-in-file (helm-source-in-buffer)
+  ((init :initform (lambda ()
+                     (let ((file (helm-attr 'candidates-file)))
+                       (with-current-buffer (helm-candidate-buffer 'global)
+                         (insert-file-contents file)))))
+   (candidates-file :initarg :candidates-file
+                    :initform nil
+                    :custom string)))
+
+;; (helm :sources (helm-make-source "test" 'helm-source-in-file
+;;                  :candidates-file "~/.emacs.d/emacs-config/.emacs.el")
+;;       :buffer "*helm test*")
+
 
 ;;; Classes for types.
 ;;
