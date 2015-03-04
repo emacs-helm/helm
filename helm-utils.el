@@ -356,18 +356,6 @@ With a numeric prefix arg show only the ARG number of candidates."
           collect (propertize i 'face face)
           else collect i)))
 
-(defun helm-stringify (str-or-sym)
-  "Get string of STR-OR-SYM."
-  (if (stringp str-or-sym)
-      str-or-sym
-    (symbol-name str-or-sym)))
-
-(defun helm-symbolify (str-or-sym)
-  "Get symbol of STR-OR-SYM."
-  (if (symbolp str-or-sym)
-      str-or-sym
-    (intern str-or-sym)))
-
 (defun helm-describe-function (func)
   "FUNC is symbol or string."
   (describe-function (helm-symbolify func))

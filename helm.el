@@ -1643,6 +1643,18 @@ This is used in transformers to modify candidates list."
            (lambda (&rest oargs) (helm-compose oargs funcs))
            args)))
 
+(defun helm-stringify (str-or-sym)
+  "Get string of STR-OR-SYM."
+  (if (stringp str-or-sym)
+      str-or-sym
+    (symbol-name str-or-sym)))
+
+(defun helm-symbolify (str-or-sym)
+  "Get symbol of STR-OR-SYM."
+  (if (symbolp str-or-sym)
+      str-or-sym
+    (intern str-or-sym)))
+
 
 ;; Core: entry point
 ;; `:allow-nest' is not in this list because it is treated before.
