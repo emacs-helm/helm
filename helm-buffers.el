@@ -432,10 +432,12 @@ i.e same color."
              collect (string-match (substring pat 1) mjm) into neg
              else collect (string-match pat mjm) into pos
              finally return
-             (or (and pos (cl-loop for i in pos
-                                   thereis (numberp i)))
-                 (and neg (not (cl-loop for i in neg
-                                        thereis (numberp i))))))))
+             (let ((neg-test (cl-loop for i in neg thereis (numberp i)))
+                   (pos-test (cl-loop for i in pos thereis (numberp i))))
+               (or
+                (and neg (not pos) (not neg-test))
+                (and pos pos-test)
+                (and neg neg-test (not neg-test)))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
   (let ((fun (if (and helm-buffers-fuzzy-matching
