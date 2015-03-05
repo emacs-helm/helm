@@ -452,16 +452,15 @@ i.e same color."
 (defun helm-buffers--match-from-mjm (candidate)
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
-         (regexp-list (cl-loop with pattern = helm-pattern
-                               for p in (split-string pattern)
-                               when (string-match "\\`\\*" p)
-                               collect p)))
-    (if regexp-list
+         (regexp (cl-loop with pattern = helm-pattern
+                          for p in (split-string pattern)
+                          when (string-match "\\`\\*" p)
+                          return p)))
+    (if regexp
         (when buf
           (with-current-buffer buf
             (let ((mjm (format-mode-line mode-name)))
-              (cl-loop for re in regexp-list
-                       always (helm-buffer--match-mjm re mjm)))))
+              (helm-buffer--match-mjm regexp mjm))))
         t)))
 
 (defun helm-buffers--match-from-pat (candidate)
