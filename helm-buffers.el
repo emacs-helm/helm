@@ -428,40 +428,39 @@ i.e same color."
   (when (string-match "\\`\\*" pattern)
     (setq pattern (split-string (substring pattern 1) ","))
     (cl-loop for pat in pattern
-          if (string-match "\\`!" pat)
-          collect (string-match (substring pat 1) mjm) into neg
-          else collect (string-match pat mjm) into pos
-          finally return
-          (or (and pos (cl-loop for i in pos
-                             thereis (numberp i)))
-              (and neg (not (cl-loop for i in neg
-                                  thereis (numberp i))))))))
+             if (string-match "\\`!" pat)
+             collect (string-match (substring pat 1) mjm) into neg
+             else collect (string-match pat mjm) into pos
+             finally return
+             (or (and pos (cl-loop for i in pos
+                                   thereis (numberp i)))
+                 (and neg (not (cl-loop for i in neg
+                                        thereis (numberp i))))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
   (let ((fun (if (and helm-buffers-fuzzy-matching
                       (not (string-match "\\`\\^" pattern)))
                  #'helm--mapconcat-pattern
-               #'identity)))
-  (if (string-match "\\`!" pattern)
-      (not (string-match (funcall fun (substring pattern 1))
-                         candidate))
-    (string-match (funcall fun pattern) candidate))))
+                 #'identity)))
+    (if (string-match "\\`!" pattern)
+        (not (string-match (funcall fun (substring pattern 1))
+                           candidate))
+        (string-match (funcall fun pattern) candidate))))
 
 (defun helm-buffers--match-from-mjm (candidate)
-    (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
-           (buf  (get-buffer cand))
-           (regexp-list (cl-loop with pattern = helm-pattern
-                                 for p in (split-string pattern)
-                                 when (string-match "\\`\\*" p)
-                                 collect p)))
-      (if regexp-list
-          (when buf
-            (with-current-buffer buf
-              (let ((mjm (format-mode-line mode-name)))
-                (when regexp-list
-                  (cl-loop for re in regexp-list
-                           always (helm-buffer--match-mjm re mjm))))))
-          t)))
+  (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
+         (buf  (get-buffer cand))
+         (regexp-list (cl-loop with pattern = helm-pattern
+                               for p in (split-string pattern)
+                               when (string-match "\\`\\*" p)
+                               collect p)))
+    (if regexp-list
+        (when buf
+          (with-current-buffer buf
+            (let ((mjm (format-mode-line mode-name)))
+              (cl-loop for re in regexp-list
+                       always (helm-buffer--match-mjm re mjm)))))
+        t)))
 
 (defun helm-buffers--match-from-pat (candidate)
   (let ((regexp-list (cl-loop with pattern = helm-pattern
@@ -478,9 +477,9 @@ i.e same color."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
          (regexp (cl-loop with pattern = helm-pattern
-                               for p in (split-string pattern)
-                               when (string-match "\\`@\\(.*\\)" p)
-                               return (match-string 1 p))))
+                          for p in (split-string pattern)
+                          when (string-match "\\`@\\(.*\\)" p)
+                          return (match-string 1 p))))
     (if regexp
         (with-current-buffer buf
           (save-excursion
@@ -492,13 +491,13 @@ i.e same color."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
          (buf-fname (buffer-file-name buf))
-         (re (cl-loop with pattern = helm-pattern
-                      for p in (split-string pattern)
-                      when (string-match "\\`/" p)
-                      return p)))
-    (if re
+         (regexp (cl-loop with pattern = helm-pattern
+                          for p in (split-string pattern)
+                          when (string-match "\\`/" p)
+                          return p)))
+    (if regexp
         (string-match
-         (substring re 1) (helm-basedir buf-fname))
+         (substring regexp 1) (helm-basedir buf-fname))
         t)))
 
 (defun helm-buffers-match-function (candidate)
