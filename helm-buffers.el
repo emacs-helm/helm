@@ -426,8 +426,8 @@ i.e same color."
 ;;
 (defun helm-buffer--match-mjm (pattern mjm)
   (when (string-match "\\`\\*" pattern)
-    (setq pattern (split-string (substring pattern 1) ","))
-    (cl-loop for pat in pattern
+    (cl-loop with patterns = (split-string (substring pattern 1) ",")
+             for pat in patterns
              if (string-match "\\`!" pat)
              collect (string-match (substring pat 1) mjm) into neg
              else collect (string-match pat mjm) into pos
