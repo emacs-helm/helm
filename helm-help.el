@@ -245,7 +245,7 @@ If you prefix the beginning of pattern with \"/\" the match will occur on direct
 of buffer, it is interesting to narrow down to one directory for example, subsequent string
 entered after a space will match on buffer-name only.
 Note that negation is not supported for matching on buffer-file-name.
-You can't cumulate both major-mode matching AND directory matching, choose one or the other.
+You can specify more than one directory starting from helm v1.6.8
  
 **** Fuzzy matching:
 
