@@ -497,7 +497,7 @@ i.e same color."
                           for p in (split-string pattern)
                           when (string-match "\\`/" p)
                           return p)))
-    (if regexp
+    (if (and regexp buf-fname)
         (string-match
          (substring regexp 1) (helm-basedir buf-fname))
         t)))
