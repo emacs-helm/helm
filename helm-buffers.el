@@ -493,13 +493,15 @@ i.e same color."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
          (buf-fname (buffer-file-name buf))
-         (regexp (cl-loop with pattern = helm-pattern
+         (regexps (cl-loop with pattern = helm-pattern
                           for p in (split-string pattern)
                           when (string-match "\\`/" p)
-                          return p)))
-    (if (and regexp buf-fname)
-        (string-match
-         (substring regexp 1) (helm-basedir buf-fname))
+                          collect p)))
+    (if (and regexps buf-fname)
+        (cl-loop for re in regexps
+                 thereis 
+                 (string-match
+                  (substring re 1) (helm-basedir buf-fname)))
         t)))
 
 (defun helm-buffers-match-function (candidate)
