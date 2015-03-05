@@ -1998,6 +1998,7 @@ Return candidates prefixed with basename of `helm-input' first."
 
 (defun helm-ff-gnus-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
+  (require 'gnus-dired)
   (let ((flist (helm-marked-candidates :with-wildcard t)))
     (gnus-dired-attach flist)))
 
