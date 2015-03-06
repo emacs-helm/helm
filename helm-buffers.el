@@ -24,9 +24,11 @@
 (require 'helm-grep)
 (require 'helm-plugin)
 (require 'helm-regexp)
+(require 'helm-help)
 
 (declare-function ido-make-buffer-list "ido" (default))
 (declare-function ido-add-virtual-buffers-to-list "ido")
+(declare-function helm-comp-read "helm-mode")
 
 
 (defgroup helm-buffers nil
