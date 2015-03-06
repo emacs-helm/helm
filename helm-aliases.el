@@ -81,8 +81,8 @@
 (make-obsolete 'helm-c-emms-files-modifier 'helm-emms-files-modifier "1.5.1")
 (defalias 'helm-c-apt-reinstall 'helm-apt-reinstall)
 (make-obsolete 'helm-c-apt-reinstall 'helm-apt-reinstall "1.5.1")
-(defalias 'helm-c-bbdb-compose-mail 'helm-bbdb-compose-mail)
-(make-obsolete 'helm-c-bbdb-compose-mail 'helm-bbdb-compose-mail "1.5.1")
+
+
 (defalias 'helm-c-gentoo-init-list 'helm-gentoo-init-list)
 (make-obsolete 'helm-c-gentoo-init-list 'helm-gentoo-init-list "1.5.1")
 (defalias 'helm-c-gentoo-get-world 'helm-gentoo-get-world)
@@ -213,8 +213,8 @@
 (make-obsolete 'helm-c-position 'helm-position "1.5.1")
 (defalias 'helm-c-imenu-candidates 'helm-imenu-candidates)
 (make-obsolete 'helm-c-imenu-candidates 'helm-imenu-candidates "1.5.1")
-(defalias 'helm-c-bbdb-candidates 'helm-bbdb-candidates)
-(make-obsolete 'helm-c-bbdb-candidates 'helm-bbdb-candidates "1.5.1")
+
+
 (defalias 'helm-c-ucs-persistent-forward 'helm-ucs-persistent-forward)
 (make-obsolete 'helm-c-ucs-persistent-forward 'helm-ucs-persistent-forward "1.5.1")
 (defalias 'helm-c-basename 'helm-basename)
@@ -311,8 +311,8 @@
 (make-obsolete 'helm-c-highlight-world 'helm-highlight-world "1.5.1")
 (defalias 'helm-c-top-sh 'helm-top-sh)
 (make-obsolete 'helm-c-top-sh 'helm-top-sh "1.5.1")
-(defalias 'helm-c-bbdb-get-record 'helm-bbdb-get-record)
-(make-obsolete 'helm-c-bbdb-get-record 'helm-bbdb-get-record "1.5.1")
+
+
 (defalias 'helm-c-persistent-xfont-action 'helm-persistent-xfont-action)
 (make-obsolete 'helm-c-persistent-xfont-action 'helm-persistent-xfont-action "1.5.1")
 (defalias 'helm-c-latex-math-candidates 'helm-latex-math-candidates)
@@ -327,8 +327,8 @@
 (make-obsolete 'helm-c-google-suggest-action 'helm-google-suggest-action "1.5.1")
 (defalias 'helm-c-org-headline-insert-link-to-headline 'helm-org-headline-insert-link-to-headline)
 (make-obsolete 'helm-c-org-headline-insert-link-to-headline 'helm-org-headline-insert-link-to-headline "1.5.1")
-(defalias 'helm-c-bbdb-create-contact 'helm-bbdb-create-contact)
-(make-obsolete 'helm-c-bbdb-create-contact 'helm-bbdb-create-contact "1.5.1")
+
+
 (defalias 'helm-c-elisp-library-scan-init 'helm-elisp-library-scan-init)
 (make-obsolete 'helm-c-elisp-library-scan-init 'helm-elisp-library-scan-init "1.5.1")
 (defalias 'helm-c-apt-refresh 'helm-apt-refresh)
@@ -371,8 +371,8 @@
 (make-obsolete 'helm-c-adaptative-sort 'helm-adaptive-sort "1.5.1")
 (defalias 'helm-c-bmkext-addressbook-setup-alist 'helm-bmkext-addressbook-setup-alist)
 (make-obsolete 'helm-c-bmkext-addressbook-setup-alist 'helm-bmkext-addressbook-setup-alist "1.5.1")
-(defalias 'helm-c-bbdb-collect-mail-addresses 'helm-bbdb-collect-mail-addresses)
-(make-obsolete 'helm-c-bbdb-collect-mail-addresses 'helm-bbdb-collect-mail-addresses "1.5.1")
+
+
 (defalias 'helm-c-bmkext-filter-setup-alist 'helm-bmkext-filter-setup-alist)
 (make-obsolete 'helm-c-bmkext-filter-setup-alist 'helm-bmkext-filter-setup-alist "1.5.1")
 (defalias 'helm-c-grep-buffers 'helm-grep-buffers)
@@ -401,8 +401,8 @@
 (make-obsolete 'helm-c-register-action-transformer 'helm-register-action-transformer "1.5.1")
 (defalias 'helm-c-kill-ring-candidates 'helm-kill-ring-candidates)
 (make-obsolete 'helm-c-kill-ring-candidates 'helm-kill-ring-candidates "1.5.1")
-(defalias 'helm-c-bbdb-view-person-action 'helm-bbdb-view-person-action)
-(make-obsolete 'helm-c-bbdb-view-person-action 'helm-bbdb-view-person-action "1.5.1")
+
+
 (defalias 'helm-c-generic-browser 'helm-generic-browser)
 (make-obsolete 'helm-c-generic-browser 'helm-generic-browser "1.5.1")
 (defalias 'helm-c-top-init 'helm-top-init)
@@ -540,8 +540,8 @@
 ;;; variables
 ;;
 ;;
-(defvaralias 'helm-c-bbdb-name 'helm-bbdb-name)
-(make-obsolete-variable 'helm-c-bbdb-name 'helm-bbdb-name "1.5.1")
+
+
 (defvaralias 'helm-c-pdfgrep-default-command 'helm-pdfgrep-default-command)
 (make-obsolete-variable 'helm-c-pdfgrep-default-command 'helm-pdfgrep-default-command "1.5.1")
 (defvaralias 'helm-c-source-time-world 'helm-source-time-world)
@@ -840,8 +840,6 @@
 (make-obsolete-variable 'helm-c-man-pages 'helm-man-pages "1.5.1")
 (defvaralias 'helm-c-adaptative-done 'helm-adaptive-done)
 (make-obsolete-variable 'helm-c-adaptative-done 'helm-adaptive-done "1.5.1")
-(defvaralias 'helm-c-source-bbdb 'helm-source-bbdb)
-(make-obsolete-variable 'helm-c-source-bbdb 'helm-source-bbdb "1.5.1")
 (defvaralias 'helm-c-source-regexp 'helm-source-regexp)
 (make-obsolete-variable 'helm-c-source-regexp 'helm-source-regexp "1.5.1")
 (defvaralias 'helm-c-boring-file-regexp-list 'helm-boring-file-regexp-list)
