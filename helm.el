@@ -1600,6 +1600,7 @@ in the source where point is."
            (setq helm-quit t)
            (exit-minibuffer)
            (keyboard-quit)
+           ;; See comment about this in `with-local-quit'.
            (eval '(ignore nil)))))
 
 (defun helm-compose (arg-lst func-lst)
