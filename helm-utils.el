@@ -917,6 +917,17 @@ grabs the entire symbol."
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))
 
+(defun helm-read-repeat-string (prompt &optional count)
+  "Prompt as many time PROMPT is not empty.
+If COUNT is non--nil add a number after each prompt."
+  (cl-loop with elm
+        while (not (string= elm ""))
+        for n from 1
+        do (when count
+             (setq prompt (concat prompt (int-to-string n) ": ")))
+        collect (setq elm (helm-read-string prompt)) into lis
+        finally return (remove "" lis)))
+
 ;; FIXME why do we run this after PA?
 ;; Seems it is not needed, thus it create a bug
 ;; when we want to hit repetitively C-w and follow-mode is enabled,
