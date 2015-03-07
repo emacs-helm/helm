@@ -3254,8 +3254,9 @@ is done on whole `helm-buffer' and not on current source."
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
   (let ((len (string-width
-              (if (or (not (assoc 'no-matchplugin source))
-                      helm-match-plugin-mode)
+              (if (and helm-match-plugin-mode
+                       (or (assoc 'matchplugin source)
+                           (null (assoc 'no-matchplugin source))))
                   ;; Don't count spaces entered when using
                   ;; match-plugin.
                   (replace-regexp-in-string " " "" helm-pattern)
