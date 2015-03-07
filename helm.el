@@ -2816,7 +2816,7 @@ e.g helm.el$
     => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
     ^helm.el$
     => \"helm[.]el$\"."
-  (let ((ls (split-string pattern "" t)))
+  (let ((ls (split-string-and-unquote pattern "")))
     (if (string= "^" (car ls))
         ;; Exact match.
         (mapconcat (lambda (c)
