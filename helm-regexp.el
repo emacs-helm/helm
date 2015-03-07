@@ -210,9 +210,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (let* ((split (helm-grep-split-line candidate))
          (buf (car split))
          (lineno (string-to-number (nth 1 split)))
-         (split-pat (if helm-occur-match-plugin-mode
-                        (helm-mp-split-pattern helm-pattern)
-                      (list helm-pattern))))
+         (split-pat (helm-mp-split-pattern helm-pattern)))
     (cl-case method
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
@@ -270,19 +268,6 @@ Same as `helm-moccur-goto-line' but go in new frame."
   (interactive)
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-moccur-goto-line)))
-
-;;;###autoload
-(define-minor-mode helm-occur-match-plugin-mode
-    "Turn On/Off `helm-match-plugin-mode' only for `helm-m/occur'."
-  :global t
-  :init-value t
-  (if helm-occur-match-plugin-mode
-      (setq helm-source-moccur
-            (remove (assoc 'no-matchplugin helm-source-moccur)
-                    helm-source-moccur)
-            helm-source-occur helm-source-moccur)
-    (helm-attrset 'no-matchplugin nil helm-source-moccur)
-    (setq helm-source-occur helm-source-moccur)))
 
 (defvar helm-source-moccur nil)
 (defclass helm-source-multi-occur (helm-source-in-buffer)
@@ -368,8 +353,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
                   ":"
                   (propertize lineno 'face 'helm-grep-lineno)
                   ":"
-                  (helm-grep-highlight-match
-                   str helm-occur-match-plugin-mode))
+                  (helm-grep-highlight-match str t))
           candidate)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
