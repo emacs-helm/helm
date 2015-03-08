@@ -4433,16 +4433,8 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
                   do (funcall next-line-fn 1))))
 
 (defun helm-search-from-candidate-buffer-internal (search-fn)
-  (goto-char (point-min))
-  (insert "\n")
-  (goto-char (point-max))
-  (insert "\n")
   (unwind-protect
        (funcall search-fn)
-    (goto-char (point-min))
-    (delete-char 1)
-    (goto-char (1- (point-max)))
-    (delete-char 1)
     (set-buffer-modified-p nil)))
 
 (defun helm-candidate-buffer (&optional create-or-buffer)

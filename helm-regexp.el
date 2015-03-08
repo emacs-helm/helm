@@ -190,17 +190,31 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                  bufstr)
              concat bufstr)))
 
+(defun helm-moccur--next-or-previous-char ()
+  (save-excursion
+    (or (re-search-forward "^." nil t)
+        (re-search-backward "^." nil t))))
+
 (defun helm-moccur-get-line (beg end)
   "Format line for `helm-source-moccur'."
-  (format "%s:%d:%s"
-          (get-text-property beg 'buffer-name)
-          (save-restriction
-            (narrow-to-region (previous-single-property-change
-                               (point) 'buffer-name)
-                              (next-single-property-change
-                               (point) 'buffer-name))
-            (line-number-at-pos beg))
-          (buffer-substring beg end)))
+  (prog1
+      (format "%s:%d:%s"
+              (get-text-property (if (= beg end)
+                                     (helm-moccur--next-or-previous-char)
+                                     beg)
+                                 'buffer-name)
+              (save-restriction
+                (narrow-to-region (or (previous-single-property-change
+                                       (point) 'buffer-name) 1)
+                                  (or (next-single-property-change
+                                       (if (= beg end)
+                                           (helm-moccur--next-or-previous-char)
+                                           (point))
+                                       'buffer-name)
+                                      (point-max)))
+                (line-number-at-pos beg))
+              (if (= beg end) "EMPTY LINE" (buffer-substring beg end)))
+    (if (= beg end) (forward-char 1))))
 
 (cl-defun helm-moccur-action (candidate
                               &optional (method (quote buffer)) mark)
