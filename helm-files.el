@@ -1155,9 +1155,7 @@ Same as `dired-do-print' but for helm."
                            (mapconcat
                             (lambda (f) (format "- %s\n" f))
                             file-list ""))
-                   (when (and lpr-command
-                              (or lpr-switches
-                                  printer-name))
+                   (when (and lpr-command lpr-switches)
                      (mapconcat 'identity
                                 (cons lpr-command
                                       (if (stringp lpr-switches)
