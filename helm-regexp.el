@@ -213,8 +213,12 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                                        'buffer-name)
                                       (point-max)))
                 (line-number-at-pos beg))
+              ;; When matching empty line, use empty string
+              ;; to allow saving and modifying with wgrep.
               (if (= beg end) "" (buffer-substring beg end)))
-    (if (= beg end) (forward-char 1))))
+    ;; When matching empty line, forward char ("\n")
+    ;; to not be blocked forever here.
+    (when (= beg end) (forward-char 1))))
 
 (cl-defun helm-moccur-action (candidate
                               &optional (method (quote buffer)) mark)
