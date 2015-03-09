@@ -213,7 +213,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                                        'buffer-name)
                                       (point-max)))
                 (line-number-at-pos beg))
-              (if (= beg end) "EMPTY LINE" (buffer-substring beg end)))
+              (if (= beg end) "<EMPTY LINE>" (buffer-substring beg end)))
     (if (= beg end) (forward-char 1))))
 
 (cl-defun helm-moccur-action (candidate
