@@ -1119,6 +1119,10 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
+(defvar printer-name)
+(defvar lpr-switches)
+(defvar lpr-printer-switch)
+(defvar lpr-command)
 (defun helm-ff-print (_candidate)
   "Print marked files.
 You have to set in order
@@ -1126,7 +1130,6 @@ variables `lpr-command',`lpr-switches' and/or `printer-name'.
 
 e.g:
 \(setq lpr-command \"gtklp\"\)
-\(setq lpr-switches '(\"-P\")\)
 \(setq printer-name \"Epson-Stylus-Photo-R265\"\)
 
 Same as `dired-do-print' but for helm."
@@ -1140,6 +1143,12 @@ Same as `dired-do-print' but for helm."
                            (helm-comp-read
                             "Printer: " helm-ff-printer-list)
                          printer-name))
+         (lpr-switches
+	  (if (and (stringp printer-name)
+		   (string< "" printer-name))
+	      (cons (concat lpr-printer-switch printer-name)
+		    lpr-switches)
+              lpr-switches))
          (command (helm-read-string
                    (format "Print *%s File(s):\n%s with: "
                            len
@@ -1151,10 +1160,9 @@ Same as `dired-do-print' but for helm."
                                   printer-name))
                      (mapconcat 'identity
                                 (cons lpr-command
-                                      (append (if (stringp lpr-switches)
-                                                  (list lpr-switches)
-                                                lpr-switches)
-                                              (list printer-name)))
+                                      (if (stringp lpr-switches)
+                                          (list lpr-switches)
+                                          lpr-switches))
                                 " "))))
          (file-args (mapconcat #'(lambda (x)
                                    (format "'%s'" x))
