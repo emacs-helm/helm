@@ -4369,7 +4369,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
         newmatches
         (case-fold-search (helm-set-case-fold-search))
         (stopper (if search-from-end #'bobp #'eobp)))
-    (helm-search-from-candidate-buffer-internal
+    (helm--search-from-candidate-buffer-1
      (lambda ()
        (clrhash helm-cib-hash)
        (cl-dolist (searcher search-fns)
@@ -4432,7 +4432,12 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
                   collect (funcall get-line-fn (point-at-bol) (point-at-eol))
                   do (funcall next-line-fn 1))))
 
-(defun helm-search-from-candidate-buffer-internal (search-fn)
+(defun helm--search-from-candidate-buffer-1 (search-fn)
+  ;; Previously we were adding a newline at bob and at eol
+  ;; and removing these newlines afterward, it seems it is no more
+  ;; needed, thus when searching for empty line ("^$")
+  ;; it was adding the first line as a matched line
+  ;; which is wrong.
   (unwind-protect
        (funcall search-fn)
     (set-buffer-modified-p nil)))
