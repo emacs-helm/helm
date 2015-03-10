@@ -504,7 +504,7 @@ i.e same color."
                  (and buf-fname
                       (string-match
                        (substring re 1) (helm-basedir buf-fname))))
-        (and buf-fname t))))
+        t)))
 
 (defun helm-buffers-match-function (candidate)
   "Default function to match buffers."
