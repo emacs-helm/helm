@@ -75,10 +75,11 @@ Find here the documentation of all sources actually documented."
             do (if (functionp str)
                    (insert (funcall str))
                  (insert str)))))
-  (helm :sources (helm-source-org-headings-for-files
-                  (list helm-documentation-file))
-        :candidate-number-limit 99999
-        :buffer "*helm documentation*"))
+  (let ((helm-org-headings--nofilename t))
+    (helm :sources (helm-source-org-headings-for-files
+                    (list helm-documentation-file))
+          :candidate-number-limit 99999
+          :buffer "*helm documentation*")))
 
 ;;; Global help message - Used by `helm-help'
 ;;
