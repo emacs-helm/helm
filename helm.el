@@ -4208,11 +4208,14 @@ That is what completion commands operate on."
   "Delete minibuffer contents.
 When `helm-delete-minibuffer-contents-from-point' is non--nil,
 delete minibuffer contents from point instead of deleting all.
-Giving a prefix arg reverse this behavior."
+Giving a prefix arg reverse this behavior.
+When at end of minibuffer delete all."
   (interactive "P")
   (let ((str (if helm-delete-minibuffer-contents-from-point
-                 (if arg "" (helm-minibuffer-completion-contents))
-                 (if arg (helm-minibuffer-completion-contents) ""))))
+                 (if (or arg (eobp))
+                     "" (helm-minibuffer-completion-contents))
+                 (if (and arg (not (eobp)))
+                     (helm-minibuffer-completion-contents) ""))))
     (helm--delete-minibuffer-contents-from str)))
 
 
