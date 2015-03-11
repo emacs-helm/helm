@@ -477,9 +477,10 @@ will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
-(defcustom helm-delete-minibuffer-contents-from-point nil
+(defcustom helm-delete-minibuffer-contents-from-point t
   "When non--nil, `helm-delete-minibuffer-contents' delete region from `point'.
-Otherwise (default) delete `minibuffer-contents'."
+Otherwise delete `minibuffer-contents'.
+See documentation of `helm-delete-minibuffer-contents'."
   :group 'helm
   :type 'boolean)
 
