@@ -1202,14 +1202,15 @@ The checksum is copied to kill-ring."
         (not helm-ff-transformer-show-only-basename))
   (let* ((cand   (helm-get-selection nil t))
          (target (if helm-ff-transformer-show-only-basename
-                    (helm-basename cand) cand)))
+                     (helm-basename cand) cand)))
     (helm-force-update (regexp-quote target))))
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'toggle-basename '(helm-ff-toggle-basename . never-split))
-    (helm-execute-persistent-action 'toggle-basename)))
+    (unless (helm-empty-source-p)
+      (helm-attrset 'toggle-basename '(helm-ff-toggle-basename . never-split))
+      (helm-execute-persistent-action 'toggle-basename))))
 
 (cl-defun helm-reduce-file-name (fname level &key unix-close expand)
   "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.

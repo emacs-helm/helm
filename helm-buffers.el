@@ -498,11 +498,12 @@ i.e same color."
                           for p in (split-string pattern)
                           when (string-match "\\`/" p)
                           collect p)))
-    (if (and regexps buf-fname)
+    (if regexps
         (cl-loop for re in regexps
                  thereis 
-                 (string-match
-                  (substring re 1) (helm-basedir buf-fname)))
+                 (and buf-fname
+                      (string-match
+                       (substring re 1) (helm-basedir buf-fname))))
         t)))
 
 (defun helm-buffers-match-function (candidate)

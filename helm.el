@@ -3566,7 +3566,9 @@ If action buffer is selected, back to the helm buffer."
                (helm-set-pattern helm-input 'noupdate))
               (helm-saved-selection
                (setq helm-saved-current-source (helm-get-current-source))
-               (let ((actions (helm-get-actions-from-current-source)))
+               (let ((actions (helm-get-actions-from-current-source))
+                     ;; Be sure the minibuffer is entirely deleted (#907).
+                     helm-delete-minibuffer-contents-from-point)
                  (if (functionp actions)
                      (message "Sole action: %s" actions)
                      (helm-show-action-buffer actions)
