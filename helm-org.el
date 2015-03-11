@@ -31,6 +31,9 @@ NOTE: This will be slow on large org buffers."
   :group 'helm-org
   :type 'boolean)
 
+;; Internal
+(defvar helm-org-headings--nofilename nil)
+
 ;;; Org capture templates
 ;;
 ;;
@@ -83,11 +86,13 @@ NOTE: This will be slow on large org buffers."
   (apply #'append
    (mapcar (lambda (filename)
              (helm-get-org-candidates-in-file
-              filename min-depth max-depth helm-org-headings-fontify))
+              filename min-depth max-depth
+              helm-org-headings-fontify
+              helm-org-headings--nofilename))
            filenames)))
 
 (defun helm-get-org-candidates-in-file (filename min-depth max-depth
-                                        &optional fontify)
+                                        &optional fontify nofname)
   (with-current-buffer (find-file-noselect filename)
     (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify 'match-string 'match-string-no-properties)))
@@ -96,7 +101,10 @@ NOTE: This will be slow on large org buffers."
         (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
               if (let ((num-stars (length (match-string-no-properties 1))))
                    (and (>= num-stars min-depth) (<= num-stars max-depth)))
-              collect `(,(funcall match-fn 0) . ,(point-marker)))))))
+              collect `(,(if nofname (funcall match-fn 0)
+                             (concat (helm-basename filename)
+                                 ": " (funcall match-fn 0)))
+                         . ,(point-marker)))))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
