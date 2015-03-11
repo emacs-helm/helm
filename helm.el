@@ -477,9 +477,10 @@ will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
-(defcustom helm-delete-minibuffer-contents-from-point nil
+(defcustom helm-delete-minibuffer-contents-from-point t
   "When non--nil, `helm-delete-minibuffer-contents' delete region from `point'.
-Otherwise (default) delete `minibuffer-contents'."
+Otherwise delete `minibuffer-contents'.
+See documentation of `helm-delete-minibuffer-contents'."
   :group 'helm
   :type 'boolean)
 
@@ -3566,13 +3567,12 @@ If action buffer is selected, back to the helm buffer."
                (helm-set-pattern helm-input 'noupdate))
               (helm-saved-selection
                (setq helm-saved-current-source (helm-get-current-source))
-               (let ((actions (helm-get-actions-from-current-source))
-                     ;; Be sure the minibuffer is entirely deleted (#907).
-                     helm-delete-minibuffer-contents-from-point)
+               (let ((actions (helm-get-actions-from-current-source)))
                  (if (functionp actions)
                      (message "Sole action: %s" actions)
                      (helm-show-action-buffer actions)
-                     (helm-delete-minibuffer-contents)
+                     ;; Be sure the minibuffer is entirely deleted (#907).
+                     (helm--delete-minibuffer-contents-from "")
                      ;; Make `helm-pattern' differs from the previous value.
                      (setq helm-pattern 'dummy)
                      (helm-check-minibuffer-input))))
@@ -4193,22 +4193,31 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
 That is what completion commands operate on."
   (buffer-substring (field-beginning) (point)))
 
-(defun helm-delete-minibuffer-contents (&optional arg)
-  "Delete minibuffer contents.
-When called with a prefix arg or when
-`helm-delete-minibuffer-contents-from-point' is non--nil,
-delete minibuffer contents from point instead of deleting all."
-  (interactive "P")
+(defun helm--delete-minibuffer-contents-from (from-str)
+  ;; Giving an empty string value to FROM-STR delete all.
   (require 'helm-utils)
-  (let* ((input (minibuffer-contents))
-         (str (if (or arg helm-delete-minibuffer-contents-from-point)
-                  (helm-minibuffer-completion-contents) "")))
+  (let ((input (minibuffer-contents)))
     (helm-reset-yank-point)
     (if (> (length input) 0)
-        ;; minibuffer is not empty, delete contents and update.
-        (helm-set-pattern str)
-      ;; minibuffer is already empty, force update.
-      (helm-force-update))))
+        ;; minibuffer is not empty, delete contents from end
+        ;; of FROM-STR and update.
+        (helm-set-pattern from-str)
+        ;; minibuffer is already empty, force update.
+        (helm-force-update))))
+
+(defun helm-delete-minibuffer-contents (&optional arg)
+  "Delete minibuffer contents.
+When `helm-delete-minibuffer-contents-from-point' is non--nil,
+delete minibuffer contents from point instead of deleting all.
+Giving a prefix arg reverse this behavior.
+When at end of minibuffer delete all."
+  (interactive "P")
+  (let ((str (if helm-delete-minibuffer-contents-from-point
+                 (if (or arg (eobp))
+                     "" (helm-minibuffer-completion-contents))
+                 (if (and arg (not (eobp)))
+                     (helm-minibuffer-completion-contents) ""))))
+    (helm--delete-minibuffer-contents-from str)))
 
 
 ;;; Plugins
