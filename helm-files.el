@@ -1121,13 +1121,15 @@ See `helm-ff-serial-rename-1'."
 
 (defun helm-ff-print (_candidate)
   "Print marked files.
-You have to set in order
-variables `lpr-command',`lpr-switches' and/or `printer-name'.
 
-e.g:
-\(setq lpr-command \"gtklp\"\)
-\(setq printer-name \"Epson-Stylus-Photo-R265\"\)
+You may to set in order
+variables `lpr-command',`lpr-switches' and/or `printer-name',
+but with no settings helm should detect your printer(s) and
+print with the default `lpr' settings.
 
+NOTE: DO NOT set the \"-P\" flag in `lpr-switches', if you really
+have to modify this, do it in `lpr-printer-switch'.
+  
 Same as `dired-do-print' but for helm."
   (require 'lpr)
   (when (or helm-current-prefix-arg
