@@ -1119,17 +1119,20 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
+(defvar lpr-printer-switch)
 (defun helm-ff-print (_candidate)
   "Print marked files.
-You have to set in order
-variables `lpr-command',`lpr-switches' and/or `printer-name'.
 
-e.g:
-\(setq lpr-command \"gtklp\"\)
-\(setq lpr-switches '(\"-P\")\)
-\(setq printer-name \"Epson-Stylus-Photo-R265\"\)
+You may to set in order
+variables `lpr-command',`lpr-switches' and/or `printer-name',
+but with no settings helm should detect your printer(s) and
+print with the default `lpr' settings.
 
+NOTE: DO NOT set the \"-P\" flag in `lpr-switches', if you really
+have to modify this, do it in `lpr-printer-switch'.
+  
 Same as `dired-do-print' but for helm."
+  (require 'lpr)
   (when (or helm-current-prefix-arg
             (not helm-ff-printer-list))
     (setq helm-ff-printer-list
@@ -1140,21 +1143,24 @@ Same as `dired-do-print' but for helm."
                            (helm-comp-read
                             "Printer: " helm-ff-printer-list)
                          printer-name))
+         (lpr-switches
+	  (if (and (stringp printer-name)
+		   (string< "" printer-name))
+	      (cons (concat lpr-printer-switch printer-name)
+		    lpr-switches)
+              lpr-switches))
          (command (helm-read-string
                    (format "Print *%s File(s):\n%s with: "
                            len
                            (mapconcat
                             (lambda (f) (format "- %s\n" f))
                             file-list ""))
-                   (when (and lpr-command
-                              (or lpr-switches
-                                  printer-name))
+                   (when (and lpr-command lpr-switches)
                      (mapconcat 'identity
                                 (cons lpr-command
-                                      (append (if (stringp lpr-switches)
-                                                  (list lpr-switches)
-                                                lpr-switches)
-                                              (list printer-name)))
+                                      (if (stringp lpr-switches)
+                                          (list lpr-switches)
+                                          lpr-switches))
                                 " "))))
          (file-args (mapconcat #'(lambda (x)
                                    (format "'%s'" x))
