@@ -1119,6 +1119,7 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
+(defvar lpr-printer-switch)
 (defun helm-ff-print (_candidate)
   "Print marked files.
 
