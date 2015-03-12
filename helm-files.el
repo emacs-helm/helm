@@ -1119,10 +1119,6 @@ See `helm-ff-serial-rename-1'."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-etags-select)))
 
-(defvar printer-name)
-(defvar lpr-switches)
-(defvar lpr-printer-switch)
-(defvar lpr-command)
 (defun helm-ff-print (_candidate)
   "Print marked files.
 You have to set in order
@@ -1133,6 +1129,7 @@ e.g:
 \(setq printer-name \"Epson-Stylus-Photo-R265\"\)
 
 Same as `dired-do-print' but for helm."
+  (require 'lpr)
   (when (or helm-current-prefix-arg
             (not helm-ff-printer-list))
     (setq helm-ff-printer-list
