@@ -823,7 +823,7 @@ Keys description:
                  (stringp result)
                  (file-equal-p result initial-input)
                  default)
-            default)
+            (if (listp default) (car default) default))
            ((and result (stringp result))
             (expand-file-name result))
            ((and result (listp result))
@@ -834,6 +834,20 @@ Keys description:
                 (eq must-match 'confirm))
        (identity helm-pattern))
      (helm-mode--keyboard-quit))))
+
+(defun helm-mode--default-filename (fname dir initial)
+  (unless dir (setq dir default-directory))
+  (unless (file-name-absolute-p dir)
+    (setq dir (expand-file-name dir)))
+  (unless (or fname (consp fname))
+    (setq fname (expand-file-name
+                 (or initial buffer-file-name)
+                 dir)))
+  (if (and fname (consp fname))
+      (setq fname (cl-loop for f in fname
+                           collect (expand-file-name f dir)))
+      (if (file-name-absolute-p fname)
+          fname (expand-file-name fname dir))))
 
 (cl-defun helm--generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
@@ -858,6 +872,8 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
          fname)
+    (setq default-filename (helm-mode--default-filename
+                            default-filename dir initial))
     ;; Some functions that normally call `completing-read' can switch
     ;; brutally to `read-file-name' (e.g find-tag), in this case
     ;; the helm specialized function will fail because it is build
