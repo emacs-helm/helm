@@ -28,25 +28,28 @@
 (defvar helm-el-package--removable-packages nil)
 
 (defun helm-el-package--init ()
-  (when (null package-alist)
-    (setq helm-el-package--show-only 'all))
-  (when (fboundp 'package--removable-packages)
-    (setq helm-el-package--removable-packages
-          (package--removable-packages)))
-  (save-selected-window
-    (list-packages helm-el-package--initialized-p)
-    (setq helm-el-package--initialized-p t)
-    (message nil))
-  (helm-init-candidates-in-buffer
-      'global
-    (with-current-buffer (get-buffer "*Packages*")
-      (setq helm-el-package--tabulated-list tabulated-list-entries)
-      (buffer-string)))
-  (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
-  (if helm-force-updating-p
-      (message "Refreshing packages list done")
-    (setq helm-el-package--show-only 'all))
-  (kill-buffer "*Packages*"))
+  ;; Fix emacs-bug#20010 where
+  ;; write-region ask for coding-system under Windows.
+  (let ((coding-system-for-write "utf-8"))
+    (when (null package-alist)
+      (setq helm-el-package--show-only 'all))
+    (when (fboundp 'package--removable-packages)
+      (setq helm-el-package--removable-packages
+            (package--removable-packages)))
+    (save-selected-window
+      (list-packages helm-el-package--initialized-p)
+      (setq helm-el-package--initialized-p t)
+      (message nil))
+    (helm-init-candidates-in-buffer
+        'global
+      (with-current-buffer (get-buffer "*Packages*")
+        (setq helm-el-package--tabulated-list tabulated-list-entries)
+        (buffer-string)))
+    (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
+    (if helm-force-updating-p
+        (message "Refreshing packages list done")
+        (setq helm-el-package--show-only 'all))
+    (kill-buffer "*Packages*")))
 
 (defun helm-el-package-describe (candidate)
   (let ((id (get-text-property 0 'tabulated-list-id candidate)))
