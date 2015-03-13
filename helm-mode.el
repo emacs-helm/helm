@@ -842,7 +842,7 @@ Keys description:
     (setq dir (expand-file-name dir)))
   (unless (or fname (consp fname))
     (setq fname (expand-file-name
-                 (or initial buffer-file-name)
+                 (or initial buffer-file-name dir)
                  dir)))
   (if (and fname (consp fname))
       (setq fname (cl-loop for f in fname
