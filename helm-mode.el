@@ -515,6 +515,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                             (and (funcall test x)
                                                  (not (keywordp x))))
                                           default))
+               :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :persistent-action 'helm-lisp-completion-persistent-action
                :persistent-help "Show brief doc in mode-line")
     :prompt prompt
