@@ -397,6 +397,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff--auto-update-state nil)
 (defvar helm-ff--deleting-char-backward nil)
 (defvar helm-multi-files--toggle-locate nil)
+(defvar helm-ff--move-to-first-real-candidate t)
 
 
 ;;; Helm-find-files
@@ -498,6 +499,7 @@ ACTION must be an action supported by `helm-dired-action'."
          (prompt (format "%s %s file(s) to: "
                          (capitalize (symbol-name action))
                          (length ifiles)))
+         helm-ff--move-to-first-real-candidate
          (helm-always-two-windows t)
          (helm-reuse-last-window-split-state t)
          (helm-split-window-default-side
@@ -1296,6 +1298,10 @@ or hitting C-j on \"..\"."
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (and (helm-file-completion-source-p)
+                 (not (string-match
+                       "\\`[Dd]ired"
+                       (assoc-default 'name (helm-get-current-source))))
+                 helm-ff--move-to-first-real-candidate
                  (helm-get-selection))
       (unless (or (and (string-match helm-tramp-file-name-regexp it)
                        (not (file-remote-p it nil t)))
