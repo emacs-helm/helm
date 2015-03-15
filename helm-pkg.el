@@ -5,7 +5,7 @@
   '((emacs "24")
     (cl-lib "0.5")
     (async "1.2"))
-  :url "https://emacs-helm.github.com/helm")
+  :url "https://emacs-helm.github.io/helm/")
 
 ;; Local Variables:
 ;; no-byte-compile: t
