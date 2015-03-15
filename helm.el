@@ -557,6 +557,12 @@ to exit or helm update to disable the `current-input-method' with `C-\\'."
           (const :tag "Never provide guidance" nil)
           (const :tag "Always provide guidance" t)
           (const :tag "Provide guidance only in complex methods" complex-only)))
+
+(defcustom helm-display-header-line t
+  "Display header-line when non nil."
+  :group 'helm
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -3665,16 +3671,17 @@ Possible value of DIRECTION are 'next or 'previous."
               helm--mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
                                            (cadr helm-mode-line-string)
-                                         helm-mode-line-string)))
-      (setq mode-line-format (default-value 'mode-line-format)))
+                                           helm-mode-line-string)))
+        (setq mode-line-format (default-value 'mode-line-format)))
     ;; Setup header-line.
-    (let* ((hlstr (helm-interpret-value
-                   (and (listp source)
-                        (assoc-default 'header-line source))
-                   source))
-           (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
-      (setq header-line-format
-            (propertize (concat " " hlstr hlend) 'face 'helm-header))))
+    (when helm-display-header-line
+      (let* ((hlstr (helm-interpret-value
+                     (and (listp source)
+                          (assoc-default 'header-line source))
+                     source))
+             (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
+        (setq header-line-format
+              (propertize (concat " " hlstr hlend) 'face 'helm-header)))))
   (when force (force-mode-line-update)))
 
 (defun helm-show-candidate-number (&optional name)
