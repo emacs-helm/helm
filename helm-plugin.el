@@ -21,10 +21,6 @@
 (require 'helm)
 (require 'helm-utils)
 
-(declare-function Info-index-nodes "info" (&optional file))
-(declare-function Info-goto-node "info" (&optional fork))
-(declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
-
 
 ;;; Plug-in: `info-index'
 ;;
@@ -52,14 +48,6 @@
   Example:
 
   (defvar helm-source-info-wget '((info-index . \"wget\"))")
-
-(helm-document-attribute 'index-nodes "info-index plugin (optional)"
-  "  Index nodes of info file.
-
-  If it is omitted, `Info-index-nodes' is used to collect index
-  nodes. Some info files are missing index specification.
-
-  See `helm-source-info-screen'.")
 
 
 ;;; Plug-in: `candidates-file'
