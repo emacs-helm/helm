@@ -140,15 +140,13 @@ Where NAME is one of `helm-default-info-index-list'."
 
 
 ;;; Info pages
-(defvar helm-info-pages nil
-  "All info pages on system.
-Will be calculated the first time you invoke helm with this
-source.")
+(defvar helm-info--pages-cache nil
+  "Cache for all info pages on system.")
 
 (defun helm-info-pages-init ()
   "Collect candidates for initial Info node Top."
-  (if helm-info-pages
-      helm-info-pages
+  (if helm-info--pages-cache
+      helm-info--pages-cache
     (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
           topics)
       (require 'info)
@@ -158,12 +156,12 @@ source.")
         (while (re-search-forward info-topic-regexp nil t)
           (push (match-string-no-properties 1) topics))
         (kill-buffer))
-      (setq helm-info-pages topics))))
+      (setq helm-info--pages-cache topics))))
 
 (defvar helm-source-info-pages
   (helm-build-sync-source "Info Pages"
     :init #'helm-info-pages-init
-    :candidates (lambda () helm-info-pages)
+    :candidates (lambda () helm-info--pages-cache)
     :action '(("Show with Info" .(lambda (node-str)
                                   (info (replace-regexp-in-string
                                          "^[^:]+: " "" node-str)))))

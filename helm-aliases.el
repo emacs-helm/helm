@@ -729,8 +729,6 @@
 (make-obsolete-variable 'helm-c-source-elscreen 'helm-source-elscreen "1.5.1")
 (defvaralias 'helm-c-etags-mtime-alist 'helm-etags-mtime-alist)
 (make-obsolete-variable 'helm-c-etags-mtime-alist 'helm-etags-mtime-alist "1.5.1")
-(defvaralias 'helm-c-info-pages 'helm-info-pages)
-(make-obsolete-variable 'helm-c-info-pages 'helm-info-pages "1.5.1")
 (defvaralias 'helm-c-grep-default-recurse-command 'helm-grep-default-recurse-command)
 (make-obsolete-variable 'helm-c-grep-default-recurse-command 'helm-grep-default-recurse-command "1.5.1")
 (defvaralias 'helm-c-source-google-suggest 'helm-source-google-suggest)
