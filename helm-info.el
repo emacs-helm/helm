@@ -32,7 +32,7 @@
   "Info related Applications and libraries for Helm."
   :group 'helm)
 
-;;; Build info-index sources with info-index plug-in.
+;;; Build info-index sources with `helm-info-source' class.
 ;;
 ;;
 (cl-defun helm-info-init (&optional (file (helm-attr 'info-file)))
@@ -46,7 +46,7 @@
       (let (Info-history
             (tobuf (helm-candidate-buffer 'global))
             (infobuf (current-buffer))
-            s e
+            start end
             (nodes (or (helm-attr 'index-nodes) (Info-index-nodes))))
         (cl-dolist (node nodes)
           (Info-goto-node node)
@@ -55,10 +55,10 @@
             (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
               (save-current-buffer (buffer-substring-no-properties
                                     (point-at-bol) (point-at-eol)))
-              (setq s (point-at-bol)
-                    e (point-at-eol))
+              (setq start (point-at-bol)
+                    end (point-at-eol))
               (with-current-buffer tobuf
-                (insert-buffer-substring infobuf s e)
+                (insert-buffer-substring infobuf start end)
                 (insert "\n")))))))))
 
 (defun helm-info-goto (node-line)
