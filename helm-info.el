@@ -43,18 +43,15 @@
   (unless (helm-candidate-buffer)
     (save-window-excursion
       (info file)
-      (let (Info-history
-            (tobuf (helm-candidate-buffer 'global))
+      (let ((tobuf (helm-candidate-buffer 'global))
             (infobuf (current-buffer))
-            start end
-            (nodes (or (helm-attr 'index-nodes) (Info-index-nodes))))
-        (cl-dolist (node nodes)
+            Info-history
+            start end)
+        (cl-dolist (node (Info-index-nodes))
           (Info-goto-node node)
           (goto-char (point-min))
           (while (search-forward "\n* " nil t)
             (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
-              (save-current-buffer (buffer-substring-no-properties
-                                    (point-at-bol) (point-at-eol)))
               (setq start (point-at-bol)
                     end (point-at-eol))
               (with-current-buffer tobuf
