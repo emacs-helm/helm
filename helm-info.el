@@ -25,6 +25,7 @@
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
+(defvar Info-history)
 
 
 (defgroup helm-info nil
@@ -34,6 +35,56 @@
 ;;; Build info-index sources with info-index plug-in.
 ;;
 ;;
+(cl-defun helm-info-init (&optional (file (helm-attr 'info-file)))
+  ;; Allow reinit candidate buffer when using edebug.
+  (helm-aif (and debug-on-error
+                 (helm-candidate-buffer))
+      (kill-buffer it))
+  (unless (helm-candidate-buffer)
+    (save-window-excursion
+      (info file)
+      (let (Info-history
+            (tobuf (helm-candidate-buffer 'global))
+            (infobuf (current-buffer))
+            s e
+            (nodes (or (helm-attr 'index-nodes) (Info-index-nodes))))
+        (cl-dolist (node nodes)
+          (Info-goto-node node)
+          (goto-char (point-min))
+          (while (search-forward "\n* " nil t)
+            (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
+              (save-current-buffer (buffer-substring-no-properties
+                                    (point-at-bol) (point-at-eol)))
+              (setq s (point-at-bol)
+                    e (point-at-eol))
+              (with-current-buffer tobuf
+                (insert-buffer-substring infobuf s e)
+                (insert "\n")))))))))
+
+(defun helm-info-goto (node-line)
+  (Info-goto-node (car node-line))
+  (helm-goto-line (cdr node-line)))
+
+(defun helm-info-display-to-real (line)
+  (and (string-match
+        ;; This regexp is stolen from Info-apropos-matches
+        "\\* +\\([^\n]*.+[^\n]*\\):[ \t]+\\([^\n]*\\)\\.\\(?:[ \t\n]*(line +\\([0-9]+\\))\\)?" line)
+       (cons (format "(%s)%s" (helm-attr 'info-file) (match-string 2 line))
+             (string-to-number (or (match-string 3 line) "1")))))
+
+(defclass helm-info-source (helm-source-in-buffer)
+  ((info-file :initarg :info-file
+              :initform nil
+              :custom 'string)
+   (init :initform #'helm-info-init)
+   (display-to-real :initform #'helm-info-display-to-real)
+   (get-line :initform #'buffer-substring)
+   (action :initform '(("Goto node" . helm-info-goto)))))
+
+(defmacro helm-build-info-source (fname &rest args)
+  `(helm-make-source (concat "Info Index: " ,fname) 'helm-info-source
+     :info-file ,fname ,@args))
+
 (defun helm-build-info-index-command (name doc source buffer)
   "Define an helm command NAME with documentation DOC.
 Arg SOURCE will be an existing helm source named
@@ -55,8 +106,7 @@ Where NAME is one of `helm-default-info-index-list'."
                                 (intern (concat "helm-source-info-" str)))
         for sym in symbols
         for str in var-value
-        do (set sym (list (cons 'name (format "Info index: %s" str))
-                          (cons 'info-index str)))
+        do (set sym (helm-build-info-source str))
         when commands
         do (let ((com (intern (concat "helm-info-" str))))
              (helm-build-info-index-command
