@@ -20,7 +20,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-plugin)
-(require 'helm-net)
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
@@ -162,23 +161,21 @@ source.")
       (setq helm-info-pages topics))))
 
 (defvar helm-source-info-pages
-  `((name . "Info Pages")
-    (init . helm-info-pages-init)
-    (candidates . helm-info-pages)
-    (action . (("Show with Info" .(lambda (node-str)
-                                    (info (replace-regexp-in-string
-                                           "^[^:]+: " "" node-str))))))
-    (requires-pattern . 2)))
+  (helm-build-sync-source "Info Pages"
+    :init #'helm-info-pages-init
+    :candidates (lambda () helm-info-pages)
+    :action '(("Show with Info" .(lambda (node-str)
+                                  (info (replace-regexp-in-string
+                                         "^[^:]+: " "" node-str)))))
+    :requires-pattern 2))
 
 ;;;###autoload
 (defun helm-info-at-point ()
   "Preconfigured `helm' for searching info at point.
 With a prefix-arg insert symbol at point."
   (interactive)
-  (let ((helm-google-suggest-default-function
-         'helm-google-suggest-emacs-lisp))
-    (helm :sources helm-info-default-sources
-          :buffer "*helm info*")))
+  (helm :sources helm-info-default-sources
+        :buffer "*helm info*"))
 
 (provide 'helm-info)
 
