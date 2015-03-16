@@ -282,7 +282,9 @@ but the initial search for all candidates in buffer(s)."
           deactivate-mark)
       (helm-aif (and iter (helm-iter-next iter))
           (progn
-            (helm-insert-completion-at-point (car limits) (cdr limits) it)
+            (helm-insert-completion-at-point
+             (car (helm-dabbrev-info-limits helm-dabbrev--data))
+             (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (setq helm-dabbrev--cache (append (remove it helm-dabbrev--cache)
                                               (list it))))
