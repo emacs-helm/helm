@@ -101,9 +101,10 @@ NOTE: This will be slow on large org buffers."
         (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
               if (let ((num-stars (length (match-string-no-properties 1))))
                    (and (>= num-stars min-depth) (<= num-stars max-depth)))
-              collect `(,(if nofname (funcall match-fn 0)
-                             (concat (helm-basename filename)
-                                 ": " (funcall match-fn 0)))
+              collect `(,(let ((heading (funcall match-fn 4))
+                               (file (unless nofname (concat (helm-basename filename) ":"))))
+                           (org-format-outline-path
+                            (append (org-get-outline-path) (list heading)) nil file))
                          . ,(point-marker)))))))
 
 ;;;###autoload
