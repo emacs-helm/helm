@@ -102,7 +102,7 @@ NOTE: This will be slow on large org buffers."
               if (let ((num-stars (length (match-string-no-properties 1))))
                    (and (>= num-stars min-depth) (<= num-stars max-depth)))
               collect `(,(let ((heading (funcall match-fn 4))
-                               (file (if nofname 'nil (concat (helm-basename filename) ":"))))
+                               (file (unless nofname (concat (helm-basename filename) ":"))))
                            (org-format-outline-path
                             (append (org-get-outline-path) (list heading)) nil file))
                          . ,(point-marker)))))))
