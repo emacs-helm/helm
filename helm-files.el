@@ -36,7 +36,6 @@
 (require 'image-dired)
 
 (declare-function find-library-name "find-func.el" (library))
-(declare-function secure-hash "ext:fns.c" (algorithm object &optional start end binary))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
 (declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
 (declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
@@ -1180,23 +1179,13 @@ Same as `dired-do-print' but for helm."
 
 (defun helm-ff-checksum (file)
   "Calculate the checksum of FILE.
-Provide completion on different algorithms to use on Emacs24.
-On Emacs23 only 'sha1' is available.
 The checksum is copied to kill-ring."
-  (let ((algo (and (fboundp 'secure-hash)
-                   (intern
-                    (helm-comp-read
-                     "Algorithm: "
-                     '(md5 sha1 sha224
-                       sha256 sha384 sha512))))))
-    (kill-new
-     (if algo
-         (with-temp-buffer
-           (insert-file-contents-literally file)
-           (secure-hash algo (current-buffer)))
-       (with-temp-buffer
-         (insert-file-contents-literally file)
-         (sha1 (current-buffer)))))
+  (let ((algo (intern (helm-comp-read
+                       "Algorithm: "
+                       '(md5 sha1 sha224 sha256 sha384 sha512)))))
+    (kill-new (with-temp-buffer
+                (insert-file-contents-literally file)
+                (secure-hash algo (current-buffer))))
     (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (_candidate)
