@@ -100,15 +100,18 @@ Some people are installing `helm` with their own config using diverses `require`
 and other hacks, not using `helm-config`.
 Expect failures and slowdown at startup unless you really know what you are doing when you do so.
 
-### Emacs Prelude
+### Configuration
 
-If you're afraid to play with Emacs's configuration, but want to try
-out Helm - have NO FEAR. Have a look at
-[Emacs Prelude](https://github.com/bbatsov/prelude) - it has
-Helm built-in and properly set-up.
+For a minimal helm configuration, run the startup script `./emacs-helm.sh`
+and look at the file `/tmp/helm-cfg.el`.
 
-For a minimal helm configuration, run `./emacs-helm.sh` and look at the file
-`/tmp/helm-cfg.el`.
+The full configuration I use (helm maintainer) can be found [here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el).
+
+Don't hesitate also to visit all helm customizable variables with the customize interface.
+Enabling `helm-mode` will give you completion in the diverse customize commands.
+
+Also you will find some packages like [Emacs Prelude](https://github.com/bbatsov/prelude) that
+have Helm built-in and properly set-up.
 
 ### Basic usage
 
