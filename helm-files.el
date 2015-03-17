@@ -1912,7 +1912,10 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; Handle boring files
   (unless (and helm-ff-skip-boring-files
                (cl-loop for r in helm-boring-file-regexp-list
-                     thereis (string-match r file)))
+                        ;; Prevent user doing silly thing like
+                        ;; adding the dotted files to boring regexps (#924).
+                        thereis (and (not (string-match "\\.$" file))
+                                     (string-match r file))))
     ;; Handle tramp files.
     (if (and (string-match helm-tramp-file-name-regexp helm-pattern)
              helm-ff-tramp-not-fancy)
