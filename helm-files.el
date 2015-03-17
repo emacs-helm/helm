@@ -1287,6 +1287,7 @@ or hitting C-j on \"..\"."
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (and (helm-file-completion-source-p)
+                 (not (helm-empty-source-p))
                  (not (string-match
                        "\\`[Dd]ired"
                        (assoc-default 'name (helm-get-current-source))))
