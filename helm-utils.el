@@ -23,6 +23,7 @@
 (require 'dired)
 
 (declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
+(defvar winner-boring-buffers)
 
 
 (defgroup helm-utils nil
@@ -355,6 +356,16 @@ Default is `eq'."
         do (puthash elm elm cont)
         finally return
         (cl-loop for i being the hash-values in cont collect i)))
+
+(defun helm-handle-winner-boring-buffers ()
+  "Add all helm buffers to `winner-boring-buffers' when quitting/exiting helm.
+Add this to `helm-cleanup-hook' when you don't want to see helm buffers
+after running winner-undo/redo."
+  (require 'winner)
+  (when winner-mode
+    (cl-loop for b in (mapcar #'buffer-name (buffer-list))
+             when (string-match "\\*[hH]elm.*" b)
+             do (push b winner-boring-buffers))))
 
 ;;;###autoload
 (defun helm-quit-and-find-file ()
