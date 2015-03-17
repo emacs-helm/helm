@@ -363,6 +363,7 @@ Add this function to `helm-cleanup-hook' when you don't want to see helm buffers
 after running winner-undo/redo."
   (require 'winner)
   (cl-pushnew helm-buffer winner-boring-buffers :test 'equal))
+(add-hook 'helm-cleanup-hook #'helm-handle-winner-boring-buffers)
 
 ;;;###autoload
 (defun helm-quit-and-find-file ()
