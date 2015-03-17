@@ -358,14 +358,11 @@ Default is `eq'."
         (cl-loop for i being the hash-values in cont collect i)))
 
 (defun helm-handle-winner-boring-buffers ()
-  "Add all helm buffers to `winner-boring-buffers' when quitting/exiting helm.
-Add this to `helm-cleanup-hook' when you don't want to see helm buffers
+  "Add `helm-buffer' to `winner-boring-buffers' when quitting/exiting helm.
+Add this function to `helm-cleanup-hook' when you don't want to see helm buffers
 after running winner-undo/redo."
   (require 'winner)
-  (when winner-mode
-    (cl-loop for b in (mapcar #'buffer-name (buffer-list))
-             when (string-match "\\*[hH]elm.*" b)
-             do (push b winner-boring-buffers))))
+  (cl-pushnew helm-buffer winner-boring-buffers :test 'equal))
 
 ;;;###autoload
 (defun helm-quit-and-find-file ()
