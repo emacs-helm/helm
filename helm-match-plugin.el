@@ -341,6 +341,34 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
    pattern 'helm-mp-prefix-search-backward 're-search-backward))
 
 
+;;; Generic multi-match/search functions
+;;
+;;
+(defun helm-mp-match (str &optional (pattern helm-pattern))
+  (let ((fun (cl-case helm-mp-matching-method
+               (multi1 helm-mp-1-match)
+               (multi2 helm-mp-2-match)
+               (multi3 helm-mp-3-match)
+               (multi3p helm-mp-3p-match))))
+    (funcall fun str pattern)))
+
+(defun helm-mp-search (pattern &rest _ignore)
+  (let ((fun (cl-case helm-mp-matching-method
+               (multi1 helm-mp-1-search)
+               (multi2 helm-mp-2-search)
+               (multi3 helm-mp-3-search)
+               (multi3p helm-mp-3p-search))))
+    (funcall fun pattern)))
+
+(defun helm-mp-search-backward (pattern &rest _ignore)
+  (let ((fun (cl-case helm-mp-matching-method
+               (multi1 helm-mp-1-search-backward)
+               (multi2 helm-mp-2-search-backward)
+               (multi3 helm-mp-3-search-backward)
+               (multi3p helm-mp-3p-search-backward))))
+    (funcall fun pattern)))
+
+
 ;;; source compiler
 ;;
 ;;
