@@ -55,7 +55,7 @@ Default is multi3."
   '(helm-mp-exact-search helm-mp-search))
 (defconst helm-mp-default-search-backward-functions
   '(helm-mp-exact-search-backward
-    helm-mp-1-search-backward))
+    helm-mp-search-backward))
 
 
 ;;; Build regexps
