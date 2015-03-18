@@ -1287,6 +1287,7 @@ or hitting C-j on \"..\"."
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
   (helm-aif (and (helm-file-completion-source-p)
+                 (not (helm-empty-source-p))
                  (not (string-match
                        "\\`[Dd]ired"
                        (assoc-default 'name (helm-get-current-source))))
@@ -1911,7 +1912,10 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; Handle boring files
   (unless (and helm-ff-skip-boring-files
                (cl-loop for r in helm-boring-file-regexp-list
-                     thereis (string-match r file)))
+                        ;; Prevent user doing silly thing like
+                        ;; adding the dotted files to boring regexps (#924).
+                        thereis (and (not (string-match "\\.$" file))
+                                     (string-match r file))))
     ;; Handle tramp files.
     (if (and (string-match helm-tramp-file-name-regexp helm-pattern)
              helm-ff-tramp-not-fancy)
