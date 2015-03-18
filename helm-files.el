@@ -3033,7 +3033,21 @@ separator."
            proc
            #'(lambda (process event)
                (helm-process-deferred-sentinel-hook
-                process event (helm-default-directory))))))))
+                process event (helm-default-directory))
+               (if (string= event "finished\n")
+                   (with-helm-window
+                     (setq mode-line-format
+                           '(" " mode-line-buffer-identification " "
+                             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                             (:eval (propertize
+                                     (format "[Find process finished - (%s results)]" 
+                                             (max (1- (count-lines
+                                                       (point-min) (point-max)))
+                                                  0))
+                                     'face 'helm-locate-finish))))
+                     (force-mode-line-update))
+                   (helm-log "Error: Find %s"
+                             (replace-regexp-in-string "\n" "" event)))))))))
 
 (defun helm-find-1 (dir)
   (helm :sources 'helm-source-findutils

@@ -261,7 +261,7 @@ See also `helm-locate'."
                        '(" " mode-line-buffer-identification " "
                          (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                          (:eval (propertize
-                                 (format "[Locate Process Finish- (%s results)]"
+                                 (format "[Locate process finished - (%s results)]"
                                          (max (1- (count-lines
                                                    (point-min) (point-max)))
                                               0))
