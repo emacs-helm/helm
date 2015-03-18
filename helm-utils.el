@@ -56,7 +56,8 @@ and `helm-imenu-default-action'.")
   "The register where `helm-save-pos-to-register-before-jump' save position.")
 
 (defface helm-selection-line
-    '((t (:background "IndianRed4" :underline t)))
+    '((((background dark)) :background "IndianRed4" :foreground "white")
+      (((background light)) :background "khaki" :foreground "black"))
   "Face used in the `helm-current-buffer' when jumping to candidate."
   :group 'helm-utils)
 
