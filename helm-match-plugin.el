@@ -49,23 +49,13 @@ Default is multi3."
 
 
 ;; Internal
-(defconst helm-mp-default-match-functions '(helm-mp-exact-match helm-mp-match))
-(defconst helm-mp-default-search-functions '(helm-mp-exact-search helm-mp-search))
-(defconst helm-mp-default-search-backward-functions '(helm-mp-exact-search-backward
-                                                      helm-mp-1-search-backward))
-
-;;;###autoload
-(define-minor-mode helm-match-plugin-mode
-    "Add more flexible regexp matching for helm.
-See `helm-mp-matching-method' for the behavior of each method."
-  :group 'helm-match-plugin
-  :require 'helm-match-plugin
-  :global t
-  (if helm-match-plugin-mode
-      (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
-    (setq helm-compile-source-functions
-          (delq 'helm-compile-source--match-plugin
-                helm-compile-source-functions))))
+(defconst helm-mp-default-match-functions
+  '(helm-mp-exact-match helm-mp-match))
+(defconst helm-mp-default-search-functions
+  '(helm-mp-exact-search helm-mp-search))
+(defconst helm-mp-default-search-backward-functions
+  '(helm-mp-exact-search-backward
+    helm-mp-1-search-backward))
 
 
 ;;; Build regexps
@@ -336,7 +326,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 
 
 ;;; source compiler
-;;
+;;  This is used only in old sources defined without helm-source.
 ;;
 (defun helm-compile-source--match-plugin (source)
   (if (assoc 'no-matchplugin source)
@@ -365,8 +355,8 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
          ,@source))))
 
 
-;; Enable match-plugin by default.
-(helm-match-plugin-mode 1)
+;; Enable match-plugin by default in old sources.
+(add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
 
 (provide 'helm-match-plugin)
 
