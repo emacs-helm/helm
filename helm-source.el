@@ -715,7 +715,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-file)))
 
 (defmethod helm--setup-source :before ((source helm-type-file))
-    (oset source :action
+    (set-slot-value source :action
           (helm-make-actions
            "Find file"                            'helm-find-many-files
            "Find file as root"                    'helm-find-file-as-root
@@ -738,11 +738,11 @@ like `re-search-forward', see below documentation of :search slot.")
            "Open file externally (C-u to choose)" 'helm-open-file-externally
            "Open file with default tool"          'helm-open-file-with-default-tool
            "Find file in hex dump"                'hexl-find-file))
-    (oset source :persistent-help "Show this file")
-    (oset source :action-transformer '(helm-transform-file-load-el
+    (set-slot-value source :persistent-help "Show this file")
+    (set-slot-value source :action-transformer '(helm-transform-file-load-el
                                        helm-transform-file-browse-url
                                        helm-transform-file-cache))
-    (oset source :candidate-transformer '(helm-skip-boring-files
+    (set-slot-value source :candidate-transformer '(helm-skip-boring-files
                                           helm-highlight-files
                                           helm-w32-pathname-transformer)))
 
@@ -753,7 +753,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
-  (oset source :action (helm-make-actions
+  (set-slot-value source :action (helm-make-actions
                         "Jump to bookmark" 'helm-bookmark-jump
                         "Jump to BM other window" 'helm-bookmark-jump-other-window
                         "Bookmark edit annotation" 'bookmark-edit-annotation
@@ -762,8 +762,8 @@ like `re-search-forward', see below documentation of :search slot.")
                         "Edit Bookmark" 'helm-bookmark-edit-bookmark
                         "Rename bookmark" 'helm-bookmark-rename
                         "Relocate bookmark" 'bookmark-relocate))
-  (oset source :keymap helm-bookmark-map)
-  (oset source :mode-line helm-bookmark-mode-line-string))
+  (set-slot-value source :keymap helm-bookmark-map)
+  (set-slot-value source :mode-line helm-bookmark-mode-line-string))
 
 ;; Buffers
 (defclass helm-type-buffer (helm-source) ()
@@ -772,7 +772,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
-  (oset source :action (helm-make-actions
+  (set-slot-value source :action (helm-make-actions
                         "Switch to buffer(s)" 'helm-switch-to-buffers
                         (lambda () (and (locate-library "popwin") "Switch to buffer in popup window"))
                         'popwin:popup-buffer
@@ -794,8 +794,8 @@ like `re-search-forward', see below documentation of :search slot.")
                         "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
                         "Ediff Merge marked buffers `M-='" (lambda (candidate)
                                                              (helm-ediff-marked-buffers candidate t))))
-      (oset source :persistent-help "Show this buffer")
-      (oset source :filtered-candidate-transformer '(helm-skip-boring-buffers
+      (set-slot-value source :persistent-help "Show this buffer")
+      (set-slot-value source :filtered-candidate-transformer '(helm-skip-boring-buffers
                                                      helm-buffers-sort-transformer
                                                      helm-highlight-buffers)))
 
@@ -806,7 +806,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-function)))
 
 (defmethod helm--setup-source :before ((source helm-type-function))
-  (oset source :action (helm-make-actions
+  (set-slot-value source :action (helm-make-actions
                          "Describe command" 'describe-function
                          "Add command to kill ring" 'helm-kill-new
                           "Go to command's definition" 'find-function
@@ -815,9 +815,9 @@ like `re-search-forward', see below documentation of :search slot.")
                           "Trace function" 'trace-function
                           "Trace function (background)" 'trace-function-background
                           "Untrace function" 'untrace-function))
-  (oset source :action-transformer 'helm-transform-function-call-interactively)
-  (oset source :candidate-transformer 'helm-mark-interactive-functions)
-  (oset source :coerce 'helm-symbolify))
+  (set-slot-value source :action-transformer 'helm-transform-function-call-interactively)
+  (set-slot-value source :candidate-transformer 'helm-mark-interactive-functions)
+  (set-slot-value source :coerce 'helm-symbolify))
 
 ;; Commands
 (defclass helm-type-command (helm-source) ()
@@ -826,11 +826,11 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-command)))
 
 (defmethod helm--setup-source :before ((source helm-type-command))
-  (oset source :action (append (helm-make-actions
+  (set-slot-value source :action (append (helm-make-actions
                                 "Call interactively" 'helm-call-interactively)
                                (helm-actions-from-type-function)))
-  (oset source :coerce 'helm-symbolify)
-  (oset source :persistent-action 'describe-function))
+  (set-slot-value source :coerce 'helm-symbolify)
+  (set-slot-value source :persistent-action 'describe-function))
 
 
 ;;; Error functions
@@ -860,14 +860,14 @@ Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
   (declare (indent 2))  
   (let ((source (apply #'make-instance class name args)))
-    (oset source :name name)
+    (set-slot-value source :name name)
     (helm--setup-source source)
     (helm-setup-user-source source)
     (helm--create-source source)))
 
 (defun helm-make-type (class &rest args)
   (let ((source (apply #'make-instance class args)))
-    (oset source :name nil)
+    (set-slot-value source :name nil)
     (helm--setup-source source)
     (helm--create-source source)))
 
@@ -915,10 +915,10 @@ an eieio class."
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
     (when (symbolp actions)
-      (oset source :action (list (cons "Default action" actions))))
+      (set-slot-value source :action (list (cons "Default action" actions))))
     (when (symbolp action-transformers)
       (setq action-transformers (list action-transformers)))
-    (oset source
+    (set-slot-value source
           :action-transformer
           (delq nil (append (list transformer) action-transformers)))))
 
@@ -973,17 +973,17 @@ an eieio class."
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source :keymap)
       (and (symbolp it) (set-slot-value source :keymap (symbol-value it))))
-  (oset source :header-line (helm-source--header-line source))
+  (set-slot-value source :header-line (helm-source--header-line source))
   (helm-aif (slot-value source :persistent-help)
-      (oset source :header-line (helm-source--persistent-help-string it source)))
+      (set-slot-value source :header-line (helm-source--persistent-help-string it source)))
   (when (and (slot-value source :fuzzy-match) helm-fuzzy-sort-fn)
-      (oset source :filtered-candidate-transformer
+      (set-slot-value source :filtered-candidate-transformer
             (helm-aif (oref source :filtered-candidate-transformer)
                 (append (helm-mklist it)
                         (list helm-fuzzy-sort-fn))
               (list helm-fuzzy-sort-fn))))
   (unless (oref source :nohighlight)
-    (oset source :filtered-candidate-transformer
+    (set-slot-value source :filtered-candidate-transformer
           (helm-aif (oref source :filtered-candidate-transformer)
               (append (helm-mklist it)
                       (list #'helm-fuzzy-highlight-matches))
@@ -994,17 +994,17 @@ an eieio class."
 (defmethod helm--setup-source ((source helm-source-sync))
   (when (slot-value source :fuzzy-match)
     (helm-aif (oref source :match)
-        (oset source :match (append (helm-mklist it)
+        (set-slot-value source :match (append (helm-mklist it)
                                     (list helm-fuzzy-match-fn)))
-      (oset source :match helm-fuzzy-match-fn)))
+      (set-slot-value source :match helm-fuzzy-match-fn)))
   (when (slot-value source :matchplugin)
-    (oset source :match
+    (set-slot-value source :match
           (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source :init)))
     (helm-aif (slot-value source :data)
-        (oset source
+        (set-slot-value source
               :init (delq
                      nil
                      (list
@@ -1017,11 +1017,11 @@ an eieio class."
                           (if (functionp it) (funcall it) it))))))))
   (when (slot-value source :fuzzy-match)
     (helm-aif (oref source :search)
-        (oset source :search (append (helm-mklist it)
+        (set-slot-value source :search (append (helm-mklist it)
                                      (list helm-fuzzy-search-fn)))
-      (oset source :search (list helm-fuzzy-search-fn))))
+      (set-slot-value source :search (list helm-fuzzy-search-fn))))
   (when (slot-value source :matchplugin)
-    (oset source :search (helm-source-mp-get-search-or-match-fns source 'search)))
+    (set-slot-value source :search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source :match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
