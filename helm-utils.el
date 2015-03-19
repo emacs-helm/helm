@@ -58,7 +58,7 @@ and `helm-imenu-default-action'.")
 (defface helm-selection-line
     '((t (:inherit highlight)))
   "Face used in the `helm-current-buffer' when jumping to candidate."
-  :group 'helm-utils)
+  :group 'helm-faces)
 
 
 ;;; compatibility
