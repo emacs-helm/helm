@@ -4998,7 +4998,7 @@ Directories expansion is not supported."
   (require 'helm-utils)
   (let ((bn (helm-basename pattern)))
     (if (and helm-file-globstar
-           (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
+             (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
         (helm-walk-directory (helm-basedir pattern)
                              :path (cl-case full
                                      (full 'full)
