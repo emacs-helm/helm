@@ -563,6 +563,12 @@ to exit or helm update to disable the `current-input-method' with `C-\\'."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-file-globstar t
+  "Same as globstar bash shopt option.
+When non--nil a pattern beginning with two stars will expand recursively.
+Directories expansion is not supported yet."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -4978,12 +4984,34 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
           append (let* ((elm (helm-coerce-selection real source))
                         (c   (and with-wildcard
                                   (condition-case nil
-                                      (file-expand-wildcards elm t)
+                                      (helm-file-expand-wildcards elm t)
                                     (error nil)))))
                    (or c (list elm)))
           into cands
           finally do (prog1 (cl-return cands)
                        (helm-log "Marked candidates = %S" cands)))))
+
+(defun helm-file-expand-wildcards (pattern &optional full)
+  "Same as `file-expand-wildcards' but allow recursion.
+Recursion happen when PATTERN starts with two stars.
+Directories expansion is not supported."
+  (require 'helm-utils)
+  (let ((bn (helm-basename pattern)))
+    (if (and helm-file-globstar
+           (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
+        (helm-walk-directory (helm-basedir pattern)
+                             :path (cl-case full
+                                     (full 'full)
+                                     (relative 'relative)
+                                     ((basename nil) 'basename)
+                                     (t 'full))
+                             :directories nil
+                             :match (concat
+                                     (regexp-quote
+                                      (match-string 1 bn))
+                                     "\\'")
+                             :skip-subdirs t)
+        (file-expand-wildcards pattern full))))
 
 (defun helm-current-source-name= (name)
   (save-excursion
