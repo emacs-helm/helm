@@ -408,6 +408,26 @@ On completion:
 - target starts by / or [a-z]:/ => insert full path.
 - otherwise                     => insert relative file name.
 
+*** Using wildcard to select multiple files
+
+Use of wilcard is supported to give a set of files to an action:
+
+e.g
+You can copy all the files with \".el\" extension by using \"*.el\"
+and then run your copy action.
+
+You can do the same but with \"**.el\" (note the two stars),
+this will select recursively all \".el\" files under current directory.
+
+NOTE: When using an action that involve an external backend (e.g grep), using \"**\"
+is not advised (even if it works fine) because it will be slower to select all your files,
+you have better time letting the backend doing it, it will be faster.
+However, if you know you have not many files it is reasonable to use this,
+also using not recursive wilcard (e.g \"*.el\") is perfectly fine for this.
+
+This feature (\"**\") is activated by default with the option `helm-file-globstar'.
+The directory selection with \"**foo/\" like bash shopt globstar option is not supported yet.
+
 \n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
