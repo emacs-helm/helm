@@ -136,16 +136,13 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((matches (match-data))
         (line    (buffer-substring s e)))
     (propertize
-     (cl-loop with ln = (format "%5d: %s" (line-number-at-pos (1- s)) line)
+     (cl-loop with ln = (format "%5d: %s" (line-number-at-pos s) line)
            for i from 0 to (1- (/ (length matches) 2))
            concat (format "\n         %s'%s'" (format "Group %d: " i)
                           (match-string i))
            into ln1
            finally return (concat ln ln1))
-     ;; match beginning
-     ;; KLUDGE: point of helm-candidate-buffer is +1 than that of helm-current-buffer.
-     ;; It is implementation problem of candidates-in-buffer.
-     'helm-realvalue (1- s))))
+     'helm-realvalue s)))
 
 (defun helm-regexp-persistent-action (pt)
   (helm-goto-char pt)
