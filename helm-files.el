@@ -247,22 +247,22 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files-faces)
 
 (defface helm-ff-executable
-    '((t (:foreground "green")))
+    '((t (:foreground "#6e8b3d")))
   "Face used for executable files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-directory
-    '((t (:foreground "DarkRed" :background "LightGray")))
+    '((t (:inherit dired-directory)))
   "Face used for directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-dotted-directory
-    '((t (:foreground "black" :background "DimGray")))
+  '((t (:inherit font-lock-keyword-face)))
   "Face used for directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-symlink
-    '((t (:foreground "DarkOrange")))
+    '((t (:inherit font-lock-variable-name-face)))
   "Face used for symlinks in `helm-find-files'."
   :group 'helm-files-faces)
 

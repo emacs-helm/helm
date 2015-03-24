@@ -61,12 +61,12 @@
   :group 'helm-bookmark)
 
 (defface helm-bookmark-file
-    '((t (:foreground "Deepskyblue2")))
+    '((t (:inherit font-lock-builtin-face)))
   "Face used for file bookmarks."
   :group 'helm-bookmark)
 
 (defface helm-bookmark-directory
-    '((t (:inherit helm-ff-directory)))
+    '((t (:inherit dired-directory)))
   "Face used for file bookmarks."
   :group 'helm-bookmark)
 
