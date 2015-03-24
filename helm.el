@@ -583,9 +583,11 @@ Directories expansion is not supported yet."
     '((((background dark))
        :background "#22083397778B"
        :foreground "white"
+       :box t
        :weight bold :height 1.3 :family "Sans Serif")
       (((background light))
        :background "#abd7f0"
+       :box t
        :foreground "black"
        :weight bold :height 1.3 :family "Sans Serif"))
   "Face for source header in the helm buffer."
@@ -614,8 +616,7 @@ Directories expansion is not supported yet."
   "Face for candidate number in mode-line." :group 'helm-faces)
 
 (defface helm-selection
-    '((((background dark)) :background "ForestGreen")
-      (((background light)) :background "#b5ffd1"))
+  '((t (:inherit highlight)))
   "Face for currently selected item in the helm buffer."
   :group 'helm-faces)
 

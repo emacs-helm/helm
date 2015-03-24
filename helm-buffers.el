@@ -91,7 +91,7 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-not-saved
-    '((t (:foreground "Indianred2")))
+    '((t (:inherit error)))
   "Face used for buffer files not already saved on disk."
   :group 'helm-buffers-faces)
 
@@ -107,12 +107,12 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-directory
-    '((t (:foreground "DarkRed" :background "LightGray")))
+    '((t (:inherit dired-directory)))
   "Face used for directories in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-file
-    '((t :inherit font-lock-builtin-face))
+    '((t (:inherit font-lock-builtin-face)))
   "Face for buffer file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
