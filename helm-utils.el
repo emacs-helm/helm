@@ -61,76 +61,6 @@ and `helm-imenu-default-action'.")
   :group 'helm-faces)
 
 
-;;; compatibility
-;;
-;;
-(unless (fboundp 'window-system)
-  (defun window-system (&optional _arg)
-    window-system))
-
-(unless (fboundp 'make-composed-keymap)
-  (defun make-composed-keymap (maps &optional parent)
-    "Construct a new keymap composed of MAPS and inheriting from PARENT.
-When looking up a key in the returned map, the key is looked in each
-keymap of MAPS in turn until a binding is found.
-If no binding is found in MAPS, the lookup continues in PARENT, if non-nil.
-As always with keymap inheritance, a nil binding in MAPS overrides
-any corresponding binding in PARENT, but it does not override corresponding
-bindings in other keymaps of MAPS.
-MAPS can be a list of keymaps or a single keymap.
-PARENT if non-nil should be a keymap."
-    `(keymap
-      ,@(if (keymapp maps) (list maps) maps)
-      ,@parent)))
-
-(unless (fboundp 'assoc-default)
-  (defun assoc-default (key alist &optional test default)
-    "Find object KEY in a pseudo-alist ALIST.
-ALIST is a list of conses or objects.  Each element (or the element's car,
-if it is a cons) is compared with KEY by evaluating (TEST (car elt) KEY).
-If that is non-nil, the element matches;
-then `assoc-default' returns the element's cdr, if it is a cons,
-or DEFAULT if the element is not a cons.
-
-If no element matches, the value is nil.
-If TEST is omitted or nil, `equal' is used."
-    (let (found (tail alist) value)
-      (while (and tail (not found))
-        (let ((elt (car tail)))
-          (when (funcall (or test 'equal) (if (consp elt) (car elt) elt) key)
-            (setq found t value (if (consp elt) (cdr elt) default))))
-        (setq tail (cdr tail)))
-      value)))
-
-;; Function not available in XEmacs,
-(unless (fboundp 'minibuffer-contents)
-  (defun minibuffer-contents ()
-    "Return the user input in a minbuffer as a string.
-The current buffer must be a minibuffer."
-    (field-string (point-max)))
-
-  (defun delete-minibuffer-contents  ()
-    "Delete all user input in a minibuffer.
-The current buffer must be a minibuffer."
-    (delete-field (point-max))))
-
-;; Function not available in older Emacs (<= 22.1).
-(unless (fboundp 'buffer-chars-modified-tick)
-  (defun buffer-chars-modified-tick (&optional buffer)
-    "Return BUFFER's character-change tick counter.
-Each buffer has a character-change tick counter, which is set to the
-value of the buffer's tick counter (see `buffer-modified-tick'), each
-time text in that buffer is inserted or deleted.  By comparing the
-values returned by two individual calls of `buffer-chars-modified-tick',
-you can tell whether a character change occurred in that buffer in
-between these calls.  No argument or nil as argument means use current
-buffer as BUFFER."
-    (with-current-buffer (or buffer (current-buffer))
-      (if (listp buffer-undo-list)
-          (length buffer-undo-list)
-        (buffer-modified-tick)))))
-
-
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
   (ignore-errors ad-do-it))
@@ -814,12 +744,6 @@ If COUNT is non--nil add a number after each prompt."
         collect (setq elm (helm-read-string prompt)) into lis
         finally return (remove "" lis)))
 
-;; FIXME why do we run this after PA?
-;; Seems it is not needed, thus it create a bug
-;; when we want to hit repetitively C-w and follow-mode is enabled,
-;; or if we run a PA between to hits on C-w.
-;; Keep this commented for now.
-;(add-hook 'helm-after-persistent-action-hook 'helm-reset-yank-point)
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
 (add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
