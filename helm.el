@@ -4432,6 +4432,7 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
 
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
   (delq nil (cl-loop for i from 1 to limit
+                     until (eobp)
                      collect (funcall get-line-fn
                                       (point-at-bol) (point-at-eol))
                      do (forward-line 1))))
