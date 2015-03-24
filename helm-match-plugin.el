@@ -331,9 +331,7 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
 (defun helm-compile-source--match-plugin (source)
   (if (assoc 'no-matchplugin source)
       source
-    (let* ((searchers        (if (assoc 'search-from-end source)
-                                 helm-mp-default-search-backward-functions
-                               helm-mp-default-search-functions))
+    (let* ((searchers        helm-mp-default-search-functions)
            (defmatch         (helm-aif (assoc-default 'match source)
                                  (helm-mklist it)))
            (defmatch-strict  (helm-aif (assoc-default 'match-strict source)

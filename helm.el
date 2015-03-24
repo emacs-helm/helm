@@ -4337,7 +4337,7 @@ The function should have one arg, candidate, and return only
 a specific part of candidate.
 
 To customize `helm-candidates-in-buffer' behavior, use `search',
-`get-line', `match-part' and `search-from-end' attributes."
+`get-line' and `match-part' attributes."
   (let ((src (or source (helm-get-current-source))))
     (helm-candidates-in-buffer-1
      (helm-candidate-buffer)
@@ -4345,53 +4345,40 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
      (or (assoc-default 'get-line src)
          #'buffer-substring-no-properties)
      (or (assoc-default 'search src)
-         (if (assoc 'search-from-end src)
-             '(helm-candidates-in-buffer-search-from-end)
-             '(helm-candidates-in-buffer-search-from-start)))
+         '(helm-candidates-in-buffer-search-default-fn))
      (helm-candidate-number-limit src)
-     (assoc 'search-from-end src)
      (helm-attr 'match-part)
      src)))
 
-(defun helm-candidates-in-buffer-search-from-start (pattern)
+(defun helm-candidates-in-buffer-search-default-fn (pattern)
   "Search PATTERN with `re-search-forward' with bound and noerror args."
   (condition-case _err
       (re-search-forward pattern nil t)
     (invalid-regexp nil)))
 
-(defun helm-candidates-in-buffer-search-from-end (pattern)
-  "Search PATTERN with `re-search-backward' with bound and noerror args."
-  (condition-case _err
-      (re-search-backward pattern nil t)
-    (invalid-regexp nil)))
-
 (defun helm-candidates-in-buffer-1 (buffer pattern get-line-fn
-                                    search-fns limit search-from-end
+                                    search-fns limit
                                     match-part-fn source)
   "Return the list of candidates inserted in BUFFER matching PATTERN."
   ;; buffer == nil when candidates buffer does not exist.
   (when buffer
     (with-current-buffer buffer
-      (let ((start-point (if search-from-end
-                             (1+ (point-max)) (1- (point-min))))
-            (endp (if search-from-end #'bobp #'eobp))
-            (inhibit-point-motion-hooks t))
+      (let ((inhibit-point-motion-hooks t)
+            (start-point (1- (point-min))))
         (goto-char start-point)
         (if (string= pattern "")
             (helm-initial-candidates-from-candidate-buffer
-             endp get-line-fn limit search-from-end)
+             get-line-fn limit)
           (helm-search-from-candidate-buffer
-           pattern get-line-fn search-fns limit search-from-end
+           pattern get-line-fn search-fns limit
            start-point match-part-fn source))))))
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
-                                          limit search-from-end
-                                          start-point match-part-fn source)
+                                          limit start-point match-part-fn source)
   (let (buffer-read-only
         matches
         newmatches
-        (case-fold-search (helm-set-case-fold-search))
-        (stopper (if search-from-end #'bobp #'eobp)))
+        (case-fold-search (helm-set-case-fold-search)))
     (helm--search-from-candidate-buffer-1
      (lambda ()
        (clrhash helm-cib-hash)
@@ -4401,7 +4388,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
          (cl-loop with pos-lst
                   with item-count = 0
                   while (and (setq pos-lst (funcall searcher pattern))
-                             (not (funcall stopper)))
+                             (not (eobp)))
                   for cand = (apply get-line-fn
                                     (if (and pos-lst (listp pos-lst))
                                         pos-lst
@@ -4443,17 +4430,11 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
             (string-match (if helm--in-fuzzy fuzzy-regexp pattern)
                           part)))))
 
-(defun helm-initial-candidates-from-candidate-buffer (endp
-                                                      get-line-fn
-                                                      limit search-from-end)
-  (delq nil (cl-loop with next-line-fn =
-                  (if search-from-end
-                      (lambda (_x) (goto-char (max (1- (point-at-bol)) 1)))
-                    #'forward-line)
-                  until (funcall endp)
-                  for i from 1 to limit
-                  collect (funcall get-line-fn (point-at-bol) (point-at-eol))
-                  do (funcall next-line-fn 1))))
+(defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
+  (delq nil (cl-loop for i from 1 to limit
+                     collect (funcall get-line-fn
+                                      (point-at-bol) (point-at-eol))
+                     do (forward-line 1))))
 
 (defun helm--search-from-candidate-buffer-1 (search-fn)
   ;; Previously we were adding a newline at bob and at eol

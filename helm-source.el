@@ -623,7 +623,7 @@ inherit from `helm-source'.")
 
    (search
     :initarg :search
-    :initform '(helm-candidates-in-buffer-search-from-start)
+    :initform '(helm-candidates-in-buffer-search-default-fn)
     :custom (choice function list)
     :documentation
     "  List of functions like `re-search-forward' or `search-forward'.
@@ -637,18 +637,7 @@ inherit from `helm-source'.")
   (See how the `helm-mp-3-search-base' and `helm-fuzzy-search' functions are working).
 
   NOTE: FUZZY-MATCH slot will overhide value of this slot.")
-
-   (search-from-end
-    :initarg :search-from-end
-    :initform nil
-    :custom boolean
-    :documentation
-    "  Make `helm-candidates-in-buffer' search from the end of buffer.
-  If this attribute is specified, `helm-candidates-in-buffer'
-  uses `re-search-backward' instead.
-
-  NOTE: This is here for compatibilty, but it is deprecated and not used anymore.")
-
+   
    (search-strict
     :initarg :search-strict
     :initform nil
@@ -874,9 +863,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defun helm-source-mp-get-search-or-match-fns (source method)
   (require 'helm-match-plugin)
   (let ((searchers        (and (eq method 'search)
-                               (if (eq t (oref source :search-from-end))
-                                   helm-mp-default-search-backward-functions
-                                   helm-mp-default-search-functions)))
+                               helm-mp-default-search-functions))
         (defmatch         (helm-aif (slot-value source :match)
                               (helm-mklist it)))
         (defmatch-strict  (helm-aif (and (eq method 'match)
