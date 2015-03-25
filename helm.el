@@ -621,8 +621,10 @@ input method with `toggle-input-method'."
   "Face for candidate number in mode-line." :group 'helm-faces)
 
 (defface helm-selection
-    '((((background dark)) :background "ForestGreen")
-      (((background light)) :background "#b5ffd1"))
+    '((((background dark)) :background "ForestGreen"
+       :distant-foreground "black")
+      (((background light)) :background "#b5ffd1"
+       :distant-foreground "black"))
   "Face for currently selected item in the helm buffer."
   :group 'helm-faces)
 
