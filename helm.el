@@ -569,6 +569,13 @@ When non--nil a pattern beginning with two stars will expand recursively.
 Directories expansion is not supported yet."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-inherit-input-method t
+  "Inherit `current-input-method' from `current-buffer' when non--nil.
+The default is to enable this by default, the user can toggle the current
+input method with `toggle-input-method'."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -2426,7 +2433,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                                  (helm-print-error-messages)))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
-                                            nil hist tap t))
+                                            nil hist tap helm-inherit-input-method))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-exit-or-quit-maybe ()
