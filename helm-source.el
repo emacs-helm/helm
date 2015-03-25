@@ -704,7 +704,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-file)))
 
 (defmethod helm--setup-source :before ((source helm-type-file))
-    (set-slot-value source :action
+    (set-slot-value source 'action
           (helm-make-actions
            "Find file"                            'helm-find-many-files
            "Find file as root"                    'helm-find-file-as-root
@@ -727,11 +727,11 @@ like `re-search-forward', see below documentation of :search slot.")
            "Open file externally (C-u to choose)" 'helm-open-file-externally
            "Open file with default tool"          'helm-open-file-with-default-tool
            "Find file in hex dump"                'hexl-find-file))
-    (set-slot-value source :persistent-help "Show this file")
-    (set-slot-value source :action-transformer '(helm-transform-file-load-el
+    (set-slot-value source 'persistent-help "Show this file")
+    (set-slot-value source 'action-transformer '(helm-transform-file-load-el
                                        helm-transform-file-browse-url
                                        helm-transform-file-cache))
-    (set-slot-value source :candidate-transformer '(helm-skip-boring-files
+    (set-slot-value source 'candidate-transformer '(helm-skip-boring-files
                                           helm-highlight-files
                                           helm-w32-pathname-transformer)))
 
@@ -742,7 +742,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
-  (set-slot-value source :action (helm-make-actions
+  (set-slot-value source 'action (helm-make-actions
                         "Jump to bookmark" 'helm-bookmark-jump
                         "Jump to BM other window" 'helm-bookmark-jump-other-window
                         "Bookmark edit annotation" 'bookmark-edit-annotation
@@ -751,8 +751,8 @@ like `re-search-forward', see below documentation of :search slot.")
                         "Edit Bookmark" 'helm-bookmark-edit-bookmark
                         "Rename bookmark" 'helm-bookmark-rename
                         "Relocate bookmark" 'bookmark-relocate))
-  (set-slot-value source :keymap helm-bookmark-map)
-  (set-slot-value source :mode-line helm-bookmark-mode-line-string))
+  (set-slot-value source 'keymap helm-bookmark-map)
+  (set-slot-value source 'mode-line helm-bookmark-mode-line-string))
 
 ;; Buffers
 (defclass helm-type-buffer (helm-source) ()
@@ -761,7 +761,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
-  (set-slot-value source :action (helm-make-actions
+  (set-slot-value source 'action (helm-make-actions
                         "Switch to buffer(s)" 'helm-switch-to-buffers
                         (lambda () (and (locate-library "popwin") "Switch to buffer in popup window"))
                         'popwin:popup-buffer
@@ -783,8 +783,8 @@ like `re-search-forward', see below documentation of :search slot.")
                         "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
                         "Ediff Merge marked buffers `M-='" (lambda (candidate)
                                                              (helm-ediff-marked-buffers candidate t))))
-      (set-slot-value source :persistent-help "Show this buffer")
-      (set-slot-value source :filtered-candidate-transformer '(helm-skip-boring-buffers
+      (set-slot-value source 'persistent-help "Show this buffer")
+      (set-slot-value source 'filtered-candidate-transformer '(helm-skip-boring-buffers
                                                      helm-buffers-sort-transformer
                                                      helm-highlight-buffers)))
 
@@ -795,7 +795,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-function)))
 
 (defmethod helm--setup-source :before ((source helm-type-function))
-  (set-slot-value source :action (helm-make-actions
+  (set-slot-value source 'action (helm-make-actions
                          "Describe command" 'describe-function
                          "Add command to kill ring" 'helm-kill-new
                           "Go to command's definition" 'find-function
@@ -804,9 +804,9 @@ like `re-search-forward', see below documentation of :search slot.")
                           "Trace function" 'trace-function
                           "Trace function (background)" 'trace-function-background
                           "Untrace function" 'untrace-function))
-  (set-slot-value source :action-transformer 'helm-transform-function-call-interactively)
-  (set-slot-value source :candidate-transformer 'helm-mark-interactive-functions)
-  (set-slot-value source :coerce 'helm-symbolify))
+  (set-slot-value source 'action-transformer 'helm-transform-function-call-interactively)
+  (set-slot-value source 'candidate-transformer 'helm-mark-interactive-functions)
+  (set-slot-value source 'coerce 'helm-symbolify))
 
 ;; Commands
 (defclass helm-type-command (helm-source) ()
@@ -815,11 +815,11 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-command)))
 
 (defmethod helm--setup-source :before ((source helm-type-command))
-  (set-slot-value source :action (append (helm-make-actions
+  (set-slot-value source 'action (append (helm-make-actions
                                 "Call interactively" 'helm-call-interactively)
                                (helm-actions-from-type-function)))
-  (set-slot-value source :coerce 'helm-symbolify)
-  (set-slot-value source :persistent-action 'describe-function))
+  (set-slot-value source 'coerce 'helm-symbolify)
+  (set-slot-value source 'persistent-action 'describe-function))
 
 
 ;;; Error functions
@@ -849,14 +849,14 @@ Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
   (declare (indent 2))  
   (let ((source (apply #'make-instance class name args)))
-    (set-slot-value source :name name)
+    (set-slot-value source 'name name)
     (helm--setup-source source)
     (helm-setup-user-source source)
     (helm--create-source source)))
 
 (defun helm-make-type (class &rest args)
   (let ((source (apply #'make-instance class args)))
-    (set-slot-value source :name nil)
+    (set-slot-value source 'name nil)
     (helm--setup-source source)
     (helm--create-source source)))
 
@@ -864,16 +864,16 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   (require 'helm-match-plugin)
   (let ((searchers        (and (eq method 'search)
                                helm-mp-default-search-functions))
-        (defmatch         (helm-aif (slot-value source :match)
+        (defmatch         (helm-aif (slot-value source 'match)
                               (helm-mklist it)))
         (defmatch-strict  (helm-aif (and (eq method 'match)
-                                         (slot-value source :match-strict))
+                                         (slot-value source 'match-strict))
                               (helm-mklist it)))
         (defsearch        (helm-aif (and (eq method 'search)
-                                         (slot-value source :search))
+                                         (slot-value source 'search))
                               (helm-mklist it)))
         (defsearch-strict (helm-aif (and (eq method 'search-strict)
-                                         (slot-value source :search-strict))
+                                         (slot-value source 'search-strict))
                               (helm-mklist it))))
     (cl-case method
       (match (cond (defmatch-strict)
@@ -893,8 +893,8 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   "Same as `helm-add-action-to-source-if' but for SOURCE defined as eieio object.
 You can use this inside a `helm--setup-source' method for a SOURCE defined as
 an eieio class."
-  (let* ((actions     (oref source :action))
-         (action-transformers (oref source :action-transformer))
+  (let* ((actions     (slot-value source 'action))
+         (action-transformers (slot-value source 'action-transformer))
          (new-action  (list (cons name fn)))
          (transformer `(lambda (actions candidate)
                          (cond ((funcall (quote ,predicate) candidate)
@@ -902,27 +902,28 @@ an eieio class."
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
     (when (symbolp actions)
-      (set-slot-value source :action (list (cons "Default action" actions))))
+      (set-slot-value source 'action (list (cons "Default action" actions))))
     (when (symbolp action-transformers)
       (setq action-transformers (list action-transformers)))
-    (set-slot-value source
-          :action-transformer
-          (delq nil (append (list transformer) action-transformers)))))
+    (set-slot-value
+     source
+     'action-transformer
+     (delq nil (append (list transformer) action-transformers)))))
 
 ;;; Methods to access types slots.
 ;;
 ;;
 (defmethod helm-source-get-action-from-type ((object helm-type-file))
-  (oref object :action))
+  (slot-value object 'action))
 
 (defmethod helm-source-get-action-from-type ((object helm-type-buffer))
-  (oref object :action))
+  (slot-value object 'action))
 
 (defmethod helm-source-get-action-from-type ((object helm-type-bookmark))
-  (oref object :action))
+  (slot-value object 'action))
 
 (defmethod helm-source-get-action-from-type ((object helm-type-function))
-  (oref object :action))
+  (slot-value object 'action))
 
 
 ;;; Methods to build sources.
@@ -932,13 +933,13 @@ an eieio class."
   (substitute-command-keys
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
            (or (format "%s (keeping session)" string)
-               (oref source :header-line)))))
+               (slot-value source 'header-line)))))
 
 (defun helm-source--header-line (source)
   (substitute-command-keys
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
-           (helm-aif (or (oref source :persistent-action)
-                         (oref source :action))
+           (helm-aif (or (slot-value source 'persistent-action)
+                         (slot-value source 'action))
                (cond ((or (symbolp it) (functionp it))
                           (helm-symbol-name it))
                      ((listp it)
@@ -958,20 +959,20 @@ an eieio class."
 (defmethod helm--setup-source :primary ((_source helm-source)))
   
 (defmethod helm--setup-source :before ((source helm-source))
-  (helm-aif (slot-value source :keymap)
-      (and (symbolp it) (set-slot-value source :keymap (symbol-value it))))
-  (set-slot-value source :header-line (helm-source--header-line source))
-  (helm-aif (slot-value source :persistent-help)
-      (set-slot-value source :header-line (helm-source--persistent-help-string it source)))
-  (when (and (slot-value source :fuzzy-match) helm-fuzzy-sort-fn)
-      (set-slot-value source :filtered-candidate-transformer
-            (helm-aif (oref source :filtered-candidate-transformer)
+  (helm-aif (slot-value source 'keymap)
+      (and (symbolp it) (set-slot-value source 'keymap (symbol-value it))))
+  (set-slot-value source 'header-line (helm-source--header-line source))
+  (helm-aif (slot-value source 'persistent-help)
+      (set-slot-value source 'header-line (helm-source--persistent-help-string it source)))
+  (when (and (slot-value source 'fuzzy-match) helm-fuzzy-sort-fn)
+      (set-slot-value source 'filtered-candidate-transformer
+            (helm-aif (slot-value source 'filtered-candidate-transformer)
                 (append (helm-mklist it)
                         (list helm-fuzzy-sort-fn))
               (list helm-fuzzy-sort-fn))))
-  (unless (oref source :nohighlight)
-    (set-slot-value source :filtered-candidate-transformer
-          (helm-aif (oref source :filtered-candidate-transformer)
+  (unless (slot-value source 'nohighlight)
+    (set-slot-value source 'filtered-candidate-transformer
+          (helm-aif (slot-value source 'filtered-candidate-transformer)
               (append (helm-mklist it)
                       (list #'helm-fuzzy-highlight-matches))
             (list #'helm-fuzzy-highlight-matches)))))
@@ -979,59 +980,60 @@ an eieio class."
 (defmethod helm-setup-user-source ((_source helm-source)))
 
 (defmethod helm--setup-source ((source helm-source-sync))
-  (when (slot-value source :fuzzy-match)
-    (helm-aif (oref source :match)
-        (set-slot-value source :match (append (helm-mklist it)
+  (when (slot-value source 'fuzzy-match)
+    (helm-aif (slot-value source 'match)
+        (set-slot-value source 'match (append (helm-mklist it)
                                     (list helm-fuzzy-match-fn)))
-      (set-slot-value source :match helm-fuzzy-match-fn)))
-  (when (slot-value source :matchplugin)
-    (set-slot-value source :match
+      (set-slot-value source 'match helm-fuzzy-match-fn)))
+  (when (slot-value source 'matchplugin)
+    (set-slot-value source 'match
           (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
-  (let ((cur-init (slot-value source :init)))
-    (helm-aif (slot-value source :data)
-        (set-slot-value source
-              :init (delq
-                     nil
-                     (list
-                      (and (null (eq 'helm-default-init-source-in-buffer-function
-                                     cur-init))
-                           cur-init)
-                      (lambda ()
-                        (helm-init-candidates-in-buffer
-                            'global
-                          (if (functionp it) (funcall it) it))))))))
-  (when (slot-value source :fuzzy-match)
-    (helm-aif (oref source :search)
-        (set-slot-value source :search (append (helm-mklist it)
+  (let ((cur-init (slot-value source 'init)))
+    (helm-aif (slot-value source 'data)
+        (set-slot-value
+         source
+         'init (delq
+                nil
+                (list
+                 (and (null (eq 'helm-default-init-source-in-buffer-function
+                                cur-init))
+                      cur-init)
+                 (lambda ()
+                   (helm-init-candidates-in-buffer
+                       'global
+                     (if (functionp it) (funcall it) it))))))))
+  (when (slot-value source 'fuzzy-match)
+    (helm-aif (slot-value source 'search)
+        (set-slot-value source 'search (append (helm-mklist it)
                                      (list helm-fuzzy-search-fn)))
-      (set-slot-value source :search (list helm-fuzzy-search-fn))))
-  (when (slot-value source :matchplugin)
-    (set-slot-value source :search (helm-source-mp-get-search-or-match-fns source 'search)))
-  (let ((mtc (slot-value source :match)))
+      (set-slot-value source 'search (list helm-fuzzy-search-fn))))
+  (when (slot-value source 'matchplugin)
+    (set-slot-value source 'search (helm-source-mp-get-search-or-match-fns source 'search)))
+  (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
                nil "Invalid slot value for `match'")
-    (cl-assert (eq (slot-value source :volatile) t)
+    (cl-assert (eq (slot-value source 'volatile) t)
                nil "Invalid slot value for `volatile'")))
 
 (defmethod helm--setup-source ((source helm-source-async))
-  (cl-assert (null (slot-value source :candidates))
+  (cl-assert (null (slot-value source 'candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead")
-  (cl-assert (null (slot-value source :matchplugin))
+  (cl-assert (null (slot-value source 'matchplugin))
              nil "`matchplugin' not allowed in async sources."))
 
 (defmethod helm--setup-source ((source helm-source-dummy))
-  (let ((mtc (slot-value source :match)))
+  (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
                nil "Invalid slot value for `match'")
-    (cl-assert (eq (slot-value source :volatile) t)
+    (cl-assert (eq (slot-value source 'volatile) t)
                nil "Invalid slot value for `volatile'")
-    (cl-assert (equal (slot-value source :candidates) '("dummy"))
+    (cl-assert (equal (slot-value source 'candidates) '("dummy"))
                nil "Invalid slot value for `candidates'")
-    (cl-assert (eq (slot-value source :accept-empty) t)
+    (cl-assert (eq (slot-value source 'accept-empty) t)
                nil "Invalid slot value for `accept-empty'")))
 
 
