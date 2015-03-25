@@ -2669,7 +2669,15 @@ Helm plug-ins are realized by this function."
     (cond ((processp candidates)
            ;; Candidates will be filtered later in process filter.
            candidates)
-          ((null candidates) candidates)
+          ((or (null candidates)
+               ;; Can happen when the output of a process
+               ;; is empty, and the candidates function call
+               ;; something like (split-string (buffer-string) "\n")
+               ;; which result in a list of one empty string (Issue #938).
+               ;; e.g (completing-read "test: " '(""))
+               (equal candidates '("")))
+           nil)
+          ((equal candidates '("")) nil)
           ((listp candidates)
            ;; Transform candidates with `candidate-transformer' functions if
            ;; some, otherwise return candidates.
