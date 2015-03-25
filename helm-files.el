@@ -258,7 +258,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
 
 (defface helm-ff-dotted-directory
     '((t (:foreground "black" :background "DimGray")))
-  "Face used for directories in `helm-find-files'."
+  "Face used for dotted directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-symlink
