@@ -2677,7 +2677,6 @@ Helm plug-ins are realized by this function."
                ;; e.g (completing-read "test: " '(""))
                (equal candidates '("")))
            nil)
-          ((equal candidates '("")) nil)
           ((listp candidates)
            ;; Transform candidates with `candidate-transformer' functions if
            ;; some, otherwise return candidates.
