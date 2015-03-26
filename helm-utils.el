@@ -60,6 +60,11 @@ and `helm-imenu-default-action'.")
   "Face used in the `helm-current-buffer' when jumping to candidate."
   :group 'helm-faces)
 
+(defface helm-selection-item-inline
+    '((t (:inherit isearch)))
+  "Face used to highlight item matched in a selected line."
+  :group 'helm-faces)
+
 
 ;; CUA workaround
 (defadvice cua-delete-region (around helm-avoid-cua activate)
@@ -628,7 +633,7 @@ Useful in dired buffers when there is inserted subdirs."
                       (push (setq ov (make-overlay
                                       (match-beginning 0) (match-end 0)))
                             helm--match-item-overlays)
-                      (overlay-put ov 'face 'helm-match)
+                      (overlay-put ov 'face 'helm-selection-item-inline)
                       (overlay-put ov 'priority 1)))))
     (recenter)
     (when pulse
