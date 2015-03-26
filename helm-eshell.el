@@ -178,16 +178,18 @@ The function that call this should set `helm-ec-target' to thing at point."
          (args (catch 'eshell-incomplete
                  (eshell-parse-arguments beg end)))
          (target
-          (buffer-substring-no-properties
-           (save-excursion
-             (eshell-backward-argument 1) (point))
-           end))
+          (or (and (looking-back " ") " ")
+              (buffer-substring-no-properties
+               (save-excursion
+                 (eshell-backward-argument 1) (point))
+               end)))
          (first (car args)) ; Maybe lisp delimiter "(".
          last) ; Will be the last but parsed by pcomplete.
     (setq helm-ec-target (or target " ")
           end (point)
           ;; Reset beg for `with-helm-show-completion'.
-          beg (or (and target (- end (length target)))
+          beg (or (and target (not (string= target " "))
+                       (- end (length target)))
                   ;; Nothing at point.
                   (progn (insert " ") (point))))
     (cond ((eq first ?\()
