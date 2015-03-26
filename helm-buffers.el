@@ -359,7 +359,7 @@ Should be called after others transformers i.e (boring buffers)."
                           (concat truncbuf "\t" formatted-size
                                   "  " fmode "  " meta)
                         name)
-                      i)))
+                      (get-buffer i))))
 
 (defun helm-buffer--get-preselection (buffer-name)
   (concat "^"
