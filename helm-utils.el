@@ -607,17 +607,29 @@ Useful in dired buffers when there is inserted subdirs."
 ;;
 ;; Internal
 (defvar helm-match-line-overlay nil)
-
+(defvar helm--match-item-overlays nil)
 (defun helm-highlight-current-line (&optional start end buf face pulse)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
-         (args (list start end buf)))
+         (args (list start end buf))
+         cursor-type)
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
       (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
+    (cl-loop with ov
+             for r in (split-string helm-pattern)
+             do (progn
+                  (goto-char start)
+                  (save-excursion
+                    (while (re-search-forward r end t)
+                      (push (setq ov (make-overlay
+                                      (match-beginning 0) (match-end 0)))
+                            helm--match-item-overlays)
+                      (overlay-put ov 'face 'helm-match)
+                      (overlay-put ov 'priority 1)))))
     (recenter)
     (when pulse
       (sit-for 0.3)
@@ -626,7 +638,9 @@ Useful in dired buffers when there is inserted subdirs."
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay
     (delete-overlay helm-match-line-overlay)
-    (setq helm-match-line-overlay nil)))
+    (setq helm-match-line-overlay nil))
+  (when helm--match-item-overlays
+    (mapc 'delete-overlay helm--match-item-overlays)))
 
 (defun helm-match-line-update ()
   (when helm-match-line-overlay
