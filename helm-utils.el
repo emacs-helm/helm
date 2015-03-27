@@ -341,34 +341,41 @@ from its directory."
           (grep-line (and (stringp sel)
                           (helm-grep-split-line sel)))
           (bmk-name  (and (stringp sel)
+                          (not grep-line)
                           (replace-regexp-in-string "\\`\\*" "" sel)))
           (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
+          (buf       (helm-aif (get-buffer sel) (buffer-name it)))
           (default-preselection (or (buffer-file-name helm-current-buffer)
                                     default-directory)))
-     (if (stringp sel)
-         (helm-aif (get-buffer (or (get-text-property
-                                    (1- (length sel)) 'buffer-name sel)
-                                   sel))
-             (or (buffer-file-name it)
-                 (car (rassoc it dired-buffers))
-                 (and (with-current-buffer it
-                        (eq major-mode 'org-agenda-mode))
-                      org-directory
-                      (expand-file-name org-directory))
-                 (with-current-buffer it default-directory))
-           (cond (bmk (helm-aif (bookmark-get-filename bmk)
-                          (if (and ffap-url-regexp
-                                   (string-match ffap-url-regexp it))
-                              it (expand-file-name it))
-                        default-directory))
-                 ((or (file-remote-p sel)
-                      (file-exists-p sel))
-                  (expand-file-name sel))
-                 ((and grep-line (file-exists-p (car grep-line)))
-                  (expand-file-name (car grep-line)))
-                 ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
-                 (t default-preselection)))
-       default-preselection))))
+     (cond
+       ;; Buffer.
+       (buf (or (buffer-file-name sel)
+                (car (rassoc buf dired-buffers))
+                (and (with-current-buffer buf
+                       (eq major-mode 'org-agenda-mode))
+                     org-directory
+                     (expand-file-name org-directory))
+                (with-current-buffer buf default-directory)))
+       ;; Bookmark.
+       (bmk (helm-aif (bookmark-get-filename bmk)
+                (if (and ffap-url-regexp
+                         (string-match ffap-url-regexp it))
+                    it (expand-file-name it))
+              default-directory))
+       ((or (file-remote-p sel)
+            (file-exists-p sel))
+        (expand-file-name sel))
+       ;; Grep.
+       ((and grep-line (file-exists-p (car grep-line)))
+        (expand-file-name (car grep-line)))
+       ;; Occur.
+       (grep-line
+        (with-current-buffer (get-buffer (car grep-line))
+          (or (buffer-file-name) default-directory)))
+       ;; Url.
+       ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
+       ;; Default.
+       (t default-preselection)))))
 
 ;; Same as `vc-directory-exclusion-list'.
 (defvar helm-walk-ignore-directories
