@@ -215,7 +215,7 @@ So far, F can only be a symbol, not a lambda expression.")
 ;;  It should have been generated either by
 ;;  package.el or the make file.
 
-(load "helm-autoloads")
+(load "helm-autoloads" nil t)
 
 (provide 'helm-config)
 
