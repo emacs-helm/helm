@@ -203,10 +203,13 @@ Only buffer names are fuzzy matched when this is enabled,
    :action (helm-make-actions
             "Create buffer (C-u choose mode)"
             (lambda (candidate)
-             (let ((mjm (and helm-current-prefix-arg
-                             (intern-soft (helm-comp-read
-                                           "Major-mode: "
-                                           helm-buffers-favorite-modes))))
+             (let ((mjm (or (and helm-current-prefix-arg
+                                 (intern-soft (helm-comp-read
+                                               "Major-mode: "
+                                               helm-buffers-favorite-modes)))
+                            (cl-loop for (r . m) in auto-mode-alist
+                                     when (string-match r candidate)
+                                     return m)))
                    (buffer (get-buffer-create candidate)))
                (if mjm
                    (with-current-buffer buffer (funcall mjm))
