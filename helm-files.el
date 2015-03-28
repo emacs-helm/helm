@@ -1290,7 +1290,8 @@ or hitting C-j on \"..\"."
                        (assoc-default 'name (helm-get-current-source))))
                  helm-ff--move-to-first-real-candidate
                  (helm-get-selection))
-      (unless (or (and (string-match helm-tramp-file-name-regexp it)
+      (unless (or (not (stringp it))
+                  (and (string-match helm-tramp-file-name-regexp it)
                        (not (file-remote-p it nil t)))
                   (file-exists-p it))
         (helm-next-line))))
