@@ -860,9 +860,9 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
   (let* ((init (or initial dir default-directory))
          (current-command (or (helm-this-command) this-command))
          (str-command (helm-symbol-name current-command))
-         (helm-file-completion-sources
+         (helm--file-completion-sources
           (cons str-command
-                (remove str-command helm-file-completion-sources)))
+                (remove str-command helm--file-completion-sources)))
          (buf-name (format "*helm-mode-%s*" str-command))
          (entry (assq current-command
                       helm-completing-read-handlers-alist))
