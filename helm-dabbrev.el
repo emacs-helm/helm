@@ -46,11 +46,13 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
 (defcustom helm-dabbrev-major-mode-assoc
   '((emacs-lisp-mode . lisp-interaction-mode))
   "Major mode association alist.
-This allow helm-dabbrev searching in buffers with the associated `major-mode'.
+If non--nil this allows helm-dabbrev searching in buffers with the associated `major-mode'.
 e.g \(emacs-lisp-mode . lisp-interaction-mode\)
 will allow searching in the lisp-interaction-mode buffer when `current-buffer'
 is an `emacs-lisp-mode' buffer and vice versa i.e
-no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
+no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association.
+If nil the `major-mode' of buffers is disregarded and the search happens in all buffers
+(similar behaviour to `dabbrev-expand' with `dabbrev-check-all-buffers' set to non--nil)"
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-dabbrev)
 
@@ -104,33 +106,35 @@ but the initial search for all candidates in buffer(s)."
   ;; Determine the major-mode of START-BUFFER as `cur-maj-mode'.
   ;; Each time the loop go in another buffer we try to find if its
   ;; `major-mode' is:
+  ;; - any mode if `helm-dabbrev-major-mode-assoc' is nil
   ;; - same as the `cur-maj-mode'
   ;; - derived from `cur-maj-mode'
   ;; - have an assoc entry (major-mode . cur-maj-mode)
   ;; - have an rassoc entry (cur-maj-mode . major-mode)
   ;; - check if one of these entries inherit from another one in
   ;;   `helm-dabbrev-major-mode-assoc'.
-  (let* ((cur-maj-mode  (with-current-buffer start-buffer major-mode))
-         (c-assoc-mode  (assq cur-maj-mode helm-dabbrev-major-mode-assoc))
-         (c-rassoc-mode (rassq cur-maj-mode helm-dabbrev-major-mode-assoc))
-         (o-assoc-mode  (assq major-mode helm-dabbrev-major-mode-assoc))
-         (o-rassoc-mode (rassq major-mode helm-dabbrev-major-mode-assoc))
-         (cdr-c-assoc-mode (cdr c-assoc-mode))
-         (cdr-o-assoc-mode (cdr o-assoc-mode)))
-    (or (eq major-mode cur-maj-mode)
-        (derived-mode-p cur-maj-mode)
-        (or (eq cdr-c-assoc-mode major-mode)
-            (eq (car c-rassoc-mode) major-mode)
-            (eq (cdr (assq cdr-c-assoc-mode helm-dabbrev-major-mode-assoc))
-                major-mode)
-            (eq (car (rassq cdr-c-assoc-mode helm-dabbrev-major-mode-assoc))
-                major-mode))
-        (or (eq cdr-o-assoc-mode cur-maj-mode)
-            (eq (car o-rassoc-mode) cur-maj-mode)
-            (eq (cdr (assq cdr-o-assoc-mode helm-dabbrev-major-mode-assoc))
-                cur-maj-mode)
-            (eq (car (rassq cdr-o-assoc-mode helm-dabbrev-major-mode-assoc))
-                cur-maj-mode)))))
+  (or (not helm-dabbrev-major-mode-assoc)
+      (let* ((cur-maj-mode  (with-current-buffer start-buffer major-mode))
+             (c-assoc-mode  (assq cur-maj-mode helm-dabbrev-major-mode-assoc))
+             (c-rassoc-mode (rassq cur-maj-mode helm-dabbrev-major-mode-assoc))
+             (o-assoc-mode  (assq major-mode helm-dabbrev-major-mode-assoc))
+             (o-rassoc-mode (rassq major-mode helm-dabbrev-major-mode-assoc))
+             (cdr-c-assoc-mode (cdr c-assoc-mode))
+             (cdr-o-assoc-mode (cdr o-assoc-mode)))
+        (or (eq major-mode cur-maj-mode)
+            (derived-mode-p cur-maj-mode)
+            (or (eq cdr-c-assoc-mode major-mode)
+                (eq (car c-rassoc-mode) major-mode)
+                (eq (cdr (assq cdr-c-assoc-mode helm-dabbrev-major-mode-assoc))
+                    major-mode)
+                (eq (car (rassq cdr-c-assoc-mode helm-dabbrev-major-mode-assoc))
+                    major-mode))
+            (or (eq cdr-o-assoc-mode cur-maj-mode)
+                (eq (car o-rassoc-mode) cur-maj-mode)
+                (eq (cdr (assq cdr-o-assoc-mode helm-dabbrev-major-mode-assoc))
+                    cur-maj-mode)
+                (eq (car (rassq cdr-o-assoc-mode helm-dabbrev-major-mode-assoc))
+                    cur-maj-mode))))))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let* ((case-fold-search ignore-case)
