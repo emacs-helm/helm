@@ -47,6 +47,12 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
+(defcustom helm-highlight-number-lines-around-point 15
+  "Number of lines around point where matched items are highlighted."
+  :group 'helm-utils
+  :type 'integer)
+
+
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
 This hook run when jumping from `helm-goto-line', `helm-etags-default-action',
@@ -55,6 +61,9 @@ and `helm-imenu-default-action'.")
 (defvar helm-save-pos-before-jump-register ?_
   "The register where `helm-save-pos-to-register-before-jump' save position.")
 
+
+;;; Faces.
+;;
 (defface helm-selection-line
     '((t (:inherit highlight :distant-foreground "black")))
   "Face used in the `helm-current-buffer' when jumping to candidate."
@@ -642,10 +651,25 @@ Useful in dired buffers when there is inserted subdirs."
 ;; Internal
 (defvar helm-match-line-overlay nil)
 (defvar helm--match-item-overlays nil)
+
 (defun helm-highlight-current-line (&optional start end buf face pulse)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
+         (start-match (if (or (zerop helm-highlight-number-lines-around-point)
+                              (null helm-highlight-number-lines-around-point))
+                          start
+                          (save-excursion
+                            (forward-line
+                             (- helm-highlight-number-lines-around-point))
+                            (point-at-bol))))
+         (end-match   (if (or (zerop helm-highlight-number-lines-around-point)
+                              (null helm-highlight-number-lines-around-point))
+                          end
+                          (save-excursion
+                            (forward-line
+                             helm-highlight-number-lines-around-point)
+                            (point-at-eol))))
          (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
@@ -655,15 +679,14 @@ Useful in dired buffers when there is inserted subdirs."
     (cl-loop with ov
              for r in (helm-remove-if-match
                        "\\`!" (split-string helm-pattern))
-             do (progn
-                  (goto-char start)
-                  (save-excursion
-                    (while (re-search-forward r end t)
-                      (push (setq ov (make-overlay
-                                      (match-beginning 0) (match-end 0)))
-                            helm--match-item-overlays)
-                      (overlay-put ov 'face 'helm-match-item)
-                      (overlay-put ov 'priority 1)))))
+             do (save-excursion
+                  (goto-char start-match)
+                  (while (re-search-forward r end-match t)
+                    (push (setq ov (make-overlay
+                                    (match-beginning 0) (match-end 0)))
+                          helm--match-item-overlays)
+                    (overlay-put ov 'face 'helm-match-item)
+                    (overlay-put ov 'priority 1))))
     (recenter)
     (when pulse
       (sit-for 0.3)
