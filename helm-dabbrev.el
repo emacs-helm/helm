@@ -25,7 +25,10 @@
   :group 'helm)
 
 (defcustom helm-dabbrev-always-search-all t
-  "Always search in all buffers when non--nil."
+  "Always search in all buffers when non--nil.
+Note that even if nil, a search in all buffers
+will occur if the length of candidates is <= than
+`helm-dabbrev-max-length-result'."
   :group 'helm-dabbrev
   :type 'boolean)
 
@@ -43,6 +46,17 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type '(repeat regexp))
 
+(defcustom helm-dabbrev-related-buffer-fn #'helm-dabbrev--same-major-mode-p
+  "A function that decide if a buffer to search in is related to `current-buffer'.
+This is actually determined by comparing `major-mode' of the buffer to search
+and the `current-buffer'.
+The function take one arg, the buffer which is current, look at
+`helm-dabbrev--same-major-mode-p' for example.
+
+When nil all buffers are considered related to `current-buffer'."
+  :group 'helm-dabbrev
+  :type 'function)
+
 (defcustom helm-dabbrev-major-mode-assoc
   '((emacs-lisp-mode . lisp-interaction-mode))
   "Major mode association alist.
@@ -50,7 +64,12 @@ This allow helm-dabbrev searching in buffers with the associated `major-mode'.
 e.g \(emacs-lisp-mode . lisp-interaction-mode\)
 will allow searching in the lisp-interaction-mode buffer when `current-buffer'
 is an `emacs-lisp-mode' buffer and vice versa i.e
-no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association."
+no need to provide \(lisp-interaction-mode . emacs-lisp-mode\) association.
+
+When nil check is the searched buffer have same `major-mode'
+than the `current-buffer'.
+This have no effect when `helm-dabbrev-related-buffer-fn' is nil or of course
+bound to a function that doesn't handle this var."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-dabbrev)
 
@@ -182,7 +201,9 @@ but the initial search for all candidates in buffer(s)."
           
           do (with-current-buffer buf
                (when (or minibuf ; check against all buffers when in minibuffer.
-                         (helm-dabbrev--same-major-mode-p buffer1))
+                         (if helm-dabbrev-related-buffer-fn
+                             (funcall helm-dabbrev-related-buffer-fn buffer1)
+                             t))
                  (save-excursion
                    ;; Start searching before thing before point.
                    (goto-char (- (point) (length str)))
