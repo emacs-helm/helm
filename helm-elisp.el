@@ -731,7 +731,7 @@ Filename completion happen if string start after or between a double quote."
        ("Eval" . (lambda (candidate)
                    (and (boundp 'helm-sexp--last-sexp)
                         (setq helm-sexp--last-sexp candidate))
-                   (helm-run-after-quit 'helm-sexp-eval candidate)))
+                   (run-with-timer 0.1 nil #'helm-sexp-eval candidate)))
        ("Edit and eval" .
         (lambda (cand)
           (minibuffer-with-setup-hook
