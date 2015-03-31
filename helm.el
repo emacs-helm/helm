@@ -5180,12 +5180,14 @@ This happen after `helm-input-idle-delay' secs."
 
 ;;; Auto-resize mode
 ;;
-(defun helm--autoresize-hook ()
+(defun helm--autoresize-hook (&optional max-height min-height)
   (with-helm-window
     (fit-window-to-buffer nil
-                          (/ (* (frame-height) helm-autoresize-max-height)
+                          (/ (* (frame-height)
+                                (or max-height helm-autoresize-max-height))
                              100)
-                          (/ (* (frame-height) helm-autoresize-min-height)
+                          (/ (* (frame-height)
+                                (or min-height helm-autoresize-min-height))
                              100))))
 
 (define-minor-mode helm-autoresize-mode
