@@ -823,7 +823,42 @@ the command is called once for each file like this:
   "\n* Helm Moccur\n
 ** Helm Moccur tips:
 
+*** Matching
 Multiple regexp matching is allowed, just enter a space to separate your regexps.
+
+Matching empty lines is supported with the regexp \"^$\", you will get the results
+with only the buffer-name and the line number, you can of course save and edit these
+results.
+
+*** Jump to the corresponding line in the searched buffer
+You can do this with `C-j' (persistent-action), to do it repetitively
+you can use `C-<up>' and `C-<down>' or enable `helm-follow-mode' with `C-c C-f'.
+
+*** Saving results
+Same as with helm-grep, you can save the results with `C-x C-s'.
+Of course if you don't save your results, you can get back your session
+with `helm-resume'.
+
+*** Refreshing the resumed session.
+When the buffer(s) where you ran helm-(m)occur have been modified, you will be
+warned of this with the buffer flashing to red, you can refresh the buffer by running
+`C-c C-u'.
+This can be done automatically by customizing `helm-moccur-auto-update-on-resume'.
+
+*** Refreshing a saved buffer
+Just hit `g' to update your buffer.
+
+*** Edit a saved buffer
+
+To do so you have to install wgrep
+https://github.com/mhayashi1120/Emacs-wgrep
+and then:
+
+1) C-c C-p to edit the buffer(s).
+2) C-x C-s to save your changes.
+
+Tip: Use the excellent iedit https://github.com/tsdh/iedit
+to modify occurences in your buffer.
 
 \n** Specific commands for Helm Moccur:\n
 \\<helm-moccur-map>
