@@ -52,6 +52,16 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'integer)
 
+(defcustom helm-buffers-to-resize-on-pa nil
+  "A list of helm buffers where the helm-window should be reduced on persistent actions."
+  :group 'helm-utils
+  :type '(repeat (choice string)))
+
+(defcustom helm-resize-on-pa-text-height 12
+  "The size of the helm-window when resizing on persistent action."
+  :group 'helm-utils
+  :type 'integer)
+
 
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
@@ -704,6 +714,12 @@ Useful in dired buffers when there is inserted subdirs."
     (delete-overlay helm-match-line-overlay)
     (helm-highlight-current-line)))
 
+(defun helm-persistent-autoresize-hook ()
+  (when (and helm-buffers-to-resize-on-pa
+             (member helm-buffer helm-buffers-to-resize-on-pa))
+    (set-window-text-height (helm-window) helm-resize-on-pa-text-height)))
+
+(add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
 
