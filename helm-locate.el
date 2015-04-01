@@ -101,6 +101,7 @@ the opposite of \"locate\" command."
     (define-key map (kbd "C-=")     'helm-ff-run-ediff-file)
     (define-key map (kbd "C-c =")   'helm-ff-run-ediff-merge-file)
     (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
+    (define-key map (kbd "C-c C-o") 'helm-ff-run-switch-other-frame)
     (define-key map (kbd "M-i")     'helm-ff-properties-persistent)
     (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")   'helm-ff-run-open-file-with-default-tool)
