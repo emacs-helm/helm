@@ -691,7 +691,9 @@ Useful in dired buffers when there is inserted subdirs."
                        "\\`!" (split-string helm-pattern))
              do (save-excursion
                   (goto-char start-match)
-                  (while (re-search-forward r end-match t)
+                  (while (condition-case _err
+                             (re-search-forward r end-match t)
+                           (invalid-regexp nil))
                     (push (setq ov (make-overlay
                                     (match-beginning 0) (match-end 0)))
                           helm--match-item-overlays)

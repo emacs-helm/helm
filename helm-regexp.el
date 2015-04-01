@@ -234,7 +234,9 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
           when (save-excursion
-                 (re-search-forward reg (point-at-eol) t))
+                 (condition-case _err
+                     (re-search-forward reg (point-at-eol) t)
+                   (invalid-regexp nil)))
           collect (match-beginning 0) into pos-ls
           finally (when pos-ls (goto-char (apply #'min pos-ls))))
     (when mark
