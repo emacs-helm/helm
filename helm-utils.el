@@ -716,7 +716,8 @@ Useful in dired buffers when there is inserted subdirs."
 
 (defun helm-persistent-autoresize-hook ()
   (when (and helm-buffers-to-resize-on-pa
-             (member helm-buffer helm-buffers-to-resize-on-pa))
+             (member helm-buffer helm-buffers-to-resize-on-pa)
+             (eq helm-split-window-state 'vertical))
     (set-window-text-height (helm-window) helm-resize-on-pa-text-height)))
 
 (add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
