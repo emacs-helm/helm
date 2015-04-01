@@ -688,13 +688,15 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-force-update (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
-  (let ((bufname (buffer-name buffer)))
-    (regexp-quote
-     (if helm-buffer-max-length
-         (helm-substring-by-width
-          bufname helm-buffer-max-length
-          "")
-         bufname))))
+  (let ((bufname (and (bufferp buffer)
+                      (buffer-name buffer))))
+    (when bufname
+      (regexp-quote
+       (if helm-buffer-max-length
+           (helm-substring-by-width
+            bufname helm-buffer-max-length
+            "")
+           bufname)))))
 
 (defun helm-buffers-persistent-kill (_buffer)
   (let ((marked (helm-marked-candidates)))
