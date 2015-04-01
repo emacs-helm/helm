@@ -966,6 +966,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
 (defun helm-grep--filter-candidate-1 (candidate &optional dir)
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
+         ansi-color-context ; seems this avoid non--translated fname entries.
          (ansi-p (string-match-p ansi-color-regexp candidate))
          (line   (if ansi-p (ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
