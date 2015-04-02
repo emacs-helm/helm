@@ -785,8 +785,7 @@ Keys description:
                      (setq helm-ff-auto-update-flag
                            helm-ff-auto-update-initial-value)
                      (setq helm-ff--auto-update-state
-                           helm-ff-auto-update-flag)
-                     (helm-set-local-variable 'helm-in-file-completion-p t))
+                           helm-ff-auto-update-flag))
              :mode-line mode-line
              :nohighlight t
              :candidates

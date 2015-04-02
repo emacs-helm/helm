@@ -1235,8 +1235,7 @@ You should not modify this yourself unless you know what you do.")
 
 (defun helm-file-completion-source-p ()
   "Return non--nil if current source is a file completion source."
-  (or helm-in-file-completion-p
-      minibuffer-completing-file-name
+  (or minibuffer-completing-file-name
       (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
         (cl-loop for i in helm--file-completion-sources
               thereis (string= cur-source i)))))
@@ -1458,6 +1457,7 @@ purpose."
   "Exit helm when user try to execute action on an invalid tramp fname."
   (let ((cand (helm-get-selection)))
     (when (and (helm-file-completion-source-p)
+               (stringp cand)
                (helm-ff-invalid-tramp-name-p cand) ; Check candidate.
                (helm-ff-invalid-tramp-name-p)) ; check helm-pattern.
       (error "Error: Unknown file or directory `%s'" cand))))
@@ -1715,6 +1715,7 @@ Note that only existing directories are saved here."
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
               when (and sel
+                        (stringp sel)
                         (file-exists-p sel)
                         (not (file-directory-p sel)))
               do
@@ -2204,7 +2205,6 @@ Use it for non--interactive calls of `helm-find-files'."
          (helm-ff-auto-update-initial-value
           (and helm-ff-auto-update-initial-value
                (not (minibuffer-window-active-p (minibuffer-window)))))
-         (helm-in-file-completion-p t)
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
                            (expand-file-name tap)))))
