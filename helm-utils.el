@@ -686,19 +686,23 @@ Useful in dired buffers when there is inserted subdirs."
       (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
-    (cl-loop with ov
-             for r in (helm-remove-if-match
-                       "\\`!" (split-string helm-pattern))
-             do (save-excursion
-                  (goto-char start-match)
-                  (while (condition-case _err
-                             (re-search-forward r end-match t)
-                           (invalid-regexp nil))
-                    (push (setq ov (make-overlay
-                                    (match-beginning 0) (match-end 0)))
-                          helm--match-item-overlays)
-                    (overlay-put ov 'face 'helm-match-item)
-                    (overlay-put ov 'priority 1))))
+    (catch 'empty-line
+      (cl-loop with ov
+               for r in (helm-remove-if-match
+                         "\\`!" (split-string helm-pattern))
+               do (save-excursion
+                    (goto-char start-match)
+                    (while (condition-case _err
+                               (re-search-forward r end-match t)
+                             (invalid-regexp nil))
+                      (let ((s (match-beginning 0))
+                            (e (match-end 0)))
+                        (if (= s e)
+                            (throw 'empty-line nil)
+                            (push (setq ov (make-overlay s e))
+                                  helm--match-item-overlays)
+                            (overlay-put ov 'face 'helm-match-item)
+                            (overlay-put ov 'priority 1)))))))
     (recenter)
     (when pulse
       (sit-for 0.3)
