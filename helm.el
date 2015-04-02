@@ -5002,10 +5002,7 @@ Directories expansion is not supported."
                                      ((basename nil) 'basename)
                                      (t 'full))
                              :directories nil
-                             :match (concat
-                                     (regexp-quote
-                                      (match-string 1 bn))
-                                     "\\'")
+                             :match (wildcard-to-regexp bn)
                              :skip-subdirs t)
         (file-expand-wildcards pattern full))))
 
