@@ -1530,11 +1530,6 @@ HELM-ATTRIBUTE should be a symbol."
   (candidates . helm-candidates-in-buffer) or
   (candidates-in-buffer) in short.")
 
-(helm-document-attribute 'search-from-end "optional"
-  "  Make `helm-candidates-in-buffer' search from the end of buffer.
-  If this attribute is specified, `helm-candidates-in-buffer'
-  uses `re-search-backward' instead.")
-
 (helm-document-attribute 'get-line "optional"
   "  A function like `buffer-substring-no-properties' or `buffer-substring'.
   This function converts point of line-beginning and point of line-end,
