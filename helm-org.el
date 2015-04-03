@@ -98,15 +98,17 @@ NOTE: This will be slow on large org buffers."
     (let ((match-fn (if fontify 'match-string 'match-string-no-properties)))
       (save-excursion
         (goto-char (point-min))
-        (cl-loop while (re-search-forward org-complex-heading-regexp nil t)
+        (cl-loop with width = (window-width)
+                 while (re-search-forward org-complex-heading-regexp nil t)
                  if (let ((num-stars (length (match-string-no-properties 1))))
                       (and (>= num-stars min-depth) (<= num-stars max-depth)))
                  collect `(,(let ((heading (funcall match-fn 4))
-                                  (file (unless nofname (concat (helm-basename filename) ":")))
-                                  (level (length (match-string-no-properties 1)))
-                                  )
+                                  (file (unless nofname
+                                          (concat (helm-basename filename) ":")))
+                                  (level (length (match-string-no-properties 1))))
                               (org-format-outline-path
-                               (append (org-get-outline-path t level heading) (list heading)) nil file))
+                               (append (org-get-outline-path t level heading)
+                                       (list heading)) width file))
                            . ,(point-marker)))))))
 
 ;;;###autoload
