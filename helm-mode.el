@@ -517,7 +517,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        (helm-apropos-init (lambda (x)
                                             (and (funcall test x)
                                                  (not (keywordp x))))
-                                          default))
+                                          (or (car-safe default) default)))
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :persistent-action 'helm-lisp-completion-persistent-action
                :persistent-help "Show brief doc in mode-line")
@@ -541,14 +541,17 @@ that use `helm-comp-read' See `helm-M-x' for example."
 Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
 It should be used when candidate list don't need to rebuild dynamically."
-  (let ((history (or (car-safe hist) hist)))
+  (let ((history (or (car-safe hist) hist))
+        (alistp cands-in-buffer))
     (when (and default (listp default))
       ;; When DEFAULT is a list move the list on head of COLLECTION
       ;; and set it to its car. #bugfix `grep-read-files'.
       (setq collection (if (listp collection)
                            (append default collection)
                          ;; Else COLLECTION is maybe a function or a table.
-                         (append default (all-completions "" collection))))
+                         (prog1
+                             (append default (all-completions "" collection))
+                           (setq alistp t))))
       (setq default (car default)))
     (helm-comp-read
      prompt collection
@@ -557,7 +560,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp nil ; Be sure `all-completions' is used.
+     :alistp alistp ; Be sure `all-completions' is used.
      :name name
      :requires-pattern (if (and (string= default "")
                                 (or (eq require-match 'confirm)
@@ -785,8 +788,7 @@ Keys description:
                      (setq helm-ff-auto-update-flag
                            helm-ff-auto-update-initial-value)
                      (setq helm-ff--auto-update-state
-                           helm-ff-auto-update-flag)
-                     (helm-set-local-variable 'helm-in-file-completion-p t))
+                           helm-ff-auto-update-flag))
              :mode-line mode-line
              :nohighlight t
              :candidates

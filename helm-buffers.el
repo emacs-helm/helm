@@ -163,9 +163,15 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar helm-buffers-list-cache nil)
 (defvar helm-buffer-max-len-mode nil)
 (defclass helm-source-buffers (helm-source-sync helm-type-buffer)
-  ((init :initform (lambda ()
+  ((buffer-list
+    :initarg :buffer-list
+    :initform #'helm-buffer-list
+    :custom function
+    :documentation
+    "  A function with no arguments to create buffer list.")
+   (init :initform (lambda ()
                      ;; Issue #51 Create the list before `helm-buffer' creation.
-                     (setq helm-buffers-list-cache (helm-buffer-list))
+                     (setq helm-buffers-list-cache (funcall (helm-attr 'buffer-list)))
                      (let ((result (cl-loop for b in helm-buffers-list-cache
                                             maximize (length b) into len-buf
                                             maximize (length (with-current-buffer b
@@ -688,13 +694,15 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-force-update (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
-  (let ((bufname (buffer-name buffer)))
-    (regexp-quote
-     (if helm-buffer-max-length
-         (helm-substring-by-width
-          bufname helm-buffer-max-length
-          "")
-         bufname))))
+  (let ((bufname (and (bufferp buffer)
+                      (buffer-name buffer))))
+    (when bufname
+      (regexp-quote
+       (if helm-buffer-max-length
+           (helm-substring-by-width
+            bufname helm-buffer-max-length
+            "")
+           bufname)))))
 
 (defun helm-buffers-persistent-kill (_buffer)
   (let ((marked (helm-marked-candidates)))

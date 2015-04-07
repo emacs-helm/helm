@@ -47,6 +47,22 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
+(defcustom helm-highlight-number-lines-around-point 15
+  "Number of lines around point where matched items are highlighted."
+  :group 'helm-utils
+  :type 'integer)
+
+(defcustom helm-buffers-to-resize-on-pa nil
+  "A list of helm buffers where the helm-window should be reduced on persistent actions."
+  :group 'helm-utils
+  :type '(repeat (choice string)))
+
+(defcustom helm-resize-on-pa-text-height 12
+  "The size of the helm-window when resizing on persistent action."
+  :group 'helm-utils
+  :type 'integer)
+
+
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
 This hook run when jumping from `helm-goto-line', `helm-etags-default-action',
@@ -55,6 +71,9 @@ and `helm-imenu-default-action'.")
 (defvar helm-save-pos-before-jump-register ?_
   "The register where `helm-save-pos-to-register-before-jump' save position.")
 
+
+;;; Faces.
+;;
 (defface helm-selection-line
     '((t (:inherit highlight :distant-foreground "black")))
   "Face used in the `helm-current-buffer' when jumping to candidate."
@@ -333,9 +352,11 @@ from its directory."
    (lambda (f)
      (if (file-exists-p f)
          (helm-find-files-1 (file-name-directory f)
-                            (regexp-quote
-                             (if helm-ff-transformer-show-only-basename
-                                 (helm-basename f) f)))
+                            (concat
+                             "^"
+                             (regexp-quote
+                              (if helm-ff-transformer-show-only-basename
+                                  (helm-basename f) f))))
        (helm-find-files-1 f)))
    (let* ((sel       (helm-get-selection))
           (grep-line (and (stringp sel)
@@ -642,28 +663,48 @@ Useful in dired buffers when there is inserted subdirs."
 ;; Internal
 (defvar helm-match-line-overlay nil)
 (defvar helm--match-item-overlays nil)
+
 (defun helm-highlight-current-line (&optional start end buf face pulse)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
+         (start-match (if (or (zerop helm-highlight-number-lines-around-point)
+                              (null helm-highlight-number-lines-around-point))
+                          start
+                          (save-excursion
+                            (forward-line
+                             (- helm-highlight-number-lines-around-point))
+                            (point-at-bol))))
+         (end-match   (if (or (zerop helm-highlight-number-lines-around-point)
+                              (null helm-highlight-number-lines-around-point))
+                          end
+                          (save-excursion
+                            (forward-line
+                             helm-highlight-number-lines-around-point)
+                            (point-at-eol))))
          (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
       (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
-    (cl-loop with ov
-             for r in (helm-remove-if-match
-                       "\\`!" (split-string helm-pattern))
-             do (progn
-                  (goto-char start)
-                  (save-excursion
-                    (while (re-search-forward r end t)
-                      (push (setq ov (make-overlay
-                                      (match-beginning 0) (match-end 0)))
-                            helm--match-item-overlays)
-                      (overlay-put ov 'face 'helm-match-item)
-                      (overlay-put ov 'priority 1)))))
+    (catch 'empty-line
+      (cl-loop with ov
+               for r in (helm-remove-if-match
+                         "\\`!" (split-string helm-pattern))
+               do (save-excursion
+                    (goto-char start-match)
+                    (while (condition-case _err
+                               (re-search-forward r end-match t)
+                             (invalid-regexp nil))
+                      (let ((s (match-beginning 0))
+                            (e (match-end 0)))
+                        (if (= s e)
+                            (throw 'empty-line nil)
+                            (push (setq ov (make-overlay s e))
+                                  helm--match-item-overlays)
+                            (overlay-put ov 'face 'helm-match-item)
+                            (overlay-put ov 'priority 1)))))))
     (recenter)
     (when pulse
       (sit-for 0.3)
@@ -681,6 +722,13 @@ Useful in dired buffers when there is inserted subdirs."
     (delete-overlay helm-match-line-overlay)
     (helm-highlight-current-line)))
 
+(defun helm-persistent-autoresize-hook ()
+  (when (and helm-buffers-to-resize-on-pa
+             (member helm-buffer helm-buffers-to-resize-on-pa)
+             (eq helm-split-window-state 'vertical))
+    (set-window-text-height (helm-window) helm-resize-on-pa-text-height)))
+
+(add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
 
