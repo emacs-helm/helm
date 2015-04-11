@@ -129,7 +129,11 @@
    (persistent-action :initform (lambda (elm)
                                   (helm-semantic-default-action elm t)
                                   (helm-highlight-current-line)))
-   (action :initform 'helm-semantic-default-action)))
+   (action :initform (helm-make-actions
+                      "Jump to tag"  'helm-semantic-default-action
+                      "Open tag other window"  (lambda (c)
+                                                  (with-current-buffer (clone-indirect-buffer (buffer-name) t)
+                                                    (helm-semantic-default-action c)))))))
 
 (defcustom helm-semantic-fuzzy-match nil
   "Enable fuzzy matching in `helm-source-semantic'."
