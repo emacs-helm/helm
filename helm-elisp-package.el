@@ -292,6 +292,12 @@
   (helm :sources 'helm-source-list-el-package
         :buffer "*helm list packages*"))
 
+;;;###autoload
+(defun helm-list-elisp-packages-no-fetch ()
+  (interactive)
+  (let ((helm-el-package--initialized-p t))
+    (helm-list-elisp-packages nil)))
+
 (provide 'helm-elisp-package)
 
 ;;; helm-elisp-package.el ends here
