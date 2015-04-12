@@ -183,7 +183,7 @@ Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy mat
 - `helm-apropos`: Enabled by setting `helm-apropos-fuzzy-match` to `t`.
 - `helm-lisp-completion-at-point`: Enabled by setting `helm-lisp-fuzzy-completion` to `t`.
 
-**IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` to high. It is recommended that you leave variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching.
+**IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` too high. It is recommended that you leave the variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching will be.
 
 #### Autoresize
 
