@@ -486,7 +486,7 @@ for current buffer."
            (save-selected-window
              (other-window 1)
              default-directory)
-           (car helm-ff-history))))))
+           (or (car-safe helm-ff-history) default-directory))))))
 
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.

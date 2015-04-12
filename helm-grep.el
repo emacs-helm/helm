@@ -831,7 +831,7 @@ These extensions will be added to command line with --include arg of grep."
 ;;
 ;;
 (defvar helm-source-grep nil)
-(defun helm-do-grep-1 (targets &optional recurse zgrep exts)
+(defun helm-do-grep-1 (targets &optional recurse zgrep exts default-input)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
 to set the --include args of grep.
@@ -921,6 +921,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
      :sources 'helm-source-grep
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
      :default-directory helm-ff-default-directory
+     :default default-input
      :keymap helm-grep-map
      :history 'helm-grep-history
      :truncate-lines t)))
