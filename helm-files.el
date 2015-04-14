@@ -497,7 +497,8 @@ Should not be used among other sources.")
   (interactive)
   (with-helm-buffer
     (bookmark-set
-     (concat "Helm-find-files: " (helm-basename helm-ff-default-directory))))
+     (concat "Helm-find-files: "
+             (abbreviate-file-name helm-ff-default-directory))))
   (message "Helm find files session bookmarked!"))
 
 (defun helm-dwim-target-directory ()
