@@ -499,7 +499,7 @@ Should not be used among other sources.")
     (bookmark-set
      (concat "Helm-find-files: "
              (abbreviate-file-name helm-ff-default-directory))))
-  (message "Helm find files session bookmarked!"))
+  (message "Helm find files session bookmarked! "))
 
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
