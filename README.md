@@ -15,7 +15,7 @@ You can  [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge
 Emacs. It will help steer you in the right direction when you're looking
 for stuff in Emacs (like buffers, files, etc).
 
-Helm is a fork of `anything.el` originaly written by Tamas Patrovic
+Helm is a fork of `anything.el` originally written by Tamas Patrovic
 and can be considered to be its successor. 
 `Helm` sets out to clean up the legacy code in `anything.el`
 and provide a cleaner, leaner and more modular tool, that's not tied in
@@ -195,7 +195,7 @@ Here is a demo:
 
 ![helm-buffers-list](doc/helm-autoresize-mode.gif)
 
-You can customize the minimum and maximum height that Helm can resize with these two variable:
+You can customize the minimum and maximum height that Helm can resize with these two variables:
 
 - `helm-autoresize-max-height`
 - `helm-autoresize-min-height`
