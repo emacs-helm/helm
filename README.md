@@ -209,7 +209,7 @@ If you don't want the Helm window to be resized, but a smaller Helm window, you 
 Check out the project's
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open)
 a list of unresolved issues. By the way - feel free to fix any of them
-and sent us a pull request. :-)
+and send us a pull request. :-)
 
 ## Contributors
 
