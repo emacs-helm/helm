@@ -258,6 +258,11 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
          (isnonfile  (equal filename helm-bookmark--non-file-filename))) 
     (and filename (not isnonfile) (not (bookmark-get-handler bookmark)))))
 
+(defun helm-bookmark-helm-find-files-p (bookmark)
+  "Return non-nil if BOOKMARK bookmarks a `helm-find-files' session.
+BOOKMARK is a bookmark name or a bookmark record."
+  (eq (bookmark-get-handler bookmark) 'helm-ff-bookmark-jump))
+
 (defun helm-bookmark-addressbook-p (bookmark)
   "Return non--nil if BOOKMARK is a contact recorded with addressbook-bookmark.
 BOOKMARK is a bookmark name or a bookmark record."
@@ -268,14 +273,16 @@ BOOKMARK is a bookmark name or a bookmark record."
 
 (defun helm-bookmark-uncategorized-bookmark-p (bookmark)
   "Return non--nil if BOOKMARK match no known category."
-  (and (not (helm-bookmark-addressbook-p bookmark))
-       (not (helm-bookmark-gnus-bookmark-p bookmark))
-       (not (helm-bookmark-w3m-bookmark-p bookmark))
-       (not (helm-bookmark-woman-man-bookmark-p bookmark))
-       (not (helm-bookmark-info-bookmark-p bookmark))
-       (not (helm-bookmark-image-bookmark-p bookmark))
-       (not (helm-bookmark-file-p bookmark))
-       (not (helm-bookmark-addressbook-p bookmark))))
+  (cl-loop for pred in '(helm-bookmark-addressbook-p
+                         helm-bookmark-gnus-bookmark-p
+                         helm-bookmark-w3m-bookmark-p
+                         helm-bookmark-woman-man-bookmark-p
+                         helm-bookmark-info-bookmark-p
+                         helm-bookmark-image-bookmark-p
+                         helm-bookmark-file-p
+                         helm-bookmark-helm-find-files-p
+                         helm-bookmark-addressbook-p)
+           never (funcall pred bookmark)))
 
 (defun helm-bookmark-filter-setup-alist (fn)
   "Return a filtered `bookmark-alist' sorted alphabetically."
@@ -409,6 +416,19 @@ than `w3m-browse-url' use it."
             (bookmark-maybe-load-default-file)
             (helm-init-candidates-in-buffer
                 'global (helm-bookmark-local-files-setup-alist)))))
+
+;;; Helm find files sessions.
+;;
+(defun helm-bookmark-helm-find-files-setup-alist ()
+  "Specialized filter function for `helm-find-files' bookmarks."
+  (helm-bookmark-filter-setup-alist 'helm-bookmark-helm-find-files-p))
+
+(defvar helm-source-bookmark-helm-find-files
+  (helm-make-source "Bookmark helm-find-files sessions" 'helm-source-filtered-bookmarks
+      :init (lambda ()
+              (bookmark-maybe-load-default-file)
+              (helm-init-candidates-in-buffer
+                  'global (helm-bookmark-helm-find-files-setup-alist)))))
 
 ;;; Uncategorized bookmarks
 ;;
@@ -739,6 +759,7 @@ Optional source `helm-source-bookmark-addressbook' is loaded
 only if external library addressbook-bookmark.el is available."
   (interactive)
   (helm :sources (append '(helm-source-bookmark-files&dirs
+                           helm-source-bookmark-helm-find-files
                            helm-source-bookmark-info
                            helm-source-bookmark-gnus
                            helm-source-bookmark-man
