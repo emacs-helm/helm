@@ -779,7 +779,7 @@ Filename completion happen if string start after or between a double quote."
              (eq 'helm-sexp-eval-1
                  (cadr (backtrace-frame (+ i 2) #'called-interactively-p)))
              1))
-      
+
       (defun helm-sexp-eval (_candidate)
         (call-interactively #'helm-sexp-eval-1)))
   ;; Emacs 24.3
