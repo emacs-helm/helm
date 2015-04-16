@@ -546,6 +546,7 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
   (let ((non-essential t))
     (cl-loop for i in bookmarks
           for isfile        = (bookmark-get-filename i)
+          for hff           = (helm-bookmark-helm-find-files-p i)
           for handlerp      = (and (fboundp 'bookmark-get-handler)
                                    (bookmark-get-handler i))
           for isw3m         = (and (fboundp 'helm-bookmark-w3m-bookmark-p)
@@ -602,7 +603,8 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                                 ;; first connection have been established,
                                 ;; probably when host is named differently
                                 ;; i.e machine/localhost)
-                                (not (file-remote-p isfile))
+                                (or hff
+                                    (not (file-remote-p isfile)))
                                 (file-directory-p isfile))
                            (propertize trunc 'face 'helm-bookmark-directory
                                        'help-echo isfile))
