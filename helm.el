@@ -813,8 +813,6 @@ If nil, use default `mode-line-format'.")
   "Current buffer when `helm' is invoked.")
 (defvar helm-buffer-file-name nil
   "Variable `buffer-file-name' when `helm' is invoked.")
-(defvar helm-default-directory nil
-  "The value of `default-directory' when `helm' is initialized.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
   "Holds the available candidate within a single helm invocation.")
 (defvar helm-pattern ""
@@ -1098,8 +1096,8 @@ not `exit-minibuffer' or unwanted functions."
      ,@body))
 
 (defun helm-default-directory ()
-  "Return the value of `helm-default-directory'."
-  (buffer-local-value 'helm-default-directory (get-buffer helm-buffer)))
+  "Return the local value of `default-directory' in `helm-buffer'."
+  (buffer-local-value 'default-directory (get-buffer helm-buffer)))
 
 (defmacro with-helm-temp-hook (hook &rest body)
   "Execute temporarily BODY as a function for HOOK."
@@ -1953,7 +1951,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
                            'helm-full-frame (get-buffer any-buffer)))
     (setq helm-compiled-sources nil)
     (setq cur-dir (buffer-local-value
-                   'helm-default-directory (get-buffer any-buffer)))
+                   'default-directory (get-buffer any-buffer)))
     (unless (buffer-live-p helm-current-buffer)
       ;; `helm-current-buffer' may have been killed.
       (setq helm-current-buffer (current-buffer)))
@@ -2312,7 +2310,6 @@ It is intended to use this only in `helm-initial-setup'."
       (set (make-local-variable 'scroll-margin)
            (if helm-display-source-at-screen-top
                0 helm-completion-window-scroll-margin))
-      (set (make-local-variable 'helm-default-directory) root-dir)
       (set (make-local-variable 'default-directory) root-dir)
       (set (make-local-variable 'helm-marked-candidates) nil)
       (helm-initialize-persistent-action)

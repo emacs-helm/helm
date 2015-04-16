@@ -3001,7 +3001,7 @@ utility mdfind.")
 (defvar helm-source-findutils
   (helm-build-async-source "Find"
     :header-name (lambda (name)
-                   (concat name " in [" helm-default-directory "]"))
+                   (concat name " in [" (helm-default-directory) "]"))
     :candidates-process 'helm-find-shell-command-fn
     :filtered-candidate-transformer 'helm-findutils-transformer
     :action-transformer 'helm-transform-file-load-el
@@ -3014,7 +3014,7 @@ utility mdfind.")
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
            for type = (car (file-attributes i))    
-        for abs = (expand-file-name i helm-default-directory)
+        for abs = (expand-file-name i (helm-default-directory))
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (string-match "[.]\\{1,2\\}$" i)))
                        (helm-basename i) abs)
