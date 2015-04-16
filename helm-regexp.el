@@ -84,18 +84,18 @@ Any other non--nil value update after confirmation."
   "Query replace regexp from `helm-regexp'.
 With a prefix arg replace only matches surrounded by word boundaries,
 i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
-  (let ((regexp (funcall (helm-attr 'regexp))))
+  (let ((regexp helm-input))
     (apply 'query-replace-regexp
            (helm-query-replace-args regexp))))
 
 (defun helm-kill-regexp-as-sexp (_candidate)
   "Kill regexp in a format usable in lisp code."
   (helm-regexp-kill-new
-   (prin1-to-string (funcall (helm-attr 'regexp)))))
+   (prin1-to-string helm-input)))
 
 (defun helm-kill-regexp (_candidate)
   "Kill regexp as it is in `helm-pattern'."
-  (helm-regexp-kill-new (funcall (helm-attr 'regexp))))
+  (helm-regexp-kill-new helm-input))
 
 (defun helm-query-replace-args (regexp)
   "create arguments of `query-replace-regexp' action in `helm-regexp'."
@@ -112,25 +112,23 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
      (when region-only (region-end)))))
 
 (defvar helm-source-regexp
-  '((name . "Regexp Builder")
-    (init . (lambda ()
-              (helm-init-candidates-in-buffer
-                  'global (with-temp-buffer
-                            (insert-buffer-substring helm-current-buffer)
-                            (buffer-string)))))
-    (candidates-in-buffer)
-    (get-line . helm-regexp-get-line)
-    (persistent-action . helm-regexp-persistent-action)
-    (persistent-help . "Show this line")
-    (multiline)
-    (no-matchplugin)
-    (requires-pattern . 2)
-    (mode-line . "Press TAB to select action.")
-    (regexp . (lambda () helm-input))
-    (action . (("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)
-               ("Query Replace Regexp (C-u Not inside word.)"
-                . helm-query-replace-regexp)
-               ("Kill Regexp" . helm-kill-regexp)))))
+  (helm-build-in-buffer-source "Regexp Builder"
+    :init (lambda ()
+            (helm-init-candidates-in-buffer
+                'global (with-temp-buffer
+                          (insert-buffer-substring helm-current-buffer)
+                          (buffer-string))))
+    :get-line #'helm-regexp-get-line
+    :persistent-action #'helm-regexp-persistent-action
+    :persistent-help "Show this line"
+    :multiline t
+    :matchplugin nil
+    :requires-pattern 2
+    :mode-line "Press TAB to select action."
+    :action '(("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)
+              ("Query Replace Regexp (C-u Not inside word.)"
+               . helm-query-replace-regexp)
+              ("Kill Regexp" . helm-kill-regexp))))
 
 (defun helm-regexp-get-line (s e)
   (let ((matches (match-data))
