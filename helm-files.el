@@ -2855,8 +2855,6 @@ and
   "Browse project in current directory.
 See `helm-browse-project'."
   (with-helm-default-directory helm-ff-default-directory
-      ;; `helm-browse-project' will call `helm-ls-git-ls'
-      ;; which will set locally `helm-default-directory'
       (helm-browse-project helm-current-prefix-arg)))
 
 (defun helm-ff-run-browse-project ()
