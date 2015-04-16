@@ -596,16 +596,16 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                            (propertize trunc 'face 'helm-bookmark-addressbook))
                           ( ;; directories
                            (and isfile
-                                ;; This is needed because `non-essential'
-                                ;; is not working on Emacs-24.2 and the behavior
-                                ;; of tramp seems to have changed since previous
-                                ;; versions (Need to reenter password even if a
-                                ;; first connection have been established,
-                                ;; probably when host is named differently
-                                ;; i.e machine/localhost)
                                 (or hff
-                                    (not (file-remote-p isfile)))
-                                (file-directory-p isfile))
+                                    ;; This is needed because `non-essential'
+                                    ;; is not working on Emacs-24.2 and the behavior
+                                    ;; of tramp seems to have changed since previous
+                                    ;; versions (Need to reenter password even if a
+                                    ;; first connection have been established,
+                                    ;; probably when host is named differently
+                                    ;; i.e machine/localhost)
+                                    (and (not (file-remote-p isfile))
+                                         (file-directory-p isfile))))
                            (propertize trunc 'face 'helm-bookmark-directory
                                        'help-echo isfile))
                           ( ;; regular files
