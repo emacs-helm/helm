@@ -580,11 +580,11 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; if regexp-quote is not used.
      ;; when init is added to history, it will be unquoted by
      ;; helm-comp-read.
-     :initial-input (regexp-quote
-                     (pcase init
-                       ((pred (stringp)) init)
-                       ;; INIT is a cons cell.
-                       (`(,l . ,ll) (substring l 0 ll)))))))
+     :initial-input (helm-aif (pcase init
+                                ((pred (stringp)) init)
+                                ;; INIT is a cons cell.
+                                (`(,l . ,ll) (substring l 0 ll)))
+                        (regexp-quote it)))))
 
 (defun helm-completing-read-with-cands-in-buffer
     (prompt collection test require-match
