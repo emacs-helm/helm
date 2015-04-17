@@ -1342,7 +1342,8 @@ or when `helm-pattern' is equal to \"~/\"."
                  ;; to allow user to do C-a / to start e.g
                  ;; entering a tramp method e.g /sudo::.
                  (not (string-match "\\`//" helm-pattern))
-                 (not (helm-ff-invalid-tramp-name-p)))
+                 (not (helm-ff-invalid-tramp-name-p))
+                 (not (eq last-command 'helm-yank-text-at-point)))
             ;; Fix issue #542.
             (string= helm-pattern "~/"))
     (let* ((history-p   (string= (assoc-default
