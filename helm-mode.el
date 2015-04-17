@@ -35,7 +35,7 @@
     (trace-function-foreground . helm-completing-read-symbols)
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
-    (find-file-at-point . nil)
+    ;(find-file-at-point . nil)
     (ffap-alternate-file . nil)
     (tmm-menubar . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
@@ -579,8 +579,12 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
      ;; if regexp-quote is not used.
      ;; when init is added to history, it will be unquoted by
-                                        ; helm-comp-read.
-     :initial-input (and (stringp init) (regexp-quote init)))))
+     ;; helm-comp-read.
+     :initial-input (regexp-quote
+                     (pcase init
+                       ((pred (stringp)) init)
+                       ;; INIT is a cons cell.
+                       (`(,l . ,ll) (substring l 0 ll)))))))
 
 (defun helm-completing-read-with-cands-in-buffer
     (prompt collection test require-match
