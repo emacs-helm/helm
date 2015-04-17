@@ -37,25 +37,25 @@
   :group 'helm-semantic
   :type  'boolean)
 
-;;; keymap
-(defvar helm-semantic-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-semantic-help)
-    (when helm-imenu-lynx-style-map
-      (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
-      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
-    (delq nil map)))
-
-;; Internals vars
-(defvar helm-semantic--tags-cache nil)
-
 (defcustom helm-semantic-display-style 'semantic-format-tag-summarize
   "Function to present a semantic tag."
   :group 'helm-semantic
   :type '(radio
           (const :tag "Default" semantic-format-tag-summarize)
           (const :tag "Prototype" semantic-format-tag-prototype)))
+
+;;; keymap
+(defvar helm-semantic-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c ?") 'helm-semantic-help)
+    (when helm-semantic-lynx-style-map
+      (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
+      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
+    (delq nil map)))
+
+;; Internals vars
+(defvar helm-semantic--tags-cache nil)
 
 (defun helm-semantic--fetch-candidates (tags depth &optional class)
   "Write the contents of TAGS to the current buffer."
