@@ -35,7 +35,7 @@
     (trace-function-foreground . helm-completing-read-symbols)
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
-    ;(find-file-at-point . nil)
+    (find-file-at-point . nil)
     (ffap-alternate-file . nil)
     (tmm-menubar . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
