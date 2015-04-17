@@ -551,6 +551,8 @@ It should be used when candidate list don't need to rebuild dynamically."
                          ;; Else COLLECTION is maybe a function or a table.
                          (prog1
                              (append default (all-completions "" collection))
+                           ;; Ensure `all-completions' will not be used
+                           ;; a second time to recompute COLLECTION [1].
                            (setq alistp t))))
       (setq default (car default)))
     (helm-comp-read
@@ -560,7 +562,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp alistp ; Be sure `all-completions' is used.
+     :alistp alistp ; Ensure `all-completions' is used when non-nil [1].
      :name name
      :requires-pattern (if (and (string= default "")
                                 (or (eq require-match 'confirm)
