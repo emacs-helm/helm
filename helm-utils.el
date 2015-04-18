@@ -236,7 +236,7 @@ To use this add it to `helm-goto-line-before-hook'."
 With a numeric prefix arg show only the ARG number of candidates."
   (interactive "p")
   (with-helm-window
-    (with-helm-default-directory helm-default-directory
+    (with-helm-default-directory (helm-default-directory)
         (let ((helm-candidate-number-limit (and (> arg 1) arg)))
           (helm-set-source-filter
            (list (assoc-default 'name (helm-get-current-source))))))))

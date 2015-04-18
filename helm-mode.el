@@ -35,6 +35,7 @@
     (trace-function-foreground . helm-completing-read-symbols)
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
+    (find-file-at-point . nil)
     (ffap-alternate-file . nil)
     (tmm-menubar . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
@@ -551,6 +552,8 @@ It should be used when candidate list don't need to rebuild dynamically."
                          ;; Else COLLECTION is maybe a function or a table.
                          (prog1
                              (append default (all-completions "" collection))
+                           ;; Ensure `all-completions' will not be used
+                           ;; a second time to recompute COLLECTION [1].
                            (setq alistp t))))
       (setq default (car default)))
     (helm-comp-read
@@ -560,7 +563,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp alistp ; Be sure `all-completions' is used.
+     :alistp alistp ; Ensure `all-completions' is used when non-nil [1].
      :name name
      :requires-pattern (if (and (string= default "")
                                 (or (eq require-match 'confirm)
@@ -576,8 +579,12 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
      ;; if regexp-quote is not used.
      ;; when init is added to history, it will be unquoted by
-                                        ; helm-comp-read.
-     :initial-input (and (stringp init) (regexp-quote init)))))
+     ;; helm-comp-read.
+     :initial-input (helm-aif (pcase init
+                                ((pred (stringp)) init)
+                                ;; INIT is a cons cell.
+                                (`(,l . ,ll) (substring l 0 ll)))
+                        (regexp-quote it)))))
 
 (defun helm-completing-read-with-cands-in-buffer
     (prompt collection test require-match

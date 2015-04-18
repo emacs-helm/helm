@@ -296,6 +296,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
+    (define-key map (kbd "C-x r m")       'helm-ff-bookmark-set)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -415,7 +416,9 @@ Should not be used among other sources.")
                 (setq helm-ff-auto-update-flag
                       helm-ff-auto-update-initial-value)
                 (setq helm-ff--auto-update-state
-                      helm-ff-auto-update-flag)))
+                      helm-ff-auto-update-flag)
+                (helm-set-local-variable 'bookmark-make-record-function
+                                         #'helm-ff-make-bookmark-record)))
    (candidates :initform 'helm-find-files-get-candidates)
    (filtered-candidate-transformer :initform 'helm-ff-sort-candidates)
    (filter-one-by-one :initform 'helm-ff-filter-candidate-one-by-one)
@@ -473,6 +476,30 @@ Should not be used among other sources.")
      "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate))
    (before-init-hook :initform 'helm-find-files-before-init-hook)
    (after-init-hook :initform 'helm-find-files-after-init-hook)))
+
+;; Bookmark handlers.
+;;
+(defun helm-ff-make-bookmark-record ()
+  "The `bookmark-make-record-function' for `helm-find-files'."
+  (with-helm-buffer
+    `((filename . ,helm-ff-default-directory)
+      (presel . ,(helm-get-selection nil t))
+      (handler . helm-ff-bookmark-jump))))
+
+(defun helm-ff-bookmark-jump (bookmark)
+  "bookmark handler for `helm-find-files'."
+  (let ((fname (bookmark-prop-get bookmark 'filename))
+        (presel (bookmark-prop-get bookmark 'presel)))
+    (helm-find-files-1 fname presel)))
+
+(defun helm-ff-bookmark-set ()
+  "Record `helm-find-files' session in bookmarks."
+  (interactive)
+  (with-helm-buffer
+    (bookmark-set
+     (concat "Helm-find-files: "
+             (abbreviate-file-name helm-ff-default-directory))))
+  (message "Helm find files session bookmarked! "))
 
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
@@ -1315,7 +1342,8 @@ or when `helm-pattern' is equal to \"~/\"."
                  ;; to allow user to do C-a / to start e.g
                  ;; entering a tramp method e.g /sudo::.
                  (not (string-match "\\`//" helm-pattern))
-                 (not (helm-ff-invalid-tramp-name-p)))
+                 (not (helm-ff-invalid-tramp-name-p))
+                 (not (eq last-command 'helm-yank-text-at-point)))
             ;; Fix issue #542.
             (string= helm-pattern "~/"))
     (let* ((history-p   (string= (assoc-default
@@ -2828,8 +2856,6 @@ and
   "Browse project in current directory.
 See `helm-browse-project'."
   (with-helm-default-directory helm-ff-default-directory
-      ;; `helm-browse-project' will call `helm-ls-git-ls'
-      ;; which will set locally `helm-default-directory'
       (helm-browse-project helm-current-prefix-arg)))
 
 (defun helm-ff-run-browse-project ()
@@ -2974,7 +3000,7 @@ utility mdfind.")
 (defvar helm-source-findutils
   (helm-build-async-source "Find"
     :header-name (lambda (name)
-                   (concat name " in [" helm-default-directory "]"))
+                   (concat name " in [" (helm-default-directory) "]"))
     :candidates-process 'helm-find-shell-command-fn
     :filtered-candidate-transformer 'helm-findutils-transformer
     :action-transformer 'helm-transform-file-load-el
@@ -2987,7 +3013,7 @@ utility mdfind.")
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
            for type = (car (file-attributes i))    
-        for abs = (expand-file-name i helm-default-directory)
+        for abs = (expand-file-name i (helm-default-directory))
         for disp = (if (and helm-ff-transformer-show-only-basename
                             (not (string-match "[.]\\{1,2\\}$" i)))
                        (helm-basename i) abs)

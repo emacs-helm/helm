@@ -1,4 +1,4 @@
-;;; helm-tags.el --- Helm for Etags and Ctags. -*- lexical-binding: t -*-
+;;; helm-tags.el --- Helm for Etags. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2015 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -39,7 +39,7 @@ Don't search tag file deeply if outside this value."
 
 (defcustom helm-etags-match-part-only t
   "Whether to match only the tag part of CANDIDATE in
-helm-source-ctags-select."
+helm-source-etags-select."
   :type 'boolean
   :group 'helm-tags)
 
@@ -61,8 +61,11 @@ one match."
           :underline t)))
   "Face used to highlight etags filenames."
   :group 'helm-tags-faces)
-
 
+
+;;; Etags
+;;
+;;
 (defun helm-etags-run-switch-other-window ()
   "Run switch to other window action from `helm-source-etags-select'."
   (interactive)
@@ -91,55 +94,6 @@ one match."
     map)
   "Keymap used in Etags.")
 
-
-;;; Ctags
-;;
-;;
-(defvar helm-ctags-modes
-  '( c-mode c++-mode awk-mode csharp-mode java-mode javascript-mode lua-mode
-    makefile-mode pascal-mode perl-mode cperl-mode php-mode python-mode
-    scheme-mode sh-mode slang-mode sql-mode tcl-mode ))
-
-(defun helm-ctags-init ()
-  (when (and buffer-file-name
-             (memq major-mode helm-ctags-modes)
-             (helm-current-buffer-is-modified))
-    (with-current-buffer (helm-candidate-buffer 'local)
-      (call-process-shell-command
-       (if (string-match "\\.el\\.gz$" helm-buffer-file-name)
-           (format "ctags -e -u -f- --language-force=lisp --fields=n =(zcat %s) "
-                   helm-buffer-file-name)
-         (format "ctags -e -u -f- --fields=n %s " helm-buffer-file-name))
-       nil (current-buffer))
-      (goto-char (point-min))
-      (forward-line 2)
-      (delete-region (point-min) (point))
-      (cl-loop while (and (not (eobp)) (search-forward "\001" (point-at-eol) t))
-            for lineno-start = (point)
-            for lineno = (buffer-substring
-                          lineno-start
-                          (1- (search-forward "," (point-at-eol) t)))
-            do
-            (forward-line 0)
-            (insert (format "%5s:" lineno))
-            (search-forward "\177" (point-at-eol) t)
-            (delete-region (1- (point)) (point-at-eol))
-            (forward-line 1)))))
-
-(defvar helm-source-ctags
-  '((name . "Exuberant ctags")
-    (init . helm-ctags-init)
-    (candidates-in-buffer)
-    (adjust)
-    (type . line))
-  "Needs Exuberant Ctags.
-
-http://ctags.sourceforge.net/")
-
-
-;;; Etags
-;;
-;;
 (defvar helm-etags-mtime-alist nil
   "Store the last modification time of etags files here.")
 (defvar helm-etags-cache (make-hash-table :test 'equal)

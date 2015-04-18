@@ -53,9 +53,6 @@ Default is multi3."
   '(helm-mp-exact-match helm-mp-match))
 (defconst helm-mp-default-search-functions
   '(helm-mp-exact-search helm-mp-search))
-(defconst helm-mp-default-search-backward-functions
-  '(helm-mp-exact-search-backward
-    helm-mp-search-backward))
 
 
 ;;; Build regexps
@@ -103,10 +100,6 @@ but \"foo\ bar\"=> (\"foobar\")."
   (and (search-forward (helm-mp-exact-get-pattern pattern) nil t)
        (forward-line -1)))
 
-(defun helm-mp-exact-search-backward (pattern &rest _ignore)
-  (and (search-backward (helm-mp-exact-get-pattern pattern) nil t)
-       (forward-line 1)))
-
 
 ;;; Prefix match
 ;;
@@ -130,10 +123,6 @@ but \"foo\ bar\"=> (\"foobar\")."
 (defun helm-mp-prefix-search (pattern &rest _ignore)
   (search-forward (helm-mp-prefix-get-pattern pattern) nil t))
 
-(defun helm-mp-prefix-search-backward (pattern &rest _ignore)
-  (and (search-backward (helm-mp-prefix-get-pattern pattern) nil t)
-       (forward-line 1)))
-
 
 ;;; Multiple regexp patterns 1 (order is preserved / prefix).
 ;;
@@ -155,9 +144,6 @@ but \"foo\ bar\"=> (\"foobar\")."
 (defun helm-mp-1-search (pattern &rest _ignore)
   (re-search-forward (helm-mp-1-get-pattern pattern) nil t))
 
-(defun helm-mp-1-search-backward (pattern &rest _ignore)
-  (re-search-backward (helm-mp-1-get-pattern pattern) nil t))
-
 
 ;;; Multiple regexp patterns 2 (order is preserved / partial).
 ;;
@@ -178,9 +164,6 @@ but \"foo\ bar\"=> (\"foobar\")."
 
 (defun helm-mp-2-search (pattern &rest _ignore)
   (re-search-forward (helm-mp-2-get-pattern pattern) nil t))
-
-(defun helm-mp-2-search-backward (pattern &rest _ignore)
-  (re-search-backward (helm-mp-2-get-pattern pattern) nil t))
 
 
 ;;; Multiple regexp patterns 3 (permutation).
@@ -263,12 +246,6 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (helm-mp-3-search-base
    pattern 're-search-forward 're-search-forward))
 
-(defun helm-mp-3-search-backward (pattern &rest _ignore)
-  (when (stringp pattern)
-    (setq pattern (helm-mp-3-get-patterns pattern)))
-  (helm-mp-3-search-base
-   pattern 're-search-backward 're-search-backward))
-
 
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
 ;;
@@ -290,12 +267,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
   (helm-mp-3-search-base
    pattern 'helm-mp-prefix-search 're-search-forward))
 
-(defun helm-mp-3p-search-backward (pattern &rest _ignore)
-  (when (stringp pattern)
-    (setq pattern (helm-mp-3-get-patterns pattern)))
-  (helm-mp-3-search-base
-   pattern 'helm-mp-prefix-search-backward 're-search-backward))
-
 
 ;;; Generic multi-match/search functions
 ;;
@@ -314,14 +285,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                (multi2 #'helm-mp-2-search)
                (multi3 #'helm-mp-3-search)
                (multi3p #'helm-mp-3p-search))))
-    (funcall fun pattern)))
-
-(defun helm-mp-search-backward (pattern &rest _ignore)
-  (let ((fun (cl-ecase helm-mp-matching-method
-               (multi1 #'helm-mp-1-search-backward)
-               (multi2 #'helm-mp-2-search-backward)
-               (multi3 #'helm-mp-3-search-backward)
-               (multi3p #'helm-mp-3p-search-backward))))
     (funcall fun pattern)))
 
 

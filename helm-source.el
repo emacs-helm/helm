@@ -816,10 +816,30 @@ like `re-search-forward', see below documentation of :search slot.")
 
 (defmethod helm--setup-source :before ((source helm-type-command))
   (set-slot-value source 'action (append (helm-make-actions
-                                "Call interactively" 'helm-call-interactively)
-                               (helm-actions-from-type-function)))
+                                          "Call interactively" 'helm-call-interactively)
+                                         (helm-actions-from-type-function)))
   (set-slot-value source 'coerce 'helm-symbolify)
   (set-slot-value source 'persistent-action 'describe-function))
+
+;; Timers
+(defclass helm-type-timers (helm-source) ()
+  "A class to define helm type timers.")
+
+(defmethod helm--setup-source :primary ((_source helm-type-timers)))
+
+(defmethod helm--setup-source :before ((source helm-type-timers))
+  (set-slot-value source 'action
+                  '(("Cancel Timer" . (lambda (_timer)
+                                        (let ((mkd (helm-marked-candidates)))
+                                          (cl-loop for timer in mkd
+                                                   do (cancel-timer timer)))))
+                    ("Describe Function" . (lambda (tm)
+                                             (describe-function (timer--function tm))))
+                    ("Find Function" . (lambda (tm)
+                                         (find-function (timer--function tm))))))
+  (set-slot-value source 'persistent-action (lambda (tm)
+                                              (describe-function (timer--function tm))))
+  (set-slot-value source 'persistent-help "Describe Function"))
 
 
 ;;; Error functions

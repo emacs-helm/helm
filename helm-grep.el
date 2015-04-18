@@ -340,9 +340,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                           (and rec-com rec-com-ack-p)))))))
 
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
-  (let* ((default-directory (or helm-default-directory
+  (let* ((default-directory (or (helm-default-directory)
                                 (expand-file-name helm-ff-default-directory)))
-         (fnargs            (helm-grep-prepare-candidates only-files default-directory))
+         (fnargs            (helm-grep-prepare-candidates
+                             only-files default-directory))
          (ignored-files     (unless (helm-grep-use-ack-p)
                               (mapconcat
                                #'(lambda (x)
@@ -386,7 +387,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
   (let* ((default-directory (or (expand-file-name helm-ff-default-directory)
-                                helm-default-directory))
+                                (helm-default-directory)))
          (zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
@@ -920,7 +921,6 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (helm
      :sources 'helm-source-grep
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
-     :default-directory helm-ff-default-directory
      :default default-input
      :keymap helm-grep-map
      :history 'helm-grep-history
@@ -991,7 +991,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
   (let ((helm-grep-default-directory-fn
          (or helm-grep-default-directory-fn
              (lambda () (or helm-ff-default-directory
-                            helm-default-directory
+                            (helm-default-directory)
                             default-directory)))))
     (helm-grep--filter-candidate-1 candidate)))
 
