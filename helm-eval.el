@@ -102,7 +102,7 @@ Should take one arg: the string to display."
         (when (member buf helm-eldoc-active-minibuffers-list)
           (with-current-buffer buf
             (let* ((sym     (save-excursion
-                              (unless (looking-back ")\\|\"")
+                              (unless (looking-back ")\\|\"" 1)
                                 (forward-char -1))
                               (eldoc-current-symbol)))
                    (info-fn (eldoc-fnsym-in-current-sexp))
