@@ -592,7 +592,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :initial-input (helm-aif (pcase init
                                 ((pred (stringp)) init)
                                 ;; INIT is a cons cell.
-                                (`(,l . ,ll) l))
+                                (`(,l . ,_ll) l))
                         (regexp-quote it)))))
 
 (defun helm-completing-read-with-cands-in-buffer
