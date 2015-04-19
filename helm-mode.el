@@ -195,6 +195,16 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                   (all-completions "" (symbol-value collection) predicate)))
                ((and (symbolp collection) (boundp collection))
                 (all-completions "" (symbol-value collection)))
+               ;; Normally file completion should not be handled here,
+               ;; but special cases like `find-file-at-point' do it.
+               ;; Handle here specially such cases.
+               ((and (functionp collection) minibuffer-completing-file-name)
+                (cl-loop for f in (funcall collection helm-pattern test t)
+                         unless (member f '("./" "../"))
+                         collect (concat (file-name-as-directory
+                                          (helm-basedir helm-pattern)) f)))
+               ((functionp collection)
+                (funcall collection "" test t))
                ((and alistp test)
                 (cl-loop for i in collection when (funcall test i) collect i))
                (alistp collection)
