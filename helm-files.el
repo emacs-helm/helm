@@ -490,7 +490,9 @@ Should not be used among other sources.")
   "bookmark handler for `helm-find-files'."
   (let ((fname (bookmark-prop-get bookmark 'filename))
         (presel (bookmark-prop-get bookmark 'presel)))
-    (helm-find-files-1 fname presel)))
+    (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
+                                 (helm-basename presel)
+                                 presel))))
 
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
