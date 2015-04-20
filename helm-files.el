@@ -483,7 +483,7 @@ Should not be used among other sources.")
   "The `bookmark-make-record-function' for `helm-find-files'."
   (with-helm-buffer
     `((filename . ,helm-ff-default-directory)
-      (presel . ,(helm-get-selection nil t))
+      (presel . ,(helm-get-selection))
       (handler . helm-ff-bookmark-jump))))
 
 (defun helm-ff-bookmark-jump (bookmark)
