@@ -209,10 +209,13 @@ Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
 the prefix args if needed, are passed AFTER starting `helm-M-x'.
 
 You can get help on each command by persistent action."
-  (interactive (list current-prefix-arg (helm-M-x-read-extended-command)))
+  (interactive (list nil (helm-M-x-read-extended-command)))
   (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
-    (setq arg (or helm-current-prefix-arg
-                  current-prefix-arg))
+    ;; When called interactively with a prefix arg
+    ;; `helm-M-x-read-extended-command' exit with error.
+    ;; So if ARG is non-nil, that's mean `helm-M-x' have been called
+    ;; from lisp and we keep this value.
+    (unless arg (setq arg helm-current-prefix-arg))
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command sym-com
           ;; Handle C-x z (repeat) Issue #322
