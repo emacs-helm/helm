@@ -210,7 +210,7 @@ the prefix args if needed, are passed AFTER starting `helm-M-x'.
 
 You can get help on each command by persistent action."
   (interactive (list current-prefix-arg (helm-M-x-read-extended-command)))
-  (let ((sym-com (intern-soft command-name)))
+  (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
     (setq arg (or helm-current-prefix-arg
                   current-prefix-arg))
     ;; Avoid having `this-command' set to *exit-minibuffer.
