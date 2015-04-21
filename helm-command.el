@@ -170,7 +170,10 @@ fuzzy matching is running its own sort function with a different algorithm."
                                             do (set-text-properties 0 (length i) nil i)
                                             and collect i))
     (unwind-protect
-         (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
+         (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'")
+               ;; FIXME: Not needed for now as defining kmacro is prevented
+               ;; in `helm-internal'.
+               (helm--reading-passwd-or-string executing-kbd-macro))
            (when current-prefix-arg
              (ding)
              (message "%s" msg)

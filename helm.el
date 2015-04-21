@@ -1855,6 +1855,8 @@ in source.
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
+  (cl-assert (null defining-kbd-macro)
+             nil "Helm commands not supported in kmacros")
   ;; Activate the advice for `tramp-read-passwd'.
   (if (fboundp 'advice-add)
       (progn
