@@ -1089,19 +1089,34 @@ Note: This mode is incompatible with Emacs23."
   (cl-assert (boundp 'completing-read-function) nil
              "`helm-mode' not available, upgrade to Emacs-24")
   (if helm-mode
-      (progn
-        (add-function :override completing-read-function
-                      #'helm--completing-read-default)
-        (add-function :override read-file-name-function
-                      #'helm--generic-read-file-name)
-        (when helm-mode-handle-completion-in-region
-          (add-function :override completion-in-region-function
-                        #'helm--completion-in-region))
-        (message helm-completion-mode-start-message))
-      (remove-function completing-read-function #'helm--completing-read-default)
-      (remove-function read-file-name-function #'helm--generic-read-file-name)
-      (remove-function completion-in-region-function #'helm--completion-in-region)
-    (message helm-completion-mode-quit-message)))
+      (if (fboundp 'add-function)
+          (progn
+            (add-function :override completing-read-function
+                          #'helm--completing-read-default)
+            (add-function :override read-file-name-function
+                          #'helm--generic-read-file-name)
+            (when helm-mode-handle-completion-in-region
+              (add-function :override completion-in-region-function
+                            #'helm--completion-in-region)))
+          (setq completing-read-function 'helm--completing-read-default
+                read-file-name-function  'helm--generic-read-file-name)
+          (when (and (boundp 'completion-in-region-function)
+                     helm-mode-handle-completion-in-region)
+            (setq completion-in-region-function #'helm--completion-in-region))
+          (message helm-completion-mode-start-message))
+      (if (fboundp 'remove-function)
+          (progn
+            (remove-function completing-read-function #'helm--completing-read-default)
+            (remove-function read-file-name-function #'helm--generic-read-file-name)
+            (remove-function completion-in-region-function #'helm--completion-in-region))
+          (setq completing-read-function (and (fboundp 'completing-read-default)
+                                        'completing-read-default)
+                read-file-name-function  (and (fboundp 'read-file-name-default)
+                                              'read-file-name-default))
+          (when (and (boundp 'completion-in-region-function)
+                     (boundp 'helm--old-completion-in-region-function))
+            (setq completion-in-region-function helm--old-completion-in-region-function))
+          (message helm-completion-mode-quit-message))))
 
 (provide 'helm-mode)
 

@@ -23,7 +23,7 @@ the trap of backward compatibility.
 
 ## Requirements
 
-You need a recent Emacs to use latest helm, at least Emacs-24.4.
+You need a recent Emacs to use latest helm, at least Emacs-24.3.
 
 [async](https://github.com/jwiegley/emacs-async) will be installed as dependency
 when installing from melpa but is facultative when installing from git (recommended though
