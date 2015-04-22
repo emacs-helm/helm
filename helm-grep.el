@@ -706,10 +706,8 @@ Special commands:
 ;;;###autoload
 (defun helm-grep-mode-jump ()
   (interactive)
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
-    (condition-case nil
-        (progn (helm-grep-action candidate) (delete-other-windows))
-      (error nil))))
+  (helm-grep-action
+   (buffer-substring (point-at-bol) (point-at-eol))))
 
 (defun helm-grep-mode-jump-other-window-1 (arg)
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
