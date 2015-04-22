@@ -144,6 +144,9 @@ fuzzy matching is running its own sort function with a different algorithm."
       (helm-display-mode-line (helm-get-current-source) 'force))))
 
 (defun helm-M-x-read-extended-command ()
+  "Read command name to invoke in `helm-M-x'.
+Helm completion is not provided when executing or defining
+kbd macros."
   (if (or defining-kbd-macro executing-kbd-macro)
       (if helm-mode
           (unwind-protect
