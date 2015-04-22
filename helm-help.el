@@ -1064,7 +1064,8 @@ the amount of prefix args entered.
 Use persistent action to run your kmacro as many time as needed,
 you can change of kmacro with `helm-next-line' `helm-previous-line'.
 
-NOTE: You can't record keys running helm commands.
+NOTE: You can't record keys running helm commands except `helm-M-x' unless
+you don't choose from there a command using helm completion.
 
 \n** Specific commands for Helm kmacro:\n
 \\<helm-kmacro-map>
