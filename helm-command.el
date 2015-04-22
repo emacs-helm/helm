@@ -144,64 +144,69 @@ fuzzy matching is running its own sort function with a different algorithm."
       (helm-display-mode-line (helm-get-current-source) 'force))))
 
 (defun helm-M-x-read-extended-command ()
-  (let* (in-help help-cand
-         (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
-         (helm-fuzzy-sort-fn (lambda (candidates source)
-                               (funcall orig-fuzzy-sort-fn candidates source 'real)))
-         (helm--mode-line-display-prefarg t)
-         (pers-help #'(lambda (candidate)
-                        (let ((hbuf (get-buffer (help-buffer))))
-                          (if (and in-help (string= candidate help-cand)
-                                   (null helm-persistent-action-use-special-display))
-                              (progn
-                                ;; When M-x is started from a help buffer,
-                                ;; Don't kill it as it is helm-current-buffer.
-                                (unless (equal hbuf helm-current-buffer)
-                                  (kill-buffer hbuf)
-                                  (set-window-buffer (get-buffer-window hbuf)
-                                                     helm-current-buffer))
-                                (setq in-help nil))
-                              (helm-describe-function candidate)
-                              (setq in-help t))
-                          (setq help-cand candidate))))
-         (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
-    (setq extended-command-history (cl-loop for i in extended-command-history
-                                            when (commandp (intern i))
-                                            do (set-text-properties 0 (length i) nil i)
-                                            and collect i))
-    (unwind-protect
-         (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'")
-               ;; FIXME: Not needed for now as defining kmacro is prevented
-               ;; in `helm-internal'.
-               (helm--reading-passwd-or-string executing-kbd-macro))
-           (when current-prefix-arg
-             (ding)
-             (message "%s" msg)
-             (while (not (sit-for 1))
-               (discard-input))
-             (user-error msg))
-           (setq current-prefix-arg nil)
-           (helm-comp-read
-            "M-x " obarray
-            :test 'commandp
-            :requires-pattern helm-M-x-requires-pattern
-            :name "Emacs Commands"
-            :buffer "*helm M-x*"
-            :persistent-action pers-help
-            :persistent-help "Describe this command"
-            :history extended-command-history
-            :reverse-history helm-M-x-reverse-history
-            :del-input nil
-            :mode-line helm-M-x-mode-line
-            :must-match t
-            :fuzzy helm-M-x-fuzzy-match
-            :nomark t
-            :keymap helm-M-x-map
-            :candidates-in-buffer t
-            :fc-transformer 'helm-M-x-transformer
-            :hist-fc-transformer 'helm-M-x-transformer-hist))
-      (cancel-timer tm)
-      (setq helm--mode-line-display-prefarg nil))))
+  (if (or defining-kbd-macro executing-kbd-macro)
+      (if helm-mode
+          (unwind-protect
+               (progn
+                 (helm-mode -1)
+                 (read-extended-command))
+            (helm-mode 1))
+          (read-extended-command))
+      (let* (in-help help-cand
+                     (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
+                     (helm-fuzzy-sort-fn (lambda (candidates source)
+                                           (funcall orig-fuzzy-sort-fn candidates source 'real)))
+                     (helm--mode-line-display-prefarg t)
+                     (pers-help #'(lambda (candidate)
+                                    (let ((hbuf (get-buffer (help-buffer))))
+                                      (if (and in-help (string= candidate help-cand)
+                                               (null helm-persistent-action-use-special-display))
+                                          (progn
+                                            ;; When M-x is started from a help buffer,
+                                            ;; Don't kill it as it is helm-current-buffer.
+                                            (unless (equal hbuf helm-current-buffer)
+                                              (kill-buffer hbuf)
+                                              (set-window-buffer (get-buffer-window hbuf)
+                                                                 helm-current-buffer))
+                                            (setq in-help nil))
+                                          (helm-describe-function candidate)
+                                          (setq in-help t))
+                                      (setq help-cand candidate))))
+                     (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
+        (setq extended-command-history (cl-loop for i in extended-command-history
+                                                when (commandp (intern i))
+                                                do (set-text-properties 0 (length i) nil i)
+                                                and collect i))
+        (unwind-protect
+             (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
+               (when current-prefix-arg
+                 (ding)
+                 (message "%s" msg)
+                 (while (not (sit-for 1))
+                   (discard-input))
+                 (user-error msg))
+               (setq current-prefix-arg nil)
+               (helm-comp-read
+                "M-x " obarray
+                :test 'commandp
+                :requires-pattern helm-M-x-requires-pattern
+                :name "Emacs Commands"
+                :buffer "*helm M-x*"
+                :persistent-action pers-help
+                :persistent-help "Describe this command"
+                :history extended-command-history
+                :reverse-history helm-M-x-reverse-history
+                :del-input nil
+                :mode-line helm-M-x-mode-line
+                :must-match t
+                :fuzzy helm-M-x-fuzzy-match
+                :nomark t
+                :keymap helm-M-x-map
+                :candidates-in-buffer t
+                :fc-transformer 'helm-M-x-transformer
+                :hist-fc-transformer 'helm-M-x-transformer-hist))
+          (cancel-timer tm)
+          (setq helm--mode-line-display-prefarg nil)))))
 
 ;;;###autoload
 (defun helm-M-x (arg &optional command-name)

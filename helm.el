@@ -1855,8 +1855,6 @@ in source.
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
-  (cl-assert (null defining-kbd-macro)
-             nil "Helm commands not supported in kmacros")
   ;; Activate the advice for `tramp-read-passwd'.
   (if (fboundp 'advice-add)
       (progn
@@ -4028,8 +4026,7 @@ don't exit and send message 'no match'."
 (defun helm-maybe-exit-minibuffer ()
   (interactive)
   (if (and (helm--updating-p)
-           (null helm--reading-passwd-or-string)
-           (null executing-kbd-macro))
+           (null helm--reading-passwd-or-string))
       (progn (message "[Display not ready]")
              (sit-for 0.5) (message nil))
       (helm-exit-minibuffer)))
