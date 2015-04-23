@@ -38,10 +38,26 @@ Should take one arg: the string to display."
   :group 'helm-eval)
 
 
-(declare-function eldoc-current-symbol "eldoc")
-(declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
-(declare-function eldoc-get-var-docstring "eldoc" (sym))
-(declare-function eldoc-fnsym-in-current-sexp "eldoc")
+;;; Eldoc compatibility between emacs-24 and emacs-25
+;;
+(if (require 'elisp-mode nil t)    ; emacs-25
+    ;; Maybe the eldoc functions have been
+    ;; already aliased by eldoc-eval.
+    (cl-loop for f in '(eldoc-current-symbol
+                        eldoc-fnsym-in-current-sexp
+                        eldoc-get-fnsym-args-string
+                        eldoc-get-var-docstring)
+             for a in '(elisp--current-symbol
+                        elisp--fnsym-in-current-sexp
+                        elisp--get-fnsym-args-string
+                        elisp--get-var-docstring)
+             unless (fboundp f)
+             do (defalias f a))
+    ;; Emacs-24.
+    (declare-function eldoc-current-symbol "eldoc")
+    (declare-function eldoc-get-fnsym-args-string "eldoc" (sym &optional index))
+    (declare-function eldoc-get-var-docstring "eldoc" (sym))
+    (declare-function eldoc-fnsym-in-current-sexp "eldoc"))
 
 ;;; Evaluation Result
 ;;
