@@ -43,14 +43,14 @@ Should take one arg: the string to display."
 (if (require 'elisp-mode nil t)    ; emacs-25
     ;; Maybe the eldoc functions have been
     ;; already aliased by eldoc-eval.
-    (cl-loop for f in '(eldoc-current-symbol
-                        eldoc-fnsym-in-current-sexp
-                        eldoc-get-fnsym-args-string
-                        eldoc-get-var-docstring)
-             for a in '(elisp--current-symbol
-                        elisp--fnsym-in-current-sexp
-                        elisp--get-fnsym-args-string
-                        elisp--get-var-docstring)
+    (cl-loop for (f . a) in '((eldoc-current-symbol .
+                               elisp--current-symbol)
+                              (eldoc-fnsym-in-current-sexp .
+                               elisp--fnsym-in-current-sexp) 
+                              (eldoc-get-fnsym-args-string .
+                               elisp--get-fnsym-args-string) 
+                              (eldoc-get-var-docstring .
+                               elisp--get-var-docstring))
              unless (fboundp f)
              do (defalias f a))
     ;; Emacs-24.
