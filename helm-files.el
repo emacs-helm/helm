@@ -231,6 +231,10 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'string)
 
+(defcustom helm-find-files-bookmark-prefix "Helm-find-files: "
+  "bookmark name prefix of `helm-find-files' sessions."
+  :group 'helm-files
+  :type 'string)
 
 ;;; Faces
 ;;
@@ -499,7 +503,7 @@ Should not be used among other sources.")
   (interactive)
   (with-helm-buffer
     (bookmark-set
-     (concat "Helm-find-files: "
+     (concat helm-find-files-bookmark-prefix
              (abbreviate-file-name helm-ff-default-directory))))
   (message "Helm find files session bookmarked! "))
 
