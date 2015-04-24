@@ -409,21 +409,38 @@ Same as `helm-moccur-goto-line' but go in new frame."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET")      'helm-moccur-mode-goto-line)
     (define-key map (kbd "C-o")      'helm-moccur-mode-goto-line-ow)
-    (define-key map (kbd "<C-down>") 'undefined)
-    (define-key map (kbd "<C-up>")   'undefined)
+    (define-key map (kbd "<C-down>") 'helm-moccur-mode-goto-line-ow-forward)
+    (define-key map (kbd "<C-up>")   'helm-moccur-mode-goto-line-ow-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
     (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
     map))
 
 (defun helm-moccur-mode-goto-line ()
   (interactive)
-  (helm-moccur-goto-line
-   (buffer-substring (point-at-bol) (point-at-eol))))
+  (helm-aif (get-text-property (point) 'helm-realvalue)
+    (helm-moccur-goto-line it)))
 
 (defun helm-moccur-mode-goto-line-ow ()
   (interactive)
-  (helm-moccur-goto-line-ow
-   (buffer-substring (point-at-bol) (point-at-eol))))
+  (helm-aif (get-text-property (point) 'helm-realvalue)
+    (helm-moccur-goto-line-ow it)))
+
+(defun helm-moccur-mode-goto-line-ow-forward-1 (arg)
+  (condition-case nil
+      (progn
+        (save-selected-window
+          (helm-moccur-mode-goto-line-ow)
+          (recenter))
+        (forward-line arg))
+    (error nil)))
+
+(defun helm-moccur-mode-goto-line-ow-forward ()
+  (interactive)
+  (helm-moccur-mode-goto-line-ow-forward-1 1))
+
+(defun helm-moccur-mode-goto-line-ow-backward ()
+  (interactive)
+  (helm-moccur-mode-goto-line-ow-forward-1 -1))
 
 (defun helm-moccur-save-results (_candidate)
   "Save helm moccur results in a `helm-moccur-mode' buffer."
