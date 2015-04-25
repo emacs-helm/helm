@@ -1,6 +1,6 @@
 ;;; helm-pkg.el --- define helm for package.el
 
-(define-package "helm" "1.6.9"
+(define-package "helm" "1.7.0"
   "Helm is an Emacs incremental and narrowing framework"
   '((emacs "24")
     (cl-lib "0.5")
