@@ -413,6 +413,10 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (define-key map (kbd "<C-up>")   'helm-moccur-mode-goto-line-ow-backward)
     (define-key map (kbd "<M-down>") 'helm-gm-next-file)
     (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
+    (define-key map (kbd "M-n")      'helm-moccur-mode-goto-line-ow-forward)
+    (define-key map (kbd "M-p")      'helm-moccur-mode-goto-line-ow-backward)
+    (define-key map (kbd "M-N")      'helm-gm-next-file)
+    (define-key map (kbd "M-P")      'helm-gm-precedent-file)
     map))
 
 (defun helm-moccur-mode-goto-line ()
