@@ -1558,7 +1558,9 @@ Return the result of last function call."
     (helm-log "functions = %S" functions)
     (helm-log "args = %S" args)
     (cl-loop with result for fn in funs
-          do (setq result (apply fn args)) finally return result)))
+          do (setq result (apply fn args))
+          and do (and (cdr args) (setcar args result))
+          finally return result)))
 
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function to SYM for each source if any."
@@ -1622,46 +1624,10 @@ in the source where point is."
            ;; See comment about this in `with-local-quit'.
            (eval '(ignore nil)))))
 
-(defun helm-compose (arg-lst func-lst)
-  "Apply arguments specified in ARG-LST with each function of FUNC-LST.
-The result of each function will be the new `car' of ARG-LST.
-Each function in FUNC-LST must accept (length ARG-LST) arguments
-\(See examples below) .
-This function allows easy sequencing of transformer functions.
-Where generally, ARG-LST is '(candidates-list source) and FUNC-LST a
-list of transformer functions that take one or two arguments depending
-we are using 'filtered-candidate-transformer' or 'candidate-transformer'.
-e.g
-filtered-candidate-transformer:
-\(helm-compose '((1 2 3 4 5 6 7)
-                '((name . \"A helm source\") (candidates . (a b c))))
-              '((lambda (candidates _source)
-                  (cl-loop for i in candidates
-                        when (cl-oddp i) collect i))
-                (lambda (candidates _source)
-                  (cl-loop for i in candidates collect (1+ i)))))
-=>(2 4 6 8)
-
-candidate-transformer:
-\(helm-compose '((1 2 3 4 5 6 7))
-                '((lambda (candidates)
-                  (cl-loop for i in candidates
-                        when (cl-oddp i) collect i))
-                (lambda (candidates)
-                  (cl-loop for i in candidates collect (1+ i)))))
-=> (2 4 6 8)."
-  (cl-dolist (func func-lst)
-    (setcar arg-lst (apply func arg-lst)))
-  (car arg-lst))
-
 (defun helm-composed-funcall-with-source (source funcs &rest args)
   "With SOURCE apply `helm-funcall-with-source' with each FUNCS and ARGS.
 This is used in transformers to modify candidates list."
-  (if (functionp funcs)
-      (apply 'helm-funcall-with-source source funcs args)
-    (apply 'helm-funcall-with-source source
-           (lambda (&rest oargs) (helm-compose oargs funcs))
-           args)))
+  (apply 'helm-funcall-with-source source funcs args))
 
 (defun helm-stringify (str-or-sym)
   "Get string of STR-OR-SYM."
