@@ -1559,7 +1559,7 @@ Return the result of last function call."
     (helm-log "args = %S" args)
     (cl-loop with result for fn in funs
           do (setq result (apply fn args))
-          and do (and (cdr args) (setcar args result))
+          when (cdr args) do (setcar args result)
           finally return result)))
 
 (defun helm-funcall-foreach (sym &optional sources)
