@@ -199,18 +199,6 @@
      ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face))))
 
 
-;;; Compatibility emacs-24.4+
-;; Inlined from Emacs trunk.
-(defalias 'function-put
-  ;; We don't want people to just use `put' because we can't conveniently
-  ;; hook into `put' to remap old properties to new ones.  But for now, there's
-  ;; no such remapping, so we just call `put'.
-  #'(lambda (f prop value) (put f prop value))
-  "Set function F's property PROP to VALUE.
-The namespace for PROP is shared with symbols.
-So far, F can only be a symbol, not a lambda expression.")
-
-
 ;;; Load the autoload file
 ;;  It should have been generated either by
 ;;  package.el or the make file.
