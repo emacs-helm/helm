@@ -211,7 +211,9 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-files-save-history-extra-sources '("Find" "Locate")
+(defcustom helm-files-save-history-extra-sources
+  '("Find" "Locate" "Recentf"
+    "Files in Current Directory" "File Cache")
   "Extras source that save candidate to `file-name-history'."
   :group 'helm-files
   :type '(repeat (choice string)))
