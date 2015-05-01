@@ -2260,20 +2260,22 @@ Use it for non--interactive calls of `helm-find-files'."
           :buffer "*Helm Find Files*")))
 
 (defun helm-find-files-toggle-to-bookmark ()
+  "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
   (interactive)
   (with-helm-buffer
     (if (setq helm-find-files--toggle-bookmark
               (not helm-find-files--toggle-bookmark))
         (progn
-          (helm-set-sources (unless (memq 'helm-source-bookmark-helm-find-files
-                                          helm-sources)
-                              (cons 'helm-source-bookmark-helm-find-files helm-sources)))
+          (helm-set-sources
+           (unless (memq 'helm-source-bookmark-helm-find-files
+                         helm-sources)
+             (cons 'helm-source-bookmark-helm-find-files helm-sources)))
           (helm-set-source-filter '(helm-source-bookmark-helm-find-files))
           (helm-set-pattern ""))
-          
+        ;; Switch back to helm-find-files.
         (helm-set-sources '(helm-source-find-files))
         (helm-set-source-filter nil)
-        (helm-set-pattern "./")
+        (helm-set-pattern "./") ; Back to initial directory of hff session.
         (helm-check-minibuffer-input))))
 
 (defun helm-find-files-initial-input (&optional input)
