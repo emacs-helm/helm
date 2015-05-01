@@ -1076,6 +1076,97 @@ If you are using git, I suggest you use [helm-ls-git](https://github.com/emacs-h
 
 Not complete.
 
+# The Helm workflow with files, directories and buffers
+
+Old helm users were used to throw many sources in one buffer (e.g helm-mini, helm-for-files)
+and just type in pattern to find their files, and use dired to open their directories.
+This approach is like in emacs based on default-directory and current-buffer and limit you to this
+zone, thus it leave tons of dired buffers open.
+Also one of the thing people like which is particularly inefficient is running helm-locate at the same
+time with all others source, an alternative of this have been done with `helm-multi-files` which prevent
+running locate at the same time with all other sources, but it is not the best you can do with helm.
+
+The new approach is using `helm-find-files` as a starting point and never open a dired buffer.
+You can see `helm-find-files` like a virtual dired buffer that you can use anywhere.
+From `helm-find-files`, you have access to many other helm commands (e.g grep, locate, find, etc...) and
+you are not limited to current directory, you can for example mark several files from different directories and
+run helm grep on them.
+Always from `helm-find-files` you can run `C-x C-d` (`helm-browse-project`) which allow you to see
+all buffers under this directory and all files in project.
+If you use [helm-ls-git](https://github.com/emacs-helm/helm-ls-git) and [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
+the files under this directory will be shown using the corresponding backend, otherwise, if the directory is not
+under version controls you will have to give a prefix arg the first time you run `C-c C-d` to see all files under
+this directory (recursively).
+At any time, you can switch back to `helm-find-files` using `C-x C-f`.
+During this session you can also switch back to the resumed helm sources you ran previously using `C-x C-b`, or the very last
+with `C-x b`.
+The history of your directories from `helm-find-files` is accessed with `M-p` and the full history of files (`file-name-history`) is
+accessed via `C-c h`.
+
+# Writing your own helm command
+
+You create helm command like any command in Emacs, and you invoke in this function `helm`.
+
+## Calling helm
+
+The function `helm` have to be called with several keywords args the mandatory one being `:sources`,
+the other important one (even if not mandatory) is `:buffer` because it will help `helm-resume` to retrieve your
+helm session.
+The `:sources` keyword expect a single source (an alist), a symbol naming the source, or a list of sources (symbols or alist)
+e.g
+
+- Symbols list: `:sources '(helm-source-1 helm-source-2 helm-source-3)`
+
+- Single symbol: `:sources 'helm-source-1`
+
+- Single alist: `:sources '((name . "test") (candidates . (a b c d)))`
+
+- List of alists: `:sources '(((name . "test") (candidates . (a b c d)))
+                              ((name . "test2") (candidates . (e f g h))))`
+
+
+Example:
+
+    (defun my-first-helm-command ()
+      (interactive)
+      (helm :sources 'my-source
+            :buffer "*helm my command*"))
+
+The name of the buffer should be prefixed this helm, again it is not mandatory but it will allow hiding
+this buffer in buffer list among other things.
+
+A convention is to name your sources if needed with the prefix `helm-source`.
+
+## Building sources
+
+The old way to build source was creating an alist with diverse attribute.
+
+The new way described here is to use the build in functions and classes provided in helm
+that use comprehensives keywords.
+
+You will find several methods to distribute you candidates, the main ones are:
+
+- Distribute your candidates in a list (`helm-source-sync`).
+
+- Distribute your candidates in a buffer (`helm-source-in-buffer`).
+
+- Distribute your candidates asyncronously using output of a process (`helm-source-async`).
+
+
+### Creating a source using the `helm-source-sync` class
+
+### Creating a source using the `helm-source-in-buffer` class
+
+### Creating a source using the `helm-source-async` class
+
+### Create your own class inheriting from one of the main classes
+
+### Create your source from your own class
+
+### Inherit from helm-type classes
+
+### Write your own helm-type class
+
 # Usefuls links
 
 You can have infos about helm on Github.
