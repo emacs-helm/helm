@@ -503,7 +503,7 @@ This version should accept the `--exclude-dir` option.
 
          brew tap homebrew/dupes
          brew install homebrew/dupes/grep
-   
+
     You should also set `helm-grep-default-command` to use `ggrep` instead of `grep`.
 
 ## Helm do grep
@@ -737,8 +737,8 @@ On Windows you should use Everything program that mimics locate, it is very
 fast and you don't need to update database manually. To use with
 helm-locate, you will need his command line named `es`. Be sure to
 modify the PATH environment variable, to include path to the directory
-that contain `es`. And be sure too that helm-locate-fuzzy-match is unset. Or 
-Everything will not give any results. 
+that contain `es`. And be sure too that helm-locate-fuzzy-match is unset. Or
+Everything will not give any results.
 
 
 # Helm findutils
@@ -1155,9 +1155,37 @@ You will find several methods to distribute you candidates, the main ones are:
 
 ### Creating a source using the `helm-source-sync` class
 
+     (helm-build-sync-source "test"
+       :candidates '(a b c d e))
+
+     (helm :sources (helm-build-sync-source "test"
+                      :candidates '(a b c d e))
+           :buffer "*helm test*")
+
+
 ### Creating a source using the `helm-source-in-buffer` class
 
+     (helm-build-in-buffer-source "test1"
+       :data '(a b c d e))
+
+     (helm :sources (helm-build-in-buffer-source "test1"
+                      :data '(a b c d e))
+           :buffer "*helm test1*")
+
+
 ### Creating a source using the `helm-source-async` class
+
+     (helm :sources (helm-build-async-source "test2"
+                     :candidates-process
+                     (lambda ()
+                       (let ((proc (start-process
+                                    "echo" helm-buffer "echo" "a\nb\nc\nd\ne")))
+                         (prog1
+                             proc
+                           (set-process-sentinel
+                            proc (lambda (process event) nil))))))
+           :buffer "*helm test2*")
+
 
 ### Create your own class inheriting from one of the main classes
 
@@ -1171,7 +1199,7 @@ You will find several methods to distribute you candidates, the main ones are:
 
 You can have infos about helm on Github.
  <https://github.com/emacs-helm/helm>
- 
+
  And a very detailed tutorial about the possibilities of Helm by the user Tuhdo:
   <http://tuhdo.github.io/helm-intro.html>
 
