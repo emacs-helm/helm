@@ -303,6 +303,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
     (define-key map (kbd "C-x r m")       'helm-ff-bookmark-set)
+    (define-key map (kbd "C-x r b")       'helm-find-files-toggle-to-bookmark)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -404,6 +405,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff--deleting-char-backward nil)
 (defvar helm-multi-files--toggle-locate nil)
 (defvar helm-ff--move-to-first-real-candidate t)
+(defvar helm-find-files--toggle-bookmark nil)
 
 
 ;;; Helm-find-files
@@ -2237,6 +2239,7 @@ Like `find-file' but with `helm' support.
 Use it for non--interactive calls of `helm-find-files'."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
+  (setq helm-find-files--toggle-bookmark nil)
   (let* ( ;; Be sure we don't erase the precedent minibuffer if some.
          (helm-ff-auto-update-initial-value
           (and helm-ff-auto-update-initial-value
@@ -2256,6 +2259,22 @@ Use it for non--interactive calls of `helm-find-files'."
           :prompt "Find Files or Url: "
           :buffer "*Helm Find Files*")))
 
+(defun helm-find-files-toggle-to-bookmark ()
+  (interactive)
+  (with-helm-buffer
+    (if (setq helm-find-files--toggle-bookmark
+              (not helm-find-files--toggle-bookmark))
+        (progn
+          (helm-set-sources (unless (memq 'helm-source-bookmark-helm-find-files
+                                          helm-sources)
+                              (cons 'helm-source-bookmark-helm-find-files helm-sources)))
+          (helm-set-source-filter '(helm-source-bookmark-helm-find-files))
+          (helm-set-pattern ""))
+          
+        (helm-set-sources '(helm-source-find-files))
+        (helm-set-source-filter nil)
+        (helm-set-pattern "./")
+        (helm-check-minibuffer-input))))
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
