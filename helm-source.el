@@ -143,7 +143,7 @@
     :custom (alist :key-type string
                    :value-type function)
     :documentation
-      "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
+    "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
   FUNCTION is called with one parameter: the selected candidate.
 
   An action other than the default can be chosen from this list
@@ -159,7 +159,7 @@
     :initform nil
     :custom function
     :documentation
-      "  Can be a either a Function called with one parameter (the
+    "  Can be a either a Function called with one parameter (the
   selected candidate) or a cons cell where first element is this
   same function and second element a symbol (e.g never-split)
   that inform `helm-execute-persistent-action'to not split his
@@ -194,7 +194,7 @@
     :initform nil
     :custom integer
     :documentation
-      "  If present matches from the source are shown only if the
+    "  If present matches from the source are shown only if the
   pattern is not empty. Optionally, it can have an integer
   parameter specifying the required length of input which is
   useful in case of sources with lots of candidates.")
@@ -204,7 +204,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-  "  It's a function or a list of functions called with one argument
+    "  It's a function or a list of functions called with one argument
   when the completion list from the source is built. The argument
   is the list of candidates retrieved from the source. The
   function should return a transformed list of candidates which
@@ -217,13 +217,13 @@
   Note that `candidates' is run already, so the given transformer
   function should also be able to handle candidates with (DISPLAY
   . REAL) format.")
-    
+   
    (filtered-candidate-transformer
     :initarg :filtered-candidate-transformer
     :initform nil
     :custom (choice function list)
     :documentation
-      "  It has the same format as `candidate-transformer', except the
+    "  It has the same format as `candidate-transformer', except the
   function is called with two parameters: the candidate list and
   the source.
 
@@ -252,7 +252,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-      "  A transformer function that treat candidates one by one.
+    "  A transformer function that treat candidates one by one.
   It is called with one arg the candidate.
   It is faster than `filtered-candidate-transformer' or
   `candidates-transformer', but should be used only in sources
@@ -297,7 +297,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-      "  It's a function or a list of functions called with two
+    "  It's a function or a list of functions called with two
   arguments when the action list from the source is
   assembled. The first argument is the list of actions, the
   second is the current selection.  If it is a list of functions,
@@ -313,7 +313,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-      "  It's a function or a list of functions called with one argument
+    "  It's a function or a list of functions called with one argument
   before computing matches. Its argument is `helm-pattern'.
   Functions should return transformed `helm-pattern'.
 
@@ -331,7 +331,7 @@
     :initform nil
     :custom boolean
     :documentation
-      "  Indicates the source assembles the candidate list dynamically,
+    "  Indicates the source assembles the candidate list dynamically,
   so it shouldn't be cached within a single Helm
   invocation. It is only applicable to synchronous sources,
   because asynchronous sources are not cached.")
@@ -341,7 +341,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-      "  List of functions called with one parameter: a candidate. The
+    "  List of functions called with one parameter: a candidate. The
   function should return non-nil if the candidate matches the
   current pattern (see variable `helm-pattern').
 
@@ -431,7 +431,7 @@
     :initform nil
     :custom function
     :documentation
-      "  It's a function called with one argument: the selected candidate.
+    "  It's a function called with one argument: the selected candidate.
   This function is intended for type convertion. In normal case,
   the selected candidate (string) is passed to action
   function. If coerce function is specified, it is called just
@@ -461,7 +461,7 @@
     :initform nil
     :custom function
     :documentation
-      "  Function called with no parameters at end of initialization
+    "  Function called with no parameters at end of initialization
   when `helm-resume' is started.
   If this function try to do something against `helm-buffer', \(e.g updating,
   searching etc...\) probably you should run it in a timer to ensure
@@ -704,36 +704,37 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-file)))
 
 (defmethod helm--setup-source :before ((source helm-type-file))
-    (set-slot-value source 'action
-          (helm-make-actions
-           "Find file"                            'helm-find-many-files
-           "Find file as root"                    'helm-find-file-as-root
-           "Find file other window"               'find-file-other-window
-           "Find file other frame"                'find-file-other-frame
-           "Open dired in file's directory"       'helm-open-dired
-           "Grep File(s) `C-u recurse'"           'helm-find-files-grep
-           "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
-           "Pdfgrep File(s)"                      'helm-ff-pdfgrep
-           "Insert as org link"                   'helm-files-insert-as-org-link
-           "Checksum File"                        'helm-ff-checksum
-           "Ediff File"                           'helm-find-files-ediff-files
-           "Ediff Merge File"                     'helm-find-files-ediff-merge-files
-           "Etags `M-., C-u tap, C-u C-u reload tag file'"
-           'helm-ff-etags-select
-           "View file"                            'view-file
-           "Insert file"                          'insert-file
-           "Add marked files to file-cache"       'helm-ff-cache-add-file
-           "Delete file(s)"                       'helm-delete-marked-files
-           "Open file externally (C-u to choose)" 'helm-open-file-externally
-           "Open file with default tool"          'helm-open-file-with-default-tool
-           "Find file in hex dump"                'hexl-find-file))
-    (set-slot-value source 'persistent-help "Show this file")
-    (set-slot-value source 'action-transformer '(helm-transform-file-load-el
-                                       helm-transform-file-browse-url
-                                       helm-transform-file-cache))
-    (set-slot-value source 'candidate-transformer '(helm-skip-boring-files
-                                          helm-highlight-files
-                                          helm-w32-pathname-transformer)))
+  (set-slot-value
+   source 'action
+   (helm-make-actions
+    "Find file"                            'helm-find-many-files
+    "Find file as root"                    'helm-find-file-as-root
+    "Find file other window"               'find-file-other-window
+    "Find file other frame"                'find-file-other-frame
+    "Open dired in file's directory"       'helm-open-dired
+    "Grep File(s) `C-u recurse'"           'helm-find-files-grep
+    "Zgrep File(s) `C-u Recurse'"          'helm-ff-zgrep
+    "Pdfgrep File(s)"                      'helm-ff-pdfgrep
+    "Insert as org link"                   'helm-files-insert-as-org-link
+    "Checksum File"                        'helm-ff-checksum
+    "Ediff File"                           'helm-find-files-ediff-files
+    "Ediff Merge File"                     'helm-find-files-ediff-merge-files
+    "Etags `M-., C-u tap, C-u C-u reload tag file'"
+    'helm-ff-etags-select
+    "View file"                            'view-file
+    "Insert file"                          'insert-file
+    "Add marked files to file-cache"       'helm-ff-cache-add-file
+    "Delete file(s)"                       'helm-delete-marked-files
+    "Open file externally (C-u to choose)" 'helm-open-file-externally
+    "Open file with default tool"          'helm-open-file-with-default-tool
+    "Find file in hex dump"                'hexl-find-file))
+  (set-slot-value source 'persistent-help "Show this file")
+  (set-slot-value source 'action-transformer '(helm-transform-file-load-el
+                                               helm-transform-file-browse-url
+                                               helm-transform-file-cache))
+  (set-slot-value source 'candidate-transformer '(helm-skip-boring-files
+                                                  helm-highlight-files
+                                                  helm-w32-pathname-transformer)))
 
 ;; Bookmarks
 (defclass helm-type-bookmark (helm-source) ()
@@ -742,15 +743,16 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
-  (set-slot-value source 'action (helm-make-actions
-                        "Jump to bookmark" 'helm-bookmark-jump
-                        "Jump to BM other window" 'helm-bookmark-jump-other-window
-                        "Bookmark edit annotation" 'bookmark-edit-annotation
-                        "Bookmark show annotation" 'bookmark-show-annotation
-                        "Delete bookmark(s)" 'helm-delete-marked-bookmarks
-                        "Edit Bookmark" 'helm-bookmark-edit-bookmark
-                        "Rename bookmark" 'helm-bookmark-rename
-                        "Relocate bookmark" 'bookmark-relocate))
+  (set-slot-value
+   source 'action (helm-make-actions
+                   "Jump to bookmark" 'helm-bookmark-jump
+                   "Jump to BM other window" 'helm-bookmark-jump-other-window
+                   "Bookmark edit annotation" 'bookmark-edit-annotation
+                   "Bookmark show annotation" 'bookmark-show-annotation
+                   "Delete bookmark(s)" 'helm-delete-marked-bookmarks
+                   "Edit Bookmark" 'helm-bookmark-edit-bookmark
+                   "Rename bookmark" 'helm-bookmark-rename
+                   "Relocate bookmark" 'bookmark-relocate))
   (set-slot-value source 'keymap helm-bookmark-map)
   (set-slot-value source 'mode-line helm-bookmark-mode-line-string))
 
@@ -761,32 +763,41 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
-  (set-slot-value source 'action (helm-make-actions
-                        "Switch to buffer(s)" 'helm-switch-to-buffers
-                        (lambda () (and (locate-library "popwin") "Switch to buffer in popup window"))
-                        'popwin:popup-buffer
-                        "Switch to buffer(s) other window `C-c o'"
-                        'helm-switch-to-buffers-other-window
-                        "Switch to buffer other frame `C-c C-o'" 'switch-to-buffer-other-frame
-                        (lambda () (and (locate-library "elscreen") "Display buffer in Elscreen"))
-                        'helm-find-buffer-on-elscreen
-                        "Query replace regexp `C-M-%'" 'helm-buffer-query-replace-regexp
-                        "Query replace `M-%'" 'helm-buffer-query-replace
-                        "View buffer" 'view-buffer
-                        "Display buffer" 'display-buffer
-                        "Grep buffers `M-g s' (C-u grep all buffers)" 'helm-zgrep-buffers
-                        "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action
-                        "Revert buffer(s) `M-U'" 'helm-revert-marked-buffers
-                        "Insert buffer" 'insert-buffer
-                        "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
-                        "Diff with file `C-='" 'diff-buffer-with-file
-                        "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
-                        "Ediff Merge marked buffers `M-='" (lambda (candidate)
-                                                             (helm-ediff-marked-buffers candidate t))))
-      (set-slot-value source 'persistent-help "Show this buffer")
-      (set-slot-value source 'filtered-candidate-transformer '(helm-skip-boring-buffers
-                                                     helm-buffers-sort-transformer
-                                                     helm-highlight-buffers)))
+  (set-slot-value
+   source 'action (helm-make-actions
+                   "Switch to buffer(s)" 'helm-switch-to-buffers
+                   (lambda () (and (locate-library "popwin")
+                                   "Switch to buffer in popup window"))
+                   'popwin:popup-buffer
+                   "Switch to buffer(s) other window `C-c o'"
+                   'helm-switch-to-buffers-other-window
+                   "Switch to buffer other frame `C-c C-o'"
+                   'switch-to-buffer-other-frame
+                   (lambda () (and (locate-library "elscreen")
+                                   "Display buffer in Elscreen"))
+                   'helm-find-buffer-on-elscreen
+                   "Query replace regexp `C-M-%'"
+                   'helm-buffer-query-replace-regexp
+                   "Query replace `M-%'" 'helm-buffer-query-replace
+                   "View buffer" 'view-buffer
+                   "Display buffer" 'display-buffer
+                   "Grep buffers `M-g s' (C-u grep all buffers)"
+                   'helm-zgrep-buffers
+                   "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action
+                   "Revert buffer(s) `M-U'" 'helm-revert-marked-buffers
+                   "Insert buffer" 'insert-buffer
+                   "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
+                   "Diff with file `C-='" 'diff-buffer-with-file
+                   "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
+                   "Ediff Merge marked buffers `M-='"
+                   (lambda (candidate)
+                     (helm-ediff-marked-buffers candidate t))))
+  (set-slot-value source 'persistent-help "Show this buffer")
+  (set-slot-value
+   source 'filtered-candidate-transformer
+   '(helm-skip-boring-buffers
+     helm-buffers-sort-transformer
+     helm-highlight-buffers)))
 
 ;; Functions
 (defclass helm-type-function (helm-source) ()
@@ -795,17 +806,20 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-function)))
 
 (defmethod helm--setup-source :before ((source helm-type-function))
-  (set-slot-value source 'action (helm-make-actions
-                         "Describe command" 'describe-function
-                         "Add command to kill ring" 'helm-kill-new
-                          "Go to command's definition" 'find-function
-                          "Debug on entry" 'debug-on-entry
-                          "Cancel debug on entry" 'cancel-debug-on-entry
-                          "Trace function" 'trace-function
-                          "Trace function (background)" 'trace-function-background
-                          "Untrace function" 'untrace-function))
-  (set-slot-value source 'action-transformer 'helm-transform-function-call-interactively)
-  (set-slot-value source 'candidate-transformer 'helm-mark-interactive-functions)
+  (set-slot-value
+   source 'action (helm-make-actions
+                   "Describe command" 'describe-function
+                   "Add command to kill ring" 'helm-kill-new
+                   "Go to command's definition" 'find-function
+                   "Debug on entry" 'debug-on-entry
+                   "Cancel debug on entry" 'cancel-debug-on-entry
+                   "Trace function" 'trace-function
+                   "Trace function (background)" 'trace-function-background
+                   "Untrace function" 'untrace-function))
+  (set-slot-value source 'action-transformer
+                  'helm-transform-function-call-interactively)
+  (set-slot-value source 'candidate-transformer
+                  'helm-mark-interactive-functions)
   (set-slot-value source 'coerce 'helm-symbolify))
 
 ;; Commands
@@ -815,9 +829,10 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-command)))
 
 (defmethod helm--setup-source :before ((source helm-type-command))
-  (set-slot-value source 'action (append (helm-make-actions
-                                          "Call interactively" 'helm-call-interactively)
-                                         (helm-actions-from-type-function)))
+  (set-slot-value
+   source 'action (append (helm-make-actions
+                           "Call interactively" 'helm-call-interactively)
+                          (helm-actions-from-type-function)))
   (set-slot-value source 'coerce 'helm-symbolify)
   (set-slot-value source 'persistent-action 'describe-function))
 
@@ -828,17 +843,19 @@ like `re-search-forward', see below documentation of :search slot.")
 (defmethod helm--setup-source :primary ((_source helm-type-timers)))
 
 (defmethod helm--setup-source :before ((source helm-type-timers))
-  (set-slot-value source 'action
-                  '(("Cancel Timer" . (lambda (_timer)
-                                        (let ((mkd (helm-marked-candidates)))
-                                          (cl-loop for timer in mkd
-                                                   do (cancel-timer timer)))))
-                    ("Describe Function" . (lambda (tm)
-                                             (describe-function (timer--function tm))))
-                    ("Find Function" . (lambda (tm)
-                                         (find-function (timer--function tm))))))
-  (set-slot-value source 'persistent-action (lambda (tm)
-                                              (describe-function (timer--function tm))))
+  (set-slot-value
+   source 'action
+   '(("Cancel Timer" . (lambda (_timer)
+                         (let ((mkd (helm-marked-candidates)))
+                           (cl-loop for timer in mkd
+                                    do (cancel-timer timer)))))
+     ("Describe Function" . (lambda (tm)
+                              (describe-function (timer--function tm))))
+     ("Find Function" . (lambda (tm)
+                          (find-function (timer--function tm))))))
+  (set-slot-value source 'persistent-action
+                  (lambda (tm)
+                    (describe-function (timer--function tm))))
   (set-slot-value source 'persistent-help "Describe Function"))
 
 
@@ -848,7 +865,7 @@ like `re-search-forward', see below documentation of :search slot.")
 (defun helm-default-init-source-in-buffer-function ()
   (helm-init-candidates-in-buffer 'global
     '("ERROR: No buffer handling your data, use either the `init' slot or the `data' slot.")))
-  
+
 
 ;;; Internal Builder functions.
 ;;
@@ -961,7 +978,7 @@ an eieio class."
            (helm-aif (or (slot-value source 'persistent-action)
                          (slot-value source 'action))
                (cond ((or (symbolp it) (functionp it))
-                          (helm-symbol-name it))
+                      (helm-symbol-name it))
                      ((listp it)
                       (let ((action (car it)))
                         ;; It comes from :action ("foo" . function).
@@ -977,25 +994,26 @@ an eieio class."
            " (keeping session)")))
 
 (defmethod helm--setup-source :primary ((_source helm-source)))
-  
+
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source 'keymap)
       (and (symbolp it) (set-slot-value source 'keymap (symbol-value it))))
   (set-slot-value source 'header-line (helm-source--header-line source))
   (helm-aif (slot-value source 'persistent-help)
-      (set-slot-value source 'header-line (helm-source--persistent-help-string it source)))
+      (set-slot-value source 'header-line
+                      (helm-source--persistent-help-string it source)))
   (when (and (slot-value source 'fuzzy-match) helm-fuzzy-sort-fn)
-      (set-slot-value source 'filtered-candidate-transformer
-            (helm-aif (slot-value source 'filtered-candidate-transformer)
-                (append (helm-mklist it)
-                        (list helm-fuzzy-sort-fn))
-              (list helm-fuzzy-sort-fn))))
+    (set-slot-value source 'filtered-candidate-transformer
+                    (helm-aif (slot-value source 'filtered-candidate-transformer)
+                        (append (helm-mklist it)
+                                (list helm-fuzzy-sort-fn))
+                      (list helm-fuzzy-sort-fn))))
   (unless (slot-value source 'nohighlight)
     (set-slot-value source 'filtered-candidate-transformer
-          (helm-aif (slot-value source 'filtered-candidate-transformer)
-              (append (helm-mklist it)
-                      (list #'helm-fuzzy-highlight-matches))
-            (list #'helm-fuzzy-highlight-matches)))))
+                    (helm-aif (slot-value source 'filtered-candidate-transformer)
+                        (append (helm-mklist it)
+                                (list #'helm-fuzzy-highlight-matches))
+                      (list #'helm-fuzzy-highlight-matches)))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
@@ -1003,11 +1021,11 @@ an eieio class."
   (when (slot-value source 'fuzzy-match)
     (helm-aif (slot-value source 'match)
         (set-slot-value source 'match (append (helm-mklist it)
-                                    (list helm-fuzzy-match-fn)))
+                                              (list helm-fuzzy-match-fn)))
       (set-slot-value source 'match helm-fuzzy-match-fn)))
   (when (slot-value source 'matchplugin)
     (set-slot-value source 'match
-          (helm-source-mp-get-search-or-match-fns source 'match))))
+                    (helm-source-mp-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source 'init)))
@@ -1027,10 +1045,11 @@ an eieio class."
   (when (slot-value source 'fuzzy-match)
     (helm-aif (slot-value source 'search)
         (set-slot-value source 'search (append (helm-mklist it)
-                                     (list helm-fuzzy-search-fn)))
+                                               (list helm-fuzzy-search-fn)))
       (set-slot-value source 'search (list helm-fuzzy-search-fn))))
   (when (slot-value source 'matchplugin)
-    (set-slot-value source 'search (helm-source-mp-get-search-or-match-fns source 'search)))
+    (set-slot-value
+     source 'search (helm-source-mp-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))

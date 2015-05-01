@@ -211,7 +211,9 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-files-save-history-extra-sources '("Find" "Locate")
+(defcustom helm-files-save-history-extra-sources
+  '("Find" "Locate" "Recentf"
+    "Files in Current Directory" "File Cache")
   "Extras source that save candidate to `file-name-history'."
   :group 'helm-files
   :type '(repeat (choice string)))
@@ -231,6 +233,10 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'string)
 
+(defcustom helm-find-files-bookmark-prefix "Helm-find-files: "
+  "bookmark name prefix of `helm-find-files' sessions."
+  :group 'helm-files
+  :type 'string)
 
 ;;; Faces
 ;;
@@ -483,21 +489,23 @@ Should not be used among other sources.")
   "The `bookmark-make-record-function' for `helm-find-files'."
   (with-helm-buffer
     `((filename . ,helm-ff-default-directory)
-      (presel . ,(helm-get-selection nil t))
+      (presel . ,(helm-get-selection))
       (handler . helm-ff-bookmark-jump))))
 
 (defun helm-ff-bookmark-jump (bookmark)
   "bookmark handler for `helm-find-files'."
   (let ((fname (bookmark-prop-get bookmark 'filename))
         (presel (bookmark-prop-get bookmark 'presel)))
-    (helm-find-files-1 fname presel)))
+    (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
+                                 (helm-basename presel)
+                                 presel))))
 
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
   (interactive)
   (with-helm-buffer
     (bookmark-set
-     (concat "Helm-find-files: "
+     (concat helm-find-files-bookmark-prefix
              (abbreviate-file-name helm-ff-default-directory))))
   (message "Helm find files session bookmarked! "))
 
@@ -2794,6 +2802,21 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 ;; <https://github.com/emacs-helm/helm-ls-hg>
 ;; Only hg and git are supported for now.
 (defvar helm--browse-project-cache (make-hash-table :test 'equal))
+
+(defun helm-browse-project-get-buffers (root-directory)
+  (cl-loop for b in (helm-buffer-list)
+           for bf = (buffer-file-name (get-buffer b)) 
+           when (and bf (file-in-directory-p bf root-directory))
+           collect b))
+
+(defun helm-browse-project-build-buffers-source (directory)
+  (helm-make-source "Buffers in project" 'helm-source-buffers
+    :header-name (lambda (name)
+                   (format
+                    "%s (%s)"
+                    name (abbreviate-file-name directory)))
+    :buffer-list (lambda () (helm-browse-project-get-buffers directory))))
+
 (defun helm-browse-project-find-files (directory &optional refresh)
   (when refresh (remhash directory helm--browse-project-cache))
   (unless (gethash directory helm--browse-project-cache)
@@ -2801,25 +2824,26 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                         directory
                         :directories nil :path 'full :skip-subdirs t)
              helm--browse-project-cache))
-  (helm :sources (helm-build-in-buffer-source "Browse project"
-                   :data (gethash directory helm--browse-project-cache)
-                   :header-name (lambda (name)
-                                  (format
-                                   "%s (%s)"
-                                   name (abbreviate-file-name directory)))
-                   :match-part (lambda (c)
-                                 (if helm-ff-transformer-show-only-basename
-                                     (helm-basename c) c))
-                   :filter-one-by-one
-                   (lambda (c)
-                     (if helm-ff-transformer-show-only-basename
-                         (cons (propertize (helm-basename c)
-                                           'face 'helm-ff-file)
-                               c)
-                       (propertize c 'face 'helm-ff-file)))
-                   :mode-line helm-generic-file-mode-line-string
-                   :keymap helm-generic-files-map
-                   :action (helm-actions-from-type-file))
+  (helm :sources `(,(helm-browse-project-build-buffers-source directory)
+                   ,(helm-build-in-buffer-source "Browse project"
+                     :data (gethash directory helm--browse-project-cache)
+                     :header-name (lambda (name)
+                                    (format
+                                     "%s (%s)"
+                                     name (abbreviate-file-name directory)))
+                     :match-part (lambda (c)
+                                   (if helm-ff-transformer-show-only-basename
+                                       (helm-basename c) c))
+                     :filter-one-by-one
+                     (lambda (c)
+                       (if helm-ff-transformer-show-only-basename
+                           (cons (propertize (helm-basename c)
+                                             'face 'helm-ff-file)
+                                 c)
+                           (propertize c 'face 'helm-ff-file)))
+                     :mode-line helm-generic-file-mode-line-string
+                     :keymap helm-generic-files-map
+                     :action (helm-actions-from-type-file))) 
         :buffer "*helm browse project*"))
 
 ;;;###autoload
@@ -2834,7 +2858,7 @@ If the current directory is found in the cache, start
 `helm-browse-project-find-files' even with no prefix ARG.
 NOTE: The prefix ARG have no effect on the VCS controlled directories.
 
-Need dependencies for VCS:
+Needed dependencies for VCS:
 <https://github.com/emacs-helm/helm-ls-git.git>
 and
 <https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>."
@@ -2850,7 +2874,8 @@ and
         (t (let ((cur-dir (helm-current-directory)))
              (if (or arg (gethash cur-dir helm--browse-project-cache)) 
                  (helm-browse-project-find-files cur-dir (equal arg '(16)))
-               (helm-find-files nil))))))
+               (helm :sources (helm-browse-project-build-buffers-source cur-dir)
+                     :buffer "*helm browse project*"))))))
 
 (defun helm-ff-browse-project (_candidate)
   "Browse project in current directory.

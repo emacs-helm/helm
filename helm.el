@@ -1558,7 +1558,8 @@ Return the result of last function call."
     (helm-log "functions = %S" functions)
     (helm-log "args = %S" args)
     (cl-loop with result for fn in funs
-          do (setq result (apply fn args)) finally return result)))
+             do (setq result (apply fn args))
+             finally return result)))
 
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function to SYM for each source if any."
@@ -1659,9 +1660,9 @@ candidate-transformer:
 This is used in transformers to modify candidates list."
   (if (functionp funcs)
       (apply 'helm-funcall-with-source source funcs args)
-    (apply 'helm-funcall-with-source source
-           (lambda (&rest oargs) (helm-compose oargs funcs))
-           args)))
+      (apply 'helm-funcall-with-source source
+             (lambda (&rest oargs) (helm-compose oargs funcs))
+             args)))
 
 (defun helm-stringify (str-or-sym)
   "Get string of STR-OR-SYM."

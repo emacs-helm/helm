@@ -93,7 +93,9 @@ NOTE: This will be slow on large org buffers."
 
 (defun helm-get-org-candidates-in-file (filename min-depth max-depth
                                         &optional fontify nofname)
-  (with-current-buffer (find-file-noselect filename)
+  (with-current-buffer (pcase filename
+                         ((pred bufferp) filename)
+                         ((pred stringp) (find-file-noselect filename)))
     (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify 'match-string 'match-string-no-properties)))
       (save-excursion
@@ -121,10 +123,11 @@ NOTE: This will be slow on large org buffers."
 ;;;###autoload
 (defun helm-org-in-buffer-headings ()
   (interactive)
-  (helm :sources (helm-source-org-headings-for-files
-                  (list (buffer-file-name (current-buffer))))
-        :candidate-number-limit 99999
-        :buffer "*helm org inbuffer*"))
+  (let ((helm-org-headings--nofilename t))
+    (helm :sources (helm-source-org-headings-for-files
+                    (list (current-buffer)))
+          :candidate-number-limit 99999
+          :buffer "*helm org inbuffer*")))
 
 ;;;###autoload
 (defun helm-org-capture-templates ()

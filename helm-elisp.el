@@ -356,7 +356,7 @@ If SYM is not documented, return \"Not documented\"."
                           (end-of-line)
                           (search-backward tap (point-at-bol) t)
                           (setq beg (point))
-                          (looking-back "[^'`( ]")))
+                          (looking-back "[^'`( ]" 1)))
                     (expand-file-name
                      (substring-no-properties tap))))
          (end  (point))
@@ -390,7 +390,7 @@ Filename completion happen if string start after or between a double quote."
     (if (and tap (save-excursion
                    (end-of-line)
                    (search-backward tap (point-at-bol) t)
-                   (looking-back "[^'`( ]")))
+                   (looking-back "[^'`( ]" 1)))
         (helm-complete-file-name-at-point)
       (helm-lisp-completion-at-point))))
 
@@ -530,17 +530,20 @@ Filename completion happen if string start after or between a double quote."
               ("Find Function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
 
-(defun helm-info-lookup-symbol (candidate)
+(defun helm-info-lookup-symbol-1 (c)
   (let ((helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
          `(lambda ()
-            (message "`%s' Not Documented as a symbol" ,candidate))))
+            (message "`%s' Not Documented as a symbol" ,c))))
     (helm :sources '(helm-source-info-elisp
                      helm-source-info-cl
                      helm-source-info-eieio)
           :resume 'noresume
           :buffer "*helm lookup*"
-          :input candidate)))
+          :input c)))
+
+(defun helm-info-lookup-symbol (candidate)
+  (run-with-timer 0.1 nil #'helm-info-lookup-symbol-1 candidate))
 
 ;;;###autoload
 (defun helm-apropos ()

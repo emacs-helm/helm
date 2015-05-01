@@ -39,6 +39,22 @@
   :group 'helm-bookmark
   :type 'boolean)
 
+(defcustom helm-bookmark-default-filtered-sources
+  (append '(helm-source-bookmark-files&dirs
+            helm-source-bookmark-helm-find-files
+            helm-source-bookmark-info
+            helm-source-bookmark-gnus
+            helm-source-bookmark-man
+            helm-source-bookmark-images
+            helm-source-bookmark-w3m)
+          (and (locate-library "addressbook-bookmark")
+               (list 'helm-source-bookmark-addressbook))
+          (list 'helm-source-bookmark-uncategorized
+                'helm-source-bookmark-set))
+  "List of sources to use in `helm-filtered-bookmarks'."
+  :group 'helm-bookmark
+  :type '(repeat (choice symbol)))
+
 
 (defface helm-bookmark-info
     '((t (:foreground "green")))
@@ -760,17 +776,7 @@ e.g prepended with *."
 Optional source `helm-source-bookmark-addressbook' is loaded
 only if external library addressbook-bookmark.el is available."
   (interactive)
-  (helm :sources (append '(helm-source-bookmark-files&dirs
-                           helm-source-bookmark-helm-find-files
-                           helm-source-bookmark-info
-                           helm-source-bookmark-gnus
-                           helm-source-bookmark-man
-                           helm-source-bookmark-images
-                           helm-source-bookmark-w3m)
-                         (and (locate-library "addressbook-bookmark")
-                              (list 'helm-source-bookmark-addressbook))
-                         (list helm-source-bookmark-uncategorized
-                               'helm-source-bookmark-set))
+  (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
         :default (list (thing-at-point 'symbol)

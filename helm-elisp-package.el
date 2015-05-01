@@ -20,6 +20,18 @@
 (require 'helm)
 (require 'package)
 
+(defgroup helm-el-package nil
+  "helm elisp packages."
+  :group 'helm)
+
+(defcustom helm-el-package-initial-filter 'all
+  "Show only installed, upgraded or all packages at startup."
+  :group 'helm-el-package
+  :type '(radio :tag "Initial filter for elisp packages"
+          (const :tag "Show all packages" all)
+          (const :tag "Show installed packages" installed)
+          (const :tag "Show upgradable packages" upgrade)))
+
 ;; internals vars
 (defvar helm-el-package--show-only 'all)
 (defvar helm-el-package--initialized-p nil)
@@ -45,7 +57,7 @@
   (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
   (if helm-force-updating-p
       (message "Refreshing packages list done")
-      (setq helm-el-package--show-only 'all))
+      (setq helm-el-package--show-only helm-el-package-initial-filter))
   (kill-buffer "*Packages*"))
 
 (defun helm-el-package-describe (candidate)
