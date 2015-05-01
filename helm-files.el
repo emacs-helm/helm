@@ -1436,6 +1436,54 @@ or when `helm-pattern' is equal to \"~/\"."
         (helm-set-pattern input)
         (helm-check-minibuffer-input)))))
 
+(defcustom helm-dabbrev-aliases
+   '(("t" . "/temp"))
+  "Helm path alias definition alist.
+This variable allows to define aliases that will be later
+automatically expanded when inserted into the `helm-files' search
+pattern with a `:' prefix. It enables quick navigation to the
+aliased paths in a manner similar to the root or home directory
+auto-expansion via `~/' and `//'.  
+
+For instance, assuming a \(\"t\" . \"/temp\"\) alias is
+configured in `helm-dabbrev-aliases', entering `:t' followed by
+`/' at the end of the search pattern will take you immediately to
+the `/temp' directory. Obviously the same works for paths of arbitrary
+complexity."
+  :type '(alist :key-type string :value-type string)
+  :group 'helm-dabbrev)
+
+(defun helm-ff-auto-expand-alias ()
+  "Allow expanding any aliases configured in `helm-dabbrev-aliases' to
+  the corresponding path."
+  (when (and (helm-file-completion-source-p)
+             (string-match
+              "/:\\(.*\\)/"
+              helm-pattern)
+             (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
+             (not (string-match helm-ff-url-regexp helm-pattern)))
+    (let* ((alias (match-string 1 helm-pattern))
+           (subst (cdr (assoc alias helm-dabbrev-aliases)))
+           (input (if subst (expand-file-name
+                             subst
+                             (and (memq system-type '(windows-nt ms-dos))
+                                  (getenv "SystemDrive")) ; nil on Unix.
+                             )
+                    ;; remove the alias reference if substitution not found
+                    (replace-regexp-in-string                  
+                     (concat ":" alias "/") "" helm-pattern)))
+           )
+      (if (file-directory-p input)
+          (setq helm-ff-default-directory
+                (setq input (file-name-as-directory input)))
+        (setq helm-ff-default-directory (file-name-as-directory
+                                         (file-name-directory input))))
+      (with-helm-window
+        (helm-set-pattern input)
+        (helm-check-minibuffer-input)))))
+
+                                   
+
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
 On windows system substitute from start up to \"/[[:lower:]]:/\".
@@ -1460,6 +1508,7 @@ and should be used carefully elsewhere, or not at all, using
 
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
+(add-hook 'helm-after-update-hook 'helm-ff-auto-expand-alias)
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
