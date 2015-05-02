@@ -2657,7 +2657,10 @@ Helm plug-ins are realized by this function."
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
-                             (helm-interpret-value candidate-proc source)
+                             ;; Calling `helm-interpret-value' with no
+                             ;; SOURCE arg force the use of `funcall'
+                             ;; and not `helm-funcall-with-source'.
+                             (helm-interpret-value candidate-proc)
                            (helm-interpret-value candidate-fn source))
                        (error (helm-log "Error: %S" err) nil))))
     (when (and (processp candidates) (not candidate-proc))
