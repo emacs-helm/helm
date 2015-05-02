@@ -72,9 +72,8 @@ Find here the documentation of all sources actually documented."
       (erase-buffer)
       (cl-loop for elm in helm-help--string-list
             for str = (symbol-value elm)
-            do (if (functionp str)
-                   (insert (funcall str))
-                 (insert str)))))
+            do (insert (substitute-command-keys
+                        (if (functionp str) (funcall str) str))))))
   (let ((helm-org-headings--nofilename t))
     (helm :sources (helm-source-org-headings-for-files
                     (list helm-documentation-file))
