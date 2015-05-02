@@ -1176,16 +1176,10 @@ You will find several methods to distribute you candidates, the main ones are:
 ### Creating a source using the `helm-source-async` class
 
      (helm :sources (helm-build-async-source "test2"
-                     :candidates-process
-                     (lambda ()
-                       (let ((proc (start-process
-                                    "echo" helm-buffer "echo" "a\nb\nc\nd\ne")))
-                         (prog1
-                             proc
-                           (set-process-sentinel
-                            proc (lambda (process event) nil))))))
+                      :candidates-process
+                      (lambda ()
+                        (start-process "echo" nil "echo" "a\nb\nc\nd\ne")))
            :buffer "*helm test2*")
-
 
 ### Create your own class inheriting from one of the main classes
 
