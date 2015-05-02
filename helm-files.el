@@ -213,7 +213,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
 
 (defcustom helm-files-save-history-extra-sources
   '("Find" "Locate" "Recentf"
-    "Files in Current Directory" "File Cache")
+    "Files from Current Directory" "File Cache")
   "Extras source that save candidate to `file-name-history'."
   :group 'helm-files
   :type '(repeat (choice string)))
