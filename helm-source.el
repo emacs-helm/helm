@@ -570,9 +570,14 @@ Matching is done basically with `string-match' against each candidate.")
     :initform nil
     :custom function
     :documentation
-    "  You should use this attribute when using a function involving
-  an async process instead of `candidates'.
-  The function must return a process.")
+    "  This attribute is used to define a process as candidate.
+  The value must be a process.
+  
+  NOTE:
+  When building the source at runtime you can give directly a process
+  as value, otherwise wrap the process call into a function.
+  The process buffer should be nil, otherwise, if you use
+  `helm-buffer' give to the process a sentinel.")
 
    (matchplugin :initform nil)
    (dont-plug :initform '(helm-compile-source--match-plugin
