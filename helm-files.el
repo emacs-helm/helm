@@ -3059,15 +3059,15 @@ utility mdfind.")
 (defun helm-findutils-transformer (candidates _source)
   (cl-loop for i in candidates
            for type = (car (file-attributes i))    
-        for abs = (expand-file-name i (helm-default-directory))
-        for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (string-match "[.]\\{1,2\\}$" i)))
-                       (helm-basename i) abs)
-        collect (cond ((eq t type)
-                       (cons (propertize disp 'face 'helm-ff-directory) abs))
-                      ((stringp type)
-                       (cons (propertize disp 'face 'helm-ff-symlink) abs))
-                      (t (cons (propertize disp 'face 'helm-ff-file) abs)))))
+           for abs = (expand-file-name i (helm-default-directory))
+           for disp = (if (and helm-ff-transformer-show-only-basename
+                               (not (string-match "[.]\\{1,2\\}$" i)))
+                          (helm-basename i) abs)
+           collect (cond ((eq t type)
+                          (cons (propertize disp 'face 'helm-ff-directory) abs))
+                         ((stringp type)
+                          (cons (propertize disp 'face 'helm-ff-symlink) abs))
+                         (t (cons (propertize disp 'face 'helm-ff-file) abs)))))
 
 (defun helm-find-shell-command-fn ()
   "Asynchronously fetch candidates for `helm-find'.
@@ -3125,12 +3125,11 @@ separator."
                              (replace-regexp-in-string "\n" "" event)))))))))
 
 (defun helm-find-1 (dir)
-  (helm :sources 'helm-source-findutils
-        :buffer "*helm find*"
-        ;; Make these vars local for further resuming.
-        :default-directory dir ; reset it when called from elsewhere.
-        :ff-transformer-show-only-basename nil
-        :case-fold-search helm-file-name-case-fold-search))
+  (let ((default-directory (file-name-as-directory dir)))
+    (helm :sources 'helm-source-findutils
+          :buffer "*helm find*"
+          :ff-transformer-show-only-basename nil
+          :case-fold-search helm-file-name-case-fold-search)))
 
 ;; helm-find-files integration.
 (defun helm-ff-find-sh-command (_candidate)
