@@ -215,7 +215,11 @@ If no entry in cache, create one."
                   ;; Match only the tag part of CANDIDATE
                   ;; and not the filename.
                   (if helm-etags-match-part-only
-                      (cadr (helm-etags-split-line candidate))
+                      ;; Ignore the first part of the tag
+                      ;; which is irrelevant
+                      ;;(e.g in "(cl-defun foo" search only if "foo" match)
+                      (cadr (split-string
+                             (cadr (helm-etags-split-line candidate))))
                       candidate))
     :mode-line helm-etags-mode-line-string
     :keymap helm-etags-map
