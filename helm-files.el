@@ -2266,17 +2266,13 @@ Use it for non--interactive calls of `helm-find-files'."
     (if (setq helm-find-files--toggle-bookmark
               (not helm-find-files--toggle-bookmark))
         (progn
-          (helm-set-sources
-           (unless (memq 'helm-source-bookmark-helm-find-files
-                         helm-sources)
-             (cons 'helm-source-bookmark-helm-find-files helm-sources)))
-          (helm-set-source-filter '(helm-source-bookmark-helm-find-files))
+          (helm-set-sources '(helm-source-bookmark-helm-find-files))
+          (helm-set-source-filter nil)
           (helm-set-pattern ""))
         ;; Switch back to helm-find-files.
         (helm-set-sources '(helm-source-find-files))
-        (helm-set-source-filter nil)
         (helm-set-pattern "./") ; Back to initial directory of hff session.
-        (helm-check-minibuffer-input))))
+        (helm-set-source-filter nil))))
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
