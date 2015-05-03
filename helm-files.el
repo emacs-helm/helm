@@ -435,6 +435,7 @@ Should not be used among other sources.")
    (mode-line :initform helm-ff-mode-line-string)
    (volatile :initform t)
    (nohighlight :initform t)
+   (keymap :initform helm-find-files-map)
    (candidate-number-limit
     :initform 9999)
    (action-transformer
@@ -2253,7 +2254,6 @@ Use it for non--interactive calls of `helm-find-files'."
     (helm :sources 'helm-source-find-files
           :input fname
           :case-fold-search helm-file-name-case-fold-search
-          :keymap helm-find-files-map
           :preselect preselect
           :default def
           :prompt "Find Files or Url: "
@@ -2266,13 +2266,12 @@ Use it for non--interactive calls of `helm-find-files'."
     (if (setq helm-find-files--toggle-bookmark
               (not helm-find-files--toggle-bookmark))
         (progn
-          (helm-set-sources '(helm-source-bookmark-helm-find-files))
-          (helm-set-source-filter nil)
-          (helm-set-pattern ""))
+          (helm-set-pattern "" t)
+          (helm-set-sources '(helm-source-bookmark-helm-find-files)))
         ;; Switch back to helm-find-files.
+        (helm-set-pattern "./" t) ; Back to initial directory of hff session.
         (helm-set-sources '(helm-source-find-files))
-        (helm-set-pattern "./") ; Back to initial directory of hff session.
-        (helm-set-source-filter nil))))
+        (helm--maybe-update-keymap)))) 
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
