@@ -324,10 +324,10 @@ but the initial search for all candidates in buffer(s)."
           ;; Iterator is now empty, reset dabbrev to initial value
           ;; and start helm completion.
           (unless cycling-disabled-p
-            (delete-region (car limits) (point))
             (setq dabbrev old-dabbrev
                   limits  (helm-dabbrev-info-limits helm-dabbrev--data))
             (setq helm-dabbrev--data nil)
+            (delete-region (car limits) (point))
             (insert dabbrev))
           (with-helm-show-completion (car limits) (cdr limits)
             (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
