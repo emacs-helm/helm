@@ -1185,12 +1185,15 @@ arg TYPE is an existing type defined in `helm-type-attributes'."
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (let ((len (length seq)))
-    (when (> index len) (setq index len))
-    (cl-loop for i in seq
-          for count from 1 collect i
-          when (= count index)
-          if (listp elm) append elm
-          else collect elm)))
+    (cond ((> index len) (setq index len))
+          ((< index 0) (setq index 0)))
+    (if (zerop index)
+        (append elm seq)
+        (cl-loop for i in seq
+                 for count from 1 collect i
+                 when (= count index)
+                 if (listp elm) append elm
+                 else collect elm))))
 
 (defun helm-add-action-to-source (name fn source &optional index)
   "Add new action NAME linked to function FN to SOURCE.
