@@ -312,6 +312,14 @@ but the initial search for all candidates in buffer(s)."
             ;; Move already tried candidates to end of list.
             (setq helm-dabbrev--cache (append (remove it helm-dabbrev--cache)
                                               (list it))))
+        ;; When there is only one candidate in cache
+        ;; and the iterator have been consumed, no need
+        ;; to reset dabbrev, which will have for effect
+        ;; to reinitialize an iterator of one candidate
+        ;; and reinsert the same thing which is already inserted infinitely.
+        (when (and (null (cdr helm-dabbrev--cache))
+                   (string= (car helm-dabbrev--cache) dabbrev))
+          (setq cycling-disabled-p t))
         (unless cycling-disabled-p
           (delete-region (car limits) (point))
           (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev--data)
