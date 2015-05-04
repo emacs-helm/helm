@@ -3275,8 +3275,10 @@ is done on whole `helm-buffer' and not on current source."
         (helm-log "end update")))))
 
 ;; Update keymap after updating.
-;; Putting this in a hook allow users to disable it.
-(add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
+;; Now we run this in post-command-hook, it is
+;; probably no more needed in helm-after-update-hook.
+;; Leave it commented as a reminder for now.
+;; (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
 
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
