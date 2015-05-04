@@ -281,29 +281,31 @@ but the initial search for all candidates in buffer(s)."
     (unless (or cycling-disabled-p
                 (helm-dabbrev-info-p helm-dabbrev--data))
       (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev))
-      (setq helm-dabbrev--data (make-helm-dabbrev-info
-                                :dabbrev dabbrev
-                                :limits limits
-                                :iterator
-                                (helm-iter-list
-                                 (cl-loop for i in helm-dabbrev--cache when
-                                       (and i (string-match
-                                               (concat "^" (regexp-quote dabbrev)) i))
-                                       collect i into selection
-                                       when (and selection
-                                                 (= (length selection)
-                                                    helm-dabbrev-cycle-threshold))
-                                       ;; When selection len reach
-                                       ;; `helm-dabbrev-cycle-threshold'
-                                       ;; return selection.
-                                       return selection
-                                       ;; selection len never reach
-                                       ;; `helm-dabbrev-cycle-threshold'
-                                       ;; return selection.
-                                       finally return selection)))))
+      (setq helm-dabbrev--data
+            (make-helm-dabbrev-info
+             :dabbrev dabbrev
+             :limits limits
+             :iterator
+             (helm-iter-list
+              (cl-loop for i in helm-dabbrev--cache when
+                       (and i (string-match
+                               (concat "^" (regexp-quote dabbrev)) i))
+                       collect i into selection
+                       when (and selection
+                                 (= (length selection)
+                                    helm-dabbrev-cycle-threshold))
+                       ;; When selection len reach
+                       ;; `helm-dabbrev-cycle-threshold'
+                       ;; return selection.
+                       return selection
+                       ;; selection len never reach
+                       ;; `helm-dabbrev-cycle-threshold'
+                       ;; return selection.
+                       finally return selection)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)
+      ;; Cycle until iterator is consumed.
       (helm-aif (and iter (helm-iter-next iter))
           (progn
             (helm-insert-completion-at-point
@@ -312,31 +314,32 @@ but the initial search for all candidates in buffer(s)."
             ;; Move already tried candidates to end of list.
             (setq helm-dabbrev--cache (append (remove it helm-dabbrev--cache)
                                               (list it))))
-        ;; When there is only one candidate in cache
-        ;; and the iterator have been consumed, no need
-        ;; to reset dabbrev, which will have for effect
-        ;; to reinitialize an iterator of one candidate
-        ;; and reinsert the same thing which is already inserted infinitely.
-        (when (and (null (cdr helm-dabbrev--cache))
-                   (string= (car helm-dabbrev--cache) dabbrev))
-          (setq cycling-disabled-p t))
-        (unless cycling-disabled-p
-          (delete-region (car limits) (point))
-          (setq dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev--data)
-                limits  (helm-dabbrev-info-limits helm-dabbrev--data))
-          (setq helm-dabbrev--data nil)
-          (insert dabbrev))
-        (with-helm-show-completion (car limits) (cdr limits)
-          (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
-                           :data helm-dabbrev--cache
-                           :persistent-action 'ignore
-                           :persistent-help "DoNothing"
-                           :keymap helm-dabbrev-map
-                           :action 'helm-dabbrev-default-action)
-                :buffer "*helm dabbrev*"
-                :input (concat "^" dabbrev " ")
-                :resume 'noresume
-                :allow-nest t))))))
+        ;; If the length of candidates is only one when computed
+        ;; that's mean the unique matched item have already been
+        ;; inserted by the iterator, so no need to reinsert the old dabbrev,
+        ;; just let helm exiting with "No expansion found".
+        (let ((old-dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev--data)))
+          (unless (cdr (all-completions old-dabbrev helm-dabbrev--cache))
+            (setq cycling-disabled-p t))
+          ;; Iterator is now empty, reset dabbrev to initial value
+          ;; and start helm completion.
+          (unless cycling-disabled-p
+            (delete-region (car limits) (point))
+            (setq dabbrev old-dabbrev
+                  limits  (helm-dabbrev-info-limits helm-dabbrev--data))
+            (setq helm-dabbrev--data nil)
+            (insert dabbrev))
+          (with-helm-show-completion (car limits) (cdr limits)
+            (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
+                             :data helm-dabbrev--cache
+                             :persistent-action 'ignore
+                             :persistent-help "DoNothing"
+                             :keymap helm-dabbrev-map
+                             :action 'helm-dabbrev-default-action)
+                  :buffer "*helm dabbrev*"
+                  :input (concat "^" dabbrev " ")
+                  :resume 'noresume
+                  :allow-nest t)))))))
 
 (provide 'helm-dabbrev)
 
