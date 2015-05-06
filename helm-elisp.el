@@ -543,7 +543,7 @@ Filename completion happen if string start after or between a double quote."
           :input c)))
 
 (defun helm-info-lookup-symbol (candidate)
-  (run-with-timer 0.1 nil #'helm-info-lookup-symbol-1 candidate))
+  (run-with-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate))
 
 ;;;###autoload
 (defun helm-apropos ()
