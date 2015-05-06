@@ -2017,29 +2017,49 @@ Return candidates prefixed with basename of `helm-input' first."
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
-  (cond ((with-helm-current-buffer
-           (eq major-mode 'message-mode))
-         (append actions
-                 '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
-        ((string-match (image-file-name-regexp) candidate)
-         (append actions
-                 '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
-                   ("Rotate image left `M-l'" . helm-ff-rotate-image-left))))
-        ((string-match "\.el$" (helm-aif (helm-marked-candidates)
-                                   (car it) candidate))
-         (append actions
-                 '(("Byte compile lisp file(s) `M-B, C-u to load'"
-                    . helm-find-files-byte-compile)
-                   ("Load File(s) `M-L'" . helm-find-files-load-files))))
-        ((and (string-match "\.html?$" candidate)
-              (file-exists-p candidate))
-         (append actions
-                 '(("Browse url file" . browse-url-of-file))))
-        ((or (string= (file-name-extension candidate) "pdf")
-             (string= (file-name-extension candidate) "PDF"))
-         (append actions
-                 '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
-        (t actions)))
+  (let ((str-at-point (with-helm-current-buffer
+                        (buffer-substring-no-properties
+                         (point-at-bol) (point-at-eol)))))
+    (cond ((with-helm-current-buffer
+             (eq major-mode 'message-mode))
+           (append actions
+                   '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
+          ((and (not (string-match-p ffap-url-regexp str-at-point))
+                (string-match-p ":\\([0-9]+\\)\\'" str-at-point))
+           (append '(("Find file to line number" . helm-ff-goto-line))
+                   actions))
+          ((string-match (image-file-name-regexp) candidate)
+           (append actions
+                   '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
+                     ("Rotate image left `M-l'" . helm-ff-rotate-image-left))))
+          ((string-match "\.el$" (helm-aif (helm-marked-candidates)
+                                     (car it) candidate))
+           (append actions
+                   '(("Byte compile lisp file(s) `M-B, C-u to load'"
+                      . helm-find-files-byte-compile)
+                     ("Load File(s) `M-L'" . helm-find-files-load-files))))
+          ((and (string-match "\.html?$" candidate)
+                (file-exists-p candidate))
+           (append actions
+                   '(("Browse url file" . browse-url-of-file))))
+          ((or (string= (file-name-extension candidate) "pdf")
+               (string= (file-name-extension candidate) "PDF"))
+           (append actions
+                   '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
+          (t actions))))
+
+(defun helm-ff-goto-line (candidate)
+  "Find file CANDIDATE and maybe jump to line number found in fname at point.
+line number should be added at end of fname preceded with \":\".
+e.g \"foo:12\"."
+  (let ((linum (let ((str (with-helm-current-buffer
+                            (buffer-substring-no-properties
+                             (point-at-bol) (point-at-eol)))))
+                 (when (string-match ":\\([0-9]+\\)\\'" str)
+                   (match-string 1 str)))))
+    (find-file candidate)
+    (and linum (not (string= linum ""))
+         (helm-goto-line (string-to-number linum) t))))
 
 (defun helm-ff-gnus-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
