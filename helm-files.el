@@ -2024,8 +2024,10 @@ Return candidates prefixed with basename of `helm-input' first."
              (eq major-mode 'message-mode))
            (append actions
                    '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
-          ((and (not (string-match-p ffap-url-regexp str-at-point))
-                (string-match-p ":\\([0-9]+\\)\\'" str-at-point))
+          ((save-match-data
+             (and (not (string-match-p ffap-url-regexp str-at-point))
+                  (string-match "\\(.*\\):\\([0-9]+\\)\\'" str-at-point)
+                  (file-equal-p (match-string 1 str-at-point) candidate)))
            (append '(("Find file to line number" . helm-ff-goto-line))
                    actions))
           ((string-match (image-file-name-regexp) candidate)
