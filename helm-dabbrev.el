@@ -318,7 +318,9 @@ but the initial search for all candidates in buffer(s)."
         ;; that's mean the unique matched item have already been
         ;; inserted by the iterator, so no need to reinsert the old dabbrev,
         ;; just let helm exiting with "No expansion found".
-        (let ((old-dabbrev (helm-dabbrev-info-dabbrev helm-dabbrev--data)))
+        (let ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
+                               (helm-dabbrev-info-dabbrev helm-dabbrev--data)
+                               dabbrev)))
           (unless (cdr (all-completions old-dabbrev helm-dabbrev--cache))
             (setq cycling-disabled-p t))
           ;; Iterator is now empty, reset dabbrev to initial value
