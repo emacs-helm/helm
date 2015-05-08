@@ -1612,7 +1612,8 @@ purpose."
                          ;; Add the final "/" to path
                          ;; when `helm-ff-auto-update-flag' is enabled.
                          (file-name-as-directory path)
-                         (file-name-directory path))))
+                         (if (string= path "") "/"
+                             (file-name-directory path)))))
       (setq helm-ff-default-directory
             (if (string= helm-pattern "")
                 (expand-file-name "/")  ; Expand to "/" or "c:/"
