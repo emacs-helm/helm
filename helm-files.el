@@ -2020,16 +2020,18 @@ Return candidates prefixed with basename of `helm-input' first."
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
                         (buffer-substring-no-properties
-                         (point-at-bol) (point-at-eol)))))
+                         (point-at-bol) (point-at-eol))))
+        (fname-at-point (with-helm-current-buffer (ffap-guesser))))
     (cond ((with-helm-current-buffer
              (eq major-mode 'message-mode))
            (append actions
                    '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
           ((save-match-data
              (and (not (string-match-p ffap-url-regexp str-at-point))
-                  (string-match "\\(.*\\):\\([0-9]+\\)\\'" str-at-point)
+                  (string-match (concat "\\(" fname-at-point "\\):\\([0-9]+:?\\)")
+                                str-at-point)
                   (file-equal-p (match-string 1 str-at-point) candidate)))
-           (append '(("Find file to line number" . helm-ff-goto-line))
+           (append '(("Find file to line number" . helm-ff-goto-linum))
                    actions))
           ((string-match (image-file-name-regexp) candidate)
            (append actions
@@ -2051,15 +2053,17 @@ Return candidates prefixed with basename of `helm-input' first."
                    '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
           (t actions))))
 
-(defun helm-ff-goto-line (candidate)
+(defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
 line number should be added at end of fname preceded with \":\".
 e.g \"foo:12\"."
   (let ((linum (let ((str (with-helm-current-buffer
                             (buffer-substring-no-properties
-                             (point-at-bol) (point-at-eol)))))
-                 (when (string-match ":\\([0-9]+\\)\\'" str)
-                   (match-string 1 str)))))
+                             (point-at-bol) (point-at-eol))))
+                     (fname (with-helm-current-buffer (ffap-guesser))))
+                 (when (string-match
+                        (concat "\\(" fname "\\):\\([0-9]+:?\\)") str)
+                   (match-string 2 str)))))
     (find-file candidate)
     (and linum (not (string= linum ""))
          (helm-goto-line (string-to-number linum) t))))
