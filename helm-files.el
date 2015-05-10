@@ -1365,7 +1365,8 @@ or when `helm-pattern' is equal to \"~/\"."
                             (helm-create-tramp-name helm-pattern)
                           helm-pattern))
            (completed-p (string= (file-name-as-directory
-                                  (expand-file-name pat))
+                                  (expand-file-name
+                                   (substitute-in-file-name pat)))
                                  helm-ff-default-directory))
            (candnum (helm-get-candidate-number)))
       (when (and (or
