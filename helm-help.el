@@ -437,7 +437,8 @@ The directory selection with \"**foo/\" like bash shopt globstar option is not s
 *** Bookmark your `helm-find-files' session
 
 You can bookmark your `helm-find-files' session with `C-x r m'.
-You can retrieve later these bookmarks easily by using M-x helm-filtered-bookmarks.
+You can retrieve later these bookmarks easily by using M-x helm-filtered-bookmarks
+or from the current `helm-find-files' session just hitting `C-x r b'.
 
 \n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
