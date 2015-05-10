@@ -1515,15 +1515,15 @@ purpose."
     ;; In some rare cases tramp can return a nil input,
     ;; so be sure pattern is a string for safety (Issue #476).
     (unless pattern (setq pattern ""))
-    (cond ((string-match "\\`\\$" pattern)
+    (cond ((string-match helm-ff-url-regexp pattern) pattern)
+          ((string-match "\\`\\$" pattern)
            (substitute-in-file-name pattern))
           ((string= pattern "") "")
           ((string-match "\\`[.]\\{1,2\\}/\\'" pattern)
            (expand-file-name pattern))
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
            (expand-file-name default-directory))
-          ((and (string-match ".*\\(~//\\|//\\)\\'" pattern)
-                (not (string-match helm-ff-url-regexp helm-pattern)))
+          ((string-match ".*\\(~//\\|//\\)\\'" pattern)
            (expand-file-name "/")) ; Expand to "/" or "c:/"
           ((string-match "\\`\\(~/\\|.*/~/\\)\\'" pattern)
            (expand-file-name "~/"))
