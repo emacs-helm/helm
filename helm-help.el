@@ -333,16 +333,23 @@ Italic     => A non--file buffer.
   "\n* Helm Find Files\n
 
 ** Helm find files tips:
-\n*** Enter `~/' at end of pattern to quickly reach home directory.
 
-*** Enter `/' at end of pattern to quickly reach root of your file system.
+*** Quick pattern expansion:
 
-*** Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
+\n**** Enter `~/' at end of pattern to quickly reach home directory.
+
+**** Enter `/' at end of pattern to quickly reach root of your file system.
+
+**** Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session).
   If you are already in `default-directory' this will move cursor on top.
 
-*** Enter `../' at end of pattern will reach upper directory, moving cursor on top.
-  NOTE: This different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
+**** Enter `../' at end of pattern will reach upper directory, moving cursor on top.
+  NOTE: This is different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
   subdir name.
+
+**** Enter any environment var (e.g `$HOME') at end of pattern, it will be expanded.
+
+**** You can yank any valid filename after pattern, it will be expanded.
 
 *** You can complete with partial basename (start on third char entered)
 
