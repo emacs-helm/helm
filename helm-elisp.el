@@ -356,7 +356,7 @@ If SYM is not documented, return \"Not documented\"."
                           (end-of-line)
                           (search-backward tap (point-at-bol) t)
                           (setq beg (point))
-                          (looking-back "[^'`( ]" 1)))
+                          (looking-back "[^'`( ]" (1- (point)))))
                     (expand-file-name
                      (substring-no-properties tap))))
          (end  (point))
@@ -390,7 +390,7 @@ Filename completion happen if string start after or between a double quote."
     (if (and tap (save-excursion
                    (end-of-line)
                    (search-backward tap (point-at-bol) t)
-                   (looking-back "[^'`( ]" 1)))
+                   (looking-back "[^'`( ]" (1- (point)))))
         (helm-complete-file-name-at-point)
       (helm-lisp-completion-at-point))))
 

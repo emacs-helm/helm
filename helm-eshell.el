@@ -178,7 +178,7 @@ The function that call this should set `helm-ec-target' to thing at point."
          (args (catch 'eshell-incomplete
                  (eshell-parse-arguments beg end)))
          (target
-          (or (and (looking-back " " 1) " ")
+          (or (and (looking-back " " (1- (point))) " ")
               (buffer-substring-no-properties
                (save-excursion
                  (eshell-backward-argument 1) (point))
@@ -232,7 +232,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                  :resume 'noresume
                  :input input))
       (when (and flag-empty
-                 (looking-back " " 1))
+                 (looking-back " " (1- (point))))
         (delete-char -1)))))
 
 (provide 'helm-eshell)
