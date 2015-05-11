@@ -769,8 +769,6 @@
 (make-obsolete-variable 'helm-c-grep-default-directory-fn 'helm-grep-default-directory-fn "1.5.1")
 (defvaralias 'helm-c-apt-input-history 'helm-apt-input-history)
 (make-obsolete-variable 'helm-c-apt-input-history 'helm-apt-input-history "1.5.1")
-(defvaralias 'helm-async-be-async 'dired-async-be-async)
-(make-obsolete-variable 'helm-async-be-async 'dired-async-be-async "1.5.9")
 
 
 (provide 'helm-aliases)
