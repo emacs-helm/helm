@@ -32,7 +32,6 @@
 (require 'ffap)
 (require 'dired-aux)
 (require 'dired-x)
-(require 'dired-async nil t)
 (require 'tramp)
 (require 'image-dired)
 
