@@ -524,6 +524,8 @@ for current buffer."
            (save-selected-window
              (other-window 1)
              default-directory)
+           ;; Using the car of *ff-history allow
+           ;; allow staying in the directory visited instead of current.
            (or (car-safe helm-ff-history) default-directory))))))
 
 (defun helm-find-files-do-action (action)
