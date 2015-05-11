@@ -524,7 +524,7 @@ for current buffer."
            (save-selected-window
              (other-window 1)
              default-directory)
-           (or (car-safe helm-ff-history) default-directory))))))
+           (or (car-safe (cdr helm-ff-history)) default-directory))))))
 
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
@@ -554,8 +554,9 @@ ACTION must be an action supported by `helm-dired-action'."
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
-                      :preselect (if helm-ff-transformer-show-only-basename
-                                     (helm-basename cand) cand)
+                      :preselect (unless (cdr ifiles)
+                                   (if helm-ff-transformer-show-only-basename
+                                       (helm-basename cand) cand))
                       :initial-input (helm-dwim-target-directory)
                       :history (helm-find-files-history :comp-read nil))))))
     (helm-dired-action
