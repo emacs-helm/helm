@@ -2384,7 +2384,7 @@ Find inside `require' and `declare-function' sexp."
 ;;; Handle copy, rename, symlink, relsymlink and hardlink from helm.
 ;;
 ;;
-(defvar dired-async-be-async)
+(defvar dired-async-mode)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
@@ -2407,21 +2407,21 @@ copy and rename."
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
                       (not (file-directory-p candidate))))
-        ;; When FOLLOW is enabled, disable helm-async.
-        ;; If it is globally disabled use this nil value.
-        (dired-async-be-async (and (boundp 'dired-async-be-async)
-                                   dired-async-be-async
-                                   (not follow))))
-    (dired-create-files
-     fn (symbol-name action) files
-     ;; CANDIDATE is the destination.
-     (if (file-directory-p candidate)
-         ;; When CANDIDATE is a directory, build file-name in this directory.
-         ;; Else we use CANDIDATE.
-         #'(lambda (from)
-             (expand-file-name (file-name-nondirectory from) candidate))
-       #'(lambda (_from) candidate))
-     marker)
+        (dired-async-state (if dired-async-mode 1 -1)))
+    (and follow (fboundp 'dired-async-mode) (dired-async-mode -1))
+    (unwind-protect
+         (dired-create-files
+          fn (symbol-name action) files
+          ;; CANDIDATE is the destination.
+          (if (file-directory-p candidate)
+              ;; When CANDIDATE is a directory, build file-name in this directory.
+              ;; Else we use CANDIDATE.
+              #'(lambda (from)
+                  (expand-file-name (file-name-nondirectory from) candidate))
+              #'(lambda (_from) candidate))
+          marker)
+      (and (fboundp 'dired-async-mode)
+           (dired-async-mode dired-async-state)))
     (push (file-name-as-directory
            (if (file-directory-p candidate)
                (expand-file-name candidate)
