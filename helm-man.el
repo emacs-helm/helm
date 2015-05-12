@@ -20,6 +20,8 @@
 (require 'cl-lib)
 (require 'helm)
 
+(defvar woman-topic-all-completions)
+(declare-function woman-file-name "woman.el" (topic &optional re-cache))
 (declare-function woman-file-name-all-completions "woman.el" (topic))
 (declare-function Man-getpage-in-background "man.el" (topic))
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
@@ -36,7 +38,7 @@
           (const :tag "Woman" woman)))
 
 ;; Internal
-(defvar helm-man-pages nil
+(defvar helm-man--pages nil
   "All man pages on system.
 Will be calculated the first time you invoke helm with this
 source.")
@@ -59,37 +61,34 @@ source.")
              (Man-getpage-in-background candidate)))))
 
 (defvar helm-source-man-pages
-  '((name . "Manual Pages")
-    (init . (lambda ()
-              (require 'woman)
-              (require 'helm-utils)
-              (unless helm-man-pages
-                (setq helm-man-pages
-                      (ignore-errors
-                        (woman-file-name "" t)
-                        (sort (mapcar 'car woman-topic-all-completions)
-                              'string-lessp))))
-              (helm-init-candidates-in-buffer 'global helm-man-pages)))
-    (candidates-in-buffer)
-    (persistent-action . ignore)
-    (filtered-candidate-transformer
-     . (lambda (candidates _source)
-         (sort candidates #'helm-generic-sort-fn)))
-    (action  . (("Display Man page" . helm-man-default-action)))
-    ;; Woman does not work OS X
-    ;; http://xahlee.org/emacs/modernization_man_page.html
-    (action-transformer . (lambda (actions candidate)
-                            (if (eq system-type 'darwin)
-                                '(("Display Man page" . man))
-                              actions)))))
+  (helm-build-in-buffer-source "Manual Pages"
+    :init (lambda ()
+            (require 'woman)
+            (require 'helm-utils)
+            (unless helm-man--pages
+              (setq helm-man--pages
+                    (ignore-errors
+                      (woman-file-name "" t)
+                      (sort (mapcar 'car woman-topic-all-completions)
+                            'string-lessp))))
+            (helm-init-candidates-in-buffer 'global helm-man--pages))
+    :persistent-action #'ignore
+    :filtered-candidate-transformer
+     (lambda (candidates _source)
+       (sort candidates #'helm-generic-sort-fn))
+    :action  '(("Display Man page" . helm-man-default-action))))
 
 ;;;###autoload
 (defun helm-man-woman (arg)
   "Preconfigured `helm' for Man and Woman pages.
 With a prefix arg reinitialize the cache."
   (interactive "P")
-  (when arg (setq helm-man-pages nil))
-  (helm-other-buffer 'helm-source-man-pages "*Helm man woman*"))
+  (when arg (setq helm-man--pages nil))
+  (let ((default (thing-at-point 'symbol)))
+    (helm :sources 'helm-source-man-pages
+          :buffer "*Helm man woman*"
+          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
+
 
 (provide 'helm-man)
 
