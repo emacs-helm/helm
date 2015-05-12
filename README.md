@@ -1,7 +1,7 @@
 [![License GPL 3][badge-license]](http://www.gnu.org/licenses/gpl-3.0.txt)
 [![MELPA](http://melpa.org/packages/helm-badge.svg)](http://melpa.org/#/helm)
 [![MELPA Stable](http://stable.melpa.org/packages/helm-badge.svg)](http://stable.melpa.org/#/helm)
-[![Gratipay](http://img.shields.io/gratipay/thierryvolpiatto.svg)](https://www.gratipay.com/thierryvolpiatto/)
+
 
 Emacs-helm
 ==========
