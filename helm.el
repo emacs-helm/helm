@@ -873,7 +873,9 @@ when `helm' is keyboard-quitted.")
 (defvar helm--in-update nil)
 (defvar helm--in-fuzzy nil)
 (defvar helm--maybe-use-default-as-input nil
-  "Use :default arg of `helm' as input to update display.
+  "Flag to notify the use of use-default-as-input.
+Use only in let-bindings.
+Use :default arg of `helm' as input to update display.
 Note that if also :input is specified as `helm' arg, it will take
 precedence on :default.")
 
