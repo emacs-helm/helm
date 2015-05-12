@@ -21,9 +21,14 @@
 (require 'helm)
 
 (defvar woman-topic-all-completions)
+(defvar woman-manpath)
+(defvar woman-path)
+(defvar woman-expanded-directory-path)
 (declare-function woman-file-name "woman.el" (topic &optional re-cache))
 (declare-function woman-file-name-all-completions "woman.el" (topic))
 (declare-function Man-getpage-in-background "man.el" (topic))
+(declare-function woman-expand-directory-path "woman.el" (path-dirs path-regexps))
+(declare-function woman-topic-all-completions "woman.el" (path))
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
 
 (defgroup helm-man nil
@@ -66,10 +71,12 @@ source.")
             (require 'woman)
             (require 'helm-utils)
             (unless helm-man--pages
-              (setq helm-man--pages
-                    (progn
-                      (woman-file-name "" t)
-                      (mapcar 'car woman-topic-all-completions))))
+              (setq woman-expanded-directory-path
+                    (woman-expand-directory-path woman-manpath woman-path))
+              (message "Building completion list of all manual topics...")
+              (setq woman-topic-all-completions
+                    (woman-topic-all-completions woman-expanded-directory-path))
+              (setq helm-man--pages (mapcar 'car woman-topic-all-completions)))
             (helm-init-candidates-in-buffer 'global helm-man--pages))
     :persistent-action #'ignore
     :filtered-candidate-transformer
