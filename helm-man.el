@@ -65,19 +65,20 @@ source.")
       (error (kill-buffer)              ; Kill woman buffer.
              (Man-getpage-in-background candidate)))))
 
+(defun helm-man--init ()
+  (require 'woman)
+  (require 'helm-utils)
+  (unless helm-man--pages
+    (setq woman-expanded-directory-path
+          (woman-expand-directory-path woman-manpath woman-path))
+    (setq woman-topic-all-completions
+          (woman-topic-all-completions woman-expanded-directory-path))
+    (setq helm-man--pages (mapcar 'car woman-topic-all-completions)))
+  (helm-init-candidates-in-buffer 'global helm-man--pages))
+
 (defvar helm-source-man-pages
   (helm-build-in-buffer-source "Manual Pages"
-    :init (lambda ()
-            (require 'woman)
-            (require 'helm-utils)
-            (unless helm-man--pages
-              (setq woman-expanded-directory-path
-                    (woman-expand-directory-path woman-manpath woman-path))
-              (message "Building completion list of all manual topics...")
-              (setq woman-topic-all-completions
-                    (woman-topic-all-completions woman-expanded-directory-path))
-              (setq helm-man--pages (mapcar 'car woman-topic-all-completions)))
-            (helm-init-candidates-in-buffer 'global helm-man--pages))
+    :init #'helm-man--init 
     :persistent-action #'ignore
     :filtered-candidate-transformer
      (lambda (candidates _source)
