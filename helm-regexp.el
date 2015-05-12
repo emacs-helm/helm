@@ -561,7 +561,8 @@ Special commands:
         :buffer "*helm occur*"
         :history 'helm-grep-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
-                        (format "%s:%d:" (buffer-name) (line-number-at-pos (point))))
+                        (format "%s:%d:" (regexp-quote (buffer-name))
+                                (line-number-at-pos (point))))
         :truncate-lines t))
 
 ;;;###autoload
