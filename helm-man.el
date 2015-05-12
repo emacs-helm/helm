@@ -67,10 +67,9 @@ source.")
             (require 'helm-utils)
             (unless helm-man--pages
               (setq helm-man--pages
-                    (ignore-errors
+                    (progn
                       (woman-file-name "" t)
-                      (sort (mapcar 'car woman-topic-all-completions)
-                            'string-lessp))))
+                      (mapcar 'car woman-topic-all-completions))))
             (helm-init-candidates-in-buffer 'global helm-man--pages))
     :persistent-action #'ignore
     :filtered-candidate-transformer
@@ -84,11 +83,8 @@ source.")
 With a prefix arg reinitialize the cache."
   (interactive "P")
   (when arg (setq helm-man--pages nil))
-  (let ((default (thing-at-point 'symbol)))
     (helm :sources 'helm-source-man-pages
-          :buffer "*Helm man woman*"
-          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
-
+          :buffer "*Helm man woman*"))
 
 (provide 'helm-man)
 
