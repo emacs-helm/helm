@@ -472,7 +472,7 @@ will have no effect until this mode will be disabled."
                                                  helm-source-info-elisp
                                                  helm-source-etags-select
                                                  helm-source-man-pages)
-  "List of helm sources that need to use `helm-maybe-use-default-as-input'.
+  "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
 will be used as input."
   :group 'helm
@@ -751,11 +751,6 @@ and before performing action.")
   "Quit when there is no candidates when non--nil.
 This variable accepts a function, which is executed if no candidate.")
 
-(defvar helm-maybe-use-default-as-input nil
-  "Use :default arg of `helm' as input to update display.
-Note that if also :input is specified as `helm' arg, it will take
-precedence on :default.")
-
 (defvar helm-source-in-each-line-flag nil
   "Non-nil means add helm-source text-property in each candidate.
 experimental feature.")
@@ -877,6 +872,11 @@ when `helm' is keyboard-quitted.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
 (defvar helm--in-fuzzy nil)
+(defvar helm--maybe-use-default-as-input nil
+  "Use :default arg of `helm' as input to update display.
+Note that if also :input is specified as `helm' arg, it will take
+precedence on :default.")
+
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -1744,7 +1744,7 @@ Initially selected candidate.  Specified by exact candidate or a regexp.
 A default argument that will be inserted in minibuffer \
 with \\<minibuffer-local-map>\\[next-history-element].
 When nil or not present `thing-at-point' will be used instead.
-If `helm-maybe-use-default-as-input' is non--nil display will be
+If `helm--maybe-use-default-as-input' is non--nil display will be
 updated using :default arg as input unless :input is specified,
 which in this case will take precedence on :default
 This is a string or a list, in this case the car of the list will
@@ -1877,8 +1877,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (let ((non-essential t)
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
-        (helm-maybe-use-default-as-input
-         (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
+        (helm--maybe-use-default-as-input
+         (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
              (cl-loop for s in (helm-normalize-sources any-sources)
                       thereis (memq s helm-sources-using-default-as-input)))))
     ;; cua-mode overhide local helm bindings.
@@ -2283,7 +2283,7 @@ It is intended to use this only in `helm-initial-setup'."
                                     (member (assoc-default 'name s)
                                             helm-source-filter))
                                 (helm-get-sources))))
-  (setq helm-pattern (or (and helm-maybe-use-default-as-input
+  (setq helm-pattern (or (and helm--maybe-use-default-as-input
                               (or (if (listp any-default)
                                       (car any-default) any-default)
                                   (with-helm-current-buffer
@@ -2388,11 +2388,15 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; display if no result found with precedent value of `helm-pattern'
       ;; unless `helm-quit-if-no-candidate' is non--nil, in this case
       ;; Don't force update with an empty pattern.
-      ;; Reset also `helm-maybe-use-default-as-input' as this checking
+      ;; Reset also `helm--maybe-use-default-as-input' as this checking
       ;; happen only on startup.
-      (when (and helm-maybe-use-default-as-input (not source-delayed-p))
+      (when (and helm--maybe-use-default-as-input (not source-delayed-p))
+        ;; Store value of default temporarily here waiting next update
+        ;; to allow action like helm-moccur-action matching pattern
+        ;; at the place it jump to.
+        (setq helm-input helm-pattern)
         (setq helm-pattern "")
-        (setq helm-maybe-use-default-as-input nil)
+        (setq helm--maybe-use-default-as-input nil)
         (and (helm-empty-buffer-p)
              (null helm-quit-if-no-candidate)
              (helm-force-update)))
@@ -2602,14 +2606,14 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   "Check INPUT string and update the helm buffer if necessary."
   ;; First time minibuffer is entered
   ;; we check value of `helm-pattern' that have been set
-  ;; in `helm-initial-setup' when `helm-maybe-use-default-as-input'
+  ;; in `helm-initial-setup' when `helm--maybe-use-default-as-input'
   ;; is non--nil.  After this initial check, reset
-  ;; `helm-maybe-use-default-as-input' and ignore this.
+  ;; `helm--maybe-use-default-as-input' and ignore this.
   ;; This happen only when source is `delayed'.
-  (when helm-maybe-use-default-as-input ; nil when non--delayed.
+  (when helm--maybe-use-default-as-input ; nil when non--delayed.
     (setq input helm-pattern)
     (with-helm-after-update-hook (setq helm-pattern ""))
-    (setq helm-maybe-use-default-as-input nil))
+    (setq helm--maybe-use-default-as-input nil))
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)

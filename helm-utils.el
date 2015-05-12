@@ -691,7 +691,7 @@ Useful in dired buffers when there is inserted subdirs."
     (catch 'empty-line
       (cl-loop with ov
                for r in (helm-remove-if-match
-                         "\\`!" (split-string helm-pattern))
+                         "\\`!" (split-string helm-input))
                do (save-excursion
                     (goto-char start-match)
                     (while (condition-case _err
