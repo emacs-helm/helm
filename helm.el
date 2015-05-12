@@ -470,7 +470,8 @@ will have no effect until this mode will be disabled."
 
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
                                                  helm-source-info-elisp
-                                                 helm-source-etags-select)
+                                                 helm-source-etags-select
+                                                 helm-source-man-pages)
   "List of helm sources that need to use `helm-maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
 will be used as input."
