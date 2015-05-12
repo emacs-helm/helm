@@ -48,9 +48,9 @@ Should take one arg: the string to display."
                               (eldoc-fnsym-in-current-sexp .
                                elisp--fnsym-in-current-sexp) 
                               (eldoc-get-fnsym-args-string .
-                               elisp--get-fnsym-args-string) 
+                               elisp-get-fnsym-args-string) 
                               (eldoc-get-var-docstring .
-                               elisp--get-var-docstring))
+                               elisp-get-var-docstring))
              unless (fboundp f)
              do (defalias f a))
     ;; Emacs-24.
