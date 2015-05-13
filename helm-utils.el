@@ -37,7 +37,10 @@
 
 (defcustom helm-yank-text-at-point-function nil
   "The function used to forward point with `helm-yank-text-at-point'.
-When nil fallback to default `forward-word'."
+With a nil value, fallback to default `forward-word'.
+The function should take one arg, an integer like `forward-word'.
+NOTE: Using `forward-symbol' here is not very useful as it is already
+provided by \\<helm-map>\\[next-history-element]."
   :type  'function
   :group 'helm-utils)
 
