@@ -35,10 +35,10 @@
   :type 'string
   :group 'helm-utils)
 
-(defcustom helm-yank-symbol-first nil
-  "`helm-yank-text-at-point' yanks symbol at point on first
-invocation if this is non-nil."
-  :type  'boolean
+(defcustom helm-yank-text-at-point-function nil
+  "The function used to forward point with `helm-yank-text-at-point'.
+When nil fallback to default `forward-word'."
+  :type  'function
   :group 'helm-utils)
 
 (defcustom helm-default-kbsize 1024.0
@@ -811,8 +811,7 @@ If `helm-yank-symbol-first' is non--nil the first yank
 grabs the entire symbol."
   (interactive)
   (with-helm-current-buffer
-    (let ((fwd-fn (if helm-yank-symbol-first
-                      'forward-symbol 'forward-word)))
+    (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word)))
       ;; Start to initial point if C-w have never been hit.
       (unless helm-yank-point (setq helm-yank-point (point)))
       (save-excursion
