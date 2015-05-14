@@ -1398,6 +1398,9 @@ of \(action-display . function\)."
          ;; we don't lost the action added by transformer
          ;; when there is marked candidates and selection
          ;; moved to an unrelated candidate.
+         ;; FIXME some candidates unrelated to action
+         ;; and candidates related to action
+         ;; can be marked altogether, check this.
          (car (helm-marked-candidates)))
       (helm-attr 'action))))
 
