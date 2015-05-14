@@ -1103,7 +1103,11 @@ with `C-x b`.
 The history of your directories from `helm-find-files` is accessed with `M-p` and the full history of files (`file-name-history`) is
 accessed via `C-c h`.
 
-# Writing your own helm command
+# Developping using helm framework
+
+## Conventions
+
+## Writing your own helm commands
 
 You create helm command like any command in Emacs, and you invoke in this function `helm`.
 
@@ -1183,11 +1187,11 @@ You will find several methods to distribute you candidates, the main ones are:
 
 ### Create your own class inheriting from one of the main classes
 
-### Create your source from your own class
-
-### Inherit from helm-type classes
+### Create your own class and Inherit from one of helm-type classes
 
 ### Write your own helm-type class
+
+### Create your source from your own class
 
 # Usefuls links
 

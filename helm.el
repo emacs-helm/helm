@@ -1392,7 +1392,13 @@ of \(action-display . function\)."
     (helm-aif (helm-attr 'action-transformer)
         (helm-composed-funcall-with-source
          (helm-get-current-source) it
-         (helm-attr 'action) (helm-get-selection))
+         (helm-attr 'action)
+         ;; Use the car of of helm-marked-candidates
+         ;; instead of helm-get-selection insure
+         ;; we don't lost the action added by transformer
+         ;; when there is marked candidates and selection
+         ;; moved to an unrelated candidate.
+         (car (helm-marked-candidates)))
       (helm-attr 'action))))
 
 (defun helm-get-current-source ()
