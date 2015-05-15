@@ -1393,15 +1393,18 @@ of \(action-display . function\)."
         (helm-composed-funcall-with-source
          (helm-get-current-source) it
          (helm-attr 'action)
-         ;; Use the car of of helm-marked-candidates
-         ;; instead of helm-get-selection insure
-         ;; we don't lost the action added by transformer
-         ;; when there is marked candidates and selection
-         ;; moved to an unrelated candidate.
-         ;; FIXME some candidates unrelated to action
-         ;; and candidates related to action
-         ;; can be marked altogether, check this.
-         (car (helm-marked-candidates)))
+         ;; Check if the first given transformer
+         ;; returns the same set of actions for each
+         ;; candidate in marked candidates.
+         ;; If so use the car of marked to determine
+         ;; the set of actions, otherwise use the selection.
+         (if (cl-loop with marked = (helm-marked-candidates)
+                      with act = (car (helm-mklist it))
+                      with acts = (funcall act nil (car marked))
+                      for c in marked
+                      always (equal (funcall act nil c) acts))
+             (car (helm-marked-candidates))
+             (helm-get-selection)))
       (helm-attr 'action))))
 
 (defun helm-get-current-source ()
