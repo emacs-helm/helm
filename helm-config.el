@@ -23,7 +23,9 @@
 ;;
 (require 'easymenu)
 (require 'helm-aliases)
-(require 'async-bytecomp nil t)
+(declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
+(when (require 'async-bytecomp nil t)
+  (async-bytecomp-package-mode 1))
 
 
 (defgroup helm-config nil
