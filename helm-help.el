@@ -840,7 +840,14 @@ Multiple regexp matching is allowed, just enter a space to separate your regexps
 
 Matching empty lines is supported with the regexp \"^$\", you will get the results
 with only the buffer-name and the line number, you can of course save and edit these
-results.
+results (i.e add text to the empty line) .
+
+*** Automatically matching symbol at point
+
+You can match automatically the symbol at point, but keeping
+the minibuffer empty ready to write into.
+This is disabled by default, to enable this you have to add `helm-source-occur'
+and `helm-source-moccur' to `helm-sources-using-default-as-input'.
 
 *** Jump to the corresponding line in the searched buffer
 You can do this with `C-j' (persistent-action), to do it repetitively
