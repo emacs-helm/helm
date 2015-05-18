@@ -2918,11 +2918,18 @@ and
               (fboundp 'helm-hg-root)
               (helm-hg-root))
          (helm-hg-find-files-in-project))
-        (t (let ((cur-dir (helm-current-directory)))
+        (t (let ((cur-dir (helm-browse-project-get--root-dir
+                           (helm-current-directory))))
              (if (or arg (gethash cur-dir helm--browse-project-cache)) 
                  (helm-browse-project-find-files cur-dir (equal arg '(16)))
                (helm :sources (helm-browse-project-build-buffers-source cur-dir)
                      :buffer "*helm browse project*"))))))
+
+(defun helm-browse-project-get--root-dir (directory)
+  (cl-loop with dname = directory
+           while (and dname (not (gethash dname helm--browse-project-cache)))
+           do (setq dname (helm-basedir (substring dname 0 (1- (length dname)))))
+           finally return dname))
 
 (defun helm-ff-browse-project (_candidate)
   "Browse project in current directory.
