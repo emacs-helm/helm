@@ -2929,7 +2929,7 @@ and
   (cl-loop with dname = directory
            while (and dname (not (gethash dname helm--browse-project-cache)))
            do (setq dname (helm-basedir (substring dname 0 (1- (length dname)))))
-           finally return dname))
+           finally return (or dname directory)))
 
 (defun helm-ff-browse-project (_candidate)
   "Browse project in current directory.
