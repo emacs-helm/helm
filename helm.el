@@ -2065,14 +2065,18 @@ Argument SAVE-OR-RESTORE is one of save or restore."
      (helm-log "Save position at %S" (cons (point) (window-start)))
      (setq helm-current-position (cons (point) (window-start))))
     (restore
-     (helm-log "Restore position at  %S in buffer %s"
-               helm-current-position
-               (buffer-name (current-buffer)))
-     (goto-char (car helm-current-position))
-     ;; Fix this position with the NOFORCE arg of `set-window-start'
-     ;; otherwise, if there is some other buffer than `helm-current-buffer'
-     ;; one, position will be lost.
-     (set-window-start (selected-window) (cdr helm-current-position) t))))
+     ;; Maybe `helm-current-buffer' have been deleted
+     ;; during helm session so check if it is here
+     ;; otherwise position in underlaying buffer will be lost.
+     (when (get-buffer-window helm-current-buffer 'visible)
+       (helm-log "Restore position at  %S in buffer %s"
+                 helm-current-position
+                 (buffer-name (current-buffer)))
+       (goto-char (car helm-current-position))
+       ;; Fix this position with the NOFORCE arg of `set-window-start'
+       ;; otherwise, if there is some other buffer than `helm-current-buffer'
+       ;; one, position will be lost.
+       (set-window-start (selected-window) (cdr helm-current-position) t)))))
 
 
 (defun helm-frame-or-window-configuration (save-or-restore)
