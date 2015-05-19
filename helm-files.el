@@ -2928,6 +2928,8 @@ and
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
            while (and dname (not (gethash dname helm--browse-project-cache)))
+           if (file-remote-p dname)
+           do (setq dname nil) else
            do (setq dname (helm-basedir (substring dname 0 (1- (length dname)))))
            finally return (or dname (file-name-as-directory directory))))
 
