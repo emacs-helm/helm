@@ -2920,10 +2920,10 @@ and
          (helm-hg-find-files-in-project))
         (t (let ((cur-dir (helm-browse-project-get--root-dir
                            (helm-current-directory))))
-             (if (or arg (gethash cur-dir helm--browse-project-cache)) 
+             (if (or arg (gethash cur-dir helm--browse-project-cache))
                  (helm-browse-project-find-files cur-dir (equal arg '(16)))
-               (helm :sources (helm-browse-project-build-buffers-source cur-dir)
-                     :buffer "*helm browse project*"))))))
+                 (helm :sources (helm-browse-project-build-buffers-source cur-dir)
+                       :buffer "*helm browse project*"))))))
 
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
