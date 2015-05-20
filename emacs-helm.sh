@@ -22,7 +22,8 @@
 # Useful to start quickly an emacs -Q with helm.
 # Run it from this directory.
 
-TMP="/tmp/helm-cfg.el"
+TEMP="/tmp"
+CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
 
 case $1 in
@@ -54,13 +55,13 @@ if [ ! -e "$AUTO_FILE" ]; then
 fi
 
 
-cat > $TMP <<EOF
+cat > $CONF_FILE <<EOF
 (setq initial-scratch-message (concat initial-scratch-message
 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\
 ;; This Emacs is Powered by \`HELM' using\n\
 ;; emacs program \"$EMACS\".\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
-;; You can retrieve this minimal configuration in \"$TMP\" \n\
+;; You can retrieve this minimal configuration in \"$CONF_FILE\" \n\
 ;; Some originals emacs commands have been replaced by own \`helm' commands:\n\n\
 ;; - \`find-file'(C-x C-f)           =>\`helm-find-files'\n\
 ;; - \`occur'(M-s o)                 =>\`helm-occur'\n\
@@ -89,8 +90,8 @@ cat > $TMP <<EOF
 (unless (boundp 'completion-in-region-function)
   (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
   (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
-(add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$TMP") (delete-file "$TMP"))))
+(add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
-$EMACS -Q -l $TMP $@
+$EMACS -Q -l $CONF_FILE $@
 
