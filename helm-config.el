@@ -25,7 +25,8 @@
 (require 'helm-aliases)
 (declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
 (when (require 'async-bytecomp nil t)
-  (async-bytecomp-package-mode 1))
+  (and (fboundp 'async-bytecomp-package-mode)
+       (async-bytecomp-package-mode 1)))
 
 
 (defgroup helm-config nil
