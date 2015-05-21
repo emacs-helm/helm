@@ -38,7 +38,8 @@
   :type  'boolean)
 
 (defcustom helm-semantic-display-style '((python-mode . semantic-format-tag-summarize)
-                                         (c-mode . semantic-format-tag-name-c-mode))
+                                         (c-mode . semantic-format-tag-name-c-mode)
+                                         (emacs-lisp-mode . semantic-format-tag-abbreviate-emacs-lisp-mode))
   "Function to present a semantic tag according to `major-mode'.
 
 If no function is found for current `major-mode', fall back to
