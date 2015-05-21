@@ -38,12 +38,14 @@
   :type  'boolean)
 
 (defcustom helm-semantic-display-style 'semantic-format-tag-summarize
-  "Function to present a semantic tag."
+  "Function to present a semantic tag.
+You can have more or less informations depending of the `semantic-format-tag-*'
+function you choose.
+
+All the supported functions are prefixed with \"semantic-format-tag-\",
+you have completion on these functions with `C-M i' in the customize interface."
   :group 'helm-semantic
-  :type '(radio
-          (const :tag "Default" semantic-format-tag-summarize)
-          (const :tag "Default" semantic-format-tag-name)
-          (const :tag "Prototype" semantic-format-tag-prototype)))
+  :type 'function)
 
 ;;; keymap
 (defvar helm-semantic-map
