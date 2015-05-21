@@ -42,6 +42,7 @@
   :group 'helm-semantic
   :type '(radio
           (const :tag "Default" semantic-format-tag-summarize)
+          (const :tag "Default" semantic-format-tag-name)
           (const :tag "Prototype" semantic-format-tag-prototype)))
 
 ;;; keymap
