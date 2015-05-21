@@ -66,6 +66,19 @@
                           (package-desc-name id)
                         (car id)))))
 
+(defun helm-el-package-visit-homepage (candidate)
+  (let* ((id (get-text-property 0 'tabulated-list-id candidate))
+         (pkg (if (fboundp 'package-desc-name) (package-desc-name id)
+                (car id)))
+         (desc (cadr (assoc pkg package-archive-contents)))
+         (extras (package-desc-extras desc))
+         (url (and (listp extras) (cdr-safe (assoc :url extras)))))
+    (if (stringp url)
+        (browse-url url)
+      (message "Package %s has no homepage"
+               (propertize (symbol-name pkg)
+                           'face 'font-lock-keyword-face)))))
+
 (defun helm-el-package-install-1 (pkg-list)
   (cl-loop with mkd = pkg-list
         for p in mkd
@@ -280,7 +293,8 @@
    (keymap :initform helm-el-package-map)
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
-   (action :initform '(("Describe package" . helm-el-package-describe)))))
+   (action :initform '(("Describe package" . helm-el-package-describe)
+                       ("Visit homepage" . helm-el-package-visit-homepage)))))
 
 (defun helm-el-package--update ()
   (setq helm-el-package--initialized-p nil))
