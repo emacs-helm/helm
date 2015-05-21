@@ -70,7 +70,7 @@ you have completion on these functions with `C-M i' in the customize interface."
   (let ((class class) cur-type
         (stylefn (or (with-helm-current-buffer
                        (assoc-default major-mode helm-semantic-display-style))
-                     semantic-format-tag-summarize)))
+                     #'semantic-format-tag-summarize)))
     (cl-dolist (tag tags)
       (when (listp tag)
         (cl-case (setq cur-type (semantic-tag-class tag))
