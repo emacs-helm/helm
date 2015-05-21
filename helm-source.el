@@ -948,9 +948,9 @@ an eieio class."
                                 (helm-append-at-nth
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
-    (when (functionp actions)
+    (when (or (symbolp actions) (functionp actions))
       (set-slot-value source 'action (list (cons "Default action" actions))))
-    (when (functionp action-transformers)
+    (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
     (set-slot-value
      source

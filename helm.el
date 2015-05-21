@@ -1258,9 +1258,9 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
                                 (helm-append-at-nth
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
-    (when (functionp actions)
+    (when (or (symbolp actions) (functionp actions))
       (helm-attrset 'action (list (cons "Default action" actions)) source))
-    (when (functionp action-transformers)
+    (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
     (if test-only                       ; debug
         (delq nil (append (list transformer) action-transformers))
