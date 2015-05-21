@@ -37,10 +37,14 @@
   :group 'helm-semantic
   :type  'boolean)
 
-(defcustom helm-semantic-display-style '((python-mode . semantic-format-tag-summarize)
-                                         (c-mode . semantic-format-tag-name-c-mode)
-                                         (emacs-lisp-mode . semantic-format-tag-abbreviate-emacs-lisp-mode))
+(defcustom helm-semantic-display-style
+  '((python-mode . semantic-format-tag-summarize)
+    (c-mode . semantic-format-tag-name-c-mode)
+    (emacs-lisp-mode . semantic-format-tag-abbreviate-emacs-lisp-mode))
   "Function to present a semantic tag according to `major-mode'.
+
+It is an alist where the `car' of each element is a `major-mode' and
+the `cdr' a `semantic-format-tag-*' function.
 
 If no function is found for current `major-mode', fall back to
 `semantic-format-tag-summarize' default function.
