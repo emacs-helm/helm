@@ -48,11 +48,38 @@
 (defvar helm-imenu-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-imenu-help)
+    (define-key map (kbd "C-c ?")    'helm-imenu-help)
+    (define-key map (kbd "M-<down>") 'helm-imenu-next-section)
+    (define-key map (kbd "M-<up>")   'helm-imenu-previous-section)
     (when helm-imenu-lynx-style-map
       (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
       (define-key map (kbd "<right>") 'helm-execute-persistent-action))
     (delq nil map)))
+
+(defun helm-imenu-next-or-previous-section (n)
+  (with-helm-buffer
+    (let ((curtype (car (split-string (helm-get-selection nil t)
+                                      helm-imenu-delimiter)))
+          (move-fn (if (> n 0) #'helm-next-line #'helm-previous-line))
+          (stop-fn (if (> n 0)
+                       #'helm-end-of-source-p
+                       #'helm-beginning-of-source-p)))
+      (catch 'break
+        (while (not (funcall stop-fn))
+          (funcall move-fn)
+          (unless (string= curtype
+                           (car (split-string
+                                 (helm-get-selection nil t)
+                                 helm-imenu-delimiter)))
+            (throw 'break nil)))))))
+
+(defun helm-imenu-next-section ()
+  (interactive)
+  (helm-imenu-next-or-previous-section 1))
+
+(defun helm-imenu-previous-section ()
+  (interactive)
+  (helm-imenu-next-or-previous-section -1))
 
 
 ;;; Internals

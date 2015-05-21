@@ -4211,6 +4211,16 @@ before the candidate we want to preselect."
           (helm-pos-header-line-p)
           (eobp)))))
 
+(defun helm-beginning-of-source-p (&optional at-point)
+  "Return non--nil if we are at bob or beginning of source."
+  (save-excursion
+    (if (and (helm-pos-multiline-p) (null at-point))
+        (null (helm-get-previous-candidate-separator-pos))
+      (forward-line (if at-point 0 -1))
+      (or (eq (point-at-bol) (point-at-eol))
+          (helm-pos-header-line-p)
+          (bobp)))))
+
 (defun helm-edit-current-selection-internal (func)
   (with-helm-window
     (forward-line 0)
