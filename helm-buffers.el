@@ -162,6 +162,21 @@ Only buffer names are fuzzy matched when this is enabled,
 
 (defvar helm-buffers-list-cache nil)
 (defvar helm-buffer-max-len-mode nil)
+
+(defun helm-buffers-list--init ()
+  ;; Issue #51 Create the list before `helm-buffer' creation.
+  (setq helm-buffers-list-cache (funcall (helm-attr 'buffer-list)))
+  (let ((result (cl-loop for b in helm-buffers-list-cache
+                         maximize (length b) into len-buf
+                         maximize (length (with-current-buffer b
+                                            (symbol-name major-mode)))
+                         into len-mode
+                         finally return (cons len-buf len-mode))))
+    (unless (default-value 'helm-buffer-max-length)
+      (helm-set-local-variable 'helm-buffer-max-length (car result)))
+    (unless (default-value 'helm-buffer-max-len-mode)
+      (helm-set-local-variable 'helm-buffer-max-len-mode (cdr result)))))
+
 (defclass helm-source-buffers (helm-source-sync helm-type-buffer)
   ((buffer-list
     :initarg :buffer-list
@@ -169,26 +184,9 @@ Only buffer names are fuzzy matched when this is enabled,
     :custom function
     :documentation
     "  A function with no arguments to create buffer list.")
-   (init
-    :initform
-    (lambda ()
-      ;; Issue #51 Create the list before `helm-buffer' creation.
-      (setq helm-buffers-list-cache (funcall (helm-attr 'buffer-list)))
-      (let ((result (cl-loop for b in helm-buffers-list-cache
-                             maximize (length b) into len-buf
-                             maximize (length (with-current-buffer b
-                                                (symbol-name major-mode)))
-                             into len-mode
-                             finally return (cons len-buf len-mode))))
-        (unless (default-value 'helm-buffer-max-length)
-          (helm-set-local-variable 'helm-buffer-max-length (car result)))
-        (unless (default-value 'helm-buffer-max-len-mode)
-          ;; If a new buffer is longer that this value
-          ;; this value will be updated
-          (helm-set-local-variable 'helm-buffer-max-len-mode (cdr result))))))
+   (init :initform 'helm-buffers-list--init)
    (candidates :initform helm-buffers-list-cache)
    (matchplugin :initform nil)
-   ;(nohighlight :initform t)
    (match :initform 'helm-buffers-match-function)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
    (resume :initform (lambda ()
