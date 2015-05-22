@@ -164,6 +164,9 @@ e.g
 See docstring of `all-completions' for more info.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
+  ;; Ensure COLLECTION is computed from `helm-current-buffer'
+  ;; because some functions used as COLLECTION work
+  ;; only in the context of current-buffer (Issue #1030) .
   (with-helm-current-buffer
     (let ((cands
            (cond ((vectorp collection)
