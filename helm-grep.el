@@ -1235,27 +1235,43 @@ See <http://www.math.utah.edu/docs/info/mkid_toc.html>."
              "No DataBase found, create one with `mkid'")
   (helm :sources
         (helm-build-async-source "Gid"
-          :candidates-process (lambda ()
-                                (start-process
-                                 "gid" nil "gid"
-                                 "-r" helm-pattern))
-          :filter-one-by-one 'helm-grep-filter-one-by-one
-          :candidate-number-limit 99999
-          :keymap helm-grep-map
-          :action (helm-make-actions
-                   "Find File" 'helm-grep-action
-                   "Find file other frame" 'helm-grep-other-frame
-                   (lambda () (and (locate-library "elscreen")
-                                   "Find file in Elscreen"))
-                   'helm-grep-jump-elscreen
-                   "Save results in grep buffer" 'helm-grep-save-results
-                   "Find file other window" 'helm-grep-other-window)
-          :persistent-action 'helm-grep-persistent-action
-          :history 'helm-grep-history
-          :nohighlight t
-          :requires-pattern 2)
-        :buffer "*helm gid*"
-        :truncate-lines t))
+          :candidates-process
+          (lambda ()
+            (let ((proc (start-process
+                         "gid" nil "gid"
+                         "-r" helm-pattern)))
+              (prog1 proc
+                (set-process-sentinel
+                 proc (lambda (process event)
+                        (when (string= event "finished\n")
+                          (with-helm-window
+                            (setq mode-line-format
+                                  '(" " mode-line-buffer-identification " "
+                                    (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                                    (:eval (propertize
+                                            (format "[Helm Gid process finished - (%s results)]" 
+                                                    (max (1- (count-lines
+                                                              (point-min) (point-max)))
+                                                         0))
+                                            'face 'helm-locate-finish))))
+                            (force-mode-line-update))))))))
+                :filter-one-by-one 'helm-grep-filter-one-by-one
+                :candidate-number-limit 99999
+                :keymap helm-grep-map
+                :action (helm-make-actions
+                         "Find File" 'helm-grep-action
+                         "Find file other frame" 'helm-grep-other-frame
+                         (lambda () (and (locate-library "elscreen")
+                                         "Find file in Elscreen"))
+                         'helm-grep-jump-elscreen
+                         "Save results in grep buffer" 'helm-grep-save-results
+                         "Find file other window" 'helm-grep-other-window)
+                :persistent-action 'helm-grep-persistent-action
+                :history 'helm-grep-history
+                :nohighlight t
+                :requires-pattern 2)
+              :buffer "*helm gid*"
+              :truncate-lines t))
 
 (provide 'helm-grep)
 
