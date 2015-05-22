@@ -1242,7 +1242,7 @@ See <http://www.math.utah.edu/docs/info/mkid_toc.html>."
                          "-r" helm-pattern)))
               (prog1 proc
                 (set-process-sentinel
-                 proc (lambda (process event)
+                 proc (lambda (_process event)
                         (when (string= event "finished\n")
                           (with-helm-window
                             (setq mode-line-format
@@ -1254,7 +1254,9 @@ See <http://www.math.utah.edu/docs/info/mkid_toc.html>."
                                                               (point-min) (point-max)))
                                                          0))
                                             'face 'helm-locate-finish))))
-                            (force-mode-line-update))))))))
+                            (force-mode-line-update))
+                          (helm-log "Error: Gid %s"
+                                    (replace-regexp-in-string "\n" "" event))))))))
                 :filter-one-by-one 'helm-grep-filter-one-by-one
                 :candidate-number-limit 99999
                 :keymap helm-grep-map
