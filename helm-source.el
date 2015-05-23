@@ -410,14 +410,7 @@
     :custom boolean
     :documentation
     "  Allow helm collecting duplicates candidates.")
-
-   (recenter
-    :initarg :recenter
-    :initform nil
-    :custom boolean
-    :documentation
-    "  `recenter' after jumping to candidate.")
-
+   
    (history
     :initarg :history
     :initform nil

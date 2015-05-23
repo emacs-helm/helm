@@ -298,7 +298,6 @@ Same as `helm-moccur-goto-line' but go in new frame."
                        ("Goto line new frame" . helm-moccur-goto-line-of)))
    (persistent-action :initform 'helm-moccur-persistent-action)
    (persistent-help :initform "Go to line")
-   (recenter :initform t)
    (resume :initform 'helm-moccur-resume-fn)
    (candidate-number-limit :initform 9999)
    (mode-line :initform helm-moccur-mode-line)
