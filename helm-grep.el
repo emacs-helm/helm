@@ -1013,15 +1013,15 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
           (cl-loop for reg in (if multi-match
                                   (cl-loop for r in (helm-mp-split-pattern
                                                      helm-pattern)
-                                        unless (string-match "\\`!" r)
-                                        collect r)
-                                (list helm-pattern))
-                do
-                (while (and (re-search-forward reg nil t)
-                            (> (- (setq end (match-end 0))
-                                  (setq beg (match-beginning 0))) 0))
-                  (add-text-properties beg end '(face helm-grep-match)))
-                do (goto-char (point-min))) 
+                                           unless (string-match "\\`!" r)
+                                           collect r)
+                                  (list helm-pattern))
+                   do
+                   (while (and (re-search-forward reg nil t)
+                               (> (- (setq end (match-end 0))
+                                     (setq beg (match-beginning 0))) 0))
+                     (add-text-properties beg end '(face helm-grep-match)))
+                   do (goto-char (point-min))) 
           (buffer-string))
       (error nil))))
 
