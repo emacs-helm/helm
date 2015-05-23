@@ -474,7 +474,9 @@ will have no effect until this mode will be disabled."
                                                  helm-source-man-pages)
   "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
-will be used as input."
+will be used as input.
+
+Note that async sources are not supporting this actually."
   :group 'helm
   :type '(repeat (choice symbol)))
 
@@ -877,7 +879,8 @@ when `helm' is keyboard-quitted.")
 Use only in let-bindings.
 Use :default arg of `helm' as input to update display.
 Note that if also :input is specified as `helm' arg, it will take
-precedence on :default.")
+precedence on :default.
+NOTE: Async sources are not supporting this.")
 
 
 ;; Utility: logging
