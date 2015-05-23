@@ -464,7 +464,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert "-*- mode: helm-moccur -*-\n\n"
-                (format "Moccur Results for `%s':\n\n" helm-pattern))
+                (format "Moccur Results for `%s':\n\n" helm-input))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
