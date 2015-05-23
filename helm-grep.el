@@ -1230,9 +1230,11 @@ above `default-directory'.
 Need id-utils as dependency which provide `mkid', `gid' etc...
 See <https://www.gnu.org/software/idutils/>."
   (interactive)
-  (let ((db (locate-dominating-file
+  (let* ((db (locate-dominating-file
               default-directory
-              helm-gid-db-file-name)))
+              helm-gid-db-file-name))
+         (helm-grep-default-directory-fn
+          (lambda () default-directory)))
     (cl-assert db nil "No DataBase found, create one with `mkid'")
     (helm :sources
           (helm-build-async-source "Gid"
