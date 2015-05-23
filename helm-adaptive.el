@@ -52,8 +52,9 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
 (defun helm-adaptive-done-reset ()
   (setq helm-adaptive-done nil))
 
+;;;###autoload
 (define-minor-mode helm-adaptive-mode
-    "Toggle adaptive sorting in all sources."
+  "Toggle adaptive sorting in all sources."
   :group 'helm-adapt
   :require 'helm-adaptive
   :global t
