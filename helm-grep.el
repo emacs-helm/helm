@@ -1261,7 +1261,6 @@ See <https://www.gnu.org/software/idutils/>."
                                       (replace-regexp-in-string "\n" "" event))))))))
             :filter-one-by-one 'helm-grep-filter-one-by-one
             :candidate-number-limit 99999
-            :keymap helm-grep-map
             :action (helm-make-actions
                      "Find File" 'helm-grep-action
                      "Find file other frame" 'helm-grep-other-frame
@@ -1275,6 +1274,7 @@ See <https://www.gnu.org/software/idutils/>."
             :nohighlight t
             :requires-pattern 2)
           :buffer "*helm gid*"
+          :keymap helm-grep-map
           :truncate-lines t)))
 
 (provide 'helm-grep)
