@@ -521,7 +521,7 @@ Special commands:
                           (insert
                            (propertize
                             (car (helm-moccur-filter-one-by-one line))
-                            'helm-real-value line)
+                            'helm-realvalue line)
                            "\n")))))
         (message "Reverting buffer done")))))
 
