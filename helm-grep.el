@@ -1227,7 +1227,8 @@ See also `helm-do-grep-1'."
   "Helm UI for `gid' command line of `ID-Utils'.
 Need A database created with the command `mkid'
 above `default-directory'.
-See <http://www.math.utah.edu/docs/info/mkid_toc.html>."
+Need id-utils as dependency which provide `mkid', `gid' etc...
+See <https://www.gnu.org/software/idutils/>."
   (interactive)
   (let ((db (locate-dominating-file
               default-directory
