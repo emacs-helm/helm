@@ -19,6 +19,62 @@
 
 (require 'helm-grep)
 
+(defgroup helm-id-utils nil
+  "ID-Utils related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-gid-db-file-name "ID"
+  "Name of a database file created by `mkid' command from `ID-utils'."
+  :group 'helm-id-utils
+  :type 'string)
+
+(defclass helm-gid-source (helm-source-async)
+  ((header-name
+    :initform
+    (lambda (name)
+      (concat name " [" (helm-attr 'db-dir) "]")))
+   (db-dir :initarg :db-dir
+           :initform nil
+           :custom string
+           :documentation " Location of ID file.")
+   (candidates-process
+    :initform
+    (lambda ()
+      (let ((proc (start-process
+                   "gid" nil "gid"
+                   "-r" helm-pattern)))
+        (prog1 proc
+          (set-process-sentinel
+           proc (lambda (_process event)
+                  (when (string= event "finished\n")
+                    (with-helm-window
+                      (setq mode-line-format
+                            '(" " mode-line-buffer-identification " "
+                              (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                              (:eval (propertize
+                                      (format "[Helm Gid process finished - (%s results)]" 
+                                              (max (1- (count-lines
+                                                        (point-min) (point-max)))
+                                                   0))
+                                      'face 'helm-locate-finish))))
+                      (force-mode-line-update))
+                    (helm-log "Error: Gid %s"
+                              (replace-regexp-in-string "\n" "" event)))))))))
+  (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
+  (candidate-number-limit :initform 99999)
+  (action :initform (helm-make-actions
+                     "Find File" 'helm-grep-action
+                     "Find file other frame" 'helm-grep-other-frame
+                     (lambda () (and (locate-library "elscreen")
+                                     "Find file in Elscreen"))
+                     'helm-grep-jump-elscreen
+                     "Save results in grep buffer" 'helm-grep-save-results
+                     "Find file other window" 'helm-grep-other-window))
+  (persistent-action :initform 'helm-grep-persistent-action)
+  (history :initform 'helm-grep-history)
+  (nohighlight :initform t)
+  (requires-pattern :initform 2)))
+
 ;;;###autoload
 (defun helm-gid ()
   "Helm UI for `gid' command line of `ID-Utils'.
@@ -33,45 +89,8 @@ See <https://www.gnu.org/software/idutils/>."
          (helm-grep-default-directory-fn
           (lambda () default-directory)))
     (cl-assert db nil "No DataBase found, create one with `mkid'")
-    (helm :sources
-          (helm-build-async-source "Gid"
-            :header-name (lambda (name) (concat name " [" db "]"))
-            :candidates-process
-            (lambda ()
-              (let ((proc (start-process
-                           "gid" nil "gid"
-                           "-r" helm-pattern)))
-                (prog1 proc
-                  (set-process-sentinel
-                   proc (lambda (_process event)
-                          (when (string= event "finished\n")
-                            (with-helm-window
-                              (setq mode-line-format
-                                    '(" " mode-line-buffer-identification " "
-                                      (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                                      (:eval (propertize
-                                              (format "[Helm Gid process finished - (%s results)]" 
-                                                      (max (1- (count-lines
-                                                                (point-min) (point-max)))
-                                                           0))
-                                              'face 'helm-locate-finish))))
-                              (force-mode-line-update))
-                            (helm-log "Error: Gid %s"
-                                      (replace-regexp-in-string "\n" "" event))))))))
-            :filter-one-by-one 'helm-grep-filter-one-by-one
-            :candidate-number-limit 99999
-            :action (helm-make-actions
-                     "Find File" 'helm-grep-action
-                     "Find file other frame" 'helm-grep-other-frame
-                     (lambda () (and (locate-library "elscreen")
-                                     "Find file in Elscreen"))
-                     'helm-grep-jump-elscreen
-                     "Save results in grep buffer" 'helm-grep-save-results
-                     "Find file other window" 'helm-grep-other-window)
-            :persistent-action 'helm-grep-persistent-action
-            :history 'helm-grep-history
-            :nohighlight t
-            :requires-pattern 2)
+    (helm :sources (helm-make-source "Gid" 'helm-gid-source
+                     :db-dir db)
           :buffer "*helm gid*"
           :keymap helm-grep-map
           :truncate-lines t)))

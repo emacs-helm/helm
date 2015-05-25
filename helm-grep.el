@@ -158,11 +158,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type  'string)
 
-(defcustom helm-gid-db-file-name "ID"
-  "Name of a database file created by `mkid' command from `ID-utils'."
-  :group 'helm-grep
-  :type 'string)
-
 
 ;;; Faces
 ;;
