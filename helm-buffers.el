@@ -320,9 +320,8 @@ See `ido-make-buffer-list' for more infos."
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
           'helm-buffer-saved-out 'helm-buffer-process nil details 'modout))
-        ;; A new buffer file not already saved on disk.=>indianred2
-        ((and file-name
-              (not (verify-visited-file-modtime buf)))
+        ;; A new buffer file not already saved on disk (or a deleted file) .=>indianred2
+        ((and file-name (not (file-exists-p file-name)))
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
           'helm-buffer-not-saved 'helm-buffer-process nil details 'notsaved))
