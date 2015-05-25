@@ -1647,6 +1647,7 @@ purpose."
                (and ffap-url-regexp (string-match ffap-url-regexp path)))
            (list path))
           ((string= path "") (helm-ff-directory-files "/" t))
+          ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
            (list (format "file-error: Opening directory permission denied `%s'" path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
@@ -1673,6 +1674,9 @@ systems."
          (ls   (condition-case err
                    (directory-files
                     directory full directory-files-no-dot-files-regexp)
+                 ;; Handle file-error from here for Windows
+                 ;; because predicates like `file-readable-p' and friends
+                 ;; seem broken on emacs for windows.
                  (file-error
                   (prog1
                       (list (format "%s:%s"
