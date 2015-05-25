@@ -1648,7 +1648,7 @@ purpose."
            (list path))
           ((string= path "") (helm-ff-directory-files "/" t))
           ((and (file-directory-p path) (not (file-readable-p path)))
-           (list (format "Opening directory: access denied, `%s'" path)))
+           (list (format "file-error: Opening directory permission denied `%s'" path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
@@ -1661,7 +1661,7 @@ purpose."
                        (list path))
                      (helm-ff-directory-files basedir t))))))
 
-(defsubst helm-ff-directory-files (directory &optional full)
+(defun helm-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
@@ -1669,11 +1669,19 @@ dotted filename '.' and '..' even on root directories in Windows
 systems."
   (setq directory (file-name-as-directory
                    (expand-file-name directory)))
-  (let ((ls   (directory-files
-               directory full directory-files-no-dot-files-regexp))
+  (let* (file-error
+         (ls   (condition-case err
+                   (directory-files
+                    directory full directory-files-no-dot-files-regexp)
+                 (file-error
+                  (prog1
+                      (list (format "%s:%s"
+                                    (car err)
+                                    (mapconcat 'identity (cdr err) " ")))
+                    (setq file-error t)))))
         (dot  (concat directory "."))
         (dot2 (concat directory "..")))
-    (append (list dot dot2) ls)))
+    (append (and (not file-error) (list dot dot2)) ls)))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
@@ -1981,7 +1989,7 @@ Return candidates prefixed with basename of `helm-input' first."
              (attr (file-attributes file))
              (type (car attr)))
 
-        (cond ((string-match "access denied" file) file)
+        (cond ((string-match "file-error" file) file)
               ( ;; A not already saved file.
                (and (stringp type)
                     (not (helm-ff-valid-symlink-p file))
