@@ -179,80 +179,40 @@ This is a format string, don't forget the `%s'."
 (defvar helm-ggs-max-length-num-flag 0)
 
 (defun helm-google-suggest-fetch (input)
-  "Fetch suggestions for INPUT from XML buffer.
-Return an alist with elements like (data . number_results)."
-  (setq helm-ggs-max-length-real-flag 0
-        helm-ggs-max-length-num-flag 0)
+  "Fetch suggestions for INPUT from XML buffer."
   (let ((request (concat helm-google-suggest-url
                          (url-hexify-string input)))
         (fetch #'(lambda ()
                    (cl-loop
-                         with result-alist = (xml-get-children
-                                              (car (xml-parse-region
-                                                    (point-min) (point-max)))
-                                              'CompleteSuggestion)
-                         for i in result-alist
-                         for data = (cdr (cl-caadr (assoc 'suggestion i)))
-                         for nqueries = (cdr (cl-caadr (assoc 'num_queries i)))
-                         for lqueries = (length (helm-ggs-set-number-result
-                                                 nqueries))
-                         for ldata = (length data)
-                         do
-                         (progn
-                           (when (> ldata helm-ggs-max-length-real-flag)
-                             (setq helm-ggs-max-length-real-flag ldata))
-                           (when (> lqueries helm-ggs-max-length-num-flag)
-                             (setq helm-ggs-max-length-num-flag lqueries)))
-                         collect (cons data nqueries) into cont
-                         finally return cont))))
+                    with result-alist = (xml-get-children
+                                         (car (xml-parse-region
+                                               (point-min) (point-max)))
+                                         'CompleteSuggestion)
+                    for i in result-alist collect
+                    (cdr (cl-caadr (assoc 'suggestion i)))))))
     (if helm-google-suggest-use-curl-p
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (funcall fetch))
-      (with-current-buffer
-          (url-retrieve-synchronously request)
-        (funcall fetch)))))
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (funcall fetch)))))
 
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
-  (let ((suggestions
-         (cl-loop with suggested-results = (helm-google-suggest-fetch
-                                            (or (and request-prefix
-                                                     (concat request-prefix
-                                                             " " helm-pattern))
-                                                helm-pattern))
-               for (real . numresult) in suggested-results
-               ;; Prepare number of results with ","
-               for fnumresult = (helm-ggs-set-number-result numresult)
-               ;; Calculate number of spaces to add before fnumresult
-               ;; if it is smaller than longest result
-               ;; `helm-ggs-max-length-num-flag'.
-               ;; e.g 1,234,567
-               ;;       345,678
-               ;; To be sure it is aligned properly.
-               for nspaces = (if (< (length fnumresult)
-                                    helm-ggs-max-length-num-flag)
-                                 (- helm-ggs-max-length-num-flag
-                                    (length fnumresult))
-                               0)
-               ;; Add now the spaces before fnumresult.
-               for align-fnumresult = (concat (make-string nspaces ? )
-                                              fnumresult)
-               for interval = (- helm-ggs-max-length-real-flag
-                                 (length real))
-               for spaces   = (make-string (+ 2 interval) ? )
-               for display = (format "%s%s(%s results)"
-                                     real spaces align-fnumresult)
-               collect (cons display real))))
-    (if (cl-loop for (_disp . dat) in suggestions
-              thereis (equal dat helm-pattern))
+  (let ((suggestions (helm-google-suggest-fetch
+                      (or (and request-prefix
+                               (concat request-prefix
+                                       " " helm-pattern))
+                          helm-pattern))))
+    (if (member helm-pattern suggestions)
         suggestions
-      ;; if there is no suggestion exactly matching the input then
-      ;; prepend a Search on Google item to the list
-      (append
-       suggestions
-       (list (cons (concat "Search for " "'" helm-input "'" " on Google")
-                   helm-input))))))
+        ;; if there is no suggestion exactly matching the input then
+        ;; prepend a Search on Google item to the list
+        (append
+         suggestions
+         (list (cons (format "Search for '%s' on Google" helm-input)
+                     helm-input))))))
 
 (defun helm-ggs-set-number-result (num)
   (if num
