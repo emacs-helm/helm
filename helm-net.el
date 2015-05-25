@@ -174,10 +174,6 @@ This is a format string, don't forget the `%s'."
 ;;; Google Suggestions
 ;;
 ;;
-;; Internal
-(defvar helm-ggs-max-length-real-flag 0)
-(defvar helm-ggs-max-length-num-flag 0)
-
 (defun helm-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer."
   (let ((request (concat helm-google-suggest-url
