@@ -2897,7 +2897,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 (defun helm-browse-project (arg)
   "Browse files and see status of project with its vcs.
 Only HG and GIT are supported for now.
-Fall back to `helm-find-files' or `helm-browse-project-find-files'
+Fall back to `helm-browse-project-find-files'
 if current directory is not under control of one of those vcs.
 With a prefix ARG browse files recursively, with two prefix ARG
 rebuild the cache.
