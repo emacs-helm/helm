@@ -80,27 +80,26 @@ Should take one arg: the string to display."
     map))
 
 (defvar helm-source-evaluation-result
-  '((name . "Evaluation Result")
-    (init . (lambda () (require 'edebug)))
-    (dummy)
-    (multiline)
-    (mode-line . "C-RET: nl-and-indent, tab: reindent, C-tab:complete, C-p/n: next/prec-line.")
-    (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (list
-                                         (condition-case nil
-                                             (with-helm-current-buffer
-                                               (pp-to-string
-                                                (if edebug-active
-                                                    (edebug-eval-expression
-                                                     (read helm-pattern))
+  (helm-build-dummy-source "Evaluation Result"
+    :init (lambda () (require 'edebug))
+    :multiline t
+    :mode-line "C-RET: nl-and-indent, M-tab: reindent, C-tab:complete, C-p/n: next/prec-line."
+    :filtered-candidate-transformer (lambda (candidates _source)
+                                      (list
+                                       (condition-case nil
+                                           (with-helm-current-buffer
+                                             (pp-to-string
+                                              (if edebug-active
+                                                  (edebug-eval-expression
+                                                   (read helm-pattern))
                                                   (eval (read helm-pattern)))))
-                                           (error "Error")))))
-    (action . (("Copy result to kill-ring" . (lambda (candidate)
-                                               (kill-new
-                                                (replace-regexp-in-string
-                                                 "\n" "" candidate))))
-               ("copy sexp to kill-ring" . (lambda (candidate)
-                                             (kill-new helm-input)))))))
+                                         (error "Error"))))
+    :action '(("Copy result to kill-ring" . (lambda (candidate)
+                                              (kill-new
+                                               (replace-regexp-in-string
+                                                "\n" "" candidate))))
+              ("copy sexp to kill-ring" . (lambda (candidate)
+                                            (kill-new helm-input))))))
 
 (defun helm-eval-new-line-and-indent ()
   (interactive)
@@ -141,14 +140,13 @@ Should take one arg: the string to display."
 ;;
 ;;
 (defvar helm-source-calculation-result
-  '((name . "Calculation Result")
-    (dummy)
-    (filtered-candidate-transformer . (lambda (candidates _source)
-                                        (list
-                                         (condition-case nil
-                                             (calc-eval helm-pattern)
-                                           (error "error")))))
-    (action ("Copy result to kill-ring" . kill-new))))
+  (helm-build-dummy-source "Calculation Result"
+    :filtered-candidate-transformer (lambda (candidates _source)
+                                      (list
+                                       (condition-case nil
+                                           (calc-eval helm-pattern)
+                                         (error "error"))))
+    :action '(("Copy result to kill-ring" . kill-new))))
 
 ;;;###autoload
 (defun helm-eval-expression (arg)
@@ -180,7 +178,8 @@ Should take one arg: the string to display."
 (defun helm-calcul-expression ()
   "Preconfigured helm for `helm-source-calculation-result'."
   (interactive)
-  (helm-other-buffer 'helm-source-calculation-result "*helm calcul*"))
+  (helm :sources 'helm-source-calculation-result
+        :buffer "*helm calcul*"))
 
 (provide 'helm-eval)
 
