@@ -43,6 +43,8 @@
       (let ((proc (start-process
                    "gid" nil "gid"
                    "-r" helm-pattern)))
+        (set (make-local-variable 'helm-grep-last-cmd-line)
+             (format "gid -r %s" helm-pattern))
         (prog1 proc
           (set-process-sentinel
            proc (lambda (_process event)
