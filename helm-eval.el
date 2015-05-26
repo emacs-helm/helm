@@ -19,6 +19,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'eldoc)
+(require 'edebug)
 
 
 (defgroup helm-eval nil
@@ -79,12 +80,11 @@ Should take one arg: the string to display."
     (define-key map (kbd "<left>")     'backward-char)
     map))
 
-(defvar helm-source-evaluation-result
+(defun helm-build-evaluation-result-source ()
   (helm-build-dummy-source "Evaluation Result"
-    :init (lambda () (require 'edebug))
     :multiline t
     :mode-line "C-RET: nl-and-indent, M-tab: reindent, C-tab:complete, C-p/n: next/prec-line."
-    :filtered-candidate-transformer (lambda (candidates _source)
+    :filtered-candidate-transformer (lambda (_candidates _source)
                                       (list
                                        (condition-case nil
                                            (with-helm-current-buffer
@@ -94,11 +94,12 @@ Should take one arg: the string to display."
                                                    (read helm-pattern))
                                                   (eval (read helm-pattern)))))
                                          (error "Error"))))
+    :nohighlight t
     :action '(("Copy result to kill-ring" . (lambda (candidate)
                                               (kill-new
                                                (replace-regexp-in-string
                                                 "\n" "" candidate))))
-              ("copy sexp to kill-ring" . (lambda (candidate)
+              ("copy sexp to kill-ring" . (lambda (_candidate)
                                             (kill-new helm-input))))))
 
 (defun helm-eval-new-line-and-indent ()
@@ -141,18 +142,19 @@ Should take one arg: the string to display."
 ;;
 (defvar helm-source-calculation-result
   (helm-build-dummy-source "Calculation Result"
-    :filtered-candidate-transformer (lambda (candidates _source)
+    :filtered-candidate-transformer (lambda (_candidates _source)
                                       (list
                                        (condition-case nil
                                            (calc-eval helm-pattern)
                                          (error "error"))))
+    :nohighlight t
     :action '(("Copy result to kill-ring" . kill-new))))
 
 ;;;###autoload
 (defun helm-eval-expression (arg)
   "Preconfigured helm for `helm-source-evaluation-result'."
   (interactive "P")
-  (helm :sources 'helm-source-evaluation-result
+  (helm :sources (helm-build-evaluation-result-source)
         :input (when arg (thing-at-point 'sexp))
         :buffer "*helm eval*"
         :history 'read-expression-history
