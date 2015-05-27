@@ -1676,7 +1676,10 @@ systems."
                     directory full directory-files-no-dot-files-regexp)
                  ;; Handle file-error from here for Windows
                  ;; because predicates like `file-readable-p' and friends
-                 ;; seem broken on emacs for windows.
+                 ;; seem broken on emacs for Windows systems (always returns t).
+                 ;; This should never be called on GNU/Linux/Unix
+                 ;; as the error is properly intercepted in
+                 ;; `helm-find-files-get-candidates' by `file-readable-p'.
                  (file-error
                   (prog1
                       (list (format "%s:%s"
