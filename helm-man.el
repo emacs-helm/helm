@@ -57,7 +57,7 @@ source.")
             (let ((file (helm-comp-read
                          "ManFile: " wfiles :must-match t)))
               (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
-                  (manual-entry (format "-l %s" file))
+                  (manual-entry file)
                 (woman-find-file file)))
           (funcall helm-man-or-woman-function candidate))
       ;; If woman is unable to format correctly
