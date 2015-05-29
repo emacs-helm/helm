@@ -390,7 +390,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
-  (let* ((default-directory (or (expand-file-name helm-ff-default-directory)
+  (let* ((default-directory (or helm-ff-default-directory
                                 (helm-default-directory)))
          (zgrep (string-match "\\`zgrep" cmd-line))
          ;; Use pipe only with grep, zgrep or git-grep.
