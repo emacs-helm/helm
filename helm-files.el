@@ -3108,17 +3108,24 @@ utility mdfind.")
     :requires-pattern 3))
 
 (defun helm-findutils-transformer (candidates _source)
-  (cl-loop for i in candidates
-           for type = (car (file-attributes i))
-           for abs = (expand-file-name i (helm-default-directory))
-           for disp = (if (and helm-ff-transformer-show-only-basename
-                               (not (string-match "[.]\\{1,2\\}$" i)))
-                          (helm-basename i) abs)
-           collect (cond ((eq t type)
-                          (cons (propertize disp 'face 'helm-ff-directory) abs))
-                         ((stringp type)
-                          (cons (propertize disp 'face 'helm-ff-symlink) abs))
-                         (t (cons (propertize disp 'face 'helm-ff-file) abs)))))
+  (let (non-essential
+        (default-directory (helm-default-directory)))
+    (cl-loop for i in candidates
+             for abs = (expand-file-name
+                        (helm-aif (file-remote-p default-directory)
+                            (concat it i) i))
+             for type = (car (file-attributes abs))
+             for disp = (if (and helm-ff-transformer-show-only-basename
+                                 (not (string-match "[.]\\{1,2\\}$" i)))
+                            (helm-basename abs) abs)
+             collect (cond ((eq t type)
+                            (cons (propertize disp 'face 'helm-ff-directory)
+                                  abs))
+                           ((stringp type)
+                            (cons (propertize disp 'face 'helm-ff-symlink)
+                                  abs))
+                           (t (cons (propertize disp 'face 'helm-ff-file)
+                                    abs))))))
 
 (defun helm-find--build-cmd-line ()
   (require 'find-cmd)
