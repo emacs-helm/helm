@@ -431,7 +431,7 @@ will reuse the same window scheme than the one of last session unless
 (defcustom helm-split-window-default-side 'below
   "The default side to display `helm-buffer'.
 Must be one acceptable arg for `split-window' SIDE,
-that is 'below, 'above, 'left or 'right.
+that is 'below, 'above, 'left, 'right or 'other.
 
 Other acceptable values are 'same which always display `helm-buffer'
 in current window and 'other that display `helm-buffer' below if only one
