@@ -75,7 +75,7 @@ tools for searching (etags, grep, gid, (m)occur etc...).
 By default positions are added to `mark-ring' you can also add to register
 by using instead (or adding) `helm-save-pos-to-register-before-jump'.
 In this case last position is added to the register
-`helm-save-pos-before-jump-register'."
+`helm-save-pos-before-jump-register'.")
 
 (defvar helm-save-pos-before-jump-register ?_
   "The register where `helm-save-pos-to-register-before-jump' save position.")
