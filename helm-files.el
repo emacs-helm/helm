@@ -2424,7 +2424,9 @@ copy and rename."
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
                       (not (file-directory-p candidate))))
-        (dired-async-state (if dired-async-mode 1 -1)))
+        (dired-async-state (if (and (boundp 'dired-async-mode)
+                                    dired-async-mode)
+                               1 -1)))
     (and follow (fboundp 'dired-async-mode) (dired-async-mode -1))
     (unwind-protect
          (dired-create-files
