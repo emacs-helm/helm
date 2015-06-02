@@ -17,7 +17,9 @@
 
 ;;; Code:
 (require 'helm)
-(require 'helm-org)
+
+(defvar helm-org-headings--nofilename)
+(declare-function helm-source-org-headings-for-files "helm-org.el")
 
 
 (defgroup helm-help nil
@@ -64,6 +66,7 @@ With a prefix arg refresh the documentation.
 
 Find here the documentation of all sources actually documented."
   (interactive "P")
+  (require 'helm-org)
   (when arg (delete-file helm-documentation-file)
         (helm-aif (get-file-buffer helm-documentation-file)
           (kill-buffer it)))
