@@ -340,7 +340,7 @@ your eshell aliases. This allow you creating personal actions for
 
 -   Because eshell accept shell commands but also elisp functions.
 
-All these command should end with `https://github.com/emacs-helm/helm/issues/495`.
+All these command should end with `$1`.
 
 You will have completion against all these aliases once eshell is loaded (start it once before using
 helm-find-files).
@@ -349,7 +349,7 @@ helm-find-files).
 
  Go in eshell, an enter at prompt:
 
-    alias my_alias command https://github.com/emacs-helm/helm/issues/495
+    alias my_alias command $1
 
 NOTE: don`t forget to escape the $.
 
