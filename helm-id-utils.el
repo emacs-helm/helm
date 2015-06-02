@@ -62,20 +62,22 @@
                       (force-mode-line-update))
                     (helm-log "Error: Gid %s"
                               (replace-regexp-in-string "\n" "" event)))))))))
-  (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
-  (candidate-number-limit :initform 99999)
-  (action :initform (helm-make-actions
-                     "Find File" 'helm-grep-action
-                     "Find file other frame" 'helm-grep-other-frame
-                     (lambda () (and (locate-library "elscreen")
-                                     "Find file in Elscreen"))
-                     'helm-grep-jump-elscreen
-                     "Save results in grep buffer" 'helm-grep-save-results
-                     "Find file other window" 'helm-grep-other-window))
-  (persistent-action :initform 'helm-grep-persistent-action)
-  (history :initform 'helm-grep-history)
-  (nohighlight :initform t)
-  (requires-pattern :initform 2)))
+   (filtered-candidate-transformer :initform (lambda (candidates _source)
+                                               (cl-loop for c in candidates
+                                                        collect (helm-grep--filter-candidate-1 c))))
+   (candidate-number-limit :initform 99999)
+   (action :initform (helm-make-actions
+                      "Find File" 'helm-grep-action
+                      "Find file other frame" 'helm-grep-other-frame
+                      (lambda () (and (locate-library "elscreen")
+                                      "Find file in Elscreen"))
+                      'helm-grep-jump-elscreen
+                      "Save results in grep buffer" 'helm-grep-save-results
+                      "Find file other window" 'helm-grep-other-window))
+   (persistent-action :initform 'helm-grep-persistent-action)
+   (history :initform 'helm-grep-history)
+   (nohighlight :initform t)
+   (requires-pattern :initform 2)))
 
 ;;;###autoload
 (defun helm-gid ()
@@ -89,7 +91,8 @@ See <https://www.gnu.org/software/idutils/>."
               default-directory
               helm-gid-db-file-name))
          (helm-grep-default-directory-fn
-          (lambda () default-directory)))
+          (lambda () default-directory))
+         (helm--maybe-use-default-as-input t))
     (cl-assert db nil "No DataBase found, create one with `mkid'")
     (helm :sources (helm-make-source "Gid" 'helm-gid-source
                      :db-dir db)

@@ -2398,10 +2398,13 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            (timer nil)
            blink-matching-paren
            (first-src (car helm-sources))
+           (first-src-val (if (symbolp first-src)
+                              (symbol-value first-src)
+                              first-src))
+           (source-process-p (or (assq 'candidates-process src)
+                                 (assq 'candidates-process first-src-val)))
            (source-delayed-p (or (assq 'delayed src)
-                                 (assq 'delayed (if (symbolp first-src)
-                                                    (symbol-value first-src)
-                                                  first-src)))))
+                                 (assq 'delayed first-src-val))))
       ;; Startup with the first keymap found either in current source
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
@@ -2429,7 +2432,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; Don't force update with an empty pattern.
       ;; Reset also `helm--maybe-use-default-as-input' as this checking
       ;; happen only on startup.
-      (when (and helm--maybe-use-default-as-input (not source-delayed-p))
+      (when (and helm--maybe-use-default-as-input
+                 (not source-delayed-p)
+                 (not source-process-p))
         ;; Store value of default temporarily here waiting next update
         ;; to allow action like helm-moccur-action matching pattern
         ;; at the place it jump to.
