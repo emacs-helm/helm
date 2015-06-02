@@ -479,9 +479,7 @@ set to `other'."
                                                  helm-source-man-pages)
   "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
-will be used as input.
-
-Note that async sources are not supporting this actually."
+will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
@@ -883,8 +881,7 @@ when `helm' is keyboard-quitted.")
 Use only in let-bindings.
 Use :default arg of `helm' as input to update display.
 Note that if also :input is specified as `helm' arg, it will take
-precedence on :default.
-NOTE: Async sources are not supporting this.")
+precedence on :default.")
 
 
 ;; Utility: logging
@@ -2398,10 +2395,15 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            (timer nil)
            blink-matching-paren
            (first-src (car helm-sources))
+           (first-src-value (if (symbolp first-src)
+                                (symbol-value first-src)
+                                first-src))
            (source-delayed-p (or (assq 'delayed src)
-                                 (assq 'delayed (if (symbolp first-src)
-                                                    (symbol-value first-src)
-                                                  first-src)))))
+                                 (assq 'delayed first-src-value)
+                                 ;; Consider here async sources
+                                 ;; are kind of delayed sources.
+                                 (assq 'candidates-process src)
+                                 (assq 'candidates-process first-src-value))))
       ;; Startup with the first keymap found either in current source
       ;; or helm arg, otherwise use global value of `helm-map'.
       ;; This map will be used as a `minibuffer-local-map'.
