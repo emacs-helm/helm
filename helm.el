@@ -34,7 +34,13 @@
 (defmacro helm-with-gensyms (symbols &rest body)
   "Bind the SYMBOLS to fresh uninterned symbols and eval BODY."
   (declare (indent 1))
-  `(let ,(mapcar (lambda (s) `(,s (cl-gensym (symbol-name ',s))))
+  `(let ,(mapcar (lambda (s)
+                   ;; Use cl-gensym here instead of make-symbol
+                   ;; to ensure a symbol that have a live that go
+                   ;; beyond the live of its macro have different name.
+                   ;; i.e symbols created with `with-helm-temp-hook'
+                   ;; should have random names.
+                   `(,s (cl-gensym (symbol-name ',s))))
                  symbols)
      ,@body))
 
@@ -2685,6 +2691,14 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   (when helm--maybe-use-default-as-input ; nil when non--delayed.
     (setq input helm-pattern)
     (with-helm-after-update-hook
+      ;; FIXME: Large output of processes (async sources)
+      ;;        are restarting twice or more at each truncated
+      ;;        chunks.
+      ;;        helm-pattern is modified at first stop which
+      ;;        doesnt allow filters to use it for the rest
+      ;;        of the output. As a workaround a timer can
+      ;;        be used here, but it would be better to find
+      ;;        a better fix.
       (setq helm-pattern "")
       (setq helm--maybe-use-default-as-input nil)))
   ;; In delayed sources `helm-pattern' have not been resat yet.
