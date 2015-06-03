@@ -1711,6 +1711,27 @@ This is used in transformers to modify candidates list."
       str-or-sym
     (intern str-or-sym)))
 
+(defun helm-remove-if-not-match (regexp seq)
+  "Remove all elements of SEQ that don't match REGEXP."
+  (cl-loop for s in seq
+           for str = (cond ((symbolp s)
+                            (symbol-name s))
+                           ((consp s)
+                            (car s))
+                           (t s))
+           when (string-match-p regexp str)
+           collect s))
+
+(defun helm-remove-if-match (regexp seq)
+  "Remove all elements of SEQ that match REGEXP."
+  (cl-loop for s in seq
+           for str = (cond ((symbolp s)
+                            (symbol-name s))
+                           ((consp s)
+                            (car s))
+                           (t s))
+           unless (string-match-p regexp str)
+           collect s))
 
 ;; Core: entry point
 ;; `:allow-nest' is not in this list because it is treated before.
