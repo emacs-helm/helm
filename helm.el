@@ -2615,10 +2615,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   ;; by `with-helm-after-update-hook' that
   ;; may not been consumed.
   (setq helm-after-update-hook
-        (cl-loop for hook in helm-after-update-hook
-                 for val = (symbol-name hook)
-                 unless (string-match "helm--hook[0-9]+" val)
-                 collect hook))
+        (helm-remove-if-match
+         "helm--hook[0-9]+" helm-after-update-hook))
   ;; When running helm from a dedicated frame
   ;; with no minibuffer, helm will run in the main frame
   ;; which have a minibuffer, so be sure to disable
