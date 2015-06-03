@@ -156,7 +156,7 @@ fuzzy matching is running its own sort function with a different algorithm."
                 (save-excursion
                   (goto-char (point-min))
                   (while (re-search-forward "Preconfigured helm" nil t)
-                    (push (helm-get-current-function-name) results))))
+                    (push (helm-cmd--get-current-function-name) results))))
            finally return results))
 
 (defun helm-M-x-read-extended-command (&optional collection)
