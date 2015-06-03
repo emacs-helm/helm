@@ -369,7 +369,7 @@ First call open the kill-ring browser, next calls move to next line."
 
 ;;;###autoload
 (defun helm-execute-kmacro ()
-  "Keyboard macros with helm interface.
+  "Preconfigured helm for keyboard macros.
 Define your macros with `f3' and `f4'.
 See (info \"(emacs) Keyboard Macros\") for detailed infos.
 This command is useful when used with persistent action."

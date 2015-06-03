@@ -310,6 +310,7 @@
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)
+  "Preconfigured helm for listing and handling emacs packages."
   (interactive "P")
   (when arg (setq helm-el-package--initialized-p nil))
   (unless helm-source-list-el-package
@@ -320,6 +321,8 @@
 
 ;;;###autoload
 (defun helm-list-elisp-packages-no-fetch ()
+  "Preconfigured helm for emacs packages.
+Same as `helm-list-elisp-packages' but don't fetch packages on remote."
   (interactive)
   (let ((helm-el-package--initialized-p t))
     (helm-list-elisp-packages nil)))

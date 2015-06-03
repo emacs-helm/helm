@@ -142,7 +142,7 @@ current local map, current global map, and all current minor maps."
 
 ;;;###autoload
 (defun helm-browse-menubar ()
-  "Helm interface to the menubar using lacarte.el."
+  "Preconfigured helm to the menubar using lacarte.el."
   (interactive)
   (require 'lacarte)
   (helm :sources (mapcar 
@@ -283,6 +283,7 @@ It is added to `extended-command-history'.
 
 ;;;###autoload
 (defun helm-stumpwm-commands()
+  "Preconfigured helm for stumpwm commands."
   (interactive)
   (helm-other-buffer 'helm-source-stumpwm-commands
                      "*helm stumpwm commands*"))
@@ -310,7 +311,7 @@ It is added to `extended-command-history'.
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
-  "Predefined `helm' that provide completion of `comint' history."
+  "Preconfigured `helm' that provide completion of `comint' history."
   (interactive)
   (when (derived-mode-p 'comint-mode)
     (helm :sources 'helm-source-comint-input-ring

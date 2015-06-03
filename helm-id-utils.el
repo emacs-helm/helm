@@ -79,7 +79,7 @@
 
 ;;;###autoload
 (defun helm-gid ()
-  "Helm UI for `gid' command line of `ID-Utils'.
+  "Preconfigured helm for `gid' command line of `ID-Utils'.
 Need A database created with the command `mkid'
 above `default-directory'.
 Need id-utils as dependency which provide `mkid', `gid' etc...

@@ -179,7 +179,7 @@ If ARG is supplied, pre-select symbol at point instead of current"
 
 ;;;###autoload
 (defun helm-semantic-or-imenu (arg)
-  "Run `helm' with `semantic' or `imenu'.
+  "Preconfigured helm for `semantic' or `imenu'.
 If ARG is supplied, pre-select symbol at point instead of current
 semantic tag in scope.
 

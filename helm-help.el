@@ -61,7 +61,7 @@
 
 ;;;###autoload
 (defun helm-documentation (arg)
-  "Helm documentation.
+  "Preconfigured helm for helm documentation.
 With a prefix arg refresh the documentation.
 
 Find here the documentation of all sources actually documented."
@@ -565,6 +565,7 @@ C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 
 ;;;###autoload
 (defun helm-read-file-name-help ()
+  "Help command for `read-file-name'."
   (interactive)
   (let ((helm-help-message helm-read-file-name-help-message))
     (helm-help)))
@@ -626,6 +627,7 @@ book * -size +1M
 
 ;;;###autoload
 (defun helm-generic-file-help ()
+  "Global help for helm."
   (interactive)
   (let ((helm-help-message helm-generic-file-help-message))
     (helm-help)))
@@ -667,6 +669,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 
 ;;;###autoload
 (defun helm-grep-help ()
+  "Help command for helm grep."
   (interactive)
   (let ((helm-help-message helm-grep-help-message))
     (helm-help)))
@@ -687,6 +690,7 @@ Or even better don't use tramp at all and mount your remote file system on SSHFS
 
 ;;;###autoload
 (defun helm-pdfgrep-help ()
+  "Help command for pdfgrep."
   (interactive)
   (let ((helm-help-message helm-pdfgrep-help-message))
     (helm-help)))
@@ -895,6 +899,7 @@ to modify occurences in your buffer.
 
 ;;;###autoload
 (defun helm-moccur-help ()
+  "Help command for (m)occur."
   (interactive)
   (let ((helm-help-message helm-moccur-help-message))
     (helm-help)))
@@ -917,6 +922,7 @@ to modify occurences in your buffer.
 
 ;;;###autoload
 (defun helm-top-help ()
+  "Help command for top."
   (interactive)
   (let ((helm-help-message helm-top-help-message))
     (helm-help)))
@@ -939,6 +945,7 @@ to modify occurences in your buffer.
 
 ;;;###autoload
 (defun helm-apt-help ()
+  "Help command for helm apt."
   (interactive)
   (let ((helm-help-message helm-apt-help-message))
     (helm-help)))
@@ -978,6 +985,7 @@ This feature is only available with emacs-25.
 
 ;;;###autoload
 (defun helm-el-package-help ()
+  "Help command for emacs packages."
   (interactive)
   (let ((helm-help-message helm-el-package-help-message))
     (helm-help)))
@@ -1005,6 +1013,7 @@ the amount of prefix args entered.
 
 ;;;###autoload
 (defun helm-M-x-help ()
+  "Help command for `helm-M-x'."
   (interactive)
   (let ((helm-help-message helm-M-x-help-message))
     (helm-help)))
@@ -1024,6 +1033,7 @@ the amount of prefix args entered.
 
 ;;;###autoload
 (defun helm-imenu-help ()
+  "Help command for imenu."
   (interactive)
   (let ((helm-help-message helm-imenu-help-message))
     (helm-help)))
@@ -1045,6 +1055,7 @@ the amount of prefix args entered.
 
 ;;;###autoload
 (defun helm-color-help ()
+  "Help command for color."
   (interactive)
   (let ((helm-help-message helm-colors-help-message))
     (helm-help)))
@@ -1064,6 +1075,7 @@ the amount of prefix args entered.
 
 ;;;###autoload
 (defun helm-semantic-help ()
+  "Help command for semantic."
   (interactive)
   (let ((helm-help-message helm-semantic-help-message))
     (helm-help)))
@@ -1092,6 +1104,7 @@ you don't choose from there a command using helm completion.
 
 ;;;###autoload
 (defun helm-kmacro-help ()
+  "Help command for kmacro."
   (interactive)
   (let ((helm-help-message helm-kmacro-help-message))
     (helm-help)))

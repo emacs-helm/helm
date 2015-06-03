@@ -254,7 +254,7 @@ Return a cons \(beg . end\)."
 (defvar helm-lgst-len nil)
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
-  "Helm lisp symbol completion at point."
+  "Preconfigured helm for lisp symbol completion at point."
   (interactive)
   (setq helm-lgst-len 0)
   (let* ((target     (helm-thing-before-point))
@@ -345,7 +345,7 @@ If SYM is not documented, return \"Not documented\"."
 
 ;;;###autoload
 (defun helm-complete-file-name-at-point (&optional force)
-  "Complete file name at point."
+  "Preconfigured helm to complete file name at point."
   (interactive)
   (require 'helm-mode)
   (let* ((tap (thing-at-point 'filename))
@@ -383,7 +383,7 @@ If SYM is not documented, return \"Not documented\"."
 
 ;;;###autoload
 (defun helm-lisp-completion-or-file-name-at-point ()
-  "Complete lisp symbol or filename at point.
+  "Preconfigured helm to complete lisp symbol or filename at point.
 Filename completion happen if string start after or between a double quote."
   (interactive)
   (let* ((tap (thing-at-point 'filename)))
@@ -630,6 +630,7 @@ Filename completion happen if string start after or between a double quote."
 
 ;;;###autoload
 (defun helm-locate-library ()
+  "Preconfigured helm to locate elisp libraries."
   (interactive)
   (helm :sources (helm-build-in-buffer-source  "Elisp libraries (Scan)"
                    :data (lambda () (helm-locate-library-scan-list))
@@ -817,6 +818,7 @@ Filename completion happen if string start after or between a double quote."
 
 ;;;###autoload
 (defun helm-complex-command-history ()
+  "Preconfigured helm for complex command history."
   (interactive)
   (helm :sources 'helm-source-complex-command-history
         :buffer "*helm complex commands*"))

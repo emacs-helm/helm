@@ -284,6 +284,7 @@ Show actions only on line starting by a PID."
 
 ;;;###autoload
 (defun helm-xrandr-set ()
+  "Preconfigured helm for xrandr."
   (interactive)
   (helm :sources 'helm-source-xrandr-change-resolution
         :buffer "*helm xrandr*"))

@@ -115,6 +115,7 @@ NOTE: This will be slow on large org buffers."
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
+  "Preconfigured helm for org files headings."
   (interactive)
   (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
         :candidate-number-limit 99999
@@ -122,6 +123,7 @@ NOTE: This will be slow on large org buffers."
 
 ;;;###autoload
 (defun helm-org-in-buffer-headings ()
+  "Preconfigured helm for org buffer headings."
   (interactive)
   (let ((helm-org-headings--nofilename t))
     (helm :sources (helm-source-org-headings-for-files
@@ -131,6 +133,7 @@ NOTE: This will be slow on large org buffers."
 
 ;;;###autoload
 (defun helm-org-capture-templates ()
+  "Preconfigured helm for org templates."
   (interactive)
   (helm :sources (helm-source-org-capture-templates)
         :candidate-number-limit 99999

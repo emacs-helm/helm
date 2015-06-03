@@ -617,7 +617,6 @@ If N is positive go forward otherwise go backward."
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-grep-other-frame)))
 
-;;;###autoload
 (defun helm-grep-run-save-buffer ()
   "Run grep save results action from `helm-do-grep-1'."
   (interactive)
@@ -697,17 +696,14 @@ Special commands:
                                  "\n"))))
          (message "Reverting buffer done"))))))
 
-;;;###autoload
 (defun helm-gm-next-file ()
   (interactive)
   (helm-goto-next-or-prec-file 1))
 
-;;;###autoload
 (defun helm-gm-precedent-file ()
   (interactive)
   (helm-goto-next-or-prec-file -1))
 
-;;;###autoload
 (defun helm-grep-mode-jump ()
   (interactive)
   (helm-grep-action
@@ -723,17 +719,14 @@ Special commands:
           (forward-line arg))
       (error nil))))
 
-;;;###autoload
 (defun helm-grep-mode-jump-other-window-forward ()
   (interactive)
   (helm-grep-mode-jump-other-window-1 1))
 
-;;;###autoload
 (defun helm-grep-mode-jump-other-window-backward ()
   (interactive)
   (helm-grep-mode-jump-other-window-1 -1))
 
-;;;###autoload
 (defun helm-grep-mode-jump-other-window ()
   (interactive)
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))

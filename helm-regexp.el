@@ -393,9 +393,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
         :input input
         :truncate-lines t))
 
-;;;###autoload
 (defun helm-moccur-run-save-buffer ()
-  "Run grep save results action from `helm-do-grep-1'."
+  "Run moccur save results action from `helm-moccur'."
   (interactive)
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-moccur-save-results)))

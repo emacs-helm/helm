@@ -257,6 +257,7 @@ but the initial search for all candidates in buffer(s)."
 
 ;;;###autoload
 (defun helm-dabbrev ()
+  "Preconfigured helm for dynamic abbreviations."
   (interactive)
   (let ((dabbrev (helm-thing-before-point nil helm-dabbrev--regexp))
         (limits (helm-bounds-of-thing-before-point helm-dabbrev--regexp))
