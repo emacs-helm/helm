@@ -4120,7 +4120,7 @@ don't exit and send message 'no match'."
   ;; helm timer is between two cycles.
   ;; IOW `helm-check-minibuffer-input' haven't yet compared input
   ;; and `helm-pattern'.
-  (or (not (equal (minibuffer-contents) helm-input))
+  (or (not (equal (minibuffer-contents) helm-pattern))
       ;; `helm-check-minibuffer-input' have launched `helm-update'.
       helm--in-update))
 
