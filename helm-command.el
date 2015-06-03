@@ -159,7 +159,7 @@ fuzzy matching is running its own sort function with a different algorithm."
                     (push (helm-cmd--get-current-function-name) results))))
            finally return results))
 
-(defun helm-M-x-read-extended-command (&optional collection)
+(defun helm-M-x-read-extended-command (&optional collection history)
   "Read command name to invoke in `helm-M-x'.
 Helm completion is not provided when executing or defining
 kbd macros.
@@ -219,7 +219,7 @@ than the default which is OBARRAY."
                 :buffer "*helm M-x*"
                 :persistent-action pers-help
                 :persistent-help "Describe this command"
-                :history extended-command-history
+                :history (or history extended-command-history)
                 :reverse-history helm-M-x-reverse-history
                 :del-input nil
                 :mode-line helm-M-x-mode-line
