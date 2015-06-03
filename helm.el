@@ -34,7 +34,7 @@
 (defmacro helm-with-gensyms (symbols &rest body)
   "Bind the SYMBOLS to fresh uninterned symbols and eval BODY."
   (declare (indent 1))
-  `(let ,(mapcar (lambda (s) `(,s (make-symbol (concat "--" (symbol-name ',s)))))
+  `(let ,(mapcar (lambda (s) `(,s (cl-gensym (symbol-name ',s))))
                  symbols)
      ,@body))
 
@@ -1112,13 +1112,14 @@ not `exit-minibuffer' or unwanted functions."
 (defmacro with-helm-temp-hook (hook &rest body)
   "Execute temporarily BODY as a function for HOOK."
   (declare (indent 1) (debug t))
-  (helm-with-gensyms (fun)
+  (helm-with-gensyms (helm--hook)
     `(progn
-       (defun ,fun ()
+       (defun ,helm--hook ()
          (unwind-protect
               (progn ,@body)
-           (remove-hook ,hook (quote ,fun))))
-       (add-hook ,hook (quote ,fun)))))
+           (remove-hook ,hook (quote ,helm--hook))
+           (fmakunbound (quote ,helm--hook))))
+       (add-hook ,hook (quote ,helm--hook)))))
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
@@ -2610,6 +2611,14 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
+  ;; Remove the temporary hooks added
+  ;; by `with-helm-after-update-hook' that
+  ;; may not been consumed.
+  (setq helm-after-update-hook
+        (cl-loop for hook in helm-after-update-hook
+                 for val = (symbol-name hook)
+                 unless (string-match "helm--hook[0-9]+" val)
+                 collect hook))
   ;; When running helm from a dedicated frame
   ;; with no minibuffer, helm will run in the main frame
   ;; which have a minibuffer, so be sure to disable
