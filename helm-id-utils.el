@@ -62,9 +62,7 @@
                       (force-mode-line-update))
                     (helm-log "Error: Gid %s"
                               (replace-regexp-in-string "\n" "" event)))))))))
-   (filtered-candidate-transformer :initform (lambda (candidates _source)
-                                               (cl-loop for c in candidates
-                                                        collect (helm-grep--filter-candidate-1 c))))
+   (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
    (candidate-number-limit :initform 99999)
    (action :initform (helm-make-actions
                       "Find File" 'helm-grep-action

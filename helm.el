@@ -2656,8 +2656,9 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   ;; This happen only when source is `delayed'.
   (when helm--maybe-use-default-as-input ; nil when non--delayed.
     (setq input helm-pattern)
-    (with-helm-after-update-hook (setq helm-pattern ""))
-    (setq helm--maybe-use-default-as-input nil))
+    (with-helm-after-update-hook
+      (setq helm-pattern "")
+      (setq helm--maybe-use-default-as-input nil)))
   ;; In delayed sources `helm-pattern' have not been resat yet.
   (unless (equal input helm-pattern)
     (setq helm-pattern input)

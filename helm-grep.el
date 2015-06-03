@@ -995,13 +995,15 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
              (lambda () (or helm-ff-default-directory
                             (helm-default-directory)
                             default-directory)))))
-    (helm-grep--filter-candidate-1 candidate)))
+    (if (consp candidate)
+        (helm-grep--filter-candidate-1 (car candidate))
+        (helm-grep--filter-candidate-1 candidate))))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
   (require 'helm-match-plugin)
   (let (beg end)
-    (condition-case nil
+    (condition-case-unless-debug nil
         (with-temp-buffer
           (insert str)
           (goto-char (point-min))
