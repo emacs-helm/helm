@@ -2460,18 +2460,22 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; Don't force update with an empty pattern.
       ;; Reset also `helm--maybe-use-default-as-input' as this checking
       ;; happen only on startup.
-      (when (and helm--maybe-use-default-as-input
-                 (not source-delayed-p)
+      (when helm--maybe-use-default-as-input
+        (if (and (not source-delayed-p)
                  (not source-process-p))
-        ;; Store value of default temporarily here waiting next update
-        ;; to allow action like helm-moccur-action matching pattern
-        ;; at the place it jump to.
-        (setq helm-input helm-pattern)
-        (setq helm-pattern "")
-        (setq helm--maybe-use-default-as-input nil)
-        (and (helm-empty-buffer-p)
-             (null helm-quit-if-no-candidate)
-             (helm-force-update)))
+            (progn
+              ;; Store value of default temporarily here waiting next update
+              ;; to allow action like helm-moccur-action matching pattern
+              ;; at the place it jump to.
+              (setq helm-input helm-pattern)
+              (setq helm-pattern "")
+              (setq helm--maybe-use-default-as-input nil)
+              (and (helm-empty-buffer-p)
+                   (null helm-quit-if-no-candidate)
+                   (helm-force-update)))
+            (with-helm-after-update-hook
+              (setq helm-pattern "")
+              (setq helm--maybe-use-default-as-input nil))))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
       (cond ((and helm-execute-action-at-once-if-one
@@ -2689,19 +2693,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   ;; `helm--maybe-use-default-as-input' and ignore this.
   ;; This happen only when source is `delayed'.
   (when helm--maybe-use-default-as-input ; nil when non--delayed.
-    (setq input helm-pattern)
-    (with-helm-after-update-hook
-      ;; FIXME: Large output of processes (async sources)
-      ;;        are restarting twice or more at each truncated
-      ;;        chunks.
-      ;;        helm-pattern is modified at first stop which
-      ;;        doesnt allow filters to use it for the rest
-      ;;        of the output. As a workaround a timer can
-      ;;        be used here, but it would be better to find
-      ;;        a better fix.
-      (setq helm-pattern "")
-      (setq helm--maybe-use-default-as-input nil)))
-  ;; In delayed sources `helm-pattern' have not been resat yet.
+    (setq input helm-pattern))
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
