@@ -2461,21 +2461,19 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; Reset also `helm--maybe-use-default-as-input' as this checking
       ;; happen only on startup.
       (when helm--maybe-use-default-as-input
-        (if (and (not source-delayed-p)
-                 (not source-process-p))
-            (progn
-              ;; Store value of default temporarily here waiting next update
-              ;; to allow action like helm-moccur-action matching pattern
-              ;; at the place it jump to.
-              (setq helm-input helm-pattern)
-              (setq helm-pattern "")
-              (setq helm--maybe-use-default-as-input nil)
-              (and (helm-empty-buffer-p)
-                   (null helm-quit-if-no-candidate)
-                   (helm-force-update)))
+        (if (or source-delayed-p source-process-p)
             (with-helm-after-update-hook
               (setq helm-pattern "")
-              (setq helm--maybe-use-default-as-input nil))))
+              (setq helm--maybe-use-default-as-input nil))
+            ;; Store value of `default' temporarily here waiting next update
+            ;; to allow actions like helm-moccur-action matching pattern
+            ;; at the place it jump to.
+            (setq helm-input helm-pattern)
+            (setq helm-pattern "")
+            (setq helm--maybe-use-default-as-input nil)
+            (and (helm-empty-buffer-p)
+                 (null helm-quit-if-no-candidate)
+                 (helm-force-update))))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
       (cond ((and helm-execute-action-at-once-if-one
