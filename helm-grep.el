@@ -1001,11 +1001,13 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
           (insert str)
           (goto-char (point-min))
           (cl-loop for reg in (if multi-match
+                                  ;; (m)occur.
                                   (cl-loop for r in (helm-mp-split-pattern
                                                      helm-pattern)
                                            unless (string-match "\\`!" r)
                                            collect r)
-                                  (list helm-pattern))
+                                  ;; async sources (grep, gid etc...)
+                                  (list helm-input))
                    do
                    (while (and (re-search-forward reg nil t)
                                (> (- (setq end (match-end 0))

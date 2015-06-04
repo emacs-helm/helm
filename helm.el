@@ -2461,14 +2461,16 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       ;; Reset also `helm--maybe-use-default-as-input' as this checking
       ;; happen only on startup.
       (when helm--maybe-use-default-as-input
+        ;; Store value of `default' temporarily here waiting next update
+        ;; to allow actions like helm-moccur-action matching pattern
+        ;; at the place it jump to.
+        (setq helm-input helm-pattern)
         (if (or source-delayed-p source-process-p)
+            ;; Reset pattern to next update.
             (with-helm-after-update-hook
               (setq helm-pattern "")
               (setq helm--maybe-use-default-as-input nil))
-            ;; Store value of `default' temporarily here waiting next update
-            ;; to allow actions like helm-moccur-action matching pattern
-            ;; at the place it jump to.
-            (setq helm-input helm-pattern)
+            ;; Reset pattern right now.
             (setq helm-pattern "")
             (setq helm--maybe-use-default-as-input nil)
             (and (helm-empty-buffer-p)
