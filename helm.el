@@ -891,7 +891,8 @@ Use :default arg of `helm' as input to update display.
 Note that if also :input is specified as `helm' arg, it will take
 precedence on :default.
 NOTE: Async sources are not supporting this.")
-
+(defvar helm--temp-hooks nil
+  "Store temporary hooks added by `with-helm-temp-hook'.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -1125,6 +1126,7 @@ not `exit-minibuffer' or unwanted functions."
               (progn ,@body)
            (remove-hook ,hook (quote ,helm--hook))
            (fmakunbound (quote ,helm--hook))))
+       (push (cons ',helm--hook ,hook) helm--temp-hooks)
        (add-hook ,hook (quote ,helm--hook)))))
 
 (defmacro with-helm-after-update-hook (&rest body)
@@ -2643,11 +2645,11 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
   ;; Remove the temporary hooks added
-  ;; by `with-helm-after-update-hook' that
-  ;; may not been consumed.
-  (setq helm-after-update-hook
-        (helm-remove-if-match
-         "helm--hook[0-9]+" helm-after-update-hook))
+  ;; by `with-helm-temp-hook' that
+  ;; may not have been consumed.
+  (when helm--temp-hooks
+    (cl-loop for (fn . hook) in helm--temp-hooks
+             do (set hook (delete fn (symbol-value hook)))))
   ;; When running helm from a dedicated frame
   ;; with no minibuffer, helm will run in the main frame
   ;; which have a minibuffer, so be sure to disable
