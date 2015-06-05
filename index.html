@@ -1,40 +1,27 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Helm : Emacs incremental completion and selection narrowing framework">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Helm</title>
+    <meta charset="UTF-8">
+    <title>Helm by emacs-helm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Helm</h1>
+      <h2 class="project-tagline">Emacs incremental completion and selection narrowing framework</h2>
+      <a href="https://github.com/emacs-helm/helm" class="btn">View on GitHub</a>
+      <a href="https://github.com/emacs-helm/helm/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/emacs-helm/helm/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/emacs-helm/helm">View on GitHub</a>
-
-          <h1 id="project_title">Helm</h1>
-          <h2 id="project_tagline">Emacs incremental completion and selection narrowing framework</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/emacs-helm/helm/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/emacs-helm/helm/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3"></a>
+    <section class="main-content">
+      <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3"></a>
 <a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA"></a>
-<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable"></a>
-<a href="https://www.gratipay.com/thierryvolpiatto/"><img src="http://img.shields.io/gratipay/thierryvolpiatto.svg" alt="Gratipay"></a></p>
+<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable"></a></p>
 
 <h1>
 <a id="emacs-helm" class="anchor" href="#emacs-helm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Emacs-helm</h1>
@@ -48,7 +35,7 @@
 Emacs. It will help steer you in the right direction when you're looking
 for stuff in Emacs (like buffers, files, etc).</p>
 
-<p>Helm is a fork of <code>anything.el</code> originaly written by Tamas Patrovic
+<p>Helm is a fork of <code>anything.el</code> originally written by Tamas Patrovic
 and can be considered to be its successor. 
 <code>Helm</code> sets out to clean up the legacy code in <code>anything.el</code>
 and provide a cleaner, leaner and more modular tool, that's not tied in
@@ -86,9 +73,9 @@ copy/rename asynchronously your files from helm and/or dired if needed).</p>
 <p>Add to <code>.emacs.el</code> (or equivalent):</p>
 
 <div class="highlight highlight-elisp"><pre><span class="pl-c">;; [Facultative] Only if you have installed async.</span>
-(add-to-<span class="pl-s3">list</span> '<span class="pl-s3">load</span>-path <span class="pl-s1"><span class="pl-pds">"</span>/path/to/async/directory<span class="pl-pds">"</span></span>)
+(add-to-list 'load-path <span class="pl-s"><span class="pl-pds">"</span>/path/to/async/directory<span class="pl-pds">"</span></span>)
 
-(add-to-<span class="pl-s3">list</span> '<span class="pl-s3">load</span>-path <span class="pl-s1"><span class="pl-pds">"</span>/path/to/helm/directory<span class="pl-pds">"</span></span>)
+(add-to-list 'load-path <span class="pl-s"><span class="pl-pds">"</span>/path/to/helm/directory<span class="pl-pds">"</span></span>)
 (require 'helm-config)</pre></div>
 </li>
 </ol>
@@ -240,7 +227,7 @@ infos.</p>
 <code>helm-lisp-completion-at-point</code>: Enabled by setting <code>helm-lisp-fuzzy-completion</code> to <code>t</code>.</li>
 </ul>
 
-<p><strong>IMPORTANT</strong>: To make fuzzy-matching fast, you must not set <code>helm-candidate-number-limit</code> to high. It is recommended that you leave variable with its default value 100. The higher you set <code>helm-candidate-number-limit</code>, the slower fuzzy-matching.</p>
+<p><strong>IMPORTANT</strong>: To make fuzzy-matching fast, you must not set <code>helm-candidate-number-limit</code> too high. It is recommended that you leave the variable with its default value 100. The higher you set <code>helm-candidate-number-limit</code>, the slower fuzzy-matching will be.</p>
 
 <h4>
 <a id="autoresize" class="anchor" href="#autoresize" aria-hidden="true"><span class="octicon octicon-link"></span></a>Autoresize</h4>
@@ -252,9 +239,9 @@ infos.</p>
 
 <p>Here is a demo:</p>
 
-<p><img src="doc/helm-autoresize-mode.gif" alt="helm-buffers-list"></p>
+<p><img src="images/helm-autoresize-mode.gif" alt="helm-buffers-list"></p>
 
-<p>You can customize the minimum and maximum height that Helm can resize with these two variable:</p>
+<p>You can customize the minimum and maximum height that Helm can resize with these two variables:</p>
 
 <ul>
 <li><code>helm-autoresize-max-height</code></li>
@@ -271,7 +258,7 @@ infos.</p>
 <p>Check out the project's
 <a href="https://github.com/emacs-helm/helm/issues?sort=created&amp;direction=desc&amp;state=open">issue list</a>
 a list of unresolved issues. By the way - feel free to fix any of them
-and sent us a pull request. :-)</p>
+and send us a pull request. :-)</p>
 
 <h2>
 <a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h2>
@@ -297,18 +284,16 @@ on <a href="https://groups.google.com/group/emacs-helm?hl=en">emacs-helm google 
 
 <p>Cheers,<br>
 The Helm Team</p>
-      </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Helm maintained by <a href="https://github.com/emacs-helm">emacs-helm</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/emacs-helm/helm">Helm</a> is maintained by <a href="https://github.com/emacs-helm">emacs-helm</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-              <script type="text/javascript">
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -319,6 +304,6 @@ The Helm Team</p>
             } catch(err) {}
           </script>
 
-
   </body>
 </html>
+
