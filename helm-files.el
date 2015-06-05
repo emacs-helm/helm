@@ -1237,8 +1237,7 @@ The checksum is copied to kill-ring."
   (interactive)
   (with-helm-alive-p
     (unless (helm-empty-source-p)
-      (helm-attrset 'toggle-basename '(helm-ff-toggle-basename . never-split))
-      (helm-execute-persistent-action 'toggle-basename))))
+      (helm-ff-toggle-basename nil))))
 
 (cl-defun helm-reduce-file-name (fname level &key unix-close expand)
   "Reduce FNAME by LEVEL from end or beginning depending LEVEL value.
