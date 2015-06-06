@@ -692,7 +692,7 @@ will not be loaded first time you use this."
   (when (or eshell-command-aliases-list
             (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
     (and eshell-command-aliases-list (eshell-read-aliases-list))
-    (let* ((cand-list (helm-marked-candidates :with-wildcard t))
+    (let* ((cand-list (helm-marked-candidates))
            (default-directory (or helm-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
@@ -711,7 +711,8 @@ will not be loaded first time you use this."
                        "C-c ?: Help, \\[universal-argument]: Insert output at point")
                      :input-history
                      'helm-eshell-command-on-file-input-history))
-           (alias-value (car (assoc-default command eshell-command-aliases-list))))
+           (alias-value (car (assoc-default command eshell-command-aliases-list)))
+           cmd-line)
       (if (or (equal helm-current-prefix-arg '(16))
               (equal map '(16)))
           ;; Two time C-u from `helm-comp-read' mean print to current-buffer.
@@ -739,8 +740,10 @@ will not be loaded first time you use this."
           ;; on `default-directory' (limitation).
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "'%s'\\|\"%s\"\\|%s" command)
-                (eshell-command (format command mapfiles)) ; See [1]
-              (eshell-command (format "%s %s" command mapfiles))))
+                (setq cmd-line (format command mapfiles)) ; See [1]
+              (setq cmd-line (format "%s %s" command mapfiles)))
+            (helm-log "%S" cmd-line)
+            (eshell-command cmd-line))
 
         ;; Run eshell-command on EACH marked files.
         ;; To work with tramp handler we have to call
