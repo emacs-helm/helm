@@ -2408,6 +2408,10 @@ Please don't use it.
   :keymap (and helm-alive-p helm-map)
   (unless helm-alive-p (setq helm--minor-mode nil)))
 
+(defun helm--reset-default-pattern ()
+  (setq helm-pattern "")
+  (setq helm--maybe-use-default-as-input nil))
+
 (defun helm-read-pattern-maybe (any-prompt any-input
                                 any-preselect any-resume any-keymap
                                 any-default any-history)
@@ -2470,11 +2474,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
         (if (or source-delayed-p source-process-p)
             ;; Reset pattern to next update.
             (with-helm-after-update-hook
-              (setq helm-pattern "")
-              (setq helm--maybe-use-default-as-input nil))
+              (helm--reset-default-pattern))
             ;; Reset pattern right now.
-            (setq helm-pattern "")
-            (setq helm--maybe-use-default-as-input nil))
+            (helm--reset-default-pattern))
         ;; Ensure force-update when no candidates
         ;; when we start with an empty pattern.
         (and (helm-empty-buffer-p)
