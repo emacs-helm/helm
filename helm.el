@@ -2474,10 +2474,12 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
               (setq helm--maybe-use-default-as-input nil))
             ;; Reset pattern right now.
             (setq helm-pattern "")
-            (setq helm--maybe-use-default-as-input nil)
-            (and (helm-empty-buffer-p)
-                 (null helm-quit-if-no-candidate)
-                 (helm-force-update))))
+            (setq helm--maybe-use-default-as-input nil))
+        ;; Ensure force-update when no candidates
+        ;; when we start with an empty pattern.
+        (and (helm-empty-buffer-p)
+             (null helm-quit-if-no-candidate)
+             (helm-force-update)))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
       (cond ((and helm-execute-action-at-once-if-one
