@@ -437,6 +437,15 @@ also using not recursive wilcard (e.g \"*.el\") is perfectly fine for this.
 This feature (\"**\") is activated by default with the option `helm-file-globstar'.
 The directory selection with \"**foo/\" like bash shopt globstar option is not supported yet.
 
+*** Copying renaming asynchronously
+
+If you use async library (if you have installed helm from MELPA you do) you can enable
+async for copying/renaming etc... your files by enabling `dired-async-mode'.
+
+Note that even when async is enabled, running a copy/rename action with a prefix arg
+will execute action synchronously, it will follow also the first file of the marked files
+in its destination directory.
+
 *** Bookmark your `helm-find-files' session
 
 You can bookmark your `helm-find-files' session with `C-x r m'.
