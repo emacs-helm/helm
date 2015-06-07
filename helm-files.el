@@ -2968,7 +2968,6 @@ See `helm-browse-project'."
     (helm-quit-and-execute-action 'helm-ff-browse-project)))
 
 (defun helm-ff-gid (_candidate)
-  (require 'helm-id-utils)
   (with-helm-default-directory helm-ff-default-directory
       (helm-gid)))
 
