@@ -2843,7 +2843,8 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
        (if (and (listp it)
                 (not (functionp it))) ;; Don't treat lambda's as list.
            (cl-loop for f in it
-                 do (setq ,candidate (funcall f ,candidate)))
+                 do (setq ,candidate (funcall f ,candidate))
+                 finally return ,candidate)
          (setq ,candidate (funcall it ,candidate)))))
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
