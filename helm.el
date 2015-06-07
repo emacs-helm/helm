@@ -2851,9 +2851,8 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 Return CANDIDATES when pattern is empty."
   (helm-aif (and (string= helm-pattern "")
                  (assoc-default 'filter-one-by-one source))
-      (cl-loop for cand in candidates
-            do (helm--maybe-process-filter-one-by-one-candidate cand source)
-            collect cand)
+      (cl-loop for cand in candidates collect
+               (helm--maybe-process-filter-one-by-one-candidate cand source))
     candidates))
 
 (defun helm-process-filtered-candidate-transformer-maybe
