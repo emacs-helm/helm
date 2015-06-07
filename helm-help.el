@@ -69,14 +69,14 @@ Find here the documentation of all sources actually documented."
   (require 'helm-org)
   (when arg (delete-file helm-documentation-file)
         (helm-aif (get-file-buffer helm-documentation-file)
-          (kill-buffer it)))
+            (kill-buffer it)))
   (unless (file-exists-p helm-documentation-file)
     (with-temp-file helm-documentation-file
       (erase-buffer)
       (cl-loop for elm in helm-help--string-list
-            for str = (symbol-value elm)
-            do (insert (substitute-command-keys
-                        (if (functionp str) (funcall str) str))))))
+               for str = (symbol-value elm)
+               do (insert (substitute-command-keys
+                           (if (functionp str) (funcall str) str))))))
   (let ((helm-org-headings--nofilename t))
     (helm :sources (helm-source-org-headings-for-files
                     (list helm-documentation-file))
@@ -443,6 +443,12 @@ You can bookmark your `helm-find-files' session with `C-x r m'.
 You can retrieve later these bookmarks easily by using M-x helm-filtered-bookmarks
 or from the current `helm-find-files' session just hitting `C-x r b'.
 
+*** Run Gid from `helm-find-files'
+
+You can navigate to a project containing an ID file created with the `mkid'
+command from id-utils, and run the `gid' command which will use the symbol at point
+in `helm-current-buffer' as default.
+
 \n** Specific commands for `helm-find-files':\n
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\t->Run Locate (C-u to specify locate db, M-n insert basename of candidate)
@@ -451,6 +457,7 @@ or from the current `helm-find-files' session just hitting `C-x r b'.
 \\[helm-ff-run-grep]\t\t->Run Grep (C-u Recursive).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
 \\[helm-ff-run-zgrep]\t\t->Run zgrep (C-u Recursive).
+\\[helm-ff-run-gid]\t\t->Run gid (id-utils).
 \\[helm-ff-run-etags]\t\t->Run Etags (C-u use thing-at-point `C-u C-u' reload cache)
 \\[helm-ff-run-rename-file]\t\t->Rename File (C-u Follow).
 \\[helm-ff-run-query-replace-on-marked]\t\t->Query replace on marked files.
@@ -652,6 +659,16 @@ before entering anything in pattern, and hit again `C-!' when
 your regexp is ready to send to remote process, even if helm is handling
 this by delaying each process at 5s. 
 Or even better don't use tramp at all and mount your remote file system on SSHFS.
+
+* Helm Gid\n
+** Helm Gid tips
+
+Helm gid read the database created with the `mkid' command from id-utils.
+The name of the database file can be customized with `helm-gid-db-file-name', it
+is usually \"ID\".
+Helm Gid use the symbol at point as default-input.
+You have access to this command also from `helm-find-files' which allow you to
+navigate to another directory to consult its database.
 
 \n** Specific commands for Helm Grep:\n
 \\<helm-grep-map>
