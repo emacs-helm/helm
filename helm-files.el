@@ -46,6 +46,7 @@
 (declare-function eshell-bol "esh-mode")
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
+(declare-function helm-gid "helm-id-utils.el")
 
 (defvar recentf-list)
 
@@ -308,6 +309,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
     (define-key map (kbd "M-g z")         'helm-ff-run-zgrep)
+    (define-key map (kbd "C-c g")         'helm-ff-run-gid)
     (define-key map (kbd "M-.")           'helm-ff-run-etags)
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
@@ -465,6 +467,7 @@ Should not be used among other sources.")
      "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
      "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
      "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
+     "Gid" 'helm-ff-gid
      "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
      "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
      "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
@@ -2963,6 +2966,16 @@ See `helm-browse-project'."
   (interactive)
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-ff-browse-project)))
+
+(defun helm-ff-gid (_candidate)
+  (require 'helm-id-utils)
+  (with-helm-default-directory helm-ff-default-directory
+      (helm-gid)))
+
+(defun helm-ff-run-gid ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-quit-and-execute-action 'helm-ff-gid)))
 
 ;;; session.el files
 ;;
