@@ -655,53 +655,6 @@ Filename completion happen if string start after or between a double quote."
                                           (format "'%s" (prin1-to-string val)))))))
 
 
-;;; Type attributes
-;;
-;;
-(let ((actions '(("Describe command" . describe-function)
-                 ("Add command to kill ring" . helm-kill-new)
-                 ("Go to command's definition" . find-function)
-                 ("Debug on entry" . debug-on-entry)
-                 ("Cancel debug on entry" . cancel-debug-on-entry)
-                 ("Trace function" . trace-function)
-                 ("Trace function (background)" . trace-function-background)
-                 ("Untrace function" . untrace-function))))
-  (define-helm-type-attribute 'command
-      `((action ("Call interactively" . helm-call-interactively)
-                ,@actions)
-        (coerce . helm-symbolify)
-        (persistent-action . describe-function))
-    "Command. (string or symbol)")
-
-  (define-helm-type-attribute 'function
-      `((action . ,actions)
-        (action-transformer helm-transform-function-call-interactively)
-        (candidate-transformer helm-mark-interactive-functions)
-        (coerce . helm-symbolify))
-    "Function. (string or symbol)"))
-
-(define-helm-type-attribute 'variable
-    '((action
-       ("Describe variable" . describe-variable)
-       ("Add variable to kill ring" . helm-kill-new)
-       ("Go to variable's definition" . find-variable)
-       ("Set variable" . helm-set-variable))
-      (coerce . helm-symbolify))
-  "Variable.")
-
-(define-helm-type-attribute 'timer
-    '((action
-       ("Cancel Timer" . (lambda (_timer)
-                           (let ((mkd (helm-marked-candidates)))
-                             (cl-loop for timer in mkd
-                                   do (cancel-timer timer)))))
-       ("Describe Function" . (lambda (tm) (describe-function (timer--function tm))))
-       ("Find Function" . (lambda (tm) (find-function (timer--function tm)))))
-      (persistent-action . (lambda (tm) (describe-function (timer--function tm))))
-      (persistent-help . "Describe Function"))
-  "Timer.")
-
-
 ;;; Elisp Timers.
 ;;
 ;;
