@@ -703,9 +703,9 @@ will not be loaded first time you use this."
            (command (helm-comp-read
                      "Command: "
                      (cl-loop for (a . c) in eshell-command-aliases-list
-                           when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
-                           collect (propertize a 'help-echo (car c)) into ls
-                           finally return (sort ls 'string<))
+                              when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
+                              collect (propertize a 'help-echo (car c)) into ls
+                              finally return (sort ls 'string<))
                      :buffer "*helm eshell on file*"
                      :name "Eshell command"
                      :keymap helm-esh-on-file-map
@@ -721,9 +721,9 @@ will not be loaded first time you use this."
           ;; Two time C-u from `helm-comp-read' mean print to current-buffer.
           ;; i.e `eshell-command' will use this value.
           (setq current-prefix-arg '(16))
-        ;; Else reset the value of `current-prefix-arg'
-        ;; to avoid printing in current-buffer.
-        (setq current-prefix-arg nil))
+          ;; Else reset the value of `current-prefix-arg'
+          ;; to avoid printing in current-buffer.
+          (setq current-prefix-arg nil))
       (if (and (or
                 ;; One prefix-arg have been passed before `helm-comp-read'.
                 ;; If map have been set with C-u C-u (value == '(16))
@@ -744,26 +744,26 @@ will not be loaded first time you use this."
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                 (setq cmd-line (format command mapfiles)) ; See [1]
-              (setq cmd-line (format "%s %s" command mapfiles)))
+                (setq cmd-line (format "%s %s" command mapfiles)))
             (helm-log "%S" cmd-line)
             (eshell-command cmd-line))
 
-        ;; Run eshell-command on EACH marked files.
-        ;; To work with tramp handler we have to call
-        ;; COMMAND on basename of each file, using
-        ;; its basedir as `default-directory'.
-        (cl-loop for f in cand-list
-              for dir = (and (not (string-match ffap-url-regexp f))
-                             (helm-basedir f))
-              for file = (format "'%s'" (if (and dir (file-remote-p dir))
-                                            (helm-basename f) f))
-              for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
-                            ;; [1] This allow to enter other args AFTER filename
-                            ;; i.e <command %s some_more_args>
-                            (format command file)
-                          (format "%s %s" command file))
-              do (let ((default-directory (or dir default-directory)))
-                   (eshell-command com)))))))
+          ;; Run eshell-command on EACH marked files.
+          ;; To work with tramp handler we have to call
+          ;; COMMAND on basename of each file, using
+          ;; its basedir as `default-directory'.
+          (cl-loop for f in cand-list
+                   for dir = (and (not (string-match ffap-url-regexp f))
+                                  (helm-basedir f))
+                   for file = (format "%s" (if (and dir (file-remote-p dir))
+                                               (helm-basename f) f))
+                   for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
+                                 ;; [1] This allow to enter other args AFTER filename
+                                 ;; i.e <command %s some_more_args>
+                                 (format command file)
+                                 (format "%s %s" command file))
+                   do (let ((default-directory (or dir default-directory)))
+                        (eshell-command com)))))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
