@@ -991,7 +991,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
                             (helm-default-directory)
                             default-directory)))))
     (if (consp candidate)
-        (helm-grep--filter-candidate-1 (car candidate))
+        (helm-grep--filter-candidate-1 (cdr candidate))
         (helm-grep--filter-candidate-1 candidate))))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
