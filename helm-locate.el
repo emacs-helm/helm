@@ -208,8 +208,7 @@ Argument INITIAL-INPUT is a string to use as initial-input.
 See also `helm-locate'."
   (when (and db (stringp db)) (setq db (list db)))
   (helm-locate-set-command)
-  (let ((helm-ff-transformer-show-only-basename nil)
-        (helm-locate-command
+  (let ((helm-locate-command
          (if db
              (replace-regexp-in-string
               "locate"
@@ -225,6 +224,7 @@ See also `helm-locate'."
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))
     (helm :sources 'helm-source-locate
           :buffer "*helm locate*"
+          :ff-transformer-show-only-basename nil
           :input initial-input
           :default default
           :history 'helm-file-name-history)))
@@ -303,8 +303,7 @@ See also `helm-locate'."
 
 ;;;###autoload
 (defun helm-locate-read-file-name (prompt)
-  (let* (helm-ff-transformer-show-only-basename
-         (src `((name . "Locate read fname")
+  (let* ((src `((name . "Locate read fname")
                 (init . helm-locate-set-command)
                 (candidates-process . helm-locate-init)
                 (action . identity)
@@ -315,6 +314,7 @@ See also `helm-locate'."
                 (candidate-number-limit . 9999)
                 (no-matchplugin))))
     (or (helm :sources src
+              :ff-transformer-show-only-basename nil
               :prompt prompt
               :buffer "*helm locate read fname*"
               :resume 'noresume)

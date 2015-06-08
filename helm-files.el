@@ -1232,12 +1232,13 @@ The checksum is copied to kill-ring."
     (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (_candidate)
-  (setq helm-ff-transformer-show-only-basename
-        (not helm-ff-transformer-show-only-basename))
-  (let* ((cand   (helm-get-selection nil t))
-         (target (if helm-ff-transformer-show-only-basename
-                     (helm-basename cand) cand)))
-    (helm-force-update (regexp-quote target))))
+  (with-helm-buffer
+    (setq helm-ff-transformer-show-only-basename
+          (not helm-ff-transformer-show-only-basename))
+    (let* ((cand   (helm-get-selection nil t))
+           (target (if helm-ff-transformer-show-only-basename
+                       (helm-basename cand) cand)))
+      (helm-force-update (regexp-quote target)))))
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
@@ -2306,6 +2307,8 @@ Use it for non--interactive calls of `helm-find-files'."
           :input fname
           :case-fold-search helm-file-name-case-fold-search
           :preselect preselect
+          :ff-transformer-show-only-basename
+          helm-ff-transformer-show-only-basename
           :default def
           :prompt "Find Files or Url: "
           :buffer "*Helm Find Files*")))
@@ -3273,8 +3276,9 @@ Run all sources defined in `helm-for-files-preferred-list'."
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
-  (let ((helm-ff-transformer-show-only-basename nil))
-    (helm :sources helm-for-files-preferred-list :buffer "*helm for files*")))
+  (helm :sources helm-for-files-preferred-list
+        :ff-transformer-show-only-basename nil
+        :buffer "*helm for files*"))
 
 ;;;###autoload
 (defun helm-multi-files ()
@@ -3288,7 +3292,6 @@ locate."
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (setq helm-multi-files--toggle-locate nil)
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
-        (helm-ff-transformer-show-only-basename nil)
         (old-key (lookup-key
                   helm-map
                   (read-kbd-macro helm-multi-files-toggle-locate-binding))))
@@ -3297,6 +3300,7 @@ locate."
         'helm-multi-files-toggle-to-locate))
     (unwind-protect
          (helm :sources sources
+               :ff-transformer-show-only-basename nil
                :buffer "*helm multi files*")
       (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
         old-key))))
@@ -3305,8 +3309,9 @@ locate."
 (defun helm-recentf ()
   "Preconfigured `helm' for `recentf'."
   (interactive)
-  (let ((helm-ff-transformer-show-only-basename nil))
-    (helm-other-buffer 'helm-source-recentf "*helm recentf*")))
+  (helm :sources 'helm-source-recentf
+        :ff-transformer-show-only-basename nil
+        :buffer "*helm recentf*"))
 
 (provide 'helm-files)
 
