@@ -108,11 +108,13 @@ fuzzy completion is not available in `completion-at-point'."
   :group 'helm-elisp-faces)
 
 (defcustom helm-elisp-help-function
-  'helm-elisp-showdoc-modeline
+  'helm-elisp-show-doc-modeline
   "Function for displaying help for lisp symbols."
   :group 'helm-elisp
-  :type '(choice (function :tag "Open help for the symbol." helm-elisp-showhelp)
-                 (function :tag "Show one liner in modeline." helm-elisp-showdoc-modeline)))
+  :type '(choice (function :tag "Open help for the symbol."
+                  helm-elisp-show-help)
+                 (function :tag "Show one liner in modeline."
+                  helm-elisp-show-doc-modeline)))
 
 
 ;;; Show completion.
@@ -291,7 +293,8 @@ Return a cons \(beg . end\)."
                       :nomark t
                       :fuzzy-match helm-lisp-fuzzy-completion
                       :persistent-help "Show brief doc in mode-line"
-                      :filtered-candidate-transformer 'helm-lisp-completion-transformer
+                      :filtered-candidate-transformer
+                      'helm-lisp-completion-transformer
                       :action `(lambda (candidate)
                                  (with-helm-current-buffer
                                    (run-with-timer
@@ -306,10 +309,12 @@ Return a cons \(beg . end\)."
       (message "[No Match]"))))
 
 (defun helm-lisp-completion-persistent-action (candidate)
-  "Show documentation for the function."
-  (apply helm-elisp-help-function (list candidate)))
+  "Show documentation for the function.
+Documentation is shown briefly in mode-line or completely
+in other window according to the value of `helm-elisp-help-function'."
+  (funcall helm-elisp-help-function candidate))
 
-(defun helm-elisp-showhelp (candidate)
+(defun helm-elisp-show-help (candidate)
   "Show full help for the function."
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
@@ -317,8 +322,8 @@ Return a cons \(beg . end\)."
       (bound    (describe-variable sym))
       (face     (describe-face sym)))))
 
-(defun helm-elisp-showdoc-modeline (candidate)
-  "Show documentation for the function in modeline."
+(defun helm-elisp-show-doc-modeline (candidate)
+  "Show brief documentation for the function in modeline."
   (let ((cursor-in-echo-area t)
         mode-line-in-non-selected-windows)
     (helm-show-info-in-mode-line
