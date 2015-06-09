@@ -345,13 +345,10 @@ Return a cons \(beg . end\)."
 (defun helm-get-first-line-documentation (sym)
   "Return first line documentation of symbol SYM.
 If SYM is not documented, return \"Not documented\"."
-  (let ((doc (cond ((fboundp sym)
-                    (documentation sym t))
-                   ((boundp sym)
-                    (documentation-property sym 'variable-documentation t))
-                   ((facep sym)
-                    (face-documentation sym))
-                   (t nil))))
+  (let ((doc (cl-typecase sym
+                 (fbound  (documentation sym t))
+                 (bound   (documentation-property sym 'variable-documentation t))
+                 (face    (face-documentation sym)))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
