@@ -755,8 +755,9 @@ will not be loaded first time you use this."
           (cl-loop for f in cand-list
                    for dir = (and (not (string-match ffap-url-regexp f))
                                   (helm-basedir f))
-                   for file = (format "%s" (if (and dir (file-remote-p dir))
-                                               (helm-basename f) f))
+                   for file = (eshell-quote-argument
+                               (format "%s" (if (and dir (file-remote-p dir))
+                                                (helm-basename f) f)))
                    for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                                  ;; [1] This allow to enter other args AFTER filename
                                  ;; i.e <command %s some_more_args>
