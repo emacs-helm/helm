@@ -4503,6 +4503,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
        (clrhash helm-cib-hash)
        (cl-dolist (searcher search-fns)
          (goto-char start-point)
+         (forward-line 1) ; >>>[1]
          (setq newmatches nil)
          (cl-loop with pos-lst
                   with item-count = 0
@@ -4560,12 +4561,9 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
   ;; We are adding a newline at bob and at eol
   ;; and removing these newlines afterward.
   ;; This is a bad hack that should be removed.
-  ;; Without doing this we loose one candidate when searching
-  ;; with matchplugin or with fuzzy even if most of the time
-  ;; it works fine without.
-  ;; FIXME:
-  ;; With occur when searching for empty line ("^$")
-  ;; the first line is matched as an empty line which is wrong.
+  ;; To avoid matching the empty line at first line
+  ;; when searching with e.g occur and "^$" just
+  ;; forward-line before searching (See >>>[1] above).
   (goto-char (point-min))
   (insert "\n")
   (goto-char (point-max))
