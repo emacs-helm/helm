@@ -134,7 +134,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((matches (match-data))
         (line    (buffer-substring s e)))
     (propertize
-     (cl-loop with ln = (format "%5d: %s" (line-number-at-pos s) line)
+     (cl-loop with ln = (format "%5d: %s" (1- (line-number-at-pos s)) line)
            for i from 0 to (1- (/ (length matches) 2))
            concat (format "\n         %s'%s'" (format "Group %d: " i)
                           (match-string i))
