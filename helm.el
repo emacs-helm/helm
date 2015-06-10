@@ -4557,13 +4557,25 @@ When using fuzzy matching and negation (i.e \"!\"), this function is always call
                      do (forward-line 1))))
 
 (defun helm--search-from-candidate-buffer-1 (search-fn)
-  ;; Previously we were adding a newline at bob and at eol
-  ;; and removing these newlines afterward, it seems it is no more
-  ;; needed, thus when searching for empty line ("^$")
-  ;; it was adding the first line as a matched line
-  ;; which is wrong.
+  ;; We are adding a newline at bob and at eol
+  ;; and removing these newlines afterward.
+  ;; This is a bad hack that should be removed.
+  ;; Without doing this we loose one candidate when searching
+  ;; with matchplugin or with fuzzy even if most of the time
+  ;; it works fine without.
+  ;; FIXME:
+  ;; With occur when searching for empty line ("^$")
+  ;; the first line is matched as an empty line which is wrong.
+  (goto-char (point-min))
+  (insert "\n")
+  (goto-char (point-max))
+  (insert "\n")
   (unwind-protect
        (funcall search-fn)
+    (goto-char (point-min))
+    (delete-char 1)
+    (goto-char (1- (point-max)))
+    (delete-char 1)
     (set-buffer-modified-p nil)))
 
 (defun helm-candidate-buffer (&optional create-or-buffer)
