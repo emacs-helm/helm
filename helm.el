@@ -480,14 +480,13 @@ set to `other'."
   :type 'boolean)
 
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
+                                                 helm-source-imenu-all
                                                  helm-source-info-elisp
                                                  helm-source-etags-select
                                                  helm-source-man-pages)
   "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
-will be used as input.
-
-Note that async sources are not supporting this actually."
+will be used as input."
   :group 'helm
   :type '(repeat (choice symbol)))
 
@@ -889,8 +888,7 @@ when `helm' is keyboard-quitted.")
 Use only in let-bindings.
 Use :default arg of `helm' as input to update display.
 Note that if also :input is specified as `helm' arg, it will take
-precedence on :default.
-NOTE: Async sources are not supporting this.")
+precedence on :default.")
 (defvar helm--temp-hooks nil
   "Store temporary hooks added by `with-helm-temp-hook'.")
 
