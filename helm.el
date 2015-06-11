@@ -510,12 +510,6 @@ you want this mode enabled definitely."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-truncate-lines nil
-  "Truncate long lines when non--nil.
-See `truncate-lines'."
-  :group 'helm
-  :type 'boolean)
-
 (defcustom helm-move-to-line-cycle-in-source nil
   "Move to end or beginning of source when reaching top or bottom of source.
 This happen when using `helm-next/previous-line'."
@@ -891,6 +885,9 @@ Note that if also :input is specified as `helm' arg, it will take
 precedence on :default.")
 (defvar helm--temp-hooks nil
   "Store temporary hooks added by `with-helm-temp-hook'.")
+(defvar helm-truncate-lines nil
+  "[Internal] Don't set this globally, it is used as a local var.")
+
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)

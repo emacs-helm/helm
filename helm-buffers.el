@@ -75,6 +75,12 @@ Only buffer names are fuzzy matched when this is enabled,
   "Ignore checking for `file-exists-p' on remote files."
   :group 'helm-buffers
   :type 'boolean)
+
+(defcustom helm-buffers-truncate-line t
+  "Truncate lines in `helm-buffers-list' when non--nil."
+  :group 'helm-buffers
+  :type 'boolean)
+  
 
 ;;; Faces
 ;;
@@ -840,7 +846,7 @@ displayed with the `file-name-shadow' face if available."
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
         :keymap helm-buffer-map
-        :truncate-lines t))
+        :truncate-lines helm-buffers-truncate-line))
 
 (provide 'helm-buffers)
 
