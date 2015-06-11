@@ -483,7 +483,9 @@ set to `other'."
                                                  helm-source-imenu-all
                                                  helm-source-info-elisp
                                                  helm-source-etags-select
-                                                 helm-source-man-pages)
+                                                 helm-source-man-pages
+                                                 helm-source-occur
+                                                 helm-source-moccur)
   "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is member of this list, default `thing-at-point'
 will be used as input."
