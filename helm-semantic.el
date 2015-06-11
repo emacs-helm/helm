@@ -124,10 +124,8 @@ you have completion on these functions with `C-M i' in the customize interface."
 
 (defun helm-semantic--maybe-set-needs-update ()
   (with-helm-current-buffer
-    (let ((tick (buffer-modified-tick)))
-      (unless (eq helm-cached-imenu-tick tick)
-        (setq helm-cached-imenu-tick tick)
-        (semantic-parse-tree-set-needs-update)))))
+    (when (semantic-parse-tree-needs-update-p)
+      (semantic-parse-tree-set-needs-update))))
 
 (defvar helm-source-semantic nil)
 
