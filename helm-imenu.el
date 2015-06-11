@@ -94,6 +94,7 @@
 
 
 (defvar helm-source-imenu nil "See (info \"(emacs)Imenu\")")
+(defvar helm-source-imenu-all nil)
 
 (defclass helm-imenu-source (helm-source-sync)
   ((candidates :initform 'helm-imenu-candidates)
@@ -114,8 +115,14 @@
                (helm-make-source "Imenu" 'helm-imenu-source
                  :fuzzy-match helm-imenu-fuzzy-match))))
 
+(defun helm-imenu--maybe-switch-to-buffer (candidate)
+  (helm-aif (marker-buffer (cdr candidate))
+      (unless (eql it (get-buffer helm-current-buffer))
+        (switch-to-buffer it))))
+
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
+  (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
   ;; If semantic is supported in this buffer
   ;; imenu used `semantic-imenu-goto-function'
@@ -127,31 +134,39 @@
 
 (defun helm-imenu-persistent-action (candidate)
   "Default persistent action for `helm-source-imenu'."
+  (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
   (helm-highlight-current-line))
 
-(defun helm-imenu-candidates ()
-  (with-helm-current-buffer
+(defun helm-imenu-candidates (&optional buffer)
+  (with-current-buffer (or buffer helm-current-buffer)
     (let ((tick (buffer-modified-tick)))
       (if (eq helm-cached-imenu-tick tick)
           helm-cached-imenu-candidates
         (setq imenu--index-alist nil)
         (prog1 (setq helm-cached-imenu-candidates
-                     (let ((index (imenu--make-index-alist))) 
+                     (let ((index (imenu--make-index-alist t))) 
                        (helm-imenu--candidates-1
                         (delete (assoc "*Rescan*" index) index))))
           (setq helm-cached-imenu-tick tick))))))
 
+(defun helm-imenu-candidates-in-all-buffers ()
+  (cl-loop for b in (helm-buffer-list)
+           when (eq (with-helm-current-buffer major-mode)
+                    (with-current-buffer b major-mode))
+           append (with-current-buffer b
+                    (helm-imenu-candidates b))))
+
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
-        append (if (imenu--subalist-p elm)
-                   (helm-imenu--candidates-1
-                    (cl-loop for (e . v) in (cdr elm) collect
-                          (cons (propertize
-                                 e 'helm-imenu-type (car elm))
-                                v)))
-                 (and (cdr elm) ; bug in imenu, should not be needed.
-                      (list elm)))))
+           nconc (if (imenu--subalist-p elm)
+                     (helm-imenu--candidates-1
+                      (cl-loop for (e . v) in (cdr elm) collect
+                               (cons (propertize
+                                      e 'helm-imenu-type (car elm))
+                                     v)))
+                     (and (cdr elm) ; bug in imenu, should not be needed.
+                          (list elm)))))
 
 (defun helm-imenu--get-prop (item)
   ;; property value of ITEM can have itself
@@ -198,6 +213,23 @@
           :default (list (concat "\\_<" str "\\_>") str)
           :candidate-number-limit 9999
           :buffer "*helm imenu*")))
+
+;;;###autoload
+(defun helm-imenu-in-all-buffers ()
+  (interactive)
+  (unless helm-source-imenu-all
+    (setq helm-source-imenu-all
+          (helm-make-source "Imenu" 'helm-imenu-source
+            :candidates 'helm-imenu-candidates-in-all-buffers
+            :fuzzy-match helm-imenu-fuzzy-match)))
+  (let ((imenu-auto-rescan t)
+        (str (thing-at-point 'symbol))
+        (helm-execute-action-at-once-if-one
+         helm-imenu-execute-action-at-once-if-one))
+    (helm :sources 'helm-source-imenu-all
+          :default (list (concat "\\_<" str "\\_>") str)
+          :candidate-number-limit 9999
+          :buffer "*helm imenu all*")))
 
 (provide 'helm-imenu)
 
