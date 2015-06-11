@@ -108,6 +108,7 @@
     (define-key map (kbd "C-c C-x")   'helm-run-external-command)
     (define-key map (kbd "b")         'helm-resume)
     (define-key map (kbd "M-n")       'helm-gid)
+    (define-key map (kbd "@")         'helm-list-elisp-packages)
     map))
 
 ;; Don't override the keymap we just defined with an empty

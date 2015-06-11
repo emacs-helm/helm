@@ -46,6 +46,9 @@
    ("Org"
     ["Org keywords" helm-org-keywords t]
     ["Org headlines" helm-org-headlines t])
+   ("Elpa"
+    ["Elisp packages" helm-list-elisp-packages t]
+    ["Elisp packages no fetch" helm-list-elisp-packages-no-fetch t])
    ("Tools"
     ["Occur" helm-occur t]
     ["Grep" helm-do-grep t]
