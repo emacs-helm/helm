@@ -216,6 +216,7 @@
 
 ;;;###autoload
 (defun helm-imenu-in-all-buffers ()
+  "Preconfigured helm for fetching imenu entries of all buffers."
   (interactive)
   (unless helm-source-imenu-all
     (setq helm-source-imenu-all
