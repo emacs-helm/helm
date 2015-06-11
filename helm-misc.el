@@ -299,7 +299,7 @@ It is added to `extended-command-history'.
     (helm :sources helm-mini-default-sources
           :buffer "*helm mini*"
           :ff-transformer-show-only-basename nil
-          :truncate-lines t))
+          :truncate-lines helm-buffers-truncate-line))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
