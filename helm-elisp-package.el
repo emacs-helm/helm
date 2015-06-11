@@ -263,6 +263,7 @@
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-I") 'helm-el-package-show-installed)
+    (define-key map (kbd "M-O") 'helm-el-package-show-uninstalled)
     (define-key map (kbd "M-U") 'helm-el-package-show-upgrade)
     (define-key map (kbd "M-A") 'helm-el-package-show-all)
     (define-key map (kbd "C-c ?") 'helm-el-package-help)
