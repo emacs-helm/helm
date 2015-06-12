@@ -76,7 +76,7 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers
   :type 'boolean)
 
-(defcustom helm-buffers-truncate-line t
+(defcustom helm-buffers-truncate-lines t
   "Truncate lines in `helm-buffers-list' when non--nil."
   :group 'helm-buffers
   :type 'boolean)
@@ -846,7 +846,7 @@ displayed with the `file-name-shadow' face if available."
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
         :keymap helm-buffer-map
-        :truncate-lines helm-buffers-truncate-line))
+        :truncate-lines helm-buffers-truncate-lines))
 
 (provide 'helm-buffers)
 
