@@ -97,12 +97,12 @@
 
 (defclass helm-imenu-source (helm-source-sync)
   ((candidates :initform 'helm-imenu-candidates)
-    (candidate-transformer :initform 'helm-imenu-transformer)
-    (persistent-action :initform 'helm-imenu-persistent-action)
-    (persistent-help :initform "Show this entry")
-    (keymap :initform helm-imenu-map)
-    (mode-line :initform helm-imenu-mode-line)
-    (action :initform 'helm-imenu-action)))
+   (candidate-transformer :initform 'helm-imenu-transformer)
+   (persistent-action :initform 'helm-imenu-persistent-action)
+   (persistent-help :initform "Show this entry")
+   (keymap :initform helm-imenu-map)
+   (mode-line :initform helm-imenu-mode-line)
+   (action :initform 'helm-imenu-action)))
 
 (defcustom helm-imenu-fuzzy-match nil
   "Enable fuzzy matching in `helm-source-imenu'."
