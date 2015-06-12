@@ -296,10 +296,10 @@ It is added to `extended-command-history'.
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
-    (helm :sources helm-mini-default-sources
-          :buffer "*helm mini*"
-          :ff-transformer-show-only-basename nil
-          :truncate-lines helm-buffers-truncate-line))
+  (helm :sources helm-mini-default-sources
+        :buffer "*helm mini*"
+        :ff-transformer-show-only-basename nil
+        :truncate-lines helm-buffers-truncate-lines))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
