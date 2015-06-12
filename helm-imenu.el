@@ -58,19 +58,18 @@
 
 (defun helm-imenu-next-or-previous-section (n)
   (with-helm-buffer
-    (let ((curtype (car (split-string (helm-get-selection nil t)
-                                      helm-imenu-delimiter)))
-          (move-fn (if (> n 0) #'helm-next-line #'helm-previous-line))
-          (stop-fn (if (> n 0)
-                       #'helm-end-of-source-p
-                       #'helm-beginning-of-source-p)))
+    (let* ((fn (lambda ()
+                 (car (split-string (helm-get-selection nil t)
+                                    helm-imenu-delimiter))))
+           (curtype (funcall fn))
+           (move-fn (if (> n 0) #'helm-next-line #'helm-previous-line))
+           (stop-fn (if (> n 0)
+                        #'helm-end-of-source-p
+                        #'helm-beginning-of-source-p)))
       (catch 'break
         (while (not (funcall stop-fn))
           (funcall move-fn)
-          (unless (string= curtype
-                           (car (split-string
-                                 (helm-get-selection nil t)
-                                 helm-imenu-delimiter)))
+          (unless (string= curtype (funcall fn))
             (throw 'break nil)))))))
 
 (defun helm-imenu-next-section ()
