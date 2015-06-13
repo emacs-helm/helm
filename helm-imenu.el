@@ -163,8 +163,13 @@
                       (cl-loop for (e . v) in (cdr elm) collect
                                (cons (propertize
                                       e 'helm-imenu-type (car elm))
-                                     v)))
+                                     ;; If value is an integer, convert it
+                                     ;; to a marker, otherwise it is a cons cell
+                                     ;; and it will be converted on next recursions.
+                                     ;; (Issue #1060) [1]. 
+                                     (if (integerp v) (copy-marker v) v))))
                      (and (cdr elm) ; bug in imenu, should not be needed.
+                          (setcdr elm (copy-marker (cdr elm))) ; Same as [1].
                           (list elm)))))
 
 (defun helm-imenu--get-prop (item)
