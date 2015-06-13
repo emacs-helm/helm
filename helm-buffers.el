@@ -80,7 +80,14 @@ Only buffer names are fuzzy matched when this is enabled,
   "Truncate lines in `helm-buffers-list' when non--nil."
   :group 'helm-buffers
   :type 'boolean)
-  
+
+(defcustom helm-mini-default-sources '(helm-source-buffers-list
+                                       helm-source-recentf
+                                       helm-source-buffer-not-found)
+  "Default sources list used in `helm-mini'."
+  :group 'helm-misc
+  :type '(repeat (choice symbol)))
+
 
 ;;; Faces
 ;;
@@ -846,6 +853,19 @@ displayed with the `file-name-shadow' face if available."
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
         :keymap helm-buffer-map
+        :truncate-lines helm-buffers-truncate-lines))
+
+;;;###autoload
+(defun helm-mini ()
+  "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
+  (interactive)
+  (require 'helm-files)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
+  (helm :sources helm-mini-default-sources
+        :buffer "*helm mini*"
+        :ff-transformer-show-only-basename nil
         :truncate-lines helm-buffers-truncate-lines))
 
 (provide 'helm-buffers)

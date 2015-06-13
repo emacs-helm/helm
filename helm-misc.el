@@ -46,6 +46,7 @@
   "Face used to colorize home time in `helm-world-time'."
   :group 'helm-misc)
 
+
 
 ;;; Latex completion
 (defvar LaTeX-math-menu)
@@ -287,19 +288,6 @@ It is added to `extended-command-history'.
   (interactive)
   (helm-other-buffer 'helm-source-stumpwm-commands
                      "*helm stumpwm commands*"))
-
-;;;###autoload
-(defun helm-mini ()
-  "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
-  (interactive)
-  (require 'helm-files)
-  (unless helm-source-buffers-list
-    (setq helm-source-buffers-list
-          (helm-make-source "Buffers" 'helm-source-buffers)))
-  (helm :sources helm-mini-default-sources
-        :buffer "*helm mini*"
-        :ff-transformer-show-only-basename nil
-        :truncate-lines helm-buffers-truncate-lines))
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
