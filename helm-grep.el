@@ -918,7 +918,7 @@ in recurse, search being made on `helm-zgrep-file-extension-regexp'."
     (helm
      :sources 'helm-source-grep
      :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
-     :default default-input
+     :input default-input
      :keymap helm-grep-map
      :history 'helm-grep-history
      :truncate-lines t)))
