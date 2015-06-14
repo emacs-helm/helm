@@ -2934,9 +2934,9 @@ If the current directory is found in the cache, start
 NOTE: The prefix ARG have no effect on the VCS controlled directories.
 
 Needed dependencies for VCS:
-<https://github.com/emacs-helm/helm-ls-git.git>
+<https://github.com/emacs-helm/helm-ls-git>
 and
-<https://github.com/emacs-helm/helm-mercurial-queue/blob/master/helm-ls-hg.el>."
+<https://github.com/emacs-helm/helm-ls-hg>."
   (interactive "P")
   (cond ((and (require 'helm-ls-git nil t)
               (fboundp 'helm-ls-git-root-dir)
