@@ -48,6 +48,7 @@
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 (declare-function helm-gid "helm-id-utils.el")
+(declare-function helm-ls-svn-ls "ext:helm-ls-svn")
 
 (defvar recentf-list)
 
