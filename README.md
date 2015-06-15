@@ -43,7 +43,7 @@ copy/rename asynchronously your files from helm and/or dired if needed).
   2. Clone the `async` repository to some directory (facultative)
 
     ```elisp
-    $ git clone git@github.com:jwiegley/emacs-async.git /path/to/async/directory
+    $ git clone https://github.com/jwiegley/emacs-async.git /path/to/async/directory
     ```
   3. Run `make` from the `helm` directory.
   
