@@ -223,9 +223,11 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (let* ((split (helm-grep-split-line candidate))
          (buf (car split))
          (lineno (string-to-number (nth 1 split)))
-         (split-pat (helm-mp-split-pattern helm-input)))
+         (split-pat (helm-mp-split-pattern helm-input))
+         (switch-fn (if (get-buffer-window buf 'visible)
+                        #'pop-to-buffer #'switch-to-buffer)))
     (cl-case method
-      (buffer              (switch-to-buffer buf))
+      (buffer              (funcall switch-fn buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (helm-goto-line lineno)
