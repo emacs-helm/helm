@@ -2937,7 +2937,9 @@ NOTE: The prefix ARG have no effect on the VCS controlled directories.
 Needed dependencies for VCS:
 <https://github.com/emacs-helm/helm-ls-git>
 and
-<https://github.com/emacs-helm/helm-ls-hg>."
+<https://github.com/emacs-helm/helm-ls-hg>
+and
+<http://melpa.org/#/helm-ls-svn>."
   (interactive "P")
   (cond ((and (require 'helm-ls-git nil t)
               (fboundp 'helm-ls-git-root-dir)
@@ -2947,6 +2949,10 @@ and
               (fboundp 'helm-hg-root)
               (helm-hg-root))
          (helm-hg-find-files-in-project))
+        ((and (require 'helm-ls-svn nil t)
+              (fboundp 'helm-ls-svn-root-dir)
+              (helm-ls-svn-root-dir))
+         (helm-ls-svn-ls))
         (t (let ((cur-dir (helm-browse-project-get--root-dir
                            (helm-current-directory))))
              (if (or arg (gethash cur-dir helm--browse-project-cache))
