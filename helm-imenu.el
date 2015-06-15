@@ -151,8 +151,12 @@
 
 (defun helm-imenu-candidates-in-all-buffers ()
   (cl-loop for b in (buffer-list)
-           when (eq (with-helm-current-buffer major-mode)
-                    (with-current-buffer b major-mode))
+           for mm = (with-current-buffer b major-mode)
+           for cmm = (with-helm-current-buffer major-mode)
+           when (or (with-helm-current-buffer
+                      (derived-mode-p mm))
+                    (with-current-buffer b
+                      (derived-mode-p cmm)))
            append (with-current-buffer b
                     (helm-imenu-candidates b))))
 
