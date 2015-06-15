@@ -151,7 +151,8 @@ fuzzy completion is not available in `completion-at-point'."
         (recenter -1)
         (set-window-buffer (if (active-minibuffer-window)
                                (minibuffer-selected-window)
-                             (split-window nil upper-height))
+                               (split-window nil upper-height
+                                             helm-split-window-default-side))
                            buffer)))))
 
 (defmacro with-helm-show-completion (beg end &rest body)
