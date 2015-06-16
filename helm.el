@@ -590,6 +590,13 @@ input method with `toggle-input-method'."
   "Send current input in header-line."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-header-line-prompt " Input: "
+  "The name of the pseudo prompt where input is echoed in `header-line'.
+This take effect only when `helm-echo-input-in-header-line' is non--nil."
+  :group 'helm
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -3806,7 +3813,8 @@ Possible value of DIRECTION are 'next or 'previous."
 (defun helm--update-header-line ()
   (with-helm-window
     (setq header-line-format
-          (concat (propertize " Input: " 'face 'minibuffer-prompt)
+          (concat (propertize helm-header-line-prompt
+                              'face 'minibuffer-prompt)
                   (substring-no-properties helm-pattern)))))
 
 (defun helm-show-candidate-number (&optional name)
