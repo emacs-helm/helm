@@ -3799,7 +3799,7 @@ Possible value of DIRECTION are 'next or 'previous."
     ;; Setup header-line.
     (cond (helm-echo-input-in-header-line
            (setq force t)
-           (helm--update-header-line))
+           (helm--set-header-line))
           (helm-display-header-line
            (let* ((hlstr (helm-interpret-value
                           (and (listp source)
@@ -3810,7 +3810,7 @@ Possible value of DIRECTION are 'next or 'previous."
                    (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
   (when force (force-mode-line-update)))
 
-(defun helm--update-header-line ()
+(defun helm--set-header-line ()
   (with-helm-window
     (let ((comp (with-current-buffer (window-buffer (minibuffer-window))
                   (helm-minibuffer-completion-contents)))
