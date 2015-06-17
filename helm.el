@@ -1971,6 +1971,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                  (when helm-prevent-escaping-from-minibuffer
                    (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                  (add-hook 'post-command-hook 'helm--maybe-update-keymap)
+                 (add-hook 'post-command-hook 'helm--update-header-line)
                  (helm-log "show prompt")
                  (unwind-protect
                       (helm-read-pattern-maybe
@@ -1985,6 +1986,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
             nil))
       (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
+      (remove-hook 'post-command-hook 'helm--update-header-line)
       (if (fboundp 'advice-add)
           (progn
             (advice-remove 'tramp-read-passwd
@@ -3813,7 +3815,7 @@ Possible value of DIRECTION are 'next or 'previous."
                    (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
   (when force (force-mode-line-update)))
 
-(defun helm--set-header-line ()
+(defun helm--set-header-line (&optional update)
   (with-helm-window
     (let* ((comp (with-current-buffer (window-buffer (minibuffer-window))
                    (if (get-text-property (point) 'read-only)
@@ -3832,12 +3834,25 @@ Possible value of DIRECTION are 'next or 'previous."
                       ;; Sometimes the value of the input
                       ;; is not yet the same as helm-pattern.
                       ;; Generally it is one more char than helm-pattern
-                      ;; until update.
+                      ;; until update (grep).
                       (args-out-of-range nil))
                     " "))
       ;; Increment pos to handle the space before prompt [1].
       (put-text-property (1+ pos) (+ pos 2)
-                         'face 'cursor header-line-format))))
+                         'face 'cursor header-line-format))
+    (when update (force-mode-line-update))))
+
+(defun helm--update-header-line ()
+  ;; This should be used in `post-command-hook',
+  ;; nowhere else.
+  (when (and helm-echo-input-in-header-line
+             ;; Ensure we don't update when pattern
+             ;; is empty from post-command-hook, otherwise
+             ;; we loose default-as-input.
+             ;; This will be done after update
+             ;; in helm-display-mode-line.
+             (not (string= helm-pattern "")))
+    (helm--set-header-line t)))
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
