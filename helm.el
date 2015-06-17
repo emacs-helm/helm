@@ -3822,7 +3822,8 @@ Possible value of DIRECTION are 'next or 'previous."
                             'face 'minibuffer-prompt))
            (pos (+ (length prt) (length comp))))
       (setq header-line-format
-            (concat prt
+            (concat " " ; [1]
+                    prt
                     (substring-no-properties comp)
                     (condition-case _err
                         (substring-no-properties helm-pattern
@@ -3834,7 +3835,8 @@ Possible value of DIRECTION are 'next or 'previous."
                       ;; until update.
                       (args-out-of-range nil))
                     " "))
-      (put-text-property pos (1+ pos)
+      ;; Increment pos to handle the space before prompt [1].
+      (put-text-property (1+ pos) (+ pos 2)
                          'face 'cursor header-line-format))))
 
 (defun helm-show-candidate-number (&optional name)
