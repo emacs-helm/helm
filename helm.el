@@ -591,12 +591,6 @@ input method with `toggle-input-method'."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-header-line-prompt " Input: "
-  "The name of the pseudo prompt where input is echoed in `header-line'.
-This take effect only when `helm-echo-input-in-header-line' is non--nil."
-  :group 'helm
-  :type 'string)
-
 
 ;;; Faces
 ;;
