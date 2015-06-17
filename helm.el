@@ -3815,15 +3815,16 @@ Possible value of DIRECTION are 'next or 'previous."
     (let ((comp (with-current-buffer (window-buffer (minibuffer-window))
                   (helm-minibuffer-completion-contents)))
           (prt (propertize helm-header-line-prompt
-                           'face 'minibuffer-prompt)))
+                           'face 'minibuffer-prompt))
+          (cur (propertize " " 'face 'cursor)))
       (if (with-current-buffer (window-buffer (active-minibuffer-window))
             (get-text-property (point) 'read-only))
           ;; Ignore movements beyond end of prompt.
-          (setq header-line-format (concat prt "|" helm-pattern))
+          (setq header-line-format (concat prt cur helm-pattern))
           (setq header-line-format
                 (concat prt
                         (substring-no-properties comp)
-                        "|"
+                        cur
                         (substring-no-properties helm-pattern
                                                  (length comp))))))))
 
