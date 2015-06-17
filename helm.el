@@ -3816,7 +3816,7 @@ Possible value of DIRECTION are 'next or 'previous."
                   (helm-minibuffer-completion-contents)))
           (prt (propertize helm-header-line-prompt
                            'face 'minibuffer-prompt)))
-      (if (with-current-buffer (window-buffer (minibuffer-window))
+      (if (with-current-buffer (window-buffer (active-minibuffer-window))
             (get-text-property (point) 'read-only))
           ;; Ignore movements beyond end of prompt.
           (setq header-line-format (concat prt "|" helm-pattern))
