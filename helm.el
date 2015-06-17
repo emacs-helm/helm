@@ -1920,6 +1920,7 @@ in source.
            unless (memq key helm-argument-keys)
            collect (cons sym value)))
 
+(defvar helm--prompt nil)
 ;;; Core: entry point helper
 (defun helm-internal (&optional
                         any-sources any-input
@@ -1943,6 +1944,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (helm-log "any-keymap = %S" any-keymap)
   (helm-log "any-default = %S" any-default)
   (helm-log "any-history = %S" any-history)
+  (setq helm--prompt (or any-prompt "pattern: "))
   (let ((non-essential t)
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
@@ -3684,29 +3686,30 @@ Coerce source with coerce function."
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the helm buffer."
   (interactive)
-  (helm-log-run-hook 'helm-select-action-hook)
-  (setq helm-saved-selection (helm-get-selection))
-  (with-selected-frame (with-helm-window (selected-frame))
-    (prog1
-        (cond ((get-buffer-window helm-action-buffer 'visible)
-               (set-window-buffer (get-buffer-window helm-action-buffer)
-                                  helm-buffer)
-               (kill-buffer helm-action-buffer)
-               (helm-display-mode-line (helm-get-current-source))
-               (helm-set-pattern helm-input 'noupdate))
-              (helm-saved-selection
-               (setq helm-saved-current-source (helm-get-current-source))
-               (let ((actions (helm-get-actions-from-current-source)))
-                 (if (functionp actions)
-                     (message "Sole action: %s" actions)
-                     (helm-show-action-buffer actions)
-                     ;; Be sure the minibuffer is entirely deleted (#907).
-                     (helm--delete-minibuffer-contents-from "")
-                     ;; Make `helm-pattern' differs from the previous value.
-                     (setq helm-pattern 'dummy)
-                     (helm-check-minibuffer-input))))
-              (t (message "No Actions available")))
-      (run-hooks 'helm-window-configuration-hook))))
+  (let ((src (helm-get-current-source)))
+    (helm-log-run-hook 'helm-select-action-hook)
+    (setq helm-saved-selection (helm-get-selection))
+    (with-selected-frame (with-helm-window (selected-frame))
+      (prog1
+          (cond ((get-buffer-window helm-action-buffer 'visible)
+                 (set-window-buffer (get-buffer-window helm-action-buffer)
+                                    helm-buffer)
+                 (kill-buffer helm-action-buffer)
+                 (helm-set-pattern helm-input 'noupdate))
+                (helm-saved-selection
+                 (setq helm-saved-current-source src)
+                 (let ((actions (helm-get-actions-from-current-source)))
+                   (if (functionp actions)
+                       (message "Sole action: %s" actions)
+                       (helm-show-action-buffer actions)
+                       ;; Be sure the minibuffer is entirely deleted (#907).
+                       (helm--delete-minibuffer-contents-from "")
+                       ;; Make `helm-pattern' differs from the previous value.
+                       (setq helm-pattern 'dummy)
+                       (helm-check-minibuffer-input))))
+                (t (message "No Actions available")))
+        (helm-display-mode-line src)
+        (run-hooks 'helm-window-configuration-hook)))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
@@ -3812,22 +3815,27 @@ Possible value of DIRECTION are 'next or 'previous."
 
 (defun helm--set-header-line ()
   (with-helm-window
-    (let ((comp (with-current-buffer (window-buffer (minibuffer-window))
-                  (helm-minibuffer-completion-contents)))
-          (prt (propertize helm-header-line-prompt
-                           'face 'minibuffer-prompt))
-          (cur (propertize " " 'face 'cursor)))
-      (if (with-current-buffer (window-buffer (active-minibuffer-window))
-            (get-text-property (point) 'read-only))
-          ;; Ignore movements beyond end of prompt.
-          (setq header-line-format (concat prt cur helm-pattern))
-          (setq header-line-format
-                (concat prt
-                        (substring-no-properties comp)
-                        cur
+    (let* ((comp (with-current-buffer (window-buffer (minibuffer-window))
+                   (if (get-text-property (point) 'read-only)
+                       "" (helm-minibuffer-completion-contents))))
+           (prt (propertize helm--prompt
+                            'face 'minibuffer-prompt))
+           (pos (+ (length prt) (length comp))))
+      (setq header-line-format
+            (concat prt
+                    (substring-no-properties comp)
+                    (condition-case _err
                         (substring-no-properties helm-pattern
                                                  (if (string= helm-pattern "")
-                                                     0 (length comp)))))))))
+                                                     0 (length comp)))
+                      ;; Sometimes the value of the input
+                      ;; is not yet the same as helm-pattern.
+                      ;; Generally it is one more char than helm-pattern
+                      ;; until update.
+                      (args-out-of-range nil))
+                    " "))
+      (put-text-property pos (1+ pos)
+                         'face 'cursor header-line-format))))
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
