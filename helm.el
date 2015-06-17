@@ -3826,7 +3826,8 @@ Possible value of DIRECTION are 'next or 'previous."
                         (substring-no-properties comp)
                         cur
                         (substring-no-properties helm-pattern
-                                                 (length comp))))))))
+                                                 (if (string= helm-pattern "")
+                                                     0 (length comp)))))))))
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
