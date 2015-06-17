@@ -3812,10 +3812,20 @@ Possible value of DIRECTION are 'next or 'previous."
 
 (defun helm--update-header-line ()
   (with-helm-window
-    (setq header-line-format
-          (concat (propertize helm-header-line-prompt
-                              'face 'minibuffer-prompt)
-                  (substring-no-properties helm-pattern)))))
+    (let ((comp (with-current-buffer (window-buffer (minibuffer-window))
+                  (helm-minibuffer-completion-contents))))
+      (if (and (string= helm-pattern "")
+               (not (with-current-buffer (window-buffer (minibuffer-window))
+                      (eobp))))
+          ;; Ignore movements beyond end of prompt.
+          (setq header-line-format (concat helm-header-line-prompt "|"))
+          (setq header-line-format
+                (concat (propertize helm-header-line-prompt
+                                    'face 'minibuffer-prompt)
+                        (substring-no-properties comp)
+                        "|"
+                        (substring-no-properties helm-pattern
+                                                 (length comp))))))))
 
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
