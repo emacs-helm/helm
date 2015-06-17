@@ -3813,15 +3813,15 @@ Possible value of DIRECTION are 'next or 'previous."
 (defun helm--update-header-line ()
   (with-helm-window
     (let ((comp (with-current-buffer (window-buffer (minibuffer-window))
-                  (helm-minibuffer-completion-contents))))
-      (if (and (string= helm-pattern "")
-               (not (with-current-buffer (window-buffer (minibuffer-window))
-                      (eobp))))
+                  (helm-minibuffer-completion-contents)))
+          (prt (propertize helm-header-line-prompt
+                           'face 'minibuffer-prompt)))
+      (if (with-current-buffer (window-buffer (minibuffer-window))
+            (get-text-property (point) 'read-only))
           ;; Ignore movements beyond end of prompt.
-          (setq header-line-format (concat helm-header-line-prompt "|"))
+          (setq header-line-format (concat prt "|" helm-pattern))
           (setq header-line-format
-                (concat (propertize helm-header-line-prompt
-                                    'face 'minibuffer-prompt)
+                (concat prt
                         (substring-no-properties comp)
                         "|"
                         (substring-no-properties helm-pattern
