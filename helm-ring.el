@@ -118,7 +118,7 @@ replace with STR as yanked string."
           (funcall (or yank-undo-function 'delete-region) (mark t) (point)))
         (setq yank-undo-function nil)
         (set-marker (mark-marker) (point) helm-current-buffer)
-        (run-with-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
+        (run-with-idle-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
         ;; Set the window start back where it was in the yank command,
         ;; if possible.
         (set-window-start (selected-window) yank-window-start t)
