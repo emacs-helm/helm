@@ -694,16 +694,20 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffers-persistent-kill-1 (buffer)
   "Persistent action to kill buffer."
-  (with-current-buffer (get-buffer buffer)
-    (if (and (buffer-modified-p)
-             (buffer-file-name (current-buffer)))
-        (progn
-          (save-buffer)
-          (kill-buffer buffer))
-      (kill-buffer buffer)))
-  (helm-delete-current-selection)
-  (with-helm-temp-hook 'helm-after-persistent-action-hook
-    (helm-force-update (regexp-quote (helm-get-selection nil t)))))
+  (if (eql (get-buffer buffer) (get-buffer helm-current-buffer))
+      (progn
+        (message "Can't kill `helm-current-buffer' without quitting session")
+        (sit-for 1))
+      (with-current-buffer (get-buffer buffer)
+        (if (and (buffer-modified-p)
+                 (buffer-file-name (current-buffer)))
+            (progn
+              (save-buffer)
+              (kill-buffer buffer))
+            (kill-buffer buffer)))
+      (helm-delete-current-selection)
+      (with-helm-temp-hook 'helm-after-persistent-action-hook
+        (helm-force-update (regexp-quote (helm-get-selection nil t))))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
