@@ -130,8 +130,6 @@ replace with STR as yanked string."
                        (set-marker (mark-marker) (point) helm-current-buffer))))))
     (kill-new str)))
 
-
-
 
 ;;;; <Mark ring>
 ;; DO NOT use these sources with other sources use
@@ -166,7 +164,6 @@ replace with STR as yanked string."
                          (helm-goto-line (string-to-number candidate))
                          (helm-highlight-current-line))
     :persistent-help "Show this line"))
-
 
 ;;; Global-mark-ring
 (defvar helm-source-global-mark-ring
