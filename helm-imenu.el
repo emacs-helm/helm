@@ -121,6 +121,7 @@
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
+  (helm-log-run-hook 'helm-goto-line-before-hook)
   (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
   ;; If semantic is supported in this buffer
