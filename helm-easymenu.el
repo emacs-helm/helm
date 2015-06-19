@@ -63,6 +63,7 @@
     ["Show xfonts" helm-select-xfont t]
     ["Ucs Symbols" helm-ucs t]
     ["Imenu" helm-imenu t]
+    ["Imenu all" helm-imenu-in-all-buffers t]
     ["Semantic or Imenu" helm-semantic-or-imenu t]
     ["Google Suggest" helm-google-suggest t]
     ["Eval expression" helm-eval-expression-with-eldoc t]
