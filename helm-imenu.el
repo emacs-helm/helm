@@ -150,15 +150,23 @@
           (setq helm-cached-imenu-tick tick))))))
 
 (defun helm-imenu-candidates-in-all-buffers ()
-  (cl-loop for b in (buffer-list)
-           for mm = (with-current-buffer b major-mode)
-           for cmm = (with-helm-current-buffer major-mode)
-           when (or (with-helm-current-buffer
-                      (derived-mode-p mm))
-                    (with-current-buffer b
-                      (derived-mode-p cmm)))
-           append (with-current-buffer b
-                    (helm-imenu-candidates b))))
+  (let* ((lst (buffer-list))
+         (progress-reporter (make-progress-reporter
+                             "Imenu indexing buffers..." 1 (length lst))))
+    (prog1
+        (cl-loop for b in lst
+                 for count from 1
+                 for mm = (with-current-buffer b major-mode)
+                 for cmm = (with-helm-current-buffer major-mode)
+                 when (or (with-helm-current-buffer
+                            (derived-mode-p mm))
+                          (with-current-buffer b
+                            (derived-mode-p cmm)))
+                 do (progress-reporter-update progress-reporter count)
+                 and
+                 append (with-current-buffer b
+                          (helm-imenu-candidates b)))
+      (progress-reporter-done progress-reporter))))
 
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
