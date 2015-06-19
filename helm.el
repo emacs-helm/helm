@@ -3818,7 +3818,7 @@ Possible value of DIRECTION are 'next or 'previous."
                             'face 'minibuffer-prompt))
            (pos (+ (length prt) (length comp))))
       (setq header-line-format
-            (concat " " ; [1]
+            (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
                     prt
                     (substring-no-properties comp)
                     (condition-case _err
