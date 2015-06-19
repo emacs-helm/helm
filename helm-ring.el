@@ -109,7 +109,7 @@ replace with STR as yanked string."
   (with-helm-current-buffer
     (setq kill-ring (delete str kill-ring))
     (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
-        (run-with-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
+        (insert-for-yank str)
       ;; from `yank-pop'
       (let ((inhibit-read-only t)
             (before (< (point) (mark t))))
@@ -118,7 +118,7 @@ replace with STR as yanked string."
           (funcall (or yank-undo-function 'delete-region) (mark t) (point)))
         (setq yank-undo-function nil)
         (set-marker (mark-marker) (point) helm-current-buffer)
-        (run-with-idle-timer 0.01 nil `(lambda () (insert-for-yank ,str)))
+        (insert-for-yank str)
         ;; Set the window start back where it was in the yank command,
         ;; if possible.
         (set-window-start (selected-window) yank-window-start t)
