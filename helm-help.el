@@ -1005,6 +1005,13 @@ This feature is only available with emacs-25.
 \\[helm-el-package-show-all]\t->Show all packages.
 \\[helm-el-package-show-installed]\t->Show installed packages only.
 \\[helm-el-package-show-uninstalled]\t->Show not installed packages only.
+\\[helm-el-package-show-upgrade]\t->Show upgradable packages only.
+\\[helm-el-run-package-install]\t->Install package(s).
+\\[helm-el-run-package-reinstall]\t->Reinstall package(s).
+\\[helm-el-run-package-uninstall]\t->Uninstall package(s).
+\\[helm-el-run-package-upgrade]\t->Upgrade package(s).
+\\[helm-el-run-package-upgrade-all]\t->Upgrade all packages upgradables.
+\\[helm-el-run-visit-homepage]\t->Visit package homepage.
 \\[helm-el-package-help]\t->Show this help.
 \n** Helm Map\n
 \\{helm-map}")
