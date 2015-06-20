@@ -22,7 +22,9 @@
 # Useful to start quickly an emacs -Q with helm.
 # Run it from this directory.
 
-TEMP="/tmp"
+# If TEMP env var exists use it otherwise declare it.
+[ -z $TEMP ] && declare TEMP="/tmp"
+
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
 
