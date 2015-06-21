@@ -2429,7 +2429,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            ;; or contain non--candidate lines (e.g grep exit status)
            (helm-get-current-source))
       (helm-mark-current-line t)
-    (helm-update any-preselect))
+      (helm-update any-preselect))
   (with-current-buffer (helm-buffer-get)
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
@@ -2446,14 +2446,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                  (assq 'candidates-process first-src-val)))
            (source-delayed-p (or (assq 'delayed src)
                                  (assq 'delayed first-src-val))))
-      ;; Startup with the first keymap found either in current source
-      ;; or helm arg, otherwise use global value of `helm-map'.
-      ;; This map will be used as a `minibuffer-local-map'.
-      ;; Maybe it will be overriden when changing source
-      ;; by `helm--maybe-update-keymap'.
-      ;; Note that helm-map have been made buffer-local
-      ;; in `helm-create-helm-buffer'.
-      (setq helm-map (or src-keymap any-keymap helm-map))
       (helm-log "helm-get-candidate-number => %S"
                 (helm-get-candidate-number))
       (helm-log "helm-execute-action-at-once-if-one = %S"
@@ -2494,14 +2486,14 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       (cond ((and helm-execute-action-at-once-if-one
                   (not source-delayed-p)
                   (= (helm-get-candidate-number) 1))
-             (ignore)) ; Don't enter the minibuffer loop.
+             (ignore))              ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
                   (not source-delayed-p)
                   (= (helm-get-candidate-number) 0))
              (setq helm-quit t)
              (and (functionp helm-quit-if-no-candidate)
                   (funcall helm-quit-if-no-candidate)))
-            (t ; Enter now minibuffer and wait for input.
+            (t              ; Enter now minibuffer and wait for input.
              (let ((tap (or any-default
                             (with-helm-current-buffer
                               (thing-at-point 'symbol)))))
@@ -2510,25 +2502,30 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                         #'(lambda ()
                             ;; Start minor-mode with global value of helm-map.
                             (helm--minor-mode 1)
-                            ;; Now overhide the global value of helm-map with
-                            ;; the local one.
-                            (setq minor-mode-overriding-map-alist
-                                  `((helm--minor-mode
-                                     . ,(with-helm-buffer helm-map))))
-                            (setq timer (run-with-idle-timer
-                                         (max helm-input-idle-delay 0.001) 'repeat
-                                         #'(lambda ()
-                                             ;; Stop updating when in persistent action
-                                             ;; or when `helm-suspend-update-flag' is
-                                             ;; non--nil.
-                                             (unless (or helm-in-persistent-action
-                                                         helm-suspend-update-flag)
-                                               (save-selected-window
-                                                 (helm-check-minibuffer-input)
-                                                 (helm-print-error-messages)))))))
+                            ;; Now overhide the global value of `helm-map' with
+                            ;; the local one which is in this order:
+                            ;; - The keymap of current source.
+                            ;; - The value passed in ANY-KEYMAP
+                            ;;   which will become buffer local.
+                            ;; - Or fallback to the global value of helm-map.
+                            (helm--maybe-update-keymap
+                             (or src-keymap any-keymap helm-map))
+                            (setq timer
+                                  (run-with-idle-timer
+                                   (max helm-input-idle-delay 0.001) 'repeat
+                                   #'(lambda ()
+                                       ;; Stop updating in persistent action
+                                       ;; or when `helm-suspend-update-flag'
+                                       ;; is non--nil.
+                                       (unless (or helm-in-persistent-action
+                                                   helm-suspend-update-flag)
+                                         (save-selected-window
+                                           (helm-check-minibuffer-input)
+                                           (helm-print-error-messages)))))))
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
-                                            nil hist tap helm-inherit-input-method))
+                                            nil hist tap
+                                            helm-inherit-input-method))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
 (defun helm-exit-or-quit-maybe ()
@@ -2603,13 +2600,13 @@ This can be useful for e.g writing quietly a complex regexp."
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
 
-(defun helm--maybe-update-keymap ()
+(defun helm--maybe-update-keymap (&optional map)
   "Handle differents keymaps in multiples sources.
 
 It will override `helm-map' with the local map of current source.
 If no map is found in current source do nothing (keep previous map)."
   (with-helm-buffer
-    (helm-aif (assoc-default 'keymap (helm-get-current-source))
+    (helm-aif (or map (assoc-default 'keymap (helm-get-current-source)))
         ;; We need the timer to leave enough time
         ;; to helm to setup its buffer when changing source
         ;; from a recursive minibuffer.
