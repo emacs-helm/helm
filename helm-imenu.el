@@ -239,7 +239,7 @@
   (interactive)
   (unless helm-source-imenu-all
     (setq helm-source-imenu-all
-          (helm-make-source "Imenu" 'helm-imenu-source
+          (helm-make-source "Imenu in all buffers" 'helm-imenu-source
             :candidates 'helm-imenu-candidates-in-all-buffers
             :fuzzy-match helm-imenu-fuzzy-match)))
   (let ((imenu-auto-rescan t)
