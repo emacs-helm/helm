@@ -796,6 +796,17 @@ first arg is a string that will be used as name for candidates number,
 second arg any string to display in mode line.
 If nil, use default `mode-line-format'.")
 
+(defvar helm-input-in-header-line-mini-set-up-hook nil
+  "Hook that run at initialization of minibuffer.
+Allow setting up minibuffer when using `header-line' as minibuffer.
+You can add here a function to narrow down minibuffer
+if you don't like to see it.
+Example:
+     (add-hook 'helm-input-in-header-line-mini-set-up-hook
+               (lambda ()
+                 (text-scale-set -12)
+                 (window--resize-mini-window (selected-window) -15)))
+It have effect only if `helm-echo-input-in-header-line' is non--nil.")
 
 ;;; Internal Variables
 ;;
@@ -2510,6 +2521,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                             ;; - Or fallback to the global value of helm-map.
                             (helm--maybe-update-keymap
                              (or src-keymap any-keymap helm-map))
+                            (when helm-echo-input-in-header-line
+                              (helm-log-run-hook
+                               'helm-input-in-header-line-mini-set-up-hook))
                             (setq timer
                                   (run-with-idle-timer
                                    (max helm-input-idle-delay 0.001) 'repeat
