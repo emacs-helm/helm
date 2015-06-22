@@ -3852,7 +3852,8 @@ Possible value of DIRECTION are 'next or 'previous."
 (defun helm--update-header-line ()
   ;; This should be used in `post-command-hook',
   ;; nowhere else.
-  (when (and helm-echo-input-in-header-line
+  (when (and (with-helm-buffer
+               helm-echo-input-in-header-line)
              ;; Ensure we don't update when pattern
              ;; is empty from post-command-hook, otherwise
              ;; we loose default-as-input.
