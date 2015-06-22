@@ -154,11 +154,12 @@ Should take one arg: the string to display."
 (defun helm-eval-expression (arg)
   "Preconfigured helm for `helm-source-evaluation-result'."
   (interactive "P")
-  (helm :sources (helm-build-evaluation-result-source)
-        :input (when arg (thing-at-point 'sexp))
-        :buffer "*helm eval*"
-        :history 'read-expression-history
-        :keymap helm-eval-expression-map))
+  (let (helm-echo-input-in-header-line)
+    (helm :sources (helm-build-evaluation-result-source)
+          :input (when arg (thing-at-point 'sexp))
+          :buffer "*helm eval*"
+          :history 'read-expression-history
+          :keymap helm-eval-expression-map)))
 
 (defvar eldoc-idle-delay)
 ;;;###autoload
