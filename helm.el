@@ -797,7 +797,20 @@ second arg any string to display in mode line.
 If nil, use default `mode-line-format'.")
 
 (defvar helm-minibuffer-set-up-hook nil
-  "Hook that run at initialization of minibuffer.")
+  "Hook that run at initialization of minibuffer.
+Useful for modifying the settings of minibuffer in helm.
+
+Here an example to hide minibuffer when using
+`helm-echo-input-in-header-line':
+
+      (add-hook 'helm-minibuffer-set-up-hook
+                (lambda ()
+                  (when helm-echo-input-in-header-line
+                    (text-scale-set -12)
+                    (window--resize-mini-window
+                     (selected-window) -15))))
+
+")
 
 ;;; Internal Variables
 ;;
