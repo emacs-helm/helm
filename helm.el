@@ -805,12 +805,14 @@ Here an example to hide minibuffer when using
 
       (add-hook 'helm-minibuffer-set-up-hook
                 (lambda ()
-                  (when helm-echo-input-in-header-line
+                  (when (with-helm-buffer helm-echo-input-in-header-line)
                     (text-scale-set -12)
                     (window--resize-mini-window
                      (selected-window) -15))))
 
-")
+Note that we check `helm-echo-input-in-header-line' value
+from `helm-buffer' which allow detecting possible local
+value of this var.")
 
 ;;; Internal Variables
 ;;
