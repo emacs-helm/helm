@@ -3829,26 +3829,16 @@ Possible value of DIRECTION are 'next or 'previous."
     (let* ((comp (with-current-buffer (window-buffer (minibuffer-window))
                    (if (get-text-property (point) 'read-only)
                        "" (helm-minibuffer-completion-contents))))
-           (prt (propertize helm--prompt
-                            'face 'minibuffer-prompt))
+           (prt (propertize helm--prompt 'face 'minibuffer-prompt))
            (pos (+ (length prt) (length comp))))
       (setq header-line-format
             (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
-                    prt
-                    (substring-no-properties comp)
-                    (condition-case _err
-                        (substring-no-properties helm-pattern
-                                                 (if (string= helm-pattern "")
-                                                     0 (length comp)))
-                      ;; Sometimes the value of the input
-                      ;; is not yet the same as helm-pattern.
-                      ;; Generally it is one more char than helm-pattern
-                      ;; until update (grep).
-                      (args-out-of-range nil))
-                    " "))
-      ;; Increment pos to handle the space before prompt [1].
-      (put-text-property (1+ pos) (+ pos 2)
-                         'face 'cursor header-line-format))
+                    prt (substring-no-properties helm-pattern) " "))
+      (condition-case _err
+          (put-text-property
+           ;; Increment pos to handle the spaces before prompt and at eol [1].
+           (1+ pos) (+ pos 2) 'face 'cursor header-line-format)
+        (args-out-of-range nil)))
     (when update (force-mode-line-update))))
 
 (defun helm--update-header-line ()
