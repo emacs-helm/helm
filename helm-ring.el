@@ -185,8 +185,11 @@ replace with STR as yanked string."
   (with-current-buffer (marker-buffer marker)
     (goto-char marker)
     (forward-line 0)
-    (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
-      (when (string= "" line) (setq line  "<EMPTY LINE>")) 
+    (let ((line (pcase (thing-at-point 'line)
+                  ((and line (pred stringp)
+                        (guard (not (string-match-p "\\`\n?\\'" line))))
+                   (car (split-string line "[\n\r]")))
+                  (_ "<EMPTY LINE>"))))
       (format "%7d:%s:    %s"
               (line-number-at-pos) (marker-buffer marker) line))))
 
