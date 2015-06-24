@@ -2539,7 +2539,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                                    helm-suspend-update-flag)
                                          (save-selected-window
                                            (helm-check-minibuffer-input)
-                                           (helm-print-error-messages)))))))
+                                           (helm-print-error-messages))))))
+                            (helm--update-header-line)) ; minibuffer has already been filled here
                       (read-from-minibuffer (or any-prompt "pattern: ")
                                             any-input helm-map
                                             nil hist tap
@@ -3825,33 +3826,26 @@ Possible value of DIRECTION are 'next or 'previous."
   (when force (force-mode-line-update)))
 
 (defun helm--set-header-line (&optional update)
-  (with-helm-window
-    (let* ((comp (with-current-buffer (window-buffer (minibuffer-window))
-                   (if (get-text-property (point) 'read-only)
-                       "" (helm-minibuffer-completion-contents))))
-           (prt (propertize helm--prompt 'face 'minibuffer-prompt))
-           (pos (+ (length prt) (length comp))))
-      (setq header-line-format
-            (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
-                    prt (substring-no-properties helm-pattern) " "))
-      (condition-case _err
-          (put-text-property
-           ;; Increment pos to handle the spaces before prompt and at eol [1].
-           (1+ pos) (+ pos 2) 'face 'cursor header-line-format)
-        (args-out-of-range nil)))
-    (when update (force-mode-line-update))))
+  (with-selected-window (minibuffer-window)
+    (let* ((beg (save-excursion (vertical-motion 0) (point))) 
+           (end (save-excursion (end-of-visual-line) (point)))
+           (cont (buffer-substring beg end)) ;i.e. the visual line where the cursor is
+           (pos (- (point) beg)))
+      (with-helm-window
+        (setq header-line-format
+              (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
+                      cont
+                      " " ;; make it possible to show cursor after last character
+                      ))
+        (put-text-property
+         (1+ pos) (+ 2 pos) ;; Increment pos to handle the space before prompt [1].
+         'face 'cursor header-line-format)
+        (when update (force-mode-line-update))))))
 
 (defun helm--update-header-line ()
   ;; This should be used in `post-command-hook',
   ;; nowhere else.
-  (when (and (with-helm-buffer
-               helm-echo-input-in-header-line)
-             ;; Ensure we don't update when pattern
-             ;; is empty from post-command-hook, otherwise
-             ;; we loose default-as-input.
-             ;; This will be done after update
-             ;; in helm-display-mode-line.
-             (not (string= helm-pattern "")))
+  (when (with-helm-buffer helm-echo-input-in-header-line)
     (helm--set-header-line t)))
 
 (defun helm-show-candidate-number (&optional name)
