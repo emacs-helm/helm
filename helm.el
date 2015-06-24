@@ -3829,16 +3829,17 @@ Possible value of DIRECTION are 'next or 'previous."
   (with-selected-window (minibuffer-window)
     (let* ((beg (save-excursion (vertical-motion 0) (point))) 
            (end (save-excursion (end-of-visual-line) (point)))
-           (cont (buffer-substring beg end)) ;i.e. the visual line where the cursor is
+           ;; The visual line where the cursor is.
+           (cont (buffer-substring beg end))
            (pos (- (point) beg)))
       (with-helm-window
         (setq header-line-format
               (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
                       cont
-                      " " ;; make it possible to show cursor after last character
+                      " " ; Make it possible to show cursor after last character.
                       ))
         (put-text-property
-         (1+ pos) (+ 2 pos) ;; Increment pos to handle the space before prompt [1].
+         (1+ pos) (+ 2 pos) ; Increment pos to handle the space before prompt [1].
          'face 'cursor header-line-format)
         (when update (force-mode-line-update))))))
 
