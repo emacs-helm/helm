@@ -100,6 +100,11 @@ Affect among others `completion-at-point', `completing-read-multiple'."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-mode-fuzzy-match nil
+  "Enable fuzzy matching in `helm-mode'."
+  :group 'helm-mode
+  :type 'boolean)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -535,6 +540,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                  (not (keywordp x))))
                                           (or (car-safe default) default)))
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
+               :fuzzy-match helm-mode-fuzzy-match
                :persistent-action 'helm-lisp-completion-persistent-action
                :persistent-help "Show brief doc in mode-line")
     :prompt prompt
@@ -587,6 +593,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                            1 0)
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
+     :fuzzy helm-mode-fuzzy-match
      :buffer buffer
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
