@@ -3822,21 +3822,22 @@ Possible value of DIRECTION are 'next or 'previous."
                           (and (listp source)
                                (assoc-default 'header-line source))
                           source))
-                  (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
+                  (hlend (make-string (max 0 (- (window-width)
+                                                (length hlstr))) ? )))
              (setq header-line-format
                    (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
   (when force (force-mode-line-update)))
 
 (defun helm--set-header-line (&optional update)
   (with-selected-window (minibuffer-window)
-    (let* ((beg (save-excursion (vertical-motion 0) (point))) 
-           (end (save-excursion (end-of-visual-line) (point)))
+    (let* ((beg  (save-excursion (vertical-motion 0) (point))) 
+           (end  (save-excursion (end-of-visual-line) (point)))
            (vprt (concat (propertize helm--prompt 'face 'minibuffer-prompt)
                          "[...]"))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
            (pref (propertize " " 'display '(space :width left-fringe)))
-           (pos (- (point) beg)))
+           (pos  (- (point) beg)))
       (with-helm-buffer
         (unless (string-match helm--prompt cont)
           (setq pref (propertize " " 'display (concat pref vprt))
@@ -3846,7 +3847,7 @@ Possible value of DIRECTION are 'next or 'previous."
                                      (substring cont (length vprt))))))
         (setq header-line-format (concat pref cont " "))
         (put-text-property
-         ; Increment pos to handle the space before prompt (i.e `pref').
+         ;; Increment pos to handle the space before prompt (i.e `pref').
          (1+ pos) (+ 2 pos)
          'face 'cursor header-line-format)
         (when update (force-mode-line-update))))))
