@@ -1959,6 +1959,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (let ((non-essential t)
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
+        (resize-mini-windows (and (null helm-echo-input-in-header-line)
+                                  resize-mini-windows))
         (helm--maybe-use-default-as-input
          (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
              (cl-loop for s in (helm-normalize-sources any-sources)
