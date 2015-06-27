@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-utils)
 (require 'org)
 
 (defgroup helm-org nil
