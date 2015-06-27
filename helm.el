@@ -666,6 +666,11 @@ input method with `toggle-input-method'."
   "Face used to highlight matches."
   :group 'helm)
 
+(defface helm-header-line-left-margin
+  '((t (:foreground "black" :background "yellow")))
+  "Face used to highlight helm-header sign in left-margin."
+  :group 'helm)
+
 
 ;;; Variables.
 ;;
@@ -3832,17 +3837,15 @@ Possible value of DIRECTION are 'next or 'previous."
   (with-selected-window (minibuffer-window)
     (let* ((beg  (save-excursion (vertical-motion 0) (point))) 
            (end  (save-excursion (end-of-visual-line) (point)))
-           (vprt (concat (propertize helm--prompt 'face 'minibuffer-prompt)
-                         "[...]"))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
            (pref (propertize
                   " "
                   'display (if (string-match helm--prompt cont)
                                '(space :width left-fringe)
-                               (propertize "->"
-                                           'face '((:background "yellow"
-                                                    :foreground "black"))))))
+                               (propertize
+                                "->"
+                                'face 'helm-header-line-left-margin))))
            (pos  (- (point) beg)))
       (with-helm-buffer
         (setq header-line-format (concat pref cont " "))
