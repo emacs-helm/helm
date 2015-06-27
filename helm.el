@@ -3836,15 +3836,15 @@ Possible value of DIRECTION are 'next or 'previous."
                          "[...]"))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
-           (pref (propertize " " 'display '(space :width left-fringe)))
+           (pref (propertize
+                  " "
+                  'display (if (string-match helm--prompt cont)
+                               '(space :width left-fringe)
+                               (propertize "->"
+                                           'face '((:background "yellow"
+                                                    :foreground "black"))))))
            (pos  (- (point) beg)))
       (with-helm-buffer
-        (unless (string-match helm--prompt cont)
-          (setq pref (propertize " " 'display (concat pref vprt))
-                cont (propertize cont 'display
-                                 (if (> (length vprt) (length cont))
-                                     cont
-                                     (substring cont (length vprt))))))
         (setq header-line-format (concat pref cont " "))
         (put-text-property
          ;; Increment pos to handle the space before prompt (i.e `pref').
