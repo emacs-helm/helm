@@ -3829,17 +3829,23 @@ Possible value of DIRECTION are 'next or 'previous."
   (with-selected-window (minibuffer-window)
     (let* ((beg (save-excursion (vertical-motion 0) (point))) 
            (end (save-excursion (end-of-visual-line) (point)))
+           (vprt (concat (propertize helm--prompt 'face 'minibuffer-prompt)
+                         "[...]"))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
+           (pref (propertize " " 'display '(space :width left-fringe)))
            (pos (- (point) beg)))
-      (with-helm-window
-        (setq header-line-format
-              (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
-                      cont
-                      " " ; Make it possible to show cursor after last character.
-                      ))
+      (with-helm-buffer
+        (unless (string-match helm--prompt cont)
+          (setq pref (propertize " " 'display (concat pref vprt))
+                cont (propertize cont 'display
+                                 (if (> (length vprt) (length cont))
+                                     cont
+                                     (substring cont (length vprt))))))
+        (setq header-line-format (concat pref cont " "))
         (put-text-property
-         (1+ pos) (+ 2 pos) ; Increment pos to handle the space before prompt [1].
+         ; Increment pos to handle the space before prompt (i.e `pref').
+         (1+ pos) (+ 2 pos)
          'face 'cursor header-line-format)
         (when update (force-mode-line-update))))))
 
