@@ -851,7 +851,8 @@ Keys description:
                   :case-fold-search case-fold
                   :default default
                   :buffer buffer
-                  :preselect preselect)))
+                  :preselect (and (stringp preselect)
+                                  (regexp-quote preselect)))))
     (or
      (cond ((and result (stringp result)
                  (string= result "") ""))
