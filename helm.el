@@ -2101,6 +2101,7 @@ Arguments SAME-AS-HELM are the same as `helm', which see."
   (with-helm-window
     (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
+          (orig-helm--prompt helm--prompt)
           (orig-helm--in-fuzzy helm--in-fuzzy)
           (orig-helm-last-frame-or-window-configuration
            helm-last-frame-or-window-configuration)
@@ -2120,6 +2121,7 @@ Arguments SAME-AS-HELM are the same as `helm', which see."
         (with-current-buffer orig-helm-buffer
           (setq helm-alive-p t) ; Nested session set this to nil on exit.
           (setq helm-buffer orig-helm-buffer)
+          (setq helm--prompt orig-helm--prompt)
           (setq helm--in-fuzzy orig-helm--in-fuzzy)
           (helm-initialize-overlays helm-buffer)
           (unless (helm-empty-buffer-p) (helm-mark-current-line t))
@@ -2127,7 +2129,23 @@ Arguments SAME-AS-HELM are the same as `helm', which see."
                 orig-helm-last-frame-or-window-configuration)
           (setq cursor-type nil)
           (setq helm-current-buffer orig-helm-current-buffer)
-          (setq helm-onewindow-p orig-one-window-p))))))
+          (setq helm-onewindow-p orig-one-window-p)
+          ;; Be sure advices, hooks, and local modes keep running.
+          (if (fboundp 'advice-add)
+              (progn
+                (advice-add 'tramp-read-passwd
+                            :around #'helm--advice-tramp-read-passwd)
+                (advice-add 'ange-ftp-get-passwd
+                            :around #'helm--advice-ange-ftp-get-passwd))
+              (ad-activate 'tramp-read-passwd)
+              (ad-activate 'ange-ftp-get-passwd))
+          (when helm-prevent-escaping-from-minibuffer
+            (helm--remap-mouse-mode 1))
+          (unless (cl-loop for h in post-command-hook
+                           thereis (memq h '(helm--maybe-update-keymap
+                                             helm--update-header-line)))
+            (add-hook 'post-command-hook 'helm--maybe-update-keymap)
+            (add-hook 'post-command-hook 'helm--update-header-line)))))))
 
 
 ;;; Core: Accessors
