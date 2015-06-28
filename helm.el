@@ -2633,16 +2633,17 @@ It will override `helm-map' with the local map of current source.
 If no map is found in current source do nothing (keep previous map)."
   (with-helm-buffer
     (helm-aif (or map (assoc-default 'keymap (helm-get-current-source)))
-        ;; We need the timer to leave enough time
-        ;; to helm to setup its buffer when changing source
-        ;; from a recursive minibuffer.
+        ;; We used a timer in the past to leave
+        ;; enough time to helm to setup its keymap
+        ;; when changing source from a recursive minibuffer.
         ;; e.g C-x C-f M-y C-g
         ;; => *find-files have now the bindings of *kill-ring.
-        (run-with-idle-timer
-         0.01 nil
-         (lambda ()
-           (with-current-buffer (window-buffer (minibuffer-window))
-             (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))))
+        ;; It is no more true now we are using `minor-mode-overriding-map-alist'
+        ;; and `helm--minor-mode' thus it fix issue #1076 for emacs-24.3
+        ;; where concurrent timers are not supported.
+        ;; i.e update keymap+check input.
+        (with-current-buffer (window-buffer (minibuffer-window))
+          (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
 
 ;;; Prevent loosing focus when using mouse.
 ;;
