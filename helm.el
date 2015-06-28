@@ -917,6 +917,7 @@ precedence on :default.")
   "Store temporary hooks added by `with-helm-temp-hook'.")
 (defvar helm-truncate-lines nil
   "[Internal] Don't set this globally, it is used as a local var.")
+(defvar helm--prompt nil)
 
 
 ;; Utility: logging
@@ -1936,7 +1937,6 @@ in source.
            unless (memq key helm-argument-keys)
            collect (cons sym value)))
 
-(defvar helm--prompt nil)
 ;;; Core: entry point helper
 (defun helm-internal (&optional
                         any-sources any-input
