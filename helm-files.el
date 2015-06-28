@@ -1884,7 +1884,11 @@ Note that only existing directories are saved here."
       (with-helm-buffer
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil))
-      (helm-force-update))))
+      (helm-force-update
+       (let ((presel (helm-get-selection)))
+         (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                (not (helm-ff-dot-file-p presel)))
+                           (helm-basename presel) presel)))))))
 
 (defun helm-ff-kill-buffer-fname (candidate)
   (let ((buf (get-file-buffer candidate)))
