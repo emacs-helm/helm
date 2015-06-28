@@ -666,6 +666,11 @@ input method with `toggle-input-method'."
   "Face used to highlight matches."
   :group 'helm)
 
+(defface helm-header-line-left-margin
+  '((t (:foreground "black" :background "yellow")))
+  "Face used to highlight helm-header sign in left-margin."
+  :group 'helm)
+
 
 ;;; Variables.
 ;;
@@ -2455,6 +2460,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                            (assoc-default 'history src)))
            (timer nil)
            blink-matching-paren
+           (resize-mini-windows (and (null helm-echo-input-in-header-line)
+                                     resize-mini-windows))
            (first-src (car helm-sources))
            (first-src-val (if (symbolp first-src)
                               (symbol-value first-src)
@@ -3820,26 +3827,31 @@ Possible value of DIRECTION are 'next or 'previous."
                           (and (listp source)
                                (assoc-default 'header-line source))
                           source))
-                  (hlend (make-string (max 0 (- (window-width) (length hlstr))) ? )))
+                  (hlend (make-string (max 0 (- (window-width)
+                                                (length hlstr))) ? )))
              (setq header-line-format
                    (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
   (when force (force-mode-line-update)))
 
 (defun helm--set-header-line (&optional update)
   (with-selected-window (minibuffer-window)
-    (let* ((beg (save-excursion (vertical-motion 0) (point))) 
-           (end (save-excursion (end-of-visual-line) (point)))
+    (let* ((beg  (save-excursion (vertical-motion 0) (point))) 
+           (end  (save-excursion (end-of-visual-line) (point)))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
-           (pos (- (point) beg)))
-      (with-helm-window
-        (setq header-line-format
-              (concat (propertize " " 'display '(space :width left-fringe)) ; [1]
-                      cont
-                      " " ; Make it possible to show cursor after last character.
-                      ))
+           (pref (propertize
+                  " "
+                  'display (if (string-match helm--prompt cont)
+                               '(space :width left-fringe)
+                               (propertize
+                                "->"
+                                'face 'helm-header-line-left-margin))))
+           (pos  (- (point) beg)))
+      (with-helm-buffer
+        (setq header-line-format (concat pref cont " "))
         (put-text-property
-         (1+ pos) (+ 2 pos) ; Increment pos to handle the space before prompt [1].
+         ;; Increment pos to handle the space before prompt (i.e `pref').
+         (1+ pos) (+ 2 pos)
          'face 'cursor header-line-format)
         (when update (force-mode-line-update))))))
 
