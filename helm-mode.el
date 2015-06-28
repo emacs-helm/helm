@@ -966,7 +966,8 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
       (ido-mode (if ido-state 1 -1))
       ;; Same comment as in `helm--completing-read-default'.
       (setq this-command current-command))
-    fname))
+    (if (eq predicate 'file-directory-p) ; Using `read-directory-name'.
+        (file-name-as-directory fname) fname)))
 
 (defun helm-mode--advice-lisp--local-variables (old--fn &rest args)
   (ignore-errors
