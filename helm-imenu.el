@@ -116,8 +116,7 @@
 
 (defun helm-imenu--maybe-switch-to-buffer (candidate)
   (helm-aif (marker-buffer (cdr candidate))
-      (unless (eql it (get-buffer helm-current-buffer))
-        (switch-to-buffer it))))
+      (switch-to-buffer it)))
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
