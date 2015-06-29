@@ -2145,7 +2145,8 @@ Arguments SAME-AS-HELM are the same as `helm', which see."
                            thereis (memq h '(helm--maybe-update-keymap
                                              helm--update-header-line)))
             (add-hook 'post-command-hook 'helm--maybe-update-keymap)
-            (add-hook 'post-command-hook 'helm--update-header-line)))))))
+            (add-hook 'post-command-hook 'helm--update-header-line))
+          (helm-display-mode-line (helm-get-current-source)))))))
 
 
 ;;; Core: Accessors
