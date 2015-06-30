@@ -664,12 +664,12 @@ input method with `toggle-input-method'."
   '((((background light)) :foreground "#b00000")
     (((background dark))  :foreground "gold1"))
   "Face used to highlight matches."
-  :group 'helm)
+  :group 'helm-faces)
 
 (defface helm-header-line-left-margin
   '((t (:foreground "black" :background "yellow")))
   "Face used to highlight helm-header sign in left-margin."
-  :group 'helm)
+  :group 'helm-faces)
 
 
 ;;; Variables.
