@@ -3861,7 +3861,7 @@ Possible value of DIRECTION are 'next or 'previous."
            (cont (buffer-substring beg end))
            (pref (propertize
                   " "
-                  'display (if (string-match helm--prompt cont)
+                  'display (if (string-match-p (regexp-quote helm--prompt) cont)
                                '(space :width left-fringe)
                                (propertize
                                 "->"
