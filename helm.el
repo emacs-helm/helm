@@ -3881,6 +3881,17 @@ Possible value of DIRECTION are 'next or 'previous."
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (helm--set-header-line t)))
 
+(defun helm-hide-minibuffer-maybe ()
+  "Hide minibuffer contents in a Helm session.
+This function should normally go to `helm-minibuffer-set-up-hook'.
+It has no effect if `helm-echo-input-in-header-line' is nil."
+  (when (with-helm-buffer helm-echo-input-in-header-line)
+    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+      (overlay-put ov 'window (selected-window))
+      (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
+                              `(:background ,bg-color :foreground ,bg-color)))
+      (setq cursor-type nil))))
+
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g \"Buffers\" otherwise
