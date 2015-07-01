@@ -152,7 +152,7 @@ infos.
 
 ### Advanced usage
 
-Helm is capable of a lot. Here is a demo of `helm-buffers-list`:
+Helm is capable of a lot. Here is a demo of `helm-buffers-list` used with `helm-moccur`:
 
 ![helm-buffers-list](doc/helm-buffers-list.gif)
 
@@ -173,16 +173,19 @@ You can find all the gory details on the [Helm Wiki](https://github.com/emacs-he
 
 Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
 
-- `helm-recentf`: Enabled by setting `helm-recentf-fuzzy-match` to `t`.
+- `helm-recentf`: Enable by setting `helm-recentf-fuzzy-match` to `t`.
 - `helm-mini`: Enable by setting `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
 - `helm-buffers-list`: Enable by setting `helm-buffers-fuzzy-matching` to `t`.
-- `helm-find-files`: Enabled by default.
+- `helm-find-files`: Enable by default.
 - `helm-locate`: Enable by setting `helm-locate-fuzzy-match` to `t`.
-- `helm-M-x`: Enabled by setting `helm-M-x-fuzzy-match` to `t`.
-- `helm-semantic`: Enabled by setting `helm-semantic-fuzzy-match` to `t`.
-- `helm-imenu`: Enabled by setting `helm-imenu-fuzzy-match` to `t`.
-- `helm-apropos`: Enabled by setting `helm-apropos-fuzzy-match` to `t`.
-- `helm-lisp-completion-at-point`: Enabled by setting `helm-lisp-fuzzy-completion` to `t`.
+- `helm-M-x`: Enable by setting `helm-M-x-fuzzy-match` to `t`.
+- `helm-semantic`: Enable by setting `helm-semantic-fuzzy-match` to `t`.
+- `helm-imenu`: Enable by setting `helm-imenu-fuzzy-match` to `t`.
+- `helm-apropos`: Enable by setting `helm-apropos-fuzzy-match` to `t`.
+- `helm-lisp-completion-at-point`: Enable by setting `helm-lisp-fuzzy-completion` to `t`.
+
+You can also enable fuzzy matching globally in all functions helmized by `helm-mode` with `helm-mode-fuzzy-match`
+and `helm-completion-in-region-fuzzy-match`.
 
 **IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` too high. It is recommended that you leave the variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching will be.
 
@@ -192,10 +195,6 @@ Helm can now resize according to the number of candidates with `helm-autoresize-
 
     (helm-autoresize-mode 1)
 
-Here is a demo:
-
-![helm-buffers-list](doc/helm-autoresize-mode.gif)
-
 You can customize the minimum and maximum height that Helm can resize with these two variables:
 
 - `helm-autoresize-max-height`
@@ -204,6 +203,27 @@ You can customize the minimum and maximum height that Helm can resize with these
 By default, `helm-autoresize-max-height` is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
 
 If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-max-height` equal to `helm-autoresize-max-height`.
+
+## Features
+
+Here some of the most important features provided by helm, not exhaustive:
+
+- `helm-mode`: Allow turning on helm in all completions provided by emacs, when available use instead the same feature provided natively by helm.
+- `helm-find-files`: Replace in one command all the files related commands (Bind it to `C-x C-f`!).
+- `helm-buffers-list`: Enhanced buffers listing.
+- `helm-browse-project`: Show all buffers and files related to project or current directory (Usable everywhere with `helm-find-files`) You will want to install
+[helm-ls-git](https://github.com/emacs-helm/helm-ls-git) and [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) for a better experience.
+- `helm-dabbrev`: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
+- `helm-moccur`: Enhanced occur for one or more buffers, launch it from `helm-buffers-list` or `current-buffer`(Own implementation).
+- `helm-M-x`: Enhanced version of `execute-extended-command` (Bind it to `M-x`!).
+- `helm-imenu` and `helm-imenu-in-all-buffers`: Imenu in `current-buffer` or in all your buffers.
+- `helm-etags-select`: Enhanced version of etags with helm-completion (Usable everywhere with `helm-find-files`).
+- `helm-apropos`: Description of functions, variables, etc... Use it instead of Most `C-h` commands.
+- `Grep`: You can launch it (recursively or not) from any files related helm commands, support as backends `grep`, `ack-grep`, `git-grep` (Own implementation).
+- `helm-show-kill-ring`: A kill ring browser for helm.
+- `helm-all-mark-rings`: A mark ring for helm, allow retrieving your last position(s) in a buffer.
+- `helm-filtered-bookmarks`: An enhanced bookmark listing.
+- `helm-list-elisp-packages`: Manage emacs packages with helm.
 
 ## Known issues
 
