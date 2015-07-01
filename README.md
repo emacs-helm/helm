@@ -208,10 +208,10 @@ If you don't want the Helm window to be resized, but a smaller Helm window, you 
 
 Here some of the most important features provided by helm, not exhaustive:
 
-- `helm-mode`: Allow turning on helm in all completions provided by emacs, when available use instead the same feature provided natively by helm.
+- `helm-mode`: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.
 - `helm-find-files`: Replace in one command all the files related commands (Bind it to `C-x C-f`!).
 - `helm-buffers-list`: Enhanced buffers listing.
-- `helm-browse-project`: Show all buffers and files related to project or current directory (Usable everywhere with `helm-find-files`) You will want to install
+- `helm-browse-project`: Show all buffers and files related to project or current directory (Usable everywhere with `helm-find-files`) you will want to install
 [helm-ls-git](https://github.com/emacs-helm/helm-ls-git) and [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) for a better experience.
 - `helm-dabbrev`: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
 - `helm-moccur`: Enhanced occur for one or more buffers, launch it from `helm-buffers-list` or `current-buffer`(Own implementation).
@@ -224,6 +224,17 @@ Here some of the most important features provided by helm, not exhaustive:
 - `helm-all-mark-rings`: A mark ring for helm, allow retrieving your last position(s) in a buffer.
 - `helm-filtered-bookmarks`: An enhanced bookmark listing.
 - `helm-list-elisp-packages`: Manage emacs packages with helm.
+
+## Helm extensions you should install
+
+- [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
+- [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
+- [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
+- [helm-firefox](https://github.com/emacs-helm/helm-firefox)
+
+**Warning** You will find many extensions outside of [emacs-helm](https://github.com/emacs-helm)
+that provide nothing more than what is provided natively by [helm](https://github.com/emacs-helm/helm) and may not be in sync will `helm` core.
+So generally prefer what is provided natively in `helm` instead of its counterpart provided externally.
 
 ## Known issues
 
