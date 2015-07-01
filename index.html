@@ -182,7 +182,7 @@ infos.</p>
 <h3>
 <a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced usage</h3>
 
-<p>Helm is capable of a lot. Here is a demo of <code>helm-buffers-list</code>:</p>
+<p>Helm is capable of a lot. Here is a demo of <code>helm-buffers-list</code> used with <code>helm-moccur</code>:</p>
 
 <p><img src="images/helm-buffers-list.gif" alt="helm-buffers-list"></p>
 
@@ -208,26 +208,29 @@ infos.</p>
 
 <ul>
 <li>
-<code>helm-recentf</code>: Enabled by setting <code>helm-recentf-fuzzy-match</code> to <code>t</code>.</li>
+<code>helm-recentf</code>: Enable by setting <code>helm-recentf-fuzzy-match</code> to <code>t</code>.</li>
 <li>
 <code>helm-mini</code>: Enable by setting <code>helm-buffers-fuzzy-matching</code> and <code>helm-recentf-fuzzy-match</code> to <code>t</code>.</li>
 <li>
 <code>helm-buffers-list</code>: Enable by setting <code>helm-buffers-fuzzy-matching</code> to <code>t</code>.</li>
 <li>
-<code>helm-find-files</code>: Enabled by default.</li>
+<code>helm-find-files</code>: Enable by default.</li>
 <li>
 <code>helm-locate</code>: Enable by setting <code>helm-locate-fuzzy-match</code> to <code>t</code>.</li>
 <li>
-<code>helm-M-x</code>: Enabled by setting <code>helm-M-x-fuzzy-match</code> to <code>t</code>.</li>
+<code>helm-M-x</code>: Enable by setting <code>helm-M-x-fuzzy-match</code> to <code>t</code>.</li>
 <li>
-<code>helm-semantic</code>: Enabled by setting <code>helm-semantic-fuzzy-match</code> to <code>t</code>.</li>
+<code>helm-semantic</code>: Enable by setting <code>helm-semantic-fuzzy-match</code> to <code>t</code>.</li>
 <li>
-<code>helm-imenu</code>: Enabled by setting <code>helm-imenu-fuzzy-match</code> to <code>t</code>.</li>
+<code>helm-imenu</code>: Enable by setting <code>helm-imenu-fuzzy-match</code> to <code>t</code>.</li>
 <li>
-<code>helm-apropos</code>: Enabled by setting <code>helm-apropos-fuzzy-match</code> to <code>t</code>.</li>
+<code>helm-apropos</code>: Enable by setting <code>helm-apropos-fuzzy-match</code> to <code>t</code>.</li>
 <li>
-<code>helm-lisp-completion-at-point</code>: Enabled by setting <code>helm-lisp-fuzzy-completion</code> to <code>t</code>.</li>
+<code>helm-lisp-completion-at-point</code>: Enable by setting <code>helm-lisp-fuzzy-completion</code> to <code>t</code>.</li>
 </ul>
+
+<p>You can also enable fuzzy matching globally in all functions helmized by <code>helm-mode</code> with <code>helm-mode-fuzzy-match</code>
+and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 
 <p><strong>IMPORTANT</strong>: To make fuzzy-matching fast, you must not set <code>helm-candidate-number-limit</code> too high. It is recommended that you leave the variable with its default value 100. The higher you set <code>helm-candidate-number-limit</code>, the slower fuzzy-matching will be.</p>
 
@@ -239,10 +242,6 @@ infos.</p>
 <pre><code>(helm-autoresize-mode 1)
 </code></pre>
 
-<p>Here is a demo:</p>
-
-<p><img src="images/helm-autoresize-mode.gif" alt="helm-buffers-list"></p>
-
 <p>You can customize the minimum and maximum height that Helm can resize with these two variables:</p>
 
 <ul>
@@ -253,6 +252,61 @@ infos.</p>
 <p>By default, <code>helm-autoresize-max-height</code> is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, <code>helm-autoresize-min-height</code> specifies the minimum height that Helm candidate buffer cannot be smaller.</p>
 
 <p>If you don't want the Helm window to be resized, but a smaller Helm window, you can set <code>helm-autoresize-max-height</code> equal to <code>helm-autoresize-max-height</code>.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<p>Here some of the most important features provided by helm, not exhaustive:</p>
+
+<ul>
+<li>
+<code>helm-mode</code>: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.</li>
+<li>
+<code>helm-find-files</code>: Replace in one command all the files related commands (Bind it to <code>C-x C-f</code>!).</li>
+<li>
+<code>helm-buffers-list</code>: Enhanced buffers listing.</li>
+<li>
+<code>helm-browse-project</code>: Show all buffers and files related to project or current directory (Usable everywhere with <code>helm-find-files</code>) you will want to install
+<a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a> and <a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a> for a better experience.</li>
+<li>
+<code>helm-dabbrev</code>: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).</li>
+<li>
+<code>helm-moccur</code>: Enhanced occur for one or more buffers, launch it from <code>helm-buffers-list</code> or <code>current-buffer</code>(Own implementation).</li>
+<li>
+<code>helm-M-x</code>: Enhanced version of <code>execute-extended-command</code> (Bind it to <code>M-x</code>!).</li>
+<li>
+<code>helm-imenu</code> and <code>helm-imenu-in-all-buffers</code>: Imenu in <code>current-buffer</code> or in all your buffers.</li>
+<li>
+<code>helm-etags-select</code>: Enhanced version of etags with helm-completion (Usable everywhere with <code>helm-find-files</code>).</li>
+<li>
+<code>helm-apropos</code>: Description of functions, variables, etc... Use it instead of Most <code>C-h</code> commands.</li>
+<li>
+<code>Grep</code>: You can launch it (recursively or not) from any files related helm commands, support as backends <code>grep</code>, <code>ack-grep</code>, <code>git-grep</code> (Own implementation).</li>
+<li>
+<code>helm-gid</code>: Helm interface to <code>gid</code> from <a href="https://www.gnu.org/software/idutils/">id-utils</a>.</li>
+<li>
+<code>helm-show-kill-ring</code>: A kill ring browser for helm.</li>
+<li>
+<code>helm-all-mark-rings</code>: A mark ring for helm, allow retrieving your last position(s) in a buffer.</li>
+<li>
+<code>helm-filtered-bookmarks</code>: An enhanced bookmark listing.</li>
+<li>
+<code>helm-list-elisp-packages</code>: Manage emacs packages with helm.</li>
+</ul>
+
+<h2>
+<a id="helm-extensions-you-should-install" class="anchor" href="#helm-extensions-you-should-install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Helm extensions you should install</h2>
+
+<ul>
+<li><a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a></li>
+<li><a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a></li>
+<li><a href="https://github.com/emacs-helm/helm-descbinds">helm-descbinds</a></li>
+<li><a href="https://github.com/emacs-helm/helm-firefox">helm-firefox</a></li>
+</ul>
+
+<p><strong>Warning</strong> You will find many extensions outside of <a href="https://github.com/emacs-helm">emacs-helm</a>
+that provide nothing more than what is provided natively by <a href="https://github.com/emacs-helm/helm">helm</a> and may not be in sync will <code>helm</code> core.
+So generally prefer what is provided natively in <code>helm</code> instead of its counterpart provided externally.</p>
 
 <h2>
 <a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known issues</h2>
