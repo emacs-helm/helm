@@ -220,6 +220,7 @@ Here some of the most important features provided by helm, not exhaustive:
 - `helm-etags-select`: Enhanced version of etags with helm-completion (Usable everywhere with `helm-find-files`).
 - `helm-apropos`: Description of functions, variables, etc... Use it instead of Most `C-h` commands.
 - `Grep`: You can launch it (recursively or not) from any files related helm commands, support as backends `grep`, `ack-grep`, `git-grep` (Own implementation).
+- `helm-gid`: Helm interface to `gid` from [id-utils](https://www.gnu.org/software/idutils/).
 - `helm-show-kill-ring`: A kill ring browser for helm.
 - `helm-all-mark-rings`: A mark ring for helm, allow retrieving your last position(s) in a buffer.
 - `helm-filtered-bookmarks`: An enhanced bookmark listing.
