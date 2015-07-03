@@ -149,14 +149,16 @@ fuzzy matching is running its own sort function with a different algorithm."
     (cadr (split-string (buffer-substring-no-properties
                          (point-at-bol) (point-at-eol))))))
 
-(defun helm-cmd--get-preconfigured-commands (helm-directory)
-  (cl-loop with results
-           for f in (directory-files helm-directory t ".*\\.el\\'")
-           do (with-current-buffer (find-file-noselect f)
-                (save-excursion
-                  (goto-char (point-min))
-                  (while (re-search-forward "Preconfigured helm" nil t)
-                    (push (helm-cmd--get-current-function-name) results))))
+(defun helm-cmd--get-preconfigured-commands ()
+  (cl-loop with helm-directory = (helm-basedir (locate-library "helm"))
+           with results
+           for f in (directory-files helm-directory t "[^helm-autoloads]\\.el\\'")
+           do (with-temp-buffer
+                (erase-buffer)
+                (insert-file-contents f)
+                (goto-char (point-min))
+                (while (re-search-forward "Preconfigured `?helm'?" nil t)
+                  (push (helm-cmd--get-current-function-name) results)))
            finally return results))
 
 (defun helm-M-x-read-extended-command (&optional collection history)
