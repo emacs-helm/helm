@@ -808,12 +808,7 @@ Useful for modifying the settings of minibuffer in helm.
 Here an example to hide minibuffer when using
 `helm-echo-input-in-header-line':
 
-      (add-hook 'helm-minibuffer-set-up-hook
-                (lambda ()
-                  (when (with-helm-buffer helm-echo-input-in-header-line)
-                    (text-scale-set -12)
-                    (window--resize-mini-window
-                     (selected-window) -15))))
+      (add-hook 'helm-minibuffer-set-up-hook #'helm-hide-minibuffer-maybe)
 
 Note that we check `helm-echo-input-in-header-line' value
 from `helm-buffer' which allow detecting possible local
