@@ -3078,11 +3078,13 @@ Score is calculated against number of contiguous matches found with PATTERN.
 If PATTERN is fully matched in CANDIDATE a maximal score (100) is given.
 A bonus of one point is given when PATTERN prefix match CANDIDATE.
 Contiguous matches have a coefficient of 2."
-  (let* ((pat-lookup (helm--collect-pairs-in-string pattern))
-         (str-lookup (helm--collect-pairs-in-string candidate))
+  (let* ((cand (if (stringp candidate)
+                   candidate (helm-stringify candidate)))
+         (pat-lookup (helm--collect-pairs-in-string pattern))
+         (str-lookup (helm--collect-pairs-in-string cand))
          (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0))
          (bonus1 (and (string-match (concat "\\<" (regexp-quote pattern) "\\>")
-                                    candidate)
+                                    cand)
                       100)))
     (+ bonus (or bonus1
                  ;; Give a coefficient of 2 for contiguous matches.
@@ -3116,14 +3118,16 @@ sort on the real part."
                                 (funcall real-or-disp-fn s2)
                               s2))
                      (data1 (or (gethash cand1 table-scr)
-                                (puthash cand1 (list (helm-score-candidate-for-pattern
-                                                      cand1 helm-pattern)
-                                                     (length cand1))
+                                (puthash cand1
+                                         (list (helm-score-candidate-for-pattern
+                                                cand1 helm-pattern)
+                                               (length (helm-stringify cand1)))
                                          table-scr)))
                      (data2 (or (gethash cand2 table-scr)
-                                (puthash cand2 (list (helm-score-candidate-for-pattern
-                                                      cand2 helm-pattern)
-                                                     (length cand2))
+                                (puthash cand2
+                                         (list (helm-score-candidate-for-pattern
+                                                cand2 helm-pattern)
+                                               (length (helm-stringify cand2)))
                                          table-scr)))
                      (len1 (cadr data1))
                      (len2 (cadr data2))
