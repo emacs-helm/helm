@@ -115,8 +115,6 @@
 (make-obsolete 'helm-c-bookmark-run-delete 'helm-bookmark-run-delete "1.5.1")
 (defalias 'helm-c-uniq-list 'helm-uniq-list)
 (make-obsolete 'helm-c-uniq-list 'helm-uniq-list "1.5.1")
-(defalias 'helm-c-pp-bookmarks 'helm-pp-bookmarks)
-(make-obsolete 'helm-c-pp-bookmarks 'helm-pp-bookmarks "1.5.1")
 (defalias 'helm-c-top-sh-persistent-action 'helm-top-sh-persistent-action)
 (make-obsolete 'helm-c-top-sh-persistent-action 'helm-top-sh-persistent-action "1.5.1")
 (defalias 'helm-c-grep-action 'helm-grep-action)

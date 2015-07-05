@@ -130,13 +130,6 @@
         collect (cons (concat trunc sep (if (listp loc) (car loc) loc)) i)
         else collect i))
 
-(defun helm-bookmark-match-fn (candidate)
-  "Match function for bookmark sources using `candidates'."
-  (if helm-bookmark-show-location
-      ;; match only location, match-plugin will match also name.
-      (string-match helm-pattern (bookmark-location candidate))
-    (string-match helm-pattern candidate)))
-
 (defun helm-bookmark-toggle-filename-1 (_candidate)
   (let* ((real (helm-get-selection helm-buffer))
          (trunc (if (> (string-width real) bookmark-bmenu-file-column)
@@ -173,41 +166,21 @@
 ;;; bookmark-set
 ;;
 (defvar helm-source-bookmark-set
-  '((name . "Set Bookmark")
-    (dummy)
-    (action . bookmark-set))
+  (helm-build-dummy-source "Set Bookmark" :action 'bookmark-set)
   "See (info \"(emacs)Bookmarks\").")
 
 
-;;; Colorize bookmarks by category
+;;; Search and match-part fns.
 ;;
-(defvar helm-source-pp-bookmarks
-  '((name . "PP-Bookmarks")
-    (init . (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (cl-loop for b in (bookmark-all-names) collect
-                                (propertize b 'location (bookmark-location b))))))
-    (candidates-in-buffer)
-    (search helm-bookmark-search-fn)
-    (match-part . helm-pp-bookmark-match-fn)
-    (filtered-candidate-transformer
-     helm-adaptive-sort
-     helm-highlight-bookmark)
-    (type . bookmark))
-  "See (info \"(emacs)Bookmarks\").")
-
 (defun helm-bookmark-search-fn (pattern)
-  "Search function for bookmark sources using `candidates-in-buffer'.
-Should be used with `helm-pp-bookmark-match-fn' as `match-part' function."
+    "Search function for bookmark sources using `helm-source-in-buffer'."
   (if helm-bookmark-show-location
       (helm-aif (next-single-property-change (point) 'location)
           (goto-char it))
     (re-search-forward pattern nil t)))
 
-(defun helm-pp-bookmark-match-fn (candidate)
-  "Search function for bookmark sources using `candidates-in-buffer'.
-Should be used with `helm-bookmark-search-fn' as `search' function."
+(defun helm-bookmark-match-part-fn (candidate)
+  "Match part function for bookmark sources using `helm-source-in-buffer'."
   (helm-aif (and helm-bookmark-show-location
                  (bookmark-location candidate))
       ;; Match against bookmark-name and location.
@@ -350,7 +323,7 @@ than `w3m-browse-url' use it."
 ;;
 (defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
   ((search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-pp-bookmark-match-fn)
+   (match-part :initform #'helm-bookmark-match-part-fn)
    (filtered-candidate-transformer
     :initform '(helm-adaptive-sort
                 helm-highlight-bookmark))))
@@ -470,7 +443,7 @@ than `w3m-browse-url' use it."
                          'global
                        (helm-bookmark-addressbook-setup-alist))))
    (search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-pp-bookmark-match-fn)
+   (match-part :initform #'helm-bookmark-match-part-fn)
    (persistent-action :initform
                       (lambda (candidate)
                         (let ((bmk (helm-bookmark-get-bookmark-from-name
@@ -759,15 +732,6 @@ e.g prepended with *."
   (helm :sources '(helm-source-bookmarks
                    helm-source-bookmark-set)
         :buffer "*helm bookmarks*"
-        :default (buffer-name helm-current-buffer)))
-
-;;;###autoload
-(defun helm-pp-bookmarks ()
-  "Preconfigured `helm' for bookmarks (pretty-printed)."
-  (interactive)
-  (helm :sources '(helm-source-pp-bookmarks
-                   helm-source-bookmark-set)
-        :buffer "*helm pp bookmarks*"
         :default (buffer-name helm-current-buffer)))
 
 ;;;###autoload
