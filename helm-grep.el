@@ -997,7 +997,8 @@ in recurse, and ignoring EXTS, search being made on
                             default-directory)))))
     (if (consp candidate)
         (helm-grep--filter-candidate-1 (cdr candidate))
-        (helm-grep--filter-candidate-1 candidate))))
+        (and (stringp candidate)
+             (helm-grep--filter-candidate-1 candidate)))))
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
