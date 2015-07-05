@@ -314,7 +314,12 @@
                       (append actions '(("Upgrade all packages"
                                          . helm-el-package-upgrade-all-action)))
                       actions)))
-        (cond ((cdr (assq (package-desc-name pkg-desc)
+        (cond ((and (package-installed-p (package-desc-name pkg-desc))
+                    (cdr (assq (package-desc-name pkg-desc)
+                          helm-el-package--upgrades)))
+               (append '(("Upgrade package(s)" . helm-el-package-upgrade)
+                         ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
+              ((cdr (assq (package-desc-name pkg-desc)
                           helm-el-package--upgrades))
                (append '(("Upgrade package(s)" . helm-el-package-upgrade)) acts))
               ((package-installed-p (package-desc-name pkg-desc))
