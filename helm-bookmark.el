@@ -606,6 +606,10 @@ Work both with standard Emacs bookmarks and bookmark-extensions.el."
                             i)
                     (cons bmk i)))))
 
+
+;;; Edit/rename/save bookmarks.
+;;
+;;
 (defun helm-bookmark-edit-bookmark (bookmark-name)
   "Edit bookmark's name and file name, and maybe save them.
 BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
