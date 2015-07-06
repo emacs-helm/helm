@@ -3724,30 +3724,29 @@ Coerce source with coerce function."
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the helm buffer."
   (interactive)
-  (let ((src (helm-get-current-source)))
-    (helm-log-run-hook 'helm-select-action-hook)
-    (setq helm-saved-selection (helm-get-selection))
-    (with-selected-frame (with-helm-window (selected-frame))
-      (prog1
-          (cond ((get-buffer-window helm-action-buffer 'visible)
-                 (set-window-buffer (get-buffer-window helm-action-buffer)
-                                    helm-buffer)
-                 (kill-buffer helm-action-buffer)
-                 (helm-set-pattern helm-input 'noupdate))
-                (helm-saved-selection
-                 (setq helm-saved-current-source src)
-                 (let ((actions (helm-get-actions-from-current-source)))
-                   (if (functionp actions)
-                       (message "Sole action: %s" actions)
-                       (helm-show-action-buffer actions)
-                       ;; Be sure the minibuffer is entirely deleted (#907).
-                       (helm--delete-minibuffer-contents-from "")
-                       ;; Make `helm-pattern' differs from the previous value.
-                       (setq helm-pattern 'dummy)
-                       (helm-check-minibuffer-input))))
-                (t (message "No Actions available")))
-        (helm-display-mode-line src)
-        (run-hooks 'helm-window-configuration-hook)))))
+  (helm-log-run-hook 'helm-select-action-hook)
+  (setq helm-saved-selection (helm-get-selection))
+  (with-selected-frame (with-helm-window (selected-frame))
+    (prog1
+        (cond ((get-buffer-window helm-action-buffer 'visible)
+               (set-window-buffer (get-buffer-window helm-action-buffer)
+                                  helm-buffer)
+               (kill-buffer helm-action-buffer)
+               (helm-set-pattern helm-input 'noupdate))
+              (helm-saved-selection
+               (setq helm-saved-current-source (helm-get-current-source))
+               (let ((actions (helm-get-actions-from-current-source)))
+                 (if (functionp actions)
+                     (message "Sole action: %s" actions)
+                     (helm-show-action-buffer actions)
+                     ;; Be sure the minibuffer is entirely deleted (#907).
+                     (helm--delete-minibuffer-contents-from "")
+                     ;; Make `helm-pattern' differs from the previous value.
+                     (setq helm-pattern 'dummy)
+                     (helm-check-minibuffer-input))))
+              (t (message "No Actions available")))
+      (helm-display-mode-line (helm-get-current-source))
+      (run-hooks 'helm-window-configuration-hook))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
@@ -3755,24 +3754,25 @@ If action buffer is selected, back to the helm buffer."
     (buffer-disable-undo)
     (set-window-buffer (get-buffer-window helm-buffer) helm-action-buffer)
     (set (make-local-variable 'helm-sources)
-         `(((name . "Actions")
-            (volatile)
-            (nomark)
-            (candidates . ,actions)
-            (mode-line . ("Action(s)" "TAB:BackToCands RET/f1/f2/fn:NthAct"))
-            (candidate-transformer
-             . (lambda (candidates)
-                 (cl-loop for (i . j) in candidates
-                          for count from 1
-                          collect
-                          (cons (concat (cond ((> count 12)
-                                               "      ")
-                                              ((< count 10)
-                                               (format "[f%s]  " count))
-                                              (t (format "[f%s] " count)))
-                                        (propertize i 'face 'helm-action))
-                                j))))
-            (candidate-number-limit))))
+         (list
+          (helm-build-sync-source "Actions"
+            :volatile t
+            :nomark t
+            :candidates actions
+            :mode-line '("Action(s)" "TAB:BackToCands RET/f1/f2/fn:NthAct")
+            :candidate-transformer
+             (lambda (candidates)
+               (cl-loop for (i . j) in candidates
+                        for count from 1
+                        collect
+                        (cons (concat (cond ((> count 12)
+                                             "      ")
+                                            ((< count 10)
+                                             (format "[f%s]  " count))
+                                            (t (format "[f%s] " count)))
+                                      (propertize i 'face 'helm-action))
+                              j)))
+            :candidate-number-limit nil)))
     (set (make-local-variable 'helm-source-filter) nil)
     (set (make-local-variable 'helm-selection-overlay) nil)
     (helm-initialize-overlays helm-action-buffer)))
