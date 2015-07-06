@@ -20,9 +20,11 @@
     - [Configuration](#configuration)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
+        - [Create your own helm source (overview)](#create-your-own-helm-source-overview)
         - [Fuzzy matching](#fuzzy-matching)
         - [Autoresize](#autoresize)
 - [Features](#features)
+    - [Applications (not exhaustive)](#applications-not-exhaustive)
 - [Helm extensions you should install](#helm-extensions-you-should-install)
 - [Known issues](#known-issues)
 - [Contributors](#contributors)
@@ -190,6 +192,20 @@ You can read [this guide](http://tuhdo.github.io/helm-intro.html) to quickly get
 
 You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
 
+### Create your own helm source (overview)
+
+Here a quick example ([see helm wiki for more infos](https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework))
+
+
+```elisp
+
+(helm :sources (helm-build-sync-source "test"
+                 :candidates '(foo foa fob bar baz)
+                 :fuzzy-match t)
+      :buffer "*helm test*")
+
+```
+
 ### Fuzzy matching
 
 Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
@@ -227,7 +243,7 @@ If you don't want the Helm window to be resized, but a smaller Helm window, you 
 
 # Features
 
-Here some of the most important features provided by helm, not exhaustive:
+## Applications (not exhaustive)
 
 - `helm-mode`: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.
 - `helm-find-files`: Replace in one command all the files related commands (Bind it to `C-x C-f`!).
