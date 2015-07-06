@@ -20,18 +20,61 @@
 
     <section class="main-content">
       <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3"></a>
-<a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA"></a>
-<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable"></a></p>
+<a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA" title=""></a>
+<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable" title=""></a></p>
 
 <h1>
 <a id="emacs-helm" class="anchor" href="#emacs-helm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Emacs-helm</h1>
 
-<p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm"></p>
+<p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title=""></p>
 
-<p>You can  <a href="https://gratipay.com/thierryvolpiatto"><img src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.1.3/dist/gratipay.png" alt="Support via Gratipay"></a> or <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate"></a> to help this project.</p>
+<p>You can  <a href="https://gratipay.com/thierryvolpiatto"><img src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.1.3/dist/gratipay.png" alt="Support via Gratipay" title=""></a> or <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title=""></a> to help this project.</p>
 
-<h2>
-<a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h2>
+
+
+<p><strong>Table of Contents</strong></p>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li>
+<a href="#getting-started">Getting Started</a>
+
+<ul>
+<li><a href="#quick-install-from-git">Quick install from git</a></li>
+<li><a href="#install-from-emacs-packaging-system">Install from Emacs packaging system</a></li>
+<li><a href="#alternate-install-warning">Alternate install warning</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#basic-usage">Basic usage</a></li>
+<li>
+<a href="#advanced-usage">Advanced usage</a>
+
+<ul>
+<li><a href="#create-your-own-helm-source-overview">Create your own helm source (overview)</a></li>
+<li><a href="#fuzzy-matching">Fuzzy matching</a></li>
+<li><a href="#autoresize">Autoresize</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#features">Features</a>
+
+<ul>
+<li><a href="#applications-not-exhaustive">Applications (not exhaustive)</a></li>
+</ul>
+</li>
+<li><a href="#helm-extensions-you-should-install">Helm extensions you should install</a></li>
+<li><a href="#known-issues">Known issues</a></li>
+<li><a href="#contributors">Contributors</a></li>
+<li><a href="#bugs--improvements">Bugs &amp; Improvements</a></li>
+<li><a href="#getting-help">Getting help</a></li>
+</ul>
+
+
+
+<h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
 
 <p><code>Helm</code> is incremental completion and selection narrowing framework for
 Emacs. It will help steer you in the right direction when you're looking
@@ -43,8 +86,8 @@ and can be considered to be its successor.
 and provide a cleaner, leaner and more modular tool, that's not tied in
 the trap of backward compatibility. </p>
 
-<h2>
-<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+<h1>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
 
 <p>You need a recent Emacs to use latest helm, at least Emacs-24.3.</p>
 
@@ -53,11 +96,11 @@ when installing from melpa but is facultative when installing from git (recommen
 as it may fix installation of all packages from (m)elpa and will allow you to
 copy/rename asynchronously your files from helm and/or dired if needed).</p>
 
-<h2>
-<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+<h1>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h1>
 
-<h3>
-<a id="quick-install-from-git" class="anchor" href="#quick-install-from-git" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick install from git</h3>
+<h2>
+<a id="quick-install-from-git" class="anchor" href="#quick-install-from-git" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick install from git</h2>
 
 <ol>
 <li>
@@ -92,8 +135,8 @@ copy/rename asynchronously your files from helm and/or dired if needed).</p>
 
 <p><em>NOTE:</em> That this will not work on Windows systems.</p>
 
-<h3>
-<a id="install-from-emacs-packaging-system" class="anchor" href="#install-from-emacs-packaging-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install from Emacs packaging system</h3>
+<h2>
+<a id="install-from-emacs-packaging-system" class="anchor" href="#install-from-emacs-packaging-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install from Emacs packaging system</h2>
 
 <p>Helm is now available on Melpa at <a href="http://melpa.org/">http://melpa.org/</a>
 You will find there instructions to install.
@@ -118,15 +161,15 @@ See <a href="https://github.com/emacs-helm/helm/wiki#faq">FAQ</a> for more infos
 
 <p><code>Only the extensions present in the github emacs-helm organisation are supported.</code></p>
 
-<h3>
-<a id="alternate-install-warning" class="anchor" href="#alternate-install-warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternate install warning</h3>
+<h2>
+<a id="alternate-install-warning" class="anchor" href="#alternate-install-warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternate install warning</h2>
 
 <p>Some people are installing <code>helm</code> with their own config using diverses <code>require</code>, <code>autoload</code>
 and other hacks, not using <code>helm-config</code>.
 Expect failures and slowdown at startup unless you really know what you are doing when you do so.</p>
 
-<h3>
-<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h3>
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h2>
 
 <p>For a minimal helm configuration, run the startup script <code>./emacs-helm.sh</code>
 and look at the file <code>/tmp/helm-cfg.el</code>.</p>
@@ -139,8 +182,8 @@ Enabling <code>helm-mode</code> will give you completion in the diverse customiz
 <p>Also you will find some packages like <a href="https://github.com/bbatsov/prelude">Emacs Prelude</a> that
 have Helm built-in and properly set-up.</p>
 
-<h3>
-<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic usage</h3>
+<h2>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic usage</h2>
 
 <p>Just type <code>M-x helm-M-x RET helm-</code>, you will have completion on all helm commands.</p>
 
@@ -179,8 +222,8 @@ your scratch buffer.
 <code>emacs-helm.sh</code> accept all emacs command line options, see <code>emacs-helm.sh -h</code> for more
 infos.</p>
 
-<h3>
-<a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced usage</h3>
+<h2>
+<a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced usage</h2>
 
 <p>Helm is capable of a lot. Here is a demo of <code>helm-buffers-list</code> used with <code>helm-moccur</code>:</p>
 
@@ -201,8 +244,20 @@ infos.</p>
 
 <p>You can find all the gory details on the <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a>.</p>
 
-<h4>
-<a id="fuzzy-matching" class="anchor" href="#fuzzy-matching" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fuzzy matching</h4>
+<h3>
+<a id="create-your-own-helm-source-overview" class="anchor" href="#create-your-own-helm-source-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create your own helm source (overview)</h3>
+
+<p>Here a quick example using sync method with candidates generated by a simple list, a function can be used instead of course (<a href="https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework">see helm wiki for more infos</a>).</p>
+
+<div class="highlight highlight-elisp"><pre>
+(helm :sources (helm-build-sync-source <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>
+                 :candidates '(foo foa fob bar baz)
+                 :fuzzy-match <span class="pl-c1">t</span>)
+      :buffer <span class="pl-s"><span class="pl-pds">"</span>*helm test*<span class="pl-pds">"</span></span>)
+</pre></div>
+
+<h3>
+<a id="fuzzy-matching" class="anchor" href="#fuzzy-matching" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fuzzy matching</h3>
 
 <p>Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:</p>
 
@@ -234,8 +289,8 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 
 <p><strong>IMPORTANT</strong>: To make fuzzy-matching fast, you must not set <code>helm-candidate-number-limit</code> too high. It is recommended that you leave the variable with its default value 100. The higher you set <code>helm-candidate-number-limit</code>, the slower fuzzy-matching will be.</p>
 
-<h4>
-<a id="autoresize" class="anchor" href="#autoresize" aria-hidden="true"><span class="octicon octicon-link"></span></a>Autoresize</h4>
+<h3>
+<a id="autoresize" class="anchor" href="#autoresize" aria-hidden="true"><span class="octicon octicon-link"></span></a>Autoresize</h3>
 
 <p>Helm can now resize according to the number of candidates with <code>helm-autoresize-mode</code>:</p>
 
@@ -253,10 +308,11 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 
 <p>If you don't want the Helm window to be resized, but a smaller Helm window, you can set <code>helm-autoresize-max-height</code> equal to <code>helm-autoresize-max-height</code>.</p>
 
-<h2>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+<h1>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h1>
 
-<p>Here some of the most important features provided by helm, not exhaustive:</p>
+<h2>
+<a id="applications-not-exhaustive" class="anchor" href="#applications-not-exhaustive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Applications (not exhaustive)</h2>
 
 <ul>
 <li>
@@ -294,8 +350,8 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 <code>helm-list-elisp-packages</code>: Manage emacs packages with helm.</li>
 </ul>
 
-<h2>
-<a id="helm-extensions-you-should-install" class="anchor" href="#helm-extensions-you-should-install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Helm extensions you should install</h2>
+<h1>
+<a id="helm-extensions-you-should-install" class="anchor" href="#helm-extensions-you-should-install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Helm extensions you should install</h1>
 
 <ul>
 <li><a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a></li>
@@ -308,22 +364,22 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 that provide nothing more than what is provided natively by <a href="https://github.com/emacs-helm/helm">helm</a> and may not be in sync will <code>helm</code> core.
 So generally prefer what is provided natively in <code>helm</code> instead of its counterpart provided externally.</p>
 
-<h2>
-<a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known issues</h2>
+<h1>
+<a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known issues</h1>
 
 <p>Check out the project's
 <a href="https://github.com/emacs-helm/helm/issues?sort=created&amp;direction=desc&amp;state=open">issue list</a>
 a list of unresolved issues. By the way - feel free to fix any of them
 and send us a pull request. :-)</p>
 
-<h2>
-<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h2>
+<h1>
+<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h1>
 
 <p>Here's a <a href="https://github.com/emacs-helm/helm/contributors">list</a> of all the people who have contributed to the
 development of Helm.</p>
 
-<h2>
-<a id="bugs--improvements" class="anchor" href="#bugs--improvements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs &amp; Improvements</h2>
+<h1>
+<a id="bugs--improvements" class="anchor" href="#bugs--improvements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs &amp; Improvements</h1>
 
 <p>Bug reports and suggestions for improvements are always
 welcome, be sure though they are related to helm, many bugs are coming from emacs itself
@@ -332,8 +388,8 @@ or other packages. GitHub pull requests are even better! :-)</p>
 <p>NOTE: When trying if something is working or not, be sure to start helm from <code>Emacs -Q</code> or even better
 Start it from your helm directory with <code>./emacs-helm.sh</code>.</p>
 
-<h2>
-<a id="getting-help" class="anchor" href="#getting-help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting help</h2>
+<h1>
+<a id="getting-help" class="anchor" href="#getting-help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting help</h1>
 
 <p>If <a href="https://github.com/emacs-helm/helm/wiki">Helm Wiki</a> is not enough, you can ask for help
 on <a href="https://groups.google.com/group/emacs-helm?hl=en">emacs-helm google group</a>.</p>
