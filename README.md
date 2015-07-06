@@ -1,16 +1,37 @@
-[![License GPL 3][badge-license]](http://www.gnu.org/licenses/gpl-3.0.txt)
-[![MELPA](http://melpa.org/packages/helm-badge.svg)](http://melpa.org/#/helm)
-[![MELPA Stable](http://stable.melpa.org/packages/helm-badge.svg)](http://stable.melpa.org/#/helm)
+<p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3" /></a>
+<a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA" title="" /></a>
+<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable" title="" /></a></p>
 
-Emacs-helm
-==========
-![Emacs-helm](https://avatars3.githubusercontent.com/u/1541688?v=3&s=200)
+<h1>Emacs-helm</h1>
 
+<p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
 
-You can  [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.1.3/dist/gratipay.png)](https://gratipay.com/thierryvolpiatto) or [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=thierry.volpiatto@gmail.com&lc=US&currency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted) to help this project.
+<p>You can  <a href="https://gratipay.com/thierryvolpiatto"><img src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.1.3/dist/gratipay.png" alt="Support via Gratipay" title="" /></a> or <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a> to help this project.</p>
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
+**Table of Contents**
 
-## Abstract
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+    - [Quick install from git](#quick-install-from-git)
+    - [Install from Emacs packaging system](#install-from-emacs-packaging-system)
+    - [Alternate install warning](#alternate-install-warning)
+    - [Configuration](#configuration)
+    - [Basic usage](#basic-usage)
+    - [Advanced usage](#advanced-usage)
+        - [Fuzzy matching](#fuzzy-matching)
+        - [Autoresize](#autoresize)
+- [Features](#features)
+- [Helm extensions you should install](#helm-extensions-you-should-install)
+- [Known issues](#known-issues)
+- [Contributors](#contributors)
+- [Bugs & Improvements](#bugs--improvements)
+- [Getting help](#getting-help)
+
+<!-- markdown-toc end -->
+
+# Introduction
 
 `Helm` is incremental completion and selection narrowing framework for
 Emacs. It will help steer you in the right direction when you're looking
@@ -22,7 +43,7 @@ and can be considered to be its successor.
 and provide a cleaner, leaner and more modular tool, that's not tied in
 the trap of backward compatibility. 
 
-## Requirements
+# Requirements
 
 You need a recent Emacs to use latest helm, at least Emacs-24.3.
 
@@ -31,9 +52,9 @@ when installing from melpa but is facultative when installing from git (recommen
 as it may fix installation of all packages from (m)elpa and will allow you to
 copy/rename asynchronously your files from helm and/or dired if needed).
 
-## Getting Started
+# Getting Started
 
-### Quick install from git
+## Quick install from git
 
   1. Clone the `helm` repository to some directory:
   
@@ -68,7 +89,7 @@ It is also recommended to use this when reporting bug.
 
 _NOTE:_ That this will not work on Windows systems.
 
-### Install from Emacs packaging system
+## Install from Emacs packaging system
 
 Helm is now available on Melpa at http://melpa.org/
 You will find there instructions to install.
@@ -95,13 +116,13 @@ _Note:_ After upgrading from the emacs packaging system you should restart emacs
 
 `Only the extensions present in the github emacs-helm organisation are supported.`
 
-### Alternate install warning
+## Alternate install warning
 
 Some people are installing `helm` with their own config using diverses `require`, `autoload`
 and other hacks, not using `helm-config`.
 Expect failures and slowdown at startup unless you really know what you are doing when you do so.
 
-### Configuration
+## Configuration
 
 For a minimal helm configuration, run the startup script `./emacs-helm.sh`
 and look at the file `/tmp/helm-cfg.el`.
@@ -114,7 +135,7 @@ Enabling `helm-mode` will give you completion in the diverse customize commands.
 Also you will find some packages like [Emacs Prelude](https://github.com/bbatsov/prelude) that
 have Helm built-in and properly set-up.
 
-### Basic usage
+## Basic usage
 
 Just type `M-x helm-M-x RET helm-`, you will have completion on all helm commands.
 
@@ -150,7 +171,7 @@ your scratch buffer.
 `emacs-helm.sh` accept all emacs command line options, see `emacs-helm.sh -h` for more
 infos.
 
-### Advanced usage
+## Advanced usage
 
 Helm is capable of a lot. Here is a demo of `helm-buffers-list` used with `helm-moccur`:
 
@@ -169,7 +190,7 @@ You can read [this guide](http://tuhdo.github.io/helm-intro.html) to quickly get
 
 You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
 
-#### Fuzzy matching
+### Fuzzy matching
 
 Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
 
@@ -189,7 +210,7 @@ and `helm-completion-in-region-fuzzy-match`.
 
 **IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` too high. It is recommended that you leave the variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching will be.
 
-#### Autoresize
+### Autoresize
 
 Helm can now resize according to the number of candidates with `helm-autoresize-mode`:
 
@@ -204,7 +225,7 @@ By default, `helm-autoresize-max-height` is set to 40, which makes Helm candidat
 
 If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-max-height` equal to `helm-autoresize-max-height`.
 
-## Features
+# Features
 
 Here some of the most important features provided by helm, not exhaustive:
 
@@ -226,7 +247,7 @@ Here some of the most important features provided by helm, not exhaustive:
 - `helm-filtered-bookmarks`: An enhanced bookmark listing.
 - `helm-list-elisp-packages`: Manage emacs packages with helm.
 
-## Helm extensions you should install
+# Helm extensions you should install
 
 - [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
 - [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
@@ -237,19 +258,19 @@ Here some of the most important features provided by helm, not exhaustive:
 that provide nothing more than what is provided natively by [helm](https://github.com/emacs-helm/helm) and may not be in sync will `helm` core.
 So generally prefer what is provided natively in `helm` instead of its counterpart provided externally.
 
-## Known issues
+# Known issues
 
 Check out the project's
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open)
 a list of unresolved issues. By the way - feel free to fix any of them
 and send us a pull request. :-)
 
-## Contributors
+# Contributors
 
 Here's a [list](https://github.com/emacs-helm/helm/contributors) of all the people who have contributed to the
 development of Helm.
 
-## Bugs & Improvements
+# Bugs & Improvements
 
 Bug reports and suggestions for improvements are always
 welcome, be sure though they are related to helm, many bugs are coming from emacs itself
@@ -258,7 +279,7 @@ or other packages. GitHub pull requests are even better! :-)
 NOTE: When trying if something is working or not, be sure to start helm from `Emacs -Q` or even better
 Start it from your helm directory with `./emacs-helm.sh`.
 
-## Getting help
+# Getting help
 
 If [Helm Wiki](https://github.com/emacs-helm/helm/wiki) is not enough, you can ask for help
 on [emacs-helm google group](https://groups.google.com/group/emacs-helm?hl=en).
