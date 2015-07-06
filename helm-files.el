@@ -1357,6 +1357,7 @@ or when `helm-pattern' is equal to \"~/\"."
   (when (or (and helm-ff-auto-update-flag
                  (null helm-ff--deleting-char-backward)
                  (helm-file-completion-source-p)
+                 (not (get-buffer-window helm-action-buffer 'visible))
                  ;; Issue #295
                  ;; File predicates are returning t
                  ;; with paths like //home/foo.
