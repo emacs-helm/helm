@@ -1163,15 +1163,17 @@ not `exit-minibuffer' or unwanted functions."
          (progn ,@body)
        (error "Running helm command outside of context"))))
 
-(cl-defun helm-attr (attribute-name
-                     &optional (src (helm-get-current-source)) compute)
+(defun helm-attr (attribute-name &optional source compute)
   "Get the value of ATTRIBUTE-NAME of SRC.
 If SRC is omitted, use current source.
 If COMPUTE is non--nil compute value of ATTRIBUTE-NAME
 with `helm-interpret-value'."
-  (helm-aif (or (assq attribute-name src)
-                (helm-get-attribute-from-source-type attribute-name src))
-      (if compute (helm-interpret-value (cdr it)) (cdr it))))
+  (let ((src (or source (helm-get-current-source))))
+    (helm-aif (or (assq attribute-name src)
+                  (helm-get-attribute-from-source-type attribute-name src))
+        (if (and compute (not (eq compute 'ignorefn)))
+            (helm-interpret-value (cdr it) src)
+            (cdr it)))))
 
 (cl-defun helm-attr-defined (attribute-name
                              &optional (src (helm-get-current-source)))
@@ -1244,9 +1246,9 @@ If INDEX is specified, action is added in action list at INDEX,
 otherwise it is added at end.
 This allow user to add a specific action to an existing source
 without modifying source code."
-  (let ((actions    (helm-attr 'action source))
+  (let ((actions    (helm-attr 'action source 'ignorefn))
         (new-action (list (cons name fn))))
-    (when (symbolp actions)
+    (when (functionp actions)
       (setq actions (list (cons "Default action" actions))))
     (helm-attrset 'action
                   (if index
@@ -1258,7 +1260,7 @@ without modifying source code."
   "Delete ACTION-OR-NAME from SOURCE.
 ACTION-OR-NAME can either be the name of action or the symbol function
 associated to name."
-  (let* ((actions    (helm-attr 'action source))
+  (let* ((actions    (helm-attr 'action source 'ignorefn))
          (del-action (if (symbolp action-or-name)
                          (rassoc action-or-name actions)
                        (assoc action-or-name actions))))
@@ -1287,7 +1289,7 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
                               'async-byte-compile-file
                               helm-source-find-files
                               'helm-ff-candidates-lisp-p\)."
-  (let* ((actions     (helm-attr 'action source))
+  (let* ((actions     (helm-attr 'action source 'ignorefn))
          (action-transformers (helm-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
          (transformer `(lambda (actions candidate)
@@ -1295,7 +1297,7 @@ only when predicate helm-ff-candidates-lisp-p return non--nil:
                                 (helm-append-at-nth
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
-    (when (or (symbolp actions) (functionp actions))
+    (when (functionp actions)
       (helm-attrset 'action (list (cons "Default action" actions)) source))
     (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
@@ -1429,7 +1431,7 @@ of \(action-display . function\)."
     (helm-aif (helm-attr 'action-transformer)
         (helm-composed-funcall-with-source
          (helm-get-current-source) it
-         (helm-attr 'action)
+         (helm-attr 'action nil 'ignorefn)
          ;; Check if the first given transformer
          ;; returns the same set of actions for each
          ;; candidate in marked candidates.
@@ -1442,7 +1444,7 @@ of \(action-display . function\)."
                       always (equal (funcall act nil c) acts))
              (car (helm-marked-candidates))
              (helm-get-selection)))
-      (helm-attr 'action))))
+      (helm-attr 'action nil 'ignorefn))))
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.

@@ -140,10 +140,11 @@
    (action
     :initarg :action
     :initform 'identity
+    :type (or symbol list)
     :custom (alist :key-type string
                    :value-type function)
     :documentation
-    "  It is a list of (DISPLAY . FUNCTION) pairs or FUNCTION.
+    "  An alist of (DISPLAY . FUNCTION) pairs, a variable name  or a function.
   FUNCTION is called with one parameter: the selected candidate.
 
   An action other than the default can be chosen from this list
@@ -943,8 +944,9 @@ an eieio class."
                                 (helm-append-at-nth
                                  actions (quote ,new-action) ,index))
                                (t actions)))))
-    (when (or (symbolp actions) (functionp actions))
-      (set-slot-value source 'action (list (cons "Default action" actions))))
+    (if (functionp actions)
+        (set-slot-value source 'action (list (cons "Default action" actions)))
+        (set-slot-value source 'action (helm-interpret-value actions source)))
     (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
     (set-slot-value
