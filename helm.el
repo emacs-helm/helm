@@ -29,8 +29,8 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'helm-source)
 (require 'helm-lib)
+(require 'helm-source)
 
 
 ;;; Multi keys
