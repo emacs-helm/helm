@@ -699,15 +699,8 @@ like `re-search-forward', see below documentation of :search slot.")
 ;;; Classes for types.
 ;;
 ;;  Files
-(defclass helm-type-file (helm-source) ()
-  "A class to define helm type file.")
-
-(defmethod helm--setup-source :primary ((_source helm-type-file)))
-
-(defmethod helm--setup-source :before ((source helm-type-file))
-  (set-slot-value
-   source 'action
-   (helm-make-actions
+(defcustom helm-type-file-actions
+  (helm-make-actions
     "Find file"                             'helm-find-many-files
     "Find file as root"                     'helm-find-file-as-root
     "Find file other window"                'find-file-other-window
@@ -733,7 +726,19 @@ like `re-search-forward', see below documentation of :search slot.")
     "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
     "Open file externally (C-u to choose)"  'helm-open-file-externally
     "Open file with default tool"           'helm-open-file-with-default-tool
-    "Find file in hex dump"                 'hexl-find-file))
+    "Find file in hex dump"                 'hexl-find-file)
+  "Default actions for type files."
+  :group 'helm-files
+  :type '(alist :key-type string
+                   :value-type function))
+
+(defclass helm-type-file (helm-source) ()
+  "A class to define helm type file.")
+
+(defmethod helm--setup-source :primary ((_source helm-type-file)))
+
+(defmethod helm--setup-source :before ((source helm-type-file))
+  (set-slot-value source 'action 'helm-type-file-actions)
   (set-slot-value source 'persistent-help "Show this file")
   (set-slot-value source 'action-transformer '(helm-transform-file-load-el
                                                helm-transform-file-browse-url
@@ -743,61 +748,73 @@ like `re-search-forward', see below documentation of :search slot.")
                                                   helm-w32-pathname-transformer)))
 
 ;; Bookmarks
+(defcustom helm-type-bookmark-actions
+  (helm-make-actions
+   "Jump to bookmark" 'helm-bookmark-jump
+   "Jump to BM other window" 'helm-bookmark-jump-other-window
+   "Bookmark edit annotation" 'bookmark-edit-annotation
+   "Bookmark show annotation" 'bookmark-show-annotation
+   "Delete bookmark(s)" 'helm-delete-marked-bookmarks
+   "Edit Bookmark" 'helm-bookmark-edit-bookmark
+   "Rename bookmark" 'helm-bookmark-rename
+   "Relocate bookmark" 'bookmark-relocate)
+  "Default actions for type bookmarks."
+  :group 'helm-bookmark
+  :type '(alist :key-type string
+                   :value-type function))
+
 (defclass helm-type-bookmark (helm-source) ()
   "A class to define type bookmarks.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
-  (set-slot-value
-   source 'action (helm-make-actions
-                   "Jump to bookmark" 'helm-bookmark-jump
-                   "Jump to BM other window" 'helm-bookmark-jump-other-window
-                   "Bookmark edit annotation" 'bookmark-edit-annotation
-                   "Bookmark show annotation" 'bookmark-show-annotation
-                   "Delete bookmark(s)" 'helm-delete-marked-bookmarks
-                   "Edit Bookmark" 'helm-bookmark-edit-bookmark
-                   "Rename bookmark" 'helm-bookmark-rename
-                   "Relocate bookmark" 'bookmark-relocate))
+  (set-slot-value source 'action 'helm-type-bookmark-actions)
   (set-slot-value source 'keymap helm-bookmark-map)
   (set-slot-value source 'mode-line helm-bookmark-mode-line-string))
 
 ;; Buffers
+(defcustom helm-type-buffer-actions
+  (helm-make-actions
+   "Switch to buffer(s)" 'helm-switch-to-buffers
+   (lambda () (and (locate-library "popwin")
+                   "Switch to buffer in popup window"))
+   'popwin:popup-buffer
+   "Switch to buffer(s) other window `C-c o'"
+   'helm-switch-to-buffers-other-window
+   "Switch to buffer other frame `C-c C-o'"
+   'switch-to-buffer-other-frame
+   (lambda () (and (locate-library "elscreen")
+                   "Display buffer in Elscreen"))
+   'helm-find-buffer-on-elscreen
+   "Query replace regexp `C-M-%'"
+   'helm-buffer-query-replace-regexp
+   "Query replace `M-%'" 'helm-buffer-query-replace
+   "View buffer" 'view-buffer
+   "Display buffer" 'display-buffer
+   "Grep buffers `M-g s' (C-u grep all buffers)"
+   'helm-zgrep-buffers
+   "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action
+   "Revert buffer(s) `M-U'" 'helm-revert-marked-buffers
+   "Insert buffer" 'insert-buffer
+   "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
+   "Diff with file `C-='" 'diff-buffer-with-file
+   "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
+   "Ediff Merge marked buffers `M-='"
+   (lambda (candidate)
+     (helm-ediff-marked-buffers candidate t)))
+  "Default actions for type buffers."
+  :group 'helm-buffers
+  :type '(alist :key-type string
+          :value-type function))
+
 (defclass helm-type-buffer (helm-source) ()
   "A class to define type buffer.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
 (defmethod helm--setup-source :before ((source helm-type-buffer))
-  (set-slot-value
-   source 'action (helm-make-actions
-                   "Switch to buffer(s)" 'helm-switch-to-buffers
-                   (lambda () (and (locate-library "popwin")
-                                   "Switch to buffer in popup window"))
-                   'popwin:popup-buffer
-                   "Switch to buffer(s) other window `C-c o'"
-                   'helm-switch-to-buffers-other-window
-                   "Switch to buffer other frame `C-c C-o'"
-                   'switch-to-buffer-other-frame
-                   (lambda () (and (locate-library "elscreen")
-                                   "Display buffer in Elscreen"))
-                   'helm-find-buffer-on-elscreen
-                   "Query replace regexp `C-M-%'"
-                   'helm-buffer-query-replace-regexp
-                   "Query replace `M-%'" 'helm-buffer-query-replace
-                   "View buffer" 'view-buffer
-                   "Display buffer" 'display-buffer
-                   "Grep buffers `M-g s' (C-u grep all buffers)"
-                   'helm-zgrep-buffers
-                   "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action
-                   "Revert buffer(s) `M-U'" 'helm-revert-marked-buffers
-                   "Insert buffer" 'insert-buffer
-                   "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
-                   "Diff with file `C-='" 'diff-buffer-with-file
-                   "Ediff Marked buffers `C-c ='" 'helm-ediff-marked-buffers
-                   "Ediff Merge marked buffers `M-='"
-                   (lambda (candidate)
-                     (helm-ediff-marked-buffers candidate t))))
+  (set-slot-value source 'action 'helm-type-buffer-actions)
   (set-slot-value source 'persistent-help "Show this buffer")
   (set-slot-value
    source 'filtered-candidate-transformer
@@ -806,22 +823,27 @@ like `re-search-forward', see below documentation of :search slot.")
      helm-highlight-buffers)))
 
 ;; Functions
+(defcustom helm-type-function-actions
+  (helm-make-actions
+   "Describe command" 'describe-function
+   "Add command to kill ring" 'helm-kill-new
+   "Go to command's definition" 'find-function
+   "Debug on entry" 'debug-on-entry
+   "Cancel debug on entry" 'cancel-debug-on-entry
+   "Trace function" 'trace-function
+   "Trace function (background)" 'trace-function-background
+   "Untrace function" 'untrace-function)
+    "Default actions for type functions."
+  :group 'helm-elisp
+  :type '(alist :key-type string :value-type function))
+
 (defclass helm-type-function (helm-source) ()
   "A class to define helm type function.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-function)))
 
 (defmethod helm--setup-source :before ((source helm-type-function))
-  (set-slot-value
-   source 'action (helm-make-actions
-                   "Describe command" 'describe-function
-                   "Add command to kill ring" 'helm-kill-new
-                   "Go to command's definition" 'find-function
-                   "Debug on entry" 'debug-on-entry
-                   "Cancel debug on entry" 'cancel-debug-on-entry
-                   "Trace function" 'trace-function
-                   "Trace function (background)" 'trace-function-background
-                   "Untrace function" 'untrace-function))
+  (set-slot-value source 'action 'helm-type-function-actions)
   (set-slot-value source 'action-transformer
                   'helm-transform-function-call-interactively)
   (set-slot-value source 'candidate-transformer
@@ -829,6 +851,14 @@ like `re-search-forward', see below documentation of :search slot.")
   (set-slot-value source 'coerce 'helm-symbolify))
 
 ;; Commands
+(defcustom helm-type-command-actions
+  (append (helm-make-actions
+           "Call interactively" 'helm-call-interactively)
+          (helm-actions-from-type-function))
+  "Default actions for type command."
+  :group 'helm-command
+  :type '(alist :key-type string :value-type function))
+
 (defclass helm-type-command (helm-source) ()
   "A class to define helm type command.")
 
@@ -836,29 +866,31 @@ like `re-search-forward', see below documentation of :search slot.")
 
 (defmethod helm--setup-source :before ((source helm-type-command))
   (set-slot-value
-   source 'action (append (helm-make-actions
-                           "Call interactively" 'helm-call-interactively)
-                          (helm-actions-from-type-function)))
+   source 'action 'helm-type-command-actions)
   (set-slot-value source 'coerce 'helm-symbolify)
   (set-slot-value source 'persistent-action 'describe-function))
 
 ;; Timers
+(defcustom helm-type-timers-actions
+  '(("Cancel Timer" . (lambda (_timer)
+                        (let ((mkd (helm-marked-candidates)))
+                          (cl-loop for timer in mkd
+                                   do (cancel-timer timer)))))
+    ("Describe Function" . (lambda (tm)
+                             (describe-function (timer--function tm))))
+    ("Find Function" . (lambda (tm)
+                         (find-function (timer--function tm)))))
+  "Default actions for type timers."
+  :group 'helm-elisp
+  :type '(alist :key-type string :value-type function))
+
 (defclass helm-type-timers (helm-source) ()
   "A class to define helm type timers.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-timers)))
 
 (defmethod helm--setup-source :before ((source helm-type-timers))
-  (set-slot-value
-   source 'action
-   '(("Cancel Timer" . (lambda (_timer)
-                         (let ((mkd (helm-marked-candidates)))
-                           (cl-loop for timer in mkd
-                                    do (cancel-timer timer)))))
-     ("Describe Function" . (lambda (tm)
-                              (describe-function (timer--function tm))))
-     ("Find Function" . (lambda (tm)
-                          (find-function (timer--function tm))))))
+  (set-slot-value source 'action 'helm-type-timers-actions)
   (set-slot-value source 'persistent-action
                   (lambda (tm)
                     (describe-function (timer--function tm))))
