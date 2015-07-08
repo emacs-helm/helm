@@ -1167,7 +1167,10 @@ not `exit-minibuffer' or unwanted functions."
   "Get the value of ATTRIBUTE-NAME of SRC.
 If SRC is omitted, use current source.
 If COMPUTE is non--nil compute value of ATTRIBUTE-NAME
-with `helm-interpret-value'."
+with `helm-interpret-value'.  COMPUTE can have also 'ignorefn as
+value, in this case `helm-interpret-value' will return a function
+as value inchanged, but will eval a symbol which is bound
+(i.e a variable)."
   (let ((src (or source (helm-get-current-source))))
     (helm-aif (or (assq attribute-name src)
                   (helm-get-attribute-from-source-type attribute-name src))
