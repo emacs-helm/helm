@@ -50,6 +50,14 @@ Any other non--nil value update after confirmation."
           (const :tag "Don't update but signal buffer needs update" nil)
           (const :tag "Update after confirmation" t)))
 
+(defcustom helm-source-multi-occur-actions
+  '(("Go to Line" . helm-moccur-goto-line)
+    ("Goto line other window" . helm-moccur-goto-line-ow)
+    ("Goto line new frame" . helm-moccur-goto-line-of))
+  "Actions for helm-occur and helm-moccur."
+  :group 'helm-regexp
+  :type '(alist :key-type string :value-type function))
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -293,9 +301,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (get-line :initform helm-moccur-get-line)
    (nohighlight :initform t)
    (migemo :initform t)
-   (action :initform '(("Go to Line" . helm-moccur-goto-line)
-                       ("Goto line other window" . helm-moccur-goto-line-ow)
-                       ("Goto line new frame" . helm-moccur-goto-line-of)))
+   (action :initform 'helm-source-multi-occur-actions)
    (persistent-action :initform 'helm-moccur-persistent-action)
    (persistent-help :initform "Go to line")
    (resume :initform 'helm-moccur-resume-fn)
