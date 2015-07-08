@@ -55,6 +55,63 @@
   :group 'helm-bookmark
   :type '(repeat (choice symbol)))
 
+(defcustom helm-bookmark-addressbook-actions
+  '(("Show Contact(s)"
+     . (lambda (candidate)
+         (let* ((contacts (helm-marked-candidates))
+                (current-prefix-arg helm-current-prefix-arg))
+           (bookmark-jump
+            (helm-bookmark-get-bookmark-from-name (car contacts)))
+           (helm-aif (cdr contacts)
+               (let ((current-prefix-arg '(4)))
+                 (cl-loop for bmk in it do
+                          (bookmark-jump
+                           (helm-bookmark-get-bookmark-from-name bmk))))))))
+    ("Mail To" . helm-bookmark-addressbook-send-mail-1)
+    ("Mail Cc" . (lambda (_candidate)
+                   (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
+    ("Mail Bcc" . (lambda (_candidate)
+                    (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
+    ("Edit Bookmark"
+     . (lambda (candidate)
+         (let ((bmk (helm-bookmark-get-bookmark-from-name
+                     candidate)))
+           (addressbook-bookmark-edit
+            (assoc bmk bookmark-alist)))))
+    ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
+    ("Insert Email at point"
+     . (lambda (candidate)
+         (let* ((bmk   (helm-bookmark-get-bookmark-from-name
+                        candidate))
+                (mlist (split-string
+                        (assoc-default
+                         'email (assoc bmk bookmark-alist))
+                        ", ")))
+           (insert
+            (if (> (length mlist) 1)
+                (helm-comp-read
+                 "Insert Mail Address: " mlist :must-match t)
+                (car mlist))))))
+    ("Show annotation"
+     . (lambda (candidate)
+         (let ((bmk (helm-bookmark-get-bookmark-from-name
+                     candidate)))
+           (bookmark-show-annotation bmk))))
+    ("Edit annotation"
+     . (lambda (candidate)
+         (let ((bmk (helm-bookmark-get-bookmark-from-name
+                     candidate)))
+           (bookmark-edit-annotation bmk))))
+    ("Show Google map"
+     . (lambda (candidate)
+         (let* ((bmk (helm-bookmark-get-bookmark-from-name
+                      candidate))
+                (full-bmk (assoc bmk bookmark-alist)))
+           (addressbook-google-map full-bmk)))))
+  "Actions for addressbook bookmarks."
+  :group 'helm-bookmark
+  :type '(alist :key-type string :value-type function))
+
 
 (defface helm-bookmark-info
     '((t (:foreground "green")))
@@ -453,58 +510,7 @@ than `w3m-browse-url' use it."
    (filtered-candidate-transformer :initform
                                    '(helm-adaptive-sort
                                      helm-highlight-bookmark))
-   (action :initform (("Show Contact(s)"
-                       . (lambda (candidate)
-                           (let* ((contacts (helm-marked-candidates))
-                                  (current-prefix-arg helm-current-prefix-arg))
-                             (bookmark-jump
-                              (helm-bookmark-get-bookmark-from-name (car contacts)))
-                             (helm-aif (cdr contacts)
-                                 (let ((current-prefix-arg '(4)))
-                                   (cl-loop for bmk in it do
-                                            (bookmark-jump
-                                             (helm-bookmark-get-bookmark-from-name bmk))))))))
-                      ("Mail To" . helm-bookmark-addressbook-send-mail-1)
-                      ("Mail Cc" . (lambda (_candidate)
-                                     (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
-                      ("Mail Bcc" . (lambda (_candidate)
-                                      (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
-                      ("Edit Bookmark"
-                       . (lambda (candidate)
-                           (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                       candidate)))
-                             (addressbook-bookmark-edit
-                              (assoc bmk bookmark-alist)))))
-                      ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
-                      ("Insert Email at point"
-                       . (lambda (candidate)
-                           (let* ((bmk   (helm-bookmark-get-bookmark-from-name
-                                          candidate))
-                                  (mlist (split-string
-                                          (assoc-default
-                                           'email (assoc bmk bookmark-alist))
-                                          ", ")))
-                             (insert
-                              (if (> (length mlist) 1)
-                                  (helm-comp-read
-                                   "Insert Mail Address: " mlist :must-match t)
-                                  (car mlist))))))
-                      ("Show annotation"
-                       . (lambda (candidate)
-                           (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                       candidate)))
-                             (bookmark-show-annotation bmk))))
-                      ("Edit annotation"
-                       . (lambda (candidate)
-                           (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                       candidate)))
-                             (bookmark-edit-annotation bmk))))
-                      ("Show Google map"
-                       . (lambda (candidate)
-                           (let* ((bmk (helm-bookmark-get-bookmark-from-name
-                                        candidate))
-                                  (full-bmk (assoc bmk bookmark-alist)))
-                             (addressbook-google-map full-bmk))))))))
+   (action :initform 'helm-bookmark-addressbook-actions)))
 
 (defun helm-bookmark-addressbook-send-mail-1 (_candidate &optional cc)
   (let* ((contacts (helm-marked-candidates))
