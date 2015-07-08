@@ -30,6 +30,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'helm-lib)
 
 
 (defgeneric helm--setup-source (source)
@@ -140,7 +141,6 @@
    (action
     :initarg :action
     :initform 'identity
-    :type (or symbol list)
     :custom (alist :key-type string
                    :value-type function)
     :documentation
@@ -699,6 +699,17 @@ like `re-search-forward', see below documentation of :search slot.")
 ;;; Classes for types.
 ;;
 ;;  Files
+(defclass helm-type-file (helm-source) ()
+  "A class to define helm type file.")
+
+(defmethod helm-source-get-action-from-type ((object helm-type-file))
+  (slot-value object 'action))
+
+(defun helm-actions-from-type-file ()
+  (let ((source (make-instance 'helm-type-file)))
+    (helm--setup-source source)
+    (helm-source-get-action-from-type source)))
+
 (defcustom helm-type-file-actions
   (helm-make-actions
     "Find file"                             'helm-find-many-files
@@ -729,11 +740,7 @@ like `re-search-forward', see below documentation of :search slot.")
     "Find file in hex dump"                 'hexl-find-file)
   "Default actions for type files."
   :group 'helm-files
-  :type '(alist :key-type string
-                   :value-type function))
-
-(defclass helm-type-file (helm-source) ()
-  "A class to define helm type file.")
+  :type '(alist :key-type string :value-type function))
 
 (defmethod helm--setup-source :primary ((_source helm-type-file)))
 
@@ -748,6 +755,12 @@ like `re-search-forward', see below documentation of :search slot.")
                                                   helm-w32-pathname-transformer)))
 
 ;; Bookmarks
+(defclass helm-type-bookmark (helm-source) ()
+  "A class to define type bookmarks.")
+
+(defmethod helm-source-get-action-from-type ((object helm-type-bookmark))
+  (slot-value object 'action))
+
 (defcustom helm-type-bookmark-actions
   (helm-make-actions
    "Jump to bookmark" 'helm-bookmark-jump
@@ -763,9 +776,6 @@ like `re-search-forward', see below documentation of :search slot.")
   :type '(alist :key-type string
                    :value-type function))
 
-(defclass helm-type-bookmark (helm-source) ()
-  "A class to define type bookmarks.")
-
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
@@ -774,6 +784,12 @@ like `re-search-forward', see below documentation of :search slot.")
   (set-slot-value source 'mode-line helm-bookmark-mode-line-string))
 
 ;; Buffers
+(defclass helm-type-buffer (helm-source) ()
+  "A class to define type buffer.")
+
+(defmethod helm-source-get-action-from-type ((object helm-type-buffer))
+  (slot-value object 'action))
+
 (defcustom helm-type-buffer-actions
   (helm-make-actions
    "Switch to buffer(s)" 'helm-switch-to-buffers
@@ -805,11 +821,7 @@ like `re-search-forward', see below documentation of :search slot.")
      (helm-ediff-marked-buffers candidate t)))
   "Default actions for type buffers."
   :group 'helm-buffers
-  :type '(alist :key-type string
-          :value-type function))
-
-(defclass helm-type-buffer (helm-source) ()
-  "A class to define type buffer.")
+  :type '(alist :key-type string :value-type function))
 
 (defmethod helm--setup-source :primary ((_source helm-type-buffer)))
 
@@ -823,6 +835,17 @@ like `re-search-forward', see below documentation of :search slot.")
      helm-highlight-buffers)))
 
 ;; Functions
+(defclass helm-type-function (helm-source) ()
+  "A class to define helm type function.")
+
+(defmethod helm-source-get-action-from-type ((object helm-type-function))
+  (slot-value object 'action))
+
+(defun helm-actions-from-type-function ()
+  (let ((source (make-instance 'helm-type-function)))
+    (helm--setup-source source)
+    (helm-source-get-action-from-type source)))
+
 (defcustom helm-type-function-actions
   (helm-make-actions
    "Describe command" 'describe-function
@@ -837,9 +860,6 @@ like `re-search-forward', see below documentation of :search slot.")
   :group 'helm-elisp
   :type '(alist :key-type string :value-type function))
 
-(defclass helm-type-function (helm-source) ()
-  "A class to define helm type function.")
-
 (defmethod helm--setup-source :primary ((_source helm-type-function)))
 
 (defmethod helm--setup-source :before ((source helm-type-function))
@@ -851,6 +871,14 @@ like `re-search-forward', see below documentation of :search slot.")
   (set-slot-value source 'coerce 'helm-symbolify))
 
 ;; Commands
+(defclass helm-type-command (helm-source) ()
+  "A class to define helm type command.")
+
+(defun helm-actions-from-type-command ()
+  (let ((source (make-instance 'helm-type-command)))
+    (helm--setup-source source)
+    (helm-source-get-action-from-type source)))
+
 (defcustom helm-type-command-actions
   (append (helm-make-actions
            "Call interactively" 'helm-call-interactively)
@@ -858,9 +886,6 @@ like `re-search-forward', see below documentation of :search slot.")
   "Default actions for type command."
   :group 'helm-command
   :type '(alist :key-type string :value-type function))
-
-(defclass helm-type-command (helm-source) ()
-  "A class to define helm type command.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-command)))
 
@@ -871,6 +896,9 @@ like `re-search-forward', see below documentation of :search slot.")
   (set-slot-value source 'persistent-action 'describe-function))
 
 ;; Timers
+(defclass helm-type-timers (helm-source) ()
+  "A class to define helm type timers.")
+
 (defcustom helm-type-timers-actions
   '(("Cancel Timer" . (lambda (_timer)
                         (let ((mkd (helm-marked-candidates)))
@@ -883,9 +911,6 @@ like `re-search-forward', see below documentation of :search slot.")
   "Default actions for type timers."
   :group 'helm-elisp
   :type '(alist :key-type string :value-type function))
-
-(defclass helm-type-timers (helm-source) ()
-  "A class to define helm type timers.")
 
 (defmethod helm--setup-source :primary ((_source helm-type-timers)))
 
@@ -985,21 +1010,6 @@ an eieio class."
      source
      'action-transformer
      (delq nil (append (list transformer) action-transformers)))))
-
-;;; Methods to access types slots.
-;;
-;;
-(defmethod helm-source-get-action-from-type ((object helm-type-file))
-  (slot-value object 'action))
-
-(defmethod helm-source-get-action-from-type ((object helm-type-buffer))
-  (slot-value object 'action))
-
-(defmethod helm-source-get-action-from-type ((object helm-type-bookmark))
-  (slot-value object 'action))
-
-(defmethod helm-source-get-action-from-type ((object helm-type-function))
-  (slot-value object 'action))
 
 
 ;;; Methods to build sources.
@@ -1152,26 +1162,11 @@ Args ARGS are keywords provided by `helm-source-in-file'."
      :candidates-file ,file ,@args))
 
 ;; Types
-(defun helm-actions-from-type-file ()
-  (let ((source (make-instance 'helm-type-file)))
-    (helm--setup-source source)
-    (helm-source-get-action-from-type source)))
-
 (defun helm-build-type-file ()
   (helm-make-type 'helm-type-file))
 
-(defun helm-actions-from-type-function ()
-  (let ((source (make-instance 'helm-type-function)))
-    (helm--setup-source source)
-    (helm-source-get-action-from-type source)))
-
 (defun helm-build-type-function ()
   (helm-make-type 'helm-type-function))
-
-(defun helm-actions-from-type-command ()
-  (let ((source (make-instance 'helm-type-command)))
-    (helm--setup-source source)
-    (helm-source-get-action-from-type source)))
 
 (defun helm-build-type-command ()
   (helm-make-type 'helm-type-command))

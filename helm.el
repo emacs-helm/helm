@@ -1171,8 +1171,8 @@ with `helm-interpret-value'."
   (let ((src (or source (helm-get-current-source))))
     (helm-aif (or (assq attribute-name src)
                   (helm-get-attribute-from-source-type attribute-name src))
-        (if (and compute (not (eq compute 'ignorefn)))
-            (helm-interpret-value (cdr it) src)
+        (if compute
+            (helm-interpret-value (cdr it) src compute)
             (cdr it)))))
 
 (cl-defun helm-attr-defined (attribute-name
@@ -1526,20 +1526,21 @@ LONG-DOC is displayed below attribute name and short documentation."
 
 (put 'helm-document-attribute 'lisp-indent-function 2)
 
-(defun helm-interpret-value (value &optional source)
+(defun helm-interpret-value (value &optional source compute)
   "Interpret VALUE as variable, function or literal and return it.
-If VALUE is a function, call it with no arguments and return the value.
+If VALUE is a function, call it with no arguments and return the value
+unless COMPUTE value is 'ignorefn.
 If SOURCE compute VALUE for this source.
 If VALUE is a variable, return the value.
 If VALUE is a symbol, but it is not a function or a variable, cause an error.
 Otherwise, return VALUE itself."
-  (cond ((and source (functionp value))
+  (cond ((and source (functionp value) (not (eq compute 'ignorefn)))
          (helm-funcall-with-source source value))
-        ((functionp value)
+        ((and (functionp value) (not (eq compute 'ignorefn)))
          (funcall value))
         ((and (symbolp value) (boundp value))
          (symbol-value value))
-        ((symbolp value)
+        ((and (symbolp value) (not (functionp value)))
          (error
           "helm-interpret-value: Symbol must be a function or a variable"))
         (t
@@ -1568,19 +1569,6 @@ IOW Don't use VALUE of previous VAR to set the VALUE of next VAR.
                              collect (cons (car i) (cadr i)))
                     helm--local-variables))))
 
-(defun helm-make-actions (&rest args)
-  "Build an alist with (NAME . ACTION) elements with each pairs in ARGS.
-Where NAME is a string or a function returning a string or nil and ACTION
-a function.
-If NAME returns nil the pair is skipped.
-
-\(fn NAME ACTION ...)"
-  (cl-loop for i on args by #'cddr
-           for name  = (car i)
-           when (functionp name)
-           do (setq name (funcall name))
-           when name
-           collect (cons name (cadr i))))
 
 ;; Core: API helper
 (cl-defun helm-empty-buffer-p (&optional (buffer helm-buffer))
