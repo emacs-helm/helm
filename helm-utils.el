@@ -107,17 +107,6 @@ In this case last position is added to the register
 ;;; Utils functions
 ;;
 ;;
-(defun helm-ff-find-printers ()
-  "Return a list of available printers on Unix systems."
-  (when (executable-find "lpstat")
-    (let ((printer-list (with-temp-buffer
-                          (call-process "lpstat" nil t nil "-a")
-                          (split-string (buffer-string) "\n"))))
-      (cl-loop for p in printer-list
-            for printer = (car (split-string p))
-            when printer
-            collect printer))))
-
 (defun helm-switch-to-buffers (buffer-or-name &optional other-window)
   "Switch to buffer BUFFER-OR-NAME.
 If more than one buffer marked switch to these buffers in separate windows.
@@ -146,53 +135,6 @@ in separate windows."
 See `helm-switch-to-buffers' for switching to marked buffers."
   (helm-switch-to-buffers buffer-or-name t))
 
-(cl-defmacro helm-position (item seq &key (test 'eq) all)
-  "A simple and faster replacement of CL `position'.
-Return position of first occurence of ITEM found in SEQ.
-Argument SEQ can be a string, in this case ITEM have to be a char.
-Argument ALL, if non--nil specify to return a list of positions of
-all ITEM found in SEQ."
-  (let ((key (if (stringp seq) 'across 'in)))
-    `(cl-loop for c ,key ,seq
-           for index from 0
-           when (funcall ,test c ,item)
-           if ,all collect index into ls
-           else return index
-           finally return ls)))
-
-(defun helm-substring (str width)
-  "Return the substring of string STR from 0 to WIDTH.
-Handle multibyte characters by moving by columns."
-  (with-temp-buffer
-    (save-excursion
-      (insert str))
-    (move-to-column width)
-    (buffer-substring (point-at-bol) (point))))
-
-(cl-defun helm-substring-by-width (str width &optional (endstr "..."))
-  "Truncate string STR to end at column WIDTH.
-Similar to `truncate-string-to-width'.
-Add ENDSTR (default \"...\") at end of truncated STR.
-Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
-  (cl-loop for ini-str = str
-        then (substring ini-str 0 (1- (length ini-str)))
-        for sw = (string-width ini-str)
-        when (<= sw width) return
-        (concat ini-str endstr (make-string (- width sw) ? ))))
-
-(defun helm-string-multibyte-p (str)
-  "Check if string STR contains multibyte characters."
-  (cl-loop for c across str
-        thereis (> (char-width c) 1)))
-
-(defun helm-get-pid-from-process-name (process-name)
-  "Get pid from running process PROCESS-NAME."
-  (cl-loop with process-list = (list-system-processes)
-        for pid in process-list
-        for process = (assoc-default 'comm (process-attributes pid))
-        when (and process (string-match process-name process))
-        return pid))
-
 (cl-defun helm-current-buffer-narrowed-p (&optional
                                             (buffer helm-current-buffer))
   "Check if BUFFER is narrowed.
@@ -202,9 +144,6 @@ Default is `helm-current-buffer'."
           (end (point-max))
           (total (buffer-size)))
       (or (/= beg 1) (/= end (1+ total))))))
-
-(defun helm-region-active-p ()
-  (and transient-mark-mode mark-active (/= (mark) (point))))
 
 (defun helm-goto-char (loc)
   "Go to char, revealing if necessary."
@@ -265,60 +204,6 @@ With a numeric prefix arg show only the ARG number of candidates."
           do (goto-char pos)
           collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
           do (forward-line 1))))
-
-(defun helm-skip-entries (seq regexp-list)
-  "Remove entries which matches one of REGEXP-LIST from SEQ."
-  (cl-loop for i in seq
-        unless (cl-loop for regexp in regexp-list
-                     thereis (and (stringp i)
-                                  (string-match regexp i)))
-        collect i))
-
-(defun helm-shadow-entries (seq regexp-list)
-  "Put shadow property on entries in SEQ matching a regexp in REGEXP-LIST."
-  (let ((face 'italic))
-    (cl-loop for i in seq
-          if (cl-loop for regexp in regexp-list
-                   thereis (and (stringp i)
-                                (string-match regexp i)))
-          collect (propertize i 'face face)
-          else collect i)))
-
-(defun helm-describe-function (func)
-  "FUNC is symbol or string."
-  (describe-function (helm-symbolify func))
-  (message nil))
-
-(defun helm-describe-variable (var)
-  "VAR is symbol or string."
-  (describe-variable (helm-symbolify var))
-  (message nil))
-
-(defun helm-find-function (func)
-  "FUNC is symbol or string."
-  (find-function (helm-symbolify func)))
-
-(defun helm-find-variable (var)
-  "VAR is symbol or string."
-  (find-variable (helm-symbolify var)))
-
-(defun helm-kill-new (candidate &optional replace)
-  "CANDIDATE is symbol or string.
-See `kill-new' for argument REPLACE."
-  (kill-new (helm-stringify candidate) replace))
-
-(cl-defun helm-fast-remove-dups (seq &key (test 'eq))
-  "Remove duplicates elements in list SEQ.
-This is same as `remove-duplicates' but with memoisation.
-It is much faster, especially in large lists.
-A test function can be provided with TEST argument key.
-Default is `eq'."
-  (cl-loop with cont = (make-hash-table :test test)
-        for elm in seq
-        unless (gethash elm cont)
-        do (puthash elm elm cont)
-        finally return
-        (cl-loop for i being the hash-values in cont collect i)))
 
 (defun helm-handle-winner-boring-buffers ()
   "Add `helm-buffer' to `winner-boring-buffers' when quitting/exiting helm.
@@ -472,21 +357,6 @@ that is sorting is done against real value of candidate."
            (< (length str1) (length str2)))
           (t (> sc1 sc2)))))
 
-(defun helm-basename (fname &optional ext)
-  "Print FNAME  with any  leading directory  components removed.
-If specified, also remove filename extension EXT."
-  (let ((non-essential t))
-    (if (and ext (or (string= (file-name-extension fname) ext)
-                     (string= (file-name-extension fname t) ext))
-             (not (file-directory-p fname)))
-        (file-name-sans-extension (file-name-nondirectory fname))
-      (file-name-nondirectory (directory-file-name fname)))))
-
-(defun helm-basedir (fname)
-  "Return the base directory of filename."
-  (helm-aif (and fname (file-name-directory fname))
-      (file-name-as-directory it)))
-
 (defun helm-ff-get-host-from-tramp-invalid-fname (fname)
   "Extract hostname from an incomplete tramp file name.
 Return nil on valid file name remote or not."
@@ -621,13 +491,6 @@ If STRING is non--nil return instead a space separated string."
             (mapconcat 'identity (list type user group other) " ")
           (list :mode-type type :user user :group group :other other))))
 
-(defun helm-current-directory ()
-  "Return current-directory name at point.
-Useful in dired buffers when there is inserted subdirs."
-  (if (eq major-mode 'dired-mode)
-      (dired-current-directory)
-    default-directory))
-
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
   (helm-with-gensyms (buffer window)
@@ -718,20 +581,6 @@ Useful in dired buffers when there is inserted subdirs."
 (add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
-
-(defun helm-w32-prepare-filename (file)
-  "Convert filename FILE to something usable by external w32 executables."
-  (replace-regexp-in-string ; For UNC paths
-   "/" "\\"
-   (replace-regexp-in-string ; Strip cygdrive paths
-    "/cygdrive/\\(.\\)" "\\1:"
-    file nil nil) nil t))
-
-;;;###autoload
-(defun helm-w32-shell-execute-open-file (file)
-  (interactive "fOpen file:")
-  (with-no-warnings
-    (w32-shell-execute "open" (helm-w32-prepare-filename file))))
 
 (defun helm-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."

@@ -30,19 +30,7 @@
 
 (require 'cl-lib)
 (require 'helm-source)
-
-(defmacro helm-with-gensyms (symbols &rest body)
-  "Bind the SYMBOLS to fresh uninterned symbols and eval BODY."
-  (declare (indent 1))
-  `(let ,(mapcar (lambda (s)
-                   ;; Use cl-gensym here instead of make-symbol
-                   ;; to ensure a symbol that have a live that go
-                   ;; beyond the live of its macro have different name.
-                   ;; i.e symbols created with `with-helm-temp-hook'
-                   ;; should have random names.
-                   `(,s (cl-gensym (symbol-name ',s))))
-                 symbols)
-     ,@body))
+(require 'helm-lib)
 
 
 ;;; Multi keys
@@ -105,18 +93,6 @@ Run each function of FUNCTIONS list in turn when called within DELAY seconds."
     (and next (symbol-value iterator) (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer delay nil `(lambda ()
                                                   (setq ,iterator nil))))))
-
-(defun helm-iter-list (seq)
-  "Return an iterator object from SEQ."
-  (let ((lis seq))
-    (lambda ()
-      (let ((elm (car lis)))
-        (setq lis (cdr lis))
-        elm))))
-
-(defun helm-iter-next (iterator)
-  "Return next elm of ITERATOR."
-  (funcall iterator))
 
 (helm-multi-key-defun helm-toggle-resplit-and-swap-windows
     "Multi key command to resplit and swap helm window.
@@ -1004,19 +980,6 @@ If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
 
 
 ;; Programming Tools
-(defmacro helm-aif (test-form then-form &rest else-forms)
-  "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
-THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
-  (declare (indent 2) (debug t))
-  `(let ((it ,test-form))
-     (if it ,then-form ,@else-forms)))
-
-(defun helm-mklist (obj)
-  "If OBJ is a list \(but not lambda\), return itself.
-Otherwise make a list with one element."
-  (if (and (listp obj) (not (functionp obj)))
-      obj
-    (list obj)))
 
 (defun helm-this-command ()
   "Return the actual command in action.
@@ -1041,24 +1004,6 @@ not `exit-minibuffer' or unwanted functions."
         if (and (eq fn 'call-interactively)
                 (> (length btf) 2))
         return (cadr (cdr btf))))
-
-(defun helm-flatten-list (seq &optional omit-nulls)
-  "Return a list of all single elements of sublists in SEQ."
-  (let (result)
-    (cl-labels ((flatten (seq)
-                  (cl-loop
-                        for elm in seq
-                        if (and (or elm
-                                    (null omit-nulls))
-                                (or (atom elm)
-                                    (functionp elm)
-                                    (and (consp elm)
-                                         (cdr elm)
-                                         (atom (cdr elm)))))
-                        do (push elm result)
-                        else do (flatten elm))))
-      (flatten seq))
-    (nreverse result)))
 
 
 ;; Test tools
@@ -1593,16 +1538,8 @@ of a source is deleted without updating the source."
                 (helm-pos-header-line-p))
               (bobp))))))
 
-(defun helm-symbol-name (obj)
-  (if (or (consp obj) (byte-code-function-p obj))
-      "Anonymous"
-      (symbol-name obj)))
-
 
 ;; Core: tools
-(defun helm-current-line-contents ()
-  "Current line string without properties."
-  (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
 (defun helm-funcall-with-source (source functions &rest args)
   "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
@@ -1721,39 +1658,6 @@ This is used in transformers to modify candidates list."
              (lambda (&rest oargs) (helm-compose oargs funcs))
              args)))
 
-(defun helm-stringify (str-or-sym)
-  "Get string of STR-OR-SYM."
-  (if (stringp str-or-sym)
-      str-or-sym
-    (symbol-name str-or-sym)))
-
-(defun helm-symbolify (str-or-sym)
-  "Get symbol of STR-OR-SYM."
-  (if (symbolp str-or-sym)
-      str-or-sym
-    (intern str-or-sym)))
-
-(defun helm-remove-if-not-match (regexp seq)
-  "Remove all elements of SEQ that don't match REGEXP."
-  (cl-loop for s in seq
-           for str = (cond ((symbolp s)
-                            (symbol-name s))
-                           ((consp s)
-                            (car s))
-                           (t s))
-           when (string-match-p regexp str)
-           collect s))
-
-(defun helm-remove-if-match (regexp seq)
-  "Remove all elements of SEQ that match REGEXP."
-  (cl-loop for s in seq
-           for str = (cond ((symbolp s)
-                            (symbol-name s))
-                           ((consp s)
-                            (car s))
-                           (t s))
-           unless (string-match-p regexp str)
-           collect s))
 
 ;; Core: entry point
 ;; `:allow-nest' is not in this list because it is treated before.
@@ -2847,21 +2751,6 @@ Cache the candidates if there is not yet a cached value."
 
 
 ;;; Core: candidate transformers
-(defun helm-transform-mapcar (function args)
-  "`mapcar' for candidate-transformer.
-
-ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
-
-\(helm-transform-mapcar 'upcase '(\"foo\" \"bar\"))
-=> (\"FOO\" \"BAR\")
-\(helm-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
-=> ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
-"
-  (cl-loop for arg in args
-        if (consp arg)
-        collect (cons (car arg) (funcall function (cdr arg)))
-        else
-        collect (funcall function arg)))
 
 (defun helm-process-candidate-transformer (candidates source)
   "Execute `candidate-transformer' function(s) on CANDIDATES in SOURCE."
@@ -2968,27 +2857,6 @@ Default function to match candidates according to `helm-pattern'."
 ;;; Fuzzy matching
 ;;
 ;;
-(defsubst helm--mapconcat-pattern (pattern)
-  "Transform string PATTERN in regexp for further fuzzy matching.
-e.g helm.el$
-    => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
-    ^helm.el$
-    => \"helm[.]el$\"."
-  (let ((ls (split-string-and-unquote pattern "")))
-    (if (string= "^" (car ls))
-        ;; Exact match.
-        (mapconcat (lambda (c)
-                     (if (and (string= c "$")
-                              (string-match "$\\'" pattern))
-                         c (regexp-quote c)))
-                   (cdr ls) "")
-        ;; Fuzzy match.
-        (mapconcat (lambda (c)
-                     (if (and (string= c "$")
-                              (string-match "$\\'" pattern))
-                         c (format "[^%s]*%s" c (regexp-quote c))))
-                   ls ""))))
-
 (defvar helm--fuzzy-regexp-cache (make-hash-table :test 'eq))
 (defun helm--fuzzy-match-maybe-set-pattern ()
   ;; Computing helm-pattern with helm--mapconcat-pattern
@@ -3059,11 +2927,6 @@ This function is used with sources build with `helm-source-sync'."
                    do (goto-char eol) and return t
                    else do (goto-char eol)
                    finally return nil)))))
-
-(defsubst helm--collect-pairs-in-string (string)
-  (cl-loop for str on (split-string string "" t) by 'cdr
-           when (cdr str)
-           collect (list (car str) (cadr str))))
 
 (defun helm-score-candidate-for-pattern (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.

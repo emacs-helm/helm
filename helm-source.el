@@ -30,7 +30,6 @@
 
 (require 'cl-lib)
 (require 'eieio)
-(require 'helm-lib)
 
 
 (defgeneric helm--setup-source (source)
