@@ -23,6 +23,13 @@
 
 ;;; Code:
 
+(defcustom helm-file-globstar t
+  "Same as globstar bash shopt option.
+When non--nil a pattern beginning with two stars will expand recursively.
+Directories expansion is not supported yet."
+  :group 'helm
+  :type 'boolean)
+
 ;; Internal
 (defvar helm-yank-point nil)
 (defvar helm-pattern ""

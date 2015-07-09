@@ -548,13 +548,6 @@ to exit or helm update to disable the `current-input-method' with `C-\\'."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-file-globstar t
-  "Same as globstar bash shopt option.
-When non--nil a pattern beginning with two stars will expand recursively.
-Directories expansion is not supported yet."
-  :group 'helm
-  :type 'boolean)
-
 (defcustom helm-inherit-input-method t
   "Inherit `current-input-method' from `current-buffer' when non--nil.
 The default is to enable this by default, the user can toggle the current
