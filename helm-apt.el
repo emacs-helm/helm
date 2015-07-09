@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-external)
+(require 'helm-help)
 
 (declare-function term-line-mode "term")
 (declare-function term-char-mode "term")
