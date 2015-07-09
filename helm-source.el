@@ -959,6 +959,9 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
     (helm--setup-source source)
     (helm--create-source source)))
 
+(defvar helm-mp-default-search-functions)
+(defvar helm-mp-default-match-functions)
+
 (defun helm-source-mp-get-search-or-match-fns (source method)
   (require 'helm-match-plugin)
   (let ((searchers        (and (eq method 'search)
