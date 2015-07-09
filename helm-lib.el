@@ -23,6 +23,11 @@
 
 ;;; Code:
 
+(require 'dired)
+
+
+;;; User vars.
+;;
 (defcustom helm-file-globstar t
   "Same as globstar bash shopt option.
 When non--nil a pattern beginning with two stars will expand recursively.
@@ -30,11 +35,39 @@ Directories expansion is not supported yet."
   :group 'helm
   :type 'boolean)
 
-;; Internal
+(defcustom helm-yank-text-at-point-function nil
+  "The function used to forward point with `helm-yank-text-at-point'.
+With a nil value, fallback to default `forward-word'.
+The function should take one arg, an integer like `forward-word'.
+NOTE: Using `forward-symbol' here is not very useful as it is already
+provided by \\<helm-map>\\[next-history-element]."
+  :type  'function
+  :group 'helm)
+
+(defcustom helm-scroll-amount nil
+  "Scroll amount when scrolling other window in a helm session.
+It is used by `helm-scroll-other-window'
+and `helm-scroll-other-window-down'.
+
+If you prefer scrolling line by line, set this value to 1."
+  :group 'helm
+  :type 'integer)
+
+
+;;; Internal vars
+;;
 (defvar helm-yank-point nil)
 (defvar helm-pattern ""
   "The input pattern used to update the helm buffer.")
+(defvar helm-buffer "*helm*"
+  "Buffer showing completions.")
+(defvar helm-current-buffer nil
+  "Current buffer when `helm' is invoked.")
+(defvar helm-suspend-update-flag nil)
 
+
+;;; Macros helper.
+;;
 (defmacro helm-with-gensyms (symbols &rest body)
   "Bind the SYMBOLS to fresh uninterned symbols and eval BODY."
   (declare (indent 1))
@@ -47,7 +80,9 @@ Directories expansion is not supported yet."
                    `(,s (cl-gensym (symbol-name ',s))))
                  symbols)
      ,@body))
-
+
+;;; Iterators
+;;
 (defun helm-iter-list (seq)
   "Return an iterator object from SEQ."
   (let ((lis seq))
@@ -74,31 +109,6 @@ If NAME returns nil the pair is skipped.
            when name
            collect (cons name (cadr i))))
 
-(defun helm-flatten-list (seq &optional omit-nulls)
-  "Return a list of all single elements of sublists in SEQ."
-  (let (result)
-    (cl-labels ((flatten (seq)
-                  (cl-loop
-                        for elm in seq
-                        if (and (or elm
-                                    (null omit-nulls))
-                                (or (atom elm)
-                                    (functionp elm)
-                                    (and (consp elm)
-                                         (cdr elm)
-                                         (atom (cdr elm)))))
-                        do (push elm result)
-                        else do (flatten elm))))
-      (flatten seq))
-    (nreverse result)))
-
-(defun helm-mklist (obj)
-  "If OBJ is a list \(but not lambda\), return itself.
-Otherwise make a list with one element."
-  (if (and (listp obj) (not (functionp obj)))
-      obj
-    (list obj)))
-
 (defmacro helm-aif (test-form then-form &rest else-forms)
   "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
 THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
@@ -109,57 +119,7 @@ THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
 (defun helm-current-line-contents ()
   "Current line string without properties."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
-
-(defun helm-stringify (str-or-sym)
-  "Get string of STR-OR-SYM."
-  (if (stringp str-or-sym)
-      str-or-sym
-    (symbol-name str-or-sym)))
-
-(defun helm-symbolify (str-or-sym)
-  "Get symbol of STR-OR-SYM."
-  (if (symbolp str-or-sym)
-      str-or-sym
-    (intern str-or-sym)))
-
-(defun helm-remove-if-not-match (regexp seq)
-  "Remove all elements of SEQ that don't match REGEXP."
-  (cl-loop for s in seq
-           for str = (cond ((symbolp s)
-                            (symbol-name s))
-                           ((consp s)
-                            (car s))
-                           (t s))
-           when (string-match-p regexp str)
-           collect s))
-
-(defun helm-remove-if-match (regexp seq)
-  "Remove all elements of SEQ that match REGEXP."
-  (cl-loop for s in seq
-           for str = (cond ((symbolp s)
-                            (symbol-name s))
-                           ((consp s)
-                            (car s))
-                           (t s))
-           unless (string-match-p regexp str)
-           collect s))
-
-(defun helm-transform-mapcar (function args)
-  "`mapcar' for candidate-transformer.
-
-ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
-
-\(helm-transform-mapcar 'upcase '(\"foo\" \"bar\"))
-=> (\"FOO\" \"BAR\")
-\(helm-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
-=> ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
-"
-  (cl-loop for arg in args
-        if (consp arg)
-        collect (cons (car arg) (funcall function (cdr arg)))
-        else
-        collect (funcall function arg)))
-
+
 ;;; Fuzzy matching routines
 ;;
 (defsubst helm--mapconcat-pattern (pattern)
@@ -187,9 +147,83 @@ e.g helm.el$
   (cl-loop for str on (split-string string "" t) by 'cdr
            when (cdr str)
            collect (list (car str) (cadr str))))
+
+;;; Help routines.
+;;
+(defun helm-help-internal (bufname insert-content-fn)
+  "Show long message during `helm' session in BUFNAME.
+INSERT-CONTENT-FN is the function that insert
+text to be displayed in BUFNAME."
+  (let ((winconf (current-frame-configuration)))
+    (unwind-protect
+         (progn
+           (setq helm-suspend-update-flag t)
+           (set-buffer (get-buffer-create bufname))
+           (switch-to-buffer bufname)
+           (delete-other-windows)
+           (delete-region (point-min) (point-max))
+           (outline-mode)
+           (save-excursion
+             (funcall insert-content-fn))
+           (setq cursor-type nil)
+           (buffer-disable-undo)
+           (helm-help-event-loop))
+      (setq helm-suspend-update-flag nil)
+      (set-frame-configuration winconf))))
 
+(defun helm-help-scroll-up (amount)
+  (condition-case _err
+      (scroll-up-command amount)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-scroll-down (amount)
+  (condition-case _err
+      (scroll-down-command amount)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-event-loop ()
+  (let ((prompt (propertize
+                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
+                 'face 'helm-helper))
+        scroll-error-top-bottom)
+    (cl-loop for event = (read-key prompt) do
+             (cl-case event
+               ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
+               ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
+               (?\C-s (isearch-forward))
+               (?\C-r (isearch-backward))
+               (?q (cl-return))
+               (t (ignore))))))
+
 ;;; List processing
 ;;
+(defun helm-flatten-list (seq &optional omit-nulls)
+  "Return a list of all single elements of sublists in SEQ."
+  (let (result)
+    (cl-labels ((flatten (seq)
+                  (cl-loop
+                        for elm in seq
+                        if (and (or elm
+                                    (null omit-nulls))
+                                (or (atom elm)
+                                    (functionp elm)
+                                    (and (consp elm)
+                                         (cdr elm)
+                                         (atom (cdr elm)))))
+                        do (push elm result)
+                        else do (flatten elm))))
+      (flatten seq))
+    (nreverse result)))
+
+(defun helm-mklist (obj)
+  "If OBJ is a list \(but not lambda\), return itself.
+Otherwise make a list with one element."
+  (if (and (listp obj) (not (functionp obj)))
+      obj
+    (list obj)))
+
 (cl-defmacro helm-position (item seq &key (test 'eq) all)
   "A simple and faster replacement of CL `position'.
 Return position of first occurence of ITEM found in SEQ.
@@ -235,8 +269,52 @@ Default is `eq'."
           collect (propertize i 'face face)
           else collect i)))
 
+(defun helm-remove-if-not-match (regexp seq)
+  "Remove all elements of SEQ that don't match REGEXP."
+  (cl-loop for s in seq
+           for str = (cond ((symbolp s)
+                            (symbol-name s))
+                           ((consp s)
+                            (car s))
+                           (t s))
+           when (string-match-p regexp str)
+           collect s))
+
+(defun helm-remove-if-match (regexp seq)
+  "Remove all elements of SEQ that match REGEXP."
+  (cl-loop for s in seq
+           for str = (cond ((symbolp s)
+                            (symbol-name s))
+                           ((consp s)
+                            (car s))
+                           (t s))
+           unless (string-match-p regexp str)
+           collect s))
+
+(defun helm-transform-mapcar (function args)
+  "`mapcar' for candidate-transformer.
+
+ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
+
+\(helm-transform-mapcar 'upcase '(\"foo\" \"bar\"))
+=> (\"FOO\" \"BAR\")
+\(helm-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
+=> ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
+"
+  (cl-loop for arg in args
+        if (consp arg)
+        collect (cons (car arg) (funcall function (cdr arg)))
+        else
+        collect (funcall function arg)))
+
 ;;; Strings processing.
 ;;
+(defun helm-stringify (str-or-sym)
+  "Get string of STR-OR-SYM."
+  (if (stringp str-or-sym)
+      str-or-sym
+    (symbol-name str-or-sym)))
+
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.
 Handle multibyte characters by moving by columns."
@@ -283,9 +361,15 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
 
 (defun helm-region-active-p ()
   (and transient-mark-mode mark-active (/= (mark) (point))))
-
+
 ;;; Symbols routines
 ;;
+(defun helm-symbolify (str-or-sym)
+  "Get symbol of STR-OR-SYM."
+  (if (symbolp str-or-sym)
+      str-or-sym
+    (intern str-or-sym)))
+
 (defun helm-symbol-name (obj)
   (if (or (consp obj) (byte-code-function-p obj))
       "Anonymous"
@@ -313,7 +397,7 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   "CANDIDATE is symbol or string.
 See `kill-new' for argument REPLACE."
   (kill-new (helm-stringify candidate) replace))
-
+
 ;;; Files routines
 ;;
 (defun helm-basename (fname &optional ext)
@@ -427,7 +511,7 @@ Directories expansion is not supported."
                              :match (wildcard-to-regexp bn)
                              :skip-subdirs t)
         (file-expand-wildcards pattern full))))
-
+
 ;;; helm internals
 ;;
 (defun helm-set-pattern (pattern &optional noupdate)
@@ -444,6 +528,22 @@ if optional NOUPDATE is non-nil, helm buffer is not changed."
 That is what completion commands operate on."
   (buffer-substring (field-beginning) (point)))
 
+(defmacro with-helm-buffer (&rest body)
+  "Eval BODY inside `helm-buffer'."
+  (declare (indent 0) (debug t))
+  `(with-current-buffer (helm-buffer-get)
+     ,@body))
+
+(defmacro with-helm-current-buffer (&rest body)
+  "Eval BODY inside `helm-current-buffer'."
+  (declare (indent 0) (debug t))
+  `(with-current-buffer (or (and (buffer-live-p helm-current-buffer)
+                                 helm-current-buffer)
+                            (setq helm-current-buffer
+                                  (current-buffer)))
+     ,@body))
+
+
 ;; Yank text at point.
 ;;
 ;;

@@ -35,15 +35,6 @@
   :type 'string
   :group 'helm-utils)
 
-(defcustom helm-yank-text-at-point-function nil
-  "The function used to forward point with `helm-yank-text-at-point'.
-With a nil value, fallback to default `forward-word'.
-The function should take one arg, an integer like `forward-word'.
-NOTE: Using `forward-symbol' here is not very useful as it is already
-provided by \\<helm-map>\\[next-history-element]."
-  :type  'function
-  :group 'helm-utils)
-
 (defcustom helm-default-kbsize 1024.0
   "Default Kbsize to use for showing files size.
 It is a float, usually 1024.0 but could be 1000.0 on some systems."

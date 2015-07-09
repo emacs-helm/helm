@@ -151,53 +151,6 @@ It is very useful, so you should bind any key."))
   "Detailed help message string for `helm'.
 It also accepts function or variable symbol.")
 
-(defun helm-help-internal (bufname insert-content-fn)
-  "Show long message during `helm' session in BUFNAME.
-INSERT-CONTENT-FN is the function that insert
-text to be displayed in BUFNAME."
-  (let ((winconf (current-frame-configuration)))
-    (unwind-protect
-         (progn
-           (setq helm-suspend-update-flag t)
-           (set-buffer (get-buffer-create bufname))
-           (switch-to-buffer bufname)
-           (delete-other-windows)
-           (delete-region (point-min) (point-max))
-           (outline-mode)
-           (save-excursion
-             (funcall insert-content-fn))
-           (setq cursor-type nil)
-           (buffer-disable-undo)
-           (helm-help-event-loop))
-      (setq helm-suspend-update-flag nil)
-      (set-frame-configuration winconf))))
-
-(defun helm-help-scroll-up (amount)
-  (condition-case _err
-      (scroll-up-command amount)
-    (beginning-of-buffer nil)
-    (end-of-buffer nil)))
-
-(defun helm-help-scroll-down (amount)
-  (condition-case _err
-      (scroll-down-command amount)
-    (beginning-of-buffer nil)
-    (end-of-buffer nil)))
-
-(defun helm-help-event-loop ()
-  (let ((prompt (propertize
-                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
-                 'face 'helm-helper))
-        scroll-error-top-bottom)
-    (cl-loop for event = (read-key prompt) do
-             (cl-case event
-               ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
-               ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
-               (?\C-s (isearch-forward))
-               (?\C-r (isearch-backward))
-               (?q (cl-return))
-               (t (ignore))))))
-
 ;;;###autoload
 (defun helm-help ()
   "Help of `helm'."

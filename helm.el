@@ -355,15 +355,6 @@ because flickering can occur in some environment."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-scroll-amount nil
-  "Scroll amount when scrolling other window in a helm session.
-It is used by `helm-scroll-other-window'
-and `helm-scroll-other-window-down'.
-
-If you prefer scrolling line by line, set this value to 1."
-  :group 'helm
-  :type 'integer)
-
 (defcustom helm-display-function 'helm-default-display-buffer
   "Function to display *helm* buffer.
 It is `helm-default-display-buffer' by default,
@@ -802,10 +793,6 @@ value of this var.")
   "Value of the currently selected object when the action list is shown.")
 (defvar helm-sources nil
   "[INTERNAL] Value of current sources in use, a list.")
-(defvar helm-buffer "*helm*"
-  "Buffer showing completions.")
-(defvar helm-current-buffer nil
-  "Current buffer when `helm' is invoked.")
 (defvar helm-buffer-file-name nil
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
@@ -837,7 +824,6 @@ See `helm-log-save-maybe' for more info.")
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\_<" "\\_>" ".*"))
-(defvar helm-suspend-update-flag nil)
 (defvar helm-force-updating-p nil)
 (defvar helm-exit-status 0
   "Flag to inform whether helm have exited or quitted.
@@ -1040,21 +1026,6 @@ not `exit-minibuffer' or unwanted functions."
   "Be sure BODY is excuted in the helm window."
   (declare (indent 0) (debug t))
   `(with-selected-window (helm-window)
-     ,@body))
-
-(defmacro with-helm-current-buffer (&rest body)
-  "Eval BODY inside `helm-current-buffer'."
-  (declare (indent 0) (debug t))
-  `(with-current-buffer (or (and (buffer-live-p helm-current-buffer)
-                                 helm-current-buffer)
-                            (setq helm-current-buffer
-                                  (current-buffer)))
-     ,@body))
-
-(defmacro with-helm-buffer (&rest body)
-  "Eval BODY inside `helm-buffer'."
-  (declare (indent 0) (debug t))
-  `(with-current-buffer (helm-buffer-get)
      ,@body))
 
 (defmacro with-helm-restore-variables (&rest body)
