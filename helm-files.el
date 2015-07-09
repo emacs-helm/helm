@@ -1330,6 +1330,7 @@ If prefix numeric arg is given go ARG level up."
 
 (add-hook 'helm-cleanup-hook 'helm-find-files--reset-level-tree)
 (add-hook 'post-self-insert-hook 'helm-find-files--reset-level-tree)
+(add-hook 'helm-after-persistent-action-hook 'helm-find-files--reset-level-tree)
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
