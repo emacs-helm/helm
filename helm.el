@@ -5038,7 +5038,6 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
   "Same as `file-expand-wildcards' but allow recursion.
 Recursion happen when PATTERN starts with two stars.
 Directories expansion is not supported."
-  (require 'helm-utils)
   (let ((bn (helm-basename pattern)))
     (if (and helm-file-globstar
              (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
