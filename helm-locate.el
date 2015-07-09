@@ -23,6 +23,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-types)
 
 
 (defgroup helm-locate nil
