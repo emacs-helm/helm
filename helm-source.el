@@ -937,15 +937,6 @@ Args ARGS are keywords provided by `helm-source-in-file'."
   `(helm-make-source ,name 'helm-source-in-file
      :candidates-file ,file ,@args))
 
-;; Types
-(defun helm-build-type-file ()
-  (helm-make-type 'helm-type-file))
-
-(defun helm-build-type-function ()
-  (helm-make-type 'helm-type-function))
-
-(defun helm-build-type-command ()
-  (helm-make-type 'helm-type-command))
 
 (provide 'helm-source)
 

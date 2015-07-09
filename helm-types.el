@@ -247,6 +247,16 @@
                     (describe-function (timer--function tm))))
   (set-slot-value source 'persistent-help "Describe Function"))
 
+;; Builders.
+(defun helm-build-type-file ()
+  (helm-make-type 'helm-type-file))
+
+(defun helm-build-type-function ()
+  (helm-make-type 'helm-type-function))
+
+(defun helm-build-type-command ()
+  (helm-make-type 'helm-type-command))
+
 (provide 'helm-types)
 
 ;; Local Variables:
