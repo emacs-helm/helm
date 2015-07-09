@@ -40,6 +40,16 @@ If nil default `helm-apt-cache-show-1' will be used."
   :type 'function
   :group 'helm-apt)
 
+(defcustom helm-apt-actions
+  '(("Show package description" . helm-apt-cache-show)
+    ("Install package" . helm-apt-install)
+    ("Reinstall package" . helm-apt-reinstall)
+    ("Remove package" . helm-apt-uninstall)
+    ("Purge package" . helm-apt-purge))
+  "Actions for helm apt."
+  :group 'helm-apt
+  :type '(alist :key-type string :value-type function))
+
 (defface helm-apt-installed
     '((t (:foreground "green")))
   "Face used for apt installed candidates."
@@ -63,22 +73,16 @@ If nil default `helm-apt-cache-show-1' will be used."
 
 
 (defvar helm-source-apt
-  `((name . "APT")
-    (init . helm-apt-init)
-    (candidates-in-buffer)
-    (candidate-transformer . helm-apt-candidate-transformer)
-    (display-to-real . helm-apt-display-to-real)
-    (update . helm-apt-refresh)
-    (keymap . ,helm-apt-map)
-    (mode-line . helm-apt-mode-line)
-    (action
-     ("Show package description" . helm-apt-cache-show)
-     ("Install package" . helm-apt-install)
-     ("Reinstall package" . helm-apt-reinstall)
-     ("Remove package" . helm-apt-uninstall)
-     ("Purge package" . helm-apt-purge))
-    (persistent-action . helm-apt-persistent-action)
-    (persistent-help . "Show package description")))
+  (helm-build-in-buffer-source "APT"
+    :init #'helm-apt-init
+    :candidate-transformer #'helm-apt-candidate-transformer
+    :display-to-real #'helm-apt-display-to-real
+    :update #'helm-apt-refresh
+    :keymap helm-apt-map
+    :mode-line helm-apt-mode-line
+    :action 'helm-apt-actions
+    :persistent-action #'helm-apt-persistent-action
+    :persistent-help "Show package description"))
 
 ;;; Internals vars
 (defvar helm-apt-search-command "apt-cache search '%s'")
