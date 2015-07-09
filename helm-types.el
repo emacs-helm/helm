@@ -246,7 +246,7 @@
                   (lambda (tm)
                     (describe-function (timer--function tm))))
   (set-slot-value source 'persistent-help "Describe Function"))
-
+
 ;; Builders.
 (defun helm-build-type-file ()
   (helm-make-type 'helm-type-file))
