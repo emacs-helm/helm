@@ -348,6 +348,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
@@ -366,6 +367,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
@@ -1278,6 +1280,8 @@ If EXPAND is non--nil expand-file-name."
               (t
                (concat "/" result)))))))
 
+(defvar helm-find-files--level-tree nil)
+(defvar helm-find-files--level-tree-iterator nil)
 (defun helm-find-files-up-one-level (arg)
   "Go up one level like unix command `cd ..'.
 If prefix numeric arg is given go ARG level up."
@@ -1300,8 +1304,32 @@ If prefix numeric arg is given go ARG level up."
                (setq helm-ff-last-expanded helm-pattern))
               ((and cur-cand (file-exists-p cur-cand))
                (setq helm-ff-last-expanded cur-cand)))
+        (unless helm-find-files--level-tree
+          (setq helm-find-files--level-tree
+                (cons helm-ff-default-directory
+                      helm-find-files--level-tree)))
+        (setq helm-find-files--level-tree-iterator nil)
+        (push new-pattern helm-find-files--level-tree)
         (helm-set-pattern new-pattern helm-suspend-update-flag)
         (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))))))
+
+(defun helm-find-files-down-last-level ()
+  (interactive)
+  (unless helm-find-files--level-tree-iterator 
+    (setq helm-find-files--level-tree-iterator
+          (helm-iter-list (cdr helm-find-files--level-tree))))
+  (setq helm-find-files--level-tree nil)
+  (helm-aif (helm-iter-next helm-find-files--level-tree-iterator)
+      (helm-set-pattern it)
+    (ignore)
+    (setq helm-find-files--level-tree-iterator nil)))
+
+(defun helm-find-files--reset-level-tree ()
+  (setq helm-find-files--level-tree-iterator nil
+        helm-find-files--level-tree nil))
+
+(add-hook 'helm-cleanup-hook 'helm-find-files--reset-level-tree)
+(add-hook 'post-self-insert-hook 'helm-find-files--reset-level-tree)
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
