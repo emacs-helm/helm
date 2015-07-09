@@ -270,65 +270,6 @@ from its directory."
        ;; Default.
        (t default-preselection)))))
 
-;; Same as `vc-directory-exclusion-list'.
-(defvar helm-walk-ignore-directories
-  '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr"
-    "_MTN" "_darcs" "{arch}" ".gvfs"))
-
-(cl-defun helm-walk-directory (directory &key (path 'basename)
-                                           (directories t)
-                                           match skip-subdirs)
-  "Walk through DIRECTORY tree.
-Argument PATH can be one of basename, relative, full, or a function
-called on file name, default to basename.
-Argument DIRECTORIES when non--nil (default) return also directories names,
-otherwise skip directories names.
-Argument MATCH can be a predicate or a regexp.
-Argument SKIP-SUBDIRS when non--nil will skip `helm-walk-ignore-directories'
-unless it is given as a list of directories, in this case this list will be used
-instead of `helm-walk-ignore-directories'."
-  (let* ((result '())
-         (fn (cl-case path
-               (basename 'file-name-nondirectory)
-               (relative 'file-relative-name)
-               (full     'identity)
-               (t        path))))
-    (cl-labels ((ls-rec (dir)
-                  (unless (and skip-subdirs
-                               (member (helm-basename dir)
-                                       (if (listp skip-subdirs)
-                                           skip-subdirs
-                                         helm-walk-ignore-directories)))
-                    (cl-loop with ls = (sort (file-name-all-completions "" dir)
-                                             'string-lessp)
-                          for f in ls
-                          ;; Use `directory-file-name' to remove the final slash.
-                          ;; Needed to avoid infloop on symlinks symlinking
-                          ;; a directory inside it [1].
-                          for file = (directory-file-name
-                                      (expand-file-name f dir))
-                          unless (member f '("./" "../"))
-                          ;; A directory.
-                          if (char-equal (aref f (1- (length f))) ?/)
-                          do (progn (when directories
-                                      (push (funcall fn file) result))
-                                    ;; Don't recurse in symlinks.
-                                    ;; `file-symlink-p' have to be called
-                                    ;; on the directory with its final
-                                    ;; slash removed [1].
-                                    (and (not (file-symlink-p file))
-                                         (ls-rec file)))
-                          else do
-                          (if match
-                              (and (if (functionp match)
-                                       (funcall match f)
-                                     (and (stringp match)
-                                          (string-match match f)))
-                                   (push (funcall fn file) result))
-                            (push (funcall fn file) result))))))
-      (ls-rec directory)
-      (nreverse result))))
-
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
 Args S1 and S2 can be single or \(display . real\) candidates,
@@ -634,36 +575,6 @@ directory, open this directory."
   (setq helm-saved-action action)
   (helm-exit-minibuffer))
 
-;; Yank text at point.
-;;
-;;
-;; Internal
-(defvar helm-yank-point nil)
-
-;;;###autoload
-(defun helm-yank-text-at-point ()
-  "Yank text at point in `helm-current-buffer' into minibuffer.
-If `helm-yank-symbol-first' is non--nil the first yank
-grabs the entire symbol."
-  (interactive)
-  (with-helm-current-buffer
-    (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word)))
-      ;; Start to initial point if C-w have never been hit.
-      (unless helm-yank-point (setq helm-yank-point (point)))
-      (save-excursion
-        (goto-char helm-yank-point)
-        (funcall fwd-fn 1)
-        (helm-set-pattern
-         (concat
-          helm-pattern (replace-regexp-in-string
-                        "\\`\n" ""
-                        (buffer-substring-no-properties
-                         helm-yank-point (point)))))
-        (setq helm-yank-point (point))))))
-
-(defun helm-reset-yank-point ()
-  (setq helm-yank-point nil))
-
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
@@ -674,9 +585,6 @@ If COUNT is non--nil add a number after each prompt."
              (setq prompt (concat prompt (int-to-string n) ": ")))
         collect (setq elm (helm-read-string prompt)) into lis
         finally return (remove "" lis)))
-
-(add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
-(add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
 (defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
   "Parse html bookmark FILE and return an alist with (title . url) as elements."

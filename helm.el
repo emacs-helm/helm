@@ -817,8 +817,6 @@ value of this var.")
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
   "Holds the available candidate within a single helm invocation.")
-(defvar helm-pattern ""
-  "The input pattern used to update the helm buffer.")
 (defvar helm-input ""
   "The input typed in the candidates panel.")
 (defvar helm-input-local nil
@@ -4259,23 +4257,8 @@ Used generally to modify current selection."
   `(helm-edit-current-selection-internal
     (lambda () ,@forms)))
 
-(defun helm-set-pattern (pattern &optional noupdate)
-  "Set minibuffer contents to PATTERN.
-if optional NOUPDATE is non-nil, helm buffer is not changed."
-  (with-selected-window (or (active-minibuffer-window) (minibuffer-window))
-    (delete-minibuffer-contents)
-    (insert pattern))
-  (when noupdate
-    (setq helm-pattern pattern)))
-
-(defun helm-minibuffer-completion-contents ()
-  "Return the user input in a minibuffer before point as a string.
-That is what completion commands operate on."
-  (buffer-substring (field-beginning) (point)))
-
 (defun helm--delete-minibuffer-contents-from (from-str)
   ;; Giving an empty string value to FROM-STR delete all.
-  (require 'helm-utils)
   (let ((input (minibuffer-contents)))
     (helm-reset-yank-point)
     (if (> (length input) 0)
