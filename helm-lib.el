@@ -403,6 +403,24 @@ instead of `helm-walk-ignore-directories'."
       (ls-rec directory)
       (nreverse result))))
 
+(defun helm-file-expand-wildcards (pattern &optional full)
+  "Same as `file-expand-wildcards' but allow recursion.
+Recursion happen when PATTERN starts with two stars.
+Directories expansion is not supported."
+  (let ((bn (helm-basename pattern)))
+    (if (and helm-file-globstar
+             (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
+        (helm-walk-directory (helm-basedir pattern)
+                             :path (cl-case full
+                                     (full 'full)
+                                     (relative 'relative)
+                                     ((basename nil) 'basename)
+                                     (t 'full))
+                             :directories nil
+                             :match (wildcard-to-regexp bn)
+                             :skip-subdirs t)
+        (file-expand-wildcards pattern full))))
+
 ;;; helm internals
 ;;
 (defun helm-set-pattern (pattern &optional noupdate)

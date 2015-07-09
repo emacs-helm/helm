@@ -5034,24 +5034,6 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
           finally do (prog1 (cl-return cands)
                        (helm-log "Marked candidates = %S" cands)))))
 
-(defun helm-file-expand-wildcards (pattern &optional full)
-  "Same as `file-expand-wildcards' but allow recursion.
-Recursion happen when PATTERN starts with two stars.
-Directories expansion is not supported."
-  (let ((bn (helm-basename pattern)))
-    (if (and helm-file-globstar
-             (string-match "\\`\\*\\{2\\}\\(.*\\)" bn))
-        (helm-walk-directory (helm-basedir pattern)
-                             :path (cl-case full
-                                     (full 'full)
-                                     (relative 'relative)
-                                     ((basename nil) 'basename)
-                                     (t 'full))
-                             :directories nil
-                             :match (wildcard-to-regexp bn)
-                             :skip-subdirs t)
-        (file-expand-wildcards pattern full))))
-
 (defun helm-current-source-name= (name)
   (save-excursion
     (goto-char (helm-get-previous-header-pos))
