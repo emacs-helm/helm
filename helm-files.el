@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-types)
 (require 'helm-utils)
 (require 'helm-external)
 (require 'helm-grep)

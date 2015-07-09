@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-types)
 (require 'helm-utils)
 (require 'helm-info)
 (require 'helm-eval)
