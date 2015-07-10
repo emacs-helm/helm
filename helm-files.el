@@ -1314,15 +1314,19 @@ If prefix numeric arg is given go ARG level up."
         (with-helm-after-update-hook (helm-ff-retrieve-last-expanded))))))
 
 (defun helm-find-files-down-last-level ()
+  "Retrieve previous paths reached by `C-l' in helm-find-files."
   (interactive)
-  (unless helm-find-files--level-tree-iterator 
-    (setq helm-find-files--level-tree-iterator
-          (helm-iter-list (cdr helm-find-files--level-tree))))
-  (setq helm-find-files--level-tree nil)
-  (helm-aif (helm-iter-next helm-find-files--level-tree-iterator)
-      (helm-set-pattern it)
-    (ignore)
-    (setq helm-find-files--level-tree-iterator nil)))
+  (with-helm-alive-p
+    (when (and (helm-file-completion-source-p)
+               (not (helm-ff-invalid-tramp-name-p)))
+      (unless helm-find-files--level-tree-iterator 
+        (setq helm-find-files--level-tree-iterator
+              (helm-iter-list (cdr helm-find-files--level-tree))))
+      (setq helm-find-files--level-tree nil)
+      (helm-aif (helm-iter-next helm-find-files--level-tree-iterator)
+          (helm-set-pattern it)
+        (ignore)
+        (setq helm-find-files--level-tree-iterator nil)))))
 
 (defun helm-find-files--reset-level-tree ()
   (setq helm-find-files--level-tree-iterator nil
