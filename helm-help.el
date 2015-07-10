@@ -589,8 +589,16 @@ book * -size +1M
 \\<helm-generic-files-map>
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename.
 \\[helm-ff-run-grep]\t\t->Run grep (C-u recurse).
+\\[helm-ff-run-zgrep]\t\t->Run zgrep.
+\\[helm-ff-run-gid]\t\t->Run gid (id-utils).
 \\[helm-ff-run-pdfgrep]\t\t->Run Pdfgrep on marked files.
-\\[helm-ff-run-delete-file]\t\t->Delete file.
+\\[helm-ff-run-copy-file]\t\t->Copy file(s)
+\\[helm-ff-run-rename-file]\t\t->Rename file(s).
+\\[helm-ff-run-symlink-file]\t\t->Symlink file(s).
+\\[helm-ff-run-hardlink-file]\t\t->Hardlink file(s).
+\\[helm-ff-run-delete-file]\t\t->Delete file(s).
+\\[helm-ff-run-byte-compile-file]\t\t->Byte compile file(s) (C-u load) (elisp).
+\\[helm-ff-run-load-file]\t\t->Load file(s) (elisp).
 \\[helm-ff-run-ediff-file]\t\t->Ediff file.
 \\[helm-ff-run-ediff-merge-file]\t\t->Ediff merge file.
 \\[helm-ff-run-switch-other-window]\t\t->Switch other window.

@@ -98,6 +98,7 @@ the opposite of \"locate\" command."
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)
     (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
+    (define-key map (kbd "C-c g")   'helm-ff-run-gid)
     (define-key map (kbd "M-R")     'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")     'helm-ff-run-copy-file)
     (define-key map (kbd "M-B")     'helm-ff-run-byte-compile-file)
