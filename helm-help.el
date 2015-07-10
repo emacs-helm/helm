@@ -290,6 +290,16 @@ Italic     => A non--file buffer.
 
 ** Helm find files tips:
 
+*** Navigation summary
+
+**** Use `C-j' (persistent action) on a directory to go down one level.
+
+**** Use `C-l' on a directory to go up one level.
+
+**** Use `C-r' to walk back the resulting tree of all the `C-l' you did.
+  Note: The tree is reinitialized each time you enter a new tree with `C-j'
+  or by entering some pattern in prompt.
+ 
 *** Quick pattern expansion:
 
 \n**** Enter `~/' at end of pattern to quickly reach home directory.
