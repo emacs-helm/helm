@@ -4296,24 +4296,31 @@ When at end of minibuffer delete all."
 
 ;; Built-in plug-in: candidates-in-buffer
 (defun helm-candidates-in-buffer (&optional source)
-  "Get candidates from the candidates buffer according to `helm-pattern'.
+  "The top level function used to store candidates in `helm-source-in-buffer'.
 
-BUFFER is `helm-candidate-buffer' by default.  Each
-candidate must be placed in one line.  This function is meant to
-be used in candidates-in-buffer or candidates attribute of an
-helm source.  Especially fast for many (1000+) candidates.
+Candidates are stored in a buffer generated internally by the function
+`helm-candidate-buffer'.  Each candidate must be placed in one line.
+This function is meant to be used in candidates-in-buffer or candidates
+attribute of an helm source.  Especially fast for many (1000+) candidates.
 
-eg.
- '((name . \"many files\")
-   (init . (lambda () (with-current-buffer (helm-candidate-buffer 'local)
-                        (insert-many-filenames))))
-   (search re-search-forward)  ; optional
-   (candidates-in-buffer)
-   (type . file))
+The buffer is created and feeded in the init attribute function of helm.
 
-+===============================================================+
-| The new way of making and narrowing candidates: Using buffers |
-+===============================================================+
+e.g:
+
+     (helm-build-in-buffer-source \"test\"
+       :init (lambda ()
+               (helm-init-candidates-in-buffer
+                   'global '(foo foa fob bar baz))))
+
+A shortcut can be used to simplify:
+          
+     (helm-build-in-buffer-source \"test\"
+       :data '(foo foa fob bar baz))
+
+The usage of the `candidates-in-buffer' is deprecated in favor
+of `helm-source-in-buffer' class.
+
+It is anyway described below and provided for backward compatibility.
 
 By default, `helm' makes candidates by evaluating the
 candidates function, then narrows them by `string-match' for each
@@ -4345,7 +4352,7 @@ And `(candidates-in-buffer . func)' is shortcut of three attributes:
   (match identity)
 The expansion is performed in `helm-get-sources'.
 
-The candidates-in-buffer attribute implies the volatile attribute.
+The `candidates-in-buffer' attribute implies the volatile attribute.
 The volatile attribute is needed because `helm-candidates-in-buffer'
 creates candidates dynamically and need to be called everytime
 `helm-pattern' changes.
@@ -4353,7 +4360,7 @@ creates candidates dynamically and need to be called everytime
 Because `helm-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
 
-However if source contain match-part attribute, match is computed only
+However if source contain `match-part' attribute, match is computed only
 on part of candidate returned by the call of function provided by this attribute.
 The function should have one arg, candidate, and return only
 a specific part of candidate.
