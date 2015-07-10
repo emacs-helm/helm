@@ -30,6 +30,13 @@
   :group 'helm-misc
   :type 'string)
 
+(defcustom helm-timezone-actions
+  '(("Set timezone env (TZ)" . (lambda (candidate)
+                                 (setenv "TZ" candidate))))
+  "Actions for helm-timezone."
+  :group 'helm-misc
+  :type '(alist :key-type string :value-type function))
+
 (defcustom helm-mini-default-sources '(helm-source-buffers-list
                                        helm-source-recentf
                                        helm-source-buffer-not-found)
@@ -94,22 +101,24 @@
 ;;
 (defun helm-time-zone-transformer (candidates _source)
   (cl-loop for i in candidates
-        collect
-        (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
-               (propertize i 'face 'helm-time-zone-current))
-              ((string-match helm-time-zone-home-location i)
-               (propertize i 'face 'helm-time-zone-home))
-              (t i))))
+           for (z . p) in display-time-world-list
+           collect
+           (cons 
+            (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
+                   (propertize i 'face 'helm-time-zone-current))
+                  ((string-match helm-time-zone-home-location i)
+                   (propertize i 'face 'helm-time-zone-home))
+                  (t i))
+            z)))
 
 (defvar helm-source-time-world
-  '((name . "Time World List")
-    (init . (lambda ()
-              (require 'time)
-              (let ((helm-buffer (helm-candidate-buffer 'global)))
-                (with-current-buffer helm-buffer
-                  (display-time-world-display display-time-world-list)))))
-    (candidates-in-buffer)
-    (filtered-candidate-transformer . helm-time-zone-transformer)))
+  (helm-build-in-buffer-source "Time World List"
+    :data (lambda ()
+            (with-temp-buffer
+              (display-time-world-display display-time-world-list)
+              (buffer-string)))
+    :action 'helm-timezone-actions
+    :filtered-candidate-transformer 'helm-time-zone-transformer))
 
 ;;; LaCarte
 ;;
@@ -266,7 +275,8 @@ It is added to `extended-command-history'.
 
 ;;;###autoload
 (defun helm-world-time ()
-  "Preconfigured `helm' to show world time."
+  "Preconfigured `helm' to show world time.
+Default action change TZ environment variable locally to emacs."
   (interactive)
   (helm-other-buffer 'helm-source-time-world "*helm world time*"))
 
