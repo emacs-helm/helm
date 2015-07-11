@@ -118,6 +118,20 @@ _Note:_ After upgrading from the emacs packaging system you should restart emacs
 
 `Only the extensions present in the github emacs-helm organisation are supported.`
 
+## Install and use only helm-core package
+
+Third party helm packages can use only helm-core package if they don't need more helm libraries
+for their packages. It is available at http://melpa.org/.
+
+All you need to add in your packages is
+
+     (require 'helm)
+
+This will provide the necessary code to build and run helm sources with multiple regexp matching
+or fuzzy matching.
+
+See [wiki](https://github.com/emacs-helm/helm/wiki#developpingusinghelmframework) for more infos.
+
 ## Alternate install warning
 
 Some people are installing `helm` with their own config using diverses `require`, `autoload`
