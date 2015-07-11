@@ -1415,34 +1415,6 @@ The action is to call FUNCTION with arguments ARGS."
   (apply 'run-with-timer 0.1 nil function args)
   (helm-exit-minibuffer))
 
-
-(defun define-helm-type-attribute (type definition &optional doc)
-  "Register type attribute of TYPE as DEFINITION with DOC.
-DOC is displayed in `helm-type-attributes' docstring.
-
-Use this function is better than setting `helm-type-attributes' directly."
-  (cl-loop for i in definition do
-        ;; without `ignore-errors', error at emacs22
-        (ignore-errors (setf i (delete nil i))))
-  (helm-add-type-attribute type definition)
-  (and doc (helm-document-type-attribute type doc))
-  nil)
-
-(defun helm-document-attribute (attribute short-doc &optional long-doc)
-  "Register ATTRIBUTE documentation introduced by plug-in.
-SHORT-DOC is displayed beside attribute name.
-LONG-DOC is displayed below attribute name and short documentation."
-  (if long-doc
-      (setq short-doc (concat "(" short-doc ")"))
-    (setq long-doc short-doc
-          short-doc ""))
-  (add-to-list 'helm-attributes attribute t)
-  (put attribute 'helm-attrdoc
-       (concat "- " (symbol-name attribute)
-               " " short-doc "\n\n" long-doc "\n")))
-
-(put 'helm-document-attribute 'lisp-indent-function 2)
-
 (defun helm-interpret-value (value &optional source compute)
   "Interpret VALUE as variable, function or literal and return it.
 If VALUE is a function, call it with no arguments and return the value
@@ -4254,15 +4226,39 @@ When at end of minibuffer delete all."
     (helm--delete-minibuffer-contents-from str)))
 
 
-;;; Plugins
+;;; Plugins (Deprecated in favor of helm-types)
 ;;
-;; Built-in plug-in: type
+;; i.e Inherit instead of helm-type-* classes in your own classes.
 (defun helm-compile-source--type (source)
   (helm-aif (assoc-default 'type source)
       (append source (assoc-default it helm-type-attributes) nil)
     source))
 
-;; `define-helm-type-attribute' is public API.
+(defun define-helm-type-attribute (type definition &optional doc)
+  "Register type attribute of TYPE as DEFINITION with DOC.
+DOC is displayed in `helm-type-attributes' docstring.
+
+Use this function is better than setting `helm-type-attributes' directly."
+  (cl-loop for i in definition do
+        ;; without `ignore-errors', error at emacs22
+        (ignore-errors (setf i (delete nil i))))
+  (helm-add-type-attribute type definition)
+  (and doc (helm-document-type-attribute type doc))
+  nil)
+
+(defun helm-document-attribute (attribute short-doc &optional long-doc)
+  "Register ATTRIBUTE documentation introduced by plug-in.
+SHORT-DOC is displayed beside attribute name.
+LONG-DOC is displayed below attribute name and short documentation."
+  (declare (indent 2))
+  (if long-doc
+      (setq short-doc (concat "(" short-doc ")"))
+    (setq long-doc short-doc
+          short-doc ""))
+  (add-to-list 'helm-attributes attribute t)
+  (put attribute 'helm-attrdoc
+       (concat "- " (symbol-name attribute)
+               " " short-doc "\n\n" long-doc "\n")))
 
 (defun helm-add-type-attribute (type definition)
   (helm-aif (assq type helm-type-attributes)
