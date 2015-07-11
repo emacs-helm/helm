@@ -20,6 +20,9 @@
 (require 'helm)
 (require 'helm-types)
 
+(declare-function display-time-world-display "time.el")
+(defvar display-time-world-list)
+
 
 (defgroup helm-misc nil
   "Various Applications and libraries for Helm."
