@@ -16,6 +16,7 @@
 - [Getting Started](#getting-started)
     - [Quick install from git](#quick-install-from-git)
     - [Install from Emacs packaging system](#install-from-emacs-packaging-system)
+    - [Install and use only helm-core package](#install-and-use-only-helm-core-package)
     - [Alternate install warning](#alternate-install-warning)
     - [Configuration](#configuration)
     - [Basic usage](#basic-usage)
