@@ -2715,10 +2715,11 @@ Else return ACTIONS unmodified."
 
 ;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
 
+(defclass helm-files-dired-source (helm-source-sync helm-type-file)
+  ((candidates :initform #'helm-files-in-all-dired-candidates)))
+
 (defvar helm-source-files-in-all-dired
-  '((name . "Files in all dired buffer.")
-    (candidates . helm-files-in-all-dired-candidates)
-    (type . file)))
+  (helm-make-source "Files in all dired buffer." 'helm-files-dired-source))
 
 
 ;;; File Cache
@@ -2796,11 +2797,11 @@ Else return ACTIONS unmodified."
 ;;
 ;;
 (defvar helm-source-file-name-history
-  `((name . "File Name History")
-    (candidates . file-name-history)
-    (persistent-action . ignore)
-    (filtered-candidate-transformer . helm-file-name-history-transformer)
-    (action . ,(helm-actions-from-type-file))))
+  (helm-build-sync-source "File Name History"
+    :candidates 'file-name-history
+    :persistent-action #'ignore
+    :filtered-candidate-transformer #'helm-file-name-history-transformer
+    :action 'helm-type-file-actions))
 
 (defvar helm-source--ff-file-name-history nil
   "[Internal] This source is build to be used with `helm-find-files'.
@@ -2837,9 +2838,9 @@ Don't use it in your own code unless you know what you are doing.")
                                    (helm-set-pattern
                                     (expand-file-name candidate))
                                    (with-helm-after-update-hook (helm-exit-minibuffer)))
-                      "Find file in helm" (lambda (candidate)
-                                            (helm-set-pattern
-                                             (expand-file-name candidate)))))))
+                     "Find file in helm" (lambda (candidate)
+                                           (helm-set-pattern
+                                            (expand-file-name candidate)))))))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
           :buffer "*helm-file-name-history*"
@@ -2881,7 +2882,7 @@ Don't use it in your own code unless you know what you are doing.")
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)
    (mode-line :initform helm-generic-file-mode-line-string)
-   (action :initform (helm-actions-from-type-file))))
+   (action :initform 'helm-type-file-actions)))
 
 (defvar helm-source-recentf nil 
   "See (info \"(emacs)File Conveniences\").
@@ -2944,7 +2945,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                            (propertize c 'face 'helm-ff-file)))
                      :mode-line helm-generic-file-mode-line-string
                      :keymap helm-generic-files-map
-                     :action (helm-actions-from-type-file))) 
+                     :action 'helm-type-file-actions)) 
         :buffer "*helm browse project*"))
 
 ;;;###autoload
@@ -3018,17 +3019,18 @@ See `helm-browse-project'."
 ;;
 ;;  session (http://emacs-session.sourceforge.net/) is an alternative to
 ;;  recentf that saves recent file history and much more.
+(defvar session-file-alist)
 (defvar helm-source-session
-  `((name . "Session")
-    (candidates . (lambda ()
-                    (cl-delete-if-not #'(lambda (f)
-                                          (or (string-match helm-tramp-file-name-regexp f)
-                                              (file-exists-p f)))
-                                      (mapcar 'car session-file-alist))))
-    (keymap . ,helm-generic-files-map)
-    (help-message . helm-generic-file-help-message)
-    (mode-line . helm-generic-file-mode-line-string)
-    (action . ,(helm-actions-from-type-file)))
+  (helm-build-sync-source "Session"
+    :candidates (lambda ()
+                  (cl-delete-if-not #'(lambda (f)
+                                        (or (string-match helm-tramp-file-name-regexp f)
+                                            (file-exists-p f)))
+                                    (mapcar 'car session-file-alist)))
+    :keymap helm-generic-files-map
+    :help-message helm-generic-file-help-message
+    :mode-line helm-generic-file-mode-line-string
+    :action 'helm-type-file-actions)
   "File list from emacs-session.")
 
 
@@ -3116,32 +3118,34 @@ Colorize only symlinks, directories and files."
            collect built))
 
 (defvar helm-source-tracker-search
-  `((name . "Tracker Search")
-    (candidates-process
-     . (lambda ()
-         (start-process "tracker-search-process" nil
-                        "tracker-search"
-                        "--disable-color"
-                        "--limit=512"
-                        helm-pattern)))
-    (filtered-candidate-transformer . helm-source-tracker-transformer)
+  (helm-build-async-source "Tracker Search"
+    :candidates-process
+     (lambda ()
+       (start-process "tracker-search-process" nil
+                      "tracker-search"
+                      "--disable-color"
+                      "--limit=512"
+                      helm-pattern))
+    :filtered-candidate-transformer #'helm-source-tracker-transformer
     ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
-    (keymap . ,helm-generic-files-map)
-    (action . ,(cdr (helm-get-attribute-from-type 'action 'file)))
-    (action-transformer
-     helm-transform-file-load-el
-     helm-transform-file-browse-url)
-    (requires-pattern . 3))
+    :keymap helm-generic-files-map
+    :action 'helm-type-file-actions
+    :action-transformer '(helm-transform-file-load-el
+                          helm-transform-file-browse-url)
+    :requires-pattern 3)
   "Source for retrieving files matching the current input pattern
 with the tracker desktop search.")
 
 ;; Spotlight (MacOS X desktop search)
+(defclass helm-mac-spotlight-source (helm-source-async helm-type-file)
+  ((candidates-process :initform
+                       (lambda ()
+                         (start-process
+                          "mdfind-process" nil "mdfind" helm-pattern)))
+   (requires-pattern :init-form 3)))
+
 (defvar helm-source-mac-spotlight
-  '((name . "mdfind")
-    (candidates-process
-     . (lambda () (start-process "mdfind-process" nil "mdfind" helm-pattern)))
-    (type . file)
-    (requires-pattern . 3))
+  (helm-make-source "mdfind" helm-mac-spotlight-source)
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
@@ -3156,7 +3160,7 @@ utility mdfind.")
     :candidates-process 'helm-find-shell-command-fn
     :filtered-candidate-transformer 'helm-findutils-transformer
     :action-transformer 'helm-transform-file-load-el
-    :action (helm-actions-from-type-file)
+    :action 'helm-type-file-actions
     :mode-line  helm-generic-file-mode-line-string
     :keymap helm-generic-files-map
     :candidate-number-limit 9999
