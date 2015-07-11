@@ -43,6 +43,7 @@
 <ul>
 <li><a href="#quick-install-from-git">Quick install from git</a></li>
 <li><a href="#install-from-emacs-packaging-system">Install from Emacs packaging system</a></li>
+<li><a href="#install-and-use-only-helm-core-package">Install and use only helm-core package</a></li>
 <li><a href="#alternate-install-warning">Alternate install warning</a></li>
 <li><a href="#configuration">Configuration</a></li>
 <li><a href="#basic-usage">Basic usage</a></li>
@@ -160,6 +161,22 @@ See <a href="https://github.com/emacs-helm/helm/wiki#faq">FAQ</a> for more infos
 <p><strong>Note to Linux Distributions Maintainers</strong></p>
 
 <p><code>Only the extensions present in the github emacs-helm organisation are supported.</code></p>
+
+<h2>
+<a id="install-and-use-only-helm-core-package" class="anchor" href="#install-and-use-only-helm-core-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install and use only helm-core package</h2>
+
+<p>Third party helm packages can use only helm-core package if they don't need more helm libraries
+for their packages. It is available at <a href="http://melpa.org/">http://melpa.org/</a>.</p>
+
+<p>All you need to add in your packages is</p>
+
+<pre><code> (require 'helm)
+</code></pre>
+
+<p>This will provide the necessary code to build and run helm sources with multiple regexp matching
+or fuzzy matching.</p>
+
+<p>See <a href="https://github.com/emacs-helm/helm/wiki#developpingusinghelmframework">wiki</a> for more infos.</p>
 
 <h2>
 <a id="alternate-install-warning" class="anchor" href="#alternate-install-warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternate install warning</h2>
