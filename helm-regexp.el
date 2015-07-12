@@ -396,6 +396,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
         :history 'helm-grep-history
+        :keymap helm-moccur-map
         :input input
         :truncate-lines t))
 
