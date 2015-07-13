@@ -21,6 +21,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'eieio)
+
 
 ;;  Files
 (defclass helm-type-file (helm-source) ()
