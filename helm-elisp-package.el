@@ -217,7 +217,7 @@
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-el-package-upgrade)))
 
-(defun helm-el-package-upgrade-all (_candidate)
+(defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
       (with-helm-display-marked-candidates
         helm-marked-buffer-name (mapcar (lambda (x) (symbol-name (car x)))
@@ -226,13 +226,13 @@
           (helm-el-package-upgrade-1 helm-el-package--tabulated-list)))
       (message "No packages to upgrade actually!")))
 
+(defun helm-el-package-upgrade-all-action (_candidate)
+  (helm-el-package-upgrade-all))
+
 (defun helm-el-run-package-upgrade-all ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-upgrade-all)))
-
-(defun helm-el-package-upgrade-all-action (_candidate)
-  (helm-el-package-upgrade-all))
+    (helm-quit-and-execute-action 'helm-el-package-upgrade-all-action)))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
