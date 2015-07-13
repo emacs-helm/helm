@@ -217,7 +217,7 @@
   (with-helm-alive-p
     (helm-quit-and-execute-action 'helm-el-package-upgrade)))
 
-(defun helm-el-package-upgrade-all ()
+(defun helm-el-package-upgrade-all (_candidate)
   (if helm-el-package--upgrades
       (with-helm-display-marked-candidates
         helm-marked-buffer-name (mapcar (lambda (x) (symbol-name (car x)))
