@@ -43,10 +43,10 @@ If nil default `helm-apt-cache-show-1' will be used."
 
 (defcustom helm-apt-actions
   '(("Show package description" . helm-apt-cache-show)
-    ("Install package" . helm-apt-install)
-    ("Reinstall package" . helm-apt-reinstall)
-    ("Remove package" . helm-apt-uninstall)
-    ("Purge package" . helm-apt-purge))
+    ("Install package(s)" . helm-apt-install)
+    ("Reinstall package(s)" . helm-apt-reinstall)
+    ("Remove package(s)" . helm-apt-uninstall)
+    ("Purge package(s)" . helm-apt-purge))
   "Actions for helm apt."
   :group 'helm-apt
   :type '(alist :key-type string :value-type function))
