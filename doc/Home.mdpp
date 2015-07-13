@@ -1231,12 +1231,15 @@ anymore, however if it happen, do like this:
 
 5. Restart emacs
 
-And report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
+If problem persists report bug on [emacs helm issues](https://github.com/emacs-helm/helm/issues)
 
 
-_Note:_ After upgrading as usual you will have anyway to restart emacs for the changes take effect.
+_Note:_ After upgrading (helm or whatever), you will have to restart emacs (expect problems otherwise).
 
 _Note:_ [emacs-async](https://github.com/jwiegley/emacs-async) is available as "async" in melpa.
+
+_Note:_ Async compilation of packages can be disabled per package or globally in async-bytecomp.el.
+If you do so, don't complain if you have errors after upgrading helm or helm modules.
 
 ## I have warnings when compiling from emacs-24.3.1
 
