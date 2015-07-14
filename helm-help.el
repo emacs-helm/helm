@@ -189,8 +189,7 @@ Italic     => A non--file buffer.
 \\[helm-mark-all]\t\t->Mark all.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
 \\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers.
-\\[helm-buffers-mark-similar-buffers]\t\t->Mark all buffers with same type (color) than current.
-\\[helm-buffer-help]\t\t->Display this help.")
+\\[helm-buffers-mark-similar-buffers]\t\t->Mark all buffers with same type (color) than current.")
 
 ;;; Find files help (`helm-find-files')
 ;;
@@ -375,8 +374,7 @@ in `helm-current-buffer' as default.
 \\[helm-narrow-window]\t\t->Narrow helm window.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
-\\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\\[helm-ff-help]\t\t->Display this help info.")
+\\[helm-ff-run-insert-org-link]\t\t->Insert org link.")
 
 
 ;;; Help for `helm-read-file-name'
@@ -439,8 +437,7 @@ By default `helm-read-file-name' use the persistent actions of `helm-find-files'
 \\[helm-ff-file-name-history]\t\t->File name history.
 C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 \\[helm-next-source]\t\t->Goto next source.
-\\[helm-previous-source]\t->Goto previous source.
-\\[helm-read-file-name-help]\t\t->Display this help info.")
+\\[helm-previous-source]\t->Goto previous source.")
 
 
 ;;; Generic file help - Used by locate.
@@ -589,8 +586,7 @@ navigate to another directory to consult its database.
 \\[helm-bookmark-run-jump-other-window]\t\t->Jump other window.
 \\[helm-bookmark-run-delete]\t\t->Delete bookmark.
 \\[helm-bookmark-run-edit]\t\t->Edit bookmark.
-\\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.
-\\[helm-bookmark-help]\t\t->Run this help.")
+\\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.")
 
 ;;; Eshell command on file help
 ;;
@@ -630,8 +626,7 @@ the command is called once for each file like this:
 <command> file1 <command> file2 etc...
 
 \n** Specific commands for `helm-find-files-eshell-command-on-file':\n
-\\<helm-esh-on-file-map>
-\\[helm-esh-help]\t\t->Display this help.")
+\\<helm-esh-on-file-map>")
 
 ;;; Ido virtual buffer help
 ;;
@@ -645,8 +640,7 @@ the command is called once for each file like this:
 \\[helm-ff-run-grep]\t\t->Grep file.
 \\[helm-ff-run-zgrep]\t\t->Zgrep file.
 \\[helm-ff-run-delete-file]\t\t->Delete file.
-\\[helm-ff-run-open-file-externally]\t\t->Open file externally.
-\\[helm-buffers-ido-virtual-help]\t\t->Display this help.")
+\\[helm-ff-run-open-file-externally]\t\t->Open file externally.")
 
 ;;; Moccur help
 ;;
