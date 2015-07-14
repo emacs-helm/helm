@@ -221,7 +221,6 @@ If no entry in cache, create one."
                       (cadr (split-string
                              (cadr (helm-etags-split-line candidate))))
                       candidate))
-    :mode-line helm-etags-mode-line-string
     :help-message 'helm-etags-help-message
     :keymap helm-etags-map
     :action '(("Go to tag" . (lambda (c)

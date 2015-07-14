@@ -223,7 +223,6 @@ than the default which is OBARRAY."
                 :history (or history extended-command-history)
                 :reverse-history helm-M-x-reverse-history
                 :del-input nil
-                :mode-line helm-M-x-mode-line
                 :help-message 'helm-M-x-help-message
                 :must-match t
                 :fuzzy helm-M-x-fuzzy-match

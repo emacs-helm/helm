@@ -80,7 +80,6 @@ If nil default `helm-apt-cache-show-1' will be used."
     :display-to-real #'helm-apt-display-to-real
     :update #'helm-apt-refresh
     :keymap helm-apt-map
-    :mode-line helm-apt-mode-line
     :help-message 'helm-apt-help-message
     :action 'helm-apt-actions
     :persistent-action #'helm-apt-persistent-action

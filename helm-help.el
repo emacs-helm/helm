@@ -944,144 +944,6 @@ you don't choose from there a command using helm completion.
 ;;
 ;;
 ;;;###autoload
-(defvar helm-buffer-mode-line-string
-  '("Buffer(s)" "\
-\\<helm-buffer-map>\
-\\[helm-buffer-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-    "String displayed in mode-line in `helm-source-buffers-list'"))
-
-;;;###autoload
-(defvar helm-color-mode-line-string
-  '("Colors" "\
-\\<helm-color-map>\
-\\[helm-color-help]:Help/\
-\\[helm-color-run-insert-name]:Insert name/\
-\\[helm-color-run-insert-rgb]:Insert RGB/\
-with shift: Kill"))
-
-;;;###autoload
-(defvar helm-buffers-ido-virtual-mode-line-string
-  '("Killed Buffer(s)" "\
-\\<helm-buffers-ido-virtual-map>\
-\\[helm-buffers-ido-virtual-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-    "String displayed in mode-line in `helm-source-buffers-list'"))
-
-;;;###autoload
-(defvar helm-ff-mode-line-string "\
-\\<helm-find-files-map>\
-\\[helm-ff-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-  "String displayed in mode-line in `helm-source-find-files'")
-
-;;;###autoload
-(defvar helm-read-file-name-mode-line-string "\
-\\<helm-read-file-map>\
-\\[helm-read-file-name-help]:Help \
-C/\\[helm-cr-empty-string]:Empty \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-  "String displayed in mode-line in `helm-source-find-files'.")
-
-;;;###autoload
-(defvar helm-generic-file-mode-line-string "\
-\\<helm-generic-files-map>\
-\\[helm-generic-file-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend"
-  "String displayed in mode-line in Locate.")
-
-;;;###autoload
-(defvar helm-grep-mode-line-string"\
-\\<helm-grep-map>\
-\\[helm-grep-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend"
-  "String displayed in mode-line in `helm-do-grep'.")
-
-;;;###autoload
-(defvar helm-pdfgrep-mode-line-string "\
-\\<helm-pdfgrep-map>\
-\\[helm-pdfgrep-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend"
-  "String displayed in mode-line in `helm-do-pdfgrep'.")
-
-;;;###autoload
-(defvar helm-etags-mode-line-string "\
-\\<helm-etags-map>\
-\\[helm-etags-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-  "String displayed in mode-line in `helm-etags-select'.")
-
-;;;###autoload
-(defvar helm-ucs-mode-line-string "\
-\\<helm-ucs-map>\
-\\[helm-ucs-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct"
-  "String displayed in mode-line in `helm-ucs'.")
-
-;;;###autoload
-(defvar helm-bookmark-mode-line-string
-  '("Bookmark(s)" "\
-\\<helm-bookmark-map>\
-\\[helm-bookmark-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct")
-  "String displayed in mode-line in `helm-source-buffers-list'")
-
-;;;###autoload
-(defvar helm-occur-mode-line "\
-\\<helm-map>\
-\\[helm-help]:Help \
-\\<helm-occur-map>\
-\\[helm-occur-run-query-replace-regexp]:Query replace regexp \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-moccur-mode-line "\
-\\<helm-moccur-map>\
-\\[helm-moccur-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
 (defvar helm-comp-read-mode-line "\
 \\<helm-comp-read-map>\
 C/\\[helm-cr-empty-string]:Empty \
@@ -1089,62 +951,25 @@ C/\\[helm-cr-empty-string]:Empty \
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct")
+f1/f2/f-n:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend")
+
+;;;###autoload
+(defvar helm-read-file-name-mode-line-string "\
+\\<helm-read-file-map>\
+\\[helm-help]:Help \
+C/\\[helm-cr-empty-string]:Empty \
+\\<helm-map>\
+\\[helm-select-action]:Act \
+\\[helm-maybe-exit-minibuffer]/\
+f1/f2/f-n:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend"
+  "String displayed in mode-line in `helm-source-find-files'.")
 
 ;;;###autoload
 (defvar helm-top-mode-line "\
 \\<helm-top-map>\
-\\[helm-top-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-apt-mode-line "\
-\\<helm-apt-map>\
-\\[helm-apt-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-el-package-mode-line "\
-\\<helm-el-package-map>\
-\\[helm-el-package-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-M-x-mode-line "\
-\\<helm-M-x-map>\
-\\[helm-M-x-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-imenu-mode-line "\
-\\<helm-imenu-map>\
-\\[helm-imenu-help]:Help \
-\\<helm-map>\
-\\[helm-select-action]:Act \
-\\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend")
-
-;;;###autoload
-(defvar helm-semantic-mode-line "\
-\\<helm-semantic-map>\
-\\[helm-semantic-help]:Help \
+\\[helm-help]:Help \
 \\<helm-map>\
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\

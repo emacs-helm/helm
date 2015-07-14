@@ -705,8 +705,7 @@ words from the buffer into the new bookmark name."
                   "Edit Bookmark" 'helm-bookmark-edit-bookmark
                   "Rename bookmark" 'helm-bookmark-rename
                   "Relocate bookmark" 'bookmark-relocate))
-      (keymap . ,helm-bookmark-map)
-      (mode-line . helm-bookmark-mode-line-string))
+      (keymap . ,helm-bookmark-map))
   "Bookmark name.")
 
 

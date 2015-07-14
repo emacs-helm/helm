@@ -286,8 +286,7 @@ See also `helm-locate'."
    (history :initform 'helm-file-name-history)
    (keymap :initform helm-generic-files-map)
    (help-message :initform 'helm-generic-file-help-message)
-   (candidate-number-limit :initform 9999)
-   (mode-line :initform helm-generic-file-mode-line-string)))
+   (candidate-number-limit :initform 9999)))
 
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source

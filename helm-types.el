@@ -108,7 +108,6 @@
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
   (set-slot-value source 'action 'helm-type-bookmark-actions)
   (set-slot-value source 'keymap helm-bookmark-map)
-  (set-slot-value source 'mode-line helm-bookmark-mode-line-string)
   (set-slot-value source 'help-message 'helm-bookmark-help-message))
 
 

@@ -101,7 +101,6 @@
    (persistent-action :initform 'helm-imenu-persistent-action)
    (persistent-help :initform "Show this entry")
    (keymap :initform helm-imenu-map)
-   (mode-line :initform helm-imenu-mode-line)
    (help-message :initform 'helm-imenu-help-message)
    (action :initform 'helm-imenu-action)))
 

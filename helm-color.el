@@ -113,7 +113,6 @@
     :keymap helm-color-map
     :persistent-help "Kill entry in RGB format."
     :persistent-action 'helm-color-kill-rgb
-    :mode-line 'helm-color-mode-line-string
     :help-message 'helm-colors-help-message
     :action
     '(("Copy Name (C-c N)" . helm-color-kill-name)

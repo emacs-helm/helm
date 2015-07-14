@@ -484,7 +484,6 @@ Should not be used among other sources.")
    (filter-one-by-one :initform 'helm-ff-filter-candidate-one-by-one)
    (persistent-action :initform 'helm-find-files-persistent-action)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
-   (mode-line :initform helm-ff-mode-line-string)
    (help-message :initform 'helm-ff-help-message)
    (volatile :initform t)
    (nohighlight :initform t)
@@ -2732,8 +2731,7 @@ Else return ACTIONS unmodified."
 (defclass helm-file-cache (helm-source-in-buffer helm-type-file)
   ((init :initform (lambda () (require 'filecache)))
    (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
-   (mode-line :initform helm-generic-file-mode-line-string)))
+   (help-message :initform helm-generic-file-help-message)))
 
 (defun helm-file-cache-get-candidates ()
   (cl-loop for item in file-cache-alist append
@@ -2883,7 +2881,6 @@ Don't use it in your own code unless you know what you are doing.")
                                       c)))
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)
-   (mode-line :initform helm-generic-file-mode-line-string)
    (action :initform 'helm-type-file-actions)))
 
 (defvar helm-source-recentf nil 
@@ -2945,7 +2942,6 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                                              'face 'helm-ff-file)
                                  c)
                            (propertize c 'face 'helm-ff-file)))
-                     :mode-line helm-generic-file-mode-line-string
                      :keymap helm-generic-files-map
                      :action 'helm-type-file-actions)) 
         :buffer "*helm browse project*"))
@@ -3031,7 +3027,6 @@ See `helm-browse-project'."
                                     (mapcar 'car session-file-alist)))
     :keymap helm-generic-files-map
     :help-message helm-generic-file-help-message
-    :mode-line helm-generic-file-mode-line-string
     :action 'helm-type-file-actions)
   "File list from emacs-session.")
 
@@ -3083,8 +3078,7 @@ Colorize only symlinks, directories and files."
                                (helm-basename candidate) candidate)))
    (fuzzy-match :initform t)
    (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
-   (mode-line :initform helm-generic-file-mode-line-string)))
+   (help-message :initform helm-generic-file-help-message)))
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
@@ -3163,7 +3157,6 @@ utility mdfind.")
     :filtered-candidate-transformer 'helm-findutils-transformer
     :action-transformer 'helm-transform-file-load-el
     :action 'helm-type-file-actions
-    :mode-line  helm-generic-file-mode-line-string
     :keymap helm-generic-files-map
     :candidate-number-limit 9999
     :requires-pattern 3))

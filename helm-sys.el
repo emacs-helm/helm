@@ -75,7 +75,6 @@ A format string where %s will be replaced with `frame-width'."
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
     :persistent-help "SIGTERM"
-    :mode-line helm-top-mode-line
     :help-message 'helm-top-help-message
     :follow 'never
     :keymap helm-top-map

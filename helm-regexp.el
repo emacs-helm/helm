@@ -306,7 +306,6 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (persistent-help :initform "Go to line")
    (resume :initform 'helm-moccur-resume-fn)
    (candidate-number-limit :initform 9999)
-   (mode-line :initform helm-moccur-mode-line)
    (help-message :initform 'helm-moccur-help-message)
    (keymap :initform helm-moccur-map)
    (history :initform 'helm-grep-history)
