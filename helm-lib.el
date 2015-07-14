@@ -279,6 +279,8 @@ text to be displayed in BUFNAME."
                      (substitute-command-keys
                       (helm-interpret-value helm-help-message)))
            (insert
+            "\n* No specific help for this source for now\n
+It may appear after next update if provided.\ni.e After first results popup in helm buffer."
             (substitute-command-keys
              (helm-interpret-value helm-help-message)))))))))
 
