@@ -170,6 +170,8 @@ It also accepts function or variable symbol.")
                       (helm-interpret-value helm-help-message)))
            (substitute-command-keys
             (helm-interpret-value helm-help-message))))))))
+
+;;; Local help messages.
 
 ;;; `helm-buffer-list' help
 ;;
