@@ -714,6 +714,7 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
+;;;###autoload
 (cl-defun helm-read-file-name
     (prompt
      &key
