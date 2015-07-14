@@ -224,6 +224,7 @@ than the default which is OBARRAY."
                 :reverse-history helm-M-x-reverse-history
                 :del-input nil
                 :mode-line helm-M-x-mode-line
+                :help-message 'helm-M-x-help-message
                 :must-match t
                 :fuzzy helm-M-x-fuzzy-match
                 :nomark t

@@ -285,7 +285,7 @@ See also `helm-locate'."
    (requires-pattern :initform 3)
    (history :initform 'helm-file-name-history)
    (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
+   (help-message :initform 'helm-generic-file-help-message)
    (candidate-number-limit :initform 9999)
    (mode-line :initform helm-generic-file-mode-line-string)))
 

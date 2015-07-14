@@ -906,6 +906,7 @@ in recurse, and ignoring EXTS, search being made on
             :nohighlight t
             :candidate-number-limit 9999
             :mode-line helm-grep-mode-line-string
+            :help-message 'helm-grep-help-message
             :history 'helm-grep-history
             :action (helm-make-actions
                      "Find File" 'helm-grep-action
@@ -1142,6 +1143,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                 :history 'helm-grep-history
                 :keymap helm-pdfgrep-map
                 :mode-line helm-pdfgrep-mode-line-string
+                :help-message 'helm-pdfgrep-help-message
                 :action #'helm-pdfgrep-action
                 :persistent-help "Jump to PDF Page"
                 :requires-pattern 2)

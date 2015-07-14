@@ -81,6 +81,7 @@ If nil default `helm-apt-cache-show-1' will be used."
     :update #'helm-apt-refresh
     :keymap helm-apt-map
     :mode-line helm-apt-mode-line
+    :help-message 'helm-apt-help-message
     :action 'helm-apt-actions
     :persistent-action #'helm-apt-persistent-action
     :persistent-help "Show package description"))

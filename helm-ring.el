@@ -432,6 +432,7 @@ This command is useful when used with persistent action."
                      (propertize (help-key-description (car c) nil)
                                  'helm-realvalue c)))
           :persistent-help "Execute kmacro"
+          :help-message 'helm-kmacro-help-message
           :action
           (helm-make-actions
            "Execute kmacro (`C-u <n>' to execute <n> times)"

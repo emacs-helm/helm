@@ -140,6 +140,7 @@ you have completion on these functions with `C-M i' in the customize interface."
    (persistent-help :initform "Show this entry")
    (keymap :initform 'helm-semantic-map)
    (mode-line :initform helm-semantic-mode-line)
+   (help-message :initform 'helm-semantic-help-message)
    (persistent-action :initform (lambda (elm)
                                   (helm-semantic-default-action elm t)
                                   (helm-highlight-current-line)))

@@ -327,6 +327,7 @@
                               ("Uninstall package(s)" . helm-el-package-uninstall))))
               (t (append acts '(("Install packages(s)" . helm-el-package-install))))))))
    (mode-line :initform helm-el-package-mode-line)
+   (help-message :initform 'helm-el-package-help-message)
    (keymap :initform helm-el-package-map)
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)

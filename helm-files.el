@@ -485,6 +485,7 @@ Should not be used among other sources.")
    (persistent-action :initform 'helm-find-files-persistent-action)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (mode-line :initform helm-ff-mode-line-string)
+   (help-message :initform 'helm-ff-help-message)
    (volatile :initform t)
    (nohighlight :initform t)
    (keymap :initform helm-find-files-map)
@@ -718,7 +719,8 @@ will not be loaded first time you use this."
                      :keymap helm-esh-on-file-map
                      :mode-line
                      '("Eshell alias"
-                       "C-c ?: Help, \\[universal-argument]: Insert output at point")
+                       "C-h m: Help, \\[universal-argument]: Insert output at point")
+                     :help-message 'helm-esh-help-message
                      :input-history
                      'helm-eshell-command-on-file-input-history))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))

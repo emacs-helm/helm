@@ -210,6 +210,7 @@ Only buffer names are fuzzy matched when this is enabled,
                                     (helm-force-update))))))
    (keymap :initform helm-buffer-map)
    (volatile :initform t)
+   (help-message :initform 'helm-buffer-help-message)
    (mode-line :initform helm-buffer-mode-line-string)
    (persistent-help
     :initform
@@ -254,6 +255,7 @@ Only buffer names are fuzzy matched when this is enabled,
     :fuzzy-match helm-buffers-fuzzy-matching
     :keymap helm-buffers-ido-virtual-map
     :mode-line helm-buffers-ido-virtual-mode-line-string
+    :help-message 'helm-buffers-ido-virtual-help-message
     :action '(("Find file" . helm-find-many-files)
               ("Find file other window" . find-file-other-window)
               ("Find file other frame" . find-file-other-frame)

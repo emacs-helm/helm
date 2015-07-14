@@ -150,17 +150,17 @@ Only math* symbols are collected."
     (helm-execute-persistent-action 'action-delete)))
 
 (defvar helm-source-ucs
-  '((name . "Ucs names")
-    (init . helm-ucs-init)
-    (candidate-number-limit . 9999)
-    (candidates-in-buffer)
-    (mode-line . helm-ucs-mode-line-string)
-    (action . (("Insert character" . helm-ucs-insert-char)
-               ("Insert character name" . helm-ucs-insert-name)
-               ("Insert character code in hex" . helm-ucs-insert-code)
-               ("Forward char" . helm-ucs-forward-char)
-               ("Backward char" . helm-ucs-backward-char)
-               ("Delete char backward" . helm-ucs-delete-backward))))
+  (helm-build-in-buffer-source "Ucs names"
+    :init #'helm-ucs-init
+    :candidate-number-limit 9999
+    :mode-line helm-ucs-mode-line-string
+    :help-message 'helm-ucs-help-message
+    :action '(("Insert character" . helm-ucs-insert-char)
+              ("Insert character name" . helm-ucs-insert-name)
+              ("Insert character code in hex" . helm-ucs-insert-code)
+              ("Forward char" . helm-ucs-forward-char)
+              ("Backward char" . helm-ucs-backward-char)
+              ("Delete char backward" . helm-ucs-delete-backward))))
   "Source for collecting `ucs-names' math symbols.")
 
 ;;;###autoload

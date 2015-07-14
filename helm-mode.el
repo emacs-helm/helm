@@ -265,6 +265,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (persistent-action nil)
                             (persistent-help "DoNothing")
                             (mode-line helm-comp-read-mode-line)
+                            help-message
                             (keymap helm-comp-read-map)
                             (name "Helm Completions")
                             candidates-in-buffer
@@ -433,6 +434,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :persistent-action persistent-action
                          :persistent-help persistent-help
                          :mode-line mode-line
+                         :help-message help-message
                          :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
@@ -442,6 +444,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
                   :mode-line mode-line
+                  :help-message help-message
                   :action action-fn))
            (src-1 (helm-build-in-buffer-source name
                     :data get-candidates
@@ -451,6 +454,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :fuzzy-match fuzzy
                     :persistent-help persistent-help
                     :mode-line mode-line
+                    :help-message help-message
                     :action action-fn))
            (src-list (list src-hist
                            (if candidates-in-buffer
@@ -820,6 +824,7 @@ Keys description:
                      (setq helm-ff--auto-update-state
                            helm-ff-auto-update-flag))
              :mode-line mode-line
+             :help-message 'helm-read-file-name-help-message
              :nohighlight t
              :candidates
              (lambda ()

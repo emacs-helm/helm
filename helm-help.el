@@ -89,7 +89,7 @@ Find here the documentation of all sources actually documented."
 (defvar helm-help-message
   (lambda ()
     (concat
-     "\n* Helm generic help\n"
+     "\n\n\n* Helm generic help\n"
      "\\<helm-map>"
      "\n`helm' is an Emacs incremental completion and selection narrowing framework.
 
@@ -100,7 +100,6 @@ Select with natural Emacs operations, choose with RET.
 ** Help
 
 C-h m : Run this generic help for helm.
-C-c ? : Run specific helm help for current source.
 
 ** Basic Operations
 
@@ -143,11 +142,15 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-follow-action-forward] : Run persistent action and goto next line.
 \\[helm-follow-action-backward] : Run persistent action and goto previous line.
 \\[helm-force-update] : Recalculate and redisplay candidates.
-
+\\[helm-toggle-suspend-update] : Suspend/reenable update.
+ 
 ** Global Commands
 
 \\<global-map>\\[helm-resume] revives last `helm' session.
-It is very useful, so you should bind any key."))
+It is very useful, so you should bind any key.
+
+\n** Helm Map
+\\{helm-map}"))
   "Detailed help message string for `helm'.
 It also accepts function or variable symbol.")
 
@@ -160,11 +163,13 @@ It also accepts function or variable symbol.")
       (helm-help-internal
        "*Helm Help*"
        (lambda ()
-         (insert (substitute-command-keys
-                  (helm-interpret-value (or (assoc-default
-                                             'help-message
-                                             (helm-get-current-source))
-                                            helm-help-message)))))))))
+         (helm-aif (assoc-default 'help-message (helm-get-current-source))
+             (insert (substitute-command-keys
+                      (helm-interpret-value it))
+                     (substitute-command-keys
+                      (helm-interpret-value helm-help-message)))
+           (substitute-command-keys
+            (helm-interpret-value helm-help-message))))))))
 
 ;;; `helm-buffer-list' help
 ;;
@@ -271,16 +276,7 @@ Italic     => A non--file buffer.
 \\[helm-toggle-buffers-details]\t\t->Toggle details.
 \\[helm-buffers-toggle-show-hidden-buffers]\t\t->Show hidden buffers.
 \\[helm-buffers-mark-similar-buffers]\t\t->Mark all buffers with same type (color) than current.
-\\[helm-buffer-help]\t\t->Display this help.
-\n** Helm Map
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-buffer-help ()
-  "Help command for helm buffers."
-  (interactive)
-  (let ((helm-help-message helm-buffer-help-message))
-    (helm-help)))
+\\[helm-buffer-help]\t\t->Display this help.")
 
 ;;; Find files help (`helm-find-files')
 ;;
@@ -466,16 +462,8 @@ in `helm-current-buffer' as default.
 \\[helm-ff-run-toggle-basename]\t\t->Toggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\t->Find file as root.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\\[helm-ff-help]\t\t->Display this help info.
-\n** Helm Map\n
-\\{helm-map}")
+\\[helm-ff-help]\t\t->Display this help info.")
 
-;;;###autoload
-(defun helm-ff-help ()
-  "Help command for `helm-find-files'."
-  (interactive)
-  (let ((helm-help-message helm-ff-help-message))
-    (helm-help)))
 
 ;;; Help for `helm-read-file-name'
 ;;
@@ -538,16 +526,8 @@ By default `helm-read-file-name' use the persistent actions of `helm-find-files'
 C/\\[helm-cr-empty-string]\t\t->Maybe return empty string (unless `must-match').
 \\[helm-next-source]\t\t->Goto next source.
 \\[helm-previous-source]\t->Goto previous source.
-\\[helm-read-file-name-help]\t\t->Display this help info.
-\n** Helm Map\n
-\\{helm-map}")
+\\[helm-read-file-name-help]\t\t->Display this help info.")
 
-;;;###autoload
-(defun helm-read-file-name-help ()
-  "Help command for `read-file-name'."
-  (interactive)
-  (let ((helm-help-message helm-read-file-name-help-message))
-    (helm-help)))
 
 ;;; Generic file help - Used by locate.
 ;;
@@ -608,16 +588,7 @@ book * -size +1M
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
 \\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\\[helm-generic-file-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-generic-file-help ()
-  "Global help for helm."
-  (interactive)
-  (let ((helm-help-message helm-generic-file-help-message))
-    (helm-help)))
+\\[helm-generic-file-help]\t\t->Show this help.")
 
 ;;; Grep help
 ;;
@@ -660,16 +631,7 @@ navigate to another directory to consult its database.
 \\[helm-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-j').
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
-\\[helm-grep-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-grep-help ()
-  "Help command for helm grep."
-  (interactive)
-  (let ((helm-help-message helm-grep-help-message))
-    (helm-help)))
+\\[helm-grep-help]\t\t->Show this help.")
 
 ;;; Pdf grep help
 ;;
@@ -681,16 +643,7 @@ navigate to another directory to consult its database.
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[helm-pdfgrep-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-pdfgrep-help ()
-  "Help command for pdfgrep."
-  (interactive)
-  (let ((helm-help-message helm-pdfgrep-help-message))
-    (helm-help)))
+\\[helm-pdfgrep-help]\t\t->Show this help.")
 
 ;;; Etags help
 ;;
@@ -702,16 +655,7 @@ navigate to another directory to consult its database.
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[helm-etags-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-etags-help ()
-  "The help function for etags."
-  (interactive)
-  (let ((helm-help-message helm-etags-help-message))
-    (helm-help)))
+\\[helm-etags-help]\t\t->Show this help.")
 
 ;;; Ucs help
 ;;
@@ -724,17 +668,7 @@ navigate to another directory to consult its database.
 \\[helm-ucs-persistent-forward]\t->Forward char.
 \\[helm-ucs-persistent-backward]\t->Backward char.
 \\[helm-ucs-persistent-delete]\t->Delete char backward.
-\\[helm-ucs-help]\t\t->Show this help.
-
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-ucs-help ()
-  "Help command for `helm-ucs'."
-  (interactive)
-  (let ((helm-help-message helm-ucs-help-message))
-    (helm-help)))
+\\[helm-ucs-help]\t\t->Show this help.")
 
 ;;; Bookmark help
 ;;
@@ -747,16 +681,7 @@ navigate to another directory to consult its database.
 \\[helm-bookmark-run-delete]\t\t->Delete bookmark.
 \\[helm-bookmark-run-edit]\t\t->Edit bookmark.
 \\[helm-bookmark-toggle-filename]\t\t->Toggle bookmark location visibility.
-\\[helm-bookmark-help]\t\t->Run this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-bookmark-help ()
-  "Help command for bookmarks."
-  (interactive)
-  (let ((helm-help-message helm-bookmark-help-message))
-    (helm-help)))
+\\[helm-bookmark-help]\t\t->Run this help.")
 
 ;;; Eshell command on file help
 ;;
@@ -797,16 +722,7 @@ the command is called once for each file like this:
 
 \n** Specific commands for `helm-find-files-eshell-command-on-file':\n
 \\<helm-esh-on-file-map>
-\\[helm-esh-help]\t\t->Display this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-esh-help ()
-  "Help command for `helm-find-files-eshell-command-on-file'."
-  (interactive)
-  (let ((helm-help-message helm-esh-help-message))
-    (helm-help)))
+\\[helm-esh-help]\t\t->Display this help.")
 
 ;;; Ido virtual buffer help
 ;;
@@ -821,16 +737,7 @@ the command is called once for each file like this:
 \\[helm-ff-run-zgrep]\t\t->Zgrep file.
 \\[helm-ff-run-delete-file]\t\t->Delete file.
 \\[helm-ff-run-open-file-externally]\t\t->Open file externally.
-\\[helm-buffers-ido-virtual-help]\t\t->Display this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-buffers-ido-virtual-help ()
-  "Help command for ido virtual buffers."
-  (interactive)
-  (let ((helm-help-message helm-buffers-ido-virtual-help-message))
-    (helm-help)))
+\\[helm-buffers-ido-virtual-help]\t\t->Display this help.")
 
 ;;; Moccur help
 ;;
@@ -890,16 +797,7 @@ to modify occurences in your buffer.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-moccur-run-goto-line-ow]\t\t->Goto line in other window.
 \\[helm-moccur-run-goto-line-of]\t\t->Goto line in new frame.
-\\[helm-moccur-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-moccur-help ()
-  "Help command for (m)occur."
-  (interactive)
-  (let ((helm-help-message helm-moccur-help-message))
-    (helm-help)))
+\\[helm-moccur-help]\t\t->Show this help.")
 
 ;;; Helm Top
 ;;
@@ -913,16 +811,7 @@ to modify occurences in your buffer.
 \\[helm-top-run-sort-by-com]\t->Sort by commands.
 \\[helm-top-run-sort-by-cpu]\t->Sort by cpu usage.
 \\[helm-top-run-sort-by-user]\t->Sort alphabetically by user.
-\\[helm-top-run-sort-by-mem]\t->Sort by memory.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-top-help ()
-  "Help command for top."
-  (interactive)
-  (let ((helm-help-message helm-top-help-message))
-    (helm-help)))
+\\[helm-top-run-sort-by-mem]\t->Sort by memory.")
 
 ;;; Helm Apt
 ;;
@@ -936,16 +825,7 @@ to modify occurences in your buffer.
 \\[helm-apt-show-all]\t->Show all packages.
 \\[helm-apt-show-only-installed]\t->Show installed packages only.
 \\[helm-apt-show-only-not-installed]\t->Show not installed packages only.
-\\[helm-apt-show-only-deinstalled]\t-Show deinstalled (not purged yet) packages only.>
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-apt-help ()
-  "Help command for helm apt."
-  (interactive)
-  (let ((helm-help-message helm-apt-help-message))
-    (helm-help)))
+\\[helm-apt-show-only-deinstalled]\t-Show deinstalled (not purged yet) packages only.>")
 
 ;;; Helm elisp package
 ;;
@@ -983,16 +863,7 @@ This feature is only available with emacs-25.
 \\[helm-el-run-package-upgrade]\t->Upgrade package(s).
 \\[helm-el-run-package-upgrade-all]\t->Upgrade all packages upgradables.
 \\[helm-el-run-visit-homepage]\t->Visit package homepage.
-\\[helm-el-package-help]\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-el-package-help ()
-  "Help command for emacs packages."
-  (interactive)
-  (let ((helm-help-message helm-el-package-help-message))
-    (helm-help)))
+\\[helm-el-package-help]\t->Show this help.")
 
 ;;; Helm M-x
 ;;
@@ -1011,16 +882,7 @@ the amount of prefix args entered.
 
 \n** Specific commands for Helm M-x:\n
 \\<helm-M-x-map>
-\\[helm-M-x-help]\t\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-M-x-help ()
-  "Help command for `helm-M-x'."
-  (interactive)
-  (let ((helm-help-message helm-M-x-help-message))
-    (helm-help)))
+\\[helm-M-x-help]\t\t->Show this help.")
 
 ;;; helm-imenu
 ;;
@@ -1031,16 +893,7 @@ the amount of prefix args entered.
 
 \n** Specific commands for Helm imenu:\n
 \\<helm-imenu-map>
-\\[helm-imenu-help]\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-imenu-help ()
-  "Help command for imenu."
-  (interactive)
-  (let ((helm-help-message helm-imenu-help-message))
-    (helm-help)))
+\\[helm-imenu-help]\t->Show this help.")
 
 ;;; helm-colors
 ;;
@@ -1053,16 +906,7 @@ the amount of prefix args entered.
 \\[helm-color-run-kill-name]\t\tKill the entry's name.
 \\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
 \\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.
-\\[helm-color-help]\t\tShow this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-color-help ()
-  "Help command for color."
-  (interactive)
-  (let ((helm-help-message helm-colors-help-message))
-    (helm-help)))
+\\[helm-color-help]\t\tShow this help.")
 
 ;;; helm semantic
 ;;
@@ -1073,16 +917,7 @@ the amount of prefix args entered.
 
 \n** Specific commands for Helm semantic:\n
 \\<helm-semantic-map>
-\\[helm-semantic-help]\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-semantic-help ()
-  "Help command for semantic."
-  (interactive)
-  (let ((helm-help-message helm-semantic-help-message))
-    (helm-help)))
+\\[helm-semantic-help]\t->Show this help.")
 
 ;;; helm kmacro
 ;;
@@ -1102,16 +937,7 @@ you don't choose from there a command using helm completion.
 
 \n** Specific commands for Helm kmacro:\n
 \\<helm-kmacro-map>
-\\[helm-kmacro-help]\t->Show this help.
-\n** Helm Map\n
-\\{helm-map}")
-
-;;;###autoload
-(defun helm-kmacro-help ()
-  "Help command for kmacro."
-  (interactive)
-  (let ((helm-help-message helm-kmacro-help-message))
-    (helm-help)))
+\\[helm-kmacro-help]\t->Show this help.")
 
 
 ;;; Mode line strings

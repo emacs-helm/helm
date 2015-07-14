@@ -102,6 +102,7 @@
    (persistent-help :initform "Show this entry")
    (keymap :initform helm-imenu-map)
    (mode-line :initform helm-imenu-mode-line)
+   (help-message :initform 'helm-imenu-help-message)
    (action :initform 'helm-imenu-action)))
 
 (defcustom helm-imenu-fuzzy-match nil
