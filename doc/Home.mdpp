@@ -1107,6 +1107,14 @@ accessed via `C-c h`.
 
 ## Conventions
 
+- Class names: It is the mess actually. TODO make a convention for these names.
+
+- Source variable names: Prefix your sources with "helm-source-"
+
+- Help: To give a specific help to your source, create a variable "helm-<my-source>-help-string"
+  And bind it in your source with the `helm-message` slot, it will appear when you use `C-h m` or `C-c ?`.
+
+
 ## Writing your own helm commands
 
 You create helm command like any command in Emacs, and you invoke in this function `helm`.
