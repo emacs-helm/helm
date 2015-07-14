@@ -65,7 +65,6 @@ If nil default `helm-apt-cache-show-1' will be used."
 (defvar helm-apt-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-apt-help)
     (define-key map (kbd "M-I")   'helm-apt-show-only-installed)
     (define-key map (kbd "M-U")   'helm-apt-show-only-not-installed)
     (define-key map (kbd "M-D")   'helm-apt-show-only-deinstalled)

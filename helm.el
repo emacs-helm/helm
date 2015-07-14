@@ -234,12 +234,14 @@ so don't use strings, vectors or whatever to define them."
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    'undefined)
     (define-key map (kbd "C-h C-d")    'helm-debug-output)
-    ;; Use `describe-mode' key in `global-map'.
-    (define-key map [f1] nil) ; Allow to eval keymap without errors.
+    ;; Allow to eval keymap without errors.
+    (define-key map [f1] nil)
     (define-key map (kbd "C-h C-h")    'undefined)
     (define-key map (kbd "C-h h")      'undefined)
+    ;; Use `describe-mode' key in `global-map'.
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))
+    (define-key map (kbd "C-c ?")    'helm-help)
     ;; Bind all actions from 1 to 12 to their corresponding nth index+1.
     (cl-loop for n from 0 to 12 do
              (define-key map (kbd (format "<f%s>" (1+ n)))

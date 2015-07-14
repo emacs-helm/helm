@@ -63,13 +63,6 @@ Show all candidates on startup when 0 (default)."
 
 (defvar helm-M-x-input-history nil)
 
-(defvar helm-M-x-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-M-x-help)
-    map)
-  "Keymap for `helm-M-x'.")
-
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
@@ -227,7 +220,6 @@ than the default which is OBARRAY."
                 :must-match t
                 :fuzzy helm-M-x-fuzzy-match
                 :nomark t
-                :keymap helm-M-x-map
                 :candidates-in-buffer t
                 :fc-transformer 'helm-M-x-transformer
                 :hist-fc-transformer 'helm-M-x-transformer-hist))

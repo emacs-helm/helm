@@ -136,7 +136,6 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar helm-buffer-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")     'helm-buffer-help)
     ;; No need to have separate command for grep and zgrep
     ;; as we don't use recursivity for buffers.
     ;; So use zgrep for both as it is capable to handle non--compressed files.
@@ -164,7 +163,6 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar helm-buffers-ido-virtual-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")   'helm-buffers-ido-virtual-help)
     (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-o") 'helm-ff-run-switch-other-frame)
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)

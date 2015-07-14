@@ -48,7 +48,6 @@
 (defvar helm-imenu-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")    'helm-imenu-help)
     (define-key map (kbd "M-<down>") 'helm-imenu-next-section)
     (define-key map (kbd "M-<up>")   'helm-imenu-previous-section)
     (when helm-imenu-lynx-style-map

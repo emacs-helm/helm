@@ -157,7 +157,6 @@
     (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
     (define-key map (kbd "C-]")   'helm-bookmark-toggle-filename)
     (define-key map (kbd "M-e")   'helm-bookmark-run-edit)
-    (define-key map (kbd "C-c ?") 'helm-bookmark-help)
     map)
   "Generic Keymap for emacs bookmark sources.")
 

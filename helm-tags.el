@@ -88,7 +88,6 @@ one match."
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
-    (define-key map (kbd "C-c ?")    'helm-etags-help)
     (define-key map (kbd "C-c o")    'helm-etags-run-switch-other-window)
     (define-key map (kbd "C-c C-o")  'helm-etags-run-switch-other-frame)
     map)

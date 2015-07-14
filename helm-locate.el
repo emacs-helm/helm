@@ -116,7 +116,6 @@ the opposite of \"locate\" command."
     (define-key map (kbd "M-.")     'helm-ff-run-etags)
     (define-key map (kbd "C-w")     'helm-yank-text-at-point)
     (define-key map (kbd "C-c @")   'helm-ff-run-insert-org-link)
-    (define-key map (kbd "C-c ?")   'helm-generic-file-help)
     map)
   "Generic Keymap for files.")
 

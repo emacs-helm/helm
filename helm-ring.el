@@ -404,12 +404,6 @@ First call open the kill-ring browser, next calls move to next line."
           :resume 'noresume
           :allow-nest t)))
 
-(defvar helm-kmacro-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-kmacro-help)
-    map))
-
 ;;;###autoload
 (defun helm-execute-kmacro ()
   "Preconfigured helm for keyboard macros.
@@ -425,7 +419,6 @@ This command is useful when used with persistent action."
                                kmacro-ring)
                          :test 'equal))
           :multiline t
-          :keymap helm-kmacro-map
           :candidate-transformer
           (lambda (candidates)
             (cl-loop for c in candidates collect

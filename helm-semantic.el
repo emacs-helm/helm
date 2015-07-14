@@ -61,7 +61,6 @@ you have completion on these functions with `C-M i' in the customize interface."
 (defvar helm-semantic-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-semantic-help)
     (when helm-semantic-lynx-style-map
       (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
       (define-key map (kbd "<right>") 'helm-execute-persistent-action))

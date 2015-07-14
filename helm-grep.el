@@ -216,7 +216,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
     (when helm-grep-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-execute-persistent-action)
       (define-key map (kbd "<left>")  'helm-grep-run-default-action))
-    (define-key map (kbd "C-c ?")    'helm-grep-help)
     (delq nil map))
   "Keymap used in Grep sources.")
 
@@ -226,7 +225,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-w")      'helm-yank-text-at-point)
-    (define-key map (kbd "C-c ?")    'helm-pdfgrep-help)
     map)
   "Keymap used in pdfgrep.")
 

@@ -27,7 +27,6 @@
     (define-key map (kbd "<C-left>")      'helm-ucs-persistent-backward)
     (define-key map (kbd "<C-right>")     'helm-ucs-persistent-forward)
     (define-key map (kbd "<C-return>")    'helm-ucs-persistent-insert)
-    (define-key map (kbd "C-c ?")         'helm-ucs-help)
     map)
   "Keymap for `helm-ucs'.")
 

@@ -70,7 +70,6 @@
    (filtered-candidate-transformer
     :initform #'helm-gid-filtered-candidate-transformer)
    (candidate-number-limit :initform 99999)
-   (mode-line :initform helm-grep-mode-line-string)
    (action :initform (helm-make-actions
                       "Find File" 'helm-grep-action
                       "Find file other frame" 'helm-grep-other-frame

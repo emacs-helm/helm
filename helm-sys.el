@@ -60,7 +60,6 @@ A format string where %s will be replaced with `frame-width'."
 (defvar helm-top-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?") 'helm-top-help)
     (define-key map (kbd "M-P")   'helm-top-run-sort-by-cpu)
     (define-key map (kbd "M-C")   'helm-top-run-sort-by-com)
     (define-key map (kbd "M-M")   'helm-top-run-sort-by-mem)

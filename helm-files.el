@@ -336,7 +336,6 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "M-p")           'helm-ff-run-switch-to-history)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "M-i")           'helm-ff-properties-persistent)
-    (define-key map (kbd "C-c ?")         'helm-ff-help)
     (define-key map (kbd "C-}")           'helm-narrow-window)
     (define-key map (kbd "C-{")           'helm-enlarge-window)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
@@ -371,7 +370,6 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
-    (define-key map (kbd "C-c ?")         'helm-read-file-name-help)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   nil nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
@@ -381,13 +379,6 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
       (define-key map (kbd "<M-right>")   'helm-next-source))
     (delq nil map))
   "Keymap for `helm-read-file-name'.")
-
-(defvar helm-esh-on-file-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c ?")    'helm-esh-help)
-    map)
-  "Keymap for `helm-find-files-eshell-command-on-file'.")
 
 
 ;; Internal.
@@ -715,7 +706,6 @@ will not be loaded first time you use this."
                               finally return (sort ls 'string<))
                      :buffer "*helm eshell on file*"
                      :name "Eshell command"
-                     :keymap helm-esh-on-file-map
                      :mode-line
                      '("Eshell alias"
                        "C-h m: Help, \\[universal-argument]: Insert output at point")

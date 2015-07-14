@@ -103,7 +103,6 @@
     (define-key map (kbd "C-c N") 'helm-color-run-kill-name)
     (define-key map (kbd "C-c r") 'helm-color-run-insert-rgb)
     (define-key map (kbd "C-c R") 'helm-color-run-kill-rgb)
-    (define-key map (kbd "C-c ?") 'helm-color-help)
     map))
 
 (defvar helm-source-colors

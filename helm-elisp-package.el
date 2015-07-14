@@ -297,7 +297,6 @@
     (define-key map (kbd "C-c u") 'helm-el-run-package-upgrade)
     (define-key map (kbd "C-c U") 'helm-el-run-package-upgrade-all)
     (define-key map (kbd "C-c @") 'helm-el-run-visit-homepage)
-    (define-key map (kbd "C-c ?") 'helm-el-package-help)
     map))
 
 (defvar helm-source-list-el-package nil)
