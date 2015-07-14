@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 (require 'helm-elisp)
 (require 'helm-regexp)
 

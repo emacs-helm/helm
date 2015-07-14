@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 (require 'grep)
 (require 'helm-regexp)
 

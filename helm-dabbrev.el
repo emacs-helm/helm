@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'helm)
+(require 'helm-help)
 (require 'helm-elisp) ; For show-completion.
 
 (defgroup helm-dabbrev nil

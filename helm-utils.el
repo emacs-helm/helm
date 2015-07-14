@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 (require 'compile) ; Fixme: Is this needed?
 (require 'dired)
 

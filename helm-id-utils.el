@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'helm-grep)
+(require 'helm-help)
 
 (defgroup helm-id-utils nil
   "ID-Utils related Applications and libraries for Helm."

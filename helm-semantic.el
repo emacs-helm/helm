@@ -24,6 +24,7 @@
 
 (require 'cl-lib)
 (require 'semantic)
+(require 'helm-help)
 (require 'helm-imenu)
 
 (declare-function pulse-momentary-highlight-one-line "pulse.el" (point &optional face))

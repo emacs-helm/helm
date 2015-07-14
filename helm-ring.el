@@ -20,6 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
+(require 'helm-help)
 (require 'helm-elisp)
 
 (declare-function undo-tree-restore-state-from-register "ext:undo-tree.el" (register))

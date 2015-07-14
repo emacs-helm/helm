@@ -24,6 +24,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-types)
+(require 'helm-help)
 
 
 (defgroup helm-locate nil

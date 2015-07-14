@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 (require 'url)
 (require 'xml)
 (require 'browse-url)

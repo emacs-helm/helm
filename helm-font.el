@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 
 (defvar helm-ucs-map
   (let ((map (make-sparse-keymap)))

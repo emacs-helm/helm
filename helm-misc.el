@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-help)
 (require 'helm-types)
 
 (declare-function display-time-world-display "time.el")
