@@ -82,6 +82,7 @@
    (persistent-action :initform 'helm-grep-persistent-action)
    (history :initform 'helm-grep-history)
    (nohighlight :initform t)
+   (help-message :initform 'helm-grep-help-message)
    (requires-pattern :initform 2)))
 
 ;;;###autoload
