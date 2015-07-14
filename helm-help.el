@@ -501,8 +501,7 @@ book * -size +1M
 \\[helm-yank-text-at-point]\t\t->Yank text at point.
 \\[helm-ff-run-open-file-externally]\t\t->Open file with external program (C-u to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\t->Open file externally with default tool.
-\\[helm-ff-run-insert-org-link]\t\t->Insert org link.
-\\[helm-generic-file-help]\t\t->Show this help.")
+\\[helm-ff-run-insert-org-link]\t\t->Insert org link.")
 
 ;;; Grep help
 ;;
@@ -544,8 +543,7 @@ navigate to another directory to consult its database.
 \\[helm-grep-run-other-frame-action]\t\t->Jump other frame.
 \\[helm-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-j').
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
-\\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.
-\\[helm-grep-help]\t\t->Show this help.")
+\\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.")
 
 ;;; Pdf grep help
 ;;
@@ -556,8 +554,7 @@ navigate to another directory to consult its database.
 \\<helm-pdfgrep-map>
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
-\\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[helm-pdfgrep-help]\t\t->Show this help.")
+\\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.")
 
 ;;; Etags help
 ;;
@@ -568,8 +565,7 @@ navigate to another directory to consult its database.
 \\<helm-etags-map>
 \\[helm-goto-next-file]\t->Next File.
 \\[helm-goto-precedent-file]\t\t->Precedent File.
-\\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
-\\[helm-etags-help]\t\t->Show this help.")
+\\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.")
 
 ;;; Ucs help
 ;;
@@ -581,8 +577,7 @@ navigate to another directory to consult its database.
 \\[helm-ucs-persistent-insert]\t->Insert char.
 \\[helm-ucs-persistent-forward]\t->Forward char.
 \\[helm-ucs-persistent-backward]\t->Backward char.
-\\[helm-ucs-persistent-delete]\t->Delete char backward.
-\\[helm-ucs-help]\t\t->Show this help.")
+\\[helm-ucs-persistent-delete]\t->Delete char backward.")
 
 ;;; Bookmark help
 ;;
@@ -710,8 +705,7 @@ to modify occurences in your buffer.
 \\[helm-goto-precedent-file]\t\t->Precedent Buffer.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-moccur-run-goto-line-ow]\t\t->Goto line in other window.
-\\[helm-moccur-run-goto-line-of]\t\t->Goto line in new frame.
-\\[helm-moccur-help]\t\t->Show this help.")
+\\[helm-moccur-run-goto-line-of]\t\t->Goto line in new frame.")
 
 ;;; Helm Top
 ;;
@@ -776,8 +770,7 @@ This feature is only available with emacs-25.
 \\[helm-el-run-package-uninstall]\t->Uninstall package(s).
 \\[helm-el-run-package-upgrade]\t->Upgrade package(s).
 \\[helm-el-run-package-upgrade-all]\t->Upgrade all packages upgradables.
-\\[helm-el-run-visit-homepage]\t->Visit package homepage.
-\\[helm-el-package-help]\t->Show this help.")
+\\[helm-el-run-visit-homepage]\t->Visit package homepage.")
 
 ;;; Helm M-x
 ;;
@@ -792,11 +785,7 @@ This feature is only available with emacs-25.
 you should have an error message if you do so.
 When you want to pass prefix args, pass them AFTER starting `helm-M-x',
 you will have a prefix arg counter appearing in mode-line notifying you
-the amount of prefix args entered.
-
-\n** Specific commands for Helm M-x:\n
-\\<helm-M-x-map>
-\\[helm-M-x-help]\t\t->Show this help.")
+the amount of prefix args entered.")
 
 ;;; helm-imenu
 ;;
@@ -807,7 +796,8 @@ the amount of prefix args entered.
 
 \n** Specific commands for Helm imenu:\n
 \\<helm-imenu-map>
-\\[helm-imenu-help]\t->Show this help.")
+\\[helm-imenu-next-section]\t\t->Go to next section.
+\\[helm-imenu-previous-section]\t\t->Go to previous section.")
 
 ;;; helm-colors
 ;;
@@ -819,8 +809,7 @@ the amount of prefix args entered.
 \\[helm-color-run-insert-name]\t\tInsert the entry'name.
 \\[helm-color-run-kill-name]\t\tKill the entry's name.
 \\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
-\\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.
-\\[helm-color-help]\t\tShow this help.")
+\\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.")
 
 ;;; helm semantic
 ;;
@@ -830,8 +819,7 @@ the amount of prefix args entered.
 \n** Helm semantic tips:
 
 \n** Specific commands for Helm semantic:\n
-\\<helm-semantic-map>
-\\[helm-semantic-help]\t->Show this help.")
+\\<helm-semantic-map>")
 
 ;;; helm kmacro
 ;;
@@ -850,8 +838,7 @@ NOTE: You can't record keys running helm commands except `helm-M-x' unless
 you don't choose from there a command using helm completion.
 
 \n** Specific commands for Helm kmacro:\n
-\\<helm-kmacro-map>
-\\[helm-kmacro-help]\t->Show this help.")
+\\<helm-kmacro-map>")
 
 
 ;;; Mode line strings
