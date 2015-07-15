@@ -550,13 +550,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                  (let ((case-fold-search t))
                    (goto-char (point-min))
                    (apply #'perform-replace
-                          (if regexp-flag
-                              (list (nth 0 args) (nth 1 args)
-                                    t t (nth 2 args) nil
-                                    multi-query-replace-map)
-                              (list (nth 0 args) (nth 1 args)
-                                    t nil (nth 2 args) nil
-                                    multi-query-replace-map)))))))))
+                          (list (nth 0 args) (nth 1 args)
+                                t regexp-flag (nth 2 args) nil
+                                multi-query-replace-map))))))))
 
 (defun helm-buffer-query-replace-regexp (_candidate)
   (helm-buffer-query-replace-1 'regexp))
