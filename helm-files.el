@@ -898,6 +898,8 @@ See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
 (defun helm-ff-query-replace-on-marked-1 (candidates)
+  "Query replace on filenames of CANDIDATES.
+This doesn't replace inside the files, only modify filenames."
   (with-helm-display-marked-candidates
     helm-marked-buffer-name
     (mapcar 'helm-basename candidates)

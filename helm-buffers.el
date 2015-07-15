@@ -538,24 +538,25 @@ i.e same color."
 (defun helm-buffer-query-replace-1 (&optional regexp-flag buffers)
   "Query replace in marked buffers.
 If REGEXP-FLAG is given use `query-replace-regexp'."
-  (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
-        (prompt (if regexp-flag "Query replace regexp" "Query replace"))
+  (let ((prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (or buffers (helm-marked-candidates)))
         (helm--reading-passwd-or-string t))
-    (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
-          with tostring = (unless (consp replace)
-                            (query-replace-read-to
-                             replace prompt regexp-flag))
-          for buf in bufs
-          do
-          (save-window-excursion
-            (switch-to-buffer buf)
-            (save-excursion
-              (let ((case-fold-search t))
-                (goto-char (point-min))
-                (if (consp replace)
-                    (apply fn (list (car replace) (cdr replace)))
-                  (apply fn (list replace tostring)))))))))
+    (cl-loop with args = (query-replace-read-args prompt regexp-flag t)
+             for buf in bufs
+             do
+             (save-window-excursion
+               (switch-to-buffer buf)
+               (save-excursion
+                 (let ((case-fold-search t))
+                   (goto-char (point-min))
+                   (apply #'perform-replace
+                          (if regexp-flag
+                              (list (nth 0 args) (nth 1 args)
+                                    t t (nth 2 args) nil
+                                    multi-query-replace-map)
+                              (list (nth 0 args) (nth 1 args)
+                                    t nil (nth 2 args) nil
+                                    multi-query-replace-map)))))))))
 
 (defun helm-buffer-query-replace-regexp (_candidate)
   (helm-buffer-query-replace-1 'regexp))
