@@ -1329,18 +1329,6 @@ If prefix numeric arg is given go ARG level up."
 (add-hook 'post-self-insert-hook 'helm-find-files--reset-level-tree)
 (add-hook 'helm-after-persistent-action-hook 'helm-find-files--reset-level-tree)
 
-(defun helm-find-files-up-one-level-or-exit ()
-  "Expand directory if some or exit on regular files."
-  (interactive)
-  (if (file-directory-p (helm-get-selection))
-      (helm-execute-persistent-action)
-      (helm-maybe-exit-minibuffer)))
-
-(helm-multi-key-defun helm-find-files-expand-or-exit
-    "Expand directory on first call, jump to directory on second call.
-Expire after 0.6s."
-  '(helm-find-files-up-one-level-or-exit helm-maybe-exit-minibuffer) 0.6)
-
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
 This happen after using `helm-find-files-up-one-level',
