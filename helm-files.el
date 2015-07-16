@@ -348,6 +348,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
+    (define-key map (kbd "RET")           'helm-find-files-expand-or-exit)
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
@@ -367,6 +368,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
+    (define-key map (kbd "RET")           'helm-find-files-expand-or-exit)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
@@ -1328,6 +1330,18 @@ If prefix numeric arg is given go ARG level up."
 (add-hook 'helm-cleanup-hook 'helm-find-files--reset-level-tree)
 (add-hook 'post-self-insert-hook 'helm-find-files--reset-level-tree)
 (add-hook 'helm-after-persistent-action-hook 'helm-find-files--reset-level-tree)
+
+(defun helm-find-files-up-one-level-or-exit ()
+  "Expand directory if some or exit on regular files."
+  (interactive)
+  (if (file-directory-p (helm-get-selection))
+      (helm-execute-persistent-action)
+      (helm-maybe-exit-minibuffer)))
+
+(helm-multi-key-defun helm-find-files-expand-or-exit
+    "Expand directory on first call, jump to directory on second call.
+Expire after 0.6s."
+  '(helm-find-files-up-one-level-or-exit helm-maybe-exit-minibuffer) 0.6)
 
 (defun helm-ff-retrieve-last-expanded ()
   "Move overlay to last visited directory `helm-ff-last-expanded'.
