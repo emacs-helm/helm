@@ -54,73 +54,6 @@ If you prefer scrolling line by line, set this value to 1."
   :group 'helm
   :type 'integer)
 
-(defvar helm-help-message
-  (lambda ()
-    (concat
-     "\n\n\n* Helm generic help\n"
-     "\\<helm-map>"
-     "\n`helm' is an Emacs incremental completion and selection narrowing framework.
-
-Narrow the list by typing some pattern,
-Multiple patterns are allowed by splitting by space.
-Select with natural Emacs operations, choose with RET.
-
-** Help
-
-C-h m : Run this generic help for helm.
-
-** Basic Operations
-
-C-p, Up: Previous Line
-C-n, Down : Next Line
-M-v, PageUp : Previous Page
-C-v, PageDown : Next Page
-Enter : Execute first (default) action / Select
-M-< : First Line
-M-> : Last Line
-M-PageUp, C-M-S-v, C-M-y : Previous Page (other-window)
-M-PageDown, C-M-v : Next Page (other-window)
-
-Tab, C-i : Show action list
-Left : Previous Source
-Right, C-o : Next Source
-C-k : Delete pattern (with prefix arg delete from point to end)
-C-j or C-z: Persistent Action (Execute action with helm session kept)
-
-** Shortcuts For nth Action
-
-f1-12: Execute nth 1 to 12 Action(s).
-
-** Visible Marks
-
-Visible marks store candidate. Some actions uses marked candidates.
-
-\\[helm-toggle-visible-mark] : Toggle Visible Mark
-\\[helm-prev-visible-mark] : Previous Mark
-\\[helm-next-visible-mark] : Next Mark
-
-** Miscellaneous Commands
-
-\\[helm-toggle-resplit-window] : Toggle vertical/horizontal split helm window.
-\\[helm-quit-and-find-file] : Drop into `find-file'.
-\\[helm-delete-current-selection] : Delete selected item (visually).
-\\[helm-kill-selection-and-quit] : Kill display value of candidate and quit (with prefix arg kill the real value).
-\\[helm-yank-selection] : Yank selection into pattern.
-\\[helm-follow-mode] : Toggle automatical execution of persistent action.
-\\[helm-follow-action-forward] : Run persistent action and goto next line.
-\\[helm-follow-action-backward] : Run persistent action and goto previous line.
-\\[helm-force-update] : Recalculate and redisplay candidates.
-\\[helm-toggle-suspend-update] : Suspend/reenable update.
- 
-** Global Commands
-
-\\<global-map>\\[helm-resume] revives last `helm' session.
-It is very useful, so you should bind any key.
-
-\n** Helm Map
-\\{helm-map}"))
-  "Detailed help message string for `helm'.
-It also accepts function or variable symbol.")
 
 ;;; Internal vars
 ;;
@@ -265,24 +198,6 @@ text to be displayed in BUFNAME."
                (?q (cl-return))
                (t (ignore))))))
 
-(defun helm-help ()
-  "Help of `helm'."
-  (interactive)
-  (with-helm-alive-p
-    (save-selected-window
-      (helm-help-internal
-       "*Helm Help*"
-       (lambda ()
-         (helm-aif (assoc-default 'help-message (helm-get-current-source))
-             (insert (substitute-command-keys
-                      (helm-interpret-value it))
-                     (substitute-command-keys
-                      (helm-interpret-value helm-help-message)))
-           (insert
-            "\n* No specific help for this source for now\n
-It may appear after next update if provided.\ni.e After first results popup in helm buffer."
-            (substitute-command-keys
-             (helm-interpret-value helm-help-message)))))))))
 
 ;;; List processing
 ;;
