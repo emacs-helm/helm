@@ -1369,72 +1369,72 @@ When only one candidate is remaining and it is a directory,
 expand to this directory.
 This happen only when `helm-ff-auto-update-flag' is non--nil
 or when `helm-pattern' is equal to \"~/\"."
-  (with-helm-window
-    (let* ((history-p   (string= (assoc-default
-                                  'name (helm-get-current-source))
-                                 "Read File Name History"))
-           (pat         (if (string-match helm-tramp-file-name-regexp
-                                          helm-pattern)
-                            (helm-create-tramp-name helm-pattern)
-                            helm-pattern))
-           (completed-p (string= (file-name-as-directory
-                                  (expand-file-name
-                                   (substitute-in-file-name pat)))
-                                 helm-ff-default-directory))
-           (candnum (helm-get-candidate-number))
-           (cur-cand (prog2
-                         (unless (or completed-p (file-exists-p pat) history-p)
-                           ;; Only one non--existing candidate
-                           ;; and one directory candidate, move to it.
-                           (helm-next-line))
-                         (helm-get-selection))))
-      (when (and (or (and helm-ff-auto-update-flag
-                          (null helm-ff--deleting-char-backward)
-                          (helm-file-completion-source-p)
-                          (not (get-buffer-window helm-action-buffer 'visible))
-                          ;; Issue #295
-                          ;; File predicates are returning t
-                          ;; with paths like //home/foo.
-                          ;; So check it is not the case by regexp
-                          ;; to allow user to do C-a / to start e.g
-                          ;; entering a tramp method e.g /sudo::.
-                          (not (string-match "\\`//" helm-pattern))
-                          (not (helm-ff-invalid-tramp-name-p))
-                          (not (eq last-command 'helm-yank-text-at-point)))
-                     ;; Fix issue #542.
-                     (string= helm-pattern "~/")
-                     (and (= candnum 1)
-                          (file-accessible-directory-p pat)
-                          (null helm-ff--deleting-char-backward)))
-                 (or
-                  ;; Only one candidate remaining
-                  ;; and at least 2 char in basename.
-                  (and (<= candnum 2)
-                       (>= (string-width (helm-basename helm-pattern)) 2))
-                  ;; Already completed.
-                  completed-p)
-                 (not history-p) ; Don't try to auto complete in history.
-                 (stringp cur-cand)
-                 (file-accessible-directory-p cur-cand))
-        (if (and (not (helm-dir-is-dot cur-cand)) ; [1]
-                 ;; Maybe we are here because completed-p is true
-                 ;; but check this again to be sure. (Windows fix)
-                 (<= candnum 2))        ; [2]
-            ;; If after going to next line the candidate
-            ;; is not one of "." or ".." [1]
-            ;; and only one candidate is remaining [2],
-            ;; assume candidate is a new directory to expand, and do it.
-            (helm-set-pattern (file-name-as-directory cur-cand))
-            ;; The candidate is one of "." or ".."
-            ;; that mean we have entered the last letter of the directory name
-            ;; in prompt, so expansion is already done, just add the "/" at end
-            ;; of name unless helm-pattern ends with "."
-            ;; (i.e we are writing something starting with ".")
-            (unless (string-match "\\`.*[.]\\{1\\}\\'" helm-pattern)
-              (helm-set-pattern
-               ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
-               (expand-file-name (file-name-as-directory helm-pattern)))))
-          (helm-check-minibuffer-input)))))
+  (when (helm-file-completion-source-p)
+    (with-helm-window
+      (let* ((history-p   (string= (assoc-default
+                                    'name (helm-get-current-source))
+                                   "Read File Name History"))
+             (pat         (if (string-match helm-tramp-file-name-regexp
+                                            helm-pattern)
+                              (helm-create-tramp-name helm-pattern)
+                              helm-pattern))
+             (completed-p (string= (file-name-as-directory
+                                    (expand-file-name
+                                     (substitute-in-file-name pat)))
+                                   helm-ff-default-directory))
+             (candnum (helm-get-candidate-number))
+             (cur-cand (prog2
+                           (unless (or completed-p (file-exists-p pat) history-p)
+                             ;; Only one non--existing candidate
+                             ;; and one directory candidate, move to it.
+                             (helm-next-line))
+                           (helm-get-selection))))
+        (when (and (or (and helm-ff-auto-update-flag
+                            (null helm-ff--deleting-char-backward)
+                            (not (get-buffer-window helm-action-buffer 'visible))
+                            ;; Issue #295
+                            ;; File predicates are returning t
+                            ;; with paths like //home/foo.
+                            ;; So check it is not the case by regexp
+                            ;; to allow user to do C-a / to start e.g
+                            ;; entering a tramp method e.g /sudo::.
+                            (not (string-match "\\`//" helm-pattern))
+                            (not (helm-ff-invalid-tramp-name-p))
+                            (not (eq last-command 'helm-yank-text-at-point)))
+                       ;; Fix issue #542.
+                       (string= helm-pattern "~/")
+                       (and (= candnum 1)
+                            (file-accessible-directory-p pat)
+                            (null helm-ff--deleting-char-backward)))
+                   (or
+                    ;; Only one candidate remaining
+                    ;; and at least 2 char in basename.
+                    (and (<= candnum 2)
+                         (>= (string-width (helm-basename helm-pattern)) 2))
+                    ;; Already completed.
+                    completed-p)
+                   (not history-p) ; Don't try to auto complete in history.
+                   (stringp cur-cand)
+                   (file-accessible-directory-p cur-cand))
+          (if (and (not (helm-dir-is-dot cur-cand)) ; [1]
+                   ;; Maybe we are here because completed-p is true
+                   ;; but check this again to be sure. (Windows fix)
+                   (<= candnum 2))      ; [2]
+              ;; If after going to next line the candidate
+              ;; is not one of "." or ".." [1]
+              ;; and only one candidate is remaining [2],
+              ;; assume candidate is a new directory to expand, and do it.
+              (helm-set-pattern (file-name-as-directory cur-cand))
+              ;; The candidate is one of "." or ".."
+              ;; that mean we have entered the last letter of the directory name
+              ;; in prompt, so expansion is already done, just add the "/" at end
+              ;; of name unless helm-pattern ends with "."
+              ;; (i.e we are writing something starting with ".")
+              (unless (string-match "\\`.*[.]\\{1\\}\\'" helm-pattern)
+                (helm-set-pattern
+                 ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
+                 (expand-file-name (file-name-as-directory helm-pattern)))))
+          (helm-check-minibuffer-input))))))
 
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
