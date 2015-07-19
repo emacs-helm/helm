@@ -226,7 +226,7 @@ Italic     => A non--file buffer.
 
 **** You can yank any valid filename after pattern, it will be expanded.
 
-*** You can complete with partial basename (start on third char entered)
+*** Helm find files is fuzzy matching (start on third char entered)
 
   e.g \"fob\" or \"fbr\" will complete \"foobar\"
   but \"fb\" will wait for a third char for completing.
