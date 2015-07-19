@@ -1383,7 +1383,7 @@ or when `helm-pattern' is equal to \"~/\"."
                                  helm-ff-default-directory))
            (candnum (helm-get-candidate-number))
            (cur-cand (prog2
-                         (unless (or completed-p (file-exists-p pat))
+                         (unless (or completed-p (file-exists-p pat) history-p)
                            ;; Only one non--existing candidate
                            ;; and one directory candidate, move to it.
                            (helm-next-line))
