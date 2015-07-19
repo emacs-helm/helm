@@ -1403,7 +1403,9 @@ or when `helm-pattern' is equal to \"~/\"."
                           (not (eq last-command 'helm-yank-text-at-point)))
                      ;; Fix issue #542.
                      (string= helm-pattern "~/")
-                     (and (= candnum 1) (file-accessible-directory-p pat)))
+                     (and (= candnum 1)
+                          (file-accessible-directory-p pat)
+                          (null helm-ff--deleting-char-backward)))
                  (or
                   ;; Only one candidate remaining
                   ;; and at least 2 char in basename.
