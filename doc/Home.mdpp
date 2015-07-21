@@ -45,8 +45,10 @@ To get it with git:
 Once you have the helm directory, `cd` into it and run `make`.
 Edit your `init.el` file and add:
 
-    (add-to-list 'load-path "/path/to/helm/directory")
-    (require 'helm-config)
+```emacs-lisp
+(add-to-list 'load-path "/path/to/helm/directory")
+(require 'helm-config)
+```
 
 For a quick try, you can also run the shell script provided with helm if your system support it:
 
@@ -362,10 +364,12 @@ Here how to start Eshell at Emacs startup:
 
 Add this to your `init.el`:
 
-    (add-hook 'emacs-startup-hook #'(lambda ()
-                                      (let ((default-directory (getenv "HOME")))
-                                        (command-execute 'eshell)
-                                        (bury-buffer))))
+```emacs-lisp
+(add-hook 'emacs-startup-hook (lambda ()
+                                (let ((default-directory (getenv "HOME")))
+                                  (command-execute 'eshell)
+                                  (bury-buffer))))
+```
 
 ## Copy Files
 
@@ -617,23 +621,28 @@ use the backend way to highlight result with ANSI sequences e.g:
 
 For ack-grep:
 
-    (setq helm-grep-default-command
-              "ack-grep -Hn --smart-case --no-group %e %p %f"
-              helm-grep-default-recurse-command
-              "ack-grep -H --smart-case --no-group %e %p %f")
+```emacs-lisp
+(setq helm-grep-default-command
+      "ack-grep -Hn --smart-case --no-group %e %p %f"
+      helm-grep-default-recurse-command
+      "ack-grep -H --smart-case --no-group %e %p %f")
+```
 
 For grep:
 
-    (setq helm-grep-default-command
-              "grep --color=always -d skip %e -n%cH -e %p %f"
-              helm-grep-default-recurse-command
-              "grep --color=always -d recurse %e -n%cH -e %p %f")
+```emacs-lisp
+(setq helm-grep-default-command
+      "grep --color=always -d skip %e -n%cH -e %p %f"
+      helm-grep-default-recurse-command
+      "grep --color=always -d recurse %e -n%cH -e %p %f")
+```
 
 For git-grep
 
-    (setq helm-ls-git-grep-command
-          "git grep -n%cH --color=always --full-name -e %p %f")
-
+```emacs-lisp
+(setq helm-ls-git-grep-command
+      "git grep -n%cH --color=always --full-name -e %p %f")
+```
 
 The color of git-grep can be customized from global .gitconfig file.
 
@@ -981,11 +990,13 @@ Of course pcomplete is already enabled in Eshell, but what we want here
 is to enable it with helm support.
  Enabling is easy, just add to `init.el`:
 
->     (add-hook 'eshell-mode-hook
->               #'(lambda ()
->                   (define-key eshell-mode-map
->                     [remap eshell-pcomplete]
->                     'helm-esh-pcomplete)))
+```emacs-lisp
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (define-key eshell-mode-map
+              [remap eshell-pcomplete]
+              'helm-esh-pcomplete)))
+```
 
 Now when hitting `TAB`, you should have helm pcompletion.
 
@@ -995,13 +1006,14 @@ In eshell when you use sudo, there is no completion on the command you enter
 after sudo, this is true in shell also with or without helm.
 To fix this problem, you can define a `pcomplete/sudo`  function and put it in your configuration.
 
-    (defun pcomplete/sudo ()
-      (let ((prec (pcomplete-arg 'last -1)))
-        (cond ((string= "sudo" prec)
-               (while (pcomplete-here*
-                        (funcall pcomplete-command-completion-function)
-                        (pcomplete-arg 'last) t))))))
-
+```emacs-lisp
+(defun pcomplete/sudo ()
+  (let ((prec (pcomplete-arg 'last -1)))
+    (cond ((string= "sudo" prec)
+           (while (pcomplete-here*
+                   (funcall pcomplete-command-completion-function)
+                   (pcomplete-arg 'last) t))))))
+```
 
 However this an incomplete definition of `pcomplete/sudo` which will not work in some case
 without modifications to some emacs functions due to bugs unresolved in emacs, to fix this
@@ -1018,48 +1030,52 @@ For more enhanced completions.
 
  Here an example with `find` command:
 
-    (defun pcomplete/find ()
-      (let ((prec (pcomplete-arg 'last -1)))
-        (cond ((and (pcomplete-match "^-" 'last)
-                    (string= "find" prec))
-               (pcomplete-opt "HLPDO"))
-              ((pcomplete-match "^-" 'last)
-               (while (pcomplete-here
-                       '("-amin" "-anewer" "-atime" "-cmin" "-cnewer" "-context"
-                         "-ctime" "-daystart" "-delete" "-depth" "-empty" "-exec"
-                         "-execdir" "-executable" "-false" "-fls" "-follow" "-fprint"
-                         "-fprint0" "-fprintf" "-fstype" "-gid" "-group"
-                         "-help" "-ignore_readdir_race" "-ilname" "-iname"
-                         "-inum" "-ipath" "-iregex" "-iwholename"
-                         "-links" "-lname" "-ls" "-maxdepth"
-                         "-mindepth" "-mmin" "-mount" "-mtime"
-                         "-name" "-newer" "-nogroup" "-noignore_readdir_race"
-                         "-noleaf" "-nouser" "-nowarn" "-ok"
-                         "-okdir" "-path" "-perm" "-print"
-                         "-print0" "-printf" "-prune" "-quit"
-                         "-readable" "-regex" "-regextype" "-samefile"
-                         "-size" "-true" "-type" "-uid"
-                         "-used" "-user" "-version" "-warn"
-                         "-wholename" "-writable" "-xdev" "-xtype"))))
-              ((string= "-type" prec)
-               (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s" "D"))))
-              ((string= "-xtype" prec)
-               (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s"))))
-              ((or (string= prec "-exec")
-                   (string= prec "-execdir"))
-               (while (pcomplete-here* (funcall pcomplete-command-completion-function)
-                                       (pcomplete-arg 'last) t))))
-        (while (pcomplete-here (pcomplete-entries) nil 'identity))))
+```emacs-lisp
+(defun pcomplete/find ()
+  (let ((prec (pcomplete-arg 'last -1)))
+    (cond ((and (pcomplete-match "^-" 'last)
+                (string= "find" prec))
+           (pcomplete-opt "HLPDO"))
+          ((pcomplete-match "^-" 'last)
+           (while (pcomplete-here
+                   '("-amin" "-anewer" "-atime" "-cmin" "-cnewer" "-context"
+                     "-ctime" "-daystart" "-delete" "-depth" "-empty" "-exec"
+                     "-execdir" "-executable" "-false" "-fls" "-follow" "-fprint"
+                     "-fprint0" "-fprintf" "-fstype" "-gid" "-group"
+                     "-help" "-ignore_readdir_race" "-ilname" "-iname"
+                     "-inum" "-ipath" "-iregex" "-iwholename"
+                     "-links" "-lname" "-ls" "-maxdepth"
+                     "-mindepth" "-mmin" "-mount" "-mtime"
+                     "-name" "-newer" "-nogroup" "-noignore_readdir_race"
+                     "-noleaf" "-nouser" "-nowarn" "-ok"
+                     "-okdir" "-path" "-perm" "-print"
+                     "-print0" "-printf" "-prune" "-quit"
+                     "-readable" "-regex" "-regextype" "-samefile"
+                     "-size" "-true" "-type" "-uid"
+                     "-used" "-user" "-version" "-warn"
+                     "-wholename" "-writable" "-xdev" "-xtype"))))
+          ((string= "-type" prec)
+           (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s" "D"))))
+          ((string= "-xtype" prec)
+           (while (pcomplete-here (list "b" "c" "d" "p" "f" "l" "s"))))
+          ((or (string= prec "-exec")
+               (string= prec "-execdir"))
+           (while (pcomplete-here* (funcall pcomplete-command-completion-function)
+                                   (pcomplete-arg 'last) t))))
+    (while (pcomplete-here (pcomplete-entries) nil 'identity))))
+```
 
 ## Enable helm Eshell history
 
 Add this to `init.el`
 
-     (add-hook 'eshell-mode-hook
-               #'(lambda ()
-                   (define-key eshell-mode-map
-                     (kbd "M-p")
-                     'helm-eshell-history)))
+```emacs-lisp
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (define-key eshell-mode-map
+              (kbd "M-p")
+              'helm-eshell-history)))
+```
 
 # Completion in emacs shell
 
@@ -1137,10 +1153,12 @@ e.g
 
 Example:
 
-    (defun my-first-helm-command ()
-      (interactive)
-      (helm :sources 'my-source
-            :buffer "*helm my command*"))
+```emacs-lisp
+(defun my-first-helm-command ()
+  (interactive)
+  (helm :sources 'my-source
+        :buffer "*helm my command*"))
+```
 
 The name of the buffer should be prefixed this helm, again it is not mandatory but it will allow hiding
 this buffer in buffer list among other things.
@@ -1165,31 +1183,35 @@ You will find several methods to distribute you candidates, the main ones are:
 
 ### Creating a source using the `helm-source-sync` class
 
-     (helm-build-sync-source "test"
-       :candidates '(a b c d e))
+```emacs-lisp
+(helm-build-sync-source "test"
+  :candidates '(a b c d e))
 
-     (helm :sources (helm-build-sync-source "test"
-                      :candidates '(a b c d e))
-           :buffer "*helm test*")
-
+(helm :sources (helm-build-sync-source "test"
+                 :candidates '(a b c d e))
+      :buffer "*helm test*")
+```
 
 ### Creating a source using the `helm-source-in-buffer` class
 
-     (helm-build-in-buffer-source "test1"
-       :data '(a b c d e))
+```emacs-lisp
+(helm-build-in-buffer-source "test1"
+  :data '(a b c d e))
 
-     (helm :sources (helm-build-in-buffer-source "test1"
-                      :data '(a b c d e))
-           :buffer "*helm test1*")
-
+(helm :sources (helm-build-in-buffer-source "test1"
+                 :data '(a b c d e))
+      :buffer "*helm test1*")
+```
 
 ### Creating a source using the `helm-source-async` class
 
-     (helm :sources (helm-build-async-source "test2"
-                      :candidates-process
-                      (lambda ()
-                        (start-process "echo" nil "echo" "a\nb\nc\nd\ne")))
-           :buffer "*helm test2*")
+```emacs-lisp
+(helm :sources (helm-build-async-source "test2"
+                 :candidates-process
+                 (lambda ()
+                   (start-process "echo" nil "echo" "a\nb\nc\nd\ne")))
+      :buffer "*helm test2*")
+```
 
 ### Create your own class inheriting from one of the main classes
 
@@ -1289,6 +1311,7 @@ or
 (defmethod helm-setup-user-source ((source helm-source-multi-occur))
   (oset source :follow 1))
 ```
+
 You can also setup the source yourself:
 
 ```emacs-lisp
