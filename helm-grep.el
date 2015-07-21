@@ -159,6 +159,12 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type  'string)
 
+(defcustom helm-grep-save-buffer-name-no-confirm nil
+  "when *hgrep* already exists,auto append suffix."
+  :group 'helm-grep
+  :type 'boolean)
+
+
 
 ;;; Faces
 ;;
@@ -636,13 +642,16 @@ If N is positive go forward otherwise go backward."
   (let ((buf "*hgrep*")
         new-buf)
     (when (get-buffer buf)
-      (setq new-buf (helm-read-string "GrepBufferName: " buf))
-      (cl-loop for b in (helm-buffer-list)
-            when (and (string= new-buf b)
-                      (not (y-or-n-p
-                            (format "Buffer `%s' already exists overwrite? "
-                                    new-buf))))
-            do (setq new-buf (helm-read-string "GrepBufferName: " "*hgrep ")))
+      (if   helm-grep-save-buffer-name-no-confirm
+          (setq new-buf  (format "*hgrep|%s|-%s" helm-pattern
+                                 (format-time-string "%H-%M-%S*")))
+        (setq new-buf (helm-read-string "GrepBufferName: " buf))
+        (cl-loop for b in (helm-buffer-list)
+                 when (and (string= new-buf b)
+                           (not (y-or-n-p
+                                 (format "Buffer `%s' already exists overwrite? "
+                                         new-buf))))
+            do (setq new-buf (helm-read-string "GrepBufferName: " "*hgrep "))))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
