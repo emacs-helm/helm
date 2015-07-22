@@ -31,6 +31,7 @@
   :type '(radio :tag "Initial filter for elisp packages"
           (const :tag "Show all packages" all)
           (const :tag "Show installed packages" installed)
+          (const :tag "Show not installed packages" uninstalled)
           (const :tag "Show upgradable packages" upgrade)))
 
 ;; internals vars
@@ -58,7 +59,9 @@
   (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
   (if helm-force-updating-p
       (message "Refreshing packages list done")
-      (setq helm-el-package--show-only helm-el-package-initial-filter))
+      (setq helm-el-package--show-only (if helm-el-package--upgrades
+                                           'upgrade
+                                           helm-el-package-initial-filter)))
   (kill-buffer "*Packages*"))
 
 (defun helm-el-package-describe (candidate)
