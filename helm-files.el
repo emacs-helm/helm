@@ -1318,7 +1318,6 @@ If prefix numeric arg is given go ARG level up."
       (setq helm-find-files--level-tree nil)
       (helm-aif (helm-iter-next helm-find-files--level-tree-iterator)
           (helm-set-pattern it)
-        (ignore)
         (setq helm-find-files--level-tree-iterator nil)))))
 
 (defun helm-find-files--reset-level-tree ()
