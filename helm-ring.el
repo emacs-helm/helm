@@ -322,9 +322,8 @@ the `global-mark-ring' after each new visit."
                         "[...]" ""))
             'insert-register
             'append-to-register
-            'prepend-to-register))
-          (t
-           "GARBAGE!"))
+            'prepend-to-register)))
+        unless (null string-actions) ; Fix Issue #1107.
         collect (cons (format "Register %3s:\n %s" key (car string-actions))
                       (cons char (cdr string-actions)))))
 
