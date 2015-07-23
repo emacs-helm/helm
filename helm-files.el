@@ -1368,8 +1368,7 @@ When only one candidate is remaining and it is a directory,
 expand to this directory.
 This happen only when `helm-ff-auto-update-flag' is non--nil
 or when `helm-pattern' is equal to \"~/\"."
-  (when (and helm-ff-auto-update-flag
-             (helm-file-completion-source-p)
+  (when (and (helm-file-completion-source-p)
              (not (helm-ff-invalid-tramp-name-p)))
     (with-helm-window
       (let* ((history-p   (string= (assoc-default
@@ -1390,7 +1389,8 @@ or when `helm-pattern' is equal to \"~/\"."
                              ;; and one directory candidate, move to it.
                              (helm-next-line))
                            (helm-get-selection))))
-        (when (and (or (and (null helm-ff--deleting-char-backward)
+        (when (and (or (and helm-ff-auto-update-flag
+                            (null helm-ff--deleting-char-backward)
                             (not (get-buffer-window helm-action-buffer 'visible))
                             ;; Issue #295
                             ;; File predicates are returning t
