@@ -1402,6 +1402,7 @@ or when `helm-pattern' is equal to \"~/\"."
                             (not (eq last-command 'helm-yank-text-at-point)))
                        ;; Fix issue #542.
                        (string= helm-pattern "~/")
+                       ;; Only one remaining directory, expand it.
                        (and (= candnum 1)
                             (file-accessible-directory-p pat)
                             (null helm-ff--deleting-char-backward)))
