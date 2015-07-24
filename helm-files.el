@@ -1587,7 +1587,7 @@ purpose."
           ;; allowing `helm-ff-retrieve-last-expanded' to retrieve it
           ;; when descending level.
           ;; However, we don't add automatically the "/" when
-          ;; `helm-ff-auto-update-flag' is enabled to avoid quick expansion.
+          ;; `helm-ff-auto-update-flag' is not enabled to avoid quick expansion.
           ((and (file-accessible-directory-p pattern)
                 helm-ff-auto-update-flag)
            (file-name-as-directory (expand-file-name pattern)))
