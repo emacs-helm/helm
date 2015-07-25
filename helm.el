@@ -3626,6 +3626,7 @@ If action buffer is selected, back to the helm buffer."
           (helm-build-sync-source "Actions"
             :volatile t
             :nomark t
+            :keymap 'helm-map
             :candidates actions
             :mode-line '("Action(s)" "TAB:BackToCands RET/f1/f2/fn:NthAct")
             :candidate-transformer
