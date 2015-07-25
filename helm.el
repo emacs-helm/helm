@@ -1869,9 +1869,10 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
         (helm--maybe-use-default-as-input
-         (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
-             (cl-loop for s in (helm-normalize-sources any-sources)
-                      thereis (memq s helm-sources-using-default-as-input)))))
+         (and (null any-input)
+              (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
+                  (cl-loop for s in (helm-normalize-sources any-sources)
+                           thereis (memq s helm-sources-using-default-as-input))))))
     ;; cua-mode overhide local helm bindings.
     ;; disable this stupid thing if enabled.
     (and cua-mode (cua-mode -1))
