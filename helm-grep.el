@@ -19,7 +19,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-help)
-(require 'grep)
 (require 'helm-regexp)
 
 ;;; load wgrep proxy if it's available
@@ -164,6 +163,20 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type 'boolean)
 
+(defcustom helm-grep-ignored-files
+  (cons ".#*" (delq nil (mapcar (lambda (s)
+				  (unless (string-match-p "/\\'" s)
+				    (concat "*" s)))
+				completion-ignored-extensions)))
+  "List of file names which `helm-grep' shall exclude."
+  :group 'helm-grep
+  :type '(repeat string))
+
+(defcustom helm-grep-ignored-directories
+  helm-walk-ignore-directories
+  "List of names of sub-directories which `helm-grep' shall not recurse into."
+  :group 'helm-grep
+  :type '(repeat string))
 
 
 ;;; Faces
@@ -358,7 +371,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                #'(lambda (x)
                                    (concat "--exclude="
                                            (shell-quote-argument x)))
-                               grep-find-ignored-files " ")))
+                               helm-grep-ignored-files " ")))
          (ignored-dirs      (unless (helm-grep-use-ack-p)
                               (mapconcat
                                ;; Need grep version >=2.5.4
@@ -366,7 +379,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                #'(lambda (x)
                                    (concat "--exclude-dir="
                                            (shell-quote-argument x)))
-                               grep-find-ignored-directories " ")))
+                               helm-grep-ignored-directories " ")))
          (exclude           (unless (helm-grep-use-ack-p)
                               (if helm-grep-in-recurse
                                   (concat (or include ignored-files)
@@ -811,7 +824,7 @@ These extensions will be added to command line with --include arg of grep."
         unless (or (not glob)
                    (and glob-list (member glob glob-list))
                    (and glob-list (member glob ext-list))
-                   (and glob-list (member glob grep-find-ignored-files)))
+                   (and glob-list (member glob helm-grep-ignored-files)))
         collect glob into glob-list
         finally return (delq nil (append ext-list glob-list))))
 
@@ -846,7 +859,7 @@ e.g *.el *.py *.tex.
 From lisp use the EXTS argument as a list of extensions as above.
 If you are using ack-grep, you will be prompted for --type
 instead and EXTS will be ignored.
-If prompt is empty `grep-find-ignored-files' are added to --exclude.
+If prompt is empty `helm-grep-ignored-files' are added to --exclude.
 Argument DEFAULT-INPUT is use as `default' arg of `helm' and INPUT
 is used as `input' arg of `helm', See `helm' docstring.
 ZGREP when non--nil use zgrep instead, without prompting for a choice
