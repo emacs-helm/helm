@@ -193,10 +193,10 @@ than the default which is OBARRAY."
                     (setq help-cand candidate))))
              (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg)))
         (setq extended-command-history
-              (cl-loop for i in extended-command-history
-                       when (commandp (intern i))
-                       do (set-text-properties 0 (length i) nil i)
-                       and collect i))
+              (cl-loop for c in extended-command-history
+                       when (and c (commandp (intern c)))
+                       do (set-text-properties 0 (length c) nil c)
+                       and collect c))
         (unwind-protect
              (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
                (when current-prefix-arg
