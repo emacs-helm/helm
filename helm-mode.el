@@ -965,8 +965,6 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        :default default-filename
                        :initial-input (expand-file-name init dir)
                        :alistp nil
-                       :preselect (and (stringp preselect)
-                                       (regexp-quote preselect))
                        :must-match mustmatch
                        :test predicate))))
       (helm-mode 1)
