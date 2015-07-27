@@ -76,12 +76,13 @@ cat > $CONF_FILE <<EOF
 ;; You will find embeded help for most helm commands with \`C-c ?'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
+(package-initialize)
+(add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (setq default-frame-alist '((vertical-scroll-bars . nil)
                             (tool-bar-lines . 0)
                             (menu-bar-lines . 0)
                             (fullscreen . nil)))
 (blink-cursor-mode -1)
-(add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (require 'helm-config)
 (helm-mode 1)
 (define-key global-map [remap find-file] 'helm-find-files)
