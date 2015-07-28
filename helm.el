@@ -3900,7 +3900,13 @@ Key arg DIRECTION can be one of:
   (forward-line 1))
 
 (defun helm-move--next-source-fn ()
-  (goto-char (or (helm-get-next-header-pos) (point-min))))
+  (goto-char (or (and (not (save-excursion
+                             (forward-line 1) (eobp)))
+                      ;; Empty source at eob are just
+                      ;; not displayed unless they are dummy.
+                      ;; Issue #1117.
+                      (helm-get-next-header-pos))
+                 (point-min))))
 
 (defun helm-move--goto-source-fn (source-or-name)
   (goto-char (point-min))
