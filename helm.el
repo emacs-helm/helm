@@ -3900,7 +3900,13 @@ Key arg DIRECTION can be one of:
   (forward-line 1))
 
 (defun helm-move--next-source-fn ()
-  (goto-char (or (helm-get-next-header-pos) (point-min))))
+  (let ((pos (helm-get-next-header-pos)))
+    (if pos (progn (goto-char pos)
+                   (forward-line 1)
+                   (when (eobp)
+                     (goto-char (point-min)))
+                   (forward-line -1))
+      (goto-char (point-min)))))
 
 (defun helm-move--goto-source-fn (source-or-name)
   (goto-char (point-min))
