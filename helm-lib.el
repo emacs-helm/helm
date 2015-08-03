@@ -326,11 +326,12 @@ Handle multibyte characters by moving by columns."
     (move-to-column width)
     (buffer-substring (point-at-bol) (point))))
 
-(cl-defun helm-substring-by-width (str width &optional (endstr "..."))
+(cl-defun helm-substring-by-width (str width &optional (endstr (string #x2026)))
   "Truncate string STR to end at column WIDTH.
 Similar to `truncate-string-to-width'.
-Add ENDSTR (default \"...\") at end of truncated STR.
+Add ENDSTR at end of truncated STR.
 Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
+  (cl-callf - width (string-width endstr))
   (cl-loop for ini-str = str
         then (substring ini-str 0 (1- (length ini-str)))
         for sw = (string-width ini-str)
