@@ -382,7 +382,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
 
 
 ;; Internal.
-(defvar helm-find-files-doc-header " (`C-l': Go up one level)"
+(defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
 (defvar helm-ff-auto-update-flag nil
   "Internal, flag to turn on/off auto-update in `helm-find-files'.
@@ -461,7 +461,8 @@ Should not be used among other sources.")
 (defclass helm-source-ffiles (helm-source-sync)
   ((header-name
     :initform (lambda (name)
-                (concat name helm-find-files-doc-header)))
+                (concat name (substitute-command-keys
+                              helm-find-files-doc-header))))
    (init
     :initform (lambda ()
                 (setq helm-ff-auto-update-flag
