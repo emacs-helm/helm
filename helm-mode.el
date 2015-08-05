@@ -818,8 +818,9 @@ Keys description:
              :action action-fn)
            ;; Other source.
            (helm-build-sync-source name
-             :header-name (lambda (hname)
-                            (concat hname helm-find-files-doc-header))
+             :header-name (lambda (name)
+                            (concat name (substitute-command-keys
+                                          helm-find-files-doc-header)))
              :init (lambda ()
                      (setq helm-ff-auto-update-flag
                            helm-ff-auto-update-initial-value)
