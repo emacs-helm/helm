@@ -331,7 +331,6 @@ Handle multibyte characters by moving by columns."
 Similar to `truncate-string-to-width'.
 Add ENDSTR at end of truncated STR.
 Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
-  (cl-callf - width (string-width endstr))
   (cl-loop for ini-str = str
         then (substring ini-str 0 (1- (length ini-str)))
         for sw = (string-width ini-str)
