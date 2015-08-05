@@ -806,8 +806,9 @@ Keys description:
           (list
            ;; History source.
            (helm-build-sync-source (format "%s History" name)
-             :header-name (lambda (hname)
-                            (concat hname helm-find-files-doc-header))
+             :header-name (lambda (name)
+                            (concat name (substitute-command-keys
+                                          helm-find-files-doc-header)))
              :mode-line mode-line
              :candidates hist
              :nohighlight t
