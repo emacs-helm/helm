@@ -248,6 +248,8 @@ On a symlinked directory a prefix arg will allow expanding to its true name.
   (`C-<down' and `C-<left>').
 
 *** You can turn off/on (toggle) autoupdate completion at any moment with `C-DEL'.
+  It is useful when auto completion is enabled and when trying to create a new file
+  or directory you want to prevent helm trying to complete what you are writing.
   NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
 *** You can create a new directory and a new file at the same time.
