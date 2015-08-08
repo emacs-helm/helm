@@ -2198,11 +2198,15 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            ;; second hit insert ":" and expand.
            (if (string= candidate helm-pattern)
                (funcall insert-in-minibuffer (concat candidate ":"))
-             (funcall insert-in-minibuffer candidate)))
-          ( ;; A symlink directory, expand it but not to its truename (#1121).
+               (funcall insert-in-minibuffer candidate)))
+          (;; A symlink directory, expand it but not to its truename
+           ;; unless a prefix arg is given.
            (and (file-directory-p candidate) (file-symlink-p candidate))
-           (funcall insert-in-minibuffer (file-name-as-directory
-                                          (expand-file-name candidate))))
+           (funcall insert-in-minibuffer
+                    (file-name-as-directory
+                     (if current-prefix-arg
+                         (file-truename (expand-file-name candidate))
+                         (expand-file-name candidate)))))
           ;; A directory, open it.
           ((file-directory-p candidate)
            (when (string= (helm-basename candidate) "..")
@@ -2214,7 +2218,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            (funcall insert-in-minibuffer (file-truename candidate)))
           ;; A regular file, expand it, (first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
-           (setq helm-pattern "") ; Force update.
+           (setq helm-pattern "")       ; Force update.
            (funcall insert-in-minibuffer new-pattern))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.

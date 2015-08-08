@@ -201,7 +201,12 @@ Italic     => A non--file buffer.
 
 *** Navigation summary
 
+For a better experience you can enable auto completion by setting
+`helm-ff-auto-update-initial-value' to non-nil in your init file.
+It is not enabled by default to not confuse new users.
+
 **** Use `C-j' (persistent action) on a directory to go down one level.
+On a symlinked directory a prefix arg will allow expanding to its true name.
 
 **** Use `C-l' on a directory to go up one level.
 
@@ -231,7 +236,7 @@ Italic     => A non--file buffer.
   e.g \"fob\" or \"fbr\" will complete \"foobar\"
   but \"fb\" will wait for a third char for completing.
 
-*** Use `C-u C-j' to watch an image.
+*** Use `C-u C-j' to watch an image or `C-<down>'.
 
 *** `C-j' on a filename will expand in helm-buffer to this filename.
   Second hit on `C-j' will display buffer filename.
