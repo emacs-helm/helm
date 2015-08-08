@@ -86,8 +86,13 @@ Only buffer names are fuzzy matched when this is enabled,
                                        helm-source-recentf
                                        helm-source-buffer-not-found)
   "Default sources list used in `helm-mini'."
-  :group 'helm-misc
+  :group 'helm-buffers
   :type '(repeat (choice symbol)))
+
+(defcustom helm-buffers-end-truncated-string (string #x2026)
+  "The string to display at end of truncated buffer names."
+  :type 'string
+  :group 'helm-buffers)
 
 
 ;;; Faces
@@ -362,9 +367,12 @@ Should be called after others transformers i.e (boring buffers)."
                                       (helm-buffer--details i))
         for truncbuf = (if (> (string-width name) helm-buffer-max-length)
                            (helm-substring-by-width
-                            name helm-buffer-max-length)
-                         (concat name (make-string
-                                       (- (+ helm-buffer-max-length 3)
+                            name helm-buffer-max-length
+                            helm-buffers-end-truncated-string)
+                         (concat name
+                                 (make-string
+                                       (- (+ helm-buffer-max-length
+                                             (length helm-buffers-end-truncated-string))
                                           (string-width name)) ? )))
         for len = (length mode)
         when (> len helm-buffer-max-len-mode)
@@ -390,7 +398,8 @@ Should be called after others transformers i.e (boring buffers)."
                         helm-buffer-max-length))
                 (regexp-quote
                  (helm-substring-by-width
-                  bufname helm-buffer-max-length))
+                  bufname helm-buffer-max-length
+                  helm-buffers-end-truncated-string))
                 (concat (regexp-quote bufname)
                         (if helm-buffer-details-flag
                             "$" "[[:blank:]]+"))))))

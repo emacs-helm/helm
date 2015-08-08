@@ -326,7 +326,7 @@ Handle multibyte characters by moving by columns."
     (move-to-column width)
     (buffer-substring (point-at-bol) (point))))
 
-(cl-defun helm-substring-by-width (str width &optional (endstr (string #x2026)))
+(defun helm-substring-by-width (str width &optional endstr)
   "Truncate string STR to end at column WIDTH.
 Similar to `truncate-string-to-width'.
 Add ENDSTR at end of truncated STR.
