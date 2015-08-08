@@ -2028,15 +2028,15 @@ Return candidates prefixed with basename of `helm-input' first."
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-invalid-symlink) t)
                      file))
+              ;; A dotted directory.
+              ((helm-ff-dot-file-p file)
+               (cons (helm-ff-prefix-filename
+                      (propertize disp 'face 'helm-ff-dotted-directory) t)
+                     file))
               ;; A symlink.
               ((stringp type)
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-symlink) t)
-                     file))
-              ;; A dotted directory.
-              ((and (eq t type) (helm-ff-dot-file-p file))
-               (cons (helm-ff-prefix-filename
-                      (propertize disp 'face 'helm-ff-dotted-directory) t)
                      file))
               ;; A directory.
               ((eq t type)
@@ -2199,11 +2199,10 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            (if (string= candidate helm-pattern)
                (funcall insert-in-minibuffer (concat candidate ":"))
              (funcall insert-in-minibuffer candidate)))
-          ( ;; A symlink directory, expand it's truename.
+          ( ;; A symlink directory, expand it but not to its truename (#1121).
            (and (file-directory-p candidate) (file-symlink-p candidate))
            (funcall insert-in-minibuffer (file-name-as-directory
-                                          (file-truename
-                                           (expand-file-name candidate)))))
+                                          (expand-file-name candidate))))
           ;; A directory, open it.
           ((file-directory-p candidate)
            (when (string= (helm-basename candidate) "..")
