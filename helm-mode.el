@@ -396,7 +396,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                            (string= helm-pattern "")
                                            (assoc helm-pattern cands)
                                            (assoc (intern helm-pattern) cands)
-                                           (member helm-pattern cands))
+                                           (member helm-pattern cands)
+                                           (member (downcase helm-pattern) cands)
+                                           (member (upcase helm-pattern) cands))
                                  (setq cands (append (list
                                                       ;; Unquote helm-pattern
                                                       ;; when it is added
