@@ -154,6 +154,8 @@ Only math* symbols are collected."
     :init #'helm-ucs-init
     :candidate-number-limit 9999
     :help-message 'helm-ucs-help-message
+    :filtered-candidate-transformer
+    (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
     :action '(("Insert character" . helm-ucs-insert-char)
               ("Insert character name" . helm-ucs-insert-name)
               ("Insert character code in hex" . helm-ucs-insert-code)
