@@ -601,9 +601,6 @@ It should be used when candidate list don't need to rebuild dynamically."
                                         'confirm-after-completion)))
                            1 0)
      :candidates-in-buffer cands-in-buffer
-     :fc-transformer (append (list #'helm-cr-default-transformer)
-                             (unless helm-mode-fuzzy-match
-                               (list #'helm-cr-sort-transformer)))
      :exec-when-only-one exec-when-only-one
      :fuzzy helm-mode-fuzzy-match
      :buffer buffer
