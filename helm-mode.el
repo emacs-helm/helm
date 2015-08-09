@@ -308,6 +308,8 @@ Keys description:
 
 - MUST-MATCH: Candidate selected must be one of COLLECTION.
 
+- FUZZY: Enable fuzzy matching.
+
 - REVERSE-HISTORY: When non--nil display history source after current
   source completion.
 
@@ -343,9 +345,14 @@ Keys description:
 
 - VOLATILE: Use volatile attribute \(enabled by default\).
 
-- SORT: A predicate to give to `sort' e.g `string-lessp'.
+- SORT: A predicate to give to `sort' e.g `string-lessp'
+  Use this only on small data as it is ineficient.
+  If you want to sort faster add a sort function to
+  FC-TRANSFORMER.
+  Note that FUZZY when enabled is already providing a sort function.
 
-- FC-TRANSFORMER: A `filtered-candidate-transformer' function.
+- FC-TRANSFORMER: A `filtered-candidate-transformer' function
+  or a list of functions.
 
 - HIST-FC-TRANSFORMER: A `filtered-candidate-transformer'
   function for the history source.
@@ -357,7 +364,7 @@ Keys description:
 - ALISTP: \(default is non--nil\) See `helm-comp-read-get-candidates'.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
-  `helm-candidates-in-buffer' which is much faster.
+  `helm-source-in-buffer' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
 Any prefix args passed during `helm-comp-read' invocation will be recorded
