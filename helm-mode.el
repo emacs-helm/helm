@@ -101,7 +101,12 @@ Affect among others `completion-at-point', `completing-read-multiple'."
   :type 'boolean)
 
 (defcustom helm-mode-fuzzy-match nil
-  "Enable fuzzy matching in `helm-mode'."
+  "Enable fuzzy matching in `helm-mode' globally.
+Note that this will slow down completion and modify sorting
+which is unwanted in many places.
+This affect only the functions with completing-read helmized by helm-mode.
+To fuzzy match `completion-at-point' and friends see
+`helm-completion-in-region-fuzzy-match'."
   :group 'helm-mode
   :type 'boolean)
 
