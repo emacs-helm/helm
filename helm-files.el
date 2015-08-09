@@ -271,6 +271,11 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   "Face used for dotted directories in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-dotted-symlink-directory
+    '((t (:foreground "DarkOrange" :background "DimGray")))
+  "Face used for dotted symlinked directories in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-symlink
     '((t (:foreground "DarkOrange")))
   "Face used for symlinks in `helm-find-files'."
@@ -2027,6 +2032,11 @@ Return candidates prefixed with basename of `helm-input' first."
                     (not (string-match "^\.#" (helm-basename file))))
                (cons (helm-ff-prefix-filename
                       (propertize disp 'face 'helm-ff-invalid-symlink) t)
+                     file))
+              ;; A dotted directory symlinked.
+              ((and (helm-ff-dot-file-p file) (stringp type))
+               (cons (helm-ff-prefix-filename
+                      (propertize disp 'face 'helm-ff-dotted-symlink-directory) t)
                      file))
               ;; A dotted directory.
               ((helm-ff-dot-file-p file)
