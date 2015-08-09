@@ -221,9 +221,6 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  (t (all-completions "" collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
-(defun helm-cr-sort-transformer (candidates _source)
-  (sort candidates #'helm-generic-sort-fn))
-
 (defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
   (cl-loop for c in candidates
