@@ -67,10 +67,11 @@ Show all candidates on startup when 0 (default)."
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
-  (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
-        for str-key  = (key-description key)
-        for ismenu   = (string-match "<menu-bar>" str-key)
-        unless ismenu collect (cons str-key com)))
+  (when mode-map
+    (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
+             for str-key  = (key-description key)
+             for ismenu   = (string-match "<menu-bar>" str-key)
+             unless ismenu collect (cons str-key com))))
 
 (defun helm-get-mode-map-from-mode (mode)
   "Guess the mode-map name according to MODE.
@@ -91,9 +92,9 @@ Return nil if no mode-map found."
 
 (defun helm-M-x-current-mode-map-alist ()
   "Return mode-map alist of current `major-mode'."
-  (let ((map (helm-get-mode-map-from-mode major-mode)))
-    (when (and map (boundp map))
-      (helm-M-x-get-major-mode-command-alist (symbol-value map)))))
+  (let ((map-sym (helm-get-mode-map-from-mode major-mode)))
+    (when (and map-sym (boundp map-sym))
+      (helm-M-x-get-major-mode-command-alist (symbol-value map-sym)))))
 
 
 (defun helm-M-x-transformer-1 (candidates &optional sort)
