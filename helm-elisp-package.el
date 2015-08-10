@@ -60,7 +60,7 @@
   (if helm-force-updating-p
       (if helm-el-package--upgrades
           (message "Refreshing packages list done, %d package(s) to upgrade available"
-                   (/ (length helm-el-package--upgrades) 2))
+                   (length helm-el-package--upgrades))
           (message "Refreshing packages list done"))
       (setq helm-el-package--show-only (if helm-el-package--upgrades
                                            'upgrade
