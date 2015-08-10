@@ -153,7 +153,8 @@ Should take one arg: the string to display."
     :nohighlight t
     :action '(("Copy result to kill-ring" . (lambda (candidate)
                                               (kill-new candidate)
-                                              (message "Result copied to kill-ring")))
+                                              (message "Result \"%s\" copied to kill-ring"
+                                                       candidate)))
               ("Copy operation to kill-ring" . (lambda (_candidate)
                                                  (kill-new helm-input)
                                                  (message "Calculation copied to kill-ring"))))))
