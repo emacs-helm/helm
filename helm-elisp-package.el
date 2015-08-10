@@ -58,7 +58,10 @@
       (buffer-string)))
   (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
   (if helm-force-updating-p
-      (message "Refreshing packages list done")
+      (if helm-el-package--upgrades
+          (message "Refreshing packages list done, %d package(s) to upgrade available"
+                   (/ (length helm-el-package--upgrades) 2))
+          (message "Refreshing packages list done"))
       (setq helm-el-package--show-only (if helm-el-package--upgrades
                                            'upgrade
                                            helm-el-package-initial-filter)))
