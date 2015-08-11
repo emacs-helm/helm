@@ -4482,6 +4482,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
   (let (buffer-read-only
         matches
         newmatches
+        (item-count 0)
         (case-fold-search (helm-set-case-fold-search)))
     (helm--search-from-candidate-buffer-1
      (lambda ()
@@ -4491,7 +4492,6 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
          (forward-line 1) ; >>>[1]
          (setq newmatches nil)
          (cl-loop with pos-lst
-                  with item-count = 0
                   while (and (setq pos-lst (funcall searcher pattern))
                              (not (eobp)))
                   for cand = (apply get-line-fn
