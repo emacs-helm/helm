@@ -419,6 +419,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                        "\\s\\" "" helm-pattern))
                                                      cands))
                                  (setq helm-cr-unknown-pattern-flag t))
+                               ;; When DEFAULT is initially a list, candidates
+                               ;; come already computed with DEFAULT list appended,
+                               ;; and DEFAULT is set to the car of this list.
                                (if (and default (not (string= default "")))
                                    (delq nil (cons default (delete default cands)))
                                  cands))))
