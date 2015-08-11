@@ -1889,6 +1889,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                  (helm-initialize
                   any-resume any-input any-default any-sources)
                  (helm-display-buffer helm-buffer)
+                 ;; We are now in helm-buffer.
                  (when helm-prevent-escaping-from-minibuffer
                    (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                  (add-hook 'post-command-hook 'helm--maybe-update-keymap)
@@ -1906,8 +1907,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             (helm-restore-position-on-quit)
             (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
             nil))
-      (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
-      (remove-hook 'post-command-hook 'helm--update-header-line)
       (if (fboundp 'advice-add)
           (progn
             (advice-remove 'tramp-read-passwd
@@ -2600,6 +2599,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   (with-current-buffer helm-buffer
     ;; bury-buffer from this window.
     (bury-buffer) ;[1]
+    (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
+    (remove-hook 'post-command-hook 'helm--update-header-line)
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
