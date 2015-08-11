@@ -93,8 +93,13 @@ but \"foo\ bar\"=> (\"foobar\")."
   helm-mp-exact-pattern-real)
 
 
-(defun helm-mp-exact-match (str &optional pattern)
-  (string= str (or pattern helm-pattern)))
+(cl-defun helm-mp-exact-match (str &optional (pattern helm-pattern))
+  (if case-fold-search
+      (progn
+        (setq str (downcase str)
+              pattern (downcase pattern))
+        (string= str pattern))
+      (string= str pattern)))
 
 (defun helm-mp-exact-search (pattern &rest _ignore)
   (and (search-forward (helm-mp-exact-get-pattern pattern) nil t)
