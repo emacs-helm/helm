@@ -1850,79 +1850,80 @@ in source.
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
-  ;; Activate the advice for `tramp-read-passwd'.
-  (if (fboundp 'advice-add)
-      (progn
-        (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
-        (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd))
-      (ad-activate 'tramp-read-passwd)
-      (ad-activate 'ange-ftp-get-passwd))
-  (helm-log (concat "[Start session] " (make-string 41 ?+)))
-  (helm-log "any-prompt = %S" any-prompt)
-  (helm-log "any-preselect = %S" any-preselect)
-  (helm-log "any-buffer = %S" any-buffer)
-  (helm-log "any-keymap = %S" any-keymap)
-  (helm-log "any-default = %S" any-default)
-  (helm-log "any-history = %S" any-history)
-  (setq helm--prompt (or any-prompt "pattern: "))
-  (let ((non-essential t)
-        (input-method-verbose-flag helm-input-method-verbose-flag)
-        (old--cua cua-mode)
-        (helm--maybe-use-default-as-input
-         (and (null any-input)
-              (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
-                  (cl-loop for s in (helm-normalize-sources any-sources)
-                           thereis (memq s helm-sources-using-default-as-input))))))
-    ;; cua-mode overhide local helm bindings.
-    ;; disable this stupid thing if enabled.
-    (and cua-mode (cua-mode -1))
-    (unwind-protect
-         (condition-case-unless-debug _v
-             (let ( ;; `helm-source-name' is non-nil
-                   ;; when `helm' is invoked by action, reset it.
-                   helm-source-name
-                   helm-current-source
-                   helm-in-persistent-action
-                   helm-quit
-                   (helm-buffer (or any-buffer helm-buffer)))
-               (with-helm-restore-variables
-                 (helm-initialize
-                  any-resume any-input any-default any-sources)
-                 (helm-display-buffer helm-buffer)
-                 ;; We are now in helm-buffer.
-                 (when helm-prevent-escaping-from-minibuffer
-                   (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
-                 (add-hook 'post-command-hook 'helm--maybe-update-keymap)
-                 (add-hook 'post-command-hook 'helm--update-header-line)
-                 (helm-log "show prompt")
-                 (unwind-protect
-                      (helm-read-pattern-maybe
-                       any-prompt any-input any-preselect
-                       any-resume any-keymap any-default any-history)
-                   (helm-cleanup)))
-               (prog1
-                   (unless helm-quit (helm-execute-selection-action))
-                 (helm-log (concat "[End session] " (make-string 41 ?-)))))
-           (quit
-            (helm-restore-position-on-quit)
-            (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
-            nil))
-      (if (fboundp 'advice-add)
-          (progn
-            (advice-remove 'tramp-read-passwd
-                           #'helm--advice-tramp-read-passwd)
-            (advice-remove 'ange-ftp-get-passwd
-                           #'helm--advice-ange-ftp-get-passwd))
-          (ad-deactivate 'tramp-read-passwd)
-          (ad-deactivate 'ange-ftp-get-passwd))
-      (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-      (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
-      (setq helm-alive-p nil)
-      ;; Reset helm-pattern so that lambda's using it
-      ;; before running helm will not start with its old value.
-      (setq helm-pattern "")
-      (and old--cua (cua-mode 1))
-      (helm-log-save-maybe))))
+  (catch 'exit
+    ;; Activate the advice for `tramp-read-passwd'.
+    (if (fboundp 'advice-add)
+        (progn
+          (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+          (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd))
+        (ad-activate 'tramp-read-passwd)
+        (ad-activate 'ange-ftp-get-passwd))
+    (helm-log (concat "[Start session] " (make-string 41 ?+)))
+    (helm-log "any-prompt = %S" any-prompt)
+    (helm-log "any-preselect = %S" any-preselect)
+    (helm-log "any-buffer = %S" any-buffer)
+    (helm-log "any-keymap = %S" any-keymap)
+    (helm-log "any-default = %S" any-default)
+    (helm-log "any-history = %S" any-history)
+    (setq helm--prompt (or any-prompt "pattern: "))
+    (let ((non-essential t)
+          (input-method-verbose-flag helm-input-method-verbose-flag)
+          (old--cua cua-mode)
+          (helm--maybe-use-default-as-input
+           (and (null any-input)
+                (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
+                    (cl-loop for s in (helm-normalize-sources any-sources)
+                             thereis (memq s helm-sources-using-default-as-input))))))
+      ;; cua-mode overhide local helm bindings.
+      ;; disable this stupid thing if enabled.
+      (and cua-mode (cua-mode -1))
+      (unwind-protect
+           (condition-case-unless-debug _v
+               (let ( ;; `helm-source-name' is non-nil
+                     ;; when `helm' is invoked by action, reset it.
+                     helm-source-name
+                     helm-current-source
+                     helm-in-persistent-action
+                     helm-quit
+                     (helm-buffer (or any-buffer helm-buffer)))
+                 (with-helm-restore-variables
+                   (helm-initialize
+                    any-resume any-input any-default any-sources)
+                   (helm-display-buffer helm-buffer)
+                   ;; We are now in helm-buffer.
+                   (when helm-prevent-escaping-from-minibuffer
+                     (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
+                   (add-hook 'post-command-hook 'helm--maybe-update-keymap)
+                   (add-hook 'post-command-hook 'helm--update-header-line)
+                   (helm-log "show prompt")
+                   (unwind-protect
+                        (helm-read-pattern-maybe
+                         any-prompt any-input any-preselect
+                         any-resume any-keymap any-default any-history)
+                     (helm-cleanup)))
+                 (prog1
+                     (unless helm-quit (helm-execute-selection-action))
+                   (helm-log (concat "[End session] " (make-string 41 ?-)))))
+             (quit
+              (helm-restore-position-on-quit)
+              (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
+              nil))
+        (if (fboundp 'advice-add)
+            (progn
+              (advice-remove 'tramp-read-passwd
+                             #'helm--advice-tramp-read-passwd)
+              (advice-remove 'ange-ftp-get-passwd
+                             #'helm--advice-ange-ftp-get-passwd))
+            (ad-deactivate 'tramp-read-passwd)
+            (ad-deactivate 'ange-ftp-get-passwd))
+        (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
+        (helm--remap-mouse-mode -1)     ; Reenable mouse bindings.
+        (setq helm-alive-p nil)
+        ;; Reset helm-pattern so that lambda's using it
+        ;; before running helm will not start with its old value.
+        (setq helm-pattern "")
+        (and old--cua (cua-mode 1))
+        (helm-log-save-maybe)))))
 
 
 ;;; Helm resume
@@ -2280,13 +2281,15 @@ It is intended to use this only in `helm-initial-setup'."
   ;; For initialization of helm locals vars that need
   ;; a value from current buffer, it is here.
   (helm-set-local-variable 'current-input-method current-input-method)
-  (setq helm-current-prefix-arg nil)
-  (setq helm-suspend-update-flag nil)
-  (setq helm-current-buffer (helm--current-buffer))
-  (setq helm-buffer-file-name buffer-file-name)
-  (setq helm-issued-errors nil)
-  (setq helm-compiled-sources nil)
-  (setq helm-saved-current-source nil)
+  (setq helm-current-prefix-arg nil
+        helm-saved-action nil
+        helm-saved-selection nil
+        helm-suspend-update-flag nil
+        helm-current-buffer (helm--current-buffer)
+        helm-buffer-file-name buffer-file-name
+        helm-issued-errors nil
+        helm-compiled-sources nil
+        helm-saved-current-source nil)
   (unless (and (or helm-split-window-state
                    helm--window-side-state)
                helm-reuse-last-window-split-state)
@@ -3568,14 +3571,14 @@ If PRESERVE-SAVED-ACTION is non--nil save action."
   (let ((source (or helm-saved-current-source
                     (helm-get-current-source)))
         non-essential)
-    (setq selection (or selection
-                        (helm-get-selection)
-                        (and (assoc 'accept-empty source) "")))
+    (setq selection (helm-coerce-selection
+                     (or selection
+                         helm-saved-selection
+                         (helm-get-selection)
+                         (and (assoc 'accept-empty source) ""))
+                     source))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (when (and selection action)
-      (helm-funcall-with-source
-       source action
-       (helm-coerce-selection selection source)))))
+    (when (and selection action) (funcall action selection))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.

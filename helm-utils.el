@@ -569,6 +569,7 @@ directory, open this directory."
 (defun helm-quit-and-execute-action (action)
   "Quit current helm session and execute ACTION."
   (setq helm-saved-action action)
+  (setq helm-saved-selection (helm-get-selection))
   (helm-exit-minibuffer))
 
 (defun helm-read-repeat-string (prompt &optional count)
