@@ -2280,13 +2280,15 @@ It is intended to use this only in `helm-initial-setup'."
   ;; For initialization of helm locals vars that need
   ;; a value from current buffer, it is here.
   (helm-set-local-variable 'current-input-method current-input-method)
-  (setq helm-current-prefix-arg nil)
-  (setq helm-suspend-update-flag nil)
-  (setq helm-current-buffer (helm--current-buffer))
-  (setq helm-buffer-file-name buffer-file-name)
-  (setq helm-issued-errors nil)
-  (setq helm-compiled-sources nil)
-  (setq helm-saved-current-source nil)
+  (setq helm-current-prefix-arg nil
+        helm-saved-action nil
+        helm-saved-selection nil
+        helm-suspend-update-flag nil
+        helm-current-buffer (helm--current-buffer)
+        helm-buffer-file-name buffer-file-name
+        helm-issued-errors nil
+        helm-compiled-sources nil
+        helm-saved-current-source nil)
   (unless (and (or helm-split-window-state
                    helm--window-side-state)
                helm-reuse-last-window-split-state)
@@ -3568,14 +3570,14 @@ If PRESERVE-SAVED-ACTION is non--nil save action."
   (let ((source (or helm-saved-current-source
                     (helm-get-current-source)))
         non-essential)
-    (setq selection (or selection
-                        (helm-get-selection)
-                        (and (assoc 'accept-empty source) "")))
+    (setq selection (helm-coerce-selection
+                     (or selection
+                         helm-saved-selection
+                         (helm-get-selection)
+                         (and (assoc 'accept-empty source) ""))
+                     source))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (when (and selection action)
-      (helm-funcall-with-source
-       source action
-       (helm-coerce-selection selection source)))))
+    (when (and selection action) (funcall action selection))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.
