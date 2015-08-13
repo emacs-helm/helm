@@ -233,7 +233,7 @@ so don't use strings, vectors or whatever to define them."
     (define-key map (kbd "C-t")        'helm-toggle-resplit-and-swap-windows)
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    'undefined)
-    (define-key map (kbd "C-h C-d")    'helm-debug-output)
+    (define-key map (kbd "C-h C-d")    'helm-enable-or-switch-to-debug)
     ;; Allow to eval keymap without errors.
     (define-key map [f1] nil)
     (define-key map (kbd "C-h C-h")    'undefined)
@@ -2624,6 +2624,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   ;; be a helm buffer.
   (replace-buffer-in-windows helm-buffer)
   (setq helm-alive-p nil)
+  (setq helm-debug nil)
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
   (helm-clean-up-minibuffer))
@@ -4178,6 +4179,24 @@ to a list of forms.\n\n")
             (pp-to-string v) "\n"
             (pp-to-string (with-current-buffer helm-buffer (eval v))) "\n"))
   (message "Calculating all helm-related values...Done"))
+
+;;;###autoload
+(defun helm-debug-toggle ()
+  "Enable/disable helm debug from outside of helm session."
+  (interactive)
+  (setq helm-debug (not helm-debug))
+  (message "Helm Debug is now %s"
+           (if helm-debug "Enabled" "Disabled")))
+
+(defun helm-enable-or-switch-to-debug ()
+  "First hit enable helm debugging, second hit switch to debug buffer."
+  (interactive)
+  (with-helm-alive-p
+    (if helm-debug
+        (helm-run-after-quit
+         #'helm-debug-open-last-log)
+        (setq helm-debug t)
+        (message "Debugging enabled"))))
 
 
 ;; Core: misc
