@@ -89,7 +89,7 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers
   :type '(repeat (choice symbol)))
 
-(defcustom helm-buffers-end-truncated-string (string #x2026)
+(defcustom helm-buffers-end-truncated-string "..."
   "The string to display at end of truncated buffer names."
   :type 'string
   :group 'helm-buffers)
