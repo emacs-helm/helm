@@ -824,7 +824,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 
 ** Miscellaneous Commands
 
-\\[helm-toggle-resplit-window] : Toggle vertical/horizontal split helm window.
+\\[helm-toggle-resplit-and-swap-windows] : Toggle vertical/horizontal split on first hit and swap helm window on second hit.
 \\[helm-quit-and-find-file] : Drop into `find-file'.
 \\[helm-delete-current-selection] : Delete selected item (visually).
 \\[helm-kill-selection-and-quit] : Kill display value of candidate and quit (with prefix arg kill the real value).
