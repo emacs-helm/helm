@@ -1951,6 +1951,8 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
     (setq helm-compiled-sources nil)
     (setq cur-dir (buffer-local-value
                    'default-directory (get-buffer any-buffer)))
+    (setq helm-saved-selection nil
+          helm-saved-action nil)
     (unless (buffer-live-p helm-current-buffer)
       ;; `helm-current-buffer' may have been killed.
       (setq helm-current-buffer (current-buffer)))
