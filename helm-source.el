@@ -32,6 +32,14 @@
 (require 'eieio)
 (require 'helm-lib)
 
+(defvar helm-fuzzy-sort-fn)
+(defvar helm-fuzzy-match-fn)
+(defvar helm-fuzzy-search-fn)
+
+(declare-function helm-init-candidates-in-buffer "helm.el")
+(declare-function helm-interpret-value "helm.el")
+(declare-function helm-fuzzy-highlight-matches "helm.el")
+
 
 (defgeneric helm--setup-source (source)
   "Prepare slots and handle slot errors before creating a helm source.")
