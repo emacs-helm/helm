@@ -23,7 +23,6 @@
 (require 'helm-utils)
 (require 'helm-external)
 (require 'helm-grep)
-(require 'helm-match-plugin)
 (require 'helm-help)
 (require 'helm-locate)
 (require 'helm-bookmark)

@@ -23,8 +23,9 @@
 
 ;;; Code:
 
-(require 'helm)
 (require 'cl-lib)
+
+(defvar helm-pattern)
 
 
 (defgroup helm-match-plugin nil
@@ -319,10 +320,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
       `(,(if (assoc 'candidates-in-buffer source)
              `(search ,@searchfns) `(match ,@matchfns))
          ,@source))))
-
-
-;; Enable match-plugin by default in old sources.
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
 
 (provide 'helm-match-plugin)
 

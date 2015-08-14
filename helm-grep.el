@@ -1023,7 +1023,6 @@ in recurse, and ignoring EXTS, search being made on
 
 (defun helm-grep-highlight-match (str &optional multi-match)
   "Highlight in string STR all occurences matching `helm-pattern'."
-  (require 'helm-match-plugin)
   (let (beg end)
     (condition-case-unless-debug nil
         (with-temp-buffer

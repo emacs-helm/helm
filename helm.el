@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'helm-match-plugin)
 (require 'helm-lib)
 (require 'helm-source)
 
@@ -4330,6 +4331,10 @@ When at end of minibuffer delete all."
 ;;; Plugins (Deprecated in favor of helm-types)
 ;;
 ;; i.e Inherit instead of helm-type-* classes in your own classes.
+
+;; Enable match-plugin by default in old sources.
+(add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
+
 (defun helm-compile-source--type (source)
   (helm-aif (assoc-default 'type source)
       (append source (assoc-default it helm-type-attributes) nil)
