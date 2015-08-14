@@ -4334,7 +4334,34 @@ When at end of minibuffer delete all."
 ;;
 ;; i.e Inherit instead of helm-type-* classes in your own classes.
 
-;; Enable match-plugin by default in old sources.
+;; [DEPRECATED] Enable match-plugin by default in old sources.
+;; This is deprecated and will not run in sources
+;; created by helm-source.
+;; Keep it for backward compatibility with old sources.
+(defun helm-compile-source--match-plugin (source)
+  (if (assoc 'no-matchplugin source)
+      source
+    (let* ((searchers        helm-mp-default-search-functions)
+           (defmatch         (helm-aif (assoc-default 'match source)
+                                 (helm-mklist it)))
+           (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
+                                 (helm-mklist it)))
+           (defsearch        (helm-aif (assoc-default 'search source)
+                                 (helm-mklist it)))
+           (defsearch-strict (helm-aif (assoc-default 'search-strict source)
+                                 (helm-mklist it)))
+           (matchfns         (cond (defmatch-strict)
+                                   (defmatch
+                                    (append helm-mp-default-match-functions defmatch))
+                                   (t helm-mp-default-match-functions)))
+           (searchfns        (cond (defsearch-strict)
+                                   (defsearch
+                                    (append searchers defsearch))
+                                   (t searchers))))
+      `(,(if (assoc 'candidates-in-buffer source)
+             `(search ,@searchfns) `(match ,@matchfns))
+         ,@source))))
+
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
 
 (defun helm-compile-source--type (source)

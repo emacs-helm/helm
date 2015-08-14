@@ -293,33 +293,6 @@ e.g \"bar foo\" will match \"barfoo\" but not \"foobar\" contrarily to
                (multi3p #'helm-mp-3p-search))))
     (funcall fun pattern)))
 
-
-;;; source compiler
-;;  This is used only in old sources defined without helm-source.
-;;
-(defun helm-compile-source--match-plugin (source)
-  (if (assoc 'no-matchplugin source)
-      source
-    (let* ((searchers        helm-mp-default-search-functions)
-           (defmatch         (helm-aif (assoc-default 'match source)
-                                 (helm-mklist it)))
-           (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
-                                 (helm-mklist it)))
-           (defsearch        (helm-aif (assoc-default 'search source)
-                                 (helm-mklist it)))
-           (defsearch-strict (helm-aif (assoc-default 'search-strict source)
-                                 (helm-mklist it)))
-           (matchfns         (cond (defmatch-strict)
-                                   (defmatch
-                                    (append helm-mp-default-match-functions defmatch))
-                                   (t helm-mp-default-match-functions)))
-           (searchfns        (cond (defsearch-strict)
-                                   (defsearch
-                                    (append searchers defsearch))
-                                   (t searchers))))
-      `(,(if (assoc 'candidates-in-buffer source)
-             `(search ,@searchfns) `(match ,@matchfns))
-         ,@source))))
 
 (provide 'helm-match-plugin)
 
