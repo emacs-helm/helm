@@ -29,8 +29,8 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'helm-match-plugin)
 (require 'helm-lib)
+(require 'helm-match-plugin)
 (require 'helm-source)
 
 
