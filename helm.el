@@ -846,6 +846,8 @@ It is very useful, so you should bind any key.
   "Detailed help message string for `helm'.
 It also accepts function or variable symbol.")
 
+(defvar helm-autoresize-mode) ;; Undefined in `helm-default-display-buffer'.
+
 
 ;;; Internal Variables
 ;;
