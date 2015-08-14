@@ -30,7 +30,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
-(eval-when-compile (require 'helm-lib))
+(require 'helm-lib)
 
 
 (defgeneric helm--setup-source (source)
