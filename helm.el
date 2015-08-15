@@ -33,6 +33,11 @@
 (require 'helm-match-plugin)
 (require 'helm-source)
 
+(defalias 'helm-run-after-quit 'helm-run-after-exit)
+(make-obsolete 'helm-run-after-quit 'helm-run-after-exit "1.7.7")
+(defalias 'helm-quit-and-execute-action 'helm-exit-and-execute-action)
+(make-obsolete 'helm-quit-and-execute-action 'helm-exit-and-execute-action "1.7.7")
+
 
 ;;; Multi keys
 ;;
