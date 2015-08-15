@@ -229,7 +229,8 @@ from its directory."
                           (not grep-line)
                           (replace-regexp-in-string "\\`\\*" "" sel)))
           (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
-          (buf       (helm-aif (get-buffer sel) (buffer-name it)))
+          (buf       (helm-aif (and (bufferp sel) (get-buffer sel))
+                         (buffer-name it)))
           (default-preselection (or (buffer-file-name helm-current-buffer)
                                     default-directory)))
      (cond

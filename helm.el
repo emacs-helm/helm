@@ -1482,12 +1482,12 @@ Allow also checking if helm-buffer contain candidates."
 (defun helm-run-after-quit (function &rest args)
   "Perform an action after quitting `helm'.
 The action is to call FUNCTION with arguments ARGS."
-  (setq helm-quit t)
   (helm-kill-async-processes)
   (helm-log "function = %S" function)
   (helm-log "args = %S" args)
-  (apply 'run-with-timer 0.1 nil function args)
-  (helm-exit-minibuffer))
+  (helm-quit-and-execute-action
+   (lambda (_candidate)
+     (apply function args))))
 
 (defun helm-interpret-value (value &optional source compute)
   "Interpret VALUE as variable, function or literal and return it.
