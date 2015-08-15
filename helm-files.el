@@ -203,6 +203,11 @@ i.e `helm-read-file-name'."
   :group 'helm-files
   :type  'boolean)
 
+(defcustom helm-ff-candidate-number-limit 5000
+  "The `helm-candidate-number-limit' for `helm-find-files', `read-file-name' and friends."
+  :group 'helm-files
+  :type 'integer)
+
 (defcustom helm-findutils-skip-boring-files t
   "Ignore files matching regexps in `completion-ignored-extensions'."
   :group 'helm-files
@@ -484,8 +489,7 @@ Should not be used among other sources.")
    (volatile :initform t)
    (nohighlight :initform t)
    (keymap :initform helm-find-files-map)
-   (candidate-number-limit
-    :initform 9999)
+   (candidate-number-limit :initform helm-ff-candidate-number-limit)
    (action-transformer
     :initform 'helm-find-files-action-transformer)
    (action :initform 'helm-find-files-actions)

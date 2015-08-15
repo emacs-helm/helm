@@ -745,6 +745,7 @@ See documentation of `completing-read' and `all-completions' for details."
        must-match
        default
        marked-candidates
+       (candidate-number-limit helm-ff-candidate-number-limit)
        nomark
        (alistp t)
        (persistent-action 'helm-find-files-persistent-action)
@@ -861,7 +862,7 @@ Keys description:
              :filtered-candidate-transformer 'helm-ff-sort-candidates
              :filter-one-by-one 'helm-ff-filter-candidate-one-by-one
              :persistent-action persistent-action
-             :candidate-number-limit 9999
+             :candidate-number-limit candidate-number-limit 
              :persistent-help persistent-help
              :volatile t
              :nomark nomark
