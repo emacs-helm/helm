@@ -864,7 +864,6 @@ Keys description:
              :filtered-candidate-transformer 'helm-ff-sort-candidates
              :filter-one-by-one 'helm-ff-filter-candidate-one-by-one
              :persistent-action persistent-action
-             :candidate-number-limit candidate-number-limit 
              :persistent-help persistent-help
              :volatile t
              :nomark nomark
@@ -875,6 +874,7 @@ Keys description:
                   :input (expand-file-name initial-input)
                   :prompt prompt
                   :keymap cmap
+                  :candidate-number-limit candidate-number-limit
                   :resume 'noresume
                   :case-fold-search case-fold
                   :default default

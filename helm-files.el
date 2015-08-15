@@ -489,7 +489,7 @@ Should not be used among other sources.")
    (volatile :initform t)
    (nohighlight :initform t)
    (keymap :initform helm-find-files-map)
-   (candidate-number-limit :initform helm-ff-candidate-number-limit)
+   (candidate-number-limit :initform 'helm-ff-candidate-number-limit)
    (action-transformer
     :initform 'helm-find-files-action-transformer)
    (action :initform 'helm-find-files-actions)

@@ -835,6 +835,9 @@ an eieio class."
   (helm-aif (slot-value source 'persistent-help)
       (set-slot-value source 'header-line
                       (helm-source--persistent-help-string it source)))
+  (helm-aif (slot-value source 'candidate-number-limit)
+      (and (symbolp it) (set-slot-value
+                         source 'candidate-number-limit (symbol-value it))))
   (when (and (slot-value source 'fuzzy-match) helm-fuzzy-sort-fn)
     (set-slot-value source 'filtered-candidate-transformer
                     (helm-aif (slot-value source 'filtered-candidate-transformer)
