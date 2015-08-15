@@ -229,6 +229,9 @@
          helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu
           :default (list (concat "\\_<" str "\\_>") str)
+          :preselect (unless (memq 'helm-source-imenu
+                                   helm-sources-using-default-as-input)
+                       str)
           :buffer "*helm imenu*")))
 
 ;;;###autoload
@@ -246,6 +249,9 @@
          helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu-all
           :default (list (concat "\\_<" str "\\_>") str)
+          :preselect (unless (memq 'helm-source-imenu-all
+                                   helm-sources-using-default-as-input)
+                       str)
           :buffer "*helm imenu all*")))
 
 (provide 'helm-imenu)
