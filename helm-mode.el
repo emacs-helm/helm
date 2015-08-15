@@ -282,7 +282,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             hist-fc-transformer
                             marked-candidates
                             nomark
-                            (alistp t))
+                            (alistp t)
+                            (candidate-number-limit helm-candidate-number-limit))
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -495,6 +496,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :preselect preselect
                          :prompt prompt
                          :resume 'noresume
+                         :candidate-number-limit candidate-number-limit
                          :case-fold-search case-fold
                          :keymap loc-map
                          :history (and (symbolp input-history) input-history)
