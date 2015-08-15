@@ -1489,8 +1489,11 @@ The action is to call FUNCTION with arguments ARGS."
    (lambda (_candidate)
      (apply function args))))
 
-(defalias 'helm-run-after-quit 'helm-run-after-exit)
-(make-obsolete 'helm-run-after-quit 'helm-run-after-exit "1.7.7")
+(defun helm-exit-and-execute-action (action)
+  "Quit current helm session and execute ACTION."
+  (setq helm-saved-action action)
+  (setq helm-saved-selection (helm-get-selection))
+  (helm-exit-minibuffer))
 
 (defun helm-interpret-value (value &optional source compute)
   "Interpret VALUE as variable, function or literal and return it.

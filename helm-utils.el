@@ -567,15 +567,6 @@ directory, open this directory."
   (let ((helm--reading-passwd-or-string t))
     (mapc 'find-file (helm-marked-candidates))))
 
-(defun helm-exit-and-execute-action (action)
-  "Quit current helm session and execute ACTION."
-  (setq helm-saved-action action)
-  (setq helm-saved-selection (helm-get-selection))
-  (helm-exit-minibuffer))
-
-(defalias 'helm-quit-and-execute-action 'helm-exit-and-execute-action)
-(make-obsolete 'helm-quit-and-execute-action 'helm-exit-and-execute-action "1.7.7")
-
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.
 If COUNT is non--nil add a number after each prompt."
