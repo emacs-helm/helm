@@ -89,7 +89,7 @@
 (defun helm-el-run-visit-homepage ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-visit-homepage)))
+    (helm-exit-and-execute-action 'helm-el-package-visit-homepage)))
 
 (defun helm-el-package-install-1 (pkg-list)
   (cl-loop with mkd = pkg-list
@@ -124,7 +124,7 @@
 (defun helm-el-run-package-install ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-install)))
+    (helm-exit-and-execute-action 'helm-el-package-install)))
 
 (defun helm-el-package-uninstall-1 (pkg-list)
   (cl-loop with mkd = pkg-list
@@ -172,7 +172,7 @@
 (defun helm-el-run-package-uninstall ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-uninstall)))
+    (helm-exit-and-execute-action 'helm-el-package-uninstall)))
 
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
@@ -222,7 +222,7 @@
 (defun helm-el-run-package-upgrade ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-upgrade)))
+    (helm-exit-and-execute-action 'helm-el-package-upgrade)))
 
 (defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
@@ -239,7 +239,7 @@
 (defun helm-el-run-package-upgrade-all ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-upgrade-all-action)))
+    (helm-exit-and-execute-action 'helm-el-package-upgrade-all-action)))
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
@@ -354,7 +354,7 @@
 (defun helm-el-run-package-reinstall ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-el-package-reinstall)))
+    (helm-exit-and-execute-action 'helm-el-package-reinstall)))
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)

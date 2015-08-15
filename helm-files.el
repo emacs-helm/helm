@@ -951,7 +951,7 @@ This doesn't replace inside the files, only modify filenames."
 ;; The action.
 (defun helm-ff-query-replace-on-marked (_candidate)
   (let ((marked (helm-marked-candidates)))
-    (helm-run-after-quit #'helm-ff-query-replace-on-marked-1 marked)))
+    (helm-run-after-exit #'helm-ff-query-replace-on-marked-1 marked)))
 
 ;; The command for `helm-find-files-map'.
 (defun helm-ff-run-query-replace-on-marked ()
@@ -961,12 +961,12 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-query-replace (_candidate)
   (let ((bufs (cl-loop for f in (helm-marked-candidates)
                        collect (buffer-name (find-file-noselect f)))))
-    (helm-run-after-quit #'helm-buffer-query-replace-1 nil bufs)))
+    (helm-run-after-exit #'helm-buffer-query-replace-1 nil bufs)))
 
 (defun helm-ff-query-replace-regexp (_candidate)
   (let ((bufs (cl-loop for f in (helm-marked-candidates)
                        collect (buffer-name (find-file-noselect f)))))
-    (helm-run-after-quit #'helm-buffer-query-replace-1 'regexp bufs)))
+    (helm-run-after-exit #'helm-buffer-query-replace-1 'regexp bufs)))
 
 (defun helm-ff-run-query-replace ()
   (interactive)
@@ -1006,124 +1006,124 @@ This doesn't replace inside the files, only modify filenames."
   (interactive)
   (with-helm-alive-p
     (when (helm-file-completion-source-p)
-      (helm-quit-and-execute-action 'helm-find-files-switch-to-hist))))
+      (helm-exit-and-execute-action 'helm-find-files-switch-to-hist))))
 
 (defun helm-ff-run-grep ()
   "Run Grep action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-grep)))
+    (helm-exit-and-execute-action 'helm-find-files-grep)))
 
 (defun helm-ff-run-pdfgrep ()
   "Run Pdfgrep action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-pdfgrep)))
+    (helm-exit-and-execute-action 'helm-ff-pdfgrep)))
 
 (defun helm-ff-run-zgrep ()
   "Run Grep action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-zgrep)))
+    (helm-exit-and-execute-action 'helm-ff-zgrep)))
 
 (defun helm-ff-run-copy-file ()
   "Run Copy file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-copy)))
+    (helm-exit-and-execute-action 'helm-find-files-copy)))
 
 (defun helm-ff-run-rename-file ()
   "Run Rename file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-rename)))
+    (helm-exit-and-execute-action 'helm-find-files-rename)))
 
 (defun helm-ff-run-byte-compile-file ()
   "Run Byte compile file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-byte-compile)))
+    (helm-exit-and-execute-action 'helm-find-files-byte-compile)))
 
 (defun helm-ff-run-load-file ()
   "Run Load file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-load-files)))
+    (helm-exit-and-execute-action 'helm-find-files-load-files)))
 
 (defun helm-ff-run-eshell-command-on-file ()
   "Run eshell command on file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      'helm-find-files-eshell-command-on-file)))
 
 (defun helm-ff-run-ediff-file ()
   "Run Ediff file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-ediff-files)))
+    (helm-exit-and-execute-action 'helm-find-files-ediff-files)))
 
 (defun helm-ff-run-ediff-merge-file ()
   "Run Ediff merge file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      'helm-find-files-ediff-merge-files)))
 
 (defun helm-ff-run-symlink-file ()
   "Run Symlink file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-symlink)))
+    (helm-exit-and-execute-action 'helm-find-files-symlink)))
 
 (defun helm-ff-run-hardlink-file ()
   "Run Hardlink file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-files-hardlink)))
+    (helm-exit-and-execute-action 'helm-find-files-hardlink)))
 
 (defun helm-ff-run-delete-file ()
   "Run Delete file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-delete-marked-files)))
+    (helm-exit-and-execute-action 'helm-delete-marked-files)))
 
 (defun helm-ff-run-complete-fn-at-point ()
   "Run complete file name action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      'helm-insert-file-name-completion-at-point)))
 
 (defun helm-ff-run-switch-to-eshell ()
   "Run switch to eshell action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-switch-to-eshell)))
+    (helm-exit-and-execute-action 'helm-ff-switch-to-eshell)))
 
 (defun helm-ff-run-switch-other-window ()
   "Run switch to other window action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'find-file-other-window)))
+    (helm-exit-and-execute-action 'find-file-other-window)))
 
 (defun helm-ff-run-switch-other-frame ()
   "Run switch to other frame action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'find-file-other-frame)))
+    (helm-exit-and-execute-action 'find-file-other-frame)))
 
 (defun helm-ff-run-open-file-externally ()
   "Run open file externally command action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-open-file-externally)))
+    (helm-exit-and-execute-action 'helm-open-file-externally)))
 
 (defun helm-ff-run-open-file-with-default-tool ()
   "Run open file externally command action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-open-file-with-default-tool)))
+    (helm-exit-and-execute-action 'helm-open-file-with-default-tool)))
 
 (defun helm-ff-locate (candidate)
   "Locate action function for `helm-find-files'."
@@ -1143,7 +1143,7 @@ This doesn't replace inside the files, only modify filenames."
   "Run locate action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-locate)))
+    (helm-exit-and-execute-action 'helm-ff-locate)))
 
 (defun helm-files-insert-as-org-link (candidate)
   (insert (format "[[%s][]]" candidate))
@@ -1152,24 +1152,24 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-run-insert-org-link ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-files-insert-as-org-link)))
+    (helm-exit-and-execute-action 'helm-files-insert-as-org-link)))
 
 (defun helm-ff-run-find-file-as-root ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-find-file-as-root)))
+    (helm-exit-and-execute-action 'helm-find-file-as-root)))
 
 (defun helm-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-gnus-attach-files)))
+    (helm-exit-and-execute-action 'helm-ff-gnus-attach-files)))
 
 (defun helm-ff-run-etags ()
   "Run Etags command action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-etags-select)))
+    (helm-exit-and-execute-action 'helm-ff-etags-select)))
 
 (defvar lpr-printer-switch)
 (defun helm-ff-print (_candidate)
@@ -1226,7 +1226,7 @@ Same as `dired-do-print' but for helm."
   "Run Print file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-print)))
+    (helm-exit-and-execute-action 'helm-ff-print)))
 
 (defun helm-ff-checksum (file)
   "Calculate the checksum of FILE.
@@ -3004,7 +3004,7 @@ See `helm-browse-project'."
 (defun helm-ff-run-browse-project ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-browse-project)))
+    (helm-exit-and-execute-action 'helm-ff-browse-project)))
 
 (defun helm-ff-gid (_candidate)
   (with-helm-default-directory helm-ff-default-directory
@@ -3013,7 +3013,7 @@ See `helm-browse-project'."
 (defun helm-ff-run-gid ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-gid)))
+    (helm-exit-and-execute-action 'helm-ff-gid)))
 
 ;;; session.el files
 ;;
@@ -3259,7 +3259,7 @@ separator."
   "Run find shell command action with key from `helm-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-ff-find-sh-command)))
+    (helm-exit-and-execute-action 'helm-ff-find-sh-command)))
 
 
 ;;; Preconfigured commands

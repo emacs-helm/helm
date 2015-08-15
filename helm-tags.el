@@ -78,7 +78,7 @@ one match."
   "Run switch to other window action from `helm-source-etags-select'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      (lambda (c)
        (helm-etags-action-goto 'find-file-other-window c)))))
 
@@ -86,7 +86,7 @@ one match."
   "Run switch to other frame action from `helm-source-etags-select'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      (lambda (c)
        (helm-etags-action-goto 'find-file-other-frame c)))))
 

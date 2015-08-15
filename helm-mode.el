@@ -135,7 +135,7 @@ To fuzzy match `completion-at-point' and friends see
   "Return empty string."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action
+    (helm-exit-and-execute-action
      #'(lambda (_candidate)
          (identity "")))))
 

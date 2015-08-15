@@ -282,18 +282,18 @@ Same as `helm-moccur-goto-line' but go in new frame."
   "Run goto line other window action from `helm-source-moccur'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-moccur-goto-line-ow)))
+    (helm-exit-and-execute-action 'helm-moccur-goto-line-ow)))
 
 (defun helm-moccur-run-goto-line-of ()
   "Run goto line new frame action from `helm-source-moccur'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-moccur-goto-line-of)))
+    (helm-exit-and-execute-action 'helm-moccur-goto-line-of)))
 
 (defun helm-moccur-run-default-action ()
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-moccur-goto-line)))
+    (helm-exit-and-execute-action 'helm-moccur-goto-line)))
 
 (defvar helm-source-moccur nil)
 (defclass helm-source-multi-occur (helm-source-in-buffer)
@@ -407,7 +407,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
   "Run moccur save results action from `helm-moccur'."
   (interactive)
   (with-helm-alive-p
-    (helm-quit-and-execute-action 'helm-moccur-save-results)))
+    (helm-exit-and-execute-action 'helm-moccur-save-results)))
 
 
 ;;; helm-moccur-mode

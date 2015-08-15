@@ -80,22 +80,22 @@
 (defun helm-color-run-insert-name ()
   "Insert name of color from `helm-source-colors'"
   (interactive)
-  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-insert-name)))
+  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-name)))
 
 (defun helm-color-run-kill-name ()
   "Kill name of color from `helm-source-colors'"
   (interactive)
-  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-kill-name)))
+  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-name)))
 
 (defun helm-color-run-insert-rgb ()
   "Insert RGB of color from `helm-source-colors'"
   (interactive)
-  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-insert-rgb)))
+  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-rgb)))
 
 (defun helm-color-run-kill-rgb ()
   "Kill RGB of color from `helm-source-colors'"
   (interactive)
-  (with-helm-alive-p (helm-quit-and-execute-action 'helm-color-kill-rgb)))
+  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-rgb)))
 
 (defvar helm-color-map
   (let ((map (make-sparse-keymap)))
