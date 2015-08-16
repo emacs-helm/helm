@@ -1485,8 +1485,14 @@ Allow also checking if helm-buffer contain candidates."
   (helm-buffer-is-modified helm-current-buffer))
 
 (defun helm-run-after-exit (function &rest args)
-  "Perform an action after exiting `helm'.
-The action is to call FUNCTION with arguments ARGS."
+  "Exectute FUNCTION with ARGS after exiting `helm'.
+The action is to call FUNCTION with arguments ARGS.
+Contrarily to `helm-exit-and-execute-action' this can be used
+to call non--actions functions with any ARGS or no ARGS at all.
+
+Use this on commands invoked from keybindings, but not
+on action functions invoked as action from the action menu,
+i.e functions called with RET."
   (helm-kill-async-processes)
   (helm-log "function = %S" function)
   (helm-log "args = %S" args)
@@ -1495,7 +1501,13 @@ The action is to call FUNCTION with arguments ARGS."
      (apply function args))))
 
 (defun helm-exit-and-execute-action (action)
-  "Quit current helm session and execute ACTION."
+  "Exit current helm session and execute ACTION.
+Argument ACTION is a function called with one arg (candidate)
+and part of the actions of current source.
+
+Use this on commands invoked from keybindings, but not
+on action functions invoked as action from the action menu,
+i.e functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (helm-get-selection))
   (helm-exit-minibuffer))
