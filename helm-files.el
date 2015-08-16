@@ -951,30 +951,33 @@ This doesn't replace inside the files, only modify filenames."
 ;; The action.
 (defun helm-ff-query-replace-on-marked (_candidate)
   (let ((marked (helm-marked-candidates)))
-    (helm-run-after-exit #'helm-ff-query-replace-on-marked-1 marked)))
+    (helm-ff-query-replace-on-marked-1 marked)))
 
 ;; The command for `helm-find-files-map'.
 (defun helm-ff-run-query-replace-on-marked ()
   (interactive)
-  (helm-ff-query-replace-on-marked nil))
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-query-replace-on-marked)))
 
 (defun helm-ff-query-replace (_candidate)
   (let ((bufs (cl-loop for f in (helm-marked-candidates)
                        collect (buffer-name (find-file-noselect f)))))
-    (helm-run-after-exit #'helm-buffer-query-replace-1 nil bufs)))
+    (helm-buffer-query-replace-1 nil bufs)))
 
 (defun helm-ff-query-replace-regexp (_candidate)
   (let ((bufs (cl-loop for f in (helm-marked-candidates)
                        collect (buffer-name (find-file-noselect f)))))
-    (helm-run-after-exit #'helm-buffer-query-replace-1 'regexp bufs)))
+    (helm-buffer-query-replace-1 'regexp bufs)))
 
 (defun helm-ff-run-query-replace ()
   (interactive)
-  (helm-ff-query-replace nil))
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-query-replace)))
 
 (defun helm-ff-run-query-replace-regexp ()
   (interactive)
-  (helm-ff-query-replace-regexp nil))
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-query-replace-regexp)))
 
 (defun helm-ff-toggle-auto-update (_candidate)
   (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
