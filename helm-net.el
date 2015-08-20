@@ -75,7 +75,7 @@ a personal url, see your settings on duckduckgo."
   :group 'helm-net)
 
 (defcustom helm-wikipedia-suggest-url
-  "http://en.wikipedia.org/w/api.php?action=opensearch&search="
+  "https://en.wikipedia.org/w/api.php?action=opensearch&search="
   "Url used for looking up Wikipedia suggestions."
   :type 'string
   :group 'helm-net)
