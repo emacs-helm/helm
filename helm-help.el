@@ -1243,7 +1243,7 @@ HELM-ATTRIBUTE should be a symbol."
 
 (helm-document-attribute 'match-strict "optional"
   "  When specifying a match function within a source and
-  helm-match-plugin is enabled, the result of all matching
+  helm-multi-match is enabled, the result of all matching
   functions will be concatened, which in some cases is not what
   is wanted. When using `match-strict' only this or these
   functions will be used. You can specify those functions as a

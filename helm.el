@@ -2935,7 +2935,7 @@ Default function to match candidates according to `helm-pattern'."
 This function is used with sources build with `helm-source-sync'."
   (unless (string-match " " helm-pattern)
     ;; When pattern have one or more spaces, let
-    ;; match-plugin doing the job with no fuzzy matching.[1]
+    ;; multi-match doing the job with no fuzzy matching.[1]
     (let ((regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache))))
       (if (string-match "\\`!" helm-pattern)
           (not (string-match regexp candidate))
@@ -3330,7 +3330,7 @@ is done on whole `helm-buffer' and not on current source."
               (if (or (assoc 'matchplugin source)
                       (null (assoc 'no-matchplugin source)))
                   ;; Don't count spaces entered when using
-                  ;; match-plugin.
+                  ;; multi-match.
                   (replace-regexp-in-string " " "" helm-pattern)
                 helm-pattern))))
     (and (or (not helm-source-filter)
@@ -3339,7 +3339,7 @@ is done on whole `helm-buffer' and not on current source."
              (helm-aif (assoc 'requires-pattern source) (or (cdr it) 1) 0))
          ;; These incomplete regexps hang helm forever
          ;; so defer update. Maybe replace spaces quoted when using
-         ;; match-plugin-mode.
+         ;; multi-match.
          (not (member (replace-regexp-in-string "\\s\\ " " " helm-pattern)
                       helm-update-blacklist-regexps)))))
 
@@ -4360,11 +4360,11 @@ When at end of minibuffer delete all."
 ;;
 ;; i.e Inherit instead of helm-type-* classes in your own classes.
 
-;; [DEPRECATED] Enable match-plugin by default in old sources.
+;; [DEPRECATED] Enable multi-match by default in old sources.
 ;; This is deprecated and will not run in sources
 ;; created by helm-source.
 ;; Keep it for backward compatibility with old sources.
-(defun helm-compile-source--match-plugin (source)
+(defun helm-compile-source--multi-match (source)
   (if (assoc 'no-matchplugin source)
       source
     (let* ((searchers        helm-mm-default-search-functions)
@@ -4388,7 +4388,7 @@ When at end of minibuffer delete all."
              `(search ,@searchfns) `(match ,@matchfns))
          ,@source))))
 
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--match-plugin)
+(add-to-list 'helm-compile-source-functions 'helm-compile-source--multi-match)
 
 (defun helm-compile-source--type (source)
   (helm-aif (assoc-default 'type source)

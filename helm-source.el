@@ -546,7 +546,7 @@
     :initform '("ERROR: You must specify the `candidates' slot, either with a list or a function"))
 
    (dont-plug
-    :initform '(helm-compile-source--match-plugin
+    :initform '(helm-compile-source--multi-match
                 helm-compile-source--persistent-help))
    
    (match-strict
@@ -555,7 +555,7 @@
     :custom function
     :documentation
     "  When specifying a match function within a source and
-  helm-match-plugin is enabled, the result of all matching
+  helm-multi-match is enabled, the result of all matching
   functions will be concatened, which in some cases is not what
   is wanted. When using `match-strict' only this or these
   functions will be used. You can specify those functions as a
@@ -584,7 +584,7 @@ Matching is done basically with `string-match' against each candidate.")
   `helm-buffer' give to the process a sentinel.")
 
    (matchplugin :initform nil)
-   (dont-plug :initform '(helm-compile-source--match-plugin
+   (dont-plug :initform '(helm-compile-source--multi-match
                           helm-compile-source--persistent-help)))
 
   "Use this class to define a helm source calling an external process.
@@ -607,7 +607,7 @@ inherit from `helm-source'.")
    
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer
-                helm-compile-source--match-plugin
+                helm-compile-source--multi-match
                 helm-compile-source--persistent-help))
    
    (candidates
@@ -653,7 +653,7 @@ inherit from `helm-source'.")
     :custom function
     :documentation
     "  When specifying a search function within a source and
-  helm-match-plugin is enabled, the result of all searching
+  helm-multi-match is enabled, the result of all searching
   functions will be concatened, which in some cases is not what
   is wanted. When using `search-strict' only this or these
   functions will be used. You can specify those functions as a
