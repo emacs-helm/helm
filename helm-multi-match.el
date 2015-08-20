@@ -28,7 +28,7 @@
 (defvar helm-pattern)
 
 
-(defgroup helm-match-plugin nil
+(defgroup helm-multi-match nil
   "Helm multi match."
   :group 'helm)
 
@@ -46,7 +46,7 @@ Default is multi3."
            (const :tag "Multiple regexp 2 ordered with partial match"        multi2)
            (const :tag "Multiple regexp 3 matching no order, partial, best." multi3)
            (const :tag "Multiple regexp 3p matching with prefix match"       multi3p))
-  :group 'helm-match-plugin)
+  :group 'helm-multi-match)
 
 
 ;; Internal
