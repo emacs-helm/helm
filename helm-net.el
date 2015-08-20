@@ -189,7 +189,7 @@ This is a format string, don't forget the `%s'."
   (let ((request (concat helm-google-suggest-url
                          (url-hexify-string input))))
     (helm-net--url-retrieve-sync request)))
-        
+
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
   (let ((suggestions (helm-google-suggest-fetch
