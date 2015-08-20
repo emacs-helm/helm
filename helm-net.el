@@ -162,33 +162,33 @@ This is a format string, don't forget the `%s'."
                         candidate))))
   "List of additional actions for suggest sources.")
 
-(defun helm-net--url-retrieve-sync (request &optional parser)
-  (let ((fetch (or parser
-                   (lambda ()
-                     (cl-loop
-                      with result-alist = (xml-get-children
-                                           (car (xml-parse-region
-                                                 (point-min) (point-max)))
-                                           'CompleteSuggestion)
-                      for i in result-alist collect
-                      (cdr (cl-caadr (assoc 'suggestion i))))))))
-    (if helm-net-prefer-curl
-        (with-temp-buffer
-          (call-process "curl" nil t nil request)
-          (funcall fetch))
-        (with-current-buffer
-            (url-retrieve-synchronously request)
-          (funcall fetch)))))
+(defun helm-net--url-retrieve-sync (request parser)
+  (if helm-net-prefer-curl
+      (with-temp-buffer
+        (call-process "curl" nil t nil request)
+        (funcall parser))
+      (with-current-buffer (url-retrieve-synchronously request)
+        (funcall parser))))
 
 
 ;;; Google Suggestions
 ;;
 ;;
+(defun helm-google-suggest-parser ()
+  (cl-loop
+   with result-alist = (xml-get-children
+                        (car (xml-parse-region
+                              (point-min) (point-max)))
+                        'CompleteSuggestion)
+   for i in result-alist collect
+   (cdr (cl-caadr (assoc 'suggestion i)))))
+
 (defun helm-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer."
   (let ((request (concat helm-google-suggest-url
                          (url-hexify-string input))))
-    (helm-net--url-retrieve-sync request)))
+    (helm-net--url-retrieve-sync
+     request #'helm-google-suggest-parser)))
 
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
   "Set candidates with result and number of google results found."
