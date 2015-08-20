@@ -129,18 +129,9 @@ This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
-
-;;; Additional actions for search suggestions
-;;
-;;
-;; Internal
-
-(defun helm-search-suggest-perform-additional-action (url query)
-  "Perform the search via URL using QUERY as input."
-  (browse-url (format url (url-hexify-string query))))
-
-(defvar helm-search-suggest-additional-actions
-  '(("Wikipedia" . (lambda (candidate)
+(defcustom helm-google-suggest-actions
+  '(("Google Search" . helm-google-suggest-action)
+    ("Wikipedia" . (lambda (candidate)
                      (helm-search-suggest-perform-additional-action
                       helm-search-suggest-action-wikipedia-url
                       candidate)))
@@ -160,7 +151,19 @@ This is a format string, don't forget the `%s'."
                        (helm-search-suggest-perform-additional-action
                         helm-search-suggest-action-google-news-url
                         candidate))))
-  "List of additional actions for suggest sources.")
+  "List of actions for google suggest sources."
+  :group 'helm-net
+  :type '(alist :key-type string :value-type function))
+
+
+;;; Additional actions for search suggestions
+;;
+;;
+;; Internal
+
+(defun helm-search-suggest-perform-additional-action (url query)
+  "Perform the search via URL using QUERY as input."
+  (browse-url (format url (url-hexify-string query))))
 
 (defun helm-net--url-retrieve-sync (request parser)
   (if helm-net-prefer-curl
@@ -234,14 +237,13 @@ This is a format string, don't forget the `%s'."
   "Default function to use in helm google suggest.")
 
 (defvar helm-source-google-suggest
-  `((name . "Google Suggest")
-    (candidates . (lambda ()
-                    (funcall helm-google-suggest-default-function)))
-    (action . ,(cons '("Google Search" . helm-google-suggest-action)
-                     helm-search-suggest-additional-actions))
-    (volatile)
-    (keymap . ,helm-map)
-    (requires-pattern . 3)))
+  (helm-build-sync-source "Google Suggest"
+    :candidates (lambda ()
+                  (funcall helm-google-suggest-default-function))
+    :action 'helm-google-suggest-actions
+    :volatile t
+    :keymap helm-map
+    :requires-pattern 3))
 
 (defun helm-google-suggest-emacs-lisp ()
   "Try to emacs lisp complete with google suggestions."
@@ -342,18 +344,18 @@ This is a format string, don't forget the `%s'."
 
 
 (defvar helm-source-wikipedia-suggest
-  `((name . "Wikipedia Suggest")
-    (candidates . helm-wikipedia-suggest-fetch)
-    (action . (("Wikipedia" . (lambda (candidate)
-                                (helm-search-suggest-perform-additional-action
-                                 helm-search-suggest-action-wikipedia-url
-                                 candidate)))))
-    (persistent-action . helm-wikipedia-persistent-action)
-    (volatile)
-    (keymap . ,helm-map)
-    (follow . 1)
-    (follow-delay . ,helm-wikipedia-follow-delay)
-    (requires-pattern . 3)))
+  (helm-build-sync-source "Wikipedia Suggest"
+    :candidates #'helm-wikipedia-suggest-fetch
+    :action '(("Wikipedia" . (lambda (candidate)
+                               (helm-search-suggest-perform-additional-action
+                                helm-search-suggest-action-wikipedia-url
+                                candidate))))
+    :persistent-action #'helm-wikipedia-persistent-action
+    :volatile t
+    :keymap helm-map
+    :follow 1
+    :follow-delay helm-wikipedia-follow-delay
+    :requires-pattern 3))
 
 
 ;;; Web browser functions.
