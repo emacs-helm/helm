@@ -31,7 +31,7 @@
 (require 'cl-lib)
 (require 'advice) ; Shutup byte compiler about ad-deactivate.
 (require 'helm-lib)
-(require 'helm-match-plugin)
+(require 'helm-multi-match)
 (require 'helm-source)
 
 
@@ -4367,7 +4367,7 @@ When at end of minibuffer delete all."
 (defun helm-compile-source--match-plugin (source)
   (if (assoc 'no-matchplugin source)
       source
-    (let* ((searchers        helm-mp-default-search-functions)
+    (let* ((searchers        helm-mm-default-search-functions)
            (defmatch         (helm-aif (assoc-default 'match source)
                                  (helm-mklist it)))
            (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
@@ -4378,8 +4378,8 @@ When at end of minibuffer delete all."
                                  (helm-mklist it)))
            (matchfns         (cond (defmatch-strict)
                                    (defmatch
-                                    (append helm-mp-default-match-functions defmatch))
-                                   (t helm-mp-default-match-functions)))
+                                    (append helm-mm-default-match-functions defmatch))
+                                   (t helm-mm-default-match-functions)))
            (searchfns        (cond (defsearch-strict)
                                    (defsearch
                                     (append searchers defsearch))

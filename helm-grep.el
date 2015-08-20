@@ -1030,7 +1030,7 @@ in recurse, and ignoring EXTS, search being made on
           (goto-char (point-min))
           (cl-loop for reg in (if multi-match
                                   ;; (m)occur.
-                                  (cl-loop for r in (helm-mp-split-pattern
+                                  (cl-loop for r in (helm-mm-split-pattern
                                                      helm-pattern)
                                            unless (string-match "\\`!" r)
                                            collect r)

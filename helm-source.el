@@ -643,7 +643,7 @@ inherit from `helm-source'.")
   this function should returns in such case a cons cell of two integers defining
   the beg and end positions to match in the line previously matched by
   `re-search-forward' or similar, and move point to next line
-  (See how the `helm-mp-3-search-base' and `helm-fuzzy-search' functions are working).
+  (See how the `helm-mm-3-search-base' and `helm-fuzzy-search' functions are working).
 
   NOTE: FUZZY-MATCH slot will overhide value of this slot.")
    
@@ -742,12 +742,12 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
     (helm--setup-source source)
     (helm--create-source source)))
 
-(defvar helm-mp-default-search-functions)
-(defvar helm-mp-default-match-functions)
+(defvar helm-mm-default-search-functions)
+(defvar helm-mm-default-match-functions)
 
 (defun helm-source-mp-get-search-or-match-fns (source method)
   (let ((searchers        (and (eq method 'search)
-                               helm-mp-default-search-functions))
+                               helm-mm-default-search-functions))
         (defmatch         (helm-aif (slot-value source 'match)
                               (helm-mklist it)))
         (defmatch-strict  (helm-aif (and (eq method 'match)
@@ -762,8 +762,8 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
     (cl-case method
       (match (cond (defmatch-strict)
                    (defmatch
-                    (append helm-mp-default-match-functions defmatch))
-                   (t helm-mp-default-match-functions)))
+                    (append helm-mm-default-match-functions defmatch))
+                   (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
                     (defsearch
                      (append searchers defsearch))

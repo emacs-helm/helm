@@ -1729,7 +1729,7 @@ systems."
 
 (defun helm-ff-smart-completion-p ()
   (and helm-ff-smart-completion
-       (not (memq helm-mp-matching-method '(multi1 multi3p)))))
+       (not (memq helm-mm-matching-method '(multi1 multi3p)))))
 
 (defun helm-ff--transform-pattern-for-completion (pattern)
   "Maybe return PATTERN with it's basename modified as a regexp.
