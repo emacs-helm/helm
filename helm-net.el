@@ -59,11 +59,14 @@ When nil, fallback to `browse-url-browser-function'."
   :type 'string
   :group 'helm-net)
 
-(defcustom helm-google-suggest-use-curl-p nil
-  "When non--nil use CURL to get info from `helm-google-suggest-url'.
+(defcustom helm-net-prefer-curl nil
+  "When non--nil use CURL external program to fetch data.
 Otherwise `url-retrieve-synchronously' is used."
   :type 'boolean
   :group 'helm-net)
+
+(defvaralias 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl)
+(make-obsolete-variable 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl "1.7.7")
 
 (defcustom helm-surfraw-duckduckgo-url
   "https://duckduckgo.com/lite/?q=%s&kp=1"
@@ -169,7 +172,7 @@ This is a format string, don't forget the `%s'."
                                            'CompleteSuggestion)
                       for i in result-alist collect
                       (cdr (cl-caadr (assoc 'suggestion i))))))))
-    (if helm-google-suggest-use-curl-p
+    (if helm-net-prefer-curl
         (with-temp-buffer
           (call-process "curl" nil t nil request)
           (funcall fetch))
