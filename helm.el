@@ -3757,7 +3757,7 @@ Possible value of DIRECTION are 'next or 'previous."
 
 (defun helm--set-header-line (&optional update)
   (with-selected-window (minibuffer-window)
-    (let* ((beg  (save-excursion (vertical-motion 0) (point))) 
+    (let* ((beg  (save-excursion (vertical-motion 0 (helm-window)) (point)))
            (end  (save-excursion (end-of-visual-line) (point)))
            ;; The visual line where the cursor is.
            (cont (buffer-substring beg end))
