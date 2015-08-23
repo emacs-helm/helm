@@ -23,6 +23,8 @@
 (require 'helm-utils)
 (require 'helm-plugin)
 
+(declare-function helm-mm-split-pattern "helm-multi-match")
+
 
 (defgroup helm-regexp nil
   "Regexp related Applications and libraries for Helm."

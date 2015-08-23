@@ -28,6 +28,7 @@
 (declare-function helm-elscreen-find-file "helm-elscreen" (file))
 (declare-function View-quit "view")
 (declare-function doc-view-goto-page "doc-view" (page))
+(declare-function helm-mm-split-pattern "helm-multi-match")
 
 
 (defgroup helm-grep nil

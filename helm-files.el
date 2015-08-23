@@ -51,6 +51,7 @@
 (declare-function helm-ls-svn-ls "ext:helm-ls-svn")
 
 (defvar recentf-list)
+(defvar helm-mm-matching-method)
 
 
 ;;; Type attributes
