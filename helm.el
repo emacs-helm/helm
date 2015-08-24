@@ -224,6 +224,7 @@ so don't use strings, vectors or whatever to define them."
     (define-key map (kbd "C-c C-i")    'helm-copy-to-buffer)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-refresh)
+    (define-key map (kbd "C-c >")      'helm-toggle-truncate-line)
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
@@ -5400,6 +5401,14 @@ See `fit-window-to-buffer' for more infos."
 It may appear after next update if provided.\ni.e After first results popup in helm buffer."
             (substitute-command-keys
              (helm-interpret-value helm-help-message)))))))))
+
+(defun helm-toggle-truncate-line ()
+  "Toggle `truncate-lines' value in `helm-buffer'"
+  (interactive)
+  (with-helm-alive-p
+    (with-helm-buffer
+      (setq truncate-lines (not truncate-lines))
+      (helm-update (regexp-quote (helm-get-selection nil t))))))
 
 (provide 'helm)
 
