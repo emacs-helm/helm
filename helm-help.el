@@ -746,15 +746,34 @@ to modify occurences in your buffer.
 (defvar helm-el-package-help-message
   "\n* Helm elisp package\n
 \n** Helm elisp package tips:
+
+*** Compile all your packages asynchronously
+
+When using async (if you have installed from MELPA you do), only helm, helm-core,
+and magit are compiled asynchronously, if you want all your packages compiled async,
+add to your init file:
+    
+     (setq async-bytecomp-allowed-packages '(all))
+    
 *** Upgrade elisp packages
+
+On initial start (when emacs is fetching packages on remote), if helm find
+package to upgrade it will start in the upgradables packages view showing the packages
+availables to upgrade.
+On further starts, you will have to refresh the list with `C-c C-u', if helm find upgrades
+you will have a message telling you some packages are available for upgrade, you can switch to
+upgrade view (see below) to see what packages are available for upgrade or just hit `C-c U'.
+to upgrade all.
 
 To see upgradables packages hit <M-U>.
 
-Then you can install all upgradables packages with the upgrade all action,
+Then you can install all upgradables packages with the upgrade all action (`C-c C-u'),
 or upgrade only the specific packages by marking them (the new ones) and running
 the upgrade action (visible only when there is upgradables packages).
 Of course you can upgrade a single package by just running the upgrade action
-without marking it.
+without marking it (`C-c u' or RET) .
+
+\*WARNING* You are strongly advised to RESTART emacs after UPGRADING packages.
 
 *** Meaning of flags prefixing packages (Emacs-25)
 
