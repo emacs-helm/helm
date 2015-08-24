@@ -223,7 +223,7 @@ so don't use strings, vectors or whatever to define them."
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
     (define-key map (kbd "C-c C-i")    'helm-copy-to-buffer)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
-    (define-key map (kbd "C-c C-u")    'helm-force-update)
+    (define-key map (kbd "C-c C-u")    'helm-refresh)
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
@@ -3360,12 +3360,16 @@ is done on whole `helm-buffer' and not on current source."
 
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
+
 The difference with `helm-update' is this function is reevaling
 the `init' and `update' attributes functions when present
-before updating candidates according to pattern i.e calling `helm-update'.
+before running `helm-update', also `helm-candidate-cache',
+if some (async candidates are not cached)
+is not reinitialized so that candidates are not recomputed
+unless pattern have changed.
+
 Selection is preserved to current candidate or moved to PRESELECT
 if specified."
-  (interactive)
   (let ((source    (helm-get-current-source))
         (selection (helm-get-selection nil t))
         ;; `helm-goto-source' need to have all sources displayed
@@ -3377,6 +3381,12 @@ if specified."
             (helm-get-sources)))
     (helm-update (or preselect selection) source)
     (with-helm-window (recenter))))
+
+(defun helm-refresh ()
+  "Force recalculation and update of candidates."
+  (interactive)
+  (with-helm-alive-p
+    (helm-force-update)))
 
 (defun helm-force-update--reinit (source)
   "Reinit SOURCE by calling his update and/or init functions."
