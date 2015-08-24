@@ -576,7 +576,11 @@ navigate to another directory to consult its database.
 ;;
 (defvar helm-ucs-help-message
   "\n* Helm Ucs\n
-\n** Specific commands for `helm-ucs':\n
+** Helm ucs tips
+Use commands below to insert unicode characters
+in current-buffer without quitting helm.
+
+** Specific commands for `helm-ucs':\n
 \\<helm-ucs-map>
 \\[helm-ucs-persistent-insert]\t->Insert char.
 \\[helm-ucs-persistent-forward]\t->Forward char.
