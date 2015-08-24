@@ -728,7 +728,8 @@ and before performing action.")
   "Variables which are restored after `helm' invocation.")
 
 (defvar helm-execute-action-at-once-if-one nil
-  "Execute default action and exit when only one candidate is remaining.")
+  "Execute default action and exit when only one candidate is remaining.
+It can be also a function returning a boolean value.")
 
 (defvar helm-quit-if-no-candidate nil
   "Quit when there is no candidates when non--nil.
@@ -2462,7 +2463,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
              (helm-force-update)))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
-      (cond ((and helm-execute-action-at-once-if-one
+      (cond ((and (if (functionp helm-execute-action-at-once-if-one)
+                      (funcall helm-execute-action-at-once-if-one)
+                      helm-execute-action-at-once-if-one)
                   (not source-delayed-p)
                   (= (helm-get-candidate-number) 1))
              (ignore))              ; Don't enter the minibuffer loop.

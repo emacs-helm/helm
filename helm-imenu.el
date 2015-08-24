@@ -33,10 +33,11 @@
   :group 'helm-imenu
   :type 'string)
 
-(defcustom helm-imenu-execute-action-at-once-if-one t
+(defcustom helm-imenu-execute-action-at-once-if-one
+  #'helm-imenu--execute-action-at-once-p
   "Goto the candidate when only one is remaining."
   :group 'helm-imenu
-  :type 'boolean)
+  :type 'function)
 
 (defcustom helm-imenu-lynx-style-map t
   "Use Arrow keys to jump to occurences."
@@ -116,6 +117,18 @@
 (defun helm-imenu--maybe-switch-to-buffer (candidate)
   (helm-aif (marker-buffer (cdr candidate))
       (switch-to-buffer it)))
+
+(defun helm-imenu--execute-action-at-once-p ()
+  (let ((cur (helm-get-selection))
+        (mb (with-helm-current-buffer
+              (save-excursion
+                (goto-char (point-at-bol))
+                 (point-marker)))))
+    (if (equal (cdr cur) mb)
+        (prog1 nil
+          (helm-set-pattern "")
+          (helm-force-update))
+        t)))
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
