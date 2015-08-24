@@ -152,7 +152,6 @@ Only math* symbols are collected."
 (defvar helm-source-ucs
   (helm-build-in-buffer-source "Ucs names"
     :init #'helm-ucs-init
-    :candidate-number-limit 9999
     :help-message 'helm-ucs-help-message
     :filtered-candidate-transformer
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
