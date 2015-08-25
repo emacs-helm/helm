@@ -241,10 +241,7 @@
         (helm-execute-action-at-once-if-one
          helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu
-          :default (list (concat "\\_<" str "\\_>") str)
-          :preselect (unless (memq 'helm-source-imenu
-                                   helm-sources-using-default-as-input)
-                       str)
+          :preselect str
           :buffer "*helm imenu*")))
 
 ;;;###autoload

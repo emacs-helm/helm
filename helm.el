@@ -729,7 +729,7 @@ and before performing action.")
 
 (defvar helm-execute-action-at-once-if-one nil
   "Execute default action and exit when only one candidate is remaining.
-It can be also a function returning a boolean value.")
+It can be also a function called with no args returning a boolean value.")
 
 (defvar helm-quit-if-no-candidate nil
   "Quit when there is no candidates when non--nil.
@@ -2517,7 +2517,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
 This function is handling `helm-execute-action-at-once-if-one' and
 `helm-quit-if-no-candidate' in delayed sources."
   (with-helm-window
-    (cond ((and helm-execute-action-at-once-if-one
+    (cond ((and (if (functionp helm-execute-action-at-once-if-one)
+                    (funcall helm-execute-action-at-once-if-one)
+                    helm-execute-action-at-once-if-one)
                 (= (helm-get-candidate-number) 1))
            (helm-exit-minibuffer))
           ((and helm-quit-if-no-candidate
