@@ -3765,8 +3765,8 @@ Possible value of DIRECTION are 'next or 'previous."
                           (and (listp source)
                                (assoc-default 'header-line source))
                           source))
-                  (hlend (make-string (max 0 (- (window-width)
-                                                (length hlstr))) ? )))
+                  (len (max 0 (- (length hlstr) 2)))
+                  (hlend (make-string (max 0 (- (window-width) len)) ? )))
              (setq header-line-format
                    (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
   (when force (force-mode-line-update)))
