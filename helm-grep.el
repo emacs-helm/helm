@@ -1179,6 +1179,53 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      (format-spec helm-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
 
+;;; AG
+;;
+;;
+(defun helm-grep-ag-1 (directory)
+  (helm :sources
+        (helm-build-async-source "ag"
+          :candidates-process
+          (lambda ()
+            (let (process-connection-type)
+              (prog1
+                  (start-process-shell-command
+                   "ag" helm-buffer
+                   (format "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
+                           helm-pattern
+                           directory))
+                (set-process-sentinel
+                 (get-buffer-process helm-buffer)
+                 (lambda (_process event)
+                   (when (string= event "finished\n")
+                     (with-helm-window
+                       (setq mode-line-format
+                             '(" " mode-line-buffer-identification " "
+                               (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                               (:eval (propertize
+                                       (format
+                                        "[AG process finished - (%s results)] "
+                                        (max (1- (count-lines
+                                                  (point-min)
+                                                  (point-max)))
+                                             0))
+                                       'face 'helm-grep-finish))))
+                       (force-mode-line-update))))))))
+          :nohighlight t
+          :filter-one-by-one 'helm-grep-filter-one-by-one
+          :persistent-action 'helm-grep-persistent-action
+          :candidate-number-limit 99999
+          :requires-pattern 2
+          :action (helm-make-actions
+                   "Find File" 'helm-grep-action
+                   "Find file other frame" 'helm-grep-other-frame
+                   (lambda () (and (locate-library "elscreen")
+                                   "Find file in Elscreen"))
+                   'helm-grep-jump-elscreen
+                   "Save results in grep buffer" 'helm-grep-save-results
+                   "Find file other window" 'helm-grep-other-window))
+        :buffer "*helm ag*"))
+
 ;;;###autoload
 (defun helm-do-grep ()
   "Preconfigured helm for grep.

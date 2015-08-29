@@ -322,6 +322,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
     (define-key map (kbd "M-g z")         'helm-ff-run-zgrep)
+    (define-key map (kbd "M-g a")         'helm-ff-run-grep-ag)
     (define-key map (kbd "C-c g")         'helm-ff-run-gid)
     (define-key map (kbd "M-.")           'helm-ff-run-etags)
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
@@ -440,6 +441,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Add marked files to file-cache" 'helm-ff-cache-add-file
    "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
    "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
+   "Grep current directory with AG" 'helm-find-files-ag
    "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
    "Gid" 'helm-ff-gid
    "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
@@ -638,6 +640,9 @@ ACTION must be an action supported by `helm-dired-action'."
   "Default action to grep files from `helm-find-files'."
   (helm-do-grep-1 (helm-marked-candidates :with-wildcard t)
                   helm-current-prefix-arg))
+
+(defun helm-find-files-ag (_candidate)
+  (helm-grep-ag-1 helm-ff-default-directory))
 
 (defun helm-ff-zgrep (_candidate)
   "Default action to zgrep files from `helm-find-files'."
@@ -1017,6 +1022,11 @@ This doesn't replace inside the files, only modify filenames."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-find-files-grep)))
+
+(defun helm-ff-run-grep-ag ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-find-files-ag)))
 
 (defun helm-ff-run-pdfgrep ()
   "Run Pdfgrep action from `helm-source-find-files'."
