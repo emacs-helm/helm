@@ -1187,13 +1187,15 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         (helm-build-async-source "ag"
           :candidates-process
           (lambda ()
-            (let (process-connection-type)
-              (prog1
-                  (start-process-shell-command
-                   "ag" helm-buffer
+            (let (process-connection-type
+                  (cmd-line
                    (format "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
                            helm-pattern
-                           directory))
+                           directory)))
+              (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
+              (prog1
+                  (start-process-shell-command
+                   "ag" helm-buffer cmd-line)
                 (set-process-sentinel
                  (get-buffer-process helm-buffer)
                  (lambda (_process event)
@@ -1212,6 +1214,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                                        'face 'helm-grep-finish))))
                        (force-mode-line-update))))))))
           :nohighlight t
+          :keymap helm-grep-map
           :filter-one-by-one 'helm-grep-filter-one-by-one
           :persistent-action 'helm-grep-persistent-action
           :candidate-number-limit 99999
