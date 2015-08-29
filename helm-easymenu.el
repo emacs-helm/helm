@@ -52,6 +52,7 @@
    ("Tools"
     ["Occur" helm-occur t]
     ["Grep" helm-do-grep t]
+    ["Grep current directory with AG" helm-do-grep-ag t]
     ["Gid"  helm-gid t]
     ["Etags" helm-etags-select t]
     ["Lisp complete at point" helm-lisp-completion-at-point t]
