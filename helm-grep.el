@@ -1227,6 +1227,12 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
         :buffer "*helm ag*"))
 
 ;;;###autoload
+(defun helm-do-grep-ag ()
+  "Preconfigured helm for grepping with AG in `default-directory'."
+  (interactive)
+  (helm-grep-ag-1 default-directory))
+
+;;;###autoload
 (defun helm-do-grep ()
   "Preconfigured helm for grep.
 Contrarily to Emacs `grep', no default directory is given, but
