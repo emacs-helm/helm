@@ -3761,14 +3761,14 @@ Possible value of DIRECTION are 'next or 'previous."
            (setq force t)
            (helm--set-header-line))
           (helm-display-header-line
-           (let* ((hlstr (helm-interpret-value
+           (let ((hlstr (helm-interpret-value
                           (and (listp source)
                                (assoc-default 'header-line source))
                           source))
-                  (len (max 0 (- (length hlstr) 2)))
-                  (hlend (make-string (max 0 (- (window-width) len)) ? )))
+                 (endstr (make-string (window-width) ? )))
              (setq header-line-format
-                   (propertize (concat " " hlstr hlend) 'face 'helm-header))))))
+                   (propertize (concat " " hlstr endstr)
+                               'face 'helm-header))))))
   (when force (force-mode-line-update)))
 
 (defun helm--set-header-line (&optional update)
