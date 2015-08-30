@@ -993,7 +993,7 @@ in recurse, and ignoring EXTS, search being made on
                               (funcall helm-grep-default-directory-fn))))
          ansi-color-context ; seems this avoid non--translated fname entries.
          ;; Fix bug in `ansi-color-regexp'.
-         (ansi-color-regexp "\\[\\(K\\|[0-9;]*m\\)")
+         ;; (ansi-color-regexp "\033\\[\\(K\\|[0-9;]*m\\)")
          (ansi-p (string-match-p ansi-color-regexp candidate))
          (line   (if ansi-p (ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
