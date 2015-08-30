@@ -993,6 +993,7 @@ in recurse, and ignoring EXTS, search being made on
                               (funcall helm-grep-default-directory-fn))))
          ansi-color-context ; seems this avoid non--translated fname entries.
          ;; Fix bug in `ansi-color-regexp'.
+         ;; This fix is disabled because it is not working on emacs-25
          ;; (ansi-color-regexp "\033\\[\\(K\\|[0-9;]*m\\)")
          (ansi-p (string-match-p ansi-color-regexp candidate))
          (line   (if ansi-p (ansi-color-apply candidate) candidate))
@@ -1186,7 +1187,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;
 ;; TODO:
 ;; [x] make command configurable.
-;; [x] Fix ansi sequences (maybe nothing to fix, check).
+;; [] Fix ansi sequences (maybe nothing to fix, check).
 ;; [] Make a source (will allow using default as input easily) .
 ;; [] Create a candidates-process fn (find a way to pass directory arg).
 
@@ -1199,10 +1200,7 @@ You must use a format that fit with helm grep, that is:
 
     filename:line-number:string
 
-The options \"--nogroup\" allow this.
-
-By default \"--nocolor\" option is used but you can use safely \"--color\"
-which will process faster the line."
+The options \"--nogroup\" allow this."
   :group 'helm-grep
   :type 'string)
 
