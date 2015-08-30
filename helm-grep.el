@@ -1188,7 +1188,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;; [x] make command configurable.
 ;; [x] Fix ansi sequences (maybe nothing to fix, check).
 ;; [] Make a source (will allow using default as input easily) .
-;; [] Create a candidates-process fn.
+;; [] Create a candidates-process fn (find a way to pass directory arg).
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
