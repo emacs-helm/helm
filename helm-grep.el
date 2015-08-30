@@ -1185,10 +1185,26 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;
 ;;
 ;; TODO:
-;; [] make command configurable.
+;; [x] make command configurable.
 ;; [x] Fix ansi sequences (maybe nothing to fix, check).
 ;; [] Make a source (will allow using default as input easily) .
 ;; [] Create a candidates-process fn.
+
+(defcustom helm-grep-ag-command
+  "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
+  "The default command for AG.
+Take two format specs, the first for pattern and the second for directory.
+
+You must use a format that fit with helm grep, that is:
+
+    filename:line-number:string
+
+The options \"--nogroup\" allow this.
+
+By default \"--nocolor\" option is used but you can use safely \"--color\"
+which will process faster the line."
+  :group 'helm-grep
+  :type 'string)
 
 (defun helm-grep-ag-1 (directory)
   (helm :sources
@@ -1197,7 +1213,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
           (lambda ()
             (let (process-connection-type
                   (cmd-line
-                   (format "ag --line-numbers -S --hidden --color --nogroup %s %s"
+                   (format helm-grep-ag-command
                            helm-pattern
                            directory)))
               (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
