@@ -992,6 +992,8 @@ in recurse, and ignoring EXTS, search being made on
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
          ansi-color-context ; seems this avoid non--translated fname entries.
+         ;; Fix bug in `ansi-color-regexp'.
+         (ansi-color-regexp "\\[\\(K\\|[0-9;]*m\\)")
          (ansi-p (string-match-p ansi-color-regexp candidate))
          (line   (if ansi-p (ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
@@ -1182,6 +1184,12 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;; AG
 ;;
 ;;
+;; TODO:
+;; [] make command configurable.
+;; [x] Fix ansi sequences (maybe nothing to fix, check).
+;; [] Make a source (will allow using default as input easily) .
+;; [] Create a candidates-process fn.
+
 (defun helm-grep-ag-1 (directory)
   (helm :sources
         (helm-build-async-source "ag"
@@ -1189,7 +1197,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
           (lambda ()
             (let (process-connection-type
                   (cmd-line
-                   (format "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
+                   (format "ag --line-numbers -S --hidden --color --nogroup %s %s"
                            helm-pattern
                            directory)))
               (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
