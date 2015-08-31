@@ -1181,7 +1181,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 ;;; AG
 ;;
-;;
+;;  https://github.com/ggreer/the_silver_searcher
 ;; TODO:
 ;; [x] make command configurable.
 ;; [x] Fix ansi sequences (maybe nothing to fix, check).
@@ -1210,13 +1210,15 @@ Should not be used elsewhere.
 It is modifying `ansi-color-apply' and reusing the emacs-24.5 code
 as the emacs-25 version is broken."
   (let ((ansi-color-regexp "\033\\[\\(K\\|[0-9;]*m\\)")
+        (ansi-color-drop-regexp
+         "\033\\[\\([ABCDsuK]\\|[12][JK]\\|=[0-9]+[hI]\\|[0-9;]*[Hf]\\)")
         (codes (car ansi-color-context))
 	(start 0) end escape-sequence result
 	colorized-substring)
     ;; If context was saved and is a string, prepend it.
-    (if (cadr ansi-color-context)
-        (setq string (concat (cadr ansi-color-context) string)
-              ansi-color-context nil))
+    (when (cadr ansi-color-context)
+      (setq string (concat (cadr ansi-color-context) string)
+            ansi-color-context nil))
     ;; Find the next escape sequence.
     (while (setq end (string-match ansi-color-regexp string start))
       (setq escape-sequence (match-string 1 string))
