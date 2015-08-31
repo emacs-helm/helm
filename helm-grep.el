@@ -1182,11 +1182,6 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;; AG
 ;;
 ;;  https://github.com/ggreer/the_silver_searcher
-;; TODO:
-;; [x] make command configurable.
-;; [x] Fix ansi sequences (maybe nothing to fix, check).
-;; [] Make a source (will allow using default as input easily) .
-;; [] Create a candidates-process fn (find a way to pass directory arg).
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
@@ -1203,6 +1198,8 @@ By default \"--nocolor\" option is used but you can use safely \"--color\"
 which will process faster the line."
   :group 'helm-grep
   :type 'string)
+
+(defvar helm-source-grep-ag nil)
 
 (defun helm--ansi-color-apply (string)
   "[INTERNAL] This is used to advice `ansi-color-apply' in helm-ag.
@@ -1248,53 +1245,57 @@ as the emacs-25 version is broken."
       (setq ansi-color-context (if (or codes fragment) (list codes fragment))))
     (apply 'concat (nreverse result))))
 
+(defun helm-grep-ag-init (directory)
+  (let (process-connection-type
+        (cmd-line
+         (format helm-grep-ag-command
+                 helm-pattern
+                 directory)))
+    (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
+    (prog1
+        (start-process-shell-command
+         "ag" helm-buffer cmd-line)
+      (set-process-sentinel
+       (get-buffer-process helm-buffer)
+       (lambda (_process event)
+         (when (string= event "finished\n")
+           (with-helm-window
+             (setq mode-line-format
+                   '(" " mode-line-buffer-identification " "
+                     (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                     (:eval (propertize
+                             (format
+                              "[AG process finished - (%s results)] "
+                              (max (1- (count-lines
+                                        (point-min)
+                                        (point-max)))
+                                   0))
+                             'face 'helm-grep-finish))))
+             (force-mode-line-update))))))))
+
 (defun helm-grep-ag-1 (directory)
+  (unless helm-source-grep-ag
+    (setq helm-source-grep-ag
+          (helm-build-async-source "ag"
+            :candidates-process
+            (lambda () (helm-grep-ag-init directory))
+            :nohighlight t
+            :keymap helm-grep-map
+            :filter-one-by-one 'helm-grep-filter-one-by-one
+            :persistent-action 'helm-grep-persistent-action
+            :candidate-number-limit 99999
+            :requires-pattern 2
+            :action (helm-make-actions
+                     "Find File" 'helm-grep-action
+                     "Find file other frame" 'helm-grep-other-frame
+                     (lambda () (and (locate-library "elscreen")
+                                     "Find file in Elscreen"))
+                     'helm-grep-jump-elscreen
+                     "Save results in grep buffer" 'helm-grep-save-results
+                     "Find file other window" 'helm-grep-other-window))))
   (advice-add 'ansi-color-apply :override #'helm--ansi-color-apply)
   (unwind-protect
-       (helm :sources
-             (helm-build-async-source "ag"
-               :candidates-process
-               (lambda ()
-                 (let (process-connection-type
-                       (cmd-line
-                        (format helm-grep-ag-command
-                                helm-pattern
-                                directory)))
-                   (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
-                   (prog1
-                       (start-process-shell-command
-                        "ag" helm-buffer cmd-line)
-                     (set-process-sentinel
-                      (get-buffer-process helm-buffer)
-                      (lambda (_process event)
-                        (when (string= event "finished\n")
-                          (with-helm-window
-                            (setq mode-line-format
-                                  '(" " mode-line-buffer-identification " "
-                                    (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                                    (:eval (propertize
-                                            (format
-                                             "[AG process finished - (%s results)] "
-                                             (max (1- (count-lines
-                                                       (point-min)
-                                                       (point-max)))
-                                                  0))
-                                            'face 'helm-grep-finish))))
-                            (force-mode-line-update))))))))
-               :nohighlight t
-               :keymap helm-grep-map
-               :filter-one-by-one 'helm-grep-filter-one-by-one
-               :persistent-action 'helm-grep-persistent-action
-               :candidate-number-limit 99999
-               :requires-pattern 2
-               :action (helm-make-actions
-                        "Find File" 'helm-grep-action
-                        "Find file other frame" 'helm-grep-other-frame
-                        (lambda () (and (locate-library "elscreen")
-                                        "Find file in Elscreen"))
-                        'helm-grep-jump-elscreen
-                        "Save results in grep buffer" 'helm-grep-save-results
-                        "Find file other window" 'helm-grep-other-window))
+       (helm :sources 'helm-source-grep-ag
              :buffer "*helm ag*")
     (advice-remove 'ansi-color-apply #'helm--ansi-color-apply)))
 
