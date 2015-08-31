@@ -1283,6 +1283,7 @@ as emacs-25 version of `ansi-color-apply' is partially broken."
             (lambda () (helm-grep-ag-init directory))
             :nohighlight t
             :keymap helm-grep-map
+            :help-message 'helm-grep-help-message
             :filter-one-by-one 'helm-grep-filter-one-by-one
             :persistent-action 'helm-grep-persistent-action
             :candidate-number-limit 99999

@@ -538,6 +538,17 @@ Helm Gid use the symbol at point as default-input.
 You have access to this command also from `helm-find-files' which allow you to
 navigate to another directory to consult its database.
 
+* Helm AG\n
+** Helm AG tips
+
+Helm AG is different from grep or ack-grep in that it works on a directory and not
+a list of files.
+You can ignore files and directories by using a \".agignore\" file, local to directory
+or global when placed in home directory (See AG man page for more infos).
+This file supports same entries as what you will find in `helm-grep-ignored-files' and
+`helm-grep-ignored-directories'.
+As always you can access helm AG from `helm-find-files'.
+
 \n** Specific commands for Helm Grep:\n
 \\<helm-grep-map>
 \\[helm-goto-next-file]\t->Next File.
