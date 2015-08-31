@@ -1186,13 +1186,14 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
   "The default command for AG.
-Take two format specs, the first for pattern and the second for directory.
+Takes two format specs, the first for pattern and the second for directory.
 
 You must use a format that fit with helm grep, that is:
 
     filename:line-number:string
 
-The options \"--nogroup\" allow this.
+The option \"--nogroup\" allow this.
+The option \"--line-numbers\" is also mandatory.
 
 By default \"--nocolor\" option is used but you can use safely \"--color\"
 which will process faster the line."
