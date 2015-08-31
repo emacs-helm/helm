@@ -270,6 +270,7 @@ Only buffer names are fuzzy matched when this is enabled,
 
 
 (defvar ido-use-virtual-buffers)
+(defvar ido-ignore-buffers)
 (defun helm-buffer-list ()
   "Return the current list of buffers.
 Currently visible buffers are put at the end of the list.
@@ -277,6 +278,7 @@ See `ido-make-buffer-list' for more infos."
   (require 'ido)
   (let ((ido-process-ignore-lists t)
         ido-ignored-list
+        ido-ignore-buffers
         ido-use-virtual-buffers)
     (ido-make-buffer-list nil)))
 
