@@ -254,7 +254,7 @@ You can customize the minimum and maximum height that Helm can resize with these
 
 By default, `helm-autoresize-max-height` is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
 
-If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-max-height` equal to `helm-autoresize-max-height`.
+If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-min-height` equal to `helm-autoresize-max-height`.
 
 # Features
 
