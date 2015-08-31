@@ -1018,7 +1018,8 @@ in recurse, and ignoring EXTS, search being made on
                             (helm-default-directory)
                             default-directory)))))
     (if (consp candidate)
-        (helm-grep--filter-candidate-1 (cdr candidate))
+        ;; Already computed do nothing (default as input).
+        candidate
         (and (stringp candidate)
              (helm-grep--filter-candidate-1 candidate)))))
 
