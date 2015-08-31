@@ -575,6 +575,54 @@ grabs the entire symbol."
 (add-hook 'helm-cleanup-hook 'helm-reset-yank-point)
 (add-hook 'helm-after-initialize-hook 'helm-reset-yank-point)
 
+;;; Ansi
+;;
+;;
+(defvar helm--ansi-color-regexp
+  "\033\\[\\(K\\|[0-9;]*m\\)")
+(defvar helm--ansi-color-drop-regexp
+  "\033\\[\\([ABCDsuK]\\|[12][JK]\\|=[0-9]+[hI]\\|[0-9;]*[Hf]\\)")
+(defun helm--ansi-color-apply (string)
+  "A version of `ansi-color-apply' immune to upstream changes.
+
+Similar to the emacs-24.5 version without support to `ansi-color-context'
+which is buggy in emacs.
+
+Modify also `ansi-color-regexp' by using own variable `helm--ansi-color-regexp'
+that match whole STRING.
+
+This is needed to provide compatibility for both emacs-25 and emacs-24.5
+as emacs-25 version of `ansi-color-apply' is partially broken."
+  (let ((start 0)
+        codes end escape-sequence
+        result colorized-substring)
+    ;; Find the next escape sequence.
+    (while (setq end (string-match helm--ansi-color-regexp string start))
+      (setq escape-sequence (match-string 1 string))
+      ;; Colorize the old block from start to end using old face.
+      (when codes
+        (put-text-property
+         start end 'font-lock-face (ansi-color--find-face codes) string))
+      (setq colorized-substring (substring string start end)
+	    start (match-end 0))
+      ;; Eliminate unrecognized ANSI sequences.
+      (while (string-match helm--ansi-color-drop-regexp colorized-substring)
+	(setq colorized-substring
+	      (replace-match "" nil nil colorized-substring)))
+      (push colorized-substring result)
+      ;; Create new face, by applying escape sequence parameters.
+      (setq codes (ansi-color-apply-sequence escape-sequence codes)))
+    ;; If the rest of the string should have a face, put it there.
+    (when codes
+      (put-text-property
+       start (length string)
+       'font-lock-face (ansi-color--find-face codes) string))
+    ;; Save the remainder of the string to the result.
+    (if (string-match "\033" string start)
+        (push (substring string start (match-beginning 0)) result)
+	(push (substring string start) result))
+    (apply 'concat (nreverse result))))
+
 (provide 'helm-lib)
 
 ;; Local Variables:

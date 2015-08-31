@@ -989,9 +989,8 @@ in recurse, and ignoring EXTS, search being made on
 (defun helm-grep--filter-candidate-1 (candidate &optional dir)
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
-         ansi-color-context ; seems this avoid non--translated fname entries.
-         (ansi-p (string-match-p ansi-color-regexp candidate))
-         (line   (if ansi-p (ansi-color-apply candidate) candidate))
+         (ansi-p (string-match-p helm--ansi-color-regexp candidate))
+         (line   (if ansi-p (helm--ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
          (fname  (if (and root split)
                      (expand-file-name (car split) root)
@@ -1199,50 +1198,6 @@ which will process faster the line."
   :group 'helm-grep
   :type 'string)
 
-(defun helm--ansi-color-apply (string)
-  "[INTERNAL] Ensure emacs-24.5 version of `ansi-color-apply' is used.
-Modify also `ansi-color-regexp' to match whole STRING.
-This is needed to provide compatibility for both emacs-25 and emacs-24.5
-as emacs-25 version of `ansi-color-apply' is partially broken."
-  (let ((ansi-color-regexp "\033\\[\\(K\\|[0-9;]*m\\)")
-        (ansi-color-drop-regexp
-         "\033\\[\\([ABCDsuK]\\|[12][JK]\\|=[0-9]+[hI]\\|[0-9;]*[Hf]\\)")
-        (codes (car ansi-color-context))
-	(start 0) end escape-sequence result
-	colorized-substring)
-    ;; If context was saved and is a string, prepend it.
-    (when (cadr ansi-color-context)
-      (setq string (concat (cadr ansi-color-context) string)
-            ansi-color-context nil))
-    ;; Find the next escape sequence.
-    (while (setq end (string-match ansi-color-regexp string start))
-      (setq escape-sequence (match-string 1 string))
-      ;; Colorize the old block from start to end using old face.
-      (when codes
-	(put-text-property start end 'font-lock-face (ansi-color--find-face codes) string))
-      (setq colorized-substring (substring string start end)
-	    start (match-end 0))
-      ;; Eliminate unrecognized ANSI sequences.
-      (while (string-match ansi-color-drop-regexp colorized-substring)
-	(setq colorized-substring
-	      (replace-match "" nil nil colorized-substring)))
-      (push colorized-substring result)
-      ;; Create new face, by applying escape sequence parameters.
-      (setq codes (ansi-color-apply-sequence escape-sequence codes)))
-    ;; if the rest of the string should have a face, put it there
-    (when codes
-      (put-text-property start (length string)
-                         'font-lock-face (ansi-color--find-face codes) string))
-    ;; save context, add the remainder of the string to the result
-    (let (fragment)
-      (if (string-match "\033" string start)
-	  (let ((pos (match-beginning 0)))
-	    (setq fragment (substring string pos))
-	    (push (substring string start pos) result))
-	(push (substring string start) result))
-      (setq ansi-color-context (if (or codes fragment) (list codes fragment))))
-    (apply 'concat (nreverse result))))
-
 (defun helm-grep-ag-init (directory)
   (let (process-connection-type
         (cmd-line
@@ -1293,11 +1248,8 @@ as emacs-25 version of `ansi-color-apply' is partially broken."
                      'helm-grep-jump-elscreen
                      "Save results in grep buffer" 'helm-grep-save-results
                      "Find file other window" 'helm-grep-other-window))))
-  (advice-add 'ansi-color-apply :override #'helm--ansi-color-apply)
-  (unwind-protect
-       (helm :sources 'helm-source-grep-ag
-             :buffer "*helm ag*")
-    (advice-remove 'ansi-color-apply #'helm--ansi-color-apply)))
+  (helm :sources 'helm-source-grep-ag
+        :buffer "*helm ag*"))
 
 ;;;###autoload
 (defun helm-do-grep-ag ()
