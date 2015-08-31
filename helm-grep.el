@@ -1202,10 +1202,10 @@ which will process faster the line."
 (defvar helm-source-grep-ag nil)
 
 (defun helm--ansi-color-apply (string)
-  "[INTERNAL] This is used to advice `ansi-color-apply' in helm-ag.
-Should not be used elsewhere.
-It is modifying `ansi-color-apply' and reusing the emacs-24.5 code
-as the emacs-25 version is broken."
+  "[INTERNAL] Ensure emacs-24.5 version of `ansi-color-apply' is used.
+Modify also `ansi-color-regexp' to match whole STRING.
+This is needed to provide compatibility for both emacs-25 and emacs-24.5
+as emacs-25 version of `ansi-color-apply' is partially broken."
   (let ((ansi-color-regexp "\033\\[\\(K\\|[0-9;]*m\\)")
         (ansi-color-drop-regexp
          "\033\\[\\([ABCDsuK]\\|[12][JK]\\|=[0-9]+[hI]\\|[0-9;]*[Hf]\\)")
