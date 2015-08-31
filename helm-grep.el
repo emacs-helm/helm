@@ -921,8 +921,6 @@ in recurse, and ignoring EXTS, search being made on
            (if zgrep "Zgrep" (capitalize (if recurse
                                              (helm-grep-command t)
                                              (helm-grep-command))))
-            :header-name (lambda (name)
-                           (concat name "(C-c ? Help)"))
             :candidates-process 'helm-grep-collect-candidates
             :filter-one-by-one 'helm-grep-filter-one-by-one
             :nohighlight t
