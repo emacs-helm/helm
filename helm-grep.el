@@ -29,6 +29,8 @@
 (declare-function View-quit "view")
 (declare-function doc-view-goto-page "doc-view" (page))
 (declare-function helm-mm-split-pattern "helm-multi-match")
+(declare-function helm--ansi-color-apply "helm-lib")
+(defvar helm--ansi-color-regexp)
 
 
 (defgroup helm-grep nil
