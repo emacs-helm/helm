@@ -1199,8 +1199,6 @@ which will process faster the line."
   :group 'helm-grep
   :type 'string)
 
-(defvar helm-source-grep-ag nil)
-
 (defun helm--ansi-color-apply (string)
   "[INTERNAL] Ensure emacs-24.5 version of `ansi-color-apply' is used.
 Modify also `ansi-color-regexp' to match whole STRING.
@@ -1273,6 +1271,7 @@ as emacs-25 version of `ansi-color-apply' is partially broken."
                              'face 'helm-grep-finish))))
              (force-mode-line-update))))))))
 
+(defvar helm-source-grep-ag nil)
 (defun helm-grep-ag-1 (directory)
   (unless helm-source-grep-ag
     (setq helm-source-grep-ag
