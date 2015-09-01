@@ -51,8 +51,7 @@
     "Checksum File"                         'helm-ff-checksum
     "Ediff File"                            'helm-find-files-ediff-files
     "Ediff Merge File"                      'helm-find-files-ediff-merge-files
-    "Etags `M-., C-u tap, C-u C-u reload tag file'"
-    'helm-ff-etags-select
+    "Etags `M-., C-u reload tag file'"      'helm-ff-etags-select
     "View file"                             'view-file
     "Insert file"                           'insert-file
     "Add marked files to file-cache"        'helm-ff-cache-add-file
