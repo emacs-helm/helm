@@ -1230,26 +1230,25 @@ which will process faster the line."
 
 (defvar helm-source-grep-ag nil)
 (defun helm-grep-ag-1 (directory)
-  (unless helm-source-grep-ag
-    (setq helm-source-grep-ag
-          (helm-build-async-source "ag"
-            :candidates-process
-            (lambda () (helm-grep-ag-init directory))
-            :nohighlight t
-            :keymap helm-grep-map
-            :help-message 'helm-grep-help-message
-            :filter-one-by-one 'helm-grep-filter-one-by-one
-            :persistent-action 'helm-grep-persistent-action
-            :candidate-number-limit 99999
-            :requires-pattern 2
-            :action (helm-make-actions
-                     "Find File" 'helm-grep-action
-                     "Find file other frame" 'helm-grep-other-frame
-                     (lambda () (and (locate-library "elscreen")
-                                     "Find file in Elscreen"))
-                     'helm-grep-jump-elscreen
-                     "Save results in grep buffer" 'helm-grep-save-results
-                     "Find file other window" 'helm-grep-other-window))))
+  (setq helm-source-grep-ag
+        (helm-build-async-source "ag"
+          :candidates-process
+          (lambda () (helm-grep-ag-init directory))
+          :nohighlight t
+          :keymap helm-grep-map
+          :help-message 'helm-grep-help-message
+          :filter-one-by-one 'helm-grep-filter-one-by-one
+          :persistent-action 'helm-grep-persistent-action
+          :candidate-number-limit 99999
+          :requires-pattern 2
+          :action (helm-make-actions
+                   "Find File" 'helm-grep-action
+                   "Find file other frame" 'helm-grep-other-frame
+                   (lambda () (and (locate-library "elscreen")
+                                   "Find file in Elscreen"))
+                   'helm-grep-jump-elscreen
+                   "Save results in grep buffer" 'helm-grep-save-results
+                   "Find file other window" 'helm-grep-other-window)))
   (helm :sources 'helm-source-grep-ag
         :buffer "*helm ag*"))
 
