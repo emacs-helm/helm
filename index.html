@@ -323,7 +323,7 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 
 <p>By default, <code>helm-autoresize-max-height</code> is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, <code>helm-autoresize-min-height</code> specifies the minimum height that Helm candidate buffer cannot be smaller.</p>
 
-<p>If you don't want the Helm window to be resized, but a smaller Helm window, you can set <code>helm-autoresize-max-height</code> equal to <code>helm-autoresize-max-height</code>.</p>
+<p>If you don't want the Helm window to be resized, but a smaller Helm window, you can set <code>helm-autoresize-min-height</code> equal to <code>helm-autoresize-max-height</code>.</p>
 
 <h1>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h1>
@@ -340,7 +340,7 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 <code>helm-buffers-list</code>: Enhanced buffers listing.</li>
 <li>
 <code>helm-browse-project</code>: Show all buffers and files related to project or current directory (Usable everywhere with <code>helm-find-files</code>) you will want to install
-<a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a> and <a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a> for a better experience.</li>
+<a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a>, <a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a> and <code>helm-ls-svn</code> for a better experience.</li>
 <li>
 <code>helm-dabbrev</code>: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).</li>
 <li>
@@ -354,7 +354,8 @@ and <code>helm-completion-in-region-fuzzy-match</code>.</p>
 <li>
 <code>helm-apropos</code>: Description of functions, variables, etc... Use it instead of Most <code>C-h</code> commands.</li>
 <li>
-<code>Grep</code>: You can launch it (recursively or not) from any files related helm commands, support as backends <code>grep</code>, <code>ack-grep</code>, <code>git-grep</code> (Own implementation).</li>
+<code>Grep</code>: You can launch it (recursively or not) from any files related helm commands, support as backends <code>grep</code>, <code>ack-grep</code>, <code>git-grep</code>,
+<code>ag</code> and <code>pt</code> (Own implementation).</li>
 <li>
 <code>helm-gid</code>: Helm interface to <code>gid</code> from <a href="https://www.gnu.org/software/idutils/">id-utils</a>.</li>
 <li>
