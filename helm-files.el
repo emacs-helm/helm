@@ -2349,15 +2349,17 @@ Use it for non--interactive calls of `helm-find-files'."
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
-    (helm :sources 'helm-source-find-files
-          :input fname
-          :case-fold-search helm-file-name-case-fold-search
-          :preselect preselect
-          :ff-transformer-show-only-basename
-          helm-ff-transformer-show-only-basename
-          :default def
-          :prompt "Find Files or Url: "
-          :buffer "*Helm Find Files*")))
+    (unwind-protect
+         (helm :sources 'helm-source-find-files
+               :input fname
+               :case-fold-search helm-file-name-case-fold-search
+               :preselect preselect
+               :ff-transformer-show-only-basename
+               helm-ff-transformer-show-only-basename
+               :default def
+               :prompt "Find Files or Url: "
+               :buffer "*Helm Find Files*")
+      (setq helm-ff-default-directory nil))))
 
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
