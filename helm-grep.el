@@ -1232,6 +1232,9 @@ which will process faster the line."
 (defun helm-grep-ag-1 (directory)
   (setq helm-source-grep-ag
         (helm-build-async-source "ag"
+          :header-name (lambda (name)
+                         (format "%s [%s]"
+                                 name (abbreviate-file-name directory)))
           :candidates-process
           (lambda () (helm-grep-ag-init directory))
           :nohighlight t
