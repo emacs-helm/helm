@@ -264,14 +264,15 @@ If you don't want the Helm window to be resized, but a smaller Helm window, you 
 - `helm-find-files`: Replace in one command all the files related commands (Bind it to `C-x C-f`!).
 - `helm-buffers-list`: Enhanced buffers listing.
 - `helm-browse-project`: Show all buffers and files related to project or current directory (Usable everywhere with `helm-find-files`) you will want to install
-[helm-ls-git](https://github.com/emacs-helm/helm-ls-git) and [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) for a better experience.
+[helm-ls-git](https://github.com/emacs-helm/helm-ls-git), [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) and `helm-ls-svn` for a better experience.
 - `helm-dabbrev`: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
 - `helm-moccur`: Enhanced occur for one or more buffers, launch it from `helm-buffers-list` or `current-buffer`(Own implementation).
 - `helm-M-x`: Enhanced version of `execute-extended-command` (Bind it to `M-x`!).
 - `helm-imenu` and `helm-imenu-in-all-buffers`: Imenu in `current-buffer` or in all your buffers.
 - `helm-etags-select`: Enhanced version of etags with helm-completion (Usable everywhere with `helm-find-files`).
 - `helm-apropos`: Description of functions, variables, etc... Use it instead of Most `C-h` commands.
-- `Grep`: You can launch it (recursively or not) from any files related helm commands, support as backends `grep`, `ack-grep`, `git-grep` (Own implementation).
+- `Grep`: You can launch it (recursively or not) from any files related helm commands, support as backends `grep`, `ack-grep`, `git-grep`,
+`ag` and `pt` (Own implementation).
 - `helm-gid`: Helm interface to `gid` from [id-utils](https://www.gnu.org/software/idutils/).
 - `helm-show-kill-ring`: A kill ring browser for helm.
 - `helm-all-mark-rings`: A mark ring for helm, allow retrieving your last position(s) in a buffer.
