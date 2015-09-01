@@ -1179,26 +1179,30 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      (format-spec helm-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
 
-;;; AG
+;;; AG - AT
 ;;
 ;;  https://github.com/ggreer/the_silver_searcher
+;;  https://github.com/monochromegane/the_platinum_searcher
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
-  "The default command for AG.
+  "The default command for AG or PT.
 Takes two format specs, the first for pattern and the second for directory.
 
-You must use a format that fit with helm grep, that is:
+You must use an output format that fit with helm grep, that is:
 
-    filename:line-number:string
+    \"filename:line-number:string\"
 
 The option \"--nogroup\" allow this.
-The option \"--line-numbers\" is also mandatory.
+The option \"--line-numbers\" is also mandatory except with PT (not supported).
 
 By default \"--nocolor\" option is used but you can use safely \"--color\"
 which will process faster the line."
   :group 'helm-grep
   :type 'string)
+
+(defun helm-grep--ag-command ()
+  (car (split-string helm-grep-ag-command)))
 
 (defun helm-grep-ag-init (directory)
   (let (process-connection-type
@@ -1220,7 +1224,8 @@ which will process faster the line."
                      (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                      (:eval (propertize
                              (format
-                              "[AG process finished - (%s results)] "
+                              "[%s process finished - (%s results)] "
+                              (upcase (helm-grep--ag-command))
                               (max (1- (count-lines
                                         (point-min)
                                         (point-max)))
@@ -1231,7 +1236,7 @@ which will process faster the line."
 (defvar helm-source-grep-ag nil)
 (defun helm-grep-ag-1 (directory)
   (setq helm-source-grep-ag
-        (helm-build-async-source "ag"
+        (helm-build-async-source (upcase (helm-grep--ag-command))
           :header-name (lambda (name)
                          (format "%s [%s]"
                                  name (abbreviate-file-name directory)))
@@ -1253,6 +1258,7 @@ which will process faster the line."
                    "Save results in grep buffer" 'helm-grep-save-results
                    "Find file other window" 'helm-grep-other-window)))
   (helm :sources 'helm-source-grep-ag
+        :keymap helm-grep-map
         :buffer "*helm ag*"))
 
 ;;;###autoload
