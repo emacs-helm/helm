@@ -78,6 +78,9 @@ To enable ANSI in grep it is a little more difficult:
       \(setenv \"GREP_COLORS\" \"ms=01;31:mc=01;31:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
     2) Add the option \"--color=always\".
 
+NOTE: Starting from Helm version 1.7.8 step 1 is no more mandatory
+     \(unless you want to customize GREP_COLORS\).
+
 To enable ANSI color in git-grep just add \"--color=always\".
 To customize the ANSI color in git-grep, GREP_COLORS have no effect,
 you will have to setup this in your .gitconfig:
