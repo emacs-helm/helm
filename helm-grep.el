@@ -1262,7 +1262,7 @@ which will process faster the line."
                    "Find file other window" 'helm-grep-other-window)))
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
-        :buffer "*helm ag*"))
+        :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
 ;;;###autoload
 (defun helm-do-grep-ag ()
