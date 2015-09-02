@@ -331,10 +331,14 @@ See also `helm-locate'."
   "Find files with locate in `helm-locate-project-list'.
 With a prefix arg refresh the database in each project."
   (interactive "P")
+  (helm-locate-set-command)
+  (cl-assert (and (string-match-p "\\`locate" helm-locate-command)
+                  (executable-find "updatedb"))
+             nil "Unsupported locate version")
   (let ((dbs (helm-locate-find-dbs-in-projects update)))
     (if dbs
         (helm-locate-with-db dbs)
-        (message "No projects found, please setup `helm-locate-project-list'"))))
+        (user-error "No projects found, please setup `helm-locate-project-list'"))))
 
 ;;;###autoload
 (defun helm-locate-read-file-name (prompt)
