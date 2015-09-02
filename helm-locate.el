@@ -90,6 +90,13 @@ the opposite of \"locate\" command."
   :group 'helm-locate
   :type 'boolean)
 
+(defcustom helm-locate-project-list nil
+  "A list of directories, your projects.
+When set, allow browsing recursively files in all
+directories of this list with `helm-projects-find-files'."
+  :group 'helm-locate
+  :type '(repeat string))
+
 
 (defvar helm-generic-files-map
   (let ((map (make-sparse-keymap)))
@@ -301,6 +308,33 @@ See also `helm-locate'."
                       (match-string 1 pattern)) " -b"))
             (t (helm--mapconcat-pattern pattern)))
       pattern))
+
+(defun helm-locate-find-dbs-in-projects (&optional update)
+  (let* ((pfn (lambda (candidate directory)
+                (unless (= (shell-command
+                            (format helm-locate-create-db-command
+                                    candidate
+                                    directory))
+                           0)
+                  (error "Failed to create locatedb file `%s'" candidate)))))
+    (cl-loop for p in helm-locate-project-list
+             for db = (expand-file-name
+                       helm-ff-locate-db-filename
+                       (file-name-as-directory p))
+             if (and (null update) (file-exists-p db))
+             collect db
+             else do (funcall pfn db p)
+             and collect db)))
+
+;;;###autoload
+(defun helm-projects-find-files (update)
+  "Find files with locate in `helm-locate-project-list'.
+With a prefix arg refresh the database in each project."
+  (interactive "P")
+  (let ((dbs (helm-locate-find-dbs-in-projects update)))
+    (if dbs
+        (helm-locate-with-db dbs)
+        (message "No projects found, please setup `helm-locate-project-list'"))))
 
 ;;;###autoload
 (defun helm-locate-read-file-name (prompt)
