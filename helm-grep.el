@@ -122,8 +122,8 @@ see `helm-grep-default-command' for more infos."
 (defcustom helm-pdfgrep-default-command
   "pdfgrep --color never -niH %s %s"
   "Default command for pdfgrep.
-Option --color always is not supported, expect
-errors when executing actions."
+Option \"--color always\" is supported starting helm version 1.7.8,
+when used matchs will be highlighted according to GREP_COLORS env var."
   :group 'helm-grep
   :type  'string)
 
@@ -1161,6 +1161,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                                                             default-directory)))
                 :candidates-process (lambda ()
                                       (funcall helm-pdfgrep-default-function helm-pdfgrep-targets))
+                :nohighlight t
                 :filter-one-by-one #'helm-grep-filter-one-by-one
                 :candidate-number-limit 9999
                 :history 'helm-grep-history
