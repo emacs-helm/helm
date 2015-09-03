@@ -38,7 +38,7 @@
   :group 'helm)
 
 (defcustom helm-grep-default-command
-  "grep --color=never -a -d skip %e -n%cH -e %p %f"
+  "grep --color=always -a -d skip %e -n%cH -e %p %f"
   "Default grep format command for `helm-do-grep-1'.
 Where:
 '%e' format spec is for --exclude or --include grep options or
@@ -65,21 +65,17 @@ don't specify the '%e' format spec.
 Helm also support ack-grep and git-grep ,
 here a default command example for ack-grep:
 
-\(setq helm-grep-default-command \"ack-grep -Hn --no-group --no-color %e %p %f\"
-       helm-grep-default-recurse-command \"ack-grep -H --no-group --no-color %e %p %f\")
+\(setq helm-grep-default-command \"ack-grep -Hn --smart-case --no-group %e %p %f\"
+       helm-grep-default-recurse-command \"ack-grep -H --smart-case --no-group %e %p %f\")
 
 You can ommit the %e spec if you don't want to be prompted for types.
 
 NOTE: Helm for ack-grep support ANSI sequences, so you can remove
 the \"--no-color\" option safely (recommended).
 
-To enable ANSI in grep it is a little more difficult:
-    1) Modify env var
-      \(setenv \"GREP_COLORS\" \"ms=01;31:mc=01;31:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
-    2) Add the option \"--color=always\".
-
-NOTE: Starting from Helm version 1.7.8 step 1 is no more mandatory
-     \(unless you want to customize GREP_COLORS\).
+Same for grep you can use safely the option \"--color=always\" (default).
+You can customize the color of matches using GREP_COLORS env var.
+e.g: \(setenv \"GREP_COLORS\" \"ms=30;43:mc=30;43:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
 
 To enable ANSI color in git-grep just add \"--color=always\".
 To customize the ANSI color in git-grep, GREP_COLORS have no effect,
@@ -103,14 +99,14 @@ NOTE: Remote grepping is not available with ack-grep,
   :type  'string)
 
 (defcustom helm-grep-default-recurse-command
-  "grep --color=never -a -d recurse %e -n%cH -e %p %f"
+  "grep --color=always -a -d recurse %e -n%cH -e %p %f"
   "Default recursive grep format command for `helm-do-grep-1'.
 See `helm-grep-default-command' for format specs and infos about ack-grep."
   :group 'helm-grep
   :type  'string)
 
 (defcustom helm-default-zgrep-command
-  "zgrep -a -n%cH -e %p %f"
+  "zgrep --color=always -a -n%cH -e %p %f"
   "Default command for Zgrep.
 See `helm-grep-default-command' for infos on format specs.
 Option --color=always is supported and can be used safely
@@ -120,7 +116,7 @@ see `helm-grep-default-command' for more infos."
   :type  'string)
 
 (defcustom helm-pdfgrep-default-command
-  "pdfgrep --color never -niH %s %s"
+  "pdfgrep --color always -niH %s %s"
   "Default command for pdfgrep.
 Option \"--color always\" is supported starting helm version 1.7.8,
 when used matchs will be highlighted according to GREP_COLORS env var."
@@ -1189,7 +1185,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;  https://github.com/monochromegane/the_platinum_searcher
 
 (defcustom helm-grep-ag-command
-  "ag --line-numbers -S --hidden --nocolor --nogroup %s %s"
+  "ag --line-numbers -S --hidden --color --nogroup %s %s"
   "The default command for AG or PT.
 Takes two format specs, the first for pattern and the second for directory.
 
@@ -1200,8 +1196,7 @@ You must use an output format that fit with helm grep, that is:
 The option \"--nogroup\" allow this.
 The option \"--line-numbers\" is also mandatory except with PT (not supported).
 
-By default \"--nocolor\" option is used but you can use safely \"--color\"
-which will process faster the line."
+You can use safely \"--color\" (default)."
   :group 'helm-grep
   :type 'string)
 
