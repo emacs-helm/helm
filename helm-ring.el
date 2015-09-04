@@ -47,6 +47,16 @@ If nil or zero (disabled), don't truncate candidate, show all."
   :group 'helm-ring
   :type  'integer)
 
+(defcustom helm-kill-ring-actions
+  '(("Yank" . helm-kill-ring-action)
+    ("Delete" . (lambda (_candidate)
+                  (cl-loop for cand in (helm-marked-candidates)
+                           do (setq kill-ring
+                                    (delete cand kill-ring))))))
+  "List of actions for kill ring source."
+  :group 'helm-ring
+  :type '(alist :key-type string :value-type function))
+
 
 ;;; Kill ring
 ;;
@@ -64,11 +74,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
     :init (lambda () (helm-attrset 'last-command last-command))
     :candidates #'helm-kill-ring-candidates
     :filtered-candidate-transformer #'helm-kill-ring-transformer
-    :action '(("Yank" . helm-kill-ring-action)
-              ("Delete" . (lambda (candidate)
-                            (cl-loop for cand in (helm-marked-candidates)
-                                     do (setq kill-ring
-                                              (delete cand kill-ring))))))
+    :action 'helm-kill-ring-actions
     :persistent-action (lambda (_candidate) (ignore))
     :persistent-help "DoNothing"
     :keymap helm-kill-ring-map
