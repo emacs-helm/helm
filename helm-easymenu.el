@@ -42,7 +42,8 @@
    ("Info"
     ["Info at point" helm-info-at-point t]
     ["Emacs Manual index" helm-info-emacs t]
-    ["Gnus Manual index" helm-info-gnus t])
+    ["Gnus Manual index" helm-info-gnus t]
+    ["Helm documentation" helm-documentation t])
    ("Org"
     ["Org keywords" helm-org-keywords t]
     ["Org headlines" helm-org-headlines t])
