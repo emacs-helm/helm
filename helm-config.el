@@ -105,11 +105,12 @@
     (define-key map (kbd "h i")       'helm-info-at-point)
     (define-key map (kbd "h r")       'helm-info-emacs)
     (define-key map (kbd "h g")       'helm-info-gnus)
+    (define-key map (kbd "h h")       'helm-documentation)
     (define-key map (kbd "C-x C-b")   'helm-buffers-list)
     (define-key map (kbd "C-x r i")   'helm-register)
     (define-key map (kbd "C-c C-x")   'helm-run-external-command)
     (define-key map (kbd "b")         'helm-resume)
-    (define-key map (kbd "M-n")       'helm-gid)
+    (define-key map (kbd "C-c g")       'helm-gid)
     (define-key map (kbd "@")         'helm-list-elisp-packages)
     map))
 
