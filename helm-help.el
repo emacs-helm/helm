@@ -558,7 +558,7 @@ As always you can access helm AG from `helm-find-files'.
 \\[helm-grep-run-other-window-action]\t\t->Jump other window.
 \\[helm-grep-run-other-frame-action]\t\t->Jump other frame.
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
-\\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.")
+\\[helm-grep-run-save-buffer]\t\t->Save to a `helm-grep-mode' enabled buffer.")
 
 ;;; Pdf grep help
 ;;
