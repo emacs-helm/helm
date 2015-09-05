@@ -516,7 +516,8 @@ book * -size +1M
 *** You can start grep with a prefix arg to recurse in subdirectories.
 *** You can use wild card when selecting files (e.g *.el)
 *** You can grep in many differents directories by marking files or wild cards.
-*** You can save your results in a grep-mode buffer, see commands below.
+*** You can save your results in a `helm-grep-mode' buffer, see commands below.
+Once in this buffer you can use emacs-wgrep to edit your changes.
 
 *** Important:\n
 Grepping on remote file will work only with grep, not ack-grep, but it is
@@ -556,7 +557,6 @@ As always you can access helm AG from `helm-find-files'.
 \\[helm-yank-text-at-point]\t\t->Yank Text at point in minibuffer.
 \\[helm-grep-run-other-window-action]\t\t->Jump other window.
 \\[helm-grep-run-other-frame-action]\t\t->Jump other frame.
-\\[helm-grep-run-persistent-action]\t\t->Run persistent action (Same as `C-j').
 \\[helm-grep-run-default-action]\t\t->Run default action (Same as RET).
 \\[helm-grep-run-save-buffer]\t\t->Save to a `grep-mode' enabled buffer.")
 
