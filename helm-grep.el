@@ -431,7 +431,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
            (let ((noresult (= (process-exit-status process) 1)))
              (unless noresult
                (helm-process-deferred-sentinel-hook
-                process event helm-ff-default-directory))
+                process event (helm-default-directory)))
              (cond ((and noresult
                          ;; [FIXME] This is a workaround for zgrep
                          ;; that exit with code 1
