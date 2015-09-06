@@ -924,6 +924,7 @@ in recurse, and ignoring EXTS, search being made on
                                              (helm-grep-command))))
             :candidates-process 'helm-grep-collect-candidates
             :filter-one-by-one 'helm-grep-filter-one-by-one
+            :keymap helm-grep-map
             :nohighlight t
             :candidate-number-limit 9999
             :help-message 'helm-grep-help-message
