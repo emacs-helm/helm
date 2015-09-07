@@ -163,7 +163,7 @@ text to be displayed in BUFNAME."
            (switch-to-buffer bufname)
            (delete-other-windows)
            (delete-region (point-min) (point-max))
-           (outline-mode)
+           (org-mode)
            (save-excursion
              (funcall insert-content-fn))
            (setq cursor-type nil)
