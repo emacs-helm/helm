@@ -2466,6 +2466,10 @@ Where ACTION is a symbol that can be one of:
 Argument FOLLOW when non--nil specify to follow FILES to destination for the actions
 copy and rename."
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
+  ;; When default-directory in current-buffer is an invalid directory,
+  ;; (e.g buffer-file have been renamed somewhere else)
+  ;; be sure to use a valid value to give to dired-create-file.
+  ;; i.e async is creating a process buffer based on default-directory.
   (let ((default-directory helm-ff-default-directory)
         (fn     (cl-case action
                   (copy       'dired-copy-file)
