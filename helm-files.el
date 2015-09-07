@@ -2466,7 +2466,8 @@ Where ACTION is a symbol that can be one of:
 Argument FOLLOW when non--nil specify to follow FILES to destination for the actions
 copy and rename."
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
-  (let ((fn     (cl-case action
+  (let ((default-directory helm-ff-default-directory)
+        (fn     (cl-case action
                   (copy       'dired-copy-file)
                   (rename     'dired-rename-file)
                   (symlink    'make-symbolic-link)
