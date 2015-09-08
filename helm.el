@@ -831,7 +831,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-kill-selection-and-quit]\t\tKill display value of candidate and quit (with prefix arg kill the real value).
 \\[helm-yank-selection]\t\tYank selection into pattern.
 \\[helm-follow-mode]\t\tToggle automatical execution of persistent action.
-\\[helm-follow-action-forward]\t\tRun persistent action and goto next line.
+\\[helm-follow-action-forward]\tRun persistent action and goto next line.
 \\[helm-follow-action-backward]\t\tRun persistent action and goto previous line.
 \\[helm-refresh]\t\tRecalculate and redisplay candidates.
 \\[helm-toggle-suspend-update]\t\tSuspend/reenable update.
