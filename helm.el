@@ -782,8 +782,6 @@ from `helm-buffer' which allow detecting possible local
 value of this var.")
 
 (defvar helm-help-message
-  (lambda ()
-    (concat
      "* Helm Generic Help
 
 \\<helm-map>`helm' is an Emacs incremental completion and selection narrowing framework.
@@ -835,7 +833,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-follow-mode]		Toggle automatical execution of persistent action.
 \\[helm-follow-action-forward]		Run persistent action and goto next line.
 \\[helm-follow-action-backward]		Run persistent action and goto previous line.
-\\[helm-force-update]		Recalculate and redisplay candidates.
+\\[helm-refresh]		Recalculate and redisplay candidates.
 \\[helm-toggle-suspend-update]		Suspend/reenable update.
  
 ** Global Commands
@@ -844,7 +842,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 It is very useful, so you should bind any key.
 
 ** Helm Map
-\\{helm-map}"))
+\\{helm-map}")
   "Detailed help message string for `helm'.
 It also accepts function or variable symbol.")
 
