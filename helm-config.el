@@ -135,23 +135,22 @@
 
 
 ;;; Fontlock
-(cl-dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-  (font-lock-add-keywords
-   mode
-   '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-temp-hook\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-window\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-quittable\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-current-buffer\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-buffer\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-show-completion\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-default-directory\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-display-same-window\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-restore-variables\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(define-helm-type-attribute\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-multi-key-defun\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-while-no-input\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face))))
+(font-lock-add-keywords
+ 'emacs-lisp-mode
+ '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-temp-hook\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-window\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-quittable\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-current-buffer\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-buffer\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-show-completion\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-default-directory\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-display-same-window\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(with-helm-restore-variables\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(define-helm-type-attribute\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(helm-multi-key-defun\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(helm-while-no-input\\)\\>" 1 font-lock-keyword-face)
+   ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face)))
 
 
 ;;; Load the autoload file
