@@ -842,7 +842,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 It is very useful, so you should bind any key.
 
 ** Helm Map
-\\{helm-map}")
+\\{helm-map}"
   "Detailed help message string for `helm'.
 It also accepts function or variable symbol.")
 
