@@ -2936,8 +2936,8 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 (defun helm-browse-project-get-buffers (root-directory)
   (cl-loop for b in (helm-buffer-list)
-           for bf = (buffer-file-name (get-buffer b)) 
-           when (and bf (file-in-directory-p bf root-directory))
+           for cd = (with-current-buffer b default-directory)
+           when (file-in-directory-p cd root-directory)
            collect b))
 
 (defun helm-browse-project-build-buffers-source (directory)
