@@ -2457,6 +2457,13 @@ Find inside `require' and `declare-function' sexp."
 ;;; Handle copy, rename, symlink, relsymlink and hardlink from helm.
 ;;
 ;;
+(defun helm-ff--valid-default-directory ()
+  (with-helm-current-buffer
+    (cl-loop for b in (buffer-list)
+             for cd = (with-current-buffer b default-directory)
+             when (eq (car (file-attributes cd)) t)
+             return cd)))
+
 (defvar dired-async-mode)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
@@ -2469,15 +2476,8 @@ copy and rename."
   ;; When default-directory in current-buffer is an invalid directory,
   ;; (e.g buffer-file directory have been renamed somewhere else)
   ;; be sure to use a valid value to give to dired-create-file.
-  ;; i.e async is creating a process buffer based on default-directory.
-  (let ((default-directory (or helm-ff-default-directory
-                               ;; Choose another directory available
-                               ;; when using this outside of hff.
-                               (if (file-directory-p default-directory)
-                                   default-directory
-                                   ;; Use a fake default-directory.
-                                   (file-name-as-directory
-                                    user-emacs-directory))))
+  ;; i.e start-process is creating a process buffer based on default-directory.
+  (let ((default-directory (helm-ff--valid-default-directory))
         (fn     (cl-case action
                   (copy       'dired-copy-file)
                   (rename     'dired-rename-file)
