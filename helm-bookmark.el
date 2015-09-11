@@ -475,7 +475,9 @@ than `w3m-browse-url' use it."
       :init (lambda ()
               (bookmark-maybe-load-default-file)
               (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-helm-find-files-setup-alist)))))
+                  'global (helm-bookmark-helm-find-files-setup-alist)))
+      :persistent-action (lambda (_candidate) (ignore))
+      :persistent-help "Do nothing"))
 
 ;;; Uncategorized bookmarks
 ;;
