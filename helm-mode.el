@@ -1001,7 +1001,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
     (apply old--fn args)))
 
 (defun helm--completion-in-region (start end collection &optional predicate)
-  "[EXPERIMENTAL] Helm replacement of `completion--in-region'.
+  "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
