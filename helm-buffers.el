@@ -515,7 +515,7 @@ i.e same color."
                           for p in (split-string pattern)
                           when (string-match "\\`@\\(.*\\)" p)
                           return (match-string 1 p))))
-    (if regexp
+    (if (and buf regexp)
         (with-current-buffer buf
           (save-excursion
             (goto-char (point-min))
