@@ -379,7 +379,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defvar helm-browse-url-default-browser-alist
   `((,(or (and (boundp 'w3m-command) w3m-command)
           "/usr/bin/w3m") . w3m-browse-url)
-    (,browse-url-firefox-program . helm-browse-url-firefox)
+    (,browse-url-firefox-program . browse-url-firefox)
     (,helm-browse-url-chromium-program . helm-browse-url-chromium)
     (,helm-browse-url-conkeror-program . helm-browse-url-conkeror)
     (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
@@ -408,7 +408,9 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defun helm-browse-url-firefox (url &optional _ignore)
   "Same as `browse-url-firefox' but detach from emacs.
 So when you quit emacs you can keep your firefox open
-and not be prompted to kill firefox process."
+and not be prompted to kill firefox process.
+
+NOTE: Probably not supported on some systems (e.g Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
   (let ((process-environment (browse-url-process-environment)))
