@@ -418,7 +418,7 @@ NOTE: Probably not supported on some systems (e.g Windows)."
      (format "(%s %s %s &)"
              browse-url-firefox-program
              helm-browse-url-firefox-new-window
-             (browse-url-encode-url url)))))
+             url))))
 
 (defun helm-browse-url-chromium (url &optional _ignore)
   "Browse URL with google chrome browser."
