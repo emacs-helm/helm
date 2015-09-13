@@ -276,10 +276,10 @@ If FILE is nil return nil."
          (/= last-modif (helm-etags-mtime file)))))
 
 ;;;###autoload
-(defun helm-etags-select (arg)
+(defun helm-etags-select (reinit)
   "Preconfigured helm for etags.
-If called with a prefix argument or if any of the tag files have
-been modified, reinitialize cache.
+If called with a prefix argument REINIT
+or if any of the tag files have been modified, reinitialize cache.
 
 This function aggregates three sources of tag files:
 
@@ -294,7 +294,8 @@ This function aggregates three sources of tag files:
         (str (if (region-active-p)
                  (buffer-substring-no-properties
                   (region-beginning) (region-end))
-                 (thing-at-point 'symbol))))
+                 (with-syntax-table (standard-syntax-table)
+                   (thing-at-point 'symbol)))))
     (if (cl-notany 'file-exists-p tag-files)
         (message "Error: No tag file found.\
 Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.")
@@ -302,7 +303,7 @@ Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.
                  unless (member k tag-files)
                  do (remhash k helm-etags-cache))
         (mapc (lambda (f)
-                (when (or (equal arg '(4))
+                (when (or (equal reinit '(4))
                           (and helm-etags-mtime-alist
                                (helm-etags-file-modified-p f)))
                   (remhash f helm-etags-cache)))
