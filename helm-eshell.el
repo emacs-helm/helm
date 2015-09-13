@@ -15,12 +15,15 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;; Enable like this in .emacs:
+;;; Commentary:
 ;;
+;; Enable like this in .emacs:
 ;; (add-hook 'eshell-mode-hook
 ;;           #'(lambda ()
-;;               (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)))
-;;
+;;               (eshell-cmpl-initialize)
+;;               (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)
+;;               (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+
 
 ;;; Code:
 (require 'cl-lib)
