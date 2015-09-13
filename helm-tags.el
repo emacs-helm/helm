@@ -170,17 +170,19 @@ If not found in CURRENT-DIR search in upper directory."
           with fname
           with cand
           for i in split for count from 0
-          for elm = (unless (string-match "^\x0c" i)
-                      (helm-aif (string-match "\177" i)
+          for elm = (unless (string-match "^\x0c" i)    ;; "^L"
+                      (helm-aif (string-match "\177" i) ;; "^?"
                           (substring i 0 it)
                         i))
+          for linum = (when (string-match "[0-9]+,?[0-9]*$" i)
+                        (car (split-string (match-string 0 i) ",")))
           do (cond ((and elm (string-match "^\\([^,]+\\),[0-9]+$" elm))
                     (setq fname (propertize (match-string 1 elm)
                                             'face 'helm-etags-file)))
-                   (elm (setq cand (concat fname ": " elm)))
+                   (elm (setq cand (format "%s:%s:%s" fname linum elm)))
                    (t (setq cand nil)))
           when cand do (progn
-                         (insert (concat cand "\n"))
+                         (insert (propertize (concat cand "\n") 'linum linum))
                          (progress-reporter-update progress-reporter count)))))
 
 (defun helm-etags-init ()
@@ -206,9 +208,9 @@ If no entry in cache, create one."
                            (cons f (helm-etags-mtime f))))))))))
 
 (defun helm-etags-split-line (line)
-  (let ((regexp "\\`\\([[:lower:][:upper:]]?:?.*?\\): \\(.*\\)"))
+  (let ((regexp "^\\([[:lower:][:upper:]]?:?.*?\\):\\([0-9]+\\):\\(.*\\)"))
     (when (string-match regexp line)
-      (cl-loop for n from 1 to 2 collect (match-string n line)))))
+      (cl-loop for n from 1 to 3 collect (match-string n line)))))
 
 (defvar helm-source-etags-select nil
   "Helm source for Etags.")
@@ -223,8 +225,8 @@ If no entry in cache, create one."
                   ;; and not the filename.
                   (cl-ecase helm-etags-match-part-only
                       (endtag (cadr (split-string
-                                     (cadr (helm-etags-split-line candidate)))))
-                      (tag    (cadr (helm-etags-split-line candidate)))
+                                     (cl-caddr (helm-etags-split-line candidate)))))
+                      (tag    (cl-caddr (helm-etags-split-line candidate)))
                       (all    candidate)))
     :help-message 'helm-etags-help-message
     :keymap helm-etags-map
@@ -255,14 +257,15 @@ If no entry in cache, create one."
                                (car split) (file-name-directory tagf))
                       when (file-exists-p f)
                       return f))
-         (elm   (cadr split)))
+         (elm   (cl-caddr split))
+         (linum (string-to-number (cadr split))))
     (if (null fname)
         (error "file %s not found" fname)
       (ring-insert find-tag-marker-ring (point-marker))
       (funcall switcher fname)
-      (goto-char (point-min))
-      (search-forward elm nil t)
-      (goto-char (match-beginning 0)))))
+      (helm-goto-line linum t)
+      (when (search-forward elm nil t)
+        (goto-char (match-beginning 0))))))
 
 (defun helm-etags-mtime (file)
   "Last modification time of etags tag FILE."
