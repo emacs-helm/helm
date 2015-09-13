@@ -294,6 +294,11 @@ This function aggregates three sources of tag files:
         (str (if (region-active-p)
                  (buffer-substring-no-properties
                   (region-beginning) (region-end))
+                 ;; Use a raw syntax-table to determine tap.
+                 ;; This may be wrong when calling etags
+                 ;; with hff from a buffer that use
+                 ;; a different syntax, but most of the time it
+                 ;; should be better.
                  (with-syntax-table (standard-syntax-table)
                    (thing-at-point 'symbol)))))
     (if (cl-notany 'file-exists-p tag-files)
