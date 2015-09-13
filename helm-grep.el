@@ -608,7 +608,7 @@ If N is positive go forward otherwise go backward."
   "Go to precedent file in helm grep/etags buffers."
   (interactive)
   (with-helm-window
-    (helm-goto-next-or-prec-file 1))))
+    (helm-goto-next-or-prec-file 1)))
 
 (defun helm-grep-run-default-action ()
   "Run grep default action from `helm-do-grep-1'."
