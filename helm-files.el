@@ -2667,7 +2667,7 @@ Called with a prefix arg open files in background without selecting them."
         ;; an existing filename, create or jump to it.
         ;; If the basedir of candidate doesn't exists,
         ;; ask for creating it.
-        (let ((dir (file-name-directory candidate)))
+        (let ((dir (helm-basedir candidate)))
           (find-file-at-point
            (cond ((and dir (file-directory-p dir))
                   (substitute-in-file-name (car marked)))

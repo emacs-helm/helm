@@ -413,8 +413,10 @@ If specified, also remove filename extension EXT."
       (file-name-nondirectory (directory-file-name fname)))))
 
 (defun helm-basedir (fname)
-  "Return the base directory of filename."
-  (helm-aif (and fname (file-name-directory fname))
+  "Return the base directory of filename ending by a slash."
+  (helm-aif (and fname
+                 (or (and (string= fname "~") "~")
+                     (file-name-directory fname)))
       (file-name-as-directory it)))
 
 (defun helm-current-directory ()
