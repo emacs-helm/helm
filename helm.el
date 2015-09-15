@@ -5061,7 +5061,6 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name (helm-get-current-source)))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
-    (overlay-put o 'display (concat "> " (overlay-get o 'string)))
     (overlay-put o 'real   (helm-get-selection))
     (add-to-list 'helm-visible-mark-overlays o))
   (push (cons (helm-get-current-source) (helm-get-selection))
