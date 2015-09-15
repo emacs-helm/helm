@@ -305,6 +305,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (filter-one-by-one :initform 'helm-moccur-filter-one-by-one)
    (get-line :initform helm-moccur-get-line)
    (nohighlight :initform t)
+   (nomark :initform t)
    (migemo :initform t)
    (action :initform 'helm-source-multi-occur-actions)
    (persistent-action :initform 'helm-moccur-persistent-action)
