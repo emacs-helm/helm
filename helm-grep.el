@@ -207,11 +207,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   "Face used to highlight grep number lines."
   :group 'helm-grep-faces)
 
-(defface helm-grep-running
-    '((t (:foreground "Red")))
-  "Face used in mode line when grep is running."
-  :group 'helm-grep-faces)
-
 (defface helm-grep-finish
     '((t (:foreground "Green")))
   "Face used in mode line when grep is finish."
