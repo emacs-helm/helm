@@ -422,9 +422,10 @@ If specified, also remove filename extension EXT."
 (defun helm-current-directory ()
   "Return current-directory name at point.
 Useful in dired buffers when there is inserted subdirs."
-  (if (eq major-mode 'dired-mode)
-      (dired-current-directory)
-    default-directory))
+  (expand-file-name
+   (if (eq major-mode 'dired-mode)
+       (dired-current-directory)
+       default-directory)))
 
 (defun helm-w32-prepare-filename (file)
   "Convert filename FILE to something usable by external w32 executables."
