@@ -3069,7 +3069,7 @@ It is meant to use with `filter-one-by-one' slot."
   "The filtered-candidate-transformer function to highlight matches in fuzzy.
 See helm-fuzzy-default-highlight-match."
   (cl-loop for c in candidates
-           collect (helm-fuzzy-default-highlight-match c)))
+           collect (funcall helm-fuzzy-matching-highlight-fn c)))
 
 (defun helm-match-functions (source)
   (let ((matchfns (or (assoc-default 'match source)
