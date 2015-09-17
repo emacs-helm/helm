@@ -547,7 +547,8 @@
 
    (dont-plug
     :initform '(helm-compile-source--multi-match
-                helm-compile-source--persistent-help))
+                helm-compile-source--persistent-help
+                helm-compile-source--migemo))
    
    (match-strict
     :initarg :match-strict
@@ -585,7 +586,8 @@ Matching is done basically with `string-match' against each candidate.")
 
    (matchplugin :initform nil)
    (dont-plug :initform '(helm-compile-source--multi-match
-                          helm-compile-source--persistent-help)))
+                          helm-compile-source--persistent-help
+                          helm-compile-source--migemo)))
 
   "Use this class to define a helm source calling an external process.
 The :candidates slot is not allowed even if described because this class
@@ -608,7 +610,8 @@ inherit from `helm-source'.")
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer
                 helm-compile-source--multi-match
-                helm-compile-source--persistent-help))
+                helm-compile-source--persistent-help
+                helm-compile-source--migemo))
    
    (candidates
     :initform 'helm-candidates-in-buffer)

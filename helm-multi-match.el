@@ -268,11 +268,13 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (string-match (cdr helm-mm--previous-migemo-info) str))
 
 (cl-defun helm-mm-3-migemo-match (str &optional (pattern helm-pattern))
-  (cl-loop for (pred . re) in (helm-mm-3-get-patterns pattern)
-           always (funcall pred (helm-mm-migemo-string-match str re))))
+  (and (featurep 'migemo)
+       (cl-loop for (pred . re) in (helm-mm-3-get-patterns pattern)
+                always (funcall pred (helm-mm-migemo-string-match str re)))))
 
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
-  (helm-mm-3-search-base pattern 'migemo-forward 'migemo-forward))
+  (and (featurep 'migemo)
+       (helm-mm-3-search-base pattern 'migemo-forward 'migemo-forward)))
 
 
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
