@@ -251,6 +251,28 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
     (setq pattern (helm-mm-3-get-patterns pattern)))
   (helm-mm-3-search-base
    pattern 're-search-forward 're-search-forward))
+
+;;; mp-3 with migemo
+;;
+;;
+(defvar helm-mm--previous-migemo-info nil
+  "[Internal] Cache previous migemo query.")
+
+(declare-function migemo-get-pattern "ext:migemo.el")
+
+(cl-defun helm-string-match-with-migemo (str &optional (pattern helm-pattern))
+  "Migemo version of `string-match'."
+  (unless (string= pattern (car-safe helm-mm--previous-migemo-info))
+    (setq helm-mm--previous-migemo-info
+          (cons pattern (migemo-get-pattern pattern))))
+  (string-match (cdr helm-mm--previous-migemo-info) str))
+
+(cl-defun helm-mm-3migemo-match (str &optional (pattern helm-pattern))
+  (cl-loop for (pred . re) in (helm-mm-3-get-patterns pattern)
+           always (funcall pred (helm-string-match-with-migemo str re))))
+
+(defun helm-mm-3migemo-search (pattern &rest _ignore)
+  (helm-mm-3-search-base pattern 'migemo-forward 'migemo-forward))
 
 
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)

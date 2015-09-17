@@ -745,7 +745,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-search-functions)
 (defvar helm-mm-default-match-functions)
 
-(defun helm-source-mp-get-search-or-match-fns (source method)
+(defun helm-source-mm-get-search-or-match-fns (source method)
   (let ((searchers        (and (eq method 'search)
                                helm-mm-default-search-functions))
         (defmatch         (helm-aif (slot-value source 'match)
@@ -758,13 +758,19 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                               (helm-mklist it)))
         (defsearch-strict (helm-aif (and (eq method 'search-strict)
                                          (slot-value source 'search-strict))
-                              (helm-mklist it))))
+                              (helm-mklist it)))
+        (migemo           (slot-value source 'migemo)))
     (cl-case method
       (match (cond (defmatch-strict)
+                   (migemo
+                    (append helm-mm-default-match-functions
+                            defmatch '(helm-mm-3migemo-match)))
                    (defmatch
                     (append helm-mm-default-match-functions defmatch))
                    (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
+                    (migemo
+                     (append searchers defsearch '(helm-mm-3migemo-search)))
                     (defsearch
                      (append searchers defsearch))
                     (t searchers))))))
@@ -861,7 +867,7 @@ an eieio class."
       (set-slot-value source 'match helm-fuzzy-match-fn)))
   (when (slot-value source 'matchplugin)
     (set-slot-value source 'match
-                    (helm-source-mp-get-search-or-match-fns source 'match))))
+                    (helm-source-mm-get-search-or-match-fns source 'match))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source 'init)))
@@ -885,7 +891,7 @@ an eieio class."
       (set-slot-value source 'search (list helm-fuzzy-search-fn))))
   (when (slot-value source 'matchplugin)
     (set-slot-value
-     source 'search (helm-source-mp-get-search-or-match-fns source 'search)))
+     source 'search (helm-source-mm-get-search-or-match-fns source 'search)))
   (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))
