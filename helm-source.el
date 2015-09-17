@@ -764,13 +764,13 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
       (match (cond (defmatch-strict)
                    (migemo
                     (append helm-mm-default-match-functions
-                            defmatch '(helm-mm-3migemo-match)))
+                            defmatch '(helm-mm-3-migemo-match)))
                    (defmatch
                     (append helm-mm-default-match-functions defmatch))
                    (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
                     (migemo
-                     (append searchers defsearch '(helm-mm-3migemo-search)))
+                     (append searchers defsearch '(helm-mm-3-migemo-search)))
                     (defsearch
                      (append searchers defsearch))
                     (t searchers))))))
