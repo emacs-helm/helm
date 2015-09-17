@@ -746,9 +746,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-match-functions)
 
 (defun helm-source-mm-get-search-or-match-fns (source method)
-  (let ((searchers        (and (eq method 'search)
-                               helm-mm-default-search-functions))
-        (defmatch         (helm-aif (slot-value source 'match)
+  (let ((defmatch         (helm-aif (slot-value source 'match)
                               (helm-mklist it)))
         (defmatch-strict  (helm-aif (and (eq method 'match)
                                          (slot-value source 'match-strict))
@@ -770,10 +768,11 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                    (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
                     (migemo
-                     (append searchers defsearch '(helm-mm-3-migemo-search)))
+                     (append helm-mm-default-search-functions
+                             defsearch '(helm-mm-3-migemo-search)))
                     (defsearch
-                     (append searchers defsearch))
-                    (t searchers))))))
+                     (append helm-mm-default-search-functions defsearch))
+                    (t helm-mm-default-search-functions))))))
 
 
 ;;; Modifiers
