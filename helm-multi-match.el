@@ -257,6 +257,7 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
 ;;
 (defvar helm-mm--previous-migemo-info nil
   "[Internal] Cache previous migemo query.")
+(make-local-variable 'helm-mm--previous-migemo-info)
 
 (declare-function migemo-get-pattern "ext:migemo.el")
 
