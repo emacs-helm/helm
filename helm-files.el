@@ -2936,8 +2936,13 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 (defun helm-browse-project-get-buffers (root-directory)
   (cl-loop for b in (helm-buffer-list)
+           ;; FIXME: Why default-directory is root-directory
+           ;; for current-buffer when coming from helm-quit-and-find-file.
            for cd = (with-current-buffer b default-directory)
-           when (file-in-directory-p cd root-directory)
+           for bn = (buffer-file-name (get-buffer b))
+           if (or (and bn (file-in-directory-p bn root-directory))
+                  (and (null bn)
+                       (file-in-directory-p cd root-directory)))
            collect b))
 
 (defun helm-browse-project-build-buffers-source (directory)
