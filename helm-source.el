@@ -497,15 +497,7 @@
     :custom list
     :documentation
     "  A list of compile functions plugin to ignore.")
-
-   (migemo
-    :initarg :migemo
-    :initform nil
-    :custom boolean
-    :documentation
-    "  Needed for Japanese input with helm-migemo.el.
-  If you are not Japanese, ignore this.")
-
+   
    (matchplugin
     :initarg :matchplugin
     :initform t
@@ -548,7 +540,17 @@
    (dont-plug
     :initform '(helm-compile-source--multi-match
                 helm-compile-source--persistent-help
+                ;; Ensure this will not be plugged
+                ;; if user have somewhere old helm-migemo.el.
                 helm-compile-source--migemo))
+
+   (migemo
+    :initarg :migemo
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Enable migemo.
+  It will be available for this source once `helm-migemo-mode' is enabled.")
    
    (match-strict
     :initarg :match-strict
@@ -586,8 +588,7 @@ Matching is done basically with `string-match' against each candidate.")
 
    (matchplugin :initform nil)
    (dont-plug :initform '(helm-compile-source--multi-match
-                          helm-compile-source--persistent-help
-                          helm-compile-source--migemo)))
+                          helm-compile-source--persistent-help)))
 
   "Use this class to define a helm source calling an external process.
 The :candidates slot is not allowed even if described because this class
@@ -612,6 +613,14 @@ inherit from `helm-source'.")
                 helm-compile-source--multi-match
                 helm-compile-source--persistent-help
                 helm-compile-source--migemo))
+
+   (migemo
+    :initarg :migemo
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Enable migemo.
+  It will be available for this source once `helm-migemo-mode' is enabled.")
    
    (candidates
     :initform 'helm-candidates-in-buffer)
