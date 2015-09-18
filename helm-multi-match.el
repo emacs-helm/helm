@@ -261,6 +261,16 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
 
 (declare-function migemo-get-pattern "ext:migemo.el")
 
+(define-minor-mode helm-migemo-mode
+    "Enable migemo in helm.
+It will be available in the source handling it,
+i.e the sources which have the slot :migemo with non--nil value."
+  :lighter " hmio"
+  :group 'helm
+  :global t
+  (cl-assert (featurep 'migemo)
+             nil "No feature called migemo found, install migemo.el."))
+
 (cl-defun helm-mm-migemo-string-match (str &optional (pattern helm-pattern))
   "Migemo version of `string-match'."
   (unless (string= pattern (car-safe helm-mm--previous-migemo-info))
@@ -269,12 +279,12 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (string-match (cdr helm-mm--previous-migemo-info) str))
 
 (cl-defun helm-mm-3-migemo-match (str &optional (pattern helm-pattern))
-  (and (featurep 'migemo)
+  (and helm-migemo-mode
        (cl-loop for (pred . re) in (helm-mm-3-get-patterns pattern)
                 always (funcall pred (helm-mm-migemo-string-match str re)))))
 
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
-  (and (featurep 'migemo)
+  (and helm-migemo-mode
        (helm-mm-3-search-base pattern 'migemo-forward 'migemo-forward)))
 
 
