@@ -263,7 +263,7 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
 
 (define-minor-mode helm-migemo-mode
     "Enable migemo in helm.
-It will be available in the source handling it,
+It will be available in the sources handling it,
 i.e the sources which have the slot :migemo with non--nil value."
   :lighter " Hmio"
   :group 'helm
