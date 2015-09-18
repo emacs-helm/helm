@@ -70,7 +70,7 @@
   Its argument is the name of the source. This attribute is useful to
   add an additional information with the source name.
   It doesn't modify the name of the source.")
-   
+
    (init
     :initarg :init
     :initform nil
@@ -90,10 +90,10 @@
     "  Specifies how to retrieve candidates from the source.
   It can either be a variable name, a function called with no parameters
   or the actual list of candidates.
-  
+
   The list must be a list whose members are strings, symbols
   or (DISPLAY . REAL) pairs.
-  
+
   In case of (DISPLAY . REAL) pairs, the DISPLAY string is shown
   in the Helm buffer, but the REAL one is used as action
   argument when the candidate is selected. This allows a more
@@ -101,11 +101,11 @@
   for example, too long or have a common part shared with other
   candidates which can be safely replaced with an abbreviated
   string for display purposes.
-  
+
   Note that if the (DISPLAY . REAL) form is used then pattern
   matching is done on the displayed string, not on the real
   value.")
-   
+
    (update
     :initarg :update
     :initform nil
@@ -123,7 +123,7 @@
   closed. It is useful for killing unneeded candidates buffer.
 
   Note that the function is executed BEFORE performing action.")
-   
+
    (delayed
     :initarg :delayed
     :initform nil
@@ -133,7 +133,7 @@
   typing and is idle for `helm-idle-delay' seconds.
   If a value is given to delayed attr, this value is used instead only
   if it is > to `helm-idle-delay'.")
-   
+
    (keymap
     :initarg :keymap
     :initform nil
@@ -145,7 +145,7 @@
   `helm' argument KEYMAP.  NOTE: when a source have `helm-map' as
   keymap attr, the global value of `helm-map' will override the
   actual local one.")
-   
+
    (action
     :initarg :action
     :initform 'identity
@@ -191,14 +191,14 @@
     :documentation
     "  Help message for this source.
   If not present, `helm-help-message' value will be used.")
-   
+
    (multiline
     :initarg :multiline
     :initform nil
     :custom boolean
     :documentation
     "  Enable to selection multiline candidates.")
-   
+
    (requires-pattern
     :initarg :requires-pattern
     :initform nil
@@ -227,7 +227,7 @@
   Note that `candidates' is run already, so the given transformer
   function should also be able to handle candidates with (DISPLAY
   . REAL) format.")
-   
+
    (filtered-candidate-transformer
     :initarg :filtered-candidate-transformer
     :initform nil
@@ -397,7 +397,7 @@
     :custom boolean
     :documentation
     "  Don't allow marking candidates when this attribute is present.")
-   
+
    (nohighlight
     :initarg :nohighlight
     :initform nil
@@ -413,14 +413,14 @@
   Remember that this function should run AFTER all filter functions if those
   filter functions are modifying face properties, though it is possible to
   avoid this by using new `add-face-text-property' in your filter functions.")
-   
+
    (allow-dups
     :initarg :allow-dups
     :initform nil
     :custom boolean
     :documentation
     "  Allow helm collecting duplicates candidates.")
-   
+
    (history
     :initarg :history
     :initform nil
@@ -428,7 +428,7 @@
     :documentation
     "  Allow passing history variable to helm from source.
   It should be a quoted symbol.")
-   
+
    (coerce
     :initarg :coerce
     :initform nil
@@ -497,7 +497,7 @@
     :custom list
     :documentation
     "  A list of compile functions plugin to ignore.")
-   
+
    (matchplugin
     :initarg :matchplugin
     :initform t
@@ -513,7 +513,7 @@
   on part of candidate returned by the call of function provided
   by this attribute. The function should have one arg, candidate,
   and return only a specific part of candidate.")
-   
+
    (before-init-hook
     :initarg :before-init-hook
     :initform nil
@@ -529,7 +529,7 @@
     :documentation
     "  A local hook that run at end of initilization of this source.
   i.e After the creation of `helm-buffer'."))
-  
+
   "Main interface to define helm sources."
   :abstract t)
 
@@ -551,7 +551,7 @@
     :documentation
     "  Enable migemo.
   It will be available for this source once `helm-migemo-mode' is enabled.")
-   
+
    (match-strict
     :initarg :match-strict
     :initform nil
@@ -579,7 +579,7 @@ Matching is done basically with `string-match' against each candidate.")
     :documentation
     "  This attribute is used to define a process as candidate.
   The value must be a process.
-  
+
   NOTE:
   When building the source at runtime you can give directly a process
   as value, otherwise wrap the process call into a function.
@@ -607,7 +607,7 @@ inherit from `helm-source'.")
   This data will be passed in a function added to the init slot and
   the buffer will be build with `helm-init-candidates-in-buffer'.
   This is an easy and fast method to build a `candidates-in-buffer' source.")
-   
+
    (dont-plug
     :initform '(helm-compile-source--candidates-in-buffer
                 helm-compile-source--multi-match
@@ -621,16 +621,16 @@ inherit from `helm-source'.")
     :documentation
     "  Enable migemo.
   It will be available for this source once `helm-migemo-mode' is enabled.")
-   
+
    (candidates
     :initform 'helm-candidates-in-buffer)
 
    (volatile
     :initform t)
-   
+
    (match
     :initform '(identity))
-   
+
    (get-line
     :initarg :get-line
     :initform 'buffer-substring-no-properties
@@ -658,7 +658,7 @@ inherit from `helm-source'.")
   (See how the `helm-mm-3-search-base' and `helm-fuzzy-search' functions are working).
 
   NOTE: FUZZY-MATCH slot will overhide value of this slot.")
-   
+
    (search-strict
     :initarg :search-strict
     :initform nil
@@ -687,7 +687,7 @@ like `re-search-forward', see below documentation of :search slot.")
 
    (matchplugin
     :initform nil)
-   
+
    (accept-empty
     :initarg :accept-empty
     :initform t
@@ -698,7 +698,7 @@ like `re-search-forward', see below documentation of :search slot.")
 
    (match
     :initform 'identity)
-   
+
    (volatile
     :initform t)))
 
@@ -712,8 +712,8 @@ like `re-search-forward', see below documentation of :search slot.")
     :initform nil
     :custom string
     :documentation "A filename."))
-  
-  "The contents of the file will be used as candidates in buffer.") 
+
+  "The contents of the file will be used as candidates in buffer.")
 
 
 ;;; Error functions
@@ -741,7 +741,7 @@ Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
 Argument CLASS is an eieio class object.
 Arguments ARGS are keyword value pairs as defined in CLASS."
-  (declare (indent 2))  
+  (declare (indent 2))
   (let ((source (apply #'make-instance class name args)))
     (set-slot-value source 'name name)
     (helm--setup-source source)
