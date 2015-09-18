@@ -265,7 +265,7 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
     "Enable migemo in helm.
 It will be available in the source handling it,
 i.e the sources which have the slot :migemo with non--nil value."
-  :lighter " hmio"
+  :lighter " Hmio"
   :group 'helm
   :global t
   (cl-assert (featurep 'migemo)
