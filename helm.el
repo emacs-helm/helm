@@ -3049,7 +3049,7 @@ It is meant to use with `filter-one-by-one' slot."
          (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair)))
     (with-temp-buffer
-      (insert display)
+      (insert (propertize display 'read-only nil))
       (goto-char (point-min))
       (if (search-forward helm-pattern nil t)
           (add-text-properties
@@ -3412,6 +3412,7 @@ and store the real value in a text property."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match)))
+    (add-text-properties 0 (length dispvalue) '(read-only nil) dispvalue)
     (when (and (stringp dispvalue)
              (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)

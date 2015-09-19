@@ -1012,7 +1012,7 @@ in recurse, and ignoring EXTS, search being made on
   (let (beg end)
     (condition-case-unless-debug nil
         (with-temp-buffer
-          (insert str)
+          (insert (propertize str 'read-only nil))
           (goto-char (point-min))
           (cl-loop for reg in (if multi-match
                                   ;; (m)occur.
