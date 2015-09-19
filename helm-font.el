@@ -35,30 +35,30 @@
 ;;; Xfont selection
 ;;
 ;;
-(defun helm-persistent-xfont-action (elm)
-  "Show current font temporarily"
-  (let ((current-font (cdr (assoc 'font (frame-parameters))))
-        (default-font elm))
-    (unwind-protect
-         (progn (set-frame-font default-font 'keep-size) (sit-for 2))
-      (set-frame-font current-font))))
-
 (defvar helm-xfonts-cache nil)
 (defvar helm-source-xfonts
   '((name . "X Fonts")
     (init . (lambda ()
               (unless helm-xfonts-cache
                 (setq helm-xfonts-cache
-                      (x-list-fonts "*")))))
+                      (x-list-fonts "*")))
+
+	      ;; Save current font so it can be restored in cleanup
+	      (setq helm-previous-font (cdr (assoc 'font (frame-parameters))))))
     (candidates . helm-xfonts-cache)
-    (action . (("Copy to kill ring" . (lambda (elm)
-                                        (kill-new elm)))
-               ("Set Font" . (lambda (elm)
+    (action . (("Copy font to kill ring" . (lambda (elm)
+                                             (kill-new elm)))
+               ("Set font" . (lambda (elm)
                                (kill-new elm)
                                (set-frame-font elm 'keep-size)
-                               (message "New font have been copied to kill ring")))))
-    (persistent-action . helm-persistent-xfont-action)
-    (persistent-help . "Switch to this font temporarily")))
+                               (message "Font copied to kill ring")))))
+    (cleanup . (lambda ()
+		 ;; Restore previous font
+		 (set-frame-font helm-previous-font 'keep-size)))
+    (persistent-action . (lambda (new-font)
+			   (set-frame-font new-font 'keep-size)
+			   (kill-new new-font)))
+    (persistent-help . "Preview font and copy to kill-ring")))
 
 ;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
 ;;
