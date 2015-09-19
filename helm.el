@@ -3412,7 +3412,6 @@ and store the real value in a text property."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match)))
-    (add-text-properties 0 (length dispvalue) '(read-only nil) dispvalue)
     (when (and (stringp dispvalue)
              (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)
