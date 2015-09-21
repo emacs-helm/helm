@@ -107,7 +107,8 @@
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
   (set-slot-value source 'action 'helm-type-bookmark-actions)
   (set-slot-value source 'keymap helm-bookmark-map)
-  (set-slot-value source 'help-message 'helm-bookmark-help-message))
+  (set-slot-value source 'help-message 'helm-bookmark-help-message)
+  (set-slot-value source 'migemo t))
 
 
 ;; Buffers
