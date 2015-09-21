@@ -4628,12 +4628,11 @@ this function is always called."
                      (not (funcall matchfn (substring i 1) part))
                      (funcall matchfn i part)))
         (if (string-match "\\`!" pattern)
-            (not (string-match (if helm--in-fuzzy
-                                   ;; Fuzzy regexp have already been
-                                   ;; computed with substring 1.
-                                   fuzzy-regexp
-                                   (substring 1 pattern))
-                               part))
+            (if helm--in-fuzzy
+                ;; Fuzzy regexp have already been
+                ;; computed with substring 1.
+                (not (string-match fuzzy-regexp part))
+                (not (funcall matchfn (substring 1 pattern) part)))
             (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
