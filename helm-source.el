@@ -880,7 +880,12 @@ an eieio class."
       (set-slot-value source 'match helm-fuzzy-match-fn)))
   (when (slot-value source 'matchplugin)
     (set-slot-value source 'match
-                    (helm-source-mm-get-search-or-match-fns source 'match))))
+                    (helm-source-mm-get-search-or-match-fns source 'match)))
+  (when (and (null (slot-value source 'matchplugin))
+             (slot-value source 'migemo))
+    (set-slot-value source 'match
+                    (append (helm-mklist (slot-value source 'match))
+                            '(helm-mm-3-migemo-match)))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source 'init)))
@@ -905,6 +910,11 @@ an eieio class."
   (when (slot-value source 'matchplugin)
     (set-slot-value
      source 'search (helm-source-mm-get-search-or-match-fns source 'search)))
+  (when (and (null (slot-value source 'matchplugin))
+             (slot-value source 'migemo))
+    (set-slot-value source 'search
+                    (append (helm-mklist (slot-value source 'search))
+                            '(helm-mm-3-migemo-search))))
   (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))

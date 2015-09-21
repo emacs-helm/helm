@@ -212,6 +212,7 @@ Only buffer names are fuzzy matched when this is enabled,
                                   (with-helm-buffer
                                     (helm-force-update))))))
    (keymap :initform helm-buffer-map)
+   (migemo :initform t)
    (volatile :initform t)
    (help-message :initform 'helm-buffer-help-message)
    (persistent-help
