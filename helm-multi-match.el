@@ -276,7 +276,7 @@ i.e the sources which have the slot :migemo with non--nil value."
   (unless (string= pattern (car-safe helm-mm--previous-migemo-info))
     (setq helm-mm--previous-migemo-info
           (cons pattern (migemo-get-pattern pattern))))
-  (string-match (cdr helm-mm--previous-migemo-info) str))
+  (string-match (concat pattern "\\|" (cdr helm-mm--previous-migemo-info)) str))
 
 (cl-defun helm-mm-3-migemo-match (str &optional (pattern helm-pattern))
   (and helm-migemo-mode
