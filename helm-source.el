@@ -550,8 +550,7 @@
     :custom boolean
     :documentation
     "  Enable migemo.
-  It will be available for this source once `helm-migemo-mode' is enabled.
-  Note that this imply :matchplugin t.")
+  It will be available for this source once `helm-migemo-mode' is enabled.")
 
    (match-strict
     :initarg :match-strict
@@ -621,8 +620,7 @@ inherit from `helm-source'.")
     :custom boolean
     :documentation
     "  Enable migemo.
-  It will be available for this source once `helm-migemo-mode' is enabled.
-  Note that this imply :matchplugin t.")
+  It will be available for this source once `helm-migemo-mode' is enabled.")
 
    (candidates
     :initform 'helm-candidates-in-buffer)
