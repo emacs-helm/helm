@@ -333,12 +333,10 @@ BOOKMARK is a bookmark name or a bookmark record."
 
 (defun helm-bookmark-filter-setup-alist (fn)
   "Return a filtered `bookmark-alist' sorted alphabetically."
-  (cl-loop with alist = (cl-loop for b in bookmark-alist
-                              when (funcall fn b) collect b)
-        for bmk in alist
-        for name = (car bmk)
-        collect (propertize name 'location (bookmark-location name))))
-
+  (cl-loop for b in bookmark-alist
+           for name = (car b)
+           when (funcall fn b) collect
+           (propertize name 'location (bookmark-location name))))
 
 ;;; Bookmark handlers
 ;;
