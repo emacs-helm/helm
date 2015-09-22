@@ -2868,6 +2868,7 @@ Don't use it in your own code unless you know what you are doing.")
                               file-name-history))
             :fuzzy-match t
             :persistent-action 'ignore
+            :migemo t
             :filtered-candidate-transformer 'helm-file-name-history-transformer
             :action (helm-make-actions
                      "Find file" (lambda (candidate)
