@@ -550,7 +550,12 @@
     :custom boolean
     :documentation
     "  Enable migemo.
-  It will be available for this source once `helm-migemo-mode' is enabled.")
+  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  to force not using generic migemo matching function.
+  In this case you have to provide your own migemo matching funtion
+  that kick in when `helm-migemo-mode' is enabled.
+  Otherwise it will be available for this source once `helm-migemo-mode'
+  is enabled when non-nil.")
 
    (match-strict
     :initarg :match-strict
@@ -620,7 +625,12 @@ inherit from `helm-source'.")
     :custom boolean
     :documentation
     "  Enable migemo.
-  It will be available for this source once `helm-migemo-mode' is enabled.")
+  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  to force not using generic migemo matching function.
+  In this case you have to provide your own migemo matching funtion
+  that kick in when `helm-migemo-mode' is enabled.
+  Otherwise it will be available for this source once `helm-migemo-mode'
+  is enabled when non-nil.")
 
    (candidates
     :initform 'helm-candidates-in-buffer)
@@ -879,11 +889,12 @@ an eieio class."
   (when (slot-value source 'matchplugin)
     (set-slot-value source 'match
                     (helm-source-mm-get-search-or-match-fns source 'match)))
-  (when (and (null (slot-value source 'matchplugin))
-             (slot-value source 'migemo))
-    (set-slot-value source 'match
-                    (append (helm-mklist (slot-value source 'match))
-                            '(helm-mm-3-migemo-match)))))
+  (helm-aif (and (null (slot-value source 'matchplugin))
+                 (slot-value source 'migemo))
+      (unless (eq it 'nomultimatch) ; Use own migemo fn.
+        (set-slot-value source 'match
+                        (append (helm-mklist (slot-value source 'match))
+                                '(helm-mm-3-migemo-match))))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (let ((cur-init (slot-value source 'init)))
@@ -908,11 +919,12 @@ an eieio class."
   (when (slot-value source 'matchplugin)
     (set-slot-value
      source 'search (helm-source-mm-get-search-or-match-fns source 'search)))
-  (when (and (null (slot-value source 'matchplugin))
-             (slot-value source 'migemo))
-    (set-slot-value source 'search
-                    (append (helm-mklist (slot-value source 'search))
-                            '(helm-mm-3-migemo-search))))
+  (helm-aif (and (null (slot-value source 'matchplugin))
+                 (slot-value source 'migemo))
+      (unless (eq it 'nomultimatch)
+        (set-slot-value source 'search
+                        (append (helm-mklist (slot-value source 'search))
+                                '(helm-mm-3-migemo-search)))))
   (let ((mtc (slot-value source 'match)))
     (cl-assert (or (equal '(identity) mtc)
                    (eq 'identity mtc))

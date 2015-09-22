@@ -212,7 +212,7 @@ Only buffer names are fuzzy matched when this is enabled,
                                   (with-helm-buffer
                                     (helm-force-update))))))
    (keymap :initform helm-buffer-map)
-   (migemo :initform t)
+   (migemo :initform 'nomultimatch)
    (volatile :initform t)
    (help-message :initform 'helm-buffer-help-message)
    (persistent-help
@@ -475,14 +475,17 @@ i.e same color."
                 (and neg neg-test (not neg-test)))))))
 
 (defun helm-buffer--match-pattern (pattern candidate)
-  (let ((fun (if (and helm-buffers-fuzzy-matching
+  (let ((bfn (if (and helm-buffers-fuzzy-matching
+                      (not helm-migemo-mode)
                       (not (string-match "\\`\\^" pattern)))
                  #'helm--mapconcat-pattern
-                 #'identity)))
+                 #'identity))
+        (mfn (if helm-migemo-mode
+                 #'helm-mm-migemo-string-match #'string-match)))
     (if (string-match "\\`!" pattern)
-        (not (string-match (funcall fun (substring pattern 1))
-                           candidate))
-        (string-match (funcall fun pattern) candidate))))
+        (not (funcall mfn (funcall bfn (substring pattern 1))
+                      candidate))
+        (funcall mfn (funcall bfn pattern) candidate))))
 
 (defun helm-buffers--match-from-mjm (candidate)
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
