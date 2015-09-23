@@ -275,9 +275,11 @@ i.e the sources which have the slot :migemo with non--nil value."
 (defun helm-mm-migemo-string-match (pattern str)
   "Migemo version of `string-match'."
   (unless (assoc pattern helm-mm--previous-migemo-info)
-    (push (cons pattern (concat (migemo-get-pattern pattern)
-                                "\\|" pattern))
-          helm-mm--previous-migemo-info))
+    (with-helm-buffer
+      (setq helm-mm--previous-migemo-info
+            (push (cons pattern (concat (migemo-get-pattern pattern)
+                                        "\\|" pattern))
+                  helm-mm--previous-migemo-info))))
   (string-match (assoc-default pattern helm-mm--previous-migemo-info) str))
 
 (cl-defun helm-mm-3-migemo-match (str &optional (pattern helm-pattern))
@@ -286,10 +288,13 @@ i.e the sources which have the slot :migemo with non--nil value."
                 always (funcall pred (helm-mm-migemo-string-match re str)))))
 
 (defun helm-mm-migemo-forward (word &optional bound noerror count)
-  (re-search-forward
-   (if (delq 'ascii (find-charset-string word)) word
-     (concat (migemo-search-pattern-get word) "\\|" word))
-   bound noerror count))
+  (let ((regex (if (delq 'ascii (find-charset-string word))
+                   word
+                   (concat (migemo-search-pattern-get word) "\\|" word))))
+    (with-helm-buffer
+      (setq helm-mm--previous-migemo-info
+            (push (cons word regex) helm-mm--previous-migemo-info)))
+    (re-search-forward regex bound noerror count)))
 
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
   (and helm-migemo-mode
