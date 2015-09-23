@@ -1791,11 +1791,10 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
        ;; (e.g ./foo/*.el => ./foo/[*].el)
        (concat (regexp-quote bd)
                (replace-regexp-in-string "[*]" "[*]" bn)))
-      (t
-       (setq bn (if (>= (length bn) 2) ; wait 2nd char before concating.
-                    (helm--mapconcat-pattern bn)
-                  (concat ".*" (regexp-quote bn))))
-       (concat (regexp-quote bd) bn)))))
+      (t (concat (regexp-quote bd)
+                 (if (>= (length bn) 2) ; wait 2nd char before concating.
+                     (helm--mapconcat-pattern bn)
+                     (concat ".*" (regexp-quote bn))))))))
 
 (defun helm-dir-is-dot (dir)
   (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
