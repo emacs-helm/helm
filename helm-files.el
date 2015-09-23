@@ -118,8 +118,8 @@ and `helm-read-file-map' for this take effect."
   :group 'helm-files
   :type 'integer)
 
-(defcustom helm-ff-smart-completion t
-  "Try to complete filenames smarter when non--nil.
+(defcustom helm-ff-fuzzy-matching t
+  "Enable fuzzy matching for `helm-find-files' when non--nil.
 See `helm-ff--transform-pattern-for-completion' for more info."
   :group 'helm-files
   :type 'boolean)
@@ -1739,13 +1739,13 @@ systems."
         if isbad concat (cdr isbad)
         else concat (string i)))
 
-(defun helm-ff-smart-completion-p ()
-  (and helm-ff-smart-completion
+(defun helm-ff-fuzzy-matching-p ()
+  (and helm-ff-fuzzy-matching
        (not (memq helm-mm-matching-method '(multi1 multi3p)))))
 
 (defun helm-ff--transform-pattern-for-completion (pattern)
   "Maybe return PATTERN with it's basename modified as a regexp.
-This happen only when `helm-ff-smart-completion' is enabled.
+This happen only when `helm-ff-fuzzy-matching' is enabled.
 This provide a similar behavior as `ido-enable-flex-matching'.
 See also `helm--mapconcat-pattern'.
 If PATTERN is an url returns it unmodified.
@@ -1775,7 +1775,7 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
       ;; This allow showing all files/dirs matching BN (Issue #518).
       ;; FIXME: some multi-match methods may not work here.
       (dir-p (concat (regexp-quote bd) " " (regexp-quote bn)))
-      ((or (not (helm-ff-smart-completion-p))
+      ((or (not (helm-ff-fuzzy-matching-p))
            (string-match "\\s-" bn))    ; Fall back to multi-match.
        (concat (regexp-quote bd) bn))
       ((or (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
