@@ -1771,11 +1771,6 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
            (and dir-p (string-match (regexp-quote bn) bd)))
        ;; Use full PATTERN on e.g "/ssh:host:".
        (regexp-quote pattern))
-      ;; With Migemo make a regexp like "bd bn" forcing
-      ;; the use of multi-match.  Fuzzy will be disabled
-      ;; in this case. If bn contain a space we will have:
-      ;; "bd bn1 bn2".
-      (helm-migemo-mode (concat (regexp-quote bd) " " bn))
       ;; Prefixing BN with a space call multi-match completion.
       ;; This allow showing all files/dirs matching BN (Issue #518).
       ;; FIXME: some multi-match methods may not work here.
