@@ -3047,21 +3047,31 @@ sort on the real part."
 It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
-         (real (cdr pair)))
+         (real (cdr pair))
+         (regex (helm-aif (and helm-migemo-mode
+                               (assoc helm-pattern
+                                      helm-mm--previous-migemo-info))
+                    (cdr it)
+                  helm-pattern)))
     (with-temp-buffer
-      (insert (propertize display 'read-only nil))
+      (insert display)
       (goto-char (point-min))
-      (if (search-forward helm-pattern nil t)
+      (if (re-search-forward regex nil t)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match))
-          (cl-loop with pattern = (if (string-match-p " " helm-pattern)
-                                      (split-string helm-pattern)
-                                      (split-string helm-pattern "" t))
-                   for p in pattern
+          (cl-loop with patterns = (if (string-match-p " " helm-pattern)
+                                       (split-string helm-pattern)
+                                       (split-string helm-pattern "" t))
+                   for p in patterns
+                   for re = (or (and helm-migemo-mode
+                                     (assoc-default
+                                      p helm-mm--previous-migemo-info))
+                                p)
                    do
-                   (when (search-forward p nil t)
+                   (when (re-search-forward re nil t)
                      (add-text-properties
-                      (match-beginning 0) (match-end 0) '(face helm-match)))))
+                      (match-beginning 0) (match-end 0)
+                      '(face helm-match)))))
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
