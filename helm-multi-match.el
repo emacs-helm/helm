@@ -294,7 +294,7 @@ i.e the sources which have the slot :migemo with non--nil value."
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
   (and helm-migemo-mode
        (helm-mm-3-search-base
-        pattern 'helm-mm-migemo-forward 'helm-migemo-forward)))
+        pattern 'helm-mm-migemo-forward 'helm-mm-migemo-forward)))
 
 
 ;;; mp-3p- (multiple regexp pattern 3 with prefix search)
