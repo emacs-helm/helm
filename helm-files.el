@@ -3114,6 +3114,7 @@ Colorize only symlinks, directories and files."
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
    (fuzzy-match :initform t)
+   (migemo :initform t)
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)))
 
