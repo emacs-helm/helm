@@ -275,10 +275,10 @@ i.e the sources which have the slot :migemo with non--nil value."
 (defun helm-mm-migemo-string-match (pattern str)
   "Migemo version of `string-match'."
   (unless (assoc pattern helm-mm--previous-migemo-info)
-    (push (cons pattern (migemo-get-pattern pattern))
+    (push (cons pattern (concat (migemo-get-pattern pattern)
+                                "\\|" pattern))
           helm-mm--previous-migemo-info))
-  (string-match (concat (assoc-default pattern helm-mm--previous-migemo-info)
-                        "\\|" pattern) str))
+  (string-match (assoc-default pattern helm-mm--previous-migemo-info) str))
 
 (cl-defun helm-mm-3-migemo-match (str &optional (pattern helm-pattern))
   (and helm-migemo-mode

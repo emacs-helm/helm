@@ -3068,7 +3068,7 @@ It is meant to use with `filter-one-by-one' slot."
                                       p helm-mm--previous-migemo-info))
                                 p)
                    do
-                   (when (search-forward re nil t)
+                   (when (re-search-forward re nil t)
                      (add-text-properties
                       (match-beginning 0) (match-end 0)
                       '(face helm-match)))))
