@@ -246,6 +246,12 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   "bookmark name prefix of `helm-find-files' sessions."
   :group 'helm-files
   :type 'string)
+
+(defcustom helm-ff-guess-ffap-filenames nil
+  "Use ffap to guess local filenames at point.
+This doesn't disable url or mail at point, only files."
+  :group 'helm-files
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -2377,7 +2383,8 @@ Use it for non--interactive calls of `helm-find-files'."
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (let ((ffap-machine-p-known 'reject))
+  (let ((ffap-machine-p-known 'reject)
+        (ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
     (unless (eq major-mode 'image-mode)
       (or (and input (or (and (file-remote-p input) input)
                          (expand-file-name input)))
