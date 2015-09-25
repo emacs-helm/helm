@@ -24,8 +24,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-
-(defvar helm-pattern)
+(require 'helm-lib)
 
 
 (defgroup helm-multi-match nil
