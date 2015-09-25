@@ -24,6 +24,7 @@
 (require 'helm-plugin)
 
 (declare-function helm-mm-split-pattern "helm-multi-match")
+(declare-function migemo-forward "ext:migemo.el")
 
 
 (defgroup helm-regexp nil
