@@ -287,13 +287,16 @@ i.e the sources which have the slot :migemo with non--nil value."
                 always (funcall pred (helm-mm-migemo-string-match re str)))))
 
 (defun helm-mm-migemo-forward (word &optional bound noerror count)
-  (let ((regex (if (delq 'ascii (find-charset-string word))
-                   word
-                   (concat (migemo-search-pattern-get word) "\\|" word))))
-    (with-helm-buffer
+  (with-helm-buffer
+    (unless (assoc word helm-mm--previous-migemo-info)
       (setq helm-mm--previous-migemo-info
-            (push (cons word regex) helm-mm--previous-migemo-info)))
-    (re-search-forward regex bound noerror count)))
+            (push (cons word (if (delq 'ascii (find-charset-string word))
+                                 word
+                                 (concat (migemo-search-pattern-get word)
+                                         "\\|" word)))
+                  helm-mm--previous-migemo-info))))
+  (re-search-forward
+   (assoc-default word helm-mm--previous-migemo-info) bound noerror count))
 
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
   (and helm-migemo-mode
