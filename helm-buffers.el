@@ -523,7 +523,9 @@ i.e same color."
         (with-current-buffer buf
           (save-excursion
             (goto-char (point-min))
-            (re-search-forward regexp nil t)))
+            (if helm-migemo-mode
+                (helm-mm-migemo-forward regexp nil t)
+             (re-search-forward regexp nil t))))
         t)))
 
 (defun helm-buffers--match-from-directory (candidate)
