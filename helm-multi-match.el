@@ -290,9 +290,10 @@ i.e the sources which have the slot :migemo with non--nil value."
   (let ((regex (if (delq 'ascii (find-charset-string word))
                    word
                    (concat (migemo-search-pattern-get word) "\\|" word))))
-    (with-helm-buffer
-      (setq helm-mm--previous-migemo-info
-            (push (cons word regex) helm-mm--previous-migemo-info)))
+    (unless (assoc word helm-mm--previous-migemo-info)
+     (with-helm-buffer
+       (setq helm-mm--previous-migemo-info
+             (push (cons word regex) helm-mm--previous-migemo-info))))
     (re-search-forward regex bound noerror count)))
 
 (defun helm-mm-3-migemo-search (pattern &rest _ignore)
