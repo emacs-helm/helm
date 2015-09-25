@@ -736,7 +736,7 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-btf--usable-p ()
   "Return t if current version of `backtrace-frame' accept 2 arguments."
   (condition-case nil
-      (and (backtrace-frame 1 'condition-case) t)
+      (progn (backtrace-frame 1 'condition-case) t)
     (wrong-number-of-arguments nil)))
 
 (if (helm-btf--usable-p)        ; Check if BTF accept more than one arg.
