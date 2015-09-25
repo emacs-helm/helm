@@ -483,7 +483,9 @@ If STRING is non--nil return instead a space separated string."
                do (save-excursion
                     (goto-char start-match)
                     (while (condition-case _err
-                               (re-search-forward r end-match t)
+                               (if helm-migemo-mode
+                                   (helm-mm-migemo-forward r end-match t)
+                                   (re-search-forward r end-match t))
                              (invalid-regexp nil))
                       (let ((s (match-beginning 0))
                             (e (match-end 0)))
