@@ -3538,6 +3538,11 @@ after the source name by overlay."
             collect newline
             ;; Store last incomplete line (last chunk truncated)
             ;; until new output arrives.
+            ;; Previously we were storing 'line' in incomplete-line-info
+            ;; which assume output is truncated in only two chunks,
+            ;; which may be wrong if output is very large and is truncated
+            ;; in more than two chunks, so store now 'newline' which
+            ;; contain the previous chunks (Issue #1187).
             finally do (setcdr incomplete-line-info newline))))
 
 (defun helm-output-filter--post-process ()
