@@ -2821,7 +2821,8 @@ Cache the candidates if there is not yet a cached value."
            (cl-loop for f in it
                  do (setq ,candidate (funcall f ,candidate))
                  finally return ,candidate)
-         (setq ,candidate (funcall it ,candidate)))))
+         (setq ,candidate (funcall it ,candidate)))
+     ,candidate))
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
   "Process the CANDIDATES with the `filter-one-by-one' function in SOURCE.
@@ -3502,21 +3503,20 @@ after the source name by overlay."
                           (split-string output-string "\n")
                           (assoc 'incomplete-line source))
                          source t))
-    (when candidate
-      (setq candidate
-            (helm--maybe-process-filter-one-by-one-candidate candidate source))
-      (if (assq 'multiline source)
-          (let ((start (point)))
-            (helm-insert-candidate-separator)
-            (helm-insert-match candidate 'insert-before-markers source
-                               (1+ (cdr (assoc 'item-count source))))
-            (put-text-property start (point) 'helm-multiline t))
+    (setq candidate
+          (helm--maybe-process-filter-one-by-one-candidate candidate source))
+    (if (assq 'multiline source)
+        (let ((start (point)))
+          (helm-insert-candidate-separator)
           (helm-insert-match candidate 'insert-before-markers source
-                             (1+ (cdr (assoc 'item-count source)))))
-      (cl-incf (cdr (assoc 'item-count source)))
-      (when (>= (assoc-default 'item-count source) limit)
-        (helm-kill-async-process process)
-        (cl-return)))))
+                             (1+ (cdr (assoc 'item-count source))))
+          (put-text-property start (point) 'helm-multiline t))
+        (helm-insert-match candidate 'insert-before-markers source
+                           (1+ (cdr (assoc 'item-count source)))))
+    (cl-incf (cdr (assoc 'item-count source)))
+    (when (>= (assoc-default 'item-count source) limit)
+      (helm-kill-async-process process)
+      (cl-return))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info)
   "Collect LINES maybe completing the truncated first and last lines."
