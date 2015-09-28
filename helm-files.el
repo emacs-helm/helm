@@ -366,6 +366,7 @@ This doesn't disable url or mail at point, only files."
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
+    (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   nil nil 'helm-ff-delete-char-backward--exit-fn)
@@ -455,6 +456,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
    'helm-find-files-eshell-command-on-file
    "Find file as root `C-c r'" 'helm-find-file-as-root
+   "Find alternate file" 'find-alternate-file
    "Ediff File `C-='" 'helm-find-files-ediff-files
    "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
    "Delete File(s) `M-D'" 'helm-delete-marked-files
@@ -1179,6 +1181,11 @@ This doesn't replace inside the files, only modify filenames."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-find-file-as-root)))
+
+(defun helm-ff-run-find-alternate-file ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'find-alternate-file)))
 
 (defun helm-ff-run-gnus-attach-files ()
   "Run gnus attach files command action from `helm-source-find-files'."
