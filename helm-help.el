@@ -260,7 +260,7 @@ NOTE: `C-u C-j' will display buffer directly.
 *** To browse images directories turn on `helm-follow-mode' and navigate with arrow keys
 
 You can also use `helm-follow-action-forward' and `helm-follow-action-backward'
-(`C-<down' and `C-<left>').
+\(`C-<down' and `C-<left>').
 
 *** You can turn off/on (toggle) autoupdate completion at any moment with `C-DEL'
 
@@ -398,6 +398,7 @@ in `helm-current-buffer' as default.
 \\[helm-narrow-window]\t\tNarrow helm window.
 \\[helm-ff-run-toggle-basename]\t\tToggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\tFind file as root.
+\\[helm-ff-run-find-alternate-file]\t\tFind alternate file.
 \\[helm-ff-run-insert-org-link]\t\tInsert org link.")
 
 ;;; Help for `helm-read-file-name'
