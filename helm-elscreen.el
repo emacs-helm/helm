@@ -39,34 +39,37 @@
   (helm-require-or-error 'elscreen 'helm-elscreen-find-file)
   (elscreen-find-file file))
 
-(defvar helm-source-elscreen
-  '((name . "Elscreen")
-    (candidates
-     . (lambda ()
-         (if (cdr (elscreen-get-screen-to-name-alist))
-             (sort
-              (cl-loop for sname in (elscreen-get-screen-to-name-alist)
-                    append (list (format "[%d] %s" (car sname) (cdr sname))))
-              #'(lambda (a b) (compare-strings a nil nil b nil nil))))))
-    (action
-     . (("Change Screen" .
-                         (lambda (candidate)
-                           (elscreen-goto (- (aref candidate 1) (aref "0" 0)))))
-        ("Kill Screen(s)" .
-                          (lambda (candidate)
-                            (cl-dolist (i (helm-marked-candidates))
-                              (elscreen-goto (- (aref i 1) (aref "0" 0)))
-                              (elscreen-kill))))
-        ("Only Screen" .
-                       (lambda (candidate)
-                         (elscreen-goto (- (aref candidate 1) (aref "0" 0)))
-                         (elscreen-kill-others)))))))
+(defclass helm-source-elscreen (helm-source-sync)
+  ((candidates
+    :initform
+    (lambda ()
+      (when (cdr (elscreen-get-screen-to-name-alist))
+        (cl-sort (cl-loop for (screen . name) in (elscreen-get-screen-to-name-alist)
+                       collect (cons (format "[%d] %s" screen name) screen))
+                 #'< :key #'cdr))))
+   (action :initform
+           '(("Change Screen" .
+              (lambda (candidate)
+                (elscreen-goto candidate)))
+             ("Kill Screen(s)" .
+              (lambda (_)
+                (cl-dolist (i (helm-marked-candidates))
+                  (elscreen-goto i)
+                  (elscreen-kill))))
+             ("Only Screen" .
+              (lambda (candidate)
+                (elscreen-goto candidate)
+                (elscreen-kill-others)))))
+   (migemo :initform t)))
+
+(defvar helm-source-elscreen-list
+  (helm-make-source "ElScreen" 'helm-source-elscreen))
 
 ;;;###autoload
 (defun helm-elscreen ()
   "Preconfigured helm to list elscreen."
   (interactive)
-  (helm-other-buffer 'helm-source-elscreen "*Helm Elscreen*"))
+  (helm-other-buffer 'helm-source-elscreen-list "*Helm ElScreen*"))
 
 (provide 'helm-elscreen)
 
