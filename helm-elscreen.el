@@ -22,6 +22,7 @@
 (declare-function elscreen-find-screen-by-buffer "ext:elscreen.el" (buffer &optional create))
 (declare-function elscreen-find-file "ext:elscreen.el" (filename))
 (declare-function elscreen-goto "ext:elscreen.el" (screen))
+(declare-function elscreen-get-conf-list "ext:elscreen.el" (type))
 
 (defun helm-find-buffer-on-elscreen (candidate)
   "Open buffer in new screen, if marked buffers open all in elscreens."
@@ -62,14 +63,33 @@
                 (elscreen-kill-others)))))
    (migemo :initform t)))
 
+(defclass helm-source-elscreen-history (helm-source-elscreen)
+  ((candidates
+    :initform
+    (lambda ()
+      (let ((sname (elscreen-get-screen-to-name-alist)))
+        (when (cdr sname)
+          (cl-loop for screen in (cdr (elscreen-get-conf-list 'screen-history))
+                collect (cons (format "[%d] %s" screen (cdr (assq screen sname)))
+                              screen))))))))
+
 (defvar helm-source-elscreen-list
   (helm-make-source "ElScreen" 'helm-source-elscreen))
+
+(defvar helm-source-elscreen-history-list
+  (helm-make-source "ElScreen History" 'helm-source-elscreen-history))
 
 ;;;###autoload
 (defun helm-elscreen ()
   "Preconfigured helm to list elscreen."
   (interactive)
   (helm-other-buffer 'helm-source-elscreen-list "*Helm ElScreen*"))
+
+;;;###autoload
+(defun helm-elscreen-history ()
+  "Preconfigured helm to list elscreen in history order."
+  (interactive)
+  (helm-other-buffer 'helm-source-elscreen-history-list "*Helm ElScreen*"))
 
 (provide 'helm-elscreen)
 
