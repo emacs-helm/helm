@@ -1196,8 +1196,8 @@ You can use safely \"--color\" (default)."
 
 (defun helm-grep-ag-init (directory)
   (let ((cmd-line (format helm-grep-ag-command
-                          helm-pattern
-                          directory)))
+                          (shell-quote-argument helm-pattern)
+                          (shell-quote-argument directory))))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (prog1
         (start-process-shell-command
