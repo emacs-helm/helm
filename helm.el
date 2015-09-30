@@ -4698,32 +4698,36 @@ Acceptable values of CREATE-OR-BUFFER:
          (local-bname (format " *helm candidates:%s*%s"
                               helm-source-name
                               (buffer-name helm-current-buffer)))
-         (register-func #'(lambda ()
-                            (setq helm-candidate-buffer-alist
-                                  (cons (cons helm-source-name create-or-buffer)
-                                        (delete (assoc helm-source-name
-                                                       helm-candidate-buffer-alist)
-                                                helm-candidate-buffer-alist)))))
-         (kill-buffers-func #'(lambda ()
-                                (cl-loop for b in (buffer-list)
-                                      if (string-match (format "^%s" (regexp-quote global-bname))
-                                                       (buffer-name b))
-                                      do (kill-buffer b))))
-         (create-func #'(lambda ()
-                          (with-current-buffer
-                              (get-buffer-create (if (eq create-or-buffer 'global)
-                                                     global-bname
-                                                   local-bname))
-                            (set (make-local-variable 'inhibit-read-only) t) ; Fix (#1176)
-                            (buffer-disable-undo)
-                            (erase-buffer)
-                            (font-lock-mode -1))))
-         (return-func #'(lambda ()
-                          (or (get-buffer local-bname)
-                              (get-buffer global-bname)
-                              (helm-aif (assoc-default helm-source-name
-                                                       helm-candidate-buffer-alist)
-                                  (and (buffer-live-p it) it))))))
+         (register-func
+          (lambda ()
+            (setq helm-candidate-buffer-alist
+                  (cons (cons helm-source-name create-or-buffer)
+                        (delete (assoc helm-source-name
+                                       helm-candidate-buffer-alist)
+                                helm-candidate-buffer-alist)))))
+         (kill-buffers-func
+          (lambda ()
+            (cl-loop for b in (buffer-list)
+                     if (string-match (format "^%s" (regexp-quote global-bname))
+                                      (buffer-name b))
+                     do (kill-buffer b))))
+         (create-func
+          (lambda ()
+            (with-current-buffer
+                (get-buffer-create (if (eq create-or-buffer 'global)
+                                       global-bname
+                                       local-bname))
+              (set (make-local-variable 'inhibit-read-only) t) ; Fix (#1176)
+              (buffer-disable-undo)
+              (erase-buffer)
+              (font-lock-mode -1))))
+         (return-func
+          (lambda ()
+            (or (get-buffer local-bname)
+                (get-buffer global-bname)
+                (helm-aif (assoc-default helm-source-name
+                                         helm-candidate-buffer-alist)
+                    (and (buffer-live-p it) it))))))
     (when create-or-buffer
       (funcall register-func)
       (unless (bufferp create-or-buffer)
