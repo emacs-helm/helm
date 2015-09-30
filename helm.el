@@ -3055,7 +3055,7 @@ It is meant to use with `filter-one-by-one' slot."
                     (cdr it)
                   helm-pattern)))
     (with-temp-buffer
-      (insert (propertize display 'read-only nil))
+      (insert (propertize display 'read-only nil)) ; Fix (#1176)
       (goto-char (point-min))
       (if (re-search-forward regex nil t)
           (add-text-properties
@@ -4714,7 +4714,7 @@ Acceptable values of CREATE-OR-BUFFER:
                               (get-buffer-create (if (eq create-or-buffer 'global)
                                                      global-bname
                                                    local-bname))
-                            (set (make-local-variable 'inhibit-read-only) t)
+                            (set (make-local-variable 'inhibit-read-only) t) ; Fix (#1176)
                             (buffer-disable-undo)
                             (erase-buffer)
                             (font-lock-mode -1))))
