@@ -3055,7 +3055,7 @@ It is meant to use with `filter-one-by-one' slot."
                     (cdr it)
                   helm-pattern)))
     (with-temp-buffer
-      (insert display)
+      (insert (propertize display 'read-only nil))
       (goto-char (point-min))
       (if (re-search-forward regex nil t)
           (add-text-properties
