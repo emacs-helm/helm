@@ -423,8 +423,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
       (set-process-sentinel
        (get-buffer-process helm-buffer)
        (lambda (process event)
-           (let ((noresult (= (process-exit-status process) 1)))
-             (unless noresult
+           (let* ((err      (process-exit-status process))
+                  (noresult (= err 1)))
+             (unless err
                (helm-process-deferred-sentinel-hook
                 process event (helm-default-directory)))
              (cond ((and noresult
@@ -432,7 +433,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          ;; that exit with code 1
                          ;; after a certain amount of results.
                          (not (with-helm-buffer helm-grep-use-zgrep)))
-                    (with-current-buffer helm-buffer
+                    (with-helm-buffer
                       (insert (concat "* Exit with code 1, no result found,"
                                       " Command line was:\n\n "
                                       (propertize helm-grep-last-cmd-line
@@ -984,15 +985,16 @@ in recurse, and ignoring EXTS, search being made on
                    (car-safe split)))
          (lineno (nth 1 split))
          (str    (nth 2 split)))
-    (when (and fname lineno str)
-      (cons (concat (propertize (file-name-nondirectory fname)
-                                'face 'helm-grep-file
-                                'help-echo fname)
-                    ":"
-                    (propertize lineno 'face 'helm-grep-lineno)
-                    ":"
-                    (if ansi-p str (helm-grep-highlight-match str)))
-            line))))
+    (if (and fname lineno str)
+        (cons (concat (propertize (file-name-nondirectory fname)
+                                  'face 'helm-grep-file
+                                  'help-echo fname)
+                      ":"
+                      (propertize lineno 'face 'helm-grep-lineno)
+                      ":"
+                      (if ansi-p str (helm-grep-highlight-match str)))
+              line)
+        "")))
 
 (defun helm-grep-filter-one-by-one (candidate)
   "`filter-one-by-one' transformer function for `helm-do-grep'."
