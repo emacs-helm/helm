@@ -248,7 +248,7 @@ Support install, remove and purge actions."
                      (t          (error "Unknown action"))))
         (beg       (point))
         end
-        (cand-list (mapconcat #'(lambda (x) (format "'%s'" x))
+        (cand-list (mapconcat (lambda (x) (format "'%s'" x))
                               (helm-marked-candidates) " ")))
     (goto-char (point-max))
     (insert (concat command cand-list))

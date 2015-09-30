@@ -19,7 +19,7 @@
 ;;
 ;; Enable like this in .emacs:
 ;; (add-hook 'eshell-mode-hook
-;;           #'(lambda ()
+;;           (lambda ()
 ;;               (eshell-cmpl-initialize)
 ;;               (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)
 ;;               (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))

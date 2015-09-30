@@ -570,7 +570,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
-                   (mapcar #'(lambda (f)
+                   (mapcar (lambda (f)
                                (if (file-directory-p f)
                                    (concat (helm-basename f) "/")
                                  (helm-basename f)))
@@ -793,7 +793,7 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 
 (defun helm-ff-switch-to-eshell (_candidate)
   "Switch to eshell and cd to `helm-ff-default-directory'."
-  (let ((cd-eshell #'(lambda ()
+  (let ((cd-eshell (lambda ()
                        (eshell-kill-input)
                        (goto-char (point-max))
                        (insert
@@ -1242,7 +1242,7 @@ Same as `dired-do-print' but for helm."
                                           (list lpr-switches)
                                           lpr-switches))
                                 " "))))
-         (file-args (mapconcat #'(lambda (x)
+         (file-args (mapconcat (lambda (x)
                                    (format "'%s'" x))
                                file-list " "))
          (cmd-line (concat command " " file-args)))
@@ -2007,7 +2007,7 @@ Return candidates prefixed with basename of `helm-input' first."
              (rest-cand (if cand1 (cdr candidates) candidates))
              (memo-src  (make-hash-table :test 'equal))
              (all (sort rest-cand
-                        #'(lambda (s1 s2)
+                        (lambda (s1 s2)
                             (let* ((score (lambda (str)
                                             (helm-ff-score-candidate-for-pattern
                                              str (helm-basename helm-input))))
@@ -2223,7 +2223,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
          (new-pattern   (helm-get-selection))
          (num-lines-buf (with-current-buffer helm-buffer
                           (count-lines (point-min) (point-max))))
-         (insert-in-minibuffer #'(lambda (fname)
+         (insert-in-minibuffer (lambda (fname)
                                    (with-selected-window (minibuffer-window)
                                      (unless follow
                                        (delete-minibuffer-contents)
@@ -2517,9 +2517,9 @@ copy and rename."
           (if (file-directory-p candidate)
               ;; When CANDIDATE is a directory, build file-name in this directory.
               ;; Else we use CANDIDATE.
-              #'(lambda (from)
+              (lambda (from)
                   (expand-file-name (file-name-nondirectory from) candidate))
-              #'(lambda (_from) candidate))
+              (lambda (_from) candidate))
           marker)
       (and (fboundp 'dired-async-mode)
            (dired-async-mode dired-async-state)))
@@ -2628,7 +2628,7 @@ Ask to kill buffers associated with that file, too."
          (len (length files)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
-      (mapcar #'(lambda (f)
+      (mapcar (lambda (f)
                   (if (file-directory-p f)
                       (concat (helm-basename f) "/")
                     (helm-basename f)))
@@ -2649,7 +2649,7 @@ Called with a prefix arg open files in background without selecting them."
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
         (find-file-wildcards nil)
         (make-dir-fn
-         #'(lambda (dir &optional helm-ff)
+         (lambda (dir &optional helm-ff)
              (when (y-or-n-p (format "Create directory `%s'? " dir))
                (let ((dirfname (directory-file-name dir)))
                  (if (file-exists-p dirfname)
@@ -3072,7 +3072,7 @@ See `helm-browse-project'."
 (defvar helm-source-session
   (helm-build-sync-source "Session"
     :candidates (lambda ()
-                  (cl-delete-if-not #'(lambda (f)
+                  (cl-delete-if-not (lambda (f)
                                         (or (string-match helm-tramp-file-name-regexp f)
                                             (file-exists-p f)))
                                     (mapcar 'car session-file-alist)))
@@ -3275,7 +3275,7 @@ separator."
     (prog1 proc
       (set-process-sentinel
        proc
-       #'(lambda (process event)
+       (lambda (process event)
            (helm-process-deferred-sentinel-hook
             process event (helm-default-directory))
            (if (string= event "finished\n")

@@ -165,7 +165,7 @@ INIT is a string to use as initial input in prompt.
 See `helm-locate-with-db' and `helm-locate'."
   (require 'helm-mode)
   (helm-locate-set-command)
-  (let ((pfn #'(lambda (candidate)
+  (let ((pfn (lambda (candidate)
                  (if (file-directory-p candidate)
                      (message "Error: The locate Db should be a file")
                    (if (= (shell-command
@@ -185,7 +185,7 @@ See `helm-locate-with-db' and `helm-locate'."
                                                           (or helm-ff-default-directory
                                                               default-directory))
                          :preselect helm-locate-db-file-regexp
-                         :test #'(lambda (x)
+                         :test (lambda (x)
                                    (if helm-locate-db-file-regexp
                                        ;; Select only locate db files and directories
                                        ;; to allow navigation.
@@ -270,7 +270,7 @@ See also `helm-locate'."
          cmd)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       #'(lambda (_process event)
+       (lambda (_process event)
            (if (string= event "finished\n")
                (with-helm-window
                  (setq mode-line-format

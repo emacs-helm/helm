@@ -105,7 +105,7 @@ In this case EXE must be provided as \"EXE %s\"."
           (start-process-shell-command proc nil real-com))
         (set-process-sentinel
          (get-process proc)
-         #'(lambda (process event)
+         (lambda (process event)
              (when (and (string= event "finished\n")
                         helm-raise-command
                         (not (helm-get-pid-from-process-name real-com)))

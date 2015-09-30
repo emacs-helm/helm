@@ -158,7 +158,7 @@ but the initial search for all candidates in buffer(s)."
          (minibuf (minibufferp buffer1))
          result pos-before pos-after
          (search-and-store
-          #'(lambda (pattern direction)
+          (lambda (pattern direction)
               (while (cl-case direction
                        (1   (search-forward pattern nil t))
                        (-1  (search-backward pattern nil t))
@@ -230,7 +230,7 @@ but the initial search for all candidates in buffer(s)."
 (defun helm-dabbrev--get-candidates (abbrev)
   (cl-assert abbrev nil "[No Match]")
   (with-current-buffer (current-buffer)
-    (let* ((dabbrev-get #'(lambda (str all-bufs)
+    (let* ((dabbrev-get (lambda (str all-bufs)
                             (helm-dabbrev--collect
                              str helm-candidate-number-limit
                              (cl-case helm-dabbrev-case-fold-search
@@ -267,7 +267,7 @@ but the initial search for all candidates in buffer(s)."
                                 (zerop helm-dabbrev-cycle-threshold)))
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
-         #'(lambda ()
+         (lambda ()
              (message "[Helm-dabbrev: No expansion found]"))))
     (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
                nil "[Helm-dabbrev: Nothing found before point]")

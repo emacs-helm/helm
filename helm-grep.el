@@ -330,7 +330,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
           (let ((files (if (file-remote-p in-directory)
                        ;; Grep don't understand tramp filenames
                        ;; use the local name.
-                       (mapcar #'(lambda (x)
+                       (mapcar (lambda (x)
                                    (file-remote-p x 'localname))
                                all-files)
                        all-files)))
@@ -365,7 +365,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                              only-files default-directory))
          (ignored-files     (unless (helm-grep-use-ack-p)
                               (mapconcat
-                               #'(lambda (x)
+                               (lambda (x)
                                    (concat "--exclude="
                                            (shell-quote-argument x)))
                                helm-grep-ignored-files " ")))
@@ -373,7 +373,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                               (mapconcat
                                ;; Need grep version >=2.5.4
                                ;; of Gnuwin32 on windoze.
-                               #'(lambda (x)
+                               (lambda (x)
                                    (concat "--exclude-dir="
                                            (shell-quote-argument x)))
                                helm-grep-ignored-directories " ")))
@@ -422,7 +422,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
       ;; Init sentinel.
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       #'(lambda (process event)
+       (lambda (process event)
            (let ((noresult (= (process-exit-status process) 1)))
              (unless noresult
                (helm-process-deferred-sentinel-hook
@@ -564,7 +564,7 @@ If N is positive go forward otherwise go backward."
          (current-line-list  (helm-grep-split-line sel))
          (current-fname      (nth 0 current-line-list))
          (bob-or-eof         (if (eq n 1) 'eobp 'bobp))
-         (mark-maybe #'(lambda ()
+         (mark-maybe (lambda ()
                          (if allow-mode
                              (ignore)
                            (helm-mark-current-line)))))
@@ -788,7 +788,7 @@ Special commands:
                 :fc-transformer '(helm-adaptive-sort
                                   helm-grep-ack-types-transformer)
                 :buffer "*helm ack-types*")))
-    (mapconcat #'(lambda (type) (concat "--type=" type)) types " ")))
+    (mapconcat (lambda (type) (concat "--type=" type)) types " ")))
 
 
 ;;; grep extensions
@@ -862,7 +862,7 @@ in recurse, and ignoring EXTS, search being made on
                     (not (helm-grep-use-ack-p :where 'recursive))
                     (or exts (helm-grep-get-file-extensions targets))))
          (include-files (and exts
-                             (mapconcat #'(lambda (x)
+                             (mapconcat (lambda (x)
                                             (concat "--include="
                                                     (shell-quote-argument x)))
                                         (if (> (length exts) 1)
@@ -1094,7 +1094,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                                 default-directory))
          (fnargs   (helm-grep-prepare-candidates
                     (if (file-remote-p default-directory)
-                        (mapcar #'(lambda (x)
+                        (mapcar (lambda (x)
                                     (file-remote-p x 'localname))
                                 only-files)
                       only-files)
@@ -1113,7 +1113,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
       (message nil)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       #'(lambda (_process event)
+       (lambda (_process event)
            (if (string= event "finished\n")
                (with-helm-window
                  (setq mode-line-format
@@ -1309,7 +1309,7 @@ See also `helm-do-grep-1'."
          (only (helm-read-file-name
                 "Search in file(s): "
                 :marked-candidates t
-                :test #'(lambda (file)
+                :test (lambda (file)
                           (or (string= (file-name-extension file) "pdf")
                               (string= (file-name-extension file) "PDF")
                               (file-directory-p file)))

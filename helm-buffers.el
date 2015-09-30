@@ -419,7 +419,7 @@ Should be called after others transformers i.e (boring buffers)."
   (if (string= helm-pattern "")
       candidates
     (sort candidates
-          #'(lambda (s1 s2)
+          (lambda (s1 s2)
               (< (string-width s1) (string-width s2))))))
 
 (defun helm-buffers-mark-similar-buffers-1 ()

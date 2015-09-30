@@ -133,7 +133,7 @@ Lookes recursively in parents directorys for a
 (defun helm-etags-find-tag-file-directory (current-dir)
   "Try to find the directory containing tag file.
 If not found in CURRENT-DIR search in upper directory."
-  (let ((file-exists? #'(lambda (dir)
+  (let ((file-exists? (lambda (dir)
                           (let ((tag-path (expand-file-name
                                            helm-etags-tag-file-name dir)))
                             (and (stringp tag-path)

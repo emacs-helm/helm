@@ -274,7 +274,7 @@ that is sorting is done against real value of candidate."
          (split (split-string pattern))
          (str1  (if (consp s1) (cdr s1) s1))
          (str2  (if (consp s2) (cdr s2) s2))
-         (score #'(lambda (str r1 r2 r3 lst)
+         (score (lambda (str r1 r2 r3 lst)
                     (+ (if (string-match (concat "\\`" pattern) str) 1 0)
                        (cond ((string-match r1 str) 5)
                              ((and (string-match " " pattern)

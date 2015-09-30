@@ -401,7 +401,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
            (append args (list url)))
     (set-process-sentinel
      (get-process proc)
-     #'(lambda (process event)
+     (lambda (process event)
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 

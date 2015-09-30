@@ -177,7 +177,7 @@ than the default which is OBARRAY."
                                             candidates source 'real)))
              (helm--mode-line-display-prefarg t)
              (pers-help
-              #'(lambda (candidate)
+              (lambda (candidate)
                   (let ((hbuf (get-buffer (help-buffer))))
                     (if (and in-help (string= candidate help-cand)
                              (null helm-persistent-action-use-special-display))
