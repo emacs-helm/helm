@@ -4714,6 +4714,7 @@ Acceptable values of CREATE-OR-BUFFER:
                               (get-buffer-create (if (eq create-or-buffer 'global)
                                                      global-bname
                                                    local-bname))
+                            (set (make-local-variable 'inhibit-read-only) t)
                             (buffer-disable-undo)
                             (erase-buffer)
                             (font-lock-mode -1))))
