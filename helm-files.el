@@ -2919,15 +2919,9 @@ Don't use it in your own code unless you know what you are doing.")
                            (if (or helm-ff-transformer-show-only-basename
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
-   (filter-one-by-one :initform (lambda (c)
-                                  (if (and helm-ff-transformer-show-only-basename
-                                           (not (consp c)))
-                                      (cons (helm-basename c) c)
-                                      c)))
    (migemo :initform t)
    (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
-   (action :initform 'helm-type-file-actions)))
+   (help-message :initform helm-generic-file-help-message)))
 
 (defvar helm-source-recentf nil 
   "See (info \"(emacs)File Conveniences\").
