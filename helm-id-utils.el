@@ -24,6 +24,15 @@
   "ID-Utils related Applications and libraries for Helm."
   :group 'helm)
 
+(defcustom helm-gid-program "gid"
+  "Name of gid command (usually `gid').
+For Mac OS X users, if you install GNU coreutils, the name `gid'
+might be occupied by `id' from GNU coreutils, and you should set
+it to correct name (or absolute path), for example, if using
+MacPorts to install id-utils, it should be `gid32'."
+  :group 'helm-id-utils
+  :type 'file)
+
 (defcustom helm-gid-db-file-name "ID"
   "Name of a database file created by `mkid' command from `ID-utils'."
   :group 'helm-id-utils
@@ -31,10 +40,10 @@
 
 (defun helm-gid-candidates-process ()
   (let ((proc (start-process
-               "gid" nil "gid"
+               "gid" nil helm-gid-program
                "-r" helm-pattern)))
     (set (make-local-variable 'helm-grep-last-cmd-line)
-         (format "gid -r %s" helm-pattern))
+         (format "%s -r %s" helm-gid-program helm-pattern))
     (prog1 proc
       (set-process-sentinel
        proc (lambda (_process event)
