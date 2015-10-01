@@ -3184,7 +3184,7 @@ with the tracker desktop search.")
                        (lambda ()
                          (start-process
                           "mdfind-process" nil "mdfind" helm-pattern)))
-   (requires-pattern :init-form 3)))
+   (requires-pattern :initform 3)))
 
 (defvar helm-source-mac-spotlight
   (helm-make-source "mdfind" helm-mac-spotlight-source)
