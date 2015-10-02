@@ -3802,7 +3802,11 @@ Possible value of DIRECTION are 'next or 'previous."
         (put-text-property
          ;; Increment pos to handle the space before prompt (i.e `pref').
          (1+ pos) (+ 2 pos)
-         'face 'cursor header-line-format)
+         'face ;don't just use 'cursor; this can hide the current character
+         `((t :inverse-video t
+              :foreground ,(face-background 'cursor)
+              :background ,(face-background 'default)))
+         header-line-format)
         (when update (force-mode-line-update))))))
 
 (defun helm--update-header-line ()
