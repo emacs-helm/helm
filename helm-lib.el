@@ -65,7 +65,8 @@ If you prefer scrolling line by line, set this value to 1."
 (defvar helm-current-buffer nil
   "Current buffer when `helm' is invoked.")
 (defvar helm-suspend-update-flag nil)
-
+(defvar helm-action-buffer "*helm action*"
+  "Buffer showing actions.")
 
 ;;; Macros helper.
 ;;
@@ -546,6 +547,26 @@ That is what completion commands operate on."
                                  helm-current-buffer)
                             (setq helm-current-buffer
                                   (current-buffer)))
+     ,@body))
+
+(defun helm-buffer-get ()
+  "Return `helm-action-buffer' if shown otherwise `helm-buffer'."
+  (if (helm-action-window)
+      helm-action-buffer
+    helm-buffer))
+
+(defun helm-window ()
+  "Window of `helm-buffer'."
+  (get-buffer-window (helm-buffer-get) 0))
+
+(defun helm-action-window ()
+  "Window of `helm-action-buffer'."
+  (get-buffer-window helm-action-buffer 'visible))
+
+(defmacro with-helm-window (&rest body)
+  "Be sure BODY is excuted in the helm window."
+  (declare (indent 0) (debug t))
+  `(with-selected-window (helm-window)
      ,@body))
 
 
