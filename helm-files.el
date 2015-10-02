@@ -3328,23 +3328,25 @@ Called with a prefix arg show history if some.
 Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
-  (let* ((hist          (and arg helm-ff-history (helm-find-files-history)))
-         (default-input (or hist (helm-find-files-initial-input)))
-         (input         (cond ((and (eq major-mode 'org-agenda-mode)
-                                    org-directory
-                                    (not default-input))
-                               (expand-file-name org-directory))
-                              ((and (eq major-mode 'dired-mode) default-input)
-                               (file-name-directory default-input))
-                              ((and (not (string= default-input ""))
-                                    default-input))
-                              (t (expand-file-name (helm-current-directory)))))
-         (presel        (helm-aif (or hist
-                                      (buffer-file-name (current-buffer))
-                                      (and (eq major-mode 'dired-mode)
-                                           default-input))
-                            (if helm-ff-transformer-show-only-basename
-                                (helm-basename it) it))))
+  (let* ((hist            (and arg helm-ff-history (helm-find-files-history)))
+         (default-input   (or hist (helm-find-files-initial-input)))
+         (input           (cond ((and (eq major-mode 'org-agenda-mode)
+                                      org-directory
+                                      (not default-input))
+                                 (expand-file-name org-directory))
+                                ((and (eq major-mode 'dired-mode) default-input)
+                                 (file-name-directory default-input))
+                                ((and (not (string= default-input ""))
+                                      default-input))
+                                (t (expand-file-name (helm-current-directory)))))
+         (input-as-presel (null (nth 0 (file-attributes input))))
+         (presel          (helm-aif (or hist
+                                        (and input-as-presel input)
+                                        (buffer-file-name (current-buffer))
+                                        (and (eq major-mode 'dired-mode)
+                                             default-input))
+                              (if helm-ff-transformer-show-only-basename
+                                  (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
     (helm-find-files-1 input (and presel (concat "^" (regexp-quote presel))))))
 
