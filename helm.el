@@ -3270,8 +3270,11 @@ is done on whole `helm-buffer' and not on current source."
                    ;; Export the variables from cl-loop
                    finally (setq delayed-sources ds
                                  normal-sources ns))
+             ;; Compute matches without rendering the sources.
              (helm-log "Matches: %S"
                        (setq matches (helm--collect-matches normal-sources)))
+             ;; If computing matches finished and is not interrupted
+             ;; erase the helm-buffer and render results (Fix #1157).
              (when matches
                (erase-buffer)
                (cl-loop for src in normal-sources
@@ -3297,6 +3300,9 @@ is done on whole `helm-buffer' and not on current source."
                  (helm-preselect preselect source))
                (setq helm-force-updating-p nil)))
         (when delayed-sources
+          ;; Erase buffer when there is no normal-sources,
+          ;; otherwise it would erase the already computed normal sources.
+          (unless normal-sources (erase-buffer))
           ;; Allow giving a value to `delayed' attr from inside source.
           ;; Retain the biggest value (the slower) found in DELAYED-SOURCES.
           (let ((helm-idle-delay (cl-loop with delay = helm-idle-delay
