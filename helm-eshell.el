@@ -40,7 +40,7 @@
 
 
 (defgroup helm-eshell nil
-  ""
+  "Helm eshell completion and history."
   :group 'helm)
 
 (defcustom helm-eshell-hist-ignoredups nil
