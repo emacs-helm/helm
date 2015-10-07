@@ -392,9 +392,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
                    (buffer-name (current-buffer))
                    (remove helm-current-buffer buffers))
                   buffers)))
-    (unless helm-source-moccur
-      (setq helm-source-moccur
-            (helm-make-source "Moccur" 'helm-source-multi-occur)))
+    (helm--maybe-build-source 'helm-source-moccur
+      (helm-make-source "Moccur" 'helm-source-multi-occur))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
     (helm-set-local-variable
