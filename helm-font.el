@@ -141,7 +141,10 @@ Only math* symbols are collected."
     (helm-attrset 'action-delete 'helm-ucs-delete-backward)
     (helm-execute-persistent-action 'action-delete)))
 
-(defvar helm-source-ucs
+(defvar helm-source-ucs nil 
+  "Source for collecting `ucs-names' symbols.")
+
+(defun helm-build-ucs-source ()
   (helm-build-in-buffer-source "Ucs names"
     :data #'helm-ucs-init
     :help-message 'helm-ucs-help-message
@@ -153,8 +156,7 @@ Only math* symbols are collected."
               ("Insert character code in hex" . helm-ucs-insert-code)
               ("Forward char" . helm-ucs-forward-char)
               ("Backward char" . helm-ucs-backward-char)
-              ("Delete char backward" . helm-ucs-delete-backward)))
-  "Source for collecting `ucs-names' symbols.")
+              ("Delete char backward" . helm-ucs-delete-backward))))
 
 ;;;###autoload
 (defun helm-select-xfont ()
@@ -169,6 +171,8 @@ Only math* symbols are collected."
 (defun helm-ucs ()
   "Preconfigured helm for `ucs-names' math symbols."
   (interactive)
+  (helm--maybe-build-source 'helm-source-ucs
+    #'helm-build-ucs-source)
   (helm :sources 'helm-source-ucs
         :keymap  helm-ucs-map))
 
