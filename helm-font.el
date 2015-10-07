@@ -158,7 +158,8 @@ Only math* symbols are collected."
 (defun helm-select-xfont ()
   "Preconfigured `helm' to select Xfont."
   (interactive)
-  (helm-other-buffer 'helm-source-xfonts "*helm select* xfont"))
+  (helm :sources 'helm-source-xfonts
+        :buffer "*helm select xfont*"))
 
 ;;;###autoload
 (defun helm-ucs ()
