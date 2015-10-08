@@ -37,30 +37,28 @@
 ;;
 (defvar helm-xfonts-cache nil)
 (defvar helm-previous-font nil)
-(defvar helm-source-xfonts nil)
-
-(defun helm-build-xfonts-source ()
-  (helm-build-sync-source "X Fonts"
-    :init (lambda ()
-            (unless helm-xfonts-cache
-              (setq helm-xfonts-cache
-                    (x-list-fonts "*")))
-            ;; Save current font so it can be restored in cleanup
-            (setq helm-previous-font (cdr (assoc 'font (frame-parameters)))))
-    :candidates 'helm-xfonts-cache
-    :action '(("Copy font to kill ring" . (lambda (elm)
-                                            (kill-new elm)))
-              ("Set font" . (lambda (elm)
-                              (kill-new elm)
-                              (set-frame-font elm 'keep-size)
-                              (message "Font copied to kill ring"))))
-    :cleanup (lambda ()
-               ;; Restore previous font
-               (set-frame-font helm-previous-font 'keep-size))
-    :persistent-action (lambda (new-font)
-                         (set-frame-font new-font 'keep-size)
-                         (kill-new new-font))
-    :persistent-help "Preview font and copy to kill-ring"))
+(defvar helm-source-xfonts
+  '((name . "X Fonts")
+    (init . (lambda ()
+              (unless helm-xfonts-cache
+                (setq helm-xfonts-cache
+                      (x-list-fonts "*")))
+              ;; Save current font so it can be restored in cleanup
+              (setq helm-previous-font (cdr (assoc 'font (frame-parameters))))))
+    (candidates . helm-xfonts-cache)
+    (action . (("Copy font to kill ring" . (lambda (elm)
+                                             (kill-new elm)))
+               ("Set font" . (lambda (elm)
+                               (kill-new elm)
+                               (set-frame-font elm 'keep-size)
+                               (message "Font copied to kill ring")))))
+    (cleanup . (lambda ()
+                 ;; Restore previous font
+                 (set-frame-font helm-previous-font 'keep-size)))
+    (persistent-action . (lambda (new-font)
+                           (set-frame-font new-font 'keep-size)
+                           (kill-new new-font)))
+    (persistent-help . "Preview font and copy to kill-ring")))
 
 ;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
 ;;
@@ -141,10 +139,7 @@ Only math* symbols are collected."
     (helm-attrset 'action-delete 'helm-ucs-delete-backward)
     (helm-execute-persistent-action 'action-delete)))
 
-(defvar helm-source-ucs nil 
-  "Source for collecting `ucs-names' symbols.")
-
-(defun helm-build-ucs-source ()
+(defvar helm-source-ucs
   (helm-build-in-buffer-source "Ucs names"
     :data #'helm-ucs-init
     :help-message 'helm-ucs-help-message
@@ -156,14 +151,13 @@ Only math* symbols are collected."
               ("Insert character code in hex" . helm-ucs-insert-code)
               ("Forward char" . helm-ucs-forward-char)
               ("Backward char" . helm-ucs-backward-char)
-              ("Delete char backward" . helm-ucs-delete-backward))))
+              ("Delete char backward" . helm-ucs-delete-backward)))
+  "Source for collecting `ucs-names' math symbols.")
 
 ;;;###autoload
 (defun helm-select-xfont ()
   "Preconfigured `helm' to select Xfont."
   (interactive)
-  (helm--maybe-build-source 'helm-source-xfonts
-    #'helm-build-xfonts-source)
   (helm :sources 'helm-source-xfonts
         :buffer "*helm select xfont*"))
 
@@ -171,8 +165,6 @@ Only math* symbols are collected."
 (defun helm-ucs ()
   "Preconfigured helm for `ucs-names' math symbols."
   (interactive)
-  (helm--maybe-build-source 'helm-source-ucs
-    #'helm-build-ucs-source)
   (helm :sources 'helm-source-ucs
         :keymap  helm-ucs-map))
 

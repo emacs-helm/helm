@@ -2359,8 +2359,9 @@ Use it for non--interactive calls of `helm-find-files'."
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
                            (expand-file-name tap)))))
-    (helm--maybe-build-source 'helm-source-find-files
-      (helm-make-source "Find Files" 'helm-source-ffiles))
+    (unless helm-source-find-files
+      (setq helm-source-find-files (helm-make-source
+                                    "Find Files" 'helm-source-ffiles)))
     (unwind-protect
          (helm :sources 'helm-source-find-files
                :input fname
@@ -2861,29 +2862,30 @@ Don't use it in your own code unless you know what you are doing.")
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
-  (helm--maybe-build-source 'helm-source--ff-file-name-history
-    (helm-build-sync-source "File name history"
-      :init (lambda ()
-              (with-helm-alive-p
-                (when helm-ff-file-name-history-use-recentf
-                  (require 'recentf)
-                  (or recentf-mode (recentf-mode 1)))))
-      :candidates (lambda ()
-                    (if helm-ff-file-name-history-use-recentf
-                        recentf-list
-                        file-name-history))
-      :fuzzy-match t
-      :persistent-action 'ignore
-      :migemo t
-      :filtered-candidate-transformer 'helm-file-name-history-transformer
-      :action (helm-make-actions
-               "Find file" (lambda (candidate)
-                             (helm-set-pattern
-                              (expand-file-name candidate))
-                             (with-helm-after-update-hook (helm-exit-minibuffer)))
-               "Find file in helm" (lambda (candidate)
-                                     (helm-set-pattern
-                                      (expand-file-name candidate))))))
+  (unless helm-source--ff-file-name-history
+    (setq helm-source--ff-file-name-history
+          (helm-build-sync-source "File name history"
+            :init (lambda ()
+                    (with-helm-alive-p
+                      (when helm-ff-file-name-history-use-recentf
+                        (require 'recentf)
+                        (or recentf-mode (recentf-mode 1)))))
+            :candidates (lambda ()
+                          (if helm-ff-file-name-history-use-recentf
+                              recentf-list
+                              file-name-history))
+            :fuzzy-match t
+            :persistent-action 'ignore
+            :migemo t
+            :filtered-candidate-transformer 'helm-file-name-history-transformer
+            :action (helm-make-actions
+                     "Find file" (lambda (candidate)
+                                   (helm-set-pattern
+                                    (expand-file-name candidate))
+                                   (with-helm-after-update-hook (helm-exit-minibuffer)))
+                     "Find file in helm" (lambda (candidate)
+                                           (helm-set-pattern
+                                            (expand-file-name candidate)))))))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
           :buffer "*helm-file-name-history*"
@@ -3124,9 +3126,7 @@ Colorize only symlinks, directories and files."
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)))
 
-(defvar helm-source-files-in-current-dir nil)
-
-(defun helm-build-files-in-current-dir-source ()
+(defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
       helm-files-in-current-dir-source))
 
@@ -3355,10 +3355,9 @@ This is the starting point for nearly all actions you can do on files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
-  (helm--maybe-build-source 'helm-source-buffers-list
-    (helm-make-source "Buffers" 'helm-source-buffers))
-  (helm--maybe-build-source 'helm-source-files-in-current-dir
-    'helm-build-files-in-current-dir-source)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-for-files-preferred-list
         :ff-transformer-show-only-basename nil
         :buffer "*helm for files*"))
@@ -3370,10 +3369,9 @@ Allow toggling from locate to others sources.
 This allow seeing first if what you search is in other sources before launching
 locate."
   (interactive)
-  (helm--maybe-build-source 'helm-source-buffers-list
-    (helm-make-source "Buffers" 'helm-source-buffers))
-  (helm--maybe-build-source 'helm-source-files-in-current-dir
-    'helm-build-files-in-current-dir-source)
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (setq helm-multi-files--toggle-locate nil)
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
         (old-key (lookup-key

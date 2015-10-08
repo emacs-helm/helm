@@ -124,7 +124,24 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
      (when region-only (region-beginning))
      (when region-only (region-end)))))
 
-(defvar helm-source-regexp nil)
+(defvar helm-source-regexp
+  (helm-build-in-buffer-source "Regexp Builder"
+    :init (lambda ()
+            (helm-init-candidates-in-buffer
+                'global (with-temp-buffer
+                          (insert-buffer-substring helm-current-buffer)
+                          (buffer-string))))
+    :get-line #'helm-regexp-get-line
+    :persistent-action #'helm-regexp-persistent-action
+    :persistent-help "Show this line"
+    :multiline t
+    :matchplugin nil
+    :requires-pattern 2
+    :mode-line "Press TAB to select action."
+    :action '(("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)
+              ("Query Replace Regexp (C-u Not inside word.)"
+               . helm-query-replace-regexp)
+              ("Kill Regexp" . helm-kill-regexp))))
 
 (defun helm-regexp-get-line (s e)
   (let ((matches (match-data))
@@ -375,8 +392,9 @@ Same as `helm-moccur-goto-line' but go in new frame."
                    (buffer-name (current-buffer))
                    (remove helm-current-buffer buffers))
                   buffers)))
-    (helm--maybe-build-source 'helm-source-moccur
-      (helm-make-source "Moccur" 'helm-source-multi-occur))
+    (unless helm-source-moccur
+      (setq helm-source-moccur
+            (helm-make-source "Moccur" 'helm-source-multi-occur)))
     (helm-attrset 'moccur-buffers bufs helm-source-moccur)
     (helm-set-local-variable 'helm-multi-occur-buffer-list bufs)
     (helm-set-local-variable
@@ -530,30 +548,12 @@ Special commands:
   "Preconfigured helm to build regexps.
 `query-replace-regexp' can be run from there against found regexp."
   (interactive)
-  (helm--maybe-build-source 'helm-source-regexp
-    (helm-build-in-buffer-source "Regexp Builder"
-      :init (lambda ()
-              (helm-init-candidates-in-buffer
-                  'global (with-temp-buffer
-                            (insert-buffer-substring helm-current-buffer)
-                            (buffer-string))))
-      :get-line #'helm-regexp-get-line
-      :persistent-action #'helm-regexp-persistent-action
-      :persistent-help "Show this line"
-      :multiline t
-      :matchplugin nil
-      :requires-pattern 2
-      :mode-line "Press TAB to select action."
-      :action '(("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)
-                ("Query Replace Regexp (C-u Not inside word.)"
-                 . helm-query-replace-regexp)
-                ("Kill Regexp" . helm-kill-regexp))))
   (save-restriction
     (when (and (helm-region-active-p)
                ;; Don't narrow to region if buffer is already narrowed.
                (not (helm-current-buffer-narrowed-p (current-buffer))))
       (narrow-to-region (region-beginning) (region-end)))
-    (helm :sources 'helm-source-regexp
+    (helm :sources helm-source-regexp
           :buffer "*helm regexp*"
           :prompt "Regexp: "
           :history 'helm-build-regexp-history)))

@@ -953,19 +953,7 @@ an eieio class."
 
 ;;; User functions
 ;;
-;;  Source builders
-
-(defmacro helm--maybe-build-source (source fn-or-form)
-  "Build SOURCE with FN-OR-FORM.
-If SOURCE is already defined do nothing.
-Argument SOURCE is a symbol and FN-OR-FORM can be a function
-or a sexp."
-  (declare (indent 1))
-  `(unless (symbol-value ,source)
-     (set ,source (if (functionp ,fn-or-form)
-                      (funcall ,fn-or-form)
-                      ,fn-or-form))))
-
+;;  Sources
 (defmacro helm-build-sync-source (name &rest args)
   "Build a synchronous helm source with name NAME.
 Args ARGS are keywords provided by `helm-source-sync'."

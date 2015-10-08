@@ -873,8 +873,9 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-buffers-list ()
   "Preconfigured `helm' to list buffers."
   (interactive)
-  (helm--maybe-build-source 'helm-source-buffers-list
-    (helm-make-source "Buffers" 'helm-source-buffers))
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources '(helm-source-buffers-list
                    helm-source-ido-virtual-buffers
                    helm-source-buffer-not-found)
@@ -887,8 +888,9 @@ displayed with the `file-name-shadow' face if available."
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
   (require 'helm-files)
-  (helm--maybe-build-source 'helm-source-buffers-list
-    (helm-make-source "Buffers" 'helm-source-buffers))
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-mini-default-sources
         :buffer "*helm mini*"
         :ff-transformer-show-only-basename nil

@@ -361,8 +361,9 @@
   "Preconfigured helm for listing and handling emacs packages."
   (interactive "P")
   (when arg (setq helm-el-package--initialized-p nil))
-  (helm--maybe-build-source 'helm-source-list-el-package
-    (helm-make-source "list packages" 'helm-list-el-package-source))
+  (unless helm-source-list-el-package
+    (setq helm-source-list-el-package
+          (helm-make-source "list packages" 'helm-list-el-package-source)))
   (helm :sources 'helm-source-list-el-package
         :buffer "*helm list packages*"))
 
