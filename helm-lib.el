@@ -254,13 +254,17 @@ Default is `eq'."
         finally return
         (cl-loop for i being the hash-values in cont collect i)))
 
-(defun helm-skip-entries (seq regexp-list)
+(defun helm-skip-entries (seq black-regexp-list &optional white-regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
   (cl-loop for i in seq
-        unless (cl-loop for regexp in regexp-list
-                     thereis (and (stringp i)
-                                  (string-match regexp i)))
-        collect i))
+           unless (and (cl-loop for re in black-regexp-list
+                                thereis (and (stringp i)
+                                             (string-match-p re i)))
+                       (null
+                        (cl-loop for re in white-regexp-list
+                                thereis (and (stringp i)
+                                             (string-match-p re i)))))
+           collect i))
 
 (defun helm-shadow-entries (seq regexp-list)
   "Put shadow property on entries in SEQ matching a regexp in REGEXP-LIST."

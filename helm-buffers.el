@@ -45,6 +45,13 @@ filtered from the list of candidates if the
   :type  '(repeat (choice regexp))
   :group 'helm-buffers)
 
+(defcustom helm-white-buffer-regexp-list nil
+  "The regexp list of not boring buffers.
+These buffers will be displayed even if they match one of
+`helm-boring-buffer-regexp-list'."
+  :type '(repeat (choice regexp))
+  :group 'helm-buffers)
+
 (defcustom helm-buffers-favorite-modes '(lisp-interaction-mode
                                          emacs-lisp-mode
                                          text-mode
@@ -823,7 +830,9 @@ Can be used by any source that list buffers."
 ;;
 ;;
 (defun helm-skip-boring-buffers (buffers _source)
-  (helm-skip-entries buffers helm-boring-buffer-regexp-list))
+  (helm-skip-entries buffers
+                     helm-boring-buffer-regexp-list
+                     helm-white-buffer-regexp-list))
 
 (defun helm-shadow-boring-buffers (buffers _source)
   "Buffers matching `helm-boring-buffer-regexp' will be
