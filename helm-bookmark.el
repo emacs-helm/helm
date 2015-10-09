@@ -224,7 +224,16 @@
 ;;; bookmark-set
 ;;
 (defvar helm-source-bookmark-set
-  (helm-build-dummy-source "Set Bookmark" :action 'bookmark-set)
+  (helm-build-dummy-source "Set Bookmark"
+    :filtered-candidate-transformer
+    (lambda (_candidates _source)
+      (list (or (and (not (string= helm-pattern ""))
+                     helm-pattern)
+                "Enter a bookmark name to record")))
+    :action '(("Set bookmark" . (lambda (candidate)
+                                  (if (string= helm-pattern "")
+                                      (message "No bookmark name given for record")
+                                      (bookmark-set candidate))))))
   "See (info \"(emacs)Bookmarks\").")
 
 
