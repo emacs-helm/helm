@@ -677,11 +677,13 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; calling `minibuffer-completion-help' or other minibuffer
          ;; functions we DONT WANT here, in these cases removing the hook
          ;; (a symbol) have no effect. Issue #448.
-         ;; But because `minibuffer-completion-table' and
+         ;; Because `minibuffer-completion-table' and
          ;; `minibuffer-completion-predicate' are not bound
-         ;; anymore here, these functions should have no effect now.
-         (minibuffer-setup-hook (remove 'minibuffer-completion-help
-                                        minibuffer-setup-hook))
+         ;; anymore here, these functions should have no effect now,
+         ;; except in some rare cases like in `woman-file-name',
+         ;; so bind `minibuffer-setup-hook' to nil (Issue #1205)
+         ;; otherwise helm have not the time to close its initial session.
+         minibuffer-setup-hook
          ;; Disable hack that could be used before `completing-read'.
          ;; i.e (push ?\t unread-command-events).
          unread-command-events)
