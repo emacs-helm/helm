@@ -38,27 +38,27 @@
 (defvar helm-xfonts-cache nil)
 (defvar helm-previous-font nil)
 (defvar helm-source-xfonts
-  '((name . "X Fonts")
-    (init . (lambda ()
-              (unless helm-xfonts-cache
-                (setq helm-xfonts-cache
-                      (x-list-fonts "*")))
-              ;; Save current font so it can be restored in cleanup
-              (setq helm-previous-font (cdr (assoc 'font (frame-parameters))))))
-    (candidates . helm-xfonts-cache)
-    (action . (("Copy font to kill ring" . (lambda (elm)
-                                             (kill-new elm)))
-               ("Set font" . (lambda (elm)
-                               (kill-new elm)
-                               (set-frame-font elm 'keep-size)
-                               (message "Font copied to kill ring")))))
-    (cleanup . (lambda ()
-                 ;; Restore previous font
-                 (set-frame-font helm-previous-font 'keep-size)))
-    (persistent-action . (lambda (new-font)
-                           (set-frame-font new-font 'keep-size)
-                           (kill-new new-font)))
-    (persistent-help . "Preview font and copy to kill-ring")))
+  (helm-build-sync-source "X Fonts"
+    :init (lambda ()
+            (unless helm-xfonts-cache
+              (setq helm-xfonts-cache
+                    (x-list-fonts "*")))
+            ;; Save current font so it can be restored in cleanup
+            (setq helm-previous-font (cdr (assoc 'font (frame-parameters)))))
+    :candidates 'helm-xfonts-cache
+    :action '(("Copy font to kill ring" . (lambda (elm)
+                                            (kill-new elm)))
+              ("Set font" . (lambda (elm)
+                              (kill-new elm)
+                              (set-frame-font elm 'keep-size)
+                              (message "Font copied to kill ring"))))
+    :cleanup (lambda ()
+               ;; Restore previous font
+               (set-frame-font helm-previous-font 'keep-size))
+    :persistent-action (lambda (new-font)
+                         (set-frame-font new-font 'keep-size)
+                         (kill-new new-font))
+    :persistent-help "Preview font and copy to kill-ring"))
 
 ;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
 ;;
