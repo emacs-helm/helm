@@ -53,7 +53,7 @@ Normally you should not have to modify this yourself.
 If nil it will be calculated when `helm-locate' startup
 with these default values for different systems:
 
-Gnu/linux: \"locate %s -e -A %s\"
+Gnu/linux: \"locate %s -e -r %s\"
 berkeley-unix: \"locate %s %s\"
 windows-nt: \"es %s %s\"
 Others: \"locate %s %s\"
