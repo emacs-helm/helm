@@ -1418,11 +1418,15 @@ or when `helm-pattern' is equal to \"~/\"."
                                      (substitute-in-file-name pat)))
                                    helm-ff-default-directory))
              (candnum (helm-get-candidate-number))
+             (lt2-p   (and (<= candnum 2)
+                           (>= (string-width (helm-basename helm-pattern)) 2)))
              (cur-cand (prog2
-                           (unless (or completed-p (file-exists-p pat) history-p)
-                             ;; Only one non--existing candidate
-                             ;; and one directory candidate, move to it.
-                             (helm-next-line))
+                           (unless (or completed-p
+                                       (file-exists-p pat)
+                                       history-p (null lt2-p))
+                                  ;; Only one non--existing candidate
+                                  ;; and one directory candidate, move to it.
+                                  (helm-next-line))
                            (helm-get-selection))))
         (when (and (or (and helm-ff-auto-update-flag
                             (null helm-ff--deleting-char-backward)
@@ -1445,8 +1449,7 @@ or when `helm-pattern' is equal to \"~/\"."
                    (or
                     ;; Only one candidate remaining
                     ;; and at least 2 char in basename.
-                    (and (<= candnum 2)
-                         (>= (string-width (helm-basename helm-pattern)) 2))
+                    lt2-p
                     ;; Already completed.
                     completed-p)
                    (not history-p) ; Don't try to auto complete in history.
