@@ -180,6 +180,23 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type '(repeat string))
 
+(defcustom helm-grep-truncate-lines t
+  "When nil the grep line that appears will not be truncated."
+  :group 'helm-grep
+  :type 'boolean)
+
+(defcustom helm-grep-file-path-style 'only-filename
+  "File path display style when grep results are displayed.
+only-filename: displays only the filename, none of the directory path
+absolute: displays absolute path
+relative: displays relative path from root grep directory
+"
+  ;; only-filename, absolute, relative
+  :group 'helm-grep
+  :type '(choice (const :tag "Filename Only" only-filename)
+                 (const :tag "Absolute" absolute)
+                 (const :tag "Relative" relative)))
+
 
 ;;; Faces
 ;;
@@ -934,7 +951,7 @@ in recurse, and ignoring EXTS, search being made on
      :input input
      :keymap helm-grep-map
      :history 'helm-grep-history
-     :truncate-lines t)))
+     :truncate-lines helm-grep-truncate-lines)))
 
 
 
@@ -984,9 +1001,13 @@ in recurse, and ignoring EXTS, search being made on
                      (expand-file-name (car split) root)
                    (car-safe split)))
          (lineno (nth 1 split))
-         (str    (nth 2 split)))
+         (str    (nth 2 split))
+         (display-fname (cl-case helm-grep-file-path-style
+                          (only-filename (file-name-nondirectory fname))
+                          (absolute fname)
+                          (relative (file-relative-name fname root)))))
     (if (and fname lineno str)
-        (cons (concat (propertize (file-name-nondirectory fname)
+        (cons (concat (propertize display-fname
                                   'face 'helm-grep-file
                                   'help-echo fname)
                       ":"
