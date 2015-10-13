@@ -1424,9 +1424,13 @@ or when `helm-pattern' is equal to \"~/\"."
                            (unless (or completed-p
                                        (file-exists-p pat)
                                        history-p (null lt2-p))
-                                  ;; Only one non--existing candidate
-                                  ;; and one directory candidate, move to it.
-                                  (helm-next-line))
+                             ;; Only one non--existing candidate
+                             ;; and one directory candidate, move to it,
+                             ;; but not when renaming, copying etc...,
+                             ;; so for this use
+                             ;; `helm-ff-move-to-first-real-candidate'
+                             ;; instead of `helm-next-line' (Issue #910).
+                             (helm-ff-move-to-first-real-candidate))
                            (helm-get-selection))))
         (when (and (or (and helm-ff-auto-update-flag
                             (null helm-ff--deleting-char-backward)
