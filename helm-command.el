@@ -62,6 +62,9 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command-faces)
 
 
+(defvar helm-M-x-input-history nil)
+
+
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (when mode-map
@@ -217,6 +220,7 @@ than the default which is OBARRAY."
                 :persistent-help "Describe this command"
                 :history (or history extended-command-history)
                 :reverse-history helm-M-x-reverse-history
+                :input-history 'helm-M-x-input-history
                 :del-input nil
                 :help-message 'helm-M-x-help-message
                 :must-match t
