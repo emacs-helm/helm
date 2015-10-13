@@ -62,9 +62,6 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command-faces)
 
 
-(defvar helm-M-x-input-history nil)
-
-
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (when mode-map
