@@ -185,15 +185,14 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type 'boolean)
 
-(defcustom helm-grep-file-path-style 'only-filename
+(defcustom helm-grep-file-path-style 'basename
   "File path display style when grep results are displayed.
-only-filename: displays only the filename, none of the directory path
-absolute: displays absolute path
-relative: displays relative path from root grep directory
-"
-  ;; only-filename, absolute, relative
+Possible value are:
+    basename: displays only the filename, none of the directory path
+    absolute: displays absolute path
+    relative: displays relative path from root grep directory."
   :group 'helm-grep
-  :type '(choice (const :tag "Filename Only" only-filename)
+  :type '(choice (const :tag "Basename" basename)
                  (const :tag "Absolute" absolute)
                  (const :tag "Relative" relative)))
 
@@ -1002,8 +1001,8 @@ in recurse, and ignoring EXTS, search being made on
                    (car-safe split)))
          (lineno (nth 1 split))
          (str    (nth 2 split))
-         (display-fname (cl-case helm-grep-file-path-style
-                          (only-filename (file-name-nondirectory fname))
+         (display-fname (cl-ecase helm-grep-file-path-style
+                          (basename (file-name-nondirectory fname))
                           (absolute fname)
                           (relative (file-relative-name fname root)))))
     (if (and fname lineno str)
