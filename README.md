@@ -177,7 +177,7 @@ You can enable this by adding in your init file:
 (helm-mode 1)
 ```
 
-- _NOTE_ that the helmized emacs commands are different and much more basics than the helm ones.
+- _NOTE_ that the helmized emacs commands are different and much more basic than the helm ones.
 
 As a startup point you can also look at the helm section in Emacs menu to
 discover some of the commands provided by helm.
