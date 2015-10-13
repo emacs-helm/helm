@@ -3743,6 +3743,11 @@ Possible value of DIRECTION are 'next or 'previous."
               `(" " mode-line-buffer-identification " "
                     (:eval (format "L%d" (helm-candidate-number-at-point)))
                     " " ,follow
+                    (:eval (and helm-marked-candidates
+                                (propertize
+                                 (format "M%d" (length helm-marked-candidates))
+                                 'face 'helm-visible-mark)))
+                    " "
                     (:eval (when ,helm--mode-line-display-prefarg
                              (let ((arg (prefix-numeric-value
                                          (or prefix-arg current-prefix-arg))))
@@ -5094,8 +5099,9 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (helm-aif (helm-this-visible-mark)
             (helm-delete-visible-mark it)
           (helm-make-visible-mark))
-        (unless (helm-end-of-source-p)
-          (helm-next-line))))))
+        (if (helm-end-of-source-p)
+            (helm-display-mode-line (helm-get-current-source))
+            (helm-next-line))))))
 
 (defun helm-file-completion-source-p ()
   "Return non--nil if current source is a file completion source."
@@ -5169,6 +5175,7 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
         (helm-clear-visible-mark))
       (setq helm-marked-candidates nil)
       (helm-mark-current-line)
+      (helm-display-mode-line (helm-get-current-source))
       (message "%s candidates unmarked" len))))
 
 (defun helm-toggle-all-marks ()
