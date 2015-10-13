@@ -82,7 +82,7 @@ To customize the ANSI color in git-grep, GREP_COLORS have no effect,
 you will have to setup this in your .gitconfig:
 
     [color \"grep\"]
-	match = black yellow
+        match = black yellow
 
 where \"black\" is the foreground and \"yellow\" the background.
 See the git documentation for more infos.
@@ -167,9 +167,9 @@ If set to nil `doc-view-mode' will be used instead of an external command."
 
 (defcustom helm-grep-ignored-files
   (cons ".#*" (delq nil (mapcar (lambda (s)
-				  (unless (string-match-p "/\\'" s)
-				    (concat "*" s)))
-				completion-ignored-extensions)))
+                                  (unless (string-match-p "/\\'" s)
+                                    (concat "*" s)))
+                                completion-ignored-extensions)))
   "List of file names which `helm-grep' shall exclude."
   :group 'helm-grep
   :type '(repeat string))
