@@ -1002,10 +1002,11 @@ in recurse, and ignoring EXTS, search being made on
          (lineno (nth 1 split))
          (str    (nth 2 split))
          (display-fname (cl-ecase helm-grep-file-path-style
-                          (basename (file-name-nondirectory fname))
+                          (basename (and fname (file-name-nondirectory fname)))
                           (absolute fname)
-                          (relative (file-relative-name fname root)))))
-    (if (and fname lineno str)
+                          (relative (and fname root
+                                         (file-relative-name fname root))))))
+    (if (and display-fname lineno str)
         (cons (concat (propertize display-fname
                                   'face 'helm-grep-file
                                   'help-echo fname)
