@@ -388,6 +388,8 @@ in `helm-current-buffer' as default.
 \\[helm-ff-run-grep]\t\tRun Grep (C-u Recursive).
 \\[helm-ff-run-pdfgrep]\t\tRun Pdfgrep on marked files.
 \\[helm-ff-run-zgrep]\t\tRun zgrep (C-u Recursive).
+\\[helm-ff-run-grep-ag]\t\tRun AG grep on current directory.
+\\[helm-ff-run-git-grep]\t\tRun git-grep on current directory.
 \\[helm-ff-run-gid]\t\tRun gid (id-utils).
 \\[helm-ff-run-etags]\t\tRun Etags (C-u use thing-at-point `C-u C-u' reload cache)
 \\[helm-ff-run-rename-file]\t\tRename File (C-u Follow).
