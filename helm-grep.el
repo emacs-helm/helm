@@ -1292,6 +1292,7 @@ You have also to enable this in global \".gitconfig\" with
   :type 'string)
 
 (defun helm-grep-git-1 (directory)
+  (require 'vc)
   (let* ((helm-grep-default-command helm-grep-git-grep-command)
          helm-grep-default-recurse-command
          ;; Expand filename of each candidate with the git root dir.
