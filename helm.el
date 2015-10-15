@@ -5201,23 +5201,29 @@ Otherwise one element list of current selection.
 When key WITH-WILDCARD is specified try to expand a wilcard if some."
   (with-current-buffer helm-buffer
     (cl-loop with current-src = (helm-get-current-source)
-          for (source . real) in
-          (or (reverse helm-marked-candidates)
-              (list (cons current-src (helm-get-selection))))
-          when (equal (assoc 'name current-src)
-                      (assoc 'name source))
-          ;; When real is a normal filename without wildcard
-          ;; file-expand-wildcards returns a list of one file.
-          ;; When real is a non--existent file it return nil.
-          append (let* ((elm (helm-coerce-selection real source))
-                        (c   (and with-wildcard
-                                  (condition-case nil
-                                      (helm-file-expand-wildcards elm t)
-                                    (error nil)))))
-                   (or c (list elm)))
-          into cands
-          finally do (prog1 (cl-return cands)
-                       (helm-log "Marked candidates = %S" cands)))))
+             for (source . real) in
+             ;; Filter out marked candidates not belonging
+             ;; to current source here because if there is
+             ;; marked candidates in an other source
+             ;; and no marked in current source, the current candidate
+             ;; will never be returned.
+             (or (cl-loop for c in (reverse helm-marked-candidates)
+                          when (equal (assoc 'name (car c))
+                                      (assoc 'name current-src))
+                          collect c)
+                 (list (cons current-src (helm-get-selection))))
+             ;; When real is a normal filename without wildcard
+             ;; file-expand-wildcards returns a list of one file.
+             ;; When real is a non--existent file it return nil.
+             append (let* ((elm (helm-coerce-selection real source))
+                           (c   (and with-wildcard
+                                     (condition-case nil
+                                         (helm-file-expand-wildcards elm t)
+                                       (error nil)))))
+                      (or c (list elm)))
+             into cands
+             finally do (prog1 (cl-return cands)
+                          (helm-log "Marked candidates = %S" cands)))))
 
 (defun helm-current-source-name= (name)
   (save-excursion
