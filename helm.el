@@ -3736,17 +3736,23 @@ Possible value of DIRECTION are 'next or 'previous."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  (let ((follow (and (eq (cdr (assq 'follow source)) 1) "(HF) ")))
+  (let ((follow (and (eq (cdr (assq 'follow source)) 1) "(HF) "))
+        (marked (and helm-marked-candidates
+                     (cl-loop with cur-name = (assoc-default 'name source)
+                              for c in helm-marked-candidates
+                              for name = (assoc-default 'name (car c))
+                              when (string= name cur-name)
+                              collect c))))
     ;; Setup mode-line.
     (if helm-mode-line-string
         (setq mode-line-format
               `(" " mode-line-buffer-identification " "
                     (:eval (format "L%d" (helm-candidate-number-at-point)))
                     " " ,follow
-                    (:eval (and helm-marked-candidates
-                                (propertize
-                                 (format "M%d" (length helm-marked-candidates))
-                                 'face 'helm-visible-mark)))
+                    (:eval ,(and marked
+                                 (propertize
+                                  (format "M%d" (length marked))
+                                  'face 'helm-visible-mark)))
                     " "
                     (:eval (when ,helm--mode-line-display-prefarg
                              (let ((arg (prefix-numeric-value
