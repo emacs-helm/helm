@@ -5196,15 +5196,20 @@ visible or invisible in all sources of current helm session"
       (helm-mark-all))))
 
 (defun helm--compute-marked (real source wildcard)
-  ;; When real is a normal filename without wildcard
-  ;; file-expand-wildcards returns a list of one file.
-  ;; When real is a non--existent file it return nil.
   (let* ((coerced (helm-coerce-selection real source))
          (wilds   (and wildcard
                        (condition-case nil
                            (helm-file-expand-wildcards coerced t)
                          (error nil)))))
-    (or wilds (list coerced))))
+    (unless (or wilds (null wildcard))
+      ;; When real is a normal filename without wildcard
+      ;; file-expand-wildcards returns a list of one file.
+      ;; When real is a non--existent file it return nil.
+      ;; IOW prevent returning (list "/foo/*.el") when
+      ;; "/foo/*.el" haven't expanded previously and is
+      ;; a non existing file.
+      (setq coerced (file-expand-wildcards coerced t)))
+    (or wilds (and coerced (list coerced)))))
 
 (cl-defun helm-marked-candidates (&key with-wildcard)
   "Return marked candidates of current source if any.
