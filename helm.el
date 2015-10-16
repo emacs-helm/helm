@@ -5211,19 +5211,20 @@ visible or invisible in all sources of current helm session"
 Otherwise one element list of current selection.
 When key WITH-WILDCARD is specified try to expand a wilcard if some."
   (with-current-buffer helm-buffer
-    (cl-loop with current-src = (helm-get-current-source)
-             for (source . real) in (reverse helm-marked-candidates)
-             when (equal (assq 'name source) (assq 'name current-src))
-             append (helm--compute-marked real source with-wildcard) 
-             into cands
-             finally do (prog1 (cl-return
-                                (or cands
-                                    (append
-                                     (helm--compute-marked
-                                      (helm-get-selection) current-src
-                                      with-wildcard)
-                                     cands)))
-                          (helm-log "Marked candidates = %S" cands)))))
+    (let ((candidates
+           (cl-loop with current-src = (helm-get-current-source)
+                    for (source . real) in (reverse helm-marked-candidates)
+                    when (equal (assq 'name source) (assq 'name current-src))
+                    append (helm--compute-marked real source with-wildcard) 
+                    into cands
+                    finally return (or cands
+                                       (append
+                                        (helm--compute-marked
+                                         (helm-get-selection) current-src
+                                         with-wildcard)
+                                        cands)))))
+      (helm-log "Marked candidates = %S" candidates)
+      candidates)))
 
 (defun helm-current-source-name= (name)
   (save-excursion
