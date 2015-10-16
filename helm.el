@@ -3055,7 +3055,7 @@ It is meant to use with `filter-one-by-one' slot."
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight matches in fuzzy.
-See helm-fuzzy-default-highlight-match."
+See `helm-fuzzy-default-highlight-match'."
   (cl-loop for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c)))
 
