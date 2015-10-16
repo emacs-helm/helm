@@ -5326,7 +5326,7 @@ is what is used to perform actions."
   (with-helm-buffer
     (cl-loop for cand in (helm-marked-candidates)
              do (with-helm-current-buffer
-                  (insert cand "\n")))))
+                  (insert (format "%s\n" cand))))))
 
 
 ;;; Follow-mode: Automatical execution of persistent-action
