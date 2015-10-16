@@ -578,9 +578,7 @@ That is what completion commands operate on."
 ;;
 ;;
 (defun helm-yank-text-at-point ()
-  "Yank text at point in `helm-current-buffer' into minibuffer.
-If `helm-yank-symbol-first' is non--nil the first yank
-grabs the entire symbol."
+  "Yank text at point in `helm-current-buffer' into minibuffer."
   (interactive)
   (with-helm-current-buffer
     (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word)))
