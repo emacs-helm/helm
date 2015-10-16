@@ -5234,22 +5234,23 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
 (defun helm-revive-visible-mark ()
   "Restore marked candidates when helm update display."
   (with-current-buffer helm-buffer
-    (cl-dolist (o helm-visible-mark-overlays)
-      (goto-char (point-min))
-      (while (and (search-forward (overlay-get o 'string) nil t)
-                  (helm-current-source-name= (overlay-get o 'source)))
-        ;; Calculate real value of candidate.
-        ;; It can be nil if candidate have only a display value.
-        (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
-          (if real
-              ;; Check if real value of current candidate is the same
-              ;; than the one stored in overlay.
-              ;; This is needed when some cands have same display names.
-              ;; Using equal allow testing any type of value for real cand.
-              ;; Issue (#706).
-              (and (equal (overlay-get o 'real) real)
-                   (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
-            (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0)))))))))
+    (save-excursion
+      (cl-dolist (o helm-visible-mark-overlays)
+        (goto-char (point-min))
+        (while (and (search-forward (overlay-get o 'string) nil t)
+                    (helm-current-source-name= (overlay-get o 'source)))
+          ;; Calculate real value of candidate.
+          ;; It can be nil if candidate have only a display value.
+          (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
+            (if real
+                ;; Check if real value of current candidate is the same
+                ;; than the one stored in overlay.
+                ;; This is needed when some cands have same display names.
+                ;; Using equal allow testing any type of value for real cand.
+                ;; Issue (#706).
+                (and (equal (overlay-get o 'real) real)
+                     (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
+                (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))))))))
 (add-hook 'helm-update-hook 'helm-revive-visible-mark)
 
 (defun helm-next-point-in-list (curpos points &optional prev)
