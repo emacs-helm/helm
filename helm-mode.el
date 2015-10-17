@@ -570,7 +570,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :fuzzy-match helm-mode-fuzzy-match
                :persistent-action 'helm-lisp-completion-persistent-action
-               :persistent-help "Show brief doc in mode-line")
+               :persistent-help 'helm-lisp-completion-persistent-help)
     :prompt prompt
     :buffer buffer
     :input init
