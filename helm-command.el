@@ -169,29 +169,11 @@ than the default which is OBARRAY."
                  (read-extended-command))
             (helm-mode 1))
           (read-extended-command))
-      (let* (in-help
-             help-cand
-             (orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
+      (let* ((orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
              (helm-fuzzy-sort-fn (lambda (candidates source)
                                    (funcall orig-fuzzy-sort-fn
                                             candidates source 'real)))
              (helm--mode-line-display-prefarg t)
-             (pers-help
-              (lambda (candidate)
-                  (let ((hbuf (get-buffer (help-buffer))))
-                    (if (and in-help (string= candidate help-cand)
-                             (null helm-persistent-action-use-special-display))
-                        (progn
-                          ;; When M-x is started from a help buffer,
-                          ;; Don't kill it as it is helm-current-buffer.
-                          (unless (equal hbuf helm-current-buffer)
-                            (kill-buffer hbuf)
-                            (set-window-buffer (get-buffer-window hbuf)
-                                               helm-current-buffer))
-                          (setq in-help nil))
-                        (helm-describe-function candidate)
-                        (setq in-help t))
-                    (setq help-cand candidate))))
              (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
              (helm-move-selection-after-hook
               (cons (lambda () (setq current-prefix-arg nil))
@@ -216,7 +198,9 @@ than the default which is OBARRAY."
                 :requires-pattern helm-M-x-requires-pattern
                 :name "Emacs Commands"
                 :buffer "*helm M-x*"
-                :persistent-action pers-help
+                :persistent-action (lambda (candidate)
+                                     (helm-elisp--persistent-help
+                                      candidate 'helm-describe-function))
                 :persistent-help "Describe this command"
                 :history (or history extended-command-history)
                 :reverse-history helm-M-x-reverse-history
