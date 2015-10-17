@@ -558,11 +558,11 @@ that use `helm-comp-read' See `helm-M-x' for example."
     (prompt _collection test _require-match init
      hist default _inherit-input-method name buffer)
   "Specialized function for fast symbols completion in `helm-mode'."
+  (require 'helm-elisp)
   (or
    (helm
     :sources (helm-build-in-buffer-source name
                :init (lambda ()
-                       (require 'helm-elisp)
                        (helm-apropos-init (lambda (x)
                                             (and (funcall test x)
                                                  (not (keywordp x))))
@@ -570,7 +570,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :fuzzy-match helm-mode-fuzzy-match
                :persistent-action 'helm-lisp-completion-persistent-action
-               :persistent-help 'helm-lisp-completion-persistent-help)
+               :persistent-help (helm-lisp-completion-persistent-help))
     :prompt prompt
     :buffer buffer
     :input init

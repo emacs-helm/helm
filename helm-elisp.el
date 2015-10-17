@@ -295,7 +295,7 @@ Return a cons \(beg . end\)."
                       :persistent-action 'helm-lisp-completion-persistent-action
                       :nomark t
                       :fuzzy-match helm-lisp-fuzzy-completion
-                      :persistent-help 'helm-lisp-completion-persistent-help
+                      :persistent-help (helm-lisp-completion-persistent-help)
                       :filtered-candidate-transformer
                       'helm-lisp-completion-transformer
                       :action `(lambda (candidate)
