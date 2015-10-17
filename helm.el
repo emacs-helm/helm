@@ -5201,7 +5201,8 @@ visible or invisible in all sources of current helm session"
                        (condition-case nil
                            (helm-file-expand-wildcards coerced t)
                          (error nil)))))
-    (unless (or wilds (null wildcard))
+    (unless (or wilds (null wildcard)
+                (null (string-match-p "[[*?]" coerced)))
       ;; When real is a normal filename without wildcard
       ;; file-expand-wildcards returns a list of one file.
       ;; When real is a non--existent file it return nil.
@@ -5379,7 +5380,7 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
                 (message "helm-follow-mode is %s"
                          (if helm-follow-mode
                              "enabled" "disabled"))
-                (helm-display-mode-line src))
+                (helm-display-mode-line src t))
             (unless helm-follow-mode-persistent
               (and sym (set sym (remove (assq 'follow src) src)))))
           (message "Not enough candidates for helm-follow-mode")))))
