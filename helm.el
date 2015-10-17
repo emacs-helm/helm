@@ -5379,7 +5379,7 @@ This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
                 (message "helm-follow-mode is %s"
                          (if helm-follow-mode
                              "enabled" "disabled"))
-                (helm-display-mode-line src))
+                (helm-display-mode-line src t))
             (unless helm-follow-mode-persistent
               (and sym (set sym (remove (assq 'follow src) src)))))
           (message "Not enough candidates for helm-follow-mode")))))
