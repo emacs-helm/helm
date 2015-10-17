@@ -5201,7 +5201,8 @@ visible or invisible in all sources of current helm session"
                        (condition-case nil
                            (helm-file-expand-wildcards coerced t)
                          (error nil)))))
-    (unless (or wilds (null wildcard))
+    (unless (or wilds (null wildcard)
+                (null (string-match-p "[[*?]" coerced)))
       ;; When real is a normal filename without wildcard
       ;; file-expand-wildcards returns a list of one file.
       ;; When real is a non--existent file it return nil.
