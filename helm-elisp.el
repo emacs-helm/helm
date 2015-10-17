@@ -295,7 +295,7 @@ Return a cons \(beg . end\)."
                       :persistent-action 'helm-lisp-completion-persistent-action
                       :nomark t
                       :fuzzy-match helm-lisp-fuzzy-completion
-                      :persistent-help "Show brief doc in mode-line"
+                      :persistent-help (helm-lisp-completion-persistent-help)
                       :filtered-candidate-transformer
                       'helm-lisp-completion-transformer
                       :action `(lambda (candidate)
@@ -316,6 +316,12 @@ Return a cons \(beg . end\)."
 Documentation is shown briefly in mode-line or completely
 in other window according to the value of `helm-elisp-help-function'."
   (funcall helm-elisp-help-function candidate))
+
+(defun helm-lisp-completion-persistent-help ()
+  "Return persistent-help according to the value of `helm-elisp-help-function'"
+    (cl-ecase helm-elisp-help-function
+      (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
+      (helm-elisp-show-help "Open help for the symbol")))
 
 (defun helm-elisp-show-help (candidate)
   "Show full help for the function."
