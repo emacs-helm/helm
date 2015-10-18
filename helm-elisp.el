@@ -328,13 +328,14 @@ in other window according to the value of `helm-elisp-help-function'."
     (cl-typecase sym
       (fbound   (describe-function sym))
       (bound    (describe-variable sym))
-      (face     (describe-face sym)))))
+      (face     (describe-face sym))))
+  (message nil))
 
 (defun helm-elisp-show-help (candidate)
   "Show full help for the function."
   (helm-elisp--persistent-help
    candidate 'helm-elisp--show-help-1))
-  
+
 (defun helm-elisp-show-doc-modeline (candidate)
   "Show brief documentation for the function in modeline."
   (let ((cursor-in-echo-area t)
