@@ -392,6 +392,11 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   (describe-variable (helm-symbolify var))
   (message nil))
 
+(defun helm-describe-face (face)
+  "VAR is symbol or string."
+  (describe-face (helm-symbolify face))
+  (message nil))
+
 (defun helm-find-function (func)
   "FUNC is symbol or string."
   (find-function (helm-symbolify func)))

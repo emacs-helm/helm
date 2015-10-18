@@ -326,9 +326,9 @@ in other window according to the value of `helm-elisp-help-function'."
 (defun helm-elisp--show-help-1 (candidate)
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
-      (fbound   (describe-function sym))
-      (bound    (describe-variable sym))
-      (face     (describe-face sym)))))
+      (fboundp  (helm-describe-function sym))
+      (bound    (helm-describe-variable sym))
+      (face     (helm-describe-face sym)))))
 
 (defun helm-elisp-show-help (candidate)
   "Show full help for the function."
@@ -485,24 +485,22 @@ Filename completion happen if string start after or between a double quote."
               ("Set variable" . helm-set-variable))))
 
 (defun helm-def-source--emacs-faces (&optional default)
-  (let ((def-act (lambda (candidate)
-                   (describe-face (intern candidate)))))
-    (helm-build-in-buffer-source "Faces"
-      :init (lambda () (helm-apropos-init-faces default))
-      :fuzzy-match helm-apropos-fuzzy-match
-      :filtered-candidate-transformer
-      (append (and (null helm-apropos-fuzzy-match)
-                   '(helm-apropos-default-sort-fn))
-              (list
-               (lambda (candidates _source)
-                 (cl-loop for c in candidates
-                          collect (propertize c 'face (intern c))))))
-      :persistent-action (lambda (candidate)
-                           (helm-elisp--persistent-help
-                            candidate def-act))
-      :persistent-help "Describe face"
-      :nomark t
-      :action def-act)))
+  (helm-build-in-buffer-source "Faces"
+    :init (lambda () (helm-apropos-init-faces default))
+    :fuzzy-match helm-apropos-fuzzy-match
+    :filtered-candidate-transformer
+    (append (and (null helm-apropos-fuzzy-match)
+                 '(helm-apropos-default-sort-fn))
+            (list
+             (lambda (candidates _source)
+               (cl-loop for c in candidates
+                        collect (propertize c 'face (intern c))))))
+    :persistent-action (lambda (candidate)
+                         (helm-elisp--persistent-help
+                          candidate 'helm-describe-face))
+    :persistent-help "Describe face"
+    :nomark t
+    :action 'helm-describe-face))
 
 (defun helm-def-source--helm-attributes (&optional _default)
   (let ((def-act (lambda (candidate)
