@@ -321,7 +321,7 @@ in other window according to the value of `helm-elisp-help-function'."
   "Return persistent-help according to the value of `helm-elisp-help-function'"
     (cl-ecase helm-elisp-help-function
       (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
-      (helm-elisp-show-help "Open help for the symbol")))
+      (helm-elisp-show-help "Toggle show help for the symbol")))
 
 (defun helm-elisp--show-help-1 (candidate)
   (let ((sym (intern-soft candidate)))
