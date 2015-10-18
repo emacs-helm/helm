@@ -5203,13 +5203,14 @@ visible or invisible in all sources of current helm session"
                            (helm-file-expand-wildcards coerced t)
                          (error nil)))))
     (unless (or wilds (null wildcard)
-                (null (string-match-p "[[*?]" coerced)))
+                (null (string-match-p "[[*?]" coerced))) ; [1]
       ;; When real is a normal filename without wildcard
       ;; file-expand-wildcards returns a list of one file.
       ;; When real is a non--existent file it return nil.
       ;; IOW prevent returning (list "/foo/*.el") when
       ;; "/foo/*.el" haven't expanded previously and is
-      ;; a non existing file.
+      ;; a non existing file, but allow returning a non
+      ;; existing file that doesn't match a wilcard regexp [1].
       (setq coerced (file-expand-wildcards coerced t)))
     (or wilds (and coerced (list coerced)))))
 
