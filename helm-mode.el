@@ -569,7 +569,10 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                           (or (car-safe default) default)))
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :fuzzy-match helm-mode-fuzzy-match
-               :persistent-action 'helm-lisp-completion-persistent-action
+               :persistent-action
+               (lambda (candidate)
+                 (helm-lisp-completion-persistent-action
+                  candidate name))
                :persistent-help (helm-lisp-completion-persistent-help))
     :prompt prompt
     :buffer buffer

@@ -311,11 +311,11 @@ Return a cons \(beg . end\)."
            :allow-nest t))
       (message "[No Match]"))))
 
-(defun helm-lisp-completion-persistent-action (candidate)
+(defun helm-lisp-completion-persistent-action (candidate &optional name)
   "Show documentation for the function.
 Documentation is shown briefly in mode-line or completely
 in other window according to the value of `helm-elisp-help-function'."
-  (funcall helm-elisp-help-function candidate))
+  (funcall helm-elisp-help-function candidate name))
 
 (defun helm-lisp-completion-persistent-help ()
   "Return persistent-help according to the value of `helm-elisp-help-function'"
@@ -323,17 +323,22 @@ in other window according to the value of `helm-elisp-help-function'."
       (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
       (helm-elisp-show-help "Toggle show help for the symbol")))
 
-(defun helm-elisp--show-help-1 (candidate)
+(defun helm-elisp--show-help-1 (candidate name)
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
+      ((and fboundp boundp)
+       (when (member name '("describe-function" "describe-variable"))
+         (funcall (intern (format "helm-%s" name)) sym)))
       (fboundp  (helm-describe-function sym))
       (bound    (helm-describe-variable sym))
       (face     (helm-describe-face sym)))))
 
-(defun helm-elisp-show-help (candidate)
-  "Show full help for the function."
+(defun helm-elisp-show-help (candidate name)
+  "Show full help for the function CANDIDATE.
+Arg NAME specify the name of the top level function
+calling helm generic completion (e.g \"describe-function\")."
   (helm-elisp--persistent-help
-   candidate 'helm-elisp--show-help-1))
+   candidate 'helm-elisp--show-help-1 name))
   
 (defun helm-elisp-show-doc-modeline (candidate)
   "Show brief documentation for the function in modeline."
@@ -608,7 +613,7 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-info-lookup-symbol (candidate)
   (run-with-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate))
 
-(defun helm-elisp--persistent-help (candidate fun)
+(defun helm-elisp--persistent-help (candidate fun &optional name)
   (let ((hbuf (get-buffer (help-buffer))))
     (if (and (helm-attr 'help-running-p)
              (string= candidate (helm-attr 'help-current-symbol))
@@ -621,7 +626,7 @@ Filename completion happen if string start after or between a double quote."
             (set-window-buffer (get-buffer-window hbuf)
                                helm-current-buffer))
           (helm-attrset 'help-running-p nil))
-        (funcall fun candidate)
+        (if name (funcall fun candidate name) (funcall fun candidate))
         (helm-attrset 'help-running-p t))
     (helm-attrset 'help-current-symbol candidate)))
 
