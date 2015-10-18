@@ -110,7 +110,7 @@ fuzzy completion is not available in `completion-at-point'."
   :group 'helm-elisp-faces)
 
 (defcustom helm-elisp-help-function
-  'helm-elisp-show-doc-modeline
+  'helm-elisp-show-help
   "Function for displaying help for lisp symbols."
   :group 'helm-elisp
   :type '(choice (function :tag "Open help for the symbol."
@@ -323,14 +323,18 @@ in other window according to the value of `helm-elisp-help-function'."
       (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
       (helm-elisp-show-help "Open help for the symbol")))
 
-(defun helm-elisp-show-help (candidate)
-  "Show full help for the function."
+(defun helm-elisp--show-help-1 (candidate)
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
       (fbound   (describe-function sym))
       (bound    (describe-variable sym))
       (face     (describe-face sym)))))
 
+(defun helm-elisp-show-help (candidate)
+  "Show full help for the function."
+  (helm-elisp--persistent-help
+   candidate 'helm-elisp--show-help-1))
+  
 (defun helm-elisp-show-doc-modeline (candidate)
   "Show brief documentation for the function in modeline."
   (let ((cursor-in-echo-area t)
