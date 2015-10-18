@@ -4293,7 +4293,8 @@ before the candidate we want to preselect."
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
-    (helm-mark-current-line)))
+    (helm-mark-current-line)
+    (helm-display-mode-line (helm-get-current-source))))
 
 (defun helm-delete-current-selection ()
   "Delete the currently selected item."
