@@ -323,7 +323,7 @@ in other window according to the value of `helm-elisp-help-function'."
       (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
       (helm-elisp-show-help "Toggle show help for the symbol")))
 
-(defun helm-elisp--show-help-1 (candidate name)
+(defun helm-elisp--show-help-1 (candidate &optional name)
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
       ((and fboundp boundp)
@@ -333,7 +333,7 @@ in other window according to the value of `helm-elisp-help-function'."
       (bound    (helm-describe-variable sym))
       (face     (helm-describe-face sym)))))
 
-(defun helm-elisp-show-help (candidate name)
+(defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
 Arg NAME specify the name of the top level function
 calling helm generic completion (e.g \"describe-function\")."
