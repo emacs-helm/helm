@@ -340,7 +340,7 @@ calling helm generic completion (e.g \"describe-function\")."
   (helm-elisp--persistent-help
    candidate 'helm-elisp--show-help-1 name))
   
-(defun helm-elisp-show-doc-modeline (candidate)
+(defun helm-elisp-show-doc-modeline (candidate &optional _name)
   "Show brief documentation for the function in modeline."
   (let ((cursor-in-echo-area t)
         mode-line-in-non-selected-windows)
