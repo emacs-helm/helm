@@ -437,20 +437,26 @@ in `helm-current-buffer' as default.
 
 ** Tips
 
-*** Enter `~/' at end of pattern to quickly reach home directory
+If you are here, you are probably using a vanilla command like `find-file'
+helmized by `helm-mode', this is cool, but it is even better for your file
+navigation to use `helm-find-files' which is fully featured.
 
-*** Enter `/' at end of pattern to quickly reach root of your file system
+*** Navigation
 
-*** Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session)
+**** Enter `~/' at end of pattern to quickly reach home directory
+
+**** Enter `/' at end of pattern to quickly reach root of your file system
+
+**** Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session)
 
 If you are in `default-directory' move cursor on top.
 
-*** Enter `../' at end of pattern will reach upper directory, moving cursor on top
+**** Enter `../' at end of pattern will reach upper directory, moving cursor on top
 
 NOTE: This different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
 subdir name.
 
-*** You can complete with partial basename (start on third char entered)
+**** You can complete with partial basename (start on third char entered)
 
 E.g. \"fob\" or \"fbr\" will complete \"foobar\"
 but \"fb\" will wait for a third char for completing.
@@ -469,7 +475,7 @@ NOTE: `C-u C-j' will display buffer directly.
 
 **** To browse images directories turn on `helm-follow-mode' and navigate with arrow keys
 
-**** Delete characters
+*** Delete characters backward
 
 When you want to delete backward characters, e.g. to create a new file or directory,
 autoupdate may keep updating to an existent directory preventing you from doing so.
@@ -477,6 +483,8 @@ In this case, type C-<backspace> and then <backspace>.
 This should not be needed when copying/renaming files because autoupdate is disabled
 by default in that case.
 NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
+
+*** Create new directory and files
 
 **** Create a new directory and a new file at the same time
 
@@ -487,6 +495,10 @@ E.g. You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 **** To create a new directory, add a \"/\" at end of new name and press <RET>
 
 **** To create a new file just write the filename not ending with \"/\"
+
+_NOTE_: File and directory creation work only in some commands (e.g `find-file')
+and will not work in other commands where it is not intended to return a file or a directory
+\(e.g `list-directory').
 
 ** Commands
 \\<helm-read-file-map>
