@@ -340,14 +340,14 @@ calling helm generic completion (e.g \"describe-function\")."
   (helm-elisp--persistent-help
    candidate 'helm-elisp--show-help-1 name))
   
-(defun helm-elisp-show-doc-modeline (candidate &optional _name)
+(defun helm-elisp-show-doc-modeline (candidate &optional name)
   "Show brief documentation for the function in modeline."
   (let ((cursor-in-echo-area t)
         mode-line-in-non-selected-windows)
     (helm-show-info-in-mode-line
      (propertize
       (helm-get-first-line-documentation
-       (intern candidate))
+       (intern candidate) name)
       'face 'helm-lisp-completion-info))))
 
 (defun helm-lisp-completion-transformer (candidates _source)
@@ -365,13 +365,18 @@ calling helm generic completion (e.g \"describe-function\")."
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
-(defun helm-get-first-line-documentation (sym)
+(defun helm-get-first-line-documentation (sym &optional name)
   "Return first line documentation of symbol SYM.
 If SYM is not documented, return \"Not documented\"."
   (let ((doc (cl-typecase sym
-                 (fbound  (documentation sym t))
-                 (bound   (documentation-property sym 'variable-documentation t))
-                 (face    (face-documentation sym)))))
+               ((and fboundp boundp)
+                (cond ((string= name "describe-function")
+                       (documentation sym t))
+                      ((string= name  "describe-variable")
+                       (documentation-property sym 'variable-documentation t))))
+               (fbound  (documentation sym t))
+               (bound   (documentation-property sym 'variable-documentation t))
+               (face    (face-documentation sym)))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
