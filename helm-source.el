@@ -858,10 +858,10 @@ an eieio class."
 (defmethod helm--setup-source :before ((source helm-source))
   (helm-aif (slot-value source 'keymap)
       (and (symbolp it) (set-slot-value source 'keymap (symbol-value it))))
-  (set-slot-value source 'header-line (helm-source--header-line source))
   (helm-aif (slot-value source 'persistent-help)
       (set-slot-value source 'header-line
-                      (helm-source--persistent-help-string it source)))
+                      (helm-source--persistent-help-string it source))
+    (set-slot-value source 'header-line (helm-source--header-line source)))
   (helm-aif (slot-value source 'candidate-number-limit)
       (and (symbolp it) (set-slot-value
                          source 'candidate-number-limit (symbol-value it))))
