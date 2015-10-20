@@ -3121,18 +3121,19 @@ and `helm-pattern'."
               (case-fold-search (helm-set-case-fold-search)))
           (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
-            (let (newmatches)
-              (cl-dolist (candidate cands)
-                (unless (gethash candidate helm-match-hash)
-                  (let ((target (helm-candidate-get-display candidate)))
-                    (when (funcall match
-                                   (if match-part-fn
-                                       (funcall match-part-fn target) target))
-                      (helm--accumulate-candidates
-                       candidate newmatches
-                       helm-match-hash item-count limit source)))))
-              ;; filter-one-by-one may return nil candidates, so delq them if some.
-              (setq matches (nconc matches (nreverse (delq nil newmatches)))))))
+            (when (< item-count limit)
+              (let (newmatches)
+                (cl-dolist (candidate cands)
+                  (unless (gethash candidate helm-match-hash)
+                    (let ((target (helm-candidate-get-display candidate)))
+                      (when (funcall match
+                                     (if match-part-fn
+                                         (funcall match-part-fn target) target))
+                        (helm--accumulate-candidates
+                         candidate newmatches
+                         helm-match-hash item-count limit source)))))
+                ;; filter-one-by-one may return nil candidates, so delq them if some.
+                (setq matches (nconc matches (nreverse (delq nil newmatches))))))))
       (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
                (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                                (assoc-default 'name source) (car err) (cdr err)))
