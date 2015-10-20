@@ -492,7 +492,16 @@ Filename completion happen if string start after or between a double quote."
     :action '(("Describe Variable" . helm-describe-variable)
               ("Find Variable" . helm-find-variable)
               ("Info lookup" . helm-info-lookup-symbol)
-              ("Set variable" . helm-set-variable))))
+              ("Set variable" . helm-set-variable))
+    :action-transformer
+    (lambda (actions candidate)
+      (let ((sym (helm-symbolify candidate)))
+        (if (custom-variable-p sym)
+            (append actions
+                    '(("Customize Variable" .
+                       (lambda (candidate)
+                         (customize-option (helm-symbolify candidate))))))
+          actions)))))
 
 (defun helm-def-source--emacs-faces (&optional default)
   (helm-build-in-buffer-source "Faces"
