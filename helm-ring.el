@@ -263,7 +263,13 @@ the `global-mark-ring' after each new visit."
     :candidates #'helm-register-candidates
     :action-transformer #'helm-register-action-transformer
     :multiline t
-    :action nil)
+    :action '(("Delete Register(s)" .
+               (lambda (_candidate)
+                 (cl-loop for candidate in (helm-marked-candidates)
+                          for register = (car candidate)
+                          do (setq register-alist
+                                (delq (assoc register register-alist)
+                                      register-alist)))))))
   "See (info \"(emacs)Registers\")")
 
 (defun helm-register-candidates ()
@@ -333,9 +339,10 @@ the `global-mark-ring' after each new visit."
         collect (cons (format "Register %3s:\n %s" key (car string-actions))
                       (cons char (cdr string-actions)))))
 
-(defun helm-register-action-transformer (_actions register-and-functions)
+(defun helm-register-action-transformer (actions register-and-functions)
   "Decide actions by the contents of register."
-  (cl-loop with func-actions =
+  (cl-loop with transformer-actions = nil
+           with func-actions =
         '((insert-register
            "Insert Register" .
            (lambda (c) (insert-register (car c))))
@@ -361,7 +368,8 @@ the `global-mark-ring' after each new visit."
         for func in (cdr register-and-functions)
         for cell = (assq func func-actions)
         when cell
-        collect (cdr cell)))
+        do (push (cdr cell) transformer-actions)
+        finally return (append (nreverse transformer-actions) actions)))
 
 ;;;###autoload
 (defun helm-mark-ring ()
