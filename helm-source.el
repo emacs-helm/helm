@@ -837,7 +837,12 @@ an eieio class."
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
            (helm-aif (or (slot-value source 'persistent-action)
                          (slot-value source 'action))
-               (cond ((or (symbolp it) (functionp it))
+               (cond ((and (symbolp it)
+                           (boundp it)
+                           (listp (symbol-value it))
+                           (stringp (caar (symbol-value it))))
+                      (caar (symbol-value it)))
+                     ((or (symbolp it) (functionp it))
                       (helm-symbol-name it))
                      ((listp it)
                       (let ((action (car it)))
