@@ -143,23 +143,28 @@ replace with STR as yanked string."
 ;; the commands `helm-mark-ring', `helm-global-mark-ring' or
 ;; `helm-all-mark-rings' instead.
 
-(defun helm-mark-ring-get-marks (pos)
+(defun helm-mark-ring-line-string-at-pos (pos)
+  "Return line string at position POS."
   (save-excursion
     (goto-char pos)
     (forward-line 0)
-    (let ((line  (car (split-string (thing-at-point 'line) "[\n\r]"))))
-      (when (string= "" line)
-        (setq line  "<EMPTY LINE>"))
-      (format "%7d: %s" (line-number-at-pos) line))))
+    (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
+      (if (string= "" line)
+          "<EMPTY LINE>"
+        line))))
 
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
     (cl-loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
-          for i in marks
-          for m = (helm-mark-ring-get-marks i)
-          unless (and recip (member m recip))
-          collect m into recip
-          finally return recip)))
+             for i in marks
+             with max-line-number = (line-number-at-pos (point-max))
+             with width = (length (number-to-string max-line-number))
+             for m = (format (concat "%" (number-to-string width) "d: %s")
+                             (line-number-at-pos i)
+                             (helm-mark-ring-line-string-at-pos i))
+             unless (and recip (member m recip))
+             collect m into recip
+             finally return recip)))
 
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
@@ -262,6 +267,7 @@ the `global-mark-ring' after each new visit."
   (helm-build-sync-source "Registers"
     :candidates #'helm-register-candidates
     :action-transformer #'helm-register-action-transformer
+    :persistent-help ""
     :multiline t
     :action '(("Delete Register(s)" .
                (lambda (_candidate)
