@@ -2957,11 +2957,11 @@ Don't use it in your own code unless you know what you are doing.")
 (defmethod helm--setup-source ((source helm-recentf-source))
   (set-slot-value
    source 'action
-   (nconc (symbol-value (helm-actions-from-type-file))
-          '(("Delete file(s) from recentf" .
-             (lambda (_candidate)
-               (cl-loop for file in (helm-marked-candidates)
-                        do (setq recentf-list (delq file recentf-list)))))))))
+   (append (symbol-value (helm-actions-from-type-file))
+           '(("Delete file(s) from recentf" .
+              (lambda (_candidate)
+                (cl-loop for file in (helm-marked-candidates)
+                         do (setq recentf-list (delq file recentf-list)))))))))
 
 (defvar helm-source-recentf nil 
   "See (info \"(emacs)File Conveniences\").
