@@ -869,6 +869,11 @@ It also accepts function or variable symbol.")
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
   "Holds the available candidate within a single helm invocation.")
+(defvar helm-preferred-matches-cache (make-hash-table :test 'equal :size 8192)
+  "Caches the preferred matches within a single helm invocation.")
+(defvar helm-preferred-candidates-cache (make-hash-table :test 'equal :size 1024)
+  "Caches the complete candidates list for locating preferred matches.")
+(defvar helm-preferred-matches-candidate-copy '())
 (defvar helm-input ""
   "The input typed in the candidates panel.")
 (defvar helm-input-local nil
@@ -3114,12 +3119,35 @@ and `helm-pattern'."
              (if (string-match "[[:upper:]]" pattern) nil t)))
     (t helm-case-fold-search)))
 
-(defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
-  (let (matches)
+
+(defun helm--mapconcat-initials-pattern (pattern seperators)
+  "Transform string PATTERN into a regexp for fuzzy matching as initials.
+e.g (helm--mapconcat-initials-pattern \"abcd\" \"-/\")
+    => \"^a\\(.+?[- /]b\\)\\(.+?[- /]c\\)\\(.+?[- /]d\\)\"
+
+SEPERATORS is a string contains one or more delimiters denotice word boundaries.
+For 'foo/my-function' SEPERATORS would be \"/-\""
+  (let ((ls (split-string-and-unquote pattern "")))
+    (concat
+     (format "^%s" (car ls) seperators (car ls))
+     (mapconcat (lambda (c)
+                  (if (and (string= c "$")
+                           (string-match "$\\'" pattern))
+                      c (format "\\(.+?[%s]%s\\)" seperators c)))
+                (cdr ls) ""))))
+
+(defun helm--make-initials-matcher (pattern &optional seperators)
+  (let* ((initials-pat (helm--mapconcat-initials-pattern pattern (or seperators "- /")))
+         (matcher (lambda (candidate)
+                    ;; (message "initials matcher Ran")
+                    (string-match initials-pat candidate))))
+    matcher))
+
+(defun helm-match-from-candidates-1 (cands matchfns match-part-fn limit source)
+  (let* (matches)
     (condition-case-unless-debug err
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search)))
-          (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
             (when (< item-count limit)
               (let (newmatches)
@@ -3140,6 +3168,44 @@ and `helm-pattern'."
              (setq matches nil)))
     matches))
 
+; TODO: put this somewhere else
+(defun helm--drop-last-char (s)
+  (let ((len (or (length s) 0)))
+    (when (> len 0)
+      (substring s 0 (1- len)))))
+
+(defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
+  (clrhash helm-match-hash)
+  (when (< (length helm-pattern) 2) ; reset on new query
+    (clrhash helm-preferred-matches-cache)
+    (puthash (assoc-default 'name source) cands helm-preferred-candidates-cache))
+  (let* ((source-name (assoc-default 'name source))
+         (prelim-matcher (helm--make-initials-matcher helm-pattern))
+         (cached-preferred (when (> (length helm-pattern) 1)
+                             (gethash (concat source-name (helm--drop-last-char helm-pattern))
+                                      helm-preferred-matches-cache)))
+         (all-candidates (or cached-preferred  ; matches from but-last prefix query
+                             (gethash source-name helm-preferred-candidates-cache) ; all candidates for the source
+                             cands))
+         (preferred-matches (when (and
+                                   (> (length helm-pattern) 1)
+                                   (< (length helm-pattern) 6)
+                                   (assoc 'fuzzy-match source))
+                              (helm-match-from-candidates-1 all-candidates
+                                                            (list prelim-matcher)
+                                                            match-part-fn limit source)))
+         (preferred-count (length preferred-matches) )
+         (remaining-count (max 0 (- limit preferred-count)) )
+         (matches (helm-match-from-candidates-1 cands
+                                                matchfns
+                                                match-part-fn remaining-count source))
+         (result (append preferred-matches matches)))
+
+    (when (and (< preferred-count limit)
+               (> (length helm-pattern) 1))
+      (puthash (concat source-name helm-pattern) preferred-matches helm-preferred-matches-cache))
+    result))
+
 (defun helm-compute-matches (source)
   "Start computing candidates in SOURCE."
   (save-current-buffer
@@ -3156,7 +3222,9 @@ and `helm-pattern'."
       ;; candidates.
       (helm-process-filtered-candidate-transformer
        (if (or (equal helm-pattern "")
-               (equal matchfns '(identity)))
+               (and  (equal matchfns '(identity))
+                     ; always go through matching logic for fuzzy
+                     (not (assoc 'fuzzy-match source))))
            ;; Compute all candidates up to LIMIT.
            (helm-take-first-elements
             (helm-get-cached-candidates source) limit)
