@@ -112,13 +112,13 @@ To fuzzy match `completion-at-point' and friends see
   :group 'helm-mode
   :type 'boolean)
 
-(defcustom helm-mode-minibuffer-setup-hook-black-list nil
+(defcustom helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
   "Incompatible `minibuffer-setup-hook' functions go here.
 A list of symbols.
 Helm-mode is rejecting all lambda's, byte-code fns
 and all functions belonging in this list from `minibuffer-setup-hook'."
   :group 'helm-mode
-  :type 'boolean)
+  :type '(repeat (choice symbol)))
 
 
 (defvar helm-comp-read-map
