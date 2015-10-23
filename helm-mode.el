@@ -112,6 +112,14 @@ To fuzzy match `completion-at-point' and friends see
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-mode-minibuffer-setup-hook-black-list nil
+  "Incompatible `minibuffer-setup-hook' functions go here.
+A list of symbols.
+Helm-mode is rejecting all lambda's, byte-code fns
+and all functions belonging in this list from `minibuffer-setup-hook'."
+  :group 'helm-mode
+  :type 'boolean)
+
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -688,9 +696,15 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; `minibuffer-completion-predicate' are not bound
          ;; anymore here, these functions should have no effect now,
          ;; except in some rare cases like in `woman-file-name',
-         ;; so bind `minibuffer-setup-hook' to nil (Issue #1205)
+         ;; so remove all incompatible functions
+         ;; from `minibuffer-setup-hook' (Issue #1205, #1240).
          ;; otherwise helm have not the time to close its initial session.
-         minibuffer-setup-hook
+         (minibuffer-setup-hook
+          (cl-loop for h in minibuffer-setup-hook
+                   unless (or (consp h) ; a lambda.
+                              (byte-code-function-p h)
+                              (memq h helm-mode-minibuffer-setup-hook-black-list))
+                   collect h))
          ;; Disable hack that could be used before `completing-read'.
          ;; i.e (push ?\t unread-command-events).
          unread-command-events)
