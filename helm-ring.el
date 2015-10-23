@@ -262,6 +262,7 @@ the `global-mark-ring' after each new visit."
   (helm-build-sync-source "Registers"
     :candidates #'helm-register-candidates
     :action-transformer #'helm-register-action-transformer
+    :persistent-help ""
     :multiline t
     :action '(("Delete Register(s)" .
                (lambda (_candidate)
