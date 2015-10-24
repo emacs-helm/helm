@@ -3223,11 +3223,38 @@ MAX-GROUP-LENGTH=2 with pattern \"abc\" returns a regex that matches
     (when (> len 0)
       (substring s 0 (1- len)))))
 
+(defun helm--new-nonempty-query-p (source query)
+  "Check if query is not-empty and not covered by current cached contents"
+  (and  (> (length query) 0)
+        (not (string-prefix-p
+              (or (gethash  (concat (assoc-default 'name source) "-query")
+                            helm-preferred-candidates-cache)
+                  "\x00")
+              query))))
+
+(defun helm--get-all-source-candidates-no-really-NO-REALLY (source query)
+  (if (eq (assoc-default 'candidates source) #'helm-candidates-in-buffer)
+      (helm-candidates-in-buffer-1
+       (helm-candidate-buffer)
+       query
+       (or (assoc-default 'get-line source)
+           #'buffer-substring-no-properties)
+       (or (assoc-default 'search source)
+           '(helm-candidates-in-buffer-search-default-fn))
+       50000
+       (helm-attr 'match-part)
+       source)
+    (helm-get-candidates source)))
+
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
   (clrhash helm-match-hash)
-  (when (< (length helm-pattern) 2) ; reset on new query
+  ;; when a new query begins we need to reset the caches.
+  (when (helm--new-nonempty-query-p source helm-pattern)
     (clrhash helm-preferred-matches-cache)
-    (puthash (assoc-default 'name source) cands helm-preferred-candidates-cache))
+    (puthash (assoc-default 'name source)
+             (helm--get-all-source-candidates-no-really-NO-REALLY source helm-pattern)
+             helm-preferred-candidates-cache)
+    (puthash (concat (assoc-default 'name source) "-query") helm-pattern helm-preferred-candidates-cache))
   (let* ((source-name (assoc-default 'name source))
          (prelim-matcher (helm--make-initials-matcher helm-pattern))
          (cached-preferred (when (> (length helm-pattern) 1)
