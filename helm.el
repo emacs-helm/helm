@@ -873,6 +873,8 @@ It also accepts function or variable symbol.")
   "Caches the preferred matches within a single helm invocation.")
 (defvar helm-preferred-candidates-cache (make-hash-table :test 'equal :size 1024)
   "Caches the complete candidates list for locating preferred matches.")
+(defvar helm-preferred-max-group-length 4
+  "Controls the complexity of matching when searching for preferred fuzzy matches.")
 (defvar helm-preferred-matches-candidate-copy '())
 (defvar helm-input ""
   "The input typed in the candidates panel.")
@@ -3120,21 +3122,68 @@ and `helm-pattern'."
     (t helm-case-fold-search)))
 
 
-(defun helm--mapconcat-initials-pattern (pattern seperators)
+(defun helm--mapconcat-initials-pattern-1 (ls seperators)
   "Transform string PATTERN into a regexp for fuzzy matching as initials.
 e.g (helm--mapconcat-initials-pattern \"abcd\" \"-/\")
-    => \"^a\\(.+?[- /]b\\)\\(.+?[- /]c\\)\\(.+?[- /]d\\)\"
+    => \"^a\\(.*[- /]b\\)\\(.*[- /]c\\)\\(.*[- /]d\\)\"
 
 SEPERATORS is a string contains one or more delimiters denotice word boundaries.
 For 'foo/my-function' SEPERATORS would be \"/-\""
-  (let ((ls (split-string-and-unquote pattern "")))
-    (concat
-     (format "^%s" (car ls) seperators (car ls))
-     (mapconcat (lambda (c)
-                  (if (and (string= c "$")
-                           (string-match "$\\'" pattern))
-                      c (format "\\(.+?[%s]%s\\)" seperators c)))
-                (cdr ls) ""))))
+  (concat "\\("
+          (format "^%s" (car ls) seperators (car ls))
+          (mapconcat (lambda (c)
+                       (if (and (string= c "$")
+                                (string-match "$\\'" pattern))
+                           c (format "\\(.*[%s]%s\\)" seperators c)))
+                     (cdr ls) "")
+          "\\)"))
+
+(defun helm--explode-pattern-to-fuzzy-initials (query max-length)
+  "Takes a string QUERY and returns a list \"exploded\" variations of it
+
+The variations include every way to select one group of 1 to MAX-LENGTH
+letters in the string and keep the rests as singl letters.
+
+Example: (explode \"abc\" 2) =>
+         ((\"a\" \"b\" \"c\") (\"ab\" \"c\") (\"a\" \"bc\"))"
+  (let (results)
+    (cl-loop
+       for len from 1 to (min max-length (1- (length query)))
+       do (cl-loop for pos from 0 to (if ( = len 1)
+                                         0
+                                       (- (length query) len))
+             for result = (cl-loop
+                             for i = 0 then (+ i (if (= i pos)
+                                                     len
+                                                   1))
+                             until (>= i (length query))
+                             collect (substring query i
+                                                (+ i (if (= i pos)
+                                                         len
+                                                       1))))
+             do (push result results)))
+    results))
+
+(defun helm--mapconcat-initials-pattern (pattern seperators &optional max-group-length)
+  "Transform string PATTERN into a regexp for fuzzy matching as initials.
+
+Create all variations breaking up PATTERN into initials and a single group
+of 1 up to MAX-LENGTH characters, convert each one into a regex that
+will match that variation as an abbreviation of the string and finally
+return the regex formed of their conjunction.
+
+MAX-GROUP-LENGTH=1 with pattern \"abc\" returns a regex that matches
+       \"a...-b...-c\"
+
+MAX-GROUP-LENGTH=2 with pattern \"abc\" returns a regex that matches
+       \"a...-b...-c...\" or \"ab...-c...\" or \"a...-bc....\"
+
+"
+  (mapconcat (lambda (ls) (helm--mapconcat-initials-pattern-1 ls seperators))
+             (helm--explode-pattern-to-fuzzy-initials
+              pattern
+              (or max-group-length helm-preferred-max-group-length))
+             "\\|"))
 
 (defun helm--make-initials-matcher (pattern &optional seperators)
   (let* ((initials-pat (helm--mapconcat-initials-pattern pattern (or seperators "- /")))
@@ -3202,6 +3251,7 @@ For 'foo/my-function' SEPERATORS would be \"/-\""
          (result (append preferred-matches matches)))
 
     (when (and (< preferred-count limit)
+               (= helm-preferred-max-group-length 1)
                (> (length helm-pattern) 1))
       (puthash (concat source-name helm-pattern) preferred-matches helm-preferred-matches-cache))
     result))
