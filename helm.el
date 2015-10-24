@@ -3121,21 +3121,20 @@ and `helm-pattern'."
              (if (string-match "[[:upper:]]" pattern) nil t)))
     (t helm-case-fold-search)))
 
+(defun helm--mapconcat-initials-pattern-1 (groups seperators)
+  "Construct a regexp from GROUPS to match them as seperated initials of a string.
+e.g (helm--mapconcat-initials-pattern-1 '(\"a\" \"bc\" \"d\") \"-/\")
+will return a pattern that matches \"a123/bc45-d\"
 
-(defun helm--mapconcat-initials-pattern-1 (ls seperators)
-  "Transform string PATTERN into a regexp for fuzzy matching as initials.
-e.g (helm--mapconcat-initials-pattern \"abcd\" \"-/\")
-    => \"^a\\(.*[- /]b\\)\\(.*[- /]c\\)\\(.*[- /]d\\)\"
-
-SEPERATORS is a string contains one or more delimiters denotice word boundaries.
-For 'foo/my-function' SEPERATORS would be \"/-\""
+SEPERATORS is a string contains one or more word seperators. Any characters
+which are not regex-safe should be quoted."
   (concat "\\("
-          (format "^%s" (car ls) seperators (car ls))
+          (format "^%s" (car groups) seperators (car groups))
           (mapconcat (lambda (c)
                        (if (and (string= c "$")
                                 (string-match "$\\'" pattern))
                            c (format "\\(.*[%s]%s\\)" seperators c)))
-                     (cdr ls) "")
+                     (cdr groups) "")
           "\\)"))
 
 (defun helm--explode-pattern-to-fuzzy-initials (query max-length)
