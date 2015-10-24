@@ -2954,7 +2954,7 @@ Don't use it in your own code unless you know what you are doing.")
    (keymap :initform helm-generic-files-map)
    (help-message :initform helm-generic-file-help-message)))
 
-(defmethod helm--setup-source ((source helm-recentf-source))
+(defmethod helm--setup-source :after ((source helm-recentf-source))
   (set-slot-value
    source 'action
    (append (symbol-value (helm-actions-from-type-file))
