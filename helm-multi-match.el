@@ -271,13 +271,22 @@ i.e the sources which have the slot :migemo with non--nil value."
   (cl-assert (featurep 'migemo)
              nil "No feature called migemo found, install migemo.el."))
 
+(defun helm-mm-migemo-get-pattern (pattern)
+  (let ((regex (migemo-get-pattern pattern)))
+    (if (ignore-errors (string-match regex "") t)
+        (concat regex "\\|" pattern) pattern)))
+
+(defun helm-mm-migemo-search-pattern-get (pattern)
+  (let ((regex (migemo-search-pattern-get pattern)))
+    (if (ignore-errors (string-match regex "") t)
+        (concat regex "\\|" pattern) pattern)))
+
 (defun helm-mm-migemo-string-match (pattern str)
   "Migemo version of `string-match'."
   (unless (assoc pattern helm-mm--previous-migemo-info)
     (with-helm-buffer
       (setq helm-mm--previous-migemo-info
-            (push (cons pattern (concat (migemo-get-pattern pattern)
-                                        "\\|" pattern))
+            (push (cons pattern (helm-mm-migemo-get-pattern pattern))
                   helm-mm--previous-migemo-info))))
   (string-match (assoc-default pattern helm-mm--previous-migemo-info) str))
 
@@ -292,8 +301,7 @@ i.e the sources which have the slot :migemo with non--nil value."
       (setq helm-mm--previous-migemo-info
             (push (cons word (if (delq 'ascii (find-charset-string word))
                                  word
-                                 (concat (migemo-search-pattern-get word)
-                                         "\\|" word)))
+                               (helm-mm-migemo-search-pattern-get word)))
                   helm-mm--previous-migemo-info))))
   (re-search-forward
    (assoc-default word helm-mm--previous-migemo-info) bound noerror count))
