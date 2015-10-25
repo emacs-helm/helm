@@ -869,6 +869,13 @@ It also accepts function or variable symbol.")
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
   "Holds the available candidate within a single helm invocation.")
+(defvar helm-preferred-matches-cache (make-hash-table :test 'equal :size 8192)
+  "Caches the preferred matches within a single helm invocation.")
+(defvar helm-preferred-candidates-cache (make-hash-table :test 'equal :size 1024)
+  "Caches the complete candidates list for locating preferred matches.")
+(defvar helm-preferred-max-group-length 4
+  "Controls the complexity of matching when searching for preferred fuzzy matches.")
+(defvar helm-preferred-matches-candidate-copy '())
 (defvar helm-input ""
   "The input typed in the candidates panel.")
 (defvar helm-input-local nil
@@ -3114,12 +3121,81 @@ and `helm-pattern'."
              (if (string-match "[[:upper:]]" pattern) nil t)))
     (t helm-case-fold-search)))
 
-(defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
-  (let (matches)
+(defun helm--mapconcat-initials-pattern-1 (groups seperators)
+  "Construct a regexp from GROUPS to match them as seperated initials of a string.
+e.g (helm--mapconcat-initials-pattern-1 '(\"a\" \"bc\" \"d\") \"-/\")
+will return a pattern that matches \"a123/bc45-d\"
+
+SEPERATORS is a string contains one or more word seperators. Any characters
+which are not regex-safe should be quoted."
+  (concat "\\("
+          (format "^%s" (car groups) seperators (car groups))
+          (mapconcat (lambda (c)
+                       (if (and (string= c "$")
+                                (string-match "$\\'" pattern))
+                           c (format "\\(.*[%s]%s\\)" seperators c)))
+                     (cdr groups) "")
+          "\\)"))
+
+(defun helm--explode-pattern-to-fuzzy-initials (query max-length)
+  "Takes a string QUERY and returns a list \"exploded\" variations of it
+
+The variations include every way to select one group of 1 to MAX-LENGTH
+letters in the string and keep the rests as singl letters.
+
+Example: (explode \"abc\" 2) =>
+         ((\"a\" \"b\" \"c\") (\"ab\" \"c\") (\"a\" \"bc\"))"
+  (let (results)
+    (cl-loop
+       for len from 1 to (min max-length (1- (length query)))
+       do (cl-loop for pos from 0 to (if ( = len 1)
+                                         0
+                                       (- (length query) len))
+             for result = (cl-loop
+                             for i = 0 then (+ i (if (= i pos)
+                                                     len
+                                                   1))
+                             until (>= i (length query))
+                             collect (substring query i
+                                                (+ i (if (= i pos)
+                                                         len
+                                                       1))))
+             do (push result results)))
+    results))
+
+(defun helm--mapconcat-initials-pattern (pattern seperators &optional max-group-length)
+  "Transform string PATTERN into a regexp for fuzzy matching as initials.
+
+Create all variations breaking up PATTERN into initials and a single group
+of 1 up to MAX-LENGTH characters, convert each one into a regex that
+will match that variation as an abbreviation of the string and finally
+return the regex formed of their conjunction.
+
+MAX-GROUP-LENGTH=1 with pattern \"abc\" returns a regex that matches
+       \"a...-b...-c\"
+
+MAX-GROUP-LENGTH=2 with pattern \"abc\" returns a regex that matches
+       \"a...-b...-c...\" or \"ab...-c...\" or \"a...-bc....\"
+
+"
+  (mapconcat (lambda (ls) (helm--mapconcat-initials-pattern-1 ls seperators))
+             (helm--explode-pattern-to-fuzzy-initials
+              pattern
+              (or max-group-length helm-preferred-max-group-length))
+             "\\|"))
+
+(defun helm--make-initials-matcher (pattern &optional seperators)
+  (let* ((initials-pat (helm--mapconcat-initials-pattern pattern (or seperators "- /")))
+         (matcher (lambda (candidate)
+                    ;; (message "initials matcher Ran")
+                    (string-match initials-pat candidate))))
+    matcher))
+
+(defun helm-match-from-candidates-1 (cands matchfns match-part-fn limit source)
+  (let* (matches)
     (condition-case-unless-debug err
         (let ((item-count 0)
               (case-fold-search (helm-set-case-fold-search)))
-          (clrhash helm-match-hash)
           (cl-dolist (match matchfns)
             (when (< item-count limit)
               (let (newmatches)
@@ -3140,6 +3216,72 @@ and `helm-pattern'."
              (setq matches nil)))
     matches))
 
+; TODO: put this somewhere else
+(defun helm--drop-last-char (s)
+  (let ((len (or (length s) 0)))
+    (when (> len 0)
+      (substring s 0 (1- len)))))
+
+(defun helm--new-nonempty-query-p (source query)
+  "Check if query is not-empty and not covered by current cached contents"
+  (and  (> (length query) 0)
+        (not (string-prefix-p
+              (or (gethash  (concat (assoc-default 'name source) "-query")
+                            helm-preferred-candidates-cache)
+                  "\x00")
+              query))))
+
+(defun helm--get-all-source-candidates-no-really-NO-REALLY (source query)
+  (if (eq (assoc-default 'candidates source) #'helm-candidates-in-buffer)
+      (helm-candidates-in-buffer-1
+       (helm-candidate-buffer)
+       query
+       (or (assoc-default 'get-line source)
+           #'buffer-substring-no-properties)
+       (or (assoc-default 'search source)
+           '(helm-candidates-in-buffer-search-default-fn))
+       50000
+       (helm-attr 'match-part)
+       source)
+    (helm-get-candidates source)))
+
+(defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
+  (clrhash helm-match-hash)
+  ;; when a new query begins we need to reset the caches.
+  (when (helm--new-nonempty-query-p source helm-pattern)
+    (clrhash helm-preferred-matches-cache)
+    (puthash (assoc-default 'name source)
+             (helm--get-all-source-candidates-no-really-NO-REALLY source helm-pattern)
+             helm-preferred-candidates-cache)
+    (puthash (concat (assoc-default 'name source) "-query") helm-pattern helm-preferred-candidates-cache))
+  (let* ((source-name (assoc-default 'name source))
+         (prelim-matcher (helm--make-initials-matcher helm-pattern))
+         (cached-preferred (when (> (length helm-pattern) 1)
+                             (gethash (concat source-name (helm--drop-last-char helm-pattern))
+                                      helm-preferred-matches-cache)))
+         (all-candidates (or cached-preferred  ; matches from but-last prefix query
+                             (gethash source-name helm-preferred-candidates-cache) ; all candidates for the source
+                             cands))
+         (preferred-matches (when (and
+                                   (> (length helm-pattern) 1)
+                                   (< (length helm-pattern) 6)
+                                   (assoc 'fuzzy-match source))
+                              (helm-match-from-candidates-1 all-candidates
+                                                            (list prelim-matcher)
+                                                            match-part-fn limit source)))
+         (preferred-count (length preferred-matches) )
+         (remaining-count (max 0 (- limit preferred-count)) )
+         (matches (helm-match-from-candidates-1 cands
+                                                matchfns
+                                                match-part-fn remaining-count source))
+         (result (append preferred-matches matches)))
+
+    (when (and (< preferred-count limit)
+               (= helm-preferred-max-group-length 1)
+               (> (length helm-pattern) 1))
+      (puthash (concat source-name helm-pattern) preferred-matches helm-preferred-matches-cache))
+    result))
+
 (defun helm-compute-matches (source)
   "Start computing candidates in SOURCE."
   (save-current-buffer
@@ -3156,7 +3298,9 @@ and `helm-pattern'."
       ;; candidates.
       (helm-process-filtered-candidate-transformer
        (if (or (equal helm-pattern "")
-               (equal matchfns '(identity)))
+               (and  (equal matchfns '(identity))
+                     ; always go through matching logic for fuzzy
+                     (not (assoc 'fuzzy-match source))))
            ;; Compute all candidates up to LIMIT.
            (helm-take-first-elements
             (helm-get-cached-candidates source) limit)
