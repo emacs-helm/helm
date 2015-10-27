@@ -2169,13 +2169,14 @@ Return candidates prefixed with basename of `helm-input' first."
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
 line number should be added at end of fname preceded with \":\".
 e.g \"foo:12\"."
-  (let ((linum (let ((str (with-helm-current-buffer
-                            (buffer-substring-no-properties
+  (let ((linum (with-helm-current-buffer
+                 (let ((str (buffer-substring-no-properties
                              (point-at-bol) (point-at-eol))))
-                     (fname (with-helm-current-buffer (ffap-guesser))))
-                 (when (string-match
-                        (concat "\\(" fname "\\):\\([0-9]+:?\\)") str)
-                   (match-string 2 str)))))
+                   (when (string-match
+                          (concat "\\(" (ffap-guesser)
+                                  "\\):\\([0-9]+:?\\)")
+                          str)
+                     (match-string 2 str))))))
     (find-file candidate)
     (and linum (not (string= linum ""))
          (helm-goto-line (string-to-number linum) t))))
