@@ -26,6 +26,10 @@
 (require 'helm-files)
 (require 'advice)
 
+(declare-function 'helm-describe-function "helm-lib")
+(declare-function 'helm-describe-variable "helm-lib")
+(declare-function 'helm-describe-face "helm-lib")
+
 
 (defgroup helm-elisp nil
   "Elisp related Applications and libraries for Helm."
