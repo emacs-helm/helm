@@ -248,8 +248,16 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :type 'string)
 
 (defcustom helm-ff-guess-ffap-filenames nil
-  "Use ffap to guess local filenames at point.
-This doesn't disable url or mail at point, only files."
+  "Use ffap to guess local filenames at point in `helm-find-files'.
+This doesn't disable url or mail at point, see
+`helm-ff-guess-ffap-urls' for this."
+  :group 'helm-files
+  :type 'boolean)
+
+(defcustom helm-ff-guess-ffap-urls t
+  "Use ffap to guess local urls at point in `helm-find-files'.
+This doesn't disable guessing filenames at point,
+see `helm-ff-guess-ffap-filenames' for this."
   :group 'helm-files
   :type 'boolean)
 
@@ -2139,7 +2147,8 @@ Return candidates prefixed with basename of `helm-input' first."
            (append actions
                    '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
           ((save-match-data
-             (and (not (string-match-p ffap-url-regexp str-at-point))
+             (and ffap-url-regexp
+                  (not (string-match-p ffap-url-regexp str-at-point))
                   (string-match (concat "\\(" fname-at-point "\\):\\([0-9]+:?\\)")
                                 str-at-point)
                   (file-equal-p (match-string 1 str-at-point) candidate)))
@@ -2423,7 +2432,8 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
   (let ((ffap-machine-p-known 'reject)
-        (ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
+        (ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))
+        (ffap-url-regexp (and helm-ff-guess-ffap-urls ffap-url-regexp)))
     (unless (eq major-mode 'image-mode)
       (or (and input (or (and (file-remote-p input) input)
                          (expand-file-name input)))
