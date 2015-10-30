@@ -3046,10 +3046,11 @@ It is meant to use with `filter-one-by-one' slot."
                                       p helm-mm--previous-migemo-info))
                                 p)
                    do
-                   (when (re-search-forward re nil t)
+                   (save-excursion
+                     (when (re-search-forward re nil t)
                      (add-text-properties
                       (match-beginning 0) (match-end 0)
-                      '(face helm-match)))))
+                      '(face helm-match))))))
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
