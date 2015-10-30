@@ -3037,8 +3037,10 @@ It is meant to use with `filter-one-by-one' slot."
       (if (re-search-forward regex nil t)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match))
-          (cl-loop with patterns = (if (string-match-p " " helm-pattern)
-                                       (split-string helm-pattern)
+          (cl-loop with multi-match
+                   with patterns = (if (string-match-p " " helm-pattern)
+                                       (prog1 (split-string helm-pattern)
+                                         (setq multi-match t))
                                        (split-string helm-pattern "" t))
                    for p in patterns
                    for re = (or (and helm-migemo-mode
@@ -3046,11 +3048,11 @@ It is meant to use with `filter-one-by-one' slot."
                                       p helm-mm--previous-migemo-info))
                                 p)
                    do
-                   (save-excursion
-                     (when (re-search-forward re nil t)
+                   (when (re-search-forward re nil t)
                      (add-text-properties
                       (match-beginning 0) (match-end 0)
-                      '(face helm-match))))))
+                      '(face helm-match)))
+                   (when multi-match (goto-char (point-min)))))
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
