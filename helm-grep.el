@@ -1300,6 +1300,7 @@ You have also to enable this in global \".gitconfig\" with
          (helm-grep-default-directory-fn (lambda ()
                                            (vc-find-root directory ".git")))
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
+    (cl-assert helm-ff-default-directory nil "Not inside a Git repository")
     (helm-do-grep-1 (if all '("") `(,(expand-file-name directory))))))
 
 
