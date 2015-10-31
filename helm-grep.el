@@ -1277,7 +1277,7 @@ You can use safely \"--color\" (default)."
 ;;
 ;;
 (defcustom helm-grep-git-grep-command
-  "git grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p %f"
+  "git grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p -- %f"
   "The git grep default command line.
 The option \"--color=always\" can be used safely.
 The color of matched items can be customized in your .gitconfig
@@ -1291,7 +1291,7 @@ You have also to enable this in global \".gitconfig\" with
   :group 'helm-grep
   :type 'string)
 
-(defun helm-grep-git-1 (directory)
+(defun helm-grep-git-1 (directory &optional all)
   (require 'vc)
   (let* ((helm-grep-default-command helm-grep-git-grep-command)
          helm-grep-default-recurse-command
@@ -1300,7 +1300,7 @@ You have also to enable this in global \".gitconfig\" with
          (helm-grep-default-directory-fn (lambda ()
                                            (vc-find-root directory ".git")))
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
-    (helm-do-grep-1 '("--"))))
+    (helm-do-grep-1 (if all '("") `(,(expand-file-name directory))))))
 
 
 ;;;###autoload
@@ -1310,10 +1310,11 @@ You have also to enable this in global \".gitconfig\" with
   (helm-grep-ag-1 default-directory))
 
 ;;;###autoload
-(defun helm-grep-do-git-grep ()
-  "Preconfigured helm for git-grepping `default-directory'."
-  (interactive)
-  (helm-grep-git-1 default-directory))
+(defun helm-grep-do-git-grep (arg)
+  "Preconfigured helm for git-grepping `default-directory'.
+With a prefix arg ARG git-grep the whole repository."
+  (interactive "P")
+  (helm-grep-git-1 default-directory arg))
 
 ;;;###autoload
 (defun helm-do-grep ()
