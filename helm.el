@@ -5330,9 +5330,9 @@ is what is used to perform actions."
    (lambda (sel)
      (kill-new sel)
      ;; Return nil to force `helm-mode--keyboard-quit'
-     ;; in `helm-comp-read' otherwise the value "Killed: foo"
+     ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
      ;; is used as exit value for `helm-comp-read'.
-     (prog1 nil (message "Killed: %s" sel) (sit-for 1)))
+     (prog1 nil (message "Saved to kill-ring: %s" sel) (sit-for 1)))
    (helm-get-selection nil (not arg))))
 
 (defun helm-copy-to-buffer ()
