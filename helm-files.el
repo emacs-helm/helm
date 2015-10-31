@@ -674,7 +674,7 @@ ACTION must be an action supported by `helm-dired-action'."
 
 (defun helm-ff-git-grep (_candidate)
   "Default action to git-grep `helm-ff-default-directory'."
-  (helm-grep-git-1 helm-ff-default-directory))
+  (helm-grep-git-1 helm-ff-default-directory helm-current-prefix-arg))
 
 (defun helm-find-files-ag (_candidate)
   (helm-grep-ag-1 helm-ff-default-directory))
