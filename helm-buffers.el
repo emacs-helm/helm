@@ -647,12 +647,12 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-execute-persistent-action 'kill-action)))
 
 (defun helm-kill-marked-buffers (_ignore)
-  (let ((bufs (helm-marked-candidates)))
-    (mapc 'kill-buffer bufs)
+  (let* ((bufs (helm-marked-candidates))
+         (killed-bufs (cl-count-if 'kill-buffer bufs)))
     (with-helm-buffer
       (setq helm-marked-candidates nil
             helm-visible-mark-overlays nil))
-    (message "Killed %s buffers" (length bufs))))
+    (message "Killed %s buffer(s)" killed-bufs)))
 
 (defun helm-buffer-run-kill-buffers ()
   "Run kill buffer action from `helm-source-buffers-list'."
