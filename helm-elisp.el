@@ -331,8 +331,11 @@ in other window according to the value of `helm-elisp-help-function'."
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
       ((and fboundp boundp)
-       (when (member name '("describe-function" "describe-variable"))
-         (funcall (intern (format "helm-%s" name)) sym)))
+       (if (member name '("describe-function" "describe-variable"))
+           (funcall (intern (format "helm-%s" name)) sym)
+           ;; When there is no way to know what to describe
+           ;; prefer describe-function.
+           (helm-describe-function sym)))
       (fboundp  (helm-describe-function sym))
       (bound    (helm-describe-variable sym))
       (face     (helm-describe-face sym)))))
@@ -377,7 +380,8 @@ If SYM is not documented, return \"Not documented\"."
                 (cond ((string= name "describe-function")
                        (documentation sym t))
                       ((string= name  "describe-variable")
-                       (documentation-property sym 'variable-documentation t))))
+                       (documentation-property sym 'variable-documentation t))
+                      (t (documentation sym t))))
                (fbound  (documentation sym t))
                (bound   (documentation-property sym 'variable-documentation t))
                (face    (face-documentation sym)))))
