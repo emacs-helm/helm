@@ -759,8 +759,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
       (if (or (eql (window-buffer helm-persistent-action-display-window)
                    (get-buffer helm-current-buffer))
               (not (eq last-command 'helm-execute-persistent-action)))
-        (switch-to-buffer candidate)
-        (switch-to-buffer helm-current-buffer))))
+          (switch-to-buffer candidate)
+          (switch-to-buffer helm-current-buffer))))
 
 (defun helm-ediff-marked-buffers (_candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
