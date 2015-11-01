@@ -756,8 +756,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
       (helm-buffers-persistent-kill candidate)
-      (if (eql (window-buffer helm-persistent-action-display-window)
-               (get-buffer helm-current-buffer))
+      (if (or (eql (window-buffer helm-persistent-action-display-window)
+                   (get-buffer helm-current-buffer))
+              (not (eq last-command 'helm-execute-persistent-action)))
         (switch-to-buffer candidate)
         (switch-to-buffer helm-current-buffer))))
 
