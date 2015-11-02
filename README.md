@@ -289,6 +289,7 @@ If you don't want the Helm window to be resized, but a smaller Helm window, you 
 **Warning** You will find many extensions outside of [emacs-helm](https://github.com/emacs-helm)
 that provide nothing more than what is provided natively by [helm](https://github.com/emacs-helm/helm) and may not be in sync will `helm` core.
 So generally prefer what is provided natively in `helm` instead of its counterpart provided externally.
+Actually more than 20 unuseful or deprecated packages you can find on MELPA, be aware.
 
 # Known issues
 
