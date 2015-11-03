@@ -2684,6 +2684,10 @@ Ask to kill buffers associated with that file, too."
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
 Called with a prefix arg open files in background without selecting them."
+  ;; FIXME: `helm-marked-candidates' return nil
+  ;; on long urls like:
+  ;; https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cats
+  ;; but only here (in edebug it is returning the url correctly).
   (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
@@ -2722,12 +2726,11 @@ Called with a prefix arg open files in background without selecting them."
         ;; an existing filename, create or jump to it.
         ;; If the basedir of candidate doesn't exists,
         ;; ask for creating it.
-        (let ((dir (helm-basedir candidate)))
+        (let ((dir (and (not url-p) (helm-basedir candidate))))
           (find-file-at-point
            (cond ((and dir (file-directory-p dir))
-                  (substitute-in-file-name (car marked)))
-                 ;; FIXME Why do we use this on urls ?
-                 (url-p (helm-substitute-in-filename (car marked)))
+                  (substitute-in-file-name candidate))
+                 (url-p candidate)
                  ((funcall make-dir-fn dir) candidate))))))))
 
 (defun helm-shadow-boring-files (files)
