@@ -2020,12 +2020,11 @@ return FNAME prefixed with [?]."
          (prefix-url (propertize
                       " " 'display
                       (propertize "[@]" 'face 'helm-ff-prefix))))
-    (cond ((or file-or-symlinkp (file-exists-p fname)) fname)
+    (cond (file-or-symlinkp fname)
           ((or (string-match helm-ff-url-regexp fname)
                (and ffap-url-regexp (string-match ffap-url-regexp fname)))
            (concat prefix-url " " fname))
-          ((or new-file (not (file-exists-p fname)))
-           (concat prefix-new " " fname)))))
+          (new-file (concat prefix-new " " fname)))))
 
 (defun helm-ff-score-candidate-for-pattern (str pattern)
   (if (member str '("." ".."))
