@@ -2684,10 +2684,6 @@ Ask to kill buffers associated with that file, too."
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
 Called with a prefix arg open files in background without selecting them."
-  ;; FIXME: `helm-marked-candidates' return nil
-  ;; on long urls like:
-  ;; https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cats
-  ;; but only here (in edebug it is returning the url correctly).
   (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and ffap-url-regexp ; we should have only one candidate.
                     (string-match ffap-url-regexp candidate)))
