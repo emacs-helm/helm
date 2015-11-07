@@ -1957,12 +1957,14 @@ Note that only existing directories are saved here."
     (unwind-protect
          (save-selected-window
            (cl-loop for c in marked do
-                    (progn (helm-preselect (if (and helm-ff-transformer-show-only-basename
-                                                    (not (helm-ff-dot-file-p c)))
-                                               (helm-basename c) c))
-                           (when (y-or-n-p (format "Really Delete file `%s'? " c))
-                             (helm-delete-file c helm-ff-signal-error-on-dot-files
-                                               'synchro)
+                    (progn (helm-preselect
+                            (if (and helm-ff-transformer-show-only-basename
+                                     (not (helm-ff-dot-file-p c)))
+                                (helm-basename c) c))
+                           (when (y-or-n-p
+                                  (format "Really Delete file `%s'? " c))
+                             (helm-delete-file
+                              c helm-ff-signal-error-on-dot-files 'synchro)
                              (helm-delete-current-selection)
                              (message nil)))))
       (with-helm-buffer
@@ -1977,11 +1979,11 @@ Note that only existing directories are saved here."
 (defun helm-ff-kill-buffer-fname (candidate)
   (let* ((buf      (get-file-buffer candidate))
          (buf-name (buffer-name buf)))
-    (if (and buf
-             (not (eq buf (get-buffer helm-current-buffer))))
-        (progn
-          (kill-buffer buf) (message "Buffer `%s' killed" buf-name))
-      (message "No buffer to kill"))))
+    (cond ((and buf (eq buf (get-buffer helm-current-buffer)))
+           (user-error
+            "Can't kill `helm-current-buffer' without quitting session"))
+          (buf (kill-buffer buf) (message "Buffer `%s' killed" buf-name))
+          (t (message "No buffer to kill")))))
 
 (defun helm-ff-kill-or-find-buffer-fname (candidate)
   "Find file CANDIDATE or kill it's buffer if it is visible.
@@ -1994,14 +1996,16 @@ in `helm-find-files-persistent-action'."
          (buf-name (buffer-name buf))
          (win (get-buffer-window buf))
          (helm--reading-passwd-or-string t))
-    (if (and buf win
-             (not (eq buf (get-buffer helm-current-buffer)))
-             (not (buffer-modified-p buf)))
-        (progn
-          (kill-buffer buf)
-          (set-window-buffer win helm-current-buffer)
-          (message "Buffer `%s' killed" buf-name))
-      (find-file candidate))))
+    (cond ((and buf win (eq buf (get-buffer helm-current-buffer)))
+           (user-error
+            "Can't kill `helm-current-buffer' without quitting session"))
+          ((and buf win (buffer-modified-p buf))
+           (message "Can't kill modified buffer, please save it before"))
+          ((and buf win)
+           (kill-buffer buf)
+           (set-window-buffer win helm-current-buffer)
+           (message "Buffer `%s' killed" buf-name))
+          (t (find-file candidate)))))
 
 (defun helm-ff-run-kill-buffer-persistent ()
   "Execute `helm-ff-kill-buffer-fname' without quitting."
