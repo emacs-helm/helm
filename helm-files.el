@@ -1975,10 +1975,12 @@ Note that only existing directories are saved here."
                            (helm-basename presel) presel)))))))
 
 (defun helm-ff-kill-buffer-fname (candidate)
-  (let ((buf (get-file-buffer candidate)))
-    (if buf
+  (let* ((buf      (get-file-buffer candidate))
+         (buf-name (buffer-name buf)))
+    (if (and buf
+             (not (eq buf (get-buffer helm-current-buffer))))
         (progn
-          (kill-buffer buf) (message "Buffer `%s' killed" buf))
+          (kill-buffer buf) (message "Buffer `%s' killed" buf-name))
       (message "No buffer to kill"))))
 
 (defun helm-ff-kill-or-find-buffer-fname (candidate)
@@ -2002,7 +2004,7 @@ in `helm-find-files-persistent-action'."
       (find-file candidate))))
 
 (defun helm-ff-run-kill-buffer-persistent ()
-  "Execute `helm-ff-kill-buffer-fname' whitout quitting."
+  "Execute `helm-ff-kill-buffer-fname' without quitting."
   (interactive)
   (with-helm-alive-p
     (helm-attrset 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
