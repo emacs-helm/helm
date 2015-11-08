@@ -389,7 +389,7 @@ Where db_path is a filename matched by
 `helm-locate-db-file-regexp'."
   (interactive "P")
   (setq helm-ff-default-directory default-directory)
-  (helm-locate-1 arg))
+  (helm-locate-1 arg nil nil (thing-at-point 'filename)))
 
 (provide 'helm-locate)
 
