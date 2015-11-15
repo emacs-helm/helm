@@ -74,14 +74,16 @@ NOTE: This will be slow on large org buffers."
          file-name (concat "file:" file-name "::*" heading-name))))))
 
 (defun helm-org-heading-refile (marker)
-  (with-helm-current-buffer
-    (org-cut-subtree))
-  (let ((target-level (with-current-buffer (marker-buffer marker)
-                       (goto-char (marker-position marker))
-                       (org-current-level))))
-    (helm-org-goto-marker marker)
-    (org-end-of-subtree t t)
-    (org-paste-subtree (+ target-level 1))))
+  (save-selected-window
+    (when (eq major-mode 'org-agenda-mode)
+      (org-agenda-switch-to))
+    (org-cut-subtree)
+    (let ((target-level (with-current-buffer (marker-buffer marker)
+                          (goto-char (marker-position marker))
+                          (org-current-level))))
+      (helm-org-goto-marker marker)
+      (org-end-of-subtree t t)
+      (org-paste-subtree (+ target-level 1)))))
 
 (defun helm-org-get-candidates (filenames min-depth max-depth)
   (apply #'append
