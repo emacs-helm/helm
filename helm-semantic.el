@@ -138,7 +138,6 @@ you have completion on these functions with `C-M i' in the customize interface."
                          (helm-semantic--fetch-candidates helm-semantic--tags-cache 0)))))
    (get-line :initform 'buffer-substring)
    (persistent-help :initform "Show this entry")
-   (allow-dups :initform t)
    (keymap :initform 'helm-semantic-map)
    (help-message :initform 'helm-semantic-help-message)
    (persistent-action :initform (lambda (elm)

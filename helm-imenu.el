@@ -98,7 +98,6 @@
 (defclass helm-imenu-source (helm-source-sync)
   ((candidates :initform 'helm-imenu-candidates)
    (candidate-transformer :initform 'helm-imenu-transformer)
-   (allow-dups :initform t)
    (persistent-action :initform 'helm-imenu-persistent-action)
    (persistent-help :initform "Show this entry")
    (keymap :initform helm-imenu-map)
