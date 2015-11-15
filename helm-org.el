@@ -21,6 +21,8 @@
 (require 'helm-utils)
 (require 'org)
 
+(declare-function org-agenda-switch-to "org-agenda.el")
+
 (defgroup helm-org nil
   "Org related functions for helm."
   :group 'helm)
