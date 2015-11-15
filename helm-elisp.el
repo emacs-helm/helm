@@ -774,13 +774,12 @@ Filename completion happen if string start after or between a double quote."
 ;;
 (defclass helm-absolute-time-timers-class (helm-source-sync helm-type-timers)
   ((candidates :initform timer-list)
-   (filtered-candidate-transformer
-    :initform
-    (lambda (candidates _source)
-      (cl-loop for timer in candidates
-               collect (cons (helm-elisp--format-timer timer) timer))))
    (allow-dups :initform t)
-   (volatile :initform t)))
+   (candidate-transformer
+    :initform
+    (lambda (candidates)
+      (cl-loop for timer in candidates
+               collect (cons (helm-elisp--format-timer timer) timer))))))
 
 (defvar helm-source-absolute-time-timers
   (helm-make-source "Absolute Time Timers" 'helm-absolute-time-timers-class))
@@ -788,10 +787,9 @@ Filename completion happen if string start after or between a double quote."
 (defclass helm-idle-time-timers-class (helm-source-sync helm-type-timers)
   ((candidates :initform timer-idle-list)
    (allow-dups :initform t)
-   (volatile :initform t)
-   (filtered-candidate-transformer
+   (candidate-transformer
     :initform
-    (lambda (candidates _source)
+    (lambda (candidates)
       (cl-loop for timer in candidates
                collect (cons (helm-elisp--format-timer timer) timer))))))
 

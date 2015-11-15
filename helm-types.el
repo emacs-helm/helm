@@ -236,7 +236,10 @@
     ("Describe Function" . (lambda (tm)
                              (describe-function (timer--function tm))))
     ("Find Function" . (lambda (tm)
-                         (find-function (timer--function tm)))))
+                         (helm-aif (timer--function tm)
+                             (if (byte-code-function-p it)
+                                 (message "Can't find anonymous function `%s'" it)
+                                 (find-function it))))))
   "Default actions for type timers."
   :group 'helm-elisp
   :type '(alist :key-type string :value-type function))
