@@ -2180,8 +2180,8 @@ Arg ENABLE will be the value of the `no-other-window' window property."
 
 (defun helm-default-display-buffer (buffer)
   "Default function to display `helm-buffer' BUFFER.
-It uses `switch-to-buffer' or `pop-to-buffer' depending of value of
-`helm-full-frame' and/or `helm-split-window-default-side'."
+It uses `switch-to-buffer' or `display-buffer' depending of value
+of `helm-full-frame' and/or `helm-split-window-default-side'."
   (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
           (and (eq helm-split-window-default-side 'same)
                (one-window-p t)))
@@ -2196,7 +2196,7 @@ It uses `switch-to-buffer' or `pop-to-buffer' depending of value of
                (not (minibufferp helm-current-buffer))
                (not helm-split-window-in-side-p))
       (delete-other-windows))
-    (pop-to-buffer buffer)))
+    (display-buffer buffer)))
 
 
 ;;; Core: initialize
