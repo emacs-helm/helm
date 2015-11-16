@@ -713,6 +713,9 @@ and before performing action.")
 (defvar helm-move-selection-after-hook nil
   "Run after moving selection in `helm-buffer'.")
 
+(defvar helm-after-preselection-hook nil
+  "Run after preselection in `helm-buffer'.")
+
 (defvar helm-window-configuration-hook nil
   "Run when switching to and back from action buffer.")
 
@@ -4309,7 +4312,8 @@ before the candidate we want to preselect."
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
     (helm-mark-current-line)
-    (helm-display-mode-line (helm-get-current-source))))
+    (helm-display-mode-line (helm-get-current-source))
+    (helm-log-run-hook 'helm-after-preselection-hook)))
 
 (defun helm-delete-current-selection ()
   "Delete the currently selected item."
