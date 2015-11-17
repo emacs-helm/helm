@@ -251,6 +251,20 @@ so don't use strings, vectors or whatever to define them."
                `(lambda ()
                   (interactive)
                   (helm-select-nth-action ,n))))
+    ;; Bind keys to allow executing default action
+    ;; on first 9 candidates before and after selection.
+    (cl-loop for n from 1 to 9
+         for key = (format "C-c %d" n)
+         for key- = (format "C-x %d" n)
+         for fn = `(lambda ()
+                     (interactive)
+                     (helm-execute-selection-action-at-nth ,n))
+         for fn- = `(lambda ()
+                      (interactive)
+                      (helm-execute-selection-action-at-nth ,(- n)))
+         do (progn
+              (define-key map (kbd key) fn)
+              (define-key map (kbd key-) fn-)))
     map)
   "Keymap for helm.")
 
@@ -4931,6 +4945,15 @@ Possible values are 'left 'right 'below or 'above."
          (error "Sole action"))
         (t
          (error "Error in `helm-select-nth-action'"))))
+
+(defun helm-execute-selection-action-at-nth (linum)
+  "Allow to execute default action on candidate at LINUM."
+  (let ((prefarg current-prefix-arg))
+    (if (>= linum 0)
+        (helm-next-line linum)
+        (helm-previous-line (lognot (1- linum))))
+    (setq current-prefix-arg prefarg)
+    (helm-exit-minibuffer)))
 
 ;; Utility: Persistent Action
 (defmacro with-helm-display-same-window (&rest body)
