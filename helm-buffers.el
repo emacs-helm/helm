@@ -451,6 +451,7 @@ Should be called after others transformers i.e (boring buffers)."
                 (helm-make-visible-mark)))
             (forward-line 1) (end-of-line))))
       (helm-mark-current-line)
+      (helm-display-mode-line (helm-get-current-source) t)
       (message "%s candidates marked" (length helm-marked-candidates)))))
 
 (defun helm-buffers-mark-similar-buffers ()
