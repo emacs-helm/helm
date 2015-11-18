@@ -833,6 +833,16 @@ These are the default key bindings:
 
 f1-12: Execute nth 1 to 12 Action(s).
 
+** Shortcuts for executing Default Action on nth candidate
+
+C-x <n> => execute default action on number <n> candidate before selection.
+C-c <n> => execute default action on number <n> candidate after selection.
+
+Of course this works only on the 9 first and previous candidates.
+
+Helm provides nothing to visualize candidates numbers, up to you to install
+linum-relative package and enable linum-relative in helm..
+
 ** Visible Marks
 
 Visible marks store candidate. Some actions uses marked candidates.
