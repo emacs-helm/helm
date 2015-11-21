@@ -105,17 +105,14 @@ NOTE: This will be slow on large org buffers."
                          ((pred stringp) (find-file-noselect filename)))
     (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify 'match-string 'match-string-no-properties))
-          (goto-char-fn (if parents
-                            '(lambda () t)
-                          '(lambda () (goto-char (point-min)))))
           (search-fn (if parents
                          '(lambda () (and (org-up-heading-safe) (re-search-forward org-complex-heading-regexp nil t)))
                        '(lambda () (re-search-forward org-complex-heading-regexp nil t))))
-          (get-outline-path-fn '(lambda (level heading parents) (if parents
-                                                                    (org-get-outline-path)
-                                                                  (org-get-outline-path t level heading)))))
+          (get-outline-path-fn (if parents
+                                   '(lambda (&rest _) (org-get-outline-path))
+                                 'org-get-outline-path)))
       (save-excursion
-        (funcall goto-char-fn)
+        (unless parents (goto-char (point-min)))
         (cl-loop with width = (window-width)
                  while (funcall search-fn)
                  if (let ((num-stars (length (match-string-no-properties 1))))
@@ -125,7 +122,7 @@ NOTE: This will be slow on large org buffers."
                                           (concat (helm-basename filename) ":")))
                                   (level (length (match-string-no-properties 1))))
                               (org-format-outline-path
-                               (append (funcall get-outline-path-fn level heading parents)
+                               (append (funcall get-outline-path-fn t level heading)
                                        (list heading)) width file))
                            . ,(point-marker)))))))
 
