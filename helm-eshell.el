@@ -209,7 +209,7 @@ The function that call this should set `helm-ec-target' to thing at point."
           beg (or (and target (not (string= target " "))
                        (- end (length target)))
                   ;; Nothing at point.
-                  (save-excursion (insert " ") (point))))
+                  (progn (insert " ") (point))))
     (cond ((eq first ?\()
            (helm-lisp-completion-or-file-name-at-point))
           ;; In eshell `pcomplete-parse-arguments' is called
