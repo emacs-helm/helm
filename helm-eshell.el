@@ -202,14 +202,15 @@ The function that call this should set `helm-ec-target' to thing at point."
                  (eshell-backward-argument 1) (point))
                end)))
          (first (car args)) ; Maybe lisp delimiter "(".
-         last) ; Will be the last but parsed by pcomplete.
+         last ; Will be the last but parsed by pcomplete.
+         del-space)
     (setq helm-ec-target (or target " ")
           end (point)
           ;; Reset beg for `with-helm-show-completion'.
           beg (or (and target (not (string= target " "))
                        (- end (length target)))
                   ;; Nothing at point.
-                  (progn (insert " ") (point))))
+                  (progn (insert " ") (setq del-space t) (point))))
     (cond ((eq first ?\()
            (helm-lisp-completion-or-file-name-at-point))
           ;; In eshell `pcomplete-parse-arguments' is called
@@ -223,12 +224,13 @@ The function that call this should set `helm-ec-target' to thing at point."
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
              (with-helm-show-completion beg end
-               (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source)
-                     :buffer "*helm pcomplete*"
-                     :keymap helm-esh-completion-map
-                     :resume 'noresume
-                     :input (and (stringp last)
-                                 (helm-ff-set-pattern last))))))))
+               (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source)
+                         :buffer "*helm pcomplete*"
+                         :keymap helm-esh-completion-map
+                         :resume 'noresume
+                         :input (and (stringp last)
+                                     (helm-ff-set-pattern last)))
+                   (and del-space (delete-char -1))))))))
 
 ;;;###autoload
 (defun helm-eshell-history ()
