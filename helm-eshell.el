@@ -230,7 +230,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                          :resume 'noresume
                          :input (and (stringp last)
                                      (helm-ff-set-pattern last)))
-                   (and del-space (delete-char -1))))))))
+                   (and del-space (looking-back "\\s-" (1- (point)))
+                        (delete-char -1))))))))
 
 ;;;###autoload
 (defun helm-eshell-history ()
