@@ -163,10 +163,6 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (kill-new input)
   (message "Killed: %s" input))
 
-(defun helm-quote-whitespace (candidate)
-  "Quote whitespace, if some, in string CANDIDATE."
-  (replace-regexp-in-string " " "\\\\ " candidate))
-
 
 ;;; Occur
 ;;

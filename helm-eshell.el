@@ -28,9 +28,9 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-lib)
 (require 'helm-help)
 (require 'helm-elisp)
-(require 'helm-regexp)
 
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))

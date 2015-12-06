@@ -368,6 +368,11 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
 
 (defun helm-region-active-p ()
   (and transient-mark-mode mark-active (/= (mark) (point))))
+
+(defun helm-quote-whitespace (candidate)
+  "Quote whitespace, if some, in string CANDIDATE."
+  (replace-regexp-in-string " " "\\\\ " candidate))
+
 
 ;;; Symbols routines
 ;;
