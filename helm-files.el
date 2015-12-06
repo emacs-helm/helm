@@ -54,15 +54,6 @@
 (defvar helm-mm-matching-method)
 
 
-;;; Type attributes
-;;
-;;
-(define-helm-type-attribute 'file
-    (helm-build-type-file)
-  "File name.")
-
-
-
 (defgroup helm-files nil
   "Files applications and libraries for Helm."
   :group 'helm)
