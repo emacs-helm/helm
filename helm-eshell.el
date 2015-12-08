@@ -37,6 +37,7 @@
 (declare-function eshell-bol "esh-mode")
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
+(declare-function helm-quote-whitespace "helm-lib")
 
 
 (defgroup helm-eshell nil
