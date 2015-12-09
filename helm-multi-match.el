@@ -120,7 +120,10 @@ but \"foo\ bar\"=> (\"foobar\")."
   helm-mm-prefix-pattern-real)
 
 (defun helm-mm-prefix-match (str &optional pattern)
-  (setq pattern (or pattern helm-pattern))
+  ;; In filename completion basename and basedir may be
+  ;; quoted, unquote them for string comparison (Issue #1283).
+  (setq pattern (replace-regexp-in-string
+                 "\\\\" "" (or pattern helm-pattern)))
   (let ((len (length pattern)))
     (and (<= len (length str))
          (string= (substring str 0 len) pattern ))))
