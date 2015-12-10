@@ -150,11 +150,6 @@ If set to nil `doc-view-mode' will be used instead of an external command."
   :group 'helm-grep
   :type 'string)
 
-(defcustom helm-do-grep-preselect-candidate nil
-  "When non--nil the file name of current buffer will be selected."
-  :group 'helm-grep
-  :type 'boolean)
-
 (defcustom helm-grep-preferred-ext nil
   "This file extension will be preselected for grep."
   :group 'helm-grep
