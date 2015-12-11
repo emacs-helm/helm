@@ -57,6 +57,11 @@ If nil or zero (disabled), don't truncate candidate, show all."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-show-kill-ring-yank t
+  "*Insert entry from helm-show-kill-ring into the buffer."
+  :type '(boolean)
+  :group 'helm-ring)
+
 
 ;;; Kill ring
 ;;
@@ -116,7 +121,8 @@ replace with STR as yanked string."
   (with-helm-current-buffer
     (setq kill-ring (delete str kill-ring))
     (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
-        (insert-for-yank str)
+        (when helm-show-kill-ring-yank
+          (insert-for-yank str))
       ;; from `yank-pop'
       (let ((inhibit-read-only t)
             (before (< (point) (mark t))))
