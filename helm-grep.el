@@ -600,7 +600,8 @@ If N is positive go forward otherwise go backward."
            (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
                (goto-char it)
              (forward-line 1))
-           (funcall mark-maybe)))))
+           (funcall mark-maybe)))
+    (helm-log-run-hook 'helm-move-selection-after-hook)))
 
 ;;;###autoload
 (defun helm-goto-precedent-file ()
