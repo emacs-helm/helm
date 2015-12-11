@@ -52,8 +52,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
     ("Delete" . (lambda (_candidate)
                   (cl-loop for cand in (helm-marked-candidates)
                            do (setq kill-ring
-                                    (delete cand kill-ring)))))
-    ("Kill new" . kill-new))
+                                    (delete cand kill-ring))))))
   "List of actions for kill ring source."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
