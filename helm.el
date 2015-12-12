@@ -4035,9 +4035,9 @@ Key arg DIRECTION can be one of:
     (if (and arg (> arg 1))
         (cl-loop with pos = (helm-candidate-number-at-point)
                  with cand-num = (helm-get-candidate-number t)
-                 with iter = (if (eq direction 'next)
-                                 (min arg (- cand-num pos))
-                                 arg)
+                 with iter = (min arg (if (eq direction 'next)
+                                          (- cand-num pos)
+                                          (min arg (1- pos))))
                  for count from 1
                  while (<= count iter)
                  do
