@@ -112,19 +112,21 @@ NOTE: This will be slow on large org buffers."
                                    '(lambda (&rest _) (org-get-outline-path))
                                  'org-get-outline-path)))
       (save-excursion
-        (unless parents (goto-char (point-min)))
-        (cl-loop with width = (window-width)
-                 while (funcall search-fn)
-                 if (let ((num-stars (length (match-string-no-properties 1))))
-                      (and (>= num-stars min-depth) (<= num-stars max-depth)))
-                 collect `(,(let ((heading (funcall match-fn 4))
-                                  (file (unless nofname
-                                          (concat (helm-basename filename) ":")))
-                                  (level (length (match-string-no-properties 1))))
-                              (org-format-outline-path
-                               (append (funcall get-outline-path-fn t level heading)
-                                       (list heading)) width file))
-                           . ,(point-marker)))))))
+        (save-restriction
+          (widen)
+          (unless parents (goto-char (point-min)))
+          (cl-loop with width = (window-width)
+                   while (funcall search-fn)
+                   if (let ((num-stars (length (match-string-no-properties 1))))
+                        (and (>= num-stars min-depth) (<= num-stars max-depth)))
+                   collect `(,(let ((heading (funcall match-fn 4))
+                                    (file (unless nofname
+                                            (concat (helm-basename filename) ":")))
+                                    (level (length (match-string-no-properties 1))))
+                                (org-format-outline-path
+                                 (append (funcall get-outline-path-fn t level heading)
+                                         (list heading)) width file))
+                             . ,(point-marker))))))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
