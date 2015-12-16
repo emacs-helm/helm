@@ -2136,8 +2136,7 @@ Return candidates prefixed with basename of `helm-input' first."
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
                         (buffer-substring-no-properties
-                         (point-at-bol) (point-at-eol))))
-        (fname-at-point (with-helm-current-buffer (ffap-guesser))))
+                         (point-at-bol) (point-at-eol)))))
     (cond ((with-helm-current-buffer
              (eq major-mode 'message-mode))
            (append actions
