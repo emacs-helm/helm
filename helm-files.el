@@ -2145,9 +2145,8 @@ Return candidates prefixed with basename of `helm-input' first."
           ((save-match-data
              (and ffap-url-regexp
                   (not (string-match-p ffap-url-regexp str-at-point))
-                  (string-match (concat "\\(" fname-at-point "\\):\\([0-9]+:?\\)")
-                                str-at-point)
-                  (file-equal-p (match-string 1 str-at-point) candidate)))
+                  (string-match ":\\([0-9]+:?\\)" str-at-point)
+                  ))
            (append '(("Find file to line number" . helm-ff-goto-linum))
                    actions))
           ((string-match (image-file-name-regexp) candidate)
@@ -2177,11 +2176,8 @@ e.g \"foo:12\"."
   (let ((linum (with-helm-current-buffer
                  (let ((str (buffer-substring-no-properties
                              (point-at-bol) (point-at-eol))))
-                   (when (string-match
-                          (concat "\\(" (ffap-guesser)
-                                  "\\):\\([0-9]+:?\\)")
-                          str)
-                     (match-string 2 str))))))
+                   (when (string-match ":\\([0-9]+:?\\)" str)
+                     (match-string 1 str))))))
     (find-file candidate)
     (and linum (not (string= linum ""))
          (helm-goto-line (string-to-number linum) t))))
