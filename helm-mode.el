@@ -1050,7 +1050,9 @@ Can be used as value for `completion-in-region-function'."
                   ;; See Issue #407.
                   (afun (plist-get completion-extra-properties :annotation-function))
                   (data (all-completions input collection predicate))
-                  (init-space-suffix (unless helm-completion-in-region-fuzzy-match " "))
+                  (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
+                                                 (string-suffix-p " " input))
+                                       " "))
                   ;; Assume that when `afun' and `predicate' are null
                   ;; we are in filename completion.
                   (file-comp-p (or (helm-mode--in-file-completion-p)
