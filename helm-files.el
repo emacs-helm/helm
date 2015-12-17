@@ -2683,7 +2683,8 @@ Called with a prefix arg open files in background without selecting them."
         (find-file-wildcards nil)
         (make-dir-fn
          (lambda (dir &optional helm-ff)
-             (when (y-or-n-p (format "Create directory `%s'? " dir))
+             (when (or (not confirm-nonexistent-file-or-buffer)
+                     (y-or-n-p (format "Create directory `%s'? " dir)))
                (let ((dirfname (directory-file-name dir)))
                  (if (file-exists-p dirfname)
                      (error
