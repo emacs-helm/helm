@@ -115,7 +115,7 @@ NOTE: This will be slow on large org buffers."
         (save-restriction
           (widen)
           (unless parents (goto-char (point-min)))
-          (cl-loop with width = (with-helm-window (window-width))
+          (cl-loop with width = (window-width)
                    while (funcall search-fn)
                    if (let ((num-stars (length (match-string-no-properties 1))))
                         (and (>= num-stars min-depth) (<= num-stars max-depth)))
