@@ -124,16 +124,16 @@ NOTE: This will be slow on large org buffers."
           (unless parents (goto-char (point-min)))
           (cl-loop with width = (window-width)
                    while (funcall search-fn)
-                   if (let ((num-stars (length (match-string-no-properties 1))))
-                        (and (>= num-stars min-depth) (<= num-stars max-depth)))
-                   collect `(,(let ((heading (funcall match-fn 4))
-                                    (file (unless nofname
-                                            (concat (helm-basename filename) ":")))
-                                    (level (length (match-string-no-properties 1))))
-                                (org-format-outline-path
-                                 (append (funcall get-outline-path-fn t level heading)
-                                         (list heading)) width file))
-                             . ,(point-marker))))))))
+                   for num-stars = (length (match-string-no-properties 1))
+                   for heading = (funcall match-fn 4)
+                   for file = (unless nofname
+                                (concat (helm-basename filename) ":"))
+                   for level = (length (match-string-no-properties 1))
+                   if (and (>= num-stars min-depth) (<= num-stars max-depth))
+                   collect (cons (org-format-outline-path
+                                  (append (funcall get-outline-path-fn t level heading)
+                                          (list heading)) width file)
+                                 (point-marker))))))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
