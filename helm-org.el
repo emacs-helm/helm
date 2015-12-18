@@ -59,7 +59,7 @@ NOTE: This will be slow on large org buffers."
 
 (cl-defun helm-source-org-headings-for-files
     (filenames
-     &optional (min-depth 1) (max-depth 8) (parents nil))
+     &optional (min-depth 1) (max-depth 8) parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
     :candidate-transformer
@@ -95,7 +95,7 @@ NOTE: This will be slow on large org buffers."
       (org-end-of-subtree t t)
       (org-paste-subtree (+ target-level 1)))))
 
-(cl-defun helm-org-get-candidates (filenames min-depth max-depth &optional (parents nil))
+(defun helm-org-get-candidates (filenames min-depth max-depth &optional parents)
   (helm-flatten-list
    (mapcar (lambda (filename)
              (helm-org--get-candidates-in-file
