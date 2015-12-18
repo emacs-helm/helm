@@ -63,8 +63,11 @@ NOTE: This will be slow on large org buffers."
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
     :match (lambda (candidate)
-             (string-match helm-pattern
-                           (get-text-property 0 'helm-real-display candidate)))
+             (string-match
+              helm-pattern
+              (helm-aif (get-text-property 0 'helm-real-display candidate)
+                  it
+                candidate)))
     :candidate-transformer
     ;; Now that the helm-window is available proceed to truncation
     ;; and other transformations.
