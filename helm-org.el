@@ -114,10 +114,7 @@ NOTE: This will be slow on large org buffers."
                                  org-complex-heading-regexp nil t)))
                          (lambda ()
                            (re-search-forward
-                            org-complex-heading-regexp nil t))))
-          (get-outline-path-fn (if parents
-                                   (lambda (&rest _) (org-get-outline-path))
-                                   #'org-get-outline-path)))
+                            org-complex-heading-regexp nil t)))))
       (save-excursion
         (save-restriction
           (widen)
@@ -131,7 +128,8 @@ NOTE: This will be slow on large org buffers."
                    for level = (length (match-string-no-properties 1))
                    if (and (>= num-stars min-depth) (<= num-stars max-depth))
                    collect (cons (org-format-outline-path
-                                  (append (funcall get-outline-path-fn t level heading)
+                                  (append (apply #'org-get-outline-path
+                                                 (and parents (list t level heading)))
                                           (list heading))
                                   width file)
                                  (point-marker))))))))
