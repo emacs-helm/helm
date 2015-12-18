@@ -89,14 +89,14 @@ NOTE: This will be slow on large org buffers."
       (org-paste-subtree (+ target-level 1)))))
 
 (cl-defun helm-org-get-candidates (filenames min-depth max-depth &optional (parents nil))
-  (apply #'append
-         (mapcar (lambda (filename)
-                   (helm-org--get-candidates-in-file
-                    filename min-depth max-depth
-                    helm-org-headings-fontify
-                    (if parents t helm-org-headings--nofilename)
-                    parents))
-                 filenames)))
+  (helm-flatten-list
+   (mapcar (lambda (filename)
+             (helm-org--get-candidates-in-file
+              filename min-depth max-depth
+              helm-org-headings-fontify
+              (if parents t helm-org-headings--nofilename)
+              parents))
+           filenames)))
 
 (defun helm-org--get-candidates-in-file (filename min-depth max-depth
                                          &optional fontify nofname parents)
@@ -132,7 +132,8 @@ NOTE: This will be slow on large org buffers."
                    if (and (>= num-stars min-depth) (<= num-stars max-depth))
                    collect (cons (org-format-outline-path
                                   (append (funcall get-outline-path-fn t level heading)
-                                          (list heading)) width file)
+                                          (list heading))
+                                  width file)
                                  (point-marker))))))))
 
 ;;;###autoload
