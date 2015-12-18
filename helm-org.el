@@ -57,11 +57,18 @@ NOTE: This will be slow on large org buffers."
   (org-show-context)
   (org-show-entry))
 
-(cl-defun helm-source-org-headings-for-files (filenames
-                                              &optional (min-depth 1) (max-depth 8) (parents nil))
+(cl-defun helm-source-org-headings-for-files
+    (filenames
+     &optional (min-depth 1) (max-depth 8) (parents nil))
   (helm-build-sync-source "Org Headings"
-    :candidates (helm-org-get-candidates filenames min-depth max-depth parents)
-    :candidate-transformer (and parents 'reverse)
+    :candidates filenames ; Start with only filenames.
+    :candidate-transformer
+    ;; Now that the helm-window is available proceed to truncation
+    ;; and other transformations.
+    `(lambda (candidates)
+       (let ((cands (helm-org-get-candidates
+                     candidates ,min-depth ,max-depth ,parents)))
+         (if ,parents (reverse cands) cands)))
     :action '(("Go to line" . helm-org-goto-marker)
               ("Refile to this heading" . helm-org-heading-refile)
               ("Insert link to this heading"
@@ -89,44 +96,51 @@ NOTE: This will be slow on large org buffers."
       (org-paste-subtree (+ target-level 1)))))
 
 (cl-defun helm-org-get-candidates (filenames min-depth max-depth &optional (parents nil))
-  (apply #'append
-         (mapcar (lambda (filename)
-                   (helm-get-org-candidates-in-file
-                    filename min-depth max-depth
-                    helm-org-headings-fontify
-                    (if parents t helm-org-headings--nofilename)
-                    parents))
-                 filenames)))
+  (helm-flatten-list
+   (mapcar (lambda (filename)
+             (helm-org--get-candidates-in-file
+              filename min-depth max-depth
+              helm-org-headings-fontify
+              (if parents t helm-org-headings--nofilename)
+              parents))
+           filenames)))
 
-(defun helm-get-org-candidates-in-file (filename min-depth max-depth
-                                                 &optional fontify nofname parents)
+(defun helm-org--get-candidates-in-file (filename min-depth max-depth
+                                         &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
                          ((pred stringp) (find-file-noselect filename)))
     (and fontify (jit-lock-fontify-now))
-    (let ((match-fn (if fontify 'match-string 'match-string-no-properties))
+    (let ((match-fn (if fontify
+                        #'match-string
+                        #'match-string-no-properties))
           (search-fn (if parents
-                         '(lambda () (and (org-up-heading-safe) (re-search-forward org-complex-heading-regexp nil t)))
-                       '(lambda () (re-search-forward org-complex-heading-regexp nil t))))
-          (get-outline-path-fn (if parents
-                                   '(lambda (&rest _) (org-get-outline-path))
-                                 'org-get-outline-path)))
+                         (lambda ()
+                           (and (org-up-heading-safe)
+                                (re-search-forward
+                                 org-complex-heading-regexp nil t)))
+                         (lambda ()
+                           (re-search-forward
+                            org-complex-heading-regexp nil t)))))
       (save-excursion
         (save-restriction
           (widen)
           (unless parents (goto-char (point-min)))
           (cl-loop with width = (window-width)
                    while (funcall search-fn)
-                   if (let ((num-stars (length (match-string-no-properties 1))))
-                        (and (>= num-stars min-depth) (<= num-stars max-depth)))
-                   collect `(,(let ((heading (funcall match-fn 4))
-                                    (file (unless nofname
-                                            (concat (helm-basename filename) ":")))
-                                    (level (length (match-string-no-properties 1))))
-                                (org-format-outline-path
-                                 (append (funcall get-outline-path-fn t level heading)
-                                         (list heading)) width file))
-                             . ,(point-marker))))))))
+                   for num-stars = (length (match-string-no-properties 1))
+                   for heading = (funcall match-fn 4)
+                   for file = (unless nofname
+                                (concat (helm-basename filename) ":"))
+                   for level = (length (match-string-no-properties 1))
+                   if (and (>= num-stars min-depth) (<= num-stars max-depth))
+                   collect (cons (org-format-outline-path
+                                  (append (apply #'org-get-outline-path
+                                                 (and parents
+                                                      (list t level heading)))
+                                          (list heading))
+                                  width file)
+                                 (point-marker))))))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
