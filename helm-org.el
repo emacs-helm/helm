@@ -114,14 +114,11 @@ NOTE: This will be slow on large org buffers."
     (let ((match-fn (if fontify
                         #'match-string
                         #'match-string-no-properties))
-          (search-fn (if parents
-                         (lambda ()
-                           (and (org-up-heading-safe)
-                                (re-search-forward
-                                 org-complex-heading-regexp nil t)))
-                         (lambda ()
-                           (re-search-forward
-                            org-complex-heading-regexp nil t)))))
+          (search-fn (lambda ()
+                       (when (or (null parents)
+                                 (org-up-heading-safe))
+                         (re-search-forward
+                          org-complex-heading-regexp nil t)))))
       (save-excursion
         (save-restriction
           (widen)
