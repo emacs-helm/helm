@@ -62,6 +62,9 @@ NOTE: This will be slow on large org buffers."
      &optional (min-depth 1) (max-depth 8) parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
+    :match (lambda (candidate)
+             (string-match helm-pattern
+                           (get-text-property 0 'helm-real-display candidate)))
     :candidate-transformer
     ;; Now that the helm-window is available proceed to truncation
     ;; and other transformations.
@@ -131,12 +134,13 @@ NOTE: This will be slow on large org buffers."
                                 (concat (helm-basename filename) ":"))
                    for level = (length (match-string-no-properties 1))
                    if (and (>= num-stars min-depth) (<= num-stars max-depth))
-                   collect (cons (org-format-outline-path
-                                  (append (apply #'org-get-outline-path
-                                                 (and parents
-                                                      (list t level heading)))
-                                          (list heading))
-                                  width file)
+                   collect (cons (propertize
+                                  (org-format-outline-path
+                                   (append (apply #'org-get-outline-path
+                                                  (and parents
+                                                       (list t level heading)))
+                                           (list heading))
+                                   width file) 'helm-real-display heading)
                                  (point-marker))))))))
 
 ;;;###autoload
