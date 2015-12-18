@@ -57,11 +57,18 @@ NOTE: This will be slow on large org buffers."
   (org-show-context)
   (org-show-entry))
 
-(cl-defun helm-source-org-headings-for-files (filenames
-                                              &optional (min-depth 1) (max-depth 8) (parents nil))
+(cl-defun helm-source-org-headings-for-files
+    (filenames
+     &optional (min-depth 1) (max-depth 8) (parents nil))
   (helm-build-sync-source "Org Headings"
-    :candidates (helm-org-get-candidates filenames min-depth max-depth parents)
-    :candidate-transformer (and parents 'reverse)
+    :candidates filenames ; Start with only filenames.
+    :candidate-transformer
+    ;; Now that the helm-window is available proceed to truncation
+    ;; and other transformations.
+    `(lambda (candidates)
+       (let ((cands (helm-org-get-candidates
+                     candidates ,min-depth ,max-depth ,parents)))
+         (if ,parents (reverse cands) cands)))
     :action '(("Go to line" . helm-org-goto-marker)
               ("Refile to this heading" . helm-org-heading-refile)
               ("Insert link to this heading"
@@ -129,7 +136,8 @@ NOTE: This will be slow on large org buffers."
                    if (and (>= num-stars min-depth) (<= num-stars max-depth))
                    collect (cons (org-format-outline-path
                                   (append (apply #'org-get-outline-path
-                                                 (and parents (list t level heading)))
+                                                 (and parents
+                                                      (list t level heading)))
                                           (list heading))
                                   width file)
                                  (point-marker))))))))
