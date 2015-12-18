@@ -91,26 +91,33 @@ NOTE: This will be slow on large org buffers."
 (cl-defun helm-org-get-candidates (filenames min-depth max-depth &optional (parents nil))
   (apply #'append
          (mapcar (lambda (filename)
-                   (helm-get-org-candidates-in-file
+                   (helm-org--get-candidates-in-file
                     filename min-depth max-depth
                     helm-org-headings-fontify
                     (if parents t helm-org-headings--nofilename)
                     parents))
                  filenames)))
 
-(defun helm-get-org-candidates-in-file (filename min-depth max-depth
-                                                 &optional fontify nofname parents)
+(defun helm-org--get-candidates-in-file (filename min-depth max-depth
+                                         &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
                          ((pred stringp) (find-file-noselect filename)))
     (and fontify (jit-lock-fontify-now))
-    (let ((match-fn (if fontify 'match-string 'match-string-no-properties))
+    (let ((match-fn (if fontify
+                        #'match-string
+                        #'match-string-no-properties))
           (search-fn (if parents
-                         '(lambda () (and (org-up-heading-safe) (re-search-forward org-complex-heading-regexp nil t)))
-                       '(lambda () (re-search-forward org-complex-heading-regexp nil t))))
+                         (lambda ()
+                           (and (org-up-heading-safe)
+                                (re-search-forward
+                                 org-complex-heading-regexp nil t)))
+                         (lambda ()
+                           (re-search-forward
+                            org-complex-heading-regexp nil t))))
           (get-outline-path-fn (if parents
-                                   '(lambda (&rest _) (org-get-outline-path))
-                                 'org-get-outline-path)))
+                                   (lambda (&rest _) (org-get-outline-path))
+                                   #'org-get-outline-path)))
       (save-excursion
         (save-restriction
           (widen)
