@@ -74,7 +74,7 @@ NOTE: This will be slow on large org buffers."
     `(lambda (candidates)
        (let ((cands (helm-org-get-candidates
                      candidates ,min-depth ,max-depth ,parents)))
-         (if ,parents (reverse cands) cands)))
+         (if ,parents (nreverse cands) cands)))
     :action '(("Go to line" . helm-org-goto-marker)
               ("Refile to this heading" . helm-org-heading-refile)
               ("Insert link to this heading"
@@ -109,7 +109,8 @@ NOTE: This will be slow on large org buffers."
               helm-org-headings-fontify
               (if parents t helm-org-headings--nofilename)
               parents))
-           filenames)))
+           filenames)
+   t))
 
 (defun helm-org--get-candidates-in-file (filename min-depth max-depth
                                          &optional fontify nofname parents)
