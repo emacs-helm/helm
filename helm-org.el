@@ -107,7 +107,7 @@ NOTE: This will be slow on large org buffers."
              (helm-org--get-candidates-in-file
               filename min-depth max-depth
               helm-org-headings-fontify
-              (if parents t helm-org-headings--nofilename)
+              (or parents helm-org-headings--nofilename)
               parents))
            filenames)
    t))
