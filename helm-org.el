@@ -44,7 +44,7 @@ NOTE: This will be slow on large org buffers."
 (defun helm-source-org-capture-templates ()
   (helm-build-sync-source "Org Capture Templates:"
     :candidates (cl-loop for template in org-capture-templates
-                         collect `(,(nth 1 template) . ,(nth 0 template)))
+                         collect (cons (nth 1 template) (nth 0 template)))
     :action '(("Do capture" . (lambda (template-shortcut)
                                 (org-capture nil template-shortcut))))))
 
