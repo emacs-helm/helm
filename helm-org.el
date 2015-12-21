@@ -132,12 +132,11 @@ NOTE: This will be slow on large org buffers."
           (unless parents (goto-char (point-min)))
           (cl-loop with width = (window-width)
                    while (funcall search-fn)
-                   for num-stars = (length (match-string-no-properties 1))
+                   for level = (length (match-string-no-properties 1))
                    for heading = (funcall match-fn 4)
                    for file = (unless nofname
                                 (concat (helm-basename filename) ":"))
-                   for level = (length (match-string-no-properties 1))
-                   if (and (>= num-stars min-depth) (<= num-stars max-depth))
+                   if (and (>= level min-depth) (<= level max-depth))
                    collect (cons (propertize
                                   (org-format-outline-path
                                    (append (apply #'org-get-outline-path
