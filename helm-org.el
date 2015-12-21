@@ -141,8 +141,8 @@ NOTE: This will be slow on large org buffers."
                    collect (cons (propertize
                                   (org-format-outline-path
                                    (append (apply #'org-get-outline-path
-                                                  (and parents
-                                                       (list t level heading)))
+                                                  (unless parents
+                                                    (list t level heading)))
                                            (list heading))
                                    width file) 'helm-real-display heading)
                                  (point-marker))))))))
