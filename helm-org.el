@@ -71,10 +71,10 @@ NOTE: This will be slow on large org buffers."
     :candidate-transformer
     ;; Now that the helm-window is available proceed to truncation
     ;; and other transformations.
-    `(lambda (candidates)
-       (let ((cands (helm-org-get-candidates
-                     candidates ,min-depth ,max-depth ,parents)))
-         (if ,parents (nreverse cands) cands)))
+    (lambda (candidates)
+      (let ((cands (helm-org-get-candidates
+                    candidates min-depth max-depth parents)))
+         (if parents (nreverse cands) cands)))
     :action '(("Go to line" . helm-org-goto-marker)
               ("Refile to this heading" . helm-org-heading-refile)
               ("Insert link to this heading"
