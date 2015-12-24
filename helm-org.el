@@ -196,7 +196,6 @@ current heading."
         (helm-org-headings-max-depth  50))
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)) t)
-          :preselect (org-format-outline-path (org-get-outline-path))
           :candidate-number-limit 99999
           :buffer "*helm org parent headings*")))
 
