@@ -80,27 +80,6 @@ NOTE: This will be slow on large org buffers."
               ("Insert link to this heading"
                . helm-org-insert-link-to-heading-at-marker))))
 
-(defun helm-org-insert-link-to-heading-at-marker (marker)
-  (with-current-buffer (marker-buffer marker)
-    (let ((heading-name (save-excursion (goto-char (marker-position marker))
-                                        (nth 4 (org-heading-components))))
-          (file-name (buffer-file-name)))
-      (with-helm-current-buffer
-        (org-insert-link
-         file-name (concat "file:" file-name "::*" heading-name))))))
-
-(defun helm-org-heading-refile (marker)
-  (save-selected-window
-    (when (eq major-mode 'org-agenda-mode)
-      (org-agenda-switch-to))
-    (org-cut-subtree)
-    (let ((target-level (with-current-buffer (marker-buffer marker)
-                          (goto-char (marker-position marker))
-                          (org-current-level))))
-      (helm-org-goto-marker marker)
-      (org-end-of-subtree t t)
-      (org-paste-subtree (+ target-level 1)))))
-
 (defun helm-org-get-candidates (filenames min-depth max-depth &optional parents)
   (helm-flatten-list
    (mapcar (lambda (filename)
@@ -145,6 +124,27 @@ NOTE: This will be slow on large org buffers."
                                            (list heading))
                                    width file) 'helm-real-display heading)
                                  (point-marker))))))))
+
+(defun helm-org-insert-link-to-heading-at-marker (marker)
+  (with-current-buffer (marker-buffer marker)
+    (let ((heading-name (save-excursion (goto-char (marker-position marker))
+                                        (nth 4 (org-heading-components))))
+          (file-name (buffer-file-name)))
+      (with-helm-current-buffer
+        (org-insert-link
+         file-name (concat "file:" file-name "::*" heading-name))))))
+
+(defun helm-org-heading-refile (marker)
+  (save-selected-window
+    (when (eq major-mode 'org-agenda-mode)
+      (org-agenda-switch-to))
+    (org-cut-subtree)
+    (let ((target-level (with-current-buffer (marker-buffer marker)
+                          (goto-char (marker-position marker))
+                          (org-current-level))))
+      (helm-org-goto-marker marker)
+      (org-end-of-subtree t t)
+      (org-paste-subtree (+ target-level 1)))))
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
