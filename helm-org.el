@@ -44,6 +44,16 @@ NOTE: This will be slow on large org buffers."
   :group 'helm-org
   :type 'boolean)
 
+(defcustom helm-org-headings-min-depth 1
+  "Minimum depth of org headings to start with."
+  :group 'helm-org
+  :type 'integer)
+
+(defcustom helm-org-headings-max-depth 8
+  "Go down to this maximum depth of org headings."
+  :group 'helm-org
+  :type 'integer)
+
 ;;; Org capture templates
 ;;
 ;;
@@ -64,9 +74,7 @@ NOTE: This will be slow on large org buffers."
   (org-show-context)
   (org-show-entry))
 
-(cl-defun helm-source-org-headings-for-files
-    (filenames
-     &optional (min-depth 1) (max-depth 8) parents)
+(cl-defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
     :match (lambda (candidate)
@@ -79,27 +87,25 @@ NOTE: This will be slow on large org buffers."
     ;; Now that the helm-window is available proceed to truncation
     ;; and other transformations.
     (lambda (candidates)
-      (let ((cands (helm-org-get-candidates
-                    candidates min-depth max-depth parents)))
+      (let ((cands (helm-org-get-candidates candidates parents)))
          (if parents (nreverse cands) cands)))
     :action '(("Go to line" . helm-org-goto-marker)
               ("Refile to this heading" . helm-org-heading-refile)
               ("Insert link to this heading"
                . helm-org-insert-link-to-heading-at-marker))))
 
-(defun helm-org-get-candidates (filenames min-depth max-depth &optional parents)
+(defun helm-org-get-candidates (filenames &optional parents)
   (helm-flatten-list
    (mapcar (lambda (filename)
              (helm-org--get-candidates-in-file
-              filename min-depth max-depth
+              filename
               helm-org-headings-fontify
               (or parents (null helm-org-show-filename))
               parents))
            filenames)
    t))
 
-(defun helm-org--get-candidates-in-file (filename min-depth max-depth
-                                         &optional fontify nofname parents)
+(defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
                          ((pred stringp) (find-file-noselect filename)))
@@ -125,7 +131,8 @@ NOTE: This will be slow on large org buffers."
                    for heading = (funcall match-fn 4)
                    for file = (unless nofname
                                 (concat (helm-basename filename) ":"))
-                   if (and (>= level min-depth) (<= level max-depth))
+                   if (and (>= level helm-org-headings-min-depth)
+                           (<= level helm-org-headings-max-depth))
                    collect (cons (propertize
                                   (if helm-org-format-outline-path
                                       (org-format-outline-path
@@ -184,12 +191,14 @@ NOTE: This will be slow on large org buffers."
   "Preconfigured helm for org headings that are parents of the
 current heading."
   (interactive)
-  (helm :sources (helm-source-org-headings-for-files
-                  (list (current-buffer))
-                  1 50 t)  ; Use a large max-depth to ensure all parents are displayed
-        :preselect (org-format-outline-path (org-get-outline-path))
-        :candidate-number-limit 99999
-        :buffer "*helm org parent headings*"))
+  ;; Use a large max-depth to ensure all parents are displayed.
+  (let ((helm-org-headings-min-depth 1)
+        (helm-org-headings-max-depth  50))
+    (helm :sources (helm-source-org-headings-for-files
+                    (list (current-buffer)) t)
+          :preselect (org-format-outline-path (org-get-outline-path))
+          :candidate-number-limit 99999
+          :buffer "*helm org parent headings*")))
 
 ;;;###autoload
 (defun helm-org-capture-templates ()
