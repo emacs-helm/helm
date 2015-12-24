@@ -74,7 +74,7 @@ NOTE: This will be slow on large org buffers."
   (org-show-context)
   (org-show-entry))
 
-(cl-defun helm-source-org-headings-for-files (filenames &optional parents)
+(defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
     :match (lambda (candidate)
