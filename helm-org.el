@@ -34,8 +34,15 @@ NOTE: This will be slow on large org buffers."
   :group 'helm-org
   :type 'boolean)
 
-;; Internal
-(defvar helm-org-headings--nofilename nil)
+(defcustom helm-org-format-outline-path nil
+  "Show all org level as path."
+  :group 'helm-org
+  :type 'boolean)
+
+(defcustom helm-org-show-filename nil
+  "Show org filename when non--nil."
+  :group 'helm-org
+  :type 'boolean)
 
 ;;; Org capture templates
 ;;
@@ -86,7 +93,7 @@ NOTE: This will be slow on large org buffers."
              (helm-org--get-candidates-in-file
               filename min-depth max-depth
               helm-org-headings-fontify
-              (or parents helm-org-headings--nofilename)
+              (or parents (null helm-org-show-filename))
               parents))
            filenames)
    t))
@@ -109,20 +116,28 @@ NOTE: This will be slow on large org buffers."
         (save-restriction
           (widen)
           (unless parents (goto-char (point-min)))
-          (cl-loop with width = (window-width)
+          (cl-loop with width = (window-width (helm-window))
                    while (funcall search-fn)
+                   for all = (funcall match-fn  0)
+                   for truncated-all = (if (and all (> (length all) width))
+                                           (substring all 0 width) all)
                    for level = (length (match-string-no-properties 1))
                    for heading = (funcall match-fn 4)
                    for file = (unless nofname
                                 (concat (helm-basename filename) ":"))
                    if (and (>= level min-depth) (<= level max-depth))
                    collect (cons (propertize
-                                  (org-format-outline-path
-                                   (append (apply #'org-get-outline-path
-                                                  (unless parents
-                                                    (list t level heading)))
-                                           (list heading))
-                                   width file) 'helm-real-display heading)
+                                  (if helm-org-format-outline-path
+                                      (org-format-outline-path
+                                       (append (apply #'org-get-outline-path
+                                                      (unless parents
+                                                        (list t level heading)))
+                                               (list heading))
+                                       width file)
+                                      (if file
+                                          (concat file truncated-all)
+                                          truncated-all))
+                                  'helm-real-display heading)
                                  (point-marker))))))))
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
@@ -158,7 +173,7 @@ NOTE: This will be slow on large org buffers."
 (defun helm-org-in-buffer-headings ()
   "Preconfigured helm for org buffer headings."
   (interactive)
-  (let ((helm-org-headings--nofilename t))
+  (let ((helm-org-show-filename nil))
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)))
           :candidate-number-limit 99999
