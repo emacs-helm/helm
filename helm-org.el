@@ -40,7 +40,8 @@ NOTE: This will be slow on large org buffers."
   :type 'boolean)
 
 (defcustom helm-org-show-filename nil
-  "Show org filename when non--nil."
+  "Show org filenames in `helm-org-agenda-files-headings' when non--nil.
+Note this have no effect in `helm-org-in-buffer-headings'."
   :group 'helm-org
   :type 'boolean)
 
