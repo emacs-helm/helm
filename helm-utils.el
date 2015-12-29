@@ -456,20 +456,20 @@ If STRING is non--nil return instead a space separated string."
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
-         (start-match (if (or (zerop helm-highlight-number-lines-around-point)
-                              (null helm-highlight-number-lines-around-point))
+         (start-match (if (or (null helm-highlight-number-lines-around-point)
+                              (zerop helm-highlight-number-lines-around-point))
                           start
-                          (save-excursion
-                            (forward-line
-                             (- helm-highlight-number-lines-around-point))
-                            (point-at-bol))))
-         (end-match   (if (or (zerop helm-highlight-number-lines-around-point)
-                              (null helm-highlight-number-lines-around-point))
+                        (save-excursion
+                          (forward-line
+                           (- helm-highlight-number-lines-around-point))
+                          (point-at-bol))))
+         (end-match   (if (or (null helm-highlight-number-lines-around-point)
+                              (zerop helm-highlight-number-lines-around-point))
                           end
-                          (save-excursion
-                            (forward-line
-                             helm-highlight-number-lines-around-point)
-                            (point-at-eol))))
+                        (save-excursion
+                          (forward-line
+                           helm-highlight-number-lines-around-point)
+                          (point-at-eol))))
          (args (list start end buf)))
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
@@ -485,16 +485,16 @@ If STRING is non--nil return instead a space separated string."
                     (while (condition-case _err
                                (if helm-migemo-mode
                                    (helm-mm-migemo-forward r end-match t)
-                                   (re-search-forward r end-match t))
+                                 (re-search-forward r end-match t))
                              (invalid-regexp nil))
                       (let ((s (match-beginning 0))
                             (e (match-end 0)))
                         (if (= s e)
                             (throw 'empty-line nil)
-                            (push (setq ov (make-overlay s e))
-                                  helm--match-item-overlays)
-                            (overlay-put ov 'face 'helm-match-item)
-                            (overlay-put ov 'priority 1)))))))
+                          (push (setq ov (make-overlay s e))
+                                helm--match-item-overlays)
+                          (overlay-put ov 'face 'helm-match-item)
+                          (overlay-put ov 'priority 1)))))))
     (recenter)
     (when pulse
       (sit-for 0.3)
