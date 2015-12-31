@@ -4697,7 +4697,7 @@ this function is always called."
                 ;; Fuzzy regexp have already been
                 ;; computed with substring 1.
                 (not (string-match fuzzy-regexp part))
-                (not (funcall matchfn (substring 1 pattern) part)))
+                (not (funcall matchfn (substring pattern 1) part)))
             (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
