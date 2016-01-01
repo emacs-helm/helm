@@ -193,7 +193,7 @@ Only buffer names are fuzzy matched when this is enabled,
   (let ((result (cl-loop for b in helm-buffers-list-cache
                          maximize (length b) into len-buf
                          maximize (length (with-current-buffer b
-                                            (symbol-name major-mode)))
+                                            (format-mode-line mode-name)))
                          into len-mode
                          finally return (cons len-buf len-mode))))
     (unless (default-value 'helm-buffer-max-length)
