@@ -73,7 +73,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (switch-to-buffer (marker-buffer marker))
   (goto-char (marker-position marker))
   (org-show-context)
-  (org-show-entry))
+  (re-search-backward "^\*+ " nil t))
 
 (defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
