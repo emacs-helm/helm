@@ -1406,7 +1406,7 @@ or hitting C-j on \"..\"."
   (helm-aif (and (helm-file-completion-source-p)
                  (not (helm-empty-source-p))
                  (not (string-match
-                       "\\`[Dd]ired"
+                       "\\`[Dd]ired-"
                        (assoc-default 'name (helm-get-current-source))))
                  helm-ff--move-to-first-real-candidate
                  (helm-get-selection))
