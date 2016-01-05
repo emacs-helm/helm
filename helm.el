@@ -3058,11 +3058,18 @@ It is meant to use with `filter-one-by-one' slot."
                                (assoc helm-pattern
                                       helm-mm--previous-migemo-info))
                     (cdr it)
-                  helm-pattern)))
+                  helm-pattern))
+         (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                 (funcall it display))))
     (with-temp-buffer
       (insert (propertize display 'read-only nil)) ; Fix (#1176)
       (goto-char (point-min))
-      (if (re-search-forward regex nil t)
+      (when mp
+        ;; FIXME the first part of display may contain an occurence of mp.
+        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt" 
+        (search-forward mp nil t)
+        (goto-char (match-beginning 0)))
+      (if (re-search-forward regex (and mp (+ (point) (length mp))) t)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match))
           (cl-loop with multi-match
