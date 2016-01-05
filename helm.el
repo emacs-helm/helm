@@ -2307,9 +2307,10 @@ It is intended to use this only in `helm-initial-setup'."
 (defun helm-initial-setup (any-default)
   "Initialize helm settings and set up the helm buffer."
   (helm-log-run-hook 'helm-before-initialize-hook)
-  (cl-loop for s in (helm-get-sources)
-           for hook = (assoc-default 'before-init-hook s)
-           when hook do (helm-log-run-hook hook))
+  (cl-loop with h = (cl-gensym "h-before-init-hook")
+           for s in (helm-get-sources)
+           when (set h (assoc-default 'before-init-hook s))
+           do (helm-log-run-hook h))
   ;; For initialization of helm locals vars that need
   ;; a value from current buffer, it is here.
   (helm-set-local-variable 'current-input-method current-input-method)
@@ -2350,9 +2351,10 @@ It is intended to use this only in `helm-initial-setup'."
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
   (helm-log-run-hook 'helm-after-initialize-hook)
-  (cl-loop for s in (helm-get-sources)
-           for hook = (assoc-default 'after-init-hook s)
-           when hook do (helm-log-run-hook hook)))
+  (cl-loop with h = (cl-gensym "h-after-init-hook")
+           for s in (helm-get-sources)
+           when (set h (assoc-default 'after-init-hook s))
+           do (helm-log-run-hook h)))
 
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
