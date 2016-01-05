@@ -113,7 +113,7 @@ See <https://www.gnu.org/software/idutils/>."
                      :db-dir db)
           :buffer "*helm gid*"
           :keymap helm-grep-map
-          :truncate-lines t)))
+          :truncate-lines helm-grep-truncate-lines)))
 
 (provide 'helm-id-utils)
 

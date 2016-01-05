@@ -1267,6 +1267,7 @@ You can use safely \"--color\" (default)."
                    "Find file other window" 'helm-grep-other-window)))
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
+        :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
 ;;; Git grep
