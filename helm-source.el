@@ -520,7 +520,11 @@
     :custom symbol
     :documentation
     "  A local hook that run at beginning of initilization of this source.
-  i.e Before the creation of `helm-buffer'.")
+  i.e Before the creation of `helm-buffer'.
+
+  Should be a variable (defined with defvar).
+  Can be also an anonymous function or a list of functions
+  directly added to slot, this is not recommended though.")
 
    (after-init-hook
     :initarg :after-init-hook
@@ -528,7 +532,11 @@
     :custom symbol
     :documentation
     "  A local hook that run at end of initilization of this source.
-  i.e After the creation of `helm-buffer'."))
+  i.e After the creation of `helm-buffer'.
+
+  Should be a variable.
+  Can be also an anonymous function or a list of functions
+  directly added to slot, this is not recommended though."))
 
   "Main interface to define helm sources."
   :abstract t)

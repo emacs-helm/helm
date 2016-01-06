@@ -2304,13 +2304,26 @@ It is intended to use this only in `helm-initial-setup'."
     (window-buffer (with-selected-window (minibuffer-window)
                      (minibuffer-selected-window)))))
 
+(cl-defun helm--run-init-hooks (hook)
+  "Run after and before init hooks local to source.
+See :after-init-hook and :before-init-hook in `helm-source'."
+  (cl-loop with sname = (cl-ecase hook
+                          (before-init-hook "h-before-init-hook")
+                          (after-init-hook "h-after-init-hook"))
+           with h = (cl-gensym sname)
+           for s in (helm-get-sources)
+           for hv = (assoc-default hook s)
+           if (and hv (not (symbolp hv)))
+           do (set h hv)
+           and do (helm-log-run-hook h)
+           else do (helm-log-run-hook hv)))
 
 (defun helm-initial-setup (any-default)
   "Initialize helm settings and set up the helm buffer."
+  ;; Run global hook.
   (helm-log-run-hook 'helm-before-initialize-hook)
-  (cl-loop for s in (helm-get-sources)
-           for hook = (assoc-default 'before-init-hook s)
-           when hook do (helm-log-run-hook hook))
+  ;; Run local source hook.
+  (helm--run-init-hooks 'before-init-hook)
   ;; For initialization of helm locals vars that need
   ;; a value from current buffer, it is here.
   (helm-set-local-variable 'current-input-method current-input-method)
@@ -2350,10 +2363,10 @@ It is intended to use this only in `helm-initial-setup'."
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
+  ;; Run global hook.
   (helm-log-run-hook 'helm-after-initialize-hook)
-  (cl-loop for s in (helm-get-sources)
-           for hook = (assoc-default 'after-init-hook s)
-           when hook do (helm-log-run-hook hook)))
+  ;; Run local source hook.
+  (helm--run-init-hooks 'after-init-hook))
 
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
