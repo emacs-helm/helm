@@ -410,6 +410,10 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   "VAR is symbol or string."
   (find-variable (helm-symbolify var)))
 
+(defun helm-find-face-definition (face)
+  "FACE is symbol or string."
+  (find-face-definition (helm-symbolify face)))
+
 (defun helm-kill-new (candidate &optional replace)
   "CANDIDATE is symbol or string.
 See `kill-new' for argument REPLACE."
@@ -640,11 +644,11 @@ as emacs-25 version of `ansi-color-apply' is partially broken."
         (put-text-property
          start end 'font-lock-face (ansi-color--find-face codes) string))
       (setq colorized-substring (substring string start end)
-	    start (match-end 0))
+            start (match-end 0))
       ;; Eliminate unrecognized ANSI sequences.
       (while (string-match helm--ansi-color-drop-regexp colorized-substring)
-	(setq colorized-substring
-	      (replace-match "" nil nil colorized-substring)))
+        (setq colorized-substring
+              (replace-match "" nil nil colorized-substring)))
       (push colorized-substring result)
       ;; Create new face, by applying escape sequence parameters.
       (setq codes (ansi-color-apply-sequence escape-sequence codes)))
@@ -656,7 +660,7 @@ as emacs-25 version of `ansi-color-apply' is partially broken."
     ;; Save the remainder of the string to the result.
     (if (string-match "\033" string start)
         (push (substring string start (match-beginning 0)) result)
-	(push (substring string start) result))
+        (push (substring string start) result))
     (apply 'concat (nreverse result))))
 
 (provide 'helm-lib)
