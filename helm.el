@@ -2304,7 +2304,7 @@ It is intended to use this only in `helm-initial-setup'."
     (window-buffer (with-selected-window (minibuffer-window)
                      (minibuffer-selected-window)))))
 
-(cl-defun helm--run-init-hooks (hook)
+(defun helm--run-init-hooks (hook)
   "Run after and before init hooks local to source.
 See :after-init-hook and :before-init-hook in `helm-source'."
   (cl-loop with sname = (cl-ecase hook
