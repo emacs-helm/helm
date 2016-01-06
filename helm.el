@@ -3073,6 +3073,7 @@ It is meant to use with `filter-one-by-one' slot."
                                       helm-mm--previous-migemo-info))
                     (cdr it)
                   helm-pattern))
+         ;; FIXME This is called at each turn, cache it to optimize.
          (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
                  (funcall it display))))
     (with-temp-buffer
