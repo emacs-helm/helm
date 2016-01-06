@@ -5269,8 +5269,9 @@ visible or invisible in all sources of current helm session"
     ;; return nil when coerced is "/tmp/*.el".
     (unless (or wilds (null wildcard)
                 (string-match-p helm--url-regexp coerced)
+                (file-exists-p coerced)
                 (and (stringp coerced)
-                      (null (string-match-p "[[*?]" coerced))))
+                     (null (string-match-p "[[*?]" coerced))))
       (setq coerced nil))
     (or wilds (and coerced (list coerced)))))
 
