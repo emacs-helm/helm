@@ -1311,25 +1311,29 @@ If LEVEL is positive reduce from end else from beginning.
 If UNIX-CLOSE is non--nil close filename with /.
 If EXPAND is non--nil expand-file-name."
   (let* ((exp-fname  (expand-file-name fname))
-         (fname-list (split-string (if (or (string= fname "~/") expand)
-                                       exp-fname fname) "/" t))
+         (fname-list (split-string
+		      (if (or (string= fname "~/") expand)
+			  exp-fname fname)
+		      "/" t))
          (len        (length fname-list))
          (pop-list   (if (< level 0)
                          (cl-subseq fname-list (* level -1))
                        (cl-subseq fname-list 0 (- len level))))
          (result     (mapconcat 'identity pop-list "/"))
+	 (abbrev-fname  (string-match "^~" result))
          (empty      (string= result "")))
     (when unix-close (setq result (concat result "/")))
-    (if (string-match "^~" result)
-        (if (string= result "~/") "~/" result)
-      (if (< level 0)
-          (if empty "../" (concat "../" result))
-        (cond ((eq system-type 'windows-nt)
-               (if empty (expand-file-name "/") ; Expand to "/" or "c:/".
-                 result))
-              (empty "/")
-              (t
-               (concat "/" result)))))))
+    (cond ((and abbrev-fname (string= result "~/")) "~/")
+	  (abbrev-fname result)
+	  ((and (< level 0) empty) "../")
+	  ((< level 0) (concat "../" result))
+	  ((and (eq system-type 'windows-nt)
+                (not (file-remote-p fname)))
+           ;; Result is starting by a volume name i.e "c:/".
+           result)
+          ;; Expand to "/" or "c:/".
+	  (empty (expand-file-name "/"))
+	  (t (concat "/" result)))))
 
 (defvar helm-find-files--level-tree nil)
 (defvar helm-find-files--level-tree-iterator nil)
