@@ -25,6 +25,7 @@
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 (defvar Info-history)
+(defvar Info-directory-list)
 
 
 (defgroup helm-info nil
@@ -110,17 +111,18 @@ Where NAME is one of `helm-default-info-index-list'."
   (set var value)
   (helm-define-info-index-sources value t))
 
+(defun helm-get-info-top-node-items ()
+  (require 'info)
+  (let ((files (cl-loop for d in (or Info-directory-list
+                                     Info-default-directory-list)
+                        append (directory-files d nil "\\.info"))))
+    (helm-fast-remove-dups
+     (cl-loop for f in files collect
+              (helm-file-name-sans-extension f))
+     :test 'equal)))
+
 (defcustom helm-default-info-index-list
-  '("elisp" "cl" "org" "gnus" "tramp" "ratpoison"
-    "zsh" "bash" "coreutils" "fileutils"
-    "find" "sh-utils" "textutils" "libc"
-    "make" "automake" "autoconf" "eintr"
-    "emacs" "elib" "eieio" "gauche-refe" "guile"
-    "guile-tut" "goops" "screen" "latex" "gawk"
-    "sed" "m4" "wget" "binutils" "as" "bfd" "gprof"
-    "ld" "diff" "flex" "grep" "gzip" "libtool"
-    "texinfo" "info" "gdb" "stabs" "cvsbook" "cvs"
-    "bison" "id-utils" "global")
+  (helm-get-info-top-node-items)
   "Info Manual entries to use for building helm info index commands."
   :group 'helm-info
   :type  '(repeat (choice string))
