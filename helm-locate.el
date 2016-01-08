@@ -48,12 +48,12 @@ Note that this happen only when locate is launched with a prefix arg."
 
 (defcustom helm-locate-command nil
   "A list of arguments for locate program.
-Normally you should not have to modify this yourself.
+Normally the default value should work on any system.
 
 If nil it will be calculated when `helm-locate' startup
 with these default values for different systems:
 
-Gnu/linux: \"locate %s -e -r %s\"
+Gnu/linux: \"locate %s -e --regex %s\"
 berkeley-unix: \"locate %s %s\"
 windows-nt: \"es %s %s\"
 Others: \"locate %s %s\"
@@ -216,7 +216,7 @@ See `helm-locate-with-db' and `helm-locate'."
   (unless helm-locate-command
     (setq helm-locate-command
           (cl-case system-type
-            (gnu/linux "locate %s -e -r %s")
+            (gnu/linux "locate %s -e --regex %s")
             (berkeley-unix "locate %s %s")
             (windows-nt "es %s %s")
             (t "locate %s %s")))))
