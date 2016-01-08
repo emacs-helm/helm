@@ -421,9 +421,17 @@ See `kill-new' for argument REPLACE."
 
 ;;; Files routines
 ;;
+(defun helm-file-name-sans-extension (filename)
+  "Same as `file-name-sans-extension' but remove all extensions."
+  (helm-aif (file-name-sans-extension filename)
+      (if (string-match "\\." it)
+          (helm-file-name-sans-extension it)
+          it)))
+
 (defun helm-basename (fname &optional ext)
   "Print FNAME  with any  leading directory  components removed.
-If specified, also remove filename extension EXT."
+If specified, also remove filename extension EXT.
+Arg EXT can be specified as a string with or without dot."
   (let ((non-essential t))
     (if (and ext (or (string= (file-name-extension fname) ext)
                      (string= (file-name-extension fname t) ext))
