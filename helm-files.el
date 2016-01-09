@@ -2148,6 +2148,7 @@ Return candidates prefixed with basename of `helm-input' first."
           ((save-match-data
              (and ffap-url-regexp
                   (not (string-match-p ffap-url-regexp str-at-point))
+                  (not (with-helm-current-buffer (eq major-mode 'dired-mode)))
                   (string-match ":\\([0-9]+:?\\)" str-at-point)
                   ))
            (append '(("Find file to line number" . helm-ff-goto-linum))
