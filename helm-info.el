@@ -20,21 +20,39 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-plugin)
+(require 'info)
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
 (declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
 (defvar Info-history)
 (defvar Info-directory-list)
-
 
+;;; Customize
+
 (defgroup helm-info nil
-  "Info related Applications and libraries for Helm."
+  "Info-related applications and libraries for Helm."
   :group 'helm)
 
+(defcustom helm-default-info-index-list
+  (helm-get-info-files)
+  "Info files to search in with `helm-info'."
+  :group 'helm-info
+  :type  '(repeat (choice string))
+  :set   'helm-info-index-set)
+
+(defcustom helm-info-default-sources
+  '(helm-source-info-elisp
+    helm-source-info-cl
+    helm-source-info-eieio
+    helm-source-info-pages)
+  "Default sources to use for looking up symbols at point in Info
+files with `helm-info-at-point'."
+  :group 'helm-info
+  :type '(repeat (choice symbol)))
+
 ;;; Build info-index sources with `helm-info-source' class.
-;;
-;;
+
 (cl-defun helm-info-init (&optional (file (helm-attr 'info-file)))
   ;; Allow reinit candidate buffer when using edebug.
   (helm-aif (and debug-on-error
@@ -83,7 +101,7 @@
      :info-file ,fname ,@args))
 
 (defun helm-build-info-index-command (name doc source buffer)
-  "Define an helm command NAME with documentation DOC.
+  "Define a helm command NAME with documentation DOC.
 Arg SOURCE will be an existing helm source named
 `helm-source-info-<NAME>' and BUFFER a string buffer name."
   (defalias (intern (concat "helm-info-" name))
@@ -97,8 +115,8 @@ Arg SOURCE will be an existing helm source named
 (defun helm-define-info-index-sources (var-value &optional commands)
   "Define helm sources named helm-source-info-<NAME>.
 Sources are generated for all entries of `helm-default-info-index-list'.
-If COMMANDS arg is non--nil build also commands named `helm-info<NAME>'.
-Where NAME is one of `helm-default-info-index-list'."
+If COMMANDS arg is non-nil, also build commands named `helm-info-<NAME>'.
+Where NAME is an element of `helm-default-info-index-list'."
   (cl-loop for str in var-value
            for sym = (intern (concat "helm-source-info-" str))
            do (set sym (helm-build-info-source str))
@@ -110,9 +128,22 @@ Where NAME is one of `helm-default-info-index-list'."
 (defun helm-info-index-set (var value)
   (set var value)
   (helm-define-info-index-sources value t))
+
+;;; Search Info files
 
-(defun helm-get-info-top-node-items ()
-  (require 'info)
+;; `helm-info' is the main entry point here. It prompts the user for an Info
+;; file, then a term in the file's index to jump to.
+
+(defvar helm-info-searched (make-ring 32)
+  "Ring of previously searched Info files.")
+
+(defun helm-get-info-files ()
+  "Return list of Info files to use for `helm-info'.
+
+Elements of the list are strings of Info file names without
+extensions (e.g. \"emacs\" for file \"emacs.info.gz\"). Info
+files are found by searching directories in
+`Info-directory-list'."
   (let ((files (cl-loop for d in (or Info-directory-list
                                      Info-default-directory-list)
                         append (directory-files d nil "\\.info"))))
@@ -121,41 +152,46 @@ Where NAME is one of `helm-default-info-index-list'."
               (helm-file-name-sans-extension f))
      :test 'equal)))
 
-(defcustom helm-default-info-index-list
-  (helm-get-info-top-node-items)
-  "Info Manual entries to use for building helm info index commands."
-  :group 'helm-info
-  :type  '(repeat (choice string))
-  :set   'helm-info-index-set)
+(defun helm-info-search-index (candidate)
+  "Search the index of CANDIDATE's Info file using the function
+helm-info-<CANDIDATE>."
+  (let ((helm-info-function
+         (intern-soft (concat "helm-info-" candidate))))
+    (when (fboundp helm-info-function)
+      (funcall helm-info-function)
+      (ring-insert helm-info-searched candidate))))
 
-(defcustom helm-info-default-sources
-  '(helm-source-info-elisp
-    helm-source-info-cl
-    helm-source-info-eieio
-    helm-source-info-pages)
-  "The default sources to use in `helm-info-at-point'."
-  :group 'helm-info
-  :type '(repeat (choice symbol)))
+(defun helm-def-source--info-files ()
+  "Return a `helm' source for Info files."
+  (helm-build-sync-source "Helm Info"
+    :candidates
+    (lambda () (copy-sequence helm-default-info-index-list))
+    :candidate-number-limit 999
+    :candidate-transformer
+    (lambda (candidates)
+      (sort candidates #'string-lessp))
+    :nomark t
+    :action '(("Search index" . helm-info-search-index))))
 
+;;;###autoload
+(defun helm-info ()
+  "Preconfigured `helm' for searching Info files' indices."
+  (interactive)
+  (let ((default (unless (ring-empty-p helm-info-searched)
+                   (ring-ref helm-info-searched 0))))
+    (helm :sources (helm-def-source--info-files)
+          :buffer "*helm Info*"
+          :preselect (and default
+                          (concat "\\_<" (regexp-quote default) "\\_>")))))
 
-;;; Info pages
-(defvar helm-info--pages-cache nil
-  "Cache for all info pages on system.")
+;;;; Info at point
 
-(defun helm-info-pages-init ()
-  "Collect candidates for initial Info node Top."
-  (if helm-info--pages-cache
-      helm-info--pages-cache
-    (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-          topics)
-      (require 'info)
-      (with-temp-buffer
-        (Info-find-node "dir" "top")
-        (goto-char (point-min))
-        (while (re-search-forward info-topic-regexp nil t)
-          (push (match-string-no-properties 1) topics))
-        (kill-buffer))
-      (setq helm-info--pages-cache topics))))
+;; `helm-info-at-point' is the main entry point here. It searches for the
+;; symbol at point through the Info sources defined in
+;; `helm-info-default-sources' and jumps to it.
+
+(defvar helm-info--pages-cache nil
+  "Cache for all Info pages on the system.")
 
 (defvar helm-source-info-pages
   (helm-build-sync-source "Info Pages"
@@ -164,7 +200,22 @@ Where NAME is one of `helm-default-info-index-list'."
     :action '(("Show with Info" .(lambda (node-str)
                                   (info (replace-regexp-in-string
                                          "^[^:]+: " "" node-str)))))
-    :requires-pattern 2))
+    :requires-pattern 2)
+  "Helm source for Info pages.")
+
+(defun helm-info-pages-init ()
+  "Collect candidates for initial Info node Top."
+  (if helm-info--pages-cache
+      helm-info--pages-cache
+    (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
+          topics)
+      (with-temp-buffer
+        (Info-find-node "dir" "top")
+        (goto-char (point-min))
+        (while (re-search-forward info-topic-regexp nil t)
+          (push (match-string-no-properties 1) topics))
+        (kill-buffer))
+      (setq helm-info--pages-cache topics))))
 
 ;;;###autoload
 (defun helm-info-at-point ()
@@ -173,7 +224,7 @@ With a prefix-arg insert symbol at point."
   (interactive)
   (helm :sources helm-info-default-sources
         :buffer "*helm info*"))
-
+
 (provide 'helm-info)
 
 ;; Local Variables:
