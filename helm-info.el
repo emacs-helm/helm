@@ -34,13 +34,6 @@
   "Info-related applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-default-info-index-list
-  (helm-get-info-files)
-  "Info files to search in with `helm-info'."
-  :group 'helm-info
-  :type  '(repeat (choice string))
-  :set   'helm-info-index-set)
-
 (defcustom helm-info-default-sources
   '(helm-source-info-elisp
     helm-source-info-cl
@@ -151,6 +144,13 @@ files are found by searching directories in
      (cl-loop for f in files collect
               (helm-file-name-sans-extension f))
      :test 'equal)))
+
+(defcustom helm-default-info-index-list
+  (helm-get-info-files)
+  "Info files to search in with `helm-info'."
+  :group 'helm-info
+  :type  '(repeat (choice string))
+  :set   'helm-info-index-set)
 
 (defun helm-info-search-index (candidate)
   "Search the index of CANDIDATE's Info file using the function
