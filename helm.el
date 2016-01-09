@@ -440,6 +440,11 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :group 'helm
   :type 'symbol)
 
+(defcustom helm-display-buffer-default-size nil
+  "Initial height of `helm-buffer', an integer."
+  :group 'helm
+  :type 'integer)
+
 (defcustom helm-split-window-in-side-p nil
   "Force splitting inside selected window when non--nil.
 See also `helm-split-window-default-side'.
@@ -2220,7 +2225,8 @@ of `helm-full-frame' and/or `helm-split-window-default-side'."
                (not (minibufferp helm-current-buffer))
                (not helm-split-window-in-side-p))
       (delete-other-windows))
-    (display-buffer buffer)))
+    (display-buffer
+     buffer `(nil . ((window-height . ,helm-display-buffer-default-size))))))
 
 
 ;;; Core: initialize
