@@ -443,7 +443,7 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
 (defcustom helm-display-buffer-default-size nil
   "Initial height of `helm-buffer', an integer."
   :group 'helm
-  :type 'integer)
+  :type '(choice integer function))
 
 (defcustom helm-split-window-in-side-p nil
   "Force splitting inside selected window when non--nil.
