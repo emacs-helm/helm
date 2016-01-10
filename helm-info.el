@@ -140,6 +140,7 @@ files are found by searching directories in
 `Info-directory-list'."
   (let ((files (cl-loop for d in (or Info-directory-list
                                      Info-default-directory-list)
+                        when (file-directory-p d)
                         append (directory-files d nil "\\.info"))))
     (helm-fast-remove-dups
      (cl-loop for f in files collect
