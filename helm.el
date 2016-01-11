@@ -441,7 +441,10 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :type 'symbol)
 
 (defcustom helm-display-buffer-default-size nil
-  "Initial height of `helm-buffer', an integer."
+  "Initial height of `helm-buffer', an integer or a function.
+If a function, it should take one arg the window and it is in charge of
+resizing the window, its return value is ignored.
+See `display-buffer' for more info."
   :group 'helm
   :type '(choice integer function))
 
