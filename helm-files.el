@@ -2589,8 +2589,8 @@ copy and rename."
                                     dired-async-mode)
                                1 -1)))
     (and follow (fboundp 'dired-async-mode) (dired-async-mode -1))
-    (cl-assert (and (cdr files) (file-directory-p candidate))
-               nil (format "%s: target `%s' is not a directory" action candidate))
+    (when (and (cdr files) (not (file-directory-p candidate)))
+      (error "%s: target `%s' is not a directory" action candidate))
     (unwind-protect
          (dired-create-files
           fn (symbol-name action) files
