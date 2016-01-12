@@ -683,7 +683,6 @@ If N is positive go forward otherwise go backward."
       (helm-grep-mode) (pop-to-buffer buf))
     (message "Helm Grep Results saved in `%s' buffer" buf)))
 
-;;;###autoload
 (define-derived-mode helm-grep-mode
     special-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
