@@ -170,22 +170,24 @@ To use this add it to `helm-goto-line-before-hook'."
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
 
-;;;###autoload
 (defun helm-show-all-in-this-source-only (arg)
   "Show only current source of this helm session with all its candidates.
 With a numeric prefix arg show only the ARG number of candidates."
   (interactive "p")
-  (with-helm-window
-    (with-helm-default-directory (helm-default-directory)
-        (let ((helm-candidate-number-limit (and (> arg 1) arg)))
-          (helm-set-source-filter
-           (list (assoc-default 'name (helm-get-current-source))))))))
+  (with-helm-alive-p
+    (with-helm-window
+      (with-helm-default-directory (helm-default-directory)
+          (let ((helm-candidate-number-limit (and (> arg 1) arg)))
+            (helm-set-source-filter
+             (list (assoc-default 'name (helm-get-current-source)))))))))
+(put 'helm-show-all-in-this-source-only 'helm-only t)
 
-;;;###autoload
 (defun helm-display-all-sources ()
   "Display all sources previously hidden by `helm-set-source-filter'."
   (interactive)
-  (helm-set-source-filter nil))
+  (with-helm-alive-p
+    (helm-set-source-filter nil)))
+(put 'helm-display-all-sources 'helm-only t)
 
 (defun helm-displaying-source-names ()
   "Return the list of sources name for this helm session."
@@ -205,63 +207,64 @@ after running winner-undo/redo."
   (cl-pushnew helm-buffer winner-boring-buffers :test 'equal))
 (add-hook 'helm-cleanup-hook #'helm-handle-winner-boring-buffers)
 
-;;;###autoload
 (defun helm-quit-and-find-file ()
   "Drop into `helm-find-files' from `helm'.
 If current selection is a buffer or a file, `helm-find-files'
 from its directory."
   (interactive)
-  (require 'helm-grep)
-  (helm-run-after-exit
-   (lambda (f)
-     (if (file-exists-p f)
-         (helm-find-files-1 (file-name-directory f)
-                            (concat
-                             "^"
-                             (regexp-quote
-                              (if helm-ff-transformer-show-only-basename
-                                  (helm-basename f) f))))
-       (helm-find-files-1 f)))
-   (let* ((sel       (helm-get-selection))
-          (grep-line (and (stringp sel)
-                          (helm-grep-split-line sel)))
-          (bmk-name  (and (stringp sel)
-                          (not grep-line)
-                          (replace-regexp-in-string "\\`\\*" "" sel)))
-          (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
-          (buf       (helm-aif (and (bufferp sel) (get-buffer sel))
-                         (buffer-name it)))
-          (default-preselection (or (buffer-file-name helm-current-buffer)
-                                    default-directory)))
-     (cond
-       ;; Buffer.
-       (buf (or (buffer-file-name sel)
-                (car (rassoc buf dired-buffers))
-                (and (with-current-buffer buf
-                       (eq major-mode 'org-agenda-mode))
-                     org-directory
-                     (expand-file-name org-directory))
-                (with-current-buffer buf default-directory)))
-       ;; Bookmark.
-       (bmk (helm-aif (bookmark-get-filename bmk)
-                (if (and ffap-url-regexp
-                         (string-match ffap-url-regexp it))
-                    it (expand-file-name it))
-              default-directory))
-       ((or (file-remote-p sel)
-            (file-exists-p sel))
-        (expand-file-name sel))
-       ;; Grep.
-       ((and grep-line (file-exists-p (car grep-line)))
-        (expand-file-name (car grep-line)))
-       ;; Occur.
-       (grep-line
-        (with-current-buffer (get-buffer (car grep-line))
-          (or (buffer-file-name) default-directory)))
-       ;; Url.
-       ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
-       ;; Default.
-       (t default-preselection)))))
+  (with-helm-alive-p
+    (require 'helm-grep)
+    (helm-run-after-exit
+     (lambda (f)
+       (if (file-exists-p f)
+           (helm-find-files-1 (file-name-directory f)
+                              (concat
+                               "^"
+                               (regexp-quote
+                                (if helm-ff-transformer-show-only-basename
+                                    (helm-basename f) f))))
+           (helm-find-files-1 f)))
+     (let* ((sel       (helm-get-selection))
+            (grep-line (and (stringp sel)
+                            (helm-grep-split-line sel)))
+            (bmk-name  (and (stringp sel)
+                            (not grep-line)
+                            (replace-regexp-in-string "\\`\\*" "" sel)))
+            (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
+            (buf       (helm-aif (and (bufferp sel) (get-buffer sel))
+                           (buffer-name it)))
+            (default-preselection (or (buffer-file-name helm-current-buffer)
+                                      default-directory)))
+       (cond
+         ;; Buffer.
+         (buf (or (buffer-file-name sel)
+                  (car (rassoc buf dired-buffers))
+                  (and (with-current-buffer buf
+                         (eq major-mode 'org-agenda-mode))
+                       org-directory
+                       (expand-file-name org-directory))
+                  (with-current-buffer buf default-directory)))
+         ;; Bookmark.
+         (bmk (helm-aif (bookmark-get-filename bmk)
+                  (if (and ffap-url-regexp
+                           (string-match ffap-url-regexp it))
+                      it (expand-file-name it))
+                default-directory))
+         ((or (file-remote-p sel)
+              (file-exists-p sel))
+          (expand-file-name sel))
+         ;; Grep.
+         ((and grep-line (file-exists-p (car grep-line)))
+          (expand-file-name (car grep-line)))
+         ;; Occur.
+         (grep-line
+          (with-current-buffer (get-buffer (car grep-line))
+            (or (buffer-file-name) default-directory)))
+         ;; Url.
+         ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
+         ;; Default.
+         (t default-preselection))))))
+(put 'helm-quit-and-find-file 'helm-only t)
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
