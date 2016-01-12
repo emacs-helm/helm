@@ -134,27 +134,31 @@ If nil default `helm-apt-cache-show-1' will be used."
 
 (defun helm-apt-show-only-installed ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (setq helm-apt-show-only 'installed)
     (helm-update)))
+(put 'helm-apt-show-only-installed 'helm-only t)
 
 (defun helm-apt-show-only-not-installed ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (setq helm-apt-show-only 'noinstalled)
     (helm-update)))
+(put 'helm-apt-show-only-not-installed 'helm-only t)
 
 (defun helm-apt-show-only-deinstalled ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (setq helm-apt-show-only 'deinstalled)
     (helm-update)))
+(put 'helm-apt-show-only-deinstalled 'helm-only t)
 
 (defun helm-apt-show-all ()
   (interactive)
-  (when helm-alive-p
+  (with-helm-alive-p
     (setq helm-apt-show-only 'all)
     (helm-update)))
+(put 'helm-apt-show-all 'helm-only t)
 
 (defun helm-apt-init ()
   "Initialize list of debian packages."

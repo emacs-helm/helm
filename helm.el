@@ -2012,6 +2012,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
     (if (> (length helm-buffers) arg)
         (helm-run-after-exit `(lambda () (helm-resume (nth ,arg helm-buffers))))
         (message "No previous helm sessions to resume yet!"))))
+(put 'helm-resume-previous-session-after-quit 'helm-only t)
 
 (defun helm-resume-list-buffers-after-quit ()
   "List resumable helm buffers within running helm."
@@ -2020,6 +2021,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
     (if (> (length helm-buffers) 0)
         (helm-run-after-exit (lambda () (helm-resume t)))
         (message "No previous helm sessions to resume yet!"))))
+(put 'helm-resume-list-buffers-after-quit 'helm-only t)
 
 (defun helm-resume-p (any-resume)
   "Whether current helm session is resumed or not."
@@ -4085,7 +4087,9 @@ Key arg DIRECTION can be one of:
   "Move selection to the ARG previous line(s).
 Same behavior than `helm-next-line' when called with a numeric prefix arg."
   (interactive "p")
-  (helm--next-or-previous-line 'previous arg))
+  (with-helm-alive-p
+    (helm--next-or-previous-line 'previous arg)))
+(put 'helm-previous-line 'helm-only t)
 
 (defun helm-next-line (&optional arg)
   "Move selection to the next ARG line(s).
@@ -4093,37 +4097,51 @@ When a numeric prefix arg is given and this numeric arg
 is > to the number of candidates, move to last candidate of
 current source (i.e don't move to next source if some)."
   (interactive "p")
-  (helm--next-or-previous-line 'next arg))
+  (with-helm-alive-p
+    (helm--next-or-previous-line 'next arg)))
+(put 'helm-next-line 'helm-only t)
 
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
-  (helm-move-selection-common :where 'page :direction 'previous))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'page :direction 'previous)))
+(put 'helm-previous-page 'helm-only t)
 
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
-  (helm-move-selection-common :where 'page :direction 'next))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'page :direction 'next)))
+(put 'helm-next-page 'helm-only t)
 
 (defun helm-beginning-of-buffer ()
   "Move selection at the top."
   (interactive)
-  (helm-move-selection-common :where 'edge :direction 'previous))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'edge :direction 'previous)))
+(put 'helm-beginning-of-buffer 'helm-only t)
 
 (defun helm-end-of-buffer ()
   "Move selection at the bottom."
   (interactive)
-  (helm-move-selection-common :where 'edge :direction 'next))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'edge :direction 'next)))
+(put 'helm-end-of-buffer 'helm-only t)
 
 (defun helm-previous-source ()
   "Move selection to the previous source."
   (interactive)
-  (helm-move-selection-common :where 'source :direction 'previous))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'source :direction 'previous)))
+(put 'helm-previous-source 'helm-only t)
 
 (defun helm-next-source ()
   "Move selection to the next source."
   (interactive)
-  (helm-move-selection-common :where 'source :direction 'next))
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'source :direction 'next)))
+(put 'helm-next-source 'helm-only t)
 
 (defun helm-goto-source (source-or-name)
   "Move the selection to the source SOURCE-OR-NAME."
