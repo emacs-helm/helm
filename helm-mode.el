@@ -155,6 +155,7 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
     (helm-exit-and-execute-action
      (lambda (_candidate)
          (identity "")))))
+(put 'helm-cr-empty-string 'helm-only t)
 
 (defun helm-mode--keyboard-quit ()
   ;; Use this instead of `keyboard-quit'

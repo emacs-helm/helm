@@ -90,6 +90,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-visit-homepage)))
+(put 'helm-el-run-visit-homepage 'helm-only t)
 
 (defun helm-el-package-install-1 (pkg-list)
   (cl-loop with mkd = pkg-list
@@ -125,6 +126,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-install)))
+(put 'helm-el-run-package-install 'helm-only t)
 
 (defun helm-el-package-uninstall-1 (pkg-list)
   (cl-loop with mkd = pkg-list
@@ -173,6 +175,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-uninstall)))
+(put 'helm-el-run-package-uninstall 'helm-only t)
 
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
@@ -223,6 +226,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-upgrade)))
+(put 'helm-el-run-package-upgrade 'helm-only t)
 
 (defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
@@ -240,6 +244,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-upgrade-all-action)))
+(put 'helm-el-run-package-upgrade-all 'helm-only t)
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
@@ -272,24 +277,28 @@
   (with-helm-alive-p
     (setq helm-el-package--show-only 'upgrade)
     (helm-update)))
+(put 'helm-el-package-show-upgrade 'helm-only t)
 
 (defun helm-el-package-show-installed ()
   (interactive)
   (with-helm-alive-p
     (setq helm-el-package--show-only 'installed)
     (helm-update)))
+(put 'helm-el-package-show-installed 'helm-only t)
 
 (defun helm-el-package-show-all ()
   (interactive)
   (with-helm-alive-p
     (setq helm-el-package--show-only 'all)
     (helm-update)))
+(put 'helm-el-package-show-all 'helm-only t)
 
 (defun helm-el-package-show-uninstalled ()
   (interactive)
   (with-helm-alive-p
     (setq helm-el-package--show-only 'uninstalled)
     (helm-update)))
+(put 'helm-el-package-show-uninstalled 'helm-only t)
 
 (defvar helm-el-package-map
   (let ((map (make-sparse-keymap)))
@@ -355,6 +364,7 @@
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-el-package-reinstall)))
+(put 'helm-el-run-package-reinstall 'helm-only t)
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)

@@ -209,6 +209,7 @@
     (helm-attrset 'toggle-filename
                   '(helm-bookmark-toggle-filename-1 . never-split))
     (helm-execute-persistent-action 'toggle-filename)))
+(put 'helm-bookmark-toggle-filename 'helm-only t)
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark from keyboard."
@@ -699,6 +700,7 @@ words from the buffer into the new bookmark name."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-bookmark-edit-bookmark)))
+(put 'helm-bookmark-run-edit 'helm-only t)
 
 
 (defun helm-bookmark-run-jump-other-window ()
@@ -706,6 +708,7 @@ words from the buffer into the new bookmark name."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'bookmark-jump-other-window)))
+(put 'helm-bookmark-run-jump-other-window 'helm-only t)
 
 (defun helm-bookmark-run-delete ()
   "Delete bookmark from keyboard."
@@ -713,6 +716,7 @@ words from the buffer into the new bookmark name."
   (with-helm-alive-p
     (when (y-or-n-p "Delete bookmark(s)?")
       (helm-exit-and-execute-action 'helm-delete-marked-bookmarks))))
+(put 'helm-bookmark-run-delete 'helm-only t)
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.

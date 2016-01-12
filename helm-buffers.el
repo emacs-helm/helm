@@ -416,11 +416,12 @@ Should be called after others transformers i.e (boring buffers)."
 
 (defun helm-toggle-buffers-details ()
   (interactive)
-  (let ((preselect (helm-buffer--get-preselection
-                    (helm-get-selection))))
-    (when helm-alive-p
+  (with-helm-alive-p
+    (let ((preselect (helm-buffer--get-preselection
+                      (helm-get-selection))))
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
       (helm-force-update preselect))))
+(put 'helm-toggle-buffers-details 'helm-only t)
 
 (defun helm-buffers-sort-transformer (candidates _source)
   (if (string= helm-pattern "")
@@ -458,11 +459,13 @@ Should be called after others transformers i.e (boring buffers)."
     "Mark All buffers that have same property `type' than current.
 i.e same color."
   (interactive)
-  (let ((marked (helm-marked-candidates)))
-    (if (and (>= (length marked) 1)
-             (with-helm-window helm-visible-mark-overlays))
-        (helm-unmark-all)
-      (helm-buffers-mark-similar-buffers-1))))
+  (with-helm-alive-p
+    (let ((marked (helm-marked-candidates)))
+      (if (and (>= (length marked) 1)
+               (with-helm-window helm-visible-mark-overlays))
+          (helm-unmark-all)
+          (helm-buffers-mark-similar-buffers-1)))))
+(put 'helm-buffers-mark-similar-buffers 'helm-only t)
 
 
 ;;; match functions
@@ -599,6 +602,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-attrset 'diff-action 'helm-buffer-toggle-diff)
     (helm-execute-persistent-action 'diff-action)))
+(put 'helm-buffer-diff-persistent 'helm-only t)
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
@@ -622,6 +626,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-attrset 'revert-action '(helm-buffer-revert-and-update . never-split))
     (helm-execute-persistent-action 'revert-action)))
+(put 'helm-buffer-revert-persistent 'helm-only t)
 
 (defun helm-buffer-save-and-update (_candidate)
   (let ((marked (helm-marked-candidates))
@@ -639,6 +644,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
     (helm-execute-persistent-action 'save-action)))
+(put 'helm-buffer-save-persistent 'helm-only t)
 
 (defun helm-buffer-run-kill-persistent ()
   "Kill buffer without quitting helm."
@@ -646,6 +652,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-attrset 'kill-action '(helm-buffers-persistent-kill . never-split))
     (helm-execute-persistent-action 'kill-action)))
+(put 'helm-buffer-run-kill-persistent 'helm-only t)
 
 (defun helm-kill-marked-buffers (_ignore)
   (let* ((bufs (helm-marked-candidates))
@@ -660,60 +667,70 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-kill-marked-buffers)))
+(put 'helm-buffer-run-kill-buffers 'helm-only t)
 
 (defun helm-buffer-run-grep ()
   "Run Grep action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-buffers)))
+(put 'helm-buffer-run-grep 'helm-only t)
 
 (defun helm-buffer-run-zgrep ()
   "Run Grep action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-zgrep-buffers)))
+(put 'helm-buffer-run-zgrep 'helm-only t)
 
 (defun helm-buffer-run-query-replace-regexp ()
   "Run Query replace regexp action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-query-replace-regexp)))
+(put 'helm-buffer-run-query-replace-regexp 'helm-only t)
 
 (defun helm-buffer-run-query-replace ()
   "Run Query replace action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-query-replace)))
+(put 'helm-buffer-run-query-replace 'helm-only t)
 
 (defun helm-buffer-switch-other-window ()
   "Run switch to other window action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-switch-to-buffers-other-window)))
+(put 'helm-buffer-switch-other-window 'helm-only t)
 
 (defun helm-buffer-switch-other-frame ()
   "Run switch to other frame action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
+(put 'helm-buffer-switch-other-frame 'helm-only t)
 
 (defun helm-buffer-switch-to-elscreen ()
   "Run switch to elscreen  action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-find-buffer-on-elscreen)))
+(put 'helm-buffer-switch-to-elscreen 'helm-only t)
 
 (defun helm-buffer-run-ediff ()
   "Run ediff action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ediff-marked-buffers)))
+(put 'helm-buffer-run-ediff 'helm-only t)
 
 (defun helm-buffer-run-ediff-merge ()
   "Run ediff action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ediff-marked-buffers-merge)))
+(put 'helm-buffer-run-ediff-merge 'helm-only t)
 
 (defun helm-buffers-persistent-kill-1 (buffer)
   "Persistent action to kill buffer."
@@ -804,6 +821,7 @@ Can be used by any source that list buffers."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-multi-occur-as-action)))
+(put 'helm-buffers-run-multi-occur 'helm-only t)
 
 (defun helm-buffers-toggle-show-hidden-buffers ()
   (interactive)
@@ -822,6 +840,7 @@ Can be used by any source that list buffers."
                                     filter-attrs))
                       helm-source-buffers-list t))
       (helm-force-update))))
+(put 'helm-buffers-toggle-show-hidden-buffers 'helm-only t)
 
 
 ;;; Candidate Transformers

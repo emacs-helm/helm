@@ -82,6 +82,7 @@ one match."
     (helm-exit-and-execute-action
      (lambda (c)
        (helm-etags-action-goto 'find-file-other-window c)))))
+(put 'helm-etags-run-switch-other-window 'helm-only t)
 
 (defun helm-etags-run-switch-other-frame ()
   "Run switch to other frame action from `helm-source-etags-select'."
@@ -90,6 +91,7 @@ one match."
     (helm-exit-and-execute-action
      (lambda (c)
        (helm-etags-action-goto 'find-file-other-frame c)))))
+(put 'helm-etags-run-switch-other-frame 'helm-only t)
 
 (defvar helm-etags-map
   (let ((map (make-sparse-keymap)))

@@ -108,6 +108,7 @@ fuzzy matching is running its own sort function with a different algorithm."
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
+          unless (get (intern (if (consp cand) (car cand) cand)) 'helm-only)
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
                        (format "%s (%s)"

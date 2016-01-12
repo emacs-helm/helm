@@ -610,6 +610,7 @@ If N is positive go forward otherwise go backward."
   (with-helm-alive-p
     (with-helm-window
       (helm-goto-next-or-prec-file -1))))
+(put 'helm-goto-precedent-file 'helm-only t)
 
 ;;;###autoload
 (defun helm-goto-next-file ()
@@ -623,24 +624,28 @@ If N is positive go forward otherwise go backward."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-action)))
+(put 'helm-grep-run-default-action 'helm-only t)
 
 (defun helm-grep-run-other-window-action ()
   "Run grep goto other window action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-other-window)))
+(put 'helm-grep-run-other-window-action 'helm-only t)
 
 (defun helm-grep-run-other-frame-action ()
   "Run grep goto other frame action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-other-frame)))
+(put 'helm-grep-run-other-frame-action 'helm-only t)
 
 (defun helm-grep-run-save-buffer ()
   "Run grep save results action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-save-results)))
+(put 'helm-grep-run-save-buffer 'helm-only t)
 
 
 ;;; helm-grep-mode
