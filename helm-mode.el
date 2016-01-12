@@ -38,7 +38,9 @@
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
     (ffap-alternate-file . nil)
-    (tmm-menubar . nil))
+    (tmm-menubar . nil)
+    (find-file . nil)
+    (execute-extended-command . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
 where key and value are symbols.
