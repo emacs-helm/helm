@@ -424,7 +424,7 @@ See `kill-new' for argument REPLACE."
 (defun helm-file-name-sans-extension (filename)
   "Same as `file-name-sans-extension' but remove all extensions."
   (helm-aif (file-name-sans-extension filename)
-      (if (string-match "\\." it)
+      (if (string-match "[^\\.]+\\." it)
           (helm-file-name-sans-extension it)
           it)))
 
