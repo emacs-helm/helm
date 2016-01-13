@@ -982,7 +982,7 @@ This doesn't replace inside the files, only modify filenames."
 
 ;; The action.
 (defun helm-ff-query-replace-on-marked (_candidate)
-  (let ((marked (helm-marked-candidates)))
+  (let ((marked (helm-marked-candidates :with-wildcard t)))
     (helm-ff-query-replace-on-marked-1 marked)))
 
 ;; The command for `helm-find-files-map'.
@@ -993,12 +993,12 @@ This doesn't replace inside the files, only modify filenames."
 (put 'helm-ff-run-query-replace-on-marked 'helm-only t)
 
 (defun helm-ff-query-replace (_candidate)
-  (let ((bufs (cl-loop for f in (helm-marked-candidates)
+  (let ((bufs (cl-loop for f in (helm-marked-candidates :with-wildcard t)
                        collect (buffer-name (find-file-noselect f)))))
     (helm-buffer-query-replace-1 nil bufs)))
 
 (defun helm-ff-query-replace-regexp (_candidate)
-  (let ((bufs (cl-loop for f in (helm-marked-candidates)
+  (let ((bufs (cl-loop for f in (helm-marked-candidates :with-wildcard t)
                        collect (buffer-name (find-file-noselect f)))))
     (helm-buffer-query-replace-1 'regexp bufs)))
 
