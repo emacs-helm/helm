@@ -247,15 +247,6 @@
           (goto-char it))
     (re-search-forward pattern nil t)))
 
-(defun helm-bookmark-match-part-fn (candidate)
-  "Match part function for bookmark sources using `helm-source-in-buffer'."
-  (helm-aif (and helm-bookmark-show-location
-                 (bookmark-location candidate))
-      ;; Match against bookmark-name and location.
-      (concat candidate " " it)
-    ;; Match against bookmark-name.
-    candidate))
-
 
 ;;; Predicates
 ;;
@@ -389,7 +380,6 @@ than `w3m-browse-url' use it."
 ;;
 (defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
   ((search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-bookmark-match-part-fn)
    (filtered-candidate-transformer
     :initform '(helm-adaptive-sort
                 helm-highlight-bookmark))))
@@ -511,7 +501,6 @@ than `w3m-browse-url' use it."
                          'global
                        (helm-bookmark-addressbook-setup-alist))))
    (search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-bookmark-match-part-fn)
    (persistent-action :initform
                       (lambda (candidate)
                         (let ((bmk (helm-bookmark-get-bookmark-from-name
