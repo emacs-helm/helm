@@ -1027,101 +1027,109 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
-  (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
-      (funcall helm--old-completion-in-region-function
-               start end collection predicate)
+  (let ((metadata (completion-metadata (buffer-substring-no-properties start (point))
+                                       collection
+                                       nil)))
+    (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
+        (funcall helm--old-completion-in-region-function
+                 start end collection predicate)
       (advice-add
        'lisp--local-variables
        :around #'helm-mode--advice-lisp--local-variables)
       (unwind-protect
-           (let* ((enable-recursive-minibuffers t)
-                  (input (buffer-substring-no-properties start end))
-                  (current-command (or (helm-this-command) this-command))
-                  (str-command (helm-symbol-name current-command))
-                  (buf-name (format "*helm-mode-%s*" str-command))
-                  (require-match (or (and (boundp 'require-match) require-match)
-                                     minibuffer-completion-confirm
-                                     ;; If prompt have not been propagated here, that's
-                                     ;; probably mean we have no prompt and we are in
-                                     ;; completion-at-point or friend, so use a non--nil
-                                     ;; value for require-match.
-                                     (not (boundp 'prompt))))
-                  ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
-                  ;; `afun' is a closure to call against each string in `data'.
-                  ;; it provide the annotation info for each string.
-                  ;; e.g "foo" => "foo <f>" where foo is a function.
-                  ;; See Issue #407.
-                  (afun (plist-get completion-extra-properties :annotation-function))
-                  (data (all-completions input collection predicate))
-                  (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
-                                                 (string-suffix-p " " input))
-                                       " "))
-                  ;; Assume that when `afun' and `predicate' are null
-                  ;; we are in filename completion.
-                  (file-comp-p (or (helm-mode--in-file-completion-p)
-                                   (and (null afun) (null predicate))))
-                  ;; Completion-at-point and friends have no prompt.
-                  (result (if (stringp data)
-                              data
-                              (helm-comp-read
-                               (or (and (boundp 'prompt) prompt) "Pattern: ")
-                               (if file-comp-p
-                                   (cl-loop for f in data unless
-                                            (string-match "\\`\\.\\{1,2\\}/\\'" f)
-                                            collect f)
-                                   (if afun
-                                       (mapcar (lambda (s)
-                                                 (let ((ann (funcall afun s)))
-                                                   (if ann
-                                                       (cons
-                                                        (concat
-                                                         s
-                                                         (propertize
-                                                          " " 'display
-                                                          (propertize
-                                                           ann
-                                                           'face 'completions-annotations)))
-                                                        s)
-                                                       s)))
-                                               data)
-                                       data))
-                               :name str-command
-                               :fuzzy helm-completion-in-region-fuzzy-match
-                               :nomark t
-                               :initial-input
-                               (cond ((and file-comp-p
-                                           (not (string-match "/\\'" input)))
-                                      (concat (helm-basename input)
-                                              (unless (string= input "")
-                                                init-space-suffix)))
-                                     ((string-match "/\\'" input) nil)
-                                     ((or (null require-match)
-                                          (stringp require-match))
-                                      input)
-                                     (t (concat input init-space-suffix)))
-                               :buffer buf-name
-                               :fc-transformer (append (list 'helm-cr-default-transformer)
-                                                       (list (lambda (candidates _source)
-                                                               (sort candidates 'helm-generic-sort-fn))))
-                               :exec-when-only-one t
-                               :quit-when-no-cand
+          (let* ((enable-recursive-minibuffers t)
+                 (input (buffer-substring-no-properties start end))
+                 (current-command (or (helm-this-command) this-command))
+                 (str-command (helm-symbol-name current-command))
+                 (buf-name (format "*helm-mode-%s*" str-command))
+                 (require-match (or (and (boundp 'require-match) require-match)
+                                    minibuffer-completion-confirm
+                                    ;; If prompt have not been propagated here, that's
+                                    ;; probably mean we have no prompt and we are in
+                                    ;; completion-at-point or friend, so use a non--nil
+                                    ;; value for require-match.
+                                    (not (boundp 'prompt))))
+                 ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
+                 ;; `afun' is a closure to call against each string in `data'.
+                 ;; it provide the annotation info for each string.
+                 ;; e.g "foo" => "foo <f>" where foo is a function.
+                 ;; See Issue #407.
+                 (afun (plist-get completion-extra-properties :annotation-function))
+                 (data (completion-all-completions
+                        (buffer-substring start end)
+                        collection
+                        minibuffer-completion-predicate
+                        (- (point) start)
+                        metadata))
+                 (base-size (or (cdr (last data)) 0))
+                 (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
+                                                (string-suffix-p " " input))
+                                      " "))
+                 ;; Assume that when `afun' and `predicate' are null
+                 ;; we are in filename completion.
+                 (file-comp-p (or (helm-mode--in-file-completion-p)
+                                  (and (null afun) (null predicate))))
+                 ;; Completion-at-point and friends have no prompt.
+                 (result (if (stringp data)
+                             data
+                           (helm-comp-read
+                            (or (and (boundp 'prompt) prompt) "Pattern: ")
+                            (if file-comp-p
+                                (cl-loop for f in data unless
+                                         (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                                         collect f)
+                              (if afun
+                                  (mapcar (lambda (s)
+                                            (let ((ann (funcall afun s)))
+                                              (if ann
+                                                  (cons
+                                                   (concat
+                                                    s
+                                                    (propertize
+                                                     " " 'display
+                                                     (propertize
+                                                      ann
+                                                      'face 'completions-annotations)))
+                                                   s)
+                                                s)))
+                                          data)
+                                data))
+                            :name str-command
+                            :fuzzy helm-completion-in-region-fuzzy-match
+                            :nomark t
+                            :initial-input
+                            (cond ((and file-comp-p
+                                        (not (string-match "/\\'" input)))
+                                   (concat (helm-basename input)
+                                           (unless (string= input "")
+                                             init-space-suffix)))
+                                  ((string-match "/\\'" input) nil)
+                                  ((or (null require-match)
+                                       (stringp require-match))
+                                   input)
+                                  (t (concat input init-space-suffix)))
+                            :buffer buf-name
+                            :fc-transformer (append (list 'helm-cr-default-transformer)
+                                                    (list (lambda (candidates _source)
+                                                            (sort candidates 'helm-generic-sort-fn))))
+                            :exec-when-only-one t
+                            :quit-when-no-cand
+                            (lambda ()
+                              ;; Delay message to overwrite "Quit".
+                              (run-with-timer
+                               0.01 nil
                                (lambda ()
-                                   ;; Delay message to overwrite "Quit".
-                                   (run-with-timer
-                                    0.01 nil
-                                    (lambda ()
-                                        (message "[No matches]")))
-                                   t)   ; exit minibuffer immediately.
-                               :must-match require-match))))
-             (when result
-               (delete-region (if (and file-comp-p
-                                       (save-excursion
-                                         (re-search-backward "~?/" start t)))
-                                  (match-end 0) start)
-                              end)
-               (insert result)))
+                                 (message "[No matches]")))
+                              t) ; exit minibuffer immediately.
+                            :must-match require-match))))
+            (when result
+              (choose-completion-string
+               result (current-buffer)
+               (list (+ start base-size)
+                     end)
+               completion-list-insert-choice-function)))
         (advice-remove 'lisp--local-variables
-                       #'helm-mode--advice-lisp--local-variables))))
+                       #'helm-mode--advice-lisp--local-variables)))))
 
 (defun helm-mode--in-file-completion-p ()
   (with-helm-current-buffer
