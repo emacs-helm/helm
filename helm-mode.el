@@ -104,6 +104,17 @@ Affect among others `completion-at-point', `completing-read-multiple'."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-completion-in-region-file-completion-style 'emacs
+  "This tells to helm which completion list is used.
+If the completion list is giving a full filename (bash style) the actual insertion
+is deleted and the new one inserted, otherwise (emacs style)
+new filename is inserted after the first valid path name,
+the partial one being deleted.
+If you use the package `bash-completion' use `bash' as value instead of `emacs'
+otherwise you will endup with duplicate insertion in shell buffers."
+  :group 'helm-mode
+  :type 'symbol)
+
 (defcustom helm-mode-fuzzy-match nil
   "Enable fuzzy matching in `helm-mode' globally.
 Note that this will slow down completion and modify sorting
@@ -1114,11 +1125,15 @@ Can be used as value for `completion-in-region-function'."
                                    t)   ; exit minibuffer immediately.
                                :must-match require-match))))
              (when result
-               (delete-region (if (and file-comp-p
-                                       (save-excursion
-                                         (re-search-backward "~?/" start t)))
-                                  (match-end 0) start)
-                              end)
+               (delete-region
+                (if (and file-comp-p
+                         (save-excursion
+                           (re-search-backward "~?/" start t))
+                         (cl-ecase helm-completion-in-region-file-completion-style
+                           (emacs t)
+                           (bash nil)))
+                    (match-end 0) start)
+                end)
                (insert result)))
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables))))
