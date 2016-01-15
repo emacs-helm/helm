@@ -2854,9 +2854,7 @@ Else return ACTIONS unmodified."
 (defvar file-cache-alist)
 
 (defclass helm-file-cache (helm-source-in-buffer helm-type-file)
-  ((init :initform (lambda () (require 'filecache)))
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+  ((init :initform (lambda () (require 'filecache)))))
 
 (defun helm-file-cache-get-candidates ()
   (cl-loop for item in file-cache-alist append
@@ -3001,9 +2999,7 @@ Don't use it in your own code unless you know what you are doing.")
                            (if (or helm-ff-transformer-show-only-basename
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
-   (migemo :initform t)
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+   (migemo :initform t)))
 
 (defmethod helm--setup-source :after ((source helm-recentf-source))
   (set-slot-value
@@ -3215,9 +3211,7 @@ Colorize only symlinks, directories and files."
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
    (fuzzy-match :initform t)
-   (migemo :initform t)
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+   (migemo :initform t)))
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"

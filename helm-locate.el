@@ -305,9 +305,7 @@ See also `helm-locate'."
    (candidates-process :initform 'helm-locate-init)
    (requires-pattern :initform 3)
    (history :initform 'helm-file-name-history)
-   (keymap :initform helm-generic-files-map)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)
-   (help-message :initform 'helm-generic-file-help-message)
    (candidate-number-limit :initform 9999)))
 
 (defvar helm-source-locate
