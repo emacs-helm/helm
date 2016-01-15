@@ -2455,16 +2455,18 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
   (interactive)
-  (with-helm-buffer
-    (if (setq helm-find-files--toggle-bookmark
-              (not helm-find-files--toggle-bookmark))
-        (progn
-          (helm-set-pattern "" t)
-          (helm-set-sources '(helm-source-bookmark-helm-find-files)))
-        ;; Switch back to helm-find-files.
-        (helm-set-pattern "./" t) ; Back to initial directory of hff session.
-        (helm-set-sources '(helm-source-find-files))
-        (helm--maybe-update-keymap)))) 
+  (with-helm-alive-p
+    (with-helm-buffer
+      (if (setq helm-find-files--toggle-bookmark
+                (not helm-find-files--toggle-bookmark))
+          (progn
+            (helm-set-pattern "" t)
+            (helm-set-sources '(helm-source-bookmark-helm-find-files)))
+          ;; Switch back to helm-find-files.
+          (helm-set-pattern "./" t) ; Back to initial directory of hff session.
+          (helm-set-sources '(helm-source-find-files))
+          (helm--maybe-update-keymap))))) 
+(put 'helm-find-files-toggle-to-bookmark 'helm-only t)
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
