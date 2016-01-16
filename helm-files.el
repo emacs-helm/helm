@@ -3001,7 +3001,8 @@ Don't use it in your own code unless you know what you are doing.")
                            (if (or helm-ff-transformer-show-only-basename
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
-   (migemo :initform t)))
+   (migemo :initform t)
+   (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)))
 
 (defmethod helm--setup-source :after ((source helm-recentf-source))
   (set-slot-value
