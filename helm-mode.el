@@ -1062,8 +1062,8 @@ Can be used as value for `completion-in-region-function'."
                        collection
                        nil)))
                (last-data (last data))
-               (base-size (if-let ((cdr-last-data (cdr (last data))))
-                              (prog1 cdr-last-data
+               (base-size (helm-aif (cdr (last data))
+                              (prog1 it
                                 (setcdr last-data nil))
                             0))
                (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
