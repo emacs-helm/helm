@@ -529,11 +529,13 @@ Should not be used among other sources.")
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
   (interactive)
-  (with-helm-buffer
-    (bookmark-set
-     (concat helm-find-files-bookmark-prefix
-             (abbreviate-file-name helm-ff-default-directory))))
-  (message "Helm find files session bookmarked! "))
+  (with-helm-alive-p
+    (with-helm-buffer
+      (bookmark-set
+       (concat helm-find-files-bookmark-prefix
+               (abbreviate-file-name helm-ff-default-directory))))
+    (message "Helm find files session bookmarked! ")))
+(put 'helm-ff-bookmark-set 'helm-only t)
 
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
@@ -1030,11 +1032,13 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-delete-char-backward ()
   "Disable helm find files auto update and delete char backward."
   (interactive)
-  (setq helm-ff-auto-update-flag nil)
-  (setq helm-ff--deleting-char-backward t)
-  (call-interactively
-   (lookup-key (current-global-map)
-               (read-kbd-macro "DEL"))))
+  (with-helm-alive-p
+    (setq helm-ff-auto-update-flag nil)
+    (setq helm-ff--deleting-char-backward t)
+    (call-interactively
+     (lookup-key (current-global-map)
+                 (read-kbd-macro "DEL")))))
+(put 'helm-ff-delete-char-backward 'helm-only t)
 
 (defun helm-ff-delete-char-backward--exit-fn ()
   (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
