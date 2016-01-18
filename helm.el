@@ -5287,21 +5287,18 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                            (forward-line 1))
                          (forward-line 1))
                      (end-of-line))))
-               (helm-mark-current-line)
-               (message "%s candidates marked" (length helm-marked-candidates)))
+               (helm-mark-current-line))
         (helm-follow-mode follow) (message nil)))))
 
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
   (interactive)
   (with-helm-window
-    (let ((len (length helm-marked-candidates)))
-      (save-excursion
-        (helm-clear-visible-mark))
-      (setq helm-marked-candidates nil)
-      (helm-mark-current-line)
-      (helm-display-mode-line (helm-get-current-source))
-      (message "%s candidates unmarked" len))))
+    (save-excursion
+      (helm-clear-visible-mark))
+    (setq helm-marked-candidates nil)
+    (helm-mark-current-line)
+    (helm-display-mode-line (helm-get-current-source))))
 
 (defun helm-toggle-all-marks ()
   "Toggle all marks.
