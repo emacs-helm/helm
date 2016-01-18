@@ -2820,18 +2820,20 @@ Else return ACTIONS unmodified."
 
 (defun helm-multi-files-toggle-to-locate ()
   (interactive)
-  (with-helm-buffer
-  (if (setq helm-multi-files--toggle-locate
-            (not helm-multi-files--toggle-locate))
-      (progn
-        (helm-set-sources (unless (memq 'helm-source-locate
-                                        helm-sources)
-                            (cons 'helm-source-locate helm-sources)))
-        (helm-set-source-filter '(helm-source-locate)))
-      (helm-kill-async-processes)
-      (helm-set-sources (remove 'helm-source-locate
-                                helm-for-files-preferred-list))
-      (helm-set-source-filter nil))))
+  (with-helm-alive-p
+    (with-helm-buffer
+      (if (setq helm-multi-files--toggle-locate
+                (not helm-multi-files--toggle-locate))
+          (progn
+            (helm-set-sources (unless (memq 'helm-source-locate
+                                            helm-sources)
+                                (cons 'helm-source-locate helm-sources)))
+            (helm-set-source-filter '(helm-source-locate)))
+          (helm-kill-async-processes)
+          (helm-set-sources (remove 'helm-source-locate
+                                    helm-for-files-preferred-list))
+          (helm-set-source-filter nil)))))
+(put 'helm-multi-files-toggle-to-locate 'helm-only t)
 
 
 ;;; List of files gleaned from every dired buffer
