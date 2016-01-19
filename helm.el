@@ -5360,6 +5360,7 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
       (cl-dolist (o helm-visible-mark-overlays)
         (goto-char (point-min))
         (while (and (search-forward (overlay-get o 'string) nil t)
+                    (not (overlays-at (point-at-bol 0)))
                     (helm-current-source-name= (overlay-get o 'source)))
           ;; Calculate real value of candidate.
           ;; It can be nil if candidate have only a display value.
