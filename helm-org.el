@@ -76,6 +76,14 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (re-search-backward "^\\*+ " nil t)
   (org-show-entry))
 
+(defvar helm-org-headings-actions
+  '(("Go to line" . helm-org-goto-marker)
+    ("Refile to this heading" . helm-org-heading-refile)
+    ("Insert link to this heading"
+     . helm-org-insert-link-to-heading-at-marker))
+  "Default actions alist for
+  `helm-source-org-headings-for-files'.")
+
 (defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
@@ -91,10 +99,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (lambda (candidates)
       (let ((cands (helm-org-get-candidates candidates parents)))
          (if parents (nreverse cands) cands)))
-    :action '(("Go to line" . helm-org-goto-marker)
-              ("Refile to this heading" . helm-org-heading-refile)
-              ("Insert link to this heading"
-               . helm-org-insert-link-to-heading-at-marker))))
+    :action 'helm-org-headings-actions))
 
 (defun helm-org-get-candidates (filenames &optional parents)
   (helm-flatten-list
