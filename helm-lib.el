@@ -167,7 +167,6 @@ text to be displayed in BUFNAME."
            (org-mode)
            (save-excursion
              (funcall insert-content-fn))
-           (setq cursor-type nil)
            (buffer-disable-undo)
            (helm-help-event-loop))
       (setq helm-suspend-update-flag nil)
@@ -185,6 +184,18 @@ text to be displayed in BUFNAME."
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
+(defun helm-help-next-line ()
+  (condition-case _err
+      (next-line)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-previous-line ()
+  (condition-case _err
+      (previous-line)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
                  "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
@@ -196,8 +207,16 @@ text to be displayed in BUFNAME."
                ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
                (?\C-s (isearch-forward))
                (?\C-r (isearch-backward))
-               (?q (cl-return))
-               (t (ignore))))))
+               (?\C-a (move-beginning-of-line 1))
+               (?\C-e (move-end-of-line 1))
+               (?\C-f (forward-char 1))
+               (?\C-b (backward-char 1))
+               (?\C-n (helm-help-next-line))
+               (?\C-p (helm-help-previous-line))
+               (?\M-a (backward-sentence))
+               (?\M-e (forward-sentence))
+               (?q    (cl-return))
+               (t     (ignore))))))
 
 
 ;;; List processing
