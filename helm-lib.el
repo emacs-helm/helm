@@ -186,13 +186,13 @@ text to be displayed in BUFNAME."
 
 (defun helm-help-next-line ()
   (condition-case _err
-      (next-line)
+      (forward-line 1)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (defun helm-help-previous-line ()
   (condition-case _err
-      (previous-line)
+      (forward-line -1)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
