@@ -2002,6 +2002,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
          :sources (buffer-local-value
                    'helm-sources (get-buffer any-buffer))
          :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
+         :prompt (buffer-local-value 'helm--prompt (get-buffer any-buffer))
          :resume t
          :buffer any-buffer))))
 
@@ -2401,6 +2402,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'default-directory) root-dir)
       (set (make-local-variable 'helm-marked-candidates) nil)
+      (set (make-local-variable 'helm--prompt) helm--prompt)
       (helm-initialize-persistent-action)
       (helm-log "helm-display-function = %S" helm-display-function)
       (helm-log "helm--local-variables = %S" helm--local-variables)
