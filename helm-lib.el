@@ -186,16 +186,23 @@ text to be displayed in BUFNAME."
 
 (defun helm-help-next-line ()
   (condition-case _err
-      (forward-line 1)
+      (call-interactively #'next-line)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (defun helm-help-previous-line ()
   (condition-case _err
-      (forward-line -1)
+      (call-interactively #'previous-line)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
+(defun helm-help-toggle-mark ()
+  (if (region-active-p)
+      (deactivate-mark)
+      (push-mark nil nil t)))
+
+;; For movement of cursor in help buffer we need to call interactively
+;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
                  "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
@@ -207,14 +214,20 @@ text to be displayed in BUFNAME."
                ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
                (?\C-s (isearch-forward))
                (?\C-r (isearch-backward))
-               (?\C-a (move-beginning-of-line 1))
-               (?\C-e (move-end-of-line 1))
-               (?\C-f (forward-char 1))
-               (?\C-b (backward-char 1))
+               (?\C-a (call-interactively #'move-beginning-of-line))
+               (?\C-e (call-interactively #'move-end-of-line))
+               (?\C-f (call-interactively #'forward-char))
+               (?\C-b (call-interactively #'backward-char))
                (?\C-n (helm-help-next-line))
                (?\C-p (helm-help-previous-line))
-               (?\M-a (backward-sentence))
-               (?\M-e (forward-sentence))
+               (?\M-a (call-interactively #'backward-sentence))
+               (?\M-e (call-interactively #'forward-sentence))
+               (?\M-f (call-interactively #'forward-word))
+               (?\M-b (call-interactively #'backward-word))
+               (?\C-  (helm-help-toggle-mark))
+               (?\M-w (copy-region-as-kill
+                       (region-beginning) (region-end))
+                      (deactivate-mark))
                (?q    (cl-return))
                (t     (ignore))))))
 
