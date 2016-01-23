@@ -1052,15 +1052,15 @@ Can be used as value for `completion-in-region-function'."
                ;; e.g "foo" => "foo <f>" where foo is a function.
                ;; See Issue #407.
                (afun (plist-get completion-extra-properties :annotation-function))
+               (metadata (completion-metadata
+                          (buffer-substring-no-properties start (point))
+                          collection nil))
                (data (completion-all-completions
                       (buffer-substring start end)
                       collection
                       predicate
                       (- (point) start)
-                      (completion-metadata
-                       (buffer-substring-no-properties start (point))
-                       collection
-                       nil)))
+                      metadata))
                (last-data (last data))
                (base-size (helm-aif (cdr (last data))
                               (prog1 it
@@ -1069,10 +1069,7 @@ Can be used as value for `completion-in-region-function'."
                (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
                                               (string-suffix-p " " input))
                                     " "))
-               ;; Assume that when `afun' and `predicate' are null
-               ;; we are in filename completion.
-               (file-comp-p (or (helm-mode--in-file-completion-p)
-                                (and (null afun) (null predicate))))
+               (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
