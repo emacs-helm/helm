@@ -5360,11 +5360,14 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
   (with-current-buffer helm-buffer
     (save-excursion
       (cl-dolist (o helm-visible-mark-overlays)
-        (let ((o-str (overlay-get o 'string)))
+        (let ((o-src-str (overlay-get o 'source))
+              (o-str (overlay-get o 'string)))
+          ;;Move point to end of source header line
           (goto-char (point-min))
+          (search-forward o-src-str nil t)
           (while (and (search-forward o-str nil t)
                       (not (overlays-at (point-at-bol 0)))
-                      (helm-current-source-name= (overlay-get o 'source)))
+                      (helm-current-source-name= o-src-str))
             ;; Calculate real value of candidate.
             ;; It can be nil if candidate have only a display value.
             (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
@@ -5377,7 +5380,7 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
                   (and (equal (overlay-get o 'real) real)
                        (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
                 (and (equal o-str (buffer-substring (point-at-bol 0) (1+ (point-at-eol 0))))
-                 (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))))))))))
+                     (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))))))))))
 (add-hook 'helm-update-hook 'helm-revive-visible-mark)
 
 (defun helm-next-point-in-list (curpos points &optional prev)
