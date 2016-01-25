@@ -76,8 +76,12 @@ cat > $CONF_FILE <<EOF
 ;; You will find embeded help for most helm commands with \`C-c ?'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
-(setq package-load-list '((helm-core t) (helm t) (async t)))
-(package-initialize)
+(setq package-user-dir (directory-file-name
+                        (file-name-directory
+                         (directory-file-name default-directory))))
+(unless (member "helm.el" (directory-files default-directory))
+  (setq package-load-list '((helm-core t) (helm t) (async t)))
+  (package-initialize))
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (setq default-frame-alist '((vertical-scroll-bars . nil)
                             (tool-bar-lines . 0)
