@@ -529,11 +529,13 @@ Should not be used among other sources.")
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
   (interactive)
-  (with-helm-buffer
-    (bookmark-set
-     (concat helm-find-files-bookmark-prefix
-             (abbreviate-file-name helm-ff-default-directory))))
-  (message "Helm find files session bookmarked! "))
+  (with-helm-alive-p
+    (with-helm-buffer
+      (bookmark-set
+       (concat helm-find-files-bookmark-prefix
+               (abbreviate-file-name helm-ff-default-directory))))
+    (message "Helm find files session bookmarked! ")))
+(put 'helm-ff-bookmark-set 'helm-only t)
 
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
@@ -1030,11 +1032,13 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-delete-char-backward ()
   "Disable helm find files auto update and delete char backward."
   (interactive)
-  (setq helm-ff-auto-update-flag nil)
-  (setq helm-ff--deleting-char-backward t)
-  (call-interactively
-   (lookup-key (current-global-map)
-               (read-kbd-macro "DEL"))))
+  (with-helm-alive-p
+    (setq helm-ff-auto-update-flag nil)
+    (setq helm-ff--deleting-char-backward t)
+    (call-interactively
+     (lookup-key (current-global-map)
+                 (read-kbd-macro "DEL")))))
+(put 'helm-ff-delete-char-backward 'helm-only t)
 
 (defun helm-ff-delete-char-backward--exit-fn ()
   (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
@@ -2455,16 +2459,18 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
   (interactive)
-  (with-helm-buffer
-    (if (setq helm-find-files--toggle-bookmark
-              (not helm-find-files--toggle-bookmark))
-        (progn
-          (helm-set-pattern "" t)
-          (helm-set-sources '(helm-source-bookmark-helm-find-files)))
-        ;; Switch back to helm-find-files.
-        (helm-set-pattern "./" t) ; Back to initial directory of hff session.
-        (helm-set-sources '(helm-source-find-files))
-        (helm--maybe-update-keymap)))) 
+  (with-helm-alive-p
+    (with-helm-buffer
+      (if (setq helm-find-files--toggle-bookmark
+                (not helm-find-files--toggle-bookmark))
+          (progn
+            (helm-set-pattern "" t)
+            (helm-set-sources '(helm-source-bookmark-helm-find-files)))
+          ;; Switch back to helm-find-files.
+          (helm-set-pattern "./" t) ; Back to initial directory of hff session.
+          (helm-set-sources '(helm-source-find-files))
+          (helm--maybe-update-keymap))))) 
+(put 'helm-find-files-toggle-to-bookmark 'helm-only t)
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
@@ -2814,18 +2820,20 @@ Else return ACTIONS unmodified."
 
 (defun helm-multi-files-toggle-to-locate ()
   (interactive)
-  (with-helm-buffer
-  (if (setq helm-multi-files--toggle-locate
-            (not helm-multi-files--toggle-locate))
-      (progn
-        (helm-set-sources (unless (memq 'helm-source-locate
-                                        helm-sources)
-                            (cons 'helm-source-locate helm-sources)))
-        (helm-set-source-filter '(helm-source-locate)))
-      (helm-kill-async-processes)
-      (helm-set-sources (remove 'helm-source-locate
-                                helm-for-files-preferred-list))
-      (helm-set-source-filter nil))))
+  (with-helm-alive-p
+    (with-helm-buffer
+      (if (setq helm-multi-files--toggle-locate
+                (not helm-multi-files--toggle-locate))
+          (progn
+            (helm-set-sources (unless (memq 'helm-source-locate
+                                            helm-sources)
+                                (cons 'helm-source-locate helm-sources)))
+            (helm-set-source-filter '(helm-source-locate)))
+          (helm-kill-async-processes)
+          (helm-set-sources (remove 'helm-source-locate
+                                    helm-for-files-preferred-list))
+          (helm-set-source-filter nil)))))
+(put 'helm-multi-files-toggle-to-locate 'helm-only t)
 
 
 ;;; List of files gleaned from every dired buffer
@@ -2854,9 +2862,7 @@ Else return ACTIONS unmodified."
 (defvar file-cache-alist)
 
 (defclass helm-file-cache (helm-source-in-buffer helm-type-file)
-  ((init :initform (lambda () (require 'filecache)))
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+  ((init :initform (lambda () (require 'filecache)))))
 
 (defun helm-file-cache-get-candidates ()
   (cl-loop for item in file-cache-alist append
@@ -3002,8 +3008,7 @@ Don't use it in your own code unless you know what you are doing.")
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
    (migemo :initform t)
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+   (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)))
 
 (defmethod helm--setup-source :after ((source helm-recentf-source))
   (set-slot-value
@@ -3215,9 +3220,7 @@ Colorize only symlinks, directories and files."
                                    helm-recentf--basename-flag)
                                (helm-basename candidate) candidate)))
    (fuzzy-match :initform t)
-   (migemo :initform t)
-   (keymap :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)))
+   (migemo :initform t)))
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"

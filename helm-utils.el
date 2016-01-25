@@ -42,7 +42,12 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'float)
 
-(defcustom helm-highlight-number-lines-around-point 15
+(define-obsolete-variable-alias
+  'helm-highlight-number-lines-around-point
+  'helm-highlight-matches-around-point-max-lines
+  "20160119")
+
+(defcustom helm-highlight-matches-around-point-max-lines 15
   "Number of lines around point where matched items are highlighted."
   :group 'helm-utils
   :type 'integer)
@@ -459,19 +464,19 @@ If STRING is non--nil return instead a space separated string."
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
-         (start-match (if (or (null helm-highlight-number-lines-around-point)
-                              (zerop helm-highlight-number-lines-around-point))
+         (start-match (if (or (null helm-highlight-matches-around-point-max-lines)
+                              (zerop helm-highlight-matches-around-point-max-lines))
                           start
                         (save-excursion
                           (forward-line
-                           (- helm-highlight-number-lines-around-point))
+                           (- helm-highlight-matches-around-point-max-lines))
                           (point-at-bol))))
-         (end-match   (if (or (null helm-highlight-number-lines-around-point)
-                              (zerop helm-highlight-number-lines-around-point))
+         (end-match   (if (or (null helm-highlight-matches-around-point-max-lines)
+                              (zerop helm-highlight-matches-around-point-max-lines))
                           end
                         (save-excursion
                           (forward-line
-                           helm-highlight-number-lines-around-point)
+                           helm-highlight-matches-around-point-max-lines)
                           (point-at-eol))))
          (args (list start end buf)))
     (if (not helm-match-line-overlay)

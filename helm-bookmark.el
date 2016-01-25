@@ -167,8 +167,7 @@
                       (helm-init-candidates-in-buffer
                           'global
                         (bookmark-all-names))))
-    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)
-    (search :initform 'helm-bookmark-search-fn)))
+    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)))
 
 (defvar helm-source-bookmarks
   (helm-make-source "Bookmarks" 'helm-source-basic-bookmarks)
@@ -195,12 +194,12 @@
                     real))
          (loc (bookmark-location real)))
     (setq helm-bookmark-show-location (not helm-bookmark-show-location))
-    (helm-force-update (if helm-bookmark-show-location
+    (helm-update (if helm-bookmark-show-location
                            (concat (regexp-quote trunc)
                                    " +"
                                    (regexp-quote
                                     (if (listp loc) (car loc) loc)))
-                           real))))
+                           (regexp-quote real)))))
 
 (defun helm-bookmark-toggle-filename ()
   "Toggle bookmark location visibility."
@@ -236,25 +235,6 @@
                                       (message "No bookmark name given for record")
                                       (bookmark-set candidate))))))
   "See (info \"(emacs)Bookmarks\").")
-
-
-;;; Search and match-part fns.
-;;
-(defun helm-bookmark-search-fn (pattern)
-    "Search function for bookmark sources using `helm-source-in-buffer'."
-  (if helm-bookmark-show-location
-      (helm-aif (next-single-property-change (point) 'location)
-          (goto-char it))
-    (re-search-forward pattern nil t)))
-
-(defun helm-bookmark-match-part-fn (candidate)
-  "Match part function for bookmark sources using `helm-source-in-buffer'."
-  (helm-aif (and helm-bookmark-show-location
-                 (bookmark-location candidate))
-      ;; Match against bookmark-name and location.
-      (concat candidate " " it)
-    ;; Match against bookmark-name.
-    candidate))
 
 
 ;;; Predicates
@@ -388,9 +368,7 @@ than `w3m-browse-url' use it."
 ;;
 ;;
 (defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
-  ((search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-bookmark-match-part-fn)
-   (filtered-candidate-transformer
+  ((filtered-candidate-transformer
     :initform '(helm-adaptive-sort
                 helm-highlight-bookmark))))
 
@@ -510,8 +488,6 @@ than `w3m-browse-url' use it."
                      (helm-init-candidates-in-buffer
                          'global
                        (helm-bookmark-addressbook-setup-alist))))
-   (search :initform #'helm-bookmark-search-fn)
-   (match-part :initform #'helm-bookmark-match-part-fn)
    (persistent-action :initform
                       (lambda (candidate)
                         (let ((bmk (helm-bookmark-get-bookmark-from-name

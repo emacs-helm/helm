@@ -167,7 +167,6 @@ text to be displayed in BUFNAME."
            (org-mode)
            (save-excursion
              (funcall insert-content-fn))
-           (setq cursor-type nil)
            (buffer-disable-undo)
            (helm-help-event-loop))
       (setq helm-suspend-update-flag nil)
@@ -185,6 +184,25 @@ text to be displayed in BUFNAME."
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
+(defun helm-help-next-line ()
+  (condition-case _err
+      (call-interactively #'next-line)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-previous-line ()
+  (condition-case _err
+      (call-interactively #'previous-line)
+    (beginning-of-buffer nil)
+    (end-of-buffer nil)))
+
+(defun helm-help-toggle-mark ()
+  (if (region-active-p)
+      (deactivate-mark)
+      (push-mark nil nil t)))
+
+;; For movement of cursor in help buffer we need to call interactively
+;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
                  "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
@@ -196,8 +214,22 @@ text to be displayed in BUFNAME."
                ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
                (?\C-s (isearch-forward))
                (?\C-r (isearch-backward))
-               (?q (cl-return))
-               (t (ignore))))))
+               (?\C-a (call-interactively #'move-beginning-of-line))
+               (?\C-e (call-interactively #'move-end-of-line))
+               (?\C-f (call-interactively #'forward-char))
+               (?\C-b (call-interactively #'backward-char))
+               (?\C-n (helm-help-next-line))
+               (?\C-p (helm-help-previous-line))
+               (?\M-a (call-interactively #'backward-sentence))
+               (?\M-e (call-interactively #'forward-sentence))
+               (?\M-f (call-interactively #'forward-word))
+               (?\M-b (call-interactively #'backward-word))
+               (?\C-  (helm-help-toggle-mark))
+               (?\M-w (copy-region-as-kill
+                       (region-beginning) (region-end))
+                      (deactivate-mark))
+               (?q    (cl-return))
+               (t     (ignore))))))
 
 
 ;;; List processing

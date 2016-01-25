@@ -2002,6 +2002,7 @@ Called from lisp, you can specify a buffer-name as a string with ARG."
          :sources (buffer-local-value
                    'helm-sources (get-buffer any-buffer))
          :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
+         :prompt (buffer-local-value 'helm--prompt (get-buffer any-buffer))
          :resume t
          :buffer any-buffer))))
 
@@ -2401,6 +2402,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
                0 helm-completion-window-scroll-margin))
       (set (make-local-variable 'default-directory) root-dir)
       (set (make-local-variable 'helm-marked-candidates) nil)
+      (set (make-local-variable 'helm--prompt) helm--prompt)
       (helm-initialize-persistent-action)
       (helm-log "helm-display-function = %S" helm-display-function)
       (helm-log "helm--local-variables = %S" helm--local-variables)
@@ -5287,21 +5289,18 @@ Argument ACTION if present will be used as second argument of `display-buffer'."
                            (forward-line 1))
                          (forward-line 1))
                      (end-of-line))))
-               (helm-mark-current-line)
-               (message "%s candidates marked" (length helm-marked-candidates)))
+               (helm-mark-current-line))
         (helm-follow-mode follow) (message nil)))))
 
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
   (interactive)
   (with-helm-window
-    (let ((len (length helm-marked-candidates)))
-      (save-excursion
-        (helm-clear-visible-mark))
-      (setq helm-marked-candidates nil)
-      (helm-mark-current-line)
-      (helm-display-mode-line (helm-get-current-source))
-      (message "%s candidates unmarked" len))))
+    (save-excursion
+      (helm-clear-visible-mark))
+    (setq helm-marked-candidates nil)
+    (helm-mark-current-line)
+    (helm-display-mode-line (helm-get-current-source))))
 
 (defun helm-toggle-all-marks ()
   "Toggle all marks.
@@ -5361,21 +5360,30 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
   (with-current-buffer helm-buffer
     (save-excursion
       (cl-dolist (o helm-visible-mark-overlays)
-        (goto-char (point-min))
-        (while (and (search-forward (overlay-get o 'string) nil t)
-                    (helm-current-source-name= (overlay-get o 'source)))
-          ;; Calculate real value of candidate.
-          ;; It can be nil if candidate have only a display value.
-          (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
-            (if real
-                ;; Check if real value of current candidate is the same
-                ;; than the one stored in overlay.
-                ;; This is needed when some cands have same display names.
-                ;; Using equal allow testing any type of value for real cand.
-                ;; Issue (#706).
-                (and (equal (overlay-get o 'real) real)
-                     (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))
-                (move-overlay o (point-at-bol 0) (1+ (point-at-eol 0))))))))))
+        (let ((o-src-str (overlay-get o 'source))
+              (o-str (overlay-get o 'string))
+              beg end)
+          ;; Move point to end of source header line.
+          (goto-char (point-min))
+          (search-forward o-src-str nil t)
+          (while (and (search-forward o-str nil t)
+                      (not (overlays-at (point-at-bol 0)))
+                      (helm-current-source-name= o-src-str))
+            (setq beg (match-beginning 0)
+                  end (match-end 0))
+            ;; Calculate real value of candidate.
+            ;; It can be nil if candidate have only a display value.
+            (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
+              (if real
+                  ;; Check if real value of current candidate is the same
+                  ;; than the one stored in overlay.
+                  ;; This is needed when some cands have same display names.
+                  ;; Using equal allow testing any type of value for real cand.
+                  ;; Issue (#706).
+                  (and (equal (overlay-get o 'real) real)
+                       (move-overlay o beg end))
+                  (and (equal o-str (buffer-substring beg end))
+                       (move-overlay o beg end))))))))))
 (add-hook 'helm-update-hook 'helm-revive-visible-mark)
 
 (defun helm-next-point-in-list (curpos points &optional prev)
