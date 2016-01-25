@@ -1584,21 +1584,26 @@ On windows system substitute from start up to \"/[[:lower:]]:/\".
 This function is needed for `helm-ff-auto-expand-to-home-or-root'
 and should be used carefully elsewhere, or not at all, using
 `substitute-in-file-name' instead."
-  (if (and ffap-url-regexp
-           (string-match-p ffap-url-regexp fname))
-      fname
-      (with-temp-buffer
-        (insert fname)
-        (goto-char (point-min))
-        (skip-chars-forward "/") ;; Avoid infloop in UNC paths Issue #424
-        (if (re-search-forward "~.*/?\\|//\\|/[[:alpha:]]:/" nil t)
-            (let ((match (match-string 0)))
-              (goto-char (if (or (string= match "//")
-                                 (string-match-p "/[[:alpha:]]:/" match))
-                             (1+ (match-beginning 0))
-                             (match-beginning 0)))
-              (buffer-substring-no-properties (point) (point-at-eol)))
-            fname))))
+  (cond ((and ffap-url-regexp
+              (string-match-p ffap-url-regexp fname))
+         fname)
+        ((and (file-remote-p fname) (string-match-p "/\\'" fname))
+         (let ((sub (substitute-in-file-name fname)))
+           (if (file-directory-p sub)
+               sub (replace-regexp-in-string "/\\'" "" sub))))
+        (t
+         (with-temp-buffer
+           (insert fname)
+           (goto-char (point-min))
+           (skip-chars-forward "/") ;; Avoid infloop in UNC paths Issue #424
+           (if (re-search-forward "~.*/?\\|//\\|/[[:alpha:]]:/" nil t)
+               (let ((match (match-string 0)))
+                 (goto-char (if (or (string= match "//")
+                                    (string-match-p "/[[:alpha:]]:/" match))
+                                (1+ (match-beginning 0))
+                              (match-beginning 0)))
+                 (buffer-substring-no-properties (point) (point-at-eol)))
+             fname)))))
 
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
