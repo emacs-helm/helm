@@ -1587,7 +1587,7 @@ and should be used carefully elsewhere, or not at all, using
   (cond ((and ffap-url-regexp
               (string-match-p ffap-url-regexp fname))
          fname)
-        ((and (file-remote-p fname) (string-match-p "/\\'" fname))
+        ((and (file-remote-p fname) (string-match-p "//\\'" fname))
          (let ((sub (substitute-in-file-name fname)))
            (if (file-directory-p sub)
                sub (replace-regexp-in-string "/\\'" "" sub))))
