@@ -86,6 +86,15 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   :group 'helm-org
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-org-headings-persistent-help
+  "Go to line (keeping session); <f1> Go to line; <f2> Refile to this heading; <f3> Insert link to this heading"
+  "Default Persistent Help string for
+  `helm-source-org-headings-for-files'. The contents of this
+  string should match the actions defined in
+  `helm-org-headings-actions'"
+  :group 'helm-org
+  :type 'string)
+
 (defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
     :candidates filenames ; Start with only filenames.
@@ -101,6 +110,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (lambda (candidates)
       (let ((cands (helm-org-get-candidates candidates parents)))
          (if parents (nreverse cands) cands)))
+    :persistent-help helm-org-headings-persistent-help
     :action 'helm-org-headings-actions))
 
 (defun helm-org-get-candidates (filenames &optional parents)
