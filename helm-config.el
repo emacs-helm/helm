@@ -109,7 +109,7 @@
     (define-key map (kbd "C-x r i")   'helm-register)
     (define-key map (kbd "C-c C-x")   'helm-run-external-command)
     (define-key map (kbd "b")         'helm-resume)
-    (define-key map (kbd "C-c g")       'helm-gid)
+    (define-key map (kbd "M-g i")       'helm-gid)
     (define-key map (kbd "@")         'helm-list-elisp-packages)
     map))
 

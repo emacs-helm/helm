@@ -335,7 +335,7 @@ see `helm-ff-guess-ffap-filenames' for this."
     (define-key map (kbd "M-g z")         'helm-ff-run-zgrep)
     (define-key map (kbd "M-g a")         'helm-ff-run-grep-ag)
     (define-key map (kbd "M-g g")         'helm-ff-run-git-grep)
-    (define-key map (kbd "C-c g")         'helm-ff-run-gid)
+    (define-key map (kbd "M-g i")         'helm-ff-run-gid)
     (define-key map (kbd "M-.")           'helm-ff-run-etags)
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
