@@ -496,7 +496,6 @@ Useful in dired buffers when there is inserted subdirs."
     file nil nil) nil t))
 
 (defun helm-w32-shell-execute-open-file (file)
-  (interactive "fOpen file:")
   (with-no-warnings
     (w32-shell-execute "open" (helm-w32-prepare-filename file))))
 

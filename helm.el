@@ -4930,12 +4930,16 @@ If N is positive enlarge, if negative narrow."
 (defun helm-narrow-window ()
   "Narrow helm window."
   (interactive)
-  (helm-enlarge-window-1 -1))
+  (with-helm-alive-p
+    (helm-enlarge-window-1 -1)))
+(put 'helm-narrow-window 'helm-only t)
 
 (defun helm-enlarge-window ()
   "Enlarge helm window."
   (interactive)
-  (helm-enlarge-window-1 1))
+  (with-helm-alive-p
+    (helm-enlarge-window-1 1)))
+(put 'helm-enlarge-window 'helm-only t)
 
 (defun helm-swap-windows ()
   "Swap window holding `helm-buffer' with other window."
