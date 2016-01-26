@@ -80,7 +80,7 @@ cat > $CONF_FILE <<EOF
                         (file-name-directory
                          (directory-file-name default-directory))))
 (unless (member "helm.el" (directory-files default-directory))
-  (setq package-load-list '((helm-core t) (helm t) (async t)))
+  (setq package-load-list '((helm-core t) (helm t) (async t) (popup t)))
   (package-initialize))
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (setq default-frame-alist '((vertical-scroll-bars . nil)
