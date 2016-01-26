@@ -251,6 +251,12 @@ This doesn't disable guessing filenames at point,
 see `helm-ff-guess-ffap-filenames' for this."
   :group 'helm-files
   :type 'boolean)
+
+(defcustom helm-substitute-in-filename-stay-on-remote nil
+  "Don't switch back to local filesystem when expanding pattern with / or ~/."
+  :group 'helm-files
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -1587,7 +1593,8 @@ and should be used carefully elsewhere, or not at all, using
   (cond ((and ffap-url-regexp
               (string-match-p ffap-url-regexp fname))
          fname)
-        ((and (file-remote-p fname) (string-match-p "//\\'" fname))
+        ((and (file-remote-p fname)
+              helm-substitute-in-filename-stay-on-remote)
          (let ((sub (substitute-in-file-name fname)))
            (if (file-directory-p sub)
                sub (replace-regexp-in-string "/\\'" "" sub))))
@@ -1601,9 +1608,9 @@ and should be used carefully elsewhere, or not at all, using
                  (goto-char (if (or (string= match "//")
                                     (string-match-p "/[[:alpha:]]:/" match))
                                 (1+ (match-beginning 0))
-                              (match-beginning 0)))
+                                (match-beginning 0)))
                  (buffer-substring-no-properties (point) (point-at-eol)))
-             fname)))))
+               fname)))))
 
 (add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
 (add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
