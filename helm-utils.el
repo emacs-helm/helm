@@ -62,6 +62,12 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type 'integer)
 
+(defcustom helm-sources-using-help-echo-popup '("Moccur" "Imenu in all buffers"
+                                                "Ack-Grep" "AG" "Gid" "Git-Grep")
+  "Show the buffer name or the filename in a popup at selection."
+  :group 'helm-utils
+  :type '(repeat (choice string)))
+
 
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
@@ -533,8 +539,6 @@ If STRING is non--nil return instead a space separated string."
 ;;; Popup buffer-name or filename in grep/moccur/imenu-all.
 ;;
 (defvar helm--show-help-echo-timer nil)
-(defvar helm-sources-using-help-echo-popup '("Moccur" "Imenu in all buffers"
-                                             "Ack-Grep" "AG" "Gid" "Git-Grep"))
 
 (defun helm-cancel-help-echo-timer ()
   (when helm--show-help-echo-timer
