@@ -1061,6 +1061,8 @@ Can be used as value for `completion-in-region-function'."
                       predicate
                       (- (point) start)
                       metadata))
+               ;; `completion-all-completions' store the base-size in the last `cdr',
+               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                (last-data (last data))
                (base-size (helm-aif (cdr (last data))
                               (prog1 it
