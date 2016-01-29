@@ -1054,7 +1054,7 @@ Can be used as value for `completion-in-region-function'."
                (afun (plist-get completion-extra-properties :annotation-function))
                (metadata (completion-metadata
                           (buffer-substring-no-properties start (point))
-                          collection nil))
+                          collection predicate))
                (data (completion-all-completions
                       (buffer-substring start end)
                       collection
