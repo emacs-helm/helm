@@ -1071,7 +1071,11 @@ Can be used as value for `completion-in-region-function'."
                (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
                                               (string-suffix-p " " input))
                                     " "))
-               (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
+               (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
+                                (helm-mode--in-file-completion-p)
+                                ;; Assume that when `afun' and `predicate' are null
+                                ;; we are in filename completion.
+                                (and (null afun) (null predicate))))
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
