@@ -289,9 +289,10 @@ See also `helm-locate'."
                 (noresult (= err 1)))
            (cond (noresult
                   (with-helm-buffer
-                    (insert (concat "* Exit with code 1, no result found,"
-                                    " Command line was:\n\n "
-                                    cmd))))
+                    (unless (cdr helm-sources)
+                      (insert (concat "* Exit with code 1, no result found,"
+                                      " Command line was:\n\n "
+                                      cmd)))))
                  ((string= event "finished\n")
                   (with-helm-window
                     (setq mode-line-format
