@@ -1627,34 +1627,32 @@ Return the result of last function call."
   "Return candidates number in `helm-buffer'.
 If IN-CURRENT-SOURCE is provided return number of candidates
 in the source where point is."
-  (with-current-buffer (helm-buffer-get)
+  (with-helm-buffer
     (if (or (helm-empty-buffer-p)
             (helm-empty-source-p))
         0
-      (save-excursion
-        (if in-current-source
-            (goto-char (helm-get-previous-header-pos))
-          (goto-char (point-min)))
-        (forward-line 1)
-        (if (helm-pos-multiline-p)
-            (save-excursion
+        (save-excursion
+          (if in-current-source
+              (goto-char (helm-get-previous-header-pos))
+              (goto-char (point-min)))
+          (forward-line 1)
+          (if (helm-pos-multiline-p)
               (cl-loop with count-multi = 1
-                    while (and (not (if in-current-source
-                                        (save-excursion
-                                          (forward-line 2)
-                                          (or (helm-pos-header-line-p) (eobp)))
+                       while (and (not (if in-current-source
+                                           (save-excursion
+                                             (forward-line 2)
+                                             (or (helm-pos-header-line-p) (eobp)))
+                                           (eobp)))
+                                  (search-forward helm-candidate-separator nil t))
+                       do (cl-incf count-multi)
+                       finally return count-multi)
+              (cl-loop with ln = 0
+                       while (not (if in-current-source
+                                      (or (helm-pos-header-line-p) (eobp))
                                       (eobp)))
-                               (search-forward helm-candidate-separator nil t))
-                    do (cl-incf count-multi)
-                    finally return count-multi))
-          (save-excursion
-            (cl-loop with ln = 0
-                  while (not (if in-current-source
-                                 (or (helm-pos-header-line-p) (eobp))
-                               (eobp)))
-                  unless (helm-pos-header-line-p)
-                  do (cl-incf ln)
-                  do (forward-line 1) finally return ln)))))))
+                       unless (helm-pos-header-line-p)
+                       do (cl-incf ln)
+                       do (forward-line 1) finally return ln))))))
 
 (defmacro with-helm-quittable (&rest body)
   "If an error occur in execution of BODY, quit helm safely."
