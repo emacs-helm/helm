@@ -250,7 +250,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                            collect (concat (file-name-as-directory
                                             (helm-basedir helm-pattern)) f)))
                  ((functionp collection)
-                  (funcall collection "" test t))
+                  (funcall collection input test t))
                  ((and alistp test)
                   (cl-loop for i in collection when (funcall test i) collect i))
                  (alistp collection)
