@@ -176,7 +176,7 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
   (let ((debug-on-quit nil))
     (signal 'quit nil)))
 
-(defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp)
+(cl-defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp (input ""))
   "Convert COLLECTION to list removing elements that don't match TEST.
 See `helm-comp-read' about supported COLLECTION arguments.
 
@@ -211,7 +211,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   (with-helm-current-buffer
     (let ((cands
            (cond ((vectorp collection)
-                  (all-completions "" collection test))
+                  (all-completions input collection test))
                  ((and (symbolp collection) (boundp collection)
                        ;; Issue #324 history is let-bounded and given
                        ;; quoted as hist argument of completing-read.
@@ -235,9 +235,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                               (funcall (quote ,test) elm))
                                         (wrong-type-argument
                                          (funcall (quote ,test) (intern elm)))))))
-                    (all-completions "" (symbol-value collection) predicate)))
+                    (all-completions input (symbol-value collection) predicate)))
                  ((and (symbolp collection) (boundp collection))
-                  (all-completions "" (symbol-value collection)))
+                  (all-completions input (symbol-value collection)))
                  ;; Normally file completion should not be handled here,
                  ;; but special cases like `find-file-at-point' do it.
                  ;; Handle here specially such cases.
@@ -250,11 +250,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                            collect (concat (file-name-as-directory
                                             (helm-basedir helm-pattern)) f)))
                  ((functionp collection)
-                  (funcall collection "" test t))
+                  (funcall collection input test t))
                  ((and alistp test)
                   (cl-loop for i in collection when (funcall test i) collect i))
                  (alistp collection)
-                 (t (all-completions "" collection test)))))
+                 (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
 (defun helm-cr-default-transformer (candidates _source)
@@ -430,7 +430,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                       helm-read-file-name-mode-line-string))
            (get-candidates (lambda ()
                              (let ((cands (helm-comp-read-get-candidates
-                                           collection test sort alistp)))
+                                           collection test sort alistp helm-pattern)))
                                (setq helm-cr-unknown-pattern-flag nil)
                                (unless (or (eq must-match t)
                                            (string= helm-pattern "")
@@ -455,7 +455,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                  cands))))
            (history-get-candidates (lambda ()
                                      (let ((all (helm-comp-read-get-candidates
-                                                 history test nil alistp)))
+                                                 history test nil alistp helm-pattern)))
                                        (when all
                                          (delete
                                           ""
@@ -617,7 +617,13 @@ Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
 It should be used when candidate list don't need to rebuild dynamically."
   (let ((history (or (car-safe hist) hist))
-        (alistp cands-in-buffer))
+        (alistp cands-in-buffer)
+        (initial-input (helm-aif (pcase init
+                                   ((pred (stringp)) init)
+                                   ;; INIT is a cons cell.
+                                   (`(,l . ,_ll) l))
+                           (if minibuffer-completing-file-name it
+                               (regexp-quote it)))))
     (when (and default (listp default))
       ;; When DEFAULT is a list move the list on head of COLLECTION
       ;; and set it to its car. #bugfix `grep-read-files'.
@@ -625,7 +631,7 @@ It should be used when candidate list don't need to rebuild dynamically."
             ;; COLLECTION is maybe a function or a table.
             (append default
                     (helm-comp-read-get-candidates
-                     collection test nil (listp collection))))
+                     collection test nil (listp collection) initial-input)))
       ;; Ensure `all-completions' will not be used
       ;; a second time to recompute COLLECTION [1].
       (setq alistp t)
@@ -655,12 +661,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; if regexp-quote is not used.
      ;; when init is added to history, it will be unquoted by
      ;; helm-comp-read.
-     :initial-input (helm-aif (pcase init
-                                ((pred (stringp)) init)
-                                ;; INIT is a cons cell.
-                                (`(,l . ,_ll) l))
-                        (if minibuffer-completing-file-name it
-                            (regexp-quote it))))))
+     :initial-input initial-input)))
 
 (defun helm-completing-read-with-cands-in-buffer
     (prompt collection test require-match
@@ -671,7 +672,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
   ;; So (re)calculate collection outside of main helm-session.
-  (let ((cands (all-completions "" collection)))
+  (let ((cands (all-completions (or init "") collection)))
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
                                     name buffer t)))
