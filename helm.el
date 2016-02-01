@@ -1648,7 +1648,9 @@ in the source where point is."
                        while (not (if in-current-source
                                       (or (helm-pos-header-line-p) (eobp))
                                       (eobp)))
-                       unless (helm-pos-header-line-p)
+                       ;; Don't count empty lines maybe added by popup (#1370).
+                       unless (or (eq (point-at-bol) (point-at-eol))
+                                  (helm-pos-header-line-p))
                        do (cl-incf ln)
                        do (forward-line 1) finally return ln))))))
 
