@@ -476,10 +476,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                           (if helm-grep-in-recurse
                                               (helm-grep-command t)
                                             (helm-grep-command))))
-                                       (max (1- (count-lines
-                                                 (point-min)
-                                                 (point-max)))
-                                            0))
+                                       (helm-get-candidate-number))
                                       'face 'helm-grep-finish))))
                       (force-mode-line-update)))
                    ;; Catch error output in log.
@@ -1237,10 +1234,7 @@ You can use safely \"--color\" (default)."
                              (format
                               "[%s process finished - (%s results)] "
                               (upcase (helm-grep--ag-command))
-                              (max (1- (count-lines
-                                        (point-min)
-                                        (point-max)))
-                                   0))
+                              (helm-get-candidate-number))
                              'face 'helm-grep-finish))))
              (force-mode-line-update))))))))
 
