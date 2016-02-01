@@ -631,7 +631,7 @@ It should be used when candidate list don't need to rebuild dynamically."
             ;; COLLECTION is maybe a function or a table.
             (append default
                     (helm-comp-read-get-candidates
-                     collection test nil (listp collection) initial-input)))
+                     collection test nil (listp collection))))
       ;; Ensure `all-completions' will not be used
       ;; a second time to recompute COLLECTION [1].
       (setq alistp t)
