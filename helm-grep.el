@@ -446,7 +446,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          (not (with-helm-buffer helm-grep-use-zgrep)))
                     (with-helm-buffer
                       (insert (concat "* Exit with code 1, no result found,"
-                                      " Command line was:\n\n "
+                                      " command line was:\n\n "
                                       (propertize helm-grep-last-cmd-line
                                                   'face 'helm-grep-cmd-line)))
                       (setq mode-line-format

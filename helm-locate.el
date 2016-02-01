@@ -291,7 +291,7 @@ See also `helm-locate'."
                   (with-helm-buffer
                     (unless (cdr helm-sources)
                       (insert (concat "* Exit with code 1, no result found,"
-                                      " Command line was:\n\n "
+                                      " command line was:\n\n "
                                       cmd)))))
                  ((string= event "finished\n")
                   (with-helm-window
