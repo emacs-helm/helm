@@ -430,7 +430,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                       helm-read-file-name-mode-line-string))
            (get-candidates (lambda ()
                              (let ((cands (helm-comp-read-get-candidates
-                                           collection test sort alistp helm-pattern)))
+                                           collection test sort alistp)))
                                (setq helm-cr-unknown-pattern-flag nil)
                                (unless (or (eq must-match t)
                                            (string= helm-pattern "")
@@ -455,7 +455,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                  cands))))
            (history-get-candidates (lambda ()
                                      (let ((all (helm-comp-read-get-candidates
-                                                 history test nil alistp helm-pattern)))
+                                                 history test nil alistp)))
                                        (when all
                                          (delete
                                           ""
