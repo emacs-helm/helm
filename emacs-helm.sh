@@ -65,15 +65,16 @@ cat > $CONF_FILE <<EOF
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
 ;; You can retrieve this minimal configuration in \"$CONF_FILE\" \n\
 ;; Some originals emacs commands have been replaced by own \`helm' commands:\n\n\
-;; - \`find-file'(C-x C-f)           =>\`helm-find-files'\n\
-;; - \`occur'(M-s o)                 =>\`helm-occur'\n\
-;; - \`list-buffers'(C-x C-b)        =>\`helm-buffers-list'\n\
-;; - \`completion-at-point'(M-tab)   =>\`helm-lisp-completion-at-point'[1]\n\
-;; - \`dabbrev-expand'(M-/)          =>\`helm-dabbrev'\n\n\
+;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\n\
+;; - \`occur'(M-s o)                  =>\`helm-occur'\n\
+;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\n\
+;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\n\
+;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\n\n\
+;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\n\n
 ;; Some others native emacs commands are \"helmized\" by \`helm-mode'.\n\
 ;; [1] Coming with emacs-24.4 \`completion-at-point' is \"helmized\" by \`helm-mode'\n\
 ;; which provide helm completion in many other places like \`shell-mode'.\n\
-;; You will find embeded help for most helm commands with \`C-c ?'.\n\
+;; You will find embeded help for most helm commands with \`C-h m'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
 (setq package-user-dir (directory-file-name
