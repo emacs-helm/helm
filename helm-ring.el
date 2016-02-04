@@ -368,7 +368,7 @@ the `global-mark-ring' after each new visit."
            (lambda (c) (increment-register
                         helm-current-prefix-arg (car c))))
           (undo-tree-restore-state-from-register
-           "Restore Undo-tree register"
+           "Restore Undo-tree register" .
            (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
                             (undo-tree-restore-state-from-register (car c))))))
         for func in (cdr register-and-functions)
