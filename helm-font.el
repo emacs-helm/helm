@@ -63,31 +63,38 @@
 ;;; 𝕌𝕔𝕤 𝕊𝕪𝕞𝕓𝕠𝕝 𝕔𝕠𝕞𝕡𝕝𝕖𝕥𝕚𝕠𝕟
 ;;
 ;;
-(defvar helm-ucs--max-len 0)
+(defvar helm-ucs--max-len nil)
 (defvar helm-ucs--names nil)
+
+;; (string-width "빅")
+;; (string-width "➔")
+;; (string-width "⃩")
+;; (let ((bidi-display-reordering t)) (string-width "ﬦ"))
+;; (multibyte-string-p "⃩ xx123")
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
-  (cl-loop with count = 0
-        for (n . v) in (ucs-names)
-        for len = (length n)
-        if (> len count)
-        do (setq count len)
-        finally return count))
+  (cl-loop with bidi-display-reordering = t
+           for (n . v) in (ucs-names)
+           maximize (string-width n) into name
+           maximize (max 1 (string-width (format "%c #x%x:" v v))) into val
+           finally return (cons name val)))
 
 (defun helm-ucs-init ()
   "Initialize an helm buffer with ucs symbols.
 Only math* symbols are collected."
-  (unless (> helm-ucs--max-len 0)
+  (unless helm-ucs--max-len
     (setq helm-ucs--max-len
           (helm-calculate-ucs-max-len)))
   (or helm-ucs--names
       (setq helm-ucs--names
-            (cl-loop for (n . v) in (ucs-names)
-                     for len = (length n)
-                     for diff = (+ (- helm-ucs--max-len len) 2)
+            (cl-loop with bidi-display-reordering = t
+                     for (n . v) in (ucs-names)
+                     for max = (cdr helm-ucs--max-len)
+                     for len = (max 1 (string-width (format "%c #x%x:" v v)))
+                     for diff = (+ max (- max len))
                      unless (string= "" n)
-                     collect (format "%s:%s%c #x%x"
-                                     n (make-string diff ? ) v v)))))
+                     collect
+                     (format "%c #x%x:%s%s" v v (make-string diff ? ) n)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
@@ -102,17 +109,19 @@ Only math* symbols are collected."
     (delete-char -1)))
 
 (defun helm-ucs-insert (candidate n)
-  (with-helm-current-buffer
-    (string-match "^\\([^:]+\\): +\\(.\\) \\(#x[a-f0-9]+\\)$" candidate)
-    (insert (match-string n candidate))))
-
-(defun helm-ucs-insert-name (candidate)
-  (helm-ucs-insert candidate 1))
+  (when (string-match
+         "^\\(.\\) \\(#x[a-f0-9]+\\):\\([^:]+\\)+"
+         candidate)
+    (with-helm-current-buffer
+      (insert (match-string n candidate)))))
 
 (defun helm-ucs-insert-char (candidate)
-  (helm-ucs-insert candidate 2))
+  (helm-ucs-insert candidate 1))
 
 (defun helm-ucs-insert-code (candidate)
+  (helm-ucs-insert candidate 2))
+
+(defun helm-ucs-insert-name (candidate)
   (helm-ucs-insert candidate 3))
 
 (defun helm-ucs-persistent-insert ()
@@ -147,7 +156,7 @@ Only math* symbols are collected."
   (helm-build-in-buffer-source "Ucs names"
     :data #'helm-ucs-init
     :help-message 'helm-ucs-help-message
-    :match-part (lambda (candidate) (car (split-string candidate ":")))
+    :match-part (lambda (candidate) (cadr (split-string candidate ":")))
     :filtered-candidate-transformer
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
     :action '(("Insert character" . helm-ucs-insert-char)
