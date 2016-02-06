@@ -73,8 +73,7 @@
 ;; (multibyte-string-p "⃩ xx123")
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
-  (cl-loop with bidi-display-reordering = t
-           for (n . v) in (ucs-names)
+  (cl-loop for (n . v) in (ucs-names)
            maximize (string-width n) into name
            maximize (max 1 (string-width (format "%c #x%x:" v v))) into val
            finally return (cons name val)))
@@ -87,8 +86,7 @@ Only math* symbols are collected."
           (helm-calculate-ucs-max-len)))
   (or helm-ucs--names
       (setq helm-ucs--names
-            (cl-loop with bidi-display-reordering = t
-                     for (n . v) in (ucs-names)
+            (cl-loop for (n . v) in (ucs-names)
                      for max = (cdr helm-ucs--max-len)
                      for len = (max 1 (string-width (format "%c #x%x:" v v)))
                      for diff = (+ max (- max len))
