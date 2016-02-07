@@ -73,8 +73,10 @@
 ;; (multibyte-string-p "⃩ xx123")
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
-  (cl-loop for (_n . v) in (ucs-names) maximize
-           (max 1 (string-width (format "%c #x%x:" v v)))))
+  (cl-loop for (_n . v) in (ucs-names)
+           maximize (length (format "#x%x:" v)) into code
+           maximize (max 1 (string-width (format "%c" v))) into char
+           finally return (cons code char)))
 
 (defun helm-ucs-init ()
   "Initialize an helm buffer with ucs symbols.
@@ -85,10 +87,11 @@ Only math* symbols are collected."
   (or helm-ucs--names
       (setq helm-ucs--names
             (cl-loop for (n . v) in (ucs-names)
-                     for len = (max 1 (string-width (format "%c #x%x:" v v)))
-                     for diff = (+ helm-ucs--max-len (- helm-ucs--max-len len))
+                     for len = (length (format "#x%x:" v))
+                     for diff = (- (car helm-ucs--max-len) len)
                      unless (string= "" n) collect
-                     (format "%c #x%x:%s%s" v v (make-string diff ? ) n)))))
+                     (format "#x%x:%s%c%s%s"
+                             v (make-string diff ? ) v (make-string 5 ? ) n)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
@@ -104,16 +107,16 @@ Only math* symbols are collected."
 
 (defun helm-ucs-insert (candidate n)
   (when (string-match
-         "^\\(.\\) \\(#x[a-f0-9]+\\):\\([^:]+\\)+"
+         "^\\(#x[a-f0-9]+\\): \\(.\\) +\\([^:]+\\)+"
          candidate)
     (with-helm-current-buffer
       (insert (match-string n candidate)))))
 
 (defun helm-ucs-insert-char (candidate)
-  (helm-ucs-insert candidate 1))
+  (helm-ucs-insert candidate 2))
 
 (defun helm-ucs-insert-code (candidate)
-  (helm-ucs-insert candidate 2))
+  (helm-ucs-insert candidate 1))
 
 (defun helm-ucs-insert-name (candidate)
   (helm-ucs-insert candidate 3))
@@ -172,8 +175,10 @@ Only math* symbols are collected."
 (defun helm-ucs ()
   "Preconfigured helm for `ucs-names' math symbols."
   (interactive)
-  (helm :sources 'helm-source-ucs
-        :keymap  helm-ucs-map))
+  (let ((char (string (char-after))))
+    (helm :sources 'helm-source-ucs
+          :keymap  helm-ucs-map
+          :input (and (multibyte-string-p char) char))))
 
 (provide 'helm-font)
 
