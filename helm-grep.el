@@ -498,7 +498,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 ;;
 ;;
 (defun helm-grep-action (candidate &optional where mark)
-  "Define a default action for `helm-do-grep' on CANDIDATE.
+  "Define a default action for `helm-do-grep-1' on CANDIDATE.
 WHERE can be one of other-window, elscreen, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
@@ -543,7 +543,7 @@ WHERE can be one of other-window, elscreen, other-frame."
                       helm-grep-history))))))
 
 (defun helm-grep-persistent-action (candidate)
-  "Persistent action for `helm-do-grep'.
+  "Persistent action for `helm-do-grep-1'.
 With a prefix arg record CANDIDATE in `mark-ring'."
   (if current-prefix-arg
       (helm-grep-action candidate nil 'mark)
@@ -1015,7 +1015,7 @@ in recurse, and ignoring EXTS, search being made on
         "")))
 
 (defun helm-grep-filter-one-by-one (candidate)
-  "`filter-one-by-one' transformer function for `helm-do-grep'."
+  "`filter-one-by-one' transformer function for `helm-do-grep-1'."
   (let ((helm-grep-default-directory-fn
          (or helm-grep-default-directory-fn
              (lambda () (or helm-ff-default-directory

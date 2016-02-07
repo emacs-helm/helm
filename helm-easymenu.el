@@ -52,7 +52,6 @@
     ["Elisp packages no fetch" helm-list-elisp-packages-no-fetch t])
    ("Tools"
     ["Occur" helm-occur t]
-    ["Grep" helm-do-grep t]
     ["Grep current directory with AG" helm-do-grep-ag t]
     ["Gid"  helm-gid t]
     ["Etags" helm-etags-select t]
