@@ -66,11 +66,6 @@
 (defvar helm-ucs--max-len nil)
 (defvar helm-ucs--names nil)
 
-;; (string-width "빅")
-;; (string-width "➔")
-;; (string-width "⃩")
-;; (let ((bidi-display-reordering t)) (string-width "ﬦ"))
-;; (multibyte-string-p "⃩ xx123")
 (defun helm-calculate-ucs-max-len ()
   "Calculate the length of longest `ucs-names' candidate."
   (cl-loop for (_n . v) in (ucs-names)
@@ -175,10 +170,10 @@ Only math* symbols are collected."
 (defun helm-ucs ()
   "Preconfigured helm for `ucs-names' math symbols."
   (interactive)
-  (let ((char (string (char-after))))
+  (let ((char (helm-aif (char-after) (string it))))
     (helm :sources 'helm-source-ucs
           :keymap  helm-ucs-map
-          :input (and (multibyte-string-p char) char))))
+          :input (and char (multibyte-string-p char) char))))
 
 (provide 'helm-font)
 
