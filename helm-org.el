@@ -121,7 +121,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify
                         #'match-string
-                        #'match-string-no-properties))
+                      #'match-string-no-properties))
           (search-fn (lambda ()
                        (when (or (null parents)
                                  (org-up-heading-safe))
@@ -150,9 +150,9 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                                                         (list t level heading)))
                                                (list heading))
                                        width file)
-                                      (if file
-                                          (concat file truncated-all)
-                                          truncated-all))
+                                    (if file
+                                        (concat file truncated-all)
+                                      truncated-all))
                                   'helm-real-display heading)
                                  (point-marker))))))))
 
