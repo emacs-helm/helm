@@ -55,6 +55,16 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   :group 'helm-org
   :type 'integer)
 
+(defcustom helm-org-headings-actions
+  '(("Go to heading" . helm-org-goto-marker)
+    ("Open in indirect buffer `C-RET'" . helm-org--open-heading-in-indirect-buffer)
+    ("Refile to this heading `C-w`''" . helm-org-heading-refile)
+    ("Insert link to this heading `C-l`''" . helm-org-insert-link-to-heading-at-marker))
+  "Default actions alist for
+  `helm-source-org-headings-for-files'."
+  :group 'helm-org
+  :type '(alist :key-type string :value-type function))
+
 ;;; Org capture templates
 ;;
 ;;
@@ -76,15 +86,29 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (re-search-backward "^\\*+ " nil t)
   (org-show-entry))
 
-(defcustom helm-org-headings-actions
-  '(("Go to line" . helm-org-goto-marker)
-    ("Refile to this heading" . helm-org-heading-refile)
-    ("Insert link to this heading"
-     . helm-org-insert-link-to-heading-at-marker))
-  "Default actions alist for
-  `helm-source-org-headings-for-files'."
-  :group 'helm-org
-  :type '(alist :key-type string :value-type function))
+(defun helm-org--open-heading-in-indirect-buffer (marker)
+  (helm-org-goto-marker marker)
+  (org-tree-to-indirect-buffer)
+
+  ;; Put the non-indirect buffer at the bottom of the prev-buffers
+  ;; list so it won't be selected when the indirect buffer is killed
+  (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
+                                       (car (window-prev-buffers)))))
+
+(defun helm-org--run-open-heading-in-indirect-buffer ()
+  "Open selected Org heading in an indirect buffer."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
+
+(defvar helm-org-headings-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "<C-return>") 'helm-org--run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-w") 'helm-org-heading-refile)
+    (define-key map (kbd "C-l") 'helm-org-insert-link-to-heading-at-marker)
+    map)
+  "Keymap for `helm-source-org-headings-for-files'.")
 
 (defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-build-sync-source "Org Headings"
@@ -100,8 +124,12 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     ;; and other transformations.
     (lambda (candidates)
       (let ((cands (helm-org-get-candidates candidates parents)))
-         (if parents (nreverse cands) cands)))
-    :action 'helm-org-headings-actions))
+        (if parents (nreverse cands) cands)))
+
+    ;; These lines work both with and without quoting of the
+    ;; symbols. Which is correct?
+    :action 'helm-org-headings-actions
+    :keymap 'helm-org-headings-map))
 
 (defun helm-org-get-candidates (filenames &optional parents)
   (apply #'append
@@ -120,7 +148,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify
                         #'match-string
-                        #'match-string-no-properties))
+                      #'match-string-no-properties))
           (search-fn (lambda ()
                        (when (or (null parents)
                                  (org-up-heading-safe))
@@ -149,9 +177,9 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                                                         (list t level heading)))
                                                (list heading))
                                        width file)
-                                      (if file
-                                          (concat file truncated-all)
-                                          truncated-all))
+                                    (if file
+                                        (concat file truncated-all)
+                                      truncated-all))
                                   'helm-real-display heading)
                                  (point-marker))))))))
 

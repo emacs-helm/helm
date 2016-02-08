@@ -1303,6 +1303,7 @@ You have also to enable this in global \".gitconfig\" with
 (defun helm-do-grep-ag ()
   "Preconfigured helm for grepping with AG in `default-directory'."
   (interactive)
+  (require 'helm-files)
   (helm-grep-ag-1 default-directory))
 
 ;;;###autoload
@@ -1310,6 +1311,7 @@ You have also to enable this in global \".gitconfig\" with
   "Preconfigured helm for git-grepping `default-directory'.
 With a prefix arg ARG git-grep the whole repository."
   (interactive "P")
+  (require 'helm-files)
   (helm-grep-git-1 default-directory arg))
 
 
