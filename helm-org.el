@@ -104,15 +104,14 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     :action 'helm-org-headings-actions))
 
 (defun helm-org-get-candidates (filenames &optional parents)
-  (helm-flatten-list
-   (mapcar (lambda (filename)
-             (helm-org--get-candidates-in-file
-              filename
-              helm-org-headings-fontify
-              (or parents (null helm-org-show-filename))
-              parents))
-           filenames)
-   t))
+  (apply #'append
+         (mapcar (lambda (filename)
+                   (helm-org--get-candidates-in-file
+                    filename
+                    helm-org-headings-fontify
+                    (or parents (null helm-org-show-filename))
+                    parents))
+                 filenames)))
 
 (defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
