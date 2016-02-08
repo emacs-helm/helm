@@ -126,9 +126,6 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (lambda (candidates)
       (let ((cands (helm-org-get-candidates candidates parents)))
         (if parents (nreverse cands) cands)))
-
-    ;; These lines work both with and without quoting of the
-    ;; symbols. Which is correct?
     :action 'helm-org-headings-actions
     :keymap 'helm-org-headings-map))
 
