@@ -100,6 +100,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
+(put 'helm-org--run-open-heading-in-indirect-buffer 'helm-only t)
 
 (defvar helm-org-headings-map
   (let ((map (make-sparse-keymap)))
