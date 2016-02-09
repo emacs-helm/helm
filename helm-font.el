@@ -103,7 +103,7 @@ Only math* symbols are collected."
 
 (defun helm-ucs-insert (candidate n)
   (when (string-match
-         "^\\(#x[a-f0-9]+\\): \\(.\\) +\\([^:]+\\)+"
+         "^(\\(#x[a-f0-9]+\\)): *\\(.\\) *\\([^:]+\\)+"
          candidate)
     (with-helm-current-buffer
       (insert (match-string n candidate)))))
