@@ -97,7 +97,7 @@ Only math* symbols are collected."
                                             'face 'helm-ucs-char)
                      unless (string= "" n) collect
                      (concat code (make-string diff ? )
-                             char (make-string 5 ? ) n)))))
+                             char "  " n)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
