@@ -92,7 +92,7 @@ Only math* symbols are collected."
             (cl-loop for (n . v) in (ucs-names)
                      for len = (length (format "#x%x:" v))
                      for diff = (- (car helm-ucs--max-len) len)
-                     for code = (format "(#x%x):" v)
+                     for code = (format "(#x%x): " v)
                      for char = (propertize (format "%c" v)
                                             'face 'helm-ucs-char)
                      unless (string= "" n) collect
