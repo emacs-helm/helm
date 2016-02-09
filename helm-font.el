@@ -84,9 +84,10 @@ Only math* symbols are collected."
             (cl-loop for (n . v) in (ucs-names)
                      for len = (length (format "#x%x:" v))
                      for diff = (- (car helm-ucs--max-len) len)
+                     for code = (format "(#x%x):" v)
+                     for char = (propertize (format "%c" v) 'face '((:foreground "Gold")))
                      unless (string= "" n) collect
-                     (format "#x%x:%s%c%s%s"
-                             v (make-string diff ? ) v (make-string 5 ? ) n)))))
+                     (concat code (make-string diff ? ) char (make-string 5 ? ) n)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
@@ -147,6 +148,7 @@ Only math* symbols are collected."
 (defvar helm-source-ucs
   (helm-build-in-buffer-source "Ucs names"
     :data #'helm-ucs-init
+    :get-line #'buffer-substring
     :help-message 'helm-ucs-help-message
     :match-part (lambda (candidate) (cadr (split-string candidate ":")))
     :filtered-candidate-transformer
