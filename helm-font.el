@@ -21,6 +21,10 @@
 (require 'helm)
 (require 'helm-help)
 
+(defgroup helm-font nil
+  "Related applications to display fonts in helm."
+  :group 'helm)
+
 (defvar helm-ucs-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -31,6 +35,10 @@
     map)
   "Keymap for `helm-ucs'.")
 
+(defface helm-ucs-char
+    '((t (:foreground "Gold")))
+  "Face used to display ucs characters."
+  :group 'helm-font)
 
 ;;; Xfont selection
 ;;
@@ -85,9 +93,11 @@ Only math* symbols are collected."
                      for len = (length (format "#x%x:" v))
                      for diff = (- (car helm-ucs--max-len) len)
                      for code = (format "(#x%x):" v)
-                     for char = (propertize (format "%c" v) 'face '((:foreground "Gold")))
+                     for char = (propertize (format "%c" v)
+                                            'face 'helm-ucs-char)
                      unless (string= "" n) collect
-                     (concat code (make-string diff ? ) char (make-string 5 ? ) n)))))
+                     (concat code (make-string diff ? )
+                             char (make-string 5 ? ) n)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
