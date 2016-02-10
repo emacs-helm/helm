@@ -708,8 +708,11 @@ This is very similar to `helm-update-hook' but selection is not moved.
 It is useful to select a particular object instead of the first one.")
 
 (defvar helm-cleanup-hook nil
-  "Run after helm minibuffer is closed.
-IOW this hook is executed BEFORE performing action.")
+  "Run after exiting the minibuffer and before performing an
+action.
+
+This hook is run even if the minibuffer is exited
+abnormally (e.g. via `helm-keyboard-quit`).")
 
 (defvar helm-select-action-hook nil
   "Run when opening the action buffer.")
@@ -724,7 +727,11 @@ and before performing action.")
   "Run after executing action.")
 
 (defvar helm-exit-minibuffer-hook nil
-  "Run just before exiting minibuffer.")
+  "Run just before exiting the minibuffer.
+
+This hook is run if the minibuffer is exited normally (e.g. via
+candidate selection).  It is NOT run if the minibuffer is exited
+abnormally (e.g. via `helm-keyboard-quit`).")
 
 (defvar helm-after-persistent-action-hook nil
   "Run after executing persistent action.")
@@ -866,7 +873,7 @@ Visible marks store candidate. Some actions uses marked candidates.
 \\[helm-follow-action-backward]\t\tRun persistent action and goto previous line.
 \\[helm-refresh]\t\tRecalculate and redisplay candidates.
 \\[helm-toggle-suspend-update]\t\tSuspend/reenable update.
- 
+
 ** Global Commands
 
 \\<global-map>\\[helm-resume] revives last `helm' session.
@@ -2809,7 +2816,7 @@ Helm plug-ins are realized by this function."
         inhibit-quit)
     `(with-local-quit
        (catch ',catch-sym
-	 (let ((throw-on-input ',catch-sym))
+         (let ((throw-on-input ',catch-sym))
            ,@body)))))
 
 (defun helm-get-cached-candidates (source)
@@ -3097,7 +3104,7 @@ It is meant to use with `filter-one-by-one' slot."
       (goto-char (point-min))
       (when mp
         ;; FIXME the first part of display may contain an occurence of mp.
-        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt" 
+        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
         (search-forward mp nil t)
         (goto-char (match-beginning 0)))
       (if (re-search-forward regex (and mp (+ (point) (length mp))) t)
@@ -4616,7 +4623,7 @@ e.g:
                    'global '(foo foa fob bar baz))))
 
 A shortcut can be used to simplify:
-          
+
      (helm-build-in-buffer-source \"test\"
        :data '(foo foa fob bar baz))
 
@@ -5363,7 +5370,7 @@ When key WITH-WILDCARD is specified try to expand a wilcard if some."
            (cl-loop with current-src = (helm-get-current-source)
                     for (source . real) in (reverse helm-marked-candidates)
                     when (equal (assq 'name source) (assq 'name current-src))
-                    append (helm--compute-marked real source with-wildcard) 
+                    append (helm--compute-marked real source with-wildcard)
                     into cands
                     finally return (or cands
                                        (append
