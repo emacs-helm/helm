@@ -116,23 +116,32 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     map)
   "Keymap for `helm-source-org-headings-for-files'.")
 
+(defclass helm-org-headings-class (helm-source-sync)
+  ((parents
+    :initarg :parents
+    :initform nil
+    :custom boolean)
+   (match :initform
+          (lambda (candidate)
+            (string-match
+             helm-pattern
+             (helm-aif (get-text-property 0 'helm-real-display candidate)
+                 it
+               candidate))))
+   (action :initform 'helm-org-headings-actions)
+   (keymap :initform 'helm-org-headings-map)))
+
+(defmethod helm--setup-source :after ((source helm-org-headings-class))
+  (let ((parents (slot-value source 'parents)))
+    (set-slot-value source 'candidate-transformer
+                    (lambda (candidates)
+                      (let ((cands (helm-org-get-candidates candidates parents)))
+                        (if parents (nreverse cands) cands))))))
+
 (defun helm-source-org-headings-for-files (filenames &optional parents)
-  (helm-build-sync-source "Org Headings"
-    :candidates filenames ; Start with only filenames.
-    :match (lambda (candidate)
-             (string-match
-              helm-pattern
-              (helm-aif (get-text-property 0 'helm-real-display candidate)
-                  it
-                candidate)))
-    :candidate-transformer
-    ;; Now that the helm-window is available proceed to truncation
-    ;; and other transformations.
-    (lambda (candidates)
-      (let ((cands (helm-org-get-candidates candidates parents)))
-        (if parents (nreverse cands) cands)))
-    :action 'helm-org-headings-actions
-    :keymap 'helm-org-headings-map))
+  (helm-make-source "Org Headings" helm-org-headings-class
+    :parents parents
+    :candidates filenames))
 
 (defun helm-org-get-candidates (filenames &optional parents)
   (apply #'append
