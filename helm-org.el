@@ -143,7 +143,6 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
                          ((pred stringp) (find-file-noselect filename)))
-    (and fontify (jit-lock-fontify-now))
     (let ((match-fn (if fontify
                         #'match-string
                       #'match-string-no-properties))
@@ -161,6 +160,8 @@ Note this have no effect in `helm-org-in-buffer-headings'."
           (unless parents (goto-char (point-min)))
           (cl-loop with width = (window-width (helm-window))
                    while (funcall search-fn)
+                   when fontify do
+                   (jit-lock-fontify-now (point-at-bol) (point-at-eol))
                    for all = (funcall match-fn  0)
                    for truncated-all = (if (and all (> (length all) width))
                                            (substring all 0 width) all)
