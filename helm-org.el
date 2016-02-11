@@ -65,6 +65,11 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   :group 'helm-org
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-org-truncate-lines t
+  "Truncate org-header-lines when non-nil"
+  :type 'boolean
+  :group 'helm-org)
+
 ;;; Org capture templates
 ;;
 ;;
@@ -148,7 +153,9 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                       #'match-string-no-properties))
           (search-fn (lambda ()
                        (re-search-forward
-                        org-complex-heading-regexp nil t))))
+                        org-complex-heading-regexp nil t)))
+          (file (unless nofname
+                  (concat (helm-basename filename) ":"))))
       (when parents
         (add-function :around (var search-fn)
                       (lambda (old-fn &rest args)
@@ -160,32 +167,29 @@ Note this have no effect in `helm-org-in-buffer-headings'."
           (unless parents (goto-char (point-min)))
           (cl-loop with width = (window-width (helm-window))
                    while (funcall search-fn)
+                   for beg = (point-at-bol)
+                   for end = (point-at-eol)
                    when (and fontify
                              (null (text-property-any
-                                    (point-at-bol) (point-at-eol) 'fontified t)))
-                   do (jit-lock-fontify-now (point-at-bol) (point-at-eol))
-                   for all = (funcall match-fn  0)
-                   for truncated-all = (if (and all (> (length all) width))
-                                           (substring all 0 width) all)
+                                    beg end 'fontified t)))
+                   do (jit-lock-fontify-now beg end)
                    for level = (length (match-string-no-properties 1))
                    for heading = (funcall match-fn 4)
-                   for file = (unless nofname
-                                (concat (helm-basename filename) ":"))
                    if (and (>= level helm-org-headings-min-depth)
                            (<= level helm-org-headings-max-depth))
-                   collect (cons (propertize
-                                  (if helm-org-format-outline-path
-                                      (org-format-outline-path
-                                       (append (apply #'org-get-outline-path
-                                                      (unless parents
-                                                        (list t level heading)))
-                                               (list heading))
-                                       width file)
-                                    (if file
-                                        (concat file truncated-all)
-                                      truncated-all))
-                                  'helm-real-display heading)
-                                 (point-marker))))))))
+                   collect `(,(propertize
+                               (if helm-org-format-outline-path
+                                   (org-format-outline-path
+                                    (append (apply #'org-get-outline-path
+                                                   (unless parents
+                                                     (list t level heading)))
+                                            (list heading))
+                                    width file)
+                                   (if file
+                                       (concat file (funcall match-fn  0))
+                                       (funcall match-fn  0)))
+                               'helm-real-display heading)
+                              . ,(point-marker))))))))
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
   (with-current-buffer (marker-buffer marker)
@@ -214,6 +218,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (interactive)
   (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
         :candidate-number-limit 99999
+        :truncate-lines helm-org-truncate-lines
         :buffer "*helm org headings*"))
 
 ;;;###autoload
@@ -224,6 +229,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)))
           :candidate-number-limit 99999
+          :truncate-lines helm-org-truncate-lines
           :buffer "*helm org inbuffer*")))
 
 ;;;###autoload
@@ -237,6 +243,7 @@ current heading."
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)) t)
           :candidate-number-limit 99999
+          :truncate-lines helm-org-truncate-lines
           :buffer "*helm org parent headings*")))
 
 ;;;###autoload
@@ -245,6 +252,7 @@ current heading."
   (interactive)
   (helm :sources (helm-source-org-capture-templates)
         :candidate-number-limit 99999
+        :truncate-lines helm-org-truncate-lines
         :buffer "*helm org capture templates*"))
 
 
