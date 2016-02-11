@@ -148,10 +148,13 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                         #'match-string
                       #'match-string-no-properties))
           (search-fn (lambda ()
-                       (when (or (null parents)
-                                 (org-up-heading-safe))
-                         (re-search-forward
-                          org-complex-heading-regexp nil t)))))
+                       (re-search-forward
+                        org-complex-heading-regexp nil t))))
+      (when parents
+        (add-function :around (var search-fn)
+                      (lambda (old-fn &rest args)
+                                (when (org-up-heading-safe)
+                                  (apply old-fn args)))))
       (save-excursion
         (save-restriction
           (widen)
