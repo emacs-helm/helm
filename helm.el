@@ -3190,30 +3190,40 @@ and `helm-pattern'."
     (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
-  (let (matches)
-    (condition-case-unless-debug err
-        (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search)))
-          (clrhash helm-match-hash)
-          (cl-dolist (match matchfns)
-            (when (< item-count limit)
-              (let (newmatches)
-                (cl-dolist (candidate cands)
-                  (unless (gethash candidate helm-match-hash)
-                    (let ((target (helm-candidate-get-display candidate)))
-                      (when (funcall match
-                                     (if match-part-fn
-                                         (funcall match-part-fn target) target))
-                        (helm--accumulate-candidates
-                         candidate newmatches
-                         helm-match-hash item-count limit source)))))
-                ;; filter-one-by-one may return nil candidates, so delq them if some.
-                (setq matches (nconc matches (nreverse (delq nil newmatches))))))))
-      (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
-               (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                               (assoc-default 'name source) (car err) (cdr err)))
-             (setq matches nil)))
-    matches))
+  (condition-case-unless-debug err
+      (cl-loop with hash = (make-hash-table :test 'equal)
+               with allow-dups = (assq 'allow-dups source)
+               ;; FIXME is it really needed to set case-fold-search here ?
+               with case-fold-search = (helm-set-case-fold-search)
+               with count = 0
+               for iter from 1
+               for fn in matchfns
+               when (< count limit) append
+               (cl-loop for c in cands
+                        for dup = (gethash c hash)
+                        while (and (< count limit)
+                                   ;; When allowing dups check if DUP
+                                   ;; have been already found in previous loop
+                                   ;; by comparing its value with ITER.
+                                   (or (and allow-dups dup (= dup iter))
+                                       (null dup)))
+                        for target = (helm-candidate-get-display c)
+                        for part = (if match-part-fn
+                                       (funcall match-part-fn target)
+                                       target)
+                        when (funcall fn part) do
+                        (progn
+                          ;; Give as value the iteration number of
+                          ;; inner loop to be able to check if
+                          ;; the duplicate have not been found in previous loop.
+                          (puthash c iter hash)
+                          (cl-incf count)
+                          (helm--maybe-process-filter-one-by-one-candidate c source))
+                        and collect c))
+    (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
+             (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                             (assoc-default 'name source) (car err) (cdr err)))
+           nil)))
 
 (defun helm-compute-matches (source)
   "Start computing candidates in SOURCE."
