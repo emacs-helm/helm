@@ -3180,7 +3180,7 @@ and `helm-pattern'."
                with count = 0
                for iter from 1
                for fn in matchfns
-               when (< count limit) append
+               when (< count limit) nconc
                (cl-loop for c in cands
                         for dup = (gethash c hash)
                         while (and (< count limit)
@@ -4724,7 +4724,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                      ;; See comment >>>[1] in
                      ;; `helm--search-from-candidate-buffer-1'.
                      (and (looking-at pattern) (forward-line 1)))
-                append
+                nconc
                 (cl-loop with pos-lst
                          while (and (setq pos-lst (funcall searcher pattern))
                                     (not (eobp))
