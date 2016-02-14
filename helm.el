@@ -3177,10 +3177,8 @@ and `helm-pattern'."
         ;; when expanded directories contains upcase
         ;; characters.
         (bn-or-pattern (if (string-match "[~/]*" pattern)
-                           ;; `helm-basename' is not available yet.
-                           (file-name-nondirectory
-                            (directory-file-name pattern))
-                         pattern)))
+                           (helm-basename pattern)
+                           pattern)))
     (helm-set-case-fold-search-1 bn-or-pattern)))
 
 (defun helm-set-case-fold-search-1 (pattern)
@@ -3193,7 +3191,6 @@ and `helm-pattern'."
   (condition-case-unless-debug err
       (cl-loop with hash = (make-hash-table :test 'equal)
                with allow-dups = (assq 'allow-dups source)
-               ;; FIXME is it really needed to set case-fold-search here ?
                with case-fold-search = (helm-set-case-fold-search)
                with count = 0
                for iter from 1
