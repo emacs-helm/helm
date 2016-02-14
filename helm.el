@@ -4718,44 +4718,50 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
            pattern get-line-fn search-fns limit
            start-point match-part-fn source))))))
 
+
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit start-point match-part-fn source)
-  (let (buffer-read-only
-        matches
-        newmatches
-        (item-count 0)
-        (case-fold-search (helm-set-case-fold-search)))
+  (let (buffer-read-only)
     (helm--search-from-candidate-buffer-1
      (lambda ()
-       (clrhash helm-cib-hash)
-       (cl-dolist (searcher search-fns)
-         (goto-char start-point)
-         (forward-line 1) ; >>>[1]
-         (setq newmatches nil)
-         (cl-loop with pos-lst
-                  while (and (setq pos-lst (funcall searcher pattern))
-                             (not (eobp)))
-                  for cand = (apply get-line-fn
-                                    (if (and pos-lst (listp pos-lst))
-                                        pos-lst
-                                        (list (point-at-bol) (point-at-eol))))
-                  when (and (not (gethash cand helm-cib-hash))
-                            (or
-                             ;; Always collect when cand is matched
-                             ;; by searcher funcs and match-part attr
-                             ;; is not present.
-                             (and (not match-part-fn)
-                                  (not (consp pos-lst)))
-                             ;; If match-part attr is present, or if SEARCHER fn
-                             ;; returns a cons cell, collect PATTERN only if it
-                             ;; match the part of CAND specified by
-                             ;; the match-part func.
-                             (helm-search-match-part
-                              cand pattern (or match-part-fn #'identity))))
-                  do (helm--accumulate-candidates
-                      cand newmatches helm-cib-hash item-count limit source))
-         (setq matches (append matches (nreverse newmatches))))
-       (delq nil matches)))))
+       (cl-loop with hash = (make-hash-table :test 'equal)
+                with allow-dups = (assq 'allow-dups source)
+                with case-fold-search = (helm-set-case-fold-search)
+                with count = 0
+                for iter from 1
+                for searcher in search-fns
+                do (progn
+                     (goto-char start-point)
+                     (forward-line 1))  ; >>>[1]
+                append
+                (cl-loop with pos-lst
+                         while (and (setq pos-lst (funcall searcher pattern))
+                                    (not (eobp))
+                                    (< count limit))
+                         for cand = (apply get-line-fn
+                                           (if (and pos-lst (listp pos-lst))
+                                               pos-lst
+                                               (list (point-at-bol) (point-at-eol))))
+                         for dup = (gethash cand hash)
+                         when (and (or (and allow-dups dup (= dup iter))
+                                       (null dup))
+                                   (or
+                                    ;; Always collect when cand is matched
+                                    ;; by searcher funcs and match-part attr
+                                    ;; is not present.
+                                    (and (not match-part-fn)
+                                         (not (consp pos-lst)))
+                                    ;; If match-part attr is present, or if SEARCHER fn
+                                    ;; returns a cons cell, collect PATTERN only if it
+                                    ;; match the part of CAND specified by
+                                    ;; the match-part func.
+                                    (helm-search-match-part
+                                     cand pattern (or match-part-fn #'identity))))
+                         do (progn
+                              (puthash cand iter hash)
+                              (cl-incf count)
+                              (helm--maybe-process-filter-one-by-one-candidate cand source))
+                         and collect cand))))))
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
