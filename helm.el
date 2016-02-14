@@ -4717,7 +4717,13 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                 for searcher in search-fns
                 do (progn
                      (goto-char start-point)
-                     (forward-line 1))  ; >>>[1]
+                     ;; The character at start-point is a newline,
+                     ;; if pattern match it that's mean we are
+                     ;; searching for newline in buffer, in this
+                     ;; case skip this false line.
+                     ;; See comment >>>[1] in
+                     ;; `helm--search-from-candidate-buffer-1'.
+                     (and (looking-at pattern) (forward-line 1)))
                 append
                 (cl-loop with pos-lst
                          while (and (setq pos-lst (funcall searcher pattern))
