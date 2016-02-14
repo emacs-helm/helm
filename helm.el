@@ -917,8 +917,6 @@ It also accepts function or variable symbol.")
 (defvar helm-source-name nil)
 (defvar helm-current-source nil)
 (defvar helm-candidate-buffer-alist nil)
-(defvar helm-match-hash (make-hash-table :test 'equal))
-(defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
 (defvar helm-debug-root-directory nil
@@ -3145,19 +3143,6 @@ See `helm-fuzzy-default-highlight-match'."
   (let ((searchfns (assoc-default 'search source)))
     (if (and (listp searchfns) (not (functionp searchfns)))
         searchfns (list searchfns))))
-
-(defmacro helm--accumulate-candidates (candidate newmatches
-                                       hash item-count limit source)
-  "Add CAND into NEWMATCHES and use HASH to uniq NEWMATCHES.
-Argument ITEM-COUNT count the matches.
-if ITEM-COUNT reaches LIMIT, exit from inner loop."
-  `(unless (gethash ,candidate ,hash)
-     (unless (assq 'allow-dups ,source)
-       (puthash ,candidate t ,hash))
-     (helm--maybe-process-filter-one-by-one-candidate ,candidate ,source)
-     (push ,candidate ,newmatches)
-     (cl-incf ,item-count)
-     (when (= ,item-count ,limit) (cl-return))))
 
 (defun helm-take-first-elements (seq n)
   "Return the N first element of SEQ if SEQ is longer than N.
