@@ -3195,12 +3195,13 @@ and `helm-pattern'."
                                        target)
                         when (funcall fn part) do
                         (progn
+                          ;; Modify candidate before pushing it to hash.
+                          (helm--maybe-process-filter-one-by-one-candidate c source)
                           ;; Give as value the iteration number of
                           ;; inner loop to be able to check if
                           ;; the duplicate have not been found in previous loop.
                           (puthash c iter hash)
-                          (cl-incf count)
-                          (helm--maybe-process-filter-one-by-one-candidate c source))
+                          (cl-incf count))
                         and collect c))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
@@ -4749,9 +4750,10 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                     (helm-search-match-part
                                      cand pattern (or match-part-fn #'identity))))
                          do (progn
+                              (helm--maybe-process-filter-one-by-one-candidate cand source)
+                              ;; See comment in `helm-match-from-candidates'.
                               (puthash cand iter hash)
-                              (cl-incf count)
-                              (helm--maybe-process-filter-one-by-one-candidate cand source))
+                              (cl-incf count))
                          and collect cand))))))
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
