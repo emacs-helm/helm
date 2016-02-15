@@ -3230,10 +3230,6 @@ and `helm-pattern'."
             (helm-get-cached-candidates source) limit)
          ;; Compute candidates according to pattern with their match fns.
          (helm-match-from-candidates
-          ;; FIXME: What when volatile is used, and the display expected
-          ;; comes from the filtered-candidate-transformer fn ?
-          ;; In this case match function try to match on real which is maybe not
-          ;; a string.
           (helm-get-cached-candidates source) matchfns matchpartfn limit source))
        source))))
 
