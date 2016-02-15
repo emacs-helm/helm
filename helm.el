@@ -917,8 +917,6 @@ It also accepts function or variable symbol.")
 (defvar helm-source-name nil)
 (defvar helm-current-source nil)
 (defvar helm-candidate-buffer-alist nil)
-(defvar helm-match-hash (make-hash-table :test 'equal))
-(defvar helm-cib-hash (make-hash-table :test 'equal))
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
 (defvar helm-debug-root-directory nil
@@ -3146,19 +3144,6 @@ See `helm-fuzzy-default-highlight-match'."
     (if (and (listp searchfns) (not (functionp searchfns)))
         searchfns (list searchfns))))
 
-(defmacro helm--accumulate-candidates (candidate newmatches
-                                       hash item-count limit source)
-  "Add CAND into NEWMATCHES and use HASH to uniq NEWMATCHES.
-Argument ITEM-COUNT count the matches.
-if ITEM-COUNT reaches LIMIT, exit from inner loop."
-  `(unless (gethash ,candidate ,hash)
-     (unless (assq 'allow-dups ,source)
-       (puthash ,candidate t ,hash))
-     (helm--maybe-process-filter-one-by-one-candidate ,candidate ,source)
-     (push ,candidate ,newmatches)
-     (cl-incf ,item-count)
-     (when (= ,item-count ,limit) (cl-return))))
-
 (defun helm-take-first-elements (seq n)
   "Return the N first element of SEQ if SEQ is longer than N.
 It is used to narrow down list of candidates to `helm-candidate-number-limit'."
@@ -3177,10 +3162,8 @@ and `helm-pattern'."
         ;; when expanded directories contains upcase
         ;; characters.
         (bn-or-pattern (if (string-match "[~/]*" pattern)
-                           ;; `helm-basename' is not available yet.
-                           (file-name-nondirectory
-                            (directory-file-name pattern))
-                         pattern)))
+                           (helm-basename pattern)
+                           pattern)))
     (helm-set-case-fold-search-1 bn-or-pattern)))
 
 (defun helm-set-case-fold-search-1 (pattern)
@@ -3190,30 +3173,40 @@ and `helm-pattern'."
     (t helm-case-fold-search)))
 
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
-  (let (matches)
-    (condition-case-unless-debug err
-        (let ((item-count 0)
-              (case-fold-search (helm-set-case-fold-search)))
-          (clrhash helm-match-hash)
-          (cl-dolist (match matchfns)
-            (when (< item-count limit)
-              (let (newmatches)
-                (cl-dolist (candidate cands)
-                  (unless (gethash candidate helm-match-hash)
-                    (let ((target (helm-candidate-get-display candidate)))
-                      (when (funcall match
-                                     (if match-part-fn
-                                         (funcall match-part-fn target) target))
-                        (helm--accumulate-candidates
-                         candidate newmatches
-                         helm-match-hash item-count limit source)))))
-                ;; filter-one-by-one may return nil candidates, so delq them if some.
-                (setq matches (nconc matches (nreverse (delq nil newmatches))))))))
-      (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
-               (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                               (assoc-default 'name source) (car err) (cdr err)))
-             (setq matches nil)))
-    matches))
+  (condition-case-unless-debug err
+      (cl-loop with hash = (make-hash-table :test 'equal)
+               with allow-dups = (assq 'allow-dups source)
+               with case-fold-search = (helm-set-case-fold-search)
+               with count = 0
+               for iter from 1
+               for fn in matchfns
+               when (< count limit) nconc
+               (cl-loop for c in cands
+                        for dup = (gethash c hash)
+                        while (and (< count limit)
+                                   ;; When allowing dups check if DUP
+                                   ;; have been already found in previous loop
+                                   ;; by comparing its value with ITER.
+                                   (or (and allow-dups dup (= dup iter))
+                                       (null dup)))
+                        for target = (helm-candidate-get-display c)
+                        for part = (if match-part-fn
+                                       (funcall match-part-fn target)
+                                       target)
+                        when (funcall fn part) do
+                        (progn
+                          ;; Modify candidate before pushing it to hash.
+                          (helm--maybe-process-filter-one-by-one-candidate c source)
+                          ;; Give as value the iteration number of
+                          ;; inner loop to be able to check if
+                          ;; the duplicate have not been found in previous loop.
+                          (puthash c iter hash)
+                          (cl-incf count))
+                        and collect c))
+    (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
+             (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                             (assoc-default 'name source) (car err) (cdr err)))
+           nil)))
 
 (defun helm-compute-matches (source)
   "Start computing candidates in SOURCE."
@@ -3237,10 +3230,6 @@ and `helm-pattern'."
             (helm-get-cached-candidates source) limit)
          ;; Compute candidates according to pattern with their match fns.
          (helm-match-from-candidates
-          ;; FIXME: What when volatile is used, and the display expected
-          ;; comes from the filtered-candidate-transformer fn ?
-          ;; In this case match function try to match on real which is maybe not
-          ;; a string.
           (helm-get-cached-candidates source) matchfns matchpartfn limit source))
        source))))
 
@@ -4711,44 +4700,57 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
            pattern get-line-fn search-fns limit
            start-point match-part-fn source))))))
 
+
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                           limit start-point match-part-fn source)
-  (let (buffer-read-only
-        matches
-        newmatches
-        (item-count 0)
-        (case-fold-search (helm-set-case-fold-search)))
+  (let (buffer-read-only)
     (helm--search-from-candidate-buffer-1
      (lambda ()
-       (clrhash helm-cib-hash)
-       (cl-dolist (searcher search-fns)
-         (goto-char start-point)
-         (forward-line 1) ; >>>[1]
-         (setq newmatches nil)
-         (cl-loop with pos-lst
-                  while (and (setq pos-lst (funcall searcher pattern))
-                             (not (eobp)))
-                  for cand = (apply get-line-fn
-                                    (if (and pos-lst (listp pos-lst))
-                                        pos-lst
-                                        (list (point-at-bol) (point-at-eol))))
-                  when (and (not (gethash cand helm-cib-hash))
-                            (or
-                             ;; Always collect when cand is matched
-                             ;; by searcher funcs and match-part attr
-                             ;; is not present.
-                             (and (not match-part-fn)
-                                  (not (consp pos-lst)))
-                             ;; If match-part attr is present, or if SEARCHER fn
-                             ;; returns a cons cell, collect PATTERN only if it
-                             ;; match the part of CAND specified by
-                             ;; the match-part func.
-                             (helm-search-match-part
-                              cand pattern (or match-part-fn #'identity))))
-                  do (helm--accumulate-candidates
-                      cand newmatches helm-cib-hash item-count limit source))
-         (setq matches (append matches (nreverse newmatches))))
-       (delq nil matches)))))
+       (cl-loop with hash = (make-hash-table :test 'equal)
+                with allow-dups = (assq 'allow-dups source)
+                with case-fold-search = (helm-set-case-fold-search)
+                with count = 0
+                for iter from 1
+                for searcher in search-fns
+                do (progn
+                     (goto-char start-point)
+                     ;; The character at start-point is a newline,
+                     ;; if pattern match it that's mean we are
+                     ;; searching for newline in buffer, in this
+                     ;; case skip this false line.
+                     ;; See comment >>>[1] in
+                     ;; `helm--search-from-candidate-buffer-1'.
+                     (and (looking-at pattern) (forward-line 1)))
+                nconc
+                (cl-loop with pos-lst
+                         while (and (setq pos-lst (funcall searcher pattern))
+                                    (not (eobp))
+                                    (< count limit))
+                         for cand = (apply get-line-fn
+                                           (if (and pos-lst (listp pos-lst))
+                                               pos-lst
+                                               (list (point-at-bol) (point-at-eol))))
+                         for dup = (gethash cand hash)
+                         when (and (or (and allow-dups dup (= dup iter))
+                                       (null dup))
+                                   (or
+                                    ;; Always collect when cand is matched
+                                    ;; by searcher funcs and match-part attr
+                                    ;; is not present.
+                                    (and (not match-part-fn)
+                                         (not (consp pos-lst)))
+                                    ;; If match-part attr is present, or if SEARCHER fn
+                                    ;; returns a cons cell, collect PATTERN only if it
+                                    ;; match the part of CAND specified by
+                                    ;; the match-part func.
+                                    (helm-search-match-part
+                                     cand pattern (or match-part-fn #'identity))))
+                         do (progn
+                              (helm--maybe-process-filter-one-by-one-candidate cand source)
+                              ;; See comment in `helm-match-from-candidates'.
+                              (puthash cand iter hash)
+                              (cl-incf count))
+                         and collect cand))))))
 
 (defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
