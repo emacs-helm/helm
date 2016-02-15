@@ -5492,10 +5492,10 @@ is what is used to perform actions."
   "Copy selection or marked candidates to `helm-current-buffer'."
   (interactive)
   (with-helm-alive-p
-    (with-helm-buffer
-      (cl-loop for cand in (helm-marked-candidates)
-               do (with-helm-current-buffer
-                    (insert (format "%s\n" cand)))))))
+    (with-helm-current-buffer
+      (insert (mapconcat (lambda (cand)
+                           (format "%s" cand))
+                         (helm-marked-candidates) "\n")))))
 (put 'helm-copy-to-buffer 'helm-only t)
 
 
