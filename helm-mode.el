@@ -296,7 +296,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             candidates-in-buffer
                             exec-when-only-one
                             quit-when-no-cand
-                            (volatile t)
+                            volatile
                             sort
                             (fc-transformer 'helm-cr-default-transformer)
                             hist-fc-transformer
@@ -364,7 +364,7 @@ Keys description:
 - EXEC-WHEN-ONLY-ONE: Bound `helm-execute-action-at-once-if-one'
   to non--nil. (possibles values are t or nil).
 
-- VOLATILE: Use volatile attribute \(enabled by default\).
+- VOLATILE: Use volatile attribute.
 
 - SORT: A predicate to give to `sort' e.g `string-lessp'
   Use this only on small data as it is ineficient.
