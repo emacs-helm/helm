@@ -3202,7 +3202,7 @@ and `helm-pattern'."
                           ;; the duplicate have not been found in previous loop.
                           (puthash c iter hash)
                           (cl-incf count))
-                        and collect c))
+                        and when c collect c))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err)))
@@ -4746,9 +4746,8 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                     (helm-search-match-part
                                      cand pattern (or match-part-fn #'identity))))
                          do (progn
-                              (helm--maybe-process-filter-one-by-one-candidate cand source)
-                              ;; See comment in `helm-match-from-candidates'.
                               (puthash cand iter hash)
+                              (helm--maybe-process-filter-one-by-one-candidate cand source)
                               (cl-incf count))
                          and collect cand))))))
 
