@@ -479,7 +479,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :fuzzy-match fuzzy
                   :mode-line mode-line
                   :help-message help-message
-                  :action action-fn))
+                  :action action-fn
+                  :volatile volatile))
            (src-1 (helm-build-in-buffer-source name
                     :data get-candidates
                     :filtered-candidate-transformer fc-transformer
@@ -492,10 +493,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :action action-fn))
            (src-list (list src-hist
                            (if candidates-in-buffer
-                               src-1
-                             (if volatile
-                                 (append src '((volatile)))
-                               src))))
+                               src-1 src)))
            (helm-execute-action-at-once-if-one exec-when-only-one)
            (helm-quit-if-no-candidate quit-when-no-cand)
            result)
