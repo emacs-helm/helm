@@ -4733,7 +4733,8 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                                (list (point-at-bol) (point-at-eol))))
                          for dup = (gethash cand hash)
                          when (and (or (and allow-dups dup (= dup iter))
-                                       (null dup))
+                                       (null dup)
+                                       (and dup (/= dup iter)))
                                    (or
                                     ;; Always collect when cand is matched
                                     ;; by searcher funcs and match-part attr
