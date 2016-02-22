@@ -246,7 +246,7 @@ See also `helm-locate'."
            helm-locate-command)))
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))
     (helm :sources 'helm-source-locate
-          :buffer "*helm locate*"
+          :buffer " *helm locate*"
           :ff-transformer-show-only-basename nil
           :input initial-input
           :default default
@@ -377,7 +377,7 @@ With a prefix arg refresh the database in each project."
     (or (helm :sources src
               :ff-transformer-show-only-basename nil
               :prompt prompt
-              :buffer "*helm locate read fname*"
+              :buffer " *helm locate read fname*"
               :resume 'noresume)
         (keyboard-quit))))
 

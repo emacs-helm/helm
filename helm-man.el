@@ -102,7 +102,7 @@ With a prefix arg reinitialize the cache."
   (interactive "P")
   (when arg (setq helm-man--pages nil))
     (helm :sources 'helm-source-man-pages
-          :buffer "*Helm man woman*"))
+          :buffer " *Helm man woman*"))
 
 (provide 'helm-man)
 

@@ -332,7 +332,7 @@ Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.
               :default (if helm-etags-fuzzy-match
                            str
                            (list (concat "\\_<" str "\\_>") str))
-              :buffer "*helm etags*"))))
+              :buffer " *helm etags*"))))
 
 (provide 'helm-tags)
 

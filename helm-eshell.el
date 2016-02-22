@@ -226,7 +226,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                                       (pcomplete-parse-arguments))))))
              (with-helm-show-completion beg end
                (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source)
-                         :buffer "*helm pcomplete*"
+                         :buffer " *helm pcomplete*"
                          :keymap helm-esh-completion-map
                          :resume 'noresume
                          :input (and (stringp last)
@@ -250,7 +250,7 @@ The function that call this should set `helm-ec-target' to thing at point."
          (with-helm-show-completion beg end
            (helm :sources (helm-make-source "Eshell history"
                               'helm-eshell-history-source)
-                 :buffer "*helm eshell history*"
+                 :buffer " *helm eshell history*"
                  :resume 'noresume
                  :input input))
       (when (and flag-empty

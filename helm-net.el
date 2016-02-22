@@ -512,7 +512,7 @@ NOTE: Probably not supported on some systems (e.g Windows)."
   "Preconfigured `helm' for Wikipedia lookup with Wikipedia suggest."
   (interactive)
   (helm :sources 'helm-source-wikipedia-suggest
-        :buffer "*helm wikipedia*"))
+        :buffer " *helm wikipedia*"))
 
 
 (provide 'helm-net)

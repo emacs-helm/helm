@@ -272,7 +272,7 @@ Show actions only on line starting by a PID."
   (save-window-excursion
     (unless helm-alive-p (delete-other-windows))
     (helm :sources 'helm-source-top
-          :buffer "*helm top*" :full-frame t
+          :buffer " *helm top*" :full-frame t
           :candidate-number-limit 9999
           :preselect "^\\s-*[0-9]+")))
 
@@ -287,7 +287,7 @@ Show actions only on line starting by a PID."
   "Preconfigured helm for xrandr."
   (interactive)
   (helm :sources 'helm-source-xrandr-change-resolution
-        :buffer "*helm xrandr*"))
+        :buffer " *helm xrandr*"))
 
 (provide 'helm-sys)
 

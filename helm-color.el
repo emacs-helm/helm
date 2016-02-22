@@ -151,7 +151,7 @@
   "Preconfigured `helm' for color."
   (interactive)
   (helm :sources '(helm-source-colors helm-source-customize-face)
-        :buffer "*helm colors*"))
+        :buffer " *helm colors*"))
 
 (provide 'helm-color)
 

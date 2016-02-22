@@ -111,7 +111,7 @@ See <https://www.gnu.org/software/idutils/>."
     (cl-assert db nil "No DataBase found, create one with `mkid'")
     (helm :sources (helm-make-source "Gid" 'helm-gid-source
                      :db-dir db)
-          :buffer "*helm gid*"
+          :buffer " *helm gid*"
           :keymap helm-grep-map
           :truncate-lines helm-grep-truncate-lines)))
 

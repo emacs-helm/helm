@@ -173,7 +173,7 @@ If ARG is supplied, pre-select symbol at point instead of current"
           :preselect (if arg
                          (thing-at-point 'symbol)
                        tag)
-          :buffer "*helm semantic*")))
+          :buffer " *helm semantic*")))
 
 ;;;###autoload
 (defun helm-semantic-or-imenu (arg)
@@ -210,7 +210,7 @@ Fill in the symbol at point by default."
           :preselect (if (or arg imenu-p)
                          (thing-at-point 'symbol)
                          tag)
-          :buffer "*helm semantic/imenu*")))
+          :buffer " *helm semantic/imenu*")))
 
 (provide 'helm-semantic)
 

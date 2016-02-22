@@ -285,7 +285,7 @@ With a prefix arg reload cache."
     (helm :sources 'helm-source-apt
           :prompt "Search Package: "
           :input query
-          :buffer "*helm apt*"
+          :buffer " *helm apt*"
           :history 'helm-apt-input-history)))
 
 

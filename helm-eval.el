@@ -165,7 +165,7 @@ Should take one arg: the string to display."
   (interactive "P")
   (helm :sources (helm-build-evaluation-result-source)
         :input (when arg (thing-at-point 'sexp))
-        :buffer "*helm eval*"
+        :buffer " *helm eval*"
         :echo-input-in-header-line nil
         :history 'read-expression-history
         :keymap helm-eval-expression-map))
@@ -191,7 +191,7 @@ Should take one arg: the string to display."
   "Preconfigured helm for `helm-source-calculation-result'."
   (interactive)
   (helm :sources 'helm-source-calculation-result
-        :buffer "*helm calcul*"))
+        :buffer " *helm calcul*"))
 
 (provide 'helm-eval)
 
