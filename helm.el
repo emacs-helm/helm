@@ -3188,7 +3188,8 @@ and `helm-pattern'."
                                    ;; have been already found in previous loop
                                    ;; by comparing its value with ITER.
                                    (or (and allow-dups dup (= dup iter))
-                                       (null dup)))
+                                       (null dup)
+                                       (and dup (/= dup iter))))
                         for target = (helm-candidate-get-display c)
                         for part = (if match-part-fn
                                        (funcall match-part-fn target)
