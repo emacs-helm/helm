@@ -1927,6 +1927,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    helm-in-persistent-action
                    helm-quit
                    (helm-buffer (or any-buffer helm-buffer)))
+               ;; Ensure `helm-buffer' is ephemeral (Issue #1398).
+               (unless (string-match-p "\\`\\s-" helm-buffer)
+                 (setq helm-buffer (concat " " helm-buffer)))
                (with-helm-restore-variables
                  (helm-initialize
                   any-resume any-input any-default any-sources)
