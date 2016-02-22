@@ -3183,18 +3183,17 @@ and `helm-pattern'."
                when (< count limit) nconc
                (cl-loop for c in cands
                         for dup = (gethash c hash)
-                        while (and (< count limit)
-                                   ;; When allowing dups check if DUP
-                                   ;; have been already found in previous loop
-                                   ;; by comparing its value with ITER.
-                                   (or (and allow-dups dup (= dup iter))
-                                       (null dup)
-                                       (and dup (/= dup iter))))
+                        while (< count limit)
                         for target = (helm-candidate-get-display c)
                         for part = (if match-part-fn
                                        (funcall match-part-fn target)
                                        target)
-                        when (funcall fn part) do
+                        ;; When allowing dups check if DUP
+                        ;; have been already found in previous loop
+                        ;; by comparing its value with ITER.
+                        when (and (or (and allow-dups dup (= dup iter))
+                                      (null dup))
+                                  (funcall fn part)) do
                         (progn
                           ;; Modify candidate before pushing it to hash.
                           (helm--maybe-process-filter-one-by-one-candidate c source)
@@ -4733,8 +4732,7 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                                (list (point-at-bol) (point-at-eol))))
                          for dup = (gethash cand hash)
                          when (and (or (and allow-dups dup (= dup iter))
-                                       (null dup)
-                                       (and dup (/= dup iter)))
+                                       (null dup))
                                    (or
                                     ;; Always collect when cand is matched
                                     ;; by searcher funcs and match-part attr
