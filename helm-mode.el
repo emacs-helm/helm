@@ -296,7 +296,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             candidates-in-buffer
                             exec-when-only-one
                             quit-when-no-cand
-                            volatile
+                            (volatile t)
                             sort
                             (fc-transformer 'helm-cr-default-transformer)
                             hist-fc-transformer
