@@ -3197,12 +3197,11 @@ and `helm-pattern'."
                                   (funcall fn part))
                         do
                         (progn
-                          (puthash c iter hash)
-                          (helm--maybe-process-filter-one-by-one-candidate c source)
                           ;; Give as value the iteration number of
                           ;; inner loop to be able to check if
                           ;; the duplicate have not been found in previous loop.
-                          ;(puthash c iter hash)
+                          (puthash c iter hash)
+                          (helm--maybe-process-filter-one-by-one-candidate c source)
                           (cl-incf count))
                         and collect c))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
