@@ -2421,8 +2421,7 @@ Unuseful when used outside helm, don't use it.")
                do (set (make-local-variable var) val)
                finally (setq helm--local-variables nil))
       (setq truncate-lines helm-truncate-lines) ; already local.
-      (setq cursor-type nil)
-      (setq mode-name "Helm"))
+      (setq cursor-type nil))
     (helm-initialize-overlays helm-buffer)
     (get-buffer helm-buffer)))
 
