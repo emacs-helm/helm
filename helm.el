@@ -3191,8 +3191,7 @@ and `helm-pattern'."
                         ;; When allowing dups check if DUP
                         ;; have been already found in previous loop
                         ;; by comparing its value with ITER.
-                        when (and c
-                                  (or (and allow-dups dup (= dup iter))
+                        when (and (or (and allow-dups dup (= dup iter))
                                       (null dup))
                                   (funcall fn part))
                         do
@@ -3203,7 +3202,9 @@ and `helm-pattern'."
                           (puthash c iter hash)
                           (helm--maybe-process-filter-one-by-one-candidate c source)
                           (cl-incf count))
-                        and collect c))
+                        ;; Filter out nil candidates maybe returned by
+                        ;; `helm--maybe-process-filter-one-by-one-candidate'.
+                        and when c collect c))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err)))
