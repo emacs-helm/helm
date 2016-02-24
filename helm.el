@@ -2385,10 +2385,18 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   ;; Run local source hook.
   (helm--run-init-hooks 'after-init-hook))
 
+(define-derived-mode helm-major-mode
+    fundamental-mode "Hmm"
+    "Provide major-mode name in helm buffers.")
+(put 'helm-major-mode 'mode-class 'special )
+(put 'helm-major-mode 'helm-only t)
+
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
   (let ((root-dir default-directory))
     (with-current-buffer (get-buffer-create helm-buffer)
+      (helm-major-mode)
+      (helm-log "Enabling major-mode %S" major-mode)
       (helm-log "kill local variables: %S" (buffer-local-variables))
       (kill-all-local-variables)
       (set (make-local-variable 'inhibit-read-only) t)
@@ -2426,6 +2434,7 @@ Please don't use it.
   :group 'helm
   :keymap (and helm-alive-p helm-map)
   (unless helm-alive-p (setq helm--minor-mode nil)))
+(put 'helm--minor-mode 'helm-only t)
 
 (defun helm--reset-default-pattern ()
   (setq helm-pattern "")
