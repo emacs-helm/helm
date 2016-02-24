@@ -2388,7 +2388,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
 (define-derived-mode helm-major-mode
     fundamental-mode "Hmm"
     "Provide major-mode name in helm buffers.")
-(put 'helm-major-mode 'mode-class 'special )
+(put 'helm-major-mode 'mode-class 'special)
 (put 'helm-major-mode 'helm-only t)
 
 (defun helm-create-helm-buffer ()
