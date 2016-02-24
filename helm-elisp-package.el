@@ -375,7 +375,7 @@
     (setq helm-source-list-el-package
           (helm-make-source "list packages" 'helm-list-el-package-source)))
   (helm :sources 'helm-source-list-el-package
-        :buffer "*helm list packages*"))
+        :buffer " *helm list packages*"))
 
 ;;;###autoload
 (defun helm-list-elisp-packages-no-fetch ()

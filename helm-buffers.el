@@ -867,7 +867,7 @@ displayed with the `file-name-shadow' face if available."
   (helm :sources '(helm-source-buffers-list
                    helm-source-ido-virtual-buffers
                    helm-source-buffer-not-found)
-        :buffer "*helm buffers*"
+        :buffer " *helm buffers*"
         :keymap helm-buffer-map
         :truncate-lines helm-buffers-truncate-lines))
 
@@ -880,7 +880,7 @@ displayed with the `file-name-shadow' face if available."
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-mini-default-sources
-        :buffer "*helm mini*"
+        :buffer " *helm mini*"
         :ff-transformer-show-only-basename nil
         :truncate-lines helm-buffers-truncate-lines))
 

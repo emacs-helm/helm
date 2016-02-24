@@ -340,7 +340,7 @@ but the initial search for all candidates in buffer(s)."
                              :persistent-help "DoNothing"
                              :keymap helm-dabbrev-map
                              :action 'helm-dabbrev-default-action)
-                  :buffer "*helm dabbrev*"
+                  :buffer " *helm dabbrev*"
                   :input (concat "^" dabbrev " ")
                   :resume 'noresume
                   :allow-nest t)))))))

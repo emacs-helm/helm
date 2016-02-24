@@ -82,7 +82,7 @@ Find here the documentation of all sources actually documented."
     (helm :sources (helm-source-org-headings-for-files
                     (list helm-documentation-file))
           :candidate-number-limit 99999
-          :buffer "*helm documentation*")))
+          :buffer " *helm documentation*")))
 
 ;;; Local help messages.
 

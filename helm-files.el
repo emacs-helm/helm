@@ -751,7 +751,7 @@ will not be loaded first time you use this."
                               when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
                               collect (propertize a 'help-echo (car c)) into ls
                               finally return (sort ls 'string<))
-                     :buffer "*helm eshell on file*"
+                     :buffer " *helm eshell on file*"
                      :name "Eshell command"
                      :mode-line
                      '("Eshell alias"
@@ -2465,7 +2465,7 @@ Use it for non--interactive calls of `helm-find-files'."
                helm-ff-transformer-show-only-basename
                :default def
                :prompt "Find Files or Url: "
-               :buffer "*Helm Find Files*")
+               :buffer " *Helm Find Files*")
       (setq helm-ff-default-directory nil))))
 
 (defun helm-find-files-toggle-to-bookmark ()
@@ -2987,7 +2987,7 @@ Don't use it in your own code unless you know what you are doing.")
                                             (expand-file-name candidate)))))))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
-          :buffer "*helm-file-name-history*"
+          :buffer " *helm-file-name-history*"
           :allow-nest t
           :resume 'noresume)))
 (put 'helm-ff-file-name-history 'helm-only t)
@@ -3097,7 +3097,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                            (propertize c 'face 'helm-ff-file)))
                      :keymap helm-generic-files-map
                      :action 'helm-type-file-actions)) 
-        :buffer "*helm browse project*"))
+        :buffer " *helm browse project*"))
 
 ;;;###autoload
 (defun helm-browse-project (arg)
@@ -3136,7 +3136,7 @@ and
              (if (or arg (gethash cur-dir helm--browse-project-cache))
                  (helm-browse-project-find-files cur-dir (equal arg '(16)))
                  (helm :sources (helm-browse-project-build-buffers-source cur-dir)
-                       :buffer "*helm browse project*"))))))
+                       :buffer " *helm browse project*"))))))
 
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
@@ -3399,7 +3399,7 @@ separator."
 (defun helm-find-1 (dir)
   (let ((default-directory (file-name-as-directory dir)))
     (helm :sources 'helm-source-findutils
-          :buffer "*helm find*"
+          :buffer " *helm find*"
           :ff-transformer-show-only-basename nil
           :case-fold-search helm-file-name-case-fold-search)))
 
@@ -3470,7 +3470,7 @@ Run all sources defined in `helm-for-files-preferred-list'."
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-for-files-preferred-list
         :ff-transformer-show-only-basename nil
-        :buffer "*helm for files*"))
+        :buffer " *helm for files*"))
 
 ;;;###autoload
 (defun helm-multi-files ()
@@ -3493,7 +3493,7 @@ locate."
     (unwind-protect
          (helm :sources sources
                :ff-transformer-show-only-basename nil
-               :buffer "*helm multi files*")
+               :buffer " *helm multi files*")
       (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
         old-key))))
 
@@ -3503,7 +3503,7 @@ locate."
   (interactive)
   (helm :sources 'helm-source-recentf
         :ff-transformer-show-only-basename nil
-        :buffer "*helm recentf*"))
+        :buffer " *helm recentf*"))
 
 (provide 'helm-files)
 

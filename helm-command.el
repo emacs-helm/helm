@@ -198,7 +198,7 @@ than the default which is OBARRAY."
                 :test 'commandp
                 :requires-pattern helm-M-x-requires-pattern
                 :name "Emacs Commands"
-                :buffer "*helm M-x*"
+                :buffer " *helm M-x*"
                 :persistent-action (lambda (candidate)
                                      (helm-elisp--persistent-help
                                       candidate 'helm-describe-function))

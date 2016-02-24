@@ -713,7 +713,7 @@ e.g prepended with *."
   (interactive)
   (helm :sources '(helm-source-bookmarks
                    helm-source-bookmark-set)
-        :buffer "*helm bookmarks*"
+        :buffer " *helm bookmarks*"
         :default (buffer-name helm-current-buffer)))
 
 ;;;###autoload
@@ -724,7 +724,7 @@ only if external library addressbook-bookmark.el is available."
   (interactive)
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
-        :buffer "*helm filtered bookmarks*"
+        :buffer " *helm filtered bookmarks*"
         :default (list (thing-at-point 'symbol)
                        (buffer-name helm-current-buffer))))
 

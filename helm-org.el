@@ -228,7 +228,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
         :candidate-number-limit 99999
         :truncate-lines helm-org-truncate-lines
-        :buffer "*helm org headings*"))
+        :buffer " *helm org headings*"))
 
 ;;;###autoload
 (defun helm-org-in-buffer-headings ()
@@ -239,7 +239,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                     (list (current-buffer)))
           :candidate-number-limit 99999
           :truncate-lines helm-org-truncate-lines
-          :buffer "*helm org inbuffer*")))
+          :buffer " *helm org inbuffer*")))
 
 ;;;###autoload
 (defun helm-org-parent-headings ()
@@ -253,7 +253,7 @@ current heading."
                     (list (current-buffer)) t)
           :candidate-number-limit 99999
           :truncate-lines helm-org-truncate-lines
-          :buffer "*helm org parent headings*")))
+          :buffer " *helm org parent headings*")))
 
 ;;;###autoload
 (defun helm-org-capture-templates ()
@@ -262,7 +262,7 @@ current heading."
   (helm :sources (helm-source-org-capture-templates)
         :candidate-number-limit 99999
         :truncate-lines helm-org-truncate-lines
-        :buffer "*helm org capture templates*"))
+        :buffer " *helm org capture templates*"))
 
 
 (provide 'helm-org)

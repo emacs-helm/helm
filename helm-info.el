@@ -182,7 +182,7 @@ helm-info-<CANDIDATE>."
   (let ((default (unless (ring-empty-p helm-info-searched)
                    (ring-ref helm-info-searched 0))))
     (helm :sources (helm-def-source--info-files)
-          :buffer "*helm Info*"
+          :buffer " *helm Info*"
           :preselect (and default
                           (concat "\\_<" (regexp-quote default) "\\_>")))))
 
@@ -225,7 +225,7 @@ helm-info-<CANDIDATE>."
 With a prefix-arg insert symbol at point."
   (interactive)
   (helm :sources helm-info-default-sources
-        :buffer "*helm info*"))
+        :buffer " *helm info*"))
 
 (provide 'helm-info)
 

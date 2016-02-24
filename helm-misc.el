@@ -166,7 +166,7 @@ current local map, current global map, and all current minor maps."
                   '(("Major Mode"  . (local))
                     ("Minor Modes" . (minor))
                     ("Global Map"  . (global))))
-        :buffer "*helm lacarte*"))
+        :buffer " *helm lacarte*"))
 
 (defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
@@ -310,7 +310,7 @@ Default action change TZ environment variable locally to emacs."
   (interactive)
   (let ((enable-recursive-minibuffers t))
     (helm :sources 'helm-source-minibuffer-history
-          :buffer "*helm minibuffer-history*")))
+          :buffer " *helm minibuffer-history*")))
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
@@ -320,7 +320,7 @@ Default action change TZ environment variable locally to emacs."
     (helm :sources 'helm-source-comint-input-ring
           :input (buffer-substring-no-properties (comint-line-beginning-position)
                                                  (point-at-eol))
-          :buffer "*helm comint history*")))
+          :buffer " *helm comint history*")))
 
 
 (provide 'helm-misc)

@@ -383,7 +383,7 @@ the `global-mark-ring' after each new visit."
   (interactive)
   (helm :sources 'helm-source-mark-ring
         :resume 'noresume
-        :buffer "*helm mark*"))
+        :buffer " *helm mark*"))
 
 ;;;###autoload
 (defun helm-global-mark-ring ()
@@ -391,7 +391,7 @@ the `global-mark-ring' after each new visit."
   (interactive)
   (helm :sources 'helm-source-global-mark-ring
         :resume 'noresume
-        :buffer "*helm global mark*"))
+        :buffer " *helm global mark*"))
 
 ;;;###autoload
 (defun helm-all-mark-rings ()
@@ -401,7 +401,7 @@ the `global-mark-ring' after each new visit."
   (helm :sources '(helm-source-mark-ring
                    helm-source-global-mark-ring)
         :resume 'noresume
-        :buffer "*helm mark ring*"))
+        :buffer " *helm mark ring*"))
 
 ;;;###autoload
 (defun helm-register ()
@@ -409,7 +409,7 @@ the `global-mark-ring' after each new visit."
   (interactive)
   (helm :sources 'helm-source-register
         :resume 'noresume
-        :buffer "*helm register*"))
+        :buffer " *helm register*"))
 
 ;;;###autoload
 (defun helm-show-kill-ring ()
@@ -420,7 +420,7 @@ First call open the kill-ring browser, next calls move to next line."
   (interactive)
   (let ((enable-recursive-minibuffers t))
     (helm :sources helm-source-kill-ring
-          :buffer "*helm kill ring*"
+          :buffer " *helm kill ring*"
           :resume 'noresume
           :allow-nest t)))
 
@@ -457,7 +457,7 @@ This command is useful when used with persistent action."
              (kmacro-split-ring-element candidate)
              (kmacro-exec-ring-item
               candidate helm-current-prefix-arg))))
-        :buffer "*helm kmacro*"))
+        :buffer " *helm kmacro*"))
 
 (provide 'helm-ring)
 

@@ -2038,7 +2038,7 @@ Return nil if no `helm-buffer' found."
                           (candidates . helm-buffers)
                           (action . identity)))
               :resume 'noresume
-              :buffer "*helm resume*")
+              :buffer " *helm resume*")
         (keyboard-quit))))
 
 

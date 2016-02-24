@@ -801,7 +801,7 @@ Special commands:
                 :must-match t
                 :fc-transformer '(helm-adaptive-sort
                                   helm-grep-ack-types-transformer)
-                :buffer "*helm ack-types*")))
+                :buffer " *helm ack-types*")))
     (mapconcat (lambda (type) (concat "--type=" type)) types " ")))
 
 
@@ -835,7 +835,7 @@ These extensions will be added to command line with --include arg of grep."
          (extensions (helm-comp-read "Search Only in: " all-exts
                                      :marked-candidates t
                                      :fc-transformer 'helm-adaptive-sort
-                                     :buffer "*helm grep exts*"
+                                     :buffer " *helm grep exts*"
                                      :name "*helm grep extensions*")))
     (when (listp extensions) ; Otherwise it is empty string returned by C-RET.
       ;; If extensions is a list of one string containing spaces,
@@ -1177,7 +1177,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                 :action #'helm-pdfgrep-action
                 :persistent-help "Jump to PDF Page"
                 :requires-pattern 2)
-     :buffer "*helm pdfgrep*"
+     :buffer " *helm pdfgrep*"
      :history 'helm-grep-history)))
 
 (defun helm-pdfgrep-action (candidate)

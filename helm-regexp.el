@@ -406,7 +406,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
      (cl-loop for b in bufs
               collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-moccur
-        :buffer "*helm multi occur*"
+        :buffer " *helm multi occur*"
         :history 'helm-occur-history
         :keymap helm-moccur-map
         :input input
@@ -559,7 +559,7 @@ Special commands:
                (not (helm-current-buffer-narrowed-p (current-buffer))))
       (narrow-to-region (region-beginning) (region-end)))
     (helm :sources helm-source-regexp
-          :buffer "*helm regexp*"
+          :buffer " *helm regexp*"
           :prompt "Regexp: "
           :history 'helm-build-regexp-history)))
 
@@ -576,7 +576,7 @@ Special commands:
      (cl-loop for b in bufs
               collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
-        :buffer "*helm occur*"
+        :buffer " *helm occur*"
         :history 'helm-occur-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
                         (format "%s:%d:" (regexp-quote (buffer-name))
@@ -600,7 +600,7 @@ Special commands:
      (cl-loop for b in bufs
               collect (buffer-chars-modified-tick (get-buffer b))))
     (helm :sources 'helm-source-occur
-          :buffer "*helm occur*"
+          :buffer " *helm occur*"
           :history 'helm-occur-history
           :input input
           :truncate-lines helm-moccur-truncate-lines)))

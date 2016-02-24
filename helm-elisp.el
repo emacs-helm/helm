@@ -313,7 +313,7 @@ Return a cons \(beg . end\)."
            :input (if helm-lisp-fuzzy-completion
                       target (concat target " "))
            :resume 'noresume
-           :buffer "*helm lisp completion*"
+           :buffer " *helm lisp completion*"
            :allow-nest t))
       (message "[No Match]"))))
 
@@ -643,7 +643,7 @@ Filename completion happen if string start after or between a double quote."
                      helm-source-info-cl
                      helm-source-info-eieio)
           :resume 'noresume
-          :buffer "*helm lookup*"
+          :buffer " *helm lookup*"
           :input c)))
 
 (defun helm-info-lookup-symbol (candidate)
@@ -675,7 +675,7 @@ Filename completion happen if string start after or between a double quote."
           (mapcar (lambda (func)
                     (funcall func default))
                   helm-apropos-function-list)
-          :buffer "*helm apropos*"
+          :buffer " *helm apropos*"
           :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
 
 
@@ -764,7 +764,7 @@ Filename completion happen if string start after or between a double quote."
                                         (if helm-ff-transformer-show-only-basename
                                             (cons (helm-basename c) c) c))
                    :action (helm-actions-from-type-file))
-        :buffer "*helm locate library*"))
+        :buffer " *helm locate library*"))
 
 (defun helm-set-variable (var)
   "Set value to VAR interactively."
@@ -821,7 +821,7 @@ Filename completion happen if string start after or between a double quote."
   (interactive)
   (helm :sources '(helm-source-absolute-time-timers
                    helm-source-idle-time-timers)
-        :buffer "*helm timers*"))
+        :buffer " *helm timers*"))
 
 
 ;;; Complex command history
@@ -890,7 +890,7 @@ Filename completion happen if string start after or between a double quote."
   "Preconfigured helm for complex command history."
   (interactive)
   (helm :sources 'helm-source-complex-command-history
-        :buffer "*helm complex commands*"))
+        :buffer " *helm complex commands*"))
 
 (provide 'helm-elisp)
 

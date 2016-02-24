@@ -243,7 +243,7 @@
     (helm :sources 'helm-source-imenu
           :default (list (concat "\\_<" str "\\_>") str)
           :preselect str
-          :buffer "*helm imenu*")))
+          :buffer " *helm imenu*")))
 
 ;;;###autoload
 (defun helm-imenu-in-all-buffers ()
@@ -263,7 +263,7 @@
           :preselect (unless (memq 'helm-source-imenu-all
                                    helm-sources-using-default-as-input)
                        str)
-          :buffer "*helm imenu all*")))
+          :buffer " *helm imenu all*")))
 
 (provide 'helm-imenu)
 
