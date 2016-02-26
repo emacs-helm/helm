@@ -250,7 +250,7 @@
   (cl-loop for c in candidates
            for id = (get-text-property 0 'tabulated-list-id c)
            for name = (if (fboundp 'package-desc-name)
-                          (package-desc-name id)
+                          (and id (package-desc-name id))
                           (car id))
            for installed-p = (assq name package-alist)
            for upgrade-p = (assq name helm-el-package--upgrades)
