@@ -5483,7 +5483,7 @@ With a prefix arg set to real value of current selection."
 
 (defun helm-kill-selection-and-quit (arg)
   "Store display value of current selection to kill ring.
-With a prefix arg set to real value of current selection.
+With a prefix arg use real value of current selection.
 Display value is what you see in `helm-buffer' and real value
 is what is used to perform actions."
   (interactive "P")
@@ -5499,13 +5499,17 @@ is what is used to perform actions."
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
 (defun helm-copy-to-buffer ()
-  "Copy selection or marked candidates to `helm-current-buffer'."
+  "Copy selection or marked candidates to `helm-current-buffer'.
+Note that the real candidates are copied and not the display ones."
   (interactive)
   (with-helm-alive-p
-    (with-helm-current-buffer
-      (insert (mapconcat (lambda (cand)
-                           (format "%s" cand))
-                         (helm-marked-candidates) "\n")))))
+    (helm-run-after-exit
+     (lambda (cands)
+       (with-helm-current-buffer
+         (insert (mapconcat (lambda (c)
+                              (format "%s" c))
+                            cands "\n"))))
+     (helm-marked-candidates))))
 (put 'helm-copy-to-buffer 'helm-only t)
 
 
