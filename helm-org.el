@@ -139,7 +139,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                         (if parents (nreverse cands) cands))))))
 
 (defun helm-source-org-headings-for-files (filenames &optional parents)
-  (helm-make-source "Org Headings" helm-org-headings-class
+  (helm-make-source "Org Headings" 'helm-org-headings-class
     :parents parents
     :candidates filenames))
 
