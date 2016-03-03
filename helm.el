@@ -3259,7 +3259,7 @@ and `helm-pattern'."
     (if (not (assq 'multiline source))
         (cl-loop for m in matches
                  for count from 1
-                 do (helm-insert-match m 'insert source count))
+                 do (helm-insert-match m 'insert count))
       (let ((start (point))
             (count 0)
             separate)
@@ -3268,7 +3268,7 @@ and `helm-pattern'."
           (if separate
               (helm-insert-candidate-separator)
             (setq separate t))
-          (helm-insert-match match 'insert source count))
+          (helm-insert-match match 'insert count))
         (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
@@ -3492,7 +3492,7 @@ PRESELECT, if specified."
   "Remove SOURCE from `helm-candidate-cache'."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
-(defun helm-insert-match (match insert-function source &optional num)
+(defun helm-insert-match (match insert-function &optional num)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
 If MATCH is a list then insert the string to display and store
 the real value in a text property."
@@ -3582,10 +3582,10 @@ this additional info after the source name by overlay."
     (if (assq 'multiline source)
         (let ((start (point)))
           (helm-insert-candidate-separator)
-          (helm-insert-match candidate 'insert-before-markers source
+          (helm-insert-match candidate 'insert-before-markers
                              (1+ (cdr (assoc 'item-count source))))
           (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers source
+        (helm-insert-match candidate 'insert-before-markers
                            (1+ (cdr (assoc 'item-count source)))))
     (cl-incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
