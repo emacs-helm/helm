@@ -3009,10 +3009,15 @@ Don't use it in your own code unless you know what you are doing.")
         (t (setq helm-recentf--basename-flag nil)
            pattern))))
 
+(defcustom helm-turn-on-recentf t
+  "Automatically turn on `recentf-mode' when non-nil."
+  :group 'helm-files
+  :type 'boolean)
+
 (defclass helm-recentf-source (helm-source-sync helm-type-file)
   ((init :initform (lambda ()
                      (require 'recentf)
-                     (recentf-mode 1)))
+                     (recentf-mode helm-turn-on-recentf)))
    (candidates :initform (lambda () recentf-list))
    (pattern-transformer :initform 'helm-recentf-pattern-transformer)
    (match-part :initform (lambda (candidate)
