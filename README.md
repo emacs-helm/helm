@@ -36,7 +36,7 @@
 # Introduction
 
 `Helm` is an Emacs framework for incremental completions and narrowing
-selections. It helps to rapidly complete filenames, buffer names, or
+selections. It helps to rapidly complete file names, buffer names, or
 any other Emacs interactions requiring selecting an item from a list of
 possible choices.
 
@@ -104,7 +104,7 @@ one-line entry in the Emacs init file:
 ```
 
 _WARNING:_ Helm upgrades from MELPA repository encountered errors
-because of the way pacakge.el fetched and compiled updates for
+because of the way package.el fetched and compiled updates for
 existing packages. To get around these errors, Helm adds
 [Async](https://github.com/jwiegley/emacs-async) as a dependency
 package install. Async forces compilation in a clean environment,
@@ -140,7 +140,7 @@ if the careful safeguards are not implemented in the hacks.
 
 ## Configuration
 
-For minimal helm configuration, run the startup script `./emacs-helm.sh`
+For minimal helm configuration, run the start-up script `./emacs-helm.sh`
 and then see the file `/tmp/helm-cfg.el`.
 
 The full configuration I (the helm maintainer) use is
@@ -178,7 +178,7 @@ Use these embedded Info screens first before reporting bugs.
 
 `M-x helm-mode` to enable helm completion for common Emacs commands
 (e.g `M-x`, `C-x C-f`, etc...). Note that the helm functionality
-enabled thorugh helm-mode comes from a generic implementation and does
+enabled through helm-mode comes from a generic implementation and does
 not include all helm features available through equivalent
 helm-specific commands. For example, `helm-M-x` has more features than
 helm completion through `M-x`.
@@ -235,8 +235,8 @@ An example:
       :buffer "*helm test*")
 ```
 
-The candiates list may be replaced by a function that produces a list.
-See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework))
+The candidates list may be replaced by a function that produces a list.
+See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework))
 for details.
 
 
@@ -266,7 +266,7 @@ To globally enable fuzzy matching for `helm-mode`:
 
 ### Autoresize
 
-To resize the completion window based on number of candidates:
+To re-size the completion window based on number of candidates:
 
     (helm-autoresize-mode 1)
 
@@ -308,7 +308,7 @@ through the Emacs package manager. This list is not exhaustive.
   everywhere with `helm-find-files`.
 - `helm-apropos`: enhanced apropos for functions and variables that
   `C-h` commands provide.
-- `Grep`: launch from any helm file commands; supports backends
+- `Grep`: launch from any helm file commands; supports back-ends
   `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
   `pt`.
 - `helm-gid`: Helm interface for `gid` from
@@ -316,7 +316,7 @@ through the Emacs package manager. This list is not exhaustive.
 - `helm-show-kill-ring`: A helm browser for kill ring.
 - `helm-all-mark-rings`: A helm browser for mark ring; retrieves last positions in buffers.
 - `helm-filtered-bookmarks`: enhanced browser for bookmarks.
-- `helm-list-elisp-packages`: enahanced browser for elisp package management.
+- `helm-list-elisp-packages`: enhanced browser for elisp package management.
 
 # Recommended Helm extensions
 
@@ -337,7 +337,7 @@ extensions.
 
 # Known issues
 
-The Helm project has a currnt unresolved 
+The Helm project has a currant unresolved 
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
 Please feel free to fix any of them; send a pull request.
 
@@ -345,7 +345,7 @@ Please feel free to fix any of them; send a pull request.
 
 The Helm project maintains a
 [list](https://github.com/emacs-helm/helm/contributors) of
-contributers.
+contributors.
 
 # Bugs & Improvements
 
@@ -361,7 +361,7 @@ script `./emacs-helm.sh` located in the helm directory.
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
-[emacs-helm google group](https://groups.google.com/group/emacs-helm?hl=en)
+[emacs-helm Google group](https://groups.google.com/group/emacs-helm?hl=en)
 are two readily available locations.
 
 Cheers,<br>

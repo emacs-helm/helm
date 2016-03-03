@@ -63,7 +63,7 @@ function on the next hit."
 ;;;###autoload
 (defmacro helm-multi-key-defun (name docstring funs &optional delay)
   "Define NAME as a multi-key command running FUNS.
-After DELAY seconds, the FUNS list is reinitialised.
+After DELAY seconds, the FUNS list is reinitialized.
 See `helm-define-multi-key'."
   (declare (indent 2))
   (setq docstring (if docstring (concat docstring "\n\n")
@@ -112,10 +112,10 @@ and second call within 0.5s runs `helm-swap-windows'."
 This allows typing KEY to call COMMAND the first time and
 type only SUBKEY on subsequent calls.
 
-Arg MAP is the keymap to use, SUBKEY is the initial short keybinding to
+Arg MAP is the keymap to use, SUBKEY is the initial short key-binding to
 call COMMAND.
 
-Arg OTHER-SUBKEYS is an alist specifying other short keybindings
+Arg OTHER-SUBKEYS is an alist specifying other short key-bindings
 to use once started.
 e.g:
 
@@ -305,7 +305,7 @@ Set this value to nil for no limit."
 Helps curtail unnecessary retrieval of candidates from sources as
 the user is typing. 
 
-Such delay also helps declutter the results in helm displays in
+Such delay also helps de-clutter the results in helm displays in
 the short elapsed time between successive characters typed by the
 user."
   :group 'helm
@@ -446,9 +446,9 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :type 'symbol)
 
 (defcustom helm-display-buffer-default-size nil
-  "Initial height of `helm-buffer', specifie as an integer or a function.
+  "Initial height of `helm-buffer', specified as an integer or a function.
 The function should take one arg and the responsibility for
-resizing the window; function's return value is ignored. See
+re-sizing the window; function's return value is ignored. See
 `display-buffer' for more info."
   :group 'helm
   :type '(choice integer function))
@@ -475,7 +475,7 @@ or when `helm-split-window-default-side' is set to 'same.
 When `helm-autoresize-mode' is enabled, setting this to nil
 will have no effect.
 
-Also when non-`nil' it overhides the effect of `helm-split-window-default-side'
+Also when non-`nil' it overrides the effect of `helm-split-window-default-side'
 set to `other'."
   :group 'helm
   :type 'boolean)
@@ -880,7 +880,7 @@ Some Helm actions operate on marked candidates.
 \\[helm-quit-and-find-file]\t\tDrop into `helm-find-files'.
 \\[helm-kill-selection-and-quit]\t\tKill display value of candidate and quit (with prefix arg, kill the real value).
 \\[helm-yank-selection]\t\tYank current selection into pattern.
-\\[helm-follow-mode]\t\tToggle automatica execution of persistent action.
+\\[helm-follow-mode]\t\tToggle automatic execution of persistent action.
 \\[helm-follow-action-forward]\tRun persistent action and then select next line.
 \\[helm-follow-action-backward]\t\tRun persistent action and then select previous line.
 \\[helm-refresh]\t\tRecalculate and redisplay candidates.
@@ -1187,7 +1187,7 @@ If SRC is omitted, use current source.
 If COMPUTE is non-`nil' compute value of ATTRIBUTE-NAME
 with `helm-interpret-value'.  COMPUTE can have also 'ignorefn as
 value, in this case `helm-interpret-value' will return a function
-as value inchanged, but will eval a symbol which is bound
+as value unchanged, but will eval a symbol which is bound
 (i.e a variable)."
   (let ((src (or source (helm-get-current-source))))
     (helm-aif (or (assq attribute-name src)
@@ -1299,7 +1299,7 @@ argument NAME is a string that will appear in action menu
 and SOURCE should be an existing helm source already loaded.
 If INDEX is specified, action is added in action list at INDEX.
 Value of INDEX should be always >=1, default to 4.
-This allow user to add a specific `action-tranformer'
+This allow user to add a specific `action-transformer'
 to an existing source without modifying source code.
 E.g
 Add the action \"Byte compile file async\" linked to
@@ -1514,7 +1514,7 @@ The action is to call FUNCTION with arguments ARGS.
 Unlike `helm-exit-and-execute-action', this can be used
 to call non--actions functions with any ARGS or no ARGS at all.
 
-Use this on commands invoked from keybindings, but not
+Use this on commands invoked from key-bindings, but not
 on action functions invoked as action from the action menu,
 i.e. functions called with RET."
   (helm-kill-async-processes)
@@ -1529,7 +1529,7 @@ i.e. functions called with RET."
 Argument ACTION is a function called with one arg (candidate)
 and part of the actions of current source.
 
-Use this on commands invoked from keybindings, but not
+Use this on commands invoked from key-bindings, but not
 on action functions invoked as action from the action menu,
 i.e functions called with RET."
   (setq helm-saved-action action)
@@ -1841,7 +1841,7 @@ to 10 as a session local variable.
             ;; A helm session is normally running.
             (error "Error: Trying to run helm within a running helm session")
           ;; A helm session is already running and user jump somewhere else
-          ;; without desactivating it.
+          ;; without deactivating it.
           (with-helm-buffer
             (prog1
                 (message "Aborting an helm session running in background")
@@ -1928,7 +1928,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
                   (cl-loop for s in (helm-normalize-sources any-sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
-    ;; cua-mode overhide local helm bindings.
+    ;; cua-mode override local helm bindings.
     ;; disable this stupid thing if enabled.
     (and cua-mode (cua-mode -1))
     (unwind-protect
@@ -2062,7 +2062,7 @@ Call `helm' only with ANY-SOURCES and ANY-BUFFER as args."
   (helm :sources any-sources :buffer any-buffer))
 
 (defun helm-nest (&rest same-as-helm)
-  "Allows calling `helm' whithin a running helm session.
+  "Allows calling `helm' within a running helm session.
 Arguments SAME-AS-HELM are the same as `helm'"
   (with-helm-window
     (let ((orig-helm-current-buffer helm-current-buffer)
@@ -2127,7 +2127,7 @@ Argument SAVE-OR-RESTORE is either save or restore."
     (restore
      ;; Maybe `helm-current-buffer' have been deleted
      ;; during helm session so check if it is here
-     ;; otherwise position in underlaying buffer will be lost.
+     ;; otherwise position in underlying buffer will be lost.
      (when (get-buffer-window helm-current-buffer 'visible)
        (helm-log "Restore position at  %S in buffer %s"
                  helm-current-position
@@ -2538,7 +2538,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                        (lambda ()
                          ;; Start minor-mode with global value of helm-map.
                          (helm--minor-mode 1)
-                         ;; Now overhide the global value of `helm-map' with
+                         ;; Now override the global value of `helm-map' with
                          ;; the local one which is in this order:
                          ;; - The keymap of current source.
                          ;; - The value passed in ANY-KEYMAP
@@ -2593,7 +2593,7 @@ This can be useful for example for quietly writing a complex regexp."
       (setq helm-pattern ""))
     (message (if helm-suspend-update-flag
                  "Helm update suspended!"
-               "Helm update reenabled!"))))
+               "Helm update re-enabled!"))))
 (put 'helm-toggle-suspend-update 'helm-only t)
 
 (defadvice tramp-read-passwd (around disable-helm-update)
@@ -3124,7 +3124,7 @@ It is meant to use with `filter-one-by-one' slot."
       (insert (propertize display 'read-only nil)) ; Fix (#1176)
       (goto-char (point-min))
       (when mp
-        ;; FIXME the first part of display may contain an occurence of mp.
+        ;; FIXME the first part of display may contain an occurrence of mp.
         ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
         (search-forward mp nil t)
         (goto-char (match-beginning 0)))
@@ -3444,7 +3444,7 @@ not on current source."
                       helm-update-blacklist-regexps)))))
 
 (defun helm-delayed-source-p (source)
-  "Wheter SOURCE is a delayed source or not."
+  "Whether SOURCE is a delayed source or not."
   (or (assoc 'delayed source)
       (and helm-quick-update
            (> (length helm-sources) 1)
@@ -3648,7 +3648,7 @@ function."
                  ;; `helm-suspend-update-flag'
                  ;; is non-`nil' here only during a
                  ;; running process, this will never be called
-                 ;; when user set it explicitely with `C-!'.
+                 ;; when user set it explicitly with `C-!'.
                  helm-suspend-update-flag))
     (setq helm-suspend-update-flag t)
     ;; Kill the process but don't delete entry in
@@ -3659,7 +3659,7 @@ function."
     ;; the main "Emacs". To avoid this [1] helm waits for 5 seconds
     ;; before updates yet allows user input during this delay. [1] In
     ;; recent Emacs versions, this has been fixed so tramp returns nil
-    ;; in such cnditions. Note: `tramp-connection-min-time-diff' cannot
+    ;; in such conditions. Note: `tramp-connection-min-time-diff' cannot
     ;; have values less than 5 seconds otherwise the process dies.
     (run-at-time (or (and (boundp 'tramp-connection-min-time-diff)
                           tramp-connection-min-time-diff)
@@ -4191,7 +4191,7 @@ next source)."
 
 (defun helm-mark-current-line (&optional resumep)
   "Move `helm-selection-overlay' to current line.
-Note that this is unrelated to visibles marks used for marking
+Note that this is unrelated to visible marks used for marking
 candidates."
   (with-helm-window
     (when resumep
@@ -4678,7 +4678,7 @@ The expansion is performed in `helm-get-sources'.
 
 The `candidates-in-buffer' attribute implies the volatile attribute.
 The volatile attribute is needed because `helm-candidates-in-buffer'
-creates candidates dynamically and need to be called everytime
+creates candidates dynamically and need to be called every time
 `helm-pattern' changes.
 
 Because `helm-candidates-in-buffer' plays the role of `match' attribute
@@ -5528,11 +5528,11 @@ display values."
 (put 'helm-copy-to-buffer 'helm-only t)
 
 
-;;; Follow-mode: Automatical execution of persistent-action
+;;; Follow-mode: Automatic execution of persistent-action
 ;;
 ;;
 (defun helm-follow-mode (&optional arg)
-  "Execute persistent action everytime the cursor is moved when enabled.
+  "Execute persistent action every time the cursor is moved when enabled.
 This mode enabled for the current source only; for next source,
 this mode will have to be enabled again. This mode can be enabled
 or disabled interactively at anytime during a helm session. It
@@ -5618,7 +5618,7 @@ This happen after `helm-input-idle-delay' secs."
 
 (define-minor-mode helm-autoresize-mode
     "Auto resize helm window when enabled.
-Helm window is resized according to `helm-autoresize-max-height'
+Helm window is re-sized according to `helm-autoresize-max-height'
 and `helm-autoresize-min-height'. Note that when this mode is
 enabled, helm behaves as if `helm-always-two-windows' is
 enabled.
