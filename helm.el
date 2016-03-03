@@ -1465,7 +1465,7 @@ of \(action-display . function\)."
   "Return the source for the current selection.
 Allow also checking if helm-buffer contain candidates."
   (or helm-current-source
-      (with-current-buffer (helm-buffer-get)
+      (with-helm-buffer
         ;; Return nil when no--candidates.
         (cl-block exit
           ;; This goto-char shouldn't be necessary, but point is moved to
