@@ -3678,8 +3678,8 @@ function."
   ;; Position can be change when `helm-current-buffer'
   ;; is split, so jump to this position before executing action.
   (helm-current-position 'restore)
-  (helm-execute-selection-action-1)
-  (helm-log-run-hook 'helm-after-action-hook))
+  (prog1 (helm-execute-selection-action-1)
+    (helm-log-run-hook 'helm-after-action-hook)))
 
 (defun helm-execute-selection-action-1 (&optional
                                         selection action
