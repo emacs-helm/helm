@@ -16,17 +16,16 @@
 - [Getting Started](#getting-started)
     - [Quick install from git](#quick-install-from-git)
     - [Install from Emacs packaging system](#install-from-emacs-packaging-system)
-    - [Install and use only helm-core package](#install-and-use-only-helm-core-package)
-    - [Alternate install warning](#alternate-install-warning)
+    - [Installing just the helm-core package](#installing-just-the-helm-core-package)
+    - [Warning about alternate installation methods](#warning-about-alternate-installation-methods)
     - [Configuration](#configuration)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
-        - [Create your own helm source (overview)](#create-your-own-helm-source-overview)
+        - [Creating custom helm sources](#creating-custom-helm-sources)
         - [Fuzzy matching](#fuzzy-matching)
         - [Autoresize](#autoresize)
-- [Features](#features)
-    - [Applications (not exhaustive)](#applications-not-exhaustive)
-- [Helm extensions you should install](#helm-extensions-you-should-install)
+- [Helm Applications](#helm-applications)
+- [Recommended Helm extensions](#recommended-helm-extensions)
 - [Known issues](#known-issues)
 - [Contributors](#contributors)
 - [Bugs & Improvements](#bugs--improvements)
@@ -36,24 +35,26 @@
 
 # Introduction
 
-`Helm` is incremental completion and selection narrowing framework for
-Emacs. It will help steer you in the right direction when you're looking
-for stuff in Emacs (like buffers, files, etc).
+`Helm` is an Emacs framework for incremental completions and narrowing
+selections. It helps to rapidly complete file names, buffer names, or
+any other Emacs interactions requiring selecting an item from a list of
+possible choices.
 
-Helm is a fork of `anything.el` originally written by Tamas Patrovic
-and can be considered to be its successor. 
-`Helm` sets out to clean up the legacy code in `anything.el`
-and provide a cleaner, leaner and more modular tool, that's not tied in
-the trap of backward compatibility. 
+Helm is a fork of `anything.el`, which was originally written by Tamas
+Patrovic and can be considered to be its successor. `Helm` cleans the
+legacy code that is leaner, modular, and unchained from constraints of
+backward compatibility.
 
 # Requirements
 
-You need a recent Emacs to use latest helm, at least Emacs-24.3.
+Helm requires Emacs-24.3 or later versions.
 
-[async](https://github.com/jwiegley/emacs-async) will be installed as dependency
-when installing from melpa but is facultative when installing from git (recommended though
-as it may fix installation of all packages from (m)elpa and will allow you to
-copy/rename asynchronously your files from helm and/or dired if needed).
+Helm installs [async](https://github.com/jwiegley/emacs-async) package as a dependency
+when Helm is installed using MELPA. 
+
+Helm installation from the git source repository does not include
+async. The async package is recommended for smooth asynchronous file
+and dired operations in Helm.
 
 # Getting Started
 
@@ -75,142 +76,156 @@ copy/rename asynchronously your files from helm and/or dired if needed).
   3. Add to `.emacs.el` (or equivalent):
 
     ```elisp
-    ;; [Facultative] Only if you have installed async.
+    ;; If async is installed
     (add-to-list 'load-path "/path/to/async/directory")
     
     (add-to-list 'load-path "/path/to/helm/directory")
     (require 'helm-config)
     ```
     
-_NOTE:_ Installing helm like this (i.e from git+make) is the safest way.
+_NOTE:_ Installing helm using git and make is the safest way.
 
-You can have a quick try to `helm` by launching from the helm directory:
+To quickly run `helm`, launch this script from helm directory:
 
 `./emacs-helm.sh`
 
-It is also recommended to use this when reporting bug.
+Also use the same script above for bug reporting.
 
-_NOTE:_ That this will not work on Windows systems.
+_NOTE:_ This script does not work on Windows systems.
 
 ## Install from Emacs packaging system
 
-Helm is now available on Melpa at http://melpa.org/
-You will find there instructions to install.
-See also https://github.com/milkypostman/melpa#usage to startup correctly
-with the emacs packaging system.
-Then you should need only in your init file:
+Helm can also be installed from MELPA repository at http://melpa.org/.
+No further configuration is necessary to run helm other than perhaps a
+one-line entry in the Emacs init file:
 
 ```elisp
 (require 'helm-config)
 ```
 
-_WARNING:_ Due to a bad concept of package.el which is in charge of fetching helm files
-and compiling them, users had errors most of the time when upgrading from melpa and `list-package`.
-To avoid this [Async](https://github.com/jwiegley/emacs-async) have been added as dependency to
-helm to force package.el compiling its files in a clean environment.
-People installing from git and using the make file will not suffer from this problem and don't need
-[Async](https://github.com/jwiegley/emacs-async) though it is recommended as it fix installation
-of all other packages you may install with package.el from (m)elpa.
-See [FAQ](https://github.com/emacs-helm/helm/wiki#faq) for more infos.
+_WARNING:_ Helm upgrades from MELPA repository encountered errors
+because of the way package.el fetched and compiled updates for
+existing packages. To get around these errors, Helm adds
+[Async](https://github.com/jwiegley/emacs-async) as a dependency
+package install. Async forces compilation in a clean environment,
+which solves those compilation errors. Since async has other benefits
+as well, both for Helm and other packages, we recommend installing
+async even for Helm installs using git. See
+[FAQ](https://github.com/emacs-helm/helm/wiki#faq) for details.
 
-_Note:_ After upgrading from the emacs packaging system you should restart emacs for the changes take effect.
+_Note:_ Restart Emacs for Helm updates from MELPA repositories to take
+effect.
 
 **Note to Linux Distributions Maintainers**
 
-`Only the extensions present in the github emacs-helm organisation are supported.`
+`Only the extensions in the github emacs-helm repository are supported.`
 
-## Install and use only helm-core package
+## Installing just the helm-core package
 
-Third party helm packages can use only helm-core package if they don't need more helm libraries
-for their packages. It is available at http://melpa.org/.
-
-All you need to add in your packages is
+`helm-core` package is available on [MELPA](http://melpa.org/) for
+third party packages that depend on helm libraries. These packages
+should require helm as follows:
 
      (require 'helm)
 
-This will provide the necessary code to build and run helm sources with multiple regexp matching
-or fuzzy matching.
+Requiring helm builds and runs helm code necessary for multiple regexp
+and fuzzy matching. See
+[helm wiki](https://github.com/emacs-helm/helm/wiki#developpingusinghelmframework)
+for details.
 
-See [wiki](https://github.com/emacs-helm/helm/wiki#developpingusinghelmframework) for more infos.
-
-## Alternate install warning
-
-Some people are installing `helm` with their own config using diverses `require`, `autoload`
-and other hacks, not using `helm-config`.
-Expect failures and slowdown at startup unless you really know what you are doing when you do so.
+## Warning about alternate installation methods
+    
+Installation methods that circumvent `helm-config` are known to fail
+if the careful safeguards are not implemented in the hacks. 
 
 ## Configuration
 
-For a minimal helm configuration, run the startup script `./emacs-helm.sh`
-and look at the file `/tmp/helm-cfg.el`.
+For minimal helm configuration, run the start-up script `./emacs-helm.sh`
+and then see the file `/tmp/helm-cfg.el`.
 
-The full configuration I use (helm maintainer) can be found [here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el).
+The full configuration I (the helm maintainer) use is
+[here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el).
 
-Don't hesitate also to visit all helm customizable variables with the customize interface.
-Enabling `helm-mode` will give you completion in the diverse customize commands.
+Also see helm customizable variables with the customize interface.
+Enabling `helm-mode` will enable helm for many features of emacs
+requiring completions.
 
-Also you will find some packages like [Emacs Prelude](https://github.com/bbatsov/prelude) that
-have Helm built-in and properly set-up.
+For pre-configured Emacs installs, such as
+[Emacs Prelude](https://github.com/bbatsov/prelude), helm is built-in
+with no additional configuration steps necessary for using helm.
 
 ## Basic usage
 
-Just type `M-x helm-M-x RET helm-`, you will have completion on all helm commands.
+`M-x helm-M-x RET helm-` lists helm commands ready for narrowing and selecting.
 
-You can bind this to `M-x` like this:
+To bind to `M-x`: 
 
 `(global-set-key (kbd "M-x") 'helm-M-x)`
 
 - _IMPORTANT:_
 
-Once you are in the helm session (of `helm-M-x` or any one else) you can hit either `C-h m` or
-`C-c ?`, the former is will popup a general info buffer about helm while the second will
-popup a specialized info of the current source you are into.
-Sometime `C-c ?` is not available, in this case you will see in mode-line `C-h m` instead of `C-c ?`.
-PLEASE USE and ABUSE of these `helm` embeded infos before reporting a bug about how to do things
-in `helm`, you will find also useful infos in mode-line.
+In any helm session (after `helm-M-x` or `helm-` command)
 
-You can also start with `M-x helm-mode` and enjoy helm completion in your favourites
-Emacs commands (e.g `M-x`, `C-x C-f`, etc...).
-You can enable this by adding in your init file:
+`C-h m` pops a general info buffer about helm
+
+`C-c ?` pops a special info buffer of the current helm command
+
+Not all helm commands have specialized info buffers. Look for `C-c ?`
+in the mode-line. `C-h m` is shown for any command that does not have
+a specialized info buffer.
+
+Use these embedded Info screens first before reporting bugs.
+
+`M-x helm-mode` to enable helm completion for common Emacs commands
+(e.g `M-x`, `C-x C-f`, etc...). Note that the helm functionality
+enabled through helm-mode comes from a generic implementation and does
+not include all helm features available through equivalent
+helm-specific commands. For example, `helm-M-x` has more features than
+helm completion through `M-x`.
+
+To make helm-mode start with Emacs init file: 
 
 ```elisp
 (helm-mode 1)
 ```
 
-- _NOTE_ that the helmized emacs commands are different and much more basic than the helm ones.
+To discover helm commands, look at helm menu item in Emacs menu. 
 
-As a startup point you can also look at the helm section in Emacs menu to
-discover some of the commands provided by helm.
-
-For those who have a system able to run shell scripts, a convenient way to discover helm
-is to run `./emacs-helm.sh` from the helm directory, you will find interesting infos in
-your scratch buffer.
-`emacs-helm.sh` accept all emacs command line options, see `emacs-helm.sh -h` for more
-infos.
+Another way to discover helm commands: run the shell script:
+`./emacs-helm.sh` and then look in the scratch buffer. `emacs-helm.sh`
+accepts emacs command line options. `emacs-helm.sh -h` opens an Info
+screen with more details.
 
 ## Advanced usage
 
-Helm is capable of a lot. Here is a demo of `helm-buffers-list` used with `helm-moccur`:
+Helm contains many features, some of which are easier to follow
+visually. Here is a demo of `helm-buffers-list` used with
+`helm-moccur`. Demo starts with `Eval: START` in the minibuffer.
 
 ![helm-buffers-list](doc/helm-buffers-list.gif)
 
-The demo starts when you see `Eval: START` in the minibuffer.
+- Regexp `*C` selects the C buffers. `*Tcl` in the demo selects TCL
+  buffers, then with `*C` switches back to C buffers.
+- For buffers containing the string "crash", the demo adds a space,
+  then the pattern `@crash`.
+- Matching buffers are then handed over to `helm-moccur` - `moccur`
+  with its own Helm interface. The demo shows switching to a
+  single file, `kexec.c`. Multiple selections can be made with
+  `C-SPC`. `M-a` selects all.
+- Adding characters to the pattern gradually filters (narrows) the
+  available candidates. By adding `memory`, the buffers shown now
+  include those buffers with "crash" and "memory".
 
-- All the C buffers are selected using the regexp `*C`. In the demo, I also select Tcl buffers with `*Tcl` and then switched back to C buffers with `*C`.
-- I only want to have buffers that contains only the string "crash". To do that, I add a space, then add the pattern `@crash`.
-- After the initial search pattern, I hand over the current matching buffers to `helm-moccur` - `moccur` with Helm interface. In the above demo, I only switch to one file, that is `kexec.c`. However, you can select multiple buffers with `C-SPC` or select all buffers with `M-a`.
-- Candidates can be filtered gradually by adding more pattern, i.e. I added `memory` to filtered down to buffers that contain the string "memory" among the buffers that are containing "crash".
+With more pattern matching, candidates are narrowed down from the
+initial 253 buffers to 12 as shown in the modeline. 
 
-As you can see, as you filtered out, the number of candidates decreases, as displayed in the modeline. At the end, there were 12 buffers remained as the result of filtering, down from the total 253 buffers.
+Helm [guide](http://tuhdo.github.io/helm-intro.html) and
+[Helm Wiki](https://github.com/emacs-helm/helm/wiki) provide
+additional details.
 
-You can read [this guide](http://tuhdo.github.io/helm-intro.html) to quickly get started with Helm.
+### Creating custom helm sources
 
-You can find all the gory details on the [Helm Wiki](https://github.com/emacs-helm/helm/wiki).
-
-### Create your own helm source (overview)
-
-Here a quick example using sync method with candidates generated by a simple list, a function can be used instead of course ([see helm wiki for more infos](https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework)).
-
+An example:
 
 ```elisp
 
@@ -218,105 +233,136 @@ Here a quick example using sync method with candidates generated by a simple lis
                  :candidates '(foo foa fob bar baz)
                  :fuzzy-match t)
       :buffer "*helm test*")
-
 ```
+
+The candidates list may be replaced by a function that produces a list.
+See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework))
+for details.
+
 
 ### Fuzzy matching
 
-Helm has a built-in fuzzy matcher that is activated for some commands. Fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
+Helm's built-in fuzzy matcher is activated for some commands. Helm's
+fuzzy matching is disabled by default. Currently these commands
+support fuzzy matching:
 
-- `helm-recentf`: Enable by setting `helm-recentf-fuzzy-match` to `t`.
-- `helm-mini`: Enable by setting `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
-- `helm-buffers-list`: Enable by setting `helm-buffers-fuzzy-matching` to `t`.
-- `helm-find-files`: Enable by default.
-- `helm-locate`: Enable by setting `helm-locate-fuzzy-match` to `t`.
-- `helm-M-x`: Enable by setting `helm-M-x-fuzzy-match` to `t`.
-- `helm-semantic`: Enable by setting `helm-semantic-fuzzy-match` to `t`.
-- `helm-imenu`: Enable by setting `helm-imenu-fuzzy-match` to `t`.
-- `helm-apropos`: Enable by setting `helm-apropos-fuzzy-match` to `t`.
-- `helm-lisp-completion-at-point`: Enable by setting `helm-lisp-fuzzy-completion` to `t`.
+- `helm-recentf`: set `helm-recentf-fuzzy-match` to `t`.
+- `helm-mini`: set `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
+- `helm-buffers-list`: set `helm-buffers-fuzzy-matching` to `t`.
+- `helm-find-files`: fuzzy matching enabled by default.
+- `helm-locate`: set `helm-locate-fuzzy-match` to `t`.
+- `helm-M-x`: set `helm-M-x-fuzzy-match` to `t`.
+- `helm-semantic`: set `helm-semantic-fuzzy-match` to `t`.
+- `helm-imenu`: set `helm-imenu-fuzzy-match` to `t`.
+- `helm-apropos`: set `helm-apropos-fuzzy-match` to `t`.
+- `helm-lisp-completion-at-point`: set `helm-lisp-fuzzy-completion` to `t`.
 
-You can also enable fuzzy matching globally in all functions helmized by `helm-mode` with `helm-mode-fuzzy-match`
-and `helm-completion-in-region-fuzzy-match`.
+To globally enable fuzzy matching for `helm-mode`:
+- set `helm-mode-fuzzy-match` to `t`.
+- set `helm-completion-in-region-fuzzy-match` to `t`.
 
-**IMPORTANT**: To make fuzzy-matching fast, you must not set `helm-candidate-number-limit` too high. It is recommended that you leave the variable with its default value 100. The higher you set `helm-candidate-number-limit`, the slower fuzzy-matching will be.
+**IMPORTANT**: For faster fuzzy matching, set
+`helm-candidate-number-limit` to 100 or less. Default is 100.
 
 ### Autoresize
 
-Helm can now resize according to the number of candidates with `helm-autoresize-mode`:
+To re-size the completion window based on number of candidates:
 
     (helm-autoresize-mode 1)
 
-You can customize the minimum and maximum height that Helm can resize with these two variables:
+Adjust minimum and maximum height of completion window using:
 
 - `helm-autoresize-max-height`
 - `helm-autoresize-min-height`
 
-By default, `helm-autoresize-max-height` is set to 40, which makes Helm candidate buffer has the maximum height of 40% of current frame height. Similarly, `helm-autoresize-min-height` specifies the minimum height that Helm candidate buffer cannot be smaller.
+40 is the default value of `helm-autoresize-max-height`, which sets the completion window height to 40% of the fame height. `helm-autoresize-min-height` specifies the minimum height that the completion window cannot shrink to.
 
-If you don't want the Helm window to be resized, but a smaller Helm window, you can set `helm-autoresize-min-height` equal to `helm-autoresize-max-height`.
+For a fixed window size, set `helm-autoresize-min-height` equal to `helm-autoresize-max-height`.
 
-# Features
+# Helm Applications 
 
-## Applications (not exhaustive)
+These are popular applications developed using helm completion and
+narrowing framework. They are available for individual installs
+through the Emacs package manager. This list is not exhaustive.
 
-- `helm-mode`: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.
-- `helm-find-files`: Replace in one command all the files related commands (Bind it to `C-x C-f`!).
-- `helm-buffers-list`: Enhanced buffers listing.
-- `helm-browse-project`: Show all buffers and files related to project or current directory (Usable everywhere with `helm-find-files`) you will want to install
-[helm-ls-git](https://github.com/emacs-helm/helm-ls-git), [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) and `helm-ls-svn` for a better experience.
-- `helm-dabbrev`: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
-- `helm-moccur`: Enhanced occur for one or more buffers, launch it from `helm-buffers-list` or `current-buffer`(Own implementation).
-- `helm-M-x`: Enhanced version of `execute-extended-command` (Bind it to `M-x`!).
-- `helm-imenu` and `helm-imenu-in-all-buffers`: Imenu in `current-buffer` or in all your buffers.
-- `helm-etags-select`: Enhanced version of etags with helm-completion (Usable everywhere with `helm-find-files`).
-- `helm-apropos`: Description of functions, variables, etc... Use it instead of Most `C-h` commands.
-- `Grep`: You can launch it (recursively or not) from any files related helm commands, support as backends `grep`, `ack-grep`, `git-grep`,
-`ag` and `pt` (Own implementation).
-- `helm-gid`: Helm interface to `gid` from [id-utils](https://www.gnu.org/software/idutils/).
-- `helm-show-kill-ring`: A kill ring browser for helm.
-- `helm-all-mark-rings`: A mark ring for helm, allow retrieving your last position(s) in a buffer.
-- `helm-filtered-bookmarks`: An enhanced bookmark listing.
-- `helm-list-elisp-packages`: Manage emacs packages with helm.
+- `helm-mode`: turns on helm completions for most standard emacs
+  completions. Helm provides even more optimized helm completions for
+  some commands in helm-mode. Prefer these natively optimized versions
+  over the ones in helm-mode.
+- `helm-find-files`: one command that handles all the files related
+  commands (bind to `C-x C-f`).
+- `helm-buffers-list`: provides enhanced buffers listing.
+- `helm-browse-project`: handles project files and buffers; defaults
+   to current directory; works with `helm-find-files`; recommended
+   with [helm-ls-git](https://github.com/emacs-helm/helm-ls-git),
+   [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) and
+   `helm-ls-svn` for a better handling of version control files.
+- `helm-dabbrev`: enhanced dabbrev implementation with helm
+  completion; does not use emacs code.
+- `helm-moccur`: enhanced occur for one or more buffers; launch from
+  `helm-buffers-list` or `current-buffer`.
+- `helm-M-x`: enhanced `execute-extended-command` (bind to `M-x`).
+- `helm-imenu` and `helm-imenu-in-all-buffers`: provide imenus for
+  current or all buffers.
+- `helm-etags-select`: enhanced etags with helm-completion; usable
+  everywhere with `helm-find-files`.
+- `helm-apropos`: enhanced apropos for functions and variables that
+  `C-h` commands provide.
+- `Grep`: launch from any helm file commands; supports back-ends
+  `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
+  `pt`.
+- `helm-gid`: Helm interface for `gid` from
+  [id-utils](https://www.gnu.org/software/idutils/).
+- `helm-show-kill-ring`: A helm browser for kill ring.
+- `helm-all-mark-rings`: A helm browser for mark ring; retrieves last positions in buffers.
+- `helm-filtered-bookmarks`: enhanced browser for bookmarks.
+- `helm-list-elisp-packages`: enhanced browser for elisp package management.
 
-# Helm extensions you should install
+# Recommended Helm extensions
 
 - [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
 - [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
 - [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
 - [helm-firefox](https://github.com/emacs-helm/helm-firefox)
 
-**Warning** You will find many extensions outside of [emacs-helm](https://github.com/emacs-helm)
-that provide nothing more than what is provided natively by [helm](https://github.com/emacs-helm/helm) and may not be in sync will `helm` core.
-So generally prefer what is provided natively in `helm` instead of its counterpart provided externally.
-Actually more than 20 unuseful or deprecated packages you can find on MELPA, be aware.
+**Warning** Helm development has sparked quite a few extensions, many
+of which duplicate features already included in helm. Some of these
+packages (about 20 at last count in the MELPA repository) are either
+deprecated or unmaintained. Moreover, many remain out-of-sync with
+`helm` core development cycles causing incompatibilities. To avoid
+helm problems or unstable emacs, please look for comparable features
+within [helm](https://github.com/emacs-helm/helm) and
+[emacs-helm](https://github.com/emacs-helm) before installing such
+extensions.
 
 # Known issues
 
-Check out the project's
-[issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open)
-a list of unresolved issues. By the way - feel free to fix any of them
-and send us a pull request. :-)
+The Helm project has a currant unresolved 
+[issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
+Please feel free to fix any of them; send a pull request.
 
 # Contributors
 
-Here's a [list](https://github.com/emacs-helm/helm/contributors) of all the people who have contributed to the
-development of Helm.
+The Helm project maintains a
+[list](https://github.com/emacs-helm/helm/contributors) of
+contributors.
 
 # Bugs & Improvements
 
-Bug reports and suggestions for improvements are always
-welcome, be sure though they are related to helm, many bugs are coming from emacs itself
-or other packages. GitHub pull requests are even better! :-)
+The Helm Team welcomes bug reports and suggestions. Note that not all
+bugs when using Helm are due to Helm. Because of the way Helm
+interacts with many Emacs features, bugs may be related to Emacs
+itself.
 
-NOTE: When trying if something is working or not, be sure to start helm from `Emacs -Q` or even better
-Start it from your helm directory with `./emacs-helm.sh`.
+One way to ascertain that the bugs are helm-related, recreate the
+error either by using `Emacs -Q` or by running the included package
+script `./emacs-helm.sh` located in the helm directory.
 
 # Getting help
 
-If [Helm Wiki](https://github.com/emacs-helm/helm/wiki) is not enough, you can ask for help
-on [emacs-helm google group](https://groups.google.com/group/emacs-helm?hl=en).
-
+[Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
+[emacs-helm Google group](https://groups.google.com/group/emacs-helm?hl=en)
+are two readily available locations.
 
 Cheers,<br>
 The Helm Team
