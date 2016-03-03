@@ -21,11 +21,10 @@
     - [Configuration](#configuration)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
-        - [Create your own helm source (overview)](#create-your-own-helm-source-overview)
+        - [Creating custom helm sources](#creating-custom-helm-sources)
         - [Fuzzy matching](#fuzzy-matching)
         - [Autoresize](#autoresize)
-- [Features](#features)
-    - [Applications (not exhaustive)](#applications-not-exhaustive)
+- [Helm Applications](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
 - [Known issues](#known-issues)
 - [Contributors](#contributors)
@@ -135,7 +134,7 @@ and fuzzy matching. See
 for details.
 
 ## Warning about alternate installation methods
-
+    
 Installation methods that circumvent `helm-config` are known to fail
 if the careful safeguards are not implemented in the hacks. 
 
@@ -210,9 +209,9 @@ visually. Here is a demo of `helm-buffers-list` used with
 - For buffers containing the string "crash", the demo adds a space,
   then the pattern `@crash`.
 - Matching buffers are then handed over to `helm-moccur` - `moccur`
-  with its own Helm interface. Although the demo shows switching to
-  `kexec.c`, multiple selections can be made with `C-SPC`. `M-a`
-  selects all.
+  with its own Helm interface. The demo shows switching to a
+  single file, `kexec.c`. Multiple selections can be made with
+  `C-SPC`. `M-a` selects all.
 - Adding characters to the pattern gradually filters (narrows) the
   available candidates. By adding `memory`, the buffers shown now
   include those buffers with "crash" and "memory".
@@ -224,9 +223,9 @@ Helm [guide](http://tuhdo.github.io/helm-intro.html) and
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) provide
 additional details.
 
-### Create your own helm source (overview)
+### Creating custom helm sources
 
-Example showing custom helm completion for a simple list:
+An example:
 
 ```elisp
 
@@ -236,14 +235,16 @@ Example showing custom helm completion for a simple list:
       :buffer "*helm test*")
 ```
 
-The candiates list can be replaced by a function that produces a list. See 
-([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework)) for details.
+The candiates list may be replaced by a function that produces a list.
+See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developping-using-helm-framework))
+for details.
 
 
 ### Fuzzy matching
 
-Helm's built-in fuzzy matcher is activated for some commands. Helm's fuzzy matching is disabled by default. Currently these commands supports fuzzy matching:
-
+Helm's built-in fuzzy matcher is activated for some commands. Helm's
+fuzzy matching is disabled by default. Currently these commands
+support fuzzy matching:
 
 - `helm-recentf`: set `helm-recentf-fuzzy-match` to `t`.
 - `helm-mini`: set `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
@@ -260,7 +261,8 @@ To globally enable fuzzy matching for `helm-mode`:
 - set `helm-mode-fuzzy-match` to `t`.
 - set `helm-completion-in-region-fuzzy-match` to `t`.
 
-**IMPORTANT**: For fast fuzzy matching, set `helm-candidate-number-limit` to 100 or less. Default is 100. 
+**IMPORTANT**: For faster fuzzy matching, set
+`helm-candidate-number-limit` to 100 or less. Default is 100.
 
 ### Autoresize
 
@@ -277,5 +279,92 @@ Adjust minimum and maximum height of completion window using:
 
 For a fixed window size, set `helm-autoresize-min-height` equal to `helm-autoresize-max-height`.
 
-# Helm Features
+# Helm Applications 
+
+These are popular applications developed using helm completion and
+narrowing framework. They are available for individual installs
+through the Emacs package manager. This list is not exhaustive.
+
+- `helm-mode`: turns on helm completions for most standard emacs
+  completions. Helm provides even more optimized helm completions for
+  some commands in helm-mode. Prefer these natively optimized versions
+  over the ones in helm-mode.
+- `helm-find-files`: one command that handles all the files related
+  commands (bind to `C-x C-f`).
+- `helm-buffers-list`: provides enhanced buffers listing.
+- `helm-browse-project`: handles project files and buffers; defaults
+   to current directory; works with `helm-find-files`; recommended
+   with [helm-ls-git](https://github.com/emacs-helm/helm-ls-git),
+   [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) and
+   `helm-ls-svn` for a better handling of version control files.
+- `helm-dabbrev`: enhanced dabbrev implementation with helm
+  completion; does not use emacs code.
+- `helm-moccur`: enhanced occur for one or more buffers; launch from
+  `helm-buffers-list` or `current-buffer`.
+- `helm-M-x`: enhanced `execute-extended-command` (bind to `M-x`).
+- `helm-imenu` and `helm-imenu-in-all-buffers`: provide imenus for
+  current or all buffers.
+- `helm-etags-select`: enhanced etags with helm-completion; usable
+  everywhere with `helm-find-files`.
+- `helm-apropos`: enhanced apropos for functions and variables that
+  `C-h` commands provide.
+- `Grep`: launch from any helm file commands; supports backends
+  `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
+  `pt`.
+- `helm-gid`: Helm interface for `gid` from
+  [id-utils](https://www.gnu.org/software/idutils/).
+- `helm-show-kill-ring`: A helm browser for kill ring.
+- `helm-all-mark-rings`: A helm browser for mark ring; retrieves last positions in buffers.
+- `helm-filtered-bookmarks`: enhanced browser for bookmarks.
+- `helm-list-elisp-packages`: enahanced browser for elisp package management.
+
+# Recommended Helm extensions
+
+- [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
+- [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
+- [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
+- [helm-firefox](https://github.com/emacs-helm/helm-firefox)
+
+**Warning** Helm development has sparked quite a few extensions, many
+of which duplicate features already included in helm. Some of these
+packages (about 20 at last count in the MELPA repository) are either
+deprecated or unmaintained. Moreover, many remain out-of-sync with
+`helm` core development cycles causing incompatibilities. To avoid
+helm problems or unstable emacs, please look for comparable features
+within [helm](https://github.com/emacs-helm/helm) and
+[emacs-helm](https://github.com/emacs-helm) before installing such
+extensions.
+
+# Known issues
+
+The Helm project has a currnt unresolved 
+[issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
+Please feel free to fix any of them; send a pull request.
+
+# Contributors
+
+The Helm project maintains a
+[list](https://github.com/emacs-helm/helm/contributors) of
+contributers.
+
+# Bugs & Improvements
+
+The Helm Team welcomes bug reports and suggestions. Note that not all
+bugs when using Helm are due to Helm. Because of the way Helm
+interacts with many Emacs features, bugs may be related to Emacs
+itself.
+
+One way to ascertain that the bugs are helm-related, recreate the
+error either by using `Emacs -Q` or by running the included package
+script `./emacs-helm.sh` located in the helm directory.
+
+# Getting help
+
+[Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
+[emacs-helm google group](https://groups.google.com/group/emacs-helm?hl=en)
+are two readily available locations.
+
+Cheers,<br>
+The Helm Team
+
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
