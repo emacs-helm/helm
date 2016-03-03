@@ -758,7 +758,6 @@ minibuffer abnormally (e.g. via `helm-keyboard-quit').")
 (defconst helm-restored-variables
   '(helm-candidate-number-limit
     helm-source-filter
-    helm-source-in-each-line-flag
     helm-map
     helm-sources)
   "Variables restored after an `helm' invocation.")
@@ -771,10 +770,6 @@ value.")
 (defvar helm-quit-if-no-candidate nil
   "When non-`nil', quits if there are no candidates.
 This variable accepts a function.")
-
-(defvar helm-source-in-each-line-flag nil
-  "When non-`nil', adds helm-source text-property to each
-candidate. This is an experimental feature.")
 
 (defvar helm-debug-variables nil
   "A list of helm variables that `helm-debug-output' displays.
@@ -1471,26 +1466,22 @@ of \(action-display . function\)."
 Allow also checking if helm-buffer contain candidates."
   (or helm-current-source
       (with-current-buffer (helm-buffer-get)
-        (or
-         ;; This happen only when `helm-source-in-each-line-flag'
-         ;; is non-`nil' and there is candidates in buffer.
-         (get-text-property (point) 'helm-source)
-         ;; Return nil when no--candidates.
-         (cl-block exit
-           ;; This goto-char shouldn't be necessary, but point is moved to
-           ;; point-min somewhere else which shouldn't happen.
-           (goto-char (overlay-start helm-selection-overlay))
-           (let* ((header-pos (or (helm-get-previous-header-pos)
-                                  (helm-get-next-header-pos)))
-                  (source-name
-                   (save-excursion
-                     (unless header-pos
-                       (cl-return-from exit nil))
-                     (goto-char header-pos)
-                     (helm-current-line-contents))))
-             (cl-loop for source in (helm-get-sources) thereis
-                      (and (equal (assoc-default 'name source) source-name)
-                           source))))))))
+        ;; Return nil when no--candidates.
+        (cl-block exit
+          ;; This goto-char shouldn't be necessary, but point is moved to
+          ;; point-min somewhere else which shouldn't happen.
+          (goto-char (overlay-start helm-selection-overlay))
+          (let* ((header-pos (or (helm-get-previous-header-pos)
+                                 (helm-get-next-header-pos)))
+                 (source-name
+                  (save-excursion
+                    (unless header-pos
+                      (cl-return-from exit nil))
+                    (goto-char header-pos)
+                    (helm-current-line-contents))))
+            (cl-loop for source in (helm-get-sources) thereis
+                     (and (equal (assoc-default 'name source) source-name)
+                          source)))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-`nil' when BUFFER is modified since `helm' was invoked."
@@ -3519,8 +3510,6 @@ the real value in a text property."
                                 'helm-realvalue realvalue)))
       (when num
         (put-text-property start (point-at-eol) 'helm-cand-num num))
-      (when helm-source-in-each-line-flag
-        (put-text-property start (point-at-eol) 'helm-source source))
       (funcall insert-function "\n"))))
 
 (defun helm-insert-header-from-source (source)
