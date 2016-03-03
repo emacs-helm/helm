@@ -3684,16 +3684,13 @@ function."
 ;;; Core: action
 ;;
 (defun helm-execute-selection-action ()
-  "Execute current action and kill the action buffer if present."
+  "Execute current action."
   (helm-log-run-hook 'helm-before-action-hook)
   ;; Position can be change when `helm-current-buffer'
   ;; is split, so jump to this position before executing action.
   (helm-current-position 'restore)
-  (unwind-protect
-      (helm-execute-selection-action-1)
-    (helm-aif (get-buffer helm-action-buffer)
-        (kill-buffer it))
-    (helm-log-run-hook 'helm-after-action-hook)))
+  (helm-execute-selection-action-1)
+  (helm-log-run-hook 'helm-after-action-hook))
 
 (defun helm-execute-selection-action-1 (&optional
                                         selection action
@@ -3707,6 +3704,8 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
                     (if (get-buffer helm-action-buffer)
                         (helm-get-selection helm-action-buffer)
                       (helm-get-actions-from-current-source)))))
+  (helm-aif (get-buffer helm-action-buffer)
+      (kill-buffer it))
   (let ((source (or helm-saved-current-source
                     (helm-get-current-source)))
         non-essential)
