@@ -45,7 +45,9 @@ Show all candidates on startup when 0 (default)."
   :type 'boolean)
 
 (defcustom helm-M-x-fuzzy-match nil
-  "Enable fuzzy matching in `helm-M-x' when non--nil.")
+  "Enable fuzzy matching in `helm-M-x' when non--nil."
+  :group 'helm-command
+  :type 'boolean)
 
 
 ;;; Faces
