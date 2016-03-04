@@ -505,6 +505,7 @@ Should not be used among other sources.")
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
    (volatile :initform t)
+   (cleanup :initform 'helm-find-files-cleanup)
    (migemo :initform t)
    (nohighlight :initform t)
    (keymap :initform helm-find-files-map)
@@ -1465,7 +1466,6 @@ or hitting C-j on \"..\"."
                        (not (file-remote-p it nil t)))
                   (file-exists-p it))
         (helm-next-line))))
-(add-hook 'helm-after-update-hook 'helm-ff-move-to-first-real-candidate)
 
 ;;; Auto-update - helm-find-files auto expansion of directories.
 ;;
@@ -1611,9 +1611,6 @@ and should be used carefully elsewhere, or not at all, using
                                 (match-beginning 0)))
                  (buffer-substring-no-properties (point) (point-at-eol)))
                fname)))))
-
-(add-hook 'helm-after-update-hook 'helm-ff-update-when-only-one-matched)
-(add-hook 'helm-after-update-hook 'helm-ff-auto-expand-to-home-or-root)
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
@@ -2456,17 +2453,28 @@ Use it for non--interactive calls of `helm-find-files'."
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
-    (unwind-protect
-         (helm :sources 'helm-source-find-files
-               :input fname
-               :case-fold-search helm-file-name-case-fold-search
-               :preselect preselect
-               :ff-transformer-show-only-basename
-               helm-ff-transformer-show-only-basename
-               :default def
-               :prompt "Find Files or Url: "
-               :buffer "*Helm Find Files*")
-      (setq helm-ff-default-directory nil))))
+    (mapc (lambda (hook)
+            (add-hook 'helm-after-update-hook hook))
+          '(helm-ff-auto-expand-to-home-or-root
+            helm-ff-update-when-only-one-matched
+            helm-ff-move-to-first-real-candidate))
+    (helm :sources 'helm-source-find-files
+          :input fname
+          :case-fold-search helm-file-name-case-fold-search
+          :preselect preselect
+          :ff-transformer-show-only-basename
+          helm-ff-transformer-show-only-basename
+          :default def
+          :prompt "Find Files or Url: "
+          :buffer "*Helm Find Files*")))
+
+(defun helm-find-files-cleanup ()
+  (mapc (lambda (hook)
+          (remove-hook 'helm-after-update-hook hook))
+        '(helm-ff-auto-expand-to-home-or-root
+          helm-ff-update-when-only-one-matched
+          helm-ff-move-to-first-real-candidate))
+  (setq helm-ff-default-directory nil))
 
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"

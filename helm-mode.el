@@ -820,6 +820,11 @@ Keys description:
   ;; so always use 'confirm.
   (when (eq must-match 'confirm-after-completion)
     (setq must-match 'confirm))
+  (mapc (lambda (hook)
+          (add-hook 'helm-after-update-hook hook))
+        '(helm-ff-auto-expand-to-home-or-root
+          helm-ff-update-when-only-one-matched
+          helm-ff-move-to-first-real-candidate))
   (let* ((action-fn `(("Sole action (Identity)"
                        . (lambda (candidate)
                            (if ,marked-candidates
@@ -888,6 +893,7 @@ Keys description:
              :persistent-action persistent-action
              :persistent-help persistent-help
              :volatile t
+             :cleanup 'helm-find-files-cleanup
              :nomark nomark
              :action action-fn)))
          ;; Helm result.
