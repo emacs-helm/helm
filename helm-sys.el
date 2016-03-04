@@ -81,14 +81,26 @@ A format string where %s will be replaced with `frame-width'."
     :filtered-candidate-transformer #'helm-top-sort-transformer
     :action-transformer #'helm-top-action-transformer))
 
+(defvar helm-top--line nil)
 (defun helm-top-transformer (candidates _source)
   "Transformer for `helm-top'.
 Return empty string for non--valid candidates."
   (cl-loop for disp in candidates collect
         (cond ((string-match "^ *[0-9]+" disp) disp)
               ((string-match "^ *PID" disp)
-               (cons (propertize disp 'face 'helm-top-columns) ""))
-              (t (cons disp "")))))
+               (setq helm-top--line (cons (propertize disp 'face 'helm-top-columns) "")))
+              (t (cons disp "")))
+        into lst
+        finally return (or (member helm-top--line lst)
+                           (cons helm-top--line lst))))
+
+(defun helm-top--skip-top-line ()
+  (let ((src-name (assoc-default 'name (helm-get-current-source))))
+    (helm-aif (and (stringp src-name)
+                   (string= src-name "Top")
+                   (helm-get-selection nil t))
+        (when (string-match-p "^ *PID" it)
+          (helm-next-line)))))
 
 (defun helm-top-action-transformer (actions _candidate)
   "Action transformer for `top'.
@@ -269,12 +281,15 @@ Show actions only on line starting by a PID."
 (defun helm-top ()
   "Preconfigured `helm' for top command."
   (interactive)
+  (add-hook 'helm-after-update-hook 'helm-top--skip-top-line)
   (save-window-excursion
     (unless helm-alive-p (delete-other-windows))
-    (helm :sources 'helm-source-top
-          :buffer "*helm top*" :full-frame t
-          :candidate-number-limit 9999
-          :preselect "^\\s-*[0-9]+")))
+    (unwind-protect
+         (helm :sources 'helm-source-top
+               :buffer "*helm top*" :full-frame t
+               :candidate-number-limit 9999
+               :preselect "^\\s-*[0-9]+")
+      (remove-hook 'helm-after-update-hook 'helm-top--skip-top-line))))
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
