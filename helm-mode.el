@@ -822,9 +822,9 @@ Keys description:
     (setq must-match 'confirm))
   (mapc (lambda (hook)
           (add-hook 'helm-after-update-hook hook))
-        '(helm-ff-auto-expand-to-home-or-root
+        '(helm-ff-move-to-first-real-candidate
           helm-ff-update-when-only-one-matched
-          helm-ff-move-to-first-real-candidate))
+          helm-ff-auto-expand-to-home-or-root))
   (let* ((action-fn `(("Sole action (Identity)"
                        . (lambda (candidate)
                            (if ,marked-candidates

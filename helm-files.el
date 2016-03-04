@@ -2455,9 +2455,9 @@ Use it for non--interactive calls of `helm-find-files'."
                                     "Find Files" 'helm-source-ffiles)))
     (mapc (lambda (hook)
             (add-hook 'helm-after-update-hook hook))
-          '(helm-ff-auto-expand-to-home-or-root
+          '(helm-ff-move-to-first-real-candidate
             helm-ff-update-when-only-one-matched
-            helm-ff-move-to-first-real-candidate))
+            helm-ff-auto-expand-to-home-or-root))
     (helm :sources 'helm-source-find-files
           :input fname
           :case-fold-search helm-file-name-case-fold-search
