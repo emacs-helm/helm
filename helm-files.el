@@ -2458,23 +2458,24 @@ Use it for non--interactive calls of `helm-find-files'."
           '(helm-ff-move-to-first-real-candidate
             helm-ff-update-when-only-one-matched
             helm-ff-auto-expand-to-home-or-root))
-    (helm :sources 'helm-source-find-files
-          :input fname
-          :case-fold-search helm-file-name-case-fold-search
-          :preselect preselect
-          :ff-transformer-show-only-basename
-          helm-ff-transformer-show-only-basename
-          :default def
-          :prompt "Find Files or Url: "
-          :buffer "*Helm Find Files*")))
+    (unwind-protect
+         (helm :sources 'helm-source-find-files
+               :input fname
+               :case-fold-search helm-file-name-case-fold-search
+               :preselect preselect
+               :ff-transformer-show-only-basename
+               helm-ff-transformer-show-only-basename
+               :default def
+               :prompt "Find Files or Url: "
+               :buffer "*Helm Find Files*")
+      (setq helm-ff-default-directory nil))))
 
 (defun helm-find-files-cleanup ()
   (mapc (lambda (hook)
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
           helm-ff-update-when-only-one-matched
-          helm-ff-move-to-first-real-candidate))
-  (setq helm-ff-default-directory nil))
+          helm-ff-move-to-first-real-candidate)))
 
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
