@@ -669,6 +669,9 @@ If N is positive go forward otherwise go backward."
                    do (setq new-buf (helm-read-string "GrepBufferName: " "*hgrep "))))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
+      (setq default-directory (or helm-ff-default-directory
+                                  (helm-default-directory)
+                                  default-directory))
       (setq buffer-read-only t)
       (let ((inhibit-read-only t))
         (erase-buffer)
