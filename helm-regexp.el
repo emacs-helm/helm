@@ -533,7 +533,7 @@ Special commands:
              "\n")
             (goto-char (point-min))
             (cl-loop with helm-pattern = pattern
-                     while (re-search-forward pattern nil t)
+                     while (helm-mm-search pattern)
                      for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
                      when line
                      do (with-current-buffer buffer
