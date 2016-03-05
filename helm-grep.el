@@ -654,10 +654,11 @@ If N is positive go forward otherwise go backward."
 (defun helm-grep-save-results-1 ()
   "Save helm grep result in a `helm-grep-mode' buffer."
   (let ((buf "*hgrep*")
-        new-buf)
+        new-buf
+        (pattern (with-helm-buffer helm-input-local)))
     (when (get-buffer buf)
       (if helm-grep-save-buffer-name-no-confirm
-          (setq new-buf  (format "*hgrep|%s|-%s" helm-pattern
+          (setq new-buf  (format "*hgrep|%s|-%s" pattern
                                  (format-time-string "%H-%M-%S*")))
           (setq new-buf (helm-read-string "GrepBufferName: " buf))
           (cl-loop for b in (helm-buffer-list)
@@ -672,7 +673,7 @@ If N is positive go forward otherwise go backward."
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
-                (format "Grep Results for `%s':\n\n" helm-pattern))
+                (format "Grep Results for `%s':\n\n" pattern))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
