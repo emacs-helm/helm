@@ -540,7 +540,13 @@ Special commands:
                            (propertize
                             (car (helm-moccur-filter-one-by-one line))
                             'helm-realvalue line)
-                           "\n")))))
+                           "\n")
+                          (save-excursion
+                            (forward-line -1)
+                            (while (re-search-forward pattern (point-at-eol) t)
+                              (add-text-properties
+                               (match-beginning 0) (match-end 0)
+                               '(face helm-grep-match))))))))
         (message "Reverting buffer done")))))
 
 
