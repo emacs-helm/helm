@@ -5537,7 +5537,13 @@ e.g:
 \(add-hook 'helm-before-initialize-hook
           (lambda () (helm-attrset 'follow 1 helm-source-buffers-list)))
 
-This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'."
+This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'.
+
+`helm-attrset' will only work if the `helm-source' object is already properly initialized.
+Many of the `helm-source' objects are lazily initialized (or set to `nil` at load time),
+so adding these hooks in your `~/.emacs' (or equivalent) will cause helm to error.
+Some `helm-source' objects have initialization functions available you can call first
+(e.g. `helm-occur-init-source') to enable adding the hooks in your `~/.emacs'."
   (interactive "p")
   (with-helm-alive-p
     (with-current-buffer helm-buffer
