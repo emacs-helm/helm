@@ -532,21 +532,16 @@ Special commands:
                       concat bufstr)
              "\n")
             (goto-char (point-min))
-            (cl-loop while (re-search-forward pattern nil t)
+            (cl-loop with helm-pattern = pattern
+                     while (re-search-forward pattern nil t)
                      for line = (helm-moccur-get-line (point-at-bol) (point-at-eol))
                      when line
                      do (with-current-buffer buffer
                           (insert
-                           (propertize
-                            (car (helm-moccur-filter-one-by-one line))
-                            'helm-realvalue line)
-                           "\n")
-                          (save-excursion
-                            (forward-line -1)
-                            (while (re-search-forward pattern (point-at-eol) t)
-                              (add-text-properties
-                               (match-beginning 0) (match-end 0)
-                               '(face helm-grep-match))))))))
+                            (propertize
+                             (car (helm-moccur-filter-one-by-one line))
+                             'helm-realvalue line)
+                           "\n")))))
         (message "Reverting buffer done")))))
 
 
