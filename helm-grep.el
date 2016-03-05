@@ -701,10 +701,13 @@ Special commands:
   (let ((inhibit-read-only t))
     (delete-region (point) (point-max)))
   (message "Reverting buffer...")
-  (set-process-sentinel
-   (start-file-process-shell-command
-    "hgrep"  (generate-new-buffer "*hgrep revert*") helm-grep-last-cmd-line)
-   'helm-grep-mode--sentinel))
+  (let ((process-connection-type
+         ;; Git needs a nil value otherwise it tries to use a pager.
+         (null (string-match-p "\\`git" helm-grep-last-cmd-line))))
+    (set-process-sentinel
+     (start-file-process-shell-command
+      "hgrep"  (generate-new-buffer "*hgrep revert*") helm-grep-last-cmd-line)
+     'helm-grep-mode--sentinel)))
 
 (defun helm-grep-mode--sentinel (process event)
   (when (string= event "finished\n")
