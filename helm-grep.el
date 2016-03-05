@@ -703,21 +703,25 @@ Special commands:
   (set-process-sentinel
    (start-file-process-shell-command
     "hgrep"  (generate-new-buffer "*hgrep revert*") helm-grep-last-cmd-line)
-   (lambda (process event)
-     (when (string= event "finished\n")
-       (with-current-buffer (current-buffer)
-         (let ((inhibit-read-only t))
-           (save-excursion
-             (cl-loop for line in (with-current-buffer (process-buffer process)
-                                    (prog1 (split-string (buffer-string) "\n")
-                                      (kill-buffer)))
-                      when (string-match helm-grep-split-line-regexp line)
-                      do (insert (propertize
-                                  (car (helm-grep-filter-one-by-one line))
-                                  ;; needed for wgrep.
-                                  'helm-realvalue line)
-                                 "\n"))))
-         (message "Reverting buffer done"))))))
+   'helm-grep-mode--sentinel))
+
+(defun helm-grep-mode--sentinel (process event)
+  (when (string= event "finished\n")
+    (with-current-buffer (current-buffer)
+      (let ((inhibit-read-only t))
+        (save-excursion
+          (cl-loop for l in (with-current-buffer (process-buffer process)
+                              (prog1 (split-string (buffer-string) "\n")
+                                (kill-buffer)))
+                   for line = (if (string-match-p helm--ansi-color-regexp l)
+                                  (helm--ansi-color-apply l) l)
+                   when (string-match helm-grep-split-line-regexp line)
+                   do (insert (propertize
+                               (car (helm-grep-filter-one-by-one line))
+                               ;; needed for wgrep.
+                               'helm-realvalue line)
+                              "\n"))))
+      (message "Reverting buffer done"))))
 
 (defun helm-gm-next-file ()
   (interactive)
@@ -1019,7 +1023,8 @@ in recurse, and ignoring EXTS, search being made on
   (let ((helm-grep-default-directory-fn
          (or helm-grep-default-directory-fn
              (lambda () (or helm-ff-default-directory
-                            (helm-default-directory)
+                            (and (null (eq major-mode 'helm-grep-mode))
+                                 (helm-default-directory))
                             default-directory)))))
     (if (consp candidate)
         ;; Already computed do nothing (default as input).
