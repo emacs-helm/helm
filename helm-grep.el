@@ -1281,7 +1281,7 @@ You can use safely \"--color\" (default)."
 ;;
 ;;
 (defcustom helm-grep-git-grep-command
-  "git grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p -- %f"
+  "git --no-pager grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p -- %f"
   "The git grep default command line.
 The option \"--color=always\" can be used safely.
 The color of matched items can be customized in your .gitconfig
