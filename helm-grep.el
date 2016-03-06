@@ -707,6 +707,7 @@ Special commands:
          (with-helm-buffer helm-grep-last-cmd-line))
     (set (make-local-variable 'revert-buffer-function)
          #'helm-grep-mode--revert-buffer-function))
+(put 'helm-grep-mode 'helm-only t)
 
 (defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
   (goto-char (point-min))

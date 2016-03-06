@@ -501,6 +501,7 @@ Special commands:
          (with-helm-buffer helm-multi-occur-buffer-list))
     (set (make-local-variable 'revert-buffer-function)
          #'helm-moccur-mode--revert-buffer-function))
+(put 'helm-moccur-mode 'helm-only t)
 
 (defun helm-moccur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
   (goto-char (point-min))

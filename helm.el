@@ -2675,6 +2675,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   :keymap helm--remap-mouse-mode-map
   (unless helm-alive-p
     (setq helm--remap-mouse-mode-map nil)))
+(put 'helm--remap-mouse-mode 'helm-only t)
 
 ;; Core: clean up
 
