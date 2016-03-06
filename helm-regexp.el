@@ -487,7 +487,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max))))))
-      (helm-moccur-mode) (pop-to-buffer buf))
+      (helm-moccur-mode))
+    (pop-to-buffer buf)
     (message "Helm Moccur Results saved in `%s' buffer" buf)))
 
 ;;;###autoload

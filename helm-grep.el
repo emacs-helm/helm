@@ -694,7 +694,8 @@ If N is positive go forward otherwise go backward."
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max))))))
-      (helm-grep-mode) (pop-to-buffer buf))
+      (helm-grep-mode))
+    (pop-to-buffer buf)
     (message "Helm Grep Results saved in `%s' buffer" buf)))
 
 (define-derived-mode helm-grep-mode
