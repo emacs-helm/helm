@@ -713,10 +713,7 @@ Special commands:
 
 (defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
   (goto-char (point-min))
-  (re-search-forward "^Grep Results for" nil t)
-  (forward-line 0)
-  (when (re-search-forward "^$" nil t)
-    (forward-line 1))
+  (when (re-search-forward helm-grep-split-line-regexp nil t) (forward-line 0))
   (let ((inhibit-read-only t))
     (delete-region (point) (point-max)))
   (message "Reverting buffer...")
