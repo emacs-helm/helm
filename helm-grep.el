@@ -860,7 +860,29 @@ These extensions will be added to command line with --include arg of grep."
 ;;; Set up source
 ;;
 ;;
+(defclass helm-grep-class (helm-source-async)
+  ((candidates-process :initform 'helm-grep-collect-candidates)
+   (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
+   (keymap :initform helm-grep-map)
+   (nohighlight :initform t)
+   (nomark :initform t)
+   (candidate-number-limit :initform 9999)
+   (help-message :initform 'helm-grep-help-message)
+   (history :initform 'helm-grep-history)
+   (action :initform (helm-make-actions
+                      "Find File" 'helm-grep-action
+                      "Find file other frame" 'helm-grep-other-frame
+                      (lambda () (and (locate-library "elscreen")
+                                      "Find file in Elscreen"))
+                      'helm-grep-jump-elscreen
+                      "Save results in grep buffer" 'helm-grep-save-results
+                      "Find file other window" 'helm-grep-other-window))
+   (persistent-action :initform 'helm-grep-persistent-action)
+   (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
+   (requires-pattern :initform 2)))
+
 (defvar helm-source-grep nil)
+
 (defun helm-do-grep-1 (targets &optional recurse zgrep exts default-input input)
   "Launch grep on a list of TARGETS files.
 When RECURSE is given use -r option of grep and prompt user
@@ -886,13 +908,14 @@ in recurse, and ignoring EXTS, search being made on
                     (not zgrep) ; zgrep doesn't handle -r opt.
                     (not (helm-grep-use-ack-p :where 'recursive))
                     (or exts (helm-grep-get-file-extensions targets))))
-         (include-files (and exts
-                             (mapconcat (lambda (x)
-                                            (concat "--include="
-                                                    (shell-quote-argument x)))
-                                        (if (> (length exts) 1)
-                                            (remove "*" exts)
-                                          exts) " ")))
+         (include-files
+          (and exts
+               (mapconcat (lambda (x)
+                            (concat "--include="
+                                    (shell-quote-argument x)))
+                          (if (> (length exts) 1)
+                              (remove "*" exts)
+                              exts) " ")))
          (types (and (not include-files)
                      (not zgrep)
                      recurse
@@ -902,7 +925,12 @@ in recurse, and ignoring EXTS, search being made on
                      (string-match "%e" helm-grep-default-command)
                      (helm-grep-read-ack-type)))
          (follow (and helm-follow-mode-persistent
-                      (assoc-default 'follow helm-source-grep))))
+                      (assoc-default 'follow helm-source-grep)))
+         (src-name (if zgrep
+                       "Zgrep"
+                       (capitalize (if recurse
+                                       (helm-grep-command t)
+                                       (helm-grep-command))))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -913,53 +941,31 @@ in recurse, and ignoring EXTS, search being made on
       (setq helm-ff-default-directory default-directory))
     ;; We need to store these vars locally
     ;; to pass infos later to `helm-resume'.
-    (helm-set-local-variable 'helm-zgrep-recurse-flag (and recurse zgrep)
-                             'helm-grep-last-targets targets
-                             'helm-grep-include-files (or include-files types)
-                             'helm-grep-in-recurse recurse
-                             'helm-grep-use-zgrep zgrep
-                             'helm-grep-default-command
-                             (cond (zgrep helm-default-zgrep-command)
-                                   (recurse helm-grep-default-recurse-command)
-                                   ;; When resuming the local value of
-                                   ;; `helm-grep-default-command' is used, only git-grep
-                                   ;; should need this.
-                                   (t helm-grep-default-command)))
+    (helm-set-local-variable
+     'helm-zgrep-recurse-flag (and recurse zgrep)
+     'helm-grep-last-targets targets
+     'helm-grep-include-files (or include-files types)
+     'helm-grep-in-recurse recurse
+     'helm-grep-use-zgrep zgrep
+     'helm-grep-default-command
+     (cond (zgrep helm-default-zgrep-command)
+           (recurse helm-grep-default-recurse-command)
+           ;; When resuming the local value of
+           ;; `helm-grep-default-command' is used, only git-grep
+           ;; should need this.
+           (t helm-grep-default-command)))
     ;; Setup the source.
-    (setq helm-source-grep
-          (helm-build-async-source
-           (if zgrep "Zgrep" (capitalize (if recurse
-                                             (helm-grep-command t)
-                                             (helm-grep-command))))
-            :candidates-process 'helm-grep-collect-candidates
-            :filter-one-by-one 'helm-grep-filter-one-by-one
-            :keymap helm-grep-map
-            :nohighlight t
-            :nomark t
-            :candidate-number-limit 9999
-            :help-message 'helm-grep-help-message
-            :history 'helm-grep-history
-            :action (helm-make-actions
-                     "Find File" 'helm-grep-action
-                     "Find file other frame" 'helm-grep-other-frame
-                     (lambda () (and (locate-library "elscreen")
-                                     "Find file in Elscreen"))
-                     'helm-grep-jump-elscreen
-                     "Save results in grep buffer" 'helm-grep-save-results
-                     "Find file other window" 'helm-grep-other-window)
-            :persistent-action 'helm-grep-persistent-action
-            :persistent-help "Jump to line (`C-u' Record in mark ring)"
-            :requires-pattern 2
-            :follow follow))
+    (setq helm-source-grep (helm-make-source src-name 'helm-grep-class
+                             :follow follow))
     (helm
      :sources 'helm-source-grep
-     :buffer (format "*helm %s*" (if zgrep "zgrep" (helm-grep-command recurse)))
+     :buffer (format "*helm %s*"
+                     (if zgrep "zgrep" (helm-grep-command recurse)))
      :default default-input
      :input input
      :keymap helm-grep-map
      :history 'helm-grep-history
      :truncate-lines helm-grep-truncate-lines)))
-
 
 
 ;;; zgrep
