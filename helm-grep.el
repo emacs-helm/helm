@@ -1262,24 +1262,27 @@ You can use safely \"--color\" (default)."
                              'face 'helm-grep-finish))))
              (force-mode-line-update))))))))
 
+(defclass helm-grep-ag-class (helm-source-async)
+  ((nohighlight :initform t)
+   (keymap :initform helm-grep-map)
+   (help-message :initform 'helm-grep-help-message)
+   (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
+   (persistent-action :initform 'helm-grep-persistent-action)
+   (candidate-number-limit :initform 99999)
+   (requires-pattern :initform 2)
+   (nomark :initform t)
+   (action :initform 'helm-grep-actions)))
+
 (defvar helm-source-grep-ag nil)
+
 (defun helm-grep-ag-1 (directory)
   (setq helm-source-grep-ag
-        (helm-build-async-source (upcase (helm-grep--ag-command))
+        (helm-make-source (upcase (helm-grep--ag-command)) 'helm-grep-ag-class
           :header-name (lambda (name)
                          (format "%s [%s]"
                                  name (abbreviate-file-name directory)))
           :candidates-process
-          (lambda () (helm-grep-ag-init directory))
-          :nohighlight t
-          :keymap helm-grep-map
-          :help-message 'helm-grep-help-message
-          :filter-one-by-one 'helm-grep-filter-one-by-one
-          :persistent-action 'helm-grep-persistent-action
-          :candidate-number-limit 99999
-          :requires-pattern 2
-          :nomark t
-          :action 'helm-grep-actions))
+          (lambda () (helm-grep-ag-init directory))))
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
         :truncate-lines helm-grep-truncate-lines
