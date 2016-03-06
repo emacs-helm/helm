@@ -5520,24 +5520,34 @@ display values."
 ;;
 ;;
 (defun helm-follow-mode (&optional arg)
-  "Execute persistent action every time the cursor is moved when enabled.
-This mode enabled for the current source only; for next source,
-this mode will have to be enabled again. This mode can be enabled
-or disabled interactively at anytime during a helm session. It
-can also be enabled specifically for a source by adding the
-`follow' attribute to the source. Even with 'follow' attribute, a
-source can be interactively disabled or enabled. Note that when
-interactively disabled when `follow' attribute exists, next helm
-session will continue to keep the `helm-follow-mode' disabled. To
-avoid this, set `follow' attribute for the source in
-`helm-before-initialize-hook'.
+  "Execute persistent action every time the cursor is moved.
 
-e.g:
+This mode is source local, i.e It apply on current source only.
+\\<helm-map>
+This mode can be enabled or disabled interactively at anytime during
+a helm session with \\[helm-follow-mode].
 
-\(add-hook 'helm-before-initialize-hook
-          (lambda () (helm-attrset 'follow 1 helm-source-buffers-list)))
+It can also be enabled specifically for a source by adding the
+`follow' attribute to the source.
+Value of this attribute can be -1, 1, or 'never.
+If the source is defined with its own class,
+you can use `helm-setup-user-source' e.g:
 
-This will enable `helm-follow-mode' automatically in `helm-source-buffers-list'."
+    (defmethod helm-setup-user-source ((source helm-grep-class))
+      (set-slot-value source 'follow 1))
+
+Otherwise, use `helm-attrset' to setup the `follow' attribute of the existing source,
+which see.
+
+Even with `follow' attribute, a source can be interactively disabled or enabled
+unless `follow' attribute value is 'never.
+When enabling interactively `helm-follow-mode' in a source, you can keep it enabled
+for next helm sessions by setting `helm-follow-mode-persistent' to a non-nil value.
+
+Note that you can use instead of this mode the commands `helm-follow-action-forward'
+and `helm-follow-action-backward' at anytime in all helm sessions.
+
+They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-action-backward]."
   (interactive "p")
   (with-helm-alive-p
     (with-current-buffer helm-buffer
