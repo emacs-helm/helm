@@ -191,6 +191,19 @@ Possible value are:
                  (const :tag "Absolute" absolute)
                  (const :tag "Relative" relative)))
 
+(defcustom helm-grep-actions
+  (helm-make-actions
+   "Find File" 'helm-grep-action
+   "Find file other frame" 'helm-grep-other-frame
+   (lambda () (and (locate-library "elscreen")
+                   "Find file in Elscreen"))
+   'helm-grep-jump-elscreen
+   "Save results in grep buffer" 'helm-grep-save-results
+   "Find file other window" 'helm-grep-other-window)
+  "Actions for helm grep."
+  :group 'helm-grep
+  :type '(alist :key-type string :value-type function))
+
 
 ;;; Faces
 ;;
@@ -869,14 +882,7 @@ These extensions will be added to command line with --include arg of grep."
    (candidate-number-limit :initform 9999)
    (help-message :initform 'helm-grep-help-message)
    (history :initform 'helm-grep-history)
-   (action :initform (helm-make-actions
-                      "Find File" 'helm-grep-action
-                      "Find file other frame" 'helm-grep-other-frame
-                      (lambda () (and (locate-library "elscreen")
-                                      "Find file in Elscreen"))
-                      'helm-grep-jump-elscreen
-                      "Save results in grep buffer" 'helm-grep-save-results
-                      "Find file other window" 'helm-grep-other-window))
+   (action :initform 'helm-grep-actions)
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
    (requires-pattern :initform 2)))
@@ -1273,14 +1279,7 @@ You can use safely \"--color\" (default)."
           :candidate-number-limit 99999
           :requires-pattern 2
           :nomark t
-          :action (helm-make-actions
-                   "Find File" 'helm-grep-action
-                   "Find file other frame" 'helm-grep-other-frame
-                   (lambda () (and (locate-library "elscreen")
-                                   "Find file in Elscreen"))
-                   'helm-grep-jump-elscreen
-                   "Save results in grep buffer" 'helm-grep-save-results
-                   "Find file other window" 'helm-grep-other-window)))
+          :action 'helm-grep-actions))
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
         :truncate-lines helm-grep-truncate-lines
