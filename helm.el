@@ -5363,7 +5363,7 @@ visible or invisible in all sources of current helm session"
          (wilds   (and wildcard
                        (condition-case nil
                            (helm-file-expand-wildcards
-                            coerced t (helm-set-case-fold-search))
+                            coerced t)
                          (error nil)))))
     ;; Avoid returning a not expanded wilcard fname.
     ;; e.g assuming "/tmp" doesn't contain "*.el"
