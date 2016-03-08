@@ -359,8 +359,6 @@ also using not recursive wilcard (e.g. \"*.el\") is perfectly fine for this.
 This feature (\"**\") is activated by default with the option `helm-file-globstar'.
 The directory selection with \"**foo/\" like bash shopt globstar option is not supported yet.
 
-NOTE: `case-fold-search` is what `helm-set-case-fold-search` returns.
-
 *** Query replace on filenames
 
 You can rename your files by replacing only part of filenames matching
