@@ -2300,9 +2300,9 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
 
 (defun helm--recent-push (elm sym)
   "Move ELM of SYM value on top and set SYM to this new value."
-  (pcase (symbol-value sym)
-    ((and (pred (member elm)) l)
-     (set sym (cons elm (remove elm l))))))
+  (let ((m (member elm (symbol-value sym))))
+    (and m (set sym (delq (car m) (symbol-value sym))))
+    (push elm (symbol-value sym))))
 
 (defun helm--current-buffer ()
   "[internal] Return `current-buffer' BEFORE `helm-buffer' is initialized.
