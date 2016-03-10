@@ -2268,7 +2268,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
     (helm-initial-setup any-default))
   (setq helm-alive-p t)
   (unless (eq any-resume 'noresume)
-    (helm-recent-push helm-buffer 'helm-buffers)
+    (helm--recent-push helm-buffer 'helm-buffers)
     (setq helm-last-buffer helm-buffer))
   (when any-input
     (setq helm-input any-input
@@ -2298,11 +2298,11 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   "Restore position in `helm-current-buffer' when quitting."
   (helm-current-position 'restore))
 
-(defun helm-recent-push (elt list-var)
-  "Add ELT to the value of LIST-VAR as most recently used value."
-  (let ((m (member elt (symbol-value list-var))))
-    (and m (set list-var (delq (car m) (symbol-value list-var))))
-    (push elt (symbol-value list-var))))
+(defun helm--recent-push (elm sym)
+  "Move ELM of SYM value on top and set SYM to this new value."
+  (pcase (symbol-value sym)
+    ((and (pred (member elm)) l)
+     (set sym (cons elm (remove elm l))))))
 
 (defun helm--current-buffer ()
   "[internal] Return `current-buffer' BEFORE `helm-buffer' is initialized.
