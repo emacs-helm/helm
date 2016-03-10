@@ -282,9 +282,7 @@ Default is `eq'."
   (cl-loop with cont = (make-hash-table :test test)
         for elm in seq
         unless (gethash elm cont)
-        do (puthash elm elm cont)
-        finally return
-        (cl-loop for i being the hash-values in cont collect i)))
+        collect (puthash elm elm cont)))
 
 (defun helm-skip-entries (seq black-regexp-list &optional white-regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
