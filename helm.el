@@ -2302,7 +2302,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   "Move ELM of SYM value on top and set SYM to this new value."
   (pcase (symbol-value sym)
     ((and (pred (member elm)) l)
-     (set sym (remove elm l))))
+     (set sym (delete elm l))))
   (push elm (symbol-value sym)))
 
 (defun helm--current-buffer ()
