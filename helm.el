@@ -1444,7 +1444,7 @@ It is a function symbol \(sole action\) or list
 of \(action-display . function\)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (helm-aif (helm-attr 'action-transformer)
-        (helm-composed-funcall-with-source
+        (helm-funcall-with-source
          (helm-get-current-source) it
          (helm-attr 'action nil 'ignorefn)
          ;; Check if the first given transformer
@@ -1598,21 +1598,7 @@ was deleted and the candidates list not updated."
 
 
 ;; Core: tools
-
-(defun helm-funcall-with-source (source functions &rest args)
-  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
-FUNCTIONS is either a symbol or a list of functions.
-Return the result of last function call."
-  (let ((helm-source-name (assoc-default 'name source))
-        (helm-current-source source)
-        (funs (if (functionp functions) (list functions) functions)))
-    (helm-log "helm-source-name = %S" helm-source-name)
-    (helm-log "functions = %S" functions)
-    (helm-log "args = %S" args)
-    (cl-loop with result for fn in funs
-             do (setq result (apply fn args))
-             finally return result)))
-
+;;
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function to SYM for each source if any."
   (let ((sources (or sources (helm-get-sources))))
@@ -1675,47 +1661,21 @@ in the source where point is."
            ;; See comment about this in `with-local-quit'.
            (eval '(ignore nil)))))
 
-(defun helm-compose (arg-lst func-lst)
-  "Apply arguments specified in ARG-LST with each function of FUNC-LST.
-The result of each function will be the new `car' of ARG-LST.
-Each function in FUNC-LST must accept (length ARG-LST) arguments
-\(See examples below) .
-This function allows easy sequencing of transformer functions.
-Where generally, ARG-LST is '(candidates-list source) and FUNC-LST a
-list of transformer functions that take one or two arguments depending
-on 'filtered-candidate-transformer' or 'candidate-transformer'.
-e.g.
-filtered-candidate-transformer:
-\(helm-compose '((1 2 3 4 5 6 7)
-                '((name . \"A helm source\") (candidates . (a b c))))
-              '((lambda (candidates _source)
-                  (cl-loop for i in candidates
-                        when (cl-oddp i) collect i))
-                (lambda (candidates _source)
-                  (cl-loop for i in candidates collect (1+ i)))))
-=>(2 4 6 8)
-
-candidate-transformer:
-\(helm-compose '((1 2 3 4 5 6 7))
-                '((lambda (candidates)
-                  (cl-loop for i in candidates
-                        when (cl-oddp i) collect i))
-                (lambda (candidates)
-                  (cl-loop for i in candidates collect (1+ i)))))
-=> (2 4 6 8)."
-  (cl-dolist (func func-lst)
-    (setcar arg-lst (apply func arg-lst)))
-  (car arg-lst))
-
-(defun helm-composed-funcall-with-source (source funcs &rest args)
-  "With SOURCE apply `helm-funcall-with-source' with each FUNCS and ARGS.
-This is used in transformers to modify candidates list."
-  (if (functionp funcs)
-      (apply 'helm-funcall-with-source source funcs args)
-      (apply 'helm-funcall-with-source source
-             (lambda (&rest oargs) (helm-compose oargs funcs))
-             args)))
-
+(defun helm-funcall-with-source (source functions &rest args)
+  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
+FUNCTIONS is either a symbol or a list of functions.
+Return the result of last function call."
+  (let ((helm-source-name (assoc-default 'name source))
+        (helm-current-source source)
+        (funs (if (functionp functions) (list functions) functions)))
+    (helm-log "helm-source-name = %S" helm-source-name)
+    (helm-log "functions = %S" functions)
+    (helm-log "args = %S" args)
+    (cl-loop with result
+             for fn in funs
+             do (setq result (apply fn args))
+             when args do (setcar args result)
+             finally return result)))
 
 ;; Core: entry point
 ;; `:allow-nest' is not in this list because it is treated before.
@@ -2857,13 +2817,13 @@ Cache the candidates if there is no cached value yet."
 (defun helm-process-candidate-transformer (candidates source)
   "Execute `candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'candidate-transformer source)
-      (helm-composed-funcall-with-source source it candidates)
+      (helm-funcall-with-source source it candidates)
     candidates))
 
 (defun helm-process-filtered-candidate-transformer (candidates source)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'filtered-candidate-transformer source)
-      (helm-composed-funcall-with-source source it candidates source)
+      (helm-funcall-with-source source it candidates source)
     candidates))
 
 (defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
@@ -2950,7 +2910,7 @@ cons cell."
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute PATTERN function in SOURCE."
   (helm-aif (assoc-default 'pattern-transformer source)
-      (helm-composed-funcall-with-source source it pattern)
+      (helm-funcall-with-source source it pattern)
     pattern))
 
 (defun helm-default-match-function (candidate)
