@@ -2914,7 +2914,7 @@ cons cell."
         (t candidate)))
 
 (defun helm-process-pattern-transformer (pattern source)
-  "Execute pattern-transformer attribute PATTERN function in SOURCE."
+  "Execute pattern-transformer attribute function(s) on PATTERN in SOURCE."
   (helm-aif (assoc-default 'pattern-transformer source)
       (helm-funcall-with-source source it pattern)
     pattern))
