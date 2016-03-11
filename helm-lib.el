@@ -415,7 +415,8 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
     (intern str-or-sym)))
 
 (defun helm-symbol-name (obj)
-  (if (or (consp obj) (byte-code-function-p obj))
+  (if (or (and (consp obj) (functionp obj))
+          (byte-code-function-p obj))
       "Anonymous"
       (symbol-name obj)))
 
