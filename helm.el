@@ -1599,6 +1599,23 @@ was deleted and the candidates list not updated."
 
 ;; Core: tools
 ;;
+(defun helm-funcall-with-source (source functions &rest args)
+  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
+FUNCTIONS is either a symbol or a list of functions.
+Return the result of last function call."
+  (let ((helm-source-name (assoc-default 'name source))
+        (helm-current-source source)
+        (funs (if (functionp functions) (list functions) functions)))
+    (helm-log "helm-source-name = %S" helm-source-name)
+    (helm-log "functions = %S" functions)
+    (helm-log "args = %S" args)
+    (cl-loop with result
+             for fn in funs
+             do (setq result (apply fn args))
+             when (and args (cdr funs))
+             do (setcar args result)
+             finally return result)))
+
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function to SYM for each source if any."
   (let ((sources (or sources (helm-get-sources))))
@@ -1608,8 +1625,7 @@ was deleted and the candidates list not updated."
 
 (defun helm-normalize-sources (sources)
   "If SOURCES is only one source, make a list of one element."
-  (cond ((or (and sources
-                  (symbolp sources))
+  (cond ((or (and sources (symbolp sources))
              (and (listp sources) (assq 'name sources)))
          (list sources))
         (sources)
@@ -1660,22 +1676,6 @@ in the source where point is."
            (keyboard-quit)
            ;; See comment about this in `with-local-quit'.
            (eval '(ignore nil)))))
-
-(defun helm-funcall-with-source (source functions &rest args)
-  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
-FUNCTIONS is either a symbol or a list of functions.
-Return the result of last function call."
-  (let ((helm-source-name (assoc-default 'name source))
-        (helm-current-source source)
-        (funs (if (functionp functions) (list functions) functions)))
-    (helm-log "helm-source-name = %S" helm-source-name)
-    (helm-log "functions = %S" functions)
-    (helm-log "args = %S" args)
-    (cl-loop with result
-             for fn in funs
-             do (setq result (apply fn args))
-             when args do (setcar args result)
-             finally return result)))
 
 ;; Core: entry point
 ;; `:allow-nest' is not in this list because it is treated before.
