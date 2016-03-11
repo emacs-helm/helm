@@ -1613,6 +1613,12 @@ Return the result of last function call."
              for fn in funs
              do (setq result (apply fn args))
              when (and args (cdr funs))
+             ;; In filter functions, ARGS is a list of one or two elements where
+             ;; the first element is the list of candidates and the second
+             ;; a list containing the source.
+             ;; When more than one fn, set the candidates list to what returns
+             ;; this fn to compute the modified candidates with the next fn
+             ;; and so on.
              do (setcar args result)
              finally return result)))
 
