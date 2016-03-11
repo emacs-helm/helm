@@ -346,11 +346,13 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 
 ;;; Strings processing.
 ;;
-(defun helm-stringify (str-or-sym)
-  "Get string of STR-OR-SYM."
-  (if (stringp str-or-sym)
-      str-or-sym
-    (symbol-name str-or-sym)))
+(defun helm-stringify (elm)
+  "Return the repesentation of ELM as a string.
+ELM can be a string, a number or a symbol."
+  (cl-typecase elm
+    (stringp elm)
+    (numberp (number-to-string elm))
+    (symbolp (symbol-name elm))))
 
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.
