@@ -1623,7 +1623,7 @@ Return the result of last function call."
              finally return result)))
 
 (defun helm-funcall-foreach (sym &optional sources)
-  "Call the associated function to SYM for each source if any."
+  "Call the associated function(s) to SYM for each source if any."
   (let ((sources (or sources (helm-get-sources))))
     (cl-dolist (source sources)
       (helm-aif (assoc-default sym source)
@@ -1639,8 +1639,8 @@ Return the result of last function call."
 
 (defun helm-get-candidate-number (&optional in-current-source)
   "Return candidates number in `helm-buffer'.
-If IN-CURRENT-SOURCE is provided return number of candidates
-in the source where point is."
+If IN-CURRENT-SOURCE is provided return number of candidates of current source
+only."
   (with-helm-buffer
     (if (or (helm-empty-buffer-p)
             (helm-empty-source-p))
