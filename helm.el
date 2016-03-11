@@ -3209,8 +3209,10 @@ and `helm-pattern'."
       ;; Filter candidates with this func, otherwise just compute
       ;; candidates.
       (helm-process-filtered-candidate-transformer
+       ;; ; Using in-buffer method or helm-pattern is empty
+       ;; in this case compute all candidates.
        (if (or (equal helm-pattern "")
-               (equal matchfns '(identity)))
+               (helm--candidates-in-buffer-p matchfns))
            ;; Compute all candidates up to LIMIT.
            (helm-take-first-elements
             (helm-get-cached-candidates source) limit)
@@ -3218,6 +3220,9 @@ and `helm-pattern'."
          (helm-match-from-candidates
           (helm-get-cached-candidates source) matchfns matchpartfn limit source))
        source))))
+
+(defun helm--candidates-in-buffer-p (matchfns)
+  (equal matchfns '(identity)))
 
 (defun helm-render-source (source matches)
   "Display MATCHES from SOURCE according to its settings."
