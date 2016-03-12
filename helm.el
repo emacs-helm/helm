@@ -2004,9 +2004,8 @@ as a string with ARG."
   "Select an `helm-buffer' in `helm-buffers' list to resume a helm session.
 Return nil if no `helm-buffer' found."
   (when helm-buffers
-    (or (helm :sources '(((name . "Resume helm buffer")
-                          (candidates . helm-buffers)
-                          (action . identity)))
+    (or (helm :sources (helm-build-sync-source "Resume helm buffer"
+                          :candidates helm-buffers)
               :resume 'noresume
               :buffer "*helm resume*")
         (keyboard-quit))))
