@@ -112,7 +112,8 @@ If NAME returns nil the pair is skipped.
            collect (cons name (cadr i))))
 
 (defmacro helm-aif (test-form then-form &rest else-forms)
-  "Like `if' but set the result of TEST-FORM in a temprary variable called `it'.
+  "Anaphoric version of `if'.
+Like `if' but set the result of TEST-FORM in a temporary variable called `it'.
 THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
   (declare (indent 2) (debug t))
   `(let ((it ,test-form))
