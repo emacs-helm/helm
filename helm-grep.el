@@ -451,7 +451,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
        (lambda (process event)
            (let* ((err      (process-exit-status process))
                   (noresult (= err 1)))
-             (unless err
+             (unless (and err (> err 0))
                (helm-process-deferred-sentinel-hook
                 process event (helm-default-directory)))
              (cond ((and noresult
@@ -944,7 +944,8 @@ in recurse, and ignoring EXTS, search being made on
     (when (get-buffer helm-action-buffer)
       (kill-buffer helm-action-buffer))
     ;; If `helm-find-files' haven't already started,
-    ;; give a default value to `helm-ff-default-directory'.
+    ;; give a default value to `helm-ff-default-directory'
+    ;; and set locally `default-directory' to this value . See below [1].
     (unless helm-ff-default-directory
       (setq helm-ff-default-directory default-directory))
     ;; We need to store these vars locally
@@ -958,10 +959,11 @@ in recurse, and ignoring EXTS, search being made on
      'helm-grep-default-command
      (cond (zgrep helm-default-zgrep-command)
            (recurse helm-grep-default-recurse-command)
-           ;; When resuming the local value of
+           ;; When resuming, the local value of
            ;; `helm-grep-default-command' is used, only git-grep
            ;; should need this.
-           (t helm-grep-default-command)))
+           (t helm-grep-default-command))
+     'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
     (setq helm-source-grep (helm-make-source src-name 'helm-grep-class
                              :follow follow))
