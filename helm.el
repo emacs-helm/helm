@@ -585,6 +585,19 @@ The default is to enable this by default and then toggle
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-tramp-connection-min-time-diff 5
+  "Value of `tramp-connection-min-time-diff' for helm remote processes.
+If set to zero helm remote processes are not delayed.
+Setting this to a value less than 5 or disabling it with a zero value
+is risky, however on emacs versions starting at 24.5 it seems
+it is now possible to disable it.
+Anyway at any time in helm you can suspend your processes while typing
+by hitting \\<helm-map> `\\[helm-toggle-suspend-update]'.
+Only async sources than use a sentinel calling
+`helm-process-deferred-sentinel-hook' are affected by this."
+  :type 'integer
+  :group 'helm)
+
 
 ;;; Faces
 ;;
@@ -3604,7 +3617,8 @@ this additional info after the source name by overlay."
   "Defer remote processes in sentinels.
 Meant to be called at the beginning of a sentinel process
 function."
-  (when (and (string= event "finished\n")
+  (when (and (not (zerop helm-tramp-connection-min-time-diff))
+             (string= event "finished\n")
              (or (file-remote-p file)
                  ;; `helm-suspend-update-flag'
                  ;; is non-`nil' here only during a
@@ -3622,9 +3636,7 @@ function."
     ;; recent Emacs versions, this has been fixed so tramp returns nil
     ;; in such conditions. Note: `tramp-connection-min-time-diff' cannot
     ;; have values less than 5 seconds otherwise the process dies.
-    (run-at-time (or (and (boundp 'tramp-connection-min-time-diff)
-                          tramp-connection-min-time-diff)
-                     5)
+    (run-at-time helm-tramp-connection-min-time-diff
                  nil (lambda ()
                        (when helm-alive-p ; Don't run timer fn after quit.
                          (setq helm-suspend-update-flag nil)
