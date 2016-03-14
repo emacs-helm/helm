@@ -279,7 +279,7 @@ See also `helm-locate'."
     (helm-log "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd 'face 'font-lock-comment-face) "\n\n"))
     (prog1
-        (start-process-shell-command
+        (start-file-process-shell-command
          "locate-process" helm-buffer
          cmd)
       (set-process-sentinel
