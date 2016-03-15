@@ -338,7 +338,7 @@ in other window according to the value of `helm-elisp-help-function'."
            ;; When there is no way to know what to describe
            ;; prefer describe-function.
            (helm-describe-function sym)))
-      (fboundp  (helm-describe-function sym))
+      (fbound  (helm-describe-function sym))
       (bound    (helm-describe-variable sym))
       (face     (helm-describe-face sym)))))
 
