@@ -1793,10 +1793,10 @@ Other keywords are interpreted as local variables of this helm
 session. The `helm-' prefix can be omitted. For example,
 
 \(helm :sources 'helm-source-buffers-list
-       :buffer \"*buffers*\" :candidate-number-limit 10\)
+       :buffer \"*helm buffers*\" :candidate-number-limit 10\)
 
 starts helm session with `helm-source-buffers' source in
-*buffers* buffer and sets variable `helm-candidate-number-limit'
+*helm buffers* buffer and sets variable `helm-candidate-number-limit'
 to 10 as a session local variable.
 
 \(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY ALLOW-NEST OTHER-LOCAL-VARS)"
