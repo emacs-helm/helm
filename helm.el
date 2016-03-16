@@ -1378,9 +1378,9 @@ existing Helm function names."
 (defun helm--normalize-filter-sources (sources)
   (cl-loop for s in sources collect
            (cl-typecase s
-             (symbolp (assoc-default 'name (symbol-value s)))
-             (listp   (assoc-default 'name s))
-             (stringp s))))
+             (symbol (assoc-default 'name (symbol-value s)))
+             (list   (assoc-default 'name s))
+             (string s))))
 
 (defun helm-set-sources (sources &optional no-init no-update)
   "Set SOURCES during `helm' invocation.
