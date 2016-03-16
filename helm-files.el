@@ -2468,6 +2468,11 @@ Use it for non--interactive calls of `helm-find-files'."
                :default def
                :prompt "Find Files or Url: "
                :buffer "*Helm Find Files*")
+      (helm-attrset 'resume `(lambda ()
+                               (setq helm-ff-default-directory
+                                     ,helm-ff-default-directory
+                                     helm-ff-last-expanded
+                                     ,helm-ff-last-expanded)))
       (setq helm-ff-default-directory nil))))
 
 (defun helm-find-files-cleanup ()
