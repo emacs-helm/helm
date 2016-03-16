@@ -2472,7 +2472,8 @@ Use it for non--interactive calls of `helm-find-files'."
                                (setq helm-ff-default-directory
                                      ,helm-ff-default-directory
                                      helm-ff-last-expanded
-                                     ,helm-ff-last-expanded)))
+                                     ,helm-ff-last-expanded))
+                    helm-source-find-files)
       (setq helm-ff-default-directory nil))))
 
 (defun helm-find-files-cleanup ()
