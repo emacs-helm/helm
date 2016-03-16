@@ -174,6 +174,9 @@ Note this have no effect in `helm-org-in-buffer-headings'."
         (save-restriction
           (widen)
           (unless parents (goto-char (point-min)))
+          ;; clear cache for new version of org-get-outline-path
+          (and (boundp 'org-outline-path-cache)
+               (setq org-outline-path-cache nil))
           (cl-loop with width = (window-width (helm-window))
                    while (funcall search-fn)
                    for beg = (point-at-bol)
@@ -189,10 +192,16 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                    collect `(,(propertize
                                (if helm-org-format-outline-path
                                    (org-format-outline-path
-                                    (append (apply #'org-get-outline-path
-                                                   (unless parents
-                                                     (list t level heading)))
-                                            (list heading))
+                                    ;; org-get-outline-path changed in signature and behaviour since org's
+                                    ;; commit 105a4466971. Let's fall-back to the new version in case
+                                    ;; of wrong-number-of-arguments error.
+                                    (condition-case nil
+                                        (append (apply #'org-get-outline-path
+                                                       (unless parents
+                                                         (list t level heading)))
+                                                (list heading))
+                                      (wrong-number-of-arguments
+                                       (org-get-outline-path t t)))
                                     width file)
                                    (if file
                                        (concat file (funcall match-fn  0))
