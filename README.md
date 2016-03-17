@@ -120,6 +120,12 @@ effect.
 
 `Only the extensions in the github emacs-helm repository are supported.`
 
+## Debian and Ubuntu
+
+Users of Debian 9 or later or Ubuntu 16.04 or later may simply
+`apt-get install elpa-helm` (or `apt-get install elpa-helm-core`; see
+below).
+
 ## Installing just the helm-core package
 
 `helm-core` package is available on [MELPA](http://melpa.org/) for
