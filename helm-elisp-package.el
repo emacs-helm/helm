@@ -352,7 +352,7 @@
            for pkg-desc = (get-text-property 0 'tabulated-list-id p)
            for name = (package-desc-name pkg-desc)
            do (if (boundp 'package-selected-packages)
-                  (progn
+                  (with-no-warnings
                     (package-delete pkg-desc 'force 'nosave)
                     ;; pkg-desc contain the description
                     ;; of the installed package just removed
