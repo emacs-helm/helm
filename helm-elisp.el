@@ -883,7 +883,8 @@ Filename completion happen if string start after or between a double quote."
                       (run-with-timer 0.1 nil #'helm-sexp-eval candidate))
              "Edit and eval" (lambda (candidate)
                                (edit-and-eval-command "Eval: " (read candidate))))
-    :persistent-action #'helm-sexp-eval))
+    :persistent-action #'helm-sexp-eval
+    :multiline t))
 
 ;;;###autoload
 (defun helm-complex-command-history ()
