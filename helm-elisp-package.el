@@ -320,33 +320,30 @@
   ((init :initform 'helm-el-package--init)
    (get-line :initform 'buffer-substring)
    (filtered-candidate-transformer :initform 'helm-el-package--transformer)
-   (action-transformer
-    :initform
-    (lambda (actions candidate)
-      (let ((pkg-desc (get-text-property
-                       0 'tabulated-list-id candidate))
-            (acts (if helm-el-package--upgrades
-                      (append actions '(("Upgrade all packages"
-                                         . helm-el-package-upgrade-all-action)))
-                      actions)))
-        (cond ((and (package-installed-p (package-desc-name pkg-desc))
-                    (cdr (assq (package-desc-name pkg-desc)
-                          helm-el-package--upgrades)))
-               (append '(("Upgrade package(s)" . helm-el-package-upgrade)
-                         ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
-              ((cdr (assq (package-desc-name pkg-desc)
-                          helm-el-package--upgrades))
-               (append '(("Upgrade package(s)" . helm-el-package-upgrade)) acts))
-              ((package-installed-p (package-desc-name pkg-desc))
-               (append acts '(("Reinstall package(s)" . helm-el-package-reinstall)
-                              ("Uninstall package(s)" . helm-el-package-uninstall))))
-              (t (append acts '(("Install packages(s)" . helm-el-package-install))))))))
+   (action-transformer :initform 'helm-el-package--action-transformer)
    (help-message :initform 'helm-el-package-help-message)
    (keymap :initform helm-el-package-map)
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe package" . helm-el-package-describe)
                        ("Visit homepage" . helm-el-package-visit-homepage)))))
+
+(defun helm-el-package--action-transformer (actions candidate)
+  (let* ((pkg-desc (get-text-property
+                    0 'tabulated-list-id candidate))
+         (pkg-name (package-desc-name pkg-desc))
+         (acts (if helm-el-package--upgrades
+                   (append actions '(("Upgrade all packages"
+                                      . helm-el-package-upgrade-all-action)))
+                   actions)))
+    (cond ((and (package-installed-p pkg-name)
+                (cdr (assq pkg-name helm-el-package--upgrades)))
+           (append '(("Upgrade package(s)" . helm-el-package-upgrade)
+                     ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
+          ((package-installed-p pkg-name)
+           (append acts '(("Reinstall package(s)" . helm-el-package-reinstall)
+                          ("Uninstall package(s)" . helm-el-package-uninstall))))
+          (t (append acts '(("Install packages(s)" . helm-el-package-install)))))))
 
 (defun helm-el-package--update ()
   (setq helm-el-package--initialized-p nil))
