@@ -523,8 +523,7 @@ than `w3m-browse-url' use it."
 ;;
 
 (defun helm-highlight-bookmark (bookmarks _source)
-  "Used as `filtered-candidate-transformer' to colorize bookmarks.
-Work both with standard Emacs bookmarks and bookmark-extensions.el."
+  "Used as `filtered-candidate-transformer' to colorize bookmarks."
   (let ((non-essential t))
     (cl-loop for i in bookmarks
           for isfile        = (bookmark-get-filename i)
