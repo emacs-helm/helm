@@ -97,12 +97,8 @@
         for p in mkd
         for id = (get-text-property 0 'tabulated-list-id p)
         do (package-install
-            (if (fboundp 'package-desc-name)
-                (package-desc-name id)
-              (car id)))
-        collect (if (fboundp 'package-desc-full-name)
-                        id
-                      (car id))
+            (if (fboundp 'package-desc-name) id (car id)))
+        collect (if (fboundp 'package-desc-full-name) id (car id))
         into installed-list
         finally do (progn
                      (when (boundp 'package-selected-packages)
@@ -320,33 +316,33 @@
   ((init :initform 'helm-el-package--init)
    (get-line :initform 'buffer-substring)
    (filtered-candidate-transformer :initform 'helm-el-package--transformer)
-   (action-transformer
-    :initform
-    (lambda (actions candidate)
-      (let ((pkg-desc (get-text-property
-                       0 'tabulated-list-id candidate))
-            (acts (if helm-el-package--upgrades
-                      (append actions '(("Upgrade all packages"
-                                         . helm-el-package-upgrade-all-action)))
-                      actions)))
-        (cond ((and (package-installed-p (package-desc-name pkg-desc))
-                    (cdr (assq (package-desc-name pkg-desc)
-                          helm-el-package--upgrades)))
-               (append '(("Upgrade package(s)" . helm-el-package-upgrade)
-                         ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
-              ((cdr (assq (package-desc-name pkg-desc)
-                          helm-el-package--upgrades))
-               (append '(("Upgrade package(s)" . helm-el-package-upgrade)) acts))
-              ((package-installed-p (package-desc-name pkg-desc))
-               (append acts '(("Reinstall package(s)" . helm-el-package-reinstall)
-                              ("Uninstall package(s)" . helm-el-package-uninstall))))
-              (t (append acts '(("Install packages(s)" . helm-el-package-install))))))))
+   (action-transformer :initform 'helm-el-package--action-transformer)
    (help-message :initform 'helm-el-package-help-message)
    (keymap :initform helm-el-package-map)
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe package" . helm-el-package-describe)
                        ("Visit homepage" . helm-el-package-visit-homepage)))))
+
+(defun helm-el-package--action-transformer (actions candidate)
+  (let* ((pkg-desc (get-text-property
+                    0 'tabulated-list-id candidate))
+         (pkg-name (package-desc-name pkg-desc))
+         (acts (if helm-el-package--upgrades
+                   (append actions '(("Upgrade all packages"
+                                      . helm-el-package-upgrade-all-action)))
+                   actions)))
+    (cond ((and (package-installed-p pkg-name)
+                (cdr (assq pkg-name helm-el-package--upgrades)))
+           (append '(("Upgrade package(s)" . helm-el-package-upgrade)
+                     ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
+          ((and (package-installed-p pkg-name)
+                (or (null (package-built-in-p pkg-name))
+                    (and (package-built-in-p pkg-name)
+                         (assq pkg-name package-alist))))
+           (append acts '(("Reinstall package(s)" . helm-el-package-reinstall)
+                          ("Uninstall package(s)" . helm-el-package-uninstall))))
+          (t (append acts '(("Install packages(s)" . helm-el-package-install)))))))
 
 (defun helm-el-package--update ()
   (setq helm-el-package--initialized-p nil))
@@ -355,8 +351,20 @@
   (cl-loop for p in (helm-marked-candidates)
            for pkg-desc = (get-text-property 0 'tabulated-list-id p)
            for name = (package-desc-name pkg-desc)
-           do (if (fboundp 'package-reinstall)
-                  (package-reinstall name)
+           do (if (boundp 'package-selected-packages)
+                  (with-no-warnings
+                    (package-delete pkg-desc 'force 'nosave)
+                    ;; pkg-desc contain the description
+                    ;; of the installed package just removed
+                    ;; and is BTW no more valid.
+                    ;; Use the entry in package-archive-content
+                    ;; which is the non--installed package entry.
+                    ;; For some reason `package-install'
+                    ;; need a pkg-desc (package-desc-p) for the build-in
+                    ;; packages already installed, the name (as symbol)
+                    ;; fails with such packages.
+                    (package-install
+                     (cadr (assq name package-archive-contents))))
                   (package-delete pkg-desc)
                   (package-install name))))
 
