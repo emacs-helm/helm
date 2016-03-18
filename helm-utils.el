@@ -323,7 +323,7 @@ Return nil on valid file name remote or not."
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending it's value.
 `file-attributes' will take care of that to avoid overflow error.
-KBSIZE if a floating point number, defaulting to `helm-default-kbsize'."
+KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
   (let ((M (cons "M" (/ size (expt kbsize 2))))
         (G (cons "G" (/ size (expt kbsize 3))))
         (K (cons "K" (/ size kbsize)))
