@@ -820,11 +820,8 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 (defun helm-ff-switch-to-eshell (_candidate)
   "Switch to eshell and cd to `helm-ff-default-directory'."
   (let ((cd-eshell (lambda ()
-                       (eshell-kill-input)
-                       (goto-char (point-max))
-                       (insert
-                        (format "cd '%s'" helm-ff-default-directory))
-                       (eshell-send-input))))
+                     (eshell/cd helm-ff-default-directory)
+                     (eshell-reset))))
     (if (get-buffer "*eshell*")
         (switch-to-buffer "*eshell*")
       (call-interactively 'eshell))
