@@ -4359,6 +4359,7 @@ to a list of forms.\n\n")
         (helm-run-after-exit
          #'helm-debug-open-last-log)
         (setq helm-debug t)
+        (with-helm-buffer (setq truncate-lines nil))
         (message "Debugging enabled"))))
 (put 'helm-enable-or-switch-to-debug 'helm-only t)
 
