@@ -324,17 +324,14 @@ Return nil on valid file name remote or not."
 SIZE can be an integer or a float depending it's value.
 `file-attributes' will take care of that to avoid overflow error.
 KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
-  (let ((M (cons "M" (/ size (expt kbsize 2))))
-        (G (cons "G" (/ size (expt kbsize 3))))
-        (K (cons "K" (/ size kbsize)))
-        (B (cons "B" size)))
-    (cl-loop with result = B
-             for (x . y) in (list M G K B)
-             when (and (>= y 1) (< y (cdr result)))
-             do (setq result (cons x y))
-             finally return (if (string= (car result) "B")
-                                (format "%s" size)
-                                (format "%.1f%s" (cdr result) (car result))))))
+  (cl-loop with result = (cons "B" size)
+           for i in '("k" "M" "G" "T" "P" "E" "Z" "Y")
+           while (>= (cdr result) kbsize)
+           do (setq result (cons i (/ (cdr result) kbsize)))
+           finally return
+           (if (string= (car result) "B")
+               (format "%s" size)
+               (format "%.1f%s" (cdr result) (car result)))))
 
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
