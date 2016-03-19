@@ -329,9 +329,9 @@ KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
            while (>= (cdr result) kbsize)
            do (setq result (cons i (/ (cdr result) kbsize)))
            finally return
-           (if (string= (car result) "B")
-               (format "%s" size)
-               (format "%.1f%s" (cdr result) (car result)))))
+           (pcase (car result)
+             (`"B" (format "%s" size))
+             (suffix (format "%.1f%s" (cdr result) suffix)))))
 
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
