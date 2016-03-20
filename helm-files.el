@@ -254,6 +254,11 @@ see `helm-ff-guess-ffap-filenames' for this."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-no-preselect nil
+  "When non--nil `helm-find-files' starts at root of current directory."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-substitute-in-filename-stay-on-remote nil
   "Don't switch back to local filesystem when expanding pattern with / or ~/."
   :group 'helm-files
@@ -3477,7 +3482,8 @@ This is the starting point for nearly all actions you can do on files."
                               (if helm-ff-transformer-show-only-basename
                                   (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
-    (helm-find-files-1 input (and presel (concat "^" (regexp-quote presel))))))
+    (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
+                                  (concat "^" (regexp-quote presel))))))
 
 ;;;###autoload
 (defun helm-for-files ()
