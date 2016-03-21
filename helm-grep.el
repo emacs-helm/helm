@@ -431,8 +431,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                        ((and (pred (string-match-p "ack")) ack)
                                          (format "%s --color" ack)))
                        for p in it concat
-                       (format " | %s %s"
-                               pipcom (shell-quote-argument p)))
+                       (format " | %s %s" pipcom (shell-quote-argument p)))
             "")))
     (format-spec
      helm-grep-default-command
