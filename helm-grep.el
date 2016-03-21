@@ -1256,10 +1256,21 @@ You can use safely \"--color\" (default)."
 (defun helm-grep--ag-command ()
   (car (split-string helm-grep-ag-command)))
 
+(defun helm-grep-ag-prepare-cmd-line (pattern directory)
+  (let ((patterns (split-string pattern)))
+    (helm-aif (cdr patterns)
+        (concat (format helm-grep-ag-command
+                        (shell-quote-argument (car patterns))
+                        (shell-quote-argument directory))
+                (cl-loop for p in it
+                         concat (format " | ack-grep --color %s" p)))
+      (format helm-grep-ag-command
+              (shell-quote-argument pattern)
+              (shell-quote-argument directory)))))
+
 (defun helm-grep-ag-init (directory)
-  (let ((cmd-line (format helm-grep-ag-command
-                          (shell-quote-argument helm-pattern)
-                          (shell-quote-argument directory))))
+  (let ((cmd-line (helm-grep-ag-prepare-cmd-line
+                   helm-pattern directory)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (prog1
         (start-process-shell-command
