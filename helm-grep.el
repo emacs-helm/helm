@@ -416,7 +416,20 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (smartcase         (if (helm-grep-use-ack-p) ""
                               (unless (let ((case-fold-search nil))
                                         (string-match-p
-                                         "[[:upper:]]" helm-pattern)) "i"))))
+                                         "[[:upper:]]" helm-pattern)) "i")))
+         (helm-grep-default-command
+          (concat helm-grep-default-command " %m")) ; `%m' like multi.
+         (patterns (split-string helm-pattern))
+         (pipes
+          (helm-aif (cdr patterns)
+              (cl-loop with pipcom = (pcase (helm-grep-command)
+                                       ((or "grep" "zgrep" "git-grep")
+                                         "grep --color=always")
+                                       ("ack-grep" "ack-grep --color"))
+                       for p in it concat
+                       (format " | %s %s"
+                               pipcom (shell-quote-argument p)))
+            "")))
     (format-spec
      helm-grep-default-command
      (delq nil
@@ -425,8 +438,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        (cons ?e types)
                      (cons ?e exclude)))
                  (cons ?c (or smartcase ""))
-                 (cons ?p (shell-quote-argument helm-pattern))
-                 (cons ?f fnargs))))))
+                 (cons ?p (shell-quote-argument (car patterns)))
+                 (cons ?f fnargs)
+                 (cons ?m pipes))))))
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
