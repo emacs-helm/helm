@@ -278,7 +278,10 @@ current heading."
 ;; Based on code from Anders Johansson posted on 3 Mar 2016 at
 ;; <https://groups.google.com/d/msg/emacs-helm/tA6cn6TUdRY/G1S3TIdzBwAJ>
 
-(defun helm-org-completing-read-tags (prompt coll pred req initial hist def inh)
+;; FIXME: This function fails with a "Wrong number of arguments" error
+;; if its name starts with "helm"?!  If its name starts with anything
+;; else, it works fine!
+(defun not-helm-org-completing-read-tags (prompt coll pred req initial hist def inh)
   (let* ((initial (and (stringp initial)
                        (not (string= initial ""))
                        initial))
