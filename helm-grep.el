@@ -65,13 +65,15 @@ don't specify the '%e' format spec.
 Helm also support ack-grep and git-grep ,
 here a default command example for ack-grep:
 
-\(setq helm-grep-default-command \"ack-grep -Hn --smart-case --no-group %e %p %f\"
-       helm-grep-default-recurse-command \"ack-grep -H --smart-case --no-group %e %p %f\")
+\(setq helm-grep-default-command \"ack-grep -Hn --color --smart-case --no-group %e %p %f\"
+       helm-grep-default-recurse-command \"ack-grep -H --color --smart-case --no-group %e %p %f\")
 
 You can ommit the %e spec if you don't want to be prompted for types.
 
 NOTE: Helm for ack-grep support ANSI sequences, so you can remove
-the \"--no-color\" option safely (recommended).
+the \"--no-color\" option safely (recommended)
+However you should specify --color to enable multi matches highlighting
+because ack disable it when output is piped.
 
 Same for grep you can use safely the option \"--color=always\" (default).
 You can customize the color of matches using GREP_COLORS env var.
@@ -416,7 +418,21 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (smartcase         (if (helm-grep-use-ack-p) ""
                               (unless (let ((case-fold-search nil))
                                         (string-match-p
-                                         "[[:upper:]]" helm-pattern)) "i"))))
+                                         "[[:upper:]]" helm-pattern)) "i")))
+         (helm-grep-default-command
+          (concat helm-grep-default-command " %m")) ; `%m' like multi.
+         (patterns (split-string helm-pattern))
+         (pipes
+          (helm-aif (cdr patterns)
+              (cl-loop with pipcom = (pcase (helm-grep-command)
+                                       ((or "grep" "zgrep" "git-grep")
+                                         "grep --color=always")
+                                       ;; Sometimes ack-grep cmd is ack only.
+                                       ((and (pred (string-match-p "ack")) ack)
+                                         (format "%s --color" ack)))
+                       for p in it concat
+                       (format " | %s %s" pipcom (shell-quote-argument p)))
+            "")))
     (format-spec
      helm-grep-default-command
      (delq nil
@@ -425,8 +441,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                        (cons ?e types)
                      (cons ?e exclude)))
                  (cons ?c (or smartcase ""))
-                 (cons ?p (shell-quote-argument helm-pattern))
-                 (cons ?f fnargs))))))
+                 (cons ?p (shell-quote-argument (car patterns)))
+                 (cons ?f fnargs)
+                 (cons ?m pipes))))))
 
 (defun helm-grep-init (cmd-line)
   "Start an asynchronous grep process with CMD-LINE using ZGREP if non--nil."
@@ -1242,10 +1259,24 @@ You can use safely \"--color\" (default)."
 (defun helm-grep--ag-command ()
   (car (split-string helm-grep-ag-command)))
 
+(defun helm-grep-ag-prepare-cmd-line (pattern directory)
+  (let ((patterns (split-string pattern))
+        (pipe-cmd (cond ((executable-find "ack") "ack --color")
+                        ((executable-find "ack-grep") "ack-grep --color")
+                        (t "grep --perl-regexp --color=always"))))
+    (helm-aif (cdr patterns)
+        (concat (format helm-grep-ag-command
+                        (shell-quote-argument (car patterns))
+                        (shell-quote-argument directory))
+                (cl-loop for p in it concat
+                         (format " | %s %s" pipe-cmd (shell-quote-argument p))))
+      (format helm-grep-ag-command
+              (shell-quote-argument pattern)
+              (shell-quote-argument directory)))))
+
 (defun helm-grep-ag-init (directory)
-  (let ((cmd-line (format helm-grep-ag-command
-                          (shell-quote-argument helm-pattern)
-                          (shell-quote-argument directory))))
+  (let ((cmd-line (helm-grep-ag-prepare-cmd-line
+                   helm-pattern directory)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (prog1
         (start-process-shell-command
