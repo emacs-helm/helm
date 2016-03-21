@@ -1269,8 +1269,8 @@ You can use safely \"--color\" (default)."
         (concat (format helm-grep-ag-command
                         (shell-quote-argument (car patterns))
                         (shell-quote-argument directory))
-                (cl-loop for p in it
-                         concat (format " | %s %s" pipe-cmd p)))
+                (cl-loop for p in it concat
+                         (format " | %s %s" pipe-cmd (shell-quote-argument p))))
       (format helm-grep-ag-command
               (shell-quote-argument pattern)
               (shell-quote-argument directory)))))
