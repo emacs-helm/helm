@@ -311,30 +311,18 @@ current heading."
       (concat initial (mapconcat 'identity
                                  (nreverse (helm-org-completing-read-multiple
                                             prompt table pred nil nil hist def
-                                            name buffer ":"))
+                                            name buffer))
                                  ":")))))
 
 (defun helm-org-completing-read-multiple (prompt choices
                                           &optional
                                             predicate require-match
                                             initial-input hist def
-                                            name buffer sentinel)
-  "Read multiple items with `helm-completing-read-default-1'. Reading stops
-when the user enters SENTINEL. By default, SENTINEL is
-\"*done*\". SENTINEL is disambiguated with clashing completions
-by appending _ to SENTINEL until it becomes unique. So if there
-are multiple values that look like SENTINEL, the one with the
-most _ at the end is the actual sentinel value. See
-documentation for `ido-completing-read' for details on the
-other parameters."
-  (let ((sentinel (or sentinel "*done*"))
-        this-choice res done-reading)
-    ;; Uniquify the SENTINEL value
-    (while (cl-find sentinel choices)
-      (setq sentinel (concat sentinel "_")))
-    (setq choices (cons sentinel choices))
-    ;; Read some choices
-    (while (not done-reading)
+                                            name buffer)
+  "Read multiple items with `helm-completing-read-default-1'.
+Reading stops when the user enters empty string."
+  (let (this-choice result)
+    (while (not (string= this-choice ""))
       (setq this-choice
             (helm-comp-read prompt choices
                             :test predicate
@@ -345,11 +333,9 @@ other parameters."
                             :name name
                             :buffer buffer
                             :exec-when-only-one t))
-      (if (equal this-choice sentinel)
-          (setq done-reading t)
-        (setq res (cons this-choice res))
-        (setq prompt (concat prompt this-choice ":"))))
-    res))
+      (setq result (cons this-choice result))
+      (setq prompt (concat prompt this-choice ":")))
+    result))
 
 (provide 'helm-org)
 
