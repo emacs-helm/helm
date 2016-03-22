@@ -278,18 +278,19 @@ current heading."
 ;; Based on code from Anders Johansson posted on 3 Mar 2016 at
 ;; <https://groups.google.com/d/msg/emacs-helm/tA6cn6TUdRY/G1S3TIdzBwAJ>
 
-;; FIXME: This function fails with a "Wrong number of arguments" error
-;; if its name starts with "helm"?!  If its name starts with anything
-;; else, it works fine!
-(defun not-helm-org-completing-read-tags (prompt coll pred req initial hist def inh)
+;;;###autoload
+(defun helm-org-completing-read-tags (prompt collection pred req initial
+                                      hist def inherit-input-method name buffer)
   (if (not (string= "Tags: " prompt))
       ;; Not a tags prompt.  Use normal completion by calling
       ;; `org-icompleting-read' again without this function in
       ;; `helm-completing-read-handlers-alist'
-      (let ((helm-completing-read-handlers-alist (rassq-delete-all
-                                                  'not-helm-org-completing-read-tags
-                                                  helm-completing-read-handlers-alist)))
-        (org-icompleting-read prompt coll pred req initial hist def inh))
+      (let ((helm-completing-read-handlers-alist
+             (rassq-delete-all
+              'helm-org-completing-read-tags
+              helm-completing-read-handlers-alist)))
+        (org-icompleting-read
+         prompt collection pred req initial hist def inherit-input-method))
     ;; Tags prompt
     (let* ((initial (and (stringp initial)
                          (not (string= initial ""))
@@ -310,12 +311,14 @@ current heading."
       (concat initial (mapconcat 'identity
                                  (nreverse (helm-org-completing-read-multiple
                                             prompt table pred nil nil hist def
-                                            t "Org tags" "*Helm org tags*" ":"))
+                                            name buffer ":"))
                                  ":")))))
 
 (defun helm-org-completing-read-multiple (prompt choices
-                                                 &optional predicate require-match initial-input hist def
-                                                 inherit-input-method name buffer sentinel)
+                                          &optional
+                                            predicate require-match
+                                            initial-input hist def
+                                            name buffer sentinel)
   "Read multiple items with `helm-completing-read-default-1'. Reading stops
 when the user enters SENTINEL. By default, SENTINEL is
 \"*done*\". SENTINEL is disambiguated with clashing completions
@@ -332,9 +335,16 @@ other parameters."
     (setq choices (cons sentinel choices))
     ;; Read some choices
     (while (not done-reading)
-      (setq this-choice (helm-completing-read-default-1 prompt choices
-                                                        predicate require-match initial-input hist def
-                                                        inherit-input-method name buffer nil t))
+      (setq this-choice
+            (helm-comp-read prompt choices
+                            :test predicate
+                            :must-match require-match
+                            :initial-input initial-input
+                            :history hist
+                            :default def
+                            :name name
+                            :buffer buffer
+                            :exec-when-only-one t))
       (if (equal this-choice sentinel)
           (setq done-reading t)
         (setq res (cons this-choice res))
