@@ -37,6 +37,7 @@
     (trace-function-foreground . helm-completing-read-symbols)
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-with-cands-in-buffer)
+    (org-capture . not-helm-org-completing-read-tags) ; FIXME: This function doesn't work if its name starts with "helm" ??
     (org-set-tags . not-helm-org-completing-read-tags) ; FIXME: This function doesn't work if its name starts with "helm" ??
     (ffap-alternate-file . nil)
     (tmm-menubar . nil)
