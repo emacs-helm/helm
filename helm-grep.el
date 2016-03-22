@@ -1054,7 +1054,7 @@ in recurse, and ignoring EXTS, search being made on
                       ":"
                       (propertize lineno 'face 'helm-grep-lineno)
                       ":"
-                      (if ansi-p str (helm-grep-highlight-match str)))
+                      (if ansi-p str (helm-grep-highlight-match str t)))
               line)
         "")))
 
