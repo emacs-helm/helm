@@ -280,7 +280,7 @@ current heading."
 
 ;;;###autoload
 (defun helm-org-completing-read-tags (prompt collection pred req initial
-                                      hist def inherit-input-method name buffer)
+                                      hist def inherit-input-method _name _buffer)
   (if (not (string= "Tags: " prompt))
       ;; Not a tags prompt.  Use normal completion by calling
       ;; `org-icompleting-read' again without this function in
@@ -295,47 +295,28 @@ current heading."
     (let* ((initial (and (stringp initial)
                          (not (string= initial ""))
                          initial))
-           (curr (when initial
-                   (org-split-string initial ":")))
-           (table (org-uniquify
-                   (mapcar 'car org-last-tags-completion-table)))
-           (table (if curr
-                      ;; Remove current tags from list
-                      (cl-delete-if (lambda (x)
-                                      (member x curr))
-                                    table)
-                    table))
-           (prompt (if initial
-                       (concat "Tags " initial)
-                     prompt)))
+           (curr    (when initial
+                      (org-split-string initial ":")))
+           (table   (delete curr
+                            (org-uniquify
+                             (mapcar 'car org-last-tags-completion-table))))
+           (prompt  (if initial
+                        (concat prompt initial)
+                        prompt)))
       (concat initial (mapconcat 'identity
-                                 (nreverse (helm-org-completing-read-multiple
-                                            prompt table pred nil nil hist def
-                                            name buffer))
+                                 (helm-org-completing-read-multiple
+                                  prompt table pred nil nil hist def)
                                  ":")))))
 
 (defun helm-org-completing-read-multiple (prompt choices
                                           &optional
                                             predicate require-match
-                                            initial-input hist def
-                                            name buffer)
+                                            initial-input hist def)
   "Read multiple items with `helm-completing-read-default-1'.
 Reading stops when the user enters empty string."
-  (let (this-choice result)
-    (while (not (string= this-choice ""))
-      (setq this-choice
-            (helm-comp-read prompt choices
-                            :test predicate
-                            :must-match require-match
-                            :initial-input initial-input
-                            :history hist
-                            :default def
-                            :name name
-                            :buffer buffer
-                            :exec-when-only-one t))
-      (setq result (cons this-choice result))
-      (setq prompt (concat prompt this-choice ":")))
-    result))
+  (completing-read-multiple
+   prompt choices
+   predicate require-match initial-input hist def))
 
 (provide 'helm-org)
 
