@@ -304,19 +304,9 @@ current heading."
                         (concat prompt initial)
                         prompt)))
       (concat initial (mapconcat 'identity
-                                 (helm-org-completing-read-multiple
+                                 (completing-read-multiple
                                   prompt table pred nil nil hist def)
                                  ":")))))
-
-(defun helm-org-completing-read-multiple (prompt choices
-                                          &optional
-                                            predicate require-match
-                                            initial-input hist def)
-  "Read multiple items with `helm-completing-read-default-1'.
-Reading stops when the user enters empty string."
-  (completing-read-multiple
-   prompt choices
-   predicate require-match initial-input hist def))
 
 (provide 'helm-org)
 
