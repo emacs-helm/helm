@@ -2205,9 +2205,10 @@ It uses `switch-to-buffer' or `display-buffer' depending on the
 value of `helm-full-frame' or `helm-split-window-default-side'."
   (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
           (and (eq helm-split-window-default-side 'same)
-               (and (not (minibufferp helm-current-buffer))
-                    (one-window-p t))))
-      (progn (delete-other-windows) (switch-to-buffer buffer))
+               (one-window-p t)))
+      (progn (and (not (minibufferp helm-current-buffer))
+                  (delete-other-windows))
+             (switch-to-buffer buffer))
     (when (and (or helm-always-two-windows helm-autoresize-mode
                    (and (not helm-split-window-in-side-p)
                         (eq (save-selected-window
