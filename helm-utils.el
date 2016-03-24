@@ -444,15 +444,21 @@ If STRING is non--nil return instead a space separated string."
   (declare (indent 0) (debug t))
   (helm-with-gensyms (buffer window)
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
+            (helm-always-two-windows t)
+            (helm-split-window-default-side
+             (if (eq helm-split-window-default-side 'same)
+                 'below helm-split-window-default-side))
+            helm-split-window-in-side-p
+            helm-reuse-last-window-split-state
             ,window)
+       (with-current-buffer ,buffer
+         (dired-format-columns-of-files ,candidates))
        (unwind-protect
-            (with-current-buffer ,buffer
-              (dired-format-columns-of-files ,candidates)
-              (select-window
-               (setq ,window (temp-buffer-window-show
-                              ,buffer
-                              '(display-buffer-below-selected
-                                (window-height . fit-window-to-buffer)))))
+            (with-selected-window
+                (setq ,window (temp-buffer-window-show
+                               ,buffer
+                               '(display-buffer-below-selected
+                                 (window-height . fit-window-to-buffer))))
               (progn ,@body))
          (quit-window 'kill ,window)))))
 

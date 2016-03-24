@@ -577,11 +577,6 @@ ACTION must be an action supported by `helm-dired-action'."
                          (capitalize (symbol-name action))
                          (length ifiles)))
          helm-ff--move-to-first-real-candidate
-         (helm-always-two-windows t)
-         (helm-reuse-last-window-split-state t)
-         (helm-split-window-default-side
-          (eq helm-split-window-default-side 'same))
-         helm-split-window-in-side-p
          (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-initial-value
