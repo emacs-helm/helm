@@ -278,6 +278,8 @@ current heading."
 ;; Based on code from Anders Johansson posted on 3 Mar 2016 at
 ;; <https://groups.google.com/d/msg/emacs-helm/tA6cn6TUdRY/G1S3TIdzBwAJ>
 
+(defvar crm-separator)
+
 ;;;###autoload
 (defun helm-org-completing-read-tags (prompt collection pred req initial
                                       hist def inherit-input-method _name _buffer)
