@@ -302,7 +302,8 @@ current heading."
                              (mapcar 'car org-last-tags-completion-table))))
            (prompt  (if initial
                         (concat prompt initial)
-                        prompt)))
+                        prompt))
+           (crm-separator ":\\|,"))
       (concat initial (mapconcat 'identity
                                  (completing-read-multiple
                                   prompt table pred nil nil hist def)
