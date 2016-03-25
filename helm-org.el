@@ -294,10 +294,9 @@ current heading."
         (org-icompleting-read
          prompt collection pred req initial hist def inherit-input-method))
     ;; Tags prompt
-    (let* ((initial (and (stringp initial)
-                         (not (string= initial ""))
-                         initial))
-           (curr    (when initial (org-split-string initial ":")))
+    (let* ((curr (and (stringp initial)
+                      (not (string= initial ""))
+                      (org-split-string initial ":")))
            (table   (delete curr
                             (org-uniquify
                              (mapcar 'car org-last-tags-completion-table))))
