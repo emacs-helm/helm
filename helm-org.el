@@ -300,11 +300,13 @@ current heading."
            (table   (delete curr
                             (org-uniquify
                              (mapcar 'car org-last-tags-completion-table))))
-           (crm-separator ":\\|,"))
-      (mapconcat 'identity
-                 (completing-read-multiple
-                  prompt table pred nil initial hist def)
-                 ":"))))
+           (crm-separator ":\\|,\\|\\s-"))
+      (cl-letf (((symbol-function 'crm-complete-word)
+                 'self-insert-command))
+        (mapconcat 'identity
+                   (completing-read-multiple
+                    prompt table pred nil initial hist def)
+                   ":")))))
 
 (provide 'helm-org)
 
