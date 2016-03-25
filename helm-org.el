@@ -297,19 +297,15 @@ current heading."
     (let* ((initial (and (stringp initial)
                          (not (string= initial ""))
                          initial))
-           (curr    (when initial
-                      (org-split-string initial ":")))
+           (curr    (when initial (org-split-string initial ":")))
            (table   (delete curr
                             (org-uniquify
                              (mapcar 'car org-last-tags-completion-table))))
-           (prompt  (if initial
-                        (concat prompt initial)
-                        prompt))
            (crm-separator ":\\|,"))
-      (concat initial (mapconcat 'identity
-                                 (completing-read-multiple
-                                  prompt table pred nil nil hist def)
-                                 ":")))))
+      (mapconcat 'identity
+                 (completing-read-multiple
+                  prompt table pred nil initial hist def)
+                 ":"))))
 
 (provide 'helm-org)
 
