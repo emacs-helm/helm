@@ -173,13 +173,18 @@ If `helm-turn-on-show-completion' is nil just do nothing."
   `(let ((helm-move-selection-after-hook
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)
-                       helm-move-selection-after-hook))))
-     (with-helm-temp-hook 'helm-after-initialize-hook
-       (with-helm-buffer
-         (set (make-local-variable 'helm-display-function)
-              (if helm-show-completion-use-special-display
-                  'helm-show-completion-display-function
-                'helm-default-display-buffer))))
+                       helm-move-selection-after-hook)))
+         (helm-always-two-windows t)
+         (helm-split-window-default-side
+          (if (eq helm-split-window-default-side 'same)
+              'below helm-split-window-default-side))
+         helm-split-window-in-side-p
+         helm-reuse-last-window-split-state)
+     (helm-set-local-variable
+      'helm-display-function
+      (if helm-show-completion-use-special-display
+          'helm-show-completion-display-function
+          'helm-default-display-buffer))
      (unwind-protect
           (progn
             (helm-show-completion-init-overlay ,beg ,end)
