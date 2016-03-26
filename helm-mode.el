@@ -391,6 +391,11 @@ Keys description:
   `helm-source-in-buffer' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
+- ACTIONS: An alist of actions (see meaning of :action in `helm-source')
+  or a single function defining an action and taking one arg candidate.
+  The best way to provide actions is to use `helm-make-actions' function.
+  If not provided, default action will be 'identity.
+
 Any prefix args passed during `helm-comp-read' invocation will be recorded
 in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.

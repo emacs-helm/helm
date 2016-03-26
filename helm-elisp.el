@@ -673,7 +673,9 @@ Filename completion happen if string start after or between a double quote."
 
 ;;;###autoload
 (defun helm-apropos (default)
-  "Preconfigured helm to describe commands, functions, variables and faces."
+  "Preconfigured helm to describe commands, functions, variables and faces.
+In non interactives calls DEFAULT argument should be provided as a string,
+i.e the `symbol-name' of any existing symbol."
   (interactive (list (thing-at-point 'symbol)))
     (helm :sources
           (mapcar (lambda (func)
