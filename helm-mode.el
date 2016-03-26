@@ -305,7 +305,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             marked-candidates
                             nomark
                             (alistp t)
-                            (candidate-number-limit helm-candidate-number-limit))
+                            (candidate-number-limit helm-candidate-number-limit)
+                            actions)
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -398,11 +399,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
 
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((action-fn `(("Sole action (Identity)"
-                      . (lambda (candidate)
-                          (if ,marked-candidates
-                              (helm-marked-candidates)
-                            (identity candidate)))))))
+  (let ((action-fn (or actions
+                       `(("Sole action (Identity)"
+                          . (lambda (candidate)
+                              (if ,marked-candidates
+                                  (helm-marked-candidates)
+                                  (identity candidate))))))))
     ;; Assume completion have been already required,
     ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)

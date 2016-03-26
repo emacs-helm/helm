@@ -672,10 +672,9 @@ Filename completion happen if string start after or between a double quote."
     (helm-attrset 'help-current-symbol candidate)))
 
 ;;;###autoload
-(defun helm-apropos ()
+(defun helm-apropos (default)
   "Preconfigured helm to describe commands, functions, variables and faces."
-  (interactive)
-  (let ((default (thing-at-point 'symbol)))
+  (interactive (list (thing-at-point 'symbol)))
     (helm :sources
           (mapcar (lambda (func)
                     (funcall func default))
