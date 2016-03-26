@@ -680,7 +680,7 @@ Filename completion happen if string start after or between a double quote."
                     (funcall func default))
                   helm-apropos-function-list)
           :buffer "*helm apropos*"
-          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
+          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>"))))
 
 
 ;;; Advices
