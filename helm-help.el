@@ -596,7 +596,11 @@ than 1 megabyte:
 
 *** You can save your results in a `helm-grep-mode' buffer, see commands below
 
-Once in this buffer you can use emacs-wgrep to edit your changes.
+Once in this buffer you can use emacs-wgrep (external package not bundled with helm)
+to edit your changes.
+
+*** Helm grep is supporting multi matching starting from version 1.9.4.
+Just add a space between each pattern like in most helm commands.
 
 *** Important
 

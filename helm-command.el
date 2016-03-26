@@ -213,6 +213,10 @@ than the default which is OBARRAY."
                 :must-match t
                 :fuzzy helm-M-x-fuzzy-match
                 :nomark t
+                :actions (helm-make-actions
+                          "Execute command" 'identity
+                          "Switch to apropos" (lambda (candidate)
+                                                (helm-apropos candidate)))
                 :candidates-in-buffer t
                 :fc-transformer 'helm-M-x-transformer
                 :hist-fc-transformer 'helm-M-x-transformer-hist))

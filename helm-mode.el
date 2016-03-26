@@ -305,7 +305,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             marked-candidates
                             nomark
                             (alistp t)
-                            (candidate-number-limit helm-candidate-number-limit))
+                            (candidate-number-limit helm-candidate-number-limit)
+                            actions)
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -390,6 +391,11 @@ Keys description:
   `helm-source-in-buffer' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
+- ACTIONS: An alist of actions (see meaning of :action in `helm-source')
+  or a single function defining an action and taking one arg candidate.
+  The best way to provide actions is to use `helm-make-actions' function.
+  If not provided, default action will be 'identity.
+
 Any prefix args passed during `helm-comp-read' invocation will be recorded
 in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
@@ -398,11 +404,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
 
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  (let ((action-fn `(("Sole action (Identity)"
-                      . (lambda (candidate)
-                          (if ,marked-candidates
-                              (helm-marked-candidates)
-                            (identity candidate)))))))
+  (let ((action-fn (or actions
+                       `(("Sole action (Identity)"
+                          . (lambda (candidate)
+                              (if ,marked-candidates
+                                  (helm-marked-candidates)
+                                  (identity candidate))))))))
     ;; Assume completion have been already required,
     ;; so always use 'confirm.
     (when (eq must-match 'confirm-after-completion)

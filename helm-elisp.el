@@ -672,16 +672,17 @@ Filename completion happen if string start after or between a double quote."
     (helm-attrset 'help-current-symbol candidate)))
 
 ;;;###autoload
-(defun helm-apropos ()
-  "Preconfigured helm to describe commands, functions, variables and faces."
-  (interactive)
-  (let ((default (thing-at-point 'symbol)))
+(defun helm-apropos (default)
+  "Preconfigured helm to describe commands, functions, variables and faces.
+In non interactives calls DEFAULT argument should be provided as a string,
+i.e the `symbol-name' of any existing symbol."
+  (interactive (list (thing-at-point 'symbol)))
     (helm :sources
           (mapcar (lambda (func)
                     (funcall func default))
                   helm-apropos-function-list)
           :buffer "*helm apropos*"
-          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
+          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>"))))
 
 
 ;;; Advices
