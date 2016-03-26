@@ -553,8 +553,9 @@ Should not be used among other sources.")
 
 (defun helm-dwim-target-directory ()
   "Return value of `default-directory' of buffer in other window.
-If there is only one window return the value ot `default-directory'
-for current buffer."
+If there is only one window return the value of currently visited directory
+if found in `helm-ff-history' or fallback to `default-directory'
+of current buffer."
   (with-helm-current-buffer
     (let ((num-windows (length (remove (get-buffer-window helm-marked-buffer-name)
                                        (window-list)))))
@@ -564,7 +565,7 @@ for current buffer."
              (other-window 1)
              default-directory)
            ;; Using the car of *ff-history allow
-           ;; allow staying in the directory visited instead of current.
+           ;; staying in the directory visited instead of current.
            (or (car-safe helm-ff-history) default-directory))))))
 
 (defun helm-find-files-do-action (action)
