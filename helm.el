@@ -1891,6 +1891,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (helm-log "any-history = %S" any-history)
   (setq helm--prompt (or any-prompt "pattern: "))
   (let ((non-essential t)
+        mode-line-in-non-selected-windows
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
         (helm--maybe-use-default-as-input
