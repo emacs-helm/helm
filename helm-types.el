@@ -80,6 +80,7 @@
                                                   helm-highlight-files
                                                   helm-w32-pathname-transformer))
   (set-slot-value source 'help-message 'helm-generic-file-help-message)
+  (set-slot-value source 'mode-line (list "File(s)" helm-mode-line-string))
   (set-slot-value source 'keymap helm-generic-files-map))
 
 
@@ -110,6 +111,7 @@
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
   (set-slot-value source 'action 'helm-type-bookmark-actions)
   (set-slot-value source 'keymap helm-bookmark-map)
+  (set-slot-value source 'mode-line (list "Bookmark(s)" helm-mode-line-string))
   (set-slot-value source 'help-message 'helm-bookmark-help-message)
   (set-slot-value source 'migemo t))
 
@@ -159,6 +161,7 @@
 (defmethod helm--setup-source :before ((source helm-type-buffer))
   (set-slot-value source 'action 'helm-type-buffer-actions)
   (set-slot-value source 'persistent-help "Show this buffer")
+  (set-slot-value source 'mode-line (list "Buffer(s)" helm-mode-line-string))
   (set-slot-value
    source 'filtered-candidate-transformer
    '(helm-skip-boring-buffers
