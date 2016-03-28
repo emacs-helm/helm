@@ -116,8 +116,7 @@ When FILE argument is provided run EXE with FILE."
                   (delete real-com helm-external-commands-list))))))
 
 (defun helm-get-mailcap-for-file (filename)
-  "Get the command to use for FILENAME from mailcap files.
-The command is like <command %s> and is meant to use with `format'."
+  "Get the command to use for FILENAME from mailcap files."
   (mailcap-parse-mailcaps)
   (let* ((ext  (file-name-extension filename))
          (mime (when ext (mailcap-extension-to-mime ext)))
