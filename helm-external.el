@@ -84,24 +84,24 @@ and sets `helm-external-commands-list'."
   "Generic command that run asynchronously EXE.
 If EXE is already running just jump to his window if `helm-raise-command'
 is non--nil.
-When FILE argument is provided run EXE with FILE.
-In this case EXE must be provided as \"EXE %s\"."
-  (let* ((real-com (car (split-string (replace-regexp-in-string
-                                       "%s" "" exe))))
+When FILE argument is provided run EXE with FILE."
+  (let* ((real-com (car (split-string exe)))
          (proc     (if file (concat real-com " " file) real-com))
          process-connection-type)
     (if (get-process proc)
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
           (error "Error: %s is already running" real-com))
-      (when (cl-loop for i in helm-external-commands-list thereis (string= real-com i))
+      (when (member real-com helm-external-commands-list)
         (message "Starting %s..." real-com)
         (if file
             (start-process-shell-command
-             proc nil (format exe (shell-quote-argument
-                                   (if (eq system-type 'windows-nt)
-                                       (helm-w32-prepare-filename file)
-                                     file))))
+             proc nil (format "%s %s"
+                              real-com
+                              (shell-quote-argument
+                               (if (eq system-type 'windows-nt)
+                                   (helm-w32-prepare-filename file)
+                                   file))))
           (start-process-shell-command proc nil real-com))
         (set-process-sentinel
          (get-process proc)
