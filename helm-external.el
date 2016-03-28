@@ -124,7 +124,7 @@ The command is like <command %s> and is meant to use with `format'."
          (result (when mime (mailcap-mime-info mime))))
     ;; If elisp file have no associations in .mailcap
     ;; `mailcap-maybe-eval' is returned, in this case just return nil.
-    (when (stringp result) result)))
+    (when (stringp result) (helm-basename result))))
 
 (defun helm-get-default-program-for-file (filename)
   "Try to find a default program to open FILENAME.
