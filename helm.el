@@ -4722,7 +4722,10 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                      ;; case skip this false line.
                      ;; See comment >>>[1] in
                      ;; `helm--search-from-candidate-buffer-1'.
-                     (and (looking-at pattern) (forward-line 1)))
+                     (and (condition-case nil
+                              (looking-at pattern)
+                            (invalid-regexp nil))
+                          (forward-line 1)))
                 nconc
                 (cl-loop with pos-lst
                          while (and (setq pos-lst (funcall searcher pattern))
