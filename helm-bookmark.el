@@ -494,6 +494,7 @@ than `w3m-browse-url' use it."
                                     candidate)))
                           (bookmark--jump-via bmk 'switch-to-buffer))))
    (persistent-help :initform "Show contact - Prefix with C-u to append")
+   (mode-line :initform (list "Contact(s)" helm-mode-line-string))
    (filtered-candidate-transformer :initform
                                    '(helm-adaptive-sort
                                      helm-highlight-bookmark))
