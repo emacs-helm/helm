@@ -3386,7 +3386,7 @@ not on current source."
           (let ((helm-idle-delay (cl-loop with delay = helm-idle-delay
                                           for s in delayed-sources
                                           for d = (assoc-default 'delayed s)
-                                          when d do (setq delay (max delay d))
+                                          when (numberp d) do (setq delay (max delay d))
                                           finally return delay)))
             (run-with-idle-timer
              ;; Be sure helm-idle-delay is >
