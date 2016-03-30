@@ -1261,10 +1261,10 @@ You can use safely \"--color\" (default)."
 
 (defun helm-grep-ag-get-types ()
   (with-temp-buffer
-    (call-process "ag" nil t nil "--list-file-types")
-    (goto-char (point-min))
-    (cl-loop while (re-search-forward "^ *\\(--[a-z]*\\)" nil t)
-             collect (match-string 1))))
+    (when (equal (call-process "ag" nil t nil "--list-file-types") 0)
+      (goto-char (point-min))
+      (cl-loop while (re-search-forward "^ *\\(--[a-z]*\\)" nil t)
+               collect (match-string 1)))))
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory)
   (let ((patterns (split-string pattern))
