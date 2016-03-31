@@ -3239,9 +3239,9 @@ not on current source."
       (unwind-protect
           (progn
             ;; Iterate over all the sources
-            (cl-loop for source in
+            (cl-loop for src in
                      (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
-                     collect source into sources
+                     collect src into sources
                      ;; Export the variables from cl-loop
                      finally (setq all-sources sources))
             ;; When no normal-sources erase buffer
