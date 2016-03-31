@@ -1260,6 +1260,8 @@ You can use safely \"--color\" (default)."
   (car (split-string helm-grep-ag-command)))
 
 (defun helm-grep-ag-get-types ()
+  "Returns a list of AG types if available with AG version.
+See AG option \"--list-file-types\"."
   (with-temp-buffer
     (when (equal (call-process "ag" nil t nil "--list-file-types") 0)
       (goto-char (point-min))
@@ -1267,23 +1269,25 @@ You can use safely \"--color\" (default)."
                collect (match-string 1)))))
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory &optional type)
-  (let ((patterns (split-string pattern))
-        (pipe-cmd (cond ((executable-find "ack") "ack --color")
-                        ((executable-find "ack-grep") "ack-grep --color")
-                        (t "grep --perl-regexp --color=always"))))
-    (helm-aif (cdr patterns)
-        (concat (format helm-grep-ag-command
-                        type
+  "Prepare AG command line to search PATTERN in DIRECTORY.
+When TYPE is specified it is one of what returns `helm-grep-ag-get-types'
+if available with current AG version."
+  (let* ((patterns (split-string pattern))
+         (pipe-cmd (cond ((executable-find "ack") "ack --color")
+                         ((executable-find "ack-grep") "ack-grep --color")
+                         (t "grep --perl-regexp --color=always")))
+         (cmd (format helm-grep-ag-command
+                        (or type "")
                         (shell-quote-argument (car patterns))
-                        (shell-quote-argument directory))
-                (cl-loop for p in it concat
-                         (format " | %s %s" pipe-cmd (shell-quote-argument p))))
-      (format helm-grep-ag-command
-              (or type "")
-              (shell-quote-argument pattern)
-              (shell-quote-argument directory)))))
+                        (shell-quote-argument directory))))
+    (helm-aif (cdr patterns)
+        (concat cmd (cl-loop for p in it concat
+                             (format " | %s %s"
+                                     pipe-cmd (shell-quote-argument p))))
+      cmd)))
 
 (defun helm-grep-ag-init (directory &optional type)
+  "Start AG process in DIRECTORY maybe searching only files of type TYPE."
   (let ((cmd-line (helm-grep-ag-prepare-cmd-line
                    helm-pattern directory type)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
@@ -1320,6 +1324,7 @@ You can use safely \"--color\" (default)."
 (defvar helm-source-grep-ag nil)
 
 (defun helm-grep-ag-1 (directory &optional type)
+  "Start helm ag in DIRECTORY maybe searching in files of type TYPE."
   (setq helm-source-grep-ag
         (helm-make-source (upcase (helm-grep--ag-command)) 'helm-grep-ag-class
           :header-name (lambda (name)
@@ -1365,7 +1370,8 @@ You have also to enable this in global \".gitconfig\" with
 
 ;;;###autoload
 (defun helm-do-grep-ag (arg)
-  "Preconfigured helm for grepping with AG in `default-directory'."
+  "Preconfigured helm for grepping with AG in `default-directory'.
+With prefix-arg prompt for type if available with your AG version."
   (interactive "P")
   (require 'helm-files)
   (helm-grep-ag-1 default-directory
