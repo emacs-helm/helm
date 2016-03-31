@@ -3210,12 +3210,6 @@ and `helm-pattern'."
                            collect (helm-compute-matches src)))))
     (unless (eq matches t) matches)))
 
-(defun helm--compute-sources (src-list)
-  (cl-loop with matches = (helm--collect-matches src-list)
-        for src in src-list
-        for mtc in matches
-        do (helm-render-source src mtc)))
-
 
 ;;; Core: helm-update
 ;;
