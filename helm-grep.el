@@ -1277,9 +1277,9 @@ if available with current AG version."
                          ((executable-find "ack-grep") "ack-grep --color")
                          (t "grep --perl-regexp --color=always")))
          (cmd (format helm-grep-ag-command
-                        (or type "")
-                        (shell-quote-argument (car patterns))
-                        (shell-quote-argument directory))))
+                      (mapconcat 'identity type " ")
+                      (shell-quote-argument (car patterns))
+                      (shell-quote-argument directory))))
     (helm-aif (cdr patterns)
         (concat cmd (cl-loop for p in it concat
                              (format " | %s %s"
@@ -1378,7 +1378,8 @@ With prefix-arg prompt for type if available with your AG version."
                   (helm-aif (and arg (helm-grep-ag-get-types))
                       (helm-comp-read
                        "Ag type: " it
-                       :must-match t))))
+                       :must-match t
+                       :marked-candidates t))))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
