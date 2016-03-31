@@ -124,16 +124,6 @@
 
   Note that the function is executed BEFORE performing action.")
 
-   (delayed
-    :initarg :delayed
-    :initform nil
-    :custom (choice null integer)
-    :documentation
-    "  Candidates from the source are shown only if the user stops
-  typing and is idle for `helm-idle-delay' seconds.
-  If a value is given to delayed attr, this value is used instead only
-  if it is > to `helm-idle-delay'.")
-
    (keymap
     :initarg :keymap
     :initform nil

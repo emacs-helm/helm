@@ -300,29 +300,8 @@ Set this value to nil for no limit."
   :group 'helm
   :type '(choice (const :tag "Disabled" nil) integer))
 
-(defcustom helm-idle-delay 0.01
-  "Update delayed sources after this idle delay, specified in seconds.
-Helps curtail unnecessary retrieval of candidates from sources as
-the user is typing. 
-
-Such delay also helps de-clutter the results in helm displays in
-the short elapsed time between successive characters typed by the
-user."
-  :group 'helm
-  :type 'float)
-
 (defcustom helm-input-idle-delay 0.01
-  "Idle time before updating, specified in seconds.
-
-This delay applies to non-delayed sources as well. Whereas
-`helm-idle-delay' applies only to delayed sources.
-
-When set to nil, collects candidates without delay.
-
-Safe value for this is >= `helm-idle-delay' to avoid duplicates
-when using multiple sources. 
-
-Default value for this is set equal to `helm-idle-delay'."
+  "Idle time before updating, specified in seconds."
   :group 'helm
   :type 'float)
 
@@ -341,13 +320,6 @@ If t, then Helm does not pop-up new window."
 
 (defvaralias 'helm-samewindow 'helm-full-frame)
 (make-obsolete-variable 'helm-samewindow 'helm-full-frame "1.4.8.1")
-
-(defcustom helm-quick-update nil
-  "When non-`nil', helm suppresses displaying sources which at first are out of screen.
-They are updated as if they are delayed sources. This flag makes
-`helm' interaction a bit faster with many sources."
-  :group 'helm
-  :type 'boolean)
 
 (defcustom helm-candidate-separator
   "--------------------"
@@ -2450,23 +2422,13 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                               (symbol-value first-src)
                             first-src))
            (source-process-p (or (assq 'candidates-process src)
-                                 (assq 'candidates-process first-src-val)))
-           (source-delayed-p (or (assq 'delayed src)
-                                 (assq 'delayed first-src-val))))
+                                 (assq 'candidates-process first-src-val))))
       (helm-log "helm-get-candidate-number => %S"
                 (helm-get-candidate-number))
       (helm-log "helm-execute-action-at-once-if-one = %S"
                 helm-execute-action-at-once-if-one)
       (helm-log "helm-quit-if-no-candidate = %S" helm-quit-if-no-candidate)
-      ;; If source is delayed `helm-execute-action-at-once-if-one'
-      ;; and `helm-quit-if-no-candidate' are handled after update finish.
-      (when source-delayed-p
-        ;; Note that we quickly add the hook now when `helm-update'
-        ;; is already started, but because source is delayed the hook
-        ;; should have the time to be passed !!!
-        ;; the hook will remove itself once done.
-        (with-helm-after-update-hook (helm-exit-or-quit-maybe)))
-      ;; Reset `helm-pattern' for non--delayed sources and update
+      ;; Reset `helm-pattern' and update
       ;; display if no result found with precedent value of `helm-pattern'
       ;; unless `helm-quit-if-no-candidate' is non-`nil', in this case
       ;; Don't force update with an empty pattern.
@@ -2477,7 +2439,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
         ;; to allow actions like helm-moccur-action matching pattern
         ;; at the place it jump to.
         (setq helm-input helm-pattern)
-        (if (or source-delayed-p source-process-p)
+        (if source-process-p
             ;; Reset pattern to next update.
             (with-helm-after-update-hook
               (helm--reset-default-pattern))
@@ -2489,15 +2451,13 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
              (null helm-quit-if-no-candidate)
              (helm-force-update)))
       ;; Handle `helm-execute-action-at-once-if-one' and
-      ;; `helm-quit-if-no-candidate' now only for not--delayed sources.
+      ;; `helm-quit-if-no-candidate' now.
       (cond ((and (if (functionp helm-execute-action-at-once-if-one)
                       (funcall helm-execute-action-at-once-if-one)
                     helm-execute-action-at-once-if-one)
-                  (not source-delayed-p)
                   (= (helm-get-candidate-number) 1))
              (ignore))              ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
-                  (not source-delayed-p)
                   (= (helm-get-candidate-number) 0))
              (setq helm-quit t)
              (and (functionp helm-quit-if-no-candidate)
@@ -2538,23 +2498,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                            nil hist tap
                                            helm-inherit-input-method))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
-
-(defun helm-exit-or-quit-maybe ()
-  "If only one candidate, exit and run default action. Quit if no candidates.
-This function handles `helm-execute-action-at-once-if-one' and
-`helm-quit-if-no-candidate' for delayed sources."
-  (with-helm-window
-    (cond ((and (if (functionp helm-execute-action-at-once-if-one)
-                    (funcall helm-execute-action-at-once-if-one)
-                  helm-execute-action-at-once-if-one)
-                (= (helm-get-candidate-number) 1))
-           (helm-exit-minibuffer))
-          ((and helm-quit-if-no-candidate
-                (= (helm-get-candidate-number) 0))
-           (setq helm-quit t)
-           (and (functionp helm-quit-if-no-candidate)
-                (funcall helm-quit-if-no-candidate))
-           (keyboard-quit)))))
 
 (defun helm-toggle-suspend-update ()
   "Enable or disable update of display in helm.
@@ -2717,14 +2660,6 @@ WARNING: Do not use this mode yourself, it is internal to helm."
 
 (defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary."
-  ;; First time minibuffer is entered
-  ;; we check value of `helm-pattern' that have been set
-  ;; in `helm-initial-setup' when `helm--maybe-use-default-as-input'
-  ;; is non-`nil'.  After this initial check, reset
-  ;; `helm--maybe-use-default-as-input' and ignore this.
-  ;; This happen only when source is `delayed'.
-  (when helm--maybe-use-default-as-input ; nil when non--delayed.
-    (setq input helm-pattern))
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
@@ -3281,34 +3216,6 @@ and `helm-pattern'."
         for mtc in matches
         do (helm-render-source src mtc)))
 
-(cl-defun helm-process-delayed-sources (delayed-sources &optional preselect source)
-  "Process DELAYED-SOURCES for helm.
-Move selection to string or regexp PRESELECT if non-`nil'.
-This function is called by `helm-process-delayed-sources-timer'
-when emacs is idle for `helm-idle-delay'."
-  (with-helm-quittable
-    (helm-log "Delayed sources = %S"
-              (mapcar (lambda (s)
-                        (assoc-default 'name s))
-                      delayed-sources))
-    (with-current-buffer (helm-buffer-get)
-      (save-excursion
-        (goto-char (point-max))
-        (helm--compute-sources delayed-sources)
-        (when (and (not (helm-empty-buffer-p))
-                   ;; No selection yet.
-                   (= (overlay-start helm-selection-overlay)
-                      (overlay-end helm-selection-overlay)))
-          (helm-update-move-first-line 'without-hook)))
-      (save-excursion
-        (goto-char (point-min))
-        (helm-log-run-hook 'helm-update-hook))
-      (setq helm-force-updating-p nil)
-      (unless (assoc 'candidates-process source)
-        (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-after-update-hook))
-      (when preselect (helm-preselect preselect source)))))
-
 
 ;;; Core: helm-update
 ;;
@@ -3328,74 +3235,34 @@ not on current source."
     (when helm-onewindow-p (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (let (normal-sources
-          delayed-sources
-          matches)
+    (let (all-sources matches)
       (unwind-protect
           (progn
             ;; Iterate over all the sources
-            (cl-loop for source in (cl-remove-if-not
-                                    'helm-update-source-p (helm-get-sources))
-                     if (helm-delayed-source-p source)
-                     ;; Delayed sources just get collected for later
-                     ;; processing
-                     collect source into ds
-                     else
-                     ;; Collect the normal sources
-                     collect source into ns
+            (cl-loop for source in
+                     (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
+                     collect source into sources
                      ;; Export the variables from cl-loop
-                     finally (setq delayed-sources ds
-                                   normal-sources ns))
-            ;; When no normal-sources erase buffer
-            ;; for the next possible delayed source
-            ;; or the already computed normal-source
-            ;; that is no more "updateable" (requires-pattern).
-            (unless normal-sources (erase-buffer))
+                     finally (setq all-sources sources))
             ;; Compute matches without rendering the sources.
             (helm-log "Matches: %S"
-                      (setq matches (helm--collect-matches normal-sources)))
+                      (setq matches (helm--collect-matches all-sources)))
             ;; If computing matches finished and is not interrupted
             ;; erase the helm-buffer and render results (Fix #1157).
             (when matches
               (erase-buffer)
-              (cl-loop for src in normal-sources
+              (cl-loop for src in all-sources
                        for mtc in matches
                        do (helm-render-source src mtc))))
-        (helm-log "Delayed sources = %S"
-                  (mapcar (lambda (s) (assoc-default 'name s))
-                          delayed-sources))
-        (cond ((and preselect delayed-sources normal-sources)
-               ;; Preselection run here when there is
-               ;; normal AND delayed sources.
-               (helm-log "Update preselect candidate %s" preselect)
-               (helm-preselect preselect source))
-              (delayed-sources ; Preselection and hooks will run later.
-               (helm-update-move-first-line 'without-hook))
-              (t              ; No delayed sources, run the hooks now.
-               (helm-update-move-first-line)
-               (unless (assoc 'candidates-process source)
-                 (helm-display-mode-line (helm-get-current-source))
-                 (helm-log-run-hook 'helm-after-update-hook))
-               (when preselect
-                 (helm-log "Update preselect candidate %s" preselect)
-                 (helm-preselect preselect source))
-               (setq helm-force-updating-p nil)))
-        (when delayed-sources
-          ;; Allow giving a value to `delayed' attr from inside source.
-          ;; Retain the biggest value (the slower) found in DELAYED-SOURCES.
-          (let ((helm-idle-delay (cl-loop with delay = helm-idle-delay
-                                          for s in delayed-sources
-                                          for d = (assoc-default 'delayed s)
-                                          when (numberp d) do (setq delay (max delay d))
-                                          finally return delay)))
-            (run-with-idle-timer
-             ;; Be sure helm-idle-delay is >
-             ;; to helm-input-idle-delay
-             ;; otherwise use value of helm-input-idle-delay
-             ;; or 0.01 if == to 0.
-             (max helm-idle-delay helm-input-idle-delay 0.001) nil
-             'helm-process-delayed-sources delayed-sources preselect source)))
-        (helm-log "end update")))))
+        (helm-update-move-first-line)
+        (unless (assoc 'candidates-process source)
+          (helm-display-mode-line (helm-get-current-source))
+          (helm-log-run-hook 'helm-after-update-hook))
+        (when preselect
+          (helm-log "Update preselect candidate %s" preselect)
+          (helm-preselect preselect source))
+        (setq helm-force-updating-p nil)))
+        (helm-log "end update")))
 
 ;; Update keymap after updating.
 ;; Now we run this in post-command-hook, it is
@@ -3422,14 +3289,6 @@ not on current source."
          (not (member (replace-regexp-in-string "\\s\\ " " " helm-pattern)
                       helm-update-blacklist-regexps)))))
 
-(defun helm-delayed-source-p (source)
-  "Whether SOURCE is a delayed source or not."
-  (or (assoc 'delayed source)
-      (and helm-quick-update
-           (> (length helm-sources) 1)
-           (< (window-height (get-buffer-window (current-buffer)))
-              (line-number-at-pos (point-max))))))
-
 (defun helm-update-move-first-line (&optional without-hook)
   "Goto first line of `helm-buffer'."
   (goto-char (point-min))
@@ -3448,10 +3307,7 @@ pattern has changed.
 Selection is preserved to current candidate or moved to
 PRESELECT, if specified."
   (let ((source    (helm-get-current-source))
-        (selection (helm-get-selection nil t))
-        ;; `helm-goto-source' need to have all sources displayed
-        ;; So disable `helm-quick-update'.
-        helm-quick-update)
+        (selection (helm-get-selection nil t)))
     (setq helm-force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
