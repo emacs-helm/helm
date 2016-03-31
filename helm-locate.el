@@ -363,25 +363,6 @@ With a prefix arg refresh the database in each project."
         (user-error "No projects found, please setup `helm-locate-project-list'"))))
 
 ;;;###autoload
-(defun helm-locate-read-file-name (prompt)
-  (let* ((src `((name . "Locate read fname")
-                (init . helm-locate-set-command)
-                (candidates-process . helm-locate-init)
-                (action . identity)
-                (requires-pattern . 3)
-                (history . ,'helm-file-name-history)
-                (candidate-transformer . (helm-skip-boring-files
-                                          helm-highlight-files))
-                (candidate-number-limit . 9999)
-                (no-matchplugin))))
-    (or (helm :sources src
-              :ff-transformer-show-only-basename nil
-              :prompt prompt
-              :buffer "*helm locate read fname*"
-              :resume 'noresume)
-        (keyboard-quit))))
-
-;;;###autoload
 (defun helm-locate (arg)
   "Preconfigured `helm' for Locate.
 Note: you can add locate options after entering pattern.
