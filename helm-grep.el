@@ -1369,9 +1369,10 @@ You have also to enable this in global \".gitconfig\" with
   (interactive "P")
   (require 'helm-files)
   (helm-grep-ag-1 default-directory
-                  (and arg (helm-comp-read
-                            "Ag type: " (helm-grep-ag-get-types)
-                            :must-match t))))
+                  (helm-aif (and arg (helm-grep-ag-get-types))
+                      (helm-comp-read
+                       "Ag type: " it
+                       :must-match t))))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
