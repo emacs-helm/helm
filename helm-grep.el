@@ -1379,7 +1379,8 @@ With prefix-arg prompt for type if available with your AG version."
                       (helm-comp-read
                        "Ag type: " it
                        :must-match t
-                       :marked-candidates t))))
+                       :marked-candidates t
+                       :fc-transformer 'helm-adaptive-sort))))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
