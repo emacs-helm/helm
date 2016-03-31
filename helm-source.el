@@ -526,7 +526,15 @@
 
   Should be a variable.
   Can be also an anonymous function or a list of functions
-  directly added to slot, this is not recommended though."))
+  directly added to slot, this is not recommended though.")
+
+   (delayed
+    :initarg :delayed
+    :initform nil
+    :custom (choice null integer)
+    :documentation
+    "  This slot have no more effect and is just kept for backward compatibility.
+  Please don't use it."))
 
   "Main interface to define helm sources."
   :abstract t)
@@ -863,6 +871,9 @@ an eieio class."
 (defmethod helm--setup-source :primary ((_source helm-source)))
 
 (defmethod helm--setup-source :before ((source helm-source))
+  (when (slot-value source 'delayed)
+    (warn "Deprecated usage of helm `delayed' slot in `%s'"
+          (slot-value source 'name)))
   (helm-aif (slot-value source 'keymap)
       (and (symbolp it) (set-slot-value source 'keymap (symbol-value it))))
   (helm-aif (slot-value source 'persistent-help)
