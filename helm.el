@@ -3244,6 +3244,10 @@ not on current source."
                      collect source into sources
                      ;; Export the variables from cl-loop
                      finally (setq all-sources sources))
+            ;; When no normal-sources erase buffer
+            ;; for the already computed normal-source
+            ;; that is no more "updatable" (requires-pattern).
+            (unless all-sources (erase-buffer))
             ;; Compute matches without rendering the sources.
             (helm-log "Matches: %S"
                       (setq matches (helm--collect-matches all-sources)))
