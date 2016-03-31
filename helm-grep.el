@@ -1243,7 +1243,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --color --nogroup %s %s %s"
   "The default command for AG or PT.
-Takes two format specs, the first for pattern and the second for directory.
+Takes three format specs, the first for type(s), the second for pattern
+and the third for directory.
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1263,7 +1264,8 @@ You can use safely \"--color\" (default)."
   "Returns a list of AG types if available with AG version.
 See AG option \"--list-file-types\"."
   (with-temp-buffer
-    (when (equal (call-process "ag" nil t nil "--list-file-types") 0)
+    (when (equal (call-process (helm-grep--ag-command)
+                               nil t nil "--list-file-types") 0)
       (goto-char (point-min))
       (cl-loop while (re-search-forward "^ *\\(--[a-z]*\\)" nil t)
                collect (match-string 1)))))
