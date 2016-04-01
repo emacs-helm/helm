@@ -228,15 +228,19 @@ from its directory."
     (require 'helm-grep)
     (helm-run-after-exit
      (lambda (f)
-       (if (file-exists-p f)
-           (helm-find-files-1 (file-name-directory f)
-                              (concat
-                               "^"
-                               (regexp-quote
-                                (if helm-ff-transformer-show-only-basename
-                                    (helm-basename f) f))))
-           (helm-find-files-1 f)))
+       ;; Ensure specifics `helm-execute-action-at-once-if-one'
+       ;; fns don't run here.
+       (let (helm-execute-action-at-once-if-one)
+         (if (file-exists-p f)
+             (helm-find-files-1 (file-name-directory f)
+                                (concat
+                                 "^"
+                                 (regexp-quote
+                                  (if helm-ff-transformer-show-only-basename
+                                      (helm-basename f) f))))
+             (helm-find-files-1 f))))
      (let* ((sel       (helm-get-selection))
+            (marker    (if (consp sel) (markerp (cdr sel))))
             (grep-line (and (stringp sel)
                             (helm-grep-split-line sel)))
             (bmk-name  (and (stringp sel)
@@ -256,6 +260,10 @@ from its directory."
                        org-directory
                        (expand-file-name org-directory))
                   (with-current-buffer buf default-directory)))
+         ;; imenu (marker).
+         (marker
+          (or (buffer-file-name (marker-buffer (cdr sel)))
+              default-preselection))
          ;; Bookmark.
          (bmk (helm-aif (bookmark-get-filename bmk)
                   (if (and ffap-url-regexp
