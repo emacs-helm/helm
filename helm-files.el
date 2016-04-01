@@ -681,11 +681,8 @@ ACTION must be an action supported by `helm-dired-action'."
   (helm-grep-git-1 helm-ff-default-directory helm-current-prefix-arg))
 
 (defun helm-find-files-ag (_candidate)
-  (helm-grep-ag-1 helm-ff-default-directory
-                  (and helm-current-prefix-arg
-                       (helm-comp-read
-                        "Ag type: " (helm-grep-ag-get-types)
-                        :must-match t))))
+  (helm-grep-ag helm-ff-default-directory
+                helm-current-prefix-arg))
 
 (defun helm-ff-zgrep (_candidate)
   "Default action to zgrep files from `helm-find-files'."

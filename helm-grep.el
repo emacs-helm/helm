@@ -1339,6 +1339,17 @@ if available with current AG version."
         :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
+(defun helm-grep-ag (directory with-types)
+  (helm-grep-ag-1 directory
+                  (helm-aif (and with-types
+                                 (helm-grep-ag-get-types))
+                      (helm-comp-read
+                       "Ag type: " it
+                       :must-match t
+                       :marked-candidates t
+                       :fc-transformer 'helm-adaptive-sort
+                       :buffer "*helm ag types*"))))
+
 ;;; Git grep
 ;;
 ;;
@@ -1376,14 +1387,7 @@ You have also to enable this in global \".gitconfig\" with
 With prefix-arg prompt for type if available with your AG version."
   (interactive "P")
   (require 'helm-files)
-  (helm-grep-ag-1 default-directory
-                  (helm-aif (and arg (helm-grep-ag-get-types))
-                      (helm-comp-read
-                       "Ag type: " it
-                       :must-match t
-                       :marked-candidates t
-                       :fc-transformer 'helm-adaptive-sort
-                       :buffer "*helm ag types*"))))
+  (helm-grep-ag default-directory arg))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
