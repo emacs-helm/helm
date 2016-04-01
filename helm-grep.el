@@ -1378,12 +1378,14 @@ With prefix-arg prompt for type if available with your AG version."
   (require 'helm-files)
   (helm-grep-ag-1 default-directory
                   (helm-aif (and arg (helm-grep-ag-get-types))
-                      (helm-comp-read
-                       "Ag type: " it
-                       :must-match t
-                       :marked-candidates t
-                       :fc-transformer 'helm-adaptive-sort
-                       :buffer "*helm ag types*"))))
+                      (mapconcat #'identity
+                                 (helm-comp-read
+                                  "Ag type: " it
+                                  :must-match t
+                                  :marked-candidates t
+                                  :fc-transformer 'helm-adaptive-sort
+                                  :buffer "*helm ag types*")
+                                 " "))))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
