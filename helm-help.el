@@ -624,6 +624,9 @@ Helm Gid use the symbol at point as default-input.
 You have access to this command also from `helm-find-files' which allow you to
 navigate to another directory to consult its database.
 
+NOTE: Helm gid support multi matches but only the last pattern entered will be
+highlighted due to the lack of ~--color~ support in GID itself.
+
 * Helm AG
 
 ** Tips
@@ -635,6 +638,12 @@ or global when placed in home directory (See AG man page for more infos).
 This file supports same entries as what you will find in `helm-grep-ignored-files' and
 `helm-grep-ignored-directories'.
 As always you can access helm AG from `helm-find-files'.
+
+Starting at version 0.30 AG allow providing one or more TYPE argument on its command line.
+Helm provide completion on these TYPES arguments when available with your AG version,
+Use a prefix argument when starting helm ag session to get this completion.
+NOTE: You can mark several types to match in your ag query, however on the first versions of
+AG providing this, only one type was allowed, so in this case the last marked will take effect.
 
 ** Commands
 \\<helm-grep-map>

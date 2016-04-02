@@ -39,11 +39,18 @@ MacPorts to install id-utils, it should be `gid32'."
   :type 'string)
 
 (defun helm-gid-candidates-process ()
-  (let ((proc (start-process
-               "gid" nil helm-gid-program
-               "-r" helm-pattern)))
-    (set (make-local-variable 'helm-grep-last-cmd-line)
-         (format "%s -r %s" helm-gid-program helm-pattern))
+  (let* ((patterns (split-string helm-pattern))
+         (default-com (format "%s -r %s" helm-gid-program
+                              (shell-quote-argument (car patterns))))
+         (cmd (helm-aif (cdr patterns)
+                  (concat default-com
+                          (cl-loop for p in it
+                                   concat (format " | grep --color=always %s"
+                                                  (shell-quote-argument p))))
+                default-com))
+         (proc (start-process-shell-command
+                "gid" helm-buffer cmd)))
+    (set (make-local-variable 'helm-grep-last-cmd-line) cmd)
     (prog1 proc
       (set-process-sentinel
        proc (lambda (_process event)
