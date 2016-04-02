@@ -1235,7 +1235,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      (format-spec helm-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
 
-;;; AG - AT
+;;; AG - PT
 ;;
 ;;  https://github.com/ggreer/the_silver_searcher
 ;;  https://github.com/monochromegane/the_platinum_searcher
