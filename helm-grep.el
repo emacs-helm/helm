@@ -1340,6 +1340,8 @@ if available with current AG version."
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
 (defun helm-grep-ag (directory with-types)
+  "Start grep AG in DIRECTORY.
+When WITH-TYPES is non-nil provide completion on AG types."
   (helm-grep-ag-1 directory
                   (helm-aif (and with-types
                                  (helm-grep-ag-get-types))
