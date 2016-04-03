@@ -2503,11 +2503,11 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
   (let* ((non-essential t)
-         (remp (or (and file-at-pt (file-remote-p file-at-pt))
-                   (and thing-at-pt (file-remote-p thing-at-pt))))
+         (remp    (or (and file-at-pt (file-remote-p file-at-pt))
+                      (and thing-at-pt (file-remote-p thing-at-pt))))
          (def-dir (helm-current-directory))
-         (urlp (and file-at-pt ffap-url-regexp
-                    (string-match ffap-url-regexp file-at-pt)))
+         (urlp    (and file-at-pt ffap-url-regexp
+                       (string-match ffap-url-regexp file-at-pt)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
          (hlink   (helm-ff-find-url-at-point))
@@ -2528,7 +2528,7 @@ Use it for non--interactive calls of `helm-find-files'."
           ((and file-at-pt
                 (not remp)
                 (file-exists-p file-at-pt))
-           file-at-pt))))
+           (expand-file-name file-at-pt)))))
 
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
