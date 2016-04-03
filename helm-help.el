@@ -589,6 +589,8 @@ than 1 megabyte:
 ** Tips
 
 *** You can start grep with a prefix arg to recurse in subdirectories
+However now that helm support git-grep and AG, you have better time
+using one of those for your recursives search.
 
 *** You can use wild card when selecting files (e.g. *.el)
 
@@ -644,6 +646,13 @@ Helm provide completion on these TYPES arguments when available with your AG ver
 Use a prefix argument when starting helm ag session to get this completion.
 NOTE: You can mark several types to match in your ag query, however on the first versions of
 AG providing this, only one type was allowed, so in this case the last marked will take effect.
+
+* Helm git-grep
+
+Helm git-grep is searching from current directory
+(i.e default-directory or the directory currently browsed by helm-find-files).
+If this current directory is a subdirectory of project and you want to match
+also upper directories (i.e the whole project) use a prefix arg.
 
 ** Commands
 \\<helm-grep-map>
