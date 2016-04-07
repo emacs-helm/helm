@@ -516,7 +516,7 @@ i.e same color."
   (let ((regexp-list (cl-loop with pattern = helm-pattern
                               for p in (split-string pattern)
                               unless (string-match
-                                      "\\`\\(\\*\\)\\|\\(/\\)\\|\\(@\\)" p)
+                                      "\\`\\(\\*\\|/\\|@\\)" p)
                               collect p)))
     (if regexp-list
         (cl-loop for re in regexp-list
