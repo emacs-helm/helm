@@ -187,7 +187,8 @@ Only math* symbols are collected."
     (helm :sources 'helm-source-ucs
           :keymap  helm-ucs-map
           :history 'helm-ucs-history
-          :input (and char (multibyte-string-p char) char))))
+          :input (and char (multibyte-string-p char) char)
+          :buffer "*helm ucs*")))
 
 (provide 'helm-font)
 
