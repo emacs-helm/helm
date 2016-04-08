@@ -54,6 +54,9 @@
     (save-selected-window
       (if (and helm-el-package--initialized-p
                (fboundp 'package-show-package-list))
+          ;; Use this as `list-packages' doesn't work
+          ;; properly (empty buffer) when called from lisp
+          ;; with 'no-fetch (emacs-25 WA).
           (package-show-package-list)
         (list-packages helm-el-package--initialized-p))
       (setq helm-el-package--initialized-p t)
