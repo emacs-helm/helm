@@ -5382,7 +5382,7 @@ If the source is defined with its own class,
 you can use `helm-setup-user-source' e.g:
 
     (defmethod helm-setup-user-source ((source helm-grep-class))
-      (set-slot-value source 'follow 1))
+      (setf (slot-value source 'follow) 1))
 
 Otherwise, use `helm-attrset' to setup the `follow' attribute of the existing source,
 which see.

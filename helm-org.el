@@ -133,10 +133,10 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 
 (defmethod helm--setup-source :after ((source helm-org-headings-class))
   (let ((parents (slot-value source 'parents)))
-    (set-slot-value source 'candidate-transformer
-                    (lambda (candidates)
-                      (let ((cands (helm-org-get-candidates candidates parents)))
-                        (if parents (nreverse cands) cands))))))
+    (setf (slot-value source 'candidate-transformer)
+          (lambda (candidates)
+            (let ((cands (helm-org-get-candidates candidates parents)))
+              (if parents (nreverse cands) cands))))))
 
 (defun helm-source-org-headings-for-files (filenames &optional parents)
   (helm-make-source "Org Headings" 'helm-org-headings-class
