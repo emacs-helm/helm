@@ -170,7 +170,7 @@ The function that call this should set `helm-ec-target' to thing at point."
   ((init :initform
          (lambda ()
            (let ((eshell-hist-ignoredups helm-eshell-hist-ignoredups))
-             (eshell-write-history eshell-history-file-name t)
+             (eshell-write-history eshell-history-file-name)
              (with-current-buffer (helm-candidate-buffer 'global)
                (insert-file-contents eshell-history-file-name)))
            ;; Same comment as in `helm-source-esh'
