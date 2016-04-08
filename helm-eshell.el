@@ -175,6 +175,7 @@ The function that call this should set `helm-ec-target' to thing at point."
            (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
    (candidates-file :initform eshell-history-file-name)
    (nomark :initform t)
+   (multiline :initform t)
    (keymap :initform helm-eshell-history-map)
    (candidate-transformer :initform (lambda (candidates)
                                       (reverse candidates)))
