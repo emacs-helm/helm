@@ -41,31 +41,35 @@
 (defvar helm-el-package--upgrades nil)
 (defvar helm-el-package--removable-packages nil)
 
+;; Shutup bytecompiler for emacs-24*
+(defvar package-menu-async) ; Only available on emacs-25.
+
 (defun helm-el-package--init ()
-  (when (null package-alist)
-    (setq helm-el-package--show-only 'all))
-  (when (fboundp 'package--removable-packages)
-    (setq helm-el-package--removable-packages
-          (package--removable-packages)))
-  (save-selected-window
-    (list-packages helm-el-package--initialized-p)
-    (setq helm-el-package--initialized-p t)
-    (message nil))
-  (helm-init-candidates-in-buffer
-      'global
-    (with-current-buffer (get-buffer "*Packages*")
-      (setq helm-el-package--tabulated-list tabulated-list-entries)
-      (buffer-string)))
-  (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
-  (if helm-force-updating-p
-      (if helm-el-package--upgrades
-          (message "%d package(s) can be upgraded, Refreshing packages list done"
-                   (length helm-el-package--upgrades))
+  (let (package-menu-async)
+    (when (null package-alist)
+      (setq helm-el-package--show-only 'all))
+    (when (fboundp 'package--removable-packages)
+      (setq helm-el-package--removable-packages
+            (package--removable-packages)))
+    (save-selected-window
+      (list-packages helm-el-package--initialized-p)
+      (setq helm-el-package--initialized-p t)
+      (message nil))
+    (helm-init-candidates-in-buffer
+        'global
+      (with-current-buffer (get-buffer "*Packages*")
+        (setq helm-el-package--tabulated-list tabulated-list-entries)
+        (buffer-string)))
+    (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
+    (if helm-force-updating-p
+        (if helm-el-package--upgrades
+            (message "%d package(s) can be upgraded, Refreshing packages list done"
+                     (length helm-el-package--upgrades))
           (message "Refreshing packages list done, no upgrades available"))
       (setq helm-el-package--show-only (if helm-el-package--upgrades
                                            'upgrade
-                                           helm-el-package-initial-filter)))
-  (kill-buffer "*Packages*"))
+                                         helm-el-package-initial-filter)))
+    (kill-buffer "*Packages*")))
 
 (defun helm-el-package-describe (candidate)
   (let ((id (get-text-property 0 'tabulated-list-id candidate)))
