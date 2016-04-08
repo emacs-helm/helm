@@ -52,7 +52,10 @@
       (setq helm-el-package--removable-packages
             (package--removable-packages)))
     (save-selected-window
-      (list-packages helm-el-package--initialized-p)
+      (if (and helm-el-package--initialized-p
+               (fboundp 'package-show-package-list))
+          (package-show-package-list)
+        (list-packages helm-el-package--initialized-p))
       (setq helm-el-package--initialized-p t)
       (message nil))
     (helm-init-candidates-in-buffer
