@@ -3023,41 +3023,81 @@ It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair))
-         (regex (helm-aif (and helm-migemo-mode
-                               (assoc helm-pattern
-                                      helm-mm--previous-migemo-info))
-                    (cdr it)
-                  helm-pattern))
-         ;; FIXME This is called at each turn, cache it to optimize.
-         (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                 (funcall it display))))
+         start-point end-point
+         (matcher
+          (lambda (patterns)
+            "Repeatedly attempts to highlight all PATTERNS.
+PATTERNS is a list of patterns to be highlighted, in that order,
+but the matches will be repeated. On the second and successive iterations,
+if not all patterns are found, then none are highlighted.
+Returns non-nil if all PATTERNS were found at least once."
+            (let
+                ((regexps (mapcar       ; Patterns converted to regexps
+                           (lambda (p)
+                             (or (and helm-migemo-mode
+                                      (assoc
+                                       p helm-mm--previous-migemo-info))
+                                 p))
+                           patterns))
+                 found                  ; Did we find anything yet?
+                 done                   ; Are we done?
+                 matches)               ; cons list of match bounds
+
+              (goto-char start-point)
+
+              (when regexps      ; Bail on empty patterns
+                ;; Repeat until the end of the buffer
+                (while (not done)
+                  (setq matches '())
+                  (mapc (lambda (re)
+                          (if (and
+                               (re-search-forward re end-point t) ; We found something
+                               (not (equal (match-beginning 0) (match-end 0)))) ; Non-empty
+                              (push (cons (match-beginning 0) (match-end 0)) matches) ; Save result
+                            (setq done t))) ; No match? We're done
+                        regexps)
+
+                  (when (or
+                         (not found)      ; First iteration?
+                         (not done))      ; Found all patterns?
+                    ;; Apply highlights to results
+                    (mapc (lambda (m)
+                            (add-text-properties
+                             (car m) (cdr m)
+                             '(face helm-match)))
+                          matches))
+                  (when matches
+                    (setq found t)))
+                found)))))
+
     (with-temp-buffer
       (insert (propertize display 'read-only nil)) ; Fix (#1176)
-      (goto-char (point-min))
-      (when mp
-        ;; FIXME the first part of display may contain an occurrence of mp.
-        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
-        (search-forward mp nil t)
-        (goto-char (match-beginning 0)))
-      (if (re-search-forward regex (and mp (+ (point) (length mp))) t)
-          (add-text-properties
-           (match-beginning 0) (match-end 0) '(face helm-match))
-          (cl-loop with multi-match
-                   with patterns = (if (string-match-p " " helm-pattern)
-                                       (prog1 (split-string helm-pattern)
-                                         (setq multi-match t))
-                                       (split-string helm-pattern "" t))
-                   for p in patterns
-                   for re = (or (and helm-migemo-mode
-                                     (assoc-default
-                                      p helm-mm--previous-migemo-info))
-                                p)
-                   do
-                   (when (re-search-forward re nil t)
-                     (add-text-properties
-                      (match-beginning 0) (match-end 0)
-                      '(face helm-match)))
-                   (when multi-match (goto-char (point-min)))))
+
+      ;; FIXME This is called at each turn, cache it to optimize.
+      (helm-aif (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                    (funcall it display))
+          (progn
+            ;; FIXME the first part of display may contain an occurrence of mp.
+            ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
+            (goto-char (point-min))
+            (search-forward it nil t)
+            (setq start-point (match-beginning 0)
+                  end-point (match-end 0)))
+        (setq start-point (point-min)
+              end-point nil))
+
+      (cond
+       ;; First, try to find helm-pattern as a regex pattern as-is. Repeat if found.
+       ((funcall matcher (list helm-pattern)))
+
+       ;; Otherwise, if it contains a space, highlight all words, in any order.
+       ((string-match-p " " helm-pattern)
+        (mapc (lambda (s) (funcall matcher (list s))) (split-string helm-pattern)))
+
+       ;; Otherwise, highlight occurrences of each character, in that order.
+       ;; We assume that helm-pattern is not a regex in this case.
+       ((funcall matcher (mapc 'rx-form (split-string helm-pattern "" t)))))
+
       (setq display (buffer-string)))
     (if real (cons display real) display)))
 
