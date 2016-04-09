@@ -263,12 +263,17 @@ If you are already in `default-directory' this will move cursor on top.
 
 **** Enter `../' at end of pattern will reach upper directory, moving cursor on top
 
-NOTE: This is different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
+NOTE: This is different from using `C-l' in that `C-l' doesn't move cursor on top but stays on previous
 subdir name.
 
 **** Enter any environment var (e.g. `$HOME') at end of pattern, it will be expanded
 
 **** You can yank any valid filename after pattern, it will be expanded
+
+**** Special case with url's at point
+
+This have no effect at end of an url, you have first to kill pattern (`C-k')
+before entering one of these quick expansions patterns.
 
 *** Helm find files is fuzzy matching (start on third char entered)
 
