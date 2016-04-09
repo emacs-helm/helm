@@ -1547,7 +1547,8 @@ or when `helm-pattern' is equal to \"~/\"."
              (string-match
               "/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
               helm-pattern)
-             (with-current-buffer (window-buffer (minibuffer-window)) (eolp)))
+             (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
+             (not (string-match helm-ff-url-regexp helm-pattern)))
     (let* ((match (match-string 0 helm-pattern))
            (input (cond ((string= match "/./")
                          (expand-file-name default-directory))
