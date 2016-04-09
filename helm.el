@@ -3092,7 +3092,7 @@ Returns non-nil if all PATTERNS were found at least once."
 
        ;; Otherwise, highlight occurrences of each character, in that order.
        ;; We assume that helm-pattern is not a regex in this case.
-       ((funcall matcher (mapcar 'rx-form (split-string helm-pattern "" t)))))
+       ((funcall matcher (mapcar 'regexp-quote (split-string helm-pattern "" t)))))
 
       (setq display (concat mp-prefix (buffer-string) mp-suffix)))
     (if real (cons display real) display)))
