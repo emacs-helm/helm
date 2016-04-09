@@ -3030,8 +3030,7 @@ It is meant to use with `filter-one-by-one' slot."
                   helm-pattern))
          ;; FIXME This is called at each turn, cache it to optimize.
          (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                 (funcall it display)))
-         (op (and mp (replace-regexp-in-string mp "" display nil t))))
+                 (funcall it display))))
     (with-temp-buffer
       (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
       (goto-char (point-min))
@@ -3060,7 +3059,9 @@ It is meant to use with `filter-one-by-one' slot."
                        (add-text-properties
                         (match-beginning 0) (match-end 0)
                         '(face helm-match))))))
-      (setq display (if mp (concat op (buffer-string)) (buffer-string))))
+      (setq display (if (and mp (string-match mp display))
+                        (replace-match (buffer-string) t t display)
+                      (buffer-string))))
     (if real (cons display real) display)))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
