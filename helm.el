@@ -3050,11 +3050,17 @@ It is meant to use with `filter-one-by-one' slot."
                 for p in patterns
                 for re = (helm--maybe-get-migemo-pattern p)
                 do
-                (while (re-search-forward re nil t)
+                (if multi-match
+                    (progn
+                      (while (re-search-forward re nil t)
                         (add-text-properties
                          (match-beginning 0) (match-end 0)
                          '(face helm-match)))
-                do (goto-char (point-min))))
+                      (goto-char (point-min)))
+                  (when (re-search-forward re nil t)
+                    (add-text-properties
+                     (match-beginning 0) (match-end 0)
+                     '(face helm-match))))))
         (setq display (if (and mp (string-match mp display))
                           (replace-match (buffer-string) t t display)
                         (buffer-string))))
