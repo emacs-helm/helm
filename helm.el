@@ -3025,42 +3025,46 @@ real part."
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
-  (let* ((pair (and (consp candidate) candidate))
-         (display (helm-stringify (if pair (car pair) candidate)))
-         (real (cdr pair))
-         (regex (helm--maybe-get-migemo-pattern helm-pattern))
-         ;; FIXME This is called at each turn, cache it to optimize.
-         (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                 (funcall it display))))
-    (with-temp-buffer
-      (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
-      (goto-char (point-min))
-      (if (re-search-forward regex nil t)
+  (if (string= helm-pattern "")
+      candidate
+    (let* ((pair (and (consp candidate) candidate))
+           (display (helm-stringify (if pair (car pair) candidate)))
+           (multi-match (string-match-p " " helm-pattern))
+           (real (cdr pair))
+           (regex (helm--maybe-get-migemo-pattern helm-pattern))
+           ;; FIXME This is called at each turn, cache it to optimize.
+           (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                   (funcall it display)))
+           (count 0))
+      (with-temp-buffer
+        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
+        (goto-char (point-min))
+        (while (re-search-forward regex nil t)
+          (cl-incf count)
           (add-text-properties
-           (match-beginning 0) (match-end 0) '(face helm-match))
-          (cl-loop with multi-match
-                   with patterns = (if (string-match-p " " helm-pattern)
-                                       (prog1 (split-string helm-pattern)
-                                         (setq multi-match t))
-                                       (split-string helm-pattern "" t))
-                   for p in patterns
-                   for re = (helm--maybe-get-migemo-pattern p)
-                   do
-                   (if multi-match
-                       (progn
-                         (while (re-search-forward re nil t)
-                           (add-text-properties
-                            (match-beginning 0) (match-end 0)
-                            '(face helm-match)))
-                         (goto-char (point-min)))
-                     (when (re-search-forward re nil t)
-                       (add-text-properties
-                        (match-beginning 0) (match-end 0)
-                        '(face helm-match))))))
-      (setq display (if (and mp (string-match mp display))
-                        (replace-match (buffer-string) t t display)
-                      (buffer-string))))
-    (if real (cons display real) display)))
+           (match-beginning 0) (match-end 0) '(face helm-match)))
+        (when (zerop count)
+          (cl-loop with patterns = (if multi-match
+                                       (split-string helm-pattern)
+                                     (split-string helm-pattern "" t))
+                for p in patterns
+                for re = (helm--maybe-get-migemo-pattern p)
+                do
+                (if multi-match
+                    (progn
+                      (while (re-search-forward re nil t)
+                        (add-text-properties
+                         (match-beginning 0) (match-end 0)
+                         '(face helm-match)))
+                      (goto-char (point-min)))
+                  (when (re-search-forward re nil t)
+                    (add-text-properties
+                     (match-beginning 0) (match-end 0)
+                     '(face helm-match))))))
+        (setq display (if (and mp (string-match mp display))
+                          (replace-match (buffer-string) t t display)
+                        (buffer-string))))
+      (if real (cons display real) display))))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
