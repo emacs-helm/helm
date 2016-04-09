@@ -3025,59 +3025,55 @@ real part."
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
-  (let* ((pair (and (consp candidate) candidate))
-         (display (helm-stringify (if pair (car pair) candidate)))
-         (real (cdr pair))
-
-         (highlight-once
-          ;; Highlight first occurrence from RE in point.
-          ;; Returns nil if not found.
-          (lambda (re)
-            (when (re-search-forward re nil t)
-              (add-text-properties
-               (match-beginning 0) (match-end 0)
-               '(face helm-match)))))
-
-         (highlight-all
-          ;; Highlight all occurrences of RE.
-          ;; Returns nil if nothing was found, t otherwise.
-          (lambda (re)
-            (goto-char (point-min))
-            (let (found)
-              (while (funcall highlight-once re)
-                (setq found t))
-              found)))
-
-         mp-prefix mp-suffix)
-
-    (with-temp-buffer
-      (insert (propertize display 'read-only nil)) ; Fix (#1176)
-
-      ;; FIXME This is called at each turn, cache it to optimize.
-      (helm-aif (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                    (funcall it display))
-          (progn
-            (goto-char (point-max))
-            (when (search-backward it nil t)
-              (setq mp-suffix (delete-and-extract-region (match-end 0) (point-max))
-                    mp-prefix (delete-and-extract-region (point-min) (match-beginning 0))))))
-
-      (cond
-       ;; First, try to find helm-pattern as a regex pattern as-is. Repeat if found.
-       ((funcall highlight-all (helm--maybe-get-migemo-pattern helm-pattern)))
-
-       ;; Otherwise, if it contains a space, highlight all words, in any order.
-       ((string-match-p " " helm-pattern)
-        (mapc highlight-all (mapcar 'helm--maybe-get-migemo-pattern (split-string helm-pattern))))
-
-       ;; Otherwise, highlight occurrences of each character, in that order.
-       ;; We assume that helm-pattern is not a regex in this case.
-       (t
+  (if (string= helm-pattern "")
+      ;; Empty pattern, do nothing.
+      candidate
+    ;; Else start highlighting.
+    (let* ((pair    (and (consp candidate) candidate))
+           (display (helm-stringify (if pair (car pair) candidate)))
+           (real    (cdr pair))
+           (regex   (helm--maybe-get-migemo-pattern helm-pattern))
+           ;; FIXME This is called at each turn, cache it to optimize.
+           (mp      (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                        (funcall it display)))
+           (count   0))
+      (with-temp-buffer
+        ;; Insert only match-part if some, otherwise the whole display part.
+        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
         (goto-char (point-min))
-        (mapc highlight-once (mapcar 'regexp-quote (split-string helm-pattern "" t)))))
-
-      (setq display (concat mp-prefix (buffer-string) mp-suffix)))
-    (if real (cons display real) display)))
+        ;; Try first matching against whole pattern.
+        (while (re-search-forward regex nil t)
+          (cl-incf count)
+          (add-text-properties
+           (match-beginning 0) (match-end 0) '(face helm-match)))
+        ;; If no matches start matching against multiples or fuzzy matches.
+        (when (zerop count)
+          (cl-loop with multi-match = (string-match-p " " helm-pattern)
+                with patterns = (if multi-match
+                                    (split-string helm-pattern)
+                                  (split-string helm-pattern "" t))
+                for p in patterns
+                for re = (helm--maybe-get-migemo-pattern p)
+                ;; Multi matches.
+                if multi-match do
+                (progn
+                  (while (re-search-forward re nil t)
+                    (add-text-properties
+                     (match-beginning 0) (match-end 0)
+                     '(face helm-match)))
+                  (goto-char (point-min)))
+                ;; Fuzzy matches.
+                else do
+                (when (search-forward re nil t)
+                  (add-text-properties
+                   (match-beginning 0) (match-end 0)
+                   '(face helm-match)))))
+        ;; Now replace the original match-part with the part
+        ;; with face properties added.
+        (setq display (if (and mp (string-match mp display))
+                          (replace-match (buffer-string) t t display)
+                        (buffer-string))))
+      (if real (cons display real) display))))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
