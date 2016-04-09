@@ -3017,57 +3017,37 @@ real part."
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
 
+(defun helm--maybe-get-migemo-pattern (pattern)
+  (or (and helm-migemo-mode
+           (assoc-default pattern helm-mm--previous-migemo-info))
+      pattern))
+
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair))
-         (matcher
-          (lambda (patterns)
-            "Repeatedly attempts to highlight all PATTERNS.
-PATTERNS is a list of patterns to be highlighted, in that order,
-but the matches will be repeated. On the second and successive iterations,
-if not all patterns are found, then none are highlighted.
-Returns non-nil if all PATTERNS were found at least once."
-            (let
-                ((regexps (mapcar       ; Patterns converted to regexps
-                           (lambda (p)
-                             (or (and helm-migemo-mode
-                                      (assoc-default
-                                       p helm-mm--previous-migemo-info))
-                                 p))
-                           patterns))
-                 found                  ; Did we find anything yet?
-                 done                   ; Are we done?
-                 matches)               ; cons list of match bounds
 
-              (goto-char (point-min))
+         (highlight-once
+          ;; Highlight first occurrence from RE in point.
+          ;; Returns nil if not found.
+          (lambda (re)
+            (when (re-search-forward re nil t)
+              (add-text-properties
+               (match-beginning 0) (match-end 0)
+               '(face helm-match)))))
 
-              (when regexps      ; Bail on empty patterns
-                ;; Repeat until the end of the buffer
-                (while (not done)
-                  (setq matches '())
-                  (mapc (lambda (re)
-                          (if (and
-                               (re-search-forward re nil t) ; We found something
-                               (not (equal (match-beginning 0) (match-end 0)))) ; Non-empty
-                              (push (cons (match-beginning 0) (match-end 0)) matches) ; Save result
-                            (setq done t))) ; No match? We're done
-                        regexps)
+         (highlight-all
+          ;; Highlight all occurrences of RE.
+          ;; Returns nil if nothing was found, t otherwise.
+          (lambda (re)
+            (goto-char (point-min))
+            (let (found)
+              (while (funcall highlight-once re)
+                (setq found t))
+              found)))
 
-                  (when (or
-                         (not found)      ; First iteration?
-                         (not done))      ; Found all patterns?
-                    ;; Apply highlights to results
-                    (mapc (lambda (m)
-                            (add-text-properties
-                             (car m) (cdr m)
-                             '(face helm-match)))
-                          matches))
-                  (when matches
-                    (setq found t)))
-                found))))
          mp-prefix mp-suffix)
 
     (with-temp-buffer
@@ -3084,15 +3064,17 @@ Returns non-nil if all PATTERNS were found at least once."
 
       (cond
        ;; First, try to find helm-pattern as a regex pattern as-is. Repeat if found.
-       ((funcall matcher (list helm-pattern)))
+       ((funcall highlight-all (helm--maybe-get-migemo-pattern helm-pattern)))
 
        ;; Otherwise, if it contains a space, highlight all words, in any order.
        ((string-match-p " " helm-pattern)
-        (mapc (lambda (s) (funcall matcher (list s))) (split-string helm-pattern)))
+        (mapc highlight-all (mapcar 'helm--maybe-get-migemo-pattern (split-string helm-pattern))))
 
        ;; Otherwise, highlight occurrences of each character, in that order.
        ;; We assume that helm-pattern is not a regex in this case.
-       ((funcall matcher (mapcar 'regexp-quote (split-string helm-pattern "" t)))))
+       (t
+        (goto-char (point-min))
+        (mapc highlight-once (mapcar 'regexp-quote (split-string helm-pattern "" t)))))
 
       (setq display (concat mp-prefix (buffer-string) mp-suffix)))
     (if real (cons display real) display)))
