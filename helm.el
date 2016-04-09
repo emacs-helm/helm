@@ -3023,7 +3023,6 @@ It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair))
-         start-point end-point
          (matcher
           (lambda (patterns)
             "Repeatedly attempts to highlight all PATTERNS.
@@ -3043,7 +3042,7 @@ Returns non-nil if all PATTERNS were found at least once."
                  done                   ; Are we done?
                  matches)               ; cons list of match bounds
 
-              (goto-char start-point)
+              (goto-char (point-min))
 
               (when regexps      ; Bail on empty patterns
                 ;; Repeat until the end of the buffer
@@ -3051,7 +3050,7 @@ Returns non-nil if all PATTERNS were found at least once."
                   (setq matches '())
                   (mapc (lambda (re)
                           (if (and
-                               (re-search-forward re end-point t) ; We found something
+                               (re-search-forward re nil t) ; We found something
                                (not (equal (match-beginning 0) (match-end 0)))) ; Non-empty
                               (push (cons (match-beginning 0) (match-end 0)) matches) ; Save result
                             (setq done t))) ; No match? We're done
@@ -3068,7 +3067,8 @@ Returns non-nil if all PATTERNS were found at least once."
                           matches))
                   (when matches
                     (setq found t)))
-                found)))))
+                found))))
+         mp-prefix mp-suffix)
 
     (with-temp-buffer
       (insert (propertize display 'read-only nil)) ; Fix (#1176)
@@ -3077,14 +3077,10 @@ Returns non-nil if all PATTERNS were found at least once."
       (helm-aif (helm-aif (helm-attr 'match-part (helm-get-current-source))
                     (funcall it display))
           (progn
-            ;; FIXME the first part of display may contain an occurrence of mp.
-            ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
-            (goto-char (point-min))
-            (search-forward it nil t)
-            (setq start-point (match-beginning 0)
-                  end-point (match-end 0)))
-        (setq start-point (point-min)
-              end-point nil))
+            (goto-char (point-max))
+            (when (search-backward it nil t)
+              (setq mp-suffix (delete-and-extract-region (match-end 0) (point-max))
+                    mp-prefix (delete-and-extract-region (point-min) (match-beginning 0))))))
 
       (cond
        ;; First, try to find helm-pattern as a regex pattern as-is. Repeat if found.
@@ -3098,7 +3094,7 @@ Returns non-nil if all PATTERNS were found at least once."
        ;; We assume that helm-pattern is not a regex in this case.
        ((funcall matcher (mapc 'rx-form (split-string helm-pattern "" t)))))
 
-      (setq display (buffer-string)))
+      (setq display (concat mp-prefix (buffer-string) mp-suffix)))
     (if real (cons display real) display)))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
