@@ -3034,7 +3034,7 @@ Returns non-nil if all PATTERNS were found at least once."
                 ((regexps (mapcar       ; Patterns converted to regexps
                            (lambda (p)
                              (or (and helm-migemo-mode
-                                      (assoc
+                                      (assoc-default
                                        p helm-mm--previous-migemo-info))
                                  p))
                            patterns))
