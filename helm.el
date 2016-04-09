@@ -3064,7 +3064,7 @@ It is meant to use with `filter-one-by-one' slot."
                   (goto-char (point-min)))
                 ;; Fuzzy matches.
                 else do
-                (when (re-search-forward re nil t)
+                (when (search-forward re nil t)
                   (add-text-properties
                    (match-beginning 0) (match-end 0)
                    '(face helm-match)))))
