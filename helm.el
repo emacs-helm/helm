@@ -3030,16 +3030,12 @@ It is meant to use with `filter-one-by-one' slot."
                   helm-pattern))
          ;; FIXME This is called at each turn, cache it to optimize.
          (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                 (funcall it display))))
+                 (funcall it display)))
+         (op (and mp (replace-regexp-in-string mp "" display nil t))))
     (with-temp-buffer
-      (insert (propertize display 'read-only nil)) ; Fix (#1176)
+      (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
       (goto-char (point-min))
-      (when mp
-        ;; FIXME the first part of display may contain an occurrence of mp.
-        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
-        (search-forward mp nil t)
-        (goto-char (match-beginning 0)))
-      (if (re-search-forward regex (and mp (+ (point) (length mp))) t)
+      (if (re-search-forward regex nil t)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match))
           (cl-loop with multi-match
@@ -3053,12 +3049,18 @@ It is meant to use with `filter-one-by-one' slot."
                                       p helm-mm--previous-migemo-info))
                                 p)
                    do
-                   (when (re-search-forward re nil t)
-                     (add-text-properties
-                      (match-beginning 0) (match-end 0)
-                      '(face helm-match)))
-                   (when multi-match (goto-char (point-min)))))
-      (setq display (buffer-string)))
+                   (if multi-match
+                       (progn
+                         (while (re-search-forward re nil t)
+                           (add-text-properties
+                            (match-beginning 0) (match-end 0)
+                            '(face helm-match)))
+                         (goto-char (point-min)))
+                     (when (re-search-forward re nil t)
+                       (add-text-properties
+                        (match-beginning 0) (match-end 0)
+                        '(face helm-match))))))
+      (setq display (if mp (concat op (buffer-string)) (buffer-string))))
     (if real (cons display real) display)))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
