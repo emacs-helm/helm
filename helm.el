@@ -3017,17 +3017,18 @@ real part."
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
 
+(defun helm--maybe-get-migemo-pattern (pattern)
+  (or (and helm-migemo-mode
+           (assoc-default pattern helm-mm--previous-migemo-info))
+      pattern))
+
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
   (let* ((pair (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real (cdr pair))
-         (regex (helm-aif (and helm-migemo-mode
-                               (assoc helm-pattern
-                                      helm-mm--previous-migemo-info))
-                    (cdr it)
-                  helm-pattern))
+         (regex (helm--maybe-get-migemo-pattern helm-pattern))
          ;; FIXME This is called at each turn, cache it to optimize.
          (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
                  (funcall it display))))
@@ -3043,10 +3044,7 @@ It is meant to use with `filter-one-by-one' slot."
                                          (setq multi-match t))
                                        (split-string helm-pattern "" t))
                    for p in patterns
-                   for re = (or (and helm-migemo-mode
-                                     (assoc-default
-                                      p helm-mm--previous-migemo-info))
-                                p)
+                   for re = (helm--maybe-get-migemo-pattern p)
                    do
                    (if multi-match
                        (progn
