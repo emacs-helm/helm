@@ -3026,41 +3026,50 @@ real part."
   "The default function to highlight matches in fuzzy matching.
 It is meant to use with `filter-one-by-one' slot."
   (if (string= helm-pattern "")
+      ;; Empty pattern, do nothing.
       candidate
-    (let* ((pair (and (consp candidate) candidate))
+    ;; Else start highlighting.
+    (let* ((pair    (and (consp candidate) candidate))
            (display (helm-stringify (if pair (car pair) candidate)))
-           (multi-match (string-match-p " " helm-pattern))
-           (real (cdr pair))
-           (regex (helm--maybe-get-migemo-pattern helm-pattern))
+           (real    (cdr pair))
+           (regex   (helm--maybe-get-migemo-pattern helm-pattern))
            ;; FIXME This is called at each turn, cache it to optimize.
-           (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                   (funcall it display)))
-           (count 0))
+           (mp      (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                        (funcall it display)))
+           (count   0))
       (with-temp-buffer
+        ;; Insert only match-part if some, otherwise the whole display part.
         (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
         (goto-char (point-min))
+        ;; Try first matching against whole pattern.
         (while (re-search-forward regex nil t)
           (cl-incf count)
           (add-text-properties
            (match-beginning 0) (match-end 0) '(face helm-match)))
+        ;; If no matches start matching against multiples or fuzzy matches.
         (when (zerop count)
-          (cl-loop with patterns = (if multi-match
-                                       (split-string helm-pattern)
-                                     (split-string helm-pattern "" t))
+          (cl-loop with multi-match = (string-match-p " " helm-pattern)
+                with patterns = (if multi-match
+                                    (split-string helm-pattern)
+                                  (split-string helm-pattern "" t))
                 for p in patterns
                 for re = (helm--maybe-get-migemo-pattern p)
-                do
-                (if multi-match
-                    (progn
-                      (while (re-search-forward re nil t)
-                        (add-text-properties
-                         (match-beginning 0) (match-end 0)
-                         '(face helm-match)))
-                      (goto-char (point-min)))
-                  (when (re-search-forward re nil t)
+                ;; Multi matches.
+                if multi-match do
+                (progn
+                  (while (re-search-forward re nil t)
                     (add-text-properties
                      (match-beginning 0) (match-end 0)
-                     '(face helm-match))))))
+                     '(face helm-match)))
+                  (goto-char (point-min)))
+                ;; Fuzzy matches.
+                else do
+                (when (re-search-forward re nil t)
+                  (add-text-properties
+                   (match-beginning 0) (match-end 0)
+                   '(face helm-match)))))
+        ;; Now replace the original match-part with the part
+        ;; with face properties added.
         (setq display (if (and mp (string-match mp display))
                           (replace-match (buffer-string) t t display)
                         (buffer-string))))
