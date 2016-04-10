@@ -3037,6 +3037,11 @@ It is meant to use with `filter-one-by-one' slot."
            (mp      (helm-aif (helm-attr 'match-part (helm-get-current-source))
                         (funcall it display)))
            (count   0))
+      ;; Don't loose initial 'face property when inserting match-part.
+      (helm-aif (and mp (get-text-property
+                         (string-match-p mp display)
+                         'face display))
+          (setq mp (propertize mp 'face it)))
       (with-temp-buffer
         ;; Insert only match-part if some, otherwise the whole display part.
         (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
