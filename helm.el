@@ -3139,8 +3139,9 @@ and `helm-pattern'."
                         for dup = (gethash c hash)
                         while (< count limit)
                         for target = (helm-candidate-get-display c)
+                        for prop-part = (get-text-property 0 'match-part target)
                         for part = (and match-part-fn
-                                        (or (get-text-property 0 'match-part target)
+                                        (or prop-part
                                             (funcall match-part-fn target)))
                         ;; When allowing dups check if DUP
                         ;; have been already found in previous loop
@@ -3158,9 +3159,12 @@ and `helm-pattern'."
                           (cl-incf count))
                         ;; Filter out nil candidates maybe returned by
                         ;; `helm--maybe-process-filter-one-by-one-candidate'.
-                        and when c collect (if (consp c)
-                                               (cons (propertize target 'match-part part) (cdr c))
-                                             c)))
+                        and when c collect
+                        (if (and part (not prop-part))
+                            (if (consp c)
+                                (cons (propertize target 'match-part part) (cdr c))
+                              (propertize c 'match-part part))
+                          c)))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err)))
