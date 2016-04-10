@@ -3034,8 +3034,7 @@ It is meant to use with `filter-one-by-one' slot."
            (real    (cdr pair))
            (regex   (helm--maybe-get-migemo-pattern helm-pattern))
            ;; FIXME This is called at each turn, cache it to optimize.
-           (mp      (helm-aif (helm-attr 'match-part (helm-get-current-source))
-                        (funcall it display)))
+           (mp (get-text-property 0 'match-part display))
            (count   0))
       ;; Don't loose initial 'face property when inserting match-part.
       (helm-aif (and mp (get-text-property
@@ -3140,15 +3139,15 @@ and `helm-pattern'."
                         for dup = (gethash c hash)
                         while (< count limit)
                         for target = (helm-candidate-get-display c)
-                        for part = (if match-part-fn
-                                       (funcall match-part-fn target)
-                                       target)
+                        for part = (and match-part-fn
+                                        (or (get-text-property 0 'match-part target)
+                                            (funcall match-part-fn target)))
                         ;; When allowing dups check if DUP
                         ;; have been already found in previous loop
                         ;; by comparing its value with ITER.
                         when (and (or (and allow-dups dup (= dup iter))
                                       (null dup))
-                                  (funcall fn part))
+                                  (funcall fn (or part target)))
                         do
                         (progn
                           ;; Give as value the iteration number of
@@ -3159,7 +3158,9 @@ and `helm-pattern'."
                           (cl-incf count))
                         ;; Filter out nil candidates maybe returned by
                         ;; `helm--maybe-process-filter-one-by-one-candidate'.
-                        and when c collect c))
+                        and when c collect (if (consp c)
+                                               (cons (propertize target 'match-part part) (cdr c))
+                                             c)))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err)))
@@ -4610,6 +4611,10 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                            (if (and pos-lst (listp pos-lst))
                                                pos-lst
                                                (list (point-at-bol) (point-at-eol))))
+                         when (and match-part-fn
+                                   (not (get-text-property 0 'match-part cand)))
+                         do (setq cand
+                                  (propertize cand 'match-part (funcall match-part-fn cand)))
                          for dup = (gethash cand hash)
                          when (and (or (and allow-dups dup (= dup iter))
                                        (null dup))
@@ -4623,22 +4628,21 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                     ;; returns a cons cell, collect PATTERN only if it
                                     ;; match the part of CAND specified by
                                     ;; the match-part func.
-                                    (helm-search-match-part
-                                     cand pattern (or match-part-fn #'identity))))
+                                    (helm-search-match-part cand pattern)))
                          do (progn
                               (puthash cand iter hash)
                               (helm--maybe-process-filter-one-by-one-candidate cand source)
                               (cl-incf count))
                          and collect cand))))))
 
-(defun helm-search-match-part (candidate pattern match-part-fn)
+(defun helm-search-match-part (candidate pattern)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
 Because `helm-search-match-part' maybe called even if unspecified
 in source (negation), MATCH-PART-FN default to `identity'
 to match whole candidate.
 When using fuzzy matching and negation (i.e \"!\"),
 this function is always called."
-  (let ((part (funcall match-part-fn candidate))
+  (let ((part (get-text-property 0 'match-part candidate))
         (fuzzy-regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache)))
         (matchfn (if helm-migemo-mode
                      'helm-mm-migemo-string-match 'string-match)))
