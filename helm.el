@@ -3024,7 +3024,8 @@ real part."
 
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
-It is meant to use with `filter-one-by-one' slot."
+Highlight elements in CANDIDATE matching `helm-pattern' according
+to the matching method in use."
   (if (string= helm-pattern "")
       ;; Empty pattern, do nothing.
       candidate
@@ -3058,7 +3059,7 @@ It is meant to use with `filter-one-by-one' slot."
                                   (split-string helm-pattern "" t))
                 for p in patterns
                 for re = (helm--maybe-get-migemo-pattern p)
-                ;; Multi matches.
+                ;; Multi matches (regexps patterns).
                 if multi-match do
                 (progn
                   (while (re-search-forward re nil t)
@@ -3066,7 +3067,7 @@ It is meant to use with `filter-one-by-one' slot."
                      (match-beginning 0) (match-end 0)
                      '(face helm-match)))
                   (goto-char (point-min)))
-                ;; Fuzzy matches.
+                ;; Fuzzy matches (literal patterns).
                 else do
                 (when (search-forward re nil t)
                   (add-text-properties
