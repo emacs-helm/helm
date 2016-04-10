@@ -3017,68 +3017,49 @@ real part."
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
 
-(defun helm--maybe-get-migemo-pattern (pattern)
-  (or (and helm-migemo-mode
-           (assoc-default pattern helm-mm--previous-migemo-info))
-      pattern))
-
 (defun helm-fuzzy-default-highlight-match (candidate)
   "The default function to highlight matches in fuzzy matching.
-Highlight elements in CANDIDATE matching `helm-pattern' according
-to the matching method in use."
-  (if (string= helm-pattern "")
-      ;; Empty pattern, do nothing.
-      candidate
-    ;; Else start highlighting.
-    (let* ((pair    (and (consp candidate) candidate))
-           (display (helm-stringify (if pair (car pair) candidate)))
-           (real    (cdr pair))
-           (regex   (helm--maybe-get-migemo-pattern helm-pattern))
-           ;; FIXME This is called at each turn, cache it to optimize.
-           (mp (get-text-property 0 'match-part display))
-           (count   0))
-      ;; Don't loose initial 'face property when inserting match-part.
-      (helm-aif (and mp (get-text-property
-                         (string-match-p mp display)
-                         'face display))
-          (setq mp (propertize mp 'face it)))
-      (with-temp-buffer
-        ;; Insert only match-part if some, otherwise the whole display part.
-        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
-        (goto-char (point-min))
-        ;; Try first matching against whole pattern.
-        (while (re-search-forward regex nil t)
-          (cl-incf count)
+It is meant to use with `filter-one-by-one' slot."
+  (let* ((pair (and (consp candidate) candidate))
+         (display (helm-stringify (if pair (car pair) candidate)))
+         (real (cdr pair))
+         (regex (helm-aif (and helm-migemo-mode
+                               (assoc helm-pattern
+                                      helm-mm--previous-migemo-info))
+                    (cdr it)
+                  helm-pattern))
+         ;; FIXME This is called at each turn, cache it to optimize.
+         (mp (helm-aif (helm-attr 'match-part (helm-get-current-source))
+                 (funcall it display))))
+    (with-temp-buffer
+      (insert (propertize display 'read-only nil)) ; Fix (#1176)
+      (goto-char (point-min))
+      (when mp
+        ;; FIXME the first part of display may contain an occurrence of mp.
+        ;; e.g "helm-adaptive.el:27:(defgroup helm-adapt"
+        (search-forward mp nil t)
+        (goto-char (match-beginning 0)))
+      (if (re-search-forward regex (and mp (+ (point) (length mp))) t)
           (add-text-properties
-           (match-beginning 0) (match-end 0) '(face helm-match)))
-        ;; If no matches start matching against multiples or fuzzy matches.
-        (when (zerop count)
-          (cl-loop with multi-match = (string-match-p " " helm-pattern)
-                with patterns = (if multi-match
-                                    (split-string helm-pattern)
-                                  (split-string helm-pattern "" t))
-                for p in patterns
-                for re = (helm--maybe-get-migemo-pattern p)
-                ;; Multi matches (regexps patterns).
-                if multi-match do
-                (progn
-                  (while (re-search-forward re nil t)
-                    (add-text-properties
-                     (match-beginning 0) (match-end 0)
-                     '(face helm-match)))
-                  (goto-char (point-min)))
-                ;; Fuzzy matches (literal patterns).
-                else do
-                (when (search-forward re nil t)
-                  (add-text-properties
-                   (match-beginning 0) (match-end 0)
-                   '(face helm-match)))))
-        ;; Now replace the original match-part with the part
-        ;; with face properties added.
-        (setq display (if (and mp (string-match mp display))
-                          (replace-match (buffer-string) t t display)
-                        (buffer-string))))
-      (if real (cons display real) display))))
+           (match-beginning 0) (match-end 0) '(face helm-match))
+          (cl-loop with multi-match
+                   with patterns = (if (string-match-p " " helm-pattern)
+                                       (prog1 (split-string helm-pattern)
+                                         (setq multi-match t))
+                                       (split-string helm-pattern "" t))
+                   for p in patterns
+                   for re = (or (and helm-migemo-mode
+                                     (assoc-default
+                                      p helm-mm--previous-migemo-info))
+                                p)
+                   do
+                   (when (re-search-forward re nil t)
+                     (add-text-properties
+                      (match-beginning 0) (match-end 0)
+                      '(face helm-match)))
+                   (when multi-match (goto-char (point-min)))))
+      (setq display (buffer-string)))
+    (if real (cons display real) display)))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
@@ -3140,16 +3121,15 @@ and `helm-pattern'."
                         for dup = (gethash c hash)
                         while (< count limit)
                         for target = (helm-candidate-get-display c)
-                        for prop-part = (get-text-property 0 'match-part target)
-                        for part = (and match-part-fn
-                                        (or prop-part
-                                            (funcall match-part-fn target)))
+                        for part = (if match-part-fn
+                                       (funcall match-part-fn target)
+                                       target)
                         ;; When allowing dups check if DUP
                         ;; have been already found in previous loop
                         ;; by comparing its value with ITER.
                         when (and (or (and allow-dups dup (= dup iter))
                                       (null dup))
-                                  (funcall fn (or part target)))
+                                  (funcall fn part))
                         do
                         (progn
                           ;; Give as value the iteration number of
@@ -3160,12 +3140,7 @@ and `helm-pattern'."
                           (cl-incf count))
                         ;; Filter out nil candidates maybe returned by
                         ;; `helm--maybe-process-filter-one-by-one-candidate'.
-                        and when c collect
-                        (if (and part (not prop-part))
-                            (if (consp c)
-                                (cons (propertize target 'match-part part) (cdr c))
-                              (propertize c 'match-part part))
-                          c)))
+                        and when c collect c))
     (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
              (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
                              (assoc-default 'name source) (car err) (cdr err)))
@@ -4616,10 +4591,6 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                            (if (and pos-lst (listp pos-lst))
                                                pos-lst
                                                (list (point-at-bol) (point-at-eol))))
-                         when (and match-part-fn
-                                   (not (get-text-property 0 'match-part cand)))
-                         do (setq cand
-                                  (propertize cand 'match-part (funcall match-part-fn cand)))
                          for dup = (gethash cand hash)
                          when (and (or (and allow-dups dup (= dup iter))
                                        (null dup))
@@ -4633,21 +4604,22 @@ To customize `helm-candidates-in-buffer' behavior, use `search',
                                     ;; returns a cons cell, collect PATTERN only if it
                                     ;; match the part of CAND specified by
                                     ;; the match-part func.
-                                    (helm-search-match-part cand pattern)))
+                                    (helm-search-match-part
+                                     cand pattern (or match-part-fn #'identity))))
                          do (progn
                               (puthash cand iter hash)
                               (helm--maybe-process-filter-one-by-one-candidate cand source)
                               (cl-incf count))
                          and collect cand))))))
 
-(defun helm-search-match-part (candidate pattern)
+(defun helm-search-match-part (candidate pattern match-part-fn)
   "Match PATTERN only on part of CANDIDATE returned by MATCH-PART-FN.
 Because `helm-search-match-part' maybe called even if unspecified
 in source (negation), MATCH-PART-FN default to `identity'
 to match whole candidate.
 When using fuzzy matching and negation (i.e \"!\"),
 this function is always called."
-  (let ((part (get-text-property 0 'match-part candidate))
+  (let ((part (funcall match-part-fn candidate))
         (fuzzy-regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache)))
         (matchfn (if helm-migemo-mode
                      'helm-mm-migemo-string-match 'string-match)))
