@@ -3034,18 +3034,19 @@ to the matching method in use."
            (display (helm-stringify (if pair (car pair) candidate)))
            (real    (cdr pair))
            (regex   (helm--maybe-get-migemo-pattern helm-pattern))
-           ;; FIXME This is called at each turn, cache it to optimize.
-           (mp (get-text-property 0 'match-part display))
-           (count   0))
-      ;; Don't loose initial 'face property when inserting match-part.
-      (helm-aif (and mp (get-text-property
-                         (string-match-p mp display)
-                         'face display))
-          (setq mp (propertize mp 'face it)))
+           (mp      (get-text-property 0 'match-part display))
+           (count   0)
+           beg-str end-str)
       (with-temp-buffer
-        ;; Insert only match-part if some, otherwise the whole display part.
-        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
+        ;; Insert the whole display part and remove non--match-part
+        ;; to keep their original face properties.
+        (insert (propertize display 'read-only nil)) ; Fix (#1176)
         (goto-char (point-min))
+        (save-excursion
+          (when (and mp (not (string= mp display))
+                     (search-forward mp nil t))
+            (setq beg-str (delete-and-extract-region (point-min) (match-beginning 0))
+                  end-str (delete-and-extract-region (match-end 0) (point-max)))))
         ;; Try first matching against whole pattern.
         (while (re-search-forward regex nil t)
           (cl-incf count)
@@ -3075,9 +3076,7 @@ to the matching method in use."
                    '(face helm-match)))))
         ;; Now replace the original match-part with the part
         ;; with face properties added.
-        (setq display (if (and mp (string-match mp display))
-                          (replace-match (buffer-string) t t display)
-                        (buffer-string))))
+        (setq display (concat beg-str (buffer-string) end-str)))
       (if real (cons display real) display))))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
