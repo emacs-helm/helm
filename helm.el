@@ -3037,16 +3037,16 @@ to the matching method in use."
            (mp      (get-text-property 0 'match-part display))
            (count   0)
            beg-str end-str)
+      (when (and mp (not (string= mp display))
+                   (string-match mp display))
+            (setq beg-str (substring display 0 (match-beginning 0))
+                  end-str (substring display (match-end 0) (length display))))
+      ;; mp (substring display (match-beginning 0) (match-end 0))))
       (with-temp-buffer
         ;; Insert the whole display part and remove non--match-part
         ;; to keep their original face properties.
-        (insert (propertize display 'read-only nil)) ; Fix (#1176)
+        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
         (goto-char (point-min))
-        (save-excursion
-          (when (and mp (not (string= mp display))
-                     (search-forward mp nil t))
-            (setq beg-str (delete-and-extract-region (point-min) (match-beginning 0))
-                  end-str (delete-and-extract-region (match-end 0) (point-max)))))
         ;; Try first matching against whole pattern.
         (while (re-search-forward regex nil t)
           (cl-incf count)
@@ -3076,7 +3076,7 @@ to the matching method in use."
                    '(face helm-match)))))
         ;; Now replace the original match-part with the part
         ;; with face properties added.
-        (setq display (concat beg-str (buffer-string) end-str)))
+        (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
       (if real (cons display real) display))))
 
 (defun helm-fuzzy-highlight-matches (candidates _source)
