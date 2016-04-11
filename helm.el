@@ -3034,14 +3034,16 @@ to the matching method in use."
            (display (helm-stringify (if pair (car pair) candidate)))
            (real    (cdr pair))
            (regex   (helm--maybe-get-migemo-pattern helm-pattern))
-           (mp      (get-text-property 0 'match-part display))
+           (mp      (pcase (get-text-property 0 'match-part display)
+                      ((pred (string= display)) nil)
+                      (str str)))
            (count   0)
            beg-str end-str)
-      (when (and mp (not (string= mp display))
-                   (string-match mp display))
-            (setq beg-str (substring display 0 (match-beginning 0))
-                  end-str (substring display (match-end 0) (length display))))
-      ;; mp (substring display (match-beginning 0) (match-end 0))))
+      ;; Extract all parts of display keeping original properties.
+      (when (and mp (string-match mp display))
+        (setq beg-str (substring display 0 (match-beginning 0))
+              end-str (substring display (match-end 0) (length display))
+              mp (substring display (match-beginning 0) (match-end 0))))
       (with-temp-buffer
         ;; Insert the whole display part and remove non--match-part
         ;; to keep their original face properties.
