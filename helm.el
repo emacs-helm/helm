@@ -2925,6 +2925,7 @@ This function is used with sources built with `helm-source-sync'."
     ;; Same as in `helm-fuzzy-match' ref[1].
     (let* ((regexps (gethash 'helm-pattern helm--fuzzy-regexp-cache))
            (partial-regexp (car regexps))
+           (case-fold-search t)
            (regexp (cadr regexps)))
       (if (string-match "\\`!" pattern)
           ;; Don't try to search here, just return
