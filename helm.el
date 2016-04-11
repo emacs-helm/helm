@@ -5370,7 +5370,7 @@ is used to perform actions."
   (with-helm-alive-p
     (helm-run-after-exit
      (lambda (sel)
-       (kill-new sel)
+       (kill-new (format "%s" sel))
        ;; Return nil to force `helm-mode--keyboard-quit'
        ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
        ;; is used as exit value for `helm-comp-read'.
