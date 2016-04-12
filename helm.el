@@ -5374,7 +5374,7 @@ is used to perform actions."
        ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
        ;; is used as exit value for `helm-comp-read'.
        (prog1 nil (message "Saved to kill-ring: %s" sel) (sit-for 1)))
-     (helm-get-selection nil (not arg)))))
+     (format "%s" (helm-get-selection nil (not arg))))))
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
 (defun helm-copy-to-buffer ()
