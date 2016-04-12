@@ -1389,14 +1389,13 @@ Attributes:
                 helm-sources helm-compile-source-functions))
        (helm-log "helm-compiled-sources = %S" helm-compiled-sources)))))
 
-(cl-defun helm-get-selection (&optional (buffer nil buffer-s)
-                                force-display-part)
+(defun helm-get-selection (&optional buffer force-display-part)
   "Return the currently selected item or nil.
 if BUFFER is nil or unspecified, use helm-buffer as default value.
 If FORCE-DISPLAY-PART is non-`nil', return the display string.
 If FORCE-DISPLAY-PART value is 'withprop the display string is returned
 with its properties."
-  (setq buffer (if (and buffer buffer-s) buffer helm-buffer))
+  (setq buffer (or buffer helm-buffer))
   (unless (helm-empty-buffer-p buffer)
     (with-current-buffer buffer
       (let* ((disp-fn (if (eq force-display-part 'withprop)
