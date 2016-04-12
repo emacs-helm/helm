@@ -5357,6 +5357,8 @@ With a prefix arg set to real value of current selection."
   (interactive "P")
   (with-helm-alive-p
     (let ((str (helm-get-selection nil (not arg))))
+      (when str
+        (setq str (format "%s" str)))
       (kill-new str)
       (helm-set-pattern str))))
 (put 'helm-yank-selection 'helm-only t)
@@ -5370,7 +5372,9 @@ is used to perform actions."
   (with-helm-alive-p
     (helm-run-after-exit
      (lambda (sel)
-       (kill-new (format "%s" sel))
+       (when sel
+         (setq sel (format "%s" sel)))
+       (kill-new sel)
        ;; Return nil to force `helm-mode--keyboard-quit'
        ;; in `helm-comp-read' otherwise the value "Saved to kill-ring: foo"
        ;; is used as exit value for `helm-comp-read'.
