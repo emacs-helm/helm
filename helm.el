@@ -5355,7 +5355,7 @@ If PREV is non-`nil' move to precedent."
 With a prefix arg set to real value of current selection."
   (interactive "P")
   (with-helm-alive-p
-    (let ((str (helm-get-selection nil (not arg))))
+    (let ((str (format "%s" (helm-get-selection nil (not arg)))))
       (kill-new str)
       (helm-set-pattern str))))
 (put 'helm-yank-selection 'helm-only t)
