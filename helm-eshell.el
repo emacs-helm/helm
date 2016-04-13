@@ -166,19 +166,20 @@ The function that call this should set `helm-ec-target' to thing at point."
 ;;; Eshell history.
 ;;
 ;;
-(defclass helm-eshell-history-source (helm-source-in-file)
+(defclass helm-eshell-history-source (helm-source-sync)
   ((init :initform
          (lambda ()
-           (let ((eshell-hist-ignoredups helm-eshell-hist-ignoredups))
-             (eshell-write-history eshell-history-file-name))
            ;; Same comment as in `helm-source-esh'.
            (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
-   (candidates-file :initform eshell-history-file-name)
+   (candidates
+    :initform
+    (lambda ()
+      (with-helm-current-buffer
+        (cl-loop for c from 0 to (ring-length eshell-history-ring)
+                 collect (eshell-get-history c)))))
    (nomark :initform t)
    (multiline :initform t)
    (keymap :initform helm-eshell-history-map)
-   (candidate-transformer :initform (lambda (candidates)
-                                      (reverse candidates)))
    (candidate-number-limit :initform 9999)
    (action :initform (lambda (candidate)
                        (eshell-kill-input)
