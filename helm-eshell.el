@@ -70,6 +70,7 @@
    (candidates :initform 'helm-esh-get-candidates)
    (nomark :initform t)
    (persistent-action :initform 'ignore)
+   (nohighlight :initform t)
    (filtered-candidate-transformer
     :initform
     (lambda (candidates _sources)
