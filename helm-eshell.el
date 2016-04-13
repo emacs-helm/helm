@@ -44,11 +44,6 @@
   "Helm eshell completion and history."
   :group 'helm)
 
-(defcustom helm-eshell-hist-ignoredups nil
-  "Same as `eshell-hist-ignoredups' which see but for helm."
-  :group 'helm-eshell
-  :type 'boolean)
-
 
 (defvar helm-eshell-history-map
   (let ((map (make-sparse-keymap)))
