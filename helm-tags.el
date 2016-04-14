@@ -43,12 +43,10 @@ Don't search tag file deeply if outside this value."
   "Allow choosing the tag part of CANDIDATE in `helm-source-etags-select'.
 A tag looks like this:
     filename: \(defun foo
-You can choose matching against only end part of tag (i.e \"foo\"),
-against only the tag part (i.e \"(defun foo\"),
-or against the whole candidate (i.e \"(filename: (defun foo\")."
+You can choose matching against the tag part (i.e \"(defun foo\"),
+or against the whole candidate (i.e \"(filename:5:(defun foo\")."
   :type '(choice
           (const :tag "Match only tag" tag)
-          (const :tag "Match last part of tag" endtag)
           (const :tag "Match all file+tag" all))
   :group 'helm-tags)
 
@@ -220,11 +218,9 @@ If no entry in cache, create one."
     :match-part (lambda (candidate)
                   ;; Match only the tag part of CANDIDATE
                   ;; and not the filename.
-                  (cl-ecase helm-etags-match-part-only
-                      (endtag (cadr (split-string
-                                     (cl-caddr (helm-grep-split-line candidate)))))
-                      (tag    (cl-caddr (helm-grep-split-line candidate)))
-                      (all    candidate)))
+                  (cl-case helm-etags-match-part-only
+                      (tag (cl-caddr (helm-grep-split-line candidate)))
+                      (t   candidate)))
     :fuzzy-match helm-etags-fuzzy-match
     :help-message 'helm-etags-help-message
     :keymap helm-etags-map
