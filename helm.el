@@ -2703,11 +2703,15 @@ Helm plug-ins are realized by this function."
   (let* (inhibit-quit
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
-         (type-error (lambda ()
-                       (error
-                        "`%s' must either be a function, a variable or a list"
-                        (or candidate-fn candidate-proc))))
-         (candidates (condition-case-unless-debug err
+         cfn-error
+         (type-error
+          (lambda (e)
+            (error
+             "In `%s' source: `%s' must either be a function, a variable or a list\n %s"
+             (assoc-default 'name source)
+             (or candidate-fn candidate-proc)
+             e)))
+         (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
@@ -2716,13 +2720,16 @@ Helm plug-ins are realized by this function."
                              ;; and not `helm-funcall-with-source'.
                              (helm-interpret-value candidate-proc)
                            (helm-interpret-value candidate-fn source))
-                       (error (helm-log "Error: %S" err) nil))))
+                       (error (helm-log "Error: %S" (setq cfn-error err)) nil))))
     (when (and (processp candidates) (not candidate-proc))
       (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
             candidate-fn))
     (cond ((processp candidates)
            ;; Candidates will be filtered later in process filter.
            candidates)
+          ;; An error occured in candidates function.
+          (cfn-error (funcall type-error cfn-error))
+          ;; Candidates function returns no candidates.
           ((or (null candidates)
                ;; Can happen when the output of a process
                ;; is empty, and the candidates function call
@@ -2734,8 +2741,7 @@ Helm plug-ins are realized by this function."
           ((listp candidates)
            ;; Transform candidates with `candidate-transformer' functions if
            ;; some, otherwise return candidates.
-           (helm-transform-candidates candidates source))
-          (t (funcall type-error)))))
+           (helm-transform-candidates candidates source)))))
 
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without the `input-pending-p' test."
