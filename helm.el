@@ -2704,7 +2704,7 @@ Helm plug-ins are realized by this function."
          (candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
          cfn-error
-         (type-error
+         (notify-error
           (lambda (&optional e)
             (error
              "In `%s' source: `%s' %s %s"
@@ -2712,7 +2712,7 @@ Helm plug-ins are realized by this function."
              (or candidate-fn candidate-proc)
              (if e "\n" "must either be a function, a variable or a list")
              (or e ""))))
-         (candidates (condition-case err
+         (candidates (condition-case-unless-debug err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
                          (if candidate-proc
@@ -2729,7 +2729,7 @@ Helm plug-ins are realized by this function."
            ;; Candidates will be filtered later in process filter.
            candidates)
           ;; An error occured in candidates function.
-          (cfn-error (funcall type-error cfn-error))
+          (cfn-error (funcall notify-error cfn-error))
           ;; Candidates function returns no candidates.
           ((or (null candidates)
                ;; Can happen when the output of a process
@@ -2743,7 +2743,7 @@ Helm plug-ins are realized by this function."
            ;; Transform candidates with `candidate-transformer' functions if
            ;; some, otherwise return candidates.
            (helm-transform-candidates candidates source))
-          (t (funcall type-error)))))
+          (t (funcall notify-error)))))
 
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without the `input-pending-p' test."
