@@ -2707,7 +2707,7 @@ Helm plug-ins are realized by this function."
          (notify-error
           (lambda (&optional e)
             (error
-             "In `%s' source: `%s' %s %s"
+             "In `%s' source: `%s' %s %S"
              (assoc-default 'name source)
              (or candidate-fn candidate-proc)
              (if e "\n" "must either be a function, a variable or a list")
