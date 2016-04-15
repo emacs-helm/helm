@@ -3056,33 +3056,36 @@ to the matching method in use."
         ;; to keep their original face properties.
         (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
         (goto-char (point-min))
-        ;; Try first matching against whole pattern.
-        (while (re-search-forward regex nil t)
-          (cl-incf count)
-          (add-text-properties
-           (match-beginning 0) (match-end 0) '(face helm-match)))
-        ;; If no matches start matching against multiples or fuzzy matches.
-        (when (zerop count)
-          (cl-loop with multi-match = (string-match-p " " helm-pattern)
-                with patterns = (if multi-match
-                                    (split-string helm-pattern)
-                                  (split-string helm-pattern "" t))
-                for p in patterns
-                for re = (helm--maybe-get-migemo-pattern p)
-                ;; Multi matches (regexps patterns).
-                if multi-match do
-                (progn
-                  (while (re-search-forward re nil t)
-                    (add-text-properties
-                     (match-beginning 0) (match-end 0)
-                     '(face helm-match)))
-                  (goto-char (point-min)))
-                ;; Fuzzy matches (literal patterns).
-                else do
-                (when (search-forward re nil t)
-                  (add-text-properties
-                   (match-beginning 0) (match-end 0)
-                   '(face helm-match)))))
+        (condition-case nil
+            (progn
+              ;; Try first matching against whole pattern.
+              (while (re-search-forward regex nil t)
+                (cl-incf count)
+                (add-text-properties
+                 (match-beginning 0) (match-end 0) '(face helm-match)))
+              ;; If no matches start matching against multiples or fuzzy matches.
+              (when (zerop count)
+                (cl-loop with multi-match = (string-match-p " " helm-pattern)
+                         with patterns = (if multi-match
+                                             (split-string helm-pattern)
+                                             (split-string helm-pattern "" t))
+                         for p in patterns
+                         for re = (helm--maybe-get-migemo-pattern p)
+                         ;; Multi matches (regexps patterns).
+                         if multi-match do
+                         (progn
+                           (while (re-search-forward re nil t)
+                             (add-text-properties
+                              (match-beginning 0) (match-end 0)
+                              '(face helm-match)))
+                           (goto-char (point-min)))
+                         ;; Fuzzy matches (literal patterns).
+                         else do
+                         (when (search-forward re nil t)
+                           (add-text-properties
+                            (match-beginning 0) (match-end 0)
+                            '(face helm-match))))))
+          (invalid-regexp nil))
         ;; Now replace the original match-part with the part
         ;; with face properties added.
         (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
@@ -3157,7 +3160,9 @@ and `helm-pattern'."
                         ;; by comparing its value with ITER.
                         when (and (or (and allow-dups dup (= dup iter))
                                       (null dup))
-                                  (funcall fn (or part target)))
+                                  (condition-case nil
+                                      (funcall fn (or part target))
+                                    (invalid-regexp nil)))
                         do
                         (progn
                           ;; Give as value the iteration number of
