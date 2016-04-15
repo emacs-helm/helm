@@ -2711,7 +2711,7 @@ Helm plug-ins are realized by this function."
              (assoc-default 'name source)
              (or candidate-fn candidate-proc)
              (if e "\n" "must either be a function, a variable or a list")
-             e)))
+             (or e ""))))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
