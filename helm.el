@@ -2705,11 +2705,12 @@ Helm plug-ins are realized by this function."
          (candidate-proc (assoc-default 'candidates-process source))
          cfn-error
          (type-error
-          (lambda (e)
+          (lambda (&optional e)
             (error
-             "In `%s' source: `%s' must either be a function, a variable or a list\n %s"
+             "In `%s' source: `%s' %s %s"
              (assoc-default 'name source)
              (or candidate-fn candidate-proc)
+             (if e "\n" "must either be a function, a variable or a list")
              e)))
          (candidates (condition-case err
                          ;; Process candidates-(process) function
@@ -2741,7 +2742,8 @@ Helm plug-ins are realized by this function."
           ((listp candidates)
            ;; Transform candidates with `candidate-transformer' functions if
            ;; some, otherwise return candidates.
-           (helm-transform-candidates candidates source)))))
+           (helm-transform-candidates candidates source))
+          (t (funcall type-error)))))
 
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without the `input-pending-p' test."
