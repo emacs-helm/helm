@@ -1370,7 +1370,7 @@ You have also to enable this in global \".gitconfig\" with
   :group 'helm-grep
   :type 'string)
 
-(defun helm-grep-git-1 (directory &optional all)
+(defun helm-grep-git-1 (directory &optional all default input)
   (require 'vc)
   (let* ((helm-grep-default-command helm-grep-git-grep-command)
          helm-grep-default-recurse-command
@@ -1380,7 +1380,8 @@ You have also to enable this in global \".gitconfig\" with
                                            (vc-find-root directory ".git")))
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
     (cl-assert helm-ff-default-directory nil "Not inside a Git repository")
-    (helm-do-grep-1 (if all '("") `(,(expand-file-name directory))))))
+    (helm-do-grep-1 (if all '("") `(,(expand-file-name directory)))
+                    nil nil nil default input)))
 
 
 ;;;###autoload
