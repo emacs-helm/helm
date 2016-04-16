@@ -3269,44 +3269,38 @@ not on current source."
     (when helm-onewindow-p (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (let (all-sources matches)
-      (unwind-protect
-          (progn
-            ;; Iterate over all the sources
-            (cl-loop for src in
-                     (cl-remove-if-not 'helm-update-source-p (helm-get-sources))
-                     collect src into sources
-                     ;; Export the variables from cl-loop
-                     finally (setq all-sources sources))
-            ;; When no normal-sources erase buffer
-            ;; for the already computed normal-source
-            ;; that is no more "updatable" (requires-pattern).
-            (unless all-sources (erase-buffer))
-            ;; Compute matches without rendering the sources.
-            (helm-log "Matches: %S"
-                      (setq matches (helm--collect-matches all-sources)))
-            ;; If computing matches finished and is not interrupted
-            ;; erase the helm-buffer and render results (Fix #1157).
-            (when matches
-              (erase-buffer)
-              (cl-loop for src in all-sources
-                       for mtc in matches
-                       do (helm-render-source src mtc))))
-        (helm-update-move-first-line)
-        (unless (assoc 'candidates-process source)
-          (helm-display-mode-line (helm-get-current-source))
-          (helm-log-run-hook 'helm-after-update-hook))
-        (when preselect
-          (helm-log "Update preselect candidate %s" preselect)
-          (helm-preselect preselect source))
-        (setq helm-force-updating-p nil)))
-        (helm-log "end update")))
-
-;; Update keymap after updating.
-;; Now we run this in post-command-hook, it is
-;; probably no more needed in helm-after-update-hook.
-;; Leave it commented as a reminder for now.
-;; (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
+    (unwind-protect
+         (let (sources matches)
+           ;; Collect sources ready to be updated.
+           (setq sources
+                 (cl-loop for src in (helm-get-sources)
+                          when (helm-update-source-p src)
+                          collect src))
+           ;; When no sources to update erase buffer
+           ;; to avoid duplication of header and candidates
+           ;; when next chunk of update will arrive,
+           ;; otherwise the buffer is erased AFTER [1] the results
+           ;; are computed.
+           (unless sources (erase-buffer))
+           ;; Compute matches without rendering the sources.
+           (helm-log "Matches: %S"
+                     (setq matches (helm--collect-matches sources)))
+           ;; If computing matches finished and is not interrupted
+           ;; erase the helm-buffer and render results (Fix #1157).
+           (when matches
+             (erase-buffer)             ; [1]
+             (cl-loop for src in sources
+                      for mtc in matches
+                      do (helm-render-source src mtc))))
+      (helm-update-move-first-line)
+      (unless (assoc 'candidates-process source)
+        (helm-display-mode-line (helm-get-current-source))
+        (helm-log-run-hook 'helm-after-update-hook))
+      (when preselect
+        (helm-log "Update preselect candidate %s" preselect)
+        (helm-preselect preselect source))
+      (setq helm-force-updating-p nil))
+    (helm-log "end update")))
 
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
