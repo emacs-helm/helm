@@ -1371,6 +1371,12 @@ You have also to enable this in global \".gitconfig\" with
   :type 'string)
 
 (defun helm-grep-git-1 (directory &optional all default input)
+  "Run git-grep on DIRECTORY.
+If DIRECTORY is not inside or part of a git repo exit with error.
+If optional arg ALL is non-nil grep the whole repo otherwise start
+at DIRECTORY.
+Arg DEFAULT is what you will have with `next-history-element',
+arg INPUT is what you will have by default at prompt on startup."
   (require 'vc)
   (let* ((helm-grep-default-command helm-grep-git-grep-command)
          helm-grep-default-recurse-command
