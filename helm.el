@@ -3256,9 +3256,7 @@ and `helm-pattern'."
 (defun helm-update (&optional preselect source)
   "Update candidates list in `helm-buffer' based on `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection
-to a particular place after finishing update. Used only for
-single source because search is done on whole `helm-buffer' and
-not on current source."
+to a particular place after finishing update."
   (helm-log "Start updating")
   (helm-kill-async-processes)
   ;; When persistent action have been called
