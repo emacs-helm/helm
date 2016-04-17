@@ -2710,7 +2710,7 @@ Helm plug-ins are realized by this function."
              "In `%s' source: `%s' %s %S"
              (assoc-default 'name source)
              (or candidate-fn candidate-proc)
-             (if e "\n" "must either be a function, a variable or a list")
+             (if e "\n" "must be a list, a symbol bound to a list, or a function returning a list")
              (or e ""))))
          (candidates (condition-case-unless-debug err
                          ;; Process candidates-(process) function
