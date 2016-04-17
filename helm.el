@@ -2707,11 +2707,11 @@ Helm plug-ins are realized by this function."
          (notify-error
           (lambda (&optional e)
             (error
-             "In `%s' source: `%s' %s %S"
+             "In `%s' source: `%s' %s %s"
              (assoc-default 'name source)
              (or candidate-fn candidate-proc)
              (if e "\n" "must be a list, a symbol bound to a list, or a function returning a list")
-             (or e ""))))
+             (if e (prin1-to-string e) ""))))
          (candidates (condition-case-unless-debug err
                          ;; Process candidates-(process) function
                          ;; It may return a process or a list of candidates.
