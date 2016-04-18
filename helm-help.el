@@ -378,7 +378,7 @@ If you want to rename a serie of files from number 001 to 00x use \\# inside the
 string when you will be prompted for it.
 
 e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
-    to \"foo-001.jpg\" \"foo-002.jpg\" \"baz-003.jpg\"
+    to \"foo-001.jpg\" \"foo-002.jpg\" \"foo-003.jpg\"
 
 Use as replace regexp \".*\\.jpg\" and as replacement string \"foo-\\#\".
 
