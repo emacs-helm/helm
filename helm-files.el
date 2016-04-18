@@ -947,7 +947,7 @@ other directories.
 See `helm-ff-serial-rename-1'."
   (helm-ff-serial-rename-action 'copy))
 
-(defun helm-ff-query-replace-on-marked-1 (candidates)
+(defun helm-ff-query-replace-on-filenames (candidates)
   "Query replace on filenames of CANDIDATES.
 This doesn't replace inside the files, only modify filenames."
   (with-helm-display-marked-candidates
@@ -999,7 +999,7 @@ This doesn't replace inside the files, only modify filenames."
 ;; The action.
 (defun helm-ff-query-replace-on-marked (_candidate)
   (let ((marked (helm-marked-candidates :with-wildcard t)))
-    (helm-ff-query-replace-on-marked-1 marked)))
+    (helm-ff-query-replace-on-filenames marked)))
 
 ;; The command for `helm-find-files-map'.
 (defun helm-ff-run-query-replace-on-marked ()
