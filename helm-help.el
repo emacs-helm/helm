@@ -382,6 +382,10 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
 
 Use as replace regexp \".*\\.jpg\" and as replacement string \"foo-\\#\".
 
+Note: You can do this with the serial renames actions you will find in the action menu
+      for more sophisticated renaming, but using query replace regexp on filenames
+      is a fast way for most common serial replacements.
+
 *** Copying renaming asynchronously
 
 If you use async library (if you have installed helm from MELPA you do) you can enable
