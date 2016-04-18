@@ -960,7 +960,12 @@ This doesn't replace inside the files, only modify filenames."
                for old in candidates
                for new = (concat (helm-basedir old)
                                  (replace-regexp-in-string
-                                  regexp str
+                                  regexp
+                                  (save-match-data
+                                    (if (string-match "\\\\#" str)
+                                        (replace-match
+                                         (number-to-string count) t t str)
+                                        str))
                                   (helm-basename old) t))
                ;; If `regexp' is not matched in `old'
                ;; `replace-regexp-in-string' will
