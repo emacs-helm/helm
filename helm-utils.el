@@ -69,6 +69,16 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :group 'helm-utils
   :type '(repeat (choice string)))
 
+(defcustom helm-html-decode-entities-function #'helm-html-decode-entities-string
+  "Function used to decode html entities in html bookmarks.
+Helm comes by default with `helm-html-decode-entities-string', if you need something
+more sophisticated you can use `w3m-decode-entities-string' if available.
+
+In emacs itself org-entities seems broken and `xml-substitute-numeric-entities'
+supports only numeric entities."
+  :group 'helm-utils
+  :type 'function)
+
 
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
@@ -760,7 +770,8 @@ If COUNT is non--nil add a number after each prompt."
         (when (re-search-forward url-regexp nil t)
           (setq url (match-string 0)))
         (when (re-search-forward bmk-regexp nil t)
-          (setq title (helm-html-decode-entities-string (match-string 1))))
+          (setq title (funcall helm-html-decode-entities-function
+                               (match-string 1))))
         (push (cons title url) bookmarks-alist)
         (forward-line)))
     (nreverse bookmarks-alist)))
