@@ -95,107 +95,108 @@ In this case last position is added to the register
   "The register where `helm-save-pos-to-register-before-jump' save position.")
 
 (defconst helm-html-entities-alist
-  '(("&quot;"   . 34)
-    ("&gt;"     . 62)
-    ("&lt;"     . 60)
-    ("&amp;"    . 38)
-    ("&euro;"   . 8364)
-    ("&Yuml;"   . 89)
-    ("&iexcl;"  . 161)
-    ("&cent;"   . 162)
-    ("&pound;"  . 163)
-    ("&curren;" . 164)
-    ("&yen"     . 165)
-    ("&brvbar;" . 166)
-    ("&sect;"   . 167)
-    ("&uml;"    . 32)
-    ("&copy;"   . 169)
-    ("&ordf;"   . 97)
-    ("&laquo;"  . 171)
-    ("&not;"    . 172)
-    ("&masr;"   . 174)
-    ("&deg;"    . 176)
-    ("&plusmn;" . 177)
-    ("&sup2;"   . 50)
-    ("&sup3;"   . 51)
-    ("&acute;"  . 39)
-    ("&micro;"  . 956)
-    ("&para;"   . 182)
-    ("&middot;" . 183)
-    ("&cedil;"  . 32)
-    ("&sup1;"   . 49)
-    ("&ordm;"   . 111)
-    ("&raquo;"  . 187)
-    ("&frac14;" . 49)
-    ("&frac12;" . 49)
-    ("&frac34;" . 51)
-    ("&iquest;" . 191)
-    ("&Agrave;" . 192)
-    ("&Aacute;" . 193)
-    ("&Acirc;"  . 194)
-    ("&Atilde;" . 195)
-    ("&Auml;"   . 196)
-    ("&Aring;"  . 197)
-    ("&Aelig"   . 198)
-    ("&Ccedil;" . 199)
-    ("&Egrave;" . 200)
-    ("&Eacute;" . 201)
-    ("&Ecirc;"  . 202)
-    ("&Euml;"   . 203)
-    ("&Igrave;" . 204)
-    ("&Iacute;" . 205)
-    ("&Icirc;"  . 206)
-    ("&Iuml;"   . 207)
-    ("&eth;"    . 208)
-    ("&Ntilde;" . 209)
-    ("&Ograve;" . 210)
-    ("&Oacute;" . 211)
-    ("&Ocirc;"  . 212)
-    ("&Otilde;" . 213)
-    ("&Ouml;"   . 214)
-    ("&times;"  . 215)
-    ("&Oslash;" . 216)
-    ("&Ugrave;" . 217)
-    ("&Uacute;" . 218)
-    ("&Ucirc;"  . 219)
-    ("&Uuml;"   . 220)
-    ("&Yacute;" . 221)
-    ("&thorn;"  . 222)
-    ("&szlig;"  . 223)
-    ("&agrave;" . 224)
-    ("&aacute;" . 225)
-    ("&acirc;"  . 226)
-    ("&atilde;" . 227)
-    ("&auml;"   . 228)
-    ("&aring;"  . 229)
-    ("&aelig;"  . 230)
-    ("&ccedil;" . 231)
-    ("&egrave;" . 232)
-    ("&eacute;" . 233)
-    ("&ecirc;"  . 234)
-    ("&euml;"   . 235)
-    ("&igrave;" . 236)
-    ("&iacute;" . 237)
-    ("&icirc;"  . 238)
-    ("&iuml;"   . 239)
-    ("&eth;"    . 240)
-    ("&ntilde;" . 241)
-    ("&ograve;" . 242)
-    ("&oacute;" . 243)
-    ("&ocirc;"  . 244)
-    ("&otilde;" . 245)
-    ("&ouml;"   . 246)
-    ("&divide;" . 247)
-    ("&oslash;" . 248)
-    ("&ugrave;" . 249)
-    ("&uacute;" . 250)
-    ("&ucirc;"  . 251)
-    ("&uuml;"   . 252)
-    ("&yacute;" . 253)
-    ("&thorn;"  . 254)
-    ("&yuml;"   . 255)
-    ("&reg;"    . 174)
-    ("&shy;"    . 173))
+  '(("&quot;"   . 34)   ;; "
+    ("&gt;"     . 62)   ;; >
+    ("&lt;"     . 60)   ;; <
+    ("&amp;"    . 38)   ;; &
+    ("&euro;"   . 8364) ;; €
+    ("&Yuml;"   . 89)   ;; Y
+    ("&iexcl;"  . 161)  ;; ¡
+    ("&cent;"   . 162)  ;; ¢
+    ("&pound;"  . 163)  ;; £
+    ("&curren;" . 164)  ;; ¤
+    ("&yen"     . 165)  ;; ¥
+    ("&brvbar;" . 166)  ;; ¦
+    ("&sect;"   . 167)  ;; §
+    ("&uml;"    . 32)   ;; SPC 
+    ("&copy;"   . 169)  ;; ©
+    ("&ordf;"   . 97)   ;; a
+    ("&laquo;"  . 171)  ;; «
+    ("&not;"    . 172)  ;; ¬
+    ("&masr;"   . 174)  ;; ®
+    ("&deg;"    . 176)  ;; °
+    ("&plusmn;" . 177)  ;; ±
+    ("&sup2;"   . 50)   ;; 2
+    ("&sup3;"   . 51)   ;; 3
+    ("&acute;"  . 39)   ;; '
+    ("&micro;"  . 956)  ;; μ
+    ("&para;"   . 182)  ;; ¶
+    ("&middot;" . 183)  ;; ·
+    ("&cedil;"  . 32)   ;; SPC 
+    ("&sup1;"   . 49)   ;; 1
+    ("&ordm;"   . 111)  ;; o
+    ("&raquo;"  . 187)  ;; »
+    ("&frac14;" . 49)   ;; 1
+    ("&frac12;" . 49)   ;; 1
+    ("&frac34;" . 51)   ;; 3
+    ("&iquest;" . 191)  ;; ¿
+    ("&Agrave;" . 192)  ;; À
+    ("&Aacute;" . 193)  ;; Á
+    ("&Acirc;"  . 194)  ;; Â
+    ("&Atilde;" . 195)  ;; Ã
+    ("&Auml;"   . 196)  ;; Ä
+    ("&Aring;"  . 197)  ;; Å
+    ("&Aelig"   . 198)  ;; Æ
+    ("&Ccedil;" . 199)  ;; Ç
+    ("&Egrave;" . 200)  ;; È
+    ("&Eacute;" . 201)  ;; É
+    ("&Ecirc;"  . 202)  ;; Ê
+    ("&Euml;"   . 203)  ;; Ë
+    ("&Igrave;" . 204)  ;; Ì
+    ("&Iacute;" . 205)  ;; Í
+    ("&Icirc;"  . 206)  ;; Î
+    ("&Iuml;"   . 207)  ;; Ï
+    ("&eth;"    . 208)  ;; Ð
+    ("&Ntilde;" . 209)  ;; Ñ
+    ("&Ograve;" . 210)  ;; Ò
+    ("&Oacute;" . 211)  ;; Ó
+    ("&Ocirc;"  . 212)  ;; Ô
+    ("&Otilde;" . 213)  ;; Õ
+    ("&Ouml;"   . 214)  ;; Ö
+    ("&times;"  . 215)  ;; ×
+    ("&Oslash;" . 216)  ;; Ø
+    ("&Ugrave;" . 217)  ;; Ù
+    ("&Uacute;" . 218)  ;; Ú
+    ("&Ucirc;"  . 219)  ;; Û
+    ("&Uuml;"   . 220)  ;; Ü
+    ("&Yacute;" . 221)  ;; Ý
+    ("&thorn;"  . 222)  ;; Þ
+    ("&szlig;"  . 223)  ;; ß
+    ("&agrave;" . 224)  ;; à
+    ("&aacute;" . 225)  ;; á
+    ("&acirc;"  . 226)  ;; â
+    ("&atilde;" . 227)  ;; ã
+    ("&auml;"   . 228)  ;; ä
+    ("&aring;"  . 229)  ;; å
+    ("&aelig;"  . 230)  ;; æ
+    ("&ccedil;" . 231)  ;; ç
+    ("&egrave;" . 232)  ;; è
+    ("&eacute;" . 233)  ;; é
+    ("&ecirc;"  . 234)  ;; ê
+    ("&euml;"   . 235)  ;; ë
+    ("&igrave;" . 236)  ;; ì
+    ("&iacute;" . 237)  ;; í
+    ("&icirc;"  . 238)  ;; î
+    ("&iuml;"   . 239)  ;; ï
+    ("&eth;"    . 240)  ;; ð
+    ("&ntilde;" . 241)  ;; ñ
+    ("&ograve;" . 242)  ;; ò
+    ("&oacute;" . 243)  ;; ó
+    ("&ocirc;"  . 244)  ;; ô
+    ("&otilde;" . 245)  ;; õ
+    ("&ouml;"   . 246)  ;; ö
+    ("&divide;" . 247)  ;; ÷
+    ("&oslash;" . 248)  ;; ø
+    ("&ugrave;" . 249)  ;; ù
+    ("&uacute;" . 250)  ;; ú
+    ("&ucirc;"  . 251)  ;; û
+    ("&uuml;"   . 252)  ;; ü
+    ("&yacute;" . 253)  ;; ý
+    ("&thorn;"  . 254)  ;; þ
+    ("&yuml;"   . 255)  ;; ÿ
+    ("&reg;"    . 174)  ;; ®
+    ("&shy;"    . 173)) ;; ­
+
   "Table of html character entities and values.")
 
 ;;; Faces.
