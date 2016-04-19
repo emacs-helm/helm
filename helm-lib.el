@@ -110,7 +110,9 @@ If NAME returns nil the pair is skipped.
            do (setq name (funcall name))
            when name
            collect (cons name (cadr i))))
-
+
+;;; Anaphoric macros.
+;;
 (defmacro helm-aif (test-form then-form &rest else-forms)
   "Anaphoric version of `if'.
 Like `if' but set the result of TEST-FORM in a temporary variable called `it'.
@@ -118,6 +120,25 @@ THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
   (declare (indent 2) (debug t))
   `(let ((it ,test-form))
      (if it ,then-form ,@else-forms)))
+
+(defmacro helm-awhile (sexp &rest body)
+  "Anaphoric version of `while'."
+  (helm-with-gensyms (flag)
+    `(let ((,flag t))
+       (while ,flag
+         (helm-aif ,sexp
+             (progn ,@body)
+           (setq ,flag nil))))))
+
+(defmacro helm-acond (&rest clauses)
+  "Anaphoric version of `cond'."
+  (unless (null clauses)
+    (helm-with-gensyms (sym)
+      (let ((clause1 (car clauses)))
+        `(let ((,sym ,(car clause1)))
+           (helm-aif ,sym
+               ,@(cdr clause1)
+             (helm-acond ,@(cdr clauses))))))))
 
 (defun helm-current-line-contents ()
   "Current line string without properties."
