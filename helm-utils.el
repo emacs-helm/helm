@@ -766,7 +766,8 @@ If COUNT is non--nil add a number after each prompt."
     (nreverse bookmarks-alist)))
 
 (defun helm-html-entitie-to-string (entitie)
-  "Replace an html entitie by its string value."
+  "Replace an html ENTITIE by its string value.
+When unable to decode ENTITIE returns nil."
   (helm-aif (assoc entitie helm-html-entities-alist)
       (string (cdr it))
     (save-match-data
@@ -780,7 +781,8 @@ If COUNT is non--nil add a number after each prompt."
       (insert str)
       (goto-char (point-min))
       (while (re-search-forward "&#?\\([^;]*\\);" nil t)
-        (replace-match (helm-html-entitie-to-string (match-string 0))))
+        (helm-aif (helm-html-entitie-to-string (match-string 0))
+            (replace-match it)))
       (buffer-string))))
 
 (provide 'helm-utils)
