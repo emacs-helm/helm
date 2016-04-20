@@ -959,7 +959,7 @@ This doesn't replace inside the files, only modify filenames."
       (let* ((regexp (read-string "Replace regexp on filename(s): "
                                   nil 'helm-ff-query-replace-history-from def))
              (str    (read-string (format "Replace regexp `%s' with: " regexp)
-                                  nil 'helm-ff-query-replace-history-to def)))
+                                  nil 'helm-ff-query-replace-history-to)))
         (cl-loop with query = "y"
                  with count = 0
                  for old in candidates
