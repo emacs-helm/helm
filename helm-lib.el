@@ -487,10 +487,15 @@ See `kill-new' for argument REPLACE."
 (defun helm-basename (fname &optional ext)
   "Print FNAME  with any  leading directory  components removed.
 If specified, also remove filename extension EXT.
-Arg EXT can be specified as a string with or without dot."
+Arg EXT can be specified as a string with or without dot,
+in this case it should match file-name-extension.
+It can also be non-nil (`t') in this case no checking
+of file-name-extension is done and the extension is removed
+unconditionally."
   (let ((non-essential t))
     (if (and ext (or (string= (file-name-extension fname) ext)
-                     (string= (file-name-extension fname t) ext))
+                     (string= (file-name-extension fname t) ext)
+                     (eq ext t))
              (not (file-directory-p fname)))
         (file-name-sans-extension (file-name-nondirectory fname))
       (file-name-nondirectory (directory-file-name fname)))))
