@@ -374,13 +374,19 @@ Use the helm-file-globstar feature described in previous section by
 entering at end of helm-find-files pattern \"**.JPG\", then hit `M-%`,
 at first prompt enter \"JPG\", at second \"jpg\" and hit `RET`.
 
+Shortcut for basename without extension and only extension are available:
+
+- Basename without extension => \"%.\"
+- Only extension             => \".%\"
+
 If you want to rename a serie of files from number 001 to 00x use \\# inside the replacement
 string when you will be prompted for it.
 
 e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
     to \"foo-001.jpg\" \"foo-002.jpg\" \"foo-003.jpg\"
 
-Use as replace regexp \".*\\.jpg\" and as replacement string \"foo-\\#\".
+Use as replace regexp \"%.\" and as replacement string \"foo-\\#\".
+Where \"%.\" is same as regexp \".*\\.jpg\".
 
 Note: You can do this with the serial renames actions you will find in the action menu
       for more sophisticated renaming, but using query replace regexp on filenames
