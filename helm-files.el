@@ -963,7 +963,8 @@ This doesn't replace inside the files, only modify filenames."
                                   (cond ((string= regexp "%.")
                                          (helm-basename old t))
                                         ((string= regexp ".%")
-                                         (file-name-extension old)))
+                                         (file-name-extension old))
+                                        (t regexp))
                                   (save-match-data
                                     (if (string-match "\\\\#" str)
                                         (replace-match
