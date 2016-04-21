@@ -981,6 +981,10 @@ This doesn't replace inside the files, only modify filenames."
                ;; return `old' unmodified.
                unless (string= old new)
                do (progn
+                    (when (file-exists-p new)
+                      (setq new (concat (file-name-sans-extension new)
+                                        (format "(%s)" count)
+                                        (file-name-extension new t))))
                     (unless (string= query "!")
                       (while (not (member
                                    (setq query
