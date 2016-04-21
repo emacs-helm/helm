@@ -374,10 +374,11 @@ Use the helm-file-globstar feature described in previous section by
 entering at end of helm-find-files pattern \"**.JPG\", then hit `M-%`,
 at first prompt enter \"JPG\", at second \"jpg\" and hit `RET`.
 
-Shortcut for basename without extension and only extension are available:
+Shortcut for basename without extension, only extension or all are available:
 
 - Basename without extension => \"%.\"
 - Only extension             => \".%\"
+- All                        => \"%\"
 
 If you want to rename a serie of files from number 001 to 00x use \\# inside the replacement
 string when you will be prompted for it.
@@ -391,6 +392,12 @@ Where \"%.\" is same as regexp \".*\\.jpg\".
 Note: You can do this with the serial renames actions you will find in the action menu
       for more sophisticated renaming, but using query replace regexp on filenames
       is a fast way for most common serial replacements.
+
+Note also that unlike the serial renames action the renamed files stay in their initial directory
+and are not renamed to current directory, IOW use this to rename files inside current directory.
+
+In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
+are available, respectively `%u', `%d' and `%c'.
 
 *** Copying renaming asynchronously
 

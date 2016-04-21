@@ -969,12 +969,17 @@ This doesn't replace inside the files, only modify filenames."
                                          (helm-basename old t))
                                         ((string= regexp ".%")
                                          (file-name-extension old))
+                                        ((string= regexp "%")
+                                         (helm-basename old))
                                         (t regexp))
                                   (save-match-data
-                                    (if (string-match "\\\\#" str)
-                                        (replace-match
-                                         (format "%03d" (1+ count)) t t str)
-                                        str))
+                                    (cond ((string-match "\\\\#" str)
+                                           (replace-match
+                                            (format "%03d" (1+ count)) t t str))
+                                          ((string= str "%u") #'upcase)
+                                          ((string= str "%d") #'downcase)
+                                          ((string= str "%c") #'capitalize)
+                                          (t str)))
                                   (helm-basename old) t))
                ;; If `regexp' is not matched in `old'
                ;; `replace-regexp-in-string' will
