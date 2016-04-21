@@ -355,6 +355,10 @@ and then run your copy action.
 You can do the same but with \"**.el\" (note the two stars),
 this will select recursively all \".el\" files under current directory.
 
+Note that when copying recursively files, you may have files with same name
+dispatched in the different directories, so when copying them in the same directory
+they would be overwrited.
+
 NOTE: When using an action that involve an external backend (e.g. grep), using \"**\"
 is not advised (even if it works fine) because it will be slower to select all your files,
 you have better time letting the backend doing it, it will be faster.
