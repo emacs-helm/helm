@@ -384,6 +384,11 @@ Shortcut for basename without extension, only extension or all are available:
 - Only extension             => \".%\"
 - All                        => \"%\"
 
+So in the example above you could do instead:
+At first prompt enter \".%\", at second \"jpg\" and hit `RET`.
+Note that when using this instead of using \"JPG\" at first prompt, all extensions
+will be renamed to \"jpg\" even if the extension of one of the files is e.g \"png\".
+
 If you want to rename a serie of files from number 001 to 00x use \\# inside the replacement
 string when you will be prompted for it.
 
@@ -397,8 +402,8 @@ Note: You can do this with the serial renames actions you will find in the actio
       for more sophisticated renaming, but using query replace regexp on filenames
       is a fast way for most common serial replacements.
 
-Note also that unlike the serial renames action the renamed files stay in their initial directory
-and are not renamed to current directory, IOW use this to rename files inside current directory.
+Note also that unlike the serial rename actions the renamed files stay in their initial directory
+and are not renamed to current directory, IOW use this (\\#) to rename files inside current directory.
 
 In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
 are available, respectively `%u', `%d' and `%c'.
