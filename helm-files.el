@@ -584,11 +584,20 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
-                   (mapcar (lambda (f)
-                               (if (file-directory-p f)
-                                   (concat (helm-basename f) "/")
-                                 (helm-basename f)))
-                           ifiles)
+                   (cl-loop with dups = (make-hash-table :test 'equal)
+                            for f in ifiles
+                            for file = (if (file-directory-p f)
+                                           (concat (helm-basename f) "/")
+                                           (helm-basename f))
+                            for count = (gethash file dups)
+                            if count do (puthash file (1+ count) dups)
+                            else do (puthash file 1 dups)
+                            finally return (cl-loop for k being the hash-keys in dups
+                                                    using (hash-value v)
+                                                    if (> v 1)
+                                                    collect (format "%s(%s)" k v)
+                                                    else
+                                                    collect k))
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
