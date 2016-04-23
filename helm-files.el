@@ -54,6 +54,7 @@
 
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
+(defvar dired-async-mode)
 
 
 (defgroup helm-files nil
@@ -2620,7 +2621,6 @@ Find inside `require' and `declare-function' sexp."
              when (eq (car (file-attributes cd)) t)
              return cd)))
 
-(defvar dired-async-mode)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
