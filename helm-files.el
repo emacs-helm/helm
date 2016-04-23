@@ -477,6 +477,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Delete File(s) `M-D'" 'helm-delete-marked-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
+   "Backup files" 'helm-find-files-backup
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
@@ -2226,8 +2227,6 @@ Return candidates prefixed with basename of `helm-input' first."
              (eq major-mode 'message-mode))
            (append actions
                    '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
-          ((string-match-p "\\`[*]\\{2\\}\\.[a-z]+\\'" (helm-basename candidate))
-           (helm-append-at-nth actions '(("Backup files" . helm-find-files-backup)) 4))
           ((save-match-data
              (and ffap-url-regexp
                   (not (string-match-p ffap-url-regexp str-at-point))
