@@ -604,6 +604,13 @@ ACTION must be an action supported by `helm-dired-action'."
   "Copy files from `helm-find-files'."
   (helm-find-files-do-action 'copy))
 
+(defun helm-find-files-backup (_candidate)
+  "Backup files from `helm-find-files'.
+This reproduce the behavior of \"cp --backup=numbered from to\"."
+  (cl-assert (and (fboundp 'dired-async-mode) dired-async-mode) nil
+             "Backup only available when `dired-async-mode' is enabled")
+  (helm-find-files-do-action 'backup))
+
 (defun helm-find-files-rename (_candidate)
   "Rename files from `helm-find-files'."
   (helm-find-files-do-action 'rename))
@@ -2209,6 +2216,8 @@ Return candidates prefixed with basename of `helm-input' first."
              (eq major-mode 'message-mode))
            (append actions
                    '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
+          ((string-match-p "\\`[*]\\{2\\}\\.[a-z]+\\'" (helm-basename candidate))
+           (helm-append-at-nth actions '(("Backup files" . helm-find-files-backup)) 4))
           ((save-match-data
              (and ffap-url-regexp
                   (not (string-match-p ffap-url-regexp str-at-point))
@@ -2621,12 +2630,13 @@ copy and rename."
                   (rename     'dired-rename-file)
                   (symlink    'make-symbolic-link)
                   (relsymlink 'dired-make-relative-symlink)
-                  (hardlink   'dired-hardlink)))
+                  (hardlink   'dired-hardlink)
+                  (backup     'backup-file)))
         (marker (cl-case action
-                  ((copy rename)   dired-keep-marker-copy)
-                  (symlink        dired-keep-marker-symlink)
-                  (relsymlink     dired-keep-marker-relsymlink)
-                  (hardlink       dired-keep-marker-hardlink)))
+                  ((copy rename backup) dired-keep-marker-copy)
+                  (symlink              dired-keep-marker-symlink)
+                  (relsymlink           dired-keep-marker-relsymlink)
+                  (hardlink             dired-keep-marker-hardlink)))
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
                       (not (file-directory-p candidate))))
