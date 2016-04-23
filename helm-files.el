@@ -54,6 +54,7 @@
 
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
+(defvar dired-async-mode)
 
 
 (defgroup helm-files nil
@@ -476,6 +477,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Delete File(s) `M-D'" 'helm-delete-marked-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
+   "Backup files" 'helm-find-files-backup
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
@@ -584,11 +586,20 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
-                   (mapcar (lambda (f)
-                               (if (file-directory-p f)
-                                   (concat (helm-basename f) "/")
-                                 (helm-basename f)))
-                           ifiles)
+                   (cl-loop with dups = (make-hash-table :test 'equal)
+                            for f in ifiles
+                            for file = (if (file-directory-p f)
+                                           (concat (helm-basename f) "/")
+                                           (helm-basename f))
+                            for count = (gethash file dups)
+                            if count do (puthash file (1+ count) dups)
+                            else do (puthash file 1 dups)
+                            finally return (cl-loop for k being the hash-keys in dups
+                                                    using (hash-value v)
+                                                    if (> v 1)
+                                                    collect (format "%s(%s)" k v)
+                                                    else
+                                                    collect k))
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
@@ -603,6 +614,13 @@ ACTION must be an action supported by `helm-dired-action'."
 (defun helm-find-files-copy (_candidate)
   "Copy files from `helm-find-files'."
   (helm-find-files-do-action 'copy))
+
+(defun helm-find-files-backup (_candidate)
+  "Backup files from `helm-find-files'.
+This reproduce the behavior of \"cp --backup=numbered from to\"."
+  (cl-assert (and (fboundp 'dired-async-mode) dired-async-mode) nil
+             "Backup only available when `dired-async-mode' is enabled")
+  (helm-find-files-do-action 'backup))
 
 (defun helm-find-files-rename (_candidate)
   "Rename files from `helm-find-files'."
@@ -2602,7 +2620,6 @@ Find inside `require' and `declare-function' sexp."
              when (eq (car (file-attributes cd)) t)
              return cd)))
 
-(defvar dired-async-mode)
 (cl-defun helm-dired-action (candidate
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
@@ -2621,12 +2638,13 @@ copy and rename."
                   (rename     'dired-rename-file)
                   (symlink    'make-symbolic-link)
                   (relsymlink 'dired-make-relative-symlink)
-                  (hardlink   'dired-hardlink)))
+                  (hardlink   'dired-hardlink)
+                  (backup     'backup-file)))
         (marker (cl-case action
-                  ((copy rename)   dired-keep-marker-copy)
-                  (symlink        dired-keep-marker-symlink)
-                  (relsymlink     dired-keep-marker-relsymlink)
-                  (hardlink       dired-keep-marker-hardlink)))
+                  ((copy rename backup) dired-keep-marker-copy)
+                  (symlink              dired-keep-marker-symlink)
+                  (relsymlink           dired-keep-marker-relsymlink)
+                  (hardlink             dired-keep-marker-hardlink)))
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
                       (not (file-directory-p candidate))))
