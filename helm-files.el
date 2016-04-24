@@ -571,6 +571,22 @@ of current buffer."
            ;; staying in the directory visited instead of current.
            (or (car-safe helm-ff-history) default-directory))))))
 
+(defun helm-ff--count-and-collect-dups (files)
+  (cl-loop with dups = (make-hash-table :test 'equal)
+           for f in files
+           for file = (if (file-directory-p f)
+                          (concat (helm-basename f) "/")
+                          (helm-basename f))
+           for count = (gethash file dups)
+           if count do (puthash file (1+ count) dups)
+           else do (puthash file 1 dups)
+           finally return (cl-loop for k being the hash-keys in dups
+                                   using (hash-value v)
+                                   if (> v 1)
+                                   collect (format "%s(%s)" k v)
+                                   else
+                                   collect k)))
+
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
@@ -586,20 +602,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
-                   (cl-loop with dups = (make-hash-table :test 'equal)
-                            for f in ifiles
-                            for file = (if (file-directory-p f)
-                                           (concat (helm-basename f) "/")
-                                           (helm-basename f))
-                            for count = (gethash file dups)
-                            if count do (puthash file (1+ count) dups)
-                            else do (puthash file 1 dups)
-                            finally return (cl-loop for k being the hash-keys in dups
-                                                    using (hash-value v)
-                                                    if (> v 1)
-                                                    collect (format "%s(%s)" k v)
-                                                    else
-                                                    collect k))
+                   (helm-ff--count-and-collect-dups ifiles)
                    (with-helm-current-buffer
                      (helm-read-file-name
                       prompt
@@ -875,7 +878,7 @@ See `helm-ff-serial-rename-1'."
                       :must-match t)))
          done)
     (with-helm-display-marked-candidates
-      helm-marked-buffer-name (mapcar 'helm-basename cands)
+      helm-marked-buffer-name (helm-ff--count-and-collect-dups cands)
       (if (y-or-n-p
            (format "Rename %s file(s) to <%s> like this ?\n%s "
                    (length cands) dir (format "%s <-> %s%s.%s"
@@ -2624,7 +2627,7 @@ Find inside `require' and `declare-function' sexp."
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to CANDIDATE.
 Where ACTION is a symbol that can be one of:
-'copy, 'rename, 'symlink,'relsymlink, 'hardlink.
+'copy, 'rename, 'symlink,'relsymlink, 'hardlink or 'backup.
 Argument FOLLOW when non--nil specify to follow FILES to destination for the actions
 copy and rename."
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
@@ -2772,11 +2775,7 @@ Ask to kill buffers associated with that file, too."
          (len (length files)))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
-      (mapcar (lambda (f)
-                  (if (file-directory-p f)
-                      (concat (helm-basename f) "/")
-                    (helm-basename f)))
-              files)
+      (helm-ff--count-and-collect-dups files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
           (message "(No deletions performed)")
         (cl-dolist (i files)
