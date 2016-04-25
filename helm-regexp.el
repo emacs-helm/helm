@@ -567,7 +567,7 @@ Special commands:
           :history 'helm-build-regexp-history)))
 
 ;;;###autoload
-(defun helm-occur ()
+(defun helm-occur (&optional str)
   "Preconfigured helm for Occur."
   (interactive)
   (helm-occur-init-source)
@@ -579,6 +579,7 @@ Special commands:
      (cl-loop for b in bufs
               collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
+        :input str
         :buffer "*helm occur*"
         :history 'helm-occur-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
