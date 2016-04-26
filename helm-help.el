@@ -357,7 +357,11 @@ this will select recursively all \".el\" files under current directory.
 
 Note that when copying recursively files, you may have files with same name
 dispatched in the different directories, so when copying them in the same directory
-they would be overwrited.
+they would be overwrited. To avoid this helm have a special action called \"backup files\"
+that have the same behavior as the command line \"cp --backup=numbered\", it allows you
+copying for example many *.jpg files with the same name from different directories in one directory.
+Files with same name are renamed like this: \"foo.txt.~1~\".
+NOTE: This command is available only when `dired-async-mode' is used.
 
 NOTE: When using an action that involve an external backend (e.g. grep), using \"**\"
 is not advised (even if it works fine) because it will be slower to select all your files,
