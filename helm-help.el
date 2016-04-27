@@ -371,7 +371,10 @@ However, if you know you have not many files it is reasonable to use this,
 also using not recursive wilcard (e.g. \"*.el\") is perfectly fine for this.
 
 This feature (\"**\") is activated by default with the option `helm-file-globstar'.
-The directory selection with \"**foo/\" like bash shopt globstar option is not supported yet.
+It is different than the bash shopt globstar feature in that to list files with a named extension
+recursively you just have to specify e.g \"**.el\" whereas in bash you have to specify \"**/*.el\"
+which is not convenient as \"**.el\".
+The directory selection with \"**/\" like bash shopt globstar option is not supported yet.
 
 *** Query replace regexp on filenames
 
