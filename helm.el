@@ -3067,21 +3067,21 @@ to the matching method in use."
               (when (zerop count)
                 (cl-loop with multi-match = (string-match-p " " helm-pattern)
                          with patterns = (if multi-match
-                                             (split-string helm-pattern)
+                                             (mapcar #'helm--maybe-get-migemo-pattern
+                                                     (split-string helm-pattern))
                                              (split-string helm-pattern "" t))
                          for p in patterns
-                         for re = (helm--maybe-get-migemo-pattern p)
                          ;; Multi matches (regexps patterns).
                          if multi-match do
                          (progn
-                           (while (re-search-forward re nil t)
+                           (while (re-search-forward p nil t)
                              (add-text-properties
                               (match-beginning 0) (match-end 0)
                               '(face helm-match)))
                            (goto-char (point-min)))
                          ;; Fuzzy matches (literal patterns).
                          else do
-                         (when (search-forward re nil t)
+                         (when (search-forward p nil t)
                            (add-text-properties
                             (match-beginning 0) (match-end 0)
                             '(face helm-match))))))
