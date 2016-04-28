@@ -472,8 +472,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    'helm-find-files-eshell-command-on-file
    "Find file as root `C-c r'" 'helm-find-file-as-root
    "Find alternate file" 'find-alternate-file
-   "Ediff File `C-='" 'helm-find-files-ediff-files
-   "Ediff Merge File `C-c ='" 'helm-find-files-ediff-merge-files
+   "Ediff File `C-c ='" 'helm-find-files-ediff-files
+   "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
    "Delete File(s) `M-D'" 'helm-delete-marked-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
