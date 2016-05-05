@@ -3606,6 +3606,7 @@ If action buffer is selected, back to the helm buffer."
                  (set-window-buffer (get-buffer-window helm-action-buffer)
                                     helm-buffer)
                  (kill-buffer helm-action-buffer)
+                 (setq helm-saved-selection nil)
                  (helm-set-pattern helm-input 'noupdate))
                 (helm-saved-selection
                  (setq helm-saved-current-source (helm-get-current-source))
