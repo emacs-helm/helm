@@ -54,6 +54,15 @@ If you prefer scrolling line by line, set this value to 1."
   :group 'helm
   :type 'integer)
 
+(defcustom helm-help-full-frame t
+  "Display help window in full frame when non nil.
+
+Even when `nil' probably the same result (full frame)
+can be reach by tweaking `display-buffer-alist' but it is
+much more convenient to use a simple boolean value here."
+  :type 'boolean
+  :group 'helm-help)
+
 
 ;;; Internal vars
 ;;
@@ -184,7 +193,7 @@ text to be displayed in BUFNAME."
            (setq helm-suspend-update-flag t)
            (set-buffer (get-buffer-create bufname))
            (switch-to-buffer bufname)
-           (delete-other-windows)
+           (when helm-help-full-frame (delete-other-windows))
            (delete-region (point-min) (point-max))
            (org-mode)
            (save-excursion
