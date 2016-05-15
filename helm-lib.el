@@ -132,6 +132,7 @@ THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
 
 (defmacro helm-awhile (sexp &rest body)
   "Anaphoric version of `while'."
+  (declare (indent 1) (debug t))
   (helm-with-gensyms (flag)
     `(let ((,flag t))
        (while ,flag
