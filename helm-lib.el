@@ -131,7 +131,11 @@ THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
      (if it ,then-form ,@else-forms)))
 
 (defmacro helm-awhile (sexp &rest body)
-  "Anaphoric version of `while'."
+  "Anaphoric version of `while'.
+Same usage as `while' except that SEXP is bound to
+a temporary variable called `it' at each turn.
+An implicit nil block is bound to the loop so usage
+of `cl-return' is possible to exit the loop."
   (declare (indent 1) (debug t))
   `(cl-do ((it ,sexp ,sexp))
        ((not it))
