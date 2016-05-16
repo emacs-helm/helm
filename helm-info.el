@@ -64,11 +64,12 @@ files with `helm-info-at-point'."
           (goto-char (point-min))
           (while (search-forward "\n* " nil t)
             (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
-              (setq start (point-at-bol)
-                    end (point-at-eol))
-              (with-current-buffer tobuf
-                (insert-buffer-substring infobuf start end)
-                (insert "\n")))))))))
+              (let ((info-index (buffer-substring
+                                 (point-at-bol)
+                                 (point-max))))
+                (with-current-buffer tobuf
+                  (insert (replace-regexp-in-string "\n   " " " info-index) )))
+              (goto-char (point-max)))))))))
 
 (defun helm-info-goto (node-line)
   (Info-goto-node (car node-line))
