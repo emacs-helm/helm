@@ -133,12 +133,9 @@ THEN-FORM and ELSE-FORMS are then excuted just like in `if'."
 (defmacro helm-awhile (sexp &rest body)
   "Anaphoric version of `while'."
   (declare (indent 1) (debug t))
-  (helm-with-gensyms (flag)
-    `(let ((,flag t))
-       (while ,flag
-         (helm-aif ,sexp
-             (progn ,@body)
-           (setq ,flag nil))))))
+  `(cl-do ((it ,sexp ,sexp))
+       ((not it))
+     ,@body))
 
 (defmacro helm-acond (&rest clauses)
   "Anaphoric version of `cond'."
@@ -240,28 +237,28 @@ text to be displayed in BUFNAME."
                  "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
         scroll-error-top-bottom)
-    (cl-loop for event = (read-key prompt) do
-             (cl-case event
-               ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
-               ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
-               (?\C-s (isearch-forward))
-               (?\C-r (isearch-backward))
-               (?\C-a (call-interactively #'move-beginning-of-line))
-               (?\C-e (call-interactively #'move-end-of-line))
-               (?\C-f (call-interactively #'forward-char))
-               (?\C-b (call-interactively #'backward-char))
-               (?\C-n (helm-help-next-line))
-               (?\C-p (helm-help-previous-line))
-               (?\M-a (call-interactively #'backward-sentence))
-               (?\M-e (call-interactively #'forward-sentence))
-               (?\M-f (call-interactively #'forward-word))
-               (?\M-b (call-interactively #'backward-word))
-               (?\C-  (helm-help-toggle-mark))
-               (?\M-w (copy-region-as-kill
-                       (region-beginning) (region-end))
-                      (deactivate-mark))
-               (?q    (cl-return))
-               (t     (ignore))))))
+    (helm-awhile (read-key prompt)
+      (cl-case it
+        ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
+        ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
+        (?\C-s (isearch-forward))
+        (?\C-r (isearch-backward))
+        (?\C-a (call-interactively #'move-beginning-of-line))
+        (?\C-e (call-interactively #'move-end-of-line))
+        (?\C-f (call-interactively #'forward-char))
+        (?\C-b (call-interactively #'backward-char))
+        (?\C-n (helm-help-next-line))
+        (?\C-p (helm-help-previous-line))
+        (?\M-a (call-interactively #'backward-sentence))
+        (?\M-e (call-interactively #'forward-sentence))
+        (?\M-f (call-interactively #'forward-word))
+        (?\M-b (call-interactively #'backward-word))
+        (?\C-  (helm-help-toggle-mark))
+        (?\M-w (copy-region-as-kill
+                (region-beginning) (region-end))
+               (deactivate-mark))
+        (?q    (cl-return))
+        (t     (ignore))))))
 
 
 ;;; List processing
