@@ -247,7 +247,8 @@
 
 ;;;###autoload
 (defun helm-imenu-in-all-buffers ()
-  "Preconfigured helm for fetching imenu entries of all buffers."
+  "Preconfigured helm for fetching imenu entries in all buffers with similar mode as current.
+A mode is similar as current if it is the same or it is derived i.e `derived-mode-p'."
   (interactive)
   (unless helm-source-imenu-all
     (setq helm-source-imenu-all
