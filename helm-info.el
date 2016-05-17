@@ -56,18 +56,28 @@ files with `helm-info-at-point'."
     (save-window-excursion
       (info file)
       (let ((tobuf (helm-candidate-buffer 'global))
-            (infobuf (current-buffer))
             Info-history
-            start end)
+            start end line)
         (cl-dolist (node (Info-index-nodes))
           (Info-goto-node node)
           (goto-char (point-min))
           (while (search-forward "\n* " nil t)
             (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
               (setq start (point-at-bol)
-                    end (point-at-eol))
+                    ;; Fix issue #1503 by getting the invisible
+                    ;; info displayed on next line in long strings.
+                    ;; e.g "* Foo.\n   (line 12)" instead of
+                    ;;     "* Foo.(line 12)"
+                    end (or (save-excursion
+                              (goto-char (point-at-bol))
+                              (re-search-forward "(line +[0-9]+)" nil t))
+                            (point-at-eol))
+                    ;; Long string have a new line inserted before the
+                    ;; invisible spec, remove it.
+                    line (replace-regexp-in-string
+                          "\n" "" (buffer-substring start end)))
               (with-current-buffer tobuf
-                (insert-buffer-substring infobuf start end)
+                (insert line)
                 (insert "\n")))))))))
 
 (defun helm-info-goto (node-line)
