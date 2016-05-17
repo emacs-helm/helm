@@ -151,7 +151,8 @@
      ("(\\<\\(helm-while-no-input\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-aif\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-awhile\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(helm-acond\\)\\>" 1 font-lock-keyword-face))))
+     ("(\\<\\(helm-acond\\)\\>" 1 font-lock-keyword-face)
+     ("(\\<\\(helm-with-gensyms\\)\\>" 1 font-lock-keyword-face))))
 
 
 ;;; Load the autoload file
