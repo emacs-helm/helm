@@ -3469,7 +3469,22 @@ separator."
 ;;
 ;;;###autoload
 (defun helm-find (arg)
-  "Preconfigured `helm' for the find shell command."
+  "Preconfigured `helm' for the find shell command.
+
+Recursively find files whose names are matched by all specified
+globbing PATTERNs under the current directory using the external
+program specified in `find-program' (usually \"find\").  Every
+input PATTERN is silently wrapped into two stars: *PATTERN*.
+
+With prefix argument, prompt for a directory to search.
+
+When user option `helm-findutils-search-full-path' is non-nil,
+match against complete paths, otherwise, against file names
+without directory part.
+
+The (possibly empty) list of globbing PATTERNs can be followed by
+the separator \"*\" plus any number of additional arguments that
+are passed to \"find\" literally."
   (interactive "P")
   (let ((directory
          (if arg
