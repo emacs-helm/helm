@@ -106,7 +106,7 @@ and second call within 0.5s runs `helm-swap-windows'."
 
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
-                                     &optional other-subkeys menu exit-fn)
+                                         &optional other-subkeys menu exit-fn)
   "Defines in MAP a KEY and SUBKEY to COMMAND.
 
 This allows typing KEY to call COMMAND the first time and
@@ -116,10 +116,11 @@ Arg MAP is the keymap to use, SUBKEY is the initial short key-binding to
 call COMMAND.
 
 Arg OTHER-SUBKEYS is an alist specifying other short key-bindings
-to use once started e.g:
+to use once started.
+e.g:
 
-    \(helm-define-key-with-subkeys global-map
-       \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk '((?p . git-gutter:previous-hunk))\)
+\(helm-define-key-with-subkeys global-map
+   \(kbd \"C-x v n\") ?n 'git-gutter:next-hunk '((?p . git-gutter:previous-hunk))\)
 
 
 In this example, `C-x v n' will run `git-gutter:next-hunk'
@@ -134,33 +135,33 @@ For any other keys pressed, run their assigned command as defined
 in MAP and then exit the loop running EXIT-FN, if specified.
 
 NOTE: SUBKEY and OTHER-SUBKEYS bindings support char syntax only 
-\(e.g ?n), so don't use strings or vectors to define them."
+(e.g ?n), so don't use strings or vectors to define them."
   (declare (indent 1))
   (define-key map key
     (lambda ()
       (interactive)
       (unwind-protect
-           (progn
-             (call-interactively command)
-             (helm-awhile (read-key menu)
-               (setq last-command-event it)
-               (helm-acond
-                ((eq it subkey)
-                 (call-interactively command)
-                 t)
-                ((assoc it other-subkeys)
-                 (call-interactively (cdr it))
-                 t)
-                ((vector last-command-event)
-                 (let ((com (lookup-key map it)))
-                   (if (commandp com)
-                       (call-interactively com)
-                       (setq unread-command-events
-                             (nconc (mapcar 'identity it)
-                                    unread-command-events)))
-                   nil)))))
+          (progn
+            (call-interactively command)
+            (while (let ((input (read-key menu)) other kb com)
+                     (setq last-command-event input)
+                     (cond
+                      ((eq input subkey)
+                       (call-interactively command)
+                       t)
+                      ((setq other (assoc input other-subkeys))
+                       (call-interactively (cdr other))
+                       t)
+                      (t
+                       (setq kb (vector last-command-event))
+                       (setq com (lookup-key map kb))
+                       (if (commandp com)
+                           (call-interactively com)
+                         (setq unread-command-events
+                               (nconc (mapcar 'identity kb)
+                                      unread-command-events)))
+                       nil)))))
         (and exit-fn (funcall exit-fn))))))
-
 
 ;;; Keymap
 ;;
