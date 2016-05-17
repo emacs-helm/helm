@@ -137,9 +137,13 @@ a temporary variable called `it' at each turn.
 An implicit nil block is bound to the loop so usage
 of `cl-return' is possible to exit the loop."
   (declare (indent 1) (debug t))
-  `(cl-do ((it ,sexp ,sexp))
-       ((not it))
-     ,@body))
+  (helm-with-gensyms (flag)
+    `(let ((,flag t))
+       (cl-block nil
+         (while ,flag
+           (helm-aif ,sexp
+               (progn ,@body)
+             (setq ,flag nil)))))))
 
 (defmacro helm-acond (&rest clauses)
   "Anaphoric version of `cond'."
