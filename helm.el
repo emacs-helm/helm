@@ -1078,7 +1078,7 @@ Messages are logged to a file named with todays date and time in this directory.
   (if helm--last-log-file
       (progn
         (find-file helm--last-log-file)
-        (outline-mode) (view-mode 1))
+        (outline-mode) (view-mode 1) (visual-line-mode 1))
     (switch-to-buffer helm-debug-buffer)
     (view-mode 1) (visual-line-mode 1)))
 
