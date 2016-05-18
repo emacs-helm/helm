@@ -515,34 +515,34 @@ you have in `file-attributes'."
                       :inode       inode
                       :device-num  device-num)))
          (modes (helm-split-mode-file-attributes (cl-getf all :mode))))
-    (cond (type (cl-getf all :type))
-          (links (cl-getf all :links))
-          (uid   (cl-getf all :uid))
-          (gid   (cl-getf all :gid))
+    (cond (type        (cl-getf all :type))
+          (links       (cl-getf all :links))
+          (uid         (cl-getf all :uid))
+          (gid         (cl-getf all :gid))
           (access-time (cl-getf all :access-time))
-          (modif-time (cl-getf all :modif-time))
-          (status (cl-getf all :status))
-          (size (cl-getf all :size))
-          (mode (cl-getf all :mode))
-          (gid-change (cl-getf all :gid-change))
-          (inode (cl-getf all :inode))
-          (device-num (cl-getf all :device-num))
-          (dired
-           (concat
-            (helm-split-mode-file-attributes (cl-getf all :mode) t) " "
-            (number-to-string (cl-getf all :links)) " "
-            (cl-getf all :uid) ":"
-            (cl-getf all :gid) " "
-            (if human-size
-                (helm-file-human-size (cl-getf all :size))
-              (int-to-string (cl-getf all :size))) " "
-              (cl-getf all :modif-time)))
+          (modif-time  (cl-getf all :modif-time))
+          (status      (cl-getf all :status))
+          (size        (cl-getf all :size))
+          (mode        (cl-getf all :mode))
+          (gid-change  (cl-getf all :gid-change))
+          (inode       (cl-getf all :inode))
+          (device-num  (cl-getf all :device-num))
+          (dired       (concat
+                        (helm-split-mode-file-attributes
+                         (cl-getf all :mode) t) " "
+                        (number-to-string (cl-getf all :links)) " "
+                        (cl-getf all :uid) ":"
+                        (cl-getf all :gid) " "
+                        (if human-size
+                            (helm-file-human-size (cl-getf all :size))
+                            (int-to-string (cl-getf all :size))) " "
+                        (cl-getf all :modif-time)))
           (human-size (helm-file-human-size (cl-getf all :size)))
-          (mode-type (cl-getf modes :mode-type))
+          (mode-type  (cl-getf modes :mode-type))
           (mode-owner (cl-getf modes :user))
           (mode-group (cl-getf modes :group))
           (mode-other (cl-getf modes :other))
-          (t (append all modes)))))
+          (t          (append all modes)))))
 
 (defun helm-split-mode-file-attributes (str &optional string)
   "Split mode file attributes STR into a proplist.
