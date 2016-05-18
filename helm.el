@@ -568,6 +568,16 @@ Only async sources than use a sentinel calling
   :type 'integer
   :group 'helm)
 
+(defcustom helm-debug-root-directory nil
+  "When non-`nil', saves helm log messages to a file in this directory.
+When `nil' log messages are saved to a buffer instead.
+Log message are saved only when `helm-debug' is non-nil, so setting this
+doesn't enable debugging by itself.
+
+See `helm-log-save-maybe' for more info."
+  :type 'string
+  :group 'helm)
+
 
 ;;; Faces
 ;;
@@ -871,6 +881,24 @@ Very useful for resuming previous Helm. Binding a key to this
 command will greatly improve `helm' interactivity especially
 after an accidental exit.
 
+** Debugging helm
+
+helm have a special variable called `helm-debug', setting it to non-nil
+will allow helm logging in a special outline-mode buffer.
+Helm is resetting the variable to nil at end of each session.
+
+A convenient command is bound to \\<helm-map>\\[helm-enable-or-switch-to-debug]
+and allow turning debugging to this session only.
+To avoid accumulating log while you are typing your pattern, you can use
+\\<helm-map>\\[helm-toggle-suspend-update] to turn off updating, then when you
+are ready turn it on again to start updating.
+
+Once you exit your helm session you can access the debug buffer with `helm-debug-open-last-log'.
+It is possible to save logs to dated files when `helm-debug-root-directory'
+is set to a valid directory.
+
+NOTE: Be aware that helm log buffers grow really fast, so use `helm-debug' only when needed.
+
 ** Helm Map
 \\{helm-map}"
   "Message string containing detailed help for `helm'.
@@ -911,11 +939,7 @@ It also accepts function or variable symbol.")
 (defvar helm-candidate-buffer-alist nil)
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
-(defvar helm-debug-root-directory nil
-  "When non-`nil', saves helm log messages to `helm-last-log-file'.
-Use only for debugging purposes because of the size of the log files.
-See `helm-log-save-maybe' for more info.")
-(defvar helm-last-log-file nil
+(defvar helm--last-log-file nil
   "The name of the log file of the last helm session.")
 (defvar helm-follow-mode nil)
 (defvar helm--local-variables nil)
@@ -1028,10 +1052,8 @@ e.g (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
       (add-to-list 'helm-issued-errors msg))))
 
 (defun helm-log-save-maybe ()
-  "May be save log buffer to `helm-last-log-file'.
-If `helm-debug-root-directory' is non-`nil' then a valid
-directory, 'helm-debug-<date of today>', is created and messages
-logged to a file named with todays date and time."
+  "Save log buffer if `helm-debug-root-directory' is set to a valid directory.
+Messages are logged to a file named with todays date and time in this directory."
   (when (and (stringp helm-debug-root-directory)
              (file-directory-p helm-debug-root-directory)
              helm-debug)
@@ -1041,20 +1063,22 @@ logged to a file named with todays date and time."
       (make-directory logdir t)
       (with-current-buffer (get-buffer-create helm-debug-buffer)
         (write-region (point-min) (point-max)
-                      (setq helm-last-log-file
+                      (setq helm--last-log-file
                             (expand-file-name
                              (format-time-string "%Y%m%d-%H%M%S")
                              logdir))
                       nil 'silent)
-        (kill-buffer)))))
+        (kill-buffer))))
+  (setq helm-debug nil))
 
 ;;;###autoload
 (defun helm-debug-open-last-log ()
-  "Open helm log file of last helm session.
-If `helm-last-log-file' is nil, switch to `helm-debug-buffer' ."
+  "Open helm log file or buffer of last helm session."
   (interactive)
-  (if helm-last-log-file
-      (view-file helm-last-log-file)
+  (if helm--last-log-file
+      (progn
+        (find-file helm--last-log-file)
+        (outline-mode) (view-mode 1))
     (switch-to-buffer helm-debug-buffer)
     (view-mode 1) (visual-line-mode 1)))
 
@@ -2632,7 +2656,6 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   ;; be a helm buffer.
   (replace-buffer-in-windows helm-buffer)
   (setq helm-alive-p nil)
-  (setq helm-debug nil)
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
   (helm-clean-up-minibuffer))
