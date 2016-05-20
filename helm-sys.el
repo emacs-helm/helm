@@ -191,25 +191,25 @@ Show actions only on line starting by a PID."
   (interactive)
   (helm-top-set-mode-line "COM")
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
-  (helm-force-update))
+  (helm-update (regexp-quote (helm-get-selection nil t))))
 
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
   (helm-top-set-mode-line "CPU")
   (setq helm-top-sort-fn nil)
-  (helm-force-update))
+  (helm-update (regexp-quote (helm-get-selection nil t))))
 
 (defun helm-top-run-sort-by-mem ()
   (interactive)
   (helm-top-set-mode-line "MEM")
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
-  (helm-force-update))
+  (helm-update (regexp-quote (helm-get-selection nil t))))
 
 (defun helm-top-run-sort-by-user ()
   (interactive)
   (helm-top-set-mode-line "USER")
   (setq helm-top-sort-fn 'helm-top-sort-by-user)
-  (helm-force-update))
+  (helm-update (regexp-quote (helm-get-selection nil t))))
 
 
 ;;; X RandR resolution change
