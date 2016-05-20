@@ -1298,19 +1298,39 @@ if available with current AG version."
          "ag" helm-buffer cmd-line)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
-       (lambda (_process event)
-         (when (string= event "finished\n")
-           (with-helm-window
-             (setq mode-line-format
-                   '(" " mode-line-buffer-identification " "
-                     (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                     (:eval (propertize
-                             (format
-                              "[%s process finished - (%s results)] "
-                              (upcase (helm-grep--ag-command))
-                              (helm-get-candidate-number))
-                             'face 'helm-grep-finish))))
-             (force-mode-line-update))))))))
+       (lambda (process event)
+         (let* ((err      (process-exit-status process))
+                (noresult (= err 1)))
+           (cond (noresult
+                  (with-helm-buffer
+                    (insert (concat "* Exit with code 1, no result found,"
+                                    " command line was:\n\n "
+                                    (propertize helm-grep-last-cmd-line
+                                                'face 'helm-grep-cmd-line)))
+                    (setq mode-line-format
+                          '(" " mode-line-buffer-identification " "
+                            (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                            (:eval (propertize
+                                    (format
+                                     "[%s process finished - (no results)] "
+                                     (upcase (helm-grep--ag-command)))
+                                    'face 'helm-grep-finish))))))
+                 ((string= event "finished\n")
+                  (with-helm-window
+                    (setq mode-line-format
+                          '(" " mode-line-buffer-identification " "
+                            (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                            (:eval (propertize
+                                    (format
+                                     "[%s process finished - (%s results)] "
+                                     (upcase (helm-grep--ag-command))
+                                     (helm-get-candidate-number))
+                                    'face 'helm-grep-finish))))
+                    (force-mode-line-update)))
+                 (t (helm-log
+                     "Error: %s %s"
+                     (helm-grep--ag-command)
+                     (replace-regexp-in-string "\n" "" event))))))))))
 
 (defclass helm-grep-ag-class (helm-source-async)
   ((nohighlight :initform t)
