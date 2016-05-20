@@ -3358,7 +3358,7 @@ pattern has changed.
 Selection is preserved to current candidate or moved to
 PRESELECT, if specified."
   (let ((source    (helm-get-current-source))
-        (selection (helm-get-selection nil t)))
+        (selection (regexp-quote (helm-get-selection nil t))))
     (setq helm-force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
