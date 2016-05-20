@@ -1293,6 +1293,10 @@ if available with current AG version."
   (let ((cmd-line (helm-grep-ag-prepare-cmd-line
                    helm-pattern directory type)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
+    (helm-log "Starting %s process in directory `%s'"
+              (helm-grep--ag-command) directory)
+    (helm-log "Command line used was:\n\n%s"
+              (concat ">>> " cmd-line "\n\n"))
     (prog1
         (start-process-shell-command
          "ag" helm-buffer cmd-line)
