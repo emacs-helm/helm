@@ -497,10 +497,11 @@ See `kill-new' for argument REPLACE."
 Argument ALIST is an alist of associated major modes."
   ;; START-BUFFER is the current-buffer where we start searching.
   ;; Determine the major-mode of START-BUFFER as `cur-maj-mode'.
-  ;; Each time the loop go in another buffer we try to find if its
-  ;; `major-mode' is:
+  ;; Each time the loop go in another buffer we try from this buffer
+  ;; to determine if its `major-mode' is:
   ;; - same as the `cur-maj-mode'
-  ;; - derived from `cur-maj-mode'
+  ;; - derived from `cur-maj-mode' and from
+  ;;   START-BUFFER if its mode is derived from the one in START-BUFFER. 
   ;; - have an assoc entry (major-mode . cur-maj-mode)
   ;; - have an rassoc entry (cur-maj-mode . major-mode)
   ;; - check if one of these entries inherit from another one in
