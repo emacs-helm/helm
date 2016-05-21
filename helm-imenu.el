@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-lib)
 (require 'imenu)
 (require 'helm-utils)
 (require 'helm-help)
