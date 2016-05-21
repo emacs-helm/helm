@@ -59,8 +59,7 @@ When nil all buffers are considered related to `current-buffer'."
   :group 'helm-dabbrev
   :type 'function)
 
-(defcustom helm-dabbrev-major-mode-assoc
-  '((emacs-lisp-mode . lisp-interaction-mode))
+(defcustom helm-dabbrev-major-mode-assoc nil 
   "Major mode association alist.
 This allow helm-dabbrev searching in buffers with the associated `major-mode'.
 e.g \(emacs-lisp-mode . lisp-interaction-mode\)
