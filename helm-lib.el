@@ -493,6 +493,8 @@ See `kill-new' for argument REPLACE."
 ;;; Modes
 ;;
 (defun helm-same-major-mode-p (start-buffer alist)
+  "Decide if current-buffer is related to START-BUFFER.
+Argument ALIST is an alist of associated major modes."
   ;; START-BUFFER is the current-buffer where we start searching.
   ;; Determine the major-mode of START-BUFFER as `cur-maj-mode'.
   ;; Each time the loop go in another buffer we try to find if its

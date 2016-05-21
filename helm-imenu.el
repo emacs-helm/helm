@@ -47,7 +47,7 @@
 
 (defcustom helm-imenu-all-buffer-assoc '((mu4e-view-mode . emacs-lisp-mode)
                                          (mu4e-compose-mode . emacs-lisp-mode))
-  "Major mode association alist.
+  "Major mode association alist for `helm-imenu-in-all-buffers'.
 Allow `helm-imenu-in-all-buffers' searching in these associated buffers
 even if they are not derived from each other."
   :type '(alist :key-type symbol :value-type symbol)

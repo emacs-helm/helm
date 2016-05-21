@@ -120,6 +120,7 @@ but the initial search for all candidates in buffer(s)."
         collect buf))
 
 (defun helm-dabbrev--same-major-mode-p (start-buffer)
+  "Decide if current-buffer is related to START-BUFFER."
   (helm-same-major-mode-p start-buffer helm-dabbrev-major-mode-assoc))
 
 (defun helm-dabbrev--collect (str limit ignore-case all)
