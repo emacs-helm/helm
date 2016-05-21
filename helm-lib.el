@@ -488,6 +488,48 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   "CANDIDATE is symbol or string.
 See `kill-new' for argument REPLACE."
   (kill-new (helm-stringify candidate) replace))
+
+
+;;; Modes
+;;
+(defun helm-same-major-mode-p (start-buffer alist)
+  "Decide if current-buffer is related to START-BUFFER.
+Argument ALIST is an alist of associated major modes."
+  ;; START-BUFFER is the current-buffer where we start searching.
+  ;; Determine the major-mode of START-BUFFER as `cur-maj-mode'.
+  ;; Each time the loop go in another buffer we try from this buffer
+  ;; to determine if its `major-mode' is:
+  ;; - same as the `cur-maj-mode'
+  ;; - derived from `cur-maj-mode' and from
+  ;;   START-BUFFER if its mode is derived from the one in START-BUFFER. 
+  ;; - have an assoc entry (major-mode . cur-maj-mode)
+  ;; - have an rassoc entry (cur-maj-mode . major-mode)
+  ;; - check if one of these entries inherit from another one in
+  ;;   `alist'.
+  (let* ((cur-maj-mode  (with-current-buffer start-buffer major-mode))
+         (maj-mode      major-mode)
+         (c-assoc-mode  (assq cur-maj-mode alist))
+         (c-rassoc-mode (rassq cur-maj-mode alist))
+         (o-assoc-mode  (assq major-mode alist))
+         (o-rassoc-mode (rassq major-mode alist))
+         (cdr-c-assoc-mode (cdr c-assoc-mode))
+         (cdr-o-assoc-mode (cdr o-assoc-mode)))
+    (or (eq major-mode cur-maj-mode)
+        (derived-mode-p cur-maj-mode)
+        (with-current-buffer start-buffer
+          (derived-mode-p maj-mode))
+        (or (eq cdr-c-assoc-mode major-mode)
+            (eq (car c-rassoc-mode) major-mode)
+            (eq (cdr (assq cdr-c-assoc-mode alist))
+                major-mode)
+            (eq (car (rassq cdr-c-assoc-mode alist))
+                major-mode))
+        (or (eq cdr-o-assoc-mode cur-maj-mode)
+            (eq (car o-rassoc-mode) cur-maj-mode)
+            (eq (cdr (assq cdr-o-assoc-mode alist))
+                cur-maj-mode)
+            (eq (car (rassq cdr-o-assoc-mode alist))
+                cur-maj-mode)))))
 
 ;;; Files routines
 ;;
