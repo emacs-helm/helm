@@ -590,8 +590,8 @@ Useful in dired buffers when there is inserted subdirs."
     "_MTN" "_darcs" "{arch}" ".gvfs"))
 
 (cl-defun helm-walk-directory (directory &key (path 'basename)
-                                           (directories t)
-                                           match skip-subdirs)
+                                         directories
+                                         match skip-subdirs)
   "Walk through DIRECTORY tree.
 Argument PATH can be one of basename, relative, full, or a function
 called on file name, default to basename.
