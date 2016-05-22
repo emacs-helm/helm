@@ -45,8 +45,7 @@
   :group 'helm-imenu
   :type  'boolean)
 
-(defcustom helm-imenu-all-buffer-assoc '((mu4e-view-mode . emacs-lisp-mode)
-                                         (mu4e-compose-mode . emacs-lisp-mode))
+(defcustom helm-imenu-all-buffer-assoc nil
   "Major mode association alist for `helm-imenu-in-all-buffers'.
 Allow `helm-imenu-in-all-buffers' searching in these associated buffers
 even if they are not derived from each other."
