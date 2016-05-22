@@ -624,7 +624,6 @@ instead of `helm-walk-ignore-directories'."
                              unless (member f '("./" "../"))
                              ;; A directory.
                              if (char-equal (aref f (1- (length f))) ?/)
-                             ;; nconc (and directories (list (funcall fn file)))
                              nconc (and (not (file-symlink-p file))
                                         (if directories
                                             (nconc (list (funcall fn file))
