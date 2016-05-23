@@ -48,7 +48,9 @@
 (defcustom helm-imenu-all-buffer-assoc nil
   "Major mode association alist for `helm-imenu-in-all-buffers'.
 Allow `helm-imenu-in-all-buffers' searching in these associated buffers
-even if they are not derived from each other."
+even if they are not derived from each other.
+The alist is bidirectional, i.e no need to add '((foo . bar) (bar . foo))
+only '((foo . bar)) is needed."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-imenu)
 
@@ -255,7 +257,8 @@ even if they are not derived from each other."
 ;;;###autoload
 (defun helm-imenu-in-all-buffers ()
   "Preconfigured helm for fetching imenu entries in all buffers with similar mode as current.
-A mode is similar as current if it is the same or it is derived i.e `derived-mode-p'."
+A mode is similar as current if it is the same, it is derived i.e `derived-mode-p'
+or it have an association in `helm-imenu-all-buffer-assoc'."
   (interactive)
   (unless helm-source-imenu-all
     (setq helm-source-imenu-all
