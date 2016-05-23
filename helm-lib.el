@@ -620,10 +620,12 @@ instead of `helm-walk-ignore-directories'."
                              for file = (directory-file-name (expand-file-name f dir))
                              unless (member f '("./" "../"))
                              ;; A directory (ignore symlinked dirs).
-                             if (and (helm--dir-name-p f) (not (file-symlink-p file)))
-                             nconc (if directories
-                                       (append (list (funcall fn file)) (ls-rec file))
-                                       (ls-rec file))
+                             if (helm--dir-name-p f)
+                             nconc (and (not (file-symlink-p file))
+                                        (if directories
+                                            (nconc (list (funcall fn file))
+                                                   (ls-rec file))
+                                            (ls-rec file)))
                              ;; A regular file.
                              else nconc
                              (when (or (null match)
