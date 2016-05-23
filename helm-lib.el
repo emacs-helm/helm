@@ -612,23 +612,18 @@ instead of `helm-walk-ignore-directories'."
                                        (if (listp skip-subdirs)
                                            skip-subdirs
                                          helm-walk-ignore-directories)))
-                    (cl-loop with ls = (sort (file-name-all-completions "" dir)
-                                             'string-lessp)
-                             
-                             for f in ls
+                    (cl-loop for f in (sort (file-name-all-completions "" dir)
+                                            'string-lessp)
                              ;; Use `directory-file-name' to remove the final slash.
                              ;; Needed to avoid infloop on symlinks symlinking
                              ;; a directory inside it [1].
-                             for file = (directory-file-name
-                                         (expand-file-name f dir))
+                             for file = (directory-file-name (expand-file-name f dir))
                              unless (member f '("./" "../"))
                              ;; A directory (ignore symlinked dirs).
-                             if (char-equal (aref f (1- (length f))) ?/)
-                             nconc (and (not (file-symlink-p file))
-                                        (if directories
-                                            (nconc (list (funcall fn file))
-                                                   (ls-rec file))
-                                            (ls-rec file)))
+                             if (and (helm--dir-name-p f) (not (file-symlink-p file)))
+                             nconc (if directories
+                                       (append (list (funcall fn file)) (ls-rec file))
+                                       (ls-rec file))
                              ;; A regular file.
                              else nconc
                              (when (or (null match)
@@ -638,6 +633,9 @@ instead of `helm-walk-ignore-directories'."
                                             (string-match match f)))
                                (list (funcall fn file)))))))
       (ls-rec directory))))
+
+(defsubst helm--dir-name-p (str)
+  (char-equal (aref str (1- (length str))) ?/))
 
 (defun helm-file-expand-wildcards (pattern &optional full)
   "Same as `file-expand-wildcards' but allow recursion.
