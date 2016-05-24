@@ -1,9 +1,9 @@
 ;;; helm-core-pkg.el --- define helm-core for package.el
 
-(define-package "helm-core" "1.9.5"
+(define-package "helm-core" "1.9.6"
   "Development files for Helm"
   '((emacs "24.3")
-    (async "1.8"))
+    (async "1.9"))
   :url "https://emacs-helm.github.io/helm/")
 
 ;; Local Variables:
