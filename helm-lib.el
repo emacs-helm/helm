@@ -597,7 +597,7 @@ Argument PATH can be one of basename, relative, full, or a function
 called on file name, default to basename.
 Argument DIRECTORIES when non--nil (default) return also directories names,
 otherwise skip directories names.
-Argument MATCH can be a predicate or a regexp.
+Argument MATCH is a regexp matching files or directories.
 Argument SKIP-SUBDIRS when non--nil will skip `helm-walk-ignore-directories'
 unless it is given as a list of directories, in this case this list will be used
 instead of `helm-walk-ignore-directories'."
@@ -605,36 +605,38 @@ instead of `helm-walk-ignore-directories'."
                (basename 'file-name-nondirectory)
                (relative 'file-relative-name)
                (full     'identity)
-               (t        path))))
+               (t        path)))) ; A function.
     (cl-labels ((ls-rec (dir)
-                  (unless (and skip-subdirs
-                               (member (helm-basename dir)
-                                       (if (listp skip-subdirs)
-                                           skip-subdirs
-                                         helm-walk-ignore-directories)))
+                  (unless (or (and skip-subdirs
+                                   (member (helm-basename dir)
+                                           (if (listp skip-subdirs)
+                                               skip-subdirs
+                                               helm-walk-ignore-directories)))
+                              (file-symlink-p dir))
                     (cl-loop for f in (sort (file-name-all-completions "" dir)
                                             'string-lessp)
-                             ;; Use `directory-file-name' to remove the final slash.
+                             ;; Use `helm--dir-file-name' to remove the final slash.
                              ;; Needed to avoid infloop on symlinks symlinking
-                             ;; a directory inside it [1].
-                             for file = (directory-file-name (expand-file-name f dir))
+                             ;; a directory inside it.
+                             for file = (helm--dir-file-name f dir)
                              unless (member f '("./" "../"))
-                             ;; A directory (ignore symlinked dirs).
+                             ;; A directory.
                              if (helm--dir-name-p f)
-                             nconc (and (not (file-symlink-p file))
-                                        (if directories
-                                            (nconc (list (funcall fn file))
-                                                   (ls-rec file))
-                                            (ls-rec file)))
+                             nconc (if directories
+                                       (nconc (and (or (null match)
+                                                       (string-match match f))
+                                                   (list (funcall fn file)))
+                                              (ls-rec file))
+                                       (ls-rec file))
                              ;; A regular file.
                              else nconc
-                             (when (or (null match)
-                                       (and (functionp match)
-                                            (funcall match f))
-                                       (and (stringp match)
-                                            (string-match match f)))
+                             (when (or (null match) (string-match match f))
                                (list (funcall fn file)))))))
       (ls-rec directory))))
+
+(defsubst helm--dir-file-name (file dir)
+  (expand-file-name
+   (substring file 0 (1- (length file))) dir))
 
 (defsubst helm--dir-name-p (str)
   (char-equal (aref str (1- (length str))) ?/))
