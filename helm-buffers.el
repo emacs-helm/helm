@@ -187,6 +187,7 @@ Only buffer names are fuzzy matched when this is enabled,
 
 (defvar helm-buffers-list-cache nil)
 (defvar helm-buffer-max-len-mode nil)
+(defvar helm-buffers-in-project-p nil)
 
 (defun helm-buffers-list--init ()
   ;; Issue #51 Create the list before `helm-buffer' creation.
@@ -852,7 +853,9 @@ Can be used by any source that list buffers."
   "Run `helm-buffers-browse-project' from key."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-buffers-browse-project)))
+      (if helm-buffers-in-project-p
+          (user-error "You are already browsing this project")
+          (helm-exit-and-execute-action 'helm-buffers-browse-project))))
 
 ;;; Candidate Transformers
 ;;
