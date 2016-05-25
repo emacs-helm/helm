@@ -74,7 +74,7 @@ A format string where %s will be replaced with `frame-width'."
 (defun helm-top-poll ()
   (when helm-top-poll-timer
     (cancel-timer helm-top-poll-timer))
-  (when helm-alive-p
+  (when (helm-alive-p)
     (helm-force-update))
   (add-hook 'helm-self-insert-hook 'helm-top-poll)
   (setq helm-top-poll-timer (run-with-idle-timer
