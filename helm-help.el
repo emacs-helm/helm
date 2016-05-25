@@ -185,6 +185,7 @@ Italic     => A non--file buffer.
 \\[helm-buffers-run-multi-occur]\t\tMulti Occur buffer or marked buffers. (C-u toggle force searching current-buffer).
 \\[helm-buffer-switch-other-window]\t\tSwitch other window.
 \\[helm-buffer-switch-other-frame]\t\tSwitch other frame.
+\\[helm-buffers-run-browse-project]\t\tBrowse Project from buffer.
 \\[helm-buffer-run-query-replace-regexp]\t\tQuery replace regexp in marked buffers.
 \\[helm-buffer-run-query-replace]\t\tQuery replace in marked buffers.
 \\[helm-buffer-run-ediff]\t\tEdiff current buffer with candidate.  If two marked buffers ediff those buffers.

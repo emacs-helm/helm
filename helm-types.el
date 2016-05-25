@@ -135,6 +135,8 @@
    (lambda () (and (locate-library "elscreen")
                    "Display buffer in Elscreen"))
    'helm-find-buffer-on-elscreen
+   "Browse project from buffer"
+   'helm-buffers-browse-project
    "Query replace regexp `C-M-%'"
    'helm-buffer-query-replace-regexp
    "Query replace `M-%'" 'helm-buffer-query-replace

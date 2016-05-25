@@ -153,6 +153,7 @@ Only buffer names are fuzzy matched when this is enabled,
     ;; So use zgrep for both as it is capable to handle non--compressed files.
     (define-key map (kbd "M-g s")     'helm-buffer-run-zgrep)
     (define-key map (kbd "C-s")       'helm-buffers-run-multi-occur)
+    (define-key map (kbd "C-x C-d")   'helm-buffers-run-browse-project)
     (define-key map (kbd "C-c o")     'helm-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'helm-buffer-switch-other-frame)
     (define-key map (kbd "C-c =")     'helm-buffer-run-ediff)
@@ -842,6 +843,16 @@ Can be used by any source that list buffers."
       (helm-force-update))))
 (put 'helm-buffers-toggle-show-hidden-buffers 'helm-only t)
 
+(defun helm-buffers-browse-project (buf)
+  "Browse project from buffer."
+  (with-current-buffer buf
+    (call-interactively 'helm-browse-project)))
+
+(defun helm-buffers-run-browse-project ()
+  "Run `helm-buffers-browse-project' from key."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-buffers-browse-project)))
 
 ;;; Candidate Transformers
 ;;
