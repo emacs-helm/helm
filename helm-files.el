@@ -3146,6 +3146,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                            (propertize c 'face 'helm-ff-file)))
                      :keymap helm-generic-files-map
                      :action 'helm-type-file-actions))
+        :ff-transformer-show-only-basename nil
         :buffer "*helm browse project*"))
 
 ;;;###autoload
