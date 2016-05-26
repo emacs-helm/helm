@@ -30,6 +30,7 @@
 (declare-function ido-make-buffer-list "ido" (default))
 (declare-function ido-add-virtual-buffers-to-list "ido")
 (declare-function helm-comp-read "helm-mode")
+(declare-function helm-browse-project "helm-files")
 
 
 (defgroup helm-buffers nil
