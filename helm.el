@@ -2631,6 +2631,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   "Clean up the mess when helm exit or quit."
   (helm-log "start cleanup")
   (with-current-buffer helm-buffer
+    (setq cursor-type t)
     ;; bury-buffer from this window.
     (bury-buffer) ;[1]
     (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
@@ -3969,8 +3970,10 @@ Key arg DIRECTION can be one of:
       (error (helm-log "%S" err)))))
 
 (defun helm-candidate-number-at-point ()
-  (with-helm-buffer
-    (or (get-text-property (point) 'helm-cand-num) 1)))
+  (if helm-alive-p
+      (with-helm-buffer
+        (or (get-text-property (point) 'helm-cand-num) 1))
+      (or (get-text-property (point) 'helm-cand-num) 1)))
 
 (defun helm--next-or-previous-line (direction &optional arg)
   ;; Be sure to not use this in non--interactives calls.
