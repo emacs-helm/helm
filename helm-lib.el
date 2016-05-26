@@ -617,16 +617,15 @@ instead of `helm-walk-ignore-directories'."
                                             'string-lessp)
                              unless (member f '("./" "../"))
                              ;; A directory.
-                             if (helm--dir-name-p f)
                              ;; Use `helm--dir-file-name' to remove the final slash.
                              ;; Needed to avoid infloop on directory symlinks.
-                             nconc (let ((file (helm--dir-file-name f dir)))
-                                     (if directories
-                                         (nconc (and (or (null match)
-                                                         (string-match match f))
-                                                     (list (funcall fn file)))
-                                                (ls-rec file))
-                                         (ls-rec file)))
+                             if (and (helm--dir-name-p f) (helm--dir-file-name f dir))
+                             nconc (if directories
+                                       (nconc (and (or (null match)
+                                                       (string-match match f))
+                                                   (list (funcall fn it)))
+                                              (ls-rec it))
+                                       (ls-rec it))
                              ;; A regular file.
                              else nconc
                              (when (or (null match) (string-match match f))
