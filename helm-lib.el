@@ -615,12 +615,11 @@ instead of `helm-walk-ignore-directories'."
                               (file-symlink-p dir))
                     (cl-loop for f in (sort (file-name-all-completions "" dir)
                                             'string-lessp)
-                             ;; Use `helm--dir-file-name' to remove the final slash.
-                             ;; Needed to avoid infloop on symlinks symlinking
-                             ;; a directory inside it.
                              unless (member f '("./" "../"))
                              ;; A directory.
                              if (helm--dir-name-p f)
+                             ;; Use `helm--dir-file-name' to remove the final slash.
+                             ;; Needed to avoid infloop on directory symlinks.
                              nconc (let ((file (helm--dir-file-name f dir)))
                                      (if directories
                                          (nconc (and (or (null match)
