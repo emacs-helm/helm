@@ -847,7 +847,7 @@ Can be used by any source that list buffers."
 (defun helm-buffers-browse-project (buf)
   "Browse project from buffer."
   (with-current-buffer buf
-    (call-interactively 'helm-browse-project)))
+    (helm-browse-project helm-current-prefix-arg)))
 
 (defun helm-buffers-run-browse-project ()
   "Run `helm-buffers-browse-project' from key."
