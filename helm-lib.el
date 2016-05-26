@@ -618,20 +618,20 @@ instead of `helm-walk-ignore-directories'."
                              ;; Use `helm--dir-file-name' to remove the final slash.
                              ;; Needed to avoid infloop on symlinks symlinking
                              ;; a directory inside it.
-                             for file = (helm--dir-file-name f dir)
                              unless (member f '("./" "../"))
                              ;; A directory.
                              if (helm--dir-name-p f)
-                             nconc (if directories
-                                       (nconc (and (or (null match)
-                                                       (string-match match f))
-                                                   (list (funcall fn file)))
-                                              (ls-rec file))
-                                       (ls-rec file))
+                             nconc (let ((file (helm--dir-file-name f dir)))
+                                     (if directories
+                                         (nconc (and (or (null match)
+                                                         (string-match match f))
+                                                     (list (funcall fn file)))
+                                                (ls-rec file))
+                                         (ls-rec file)))
                              ;; A regular file.
                              else nconc
                              (when (or (null match) (string-match match f))
-                               (list (funcall fn file)))))))
+                               (list (funcall fn (expand-file-name f dir))))))))
       (ls-rec directory))))
 
 (defsubst helm--dir-file-name (file dir)
