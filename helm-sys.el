@@ -84,8 +84,8 @@ A format string where %s will be replaced with `frame-width'."
           (add-hook 'helm-move-selection-after-hook 'helm-top-poll-no-update nil t)
           (setq helm-top-poll-timer (run-with-idle-timer
                                      (helm-aif (current-idle-time)
-                                         (time-add it (seconds-to-time 3))
-                                       3)
+                                         (time-add it (seconds-to-time 1.5))
+                                       1.5)
                                      nil
                                      'helm-top-poll)))
       (quit (cancel-timer helm-top-poll-timer)))))
