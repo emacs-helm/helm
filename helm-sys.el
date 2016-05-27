@@ -71,20 +71,27 @@ A format string where %s will be replaced with `frame-width'."
   "Local hook for helm-top.")
 
 (defvar helm-top-poll-timer nil)
-(defun helm-top-poll ()
+(defun helm-top-poll (&optional no-update)
   (when helm-top-poll-timer
     (cancel-timer helm-top-poll-timer))
-  (when (helm-alive-p)
-    (with-helm-quittable
-      (helm-force-update)))
-  (add-hook 'helm-self-insert-hook 'helm-top-poll)
-  (add-hook 'helm-move-selection-after-hook 'helm-top-poll)
-  (setq helm-top-poll-timer (run-with-idle-timer
-                         (helm-aif (current-idle-time)
-                             (time-add it (seconds-to-time 1))
-                           1)
-                         nil
-                         'helm-top-poll)))
+  (with-local-quit
+    (condition-case nil
+        (progn
+          (unless no-update
+            (when (helm-alive-p)
+              (helm-force-update)))
+          (add-hook 'helm-self-insert-hook 'helm-top-poll-no-update nil t)
+          (add-hook 'helm-move-selection-after-hook 'helm-top-poll-no-update nil t)
+          (setq helm-top-poll-timer (run-with-idle-timer
+                                     (helm-aif (current-idle-time)
+                                         (time-add it (seconds-to-time 3))
+                                       3)
+                                     nil
+                                     'helm-top-poll)))
+      (quit (cancel-timer helm-top-poll-timer)))))
+
+(defun helm-top-poll-no-update ()
+  (helm-top-poll t))
 
 ;;;###autoload
 (define-minor-mode helm-top-poll-mode
@@ -102,8 +109,8 @@ A format string where %s will be replaced with `frame-width'."
     :cleanup (lambda ()
                (when helm-top-poll-timer
                  (cancel-timer helm-top-poll-timer))
-               (remove-hook 'helm-self-insert-hook 'helm-top-poll)
-               (remove-hook 'helm-move-selection-after-hook 'helm-top-poll))
+               (remove-hook 'helm-self-insert-hook 'helm-top-poll-no-update)
+               (remove-hook 'helm-move-selection-after-hook 'helm-top-poll-no-update))
     :nomark t
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
