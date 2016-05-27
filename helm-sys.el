@@ -67,10 +67,40 @@ A format string where %s will be replaced with `frame-width'."
     (define-key map (kbd "M-U")   'helm-top-run-sort-by-user)
     map))
 
+(defvar helm-top-after-init-hook nil
+  "Local hook for helm-top.")
+
+(defvar helm-top-poll-timer nil)
+(defun helm-top-poll ()
+  (when helm-top-poll-timer
+    (cancel-timer helm-top-poll-timer))
+  (when helm-alive-p
+    (helm-force-update))
+  (add-hook 'helm-self-insert-hook 'helm-top-poll)
+  (setq helm-top-poll-timer (run-with-idle-timer
+                         (helm-aif (current-idle-time)
+                             (time-add it (seconds-to-time 1))
+                           1)
+                         nil
+                         'helm-top-poll)))
+
+;;;###autoload
+(define-minor-mode helm-top-poll-mode
+    "Refresh automatically helm top buffer once enabled."
+  :group 'helm-top
+  (if helm-top-poll-mode
+      (add-hook 'helm-top-after-init-hook 'helm-top-poll)
+      (remove-hook 'helm-top-after-init-hook 'helm-top-poll)))
+
 (defvar helm-source-top
   (helm-build-in-buffer-source "Top"
     :header-name (lambda (name) (concat name " (Press C-c C-u to refresh)"))
     :init #'helm-top-init
+    :after-init-hook 'helm-top-after-init-hook
+    :cleanup (lambda ()
+               (when helm-top-poll-timer
+                 (cancel-timer helm-top-poll-timer))
+               (remove-hook 'helm-self-insert-hook 'helm-top-poll))
     :nomark t
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
