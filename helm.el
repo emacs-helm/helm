@@ -2681,14 +2681,12 @@ WARNING: Do not use this mode yourself, it is internal to helm."
                               (minibuffer-window))
       (helm-check-new-input (minibuffer-contents)))))
 
-(defvar helm-self-insert-hook nil)
 (defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary."
   (unless (equal input helm-pattern)
     (setq helm-pattern input)
     (unless (helm-action-window)
       (setq helm-input helm-pattern))
-    (helm-log-run-hook 'helm-self-insert-hook)
     (helm-log "helm-pattern = %S" helm-pattern)
     (helm-log "helm-input = %S" helm-input)
     (setq helm--in-update t)
