@@ -67,10 +67,63 @@ A format string where %s will be replaced with `frame-width'."
     (define-key map (kbd "M-U")   'helm-top-run-sort-by-user)
     map))
 
+(defvar helm-top-after-init-hook nil
+  "Local hook for helm-top.")
+
+(defvar helm-top-poll-timer nil)
+(defun helm-top-poll (&optional no-update)
+  (when helm-top-poll-timer
+    (cancel-timer helm-top-poll-timer))
+  (condition-case nil
+      (progn
+        (when (and (helm-alive-p) (null no-update))
+          ;; Fix quitting while process is running
+          ;; by binding `with-local-quit' in init function
+          ;; Issue #1521.
+          (helm-force-update))
+        (setq helm-top-poll-timer (run-with-idle-timer
+                                   (helm-aif (current-idle-time)
+                                       (time-add it (seconds-to-time 1.5))
+                                     1.5)
+                                   nil
+                                   'helm-top-poll)))
+    (quit (cancel-timer helm-top-poll-timer))))
+
+(defun helm-top-poll-no-update ()
+  (helm-top-poll t))
+
+(defun helm-top-initialize-poll-hooks ()
+  ;; When emacs is idle during say 20s
+  ;; the idle timer will run in 20+1.5 s.
+  ;; This is fine when emacs stays idle, because the next timer
+  ;; will run at 21.5+1.5 etc... so the display will be updated
+  ;; at every 1.5 seconds.
+  ;; But as soon as emacs looses its idleness, the next update
+  ;; will occur at say 21+1.5 s, so we have to reinitialize
+  ;; the timer at 0+1.5.
+  (add-hook 'post-command-hook 'helm-top-poll-no-update)
+  (add-hook 'focus-in-hook 'helm-top-poll-no-update))
+
+;;;###autoload
+(define-minor-mode helm-top-poll-mode
+    "Refresh automatically helm top buffer once enabled."
+  :group 'helm-top
+  (if helm-top-poll-mode
+      (progn
+        (add-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)
+        (add-hook 'helm-top-after-init-hook 'helm-top-initialize-poll-hooks))
+      (remove-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)))
+
 (defvar helm-source-top
   (helm-build-in-buffer-source "Top"
     :header-name (lambda (name) (concat name " (Press C-c C-u to refresh)"))
     :init #'helm-top-init
+    :after-init-hook 'helm-top-after-init-hook
+    :cleanup (lambda ()
+               (when helm-top-poll-timer
+                 (cancel-timer helm-top-poll-timer))
+               (remove-hook 'post-command-hook 'helm-top-poll-no-update)
+               (remove-hook 'focus-in-hook 'helm-top-poll-no-update))
     :nomark t
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
@@ -136,11 +189,12 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
-  (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (call-process-shell-command
-     (format helm-top-command (frame-width))
-     nil (current-buffer))))
+  (with-local-quit
+    (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
+    (with-current-buffer (helm-candidate-buffer 'global)
+      (call-process-shell-command
+       (format helm-top-command (frame-width))
+       nil (current-buffer)))))
 
 (defun helm-top-display-to-real (line)
   "Return pid only from LINE."
