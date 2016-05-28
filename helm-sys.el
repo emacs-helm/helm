@@ -74,19 +74,17 @@ A format string where %s will be replaced with `frame-width'."
 (defun helm-top-poll (&optional no-update)
   (when helm-top-poll-timer
     (cancel-timer helm-top-poll-timer))
-  (with-local-quit
-    (condition-case nil
-        (progn
-          (unless no-update
-            (when (helm-alive-p)
-              (helm-force-update)))
-          (setq helm-top-poll-timer (run-with-idle-timer
-                                     (helm-aif (current-idle-time)
-                                         (time-add it (seconds-to-time 1.5))
-                                       1.5)
-                                     nil
-                                     'helm-top-poll)))
-      (quit (cancel-timer helm-top-poll-timer)))))
+  (condition-case nil
+      (progn
+        (when (and (helm-alive-p) (null no-update))
+          (with-local-quit (helm-force-update)))
+        (setq helm-top-poll-timer (run-with-idle-timer
+                                   (helm-aif (current-idle-time)
+                                       (time-add it (seconds-to-time 1.5))
+                                     1.5)
+                                   nil
+                                   'helm-top-poll)))
+    (quit (cancel-timer helm-top-poll-timer))))
 
 (defun helm-top-poll-no-update ()
   (helm-top-poll t))
