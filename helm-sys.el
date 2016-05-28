@@ -77,6 +77,14 @@ A format string where %s will be replaced with `frame-width'."
   (condition-case nil
       (progn
         (when (and (helm-alive-p) (null no-update))
+          ;; FIXME When C-g'ing while the top process is running,
+          ;; (hard to catch)
+          ;; if user don't wait the prompt to be back
+          ;; after "Waiting for process to die...done",
+          ;; and hit quickly again C-g, this may lead
+          ;; to an error when restarting helm though
+          ;; second call restore immediately this bad state.
+          ;; This bug is difficult to reproduce though.
           (with-local-quit (helm-force-update)))
         (setq helm-top-poll-timer (run-with-idle-timer
                                    (helm-aif (current-idle-time)
