@@ -98,7 +98,8 @@ A format string where %s will be replaced with `frame-width'."
   ;; But as soon as emacs looses its idleness, the next update
   ;; will occur at say 21+1.5 s, so we have to reinitialize
   ;; the timer at 0+1.5.
-  (add-hook 'post-command-hook 'helm-top-poll-no-update))
+  (add-hook 'post-command-hook 'helm-top-poll-no-update)
+  (add-hook 'focus-in-hook 'helm-top-poll-no-update))
 
 ;;;###autoload
 (define-minor-mode helm-top-poll-mode
@@ -118,7 +119,8 @@ A format string where %s will be replaced with `frame-width'."
     :cleanup (lambda ()
                (when helm-top-poll-timer
                  (cancel-timer helm-top-poll-timer))
-               (remove-hook 'post-command-hook 'helm-top-poll-no-update))
+               (remove-hook 'post-command-hook 'helm-top-poll-no-update)
+               (remove-hook 'focus-in-hook 'helm-top-poll-no-update))
     :nomark t
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
