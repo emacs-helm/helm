@@ -77,15 +77,10 @@ A format string where %s will be replaced with `frame-width'."
   (condition-case nil
       (progn
         (when (and (helm-alive-p) (null no-update))
-          ;; FIXME When C-g'ing while the top process is running,
-          ;; (hard to catch)
-          ;; if user don't wait the prompt to be back
-          ;; after "Waiting for process to die...done",
-          ;; and hit quickly again C-g, this may lead
-          ;; to an error when restarting helm though
-          ;; second call restore immediately this bad state.
-          ;; This bug is difficult to reproduce though.
-          (with-local-quit (helm-force-update)))
+          ;; Fix quitting while process is running
+          ;; by binding `with-local-quit' in init function
+          ;; Issue #1521.
+          (helm-force-update))
         (setq helm-top-poll-timer (run-with-idle-timer
                                    (helm-aif (current-idle-time)
                                        (time-add it (seconds-to-time 1.5))
@@ -194,11 +189,12 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
-  (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (call-process-shell-command
-     (format helm-top-command (frame-width))
-     nil (current-buffer))))
+  (with-local-quit
+    (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
+    (with-current-buffer (helm-candidate-buffer 'global)
+      (call-process-shell-command
+       (format helm-top-command (frame-width))
+       nil (current-buffer)))))
 
 (defun helm-top-display-to-real (line)
   "Return pid only from LINE."
