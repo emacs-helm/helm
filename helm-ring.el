@@ -115,6 +115,12 @@ If this action is executed just after `yank',
 replace with STR as yanked string."
   (with-helm-current-buffer
     (setq kill-ring (delete str kill-ring))
+    ;; Adding a `delete-selection' property
+    ;; to `helm-kill-ring-action' is not working
+    ;; because `this-command' will be `helm-maybe-exit-minibuffer',
+    ;; so use this workaround (Issue #1520).
+    (when (and (region-active-p) delete-selection-mode)
+      (delete-region (region-beginning) (region-end)))
     (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
         (insert-for-yank str)
       ;; from `yank-pop'
