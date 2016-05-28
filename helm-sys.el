@@ -80,8 +80,6 @@ A format string where %s will be replaced with `frame-width'."
           (unless no-update
             (when (helm-alive-p)
               (helm-force-update)))
-          (add-hook 'helm-self-insert-hook 'helm-top-poll-no-update nil t)
-          (add-hook 'helm-move-selection-after-hook 'helm-top-poll-no-update nil t)
           (setq helm-top-poll-timer (run-with-idle-timer
                                      (helm-aif (current-idle-time)
                                          (time-add it (seconds-to-time 1.5))
@@ -93,13 +91,30 @@ A format string where %s will be replaced with `frame-width'."
 (defun helm-top-poll-no-update ()
   (helm-top-poll t))
 
+(defun helm-top-initialize-poll-hooks ()
+  ;; When emacs is idle during say 20s
+  ;; the idle timer will run in 20+1.5 s.
+  ;; This is fine when emacs stays idle, because the next timer
+  ;; will run at 21.5+1.5 etc... so the display will be updated
+  ;; at every 1.5 seconds.
+  ;; But as soon as emacs looses its idleness, the next update
+  ;; will occur at say 21+1.5 s, so we have to reinitialize
+  ;; the timer at 0+1.5.
+  ;; FIXME In some other cases these hooks are not enough
+  ;; e.g when emacs loose focus and getback focus, none of
+  ;; the hooks below run.
+  (add-hook 'helm-self-insert-hook 'helm-top-poll-no-update)
+  (add-hook 'helm-move-selection-after-hook 'helm-top-poll-no-update))
+
 ;;;###autoload
 (define-minor-mode helm-top-poll-mode
     "Refresh automatically helm top buffer once enabled."
   :group 'helm-top
   (if helm-top-poll-mode
-      (add-hook 'helm-top-after-init-hook 'helm-top-poll)
-      (remove-hook 'helm-top-after-init-hook 'helm-top-poll)))
+      (progn
+        (add-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)
+        (add-hook 'helm-top-after-init-hook 'helm-top-initialize-poll-hooks))
+      (remove-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)))
 
 (defvar helm-source-top
   (helm-build-in-buffer-source "Top"
