@@ -82,9 +82,7 @@ A format string where %s will be replaced with `frame-width'."
           ;; Issue #1521.
           (helm-force-update (replace-regexp-in-string
                               "[0-9]+" "[0-9]+"
-                              (replace-regexp-in-string
-                              "[0-9]+" "[0-9]+"
-                              (regexp-quote (helm-get-selection nil t))))))
+                              (regexp-quote (helm-get-selection nil t)))))
         (setq helm-top-poll-timer (run-with-idle-timer
                                    (helm-aif (current-idle-time)
                                        (time-add it (seconds-to-time 1.5))
