@@ -82,7 +82,9 @@ A format string where %s will be replaced with `frame-width'."
           ;; Issue #1521.
           (helm-force-update (replace-regexp-in-string
                               "[0-9]+" "[0-9]+"
-                              (regexp-quote (helm-get-selection nil t)))))
+                              (replace-regexp-in-string
+                              "[0-9]+" "[0-9]+"
+                              (regexp-quote (helm-get-selection nil t))))))
         (setq helm-top-poll-timer (run-with-idle-timer
                                    (helm-aif (current-idle-time)
                                        (time-add it (seconds-to-time 1.5))
@@ -247,25 +249,33 @@ Show actions only on line starting by a PID."
   (interactive)
   (helm-top-set-mode-line "COM")
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
-  (helm-update (regexp-quote (helm-get-selection nil t))))
+  (helm-update (replace-regexp-in-string
+                "[0-9]+" "[0-9]+"
+                (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
   (helm-top-set-mode-line "CPU")
   (setq helm-top-sort-fn nil)
-  (helm-update (regexp-quote (helm-get-selection nil t))))
+  (helm-update (replace-regexp-in-string
+                "[0-9]+" "[0-9]+"
+                (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-top-run-sort-by-mem ()
   (interactive)
   (helm-top-set-mode-line "MEM")
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
-  (helm-update (regexp-quote (helm-get-selection nil t))))
+  (helm-update (replace-regexp-in-string
+                "[0-9]+" "[0-9]+"
+                (regexp-quote (helm-get-selection nil t)))))
 
 (defun helm-top-run-sort-by-user ()
   (interactive)
   (helm-top-set-mode-line "USER")
   (setq helm-top-sort-fn 'helm-top-sort-by-user)
-  (helm-update (regexp-quote (helm-get-selection nil t))))
+  (helm-update (replace-regexp-in-string
+                "[0-9]+" "[0-9]+"
+                (regexp-quote (helm-get-selection nil t)))))
 
 
 ;;; X RandR resolution change
