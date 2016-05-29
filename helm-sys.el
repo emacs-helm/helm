@@ -82,11 +82,11 @@ being idle."
 (defvar helm-top-after-init-hook nil
   "Local hook for helm-top.")
 
-(defvar helm-top-poll-timer nil)
+(defvar helm-top--poll-timer nil)
 
 (defun helm-top-poll (&optional no-update delay)
-  (when helm-top-poll-timer
-    (cancel-timer helm-top-poll-timer))
+  (when helm-top--poll-timer
+    (cancel-timer helm-top--poll-timer))
   (condition-case nil
       (progn
         (when (and (helm-alive-p) (null no-update))
@@ -101,7 +101,7 @@ being idle."
            (replace-regexp-in-string
             "[0-9]+" "[0-9]+"
             (regexp-quote (helm-get-selection nil t)))))
-        (setq helm-top-poll-timer
+        (setq helm-top--poll-timer
               (run-with-idle-timer
                (helm-aif (current-idle-time)
                    (time-add it (seconds-to-time
@@ -109,7 +109,7 @@ being idle."
                  (or delay (helm-top--poll-delay)))
                nil
                'helm-top-poll)))
-    (quit (cancel-timer helm-top-poll-timer))))
+    (quit (cancel-timer helm-top--poll-timer))))
 
 (defun helm-top--poll-delay ()
   (max 1.5 helm-top-poll-delay))
@@ -146,8 +146,8 @@ being idle."
     :init #'helm-top-init
     :after-init-hook 'helm-top-after-init-hook
     :cleanup (lambda ()
-               (when helm-top-poll-timer
-                 (cancel-timer helm-top-poll-timer))
+               (when helm-top--poll-timer
+                 (cancel-timer helm-top--poll-timer))
                (remove-hook 'post-command-hook 'helm-top-poll-no-update)
                (remove-hook 'focus-in-hook 'helm-top-poll-no-update))
     :nomark t
