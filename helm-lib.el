@@ -611,31 +611,31 @@ instead of `helm-walk-ignore-directories'."
                (relative 'file-relative-name)
                (full     'identity)
                (t        path)))) ; A function.
+    (setq skip-subdirs (if (listp skip-subdirs)
+                           skip-subdirs
+                           helm-walk-ignore-directories))
     (cl-labels ((ls-rec (dir)
-                  (unless (or (and skip-subdirs
-                                   (member (helm-basename dir)
-                                           (if (listp skip-subdirs)
-                                               skip-subdirs
-                                               helm-walk-ignore-directories)))
-                              (file-symlink-p dir))
+                  (unless (file-symlink-p dir)
                     (cl-loop for f in (sort (file-name-all-completions "" dir)
                                             'string-lessp)
                              unless (member f '("./" "../"))
                              ;; A directory.
                              ;; Use `helm--dir-file-name' to remove the final slash.
                              ;; Needed to avoid infloop on directory symlinks.
-                             if (and (helm--dir-name-p f) (helm--dir-file-name f dir))
-                             nconc (if directories
-                                       (nconc (and (or (null match)
-                                                       (string-match match f))
-                                                   (list (concat (funcall fn it) "/")))
-                                              (ls-rec it))
-                                       (ls-rec it))
-                             ;; A regular file.
-                             else
-                             unless (eq directories 'only)
+                             if (and (helm--dir-name-p f)
+                                     (helm--dir-file-name f dir))
                              nconc
-                             (when (or (null match) (string-match match f))
+                             (unless (member (helm-basename it) skip-subdirs)
+                               (if directories
+                                   (nconc (and (or (null match)
+                                                   (string-match match f))
+                                               (list (concat (funcall fn it) "/")))
+                                          (ls-rec it))
+                                   (ls-rec it)))
+                             ;; A regular file.
+                             else nconc
+                             (when (and (null (eq directories 'only))
+                                        (or (null match) (string-match match f)))
                                (list (funcall fn (expand-file-name f dir))))))))
       (ls-rec directory))))
 
