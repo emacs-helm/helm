@@ -593,13 +593,18 @@ Useful in dired buffers when there is inserted subdirs."
                                          directories
                                          match skip-subdirs)
   "Walk through DIRECTORY tree.
+
 Argument PATH can be one of basename, relative, full, or a function
 called on file name, default to basename.
+
 Argument DIRECTORIES when non--nil (default) return also directories names,
-otherwise skip directories names.
+otherwise skip directories names, with a value of 'only returns
+only subdirectories, i.e files are skipped.
+
 Argument MATCH is a regexp matching files or directories.
-Argument SKIP-SUBDIRS when non--nil will skip `helm-walk-ignore-directories'
-unless it is given as a list of directories, in this case this list will be used
+
+Argument SKIP-SUBDIRS when `t' will skip `helm-walk-ignore-directories'
+otherwise if it is given as a list of directories, this list will be used
 instead of `helm-walk-ignore-directories'."
   (let ((fn (cl-case path
                (basename 'file-name-nondirectory)
@@ -623,11 +628,13 @@ instead of `helm-walk-ignore-directories'."
                              nconc (if directories
                                        (nconc (and (or (null match)
                                                        (string-match match f))
-                                                   (list (funcall fn it)))
+                                                   (list (concat (funcall fn it) "/")))
                                               (ls-rec it))
                                        (ls-rec it))
                              ;; A regular file.
-                             else nconc
+                             else
+                             unless (eq directories 'only)
+                             nconc
                              (when (or (null match) (string-match match f))
                                (list (funcall fn (expand-file-name f dir))))))))
       (ls-rec directory))))
