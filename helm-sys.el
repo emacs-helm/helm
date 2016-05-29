@@ -53,6 +53,18 @@ A format string where %s will be replaced with `frame-width'."
   :type 'string
   :set  'helm-top-command-set-fn)
 
+(defcustom helm-top-poll-delay 1.5
+  "Helm top poll after this dealy when `helm-top-poll-mode' is enabled.
+The minimal delay allowed is 1.5, if less than this helm-top will use 1.5."
+  :group 'helm-sys
+  :type  'float)
+
+(defcustom helm-top-poll-delay-post-command 1.0
+  "Helm top stop polling during this delay.
+This delay is additioned to `helm-top-poll-delay' after emacs stop
+being idle."
+  :group 'helm-sys
+  :type 'float)
 
 ;;; Top (process)
 ;;
@@ -71,7 +83,8 @@ A format string where %s will be replaced with `frame-width'."
   "Local hook for helm-top.")
 
 (defvar helm-top-poll-timer nil)
-(defun helm-top-poll (&optional no-update)
+
+(defun helm-top-poll (&optional no-update delay)
   (when helm-top-poll-timer
     (cancel-timer helm-top-poll-timer))
   (condition-case nil
@@ -80,19 +93,30 @@ A format string where %s will be replaced with `frame-width'."
           ;; Fix quitting while process is running
           ;; by binding `with-local-quit' in init function
           ;; Issue #1521.
-          (helm-force-update (replace-regexp-in-string
-                              "[0-9]+" "[0-9]+"
-                              (regexp-quote (helm-get-selection nil t)))))
-        (setq helm-top-poll-timer (run-with-idle-timer
-                                   (helm-aif (current-idle-time)
-                                       (time-add it (seconds-to-time 1.5))
-                                     1.5)
-                                   nil
-                                   'helm-top-poll)))
+          (helm-force-update
+           ;; FIXME It is fine to preselect candidate
+           ;; but htop is just staying at the same line
+           ;; without taking care of the current candidate at point.
+           ;; Dunno what's the best.
+           (replace-regexp-in-string
+            "[0-9]+" "[0-9]+"
+            (regexp-quote (helm-get-selection nil t)))))
+        (setq helm-top-poll-timer
+              (run-with-idle-timer
+               (helm-aif (current-idle-time)
+                   (time-add it (seconds-to-time
+                                 (or delay (helm-top--poll-delay))))
+                 (or delay (helm-top--poll-delay)))
+               nil
+               'helm-top-poll)))
     (quit (cancel-timer helm-top-poll-timer))))
 
+(defun helm-top--poll-delay ()
+  (max 1.5 helm-top-poll-delay))
+
 (defun helm-top-poll-no-update ()
-  (helm-top-poll t))
+  (helm-top-poll t (+ (helm-top--poll-delay)
+                      helm-top-poll-delay-post-command)))
 
 (defun helm-top-initialize-poll-hooks ()
   ;; When emacs is idle during say 20s
