@@ -2415,7 +2415,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           (t
            (helm-ff-kill-or-find-buffer-fname candidate)))))
 
-;;; Recursive dirs
+
+;;; Recursive dirs completion
 (defvar helm--ff-recursive-cache (make-hash-table :test 'equal))
 (defun helm-find-files-recursive-dirs (directory &optional refresh input)
   (when refresh (remhash directory helm--ff-recursive-cache))
@@ -2430,10 +2431,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                   (format
                                    "%s (%s)"
                                    name (abbreviate-file-name directory)))
-                   :match-part (lambda (c)
-                                 (if (with-helm-buffer
-                                       helm-ff-transformer-show-only-basename)
-                                     (helm-basename c) c))
+                   :match-part (lambda (c) (helm-basename c))
                    :filter-one-by-one
                    (lambda (c)
                      (if (with-helm-buffer
