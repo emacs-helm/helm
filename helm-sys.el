@@ -65,6 +65,14 @@ This delay is additioned to `helm-top-poll-delay' after emacs stop
 being idle."
   :group 'helm-sys
   :type 'float)
+
+(defcustom helm-top-poll-preselection 'linum
+  "Stay on same line or follow candidate when `helm-top-poll' update display.
+Possible values are 'candidate or 'linum."
+  :group'helm-sys
+  :type '(radio :tag "Preferred preselection action for helm-top"
+          (const :tag "Follow candidate" candidate)
+          (const :tag "Stay on same line" linum)))
 
 ;;; Top (process)
 ;;
@@ -98,9 +106,13 @@ being idle."
            ;; but htop is just staying at the same line
            ;; without taking care of the current candidate at point.
            ;; Dunno what's the best.
-           (replace-regexp-in-string
-            "[0-9]+" "[0-9]+"
-            (regexp-quote (helm-get-selection nil t)))))
+           (cl-ecase helm-top-poll-preselection
+             (candidate (replace-regexp-in-string
+                         "[0-9]+" "[0-9]+"
+                         (regexp-quote (helm-get-selection nil t))))
+             (linum `(lambda ()
+                       (goto-char (point-min))
+                       (forward-line ,(helm-candidate-number-at-point)))))))
         (setq helm-top--poll-timer
               (run-with-idle-timer
                (helm-aif (current-idle-time)

@@ -4303,15 +4303,17 @@ want to preselect."
           (helm-goto-source source)
           (goto-char (point-min))
           (forward-line 1))
-      (let ((start (point)) mp)
-        (helm-awhile (if (consp candidate-or-regexp)
-                         (and (re-search-forward (car candidate-or-regexp) nil t)
-                              (re-search-forward (cdr candidate-or-regexp) nil t))
-                         (re-search-forward candidate-or-regexp nil t))
-          ;; If search fall on an header line continue loop
-          ;; until it match or fail (Issue #1509).
-          (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
-        (goto-char (or mp start))))
+      (if (functionp candidate-or-regexp)
+          (funcall candidate-or-regexp)
+          (let ((start (point)) mp)
+            (helm-awhile (if (consp candidate-or-regexp)
+                             (and (re-search-forward (car candidate-or-regexp) nil t)
+                                  (re-search-forward (cdr candidate-or-regexp) nil t))
+                             (re-search-forward candidate-or-regexp nil t))
+              ;; If search fall on an header line continue loop
+              ;; until it match or fail (Issue #1509).
+              (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
+            (goto-char (or mp start)))))
     (forward-line 0) ; Avoid scrolling right on long lines.
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
