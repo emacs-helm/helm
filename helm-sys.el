@@ -146,15 +146,20 @@ Possible values are 'candidate or 'linum."
 (define-minor-mode helm-top-poll-mode
     "Refresh automatically helm top buffer once enabled."
   :group 'helm-top
+  :global t
   (if helm-top-poll-mode
       (progn
         (add-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)
         (add-hook 'helm-top-after-init-hook 'helm-top-initialize-poll-hooks))
-      (remove-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)))
+      (remove-hook 'helm-top-after-init-hook 'helm-top-poll-no-update)
+      (remove-hook 'helm-top-after-init-hook 'helm-top-initialize-poll-hooks)))
 
 (defvar helm-source-top
   (helm-build-in-buffer-source "Top"
-    :header-name (lambda (name) (concat name " (Press C-c C-u to refresh)"))
+    :header-name (lambda (name)
+                   (concat name (if helm-top-poll-mode
+                                    " (auto updating)"
+                                    " (Press C-c C-u to refresh)")))
     :init #'helm-top-init
     :after-init-hook 'helm-top-after-init-hook
     :cleanup (lambda ()
