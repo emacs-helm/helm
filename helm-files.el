@@ -2405,10 +2405,66 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (file-name-directory candidate))
                 (helm-ff-file-compressed-p candidate))
            (funcall insert-in-minibuffer (concat candidate "#")))
+          ((and (not (file-exists-p candidate))
+                (string-match-p "/\\'" candidate))
+           (helm-ff-run-recursive-dirs))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
            (helm-ff-kill-or-find-buffer-fname candidate)))))
+
+;;; Recursive dirs
+(defvar helm--ff-recursive-cache (make-hash-table :test 'equal))
+(defun helm-find-files-recursive-dirs (directory &optional refresh)
+  (when refresh (remhash directory helm--ff-recursive-cache))
+  (unless (gethash directory helm--ff-recursive-cache)
+    (puthash directory (helm-walk-directory
+                        directory
+                        :directories 'only :path 'relative :skip-subdirs t)
+             helm--ff-recursive-cache))
+  (helm :sources (helm-build-in-buffer-source "Recursive directories"
+                   :data (gethash directory helm--ff-recursive-cache)
+                   :header-name (lambda (name)
+                                  (format
+                                   "%s (%s)"
+                                   name (abbreviate-file-name directory)))
+                   :match-part (lambda (c)
+                                 (if (with-helm-buffer
+                                       helm-ff-transformer-show-only-basename)
+                                     (helm-basename c) c))
+                   :filter-one-by-one
+                   (lambda (c)
+                     (if (with-helm-buffer
+                           helm-ff-transformer-show-only-basename)
+                         (cons (propertize (helm-basename c)
+                                           'face 'helm-ff-directory)
+                               c)
+                         (propertize c 'face 'helm-ff-directory)))
+                   :keymap helm-generic-files-map
+                   :action (lambda (c)
+                             (helm-find-files-1 (expand-file-name c directory))))
+        :ff-transformer-show-only-basename nil
+        :buffer "*helm recursive dirs*"))
+
+(defun helm-find-files-recurse (arg)
+  (interactive "P")
+  (let ((cur-dir (helm-browse-project-get--root-dir
+                  (helm-current-directory))))
+    (helm-find-files-recursive-dirs cur-dir arg)))
+
+(defun helm-ff-recursive-dirs (_candidate)
+  "Browse project in current directory.
+See `helm-browse-project'."
+  (with-helm-default-directory helm-ff-default-directory
+      (helm-find-files-recurse helm-current-prefix-arg)))
+
+(defun helm-ff-run-recursive-dirs ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
+(put 'helm-ff-run-recursive-dirs 'helm-only t)
+
+(define-key helm-find-files-map (kbd "C-x C-r") 'helm-ff-run-recursive-dirs)
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
