@@ -2415,7 +2415,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 ;;; Recursive dirs
 (defvar helm--ff-recursive-cache (make-hash-table :test 'equal))
-(defun helm-find-files-recursive-dirs (directory &optional refresh)
+(defun helm-find-files-recursive-dirs (directory &optional refresh input)
   (when refresh (remhash directory helm--ff-recursive-cache))
   (unless (gethash directory helm--ff-recursive-cache)
     (puthash directory (helm-walk-directory
@@ -2444,13 +2444,15 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                    :action (lambda (c)
                              (helm-find-files-1 (expand-file-name c directory))))
         :ff-transformer-show-only-basename nil
+        :input input
         :buffer "*helm recursive dirs*"))
 
 (defun helm-find-files-recurse (arg)
   (interactive "P")
   (let ((cur-dir (helm-browse-project-get--root-dir
                   (helm-current-directory))))
-    (helm-find-files-recursive-dirs cur-dir arg)))
+    (helm-find-files-recursive-dirs cur-dir arg
+                                    (helm-basename (helm-get-selection)))))
 
 (defun helm-ff-recursive-dirs (_candidate)
   "Browse project in current directory.
