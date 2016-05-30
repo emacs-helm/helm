@@ -102,10 +102,6 @@ Possible values are 'candidate or 'linum."
           ;; by binding `with-local-quit' in init function
           ;; Issue #1521.
           (helm-force-update
-           ;; FIXME It is fine to preselect candidate
-           ;; but htop is just staying at the same line
-           ;; without taking care of the current candidate at point.
-           ;; Dunno what's the best.
            (cl-ecase helm-top-poll-preselection
              (candidate (replace-regexp-in-string
                          "[0-9]+" "[0-9]+"
