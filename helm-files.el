@@ -2405,6 +2405,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (file-name-directory candidate))
                 (helm-ff-file-compressed-p candidate))
            (funcall insert-in-minibuffer (concat candidate "#")))
+          ;; File doesn't exists and ends with "/"
+          ;; Start a recursive search for directories.
           ((and (not (file-exists-p candidate))
                 (string-match-p "/\\'" candidate))
            (helm-ff-run-recursive-dirs))
@@ -2447,18 +2449,15 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
         :input input
         :buffer "*helm recursive dirs*"))
 
-(defun helm-find-files-recurse (arg)
-  (interactive "P")
-  (let ((cur-dir (helm-browse-project-get--root-dir
-                  (helm-current-directory))))
-    (helm-find-files-recursive-dirs cur-dir arg
-                                    (helm-basename (helm-get-selection)))))
-
 (defun helm-ff-recursive-dirs (_candidate)
   "Browse project in current directory.
 See `helm-browse-project'."
   (with-helm-default-directory helm-ff-default-directory
-      (helm-find-files-recurse helm-current-prefix-arg)))
+      (let ((cur-dir (helm-browse-project-get--root-dir
+                      (helm-current-directory))))
+        (helm-find-files-recursive-dirs
+         cur-dir helm-current-prefix-arg
+         (helm-basename (helm-get-selection))))))
 
 (defun helm-ff-run-recursive-dirs ()
   (interactive)
@@ -2466,7 +2465,7 @@ See `helm-browse-project'."
     (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
 (put 'helm-ff-run-recursive-dirs 'helm-only t)
 
-(define-key helm-find-files-map (kbd "C-x C-r") 'helm-ff-run-recursive-dirs)
+;; (define-key helm-find-files-map (kbd "C-x C-r") 'helm-ff-run-recursive-dirs)
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
