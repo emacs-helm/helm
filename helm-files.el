@@ -2417,16 +2417,12 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 
 ;;; Recursive dirs completion
-(defvar helm--ff-recursive-cache (make-hash-table :test 'equal))
-(defun helm-find-files-recursive-dirs (directory &optional refresh input)
-  (when refresh (remhash directory helm--ff-recursive-cache))
-  (unless (gethash directory helm--ff-recursive-cache)
-    (puthash directory (helm-walk-directory
-                        directory
-                        :directories 'only :match input :path 'relative :skip-subdirs t)
-             helm--ff-recursive-cache))
+(defun helm-find-files-recursive-dirs (directory &optional input)
   (helm :sources (helm-build-in-buffer-source "Recursive directories"
-                   :data (gethash directory helm--ff-recursive-cache)
+                   :data (helm-walk-directory
+                          directory
+                          :directories 'only :match input
+                          :path 'relative :skip-subdirs t)
                    :header-name (lambda (name)
                                   (format
                                    "%s (%s)"
@@ -2454,8 +2450,7 @@ See `helm-browse-project'."
       (let ((cur-dir (helm-browse-project-get--root-dir
                       (helm-current-directory))))
         (helm-find-files-recursive-dirs
-         cur-dir helm-current-prefix-arg
-         (helm-basename (helm-get-selection))))))
+         cur-dir (helm-basename (helm-get-selection))))))
 
 (defun helm-ff-run-recursive-dirs ()
   (interactive)
