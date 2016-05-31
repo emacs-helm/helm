@@ -2418,6 +2418,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 ;;; Recursive dirs completion
 (defun helm-find-files-recursive-dirs (directory &optional input)
+  (message "Recursively searching %s from %s ..."
+           input (abbreviate-file-name directory))
   (helm :sources (helm-build-in-buffer-source "Recursive directories"
                    :data (helm-walk-directory
                           directory
