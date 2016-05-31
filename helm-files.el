@@ -2408,6 +2408,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; File doesn't exists and ends with "/"
           ;; Start a recursive search for directories.
           ((and (not (file-exists-p candidate))
+                (not (file-remote-p candidate))
                 (string-match-p "/\\'" candidate))
            (helm-ff-run-recursive-dirs))
           ;; On second hit we open file.
@@ -2417,6 +2418,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 
 ;;; Recursive dirs completion
+;;
 (defun helm-find-files-recursive-dirs (directory &optional input)
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
@@ -2446,15 +2448,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
         :buffer "*helm recursive dirs*"))
 
 (defun helm-ff-recursive-dirs (_candidate)
-  "Browse project in current directory.
-See `helm-browse-project'."
+  "Launch a recursive search in `helm-ff-default-directory'."
   (with-helm-default-directory helm-ff-default-directory
-      (let ((cur-dir (helm-browse-project-get--root-dir
-                      (helm-current-directory))))
-        (helm-find-files-recursive-dirs
-         cur-dir (helm-basename (helm-get-selection))))))
+      (helm-find-files-recursive-dirs
+       (helm-current-directory)
+       (helm-basename (helm-get-selection)))))
 
 (defun helm-ff-run-recursive-dirs ()
+  "Recursive directories completion for `helm-find-files'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
