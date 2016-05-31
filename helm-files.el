@@ -2431,7 +2431,10 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                   (format
                                    "%s (%s)"
                                    name (abbreviate-file-name directory)))
-                   :match-part (lambda (c) (helm-basename c))
+                   :match-part (lambda (c)
+                                 (if (with-helm-buffer
+                                       helm-ff-transformer-show-only-basename)
+                                     (helm-basename c) c))
                    :filter-one-by-one
                    (lambda (c)
                      (if (with-helm-buffer
