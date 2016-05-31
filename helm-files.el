@@ -2423,7 +2423,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
   (unless (gethash directory helm--ff-recursive-cache)
     (puthash directory (helm-walk-directory
                         directory
-                        :directories 'only :path 'relative :skip-subdirs t)
+                        :directories 'only :match input :path 'relative :skip-subdirs t)
              helm--ff-recursive-cache))
   (helm :sources (helm-build-in-buffer-source "Recursive directories"
                    :data (gethash directory helm--ff-recursive-cache)
