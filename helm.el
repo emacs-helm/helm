@@ -1530,7 +1530,7 @@ Use this on commands invoked from key-bindings, but not
 on action functions invoked as action from the action menu,
 i.e functions called with RET."
   (setq helm-saved-action action)
-  (setq helm-saved-selection (helm-get-selection))
+  (setq helm-saved-selection (or (helm-get-selection) ""))
   (helm-exit-minibuffer))
 
 (defalias 'helm-run-after-quit 'helm-run-after-exit)
