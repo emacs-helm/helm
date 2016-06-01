@@ -586,8 +586,8 @@ Useful in dired buffers when there is inserted subdirs."
 
 ;; Same as `vc-directory-exclusion-list'.
 (defvar helm-walk-ignore-directories
-  '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr"
-    "_MTN" "_darcs" "{arch}" ".gvfs"))
+  '("SCCS/" "RCS/" "CVS/" "MCVS/" ".svn/" ".git/" ".hg/" ".bzr/"
+    "_MTN/" "_darcs/" "{arch}/" ".gvfs/"))
 
 (cl-defun helm-walk-directory (directory &key (path 'basename)
                                          directories
@@ -625,11 +625,11 @@ instead of `helm-walk-ignore-directories'."
                              if (and (helm--dir-name-p f)
                                      (helm--dir-file-name f dir))
                              nconc
-                             (unless (member (helm-basename it) skip-subdirs)
-                               (if directories
-                                   (nconc (and (or (null match)
-                                                   (string-match match f))
-                                               (list (concat (funcall fn it) "/")))
+                             (unless (member f skip-subdirs)
+                               (if (and directories
+                                        (or (null match)
+                                            (string-match match f)))
+                                   (nconc (list (concat (funcall fn it) "/"))
                                           (ls-rec it))
                                    (ls-rec it)))
                              ;; A regular file.
