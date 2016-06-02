@@ -2405,10 +2405,53 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (file-name-directory candidate))
                 (helm-ff-file-compressed-p candidate))
            (funcall insert-in-minibuffer (concat candidate "#")))
+          ;; File doesn't exists and ends with "/"
+          ;; Start a recursive search for directories.
+          ((and (not (file-exists-p candidate))
+                (not (file-remote-p candidate))
+                (string-match-p "/\\'" candidate))
+           (helm-ff-run-recursive-dirs))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
            (helm-ff-kill-or-find-buffer-fname candidate)))))
+
+
+;;; Recursive dirs completion
+;;
+(defun helm-find-files-recursive-dirs (directory &optional input)
+  (message "Recursively searching %s from %s ..."
+           input (abbreviate-file-name directory))
+  (helm :sources
+        (helm-make-source
+            "Recursive directories" 'helm-locate-subdirs-source
+          :basedir directory
+          :subdir input
+          :filtered-candidate-transformer
+          (lambda (candidates _source)
+            (cl-loop for c in candidates
+                     when (and (file-directory-p c)
+                               (string-match-p input (helm-basename c)))
+                     collect c))
+          :action (lambda (c)
+                    (helm-find-files-1 (file-name-as-directory c))))
+        :candidate-number-limit 999999
+        :ff-transformer-show-only-basename nil
+        :buffer "*helm recursive dirs*"))
+
+(defun helm-ff-recursive-dirs (_candidate)
+  "Launch a recursive search in `helm-ff-default-directory'."
+  (with-helm-default-directory helm-ff-default-directory
+      (helm-find-files-recursive-dirs
+       (helm-current-directory)
+       (helm-basename (helm-get-selection)))))
+
+(defun helm-ff-run-recursive-dirs ()
+  "Recursive directories completion for `helm-find-files'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
+(put 'helm-ff-run-recursive-dirs 'helm-only t)
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."

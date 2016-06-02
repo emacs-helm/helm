@@ -97,6 +97,11 @@ directories of this list with `helm-projects-find-files'."
   :group 'helm-locate
   :type '(repeat string))
 
+(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex ^%s %s.*$"
+  "Command used in recursive directories completion in `helm-find-files'."
+  :type 'string
+  :group 'helm-files)
+
 
 (defvar helm-generic-files-map
   (let ((map (make-sparse-keymap)))
@@ -347,6 +352,26 @@ See also `helm-locate'."
              collect db
              else do (funcall pfn db p)
              and collect db)))
+
+;;; Directory completion for hff.
+;;
+(defclass helm-locate-subdirs-source (helm-source-in-buffer)
+  ((basedir :initarg :basedir
+            :initform nil
+            :custom string)
+   (subdir :initarg :subdir
+           :initform nil
+           :custom 'string)
+   (data :initform #'helm-locate-init-subdirs)))
+
+(defun helm-locate-init-subdirs ()
+  (with-temp-buffer
+    (call-process-shell-command
+     (format helm-locate-recursive-dirs-command
+             (helm-attr 'basedir)
+             (helm-attr 'subdir))
+     nil t nil)
+    (buffer-string)))
 
 ;;;###autoload
 (defun helm-projects-find-files (update)
