@@ -326,11 +326,27 @@ e.g. You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 - With two prefix args
   same but the cache will be refreshed.
 
-**** You can start a recursive search with Locate of Find (See commands below)
+**** You can start a recursive search with Locate or Find (See commands below)
 
 With Locate you can use a local db with a prefix arg. If the localdb doesn't already
 exists, you will be prompted for its creation, if it exists and you want to refresh it,
 give two prefix args.
+
+Note that when using locate the helm-buffer is empty until you type something,
+but helm use by default the basename of pattern entered in your helm-find-files session,
+hitting M-n should just kick in the locate search with this pattern.
+If you want to automatically do this add the `helm-source-locate'
+to `helm-sources-using-default-as-input'.
+
+**** Recursive completion on subdirectories
+
+Starting from the current directory you are browsing, it is possible
+to have completion of all directories under here.
+So if you are at \"/home/you/foo/\" and you want to go to \"/home/you/foo/bar/baz/somewhere/else\"
+just type \"/home/you/foo/else/\" and hit `C-j', helm will show you all possibles directories
+under \"foo\".
+If you want to prevent auto expansion to kick in while typing \"else\" you can hit either `C-<backspace>'
+or add one or two spaces before \"else\".
 
 *** Insert filename at point or complete filename at point
 
