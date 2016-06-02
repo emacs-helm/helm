@@ -2419,29 +2419,6 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 ;;; Recursive dirs completion
 ;;
-(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex ^%s %s.*$"
-  "Command used in recursive directories completion in helm-find-files."
-  :type 'string
-  :group 'helm-files)
-
-(defclass helm-locate-subdirs-source (helm-source-in-buffer)
-  ((basedir :initarg :basedir
-            :initform nil
-            :custom string)
-   (subdir :initarg :subdir
-           :initform nil
-           :custom 'string)
-   (data :initform #'helm-locate-init-subdirs)))
-
-(defun helm-locate-init-subdirs ()
-  (with-temp-buffer
-    (call-process-shell-command
-     (format helm-locate-recursive-dirs-command
-             (helm-attr 'basedir)
-             (helm-attr 'subdir))
-     nil t nil)
-    (buffer-string)))
-
 (defun helm-find-files-recursive-dirs (directory &optional input)
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
