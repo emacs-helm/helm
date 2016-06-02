@@ -2419,7 +2419,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 ;;; Recursive dirs completion
 ;;
-(defcustom helm-locate-recursive-dirs-command "locate -e -A --regex ^%s %s.*$"
+(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex ^%s %s.*$"
   "Command used in recursive directories completion in helm-find-files."
   :type 'string
   :group 'helm-files)
