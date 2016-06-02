@@ -2422,6 +2422,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 (defun helm-find-files-recursive-dirs (directory &optional input)
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
+  (when (string-match "\\s-+" input)
+    (setq input (replace-match "" nil t input)))
   (helm :sources
         (helm-make-source
             "Recursive directories" 'helm-locate-subdirs-source
