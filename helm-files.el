@@ -2449,11 +2449,11 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           (lambda (candidates _source)
             (cl-loop for c in candidates
                      when (and (file-directory-p c)
-                               (file-in-directory-p c directory)
                                (string-match-p
                                 (concat "\\`" input) (helm-basename c)))
                      collect c))
-          :action 'helm-find-files-1)
+          :action (lambda (c)
+                    (helm-find-files-1 (file-name-as-directory c))))
         :candidate-number-limit 999999
         :ff-transformer-show-only-basename nil
         :buffer "*helm recursive dirs*"))
