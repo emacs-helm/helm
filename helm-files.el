@@ -2419,35 +2419,43 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 
 ;;; Recursive dirs completion
 ;;
+(defclass helm-locate-subdirs-source (helm-source-in-buffer)
+  ((basedir :initarg :basedir
+            :initform nil
+            :custom string)
+   (subdir :initarg :subdir
+           :initform nil
+           :custom 'string)
+   (data :initform #'helm-locate-init-subdirs)))
+
+(defun helm-locate-init-subdirs ()
+  (with-temp-buffer
+    (call-process-shell-command
+     (format "locate -e -A --regex ^%s %s.*$"
+             (helm-attr 'basedir)
+             (helm-attr 'subdir))
+     nil t nil)
+    (buffer-string)))
+
 (defun helm-find-files-recursive-dirs (directory &optional input)
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
-  (helm :sources (helm-build-in-buffer-source "Recursive directories"
-                   :data (helm-walk-directory
-                          directory
-                          :directories 'only :match input
-                          :path 'relative :skip-subdirs t)
-                   :header-name (lambda (name)
-                                  (format
-                                   "%s (%s)"
-                                   name (abbreviate-file-name directory)))
-                   :match-part (lambda (c)
-                                 (if (with-helm-buffer
-                                       helm-ff-transformer-show-only-basename)
-                                     (helm-basename c) c))
-                   :filter-one-by-one
-                   (lambda (c)
-                     (if (with-helm-buffer
-                           helm-ff-transformer-show-only-basename)
-                         (cons (propertize (helm-basename c)
-                                           'face 'helm-ff-directory)
-                               c)
-                         (propertize c 'face 'helm-ff-directory)))
-                   :keymap helm-generic-files-map
-                   :action (lambda (c)
-                             (helm-find-files-1 (expand-file-name c directory))))
+  (helm :sources
+        (helm-make-source
+            "Recursive directories" 'helm-locate-subdirs-source
+          :basedir directory
+          :subdir input
+          :filtered-candidate-transformer
+          (lambda (candidates _source)
+            (cl-loop for c in candidates
+                     when (and (file-directory-p c)
+                               (file-in-directory-p c directory)
+                               (string-match-p
+                                (concat "\\`" input) (helm-basename c)))
+                     collect c))
+          :action 'helm-find-files-1)
+        :candidate-number-limit 999999
         :ff-transformer-show-only-basename nil
-        :input input
         :buffer "*helm recursive dirs*"))
 
 (defun helm-ff-recursive-dirs (_candidate)
@@ -2463,8 +2471,6 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
 (put 'helm-ff-run-recursive-dirs 'helm-only t)
-
-;; (define-key helm-find-files-map (kbd "C-x C-r") 'helm-ff-run-recursive-dirs)
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
