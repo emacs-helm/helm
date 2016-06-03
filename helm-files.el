@@ -2429,12 +2429,13 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
             "Recursive directories" 'helm-locate-subdirs-source
           :basedir directory
           :subdir input
-          :filtered-candidate-transformer
-          (lambda (candidates _source)
-            (cl-loop for c in candidates
-                     when (and (file-directory-p c)
-                               (string-match-p input (helm-basename c)))
-                     collect c))
+          :candidate-transformer
+          `(helm-skip-boring-files
+            (lambda (candidates)
+              (cl-loop for c in candidates
+                       when (and (file-directory-p c)
+                                 (string-match-p ,input (helm-basename c)))
+                       collect c)))
           :action (lambda (c)
                     (helm-find-files-1 (file-name-as-directory c))))
         :candidate-number-limit 999999
