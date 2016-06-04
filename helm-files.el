@@ -2427,10 +2427,13 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
   (helm :sources
         (helm-make-source
             "Recursive directories" 'helm-locate-subdirs-source
-          :basedir (shell-quote-argument directory)
+          :basedir (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
+		       directory
+                       (shell-quote-argument directory))
           :subdir (shell-quote-argument input)
           :candidate-transformer
           `(helm-skip-boring-files
+            helm-w32-pathname-transformer
             (lambda (candidates)
               (cl-loop for c in candidates
                        when (and (file-directory-p c)

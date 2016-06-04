@@ -98,7 +98,8 @@ directories of this list with `helm-projects-find-files'."
   :type '(repeat string))
 
 (defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex ^%s %s.*$"
-  "Command used in recursive directories completion in `helm-find-files'."
+  "Command used in recursive directories completion in `helm-find-files'.
+For Windows and `es' use something like \"es -r ^%s.*%s.*$\"."
   :type 'string
   :group 'helm-files)
 
@@ -368,8 +369,12 @@ See also `helm-locate'."
   (with-temp-buffer
     (call-process-shell-command
      (format helm-locate-recursive-dirs-command
-             (helm-attr 'basedir)
-             (helm-attr 'subdir))
+	     (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
+                 ;; Fix W32 paths.
+		 (replace-regexp-in-string
+                  "/" "\\\\\\\\" (helm-attr 'basedir))
+                 (helm-attr 'basedir))
+	     (helm-attr 'subdir))
      nil t nil)
     (buffer-string)))
 
