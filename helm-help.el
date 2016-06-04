@@ -348,6 +348,11 @@ under \"foo\".
 If you want to prevent auto expansion to kick in while typing \"else\" you can hit either `C-<backspace>'
 or add spaces or 2 dots before \"else\".
 
+NOTE: Completion on subdirectories use locate as backend, you can configure
+the command with `helm-locate-recursive-dirs-command'.
+Because this completion use an index, you may not have all the recent additions
+of directories until you update your index (`updatedb' for locate).
+
 *** Insert filename at point or complete filename at point
 
 On insertion (no completion, i.e nothing at point):
