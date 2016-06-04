@@ -589,6 +589,13 @@ Useful in dired buffers when there is inserted subdirs."
   '("SCCS/" "RCS/" "CVS/" "MCVS/" ".svn/" ".git/" ".hg/" ".bzr/"
     "_MTN/" "_darcs/" "{arch}/" ".gvfs/"))
 
+(defsubst helm--dir-file-name (file dir)
+  (expand-file-name
+   (substring file 0 (1- (length file))) dir))
+
+(defsubst helm--dir-name-p (str)
+  (char-equal (aref str (1- (length str))) ?/))
+
 (cl-defun helm-walk-directory (directory &key (path 'basename)
                                          directories
                                          match skip-subdirs)
@@ -638,13 +645,6 @@ instead of `helm-walk-ignore-directories'."
                                         (or (null match) (string-match match f)))
                                (list (funcall fn (expand-file-name f dir))))))))
       (ls-rec directory))))
-
-(defsubst helm--dir-file-name (file dir)
-  (expand-file-name
-   (substring file 0 (1- (length file))) dir))
-
-(defsubst helm--dir-name-p (str)
-  (char-equal (aref str (1- (length str))) ?/))
 
 (defun helm-file-expand-wildcards (pattern &optional full)
   "Same as `file-expand-wildcards' but allow recursion.
