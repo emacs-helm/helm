@@ -346,7 +346,7 @@ So if you are at \"/home/you/foo/\" and you want to go to \"/home/you/foo/bar/ba
 just type \"/home/you/foo/else/\" and hit `C-j', helm will show you all possibles directories
 under \"foo\".
 If you want to prevent auto expansion to kick in while typing \"else\" you can hit either `C-<backspace>'
-or add one or two spaces before \"else\".
+or add spaces or 2 dots before \"else\".
 
 *** Insert filename at point or complete filename at point
 
