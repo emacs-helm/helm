@@ -334,7 +334,7 @@ Default is `eq'."
            collect i))
 
 (defun helm-boring-directory-p (directory black-list)
-  "Check if one regexp in BLACK-LIST match directory DIR."
+  "Check if one regexp in BLACK-LIST match DIRECTORY."
   (helm-awhile directory
     (setq directory (helm-basedir (directory-file-name
                                    (expand-file-name it))))
