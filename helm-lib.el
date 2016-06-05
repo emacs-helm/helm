@@ -335,13 +335,14 @@ Default is `eq'."
 
 (defun helm-boring-directory-p (directory black-list)
   "Check if one regexp in BLACK-LIST match DIRECTORY."
-  (helm-awhile directory
-    (setq directory (helm-basedir (directory-file-name
-                                   (expand-file-name it))))
+  (helm-awhile (helm-basedir (directory-file-name
+                              (expand-file-name directory)))
     (when (string= it "/") (cl-return nil))
     (when (cl-loop for r in black-list
-                   thereis (string-match-p r (directory-file-name it)))
-      (cl-return t))))
+                   thereis (string-match-p
+                            r (directory-file-name directory)))
+      (cl-return t))
+    (setq directory it)))
 
 (defun helm-shadow-entries (seq regexp-list)
   "Put shadow property on entries in SEQ matching a regexp in REGEXP-LIST."
