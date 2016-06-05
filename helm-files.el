@@ -2433,13 +2433,13 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           :subdir (shell-quote-argument input)
           :candidate-transformer
           `(helm-skip-boring-files
-            helm-w32-pathname-transformer
             (lambda (candidates)
               (cl-loop for c in candidates
                        when (and (file-directory-p c)
                                  (string-match-p ,(regexp-quote input)
                                                  (helm-basename c)))
-                       collect c)))
+                       collect c))
+            helm-w32-pathname-transformer)
           :action (lambda (c)
                     (helm-find-files-1 (file-name-as-directory c))))
         :candidate-number-limit 999999
