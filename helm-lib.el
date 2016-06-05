@@ -333,11 +333,11 @@ Default is `eq'."
                                              (string-match-p re i)))))
            collect i))
 
-(defun helm-boring-directory-p (dir black-list)
+(defun helm-boring-directory-p (directory black-list)
   "Check if one regexp in BLACK-LIST match directory DIR."
-  (helm-awhile (helm-basedir (directory-file-name
-                              (expand-file-name dir)))
-    (setq dir it)
+  (helm-awhile directory
+    (setq directory (helm-basedir (directory-file-name
+                                   (expand-file-name it))))
     (when (string= it "/") (cl-return nil))
     (when (cl-loop for r in black-list
                    thereis (string-match-p r (directory-file-name it)))
