@@ -2432,10 +2432,11 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                        (shell-quote-argument directory))
           :subdir (shell-quote-argument input)
           :candidate-transformer
-          `(helm-skip-boring-files
-            (lambda (candidates)
+          `((lambda (candidates)
               (cl-loop for c in candidates
                        when (and (file-directory-p c)
+                                 (null (helm-boring-directory-p
+                                        c helm-boring-file-regexp-list))
                                  (string-match-p ,(regexp-quote input)
                                                  (helm-basename c)))
                        collect c))

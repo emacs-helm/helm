@@ -333,6 +333,16 @@ Default is `eq'."
                                              (string-match-p re i)))))
            collect i))
 
+(defun helm-boring-directory-p (dir black-list)
+  "Check if one regexp in BLACK-LIST match directory DIR."
+  (helm-awhile (helm-basedir (directory-file-name
+                              (expand-file-name dir)))
+    (setq dir it)
+    (when (string= it "/") (cl-return nil))
+    (when (cl-loop for r in black-list
+                   thereis (string-match-p r (directory-file-name it)))
+      (cl-return t))))
+
 (defun helm-shadow-entries (seq regexp-list)
   "Put shadow property on entries in SEQ matching a regexp in REGEXP-LIST."
   (let ((face 'italic))
