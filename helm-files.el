@@ -2410,7 +2410,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ((and (not (file-exists-p candidate))
                 (not (file-remote-p candidate))
                 (string-match-p "/\\'" candidate))
-           (helm-ff-run-recursive-dirs))
+           (helm-ff-recursive-dirs candidate))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
@@ -2441,9 +2441,12 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                                  (helm-basename c)))
                        collect c))
             helm-w32-pathname-transformer)
+          :persistent-action 'ignore
           :action (lambda (c)
-                    (helm-find-files-1 (file-name-as-directory c))))
+                    (helm-set-pattern
+                     (file-name-as-directory (expand-file-name c)))))
         :candidate-number-limit 999999
+        :allow-nest t
         :ff-transformer-show-only-basename nil
         :buffer "*helm recursive dirs*"))
 
@@ -2453,13 +2456,6 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
       (helm-find-files-recursive-dirs
        (helm-current-directory)
        (helm-basename (helm-get-selection)))))
-
-(defun helm-ff-run-recursive-dirs ()
-  "Recursive directories completion for `helm-find-files'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-ff-recursive-dirs)))
-(put 'helm-ff-run-recursive-dirs 'helm-only t)
 
 (defun helm-ff-file-compressed-p (candidate)
   "Whether CANDIDATE is a compressed file or not."
