@@ -2447,6 +2447,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                      (file-name-as-directory (expand-file-name c)))))
         :candidate-number-limit 999999
         :allow-nest t
+        :resume 'noresume
         :ff-transformer-show-only-basename nil
         :buffer "*helm recursive dirs*"))
 
