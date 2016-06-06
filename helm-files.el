@@ -315,6 +315,11 @@ see `helm-ff-guess-ffap-filenames' for this."
   "Face used for file names in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-dirs
+    '((t (:inherit font-lock-function-name-face)))
+  "Face used for file names in recursive dirs completion in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-history-deleted
     '((t (:inherit helm-ff-invalid-symlink)))
   "Face used for deleted files in `file-name-history'."
@@ -2439,7 +2444,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                         c helm-boring-file-regexp-list))
                                  (string-match-p ,(regexp-quote input)
                                                  (helm-basename c)))
-                       collect c))
+                       collect (propertize c 'face 'helm-ff-dirs)))
             helm-w32-pathname-transformer)
           :persistent-action 'ignore
           :action (lambda (c)
