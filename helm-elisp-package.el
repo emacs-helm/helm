@@ -43,6 +43,7 @@
 
 ;; Shutup bytecompiler for emacs-24*
 (defvar package-menu-async) ; Only available on emacs-25.
+(declare-function async-byte-recompile-directory "ext:async-bytecomp.el")
 
 (defun helm-el-package--init ()
   (let (package-menu-async)
