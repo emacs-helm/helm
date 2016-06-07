@@ -351,11 +351,22 @@
                     (and (package-built-in-p pkg-name)
                          (assq pkg-name package-alist))))
            (append acts '(("Reinstall package(s)" . helm-el-package-reinstall)
+                          ("Recompile package(s)" . helm-el-package-recompile)
                           ("Uninstall package(s)" . helm-el-package-uninstall))))
           (t (append acts '(("Install packages(s)" . helm-el-package-install)))))))
 
 (defun helm-el-package--update ()
   (setq helm-el-package--initialized-p nil))
+
+(defun helm-el-package-recompile (_pkg)
+  (cl-loop for p in (helm-marked-candidates)
+           for pkg-desc = (get-text-property 0 'tabulated-list-id p)
+           for name = (package-desc-name pkg-desc) 
+           for dir = (package-desc-dir pkg-desc)
+           do (if (fboundp 'async-byte-recompile-directory)
+                  (async-byte-recompile-directory dir)
+                  (when (y-or-n-p (format "Really recompile `%s' while already loaded ?" name))
+                    (byte-recompile-directory dir 0 t)))))
 
 (defun helm-el-package-reinstall (_pkg)
   (cl-loop for p in (helm-marked-candidates)
