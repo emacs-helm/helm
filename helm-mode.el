@@ -622,7 +622,8 @@ It should be used when candidate list don't need to rebuild dynamically."
                     (helm-comp-read-get-candidates collection test)))
       ;; Ensure `all-completions' will not be used
       ;; a second time to recompute COLLECTION [1].
-      (setq alistp t)
+      (setq alistp t
+            test nil)
       (setq default (car default)))
     (helm-comp-read
      prompt collection
@@ -631,7 +632,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp alistp ; Ensure `all-completions' is used when non-nil [1].
+     :alistp alistp ; Ensure `all-completions' is not used when non-nil [1].
      :name name
      :requires-pattern (if (and (string= default "")
                                 (or (eq require-match 'confirm)
