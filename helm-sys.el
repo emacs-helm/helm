@@ -33,7 +33,10 @@
   :group 'helm-sys)
 
 
-(defcustom helm-top-command nil
+(defcustom helm-top-command
+  (cl-case system-type
+    (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start,vsz,%%cpu,%%mem,etime,command")
+    (t      "env COLUMNS=%s top -b -n 1"))
   "Top command used to display output of top.
 To use top command, a version supporting batch mode (-b option) is needed.
 On Mac OSX top command doesn't support this, so ps command
@@ -42,12 +45,7 @@ If you modify this the number and order of elements displayed
 should be the same as top command to have the sort commands
 working properly, that is 12 elements with the 2 first being
 PID and USER and the last 4 being %CPU, %MEM, TIME and COMMAND.
-A format string where %s will be replaced with `frame-width'.
-
-Here command line examples for ps and top:
-    env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start,vsz,%%cpu,%%mem,etime,command
-    env COLUMNS=%s top -b -n 1
-"
+A format string where %s will be replaced with `frame-width'."
   :group 'helm-sys
   :type 'string)
 
@@ -226,11 +224,6 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
-  (unless helm-top-command
-    (setq helm-top-command
-          (cl-case system-type
-            (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start,vsz,%%cpu,%%mem,etime,command")
-            (t      "env COLUMNS=%s top -b -n 1"))))
   (with-local-quit
     (unless helm-top-sort-fn (helm-top-set-mode-line "CPU"))
     (with-current-buffer (helm-candidate-buffer 'global)
