@@ -242,9 +242,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                             (helm-basedir helm-pattern)) f)))
                  ((functionp collection)
                   (funcall collection input test t))
-                 ((and alistp test)
-                  (cl-loop for i in collection when (funcall test i) collect i))
-                 (alistp collection)
+                 ((and alistp (null test)) collection)
+                 ;; Next test ensure circular objects are removed
+                 ;; with `all-completions' (Issue #1530).
                  (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
@@ -619,8 +619,7 @@ It should be used when candidate list don't need to rebuild dynamically."
       (setq collection
             ;; COLLECTION is maybe a function or a table.
             (append default
-                    (helm-comp-read-get-candidates
-                     collection test nil (listp collection))))
+                    (helm-comp-read-get-candidates collection test)))
       ;; Ensure `all-completions' will not be used
       ;; a second time to recompute COLLECTION [1].
       (setq alistp t)
