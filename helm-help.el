@@ -267,6 +267,9 @@ If you are already in `default-directory' this will move cursor on top.
 NOTE: This is different from using `C-l' in that `C-l' doesn't move cursor on top but stays on previous
 subdir name.
 
+**** Enter `..name/' at end of pattern start a recursive search of directories matching name under
+your current directory, see below the \"Recursive completion on subdirectories\" section for more infos.
+
 **** Enter any environment var (e.g. `$HOME') at end of pattern, it will be expanded
 
 **** You can yank any valid filename after pattern, it will be expanded
@@ -343,15 +346,14 @@ to `helm-sources-using-default-as-input'.
 Starting from the current directory you are browsing, it is possible
 to have completion of all directories under here.
 So if you are at \"/home/you/foo/\" and you want to go to \"/home/you/foo/bar/baz/somewhere/else\"
-just type \"/home/you/foo/else/\" and hit `C-j', helm will show you all possibles directories
-under \"foo\".
-If you want to prevent auto expansion to kick in while typing \"else\" you can hit either `C-<backspace>'
-or add spaces or 2 dots before \"else\".
+just type \"/home/you/foo/..else\" and hit `C-j' or enter the final \"/\", helm will show you all
+possibles directories under \"foo\" matching \"else\".
+\(Note that entering two spaces before \"else\" instead of two dots works also).
 
 NOTE: Completion on subdirectories use locate as backend, you can configure
 the command with `helm-locate-recursive-dirs-command'.
 Because this completion use an index, you may not have all the recent additions
-of directories until you update your index (`updatedb' for locate).
+of directories until you update your index (with `updatedb' for locate).
 
 *** Insert filename at point or complete filename at point
 
