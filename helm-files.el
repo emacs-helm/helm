@@ -1598,7 +1598,8 @@ or when `helm-pattern' is equal to \"~/\"."
                  "\\`\\([.]\\|\\s-\\)\\{2\\}[^/]+"
                  (helm-basename helm-pattern))
                 (string-match-p "/\\'" helm-pattern))
-           (helm-ff-recursive-dirs helm-pattern))
+           (helm-ff-recursive-dirs helm-pattern)
+           (with-helm-window (helm-check-minibuffer-input)))
           ((and (string-match
                  "/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
                  helm-pattern)
@@ -1625,8 +1626,8 @@ or when `helm-pattern' is equal to \"~/\"."
                  (setq helm-ff-default-directory (file-name-as-directory
                                                   (file-name-directory input))))
              (with-helm-window
-               (helm-set-pattern input)))))
-    (helm-check-minibuffer-input)))
+               (helm-set-pattern input)
+               (helm-check-minibuffer-input)))))))
 
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
