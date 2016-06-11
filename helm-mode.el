@@ -1076,7 +1076,8 @@ Can be used as value for `completion-in-region-function'."
                                 (setcdr last-data nil))
                             0))
                (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
-                                              (string-suffix-p " " input))
+                                              (string-suffix-p " " input)
+                                              (string= input ""))
                                     " "))
                (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
                                 (helm-mode--in-file-completion-p)
@@ -1115,8 +1116,7 @@ Can be used as value for `completion-in-region-function'."
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
                                  (concat (helm-basename input)
-                                         (unless (string= input "")
-                                           init-space-suffix)))
+                                         init-space-suffix))
                                 ((string-match "/\\'" input) nil)
                                 ((or (null require-match)
                                      (stringp require-match))
