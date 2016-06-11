@@ -184,13 +184,13 @@ This is a filtered candidate transformer you can use with the
                                              helm-pattern))
                                  (cl-incf count (cdr pattern-info))
 
-                               ;; if current pattern is equal to the previously
-                               ;; used one then this candidate has priority
-                               ;; (that's why its count is boosted by 10000) and
-                               ;; it only has to compete with other candidates
-                               ;; which were also selected with the same pattern
-                               (setq count (+ 10000 (cdr pattern-info)))
-                               (cl-return)))
+                                 ;; if current pattern is equal to the previously
+                                 ;; used one then this candidate has priority
+                                 ;; (that's why its count is boosted by 10000) and
+                                 ;; it only has to compete with other candidates
+                                 ;; which were also selected with the same pattern
+                                 (setq count (+ 10000 (cdr pattern-info)))
+                                 (cl-return)))
                            (cons (car candidate-info) count)))
                        (cdr source-info))))
           (if (and usage (consp usage))
@@ -202,20 +202,22 @@ This is a filtered candidate transformer you can use with the
 
                 ;; put those candidates first which have the highest usage count
                 (cl-loop for (info . _freq) in usage
-                      for member = (cl-member info candidates
-                                              :test 'helm-adaptive-compare)
-                      when member collect (car member) into sorted
-                      and do
-                      (setq candidates (cl-remove info candidates
-                                                  :test 'helm-adaptive-compare))
-                      finally return (append sorted candidates)))
-            (message "Your `%s' is maybe corrupted or too old, \
+                         for mlinfo = (and (assq 'multiline source)
+                                           (replace-regexp-in-string "\n\\'" "" info))
+                         for member = (cl-member (or mlinfo info) candidates
+                                                 :test 'helm-adaptive-compare)
+                         when member collect (car member) into sorted
+                         and do
+                         (setq candidates (cl-remove (or mlinfo info) candidates
+                                                     :test 'helm-adaptive-compare))
+                         finally return (append sorted candidates)))
+              (message "Your `%s' is maybe corrupted or too old, \
 you should reinitialize it with `helm-reset-adaptive-history'"
-                     helm-adaptive-history-file)
-            (sit-for 1)
-            candidates))
-      ;; if there is no information stored for this source then do nothing
-      candidates)))
+                       helm-adaptive-history-file)
+              (sit-for 1)
+              candidates))
+        ;; if there is no information stored for this source then do nothing
+        candidates)))
 
 ;;;###autoload
 (defun helm-reset-adaptive-history ()
