@@ -2415,12 +2415,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (file-name-directory candidate))
                 (helm-ff-file-compressed-p candidate))
            (funcall insert-in-minibuffer (concat candidate "#")))
-          ;; File doesn't exists and ends with "/"
+          ;; File doesn't exists and basename starts with ".." or "  ",
           ;; Start a recursive search for directories.
           ((and (not (file-exists-p candidate))
                 (not (file-remote-p candidate))
                 (string-match-p "\\`\\([.]\\|\\s-\\)\\{2\\}[^/]+"
                                 (helm-basename candidate)))
+           ;; As soon as the final "/" is added the job is passed
+           ;; to `helm-ff-auto-expand-to-home-or-root'.
            (funcall insert-in-minibuffer (concat candidate "/")))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
