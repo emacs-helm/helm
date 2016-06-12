@@ -364,11 +364,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                 (mapconcat 'identity files " ")
                 (mapconcat 'shell-quote-argument files " "))))))
 
-(defun helm-grep-command (&optional recursive)
+(defun helm-grep-command (&optional recursive grep)
   (let* ((com (if recursive
                   helm-grep-default-recurse-command
                   helm-grep-default-command))
-         (exe (and com (car (split-string com " ")))))
+         (exe (if grep
+                  (symbol-name grep)
+                  (and com (car (split-string com " "))))))
     (if (and exe (string= exe "git")) "git-grep" exe)))
 
 (cl-defun helm-grep-use-ack-p (&key where)
@@ -989,8 +991,7 @@ in recurse, and ignore EXTS, search being made on
                              :follow follow))
     (helm
      :sources 'helm-source-grep
-     :buffer (format "*helm %s*"
-                     (if (eq grep 'zgrep) "zgrep" (helm-grep-command recurse)))
+     :buffer (format "*helm %s*" (helm-grep-command recurse grep))
      :default default-input
      :input input
      :keymap helm-grep-map
@@ -1405,7 +1406,7 @@ at DIRECTORY.
 Arg DEFAULT is what you will have with `next-history-element',
 arg INPUT is what you will have by default at prompt on startup."
   (require 'vc)
-  (let* ((helm-grep-default-command helm-grep-git-grep-command)
+  (let* (;;(helm-grep-default-command helm-grep-git-grep-command)
          helm-grep-default-recurse-command
          ;; Expand filename of each candidate with the git root dir.
          ;; The filename will be in the help-echo prop.
@@ -1414,7 +1415,7 @@ arg INPUT is what you will have by default at prompt on startup."
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
     (cl-assert helm-ff-default-directory nil "Not inside a Git repository")
     (helm-do-grep-1 (if all '("") `(,(expand-file-name directory)))
-                    nil nil nil default input)))
+                    nil 'git nil default input)))
 
 
 ;;;###autoload
