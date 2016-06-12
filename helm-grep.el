@@ -912,20 +912,25 @@ These extensions will be added to command line with --include arg of grep."
 
 (defun helm-do-grep-1 (targets &optional recurse grep exts default-input input)
   "Launch grep on a list of TARGETS files.
+
 When RECURSE is given use -r option of grep and prompt user
-to set the --include args of grep.
-You can give more than one arg separated by space at prompt.
-e.g *.el *.py *.tex.
+for EXTS to set the --include args of grep.
+Interactively you can give more than one arg separated by space at prompt.
+e.g
+    $Pattern: *.el *.py *.tex
+
 From lisp use the EXTS argument as a list of extensions as above.
 If you are using ack-grep, you will be prompted for --type
 instead and EXTS will be ignored.
 If prompt is empty `helm-grep-ignored-files' are added to --exclude.
+
 Argument DEFAULT-INPUT is use as `default' arg of `helm' and INPUT
 is used as `input' arg of `helm', See `helm' docstring.
+
 Arg GREP when non--nil specify which grep to use
-It actually support only 'zgrep and 'git.
+It is used actually to specify 'zgrep or 'git.
 When zgrep is used don't prompt for a choice
-in recurse, and ignore EXTS, search being made on
+in recurse, and ignore EXTS, search being made recursively on files matching
 `helm-zgrep-file-extension-regexp' only."
   (when (and (helm-grep-use-ack-p)
              helm-ff-default-directory
