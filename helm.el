@@ -2770,8 +2770,7 @@ Helm plug-ins are realized by this function."
 (defmacro helm-while-no-input (&rest body)
   "Same as `while-no-input' but without the `input-pending-p' test."
   (declare (debug t) (indent 0))
-  (let ((catch-sym (make-symbol "input"))
-        inhibit-quit)
+  (let ((catch-sym (make-symbol "input")))
     `(with-local-quit
        (catch ',catch-sym
          (let ((throw-on-input ',catch-sym))
