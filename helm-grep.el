@@ -1100,7 +1100,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                    (while (and (re-search-forward reg nil t)
                                (> (- (setq end (match-end 0))
                                      (setq beg (match-beginning 0))) 0))
-                     (add-text-properties beg end '(face helm-grep-match)))
+                     (helm-add-face-text-properties beg end 'helm-grep-match))
                    do (goto-char (point-min))) 
           (buffer-string))
       (error nil))))

@@ -3083,8 +3083,8 @@ to the matching method in use."
               ;; Try first matching against whole pattern.
               (while (re-search-forward regex nil t)
                 (cl-incf count)
-                (add-text-properties
-                 (match-beginning 0) (match-end 0) '(face helm-match)))
+                (helm-add-face-text-properties
+                 (match-beginning 0) (match-end 0) 'helm-match))
               ;; If no matches start matching against multiples or fuzzy matches.
               (when (zerop count)
                 (cl-loop with multi-match = (string-match-p " " helm-pattern)
@@ -3097,16 +3097,16 @@ to the matching method in use."
                          if multi-match do
                          (progn
                            (while (re-search-forward p nil t)
-                             (add-text-properties
+                             (helm-add-face-text-properties
                               (match-beginning 0) (match-end 0)
-                              '(face helm-match)))
+                              'helm-match))
                            (goto-char (point-min)))
                          ;; Fuzzy matches (literal patterns).
                          else do
                          (when (search-forward p nil t)
-                           (add-text-properties
+                           (helm-add-face-text-properties
                             (match-beginning 0) (match-end 0)
-                            '(face helm-match))))))
+                            'helm-match)))))
           (invalid-regexp nil))
         ;; Now replace the original match-part with the part
         ;; with face properties added.
