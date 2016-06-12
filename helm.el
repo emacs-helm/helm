@@ -1592,15 +1592,16 @@ Default value for BUFFER is `helm-buffer'."
   "Check if current source contains candidates.
 This could happen when for example the last element of a source
 was deleted and the candidates list not updated."
-  (with-helm-window
-    (or (helm-empty-buffer-p)
-        (and (helm-end-of-source-p)
-             (eq (point-at-bol) (point-at-eol))
-             (or
-              (save-excursion
-                (forward-line -1)
-                (helm-pos-header-line-p))
-              (bobp))))))
+  (when (helm-window)
+    (with-helm-window
+      (or (helm-empty-buffer-p)
+          (and (helm-end-of-source-p)
+               (eq (point-at-bol) (point-at-eol))
+               (or
+                (save-excursion
+                  (forward-line -1)
+                  (helm-pos-header-line-p))
+                (bobp)))))))
 
 
 ;; Core: tools
