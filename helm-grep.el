@@ -955,11 +955,7 @@ in recurse, and ignore EXTS, search being made on
                      (helm-grep-read-ack-type)))
          (follow (and helm-follow-mode-persistent
                       (assoc-default 'follow helm-source-grep)))
-         (src-name (if (eq grep 'zgrep)
-                       "Zgrep"
-                       (capitalize (if recurse
-                                       (helm-grep-command t)
-                                       (helm-grep-command))))))
+         (src-name (capitalize (helm-grep-command recurse grep))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -1406,8 +1402,7 @@ at DIRECTORY.
 Arg DEFAULT is what you will have with `next-history-element',
 arg INPUT is what you will have by default at prompt on startup."
   (require 'vc)
-  (let* (;;(helm-grep-default-command helm-grep-git-grep-command)
-         helm-grep-default-recurse-command
+  (let* (helm-grep-default-recurse-command
          ;; Expand filename of each candidate with the git root dir.
          ;; The filename will be in the help-echo prop.
          (helm-grep-default-directory-fn (lambda ()
