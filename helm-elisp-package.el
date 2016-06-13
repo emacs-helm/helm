@@ -105,26 +105,20 @@
 
 (defun helm-el-package-install-1 (pkg-list)
   (cl-loop with mkd = pkg-list
-        for p in mkd
-        for id = (get-text-property 0 'tabulated-list-id p)
-        do (package-install
-            (if (fboundp 'package-desc-name) id (car id)))
-        collect (if (fboundp 'package-desc-full-name) id (car id))
-        into installed-list
-        finally do (progn
-                     (when (boundp 'package-selected-packages)
-                       (customize-save-variable
-                        'package-selected-packages
-                        (append (mapcar 'package-desc-name installed-list)
-                                package-selected-packages)))
-                     (if (fboundp 'package-desc-full-name)
-                         (message (format "%d packages installed:\n(%s)"
-                                          (length installed-list)
-                                          (mapconcat #'package-desc-full-name
-                                                     installed-list ", ")))
-                         (message (format "%d packages installed:\n(%s)"
-                                          (length installed-list)
-                                          (mapconcat 'symbol-name installed-list ", ")))))))
+           for p in mkd
+           for id = (get-text-property 0 'tabulated-list-id p)
+           do (package-install
+               (if (fboundp 'package-desc-name) id (car id)))
+           collect (if (fboundp 'package-desc-full-name) id (car id))
+           into installed-list
+           finally do (if (fboundp 'package-desc-full-name)
+                          (message (format "%d packages installed:\n(%s)"
+                                           (length installed-list)
+                                           (mapconcat #'package-desc-full-name
+                                                      installed-list ", ")))
+                          (message (format "%d packages installed:\n(%s)"
+                                           (length installed-list)
+                                           (mapconcat 'symbol-name installed-list ", "))))))
 
 (defun helm-el-package-install (_candidate)
   (helm-el-package-install-1 (helm-marked-candidates)))
@@ -213,7 +207,10 @@
                   (ignore))
                  ((equal pkg-desc upgrade)
                   ;;Install.
-                  (package-install pkg-desc))
+                  (with-no-warnings
+                    (if (boundp 'package-selected-packages)
+                        (package-install pkg-desc t)
+                        (package-install pkg-desc))))
                  (t
                   ;; Delete.
                   (if (boundp 'package-selected-packages)
@@ -386,7 +383,7 @@
                     ;; packages already installed, the name (as symbol)
                     ;; fails with such packages.
                     (package-install
-                     (cadr (assq name package-archive-contents))))
+                     (cadr (assq name package-archive-contents)) t))
                   (package-delete pkg-desc)
                   (package-install name))))
 
