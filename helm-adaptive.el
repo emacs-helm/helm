@@ -104,7 +104,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                                 (progn
                                   (push (list source-name) helm-adaptive-history)
                                   (car helm-adaptive-history))))
-               (selection (helm-get-selection))
+               (selection (helm-get-selection nil t))
                (selection-info (progn
                                  (setcdr source-info
                                          (cons
