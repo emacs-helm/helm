@@ -552,7 +552,7 @@ i.e same color."
                           collect p)))
     (if regexps
         (cl-loop for re in regexps
-                 thereis 
+                 thereis
                  (and buf-fname
                       (string-match
                        (substring re 1) (helm-basedir buf-fname))))
@@ -898,6 +898,12 @@ displayed with the `file-name-shadow' face if available."
         :buffer "*helm mini*"
         :ff-transformer-show-only-basename nil
         :truncate-lines helm-buffers-truncate-lines))
+
+(defun helm-quit-and-helm-mini ()
+  "Drop into `helm-mini' from `helm'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-run-after-exit 'helm-mini)))
 
 (provide 'helm-buffers)
 
