@@ -903,9 +903,7 @@ displayed with the `file-name-shadow' face if available."
   "Drop into `helm-mini' from `helm'."
   (interactive)
   (with-helm-alive-p
-    (helm-run-after-exit
-     (lambda ()
-       (helm-mini)))))
+    (helm-run-after-exit 'helm-mini)))
 
 (provide 'helm-buffers)
 
