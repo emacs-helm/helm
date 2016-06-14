@@ -83,7 +83,7 @@ much more convenient to use a simple boolean value here."
 (defun helm-add-face-text-properties (beg end face &optional append object)
   "Add the face property to the text from START to END.
 It is a compatibility function which behave exactly like
-`add-face-text-property' is available otherwise like `add-text-properties'.
+`add-face-text-property' if available otherwise like `add-text-properties'.
 When only `add-text-properties' is available APPEND is ignored."
   (if (fboundp 'add-face-text-property)
       (add-face-text-property beg end face append object)
