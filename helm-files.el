@@ -1592,8 +1592,11 @@ or when `helm-pattern' is equal to \"~/\"."
 
 (defun helm-ff-auto-expand-to-home-or-root ()
   "Allow expanding to home/user directory or root or text yanked after pattern."
-  (when (helm-file-completion-source-p)
-    (cond ((and (null (file-exists-p helm-pattern))
+  (when (and (helm-file-completion-source-p)
+             (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
+             (not (string-match helm-ff-url-regexp helm-pattern)))
+    (cond ((and (not (file-remote-p helm-pattern))
+                (null (file-exists-p helm-pattern))
                 (string-match-p
                  "\\`\\([.]\\|\\s-\\)\\{2\\}[^/]+"
                  (helm-basename helm-pattern))
@@ -1602,9 +1605,7 @@ or when `helm-pattern' is equal to \"~/\"."
            (with-helm-window (helm-check-minibuffer-input)))
           ((and (string-match
                  "/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
-                 helm-pattern)
-                (with-current-buffer (window-buffer (minibuffer-window)) (eolp))
-                (not (string-match helm-ff-url-regexp helm-pattern)))
+                 helm-pattern))
            (let* ((match (match-string 0 helm-pattern))
                   (input (cond ((string= match "/./")
                                 (expand-file-name default-directory))
