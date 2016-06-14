@@ -1761,6 +1761,9 @@ purpose."
          invalid-basedir
          non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
+    ;; Tramp check if path is valid without waiting a valid
+    ;; connection and may send a file-error.
+    (setq helm--ignore-errors (file-remote-p path))
     (set-text-properties 0 (length path) nil path)
     ;; Issue #118 allow creation of newdir+newfile.
     (unless (or

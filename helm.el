@@ -1001,6 +1001,10 @@ because they are automatically added.
 You should not modify this yourself unless you know what you are doing.")
 ;; Same as `ffap-url-regexp' but keep it here to ensure `ffap-url-regexp' is not nil.
 (defvar helm--url-regexp "\\(news\\(post\\)?:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\)://\\)")
+(defvar helm--ignore-errors nil
+  "Flag to prevent helm popping up errors in candidates functions.
+Should be set in candidates functions if needed, will be restored
+at end of session.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -1941,6 +1945,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
       (setq helm-pattern "")
+      (setq helm--ignore-errors nil)
       (and old--cua (cua-mode 1))
       (helm-log-save-maybe))))
 
@@ -2752,7 +2757,8 @@ Helm plug-ins are realized by this function."
            ;; Candidates will be filtered later in process filter.
            candidates)
           ;; An error occured in candidates function.
-          (cfn-error (funcall notify-error cfn-error))
+          (cfn-error (unless helm--ignore-errors
+                       (funcall notify-error cfn-error)))
           ;; Candidates function returns no candidates.
           ((or (null candidates)
                ;; Can happen when the output of a process
