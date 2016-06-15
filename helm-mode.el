@@ -614,7 +614,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                            (if minibuffer-completing-file-name it
                                (regexp-quote it)))))
     (when (and default (listp default))
-      ;; When DEFAULT is a list move the list on head of COLLECTION
+      ;; When DEFAULT is a list append it on head of COLLECTION
       ;; and set it to its car. #bugfix `grep-read-files'.
       (setq collection
             ;; COLLECTION is maybe a function or a table.
@@ -622,8 +622,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                     (helm-comp-read-get-candidates collection test)))
       ;; Ensure `all-completions' will not be used
       ;; a second time to recompute COLLECTION [1].
-      (setq alistp t
-            test nil)
+      (setq alistp t test nil)
       (setq default (car default)))
     (helm-comp-read
      prompt collection
@@ -632,7 +631,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp alistp ; Ensure `all-completions' is not used when non-nil [1].
+     :alistp alistp
      :name name
      :requires-pattern (if (and (string= default "")
                                 (or (eq require-match 'confirm)
