@@ -525,19 +525,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                (setcar history result))
               (t ; Possibly a symbol with a nil value.
                (set history (list result)))))
-      (or
-       result
-       (when (and (eq helm-exit-status 0)
-                  (eq must-match 'confirm))
-         ;; Return empty string only if it is the DEFAULT
-         ;; value and helm-pattern is empty.
-         ;; otherwise return helm-pattern
-         (if (and (string= helm-pattern "") default)
-             default (identity helm-pattern)))
-       (unless (or (eq helm-exit-status 1)
-                   must-match)  ; FIXME this should not be needed now.
-         default)
-       (helm-mode--keyboard-quit)))))
+      (or result (helm-mode--keyboard-quit)))))
 
 ;; Generic completing-read
 ;;
@@ -909,10 +897,6 @@ Keys description:
            ((and result (listp result))
             (mapcar #'expand-file-name result))
            (t result))
-     (when (and (not (string= helm-pattern ""))
-                (eq helm-exit-status 0)
-                (eq must-match 'confirm))
-       (identity helm-pattern))
      (helm-mode--keyboard-quit))))
 
 (defun helm-mode--default-filename (fname dir initial)
