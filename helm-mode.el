@@ -273,6 +273,13 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (when (string= (get-text-property 0 'display it) "[?]")
         (helm-next-line))))
 
+(defun helm-cr-default (default cands)
+  (cond ((and (stringp default) (not (string= default "")))
+         (delq nil (cons default (delete default cands))))
+        ((consp default)
+         (append default cands))
+        (t cands)))
+
 ;;;###autoload
 (cl-defun helm-comp-read (prompt collection
                           &key
@@ -419,43 +426,37 @@ that use `helm-comp-read' See `helm-M-x' for example."
             (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
                                       helm-read-file-name-mode-line-string))
-           (get-candidates (lambda ()
-                             (let ((cands (helm-comp-read-get-candidates
-                                           collection test sort alistp)))
-                               (setq helm-cr-unknown-pattern-flag nil)
-                               (unless (or (eq must-match t)
-                                           (string= helm-pattern "")
-                                           (assoc helm-pattern cands)
-                                           (assoc (intern helm-pattern) cands)
-                                           (member helm-pattern cands)
-                                           (member (downcase helm-pattern) cands)
-                                           (member (upcase helm-pattern) cands))
-                                 (setq cands (append (list
-                                                      ;; Unquote helm-pattern
-                                                      ;; when it is added
-                                                      ;; as candidate.
-                                                      (replace-regexp-in-string
-                                                       "\\s\\" "" helm-pattern))
-                                                     cands))
-                                 (setq helm-cr-unknown-pattern-flag t))
-                               ;; When DEFAULT is initially a list, candidates
-                               ;; come already computed with DEFAULT list appended,
-                               ;; and DEFAULT is set to the car of this list.
-                               (if (and default (not (string= default "")))
-                                   (delq nil (cons default (delete default cands)))
-                                 cands))))
-           (history-get-candidates (lambda ()
-                                     (let ((all (helm-comp-read-get-candidates
-                                                 history test nil alistp)))
-                                       (when all
-                                         (delete
-                                          ""
-                                          (helm-fast-remove-dups
-                                           (if (and default (not (string= default "")))
-                                               (delq nil (cons default
-                                                               (delete default all)))
-                                             all)
-                                           :test 'equal))))))
+           (get-candidates
+            (lambda ()
+              (let ((cands (helm-comp-read-get-candidates
+                            collection test sort alistp)))
+                (setq helm-cr-unknown-pattern-flag nil)
+                (unless (or (eq must-match t)
+                            (string= helm-pattern "")
+                            (assoc helm-pattern cands)
+                            (assoc (intern helm-pattern) cands)
+                            (member helm-pattern cands)
+                            (member (downcase helm-pattern) cands)
+                            (member (upcase helm-pattern) cands))
+                  (setq cands (append (list
+                                       ;; Unquote helm-pattern
+                                       ;; when it is added
+                                       ;; as candidate.
+                                       (replace-regexp-in-string
+                                        "\\s\\" "" helm-pattern))
+                                      cands))
+                  (setq helm-cr-unknown-pattern-flag t))
+                ;; When called from generic completion,
+                ;; and DEFAULT is initially a list, candidates
+                ;; come already computed with DEFAULT list appended,
+                ;; and DEFAULT is set to the car of this list.
+                (helm-cr-default default cands))))
+           (history-get-candidates
+            (lambda ()
+              (let ((cands (helm-comp-read-get-candidates
+                            history test nil alistp)))
+                (when cands
+                  (delete "" (helm-cr-default default cands))))))
            (src-hist (helm-build-sync-source (format "%s History" name)
                          :candidates history-get-candidates
                          :fuzzy-match fuzzy
@@ -613,17 +614,6 @@ It should be used when candidate list don't need to rebuild dynamically."
                                    (`(,l . ,_ll) l))
                            (if minibuffer-completing-file-name it
                                (regexp-quote it)))))
-    (when (and default (listp default))
-      ;; When DEFAULT is a list append it on head of COLLECTION
-      ;; and set it to its car. #bugfix `grep-read-files'.
-      (setq collection
-            ;; COLLECTION is maybe a function or a table.
-            (append default
-                    (helm-comp-read-get-candidates collection test)))
-      ;; Ensure `all-completions' will not be used
-      ;; a second time to recompute COLLECTION [1].
-      (setq alistp t test nil)
-      (setq default (car default)))
     (helm-comp-read
      prompt collection
      :test test
@@ -633,7 +623,8 @@ It should be used when candidate list don't need to rebuild dynamically."
      :must-match require-match
      :alistp alistp
      :name name
-     :requires-pattern (if (and (string= default "")
+     :requires-pattern (if (and (stringp default)
+                                (string= default "")
                                 (or (eq require-match 'confirm)
                                     (eq require-match
                                         'confirm-after-completion)))
