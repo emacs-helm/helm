@@ -1889,7 +1889,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (helm-log "any-history = %S" any-history)
   (setq helm--prompt (or any-prompt "pattern: "))
   (let ((non-essential t)
+        ;; Prevent mouse jumping to the upper-right
+        ;; hand corner of the frame (#1538).
         mode-line-in-non-selected-windows
+        mouse-autoselect-window
+        focus-follows-mouse
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
         (helm--maybe-use-default-as-input
