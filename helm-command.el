@@ -143,7 +143,9 @@ fuzzy matching is running its own sort function with a different algorithm."
 
 (defun helm-M-x--notify-prefix-arg ()
   ;; Notify a prefix-arg set AFTER calling M-x.
-  (when prefix-arg
+  (when (or prefix-arg
+            (when helm-M-x-allow-prefix-argument
+              helm-M-x-prefix-argument))
     (with-helm-window
       (helm-display-mode-line (helm-get-current-source) 'force))))
 
