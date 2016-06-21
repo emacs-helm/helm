@@ -49,6 +49,11 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
+(defcustom helm-M-x-allow-prefix-argument nil
+  "Allow specifying prefix argument before `helm-M-x' when non--nil."
+  :group 'helm-command
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -65,6 +70,7 @@ Show all candidates on startup when 0 (default)."
 
 
 (defvar helm-M-x-input-history nil)
+(defvar helm-M-x-prefix-argument nil "Prefix argument before calling `helm-M-x'.")
 
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
@@ -188,12 +194,14 @@ than the default which is OBARRAY."
                        and collect c))
         (unwind-protect
              (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
-               (when current-prefix-arg
-                 (ding)
-                 (message "%s" msg)
-                 (while (not (sit-for 1))
-                   (discard-input))
-                 (user-error msg))
+               (if helm-M-x-allow-prefix-argument
+                   (setq helm-M-x-prefix-argument current-prefix-arg)
+                 (when current-prefix-arg
+                   (ding)
+                   (message "%s" msg)
+                   (while (not (sit-for 1))
+                     (discard-input))
+                   (user-error msg)))
                (setq current-prefix-arg nil)
                (helm-comp-read
                 "M-x " (or collection obarray)
@@ -237,7 +245,12 @@ You can get help on each command by persistent action."
             real-this-command sym-com)
       ;; If helm-M-x is called with regular emacs completion (kmacro)
       ;; use the value of arg otherwise use helm-current-prefix-arg.
-      (let ((prefix-arg (or helm-current-prefix-arg arg)))
+      (let ((prefix-arg
+             (or helm-current-prefix-arg
+                 (when helm-M-x-allow-prefix-argument
+                   (prog1 helm-M-x-prefix-argument
+                     (setq helm-M-x-prefix-argument nil)))
+                 arg)))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
           (command-execute sym-com 'record))
