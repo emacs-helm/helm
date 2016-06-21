@@ -49,6 +49,14 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
+(defcustom helm-M-x-allow-prefix-argument nil
+  "Allow specifying prefix argument before `helm-M-x' when non--nil.
+Note if you set it to non--nil and specify a prefix argument
+before `helm-M-x', then you will NOT be able to cancel it though
+you can change it to another vaule."
+  :group 'helm-command
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -187,16 +195,29 @@ than the default which is OBARRAY."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
         (unwind-protect
-             (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
-               (when current-prefix-arg
-                 (ding)
-                 (message "%s" msg)
-                 (while (not (sit-for 1))
-                   (discard-input))
-                 (user-error msg))
+            (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'")
+                  (prompt "M-x "))
+              (if helm-M-x-allow-prefix-argument
+                  (setq prompt
+                        (concat (cond
+                                 ((eq current-prefix-arg '-) "- ")
+                                 ((and (consp current-prefix-arg)
+                                       (eq (car current-prefix-arg) 4)) "C-u ")
+                                 ((and (consp current-prefix-arg)
+                                       (integerp (car current-prefix-arg)))
+                                  (format "%d " (car current-prefix-arg)))
+                                 ((integerp current-prefix-arg)
+                                  (format "%d " current-prefix-arg)))
+                                "M-x "))
+                (when current-prefix-arg
+                  (ding)
+                  (message "%s" msg)
+                  (while (not (sit-for 1))
+                    (discard-input))
+                  (user-error msg)))
                (setq current-prefix-arg nil)
                (helm-comp-read
-                "M-x " (or collection obarray)
+                prompt (or collection obarray)
                 :test 'commandp
                 :requires-pattern helm-M-x-requires-pattern
                 :name "Emacs Commands"
