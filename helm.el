@@ -3750,7 +3750,9 @@ DIRECTION is either 'next or 'previous."
                      (:eval (when ,helm--mode-line-display-prefarg
                               (let ((arg (prefix-numeric-value
                                           (or prefix-arg current-prefix-arg
-                                              (when helm-M-x-allow-prefix-argument
+                                              (when (and helm-M-x-allow-prefix-argument
+                                                         helm-M-x-display-prefix-argument-p)
+                                                (setq helm-M-x-display-prefix-argument-p nil)
                                                 helm-M-x-prefix-argument)))))
                                 (unless (= arg 1)
                                   (propertize (format " [prefarg:%s]" arg)
