@@ -49,7 +49,7 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-allow-prefix-argument nil
+(defcustom helm-M-x-allow-prefix-argument t
   "Allow specifying prefix argument before `helm-M-x' when non--nil.
 Note if you set it to non--nil and specify a prefix argument
 before `helm-M-x', then you will NOT be able to cancel it though
@@ -168,6 +168,20 @@ fuzzy matching is running its own sort function with a different algorithm."
           (push (substring (helm-cmd--get-current-function-name) 1) results))))
     results))
 
+(defvar helm-M-x-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-comp-read-map)
+    (define-key map (kbd "C-u") 'nil)
+    (define-key map (kbd "C-u") 'helm-M-x-universal-argument)
+    map))
+
+(defun helm-M-x-universal-argument ()
+  (interactive)
+  (if helm-M-x-prefix-argument
+      (setq helm-M-x-prefix-argument nil)
+      (setq prefix-arg (list 4))
+      (universal-argument--mode)))
+
 (defun helm-M-x-read-extended-command (&optional collection history)
   "Read command name to invoke in `helm-M-x'.
 Helm completion is not provided when executing or defining
@@ -234,6 +248,7 @@ than the default which is OBARRAY."
                 :input-history 'helm-M-x-input-history
                 :del-input nil
                 :help-message 'helm-M-x-help-message
+                :keymap helm-M-x-map
                 :must-match t
                 :fuzzy helm-M-x-fuzzy-match
                 :nomark t
@@ -241,9 +256,7 @@ than the default which is OBARRAY."
                 :fc-transformer 'helm-M-x-transformer
                 :hist-fc-transformer 'helm-M-x-transformer-hist))
           (cancel-timer tm)
-          (setq helm--mode-line-display-prefarg nil)
-          (when helm-M-x-allow-prefix-argument
-            (setq helm-M-x-prefix-argument nil))))))
+          (setq helm--mode-line-display-prefarg nil)))))
 
 ;;;###autoload
 (defun helm-M-x (arg &optional command-name)
@@ -267,7 +280,7 @@ You can get help on each command by persistent action."
              (or helm-current-prefix-arg
                  (when helm-M-x-allow-prefix-argument
                    (prog1 helm-M-x-prefix-argument
-                     (setq helm-M-x-prefix-argument nil)))
+                     (setq helm-M-x-prefix-argument nil arg nil)))
                  arg)))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
