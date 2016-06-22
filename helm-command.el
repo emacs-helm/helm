@@ -183,11 +183,11 @@ fuzzy matching is running its own sort function with a different algorithm."
   (interactive)
   (if helm-M-x-prefix-argument
       (progn (setq helm-M-x-prefix-argument nil)
-             ;; Assuming in minibuffer
              (let ((inhibit-read-only t))
-               (save-excursion
-                 (goto-char (point-min))
-                 (delete-char (- (minibuffer-prompt-width) (length "M-x ")))))
+               (with-selected-window (minibuffer-window)
+                 (save-excursion
+                   (goto-char (point-min))
+                   (delete-char (- (minibuffer-prompt-width) (length "M-x "))))))
              (message "Initial prefix arg disabled"))
     (setq prefix-arg (list 4))
     (universal-argument--mode)))
