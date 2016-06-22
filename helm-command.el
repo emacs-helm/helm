@@ -71,7 +71,6 @@ Show all candidates on startup when 0 (default)."
 
 (defvar helm-M-x-input-history nil)
 (defvar helm-M-x-prefix-argument nil "Prefix argument before calling `helm-M-x'.")
-(defvar helm-M-x-display-prefix-argument-p nil)
 
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
@@ -144,10 +143,7 @@ fuzzy matching is running its own sort function with a different algorithm."
 
 (defun helm-M-x--notify-prefix-arg ()
   ;; Notify a prefix-arg set AFTER calling M-x.
-  (when (or prefix-arg
-            (when (and helm-M-x-allow-prefix-argument
-                       helm-M-x-display-prefix-argument-p)
-              helm-M-x-prefix-argument))
+  (when prefix-arg
     (with-helm-window
       (helm-display-mode-line (helm-get-current-source) 'force))))
 
@@ -199,8 +195,7 @@ than the default which is OBARRAY."
         (unwind-protect
              (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
                (if helm-M-x-allow-prefix-argument
-                   (setq helm-M-x-prefix-argument current-prefix-arg
-                         helm-M-x-display-prefix-argument-p t)
+                   (setq helm-M-x-prefix-argument current-prefix-arg)
                  (when current-prefix-arg
                    (ding)
                    (message "%s" msg)
