@@ -3758,11 +3758,16 @@ DIRECTION is either 'next or 'previous."
                              (car-safe helm-mode-line-string)))
                      " " helm--mode-line-string-real " "
                      (:eval (make-string (window-width) ? )))
-                help-echo "Mouse is disabled"
                 keymap (keymap (mode-line keymap
                                           (mouse-1 . ignore)
+                                          (down-mouse-1 . ignore)
+                                          (drag-mouse-1 . ignore)
                                           (mouse-2 . ignore)
-                                          (mouse-3 . ignore))))
+                                          (down-mouse-2 . ignore)
+                                          (drag-mouse-2 . ignore)
+                                          (mouse-3 . ignore)
+                                          (down-mouse-3 . ignore)
+                                          (drag-mouse-3 . ignore))))
               helm--mode-line-string-real
               (substitute-command-keys (if (listp helm-mode-line-string)
                                            (cadr helm-mode-line-string)
