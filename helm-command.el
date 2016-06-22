@@ -204,7 +204,19 @@ than the default which is OBARRAY."
                    (user-error msg)))
                (setq current-prefix-arg nil)
                (helm-comp-read
-                "M-x " (or collection obarray)
+                (if helm-M-x-allow-prefix-argument
+                    (concat (cond
+                             ((eq helm-M-x-prefix-argument '-) "- ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (integerp (car helm-M-x-prefix-argument)))
+                              (format "%d " (car helm-M-x-prefix-argument)))
+                             ((integerp helm-M-x-prefix-argument)
+                              (format "%d " helm-M-x-prefix-argument)))
+                            "M-x ")
+                  "M-x ")
+                (or collection obarray)
                 :test 'commandp
                 :requires-pattern helm-M-x-requires-pattern
                 :name "Emacs Commands"
