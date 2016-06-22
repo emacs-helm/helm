@@ -241,7 +241,9 @@ than the default which is OBARRAY."
                 :fc-transformer 'helm-M-x-transformer
                 :hist-fc-transformer 'helm-M-x-transformer-hist))
           (cancel-timer tm)
-          (setq helm--mode-line-display-prefarg nil)))))
+          (setq helm--mode-line-display-prefarg nil)
+          (when helm-M-x-allow-prefix-argument
+            (setq helm-M-x-prefix-argument nil))))))
 
 ;;;###autoload
 (defun helm-M-x (arg &optional command-name)
