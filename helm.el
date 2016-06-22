@@ -1963,7 +1963,9 @@ Call with a prefix arg to choose among existing helm
 buffers (sessions). When calling from lisp, specify a buffer-name
 as a string with ARG."
   (interactive "P")
-  (let (any-buffer cur-dir (helm-full-frame helm-full-frame))
+  (let (any-buffer
+        cur-dir
+        (helm-full-frame (default-value 'helm-full-frame)))
     (if arg
         (if (and (stringp arg) (bufferp (get-buffer arg)))
             (setq any-buffer arg)
