@@ -1009,11 +1009,12 @@ This feature is only available with emacs-25.
 
 *** Prefix Args
 
-All the prefix args passed BEFORE running `helm-M-x' are ignored,
-you should get an error message if you do so.
-When you want to pass prefix args, pass them AFTER starting `helm-M-x',
+When you want pass prefix args, you should pass prefix args AFTER starting `helm-M-x',
 you will see a prefix arg counter appearing in mode-line notifying you
-the number of prefix args entered.")
+the number of prefix args entered.
+
+If you pass prefix args before running `helm-M-x', it will be displayed in prompt,
+then the first C-u after `helm-M-x' will be used to clear that prefix args.")
 
 ;;; helm-imenu
 ;;

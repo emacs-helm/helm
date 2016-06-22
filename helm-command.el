@@ -51,9 +51,13 @@ Show all candidates on startup when 0 (default)."
 
 (defcustom helm-M-x-allow-prefix-argument t
   "Allow specifying prefix argument before `helm-M-x' when non--nil.
-Note if you set it to non--nil and specify a prefix argument
-before `helm-M-x', then you will NOT be able to cancel it though
-you can change it to another vaule."
+
+If this variable is non--nil and you specify prefix argument before `helm-M-x',
+the first C-u after `helm-M-x' will be used to clear the initial prefix
+argument, otherwise C-u works as usual.
+
+If this variable is nil, inhibits setting prefix argument before `helm-M-x'
+by signaling an error."
   :group 'helm-command
   :type 'boolean)
 
