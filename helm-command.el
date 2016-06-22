@@ -50,7 +50,10 @@ Show all candidates on startup when 0 (default)."
   :type 'boolean)
 
 (defcustom helm-M-x-allow-prefix-argument nil
-  "Allow specifying prefix argument before `helm-M-x' when non--nil."
+  "Allow specifying prefix argument before `helm-M-x' when non--nil.
+Note if you set it to non--nil and specify a prefix argument
+before `helm-M-x', then you will NOT be able to cancel it though
+you can change it to another vaule."
   :group 'helm-command
   :type 'boolean)
 
@@ -70,7 +73,8 @@ Show all candidates on startup when 0 (default)."
 
 
 (defvar helm-M-x-input-history nil)
-(defvar helm-M-x-prefix-argument nil "Prefix argument before calling `helm-M-x'.")
+(defvar helm-M-x-prefix-argument nil
+  "Prefix argument before calling `helm-M-x'.")
 
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
