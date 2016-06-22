@@ -178,7 +178,8 @@ fuzzy matching is running its own sort function with a different algorithm."
 (defun helm-M-x-universal-argument ()
   (interactive)
   (if helm-M-x-prefix-argument
-      (setq helm-M-x-prefix-argument nil)
+      (progn (setq helm-M-x-prefix-argument nil)
+             (message "Initial prefix arg disabled"))
       (setq prefix-arg (list 4))
       (universal-argument--mode)))
 
