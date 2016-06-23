@@ -65,6 +65,8 @@ Show all candidates on startup when 0 (default)."
 
 
 (defvar helm-M-x-input-history nil)
+(defvar helm-M-x-prefix-argument nil
+  "Prefix argument before calling `helm-M-x'.")
 
 
 (cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
@@ -158,6 +160,26 @@ fuzzy matching is running its own sort function with a different algorithm."
           (push (substring (helm-cmd--get-current-function-name) 1) results))))
     results))
 
+(defvar helm-M-x-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-comp-read-map)
+    (define-key map (kbd "C-u") 'nil)
+    (define-key map (kbd "C-u") 'helm-M-x-universal-argument)
+    map))
+
+(defun helm-M-x-universal-argument ()
+  (interactive)
+  (if helm-M-x-prefix-argument
+      (progn (setq helm-M-x-prefix-argument nil)
+             (let ((inhibit-read-only t))
+               (with-selected-window (minibuffer-window)
+                 (save-excursion
+                   (goto-char (point-min))
+                   (delete-char (- (minibuffer-prompt-width) (length "M-x "))))))
+             (message "Initial prefix arg disabled"))
+    (setq prefix-arg (list 4))
+    (universal-argument--mode)))
+
 (defun helm-M-x-read-extended-command (&optional collection history)
   "Read command name to invoke in `helm-M-x'.
 Helm completion is not provided when executing or defining
@@ -187,35 +209,43 @@ than the default which is OBARRAY."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
         (unwind-protect
-             (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
-               (when current-prefix-arg
-                 (ding)
-                 (message "%s" msg)
-                 (while (not (sit-for 1))
-                   (discard-input))
-                 (user-error msg))
+             (progn
+               (setq helm-M-x-prefix-argument current-prefix-arg)
                (setq current-prefix-arg nil)
-               (helm-comp-read
-                "M-x " (or collection obarray)
-                :test 'commandp
-                :requires-pattern helm-M-x-requires-pattern
-                :name "Emacs Commands"
-                :buffer "*helm M-x*"
-                :persistent-action (lambda (candidate)
-                                     (helm-elisp--persistent-help
-                                      candidate 'helm-describe-function))
-                :persistent-help "Describe this command"
-                :history (or history extended-command-history)
-                :reverse-history helm-M-x-reverse-history
-                :input-history 'helm-M-x-input-history
-                :del-input nil
-                :help-message 'helm-M-x-help-message
-                :must-match t
-                :fuzzy helm-M-x-fuzzy-match
-                :nomark t
-                :candidates-in-buffer t
-                :fc-transformer 'helm-M-x-transformer
-                :hist-fc-transformer 'helm-M-x-transformer-hist))
+               (condition-case nil
+                   (helm-comp-read
+                    (concat (cond
+                             ((eq helm-M-x-prefix-argument '-) "- ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (integerp (car helm-M-x-prefix-argument)))
+                              (format "%d " (car helm-M-x-prefix-argument)))
+                             ((integerp helm-M-x-prefix-argument)
+                              (format "%d " helm-M-x-prefix-argument)))
+                            "M-x ")
+                    (or collection obarray)
+                    :test 'commandp
+                    :requires-pattern helm-M-x-requires-pattern
+                    :name "Emacs Commands"
+                    :buffer "*helm M-x*"
+                    :persistent-action (lambda (candidate)
+                                         (helm-elisp--persistent-help
+                                          candidate 'helm-describe-function))
+                    :persistent-help "Describe this command"
+                    :history (or history extended-command-history)
+                    :reverse-history helm-M-x-reverse-history
+                    :input-history 'helm-M-x-input-history
+                    :del-input nil
+                    :help-message 'helm-M-x-help-message
+                    :keymap helm-M-x-map
+                    :must-match t
+                    :fuzzy helm-M-x-fuzzy-match
+                    :nomark t
+                    :candidates-in-buffer t
+                    :fc-transformer 'helm-M-x-transformer
+                    :hist-fc-transformer 'helm-M-x-transformer-hist)
+                 (quit (setq helm-M-x-prefix-argument nil))))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 
@@ -237,7 +267,14 @@ You can get help on each command by persistent action."
             real-this-command sym-com)
       ;; If helm-M-x is called with regular emacs completion (kmacro)
       ;; use the value of arg otherwise use helm-current-prefix-arg.
-      (let ((prefix-arg (or helm-current-prefix-arg arg)))
+      (let ((prefix-arg
+             (or helm-current-prefix-arg
+                 (when helm-M-x-prefix-argument
+                   (prog1 helm-M-x-prefix-argument
+                     (setq helm-M-x-prefix-argument nil)))
+                 ;; Use arg if calling from defining/executing keyboard macro and from lisp
+                 (cond ((or defining-kbd-macro executing-kbd-macro) arg)
+                       ((not (called-interactively-p 'any)) arg)))))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
           (command-execute sym-com 'record))
