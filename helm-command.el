@@ -212,38 +212,40 @@ than the default which is OBARRAY."
              (progn
                (setq helm-M-x-prefix-argument current-prefix-arg)
                (setq current-prefix-arg nil)
-               (helm-comp-read
-                (concat (cond
-                         ((eq helm-M-x-prefix-argument '-) "- ")
-                         ((and (consp helm-M-x-prefix-argument)
-                               (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                         ((and (consp helm-M-x-prefix-argument)
-                               (integerp (car helm-M-x-prefix-argument)))
-                          (format "%d " (car helm-M-x-prefix-argument)))
-                         ((integerp helm-M-x-prefix-argument)
-                          (format "%d " helm-M-x-prefix-argument)))
-                        "M-x ")
-                (or collection obarray)
-                :test 'commandp
-                :requires-pattern helm-M-x-requires-pattern
-                :name "Emacs Commands"
-                :buffer "*helm M-x*"
-                :persistent-action (lambda (candidate)
-                                     (helm-elisp--persistent-help
-                                      candidate 'helm-describe-function))
-                :persistent-help "Describe this command"
-                :history (or history extended-command-history)
-                :reverse-history helm-M-x-reverse-history
-                :input-history 'helm-M-x-input-history
-                :del-input nil
-                :help-message 'helm-M-x-help-message
-                :keymap helm-M-x-map
-                :must-match t
-                :fuzzy helm-M-x-fuzzy-match
-                :nomark t
-                :candidates-in-buffer t
-                :fc-transformer 'helm-M-x-transformer
-                :hist-fc-transformer 'helm-M-x-transformer-hist))
+               (condition-case nil
+                   (helm-comp-read
+                    (concat (cond
+                             ((eq helm-M-x-prefix-argument '-) "- ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                             ((and (consp helm-M-x-prefix-argument)
+                                   (integerp (car helm-M-x-prefix-argument)))
+                              (format "%d " (car helm-M-x-prefix-argument)))
+                             ((integerp helm-M-x-prefix-argument)
+                              (format "%d " helm-M-x-prefix-argument)))
+                            "M-x ")
+                    (or collection obarray)
+                    :test 'commandp
+                    :requires-pattern helm-M-x-requires-pattern
+                    :name "Emacs Commands"
+                    :buffer "*helm M-x*"
+                    :persistent-action (lambda (candidate)
+                                         (helm-elisp--persistent-help
+                                          candidate 'helm-describe-function))
+                    :persistent-help "Describe this command"
+                    :history (or history extended-command-history)
+                    :reverse-history helm-M-x-reverse-history
+                    :input-history 'helm-M-x-input-history
+                    :del-input nil
+                    :help-message 'helm-M-x-help-message
+                    :keymap helm-M-x-map
+                    :must-match t
+                    :fuzzy helm-M-x-fuzzy-match
+                    :nomark t
+                    :candidates-in-buffer t
+                    :fc-transformer 'helm-M-x-transformer
+                    :hist-fc-transformer 'helm-M-x-transformer-hist)
+                 (quit (setq helm-M-x-prefix-argument nil))))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 
