@@ -210,48 +210,39 @@ than the default which is OBARRAY."
                        and collect c))
         (unwind-protect
              (progn
-               (setq helm-M-x-prefix-argument current-prefix-arg)
                (setq current-prefix-arg nil)
-               (condition-case nil
-                   (helm-comp-read
-                    (concat (cond
-                             ((eq helm-M-x-prefix-argument '-) "- ")
-                             ((and (consp helm-M-x-prefix-argument)
-                                   (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                             ((and (consp helm-M-x-prefix-argument)
-                                   (integerp (car helm-M-x-prefix-argument)))
-                              (format "%d " (car helm-M-x-prefix-argument)))
-                             ((integerp helm-M-x-prefix-argument)
-                              (format "%d " helm-M-x-prefix-argument)))
-                            "M-x ")
-                    (or collection obarray)
-                    :test 'commandp
-                    :requires-pattern helm-M-x-requires-pattern
-                    :name "Emacs Commands"
-                    :buffer "*helm M-x*"
-                    :persistent-action (lambda (candidate)
-                                         (helm-elisp--persistent-help
-                                          candidate 'helm-describe-function))
-                    :persistent-help "Describe this command"
-                    :history (or history extended-command-history)
-                    :reverse-history helm-M-x-reverse-history
-                    :input-history 'helm-M-x-input-history
-                    :del-input nil
-                    :help-message 'helm-M-x-help-message
-                    :keymap helm-M-x-map
-                    :must-match t
-                    :fuzzy helm-M-x-fuzzy-match
-                    :nomark t
-                    :candidates-in-buffer t
-                    :fc-transformer 'helm-M-x-transformer
-                    :hist-fc-transformer 'helm-M-x-transformer-hist)
-                 ;; FIXME Probably we don't have to wrap this in
-                 ;; a condition case to rerset helm-M-x-prefix-argument.
-                 ;; The only case where it need to be reset is when
-                 ;; we C-g from an interactive session and then start
-                 ;; a vanilla session from kbd-macro, so just resetting
-                 ;; it when calling from kbd-macro should be enough.
-                 (quit (setq helm-M-x-prefix-argument nil))))
+               (helm-comp-read
+                (concat (cond
+                         ((eq helm-M-x-prefix-argument '-) "- ")
+                         ((and (consp helm-M-x-prefix-argument)
+                               (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                         ((and (consp helm-M-x-prefix-argument)
+                               (integerp (car helm-M-x-prefix-argument)))
+                          (format "%d " (car helm-M-x-prefix-argument)))
+                         ((integerp helm-M-x-prefix-argument)
+                          (format "%d " helm-M-x-prefix-argument)))
+                        "M-x ")
+                (or collection obarray)
+                :test 'commandp
+                :requires-pattern helm-M-x-requires-pattern
+                :name "Emacs Commands"
+                :buffer "*helm M-x*"
+                :persistent-action (lambda (candidate)
+                                     (helm-elisp--persistent-help
+                                      candidate 'helm-describe-function))
+                :persistent-help "Describe this command"
+                :history (or history extended-command-history)
+                :reverse-history helm-M-x-reverse-history
+                :input-history 'helm-M-x-input-history
+                :del-input nil
+                :help-message 'helm-M-x-help-message
+                :keymap helm-M-x-map
+                :must-match t
+                :fuzzy helm-M-x-fuzzy-match
+                :nomark t
+                :candidates-in-buffer t
+                :fc-transformer 'helm-M-x-transformer
+                :hist-fc-transformer 'helm-M-x-transformer-hist))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 
@@ -264,7 +255,11 @@ Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
 the prefix args if needed, are passed AFTER starting `helm-M-x'.
 
 You can get help on each command by persistent action."
-  (interactive (list current-prefix-arg (helm-M-x-read-extended-command)))
+  (declare (interactive-only command-execute))
+  (interactive
+   (progn
+     (setq helm-M-x-prefix-argument current-prefix-arg)
+     (list current-prefix-arg (helm-M-x-read-extended-command))))
   (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
     (when sym-com
       ;; Avoid having `this-command' set to *exit-minibuffer.
@@ -273,19 +268,7 @@ You can get help on each command by persistent action."
             real-this-command sym-com)
       ;; If helm-M-x is called with regular emacs completion (kmacro)
       ;; use the value of arg otherwise use helm-current-prefix-arg.
-      (let ((prefix-arg
-             (or helm-current-prefix-arg
-                 ;; FIXME this when clause is not needed.
-                 (when helm-M-x-prefix-argument
-                   (prog1 helm-M-x-prefix-argument
-                     (setq helm-M-x-prefix-argument nil)))
-                 ;; Use arg if calling from defining/executing keyboard macro and from lisp
-                 ;; FIXME This can go in one `or' block, no need to use `cond'.
-                 (cond ((or defining-kbd-macro executing-kbd-macro) arg)
-                       ;; FIXME Would be great to avoid using `called-interactively-p'
-                       ;; here which is evil especially when we want to repeat
-                       ;; complex commands.
-                       ((not (called-interactively-p 'any)) arg)))))
+      (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
           (command-execute sym-com 'record))
