@@ -270,9 +270,9 @@ You can get help on each command by persistent action."
                  (when helm-M-x-prefix-argument
                    (prog1 helm-M-x-prefix-argument
                      (setq helm-M-x-prefix-argument nil)))
-                 ;; Use arg if calling from lisp or keyboard macro
-                 (unless (called-interactively-p 'interactive)
-                   arg))))
+                 ;; Use arg if calling from defining/executing keyboard macro and from lisp
+                 (cond ((or defining-kbd-macro executing-kbd-macro) arg)
+                       ((not (called-interactively-p 'any)) arg)))))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
           (command-execute sym-com 'record))
