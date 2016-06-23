@@ -209,7 +209,7 @@ than the default which is OBARRAY."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
         (unwind-protect
-             (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
+             (progn
                (setq helm-M-x-prefix-argument current-prefix-arg)
                (setq current-prefix-arg nil)
                (helm-comp-read
