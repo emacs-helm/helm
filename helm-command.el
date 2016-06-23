@@ -267,9 +267,12 @@ You can get help on each command by persistent action."
       ;; use the value of arg otherwise use helm-current-prefix-arg.
       (let ((prefix-arg
              (or helm-current-prefix-arg
-                 (prog1 helm-M-x-prefix-argument
-                   (setq helm-M-x-prefix-argument nil arg nil))
-                 arg)))
+                 (when helm-M-x-prefix-argument
+                   (prog1 helm-M-x-prefix-argument
+                     (setq helm-M-x-prefix-argument nil)))
+                 ;; Use arg if calling from lisp or keyboard macro
+                 (unless (called-interactively-p 'interactive)
+                   arg))))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
           (command-execute sym-com 'record))
