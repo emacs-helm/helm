@@ -49,18 +49,6 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-allow-prefix-argument t
-  "Allow specifying prefix argument before `helm-M-x' when non--nil.
-
-If this variable is non--nil and you specify prefix argument before `helm-M-x',
-the first C-u after `helm-M-x' will be used to clear the initial prefix
-argument, otherwise C-u works as usual.
-
-If this variable is nil, inhibits setting prefix argument before `helm-M-x'
-by signaling an error."
-  :group 'helm-command
-  :type 'boolean)
-
 
 ;;; Faces
 ;;
@@ -222,28 +210,19 @@ than the default which is OBARRAY."
                        and collect c))
         (unwind-protect
              (let ((msg "Error: Specifying a prefix arg before calling `helm-M-x'"))
-               (if helm-M-x-allow-prefix-argument
-                   (setq helm-M-x-prefix-argument current-prefix-arg)
-                 (when current-prefix-arg
-                   (ding)
-                   (message "%s" msg)
-                   (while (not (sit-for 1))
-                     (discard-input))
-                   (user-error msg)))
+               (setq helm-M-x-prefix-argument current-prefix-arg)
                (setq current-prefix-arg nil)
                (helm-comp-read
-                (if helm-M-x-allow-prefix-argument
-                    (concat (cond
-                             ((eq helm-M-x-prefix-argument '-) "- ")
-                             ((and (consp helm-M-x-prefix-argument)
-                                   (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                             ((and (consp helm-M-x-prefix-argument)
-                                   (integerp (car helm-M-x-prefix-argument)))
-                              (format "%d " (car helm-M-x-prefix-argument)))
-                             ((integerp helm-M-x-prefix-argument)
-                              (format "%d " helm-M-x-prefix-argument)))
-                            "M-x ")
-                  "M-x ")
+                (concat (cond
+                         ((eq helm-M-x-prefix-argument '-) "- ")
+                         ((and (consp helm-M-x-prefix-argument)
+                               (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                         ((and (consp helm-M-x-prefix-argument)
+                               (integerp (car helm-M-x-prefix-argument)))
+                          (format "%d " (car helm-M-x-prefix-argument)))
+                         ((integerp helm-M-x-prefix-argument)
+                          (format "%d " helm-M-x-prefix-argument)))
+                        "M-x ")
                 (or collection obarray)
                 :test 'commandp
                 :requires-pattern helm-M-x-requires-pattern
@@ -288,9 +267,8 @@ You can get help on each command by persistent action."
       ;; use the value of arg otherwise use helm-current-prefix-arg.
       (let ((prefix-arg
              (or helm-current-prefix-arg
-                 (when helm-M-x-allow-prefix-argument
-                   (prog1 helm-M-x-prefix-argument
-                     (setq helm-M-x-prefix-argument nil arg nil)))
+                 (prog1 helm-M-x-prefix-argument
+                   (setq helm-M-x-prefix-argument nil arg nil))
                  arg)))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
