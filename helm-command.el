@@ -275,6 +275,7 @@ You can get help on each command by persistent action."
       ;; use the value of arg otherwise use helm-current-prefix-arg.
       (let ((prefix-arg
              (or helm-current-prefix-arg
+                 ;; FIXME this when clause is not needed.
                  (when helm-M-x-prefix-argument
                    (prog1 helm-M-x-prefix-argument
                      (setq helm-M-x-prefix-argument nil)))
