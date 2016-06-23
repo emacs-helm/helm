@@ -245,6 +245,12 @@ than the default which is OBARRAY."
                     :candidates-in-buffer t
                     :fc-transformer 'helm-M-x-transformer
                     :hist-fc-transformer 'helm-M-x-transformer-hist)
+                 ;; FIXME Probably we don't have to wrap this in
+                 ;; a condition case to rerset helm-M-x-prefix-argument.
+                 ;; The only case where it need to be reset is when
+                 ;; we C-g from an interactive session and then start
+                 ;; a vanilla session from kbd-macro, so just resetting
+                 ;; it when calling from kbd-macro should be enough.
                  (quit (setq helm-M-x-prefix-argument nil))))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
@@ -273,7 +279,11 @@ You can get help on each command by persistent action."
                    (prog1 helm-M-x-prefix-argument
                      (setq helm-M-x-prefix-argument nil)))
                  ;; Use arg if calling from defining/executing keyboard macro and from lisp
+                 ;; FIXME This can go in one `or' block, no need to use `cond'.
                  (cond ((or defining-kbd-macro executing-kbd-macro) arg)
+                       ;; FIXME Would be great to avoid using `called-interactively-p'
+                       ;; here which is evil especially when we want to repeat
+                       ;; complex commands.
                        ((not (called-interactively-p 'any)) arg)))))
         ;; This ugly construct is to save history even on error.
         (unless helm-M-x-always-save-history
