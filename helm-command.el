@@ -163,11 +163,12 @@ fuzzy matching is running its own sort function with a different algorithm."
 (defvar helm-M-x-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-comp-read-map)
-    (define-key map (kbd "C-u") 'nil)
+    (define-key map (kbd "C-u") nil)
     (define-key map (kbd "C-u") 'helm-M-x-universal-argument)
     map))
 
 (defun helm-M-x-universal-argument ()
+  "Same as `universal-argument' but for `helm-M-x'."
   (interactive)
   (if helm-M-x-prefix-argument
       (progn (setq helm-M-x-prefix-argument nil)
@@ -179,6 +180,7 @@ fuzzy matching is running its own sort function with a different algorithm."
              (message "Initial prefix arg disabled"))
     (setq prefix-arg (list 4))
     (universal-argument--mode)))
+(put 'helm-M-x-universal-argument 'helm-only t)
 
 (defun helm-M-x-read-extended-command (&optional collection history)
   "Read command name to invoke in `helm-M-x'.
