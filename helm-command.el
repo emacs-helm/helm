@@ -252,7 +252,9 @@ than the default which is OBARRAY."
 It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
 Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
-the prefix args if needed, are passed AFTER starting `helm-M-x'.
+the prefix args if needed, can be passed AFTER starting `helm-M-x'.
+When a prefix arg is passed BEFORE starting `helm-M-x', the first `C-u'
+while in `helm-M-x' session will disable it.
 
 You can get help on each command by persistent action."
   (interactive
