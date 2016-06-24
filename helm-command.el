@@ -247,7 +247,7 @@ than the default which is OBARRAY."
           (setq helm--mode-line-display-prefarg nil)))))
 
 ;;;###autoload
-(defun helm-M-x (arg &optional command-name)
+(defun helm-M-x (_arg &optional command-name)
   "Preconfigured `helm' for Emacs commands.
 It is `helm' replacement of regular `M-x' `execute-extended-command'.
 
@@ -255,7 +255,6 @@ Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
 the prefix args if needed, are passed AFTER starting `helm-M-x'.
 
 You can get help on each command by persistent action."
-  (declare (interactive-only command-execute))
   (interactive
    (progn
      (setq helm-M-x-prefix-argument current-prefix-arg)
@@ -277,7 +276,7 @@ You can get help on each command by persistent action."
                     (delete command-name extended-command-history)))
         (when helm-M-x-always-save-history
           (command-execute sym-com 'record))))))
-
+(put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
 
