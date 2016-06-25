@@ -458,6 +458,8 @@ Filename completion happen if string start after or between a double quote."
 ;;; Apropos
 ;;
 ;;
+(defvar helm-apropos-history nil)
+
 (defun helm-apropos-init (test default)
   "Init candidates buffer for `helm-apropos' sources."
   (require 'helm-help)
@@ -681,6 +683,7 @@ i.e the `symbol-name' of any existing symbol."
           (mapcar (lambda (func)
                     (funcall func default))
                   helm-apropos-function-list)
+          :history 'helm-apropos-history
           :buffer "*helm apropos*"
           :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>"))))
 
