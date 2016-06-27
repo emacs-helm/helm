@@ -482,18 +482,18 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
 
 (defun helm-describe-function (func)
   "FUNC is symbol or string."
-  (describe-function (helm-symbolify func))
-  (message nil))
+  (cl-letf (((symbol-function 'message) #'ignore))
+    (describe-function (helm-symbolify func))))
 
 (defun helm-describe-variable (var)
   "VAR is symbol or string."
-  (describe-variable (helm-symbolify var))
-  (message nil))
+  (cl-letf (((symbol-function 'message) #'ignore))
+    (describe-variable (helm-symbolify var))))
 
 (defun helm-describe-face (face)
-  "VAR is symbol or string."
-  (describe-face (helm-symbolify face))
-  (message nil))
+  "FACE is symbol or string."
+  (cl-letf (((symbol-function 'message) #'ignore))
+    (describe-face (helm-symbolify face))))
 
 (defun helm-find-function (func)
   "FUNC is symbol or string."
