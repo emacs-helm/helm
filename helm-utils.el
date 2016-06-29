@@ -384,8 +384,8 @@ from its directory."
                            (string-match ffap-url-regexp it))
                       it (expand-file-name it))
                 default-directory))
-         ((or (file-remote-p sel)
-              (file-exists-p sel))
+         ((and (stringp sel) (or (file-remote-p sel)
+                                 (file-exists-p sel)))
           (expand-file-name sel))
          ;; Grep.
          ((and grep-line (file-exists-p (car grep-line)))
@@ -395,7 +395,7 @@ from its directory."
           (with-current-buffer (get-buffer (car grep-line))
             (or (buffer-file-name) default-directory)))
          ;; Url.
-         ((and ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
+         ((and (stringp sel) ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
          ;; Default.
          (t default-preselection))))))
 (put 'helm-quit-and-find-file 'helm-only t)
