@@ -218,7 +218,10 @@
 
 (defun helm-bookmark-jump-other-window (candidate)
   (let (non-essential)
-    (bookmark-jump-other-window candidate)))
+    (if (string= (assoc-default 'name (helm-get-current-source))
+                 "Bookmark helm-find-files sessions")
+        (bookmark-jump candidate)
+        (bookmark-jump-other-window candidate))))
 
 
 ;;; bookmark-set
@@ -683,7 +686,7 @@ words from the buffer into the new bookmark name."
   "Jump to bookmark from keyboard."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'bookmark-jump-other-window)))
+    (helm-exit-and-execute-action 'helm-bookmark-jump-other-window)))
 (put 'helm-bookmark-run-jump-other-window 'helm-only t)
 
 (defun helm-bookmark-run-delete ()
