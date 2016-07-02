@@ -413,12 +413,13 @@ and not be prompted to kill firefox process.
 NOTE: Probably not supported on some systems (e.g Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
+  (setq url (browse-url-encode-url url))
   (let ((process-environment (browse-url-process-environment)))
     (call-process-shell-command
      (format "(%s %s %s &)"
              browse-url-firefox-program
              helm-browse-url-firefox-new-window
-             url))))
+             (shell-quote-argument url)))))
 
 (defun helm-browse-url-chromium (url &optional _ignore)
   "Browse URL with google chrome browser."
