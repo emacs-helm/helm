@@ -3743,12 +3743,11 @@ DIRECTION is either 'next or 'previous."
                 (" " mode-line-buffer-identification " "
                      (:eval (format "L%-3d" (helm-candidate-number-at-point)))
                      ,follow
+                     " "
                      (:eval ,(and marked
-                                  (concat
-                                   " "
-                                   (propertize
-                                    (format "M%d" (length marked))
-                                    'face 'helm-visible-mark))))
+                                  (propertize
+                                   (format "M%d" (length marked))
+                                   'face 'helm-visible-mark)))
                      (:eval (when ,helm--mode-line-display-prefarg
                               (let ((arg (prefix-numeric-value
                                           (or prefix-arg current-prefix-arg))))
