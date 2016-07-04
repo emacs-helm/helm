@@ -111,15 +111,8 @@
 (defmethod helm--setup-source :primary ((_source helm-type-bookmark)))
 
 (defmethod helm--setup-source :before ((source helm-type-bookmark))
-  (if (string= (slot-value source 'name) "Bookmark helm-find-files sessions")
-      (progn
-        (setf (slot-value source 'action)
-              (helm-append-at-nth
-               helm-type-bookmark-actions
-               '(("Browse project" . helm-bookmark-browse-project)) 1))
-        (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
-      (setf (slot-value source 'action) 'helm-type-bookmark-actions)
-      (setf (slot-value source 'keymap) helm-bookmark-map))
+  (setf (slot-value source 'action) 'helm-type-bookmark-actions)
+  (setf (slot-value source 'keymap) helm-bookmark-map)
   (setf (slot-value source 'mode-line) (list "Bookmark(s)" helm-mode-line-string))
   (setf (slot-value source 'help-message) 'helm-bookmark-help-message)
   (setf (slot-value source 'migemo) t))
