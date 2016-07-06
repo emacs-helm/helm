@@ -274,11 +274,17 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         (helm-next-line))))
 
 (defun helm-cr-default (default cands)
-  (cond ((and (stringp default) (not (string= default "")))
-         (delq nil (cons default (delete default cands))))
-        ((consp default)
-         (append default cands))
-        (t cands)))
+  (delq nil
+        (cond ((and (stringp default) (not (string= default "")))
+               (cons default (delete default cands)))
+              ((consp default)
+               (append (cl-loop for d in default
+                                ;; Don't convert
+                                ;; nil to "nil" (i.e the string)
+                                ;; it will be delq'ed on top.
+                                collect (if (null d) d (helm-stringify d)))
+                       cands))
+              (t cands))))
 
 ;;;###autoload
 (cl-defun helm-comp-read (prompt collection
@@ -460,9 +466,11 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          (append '((lambda (candidates sources)
                                      (cl-loop for i in candidates
                                               ;; Input is added to history in completing-read's
-                                              ;; and may be regexp-quoted, so unquote it.
-                                              for cand = (replace-regexp-in-string "\\s\\" "" i)
-                                              collect cand)))
+                                              ;; and may be regexp-quoted, so unquote it
+                                              ;; but check if cand is a string (it may be at this stage
+                                              ;; a symbol or nil) Issue #1553.
+                                              when (stringp i)
+                                              collect (replace-regexp-in-string "\\s\\" "" i))))
                                  (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                          :persistent-action persistent-action
                          :persistent-help persistent-help
