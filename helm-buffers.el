@@ -423,7 +423,7 @@ Should be called after others transformers i.e (boring buffers)."
     (let ((preselect (helm-buffer--get-preselection
                       (helm-get-selection))))
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
-      (helm-force-update preselect))))
+      (helm-update preselect))))
 (put 'helm-toggle-buffers-details 'helm-only t)
 
 (defun helm-buffers-sort-transformer (candidates _source)
