@@ -5158,9 +5158,9 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
     (set (make-local-variable 'helm-visible-mark-overlays) nil)))
 
 (defun helm-this-visible-mark ()
-  (cl-loop for o in helm-visible-mark-overlays
-        when (equal (point-at-bol) (overlay-start o))
-        return o))
+  (cl-loop for o in (overlays-at (point))
+           when (overlay-get o 'visible-mark)
+           return o))
 
 (defun helm-delete-visible-mark (overlay)
   (setq helm-marked-candidates
@@ -5171,7 +5171,7 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
   (setq helm-visible-mark-overlays
         (delq overlay helm-visible-mark-overlays)))
 
-(defun helm-make-visible-mark (&optional src-name)
+(defun helm-make-visible-mark (&optional src selection)
   (let ((o (make-overlay (point-at-bol)
                           (if (helm-pos-multiline-p)
                               (or (helm-get-next-candidate-separator-pos)
@@ -5179,11 +5179,13 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                             (1+ (point-at-eol))))))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
-    (overlay-put o 'source (or src-name (assoc-default 'name (helm-get-current-source))))
+    (overlay-put o 'source (assoc-default 'name (or src (helm-get-current-source))))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
-    (overlay-put o 'real   (helm-get-selection))
-    (add-to-list 'helm-visible-mark-overlays o))
-  (push (cons (helm-get-current-source) (helm-get-selection))
+    (overlay-put o 'real   (or selection (helm-get-selection)))
+    (overlay-put o 'visible-mark t)
+    (cl-pushnew o helm-visible-mark-overlays))
+  (push (cons (or src  (helm-get-current-source))
+              (or selection (helm-get-selection)))
         helm-marked-candidates))
 
 (defun helm-toggle-visible-mark ()
@@ -5214,9 +5216,10 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
   (interactive)
   (with-helm-alive-p
     (with-helm-window
-      (let* ((nomark (assq 'nomark (helm-get-current-source)))
-             (follow (if helm-follow-mode 1 -1))
-             (src-name    (assoc-default 'name (helm-get-current-source)))
+      (let* ((follow     (if helm-follow-mode 1 -1))
+             (src        (helm-get-current-source))
+             (nomark     (assq 'nomark src))
+             (src-name   (assoc-default 'name src))
              (filecomp-p (or (helm-file-completion-source-p)
                              (string= src-name "Files from Current Directory"))))
         (cl-letf (((symbol-function 'message) #'ignore))
@@ -5252,7 +5255,7 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                                             ;; a transformer that put a prefix tag
                                             ;; (i.e ? or @ on tramp).
                                             (not (file-exists-p cand)))))
-                             (helm-make-visible-mark src-name)))
+                             (helm-make-visible-mark src cand)))
                          (when (helm-pos-multiline-p)
                            (goto-char
                             (or (helm-get-next-candidate-separator-pos)
