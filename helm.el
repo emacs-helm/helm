@@ -2226,7 +2226,8 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                (not helm-split-window-in-side-p))
       (delete-other-windows))
     (display-buffer
-     buffer `(nil . ((window-height . ,helm-display-buffer-default-size))))))
+     buffer `(nil . ((window-height . ,helm-display-buffer-default-size))))
+    (helm-log-run-hook 'helm-window-configuration-hook)))
 
 
 ;;; Core: initialize
