@@ -5288,7 +5288,7 @@ visible or invisible in all sources of current helm session"
           (helm-mark-all)))))
 (put 'helm-toggle-all-marks 'helm-only t)
 
-(defun helm--compute-marked (real source wildcard)
+(defun helm--compute-marked (real source &optional wildcard)
   (let* ((coerced (helm-coerce-selection real source))
          (wilds   (and wildcard
                        (condition-case nil
@@ -5314,8 +5314,9 @@ selection. When key WITH-WILDCARD is specified, expand it."
     (let ((candidates
            (cl-loop with current-src = (helm-get-current-source)
                     for (source . real) in (reverse helm-marked-candidates)
+                    for use-wc = (and with-wildcard (string-match-p "\\*" real))
                     when (equal (assq 'name source) (assq 'name current-src))
-                    append (helm--compute-marked real source with-wildcard)
+                    append (helm--compute-marked real source use-wc)
                     into cands
                     finally return (or cands
                                        (append
