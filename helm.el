@@ -5246,9 +5246,9 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                            ;; autosave files/links and non--existent file.
                            (unless
                                (or (helm-this-visible-mark)
+                                   (string= prefix "[?]")          ; doesn't match
                                    (and filecomp-p
-                                        (or (string= prefix "[?]") ; don't exists
-                                            (string= prefix "[@]") ; remote
+                                        (or (string= prefix "[@]") ; remote
                                             (string-match          ; autosave
                                              "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
                                             ;; We need to test here when not using
@@ -5260,8 +5260,7 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                            (goto-char
                             (or (helm-get-next-candidate-separator-pos)
                                 (point-max))))
-                         (forward-line 1)
-                         (end-of-line))))
+                         (forward-line 1))))
                    (helm-mark-current-line))
             (helm-follow-mode follow)))))))
 (put 'helm-mark-all 'helm-only t)
