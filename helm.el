@@ -5231,7 +5231,7 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                    (message "Marking not allowed in this source")
                    (save-excursion
                      (goto-char (helm-get-previous-header-pos))
-                     (helm-next-line)
+                     (forward-line 1)
                      (let* ((next-head (helm-get-next-header-pos))
                             (end       (and next-head
                                             (save-excursion
