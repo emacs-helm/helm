@@ -3359,7 +3359,7 @@ to a particular place after finishing update."
   (goto-char (point-min))
   (unless without-hook
     (save-excursion (helm-log-run-hook 'helm-update-hook)))
-  (helm-next-line))
+  (helm-move-selection-common :where 'line :direction 'next :follow nil))
 
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
@@ -3849,7 +3849,7 @@ it is \"Candidate\(s\)\" by default."
                          cand-name))
          'face 'helm-candidate-number)))))
 
-(cl-defun helm-move-selection-common (&key where direction)
+(cl-defun helm-move-selection-common (&key where direction (follow t))
   "Move the selection marker to a new position.
 Position is determined by WHERE and DIRECTION.
 Key arg WHERE can be one of:
@@ -3888,6 +3888,8 @@ Key arg DIRECTION can be one of:
         (helm-display-source-at-screen-top-maybe where)
         (when (helm-get-previous-header-pos)
           (helm-mark-current-line))
+        (when follow
+          (helm-follow-execute-persistent-action-maybe))
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-move-selection-after-hook)))))
 
@@ -4120,8 +4122,7 @@ candidates."
                header-pos
                (point-max)))
        (1+ (point-at-eol))))
-    (setq helm-selection-point (overlay-start helm-selection-overlay)))
-  (helm-follow-execute-persistent-action-maybe))
+    (setq helm-selection-point (overlay-start helm-selection-overlay))))
 
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
