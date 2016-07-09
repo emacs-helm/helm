@@ -5223,7 +5223,8 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
              (nomark     (assq 'nomark src))
              (src-name   (assoc-default 'name src))
              (filecomp-p (or (helm-file-completion-source-p)
-                             (string= src-name "Files from Current Directory"))))
+                             (string= src-name "Files from Current Directory")))
+             (remote-p (and filecomp-p (file-remote-p helm-pattern))))
         (cl-letf (((symbol-function 'message) #'ignore))
           (helm-follow-mode -1)
           (unwind-protect
@@ -5248,15 +5249,15 @@ Argument ACTION, when present, is used as second argument of `display-buffer'."
                            ;; autosave files/links and non--existent file.
                            (unless
                                (or (helm-this-visible-mark)
-                                   (string= prefix "[?]")          ; doesn't match
+                                   (string= prefix "[?]")   ; doesn't match
                                    (and filecomp-p
-                                        (or (string= prefix "[@]") ; remote
-                                            (string-match          ; autosave
+                                        (or (string-match-p ; autosave or dot files
                                              "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
                                             ;; We need to test here when not using
                                             ;; a transformer that put a prefix tag
-                                            ;; (i.e ? or @ on tramp).
-                                            (not (file-exists-p cand)))))
+                                            ;; before candidate.
+                                            ;; (i.e no [?] prefix on tramp).
+                                            (and remote-p (not (file-exists-p cand))))))
                              (helm-make-visible-mark src cand)))
                          (when (helm-pos-multiline-p)
                            (goto-char
