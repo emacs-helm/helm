@@ -699,7 +699,7 @@ like `re-search-forward', see below documentation of :search slot.")
     :initform '("dummy"))
 
    (filtered-candidate-transformer
-    :initform 'helm-dummy-candidate)
+    :initform (lambda (_candidates _source) (list helm-pattern)))
 
    (matchplugin
     :initform nil)

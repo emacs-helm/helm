@@ -776,10 +776,7 @@ If `nil', `helm-debug-output' includes only variables with
 Default is `nil', which disables writing log messages because the
 size of `helm-debug-buffer' grows quickly.")
 
-(defvar helm-compile-source-functions
-  '(helm-compile-source--type
-    helm-compile-source--dummy
-    helm-compile-source--candidates-in-buffer)
+(defvar helm-compile-source-functions nil 
   "Functions to compile elements of `helm-sources' (plug-in).")
 
 (defvar helm-mode-line-string "\
@@ -1119,6 +1116,19 @@ and not `exit-minibuffer' or other unwanted functions."
                    (> (length btf) 2))
            return (cadr (cdr btf))))
 
+(defun helm-append-at-nth (seq elm index)
+  "Append ELM at INDEX in SEQ."
+  (let ((len (length seq)))
+    (cond ((> index len) (setq index len))
+          ((< index 0) (setq index 0)))
+    (if (zerop index)
+        (append elm seq)
+      (cl-loop for i in seq
+               for count from 1 collect i
+               when (= count index)
+               if (listp elm) append elm
+               else collect elm))))
+
 
 ;; Test tools
 (defmacro with-helm-time-after-update (&rest body)
@@ -1187,6 +1197,9 @@ and not `exit-minibuffer' or other unwanted functions."
          (progn ,@body)
        (error "Running helm command outside of context"))))
 
+
+;;; helm-attributes
+;;
 (defun helm-attr (attribute-name &optional source compute)
   "Get the value of ATTRIBUTE-NAME of SRC.
 If SRC is omitted, use current source.
@@ -1250,19 +1263,6 @@ arg TYPE is an existing type defined in `helm-type-attributes'."
   (helm-aif (assq attribute source)
       it
     (helm-get-attribute-from-source-type attribute source)))
-
-(defun helm-append-at-nth (seq elm index)
-  "Append ELM at INDEX in SEQ."
-  (let ((len (length seq)))
-    (cond ((> index len) (setq index len))
-          ((< index 0) (setq index 0)))
-    (if (zerop index)
-        (append elm seq)
-      (cl-loop for i in seq
-               for count from 1 collect i
-               when (= count index)
-               if (listp elm) append elm
-               else collect elm))))
 
 (defun helm-add-action-to-source (name fn source &optional index)
   "Add new action NAME linked to function FN to SOURCE.
@@ -1336,6 +1336,24 @@ only when predicate helm-ff-candidates-lisp-p return non-`nil':
                      :test 'equal)
                     source))))
 
+(defun helm-document-attribute (attribute short-doc &optional long-doc)
+  "Register ATTRIBUTE documentation introduced by plug-in.
+SHORT-DOC is displayed beside attribute name.
+LONG-DOC is displayed below attribute name and short documentation."
+  (declare (indent 2))
+  (if long-doc
+      (setq short-doc (concat "(" short-doc ")"))
+    (setq long-doc short-doc
+          short-doc ""))
+  (setq helm-attributes (append (delete attribute helm-attributes)
+                                (list attribute)))
+  (put attribute 'helm-attrdoc
+       (concat "- " (symbol-name attribute)
+               " " short-doc "\n\n" long-doc "\n")))
+
+
+;;; Source filter
+;;
 (defun helm-set-source-filter (sources)
   "Set the value of `helm-source-filter' to SOURCES and update.
 
@@ -4439,104 +4457,8 @@ When at the end of minibuffer, deletes all."
     (helm--delete-minibuffer-contents-from str)))
 
 
-;;; Plugins (Deprecated in favor of helm-types)
+;;; helm-source-in-buffer.
 ;;
-;; i.e Inherit instead of helm-type-* classes in your own classes.
-
-;; [DEPRECATED] Enable multi-match by default in old sources.
-;; This is deprecated and will not run in sources
-;; created by helm-source.
-;; Keep it for backward compatibility with old sources.
-(defun helm-compile-source--multi-match (source)
-  (if (assoc 'no-matchplugin source)
-      source
-    (let* ((searchers        helm-mm-default-search-functions)
-           (defmatch         (helm-aif (assoc-default 'match source)
-                                 (helm-mklist it)))
-           (defmatch-strict  (helm-aif (assoc-default 'match-strict source)
-                                 (helm-mklist it)))
-           (defsearch        (helm-aif (assoc-default 'search source)
-                                 (helm-mklist it)))
-           (defsearch-strict (helm-aif (assoc-default 'search-strict source)
-                                 (helm-mklist it)))
-           (matchfns         (cond (defmatch-strict)
-                                   (defmatch
-                                    (append helm-mm-default-match-functions defmatch))
-                                   (t helm-mm-default-match-functions)))
-           (searchfns        (cond (defsearch-strict)
-                                   (defsearch
-                                    (append searchers defsearch))
-                                   (t searchers))))
-      `(,(if (assoc 'candidates-in-buffer source)
-             `(search ,@searchfns) `(match ,@matchfns))
-         ,@source))))
-
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--multi-match)
-
-(defun helm-compile-source--type (source)
-  (helm-aif (assoc-default 'type source)
-      (append source (assoc-default it helm-type-attributes) nil)
-    source))
-
-(defun define-helm-type-attribute (type definition &optional doc)
-  "Register type attribute of TYPE as DEFINITION with DOC.
-DOC is displayed in `helm-type-attributes' docstring.
-
-Using this function is better than setting `helm-type-attributes'
-directly."
-  (cl-loop for i in definition do
-       ;; without `ignore-errors', error at emacs22
-       (ignore-errors (setf i (delete nil i))))
-  (helm-add-type-attribute type definition)
-  (and doc (helm-document-type-attribute type doc))
-  nil)
-
-(defun helm-document-attribute (attribute short-doc &optional long-doc)
-  "Register ATTRIBUTE documentation introduced by plug-in.
-SHORT-DOC is displayed beside attribute name.
-LONG-DOC is displayed below attribute name and short documentation."
-  (declare (indent 2))
-  (if long-doc
-      (setq short-doc (concat "(" short-doc ")"))
-    (setq long-doc short-doc
-          short-doc ""))
-  (setq helm-attributes (append (delete attribute helm-attributes)
-                                (list attribute)))
-  (put attribute 'helm-attrdoc
-       (concat "- " (symbol-name attribute)
-               " " short-doc "\n\n" long-doc "\n")))
-
-(defun helm-add-type-attribute (type definition)
-  (helm-aif (assq type helm-type-attributes)
-      (setq helm-type-attributes (delete it helm-type-attributes)))
-  (push (cons type definition) helm-type-attributes))
-
-(defun helm-document-type-attribute (type doc)
-  (setq helm-types (append (delete type helm-types) (list type)))
-  (put type 'helm-typeattrdoc
-       (concat "- " (symbol-name type) "\n\n" doc "\n")))
-
-;; Built-in plug-in: dummy
-(defun helm-dummy-candidate (_candidate _source)
-  "Use `helm-pattern' as CANDIDATE in SOURCE."
-  ;; `source' is defined in filtered-candidate-transformer
-  (list helm-pattern))
-
-(defun helm-compile-source--dummy (source)
-  (if (assoc 'dummy source)
-      (progn
-        (unless (helm-attr-defined
-                 'filtered-candidate-transformer source)
-          (helm-attrset 'filtered-candidate-transformer
-                        'helm-dummy-candidate source))
-        (append source
-                '((candidates "dummy")
-                  (accept-empty)
-                  (match identity)
-                  (volatile))))
-    source))
-
-;; Built-in plug-in: candidates-in-buffer
 (defun helm-candidates-in-buffer (&optional source)
   "The top level function used to store candidates in `helm-source-in-buffer'.
 
@@ -4833,15 +4755,6 @@ Returns the resulting buffer."
                              data "\n"))
         (and (stringp data) (insert data))))
     buf))
-
-(defun helm-compile-source--candidates-in-buffer (source)
-  (helm-aif (assoc 'candidates-in-buffer source)
-      (append source
-              `((candidates . ,(or (cdr it)
-                                   (lambda ()
-                                     (helm-candidates-in-buffer source))))
-                (volatile) (match identity)))
-    source))
 
 
 ;;; Resplit helm window
