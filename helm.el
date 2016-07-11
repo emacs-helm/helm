@@ -662,16 +662,6 @@ See `helm-log-save-maybe' for more info."
 ;;; Variables.
 ;;
 ;;
-(defvar helm-type-attributes nil
-  "It's a list of \(TYPE ATTRIBUTES ...\).
-ATTRIBUTES are the same as attributes for `helm-sources'. TYPE
-connects the value to the appropriate sources. Don't set this
-directly, use `define-helm-type-attribute' instead.
-
-This alist is for specifying common attributes for multiple
-sources. For example, sources which provide files can specify
-common attributes with a `file' type.")
-
 (defvar helm-source-filter nil
   "A list of source names to be displayed.
 Other sources won't appear in the search results.
