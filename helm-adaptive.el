@@ -80,13 +80,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
   "Return current source only if it use adaptive history, nil otherwise."
   (when helm-adaptive-mode
     (let* ((source (or source-name (helm-get-current-source)))
-           (adapt-source (or (assoc-default 'filtered-candidate-transformer
-                                            (assoc (assoc-default 'type source)
-                                                   helm-type-attributes))
-                             (assoc-default 'candidate-transformer
-                                            (assoc (assoc-default 'type source)
-                                                   helm-type-attributes))
-                             (assoc-default 'filtered-candidate-transformer source)
+           (adapt-source (or (assoc-default 'filtered-candidate-transformer source)
                              (assoc-default 'candidate-transformer source))))
       (if (listp adapt-source)
           (and (member 'helm-adaptive-sort adapt-source) source)
