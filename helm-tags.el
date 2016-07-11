@@ -204,8 +204,9 @@ If no entry in cache, create one."
                 ;; If an entry exists modify it.
                 (setcdr it (helm-etags-mtime f))
               ;; No entry create a new one.
-              (add-to-list 'helm-etags-mtime-alist
-                           (cons f (helm-etags-mtime f))))))))))
+              (cl-pushnew (cons f (helm-etags-mtime f))
+                          helm-etags-mtime-alist
+                          :test 'equal))))))))
 
 (defvar helm-source-etags-select nil
   "Helm source for Etags.")

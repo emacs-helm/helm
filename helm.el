@@ -1053,7 +1053,7 @@ e.g (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
   (apply 'helm-log (concat "ERROR: " (car args)) (cdr args))
   (let ((msg (apply 'format args)))
     (unless (member msg helm-issued-errors)
-      (add-to-list 'helm-issued-errors msg))))
+      (cl-pushnew msg helm-issued-errors :test 'equal))))
 
 (defun helm-log-save-maybe ()
   "Save log buffer if `helm-debug-root-directory' is set to a valid directory.
@@ -4500,7 +4500,8 @@ LONG-DOC is displayed below attribute name and short documentation."
       (setq short-doc (concat "(" short-doc ")"))
     (setq long-doc short-doc
           short-doc ""))
-  (add-to-list 'helm-attributes attribute t)
+  (setq helm-attributes (append (delete attribute helm-attributes)
+                                (list attribute)))
   (put attribute 'helm-attrdoc
        (concat "- " (symbol-name attribute)
                " " short-doc "\n\n" long-doc "\n")))
@@ -4511,7 +4512,7 @@ LONG-DOC is displayed below attribute name and short documentation."
   (push (cons type definition) helm-type-attributes))
 
 (defun helm-document-type-attribute (type doc)
-  (add-to-list 'helm-types type t)
+  (setq helm-types (append (delete type helm-types) (list type)))
   (put type 'helm-typeattrdoc
        (concat "- " (symbol-name type) "\n\n" doc "\n")))
 
