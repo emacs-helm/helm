@@ -1205,11 +1205,9 @@ If SRC is omitted, use current source.
 If COMPUTE is non-`nil' compute value of ATTRIBUTE-NAME
 with `helm-interpret-value'.  COMPUTE can have also 'ignorefn as
 value, in this case `helm-interpret-value' will return a function
-as value unchanged, but will eval a symbol which is bound
-(i.e a variable)."
+as value unchanged, but will eval a symbol which is bound."
   (let ((src (or source (helm-get-current-source))))
-    (helm-aif (or (assq attribute-name src)
-                  (helm-get-attribute-from-source-type attribute-name src))
+    (helm-aif (assq attribute-name src)
         (if compute
             (helm-interpret-value (cdr it) src compute)
             (cdr it)))))
@@ -1222,46 +1220,17 @@ if SRC is omitted, use current source."
 
 (cl-defun helm-attrset (attribute-name value
                                        &optional
-                                       (src (helm-get-current-source))
-                                       alter-type)
+                                       (src (helm-get-current-source)))
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
-If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE.
-If ALTER-TYPE is non-`nil' alter the value of ATTRIBUTE-NAME in `helm-attributes'
-if it exists.
+If ATTRIBUTE-NAME doesn't exists in source it is created with value VALUE..
 If SRC is omitted, use current source.
 If operation succeed, return value, otherwise nil."
-  (let ((from-type (helm-get-attribute-from-source-type attribute-name src))
-        done)
-    (helm-aif (or (assq attribute-name src)
-                  (and alter-type from-type))
+  (let (done)
+    (helm-aif (assq attribute-name src)
         (prog1 (setcdr it value) (setq done t))
-      (unless from-type
-        (setcdr src (cons (cons attribute-name value) (cdr src)))
-        (setq done t)))
+      (setcdr src (cons (cons attribute-name value) (cdr src)))
+      (setq done t))
     (and done value)))
-
-(defun helm-get-attribute-from-source-type (attribute source)
-  "Get ATTRIBUTE from type attribute of SOURCE."
-  (when (assq 'type source)
-    (assq attribute
-          (assq (cdr (assq 'type source))
-                helm-type-attributes))))
-
-(defun helm-get-attribute-from-type (attribute type)
-  "Get ATTRIBUTE from TYPE.
-arg TYPE is an existing type defined in `helm-type-attributes'."
-  (assq attribute (assq type helm-type-attributes)))
-
-(defun helm-get-actions-from-type (source)
-  "Get actions list from type attribute of SOURCE."
-  (when (assq 'type source)
-    (helm-get-attribute-from-source-type 'action source)))
-
-(defun helm-inherit-attribute-from-source (attribute source)
-  "Get the ATTRIBUTE of SOURCE."
-  (helm-aif (assq attribute source)
-      it
-    (helm-get-attribute-from-source-type attribute source)))
 
 (defun helm-add-action-to-source (name fn source &optional index)
   "Add new action NAME linked to function FN to SOURCE.
