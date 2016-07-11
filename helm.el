@@ -1336,21 +1336,6 @@ only when predicate helm-ff-candidates-lisp-p return non-`nil':
                      :test 'equal)
                     source))))
 
-(defun helm-document-attribute (attribute short-doc &optional long-doc)
-  "Register ATTRIBUTE documentation introduced by plug-in.
-SHORT-DOC is displayed beside attribute name.
-LONG-DOC is displayed below attribute name and short documentation."
-  (declare (indent 2))
-  (if long-doc
-      (setq short-doc (concat "(" short-doc ")"))
-    (setq long-doc short-doc
-          short-doc ""))
-  (setq helm-attributes (append (delete attribute helm-attributes)
-                                (list attribute)))
-  (put attribute 'helm-attrdoc
-       (concat "- " (symbol-name attribute)
-               " " short-doc "\n\n" long-doc "\n")))
-
 
 ;;; Source filter
 ;;

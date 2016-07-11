@@ -42,13 +42,6 @@
 
 (add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
 
-(helm-document-attribute 'info-index "info-index plugin"
-  "  Create a source of info index very easily.
-
-  Example:
-
-  (defvar helm-source-info-wget '((info-index . \"wget\"))")
-
 
 ;;; Plug-in: `candidates-file'
 ;;
@@ -76,21 +69,6 @@
         (font-lock-mode -1)
         (auto-revert-mode 1)))))
 
-(helm-document-attribute 'candidates-file "candidates-file plugin"
-  "  Use a file as the candidates buffer.
-
-  1st argument is a filename, string or function name or variable
-  name. If optional 2nd argument is non-nil, the file is opened with
-  `auto-revert-mode' enabled.
-
-  Example:
-
-  \(defvar helm-source-test-file
-    '((name . \"test1\")
-      (candidates-file \"~/.emacs.el\" t)))
-
-  Will list all lines in .emacs.el.")
-
 
 ;;; Plug-in: `persistent-help'
 ;;
@@ -117,13 +95,6 @@
                "")
            " (keeping session)")))
 
-
-;;; Document new attributes
-;;
-;;
-(helm-document-attribute 'persistent-help "persistent-help plug-in"
-  "  A string to explain persistent-action of this source. It also
-  accepts a function or a variable name.")
 
 
 (provide 'helm-plugin)

@@ -89,8 +89,7 @@ fuzzy completion is not available in `completion-at-point'."
                                         helm-def-source--eieio-classes
                                         helm-def-source--eieio-generic
                                         helm-def-source--emacs-variables
-                                        helm-def-source--emacs-faces
-                                        helm-def-source--helm-attributes)
+                                        helm-def-source--emacs-faces)
   "A list of functions that build helm sources to use in `helm-apropos'."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
@@ -549,24 +548,6 @@ Filename completion happen if string start after or between a double quote."
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
                                     (customize-face (helm-symbolify candidate)))))))
-
-(defun helm-def-source--helm-attributes (&optional _default)
-  (let ((def-act (lambda (candidate)
-                   (let (special-display-buffer-names
-                         special-display-regexps
-                         helm-persistent-action-use-special-display)
-                     (with-output-to-temp-buffer "*Help*"
-                       (princ (get (intern candidate) 'helm-attrdoc)))))))
-    (helm-build-sync-source "Helm attributes"
-      :candidates (lambda ()
-                    (mapcar 'symbol-name helm-attributes))
-      :fuzzy-match helm-apropos-fuzzy-match
-      :nomark t
-      :persistent-action (lambda (candidate)
-                           (helm-elisp--persistent-help
-                            candidate def-act))
-      :persistent-help "Describe helm attribute"
-      :action def-act)))
 
 (defun helm-def-source--emacs-commands (&optional default)
   (helm-build-in-buffer-source "Commands"
