@@ -23,7 +23,6 @@
 (require 'helm-utils)
 (require 'helm-elscreen)
 (require 'helm-grep)
-(require 'helm-plugin)
 (require 'helm-regexp)
 (require 'helm-help)
 

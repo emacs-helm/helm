@@ -20,7 +20,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-lib)
-(require 'helm-plugin)
 (require 'info)
 
 (declare-function Info-index-nodes "info" (&optional file))
