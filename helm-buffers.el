@@ -224,6 +224,7 @@ Only buffer names are fuzzy matched when this is enabled,
    (keymap :initform helm-buffer-map)
    (migemo :initform 'nomultimatch)
    (volatile :initform t)
+   (resume :initform (lambda () (setq helm-buffers-in-project-p nil)))
    (help-message :initform 'helm-buffer-help-message)
    (persistent-help
     :initform
