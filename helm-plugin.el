@@ -40,7 +40,7 @@
       (helm-make-info-source source it)
     source))
 
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
+;; (add-to-list 'helm-compile-source-functions 'helm-compile-source--info-index)
 
 
 ;;; Plug-in: `candidates-file'
@@ -56,7 +56,7 @@
         (candidates-in-buffer)
         ,@source)
     source))
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--candidates-file)
+;; (add-to-list 'helm-compile-source-functions 'helm-compile-source--candidates-file)
 
 (defun helm-p-candidates-file-init ()
   (cl-destructuring-bind (file &optional updating)
@@ -77,7 +77,7 @@
   (if (assoc 'header-line source)
       source
       (append source '((header-line . helm-persistent-help-string)))))
-(add-to-list 'helm-compile-source-functions 'helm-compile-source--persistent-help)
+;; (add-to-list 'helm-compile-source-functions 'helm-compile-source--persistent-help)
 
 (defun helm-persistent-help-string ()
   (substitute-command-keys
