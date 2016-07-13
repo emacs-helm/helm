@@ -836,12 +836,12 @@ Can be used by any source that list buffers."
                         (cons 'helm-skip-boring-buffers
                               (remove 'helm-shadow-boring-buffers
                                       filter-attrs))
-                        helm-source-buffers-list t)
+                        helm-source-buffers-list)
         (helm-attrset 'filtered-candidate-transformer
                       (cons 'helm-shadow-boring-buffers
                             (remove 'helm-skip-boring-buffers
                                     filter-attrs))
-                      helm-source-buffers-list t))
+                      helm-source-buffers-list))
       (helm-force-update))))
 (put 'helm-buffers-toggle-show-hidden-buffers 'helm-only t)
 
