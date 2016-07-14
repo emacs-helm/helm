@@ -1354,26 +1354,19 @@ If NO-UPDATE is non-`nil', skip executing `helm-update'."
   (unless no-update (helm-update)))
 
 (defun helm-get-sources ()
-  "Return compiled `helm-sources', which is memoized.
-
-Attributes:
-
-- type
-  `helm-type-attributes' are merged in.
-- candidates-buffer
-  candidates, volatile and match attribute are created."
+  "Return compiled `helm-sources', which is memoized."
   (cond
     ;; action
-    ((helm-action-window)
-     helm-sources)
+    ((helm-action-window) helm-sources)
     ;; memoized
     (helm-compiled-sources)
     ;; first time
     (t
      (prog1
          (setq helm-compiled-sources
-               (helm-compile-sources
-                helm-sources helm-compile-source-functions))
+               (mapcar (lambda (source)
+                         (if (listp source) source (symbol-value source)))
+                       helm-sources))
        (helm-log "helm-compiled-sources = %S" helm-compiled-sources)))))
 
 (defun helm-get-selection (&optional buffer force-display-part)
@@ -2672,24 +2665,6 @@ WARNING: Do not use this mode yourself, it is internal to helm."
    (lambda () (setq helm--in-update nil))))
 
 (add-hook 'helm-after-update-hook #'helm--reset-update-flag)
-
-
-;;; Core: source compiler
-;;
-;;
-(defun helm-compile-sources (sources funcs)
-  "Compile SOURCES with FUNCS.
-See `helm-compile-source-functions'.
-Helm plug-ins are realized by this function."
-  (mapcar
-   (lambda (source)
-     (cl-loop with src = (if (listp source) source (symbol-value source))
-              for noplug = (assoc 'dont-plug src)
-              for f in funcs
-              unless (and noplug (memq f (cdr noplug)))
-              do (setq src (funcall f src))
-              finally (cl-return src)))
-   sources))
 
 
 ;; Core: all candidates

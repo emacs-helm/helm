@@ -481,13 +481,6 @@
   Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
   If none of these are found fallback to `helm-input-idle-delay'.")
 
-   (dont-plug
-    :initarg :dont-plug
-    :initform '(helm-compile-source--persistent-help)
-    :custom list
-    :documentation
-    "  A list of compile functions plugin to ignore.")
-
    (matchplugin
     :initarg :matchplugin
     :initform t
@@ -543,13 +536,6 @@
   ((candidates
     :initform '("ERROR: You must specify the `candidates' slot, either with a list or a function"))
 
-   (dont-plug
-    :initform '(helm-compile-source--multi-match
-                helm-compile-source--persistent-help
-                ;; Ensure this will not be plugged
-                ;; if user have somewhere old helm-migemo.el.
-                helm-compile-source--migemo))
-
    (migemo
     :initarg :migemo
     :initform nil
@@ -597,9 +583,7 @@ Matching is done basically with `string-match' against each candidate.")
   The process buffer should be nil, otherwise, if you use
   `helm-buffer' give to the process a sentinel.")
 
-   (matchplugin :initform nil)
-   (dont-plug :initform '(helm-compile-source--multi-match
-                          helm-compile-source--persistent-help)))
+   (matchplugin :initform nil))
 
   "Use this class to define a helm source calling an external process.
 The :candidates slot is not allowed even if described because this class
@@ -618,12 +602,6 @@ inherit from `helm-source'.")
   This data will be passed in a function added to the init slot and
   the buffer will be build with `helm-init-candidates-in-buffer'.
   This is an easy and fast method to build a `candidates-in-buffer' source.")
-
-   (dont-plug
-    :initform '(helm-compile-source--candidates-in-buffer
-                helm-compile-source--multi-match
-                helm-compile-source--persistent-help
-                helm-compile-source--migemo))
 
    (migemo
     :initarg :migemo
