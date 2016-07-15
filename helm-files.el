@@ -260,6 +260,14 @@ see `helm-ff-guess-ffap-filenames' for this."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-find-file-ignore-thing-at-point nil
+  "Use only `default-directory' as default input in `helm-find-files'.
+I.e text under cursor in `current-buffer' is ignored.
+Note that when non-nil you will be unable to complete filename at point
+in `current-buffer'."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-substitute-in-filename-stay-on-remote nil
   "Don't switch back to local filesystem when expanding pattern with / or ~/."
   :group 'helm-files
@@ -3576,22 +3584,25 @@ Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on files."
   (interactive "P")
   (let* ((hist            (and arg helm-ff-history (helm-find-files-history)))
-         (default-input   (or hist (helm-find-files-initial-input)))
-         (input           (cond ((and (eq major-mode 'org-agenda-mode)
+         (smart-input     (or hist (helm-find-files-initial-input)))
+         (default-input   (expand-file-name (helm-current-directory)))
+         (input           (cond (helm-find-file-ignore-thing-at-point
+                                 default-input)
+                                ((and (eq major-mode 'org-agenda-mode)
                                       org-directory
-                                      (not default-input))
+                                      (not smart-input))
                                  (expand-file-name org-directory))
-                                ((and (eq major-mode 'dired-mode) default-input)
-                                 (file-name-directory default-input))
-                                ((and (not (string= default-input ""))
-                                      default-input))
-                                (t (expand-file-name (helm-current-directory)))))
+                                ((and (eq major-mode 'dired-mode) smart-input)
+                                 (file-name-directory smart-input))
+                                ((and (not (string= smart-input ""))
+                                      smart-input))
+                                (t default-input)))
          (input-as-presel (null (nth 0 (file-attributes input))))
          (presel          (helm-aif (or hist
                                         (and input-as-presel input)
                                         (buffer-file-name (current-buffer))
                                         (and (eq major-mode 'dired-mode)
-                                             default-input))
+                                             smart-input))
                               (if helm-ff-transformer-show-only-basename
                                   (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
