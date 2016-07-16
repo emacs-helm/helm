@@ -670,7 +670,8 @@ inherit from `helm-source'.")
 
   "Use this source to make helm sources storing candidates inside a buffer.
 Contrarily to `helm-source-sync' candidates are matched using a function
-like `re-search-forward', see below documentation of :search slot.")
+like `re-search-forward', see below documentation of :search slot.
+See `helm-candidates-in-buffer' for more infos.")
 
 (defclass helm-source-dummy (helm-source)
   ((candidates

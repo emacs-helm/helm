@@ -4372,13 +4372,11 @@ When at the end of minibuffer, deletes all."
 ;;; helm-source-in-buffer.
 ;;
 (defun helm-candidates-in-buffer (&optional source)
-  "The top level function used to store candidates in `helm-source-in-buffer'.
+  "The top level function used to store candidates with `helm-source-in-buffer'.
 
 Candidates are stored in a buffer generated internally by
-`helm-candidate-buffer' function. Each candidate must be placed
-in one line. This function is meant to be used in
-candidates-in-buffer or candidates attribute of an helm source.
-It is especially fast for many (1000+) candidates.
+`helm-candidate-buffer' function.
+Each candidate must be placed in one line.
 
 The buffer is created and fed in the init attribute function of helm.
 
@@ -4393,11 +4391,6 @@ A shortcut can be used to simplify:
 
      (helm-build-in-buffer-source \"test\"
        :data '(foo foa fob bar baz))
-
-`candidates-in-buffer' is now deprecated in favor of
-`helm-source-in-buffer' class.
-
-Description provided here for backward compatibility.
 
 By default, `helm' makes candidates by evaluating the
 candidates function, then narrows them by `string-match' for each
@@ -4414,22 +4407,14 @@ candidate buffer.  The candidates buffer is created or specified
 by `helm-candidate-buffer'.  Candidates are stored in a line.
 
 The candidates function narrows all candidates, IOW creates a
-subset of candidates dynamically. It is the task of
-`helm-candidates-in-buffer'.  As long as
-`helm-candidate-buffer' is used,`(candidates-in-buffer)' is
-sufficient in most cases.
+subset of candidates dynamically.
 
-Note that `(candidates-in-buffer)' is shortcut of three attributes:
-  (candidates . helm-candidates-in-buffer)
-  (volatile)
-  (match identity)
-And `(candidates-in-buffer . func)' is shortcut of three attributes:
-  (candidates . func)
-  (volatile)
-  (match identity)
-The expansion is performed in `helm-get-sources'.
+Class `helm-source-in-buffer' is implemented with three attributes:
 
-The `candidates-in-buffer' attribute implies the volatile attribute.
+    (candidates . helm-candidates-in-buffer)
+    (volatile)
+    (match identity)
+
 The volatile attribute is needed because `helm-candidates-in-buffer'
 creates candidates dynamically and need to be called every time
 `helm-pattern' changes.
