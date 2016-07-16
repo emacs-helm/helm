@@ -4374,8 +4374,8 @@ When at the end of minibuffer, deletes all."
 (defun helm-candidates-in-buffer (&optional source)
   "The top level function used to store candidates with `helm-source-in-buffer'.
 
-Candidates are stored in a buffer generated internally by
-`helm-candidate-buffer' function.
+Candidates are stored in a buffer generated internally
+by `helm-candidate-buffer' function.
 Each candidate must be placed in one line.
 
 The buffer is created and fed in the init attribute function of helm.
@@ -4397,8 +4397,8 @@ candidates function, then narrows them by `string-match' for each
 candidate.
 
 But this is slow for large number of candidates. The new way is
-to store all candidates in a buffer and then narrow with
-`re-search-forward'. Search function is customizable by search
+to store all candidates in a buffer and then narrow
+with `re-search-forward'. Search function is customizable by search
 attribute. The important point is that buffer processing is MUCH
 FASTER than string list processing and is the Emacs way.
 
@@ -4416,8 +4416,8 @@ Class `helm-source-in-buffer' is implemented with three attributes:
     (match identity)
 
 The volatile attribute is needed because `helm-candidates-in-buffer'
-creates candidates dynamically and need to be called every time
-`helm-pattern' changes.
+creates candidates dynamically and need to be called every
+time `helm-pattern' changes.
 
 Because `helm-candidates-in-buffer' plays the role of `match' attribute
 function, specifying `(match identity)' makes the source slightly faster.
@@ -4427,8 +4427,8 @@ on part of candidate returned by the call of function provided by this attribute
 The function should have one arg, candidate, and return only
 a specific part of candidate.
 
-To customize `helm-candidates-in-buffer' behavior, use `search',
-`get-line' and `match-part' attributes."
+To customize `helm-candidates-in-buffer' behavior,
+use `search', `get-line' and `match-part' attributes."
   (let ((src (or source (helm-get-current-source))))
     (helm-candidates-in-buffer-1
      (helm-candidate-buffer)
