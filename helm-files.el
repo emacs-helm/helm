@@ -2069,7 +2069,8 @@ Note that only existing directories are saved here."
                              (helm-delete-file
                               c helm-ff-signal-error-on-dot-files 'synchro)
                              (helm-delete-current-selection)
-                             (message nil)))))
+                             (message nil)
+                             (helm--remove-marked-and-update-mode-line c)))))
       (with-helm-buffer
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil))

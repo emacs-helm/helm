@@ -767,7 +767,8 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                                   (helm-buffers--quote-truncated-buffer b)))
                          (when (y-or-n-p (format "kill buffer (%s)? " b))
                            (helm-buffers-persistent-kill-1 b))
-                         (message nil)))
+                         (message nil)
+                         (helm--remove-marked-and-update-mode-line b)))
       (with-helm-buffer
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil))

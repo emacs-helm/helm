@@ -5164,6 +5164,13 @@ selection. When key WITH-WILDCARD is specified, expand it."
       (helm-log "Marked candidates = %S" candidates)
       candidates)))
 
+(defun helm--remove-marked-and-update-mode-line (elm)
+  (with-helm-buffer
+    (setq helm-marked-candidates
+          (delete (rassoc elm helm-marked-candidates)
+                  helm-marked-candidates))
+    (helm-display-mode-line (helm-get-current-source))))
+
 (defun helm-current-source-name= (name)
   (save-excursion
     (goto-char (helm-get-previous-header-pos))
