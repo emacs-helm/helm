@@ -1427,33 +1427,27 @@ of \(action-display . function\)."
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.
-Allow also checking if helm-buffer contain candidates."
+Return nil when `helm-buffer' is empty."
   (or helm-current-source
       (with-helm-buffer
-        ;; Return nil when no--candidates.
-        (cl-block exit
-          ;; This goto-char shouldn't be necessary, but point is moved to
-          ;; point-min somewhere else which shouldn't happen.
-          (goto-char (overlay-start helm-selection-overlay))
-          (let* ((header-pos (or (helm-get-previous-header-pos)
-                                 (helm-get-next-header-pos)))
-                 (source-name
-                  (save-excursion
-                    (unless header-pos
-                      (cl-return-from exit nil))
-                    (goto-char header-pos)
-                    (helm-current-line-contents))))
-            (cl-loop for source in (helm-get-sources) thereis
+        (let ((header-pos (or (helm-get-previous-header-pos)
+                              (helm-get-next-header-pos))))
+          ;; Return nil when no--candidates.
+          (when header-pos
+            (cl-loop with source-name = (save-excursion
+                                          (goto-char header-pos)
+                                          (helm-current-line-contents))
+                     for source in (helm-get-sources) thereis
                      (and (equal (assoc-default 'name source) source-name)
                           source)))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-`nil' when BUFFER is modified since `helm' was invoked."
-  (let* ((b (get-buffer buffer))
-         (key (concat (buffer-name b) "/" (helm-attr 'name)))
+  (let* ((buf         (get-buffer buffer))
+         (key         (concat (buffer-name buf) "/" (helm-attr 'name)))
          (source-tick (or (gethash key helm-tick-hash) 0))
-         (buffer-tick (buffer-chars-modified-tick b))
-         (modifiedp (/= source-tick buffer-tick)))
+         (buffer-tick (buffer-chars-modified-tick buf))
+         (modifiedp   (/= source-tick buffer-tick)))
     (puthash key buffer-tick helm-tick-hash)
     (helm-log "buffer = %S" buffer)
     (helm-log "modifiedp = %S" modifiedp)
