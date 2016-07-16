@@ -1432,6 +1432,8 @@ Return nil when `helm-buffer' is empty."
       (with-helm-buffer
         (let ((header-pos (or (helm-get-previous-header-pos)
                               (helm-get-next-header-pos))))
+          ;; This is needed to not loose selection.
+          (goto-char (overlay-start helm-selection-overlay))
           ;; Return nil when no--candidates.
           (when header-pos
             (cl-loop with source-name = (save-excursion
