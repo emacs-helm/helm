@@ -3258,9 +3258,10 @@ to a particular place after finishing update."
                       for mtc in matches
                       do (helm-render-source src mtc))))
       (helm-update-move-first-line)
-      (unless (assoc 'candidates-process source)
-        (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-after-update-hook))
+      (let ((src (or source (helm-get-current-source))))
+        (unless (assoc 'candidates-process src)
+          (helm-display-mode-line src)
+          (helm-log-run-hook 'helm-after-update-hook)))
       (when preselect
         (helm-log "Update preselect candidate %s" preselect)
         (helm-preselect preselect source))
