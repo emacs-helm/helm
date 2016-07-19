@@ -686,11 +686,8 @@ before creation of `helm-buffer'. Set local variables for
 This hook runs after `helm-buffer' is created but not from
 `helm-buffer'. The hook needs to specify in which buffer to run.")
 
-(defvar helm-update-hook nil
-  "Run after the helm buffer is updated.
-This hook runs at the beginning of buffer. The first candidate is
-selected after running this hook. See also
-`helm-after-update-hook'.")
+(defvaralias 'helm-update-hook 'helm-after-update-hook)
+(make-obsolete-variable 'helm-update-hook 'helm-after-update-hook "1.9.9")
 
 (defvar helm-after-update-hook nil
   "Runs after updating the helm buffer with the new input pattern.
@@ -3257,7 +3254,7 @@ to a particular place after finishing update."
              (cl-loop for src in sources
                       for mtc in matches
                       do (helm-render-source src mtc))))
-      (helm-update-move-first-line)
+      (helm--update-move-first-line)
       (let ((src (or source (helm-get-current-source))))
         (unless (assoc 'candidates-process src)
           (helm-display-mode-line src)
@@ -3287,11 +3284,9 @@ to a particular place after finishing update."
          (not (member (replace-regexp-in-string "\\s\\ " " " helm-pattern)
                       helm-update-blacklist-regexps)))))
 
-(defun helm-update-move-first-line (&optional without-hook)
+(defun helm--update-move-first-line ()
   "Goto first line of `helm-buffer'."
   (goto-char (point-min))
-  (unless without-hook
-    (save-excursion (helm-log-run-hook 'helm-update-hook)))
   (helm-move-selection-common :where 'line :direction 'next :follow nil))
 
 (defun helm-force-update (&optional preselect)
@@ -3464,7 +3459,6 @@ this additional info after the source name by overlay."
 
 (defun helm-output-filter--post-process ()
   (let ((src (helm-get-current-source)))
-    (helm-log-run-hook 'helm-update-hook)
     (helm-aif (get-buffer-window helm-buffer 'visible)
         (with-selected-window it
           (helm-skip-noncandidate-line 'next)
@@ -5187,7 +5181,7 @@ selection. When key WITH-WILDCARD is specified, expand it."
                        (move-overlay o beg end))
                   (and (equal o-str (buffer-substring beg end))
                        (move-overlay o beg end))))))))))
-(add-hook 'helm-update-hook 'helm-revive-visible-mark)
+(add-hook 'helm-after-update-hook 'helm-revive-visible-mark)
 
 (defun helm-next-point-in-list (curpos points &optional prev)
   (cond

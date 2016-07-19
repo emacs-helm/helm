@@ -695,10 +695,10 @@ If STRING is non--nil return instead a space separated string."
   (require 'popup)
   (if helm-popup-tip-mode
       (progn
-        (add-hook 'helm-update-hook 'helm-show-help-echo) ; Needed for async sources.
+        (add-hook 'helm-after-update-hook 'helm-show-help-echo) ; Needed for async sources.
         (add-hook 'helm-move-selection-after-hook 'helm-show-help-echo)
         (add-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer))
-      (remove-hook 'helm-update-hook 'helm-show-help-echo)
+      (remove-hook 'helm-after-update-hook 'helm-show-help-echo)
       (remove-hook 'helm-move-selection-after-hook 'helm-show-help-echo)
       (remove-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer)))
 
