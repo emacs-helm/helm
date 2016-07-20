@@ -1427,10 +1427,10 @@ of \(action-display . function\)."
 Return nil when `helm-buffer' is empty."
   (or helm-current-source
       (with-helm-buffer
+        ;; This is needed to not loose selection.
+        (goto-char (overlay-start helm-selection-overlay))
         (let ((header-pos (or (helm-get-previous-header-pos)
                               (helm-get-next-header-pos))))
-          ;; This is needed to not loose selection.
-          (goto-char (overlay-start helm-selection-overlay))
           ;; Return nil when no--candidates.
           (when header-pos
             (cl-loop with source-name = (save-excursion
