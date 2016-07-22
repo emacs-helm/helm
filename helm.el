@@ -4244,8 +4244,10 @@ to a list of forms.\n\n")
 
 (defun helm-preselect (candidate-or-regexp &optional source)
   "Move `helm-selection-overlay' to CANDIDATE-OR-REGEXP on startup.
-Arg CANDIDATE-OR-REGEXP can be a string or a cons cell of two
-strings. When cons cell, helm tries jumping to first element of
+Arg CANDIDATE-OR-REGEXP can be a string, a cons cell of two
+strings or a function called with no arg which will be in charge
+of moving to a specific candidate.
+When a cons cell, helm tries jumping to first element of
 cons cell and then to the second, and so on. This allows finer
 preselection if there are duplicates before the candidate we
 want to preselect."
