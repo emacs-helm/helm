@@ -484,7 +484,9 @@
    (matchplugin
     :initarg :matchplugin
     :initform t
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Use the multi-match algorithm when non-nil.")
 
    (match-part
     :initarg :match-part
