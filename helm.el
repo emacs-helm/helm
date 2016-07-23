@@ -3458,13 +3458,12 @@ this additional info after the source name by overlay."
             finally do (setcdr incomplete-line-info newline))))
 
 (defun helm-output-filter--post-process ()
-  (let ((src (helm-get-current-source)))
-    (helm-aif (get-buffer-window helm-buffer 'visible)
-        (with-selected-window it
-          (helm-skip-noncandidate-line 'next)
-          (helm-mark-current-line)
-          (helm-display-mode-line src)
-          (helm-log-run-hook 'helm-after-update-hook)))))
+  (helm-aif (get-buffer-window helm-buffer 'visible)
+      (with-selected-window it
+        (helm-skip-noncandidate-line 'next)
+        (helm-mark-current-line)
+        (helm-display-mode-line (helm-get-current-source))
+        (helm-log-run-hook 'helm-after-update-hook))))
 
 (defun helm-process-deferred-sentinel-hook (process event file)
   "Defer remote processes in sentinels.
