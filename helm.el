@@ -477,6 +477,11 @@ To make this behavior persistent across emacs sessions, set the
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-follow-follow-on-update nil
+  "Follow current candidate after each update when `helm-follow-mode' is enabled."
+  :group 'helm
+  :type 'boolean)
+
 (defcustom helm-prevent-escaping-from-minibuffer t
   "Prevent escape from minibuffer during the helm session."
   :group 'helm
@@ -3287,7 +3292,9 @@ to a particular place after finishing update."
 (defun helm--update-move-first-line ()
   "Goto first line of `helm-buffer'."
   (goto-char (point-min))
-  (helm-move-selection-common :where 'line :direction 'next :follow nil))
+  (helm-move-selection-common :where 'line
+                              :direction 'next
+                              :follow helm-follow-follow-on-update))
 
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
@@ -3462,6 +3469,8 @@ this additional info after the source name by overlay."
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line)
+        (when helm-follow-follow-on-update
+          (helm-follow-execute-persistent-action-maybe))
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-after-update-hook))))
 
