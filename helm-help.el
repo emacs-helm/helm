@@ -990,6 +990,7 @@ This feature is only available with emacs-25.
 \\[helm-el-package-show-installed]\t\tShow installed packages only.
 \\[helm-el-package-show-uninstalled]\t\tShow not installed packages only.
 \\[helm-el-package-show-upgrade]\t\tShow upgradable packages only.
+\\[helm-el-package-show-built-in]\t\tShow built-in packages only.
 \\[helm-el-run-package-install]\t\tInstall package(s).
 \\[helm-el-run-package-reinstall]\t\tReinstall package(s).
 \\[helm-el-run-package-uninstall]\t\tUninstall package(s).
