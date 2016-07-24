@@ -256,7 +256,11 @@
            for name = (if (fboundp 'package-desc-name)
                           (and id (package-desc-name id))
                           (car id))
-           for installed-p = (assq name package-alist)
+           for desc = (package-desc-status id)
+           for built-in-p = (and (package-built-in-p name)
+                                 (not (member desc '("available" "new"
+                                                     "installed" "dependency"))))
+           for installed-p = (member desc '("installed" "dependency"))
            for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (and (boundp 'package-selected-packages)
                                        (memq name package-selected-packages))
@@ -267,14 +271,24 @@
                  2 (+ (length (symbol-name name)) 2)
                  'face 'font-lock-variable-name-face c))
            for cand = (cons c (car (split-string c)))
-           when (or (and upgrade-p
+           when (or (and built-in-p
+                         (eq helm-el-package--show-only 'built-in))
+                    (and upgrade-p
                          (eq helm-el-package--show-only 'upgrade))
                     (and installed-p
                          (eq helm-el-package--show-only 'installed))
                     (and (not installed-p)
-                         (eq helm-el-package--show-only 'uninstalled)) 
+                         (not built-in-p)
+                         (eq helm-el-package--show-only 'uninstalled))
                     (eq helm-el-package--show-only 'all))
            collect cand))
+
+(defun helm-el-package-show-built-in ()
+  (interactive)
+  (with-helm-alive-p
+    (setq helm-el-package--show-only 'built-in)
+    (helm-update)))
+(put 'helm-el-package-show-built-in 'helm-only t)
 
 (defun helm-el-package-show-upgrade ()
   (interactive)
@@ -310,6 +324,7 @@
     (define-key map (kbd "M-I")   'helm-el-package-show-installed)
     (define-key map (kbd "M-O")   'helm-el-package-show-uninstalled)
     (define-key map (kbd "M-U")   'helm-el-package-show-upgrade)
+    (define-key map (kbd "M-B")   'helm-el-package-show-built-in)
     (define-key map (kbd "M-A")   'helm-el-package-show-all)
     (define-key map (kbd "C-c i") 'helm-el-run-package-install)
     (define-key map (kbd "C-c r") 'helm-el-run-package-reinstall)
