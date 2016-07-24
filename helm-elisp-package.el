@@ -348,14 +348,18 @@
                        ("Visit homepage" . helm-el-package-visit-homepage)))))
 
 (defun helm-el-package--action-transformer (actions candidate)
-  (let* ((pkg-desc (get-text-property
-                    0 'tabulated-list-id candidate))
+  (let* ((pkg-desc (get-text-property 0 'tabulated-list-id candidate))
+         (status (package-desc-status pkg-desc))
          (pkg-name (package-desc-name pkg-desc))
+         (built-in (and (package-built-in-p pkg-name)
+                        (not (member status '("available" "new"
+                                              "installed" "dependency")))))
          (acts (if helm-el-package--upgrades
                    (append actions '(("Upgrade all packages"
                                       . helm-el-package-upgrade-all-action)))
                    actions)))
-    (cond ((and (package-installed-p pkg-name)
+    (cond (built-in '(("Describe package" . helm-el-package-describe)))
+          ((and (package-installed-p pkg-name)
                 (cdr (assq pkg-name helm-el-package--upgrades)))
            (append '(("Upgrade package(s)" . helm-el-package-upgrade)
                      ("Uninstall package(s)" . helm-el-package-uninstall)) acts))
