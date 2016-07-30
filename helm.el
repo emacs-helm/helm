@@ -3821,8 +3821,7 @@ Key arg DIRECTION can be one of:
         (when (helm-pos-multiline-p)
           (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
-        (when (helm-get-previous-header-pos)
-          (helm-mark-current-line))
+        (helm-mark-current-line)
         (when follow
           (helm-follow-execute-persistent-action-maybe))
         (helm-display-mode-line (helm-get-current-source))
