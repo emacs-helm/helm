@@ -939,7 +939,8 @@ It also accepts function or variable symbol.")
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\_<" "\\_>" ".*"))
-(defvar helm-force-updating-p nil)
+(defvar helm--force-updating-p nil
+  "[INTERNAL] Don't use this in your programs.")
 (defvar helm-exit-status 0
   "Flag to inform if helm did exit or quit.
 0 means helm did exit when executing an action.
@@ -1528,7 +1529,7 @@ Just like `setq' except that the vars are not set sequentially.
 IOW Don't use VALUE of previous VAR to set the VALUE of next VAR.
 
 \(fn VAR VALUE ...)"
-  (if helm-force-updating-p
+  (if helm--force-updating-p
       (with-helm-buffer
         (cl-loop for i on args by #'cddr
                  do (set (make-local-variable (car i)) (cadr i))))
@@ -3267,7 +3268,7 @@ to a particular place after finishing update."
       (when preselect
         (helm-log "Update preselect candidate %s" preselect)
         (helm-preselect preselect source))
-      (setq helm-force-updating-p nil))
+      (setq helm--force-updating-p nil))
     (helm-log "end update")))
 
 (defun helm-update-source-p (source)
@@ -3310,7 +3311,7 @@ PRESELECT, if specified."
         (selection (helm-aif (helm-get-selection nil t)
                        (regexp-quote it)
                      it)))
-    (setq helm-force-updating-p t)
+    (setq helm--force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
             (helm-get-sources)))
@@ -4263,7 +4264,7 @@ preselection if there are duplicates before the candidate we
 want to preselect."
   (with-helm-window
     (when candidate-or-regexp
-      (if (and helm-force-updating-p source)
+      (if (and helm--force-updating-p source)
           (helm-goto-source source)
           (goto-char (point-min))
           (forward-line 1))

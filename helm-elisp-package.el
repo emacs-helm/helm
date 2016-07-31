@@ -68,7 +68,7 @@
         (setq helm-el-package--tabulated-list tabulated-list-entries)
         (buffer-string)))
     (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
-    (if helm-force-updating-p
+    (if helm--force-updating-p
         (if helm-el-package--upgrades
             (message "%d package(s) can be upgraded, Refreshing packages list done"
                      (length helm-el-package--upgrades))
