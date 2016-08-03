@@ -59,6 +59,7 @@
           ;; properly (empty buffer) when called from lisp
           ;; with 'no-fetch (emacs-25 WA).
           (package-show-package-list)
+        (when helm--force-updating-p (message "Refreshing packages list..."))  
         (list-packages helm-el-package--initialized-p))
       (setq helm-el-package--initialized-p t)
       (message nil))
