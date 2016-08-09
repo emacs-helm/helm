@@ -660,9 +660,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-kill-marked-buffers (_ignore)
   (let* ((bufs (helm-marked-candidates))
          (killed-bufs (cl-count-if 'kill-buffer bufs)))
-    (with-helm-buffer
-      (setq helm-marked-candidates nil
-            helm-visible-mark-overlays nil))
+    (when (buffer-live-p helm-buffer)
+      (with-helm-buffer
+        (setq helm-marked-candidates nil
+              helm-visible-mark-overlays nil)))
     (message "Killed %s buffer(s)" killed-bufs)))
 
 (defun helm-buffer-run-kill-buffers ()
@@ -735,17 +736,21 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-exit-and-execute-action 'helm-ediff-marked-buffers-merge)))
 (put 'helm-buffer-run-ediff-merge 'helm-only t)
 
-(defun helm-buffers-persistent-kill-1 (buffer)
+(defun helm-buffers-persistent-kill-1 (buffer-or-name)
   "Persistent action to kill buffer."
-  (if (eql (get-buffer buffer) (get-buffer helm-current-buffer))
-      (progn
-        (message "Can't kill `helm-current-buffer' without quitting session")
-        (sit-for 1))
-      (with-current-buffer (get-buffer buffer)
-        (kill-buffer buffer))
-      (helm-delete-current-selection)
-      (with-helm-temp-hook 'helm-after-persistent-action-hook
-        (helm-force-update (regexp-quote (helm-get-selection nil t))))))
+  (let ((buf (get-buffer buffer-or-name)) helm-buf-or-cur)
+    (if (or (and (eql buf (get-buffer helm-current-buffer))
+                 (setq helm-buf-or-cur "helm-current-buffer"))
+            (and (eql buf (get-buffer helm-buffer))
+                 (setq helm-buf-or-cur "helm-buffer")))
+        (progn
+          (message "Can't kill `%s' without quitting session" helm-buf-or-cur)
+          (sit-for 1))
+        (with-current-buffer buf
+          (kill-buffer buffer-or-name))
+        (helm-delete-current-selection)
+        (with-helm-temp-hook 'helm-after-persistent-action-hook
+          (helm-force-update (regexp-quote (helm-get-selection nil t)))))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
