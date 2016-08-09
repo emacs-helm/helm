@@ -765,8 +765,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                do (progn (helm-preselect
                           (format "^%s"
                                   (helm-buffers--quote-truncated-buffer b)))
-                         (when (y-or-n-p (format "kill buffer (%s)? " b))
-                           (helm-buffers-persistent-kill-1 b))
+                         (save-selected-window
+                           (when (y-or-n-p (format "kill buffer (%s)? " b))
+                             (helm-buffers-persistent-kill-1 b)))
                          (message nil)
                          (helm--remove-marked-and-update-mode-line b)))
       (with-helm-buffer
