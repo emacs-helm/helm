@@ -23,6 +23,9 @@
 
 (declare-function display-time-world-display "time.el")
 (defvar display-time-world-list)
+(declare-function LaTeX-math-mode "ext:latex.el")
+(declare-function jabber-chat-with "ext:jabber.el")
+(declare-function jabber-read-account "ext:jabber.el")
 
 
 (defgroup helm-misc nil
@@ -73,11 +76,11 @@
   (helm-build-sync-source "Latex Math Menu"
     :init (lambda ()
             (with-helm-current-buffer
-              (LaTeX-math-mode 1))))
+              (LaTeX-math-mode 1)))
     :candidate-number-limit 9999
     :candidates 'helm-latex-math-candidates
     :action (lambda (candidate)
-              (call-interactively candidate)))
+              (call-interactively candidate))))
 
 
 ;;; Jabber Contacts (jabber.el)
