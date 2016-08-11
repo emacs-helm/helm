@@ -152,8 +152,13 @@ Optional argument MAPS is a list specifying which keymaps to use: it
 can contain the symbols `local', `global', and `minor', mean the
 current local map, current global map, and all current minor maps."
   (with-helm-current-buffer
-    ;; FIXME: do we still need to remove possible '(nil) candidates.
-    (lacarte-get-overall-menu-item-alist maps)))
+    ;; When a keymap doesn't have a [menu-bar] entry
+    ;; the filtered map returned and passed to
+    ;; `lacarte-get-a-menu-item-alist-22+' is nil, which
+    ;; fails because this code is not protected for such case.
+    (condition-case nil
+        (lacarte-get-overall-menu-item-alist maps)
+      (error nil))))
 
 ;;;###autoload
 (defun helm-browse-menubar ()
