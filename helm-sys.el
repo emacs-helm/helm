@@ -337,41 +337,41 @@ Show actions only on line starting by a PID."
   (cadr (helm-xrandr-info)))
 
 (defvar helm-source-xrandr-change-resolution
-  '((name . "Change Resolution")
-    (candidates
-     . (lambda ()
-         (with-temp-buffer
-           (call-process "xrandr" nil (current-buffer) nil
-                         "--screen" (helm-xrandr-screen) "-q")
-           (goto-char 1)
-           (cl-loop with modes = nil
-                 while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
+  (helm-build-sync-source "Change Resolution"
+    :candidates
+    (lambda ()
+      (with-temp-buffer
+        (call-process "xrandr" nil (current-buffer) nil
+                      "--screen" (helm-xrandr-screen) "-q")
+        (goto-char 1)
+        (cl-loop while (re-search-forward "   \\([0-9]+x[0-9]+\\)" nil t)
                  for mode = (match-string 1)
                  unless (member mode modes)
                  collect mode into modes
-                 finally return modes))))
-    (action
-     ("Change Resolution"
-      . (lambda (mode)
-          (call-process "xrandr" nil nil nil
-                        "--screen" (helm-xrandr-screen)
-                        "--output" (helm-xrandr-output)
-                        "--mode" mode))))))
+                 finally return modes)))
+    :action
+    (helm-make-actions "Change Resolution"
+                       (lambda (mode)
+                         (call-process "xrandr" nil nil nil
+                                       "--screen" (helm-xrandr-screen)
+                                       "--output" (helm-xrandr-output)
+                                       "--mode" mode)))))
 
 
 ;;; Emacs process
 ;;
 ;;
 (defvar helm-source-emacs-process
-  '((name . "Emacs Process")
-    (init . (lambda () (list-processes--refresh)))
-    (candidates . (lambda () (mapcar #'process-name (process-list))))
-    (persistent-action . (lambda (elm)
-                           (delete-process (get-process elm))
-                           (helm-delete-current-selection)))
-    (persistent-help . "Kill Process")
-    (action ("Kill Process" . (lambda (elm)
-                                (delete-process (get-process elm)))))))
+  (helm-build-sync-source "Emacs Process"
+    :init (lambda () (list-processes--refresh))
+    :candidates (lambda () (mapcar #'process-name (process-list)))
+    :persistent-action (lambda (elm)
+                         (delete-process (get-process elm))
+                         (helm-delete-current-selection))
+    :persistent-help "Kill Process"
+    :action (helm-make-actions "Kill Process"
+                               (lambda (elm)
+                                 (delete-process (get-process elm))))))
 
 
 ;;;###autoload

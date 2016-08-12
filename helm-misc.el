@@ -223,11 +223,11 @@ It is added to `extended-command-history'.
     (insert candidate)))
 
 (defvar helm-source-comint-input-ring
-  '((name . "Comint history")
-    (candidates . (lambda ()
-                    (with-helm-current-buffer
-                      (ring-elements comint-input-ring))))
-    (action . helm-comint-input-ring-action))
+  (helm-build-sync-source "Comint history"
+    :candidates (lambda ()
+                  (with-helm-current-buffer
+                    (ring-elements comint-input-ring)))
+    :action 'helm-comint-input-ring-action)
   "Source that provide helm completion against `comint-input-ring'.")
 
 

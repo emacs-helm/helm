@@ -673,13 +673,13 @@ i.e the `symbol-name' of any existing symbol."
 ;;
 ;;
 (defvar helm-source-advice
-  '((name . "Function Advice")
-    (candidates . helm-advice-candidates)
-    (action ("Toggle Enable/Disable" . helm-advice-toggle))
-    (persistent-action . helm-advice-persistent-action)
-    (nomark)
-    (multiline)
-    (persistent-help . "Describe function / C-u C-j: Toggle advice")))
+  (helm-build-sync-source "Function Advice"
+    :candidates 'helm-advice-candidates
+    :action (helm-make-actions "Toggle Enable/Disable" 'helm-advice-toggle)
+    :persistent-action 'helm-advice-persistent-action
+    :nomark t
+    :multiline t
+    :persistent-help "Describe function / C-u C-j: Toggle advice"))
 
 (defun helm-advice-candidates ()
   (cl-loop for (fname) in ad-advised-functions
