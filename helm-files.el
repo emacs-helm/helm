@@ -3238,6 +3238,11 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                         (helm-browse-project nil))))
         :buffer "*helm browse project history*"))
 
+(defun helm-projects-history-push (root)
+  "Add or move project ROOT at the beginning of `helm-browse-project-history'."
+  (setq helm-browse-project-history (delete root helm-browse-project-history))
+  (push root helm-browse-project-history))
+
 ;;;###autoload
 (defun helm-browse-project (arg)
   "Preconfigured helm to browse projects.
@@ -3266,26 +3271,22 @@ and
     (helm-acond ((and (require 'helm-ls-git nil t)
                       (fboundp 'helm-ls-git-root-dir)
                       (helm-ls-git-root-dir))
-                 (cl-pushnew it helm-browse-project-history
-                             :test #'string=)
+                 (helm-projects-history-push it)
                  (helm-ls-git-ls))
                 ((and (require 'helm-ls-hg nil t)
                       (fboundp 'helm-hg-root)
                       (helm-hg-root))
-                 (cl-pushnew it helm-browse-project-history
-                             :test #'string=)
+                 (helm-projects-history-push it)
                  (helm-hg-find-files-in-project))
                 ((and (require 'helm-ls-svn nil t)
                       (fboundp 'helm-ls-svn-root-dir)
                       (helm-ls-svn-root-dir))
-                 (cl-pushnew it helm-browse-project-history
-                             :test #'string=)
+                 (helm-projects-history-push it)
                  (helm-ls-svn-ls))
                 ((helm-browse-project-get--root-dir (helm-current-directory))
                  (if (or arg (gethash it helm--browse-project-cache))
                      (progn
-                       (cl-pushnew it helm-browse-project-history
-                                   :test #'string=)
+                       (helm-projects-history-push it)
                        (helm-browse-project-find-files it (equal arg '(16))))
                      (helm :sources (helm-browse-project-build-buffers-source it)
                            :buffer "*helm browse project*"))))))
