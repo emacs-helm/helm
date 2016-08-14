@@ -3227,7 +3227,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 (defvar helm-browse-project-history nil)
 
-(defun helm-browse-project-history ()
+(defun helm-projects-history ()
   (interactive)
   (helm :sources
         (helm-build-sync-source "Project history"
@@ -3262,26 +3262,30 @@ and
                         helm-type-buffer-actions)
                  helm-type-buffer-actions))
         (helm-buffers-in-project-p t))
-    (cond ((and (require 'helm-ls-git nil t)
-                (fboundp 'helm-ls-git-root-dir)
-                (let ((root (helm-ls-git-root-dir)))
-                  (and root (cl-pushnew root helm-browse-project-history
-                                        :test #'string=))))
-           (helm-ls-git-ls))
-          ((and (require 'helm-ls-hg nil t)
-                (fboundp 'helm-hg-root)
-                (helm-hg-root))
-           (helm-hg-find-files-in-project))
-          ((and (require 'helm-ls-svn nil t)
-                (fboundp 'helm-ls-svn-root-dir)
-                (helm-ls-svn-root-dir))
-           (helm-ls-svn-ls))
-          (t (let ((cur-dir (helm-browse-project-get--root-dir
-                             (helm-current-directory))))
-               (if (or arg (gethash cur-dir helm--browse-project-cache))
-                   (helm-browse-project-find-files cur-dir (equal arg '(16)))
-                   (helm :sources (helm-browse-project-build-buffers-source cur-dir)
-                         :buffer "*helm browse project*")))))))
+    (helm-acond ((and (require 'helm-ls-git nil t)
+                      (fboundp 'helm-ls-git-root-dir)
+                      (helm-ls-git-root-dir))
+                 (cl-pushnew it helm-browse-project-history
+                             :test #'string=)
+                 (helm-ls-git-ls))
+                ((and (require 'helm-ls-hg nil t)
+                      (fboundp 'helm-hg-root)
+                      (helm-hg-root))
+                 (cl-pushnew it helm-browse-project-history
+                             :test #'string=)
+                 (helm-hg-find-files-in-project))
+                ((and (require 'helm-ls-svn nil t)
+                      (fboundp 'helm-ls-svn-root-dir)
+                      (helm-ls-svn-root-dir))
+                 (cl-pushnew it helm-browse-project-history
+                             :test #'string=)
+                 (helm-ls-svn-ls))
+                (t (let ((cur-dir (helm-browse-project-get--root-dir
+                                   (helm-current-directory))))
+                     (if (or arg (gethash cur-dir helm--browse-project-cache))
+                         (helm-browse-project-find-files cur-dir (equal arg '(16)))
+                         (helm :sources (helm-browse-project-build-buffers-source cur-dir)
+                               :buffer "*helm browse project*")))))))
 
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
