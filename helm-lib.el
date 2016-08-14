@@ -164,7 +164,7 @@ of `cl-return' is possible to exit the loop."
       (let ((clause1 (car clauses)))
         `(let ((,sym ,(car clause1)))
            (helm-aif ,sym
-               ,@(cdr clause1)
+               (progn ,@(cdr clause1))
              (helm-acond ,@(cdr clauses))))))))
 
 (defun helm-current-line-contents ()
