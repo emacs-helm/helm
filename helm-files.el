@@ -3225,6 +3225,18 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
         :ff-transformer-show-only-basename nil
         :buffer "*helm browse project*"))
 
+(defvar helm-browse-project-history nil)
+
+(defun helm-browse-project-history ()
+  (interactive)
+  (helm :sources
+        (helm-build-sync-source "Project history"
+          :candidates helm-browse-project-history
+          :action (lambda (candidate)
+                    (with-helm-default-directory candidate
+                        (helm-browse-project nil))))
+        :buffer "*helm browse project history*"))
+
 ;;;###autoload
 (defun helm-browse-project (arg)
   "Preconfigured helm to browse projects.
@@ -3252,7 +3264,9 @@ and
         (helm-buffers-in-project-p t))
     (cond ((and (require 'helm-ls-git nil t)
                 (fboundp 'helm-ls-git-root-dir)
-                (helm-ls-git-root-dir))
+                (let ((root (helm-ls-git-root-dir)))
+                  (and root (cl-pushnew root helm-browse-project-history
+                                        :test #'string=))))
            (helm-ls-git-ls))
           ((and (require 'helm-ls-hg nil t)
                 (fboundp 'helm-hg-root)
