@@ -3227,6 +3227,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
 
 (defvar helm-browse-project-history nil)
 
+;;;###autoload
 (defun helm-projects-history ()
   (interactive)
   (helm :sources
@@ -3280,12 +3281,14 @@ and
                  (cl-pushnew it helm-browse-project-history
                              :test #'string=)
                  (helm-ls-svn-ls))
-                (t (let ((cur-dir (helm-browse-project-get--root-dir
-                                   (helm-current-directory))))
-                     (if (or arg (gethash cur-dir helm--browse-project-cache))
-                         (helm-browse-project-find-files cur-dir (equal arg '(16)))
-                         (helm :sources (helm-browse-project-build-buffers-source cur-dir)
-                               :buffer "*helm browse project*")))))))
+                ((helm-browse-project-get--root-dir (helm-current-directory))
+                 (if (or arg (gethash it helm--browse-project-cache))
+                     (progn
+                       (cl-pushnew it helm-browse-project-history
+                                   :test #'string=)
+                       (helm-browse-project-find-files it (equal arg '(16))))
+                     (helm :sources (helm-browse-project-build-buffers-source it)
+                           :buffer "*helm browse project*"))))))
 
 (defun helm-browse-project-get--root-dir (directory)
   (cl-loop with dname = (file-name-as-directory directory)
