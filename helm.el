@@ -920,7 +920,6 @@ It also accepts function or variable symbol.")
   "Internal, store locally `helm-pattern' value for later use in `helm-resume'.")
 (defvar helm-source-name nil)
 (defvar helm-current-source nil)
-(defvar helm-candidate-buffer-alist nil)
 (defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
 (defvar helm--last-log-file nil
@@ -4601,6 +4600,7 @@ Acceptable values of CREATE-OR-BUFFER:
          (local-bname (format " *helm candidates:%s*%s"
                               helm-source-name
                               (buffer-name helm-current-buffer)))
+         helm-candidate-buffer-alist
          (register-func
           (lambda ()
             (setq helm-candidate-buffer-alist
