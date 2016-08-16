@@ -268,29 +268,31 @@
     :initform nil
     :custom function
     :documentation
-    "  Function called with one parameter; the selected candidate.
+    "  Transform the selected candidate when passing it to action.
 
-  The function transforms the selected candidate, and the result
-  is passed to the action function.  The display-to-real
-  attribute provides another way to pass to action other string than
-  the one shown in Helm buffer.
+  Function called with one parameter, the selected candidate.
 
-  Traditionally, it is possible to make candidates,
-  candidate-transformer or filtered-candidate-transformer
-  function return a list with (DISPLAY . REAL) pairs. But if REAL
-  can be generated from DISPLAY, display-to-real is more
-  convenient and faster.
+  Avoid recomputing all candidates with candidate-transformer
+  or filtered-candidate-transformer to give a new value to REAL,
+  instead the selected candidate is transformed only when passing it
+  to action.
 
-  NOTE: This is deprecated and you have better time using `filter-one-by-one'.")
+  Note that this is NOT a transformer,
+  so the display will not be modified by this function.")
 
    (real-to-display
     :initarg :real-to-display
     :initform nil
     :custom function
     :documentation
-    "  Function called with one parameter; the selected candidate.
+    "  Recompute all candidates computed previously with other transformers.
+
+  Function called with one parameter, the selected candidate.
+
   The real value of candidates will be shown in display.
-  See `display-to-real'.")
+  Note: This have nothing to do with display-to-real.
+  It is unuseful as the same can be performed by using more than
+  one function in transformers, it is kept only for backward compatibility.")
 
    (action-transformer
     :initarg :action-transformer
