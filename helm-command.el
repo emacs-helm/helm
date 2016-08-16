@@ -240,6 +240,7 @@ than the default which is OBARRAY."
                 :help-message 'helm-M-x-help-message
                 :keymap helm-M-x-map
                 :must-match t
+                :match-part (lambda (c) (car (split-string c)))
                 :fuzzy helm-M-x-fuzzy-match
                 :nomark t
                 :candidates-in-buffer t

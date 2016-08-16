@@ -309,6 +309,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (keymap helm-comp-read-map)
                             (name "Helm Completions")
                             candidates-in-buffer
+                            match-part
                             exec-when-only-one
                             quit-when-no-cand
                             (volatile t)
@@ -403,6 +404,9 @@ Keys description:
   `helm-source-in-buffer' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
+- MATCH-PART: Allow matching only one part of candidate.
+  See match-part documentation in `helm-source'.
+
 Any prefix args passed during `helm-comp-read' invocation will be recorded
 in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
@@ -462,6 +466,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src-hist (helm-build-sync-source (format "%s History" name)
                          :candidates history-get-candidates
                          :fuzzy-match fuzzy
+                         :match-part match-part
                          :filtered-candidate-transformer
                          (append '((lambda (candidates sources)
                                      (cl-loop for i in candidates
@@ -479,6 +484,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
+                  :match-part match-part
                   :filtered-candidate-transformer fc-transformer
                   :requires-pattern requires-pattern
                   :persistent-action persistent-action
@@ -490,6 +496,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :volatile volatile))
            (src-1 (helm-build-in-buffer-source name
                     :data get-candidates
+                    :match-part match-part
                     :filtered-candidate-transformer fc-transformer
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
