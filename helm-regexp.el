@@ -139,7 +139,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     :persistent-action #'helm-regexp-persistent-action
     :persistent-help "Show this line"
     :multiline t
-    :matchplugin nil
+    :multimatch nil
     :requires-pattern 2
     :mode-line "Press TAB to select action."
     :action '(("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)

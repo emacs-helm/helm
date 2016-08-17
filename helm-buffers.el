@@ -212,7 +212,7 @@ Only buffer names are fuzzy matched when this is enabled,
     "  A function with no arguments to create buffer list.")
    (init :initform 'helm-buffers-list--init)
    (candidates :initform helm-buffers-list-cache)
-   (matchplugin :initform nil)
+   (multimatch :initform nil)
    (match :initform 'helm-buffers-match-function)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
    (resume :initform (lambda ()

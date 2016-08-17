@@ -3270,8 +3270,7 @@ to a particular place after finishing update."
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
   (let ((len (string-width
-              (if (or (assoc 'matchplugin source)
-                      (null (assoc 'no-matchplugin source)))
+              (if (assoc 'multimatch source)
                   ;; Don't count spaces entered when using
                   ;; multi-match.
                   (replace-regexp-in-string " " "" helm-pattern)
