@@ -480,6 +480,7 @@ than `w3m-browse-url' use it."
 (defclass helm-bookmark-overwrite-inheritor (helm-source) ())
 
 (defmethod helm--setup-source ((source helm-bookmark-overwrite-inheritor))
+  ;; Ensure `helm-source-in-buffer' method is called.
   (call-next-method)
   (setf (slot-value source 'action)
         (helm-append-at-nth
