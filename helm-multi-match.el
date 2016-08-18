@@ -54,9 +54,9 @@ when these options are used."
 
 
 ;; Internal
-(defconst helm-mm-default-match-functions
+(defvar helm-mm-default-match-functions
   '(helm-mm-exact-match helm-mm-match))
-(defconst helm-mm-default-search-functions
+(defvar helm-mm-default-search-functions
   '(helm-mm-exact-search helm-mm-search))
 
 
