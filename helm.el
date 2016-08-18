@@ -1821,12 +1821,8 @@ example, :candidate-number-limit is bound to
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   ;; Activate the advice for `tramp-read-passwd'.
-  (if (fboundp 'advice-add)
-      (progn
-        (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
-        (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd))
-      (ad-activate 'tramp-read-passwd)
-      (ad-activate 'ange-ftp-get-passwd))
+  (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
+  (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd)
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "any-prompt = %S" any-prompt)
   (helm-log "any-preselect = %S" any-preselect)
@@ -1882,14 +1878,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             (helm-restore-position-on-quit)
             (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
             nil))
-      (if (fboundp 'advice-add)
-          (progn
-            (advice-remove 'tramp-read-passwd
-                           #'helm--advice-tramp-read-passwd)
-            (advice-remove 'ange-ftp-get-passwd
-                           #'helm--advice-ange-ftp-get-passwd))
-          (ad-deactivate 'tramp-read-passwd)
-          (ad-deactivate 'ange-ftp-get-passwd))
+      (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
+      (advice-remove 'ange-ftp-get-passwd #'helm--advice-ange-ftp-get-passwd)
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
@@ -2497,20 +2487,6 @@ This can be useful for example for quietly writing a complex regexp."
                "Helm update re-enabled!"))))
 (put 'helm-toggle-suspend-update 'helm-only t)
 
-(defadvice tramp-read-passwd (around disable-helm-update)
-  ;; Suspend update when prompting for a tramp password.
-  (setq helm-suspend-update-flag t)
-  (setq overriding-terminal-local-map nil)
-  (setq helm--reading-passwd-or-string t)
-  (let (stimers)
-    (unwind-protect
-         (progn
-           (setq stimers (with-timeout-suspend))
-           ad-do-it)
-      (with-timeout-unsuspend stimers)
-      (setq helm--reading-passwd-or-string nil)
-      (setq helm-suspend-update-flag nil))))
-
 (defun helm--advice-tramp-read-passwd (old--fn &rest args)
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
@@ -2530,16 +2506,6 @@ This can be useful for example for quietly writing a complex regexp."
   (setq helm--reading-passwd-or-string t)
   (unwind-protect
        (apply old--fn args)
-    (setq helm--reading-passwd-or-string nil)
-    (setq helm-suspend-update-flag nil)))
-
-(defadvice ange-ftp-get-passwd (around disable-helm-update)
-  ;; Suspend update when prompting for a ange password.
-  (setq helm-suspend-update-flag t)
-  (setq overriding-terminal-local-map nil)
-  (setq helm--reading-passwd-or-string t)
-  (unwind-protect
-       ad-do-it
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
 
