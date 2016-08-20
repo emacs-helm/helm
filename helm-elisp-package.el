@@ -71,7 +71,7 @@
     (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
     (if helm--force-updating-p
         (if helm-el-package--upgrades
-            (message "%d package(s) can be upgraded, Refreshing packages list done"
+            (message "Refreshing packages list done, [%d] package(s) to upgrade"
                      (length helm-el-package--upgrades))
           (message "Refreshing packages list done, no upgrades available"))
       (setq helm-el-package--show-only (if helm-el-package--upgrades
