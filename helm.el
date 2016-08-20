@@ -2755,11 +2755,11 @@ functions if some, otherwise return CANDIDATES."
   (helm-aif (assoc-default 'real-to-display source)
       (setq candidates (helm-funcall-with-source
                         source 'mapcar
-                        (lambda (cand_)
-                          (if (consp cand_)
+                        (lambda (cand)
+                          (if (consp cand)
                               ;; override DISPLAY from candidate-transformer
-                              (cons (funcall it (cdr cand_)) (cdr cand_))
-                            (cons (funcall it cand_) cand_)))
+                              (cons (funcall it (cdr cand)) (cdr cand))
+                            (cons (funcall it cand) cand)))
                         candidates))
     candidates))
 
