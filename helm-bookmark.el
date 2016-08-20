@@ -477,9 +477,9 @@ than `w3m-browse-url' use it."
     (define-key map (kbd "C-x C-d") 'helm-bookmark-run-browse-project)
     map))
 
-(defclass helm-bookmark-overwrite-inheritor (helm-source) ())
+(defclass helm-bookmark-override-inheritor (helm-source) ())
 
-(defmethod helm--setup-source ((source helm-bookmark-overwrite-inheritor))
+(defmethod helm--setup-source ((source helm-bookmark-override-inheritor))
   ;; Ensure `helm-source-in-buffer' method is called.
   (call-next-method)
   (setf (slot-value source 'action)
@@ -490,7 +490,7 @@ than `w3m-browse-url' use it."
   (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
 
 (defclass helm-bookmark-find-files-class (helm-source-filtered-bookmarks
-                                          helm-bookmark-overwrite-inheritor)
+                                          helm-bookmark-override-inheritor)
   ())
 
 (defvar helm-source-bookmark-helm-find-files
