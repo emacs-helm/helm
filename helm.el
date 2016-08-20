@@ -763,9 +763,6 @@ If `nil', `helm-debug-output' includes only variables with
 Default is `nil', which disables writing log messages because the
 size of `helm-debug-buffer' grows quickly.")
 
-(defvar helm-compile-source-functions nil 
-  "Functions to compile elements of `helm-sources' (plug-in).")
-
 (defvar helm-mode-line-string "\
 \\<helm-map>\
 \\[helm-help]:Help \
