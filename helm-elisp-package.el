@@ -130,7 +130,7 @@
     (helm-exit-and-execute-action 'helm-el-package-install)))
 (put 'helm-el-run-package-install 'helm-only t)
 
-(defun helm-el-package-uninstall-1 (pkg-list)
+(defun helm-el-package-uninstall-1 (pkg-list &optional force)
   (cl-loop with mkd = pkg-list
         for p in mkd
         for id = (get-text-property 0 'tabulated-list-id p)
@@ -139,7 +139,10 @@
             (with-no-warnings
               (if (fboundp 'package-desc-full-name)
                   ;; emacs 24.4
-                  (package-delete id)
+                  (condition-case nil
+                      (package-delete id force)
+                    (wrong-number-of-arguments
+                     (package-delete id)))
                 ;; emacs 24.3
                 (package-delete (symbol-name (car id))
                                 (package-version-join (cdr id)))))
@@ -171,7 +174,7 @@
                        "No package deleted")))
 
 (defun helm-el-package-uninstall (_candidate)
-  (helm-el-package-uninstall-1 (helm-marked-candidates)))
+  (helm-el-package-uninstall-1 (helm-marked-candidates) helm-current-prefix-arg))
 
 (defun helm-el-run-package-uninstall ()
   (interactive)
