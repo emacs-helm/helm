@@ -415,11 +415,23 @@ NOTE: this have no effect if `helm-split-window-preferred-function' is not
   :group 'helm
   :type 'symbol)
 
-(defcustom helm-display-buffer-default-size nil
+(defcustom helm-display-buffer-default-height nil
   "Initial height of `helm-buffer', specified as an integer or a function.
+
 The function should take one arg and the responsibility for
-re-sizing the window; function's return value is ignored. See
-`display-buffer' for more info."
+re-sizing the window; function's return value is ignored.
+Note that this have no effect when the split is vertical.
+See `display-buffer' for more info."
+  :group 'helm
+  :type '(choice integer function))
+
+(defcustom helm-display-buffer-default-width nil
+  "Initial width of `helm-buffer', specified as an integer or a function.
+
+The function should take one arg and the responsibility for
+re-sizing the window; function's return value is ignored.
+Note that this have no effect when the split is horizontal.
+See `display-buffer' for more info."
   :group 'helm
   :type '(choice integer function))
 
@@ -2160,7 +2172,8 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                (not helm-split-window-in-side-p))
       (delete-other-windows))
     (display-buffer
-     buffer `(nil . ((window-height . ,helm-display-buffer-default-size))))
+     buffer `(nil . ((window-height . ,helm-display-buffer-default-height)
+                     (window-width  . ,helm-display-buffer-default-width))))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 
