@@ -35,9 +35,11 @@
 
 (defcustom helm-top-command
   (cl-case system-type
-    (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start,vsz,%%cpu,%%mem,etime,command")
+    (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start_time,vsz,%%cpu,%%mem,etime,command")
     (t      "env COLUMNS=%s top -b -n 1"))
   "Top command used to display output of top.
+A format string where %s will be replaced with `frame-width'.
+
 To use top command, a version supporting batch mode (-b option) is needed.
 On Mac OSX top command doesn't support this, so ps command
 is used by default instead.
@@ -45,7 +47,8 @@ If you modify this the number and order of elements displayed
 should be the same as top command to have the sort commands
 working properly, that is 12 elements with the 2 first being
 PID and USER and the last 4 being %CPU, %MEM, TIME and COMMAND.
-A format string where %s will be replaced with `frame-width'."
+Ensure also that no elements contain spaces (e.g use start_time and not start)
+and \"env COLUMNS=%s\" is specified at beginning of command."
   :group 'helm-sys
   :type 'string)
 
@@ -269,6 +272,13 @@ Show actions only on line starting by a PID."
          (mem-2 (string-to-number (nth 9 split-2))))
     (> mem-1 mem-2)))
 
+(defun helm-top-sort-by-cpu (s1 s2)
+  (let* ((split-1 (split-string s1))
+         (split-2 (split-string s2))
+         (cpu-1 (string-to-number (nth 8 split-1)))
+         (cpu-2 (string-to-number (nth 8 split-2))))
+    (> cpu-1 cpu-2)))
+
 (defun helm-top-sort-by-user (s1 s2)
   (let* ((split-1 (split-string s1))
          (split-2 (split-string s2))
@@ -286,11 +296,13 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
-  (helm-top-set-mode-line "CPU")
-  (setq helm-top-sort-fn nil)
-  (helm-update (replace-regexp-in-string
-                "[0-9]+" "[0-9]+"
-                (regexp-quote (helm-get-selection nil t)))))
+  (let ((com (nth 2 (split-string helm-top-command))))
+    (helm-top-set-mode-line "CPU")
+    (setq helm-top-sort-fn (and (null (string= com "top"))
+                                'helm-top-sort-by-cpu))
+    (helm-update (replace-regexp-in-string
+                  "[0-9]+" "[0-9]+"
+                  (regexp-quote (helm-get-selection nil t))))))
 
 (defun helm-top-run-sort-by-mem ()
   (interactive)
