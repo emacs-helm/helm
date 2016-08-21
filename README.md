@@ -1,6 +1,6 @@
 <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3" /></a>
-<a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA" title="" /></a>
-<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable" title="" /></a></p>
+<a href="https://melpa.org/#/helm"><img alt="MELPA" src="https://melpa.org/packages/helm-badge.svg"/></a>
+<a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"/></a></p>
 
 <h1>Emacs-helm</h1>
 
