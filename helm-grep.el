@@ -1424,7 +1424,7 @@ arg INPUT is what you will have by default at prompt on startup."
 With prefix-arg prompt for type if available with your AG version."
   (interactive "P")
   (require 'helm-files)
-  (helm-grep-ag default-directory arg))
+  (helm-grep-ag (expand-file-name default-directory) arg))
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
