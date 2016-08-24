@@ -68,7 +68,7 @@ it will have no effect."
   :type '(alist :key-type symbol :value-type (integer :tag "Column number")))
 
 (defcustom helm-top-poll-delay 1.5
-  "Helm top poll after this dealy when `helm-top-poll-mode' is enabled.
+  "Helm top poll after this delay when `helm-top-poll-mode' is enabled.
 The minimal delay allowed is 1.5, if less than this helm-top will use 1.5."
   :group 'helm-sys
   :type  'float)
