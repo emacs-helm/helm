@@ -83,7 +83,8 @@ being idle."
 
 (defcustom helm-top-poll-preselection 'linum
   "Stay on same line or follow candidate when `helm-top-poll' update display.
-Possible values are 'candidate or 'linum."
+Possible values are 'candidate or 'linum.
+This affect also sorting functions in the same way."
   :group'helm-sys
   :type '(radio :tag "Preferred preselection action for helm-top"
           (const :tag "Follow candidate" candidate)
@@ -306,13 +307,20 @@ Show actions only on line starting by a PID."
          (user-2 (nth col split-2)))
     (string< user-1 user-2)))
 
+(defun helm-top--preselect-fn ()
+  (if (eq helm-top-poll-preselection 'linum)
+      `(lambda ()
+         (goto-char (point-min))
+         (forward-line ,(helm-candidate-number-at-point)))
+      (replace-regexp-in-string
+       "[0-9]+" "[0-9]+"
+       (regexp-quote (helm-get-selection nil t)))))
+
 (defun helm-top-run-sort-by-com ()
   (interactive)
   (helm-top-set-mode-line "COM")
   (setq helm-top-sort-fn 'helm-top-sort-by-com)
-  (helm-update (replace-regexp-in-string
-                "[0-9]+" "[0-9]+"
-                (regexp-quote (helm-get-selection nil t)))))
+  (helm-update (helm-top--preselect-fn)))
 
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
@@ -320,25 +328,19 @@ Show actions only on line starting by a PID."
     (helm-top-set-mode-line "CPU")
     (setq helm-top-sort-fn (and (null (string= com "top"))
                                 'helm-top-sort-by-cpu))
-    (helm-update (replace-regexp-in-string
-                  "[0-9]+" "[0-9]+"
-                  (regexp-quote (helm-get-selection nil t))))))
+    (helm-update (helm-top--preselect-fn))))
 
 (defun helm-top-run-sort-by-mem ()
   (interactive)
   (helm-top-set-mode-line "MEM")
   (setq helm-top-sort-fn 'helm-top-sort-by-mem)
-  (helm-update (replace-regexp-in-string
-                "[0-9]+" "[0-9]+"
-                (regexp-quote (helm-get-selection nil t)))))
+  (helm-update (helm-top--preselect-fn)))
 
 (defun helm-top-run-sort-by-user ()
   (interactive)
   (helm-top-set-mode-line "USER")
   (setq helm-top-sort-fn 'helm-top-sort-by-user)
-  (helm-update (replace-regexp-in-string
-                "[0-9]+" "[0-9]+"
-                (regexp-quote (helm-get-selection nil t)))))
+  (helm-update (helm-top--preselect-fn)))
 
 
 ;;; X RandR resolution change
