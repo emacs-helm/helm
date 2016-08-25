@@ -96,11 +96,6 @@ This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
-(defcustom helm-wikipedia-follow-delay 2
-  "Delay before wikipedia summary popup."
-  :type 'number
-  :group 'helm-net)
-
 (defcustom helm-search-suggest-action-youtube-url
   "http://www.youtube.com/results?aq=f&search_query=%s"
   "The Youtube search url.
@@ -359,10 +354,9 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
                                 helm-search-suggest-action-wikipedia-url
                                 candidate))))
     :persistent-action #'helm-wikipedia-persistent-action
+    :persistent-help "show summary"
     :volatile t
     :keymap helm-map
-    :follow 1
-    :follow-delay helm-wikipedia-follow-delay
     :requires-pattern 3))
 
 
