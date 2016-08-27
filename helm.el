@@ -3998,8 +3998,12 @@ next source)."
               (eq last-command 'helm-follow-action-backward)
               (eq last-command 'helm-execute-persistent-action))
       (if (> arg 0)
-          (helm-next-line 1)
-        (helm-previous-line 1)))
+          (helm-move-selection-common :where 'line
+                                      :direction 'next
+                                      :follow nil)
+          (helm-move-selection-common :where 'line
+                                      :direction 'previous
+                                      :follow nil)))
     (helm-execute-persistent-action)))
 
 (defun helm-follow-action-forward ()
