@@ -468,7 +468,10 @@ set to `other'."
                                                  helm-source-etags-select
                                                  helm-source-man-pages
                                                  helm-source-occur
-                                                 helm-source-moccur)
+                                                 helm-source-moccur
+                                                 helm-source-grep-ag
+                                                 helm-source-grep-git
+                                                 helm-source-grep)
   "List of helm sources that need to use `helm--maybe-use-default-as-input'.
 When a source is a member of this list, default `thing-at-point'
 will be used as input."
