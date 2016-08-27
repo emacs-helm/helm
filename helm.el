@@ -3444,7 +3444,8 @@ this additional info after the source name by overlay."
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line)
-        (helm-follow-execute-persistent-action-maybe 1)
+        ;; FIXME Don't hardcode follow delay.
+        (helm-follow-execute-persistent-action-maybe 0.5)
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-after-update-hook))))
 
