@@ -901,7 +901,12 @@ These extensions will be added to command line with --include arg of grep."
    (nohighlight :initform t)
    (nomark :initform t)
    (backend :initarg :backend
-            :initform nil)
+            :initform nil
+            :documentation
+            "  The grep backend that will be used.
+  It is actually used only as an internal flag
+  and don't set the backend by itself.
+  You probably don't want to modify this.")
    (candidate-number-limit :initform 9999)
    (help-message :initform 'helm-grep-help-message)
    (history :initform 'helm-grep-history)
