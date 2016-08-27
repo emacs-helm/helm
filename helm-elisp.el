@@ -94,6 +94,13 @@ fuzzy completion is not available in `completion-at-point'."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
+(defcustom helm-apropos-defaut-info-lookup-sources '(helm-source-info-elisp
+                                                     helm-source-info-cl
+                                                     helm-source-info-eieio)
+  "A list of sources to look into when searching info page of a symbol."
+  :group 'helm-elisp
+  :type '(repeat (choice symbol)))
+
 
 ;;; Faces
 ;;
@@ -628,9 +635,7 @@ Filename completion happen if string start after or between a double quote."
         (helm-quit-if-no-candidate
          `(lambda ()
             (message "`%s' Not Documented as a symbol" ,c))))
-    (helm :sources '(helm-source-info-elisp
-                     helm-source-info-cl
-                     helm-source-info-eieio)
+    (helm :sources helm-apropos-defaut-info-lookup-sources
           :resume 'noresume
           :buffer "*helm lookup*"
           :input c)))
