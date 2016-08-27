@@ -3269,7 +3269,7 @@ to a particular place after finishing update."
   (goto-char (point-min))
   (helm-move-selection-common :where 'line
                               :direction 'next
-                              :follow nil))
+                              :follow t))
 
 (defun helm-force-update (&optional preselect)
   "Force recalculation and update of candidates.
@@ -3444,6 +3444,7 @@ this additional info after the source name by overlay."
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
         (helm-mark-current-line)
+        (helm-follow-execute-persistent-action-maybe 1)
         (helm-display-mode-line (helm-get-current-source))
         (helm-log-run-hook 'helm-after-update-hook))))
 
@@ -5328,20 +5329,24 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
   "`helm-follow-mode' will execute its persistent action after this delay.
 Note that if the `follow-delay' attr is present in source,
 it will take precedence over this.")
-(defun helm-follow-execute-persistent-action-maybe ()
+(defun helm-follow-execute-persistent-action-maybe (&optional delay)
   "Execute persistent action in mode `helm-follow-mode'.
-This happen after `helm-input-idle-delay' secs."
-  (let ((src (helm-get-current-source)))
+
+This happen after: DELAY or the 'follow-attr value of current source
+or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
+  (let* ((src (helm-get-current-source))
+         (at (or delay
+                 (assoc-default 'follow-delay src)
+                 helm-follow-input-idle-delay
+                 (or (and helm-input-idle-delay
+                          (max helm-input-idle-delay 0.01))
+                     0.01))))
     (and (not (get-buffer-window helm-action-buffer 'visible))
          (eq (assoc-default 'follow src) 1)
-         (sit-for (or (assoc-default 'follow-delay src)
-                      helm-follow-input-idle-delay
-                      (and helm-input-idle-delay
-                           (max helm-input-idle-delay 0.01))))
          (helm-window)
          (helm-get-selection)
          (save-excursion
-           (helm-execute-persistent-action)))))
+           (run-with-idle-timer at nil #'helm-execute-persistent-action)))))
 
 
 ;;; Auto-resize mode
