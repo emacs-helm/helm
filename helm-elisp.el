@@ -630,18 +630,35 @@ Filename completion happen if string start after or between a double quote."
               ("Find function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
 
+(defun helm-info-lookup-fallback-source (candidate)
+  (let ((sym (helm-symbolify candidate))
+        src-name fn)
+    (cond ((fboundp sym)
+           (setq fn #'helm-describe-function
+                 src-name "Describe function"))
+          ((facep sym)
+           (setq fn #'helm-describe-face
+                 src-name "Describe face"))
+          (t
+           (setq fn #'helm-describe-variable
+                 src-name "Describe variable")))
+    (helm-build-sync-source src-name
+      :candidates (list candidate)
+      :nomark t
+      :action fn)))
+
 (defun helm-info-lookup-symbol-1 (c)
-  (let ((helm-execute-action-at-once-if-one t)
-        (helm-quit-if-no-candidate
-         `(lambda ()
-            (message "`%s' Not Documented as a symbol" ,c))))
-    (helm :sources helm-apropos-defaut-info-lookup-sources
+  (let ((helm-execute-action-at-once-if-one t))
+    (helm :sources (append helm-apropos-defaut-info-lookup-sources
+                           (list (helm-info-lookup-fallback-source c)))
           :resume 'noresume
           :buffer "*helm lookup*"
           :input c)))
 
 (defun helm-info-lookup-symbol (candidate)
-  (run-with-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate))
+  ;; Running an idle-timer allow not catching RET
+  ;; when exiting with the fallback source.
+  (run-with-idle-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate))
 
 (defun helm-elisp--persistent-help (candidate fun &optional name)
   (let ((hbuf (get-buffer (help-buffer))))
