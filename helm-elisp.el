@@ -633,7 +633,13 @@ Filename completion happen if string start after or between a double quote."
 (defun helm-info-lookup-fallback-source (candidate)
   (let ((sym (helm-symbolify candidate))
         src-name fn)
-    (cond ((fboundp sym)
+    (cond ((class-p sym)
+           (setq fn #'helm-describe-function
+                 src-name "Describe class"))
+          ((generic-p sym)
+           (setq fn #'helm-describe-function
+                 src-name "Describe generic function"))
+          ((fboundp sym)
            (setq fn #'helm-describe-function
                  src-name "Describe function"))
           ((facep sym)
@@ -644,6 +650,10 @@ Filename completion happen if string start after or between a double quote."
                  src-name "Describe variable")))
     (helm-build-sync-source src-name
       :candidates (list candidate)
+      :persistent-action (lambda (candidate)
+                           (helm-elisp--persistent-help
+                            candidate fn))
+      :persistent-help src-name
       :nomark t
       :action fn)))
 
