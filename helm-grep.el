@@ -910,7 +910,8 @@ These extensions will be added to command line with --include arg of grep."
 
 (defvar helm-source-grep nil)
 
-(cl-defun helm-do-grep-1 (targets &optional recurse grep exts default-input input (source 'helm-source-grep))
+(cl-defun helm-do-grep-1 (targets &optional recurse grep exts
+                                  default-input input (source 'helm-source-grep))
   "Launch grep on a list of TARGETS files.
 
 When RECURSE is given use -r option of grep and prompt user
