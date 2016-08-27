@@ -502,9 +502,9 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--emacs-variables (&optional default)
   (helm-build-in-buffer-source "Variables"
-    :init `(lambda ()
-             (helm-apropos-init
-              (lambda (x) (and (boundp x) (not (keywordp x)))) ,default))
+    :init (lambda ()
+            (helm-apropos-init
+             (lambda (x) (and (boundp x) (not (keywordp x)))) default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
@@ -559,8 +559,8 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--emacs-commands (&optional default)
   (helm-build-in-buffer-source "Commands"
-    :init `(lambda ()
-             (helm-apropos-init 'commandp ,default))
+    :init (lambda ()
+            (helm-apropos-init 'commandp default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
@@ -575,13 +575,13 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--emacs-functions (&optional default)
   (helm-build-in-buffer-source "Functions"
-    :init `(lambda ()
-             (helm-apropos-init (lambda (x)
-                                    (and (fboundp x)
-                                         (not (commandp x))
-                                         (not (generic-p x))
-                                         (not (class-p x))))
-                                ,default))
+    :init (lambda ()
+            (helm-apropos-init (lambda (x)
+                                 (and (fboundp x)
+                                      (not (commandp x))
+                                      (not (generic-p x))
+                                      (not (class-p x))))
+                               default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
@@ -596,10 +596,10 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--eieio-classes (&optional default)
   (helm-build-in-buffer-source "Classes"
-    :init `(lambda ()
-             (helm-apropos-init (lambda (x)
-                                    (class-p x))
-                                ,default))
+    :init (lambda ()
+            (helm-apropos-init (lambda (x)
+                                 (class-p x))
+                               default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
@@ -614,10 +614,10 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-def-source--eieio-generic (&optional default)
   (helm-build-in-buffer-source "Generic functions"
-    :init `(lambda ()
-             (helm-apropos-init (lambda (x)
-                                  (generic-p x))
-                                ,default))
+    :init (lambda ()
+            (helm-apropos-init (lambda (x)
+                                 (generic-p x))
+                               default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
