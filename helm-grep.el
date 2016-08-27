@@ -910,7 +910,7 @@ These extensions will be added to command line with --include arg of grep."
 
 (defvar helm-source-grep nil)
 
-(defun helm-do-grep-1 (targets &optional recurse grep exts default-input input)
+(cl-defun helm-do-grep-1 (targets &optional recurse grep exts default-input input (source 'helm-source-grep))
   "Launch grep on a list of TARGETS files.
 
 When RECURSE is given use -r option of grep and prompt user
@@ -959,7 +959,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                      (string-match "%e" helm-grep-default-command)
                      (helm-grep-read-ack-type)))
          (follow (and helm-follow-mode-persistent
-                      (assoc-default 'follow helm-source-grep)))
+                      (assoc-default 'follow (symbol-value source))))
          (src-name (capitalize (helm-grep-command recurse grep))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
@@ -988,10 +988,10 @@ in recurse, and ignore EXTS, search being made recursively on files matching
            (t helm-grep-default-command))
      'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
-    (setq helm-source-grep (helm-make-source src-name 'helm-grep-class
-                             :follow follow))
+    (set source (helm-make-source src-name 'helm-grep-class
+                  :follow follow))
     (helm
-     :sources 'helm-source-grep
+     :sources source
      :buffer (format "*helm %s*" (helm-grep-command recurse grep))
      :default default-input
      :input input
@@ -1384,6 +1384,8 @@ When WITH-TYPES is non-nil provide completion on AG types."
 ;;; Git grep
 ;;
 ;;
+(defvar helm-source-grep-git nil)
+
 (defcustom helm-grep-git-grep-command
   "git --no-pager grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p -- %f"
   "The git grep default command line.
@@ -1415,7 +1417,7 @@ arg INPUT is what you will have by default at prompt on startup."
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
     (cl-assert helm-ff-default-directory nil "Not inside a Git repository")
     (helm-do-grep-1 (if all '("") `(,(expand-file-name directory)))
-                    nil 'git nil default input)))
+                    nil 'git nil default input 'helm-source-grep-git)))
 
 
 ;;;###autoload
