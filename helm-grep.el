@@ -1354,6 +1354,12 @@ if available with current AG version."
 
 (defvar helm-source-grep-ag nil)
 
+(defmethod helm--setup-source ((source helm-grep-ag-class))
+  (helm-aif (and helm-follow-mode-persistent
+                 helm-source-grep-ag
+                 (assoc-default 'follow helm-source-grep-ag))
+      (setf (slot-value source 'follow) it)))
+
 (defun helm-grep-ag-1 (directory &optional type)
   "Start helm ag in DIRECTORY maybe searching in files of type TYPE."
   (setq helm-source-grep-ag
