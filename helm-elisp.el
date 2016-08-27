@@ -648,7 +648,7 @@ Filename completion happen if string start after or between a double quote."
       :action fn)))
 
 (defun helm-info-lookup-symbol-1 (c)
-  (let ((helm-execute-action-at-once-if-one t))
+  (let ((helm-execute-action-at-once-if-one 'current-source))
     (helm :sources (append helm-apropos-defaut-info-lookup-sources
                            (list (helm-info-lookup-fallback-source c)))
           :resume 'noresume

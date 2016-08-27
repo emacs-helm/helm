@@ -755,9 +755,11 @@ minibuffer abnormally (e.g. via `helm-keyboard-quit').")
   "Variables restored after an `helm' invocation.")
 
 (defvar helm-execute-action-at-once-if-one nil
-  "With the only remaining candidate, executes the default action and then exits.
-This variable accepts a function with no args and returns a boolean
-value.")
+  "When non--nil executes the default action and then exits if only one candidate.
+If symbol 'current-source is given as value exit if only one candidate
+in current source.
+This variable accepts a function with no args that should returns a boolean
+value or 'current-source.")
 
 (defvar helm-quit-if-no-candidate nil
   "When non-`nil', quits if there are no candidates.
@@ -2438,7 +2440,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
       (cond ((and (if (functionp helm-execute-action-at-once-if-one)
                       (funcall helm-execute-action-at-once-if-one)
                     helm-execute-action-at-once-if-one)
-                  (= (helm-get-candidate-number) 1))
+                  (= (helm-get-candidate-number
+                      (eq helm-execute-action-at-once-if-one 'current-source)) 1))
              (ignore))              ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
                   (= (helm-get-candidate-number) 0))
