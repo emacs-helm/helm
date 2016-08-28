@@ -680,7 +680,7 @@ If STRING is non--nil return instead a space separated string."
              (member (assoc-default 'name (helm-get-current-source))
                      helm-sources-using-help-echo-popup))
     (setq helm--show-help-echo-timer
-          (run-with-idle-timer
+          (run-with-timer
            1 nil
            (lambda ()
              (save-selected-window
