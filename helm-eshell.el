@@ -45,6 +45,12 @@
   :group 'helm)
 
 
+(defcustom helm-eshell-fuzzy-match nil
+  "Enable fuzzy matching in `helm-esh-pcomplete' when non--nil."
+  :group 'helm-eshell
+  :type 'boolean)
+
+
 (defvar helm-eshell-history-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -71,6 +77,7 @@
    (nomark :initform t)
    (persistent-action :initform 'ignore)
    (nohighlight :initform t)
+   (fuzzy-match :initform (eval helm-eshell-fuzzy-match))
    (filtered-candidate-transformer
     :initform
     (lambda (candidates _sources)
