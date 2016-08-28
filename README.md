@@ -6,7 +6,8 @@
 
 <p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
 
-<p>You can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a> to help this project.</p>
+<p>Maintainance of Helm is a lot of work that I do freely on my sparse time, you can 
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a> to help this project.</p>
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
@@ -22,9 +23,8 @@
     - [Configuration](#configuration)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
+        - [Matching methods](#matching-methods)
         - [Creating custom helm sources](#creating-custom-helm-sources)
-        - [Fuzzy matching](#fuzzy-matching)
-        - [Autoresize](#autoresize)
 - [Helm Applications](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
 - [Known issues](#known-issues)
@@ -97,6 +97,8 @@ _NOTE:_ This script does not work on Windows systems.
 ## Install from Emacs packaging system
 
 Helm can also be installed from MELPA repository at http://melpa.org/.
+You will find the instructions to install packages from MELPA [here](https://github.com/melpa/melpa#usage).
+
 No further configuration is necessary to run helm other than perhaps a
 one-line entry in the Emacs init file:
 
@@ -154,12 +156,9 @@ The full configuration I (the helm maintainer) use is
 [here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el).
 
 Also see helm customizable variables with the customize interface.
-Enabling `helm-mode` will enable helm for many features of emacs
-requiring completions.
 
-For pre-configured Emacs installs, such as
-[Emacs Prelude](https://github.com/bbatsov/prelude), helm is built-in
-with no additional configuration steps necessary for using helm.
+Enabling `helm-mode` will enable helm for many features of emacs
+requiring completions, see below how to enable `helm-mode`.
 
 ## Basic usage
 
@@ -230,6 +229,16 @@ Helm [guide](http://tuhdo.github.io/helm-intro.html) and
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) provide
 additional details.
 
+### Matching methods
+
+Helm support by default multi pattern matching, it is the standard way
+of matching in helm.
+E.g You can use a pattern like "foo bar" to match a line containing "foo" and "bar"
+or "bar" and "foo".
+Each pattern can be a regexp.
+
+In addition helm support [fuzzy matching](https://github.com/emacs-helm/helm/wiki/Fuzzy-matching).
+
 ### Creating custom helm sources
 
 An example:
@@ -246,46 +255,6 @@ The candidates list may be replaced by a function that produces a list.
 See ([helm wiki](https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework))
 for details.
 
-
-### Fuzzy matching
-
-Helm's built-in fuzzy matcher is activated for some commands. Helm's
-fuzzy matching is disabled by default. Currently these commands
-support fuzzy matching:
-
-- `helm-recentf`: set `helm-recentf-fuzzy-match` to `t`.
-- `helm-mini`: set `helm-buffers-fuzzy-matching` and `helm-recentf-fuzzy-match` to `t`.
-- `helm-buffers-list`: set `helm-buffers-fuzzy-matching` to `t`.
-- `helm-find-files`: fuzzy matching enabled by default.
-- `helm-locate`: set `helm-locate-fuzzy-match` to `t`.
-- `helm-M-x`: set `helm-M-x-fuzzy-match` to `t`.
-- `helm-semantic`: set `helm-semantic-fuzzy-match` to `t`.
-- `helm-imenu`: set `helm-imenu-fuzzy-match` to `t`.
-- `helm-apropos`: set `helm-apropos-fuzzy-match` to `t`.
-- `helm-lisp-completion-at-point`: set `helm-lisp-fuzzy-completion` to `t`.
-
-To globally enable fuzzy matching for `helm-mode`:
-- set `helm-mode-fuzzy-match` to `t`.
-- set `helm-completion-in-region-fuzzy-match` to `t`.
-
-**IMPORTANT**: For faster fuzzy matching, set
-`helm-candidate-number-limit` to 100 or less. Default is 100.
-
-### Autoresize
-
-To re-size the completion window based on number of candidates:
-
-    (helm-autoresize-mode 1)
-
-Adjust minimum and maximum height of completion window using:
-
-- `helm-autoresize-max-height`
-- `helm-autoresize-min-height`
-
-40 is the default value of `helm-autoresize-max-height`, which sets the completion window height to 40% of the fame height. `helm-autoresize-min-height` specifies the minimum height that the completion window cannot shrink to.
-
-For a fixed window size, set `helm-autoresize-min-height` equal to `helm-autoresize-max-height`.
-
 # Helm Applications 
 
 These are popular applications developed using helm completion and
@@ -296,33 +265,50 @@ through the Emacs package manager. This list is not exhaustive.
   completions. Helm provides even more optimized helm completions for
   some commands in helm-mode. Prefer these natively optimized versions
   over the ones in helm-mode.
+  
 - `helm-find-files`: one command that handles all the files related
   commands (bind to `C-x C-f`).
+  
 - `helm-buffers-list`: provides enhanced buffers listing.
+
 - `helm-browse-project`: handles project files and buffers; defaults
    to current directory; works with `helm-find-files`; recommended
    with [helm-ls-git](https://github.com/emacs-helm/helm-ls-git),
    [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg) and
    `helm-ls-svn` for a better handling of version control files.
+   Each time a project under version control is visited it is added
+   to `helm-browse-project-history` and can be visted with `helm-projects-history`.
+   
 - `helm-dabbrev`: enhanced dabbrev implementation with helm
   completion; does not use emacs code.
+  
 - `helm-moccur`: enhanced occur for one or more buffers; launch from
   `helm-buffers-list` or `current-buffer`.
-- `helm-M-x`: enhanced `execute-extended-command` (bind to `M-x`).
+  
+- `helm-M-x`: enhanced `execute-extended-command` (bind it to `M-x`).
+
 - `helm-imenu` and `helm-imenu-in-all-buffers`: provide imenus for
   current or all buffers.
+  
 - `helm-etags-select`: enhanced etags with helm-completion; usable
   everywhere with `helm-find-files`.
+  
 - `helm-apropos`: enhanced apropos for functions and variables that
   `C-h` commands provide.
+  
 - `Grep`: launch from any helm file commands; supports back-ends
   `grep`, `ack-grep`, `git-grep`, `ag` and custom implementation of
   `pt`.
+  
 - `helm-gid`: Helm interface for `gid` from
   [id-utils](https://www.gnu.org/software/idutils/).
+  
 - `helm-show-kill-ring`: A helm browser for kill ring.
+
 - `helm-all-mark-rings`: A helm browser for mark ring; retrieves last positions in buffers.
+
 - `helm-filtered-bookmarks`: enhanced browser for bookmarks.
+
 - `helm-list-elisp-packages`: enhanced browser for elisp package management.
 
 # Recommended Helm extensions
@@ -344,7 +330,7 @@ extensions.
 
 # Known issues
 
-The Helm project has a currant unresolved 
+The Helm project has a current unresolved 
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
 Please feel free to fix any of them; send a pull request.
 
