@@ -244,25 +244,23 @@ Support install, remove and purge actions."
     (ansi-term (getenv "SHELL") "term apt")
     (setq helm-apt-term-buffer (buffer-name)))
   (term-line-mode)
-  (let ((command   (cl-case action
-                     (install   "sudo apt-get install ")
-                     (reinstall "sudo apt-get install --reinstall ")
-                     (uninstall "sudo apt-get remove ")
-                     (purge     "sudo apt-get purge ")
-                     (t          (error "Unknown action"))))
-        (beg       (point))
-        end
-        (cand-list (mapconcat (lambda (x) (format "'%s'" x))
-                              (helm-marked-candidates) " ")))
-    (goto-char (point-max))
-    (insert (concat command cand-list))
-    (setq end (point))
-    (if (y-or-n-p (format "%s package(s)" (symbol-name action)))
-        (progn
+  (let* ((command   (cl-case action
+                      (install   "sudo apt-get install ")
+                      (reinstall "sudo apt-get install --reinstall ")
+                      (uninstall "sudo apt-get remove ")
+                      (purge     "sudo apt-get purge ")
+                      (t          (error "Unknown action"))))
+         (cands (helm-marked-candidates))
+         (cand-list (mapconcat (lambda (x) (format "'%s'" x)) cands " ")))
+    (with-helm-display-marked-candidates "*apt candidates*"
+      cands
+      (when (y-or-n-p (format "%s package(s)" (symbol-name action)))
+        (with-current-buffer helm-apt-term-buffer
+          (goto-char (point-max))
+          (insert (concat command cand-list))
           (setq helm-external-commands-list nil)
           (setq helm-apt-installed-packages nil)
-          (term-char-mode) (term-send-input))
-      (delete-region beg end))))
+          (term-char-mode) (term-send-input))))))
 
 ;;;###autoload
 (defun helm-apt (arg)
