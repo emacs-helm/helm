@@ -683,12 +683,13 @@ If STRING is non--nil return instead a space separated string."
           (run-with-idle-timer
            1 nil
            (lambda ()
-             (with-helm-window
-               (helm-aif (get-text-property (point-at-bol) 'help-echo)
-                   (popup-tip (concat " " (abbreviate-file-name it))
-                              :around nil
-                              :point (save-excursion
-                                       (end-of-visual-line) (point))))))))))
+             (save-selected-window
+               (with-helm-window
+                 (helm-aif (get-text-property (point-at-bol) 'help-echo)
+                     (popup-tip (concat " " (abbreviate-file-name it))
+                                :around nil
+                                :point (save-excursion
+                                         (end-of-visual-line) (point)))))))))))
 
 ;;;###autoload
 (define-minor-mode helm-popup-tip-mode
