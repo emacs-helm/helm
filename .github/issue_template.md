@@ -1,21 +1,13 @@
-## Expected or desired behavior
+## Expected behavior
 
-Please describe the behavior you expected / want
 
-## Actual behavior
+## Actual behavior from emacs-helm.sh if possible
 
-Please describe the behavior you are actually seeing,
-starting emacs with shell script "emacs-helm.sh" from the helm directory.
 
-For bug-reports, if applicable, include error messages, emacs stack
-traces etc. Try to be as specific as possible - when do you see this
-happening? Does it happen always?  Sometimes? How often?
+## Steps to reproduce (recipe)
 
-## Steps to reproduce
 
-For bug-reports, please describe in as much details as possible how
-one can reproduce the problem*.
+## Backtraces if some (M-x toggle-debug-on-error)
+
 
 ## Describe versions of helm, emacs, operating system etc.
-
-## Any other detail you can think at
