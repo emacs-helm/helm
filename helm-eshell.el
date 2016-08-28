@@ -77,7 +77,6 @@
    (nomark :initform t)
    (persistent-action :initform 'ignore)
    (nohighlight :initform t)
-   (fuzzy-match :initform (eval helm-eshell-fuzzy-match))
    (filtered-candidate-transformer
     :initform
     (lambda (candidates _sources)
@@ -229,7 +228,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
              (with-helm-show-completion beg end
-               (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source)
+               (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
+                                    :fuzzy-match helm-eshell-fuzzy-match)
                          :buffer "*helm pcomplete*"
                          :keymap helm-esh-completion-map
                          :resume 'noresume
