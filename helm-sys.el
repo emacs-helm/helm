@@ -184,6 +184,7 @@ This affect also sorting functions in the same way."
     :persistent-action #'helm-top-sh-persistent-action
     :persistent-help "SIGTERM"
     :help-message 'helm-top-help-message
+    :mode-line 'helm-top-mode-line
     :follow 'never
     :keymap helm-top-map
     :filtered-candidate-transformer #'helm-top-sort-transformer
