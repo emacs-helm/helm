@@ -316,12 +316,12 @@ Return a cons \(beg . end\)."
                       :persistent-help (helm-lisp-completion-persistent-help)
                       :filtered-candidate-transformer
                       'helm-lisp-completion-transformer
-                      :action `(lambda (candidate)
-                                 (with-helm-current-buffer
-                                   (run-with-timer
-                                    0.01 nil
-                                    'helm-insert-completion-at-point
-                                    ,beg ,end candidate))))
+                      :action (lambda (candidate)
+                                (with-helm-current-buffer
+                                  (run-with-timer
+                                   0.01 nil
+                                   'helm-insert-completion-at-point
+                                   beg end candidate))))
            :input (if helm-lisp-fuzzy-completion
                       target (concat target " "))
            :resume 'noresume

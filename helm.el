@@ -94,8 +94,8 @@ Run each function in the FUNCTIONS list in turn when called within DELAY seconds
       (set iterator (helm-iter-list (funcall fn)))
       (setq next (helm-iter-next (symbol-value iterator))))
     (and next (symbol-value iterator) (call-interactively (nth (1- next) functions)))
-    (when delay (run-with-idle-timer delay nil `(lambda ()
-                                                  (setq ,iterator nil))))))
+    (when delay (run-with-idle-timer delay nil (lambda ()
+                                                 (setq iterator nil))))))
 
 (helm-multi-key-defun helm-toggle-resplit-and-swap-windows
     "Multi key command to re-split and swap helm window.
@@ -1288,11 +1288,11 @@ only when predicate helm-ff-candidates-lisp-p return non-`nil':
   (let* ((actions     (helm-attr 'action source 'ignorefn))
          (action-transformers (helm-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
-         (transformer `(lambda (actions candidate)
-                         (cond ((funcall (quote ,predicate) candidate)
-                                (helm-append-at-nth
-                                 actions (quote ,new-action) ,index))
-                               (t actions)))))
+         (transformer (lambda (actions candidate)
+                        (cond ((funcall predicate candidate)
+                               (helm-append-at-nth
+                                actions new-action index))
+                              (t actions)))))
     (when (functionp actions)
       (helm-attrset 'action (list (cons "Default action" actions)) source))
     (when (or (symbolp action-transformers) (functionp action-transformers))
@@ -1953,7 +1953,7 @@ as a string with ARG."
   (interactive "p")
   (with-helm-alive-p
     (if (> (length helm-buffers) arg)
-        (helm-run-after-exit `(lambda () (helm-resume (nth ,arg helm-buffers))))
+        (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
       (message "No previous helm sessions available for resuming!"))))
 (put 'helm-resume-previous-session-after-quit 'helm-only t)
 
