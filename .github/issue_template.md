@@ -4,7 +4,8 @@ Please describe the behavior you expected / want
 
 ## Actual behavior
 
-Please describe the behavior you are actually seeing. 
+Please describe the behavior you are actually seeing,
+starting emacs with shell script "emacs-helm.sh" from the helm directory.
 
 For bug-reports, if applicable, include error messages, emacs stack
 traces etc. Try to be as specific as possible - when do you see this
@@ -17,4 +18,4 @@ one can reproduce the problem*.
 
 ## Describe versions of helm, emacs, operating system etc.
 
-## Any other detail
+## Any other detail you can think at
