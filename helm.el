@@ -5353,8 +5353,7 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
          (eq (assoc-default 'follow src) 1)
          (helm-window)
          (helm-get-selection)
-         (save-excursion
-           (run-with-idle-timer at nil #'helm-execute-persistent-action)))))
+         (run-with-idle-timer at nil #'helm-execute-persistent-action))))
 
 
 ;;; Auto-resize mode
