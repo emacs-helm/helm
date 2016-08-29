@@ -5323,6 +5323,10 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                   (message "helm-follow-mode not allowed in this source")
                   ;; Make follow attr persistent for this emacs session.
                   (helm-attrset 'follow (if enabled -1 1) src)
+                  (when helm-follow-mode-persistent
+                    (cl-pushnew name helm-source-names-using-follow :test 'equal)
+                    (customize-save-variable 'helm-source-names-using-follow
+                                             helm-source-names-using-follow))
                   (setq helm-follow-mode (not enabled))
                   (message "helm-follow-mode is %s"
                            (if helm-follow-mode
@@ -5337,6 +5341,12 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
   "`helm-follow-mode' will execute its persistent action after this delay.
 Note that if the `follow-delay' attr is present in source,
 it will take precedence over this.")
+
+(defcustom helm-source-names-using-follow nil
+  ""
+  :group 'helm
+  :type '(repeat (choice string)))
+
 (defun helm-follow-execute-persistent-action-maybe (&optional delay)
   "Execute persistent action in mode `helm-follow-mode'.
 
@@ -5350,7 +5360,9 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                           (max helm-input-idle-delay 0.01))
                      0.01))))
     (and (not (get-buffer-window helm-action-buffer 'visible))
-         (eq (assoc-default 'follow src) 1)
+         (or (eq (assoc-default 'follow src) 1)
+             (member (assoc-default 'name src) helm-source-names-using-follow))
+         (null (eq (assoc-default 'follow src) 'never))
          (helm-window)
          (helm-get-selection)
          (save-excursion
