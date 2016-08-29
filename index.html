@@ -20,15 +20,17 @@
 
     <section class="main-content">
       <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3"></a>
-<a href="http://melpa.org/#/helm"><img src="http://melpa.org/packages/helm-badge.svg" alt="MELPA" title=""></a>
-<a href="http://stable.melpa.org/#/helm"><img src="http://stable.melpa.org/packages/helm-badge.svg" alt="MELPA Stable" title=""></a></p>
+<a href="https://melpa.org/#/helm"><img alt="MELPA" src="https://melpa.org/packages/helm-badge.svg"></a>
+<a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"></a></p>
 
 <h1>
 <a id="emacs-helm" class="anchor" href="#emacs-helm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Emacs-helm</h1>
 
 <p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title=""></p>
 
-<p>You can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title=""></a> to help this project.</p>
+<p>Maintainance of Helm is a lot of work that I do freely on my sparse time,</p> 
+
+<p>please <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title=""></a> to help this project.</p>
 
 
 
@@ -52,9 +54,8 @@
 <a href="#advanced-usage">Advanced usage</a>
 
 <ul>
+<li><a href="#matching-methods">Matching methods</a></li>
 <li><a href="#creating-custom-helm-sources">Creating custom helm sources</a></li>
-<li><a href="#fuzzy-matching">Fuzzy matching</a></li>
-<li><a href="#autoresize">Autoresize</a></li>
 </ul>
 </li>
 </ul>
@@ -137,7 +138,9 @@ and dired operations in Helm.</p>
 <a id="install-from-emacs-packaging-system" class="anchor" href="#install-from-emacs-packaging-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install from Emacs packaging system</h2>
 
 <p>Helm can also be installed from MELPA repository at <a href="http://melpa.org/">http://melpa.org/</a>.
-No further configuration is necessary to run helm other than perhaps a
+You will find the instructions to install packages from MELPA <a href="https://github.com/melpa/melpa#usage">here</a>.</p>
+
+<p>No further configuration is necessary to run helm other than perhaps a
 one-line entry in the Emacs init file:</p>
 
 <div class="highlight highlight-source-lisp"><pre>(require 'helm-config)</pre></div>
@@ -196,13 +199,10 @@ and then see the file <code>/tmp/helm-cfg.el</code>.</p>
 <p>The full configuration I (the helm maintainer) use is
 <a href="https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el">here</a>.</p>
 
-<p>Also see helm customizable variables with the customize interface.
-Enabling <code>helm-mode</code> will enable helm for many features of emacs
-requiring completions.</p>
+<p>Also see helm customizable variables with the customize interface.</p>
 
-<p>For pre-configured Emacs installs, such as
-<a href="https://github.com/bbatsov/prelude">Emacs Prelude</a>, helm is built-in
-with no additional configuration steps necessary for using helm.</p>
+<p>Enabling <code>helm-mode</code> will enable helm for many features of emacs
+requiring completions, see below how to enable <code>helm-mode</code>.</p>
 
 <h2>
 <a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic usage</h2>
@@ -278,6 +278,17 @@ initial 253 buffers to 12 as shown in the modeline. </p>
 additional details.</p>
 
 <h3>
+<a id="matching-methods" class="anchor" href="#matching-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Matching methods</h3>
+
+<p>Helm support by default multi pattern matching, it is the standard way
+of matching in helm.
+E.g You can use a pattern like "foo bar" to match a line containing "foo" and "bar"
+or "bar" and "foo".
+Each pattern can be a regexp.</p>
+
+<p>In addition helm support <a href="https://github.com/emacs-helm/helm/wiki/Fuzzy-matching">fuzzy matching</a>.</p>
+
+<h3>
 <a id="creating-custom-helm-sources" class="anchor" href="#creating-custom-helm-sources" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating custom helm sources</h3>
 
 <p>An example:</p>
@@ -292,65 +303,6 @@ additional details.</p>
 See (<a href="https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework">helm wiki</a>)
 for details.</p>
 
-<h3>
-<a id="fuzzy-matching" class="anchor" href="#fuzzy-matching" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fuzzy matching</h3>
-
-<p>Helm's built-in fuzzy matcher is activated for some commands. Helm's
-fuzzy matching is disabled by default. Currently these commands
-support fuzzy matching:</p>
-
-<ul>
-<li>
-<code>helm-recentf</code>: set <code>helm-recentf-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-mini</code>: set <code>helm-buffers-fuzzy-matching</code> and <code>helm-recentf-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-buffers-list</code>: set <code>helm-buffers-fuzzy-matching</code> to <code>t</code>.</li>
-<li>
-<code>helm-find-files</code>: fuzzy matching enabled by default.</li>
-<li>
-<code>helm-locate</code>: set <code>helm-locate-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-M-x</code>: set <code>helm-M-x-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-semantic</code>: set <code>helm-semantic-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-imenu</code>: set <code>helm-imenu-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-apropos</code>: set <code>helm-apropos-fuzzy-match</code> to <code>t</code>.</li>
-<li>
-<code>helm-lisp-completion-at-point</code>: set <code>helm-lisp-fuzzy-completion</code> to <code>t</code>.</li>
-</ul>
-
-<p>To globally enable fuzzy matching for <code>helm-mode</code>:</p>
-
-<ul>
-<li>set <code>helm-mode-fuzzy-match</code> to <code>t</code>.</li>
-<li>set <code>helm-completion-in-region-fuzzy-match</code> to <code>t</code>.</li>
-</ul>
-
-<p><strong>IMPORTANT</strong>: For faster fuzzy matching, set
-<code>helm-candidate-number-limit</code> to 100 or less. Default is 100.</p>
-
-<h3>
-<a id="autoresize" class="anchor" href="#autoresize" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Autoresize</h3>
-
-<p>To re-size the completion window based on number of candidates:</p>
-
-<pre><code>(helm-autoresize-mode 1)
-</code></pre>
-
-<p>Adjust minimum and maximum height of completion window using:</p>
-
-<ul>
-<li><code>helm-autoresize-max-height</code></li>
-<li><code>helm-autoresize-min-height</code></li>
-</ul>
-
-<p>40 is the default value of <code>helm-autoresize-max-height</code>, which sets the completion window height to 40% of the fame height. <code>helm-autoresize-min-height</code> specifies the minimum height that the completion window cannot shrink to.</p>
-
-<p>For a fixed window size, set <code>helm-autoresize-min-height</code> equal to <code>helm-autoresize-max-height</code>.</p>
-
 <h1>
 <a id="helm-applications" class="anchor" href="#helm-applications" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Helm Applications</h1>
 
@@ -359,54 +311,40 @@ narrowing framework. They are available for individual installs
 through the Emacs package manager. This list is not exhaustive.</p>
 
 <ul>
-<li>
-<code>helm-mode</code>: turns on helm completions for most standard emacs
+<li><p><code>helm-mode</code>: turns on helm completions for most standard emacs
 completions. Helm provides even more optimized helm completions for
 some commands in helm-mode. Prefer these natively optimized versions
-over the ones in helm-mode.</li>
-<li>
-<code>helm-find-files</code>: one command that handles all the files related
-commands (bind to <code>C-x C-f</code>).</li>
-<li>
-<code>helm-buffers-list</code>: provides enhanced buffers listing.</li>
-<li>
-<code>helm-browse-project</code>: handles project files and buffers; defaults
+over the ones in helm-mode.</p></li>
+<li><p><code>helm-find-files</code>: one command that handles all the files related
+commands (bind to <code>C-x C-f</code>).</p></li>
+<li><p><code>helm-buffers-list</code>: provides enhanced buffers listing.</p></li>
+<li><p><code>helm-browse-project</code>: handles project files and buffers; defaults
 to current directory; works with <code>helm-find-files</code>; recommended
 with <a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a>,
 <a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a> and
-<code>helm-ls-svn</code> for a better handling of version control files.</li>
-<li>
-<code>helm-dabbrev</code>: enhanced dabbrev implementation with helm
-completion; does not use emacs code.</li>
-<li>
-<code>helm-moccur</code>: enhanced occur for one or more buffers; launch from
-<code>helm-buffers-list</code> or <code>current-buffer</code>.</li>
-<li>
-<code>helm-M-x</code>: enhanced <code>execute-extended-command</code> (bind to <code>M-x</code>).</li>
-<li>
-<code>helm-imenu</code> and <code>helm-imenu-in-all-buffers</code>: provide imenus for
-current or all buffers.</li>
-<li>
-<code>helm-etags-select</code>: enhanced etags with helm-completion; usable
-everywhere with <code>helm-find-files</code>.</li>
-<li>
-<code>helm-apropos</code>: enhanced apropos for functions and variables that
-<code>C-h</code> commands provide.</li>
-<li>
-<code>Grep</code>: launch from any helm file commands; supports back-ends
+<code>helm-ls-svn</code> for a better handling of version control files.
+Each time a project under version control is visited it is added
+to <code>helm-browse-project-history</code> and can be visted with <code>helm-projects-history</code>.</p></li>
+<li><p><code>helm-dabbrev</code>: enhanced dabbrev implementation with helm
+completion; does not use emacs code.</p></li>
+<li><p><code>helm-moccur</code>: enhanced occur for one or more buffers; launch from
+<code>helm-buffers-list</code> or <code>current-buffer</code>.</p></li>
+<li><p><code>helm-M-x</code>: enhanced <code>execute-extended-command</code> (bind it to <code>M-x</code>).</p></li>
+<li><p><code>helm-imenu</code> and <code>helm-imenu-in-all-buffers</code>: provide imenus for
+current or all buffers.</p></li>
+<li><p><code>helm-etags-select</code>: enhanced etags with helm-completion; usable
+everywhere with <code>helm-find-files</code>.</p></li>
+<li><p><code>helm-apropos</code>: enhanced apropos for functions and variables that
+<code>C-h</code> commands provide.</p></li>
+<li><p><code>Grep</code>: launch from any helm file commands; supports back-ends
 <code>grep</code>, <code>ack-grep</code>, <code>git-grep</code>, <code>ag</code> and custom implementation of
-<code>pt</code>.</li>
-<li>
-<code>helm-gid</code>: Helm interface for <code>gid</code> from
-<a href="https://www.gnu.org/software/idutils/">id-utils</a>.</li>
-<li>
-<code>helm-show-kill-ring</code>: A helm browser for kill ring.</li>
-<li>
-<code>helm-all-mark-rings</code>: A helm browser for mark ring; retrieves last positions in buffers.</li>
-<li>
-<code>helm-filtered-bookmarks</code>: enhanced browser for bookmarks.</li>
-<li>
-<code>helm-list-elisp-packages</code>: enhanced browser for elisp package management.</li>
+<code>pt</code>.</p></li>
+<li><p><code>helm-gid</code>: Helm interface for <code>gid</code> from
+<a href="https://www.gnu.org/software/idutils/">id-utils</a>.</p></li>
+<li><p><code>helm-show-kill-ring</code>: A helm browser for kill ring.</p></li>
+<li><p><code>helm-all-mark-rings</code>: A helm browser for mark ring; retrieves last positions in buffers.</p></li>
+<li><p><code>helm-filtered-bookmarks</code>: enhanced browser for bookmarks.</p></li>
+<li><p><code>helm-list-elisp-packages</code>: enhanced browser for elisp package management.</p></li>
 </ul>
 
 <h1>
@@ -432,7 +370,7 @@ extensions.</p>
 <h1>
 <a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known issues</h1>
 
-<p>The Helm project has a currant unresolved 
+<p>The Helm project has a current unresolved 
 <a href="https://github.com/emacs-helm/helm/issues?sort=created&amp;direction=desc&amp;state=open">issue list</a>.
 Please feel free to fix any of them; send a pull request.</p>
 
