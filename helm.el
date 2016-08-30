@@ -3638,7 +3638,11 @@ DIRECTION is either 'next or 'previous."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  (let ((follow (and (eq (cdr (assq 'follow source)) 1) " (HF)"))
+  (let ((follow (and (or (eq (cdr (assq 'follow source)) 1)
+                         (and helm-follow-mode-persistent
+                              (member (assoc-default 'name source)
+                                      helm-source-names-using-follow)))
+                     " (HF)"))
         (marked (and helm-marked-candidates
                      (cl-loop with cur-name = (assoc-default 'name source)
                               for c in helm-marked-candidates
@@ -5273,7 +5277,10 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                         ;; i.e turn it off now.
                         (< arg 0)
                         (eq (cdr fol-attr) 1)
-                        helm-follow-mode)))
+                        helm-follow-mode
+                        (and helm-follow-mode-persistent
+                             (member (assoc-default 'name src)
+                                     helm-source-names-using-follow)))))
         (if src
             (progn
               (if (eq (cdr fol-attr) 'never)
@@ -5281,7 +5288,7 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                   ;; Make follow attr persistent for this emacs session.
                   (helm-attrset 'follow (if enabled -1 1) src)
                   (when helm-follow-mode-persistent
-                    (if enabled
+                    (if (null enabled)
                         (unless (member name helm-source-names-using-follow)
                           (push name helm-source-names-using-follow)
                           (customize-save-variable 'helm-source-names-using-follow
@@ -5331,15 +5338,15 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                  (or (and helm-input-idle-delay
                           (max helm-input-idle-delay 0.01))
                      0.01))))
-    (and (not (get-buffer-window helm-action-buffer 'visible))
-         (or (eq (assoc-default 'follow src) 1)
-             (and helm-follow-mode-persistent
-                  (member (assoc-default 'name src)
-                          helm-source-names-using-follow)))
-         (null (eq (assoc-default 'follow src) 'never))
-         (helm-window)
-         (helm-get-selection)
-         (run-with-idle-timer at nil #'helm-execute-persistent-action))))
+    (when (and (not (get-buffer-window helm-action-buffer 'visible))
+               (or (eq (assoc-default 'follow src) 1)
+                   (and helm-follow-mode-persistent
+                        (member (assoc-default 'name src)
+                                helm-source-names-using-follow)))
+               (null (eq (assoc-default 'follow src) 'never))
+               (helm-window)
+               (helm-get-selection))
+      (run-with-idle-timer at nil #'helm-execute-persistent-action))))
 
 
 ;;; Auto-resize mode
