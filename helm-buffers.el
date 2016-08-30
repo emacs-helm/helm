@@ -593,11 +593,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffer-toggle-diff (candidate)
   "Toggle diff buffer CANDIDATE with it's file."
-  (let (helm-persistent-action-use-special-display)
-    (helm-aif (get-buffer-window "*Diff*")
-        (progn (kill-buffer "*Diff*")
-               (set-window-buffer it helm-current-buffer))
-      (diff-buffer-with-file (get-buffer candidate)))))
+  (helm-aif (get-buffer-window "*Diff*")
+      (progn (kill-buffer "*Diff*")
+             (set-window-buffer it helm-current-buffer))
+    (diff-buffer-with-file (get-buffer candidate))))
 
 (defun helm-buffer-diff-persistent ()
   "Toggle diff buffer without quitting helm."
