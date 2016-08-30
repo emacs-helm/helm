@@ -5281,9 +5281,15 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                   ;; Make follow attr persistent for this emacs session.
                   (helm-attrset 'follow (if enabled -1 1) src)
                   (when helm-follow-mode-persistent
-                    (cl-pushnew name helm-source-names-using-follow :test 'equal)
-                    (customize-save-variable 'helm-source-names-using-follow
-                                             helm-source-names-using-follow))
+                    (if enabled
+                        (unless (member name helm-source-names-using-follow)
+                          (push name helm-source-names-using-follow)
+                          (customize-save-variable 'helm-source-names-using-follow
+                                                   helm-source-names-using-follow))
+                        (setq helm-source-names-using-follow
+                              (delete name helm-source-names-using-follow))
+                        (customize-save-variable 'helm-source-names-using-follow
+                                                 helm-source-names-using-follow)))
                   (setq helm-follow-mode (not enabled))
                   (message "helm-follow-mode is %s"
                            (if helm-follow-mode
@@ -5300,7 +5306,16 @@ Note that if the `follow-delay' attr is present in source,
 it will take precedence over this.")
 
 (defcustom helm-source-names-using-follow nil
-  ""
+  "A list of source names to have follow enabled.
+This list of source names will be used only
+when `helm-follow-mode-persistent' is non-nil.
+
+You don't have to customize this yourself unless you really want,
+instead just set `helm-follow-mode-persistent' to non-nil and as soon
+you enable `helm-follow-mode' (C-c C-f) in a source, helm will save source name
+in this variable.
+If you turn off `helm-follow-mode' in a source and `helm-follow-mode-persistent' is non-nil
+the source name will be removed from this variable and saved."
   :group 'helm
   :type '(repeat (choice string)))
 
@@ -5318,7 +5333,9 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                      0.01))))
     (and (not (get-buffer-window helm-action-buffer 'visible))
          (or (eq (assoc-default 'follow src) 1)
-             (member (assoc-default 'name src) helm-source-names-using-follow))
+             (and helm-follow-mode-persistent
+                  (member (assoc-default 'name src)
+                          helm-source-names-using-follow)))
          (null (eq (assoc-default 'follow src) 'never))
          (helm-window)
          (helm-get-selection)
