@@ -4800,7 +4800,7 @@ Possible values are 'left 'right 'below or 'above."
         (helm-previous-line (lognot (1- linum))))
     (setq current-prefix-arg prefarg)
     (helm-exit-minibuffer)))
-
+
 ;;; Persistent Action
 ;;
 (defun helm-initialize-persistent-action ()
@@ -4820,6 +4820,7 @@ window to maintain visibility."
   (with-helm-alive-p
     (helm-log "executing persistent-action")
     (let* ((source (helm-get-current-source))
+           (selection (and source (helm-get-selection)))
            (attr-val (assoc-default attr source))
            ;; If attr value is a cons, use its car as persistent function
            ;; and its car to decide if helm window should be splitted.
@@ -4829,7 +4830,8 @@ window to maintain visibility."
                          (car attr-val) attr-val))
            (no-split (and (consp attr-val)
                           (not (functionp attr-val))
-                          (cdr attr-val))))
+                          (cdr attr-val)))
+           (cursor-in-echo-area t))
       (when source
         (with-helm-window
           (save-selected-window
@@ -4843,7 +4845,7 @@ window to maintain visibility."
                   display-buffer-function pop-up-windows pop-up-frames
                   special-display-regexps special-display-buffer-names)
               (helm-execute-selection-action-1
-               nil (or fn (helm-get-actions-from-current-source source)) t)
+               selection (or fn (helm-get-actions-from-current-source source)) t)
               (helm-log-run-hook 'helm-after-persistent-action-hook))
             ;; A typical case is when a persistent action delete
             ;; the buffer already displayed in
