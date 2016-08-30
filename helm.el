@@ -1413,14 +1413,14 @@ with its properties."
           (helm-log "selection = %S" selection)
           selection)))))
 
-(defun helm-get-actions-from-current-source ()
+(defun helm-get-actions-from-current-source (&optional source)
   "Return the associated action for the selected candidate.
 It is a function symbol \(sole action\) or list
 of \(action-display . function\)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (helm-aif (helm-attr 'action-transformer)
         (helm-funcall-with-source
-         (helm-get-current-source) it
+         (or source (helm-get-current-source)) it
          (helm-attr 'action nil 'ignorefn)
          ;; Check if the first given transformer
          ;; returns the same set of actions for each
@@ -4830,7 +4830,8 @@ window to maintain visibility."
   (interactive)
   (with-helm-alive-p
     (helm-log "executing persistent-action")
-    (let* ((attr-val (assoc-default attr (helm-get-current-source)))
+    (let* ((source (helm-get-current-source))
+           (attr-val (assoc-default attr source))
            ;; If attr value is a cons, use its car as persistent function
            ;; and its car to decide if helm window should be splitted.
            (fn       (if (and (consp attr-val)
@@ -4840,30 +4841,31 @@ window to maintain visibility."
            (no-split (and (consp attr-val)
                           (not (functionp attr-val))
                           (cdr attr-val))))
-      (with-helm-window
-        (save-selected-window
-          (if no-split
-              (helm-select-persistent-action-window)
-            (helm-select-persistent-action-window
-             (or split-onewindow helm-onewindow-p)))
-          (helm-log "current-buffer = %S" (current-buffer))
-          (let ((helm-in-persistent-action t))
-            (with-helm-display-same-window
-              (helm-execute-selection-action-1
-               nil (or fn (helm-get-actions-from-current-source)) t)
-              (helm-log-run-hook 'helm-after-persistent-action-hook))
-            ;; A typical case is when a persistent action delete
-            ;; the buffer already displayed in
-            ;; `helm-persistent-action-display-window' and `helm-full-frame'
-            ;; is enabled, we end up with the `helm-buffer'
-            ;; displayed in two windows.
-            (when (and helm-onewindow-p
-                       (> (length (window-list)) 1)
-                       (equal (buffer-name
-                               (window-buffer
-                                helm-persistent-action-display-window))
-                              (helm-buffer-get)))
-              (delete-other-windows))))))))
+      (when source
+        (with-helm-window
+          (save-selected-window
+            (if no-split
+                (helm-select-persistent-action-window)
+                (helm-select-persistent-action-window
+                 (or split-onewindow helm-onewindow-p)))
+            (helm-log "current-buffer = %S" (current-buffer))
+            (let ((helm-in-persistent-action t))
+              (with-helm-display-same-window
+                (helm-execute-selection-action-1
+                 nil (or fn (helm-get-actions-from-current-source source)) t)
+                (helm-log-run-hook 'helm-after-persistent-action-hook))
+              ;; A typical case is when a persistent action delete
+              ;; the buffer already displayed in
+              ;; `helm-persistent-action-display-window' and `helm-full-frame'
+              ;; is enabled, we end up with the `helm-buffer'
+              ;; displayed in two windows.
+              (when (and helm-onewindow-p
+                         (> (length (window-list)) 1)
+                         (equal (buffer-name
+                                 (window-buffer
+                                  helm-persistent-action-display-window))
+                                (helm-buffer-get)))
+                (delete-other-windows)))))))))
 (put 'helm-execute-persistent-action 'helm-only t)
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
