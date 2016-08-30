@@ -340,11 +340,6 @@ the default has changed now to avoid flickering."
   :group 'helm
   :type 'sexp)
 
-(defcustom helm-persistent-action-use-special-display nil
-  "If non-`nil', use `special-display-function' in persistent action."
-  :group 'helm
-  :type 'boolean)
-
 (defcustom helm-display-function 'helm-default-display-buffer
   "Function to display *helm* buffer.
 By default, it is `helm-default-display-buffer', which affects
@@ -4806,14 +4801,8 @@ Possible values are 'left 'right 'below or 'above."
     (setq current-prefix-arg prefarg)
     (helm-exit-minibuffer)))
 
-;; Utility: Persistent Action
-(defmacro with-helm-display-same-window (&rest body)
-  "Execute BODY in the window used for persistent action.
-Make `pop-to-buffer' and `display-buffer' display in the same window."
-  (declare (indent 0) (debug t))
-  `(let ((display-buffer-function 'helm-persistent-action-display-buffer))
-     ,@body))
-
+;;; Persistent Action
+;;
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
@@ -4849,23 +4838,25 @@ window to maintain visibility."
                 (helm-select-persistent-action-window
                  (or split-onewindow helm-onewindow-p)))
             (helm-log "current-buffer = %S" (current-buffer))
-            (let ((helm-in-persistent-action t))
-              (with-helm-display-same-window
-                (helm-execute-selection-action-1
-                 nil (or fn (helm-get-actions-from-current-source source)) t)
-                (helm-log-run-hook 'helm-after-persistent-action-hook))
-              ;; A typical case is when a persistent action delete
-              ;; the buffer already displayed in
-              ;; `helm-persistent-action-display-window' and `helm-full-frame'
-              ;; is enabled, we end up with the `helm-buffer'
-              ;; displayed in two windows.
-              (when (and helm-onewindow-p
-                         (> (length (window-list)) 1)
-                         (equal (buffer-name
-                                 (window-buffer
-                                  helm-persistent-action-display-window))
-                                (helm-buffer-get)))
-                (delete-other-windows)))))))))
+            (let ((helm-in-persistent-action t)
+                  (same-window-regexps '("."))
+                  display-buffer-function pop-up-windows pop-up-frames
+                  special-display-regexps special-display-buffer-names)
+              (helm-execute-selection-action-1
+               nil (or fn (helm-get-actions-from-current-source source)) t)
+              (helm-log-run-hook 'helm-after-persistent-action-hook))
+            ;; A typical case is when a persistent action delete
+            ;; the buffer already displayed in
+            ;; `helm-persistent-action-display-window' and `helm-full-frame'
+            ;; is enabled, we end up with the `helm-buffer'
+            ;; displayed in two windows.
+            (when (and helm-onewindow-p
+                       (> (length (window-list)) 1)
+                       (equal (buffer-name
+                               (window-buffer
+                                helm-persistent-action-display-window))
+                              (helm-buffer-get)))
+              (delete-other-windows))))))))
 (put 'helm-execute-persistent-action 'helm-only t)
 
 (defun helm-persistent-action-display-window (&optional split-onewindow)
@@ -4888,44 +4879,6 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
   (select-window
    (setq minibuffer-scroll-window
          (helm-persistent-action-display-window split-onewindow))))
-
-(defun helm-persistent-action-display-buffer (buf &optional  action)
-  "Make `pop-to-buffer' and `display-buffer' display in the same window.
-If `helm-persistent-action-use-special-display' is non-`nil' and
-BUF is to be displayed by `special-display-function', use it.
-Otherwise ignore `special-display-buffer-names' and `special-display-regexps'.
-Argument ACTION, when present, is used as second argument of `display-buffer'."
-  (let* ((name (buffer-name buf))
-         display-buffer-function pop-up-windows pop-up-frames
-         ;; Disable `special-display-regexps' and `special-display-buffer-names'
-         ;; unless `helm-persistent-action-use-special-display' is non-`nil'.
-         (special-display-buffer-names
-          (and helm-persistent-action-use-special-display
-               special-display-buffer-names))
-         (special-display-regexps
-          (and helm-persistent-action-use-special-display
-               special-display-regexps))
-         (same-window-regexps
-          (unless (and helm-persistent-action-use-special-display
-                       (or (member name
-                                   (mapcar (lambda (x) (or (car-safe x) x))
-                                           special-display-buffer-names))
-                           (cl-loop for x in special-display-regexps
-                                 thereis (string-match (or (car-safe x) x)
-                                                       name))))
-            '("."))))
-    ;; Don't loose minibuffer when displaying persistent window in
-    ;; another frame.
-    ;; This happen when the displayed persistent buffer-name is one of
-    ;; `special-display-buffer-names' or match `special-display-regexps'
-    ;; and `helm-persistent-action-use-special-display' is enabled.
-    (with-selected-window (if (or special-display-regexps
-                                  special-display-buffer-names)
-                              (minibuffer-window)
-                            (selected-window))
-      ;; Be sure window of BUF is not dedicated.
-      (set-window-dedicated-p (get-buffer-window buf) nil)
-      (display-buffer buf action))))
 
 ;; scroll-other-window(-down)? for persistent-action
 (defun helm-other-window-base (command &optional scroll-amount)
@@ -5339,6 +5292,7 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
   "`helm-follow-mode' will execute its persistent action after this delay.
 Note that if the `follow-delay' attr is present in source,
 it will take precedence over this.")
+
 (defun helm-follow-execute-persistent-action-maybe (&optional delay)
   "Execute persistent action in mode `helm-follow-mode'.
 
