@@ -144,23 +144,13 @@ For Windows and `es' use something like \"es -r ^%s.*%s.*$\"."
   "Try to find if a local locatedb file is available.
 The search is done in `helm-ff-default-directory' or
 fall back to `default-directory' if FROM-FF is nil."
-  (when helm-ff-locate-db-filename
-    (cond ((and helm-ff-default-directory
-                from-ff
-                (file-exists-p (expand-file-name
-                                helm-ff-locate-db-filename
-                                helm-ff-default-directory))
-                (expand-file-name
-                 helm-ff-locate-db-filename
-                 helm-ff-default-directory)))
-          ((and (not from-ff)
-                (file-exists-p (expand-file-name
-                                helm-ff-locate-db-filename
-                                default-directory))
-                (expand-file-name
-                 helm-ff-locate-db-filename
-                 default-directory))))))
-
+  (helm-aif (and helm-ff-locate-db-filename
+                 (locate-dominating-file
+                  (or (and from-ff
+                           helm-ff-default-directory)
+                      default-directory)
+                  helm-ff-locate-db-filename))
+      (expand-file-name helm-ff-locate-db-filename it)))
 
 (defun helm-locate-create-db-default-function (db-name directory)
   "Default function used to create a locale locate db file.
