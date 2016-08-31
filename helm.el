@@ -5252,22 +5252,8 @@ This mode is source local, i.e It apply on current source only.
 This mode can be enabled or disabled interactively at anytime during
 a helm session with \\[helm-follow-mode].
 
-It can also be enabled specifically for a source by adding the
-`follow' attribute to the source.
-Value of this attribute can be -1, 1, or 'never.
-If the source is defined with its own class,
-you can use `helm-setup-user-source' e.g:
-
-    (defmethod helm-setup-user-source ((source helm-grep-class))
-      (setf (slot-value source 'follow) 1))
-
-Otherwise, use `helm-attrset' to setup the `follow' attribute of the existing source,
-which see.
-
-Even with `follow' attribute, a source can be interactively disabled or enabled
-unless `follow' attribute value is 'never.
 When enabling interactively `helm-follow-mode' in a source, you can keep it enabled
-for next helm sessions by setting `helm-follow-mode-persistent' to a non-nil value.
+for next emacs sessions by setting `helm-follow-mode-persistent' to a non-nil value.
 
 Note that you can use instead of this mode the commands `helm-follow-action-forward'
 and `helm-follow-action-backward' at anytime in all helm sessions.
