@@ -863,10 +863,20 @@ navigation keys. Also note that Helm candidates list by default
 do not display line numbers. Line numbers can be enabled with the
 linum-relative package.
 
-** Visible Marks
+** Marked candidates
 
-Visible marks are displayed next to selected candidates, if any.
-Some Helm actions operate on marked candidates.
+You can mark candidates to execute an action on them instead
+of the current selected candidate only (See binding below).
+Most Helm actions operate on marked candidates unless marking candidates
+is prevented explicitely for a specific source.
+
+** Follow candidates
+
+You can execute automatically an action specified in the source as persistent-action
+while moving up and down in helm-window or while updating the list of candidates by
+turning on `helm-follow-mode' while in helm.
+The follow behavior will be saved and used in next emacs sessions when `helm-follow-mode-persistent'
+is non-nil.
 
 ** Frequently Used Commands
 
