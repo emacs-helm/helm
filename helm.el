@@ -481,11 +481,24 @@ See documentation for  `helm-delete-minibuffer-contents'."
   :type 'boolean)
 
 (defcustom helm-follow-mode-persistent nil
-  "When non-`nil', use last state of `helm-follow-mode' for the next helm session.
-To make this behavior persistent across emacs sessions, set the
-`follow' attribute explicitly in the source."
+  "When non-`nil', save last state of `helm-follow-mode' for the next emacs sessions.
+
+Each time you turn on or off `helm-follow-mode', the current source name will be stored
+or removed from `helm-source-names-using-follow'."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-source-names-using-follow nil
+  "A list of source names to have follow enabled.
+This list of source names will be used only
+when `helm-follow-mode-persistent' is non-nil.
+
+You don't have to customize this yourself unless you really want,
+instead just set `helm-follow-mode-persistent' to non-nil and as soon
+you turn on or off `helm-follow-mode' (C-c C-f) in a source,
+helm will save or remove source name in this variable."
+  :group 'helm
+  :type '(repeat (choice string)))
 
 (defcustom helm-prevent-escaping-from-minibuffer t
   "Prevent escape from minibuffer during the helm session."
