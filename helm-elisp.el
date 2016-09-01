@@ -765,11 +765,11 @@ i.e the `symbol-name' of any existing symbol."
 ;;
 (defun helm-locate-library-scan-list ()
   (cl-loop for dir in load-path
-        when (file-directory-p dir)
-        append (directory-files dir t (concat (regexp-opt (get-load-suffixes))
-                                              "\\'"))
-        into lst
-        finally return (helm-fast-remove-dups lst :test 'equal)))
+           with load-suffixes = '(".el")
+           when (file-directory-p dir)
+           append (directory-files
+                   dir t (concat (regexp-opt (get-load-suffixes))
+                                 "\\'"))))
 
 ;;;###autoload
 (defun helm-locate-library ()
