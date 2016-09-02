@@ -849,6 +849,7 @@ Keys description:
                                           helm-find-files-doc-header)))
              :mode-line mode-line
              :candidates hist
+             :follow 'never
              :nohighlight t
              :persistent-action persistent-action
              :persistent-help persistent-help
@@ -867,6 +868,7 @@ Keys description:
              :mode-line mode-line
              :help-message 'helm-read-file-name-help-message
              :nohighlight t
+             :follow 'never
              :candidates
              (lambda ()
                (append (and (not (file-exists-p helm-pattern))

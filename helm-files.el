@@ -1437,9 +1437,6 @@ If prefix numeric arg is given go ARG level up."
   (with-helm-alive-p
     (when (and (helm-file-completion-source-p)
                (not (helm-ff-invalid-tramp-name-p)))
-      (with-helm-window
-        (when helm-follow-mode
-          (helm-follow-mode -1) (message nil)))
       ;; When going up one level we want to be at the line
       ;; corresponding to actual directory, so store this info
       ;; in `helm-ff-last-expanded'.

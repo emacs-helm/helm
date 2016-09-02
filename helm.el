@@ -5011,6 +5011,7 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
       (let* ((follow     (if helm-follow-mode 1 -1))
              (src        (helm-get-current-source))
              (nomark     (assq 'nomark src))
+             helm-follow-mode-persistent
              (src-name   (assoc-default 'name src))
              (filecomp-p (or (helm-file-completion-source-p)
                              (string= src-name "Files from Current Directory")))
