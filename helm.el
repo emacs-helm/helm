@@ -5362,6 +5362,7 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                (null (eq (assoc-default 'follow src) 'never))
                (helm-window)
                (helm-get-selection))
+      (setq helm-follow-mode t)
       (run-with-idle-timer at nil #'helm-execute-persistent-action))))
 
 
