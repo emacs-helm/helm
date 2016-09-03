@@ -528,7 +528,6 @@ Should not be used among other sources.")
    (help-message :initform 'helm-ff-help-message)
    (mode-line :initform (list "File(s)" helm-mode-line-string))
    (volatile :initform t)
-   (follow :initform 'never)
    (cleanup :initform 'helm-find-files-cleanup)
    (migemo :initform t)
    (nohighlight :initform t)
@@ -1437,6 +1436,9 @@ If prefix numeric arg is given go ARG level up."
   (with-helm-alive-p
     (when (and (helm-file-completion-source-p)
                (not (helm-ff-invalid-tramp-name-p)))
+      (with-helm-window
+        (when helm-follow-mode
+          (helm-follow-mode -1) (message nil)))
       ;; When going up one level we want to be at the line
       ;; corresponding to actual directory, so store this info
       ;; in `helm-ff-last-expanded'.
@@ -2554,7 +2556,8 @@ Use it for non--interactive calls of `helm-find-files'."
                (not (minibuffer-window-active-p (minibuffer-window)))))
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
-                           (expand-file-name tap)))))
+                           (expand-file-name tap))))
+         helm-follow-mode-persistent)
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))

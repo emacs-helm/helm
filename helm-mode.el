@@ -826,6 +826,7 @@ Keys description:
           (and helm-ff-auto-update-initial-value
                (not (minibuffer-window-active-p (minibuffer-window)))))
          helm-full-frame
+         helm-follow-mode-persistent
          (hist (and history (helm-comp-read-get-candidates
                              history nil nil alistp)))
          (minibuffer-completion-confirm must-match)
@@ -849,7 +850,6 @@ Keys description:
                                           helm-find-files-doc-header)))
              :mode-line mode-line
              :candidates hist
-             :follow 'never
              :nohighlight t
              :persistent-action persistent-action
              :persistent-help persistent-help
@@ -868,7 +868,6 @@ Keys description:
              :mode-line mode-line
              :help-message 'helm-read-file-name-help-message
              :nohighlight t
-             :follow 'never
              :candidates
              (lambda ()
                (append (and (not (file-exists-p helm-pattern))
