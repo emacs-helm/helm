@@ -5355,6 +5355,7 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                           (max helm-input-idle-delay 0.01))
                      0.01))))
     (when (and (not (get-buffer-window helm-action-buffer 'visible))
+               (not (helm-pos-header-line-p))
                (or (eq (assoc-default 'follow src) 1)
                    (and helm-follow-mode-persistent
                         (member (assoc-default 'name src)
