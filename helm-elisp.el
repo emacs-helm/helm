@@ -672,7 +672,11 @@ Filename completion happen if string start after or between a double quote."
 
 (defun helm-elisp--persistent-help (candidate fun &optional name)
   (let ((hbuf (get-buffer (help-buffer))))
-    (cond  ((or (and (helm-attr 'help-running-p)
+    (cond  ((with-helm-buffer helm-follow-mode)
+            (if name
+                (funcall fun candidate name)
+                (funcall fun candidate)))
+           ((or (and (helm-attr 'help-running-p)
                      (string= candidate (helm-attr 'help-current-symbol))))
             (progn
               ;; When started from a help buffer,
@@ -682,10 +686,6 @@ Filename completion happen if string start after or between a double quote."
                 (set-window-buffer (get-buffer-window hbuf)
                                    helm-current-buffer))
               (helm-attrset 'help-running-p nil)))
-           ((with-helm-buffer helm-follow-mode)
-            (if name
-                (funcall fun candidate name)
-                (funcall fun candidate)))
            (t
             (if name
                 (funcall fun candidate name)
