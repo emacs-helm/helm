@@ -19,6 +19,7 @@
 (require 'cl-lib)
 (require 'bookmark)
 (require 'helm)
+(require 'helm-lib)
 (require 'helm-help)
 (require 'helm-types)
 (require 'helm-utils)

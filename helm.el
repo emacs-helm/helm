@@ -1113,42 +1113,6 @@ Messages are logged to a file named with todays date and time in this directory.
 
 ;; Programming Tools
 
-(defun helm-this-command ()
-  "Returns the actual command in action.
-Like `this-command' but return the real command,
-and not `exit-minibuffer' or other unwanted functions."
-  (cl-loop with bl = '(helm-maybe-exit-minibuffer
-                       helm-confirm-and-exit-minibuffer
-                       helm-exit-minibuffer
-                       exit-minibuffer)
-           for count from 1 to 50
-           for btf = (backtrace-frame count)
-           for fn = (cl-second btf)
-           if (and
-               ;; In some case we may have in the way an
-               ;; advice compiled resulting in byte-code,
-               ;; ignore it (Issue #691).
-               (symbolp fn)
-               (commandp fn)
-               (not (memq fn bl)))
-           return fn
-           else
-           if (and (eq fn 'call-interactively)
-                   (> (length btf) 2))
-           return (cadr (cdr btf))))
-
-(defun helm-append-at-nth (seq elm index)
-  "Append ELM at INDEX in SEQ."
-  (let ((len (length seq)))
-    (cond ((> index len) (setq index len))
-          ((< index 0) (setq index 0)))
-    (if (zerop index)
-        (append elm seq)
-      (cl-loop for i in seq
-               for count from 1 collect i
-               when (= count index)
-               if (listp elm) append elm
-               else collect elm))))
 
 
 ;; Test tools
