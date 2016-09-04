@@ -1111,10 +1111,6 @@ Messages are logged to a file named with todays date and time in this directory.
                 (mapconcat 'identity (reverse helm-issued-errors) "\n"))))
 
 
-;; Programming Tools
-
-
-
 ;; Test tools
 (defmacro with-helm-time-after-update (&rest body)
   (helm-with-gensyms (start-time time-elapsed)
