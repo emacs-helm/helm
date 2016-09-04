@@ -960,7 +960,6 @@ It also accepts function or variable symbol.")
 (defvar helm-issued-errors nil)
 (defvar helm--last-log-file nil
   "The name of the log file of the last helm session.")
-(defvar helm-follow-mode nil)
 (defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
@@ -2370,7 +2369,6 @@ Unuseful when used outside helm, don't use it.")
       (erase-buffer)
       (set (make-local-variable 'helm-map) helm-map)
       (make-local-variable 'helm-sources)
-      (set (make-local-variable 'helm-follow-mode) nil)
       (set (make-local-variable 'helm-display-function) helm-display-function)
       (set (make-local-variable 'helm-selection-point) nil)
       (set (make-local-variable 'scroll-margin)
@@ -3666,7 +3664,7 @@ DIRECTION is either 'next or 'previous."
                                       (assoc-default 'mode-line source))
                                  (default-value 'helm-mode-line-string))
                              source))
-  (let ((follow (and (or (eq (cdr (assq 'follow source)) 1)
+  (let ((follow (and (or (helm-follow-mode-p source)
                          (and helm-follow-mode-persistent
                               (member (assoc-default 'name source)
                                       helm-source-names-using-follow)))
@@ -5014,8 +5012,8 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
   (interactive)
   (with-helm-alive-p
     (with-helm-window
-      (let* ((follow     (if helm-follow-mode 1 -1))
-             (src        (helm-get-current-source))
+      (let* ((src        (helm-get-current-source))
+             (follow     (if (helm-follow-mode-p src) 1 -1))
              (nomark     (assq 'nomark src))
              helm-follow-mode-persistent
              (src-name   (assoc-default 'name src))
@@ -5261,6 +5259,25 @@ display values."
 ;;; Follow-mode: Automatic execution of persistent-action
 ;;
 ;;
+(defvar helm-follow-input-idle-delay nil
+  "`helm-follow-mode' will execute its persistent action after this delay.
+Note that if the `follow-delay' attr is present in source,
+it will take precedence over this.")
+
+(defcustom helm-source-names-using-follow nil
+  "A list of source names to have follow enabled.
+This list of source names will be used only
+when `helm-follow-mode-persistent' is non-nil.
+
+You don't have to customize this yourself unless you really want,
+instead just set `helm-follow-mode-persistent' to non-nil and as soon
+you enable `helm-follow-mode' (C-c C-f) in a source, helm will save source name
+in this variable.
+If you turn off `helm-follow-mode' in a source and `helm-follow-mode-persistent' is non-nil
+the source name will be removed from this variable and saved."
+  :group 'helm
+  :type '(repeat (choice string)))
+
 (defun helm-follow-mode (&optional arg)
   "Execute persistent action every time the cursor is moved.
 
@@ -5292,8 +5309,7 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                         ;; ARG, assume follow is already enabled.
                         ;; i.e turn it off now.
                         (< arg 0)
-                        (eq (cdr fol-attr) 1)
-                        helm-follow-mode
+                        (helm-follow-mode-p src)
                         (and helm-follow-mode-persistent
                              (member (assoc-default 'name src)
                                      helm-source-names-using-follow)))))
@@ -5302,7 +5318,7 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
               (if (eq (cdr fol-attr) 'never)
                   (message "helm-follow-mode not allowed in this source")
                   ;; Make follow attr persistent for this emacs session.
-                  (helm-attrset 'follow (if enabled -1 1) src)
+                  (helm-follow-mode-set-source (if enabled -1 1) src)
                   (when helm-follow-mode-persistent
                     (if (null enabled)
                         (unless (member name helm-source-names-using-follow)
@@ -5313,34 +5329,14 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                               (delete name helm-source-names-using-follow))
                         (customize-save-variable 'helm-source-names-using-follow
                                                  helm-source-names-using-follow)))
-                  (setq helm-follow-mode (not enabled))
                   (message "helm-follow-mode is %s"
-                           (if helm-follow-mode
+                           (if (helm-follow-mode-p src)
                                "enabled" "disabled"))
                   (helm-display-mode-line src t))
               (unless helm-follow-mode-persistent
                 (and sym (set sym (remove (assq 'follow src) src)))))
             (message "Not enough candidates for helm-follow-mode"))))))
 (put 'helm-follow-mode 'helm-only t)
-
-(defvar helm-follow-input-idle-delay nil
-  "`helm-follow-mode' will execute its persistent action after this delay.
-Note that if the `follow-delay' attr is present in source,
-it will take precedence over this.")
-
-(defcustom helm-source-names-using-follow nil
-  "A list of source names to have follow enabled.
-This list of source names will be used only
-when `helm-follow-mode-persistent' is non-nil.
-
-You don't have to customize this yourself unless you really want,
-instead just set `helm-follow-mode-persistent' to non-nil and as soon
-you enable `helm-follow-mode' (C-c C-f) in a source, helm will save source name
-in this variable.
-If you turn off `helm-follow-mode' in a source and `helm-follow-mode-persistent' is non-nil
-the source name will be removed from this variable and saved."
-  :group 'helm
-  :type '(repeat (choice string)))
 
 (defun helm-follow-execute-persistent-action-maybe (&optional delay)
   "Execute persistent action in mode `helm-follow-mode'.
@@ -5356,16 +5352,23 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                      0.01))))
     (when (and (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-pos-header-line-p))
-               (or (eq (assoc-default 'follow src) 1)
+               (or (helm-follow-mode-p src)
                    (and helm-follow-mode-persistent
                         (member (assoc-default 'name src)
                                 helm-source-names-using-follow)))
                (null (eq (assoc-default 'follow src) 'never))
                (helm-window)
                (helm-get-selection))
-      (setq helm-follow-mode t)
+      (helm-follow-mode-set-source 1 src)
       (run-with-idle-timer at nil #'helm-execute-persistent-action))))
 
+(defun helm-follow-mode-p (&optional source)
+  (with-helm-buffer
+    (eq (helm-attr 'follow (or source (helm-get-current-source))) 1)))
+
+(defun helm-follow-mode-set-source (value &optional source)
+  (with-helm-buffer
+    (helm-attrset 'follow value (or source (helm-get-current-source)))))
 
 ;;; Auto-resize mode
 ;;
