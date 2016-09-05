@@ -3545,7 +3545,10 @@ If action buffer is selected, back to the helm buffer."
                    (setq helm-saved-current-source src)
                    (let ((actions (helm-get-actions-from-current-source src)))
                      (if (functionp actions)
-                         (message "Sole action: %s" actions)
+                         (message "Sole action: %s"
+                                  (if (or (consp actions)
+                                          (byte-code-function-p actions))
+                                      "Anonymous" actions))
                          (helm-show-action-buffer actions)
                          ;; Be sure the minibuffer is entirely deleted (#907).
                          (helm--delete-minibuffer-contents-from "")
