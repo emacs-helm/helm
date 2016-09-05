@@ -4232,12 +4232,10 @@ When a cons cell, helm tries jumping to first element of
 cons cell and then to the second, and so on. This allows finer
 preselection if there are duplicates before the candidate we
 want to preselect.
-Argument SOURCE will be used only when `helm-preselect' is called
-from `helm-force-update' and should be in this case a valid source name
-or a source alist."
+Argument SOURCE is a valid source name or a source alist."
   (with-helm-window
     (when candidate-or-regexp
-      (if (and helm--force-updating-p source)
+      (if source
           (helm-goto-source source)
           (goto-char (point-min))
           (forward-line 1))
