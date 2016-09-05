@@ -204,10 +204,11 @@ Return empty string for non--valid candidates."
                            (cons helm-top--line lst))))
 
 (defun helm-top--skip-top-line ()
-  (let ((src-name (assoc-default 'name (helm-get-current-source))))
+  (let* ((src (helm-get-current-source))
+         (src-name (assoc-default 'name src)))
     (helm-aif (and (stringp src-name)
                    (string= src-name "Top")
-                   (helm-get-selection nil t))
+                   (helm-get-selection nil t src))
         (when (string-match-p "^ *PID" it)
           (helm-next-line)))))
 

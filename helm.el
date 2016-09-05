@@ -1361,7 +1361,7 @@ If NO-UPDATE is non-`nil', skip executing `helm-update'."
                        helm-sources))
        (helm-log "helm-compiled-sources = %S" helm-compiled-sources)))))
 
-(defun helm-get-selection (&optional buffer force-display-part)
+(defun helm-get-selection (&optional buffer force-display-part source)
   "Return the currently selected item or nil.
 if BUFFER is nil or unspecified, use helm-buffer as default value.
 If FORCE-DISPLAY-PART is non-`nil', return the display string.
@@ -1385,9 +1385,9 @@ with its properties."
                                disp-fn
                                (overlay-start helm-selection-overlay)
                                (1- (overlay-end helm-selection-overlay))))
-                        (source (helm-get-current-source)))
+                        (src (or source (helm-get-current-source))))
                     (helm-aif (and (not force-display-part)
-                                   (assoc-default 'display-to-real source))
+                                   (assoc-default 'display-to-real src))
                         (helm-funcall-with-source source it disp)
                       disp)))))
         (unless (equal selection "")
@@ -1399,23 +1399,24 @@ with its properties."
 It is a function symbol \(sole action\) or list
 of \(action-display . function\)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
-    (helm-aif (helm-attr 'action-transformer)
-        (helm-funcall-with-source
-         (or source (helm-get-current-source)) it
-         (helm-attr 'action nil 'ignorefn)
-         ;; Check if the first given transformer
-         ;; returns the same set of actions for each
-         ;; candidate in marked candidates.
-         ;; If so use the car of marked to determine
-         ;; the set of actions, otherwise use the selection.
-         (if (cl-loop with marked = (helm-marked-candidates)
-                      with act = (car (helm-mklist it))
-                      with acts = (funcall act nil (car marked))
-                      for c in marked
-                      always (equal (funcall act nil c) acts))
-             (car (helm-marked-candidates))
-             (helm-get-selection)))
-      (helm-attr 'action nil 'ignorefn))))
+    (let ((src (helm-get-current-source)))
+      (helm-aif (helm-attr 'action-transformer)
+          (helm-funcall-with-source
+           (or source src) it
+           (helm-attr 'action nil 'ignorefn)
+           ;; Check if the first given transformer
+           ;; returns the same set of actions for each
+           ;; candidate in marked candidates.
+           ;; If so use the car of marked to determine
+           ;; the set of actions, otherwise use the selection.
+           (if (cl-loop with marked = (helm-marked-candidates)
+                        with act = (car (helm-mklist it))
+                        with acts = (funcall act nil (car marked))
+                        for c in marked
+                        always (equal (funcall act nil c) acts))
+               (car (helm-marked-candidates))
+               (helm-get-selection nil nil src)))
+        (helm-attr 'action nil 'ignorefn)))))
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.
@@ -3265,10 +3266,10 @@ pattern has changed.
 
 Selection is preserved to current candidate or moved to
 PRESELECT, if specified."
-  (let ((source    (helm-get-current-source))
-        (selection (helm-aif (helm-get-selection nil t)
-                       (regexp-quote it)
-                     it)))
+  (let* ((source    (helm-get-current-source))
+         (selection (helm-aif (helm-get-selection nil t source)
+                        (regexp-quote it)
+                      it)))
     (setq helm--force-updating-p t)
     (when source
       (mapc 'helm-force-update--reinit
@@ -3505,7 +3506,7 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
     (setq selection (helm-coerce-selection
                      (or selection
                          helm-saved-selection
-                         (helm-get-selection)
+                         (helm-get-selection nil nil source)
                          (and (assoc 'accept-empty source) ""))
                      source))
     (unless preserve-saved-action (setq helm-saved-action nil))
@@ -3529,30 +3530,31 @@ Coerce source with coerce function."
 If action buffer is selected, back to the helm buffer."
   (interactive)
   (with-helm-alive-p
-    (helm-log-run-hook 'helm-select-action-hook)
-    (setq helm-saved-selection (helm-get-selection))
-    (with-selected-frame (with-helm-window (selected-frame))
-      (prog1
-          (cond ((get-buffer-window helm-action-buffer 'visible)
-                 (set-window-buffer (get-buffer-window helm-action-buffer)
-                                    helm-buffer)
-                 (kill-buffer helm-action-buffer)
-                 (setq helm-saved-selection nil)
-                 (helm-set-pattern helm-input 'noupdate))
-                (helm-saved-selection
-                 (setq helm-saved-current-source (helm-get-current-source))
-                 (let ((actions (helm-get-actions-from-current-source)))
-                   (if (functionp actions)
-                       (message "Sole action: %s" actions)
-                       (helm-show-action-buffer actions)
-                       ;; Be sure the minibuffer is entirely deleted (#907).
-                       (helm--delete-minibuffer-contents-from "")
-                       ;; Make `helm-pattern' differs from the previous value.
-                       (setq helm-pattern 'dummy)
-                       (helm-check-minibuffer-input))))
-                (t (message "No Actions available")))
-        (helm-display-mode-line (helm-get-current-source))
-        (run-hooks 'helm-window-configuration-hook)))))
+    (let ((src (helm-get-current-source)))
+      (helm-log-run-hook 'helm-select-action-hook)
+      (setq helm-saved-selection (helm-get-selection nil nil src))
+      (with-selected-frame (with-helm-window (selected-frame))
+        (prog1
+            (cond ((get-buffer-window helm-action-buffer 'visible)
+                   (set-window-buffer (get-buffer-window helm-action-buffer)
+                                      helm-buffer)
+                   (kill-buffer helm-action-buffer)
+                   (setq helm-saved-selection nil)
+                   (helm-set-pattern helm-input 'noupdate))
+                  (helm-saved-selection
+                   (setq helm-saved-current-source src)
+                   (let ((actions (helm-get-actions-from-current-source src)))
+                     (if (functionp actions)
+                         (message "Sole action: %s" actions)
+                         (helm-show-action-buffer actions)
+                         ;; Be sure the minibuffer is entirely deleted (#907).
+                         (helm--delete-minibuffer-contents-from "")
+                         ;; Make `helm-pattern' differs from the previous value.
+                         (setq helm-pattern 'dummy)
+                         (helm-check-minibuffer-input))))
+                  (t (message "No Actions available")))
+          (helm-display-mode-line src)
+          (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
 
 (defun helm-show-action-buffer (actions)
@@ -4041,13 +4043,14 @@ don't exit and send message 'no match'."
              (null helm--reading-passwd-or-string))
         (progn (message "[Display not ready]")
                (sit-for 0.5) (message nil))
-      (let* ((empty-buffer-p (with-current-buffer helm-buffer
+      (let* ((src (helm-get-current-source))
+             (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
-             (sel (helm-get-selection))
+             (sel (helm-get-selection nil nil src))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
                                      0 'display
-                                     (helm-get-selection nil 'withprop))
+                                     (helm-get-selection nil 'withprop src))
                                     "[?]"))))
         (cond ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm 'confirm))
@@ -4251,7 +4254,7 @@ Argument SOURCE is a valid source name or a source alist."
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
     (helm-mark-current-line)
-    (helm-display-mode-line (helm-get-current-source))
+    (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook 'helm-after-preselection-hook)))
 
 (defun helm-delete-current-selection ()
@@ -4758,16 +4761,17 @@ Possible values are 'left 'right 'below or 'above."
 ;; Utility: select another action by key
 (defun helm-select-nth-action (n)
   "Select the N nth action for the currently selected candidate."
-  (setq helm-saved-selection (helm-get-selection))
-  (unless helm-saved-selection
-    (error "Nothing is selected"))
-  (setq helm-saved-action
-        (helm-get-nth-action
-         n
-         (if (get-buffer-window helm-action-buffer 'visible)
-             (assoc-default 'candidates (helm-get-current-source))
-             (helm-get-actions-from-current-source))))
-  (helm-maybe-exit-minibuffer))
+  (let ((src (helm-get-current-source)))
+    (setq helm-saved-selection (helm-get-selection nil nil src))
+    (unless helm-saved-selection
+      (error "Nothing is selected"))
+    (setq helm-saved-action
+          (helm-get-nth-action
+           n
+           (if (get-buffer-window helm-action-buffer 'visible)
+               (assoc-default 'candidates src)
+               (helm-get-actions-from-current-source src))))
+    (helm-maybe-exit-minibuffer)))
 
 (defun helm-get-nth-action (n action)
   (cond ((and (zerop n) (functionp action))
@@ -4808,7 +4812,7 @@ window to maintain visibility."
   (with-helm-alive-p
     (helm-log "executing persistent-action")
     (let* ((source (helm-get-current-source))
-           (selection (and source (helm-get-selection)))
+           (selection (and source (helm-get-selection nil nil source)))
            (attr-val (assoc-default attr source))
            ;; If attr value is a cons, use its car as persistent function
            ;; and its car to decide if helm window should be splitted.
@@ -4917,30 +4921,31 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
            return o))
 
 (defun helm-delete-visible-mark (overlay)
-  (setq helm-marked-candidates
-        (remove
-         (cons (helm-get-current-source) (helm-get-selection))
-         helm-marked-candidates))
-  (delete-overlay overlay)
-  (setq helm-visible-mark-overlays
-        (delq overlay helm-visible-mark-overlays)))
+  (let ((src (helm-get-current-source)))
+    (setq helm-marked-candidates
+          (remove
+           (cons src (helm-get-selection nil nil src))
+           helm-marked-candidates))
+    (delete-overlay overlay)
+    (setq helm-visible-mark-overlays
+          (delq overlay helm-visible-mark-overlays))))
 
 (defun helm-make-visible-mark (&optional src selection)
-  (let ((o (make-overlay (point-at-bol)
+  (let* ((source (or src  (helm-get-current-source)))
+         (sel    (or selection (helm-get-selection nil nil src)))
+         (o (make-overlay (point-at-bol)
                           (if (helm-pos-multiline-p)
                               (or (helm-get-next-candidate-separator-pos)
                                   (point-max))
-                            (1+ (point-at-eol))))))
+                              (1+ (point-at-eol))))))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
-    (overlay-put o 'source (assoc-default 'name (or src (helm-get-current-source))))
+    (overlay-put o 'source (assoc-default 'name source))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
-    (overlay-put o 'real   (or selection (helm-get-selection)))
+    (overlay-put o 'real sel)
     (overlay-put o 'visible-mark t)
-    (cl-pushnew o helm-visible-mark-overlays))
-  (push (cons (or src  (helm-get-current-source))
-              (or selection (helm-get-selection)))
-        helm-marked-candidates))
+    (cl-pushnew o helm-visible-mark-overlays)
+    (push (cons source sel) helm-marked-candidates)))
 
 (defun helm-toggle-visible-mark ()
   "Toggle helm visible mark at point."
@@ -4958,10 +4963,11 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
                 (helm-next-line)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
-(defun helm-file-completion-source-p ()
+(defun helm-file-completion-source-p (&optional source)
   "Return non-`nil' if current source is a file completion source."
   (or minibuffer-completing-file-name
-      (let ((cur-source (cdr (assoc 'name (helm-get-current-source)))))
+      (let ((cur-source (cdr (assoc 'name
+                                    (or source (helm-get-current-source))))))
         (cl-loop for i in helm--file-completion-sources
                  thereis (string= cur-source i)))))
 
@@ -4975,7 +4981,7 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
              (nomark     (assq 'nomark src))
              helm-follow-mode-persistent
              (src-name   (assoc-default 'name src))
-             (filecomp-p (or (helm-file-completion-source-p)
+             (filecomp-p (or (helm-file-completion-source-p src)
                              (string= src-name "Files from Current Directory")))
              (remote-p (and filecomp-p (file-remote-p helm-pattern))))
         (cl-letf (((symbol-function 'message) #'ignore))
@@ -4996,7 +5002,7 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
                        (while (< (point) maxpoint)
                          (helm-mark-current-line)
                          (let* ((prefix (get-text-property (point-at-bol) 'display))
-                                (cand   (helm-get-selection))
+                                (cand   (helm-get-selection nil nil src))
                                 (bn     (and filecomp-p (helm-basename cand))))
                            ;; Don't mark possibles directories ending with . or ..
                            ;; autosave files/links and non--existent file.
@@ -5079,7 +5085,8 @@ selection. When key WITH-WILDCARD is specified, expand it."
                     finally return (or cands
                                        (append
                                         (helm--compute-marked
-                                         (helm-get-selection) current-src
+                                         (helm-get-selection nil nil current-src)
+                                         current-src
                                          with-wildcard)
                                         cands)))))
       (helm-log "Marked candidates = %S" candidates)
@@ -5316,7 +5323,7 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                                 helm-source-names-using-follow)))
                (null (eq (assoc-default 'follow src) 'never))
                (helm-window)
-               (helm-get-selection))
+               (helm-get-selection nil nil src))
       (helm-follow-mode-set-source 1 src)
       (run-with-idle-timer at nil #'helm-execute-persistent-action))))
 
