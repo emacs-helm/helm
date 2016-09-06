@@ -5232,20 +5232,6 @@ display values."
 Note that if the `follow-delay' attr is present in source,
 it will take precedence over this.")
 
-(defcustom helm-source-names-using-follow nil
-  "A list of source names to have follow enabled.
-This list of source names will be used only
-when `helm-follow-mode-persistent' is non-nil.
-
-You don't have to customize this yourself unless you really want,
-instead just set `helm-follow-mode-persistent' to non-nil and as soon
-you enable `helm-follow-mode' (C-c C-f) in a source, helm will save source name
-in this variable.
-If you turn off `helm-follow-mode' in a source and `helm-follow-mode-persistent' is non-nil
-the source name will be removed from this variable and saved."
-  :group 'helm
-  :type '(repeat (choice string)))
-
 (defun helm-follow-mode (&optional arg)
   "Execute persistent action every time the cursor is moved.
 
