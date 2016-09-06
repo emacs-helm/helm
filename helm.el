@@ -5242,17 +5242,19 @@ a helm session with \\[helm-follow-mode].
 When enabling interactively `helm-follow-mode' in a source, you can keep it enabled
 for next emacs sessions by setting `helm-follow-mode-persistent' to a non-nil value.
 
-When `helm-follow-mode'is called with a prefix arg and `helm-follow-mode-persistent'
+When `helm-follow-mode' is called with a prefix arg and `helm-follow-mode-persistent'
 is non-nil `helm-follow-mode' will be persistent only for this emacs session,
 but not for next emacs sessions, i.e the current source will not be saved
-to `helm-source-names-using-follow'. 
+to `helm-source-names-using-follow'.
+A prefix arg with `helm-follow-mode' already enabled will have no effect.
 
 Note that you can use instead of this mode the commands `helm-follow-action-forward'
 and `helm-follow-action-backward' at anytime in all helm sessions.
 
 They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-action-backward]."
-  (interactive (list (helm-aif current-prefix-arg
-                         (prefix-numeric-value it))))
+  (interactive (list (helm-aif (and current-prefix-arg
+                                    (prefix-numeric-value current-prefix-arg))
+                         (unless (helm-follow-mode-p) it))))
   (with-helm-alive-p
     (with-current-buffer helm-buffer
       (let* ((src      (helm-get-current-source))
