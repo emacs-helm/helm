@@ -5252,7 +5252,7 @@ and `helm-follow-action-backward' at anytime in all helm sessions.
 
 They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-action-backward]."
   (interactive (list (helm-aif current-prefix-arg
-                         (prefix-numeric-value current-prefix-arg))))
+                         (prefix-numeric-value it))))
   (with-helm-alive-p
     (with-current-buffer helm-buffer
       (let* ((src      (helm-get-current-source))
