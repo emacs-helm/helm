@@ -115,7 +115,8 @@
   (setf (slot-value source 'keymap) helm-bookmark-map)
   (setf (slot-value source 'mode-line) (list "Bookmark(s)" helm-mode-line-string))
   (setf (slot-value source 'help-message) 'helm-bookmark-help-message)
-  (setf (slot-value source 'migemo) t))
+  (setf (slot-value source 'migemo) t)
+  (setf (slot-value source 'follow) 'never))
 
 
 ;; Buffers
