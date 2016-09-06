@@ -4982,7 +4982,6 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
       (let* ((src        (helm-get-current-source))
              (follow     (if (helm-follow-mode-p src) 1 -1))
              (nomark     (assq 'nomark src))
-             helm-follow-mode-persistent
              (src-name   (assoc-default 'name src))
              (filecomp-p (or (helm-file-completion-source-p src)
                              (string= src-name "Files from Current Directory")))
@@ -5243,11 +5242,17 @@ a helm session with \\[helm-follow-mode].
 When enabling interactively `helm-follow-mode' in a source, you can keep it enabled
 for next emacs sessions by setting `helm-follow-mode-persistent' to a non-nil value.
 
+When `helm-follow-mode'is called with a prefix arg and `helm-follow-mode-persistent'
+is non-nil `helm-follow-mode' will be persistent only for this emacs session,
+but not for next emacs session, i.e the current source will not be saved
+to `helm-source-names-using-follow'. 
+
 Note that you can use instead of this mode the commands `helm-follow-action-forward'
 and `helm-follow-action-backward' at anytime in all helm sessions.
 
 They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-action-backward]."
-  (interactive "p")
+  (interactive (list (helm-aif current-prefix-arg
+                         (prefix-numeric-value current-prefix-arg))))
   (with-helm-alive-p
     (with-current-buffer helm-buffer
       (let* ((src      (helm-get-current-source))
@@ -5258,31 +5263,35 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                                                   'name (symbol-value s)))
                                 thereis (and sname (string= sname name) s)))
              (fol-attr (assq 'follow src))
-             (enabled  (or
-                        ;; If `helm-follow-mode' is called with a negative
-                        ;; ARG, assume follow is already enabled.
-                        ;; i.e turn it off now.
-                        (< arg 0)
-                        (helm-follow-mode-p src)
-                        (and helm-follow-mode-persistent
-                             (member (assoc-default 'name src)
-                                     helm-source-names-using-follow)))))
+             (enabled  (or (helm-follow-mode-p src)
+                           (and helm-follow-mode-persistent
+                                (member (assoc-default 'name src)
+                                        helm-source-names-using-follow)))))
         (if src
             (progn
               (if (eq (cdr fol-attr) 'never)
                   (message "helm-follow-mode not allowed in this source")
                   ;; Make follow attr persistent for this emacs session.
-                  (helm-follow-mode-set-source (if enabled -1 1) src)
-                  (when helm-follow-mode-persistent
+                  (helm-follow-mode-set-source
+                   (if (or enabled (and (numberp arg) (< arg 0))) -1 1)
+                   src)
+                  ;; When arg is nil assume the call is interactive.
+                  ;; However if user call helm-follow-mode with a prefix arg,
+                  ;; the call will be considered non--interactive and
+                  ;; src-name will NOT be saved to helm-source-names-using-follow.
+                  ;; When called from lisp (non--interactive) src-name
+                  ;; will never be saved.
+                  (when (and helm-follow-mode-persistent (null arg))
                     (if (null enabled)
                         (unless (member name helm-source-names-using-follow)
                           (push name helm-source-names-using-follow)
                           (customize-save-variable 'helm-source-names-using-follow
                                                    helm-source-names-using-follow))
-                        (setq helm-source-names-using-follow
-                              (delete name helm-source-names-using-follow))
-                        (customize-save-variable 'helm-source-names-using-follow
-                                                 helm-source-names-using-follow)))
+                        (when (member name helm-source-names-using-follow)
+                          (setq helm-source-names-using-follow
+                                (delete name helm-source-names-using-follow))
+                          (customize-save-variable 'helm-source-names-using-follow
+                                                   helm-source-names-using-follow))))
                   (message "helm-follow-mode is %s"
                            (if (helm-follow-mode-p src)
                                "enabled" "disabled"))
