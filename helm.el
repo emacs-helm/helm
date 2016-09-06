@@ -5244,7 +5244,7 @@ for next emacs sessions by setting `helm-follow-mode-persistent' to a non-nil va
 
 When `helm-follow-mode'is called with a prefix arg and `helm-follow-mode-persistent'
 is non-nil `helm-follow-mode' will be persistent only for this emacs session,
-but not for next emacs session, i.e the current source will not be saved
+but not for next emacs sessions, i.e the current source will not be saved
 to `helm-source-names-using-follow'. 
 
 Note that you can use instead of this mode the commands `helm-follow-action-forward'
