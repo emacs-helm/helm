@@ -249,9 +249,6 @@ replace with STR as yanked string."
     (set-mark (mark t)))
   nil)
 
-(defadvice push-mark (around helm-push-mark-mode)
-  (helm--push-mark location nomsg activate))
-
 ;;;###autoload
 (define-minor-mode helm-push-mark-mode
     "Provide an improved version of `push-mark'.
@@ -260,12 +257,8 @@ the `global-mark-ring' after each new visit."
   :group 'helm-ring
   :global t
   (if helm-push-mark-mode
-      (if (fboundp 'advice-add)
-          (advice-add 'push-mark :override #'helm--push-mark)
-          (ad-activate 'push-mark))
-      (if (fboundp 'advice-remove)
-          (advice-remove 'push-mark #'helm--push-mark)
-          (ad-deactivate 'push-mark))))
+      (advice-add 'push-mark :override #'helm--push-mark)
+      (advice-remove 'push-mark #'helm--push-mark)))
 
 ;;;; <Register>
 ;;; Insert from register

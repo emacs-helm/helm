@@ -212,16 +212,6 @@ In this case last position is added to the register
   :group 'helm-faces)
 
 
-;; CUA workaround
-(defadvice cua-delete-region (around helm-avoid-cua activate)
-  (ignore-errors ad-do-it))
-
-(defadvice copy-region-as-kill (around helm-avoid-cua activate)
-  (if cua-mode
-      (ignore-errors ad-do-it)
-    ad-do-it))
-
-
 ;;; Utils functions
 ;;
 ;;

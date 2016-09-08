@@ -1819,6 +1819,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   ;; Activate the advice for `tramp-read-passwd'.
   (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
   (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd)
+  (advice-add 'cua-delete-region :around #'cua-delete-region--advice)
+  (advice-add 'copy-region-as-kill :around #'copy-region-as-kill--advice)
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "any-prompt = %S" any-prompt)
   (helm-log "any-preselect = %S" any-preselect)
@@ -1877,6 +1879,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             nil))
       (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
       (advice-remove 'ange-ftp-get-passwd #'helm--advice-ange-ftp-get-passwd)
+      (advice-remove 'cua-delete-region #'cua-delete-region--advice)
+      (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice)
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
@@ -2506,6 +2510,16 @@ This can be useful for example for quietly writing a complex regexp."
        (apply old--fn args)
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
+
+;; CUA workaround
+(defun cua-delete-region--advice (old--fn &rest args)
+  (ignore-errors
+    (apply old--fn args)))
+
+(defun copy-region-as-kill--advice (old--fn &rest args)
+  (if cua-mode
+      (ignore-errors (apply old--fn args))
+      (apply old--fn args)))
 
 (defun helm--maybe-update-keymap (&optional map)
   "Handle different keymaps in multiples sources.
