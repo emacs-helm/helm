@@ -48,7 +48,7 @@ backward compatibility.
 
 # Requirements
 
-Helm requires Emacs-24.3 or later versions.
+Helm requires Emacs-24.4 or later versions.
 
 Helm installs [async](https://github.com/jwiegley/emacs-async) package as a dependency
 when Helm is installed using MELPA. 
