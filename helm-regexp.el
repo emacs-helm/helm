@@ -164,7 +164,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (helm-highlight-current-line))
 
 (defun helm-regexp-kill-new (input)
-  (kill-new input)
+  (kill-new (substring-no-properties input))
   (message "Killed: %s" input))
 
 
