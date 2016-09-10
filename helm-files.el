@@ -1714,11 +1714,27 @@ purpose."
   (string= (helm-ff-set-pattern pattern)
            "Invalid tramp file name"))
 
+(defun helm-ff-tramp-postfixed-p (str methods)
+  (let (result)
+    (with-temp-buffer
+      (save-excursion (insert str))
+      (helm-awhile (search-forward ":" nil t)
+        (if (save-excursion
+              (forward-char -1)
+              (looking-back (mapconcat 'identity methods "\\|")
+                            (point-at-bol)))
+            (setq result nil)
+            (setq result it))))
+    result))
+
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
-  (let ((methods (mapcar 'car tramp-methods))
-        (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
-        cur-method tramp-name)
+  (let* ((methods (mapcar 'car tramp-methods))
+         (postfixed (save-match-data
+                      ;; Returns the position of last ":".
+                      (helm-ff-tramp-postfixed-p pattern methods)))
+         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+         cur-method tramp-name)
     ;; In some rare cases tramp can return a nil input,
     ;; so be sure pattern is a string for safety (Issue #476).
     (unless pattern (setq pattern ""))
@@ -1731,11 +1747,12 @@ purpose."
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
            (expand-file-name default-directory))
           ((string-match ".*\\(~//\\|//\\)\\'" pattern)
-           (expand-file-name "/")) ; Expand to "/" or "c:/"
+           (expand-file-name "/"))      ; Expand to "/" or "c:/"
           ((string-match "\\`\\(~/\\|.*/~/\\)\\'" pattern)
            (expand-file-name "~/"))
           ;; Match "/method:maybe_hostname:~"
           ((and (string-match (concat reg "~") pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (expand-file-name
@@ -1744,6 +1761,7 @@ purpose."
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (helm-create-tramp-name
@@ -1751,13 +1769,15 @@ purpose."
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
           ((and (string-match  helm-tramp-file-name-regexp pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (helm-create-tramp-name
-                             (match-string 0 pattern)))
+           (setq tramp-name (expand-file-name
+                             (helm-create-tramp-name
+                              (match-string 0 pattern))))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
-          ((and (not (string-match reg pattern))
+          ((and (null postfixed)
                 (string-match helm-tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
            "Invalid tramp file name")   ; Write in helm-buffer.
