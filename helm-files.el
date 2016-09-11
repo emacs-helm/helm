@@ -1716,23 +1716,23 @@ purpose."
 
 (defun helm-ff-tramp-postfixed-p (str methods)
   (let (result)
-    (with-temp-buffer
-      (save-excursion (insert str))
-      (helm-awhile (search-forward ":" nil t)
-        (if (save-excursion
-              (forward-char -1)
-              (looking-back (mapconcat 'identity methods "\\|")
-                            (point-at-bol)))
-            (setq result nil)
-            (setq result it))))
+    (save-match-data
+      (with-temp-buffer
+        (save-excursion (insert str))
+        (helm-awhile (search-forward ":" nil t)
+          (if (save-excursion
+                (forward-char -1)
+                (looking-back (mapconcat 'identity methods "\\|")
+                              (point-at-bol)))
+              (setq result nil)
+              (setq result it)))))
     result))
 
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
   (let* ((methods (mapcar 'car tramp-methods))
-         (postfixed (save-match-data
-                      ;; Returns the position of last ":".
-                      (helm-ff-tramp-postfixed-p pattern methods)))
+         ;; Returns the position of last ":" entered.
+         (postfixed (helm-ff-tramp-postfixed-p pattern methods))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
          cur-method tramp-name)
     ;; In some rare cases tramp can return a nil input,
