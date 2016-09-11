@@ -1768,13 +1768,12 @@ purpose."
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
-          ((and (string-match  helm-tramp-file-name-regexp pattern)
+          ((and (string-match helm-tramp-file-name-regexp pattern)
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (expand-file-name
-                             (helm-create-tramp-name
-                              (match-string 0 pattern))))
+           (setq tramp-name (helm-create-tramp-name
+                             (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
           ((and (null postfixed)
