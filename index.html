@@ -30,7 +30,9 @@
 
 <p>Maintainance of Helm is a lot of work that I do freely on my sparse time,</p> 
 
-<p>please <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title=""></a> to help this project.</p>
+<p>please <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title=""></a> to help this project, </p> 
+
+<p>or <a href="https://gratipay.com/emacs-helm/"><img src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png" alt="Support via Gratipay"></a>.</p>
 
 
 
@@ -86,7 +88,7 @@ backward compatibility.</p>
 <h1>
 <a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h1>
 
-<p>Helm requires Emacs-24.3 or later versions.</p>
+<p>Helm requires Emacs-24.4 or later versions.</p>
 
 <p>Helm installs <a href="https://github.com/jwiegley/emacs-async">async</a> package as a dependency
 when Helm is installed using MELPA. </p>
@@ -105,22 +107,22 @@ and dired operations in Helm.</p>
 <li>
 <p>Clone the <code>helm</code> repository to some directory:</p>
 
-<div class="highlight highlight-source-lisp"><pre>$ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory</pre></div>
+<div class="highlight highlight-source-emacs-lisp"><pre>$ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory</pre></div>
 </li>
 <li>
 <p>Clone the <code>async</code> repository to some directory (facultative)</p>
 
-<div class="highlight highlight-source-lisp"><pre>$ git clone https://github.com/jwiegley/emacs-async.git /path/to/async/directory</pre></div>
+<div class="highlight highlight-source-emacs-lisp"><pre>$ git clone https://github.com/jwiegley/emacs-async.git /path/to/async/directory</pre></div>
 </li>
 <li><p>Run <code>make</code> from the <code>helm</code> directory.</p></li>
 <li>
 <p>Add to <code>.emacs.el</code> (or equivalent):</p>
 
-<div class="highlight highlight-source-lisp"><pre><span class="pl-c">;; If async is installed</span>
-(add-to-list 'load-path <span class="pl-s"><span class="pl-pds">"</span>/path/to/async/directory<span class="pl-pds">"</span></span>)
+<div class="highlight highlight-source-emacs-lisp"><pre><span class="pl-c">;; If async is installed</span>
+(add-to-list <span class="pl-c1">'load-path</span> <span class="pl-s"><span class="pl-pds">"</span>/path/to/async/directory<span class="pl-pds">"</span></span>)
 
-(add-to-list 'load-path <span class="pl-s"><span class="pl-pds">"</span>/path/to/helm/directory<span class="pl-pds">"</span></span>)
-(require 'helm-config)</pre></div>
+(add-to-list <span class="pl-c1">'load-path</span> <span class="pl-s"><span class="pl-pds">"</span>/path/to/helm/directory<span class="pl-pds">"</span></span>)
+(require <span class="pl-c1">'helm-config</span>)</pre></div>
 </li>
 </ol>
 
@@ -143,7 +145,7 @@ You will find the instructions to install packages from MELPA <a href="https://g
 <p>No further configuration is necessary to run helm other than perhaps a
 one-line entry in the Emacs init file:</p>
 
-<div class="highlight highlight-source-lisp"><pre>(require 'helm-config)</pre></div>
+<div class="highlight highlight-source-emacs-lisp"><pre>(require <span class="pl-c1">'helm-config</span>)</pre></div>
 
 <p><em>WARNING:</em> Helm upgrades from MELPA repository encountered errors
 because of the way package.el fetched and compiled updates for
@@ -238,7 +240,7 @@ helm completion through <code>M-x</code>.</p>
 
 <p>To make helm-mode start with Emacs init file: </p>
 
-<div class="highlight highlight-source-lisp"><pre>(helm-mode <span class="pl-c1">1</span>)</pre></div>
+<div class="highlight highlight-source-emacs-lisp"><pre>(helm-mode <span class="pl-c1">1</span>)</pre></div>
 
 <p>To discover helm commands, look at helm menu item in Emacs menu. </p>
 
@@ -293,11 +295,11 @@ Each pattern can be a regexp.</p>
 
 <p>An example:</p>
 
-<div class="highlight highlight-source-lisp"><pre>
-(helm :sources (helm-build-sync-source <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>
-                 :candidates '(foo foa fob bar baz)
-                 :fuzzy-match <span class="pl-c1">t</span>)
-      :buffer <span class="pl-s"><span class="pl-pds">"</span>*helm test*<span class="pl-pds">"</span></span>)</pre></div>
+<div class="highlight highlight-source-emacs-lisp"><pre>
+(helm <span class="pl-c1">:sources</span> (helm-build-sync-source <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>
+                 <span class="pl-c1">:candidates</span> '(foo foa fob bar baz)
+                 <span class="pl-c1">:fuzzy-match</span> <span class="pl-c1">t</span>)
+      <span class="pl-c1">:buffer</span> <span class="pl-s"><span class="pl-pds">"</span>*helm test*<span class="pl-pds">"</span></span>)</pre></div>
 
 <p>The candidates list may be replaced by a function that produces a list.
 See (<a href="https://github.com/emacs-helm/helm/wiki#25-developing-using-helm-framework">helm wiki</a>)
