@@ -22,6 +22,7 @@
 (require 'org)
 
 (declare-function org-agenda-switch-to "org-agenda.el")
+(declare-function org-previous-visible-heading "org.el")
 
 (defgroup helm-org nil
   "Org related functions for helm."
