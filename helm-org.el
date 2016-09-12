@@ -236,6 +236,13 @@ Note this have no effect in `helm-org-in-buffer-headings'."
       (org-end-of-subtree t t)
       (org-paste-subtree (+ target-level 1)))))
 
+(defun helm-org-in-buffer-preselect ()
+  (if (org-on-heading-p)
+      (buffer-substring-no-properties (point-at-bol) (point-at-eol))
+      (save-excursion
+        (org-previous-visible-heading 1)
+        (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
+
 (defun helm-org-run-heading-refile ()
   (interactive)
   (with-helm-alive-p
@@ -255,10 +262,11 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defun helm-org-in-buffer-headings ()
   "Preconfigured helm for org buffer headings."
   (interactive)
-  (let ((helm-org-show-filename nil))
+  (let (helm-org-show-filename helm-org-format-outline-path)
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)))
           :candidate-number-limit 99999
+          :preselect (helm-org-in-buffer-preselect)
           :truncate-lines helm-org-truncate-lines
           :buffer "*helm org inbuffer*")))
 
