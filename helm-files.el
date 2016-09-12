@@ -1532,7 +1532,7 @@ or when `helm-pattern' is equal to \"~/\"."
                                      "Read File Name History"))
                (pat         (if (string-match helm-tramp-file-name-regexp
                                               helm-pattern)
-                                (file-remote-p helm-pattern)
+                                (helm-create-tramp-name helm-pattern)
                                 helm-pattern))
                (completed-p (string= (file-name-as-directory
                                       (expand-file-name
@@ -1676,6 +1676,12 @@ and should be used carefully elsewhere, or not at all, using
       (dired (file-name-directory target))
       (dired-goto-file target))))
 
+(defun helm-create-tramp-name (fname)
+  "Build filename for `helm-pattern' like /su:: or /sudo::."
+  (apply #'tramp-make-tramp-file-name
+         (cl-loop with v = (tramp-dissect-file-name fname)
+               for i across v collect i)))
+
 (cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
@@ -1750,7 +1756,7 @@ purpose."
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (expand-file-name
-                             (file-remote-p
+                             (helm-create-tramp-name
                               (match-string 0 pattern))))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:maybe_hostname:"
@@ -1758,7 +1764,7 @@ purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
-           (setq tramp-name (file-remote-p
+           (setq tramp-name (helm-create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
@@ -1766,7 +1772,7 @@ purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (file-remote-p
+           (setq tramp-name (helm-create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
