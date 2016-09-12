@@ -1801,6 +1801,9 @@ purpose."
              (string= path "Invalid tramp file name")
              ;; An empty pattern
              (string= path "")
+             (and (string-match-p ":\\'" path)
+                  (helm-ff-tramp-postfixed-p
+                   path (mapcar 'car tramp-methods)))
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
