@@ -1796,6 +1796,7 @@ purpose."
          basedir
          invalid-basedir
          non-essential
+         (proxies tramp-default-proxies-alist)
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     ;; Tramp check if path is valid without waiting a valid
     ;; connection and may send a file-error.
@@ -1834,6 +1835,7 @@ purpose."
                         helm-ff--deleting-char-backward
                         (and dir-p (not (string-match-p "/\\'" path))))
               (or (>= (length (helm-basename path)) 3) dir-p)))
+      ;; At this point the tramp connection is triggered.
       (setq helm-pattern (helm-ff--transform-pattern-for-completion path))
       ;; This have to be set after [1] to allow deleting char backward.
       (setq basedir (expand-file-name
@@ -1841,8 +1843,8 @@ purpose."
                          ;; Add the final "/" to path
                          ;; when `helm-ff-auto-update-flag' is enabled.
                          (file-name-as-directory path)
-                         (if (string= path "") "/"
-                             (file-name-directory path)))))
+                         (if (string= path "")
+                             "/" (file-name-directory path)))))
       (setq helm-ff-default-directory
             (if (string= helm-pattern "")
                 (expand-file-name "/")  ; Expand to "/" or "c:/"
@@ -1851,6 +1853,13 @@ purpose."
                             (and ffap-url-regexp
                                  (string-match ffap-url-regexp path)))
                   basedir))))
+    ;; If proxies have changed, that's mean we are using
+    ;; a tramp multi hops connection.
+    (when (not (equal proxies tramp-default-proxies-alist))
+      ;; If the minibuffer input is a tramp multi hops pattern
+      ;; Use basedir as pattern so that pattern matches with
+      ;; the contents of directory-files.
+      (setq helm-pattern basedir))
     (cond ((string= path "Invalid tramp file name")
            (or (helm-ff-tramp-hostnames) ; Hostnames completion.
                (prog2
