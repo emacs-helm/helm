@@ -447,6 +447,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-multi-files--toggle-locate nil)
 (defvar helm-ff--move-to-first-real-candidate t)
 (defvar helm-find-files--toggle-bookmark nil)
+(defvar helm-ff--tramp-methods nil)
 
 
 ;;; Helm-find-files
@@ -1682,6 +1683,11 @@ and should be used carefully elsewhere, or not at all, using
          (cl-loop with v = (tramp-dissect-file-name fname)
                for i across v collect i)))
 
+(defun helm-ff-get-tramp-methods ()
+  "Returns a list of the car of `tramp-methods'."
+  (or helm-ff--tramp-methods
+      (setq helm-ff--tramp-methods (mapcar 'car tramp-methods))))
+
 (cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
@@ -1689,7 +1695,7 @@ purpose."
   (when (string-match helm-tramp-file-name-regexp pattern)
     (let ((method      (match-string 1 pattern))
           (tn          (match-string 0 pattern))
-          (all-methods (mapcar 'car tramp-methods)))
+          (all-methods (helm-ff-get-tramp-methods)))
       (helm-fast-remove-dups
        (cl-loop for (f . h) in (tramp-get-completion-function method)
              append (cl-loop for e in (funcall f (car h))
@@ -1714,11 +1720,27 @@ purpose."
   (string= (helm-ff-set-pattern pattern)
            "Invalid tramp file name"))
 
+(defun helm-ff-tramp-postfixed-p (str methods)
+  (let (result)
+    (save-match-data
+      (with-temp-buffer
+        (save-excursion (insert str))
+        (helm-awhile (search-forward ":" nil t)
+          (if (save-excursion
+                (forward-char -1)
+                (looking-back (mapconcat 'identity methods "\\|")
+                              (point-at-bol)))
+              (setq result nil)
+              (setq result it)))))
+    result))
+
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
-  (let ((methods (mapcar 'car tramp-methods))
-        (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
-        cur-method tramp-name)
+  (let* ((methods (helm-ff-get-tramp-methods))
+         ;; Returns the position of last ":" entered.
+         (postfixed (helm-ff-tramp-postfixed-p pattern methods))
+         (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
+         cur-method tramp-name)
     ;; In some rare cases tramp can return a nil input,
     ;; so be sure pattern is a string for safety (Issue #476).
     (unless pattern (setq pattern ""))
@@ -1731,11 +1753,12 @@ purpose."
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
            (expand-file-name default-directory))
           ((string-match ".*\\(~//\\|//\\)\\'" pattern)
-           (expand-file-name "/")) ; Expand to "/" or "c:/"
+           (expand-file-name "/"))      ; Expand to "/" or "c:/"
           ((string-match "\\`\\(~/\\|.*/~/\\)\\'" pattern)
            (expand-file-name "~/"))
           ;; Match "/method:maybe_hostname:~"
           ((and (string-match (concat reg "~") pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (expand-file-name
@@ -1744,20 +1767,22 @@ purpose."
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:maybe_hostname:"
           ((and (string-match reg pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (helm-create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
-          ((and (string-match  helm-tramp-file-name-regexp pattern)
+          ((and (string-match helm-tramp-file-name-regexp pattern)
+                postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
            (setq tramp-name (helm-create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
-          ((and (not (string-match reg pattern))
+          ((and (null postfixed)
                 (string-match helm-tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
            "Invalid tramp file name")   ; Write in helm-buffer.
@@ -1782,6 +1807,9 @@ purpose."
              (string= path "Invalid tramp file name")
              ;; An empty pattern
              (string= path "")
+             (and (string-match-p ":\\'" path)
+                  (helm-ff-tramp-postfixed-p
+                   path (helm-ff-get-tramp-methods)))
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
