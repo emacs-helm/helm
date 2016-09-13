@@ -441,6 +441,14 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
                if (listp elm) append elm
                else collect elm))))
 
+(defun helm-source-by-name (name &optional sources)
+  "Get a Helm source in SOURCES by NAME.
+
+Optional argument SOURCES is a list of Helm sources. The default
+value is `helm-sources'."
+  (car (cl-member-if (lambda (source)
+                       (string= name (assoc-default 'name source)))
+                     (or sources helm-sources))))
 
 ;;; Strings processing.
 ;;

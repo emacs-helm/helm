@@ -991,14 +991,6 @@ Args ARGS are keywords provided by `helm-source-in-file'."
   `(helm-make-source ,name 'helm-source-in-file
      :candidates-file ,file ,@args))
 
-(defun helm-source-by-name (name &optional sources)
-  "Get a Helm source in SOURCES by NAME.
-
-Optional argument SOURCES is a list of Helm sources. The default
-value is `helm-sources'."
-  (car (cl-member-if (lambda (source)
-                       (string= name (assoc-default 'name source)))
-                     (or sources helm-sources))))
 
 (provide 'helm-source)
 
