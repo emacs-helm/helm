@@ -480,7 +480,7 @@ With a value of 1 enable, a value of -1 or nil disable the mode.
     "  `helm-follow-mode' will execute persistent-action after this delay.
   Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
   If none of these are found fallback to `helm-input-idle-delay'.")
-   
+
    (multimatch
     :initarg :multimatch
     :initform t
@@ -493,7 +493,7 @@ With a value of 1 enable, a value of -1 or nil disable the mode.
   It is the standard way of matching in helm and is enabled by default.
   It can be used with fuzzy-matching enabled, but as soon helm detect a space,
   each pattern will match by regexp and will not be fuzzy.")
-   
+
    (match-part
     :initarg :match-part
     :initform nil
@@ -991,6 +991,14 @@ Args ARGS are keywords provided by `helm-source-in-file'."
   `(helm-make-source ,name 'helm-source-in-file
      :candidates-file ,file ,@args))
 
+(defun helm-source-by-name (name &optional sources)
+  "Get a Helm source in SOURCES by NAME.
+
+Optional argument SOURCES is a list of Helm sources. The default
+value is `helm-sources'."
+  (car (cl-member-if (lambda (source)
+                       (string= name (assoc-default 'name source)))
+                     (or sources helm-sources))))
 
 (provide 'helm-source)
 
