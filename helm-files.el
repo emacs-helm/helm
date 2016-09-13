@@ -3186,6 +3186,7 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
            for bn = (buffer-file-name (get-buffer b))
            if (or (and bn (file-in-directory-p bn root-directory))
                   (and (null bn)
+                       (not (file-remote-p cd))
                        (file-in-directory-p cd root-directory)))
            collect b))
 
