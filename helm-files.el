@@ -447,6 +447,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-multi-files--toggle-locate nil)
 (defvar helm-ff--move-to-first-real-candidate t)
 (defvar helm-find-files--toggle-bookmark nil)
+(defvar helm-ff--tramp-methods nil)
 
 
 ;;; Helm-find-files
@@ -1682,6 +1683,11 @@ and should be used carefully elsewhere, or not at all, using
          (cl-loop with v = (tramp-dissect-file-name fname)
                for i across v collect i)))
 
+(defun helm-ff-get-tramp-methods ()
+  "Returns a list of the car of `tramp-methods'."
+  (or helm-ff--tramp-methods
+      (setq helm-ff--tramp-methods (mapcar 'car tramp-methods))))
+
 (cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
@@ -1689,7 +1695,7 @@ purpose."
   (when (string-match helm-tramp-file-name-regexp pattern)
     (let ((method      (match-string 1 pattern))
           (tn          (match-string 0 pattern))
-          (all-methods (mapcar 'car tramp-methods)))
+          (all-methods (helm-ff-get-tramp-methods)))
       (helm-fast-remove-dups
        (cl-loop for (f . h) in (tramp-get-completion-function method)
              append (cl-loop for e in (funcall f (car h))
@@ -1730,7 +1736,7 @@ purpose."
 
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
-  (let* ((methods (mapcar 'car tramp-methods))
+  (let* ((methods (helm-ff-get-tramp-methods))
          ;; Returns the position of last ":" entered.
          (postfixed (helm-ff-tramp-postfixed-p pattern methods))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
@@ -1803,7 +1809,7 @@ purpose."
              (string= path "")
              (and (string-match-p ":\\'" path)
                   (helm-ff-tramp-postfixed-p
-                   path (mapcar 'car tramp-methods)))
+                   path (helm-ff-get-tramp-methods)))
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
