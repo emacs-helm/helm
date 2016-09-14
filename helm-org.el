@@ -58,7 +58,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
     ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
-    ("Refile to this heading `C-c r`" . helm-org-heading-refile)
+    ("Refile to this heading `C-c w`" . helm-org-heading-refile)
     ("Insert link to this heading `C-c l`" . helm-org-insert-link-to-heading-at-marker))
   "Default actions alist for
   `helm-source-org-headings-for-files'."
@@ -111,7 +111,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-c i>") 'helm-org-run-open-heading-in-indirect-buffer)
-    (define-key map (kbd "C-c r")   'helm-org-run-heading-refile)
+    (define-key map (kbd "C-c w")   'helm-org-run-heading-refile)
     (define-key map (kbd "C-c l")   'helm-org-run-insert-link-to-heading-at-marker)
     map)
   "Keymap for `helm-source-org-headings-for-files'.")
