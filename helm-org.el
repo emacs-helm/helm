@@ -22,7 +22,6 @@
 (require 'org)
 
 (declare-function org-agenda-switch-to "org-agenda.el")
-(declare-function org-previous-visible-heading "org.el")
 
 (defgroup helm-org nil
   "Org related functions for helm."
@@ -241,7 +240,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (if (org-on-heading-p)
       (buffer-substring-no-properties (point-at-bol) (point-at-eol))
       (save-excursion
-        (org-previous-visible-heading 1)
+        (outline-previous-visible-heading 1)
         (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
 
 (defun helm-org-run-heading-refile ()
