@@ -1796,7 +1796,6 @@ purpose."
          basedir
          invalid-basedir
          non-essential
-         (proxies tramp-default-proxies-alist)
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     ;; Tramp check if path is valid without waiting a valid
     ;; connection and may send a file-error.
@@ -1853,12 +1852,8 @@ purpose."
                             (and ffap-url-regexp
                                  (string-match ffap-url-regexp path)))
                   basedir))))
-    ;; If proxies have changed, that's mean we are using
-    ;; a tramp multi hops connection.
-    (when (not (equal proxies tramp-default-proxies-alist))
-      ;; If the minibuffer input is a tramp multi hops pattern
-      ;; Use basedir as pattern so that pattern matches with
-      ;; the contents of directory-files.
+    (when (and (string-match ":\\'" path)
+               (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
     (cond ((string= path "Invalid tramp file name")
            (or (helm-ff-tramp-hostnames) ; Hostnames completion.
