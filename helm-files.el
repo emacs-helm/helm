@@ -1944,6 +1944,7 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
   (setq pattern (helm-ff-handle-backslash pattern))
   (let ((bn      (helm-basename pattern))
         (bd      (or (helm-basedir pattern) ""))
+        ;; Trigger tramp connection with file-directory-p.
         (dir-p   (file-directory-p pattern))
         (tramp-p (cl-loop for (m . f) in tramp-methods
                        thereis (string-match m pattern))))
