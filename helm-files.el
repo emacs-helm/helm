@@ -1720,7 +1720,7 @@ purpose."
   (string= (helm-ff-set-pattern pattern)
            "Invalid tramp file name"))
 
-(defun helm-ff-tramp-postfixed-p (str methods)
+(defun helm-ff-tramp-postfixed-p (str)
   (let (result)
     (save-match-data
       (with-temp-buffer
@@ -1728,8 +1728,9 @@ purpose."
         (helm-awhile (search-forward ":" nil t)
           (if (save-excursion
                 (forward-char -1)
-                (looking-back (mapconcat 'identity methods "\\|")
-                              (point-at-bol)))
+                (looking-back
+                 (mapconcat 'identity (helm-ff-get-tramp-methods) "\\|")
+                 (point-at-bol)))
               (setq result nil)
               (setq result it)))))
     result))
@@ -1738,7 +1739,7 @@ purpose."
   "Handle tramp filenames in `helm-pattern'."
   (let* ((methods (helm-ff-get-tramp-methods))
          ;; Returns the position of last ":" entered.
-         (postfixed (helm-ff-tramp-postfixed-p pattern methods))
+         (postfixed (helm-ff-tramp-postfixed-p pattern))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
          cur-method tramp-name)
     ;; In some rare cases tramp can return a nil input,
@@ -1808,8 +1809,7 @@ purpose."
              ;; An empty pattern
              (string= path "")
              (and (string-match-p ":\\'" path)
-                  (helm-ff-tramp-postfixed-p
-                   path (helm-ff-get-tramp-methods)))
+                  (helm-ff-tramp-postfixed-p path))
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
