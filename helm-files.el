@@ -3731,6 +3731,35 @@ locate."
         :ff-transformer-show-only-basename nil
         :buffer "*helm recentf*"))
 
+;;;###autoload
+(defun helm-delete-tramp-connection ()
+  "Allow deleting tramp connection or marked tramp connections at once.
+
+This replace `tramp-cleanup-connection' which is partially broken in
+emacs < to 25.1.50.1.
+It allows additionally to delete more than one connection at once."
+  (interactive)
+  (let ((helm-quit-if-no-candidate
+         (lambda ()
+           (message "No Tramp connection found"))))
+    (helm :sources (helm-build-sync-source "Tramp connections"
+                     :candidates (tramp-list-connections)
+                     :candidate-transformer (lambda (candidates)
+                                              (cl-loop for v in candidates
+                                                       for name = (apply #'tramp-make-tramp-file-name
+                                                                         (cl-loop for i across v collect i))
+                                                       when (or (processp (tramp-get-connection-process v))
+                                                                (buffer-live-p (get-buffer (tramp-buffer-name v))))
+                                                       collect (cons name v)))
+                     :action (lambda (_vec)
+                               (let ((vecs (helm-marked-candidates)))
+                                 (cl-loop for v in vecs
+                                          do (progn
+                                               (tramp-cleanup-connection v)
+                                               (remhash v tramp-cache-data))))))
+          :buffer "*helm tramp connections*")))
+
+
 (provide 'helm-files)
 
 ;; Local Variables:
