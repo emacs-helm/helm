@@ -1688,20 +1688,39 @@ and should be used carefully elsewhere, or not at all, using
   (or helm-ff--tramp-methods
       (setq helm-ff--tramp-methods (mapcar 'car tramp-methods))))
 
+(defun helm-ff-previous-mh-tramp-method (str)
+  (save-match-data
+    (with-temp-buffer
+      (insert str)
+      (when (re-search-backward
+             (concat "\\([|]\\)\\("
+                     (mapconcat 'identity (helm-ff-get-tramp-methods) "\\|")
+                     "\\):")
+             nil t)
+        (list
+         (buffer-substring-no-properties (point-at-bol) (match-beginning 2))
+         (buffer-substring-no-properties (match-beginning 2) (match-end 2)))))))
+
 (cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
 purpose."
   (when (string-match helm-tramp-file-name-regexp pattern)
-    (let ((method      (match-string 1 pattern))
-          (tn          (match-string 0 pattern))
-          (all-methods (helm-ff-get-tramp-methods)))
+    (let* ((mh-method   (helm-ff-previous-mh-tramp-method pattern))
+           (method      (or (cadr mh-method) (match-string 1 pattern)))
+           (current-mh-host (helm-aif (and mh-method
+                                           (helm-ff-get-host-from-tramp-invalid-fname pattern))
+                                (concat (car mh-method) method ":"
+                                        (car (split-string it "|" t)))))
+           (all-methods (helm-ff-get-tramp-methods)))
       (helm-fast-remove-dups
-       (cl-loop for (f . h) in (tramp-get-completion-function method)
-             append (cl-loop for e in (funcall f (car h))
-                          for host = (and (consp e) (cadr e))
-                          when (and host (not (member host all-methods)))
-                          collect (concat tn host)))
+       (cons current-mh-host
+             (cl-loop for (f . h) in (tramp-get-completion-function method)
+                      append (cl-loop for e in (funcall f (car h))
+                                      for host = (and (consp e) (cadr e))
+                                      when (and host (not (member host all-methods)))
+                                      collect (concat (or (car mh-method) "/")
+                                                      method ":" host))))
        :test 'equal))))
 
 (defun helm-ff-before-action-hook-fn ()
