@@ -3736,7 +3736,8 @@ locate."
   "Allow deleting tramp connection or marked tramp connections at once.
 
 This replace `tramp-cleanup-connection' which is partially broken in
-emacs < to 25.1.50.1.
+emacs < to 25.1.50.1 (See Emacs Bug#24432).
+
 It allows additionally to delete more than one connection at once."
   (interactive)
   (let ((helm-quit-if-no-candidate
