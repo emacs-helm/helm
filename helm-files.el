@@ -2412,7 +2412,7 @@ This affect directly file CANDIDATE."
     (format "No program %s found to extract exif"
             helm-ff-exif-data-program)))
 
-(defun helm-find-files-persistent-action (candidate)
+(cl-defun helm-find-files-persistent-action (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
 If CANDIDATE is alone, open file CANDIDATE filename.
@@ -2421,6 +2421,7 @@ First hit on C-j expand CANDIDATE second hit open file.
 If a prefix arg is given or `helm-follow-mode' is on open file."
   (let* ((follow        (or (helm-follow-mode-p)
                             helm--temp-follow-flag))
+         (image-cand    (string-match-p (image-file-name-regexp) candidate))
          (new-pattern   (helm-get-selection))
          (num-lines-buf (with-current-buffer helm-buffer
                           (count-lines (point-min) (point-max))))
@@ -2431,6 +2432,11 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                        (set-text-properties 0 (length fname)
                                                             nil fname)
                                        (insert fname))))))
+    (unless image-cand
+      (when follow
+        (helm-follow-mode -1)
+        (cl-return-from helm-find-files-persistent-action
+          (message "Helm-follow-mode allowed only on images, disabling"))))
     (cond ((and (helm-ff-invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
            ;; First hit insert hostname and
@@ -2461,7 +2467,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            (funcall insert-in-minibuffer new-pattern))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
-          ((string-match (image-file-name-regexp) candidate)
+          (image-cand
            (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
              (kill-buffer image-dired-display-image-buffer))
            ;; Fix emacs bug never fixed upstream.
