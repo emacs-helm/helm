@@ -130,6 +130,11 @@ fuzzy completion is not available in `completion-at-point'."
                  (function :tag "Show one liner in modeline."
                   helm-elisp-show-doc-modeline)))
 
+(defcustom helm-locate-library-fuzzy-match t
+  "Enable fuzzy-matching in `helm-locate-library' when non--nil."
+  :type 'boolean
+  :group 'helm-elisp)
+
 
 ;;; Show completion.
 ;;
@@ -783,9 +788,13 @@ i.e the `symbol-name' of any existing symbol."
   "Preconfigured helm to locate elisp libraries."
   (interactive)
   (helm :sources (helm-build-in-buffer-source  "Elisp libraries (Scan)"
-                   :data (lambda () (helm-locate-library-scan-list))
-                   :fuzzy-match t
+                   :data #'helm-locate-library-scan-list
+                   :fuzzy-match helm-locate-library-fuzzy-match
                    :keymap helm-generic-files-map
+                   :search (unless helm-locate-library-fuzzy-match
+                             (lambda (regexp)
+                               (re-search-forward
+                                (replace-regexp-in-string "\\`\\^" "" regexp) nil t)))
                    :match-part (lambda (candidate)
                                  (if helm-ff-transformer-show-only-basename
                                      (helm-basename candidate) candidate))
