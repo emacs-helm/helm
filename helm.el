@@ -2740,14 +2740,17 @@ Cache the candidates if there is no cached value yet."
     candidates))
 
 (defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
-  "Execute `filter-one-by-one' function(s) on CANDIDATE in SOURCE."
+  "Execute `filter-one-by-one' function(s) on real value of CANDIDATE in SOURCE."
   `(helm-aif (assoc-default 'filter-one-by-one ,source)
-       (if (and (listp it)
-                (not (functionp it))) ;; Don't treat lambda's as list.
-           (cl-loop for f in it
-                 do (setq ,candidate (funcall f ,candidate))
-                 finally return ,candidate)
-         (setq ,candidate (funcall it ,candidate)))
+       (let ((real (if (consp ,candidate)
+                       (cdr ,candidate)
+                       ,candidate)))
+         (if (and (listp it)
+                  (not (functionp it))) ;; Don't treat lambda's as list.
+             (cl-loop for f in it
+                      do (setq ,candidate (funcall f real))
+                      finally return ,candidate)
+             (setq ,candidate (funcall it real))))
      ,candidate))
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
