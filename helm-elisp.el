@@ -794,7 +794,11 @@ i.e the `symbol-name' of any existing symbol."
                    :search (unless helm-locate-library-fuzzy-match
                              (lambda (regexp)
                                (re-search-forward
-                                (replace-regexp-in-string "\\`\\^" "" regexp) nil t)))
+                                (if helm-ff-transformer-show-only-basename
+                                    (replace-regexp-in-string
+                                     "\\`\\^" "" regexp)
+                                    regexp)
+                                nil t)))
                    :match-part (lambda (candidate)
                                  (if helm-ff-transformer-show-only-basename
                                      (helm-basename candidate) candidate))
