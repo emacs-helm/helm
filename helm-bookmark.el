@@ -519,13 +519,28 @@ than `w3m-browse-url' use it."
 ;;; Addressbook.
 ;;
 ;;
+(defun helm-bookmark-addressbook-search-fn (pattern)
+  (helm-awhile (next-single-property-change (point) 'email)
+    (goto-char it)
+    (end-of-line)
+    (when (string-match pattern
+                        (get-text-property
+                         0 'email (buffer-substring
+                                   (point-at-bol) (point-at-eol))))
+      (cl-return
+       (+ (point) (match-end 0))))))
+
 (defclass helm-bookmark-addressbook-class (helm-source-in-buffer)
   ((init :initform (lambda ()
                      (require 'addressbook-bookmark nil t)
                      (bookmark-maybe-load-default-file)
                      (helm-init-candidates-in-buffer
                          'global
-                       (helm-bookmark-addressbook-setup-alist))))
+                       (cl-loop for b in (helm-bookmark-addressbook-setup-alist)
+                                collect (propertize
+                                         b 'email (bookmark-prop-get
+                                                   b 'email))))))
+   (search :initform 'helm-bookmark-addressbook-search-fn)
    (persistent-action :initform
                       (lambda (candidate)
                         (let ((bmk (helm-bookmark-get-bookmark-from-name
