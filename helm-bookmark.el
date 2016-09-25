@@ -558,13 +558,11 @@ than `w3m-browse-url' use it."
          (bookmark      (helm-bookmark-get-bookmark-from-name
                          (car contacts)))
          (append   (message-buffers)))
-    (addressbook-set-mail-buffer-1 bookmark append)
+    (addressbook-set-mail-buffer-1 bookmark append cc)
     (helm-aif (cdr contacts)
-        (progn
-          (when cc (addressbook-set-mail-buffer-1 (car it) nil cc))
-          (cl-loop for bmk in (cdr it) do
-                   (addressbook-set-mail-buffer-1
-                    (helm-bookmark-get-bookmark-from-name bmk) 'append cc))))))
+        (cl-loop for bmk in it do
+                 (addressbook-set-mail-buffer-1
+                  (helm-bookmark-get-bookmark-from-name bmk) 'append cc)))))
 
 (defun helm-bookmark-addressbook-setup-alist ()
   "Specialized filter function for addressbook bookmarks."
