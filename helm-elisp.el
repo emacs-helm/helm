@@ -556,7 +556,6 @@ Filename completion happen if string start after or between a double quote."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-face))
     :persistent-help "Describe face"
-    :nomark t
     :action '(("Describe face" . helm-describe-face)
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
