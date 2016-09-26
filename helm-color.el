@@ -41,6 +41,11 @@
   (helm-build-in-buffer-source "Customize Face"
     :init 'helm-custom-faces-init
     :get-line 'buffer-substring
+    :persistent-action (lambda (candidate)
+                         (helm-elisp--persistent-help
+                          (intern (car (split-string candidate)))
+                          'helm-describe-face))
+    :persistent-help "Describe face"
     :action '(("Customize"
                . (lambda (line)
                    (customize-face (intern (car (split-string line))))))
