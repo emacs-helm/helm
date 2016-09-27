@@ -1836,7 +1836,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         ;; Prevent mouse jumping to the upper-right
         ;; hand corner of the frame (#1538).
         mouse-autoselect-window
-        mode-line-in-non-selected-windows
         focus-follows-mouse
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
