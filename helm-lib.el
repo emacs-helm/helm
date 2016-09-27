@@ -547,11 +547,13 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   (cl-letf (((symbol-function 'message) #'ignore))
     (describe-variable (helm-symbolify var))))
 
-(defun helm-describe-face (_face)
+(defun helm-describe-face (face)
   "FACE is symbol or string."
   (let ((faces (helm-marked-candidates)))
     (cl-letf (((symbol-function 'message) #'ignore))
-      (describe-face (mapcar 'helm-symbolify faces)))))
+      (describe-face (if (cdr faces)
+                         (mapcar 'helm-symbolify faces)
+                         (helm-symbolify face))))))
 
 (defun helm-find-function (func)
   "FUNC is symbol or string."
