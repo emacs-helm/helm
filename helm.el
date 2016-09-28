@@ -3507,6 +3507,9 @@ function."
   ;; is split, so jump to this position before executing action.
   (helm-current-position 'restore)
   (prog1 (helm-execute-selection-action-1)
+    (setq face-remapping-alist
+        (delete (assoc 'mode-line face-remapping-alist)
+                face-remapping-alist))
     (helm-log-run-hook 'helm-after-action-hook)))
 
 (defun helm-execute-selection-action-1 (&optional
