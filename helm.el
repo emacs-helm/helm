@@ -4860,7 +4860,8 @@ window to maintain visibility."
                           (cdr attr-val)))
            (cursor-in-echo-area t)
            mode-line-in-non-selected-windows
-           mode-line-cookie)
+           mode-line-cookie
+           buf-in-pa-window)
       (when source
         (with-helm-window
           (save-selected-window
@@ -4868,8 +4869,12 @@ window to maintain visibility."
                 (helm-select-persistent-action-window)
                 (helm-select-persistent-action-window
                  (or split-onewindow helm-onewindow-p)))
-            (setq mode-line-cookie
-                  (face-remap-add-relative 'mode-line 'mode-line-inactive))
+            (add-hook 'helm-goto-line-before-hook
+                      (lambda ()
+                        (setq mode-line-cookie
+                              (face-remap-add-relative
+                               'mode-line 'mode-line-inactive)
+                              buf-in-pa-window (current-buffer))))
             (helm-log "current-buffer = %S" (current-buffer))
             (let ((helm-in-persistent-action t)
                   (same-window-regexps '("."))
@@ -4877,7 +4882,9 @@ window to maintain visibility."
                   special-display-regexps special-display-buffer-names)
               (helm-execute-selection-action-1
                selection (or fn (helm-get-actions-from-current-source source)) t)
-              (face-remap-remove-relative mode-line-cookie)
+              (helm-aif buf-in-pa-window
+                  (with-current-buffer it
+                    (face-remap-remove-relative mode-line-cookie)))
               (helm-log-run-hook 'helm-after-persistent-action-hook))
             ;; A typical case is when a persistent action delete
             ;; the buffer already displayed in
