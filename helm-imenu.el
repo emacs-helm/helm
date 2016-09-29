@@ -150,7 +150,7 @@ only '((foo . bar)) is needed."
   ;; no need to highlight again.
   (unless (eq imenu-default-goto-function
               'semantic-imenu-goto-function)
-    (helm-highlight-current-line nil nil nil nil 'pulse)))
+    (helm-highlight-current-line)))
 
 (defun helm-imenu-persistent-action (candidate)
   "Default persistent action for `helm-source-imenu'."

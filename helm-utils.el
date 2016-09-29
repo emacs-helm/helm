@@ -266,10 +266,11 @@ Default is `helm-current-buffer'."
   "Goto LINENO opening only outline headline if needed.
 Animation is used unless NOANIM is non--nil."
   (helm-log-run-hook 'helm-goto-line-before-hook)
+  (helm-match-line-cleanup)
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
   (unless noanim
-    (helm-highlight-current-line nil nil nil nil 'pulse)))
+    (helm-highlight-current-line)))
 
 (defun helm-save-pos-to-register-before-jump ()
   "Save current buffer position to `helm-save-pos-before-jump-register'.
@@ -583,7 +584,7 @@ If STRING is non--nil return instead a space separated string."
 (defvar helm-match-line-overlay nil)
 (defvar helm--match-item-overlays nil)
 
-(defun helm-highlight-current-line (&optional start end buf face pulse)
+(defun helm-highlight-current-line (&optional start end buf face)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
@@ -626,10 +627,7 @@ If STRING is non--nil return instead a space separated string."
                                 helm--match-item-overlays)
                           (overlay-put ov 'face 'helm-match-item)
                           (overlay-put ov 'priority 1)))))))
-    (recenter)
-    (when pulse
-      (sit-for 0.3)
-      (helm-match-line-cleanup))))
+    (recenter)))
 
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay
@@ -651,6 +649,7 @@ If STRING is non--nil return instead a space separated string."
 
 (add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
+(add-hook 'helm-after-action-hook 'helm-match-line-cleanup)
 (add-hook 'helm-after-persistent-action-hook 'helm-match-line-update)
 
 ;;; Popup buffer-name or filename in grep/moccur/imenu-all.
