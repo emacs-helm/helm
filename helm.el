@@ -5354,7 +5354,9 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
                (helm-window)
                (helm-get-selection nil nil src))
       (helm-follow-mode-set-source 1 src)
-      (run-with-idle-timer at nil #'helm-execute-persistent-action))))
+      (run-with-idle-timer at nil (lambda ()
+                                    (when helm-alive-p
+                                      (helm-execute-persistent-action)))))))
 
 (defun helm-follow-mode-p (&optional source)
   (with-helm-buffer
