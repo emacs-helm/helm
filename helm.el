@@ -3558,6 +3558,10 @@ If action buffer is selected, back to the helm buffer."
             (cond ((get-buffer-window helm-action-buffer 'visible)
                    (set-window-buffer (get-buffer-window helm-action-buffer)
                                       helm-buffer)
+                   (when (and helm-show-action-window-same-window
+                              helm-always-two-windows
+                              (not helm-onewindow-p))
+                     (delete-window (helm-window)))
                    (kill-buffer helm-action-buffer)
                    (setq helm-saved-selection nil)
                    (helm-set-pattern helm-input 'noupdate))
@@ -3580,11 +3584,21 @@ If action buffer is selected, back to the helm buffer."
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
 
+(defcustom helm-show-action-window-same-window t
+  "Show action buffer beside `helm-buffer' when non-nil."
+  :group 'helm
+  :type 'boolean)
+
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
     (erase-buffer)
     (buffer-disable-undo)
-    (set-window-buffer (get-buffer-window helm-buffer) helm-action-buffer)
+    (set-window-buffer (if (and helm-show-action-window-same-window
+                                helm-always-two-windows
+                                (not helm-onewindow-p))
+                           (split-window (get-buffer-window helm-buffer) nil 'left)
+                           (get-buffer-window helm-buffer))
+                       helm-action-buffer)
     (set (make-local-variable 'helm-sources)
          (list
           (helm-build-sync-source "Actions"
