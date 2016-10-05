@@ -3576,7 +3576,7 @@ If action buffer is selected, back to the helm buffer."
                          (setq helm-pattern 'dummy)
                          (helm-check-minibuffer-input))))
                   (t (message "No Actions available")))
-          (helm-display-mode-line src)
+          (helm-display-mode-line (helm-get-current-source))
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
 
