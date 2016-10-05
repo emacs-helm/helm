@@ -3592,7 +3592,7 @@ If action buffer is selected, back to the helm buffer."
             :nomark t
             :keymap 'helm-map
             :candidates actions
-            :mode-line '("Action(s)" "TAB:BackToCands RET/f1/f2/fn:NthAct")
+            :mode-line '("Action(s)" "\\<helm-map>\\[helm-select-action]:BackToCands RET/f1/f2/fn:NthAct")
             :candidate-transformer
              (lambda (candidates)
                (cl-loop for (i . j) in candidates
