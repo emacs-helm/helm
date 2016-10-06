@@ -3555,31 +3555,29 @@ If action buffer is selected, back to the helm buffer."
       (setq helm-saved-selection (helm-get-selection nil nil src))
       (with-selected-frame (with-helm-window (selected-frame))
         (prog1
-            (cond ((get-buffer-window helm-action-buffer 'visible)
-                   (set-window-buffer (get-buffer-window helm-action-buffer)
-                                      helm-buffer)
-                   (when (and helm-show-action-window-same-window
-                              helm-always-two-windows
-                              (not helm-onewindow-p))
-                     (delete-window (helm-window)))
-                   (kill-buffer helm-action-buffer)
-                   (setq helm-saved-selection nil)
-                   (helm-set-pattern helm-input 'noupdate))
-                  (helm-saved-selection
-                   (setq helm-saved-current-source src)
-                   (let ((actions (helm-get-actions-from-current-source src)))
-                     (if (functionp actions)
-                         (message "Sole action: %s"
-                                  (if (or (consp actions)
-                                          (byte-code-function-p actions))
-                                      "Anonymous" actions))
-                         (helm-show-action-buffer actions)
-                         ;; Be sure the minibuffer is entirely deleted (#907).
-                         (helm--delete-minibuffer-contents-from "")
-                         ;; Make `helm-pattern' differs from the previous value.
-                         (setq helm-pattern 'dummy)
-                         (helm-check-minibuffer-input))))
-                  (t (message "No Actions available")))
+            (helm-acond ((get-buffer-window helm-action-buffer 'visible)
+                         (set-window-buffer (get-buffer-window helm-action-buffer)
+                                            helm-buffer)
+                         (when (and helm-show-action-window-same-window
+                                    helm-always-two-windows
+                                    (not helm-onewindow-p))
+                           (delete-window it))
+                         (kill-buffer helm-action-buffer)
+                         (setq helm-saved-selection nil)
+                         (helm-set-pattern helm-input 'noupdate))
+                        (helm-saved-selection
+                         (setq helm-saved-current-source src)
+                         (let ((actions (helm-get-actions-from-current-source src)))
+                           (if (functionp actions)
+                               (message "Sole action: %s"
+                                        (if (or (consp actions)
+                                                (byte-code-function-p actions))
+                                            "Anonymous" actions))
+                               (helm-show-action-buffer actions)
+                               ;; Be sure the minibuffer is entirely deleted (#907).
+                               (helm--delete-minibuffer-contents-from "")
+                               (helm-check-minibuffer-input))))
+                        (t (message "No Actions available")))
           (helm-display-mode-line (helm-get-current-source))
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
@@ -3596,7 +3594,7 @@ If action buffer is selected, back to the helm buffer."
     (set-window-buffer (if (and helm-show-action-window-same-window
                                 helm-always-two-windows
                                 (not helm-onewindow-p))
-                           (split-window (get-buffer-window helm-buffer) nil 'left)
+                           (split-window (get-buffer-window helm-buffer) nil 'right)
                            (get-buffer-window helm-buffer))
                        helm-action-buffer)
     (set (make-local-variable 'helm-sources)
