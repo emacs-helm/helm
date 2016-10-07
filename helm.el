@@ -3594,7 +3594,7 @@ If action buffer is selected, back to the helm buffer."
     (set-window-buffer (if (and helm-show-action-window-same-window
                                 helm-always-two-windows
                                 (not helm-onewindow-p))
-                           (split-window (get-buffer-window helm-buffer) nil 'right)
+                           (split-window (get-buffer-window helm-buffer) nil 'left)
                            (get-buffer-window helm-buffer))
                        helm-action-buffer)
     (set (make-local-variable 'helm-sources)
@@ -3696,8 +3696,9 @@ mode and header lines."
                                   (propertize (format " [prefarg:%s]" arg)
                                               'face 'helm-prefarg)))))
                      " "
-                     (:eval (helm-show-candidate-number
-                             (car-safe helm-mode-line-string)))
+                     (:eval (with-helm-buffer
+                              (helm-show-candidate-number
+                               (car-safe helm-mode-line-string))))
                      " " helm--mode-line-string-real " "
                      (:eval (make-string (window-width) ? )))
                 keymap (keymap (mode-line keymap
@@ -3721,9 +3722,9 @@ mode and header lines."
            (helm--set-header-line))
           (helm-display-header-line
            (let ((hlstr (helm-interpret-value
-                          (and (listp source)
-                               (assoc-default 'header-line source))
-                          source))
+                         (and (listp source)
+                              (assoc-default 'header-line source))
+                         source))
                  (endstr (make-string (window-width) ? )))
              (setq header-line-format
                    (propertize (concat " " hlstr endstr)
