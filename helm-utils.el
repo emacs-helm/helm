@@ -648,7 +648,7 @@ If STRING is non--nil return instead a space separated string."
     (set-window-text-height (helm-window) helm-resize-on-pa-text-height)))
 
 (defun helm-match-line-cleanup-pulse ()
-  (run-with-idle-timer 0.3 nil #'helm-match-line-cleanup))
+  (run-with-timer 0.3 nil #'helm-match-line-cleanup))
 
 (add-hook 'helm-after-persistent-action-hook 'helm-persistent-autoresize-hook)
 (add-hook 'helm-cleanup-hook 'helm-match-line-cleanup)
