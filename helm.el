@@ -3550,7 +3550,8 @@ Coerce source with coerce function."
 If action buffer is selected, back to the helm buffer."
   (interactive)
   (with-helm-alive-p
-    (let ((src (helm-get-current-source)))
+    (let ((src (helm-get-current-source))
+          helm-full-frame)
       (helm-log-run-hook 'helm-select-action-hook)
       (setq helm-saved-selection (helm-get-selection nil nil src))
       (with-selected-frame (with-helm-window (selected-frame))
@@ -3559,15 +3560,15 @@ If action buffer is selected, back to the helm buffer."
                          (set-window-buffer (get-buffer-window helm-action-buffer)
                                             helm-buffer)
                          (when (and helm-show-action-window-same-window
-                                    helm-always-two-windows
-                                    (not helm-onewindow-p))
+                                    helm-always-two-windows)
                            (delete-window it))
                          (kill-buffer helm-action-buffer)
                          (setq helm-saved-selection nil)
                          (helm-set-pattern helm-input 'noupdate))
                         (helm-saved-selection
                          (setq helm-saved-current-source src)
-                         (let ((actions (helm-get-actions-from-current-source src)))
+                         (let ((actions (helm-get-actions-from-current-source src))
+                               helm-onewindow-p)
                            (if (functionp actions)
                                (message "Sole action: %s"
                                         (if (or (consp actions)
@@ -3592,9 +3593,8 @@ If action buffer is selected, back to the helm buffer."
     (erase-buffer)
     (buffer-disable-undo)
     (set-window-buffer (if (and helm-show-action-window-same-window
-                                helm-always-two-windows
-                                (not helm-onewindow-p))
-                           (split-window (get-buffer-window helm-buffer) nil 'left)
+                                helm-always-two-windows)
+                           (split-window (get-buffer-window helm-buffer) nil 'right)
                            (get-buffer-window helm-buffer))
                        helm-action-buffer)
     (set (make-local-variable 'helm-sources)
