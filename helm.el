@@ -3550,8 +3550,7 @@ Coerce source with coerce function."
 If action buffer is selected, back to the helm buffer."
   (interactive)
   (with-helm-alive-p
-    (let ((src (helm-get-current-source))
-          helm-full-frame)
+    (let ((src (helm-get-current-source)))
       (helm-log-run-hook 'helm-select-action-hook)
       (setq helm-saved-selection (helm-get-selection nil nil src))
       (with-selected-frame (with-helm-window (selected-frame))
