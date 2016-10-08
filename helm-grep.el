@@ -427,11 +427,14 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (pipes
           (helm-aif (cdr patterns)
               (cl-loop with pipcom = (pcase (helm-grep-command)
+                                       ;; Use grep for GNU regexp based tools.
                                        ((or "grep" "zgrep" "git-grep")
-                                         "grep --color=always")
+                                        (format "grep --color=always %s"
+                                                (if smartcase "-i" "")))
+                                       ;; Use ack-grep for PCRE based tools.
                                        ;; Sometimes ack-grep cmd is ack only.
                                        ((and (pred (string-match-p "ack")) ack)
-                                         (format "%s --color" ack)))
+                                        (format "%s --smart-case --color" ack)))
                        for p in it concat
                        (format " | %s %s" pipcom (shell-quote-argument p)))
             "")))
