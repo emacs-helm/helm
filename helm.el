@@ -3558,6 +3558,7 @@ If action buffer is selected, back to the helm buffer."
             (helm-acond ((get-buffer-window helm-action-buffer 'visible)
                          (set-window-buffer (get-buffer-window helm-action-buffer)
                                             helm-buffer)
+                         (helm--action-prompt 'restore)
                          (when (and helm-show-action-window-same-window
                                     helm-always-two-windows)
                            (delete-window it))
@@ -3576,11 +3577,20 @@ If action buffer is selected, back to the helm buffer."
                                (helm-show-action-buffer actions)
                                ;; Be sure the minibuffer is entirely deleted (#907).
                                (helm--delete-minibuffer-contents-from "")
+                               (helm--action-prompt)
                                (helm-check-minibuffer-input))))
                         (t (message "No Actions available")))
           (helm-display-mode-line (helm-get-current-source))
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
+
+(defun helm--action-prompt (&optional restore)
+  (with-selected-window (minibuffer-window)
+    (let ((inhibit-read-only t))
+      (if restore
+          (remove-text-properties (point-min) (point-max) '(display))
+          (add-text-properties (point-min) (point-max)
+                               '(display "Select action: "))))))
 
 (defcustom helm-show-action-window-same-window t
   "Show action buffer beside `helm-buffer' when non-nil."
