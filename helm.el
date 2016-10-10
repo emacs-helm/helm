@@ -605,6 +605,12 @@ See `helm-log-save-maybe' for more info."
   :type 'string
   :group 'helm)
 
+(defcustom helm-show-action-window-same-window nil
+  "Show action buffer beside `helm-buffer' when non-nil.
+Note that this may not fit well with some helm window configurations,
+so it have only effect when `helm-always-two-windows' is non-nil."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -3591,11 +3597,6 @@ If action buffer is selected, back to the helm buffer."
           (remove-text-properties (point-min) (point-max) '(display))
           (add-text-properties (point-min) (point-max)
                                '(display "Select action: "))))))
-
-(defcustom helm-show-action-window-same-window t
-  "Show action buffer beside `helm-buffer' when non-nil."
-  :group 'helm
-  :type 'boolean)
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
