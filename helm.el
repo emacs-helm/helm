@@ -605,7 +605,7 @@ See `helm-log-save-maybe' for more info."
   :type 'string
   :group 'helm)
 
-(defcustom helm-show-action-window-same-window nil
+(defcustom helm-show-action-window-other-window nil
   "Show action buffer beside `helm-buffer' when non-nil.
 Note that this may not fit well with some helm window configurations,
 so it have only effect when `helm-always-two-windows' is non-nil."
@@ -3565,7 +3565,7 @@ If action buffer is selected, back to the helm buffer."
                          (set-window-buffer (get-buffer-window helm-action-buffer)
                                             helm-buffer)
                          (helm--action-prompt 'restore)
-                         (when (and helm-show-action-window-same-window
+                         (when (and helm-show-action-window-other-window
                                     helm-always-two-windows)
                            (delete-window it))
                          (kill-buffer helm-action-buffer)
@@ -3602,7 +3602,7 @@ If action buffer is selected, back to the helm buffer."
   (with-current-buffer (get-buffer-create helm-action-buffer)
     (erase-buffer)
     (buffer-disable-undo)
-    (set-window-buffer (if (and helm-show-action-window-same-window
+    (set-window-buffer (if (and helm-show-action-window-other-window
                                 helm-always-two-windows)
                            (split-window (get-buffer-window helm-buffer) nil 'right)
                            (get-buffer-window helm-buffer))
