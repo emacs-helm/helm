@@ -113,7 +113,7 @@ This affect also sorting functions in the same way."
     (cancel-timer helm-top--poll-timer))
   (condition-case nil
       (progn
-        (when (and (helm-alive-p) (null no-update))
+        (when (and (helm-alive-p) (not (helm-action-window)) (null no-update))
           ;; Fix quitting while process is running
           ;; by binding `with-local-quit' in init function
           ;; Issue #1521.
@@ -421,7 +421,8 @@ Show actions only on line starting by a PID."
          (helm :sources 'helm-source-top
                :buffer "*helm top*" :full-frame t
                :candidate-number-limit 9999
-               :preselect "^\\s-*[0-9]+")
+               :preselect "^\\s-*[0-9]+"
+               :truncate-lines helm-show-action-window-same-window)
       (remove-hook 'helm-after-update-hook 'helm-top--skip-top-line))))
 
 ;;;###autoload
