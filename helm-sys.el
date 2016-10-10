@@ -422,7 +422,7 @@ Show actions only on line starting by a PID."
                :buffer "*helm top*" :full-frame t
                :candidate-number-limit 9999
                :preselect "^\\s-*[0-9]+"
-               :truncate-lines helm-show-action-window-same-window)
+               :truncate-lines helm-show-action-window-other-window)
       (remove-hook 'helm-after-update-hook 'helm-top--skip-top-line))))
 
 ;;;###autoload
