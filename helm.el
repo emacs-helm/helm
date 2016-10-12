@@ -1029,6 +1029,7 @@ You should not modify this yourself unless you know what you are doing.")
   "Flag to prevent helm popping up errors in candidates functions.
 Should be set in candidates functions if needed, will be restored
 at end of session.")
+(defvar helm--action-prompt "Select action: ")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -3564,7 +3565,7 @@ If action buffer is selected, back to the helm buffer."
             (helm-acond ((get-buffer-window helm-action-buffer 'visible)
                          (set-window-buffer (get-buffer-window helm-action-buffer)
                                             helm-buffer)
-                         (helm--action-prompt 'restore)
+                         (helm--set-action-prompt 'restore)
                          (when (and helm-show-action-window-other-window
                                     helm-always-two-windows)
                            (delete-window it))
@@ -3583,20 +3584,24 @@ If action buffer is selected, back to the helm buffer."
                                (helm-show-action-buffer actions)
                                ;; Be sure the minibuffer is entirely deleted (#907).
                                (helm--delete-minibuffer-contents-from "")
-                               (helm--action-prompt)
+                               (helm--set-action-prompt)
                                (helm-check-minibuffer-input))))
                         (t (message "No Actions available")))
           (helm-display-mode-line (helm-get-current-source))
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
 
-(defun helm--action-prompt (&optional restore)
+(defun helm--set-action-prompt (&optional restore)
   (with-selected-window (minibuffer-window)
-    (let ((inhibit-read-only t))
-      (if restore
-          (remove-text-properties (point-min) (point-max) '(display))
-          (add-text-properties (point-min) (point-max)
-                               '(display "Select action: "))))))
+    (let ((inhibit-read-only t)
+          (props '(face minibuffer-prompt
+                   field t
+                   read-only t
+                   rear-nonsticky t
+                   front-sticky t))
+          (prt (if restore helm--prompt helm--action-prompt)))
+      (erase-buffer)
+      (insert (apply #'propertize prt props)))))
 
 (defun helm-show-action-buffer (actions)
   (with-current-buffer (get-buffer-create helm-action-buffer)
@@ -3749,7 +3754,9 @@ mode and header lines."
            (cont (buffer-substring beg end))
            (pref (propertize
                   " "
-                  'display (if (string-match-p (regexp-quote helm--prompt) cont)
+                  'display (if (string-match-p (regexp-opt `(,helm--prompt
+                                                             ,helm--action-prompt))
+                                               cont)
                                '(space :width left-fringe)
                                (propertize
                                 "->"
