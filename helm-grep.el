@@ -1270,12 +1270,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 Takes three format specs, the first for type(s), the second for pattern
 and the third for directory.
-Note that if you use ripgrep (rg) as backend, you have to prefix the first
-format spec with \"-t\", e.g \"-t%s\", see below.
 
 Here the command line to use with ripgrep:
 
-    rg --color always --smart-case --no-heading --line-number -t%s %s %s
+    rg --color always --smart-case --no-heading --line-number %s %s %s
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1297,15 +1295,17 @@ See AG option \"--list-file-types\"
 Ripgrep (rg) types are also supported if this backend is used."
   (with-temp-buffer
     (let* ((com (helm-grep--ag-command))
-           (regex (if (string= com "rg")
-                      "^\\(.*\\):" "^ *\\(--[a-z]*\\)")))
+           (ripgrep (string= com "rg"))
+           (regex (if ripgrep "^\\(.*\\):" "^ *\\(--[a-z]*\\)"))
+           (prefix (if ripgrep "-t" "")))
       (when (equal (call-process com
                                  nil t nil
-                                 (if (string= com "rg")
+                                 (if ripgrep
                                      "--type-list" "--list-file-types")) 0)
         (goto-char (point-min))
         (cl-loop while (re-search-forward regex nil t)
-                 collect (match-string 1))))))
+                 for type = (match-string 1)
+                 collect (cons type (concat prefix type)))))))
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory &optional type)
   "Prepare AG command line to search PATTERN in DIRECTORY.
