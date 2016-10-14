@@ -1266,9 +1266,16 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --color --nogroup %s %s %s"
-  "The default command for AG or PT.
+  "The default command for AG, PT or RG.
+
 Takes three format specs, the first for type(s), the second for pattern
 and the third for directory.
+Note that if you use ripgrep (rg) as backend, you have to prefix the first
+format spec with \"-t\", e.g \"-t%s\", see below.
+
+Here the command line to use with ripgrep:
+
+    rg --color always --smart-case --no-heading --line-number -t%s %s %s
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1286,13 +1293,19 @@ You can use safely \"--color\" (default)."
 
 (defun helm-grep-ag-get-types ()
   "Returns a list of AG types if available with AG version.
-See AG option \"--list-file-types\"."
+See AG option \"--list-file-types\"
+Ripgrep (rg) types are also supported if this backend is used."
   (with-temp-buffer
-    (when (equal (call-process (helm-grep--ag-command)
-                               nil t nil "--list-file-types") 0)
-      (goto-char (point-min))
-      (cl-loop while (re-search-forward "^ *\\(--[a-z]*\\)" nil t)
-               collect (match-string 1)))))
+    (let* ((com (helm-grep--ag-command))
+           (regex (if (string= com "rg")
+                      "^\\(.*\\):" "^ *\\(--[a-z]*\\)")))
+      (when (equal (call-process com
+                                 nil t nil
+                                 (if (string= com "rg")
+                                     "--type-list" "--list-file-types")) 0)
+        (goto-char (point-min))
+        (cl-loop while (re-search-forward regex nil t)
+                 collect (match-string 1))))))
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory &optional type)
   "Prepare AG command line to search PATTERN in DIRECTORY.
