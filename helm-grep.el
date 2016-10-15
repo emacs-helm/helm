@@ -1259,10 +1259,11 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      (format-spec helm-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
 
-;;; AG - PT
+;;; AG - PT - RG
 ;;
 ;;  https://github.com/ggreer/the_silver_searcher
 ;;  https://github.com/monochromegane/the_platinum_searcher
+;;  https://github.com/BurntSushi/ripgrep
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --color --nogroup %s %s %s"
@@ -1273,7 +1274,7 @@ and the third for directory.
 
 Here the command line to use with ripgrep:
 
-    rg --color always --smart-case --no-heading --line-number %s %s %s
+    rg --smart-case --no-heading --line-number %s %s %s
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1281,8 +1282,10 @@ You must use an output format that fit with helm grep, that is:
 
 The option \"--nogroup\" allow this.
 The option \"--line-numbers\" is also mandatory except with PT (not supported).
+For RG the options \"--no-heading\" and \"--line-number\" are the ones to use.
 
-You can use safely \"--color\" (default)."
+You can use safely \"--color\" (default)
+except for RG (\"--color\" option not working actually in emacs)."
   :group 'helm-grep
   :type 'string)
 
