@@ -1259,16 +1259,22 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
      (format-spec helm-pdfgrep-default-read-command
                   (list (cons ?f fname) (cons ?p pageno))))))
 
-;;; AG - PT
+;;; AG - PT - RG
 ;;
 ;;  https://github.com/ggreer/the_silver_searcher
 ;;  https://github.com/monochromegane/the_platinum_searcher
+;;  https://github.com/BurntSushi/ripgrep
 
 (defcustom helm-grep-ag-command
   "ag --line-numbers -S --hidden --color --nogroup %s %s %s"
-  "The default command for AG or PT.
+  "The default command for AG, PT or RG.
+
 Takes three format specs, the first for type(s), the second for pattern
 and the third for directory.
+
+Here the command line to use with ripgrep:
+
+    rg --smart-case --no-heading --line-number %s %s %s
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1276,8 +1282,10 @@ You must use an output format that fit with helm grep, that is:
 
 The option \"--nogroup\" allow this.
 The option \"--line-numbers\" is also mandatory except with PT (not supported).
+For RG the options \"--no-heading\" and \"--line-number\" are the ones to use.
 
-You can use safely \"--color\" (default)."
+You can use safely \"--color\" (default)
+except for RG (\"--color\" option not working actually in emacs)."
   :group 'helm-grep
   :type 'string)
 
@@ -1286,13 +1294,21 @@ You can use safely \"--color\" (default)."
 
 (defun helm-grep-ag-get-types ()
   "Returns a list of AG types if available with AG version.
-See AG option \"--list-file-types\"."
+See AG option \"--list-file-types\"
+Ripgrep (rg) types are also supported if this backend is used."
   (with-temp-buffer
-    (when (equal (call-process (helm-grep--ag-command)
-                               nil t nil "--list-file-types") 0)
-      (goto-char (point-min))
-      (cl-loop while (re-search-forward "^ *\\(--[a-z]*\\)" nil t)
-               collect (match-string 1)))))
+    (let* ((com (helm-grep--ag-command))
+           (ripgrep (string= com "rg"))
+           (regex (if ripgrep "^\\(.*\\):" "^ *\\(--[a-z]*\\)"))
+           (prefix (if ripgrep "-t" "")))
+      (when (equal (call-process com
+                                 nil t nil
+                                 (if ripgrep
+                                     "--type-list" "--list-file-types")) 0)
+        (goto-char (point-min))
+        (cl-loop while (re-search-forward regex nil t)
+                 for type = (match-string 1)
+                 collect (cons type (concat prefix type)))))))
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory &optional type)
   "Prepare AG command line to search PATTERN in DIRECTORY.
