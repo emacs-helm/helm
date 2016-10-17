@@ -267,6 +267,7 @@ Default is `helm-current-buffer'."
 Animation is used unless NOANIM is non--nil."
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (helm-match-line-cleanup)
+  (unless helm-yank-point (setq helm-yank-point (point)))
   (goto-char (point-min))
   (helm-goto-char (point-at-bol lineno))
   (unless noanim
