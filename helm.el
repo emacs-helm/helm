@@ -2287,6 +2287,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
         helm-saved-action nil
         helm-saved-selection nil
         helm-suspend-update-flag nil
+        ;; Ensure this is called BEFORE selecting helm-window.
         helm-current-buffer (helm--current-buffer)
         helm-buffer-file-name buffer-file-name
         helm-issued-errors nil
