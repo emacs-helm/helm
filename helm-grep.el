@@ -254,7 +254,6 @@ Possible value are:
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
     (define-key map (kbd "C-c o")    'helm-grep-run-other-window-action)
     (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
-    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (when helm-grep-use-ioccur-style-keys
       (define-key map (kbd "<right>")  'helm-execute-persistent-action)
@@ -267,7 +266,6 @@ Possible value are:
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
-    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     map)
   "Keymap used in pdfgrep.")
 

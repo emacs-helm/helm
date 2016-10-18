@@ -803,23 +803,40 @@ That is what completion commands operate on."
 ;; Yank text at point.
 ;;
 ;;
-(defun helm-yank-text-at-point ()
+(defun helm-yank-text-at-point (arg)
   "Yank text at point in `helm-current-buffer' into minibuffer."
-  (interactive)
+  (interactive "p")
   (with-helm-current-buffer
-    (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word)))
+    (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word))
+          diff)
       ;; Start to initial point if C-w have never been hit.
       (unless helm-yank-point (setq helm-yank-point (point)))
       (save-excursion
         (goto-char helm-yank-point)
-        (funcall fwd-fn 1)
         (helm-set-pattern
-         (concat
-          helm-pattern (replace-regexp-in-string
-                        "\\`\n" ""
-                        (buffer-substring-no-properties
-                         helm-yank-point (point)))))
-        (setq helm-yank-point (point))))))
+         (if (< arg 0)
+             (with-temp-buffer
+               (insert helm-pattern)
+               (let ((end (point-max)))
+                 (goto-char end)
+                 (funcall fwd-fn -1)
+                 (setq diff (- end (point)))
+                 (delete-region (point) end)
+                 (buffer-string)))
+             (funcall fwd-fn arg)
+             (concat
+              helm-pattern (replace-regexp-in-string
+                            "\\`\n" ""
+                            (buffer-substring-no-properties
+                             helm-yank-point (point))))))
+        (setq helm-yank-point (if diff (- (point) diff) (point)))))))
+(put 'helm-yank-text-at-point 'helm-only t)
+
+(defun helm-undo-yank-text-at-point ()
+  "Undo last entry added by `helm-yank-text-at-point'."
+  (interactive)
+  (helm-yank-text-at-point -1))
+(put 'helm-undo-yank-text-at-point 'helm-only t)
 
 (defun helm-reset-yank-point ()
   (setq helm-yank-point nil))

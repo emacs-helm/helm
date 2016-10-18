@@ -208,7 +208,6 @@ NOTE: SUBKEY and OTHER-SUBKEYS bindings support char syntax only
     (define-key map (kbd "M-m")        'helm-toggle-all-marks)
     (define-key map (kbd "M-a")        'helm-mark-all)
     (define-key map (kbd "M-U")        'helm-unmark-all)
-    (define-key map (kbd "C-w")        'helm-yank-text-at-point)
     (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
     (define-key map (kbd "C-M-e")      'helm-display-all-sources)
     (define-key map (kbd "C-r")        'undefined)
@@ -239,6 +238,9 @@ NOTE: SUBKEY and OTHER-SUBKEYS bindings support char syntax only
     (define-key map [f1] nil)
     (define-key map (kbd "C-h C-h")    'undefined)
     (define-key map (kbd "C-h h")      'undefined)
+    (helm-define-key-with-subkeys map
+      (kbd "C-w") ?\C-w 'helm-yank-text-at-point
+      '((?\C-_ . helm-undo-yank-text-at-point)))
     ;; Use `describe-mode' key in `global-map'.
     (cl-dolist (k (where-is-internal 'describe-mode global-map))
       (define-key map k 'helm-help))

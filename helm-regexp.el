@@ -82,7 +82,6 @@ Any other non--nil value update after confirmation."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-goto-next-file)
     (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
-    (define-key map (kbd "C-w")      'helm-yank-text-at-point)
     (define-key map (kbd "C-c o")    'helm-moccur-run-goto-line-ow)
     (define-key map (kbd "C-c C-o")  'helm-moccur-run-goto-line-of)
     (define-key map (kbd "C-x C-s")  'helm-moccur-run-save-buffer)
