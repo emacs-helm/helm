@@ -206,6 +206,34 @@ Possible value are:
   :group 'helm-grep
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-grep-pipe-cmd-switches nil
+  "A list of additional parameters to pass to grep pipe command.
+This will be used for pipe command for multiple pattern matching
+for grep, zgrep ack-grep and git-grep backends.
+If you add extra args for ack-grep, use ack-grep options,
+for others (grep, zgrep and git-grep) use grep options.
+Here are the commands where you may want to add switches:
+
+    grep --color=always
+    ack-grep --smart-case --color
+
+You probably don't need to use this unless you know what you are doing."
+  :group 'helm-grep
+  :type 'string)
+
+(defcustom helm-grep-ag-pipe-cmd-switches nil
+  "A list of additional parameters to pass to grep-ag pipe command.
+You can use either grep or ack-grep backend, give options according
+to which backend you use.
+Here are the commands where you may want to add switches:
+
+    grep --perl-regexp --color=always
+    ack-grep --smart-case --color
+
+You probably don't need to use this unless you know what you are doing."
+  :group 'helm-grep
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -424,19 +452,19 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (helm-grep-default-command
           (concat helm-grep-default-command " %m")) ; `%m' like multi.
          (patterns (split-string helm-pattern))
+         (pipe-switches (mapconcat 'identity helm-grep-pipe-cmd-switches " "))
          (pipes
           (helm-aif (cdr patterns)
               (cl-loop with pipcom = (pcase (helm-grep-command)
                                        ;; Use grep for GNU regexp based tools.
                                        ((or "grep" "zgrep" "git-grep")
-                                        (replace-regexp-in-string
-                                         "\\s-\\'" ""
-                                         (format "grep --color=always %s"
-                                                 (if smartcase "-i" ""))))
+                                        (format "grep --color=always%s %s"
+                                                 (if smartcase " -i" "")
+                                                 pipe-switches))
                                        ;; Use ack-grep for PCRE based tools.
                                        ;; Sometimes ack-grep cmd is ack only.
                                        ((and (pred (string-match-p "ack")) ack)
-                                        (format "%s --smart-case --color" ack)))
+                                        (format "%s --smart-case --color %s" ack pipe-switches)))
                        for p in it concat
                        (format " | %s %s" pipcom (shell-quote-argument p)))
             "")))
@@ -1326,11 +1354,17 @@ if available with current AG version."
          (smartcase (let ((case-fold-search nil))
                       (string-match-p
                        "[[:upper:]]" helm-pattern)))
-         (pipe-cmd (cond ((executable-find "ack") "ack --smart-case --color")
-                         ((executable-find "ack-grep") "ack-grep --smart-case --color")
-                         (t (replace-regexp-in-string
-                             "\\s-\\'" "" (format "grep --perl-regexp --color=always %s"
-                                                  (if smartcase "-i" ""))))))
+         (pipe-switches (mapconcat 'identity helm-grep-ag-pipe-cmd-switches " "))
+         (pipe-cmd (helm-acond ((or (executable-find "ack")
+                                    (executable-find "ack-grep"))
+                                (replace-regexp-in-string
+                                 "\\s-\\'" ""
+                                 (format "%s --smart-case --color %s"
+                                         (helm-basename it)
+                                         pipe-switches)))
+                                (t (format "grep --perl-regexp --color=always%s %s"
+                                           (if smartcase " -i" "")
+                                           pipe-switches))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
                       (shell-quote-argument (car patterns))
