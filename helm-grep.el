@@ -1351,20 +1351,12 @@ Ripgrep (rg) types are also supported if this backend is used."
 When TYPE is specified it is one of what returns `helm-grep-ag-get-types'
 if available with current AG version."
   (let* ((patterns (split-string pattern))
-         (smartcase (let ((case-fold-search nil))
-                      (string-match-p
-                       "[[:upper:]]" helm-pattern)))
          (pipe-switches (mapconcat 'identity helm-grep-ag-pipe-cmd-switches " "))
-         (pipe-cmd (helm-acond ((or (executable-find "ack")
-                                    (executable-find "ack-grep"))
-                                (replace-regexp-in-string
-                                 "\\s-\\'" ""
-                                 (format "%s --smart-case --color %s"
-                                         (helm-basename it)
-                                         pipe-switches)))
-                                (t (format "grep --perl-regexp --color=always%s %s"
-                                           (if smartcase " -i" "")
-                                           pipe-switches))))
+         (pipe-cmd (pcase (helm-grep--ag-command)
+                     ((and com (or "ag" "pt"))
+                      (format "%s -S --color%s" com (concat " " pipe-switches)))
+                     (`"rg" (format "TERM=eterm-color rg -S --color=always%s"
+                                    (concat " " pipe-switches)))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
                       (shell-quote-argument (car patterns))
