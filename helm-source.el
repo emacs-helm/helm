@@ -255,11 +255,11 @@
     "  A transformer function that treat candidates one by one.
   It is called with one arg the candidate.
   It is faster than `filtered-candidate-transformer' or
-  `candidates-transformer', but should be used only in sources
+  `candidate-transformer', but should be used only in sources
   that recompute constantly their candidates, e.g `helm-source-find-files'.
   Filtering happen early and candidates are treated
   one by one instead of re-looping on the whole list.
-  If used with `filtered-candidate-transformer' or `candidates-transformer'
+  If used with `filtered-candidate-transformer' or `candidate-transformer'
   these functions should treat the candidates transformed by the
   `filter-one-by-one' function in consequence.")
 
