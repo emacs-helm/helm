@@ -223,12 +223,8 @@ You probably don't need to use this unless you know what you are doing."
 
 (defcustom helm-grep-ag-pipe-cmd-switches nil
   "A list of additional parameters to pass to grep-ag pipe command.
-You can use either grep or ack-grep backend, give options according
-to which backend you use.
-Here are the commands where you may want to add switches:
-
-    grep --perl-regexp --color=always
-    ack-grep --smart-case --color
+Use parameters compatibles with the backend you are using
+\(i.e AG for AG, PT for PT or RG for RG)
 
 You probably don't need to use this unless you know what you are doing."
   :group 'helm-grep
