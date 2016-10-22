@@ -63,21 +63,16 @@ when these options are used."
 ;;; Build regexps
 ;;
 ;;
-(defvar helm-mm-space-regexp "[\\ ] "
+(defconst helm-mm-space-regexp "\\s\\\\s-"
   "Regexp to represent space itself in multiple regexp match.")
 
 (defun helm-mm-split-pattern (pattern)
   "Split PATTERN if it contain spaces and return resulting list.
 If spaces in PATTERN are escaped, don't split at this place.
-i.e \"foo bar\"=> (\"foo\" \"bar\")
-but \"foo\ bar\"=> (\"foobar\")."
-  (if (string= pattern "")
-      '("")
-    (cl-loop for s in (split-string
-                       (replace-regexp-in-string helm-mm-space-regexp
-                                                 "\000\000" pattern)
-                       " " t)
-          collect (replace-regexp-in-string "\000\000" " " s))))
+i.e \"foo bar baz\"=> (\"foo\" \"bar\" \"baz\")
+but \"foo\\ bar baz\"=> (\"foo\\s-bar\" \"baz\")."
+  (split-string
+   (replace-regexp-in-string helm-mm-space-regexp "\\\\s-" pattern)))
 
 (defun helm-mm-1-make-regexp (pattern)
   "Replace spaces in PATTERN with \"\.*\"."
