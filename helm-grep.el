@@ -1413,6 +1413,7 @@ if available with current AG version."
 
 (defclass helm-grep-ag-class (helm-source-async)
   ((nohighlight :initform t)
+   (pcre :initform t)
    (keymap :initform helm-grep-map)
    (help-message :initform 'helm-grep-help-message)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
