@@ -612,7 +612,9 @@ If STRING is non--nil return instead a space separated string."
     (catch 'empty-line
       (cl-loop with ov
                for r in (helm-remove-if-match
-                         "\\`!" (split-string helm-input))
+                         "\\`!" (split-string
+                                 ;; Needed for highlighting AG matches.
+                                 (helm--translate-pcre-to-elisp helm-input)))
                do (save-excursion
                     (goto-char start-match)
                     (while (condition-case _err
@@ -629,6 +631,23 @@ If STRING is non--nil return instead a space separated string."
                           (overlay-put ov 'face 'helm-match-item)
                           (overlay-put ov 'priority 1)))))))
     (recenter)))
+
+(defun helm--translate-pcre-to-elisp (regexp)
+  "Should translate pcre REGEXP to elisp regexp.
+Return elisp regexp unchanged if REGEXP is an elisp regexp."
+  (with-temp-buffer
+    (insert " " regexp " ")
+    (goto-char (point-min))
+    (save-excursion
+      ;; match (){}| unquoted
+      (helm-awhile (and (re-search-forward "\\S\\\\([(){}|]\\)" nil t)
+                        (match-string 1))
+        (replace-match (concat "\\" it) t t nil 1)))
+    ;; match \s or \S
+    (helm-awhile (and (re-search-forward "\\S\\?\\(\\s\\[sS]\\)[^-]" nil t)
+                      (match-string 1))
+      (replace-match (concat it "-") t t nil 1))
+    (buffer-substring (1+ (point-min)) (1- (point-max)))))
 
 (defun helm-match-line-cleanup ()
   (when helm-match-line-overlay
