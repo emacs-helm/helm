@@ -928,6 +928,9 @@ These extensions will be added to command line with --include arg of grep."
   ((candidates-process :initform 'helm-grep-collect-candidates)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
    (keymap :initform helm-grep-map)
+   (pcre :initarg :pcre :initform nil
+         :documentation
+         "  Backend is using pcre regexp engine when non--nil.")
    (nohighlight :initform t)
    (nomark :initform t)
    (backend :initarg :backend
@@ -984,10 +987,11 @@ in recurse, and ignore EXTS, search being made recursively on files matching
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
   (let* (non-essential
+         (ack-rec-p (helm-grep-use-ack-p :where 'recursive))
          (exts (and recurse
                     ;; [FIXME] I could handle this from helm-walk-directory.
                     (not (eq backend 'zgrep)) ; zgrep doesn't handle -r opt.
-                    (not (helm-grep-use-ack-p :where 'recursive))
+                    (not ack-rec-p)
                     (or exts (helm-grep-get-file-extensions targets))))
          (include-files
           (and exts
@@ -1000,7 +1004,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
          (types (and (not include-files)
                      (not (eq backend 'zgrep))
                      recurse
-                     (helm-grep-use-ack-p :where 'recursive)
+                     ack-rec-p
                      ;; When %e format spec is not specified
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-grep-default-command)
@@ -1034,7 +1038,8 @@ in recurse, and ignore EXTS, search being made recursively on files matching
      'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
     (set source (helm-make-source src-name 'helm-grep-class
-                  :backend backend))
+                  :backend backend
+                  :pcre (if recurse ack-rec-p (helm-grep-use-ack-p))))
     (helm
      :sources source
      :buffer (format "*helm %s*" (helm-grep-command recurse backend))
@@ -1413,7 +1418,9 @@ if available with current AG version."
 
 (defclass helm-grep-ag-class (helm-source-async)
   ((nohighlight :initform t)
-   (pcre :initform t)
+   (pcre :initarg :pcre :initform t
+         :documentation
+         "  Backend is using pcre regexp engine when non--nil.")
    (keymap :initform helm-grep-map)
    (help-message :initform 'helm-grep-help-message)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
