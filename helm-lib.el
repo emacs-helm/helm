@@ -810,7 +810,8 @@ That is what completion commands operate on."
     (let ((fwd-fn (or helm-yank-text-at-point-function #'forward-word))
           diff)
       ;; Start to initial point if C-w have never been hit.
-      (unless helm-yank-point (setq helm-yank-point (point)))
+      (unless helm-yank-point
+        (setq helm-yank-point (car helm-current-position)))
       (save-excursion
         (goto-char helm-yank-point)
         (helm-set-pattern
