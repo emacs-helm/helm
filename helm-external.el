@@ -81,7 +81,7 @@ and sets `helm-external-commands-list'."
                 (if sort (sort completions 'string-lessp) completions)))))
 
 (defun helm-run-or-raise (exe &optional file)
-  "Generic command that run asynchronously EXE.
+  "Run asynchronously EXE or jump to the application window.
 If EXE is already running just jump to his window if `helm-raise-command'
 is non--nil.
 When FILE argument is provided run EXE with FILE."
@@ -101,7 +101,7 @@ When FILE argument is provided run EXE with FILE."
                               (shell-quote-argument
                                (if (eq system-type 'windows-nt)
                                    (helm-w32-prepare-filename file)
-                                   file))))
+                                   (expand-file-name file)))))
           (start-process-shell-command proc nil real-com))
         (set-process-sentinel
          (get-process proc)
