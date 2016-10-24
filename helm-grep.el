@@ -1039,7 +1039,8 @@ in recurse, and ignore EXTS, search being made recursively on files matching
     ;; Setup the source.
     (set source (helm-make-source src-name 'helm-grep-class
                   :backend backend
-                  :pcre (if recurse ack-rec-p (helm-grep-use-ack-p))))
+                  :pcre (and (helm-grep-use-ack-p)
+                             (not (memq backend '(zgrep git))))))
     (helm
      :sources source
      :buffer (format "*helm %s*" (helm-grep-command recurse backend))
