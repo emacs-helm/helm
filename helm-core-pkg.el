@@ -1,6 +1,6 @@
 ;;; helm-core-pkg.el --- define helm-core for package.el
 
-(define-package "helm-core" "2.3.0"
+(define-package "helm-core" "2.3.1"
   "Development files for Helm"
   '((emacs "24.4")
     (async "1.9"))
