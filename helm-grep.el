@@ -503,10 +503,10 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                (helm-process-deferred-sentinel-hook
                 process event (helm-default-directory)))
              (cond ((and noresult
-                         ;; [FIXME] This is a workaround for zgrep
+                         ;; This is a workaround for zgrep
                          ;; that exit with code 1
                          ;; after a certain amount of results.
-                         (not (with-helm-buffer helm-grep-use-zgrep)))
+                         (with-helm-buffer (helm-empty-buffer-p)))
                     (with-helm-buffer
                       (insert (concat "* Exit with code 1, no result found,"
                                       " command line was:\n\n "
@@ -525,7 +525,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                               (helm-grep-command t)
                                             (helm-grep-command)))))
                                       'face 'helm-grep-finish))))))
-                   ((string= event "finished\n")
+                   ((or (string= event "finished\n")
+                        (and noresult
+                             ;; This is a workaround for zgrep
+                             ;; that exit with code 1
+                             ;; after a certain amount of results.
+                             (with-helm-buffer (not (helm-empty-buffer-p)))))
                     (with-helm-window
                       (setq mode-line-format
                             '(" " mode-line-buffer-identification " "
