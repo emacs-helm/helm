@@ -982,7 +982,7 @@ It is used actually to specify 'zgrep' or 'git'.
 When BACKEND 'zgrep' is used don't prompt for a choice
 in recurse, and ignore EXTS, search being made recursively on files matching
 `helm-zgrep-file-extension-regexp' only."
-  (when (and (helm-grep-use-ack-p)
+  (when (and (string-match-p "\\`ack" (helm-grep-command recurse backend))
              helm-ff-default-directory
              (file-remote-p helm-ff-default-directory))
     (error "Error: Remote operation not supported with ack-grep."))
@@ -1009,7 +1009,14 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                      ;; ignore types and do not prompt for choice.
                      (string-match "%e" helm-grep-default-command)
                      (helm-grep-read-ack-type)))
-         (src-name (capitalize (helm-grep-command recurse backend))))
+         (src-name (capitalize (helm-grep-command recurse backend)))
+         (com (cond ((eq backend 'zgrep) helm-default-zgrep-command)
+                    ((eq backend 'git) helm-grep-git-grep-command)
+                    (recurse helm-grep-default-recurse-command)
+                    ;; When resuming, the local value of
+                    ;; `helm-grep-default-command' is used, only git-grep
+                    ;; should need this.
+                    (t helm-grep-default-command))))
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -1027,20 +1034,12 @@ in recurse, and ignore EXTS, search being made recursively on files matching
      'helm-grep-include-files (or include-files types)
      'helm-grep-in-recurse recurse
      'helm-grep-use-zgrep (eq backend 'zgrep)
-     'helm-grep-default-command
-     (cond ((eq backend 'zgrep) helm-default-zgrep-command)
-           ((eq backend 'git) helm-grep-git-grep-command)
-           (recurse helm-grep-default-recurse-command)
-           ;; When resuming, the local value of
-           ;; `helm-grep-default-command' is used, only git-grep
-           ;; should need this.
-           (t helm-grep-default-command))
+     'helm-grep-default-command com
      'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
     (set source (helm-make-source src-name 'helm-grep-class
                   :backend backend
-                  :pcre (and (helm-grep-use-ack-p)
-                             (not (memq backend '(zgrep git))))))
+                  :pcre (string-match-p "\\`ack" com)))
     (helm
      :sources source
      :buffer (format "*helm %s*" (helm-grep-command recurse backend))
