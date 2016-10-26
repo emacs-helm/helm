@@ -4983,13 +4983,17 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
 (defun helm-recenter-top-bottom-other-window ()
   "`recenter-top-bottom' in other window (not *Helm* window)."
   (interactive)
-  (with-helm-alive-p (helm-other-window-base 'recenter-top-bottom 'noscroll)))
+  (with-helm-alive-p
+    (with-selected-window (helm-persistent-action-display-window)
+      (recenter-top-bottom 'noscroll))))
 (put 'helm-recenter-top-bottom-other-window 'helm-only t)
 
 (defun helm-reposition-window-other-window ()
   "`helm-reposition-window' in other window (not *Helm* window)."
   (interactive)
-  (with-helm-alive-p (helm-other-window-base 'reposition-window 'noscroll)))
+  (with-helm-alive-p
+    (with-selected-window (helm-persistent-action-display-window)
+      (reposition-window 'noscroll))))
 (put 'helm-reposition-window-other-window 'helm-only t)
 
 
