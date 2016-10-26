@@ -1846,6 +1846,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         ;; hand corner of the frame (#1538).
         mouse-autoselect-window
         focus-follows-mouse
+        mode-line-in-non-selected-windows
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
         (helm--maybe-use-default-as-input
