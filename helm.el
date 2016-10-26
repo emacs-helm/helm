@@ -4964,19 +4964,20 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
 (defun helm-other-window-base (command &optional scroll-amount)
   (setq scroll-amount (unless (eq scroll-amount 'noscroll)
                         helm-scroll-amount))
-  (with-selected-window (helm-persistent-action-display-window)
+  (let ((minibuffer-scroll-window
+         (helm-persistent-action-display-window)))
     (funcall command scroll-amount)))
 
 (defun helm-scroll-other-window ()
   "Scroll other window (not *Helm* window) upward."
   (interactive)
-  (with-helm-alive-p (helm-other-window-base 'scroll-up)))
+  (with-helm-alive-p (helm-other-window-base 'scroll-other-window)))
 (put 'helm-scroll-other-window 'helm-only t)
 
 (defun helm-scroll-other-window-down ()
   "Scroll other window (not *Helm* window) downward."
   (interactive)
-  (with-helm-alive-p (helm-other-window-base 'scroll-down)))
+  (with-helm-alive-p (helm-other-window-base 'scroll-other-window-down)))
 (put 'helm-scroll-other-window-down 'helm-only t)
 
 (defun helm-recenter-top-bottom-other-window ()
