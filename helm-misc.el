@@ -210,8 +210,9 @@ It is added to `extended-command-history'.
     :migemo t
     :multiline t
     :action (lambda (candidate)
-              (delete-minibuffer-contents)
-              (insert candidate))))
+              (with-helm-current-buffer
+                (delete-minibuffer-contents)
+                (insert candidate)))))
 
 ;;; Shell history
 ;;
@@ -320,7 +321,8 @@ Default action change TZ environment variable locally to emacs."
   (interactive)
   (let ((enable-recursive-minibuffers t))
     (helm :sources 'helm-source-minibuffer-history
-          :buffer "*helm minibuffer-history*")))
+          :buffer "*helm minibuffer-history*"
+          :allow-nest t)))
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
