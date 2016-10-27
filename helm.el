@@ -4989,8 +4989,9 @@ See `scroll-other-window-down'."
 Meaning of prefix ARG is the same as in `recenter-top-bottom'."
   (interactive "P")
   (with-helm-alive-p
-    (with-selected-window (helm-persistent-action-display-window)
-      (recenter-top-bottom arg))))
+    (with-helm-window
+      (with-selected-window (helm-persistent-action-display-window)
+        (recenter-top-bottom arg)))))
 (put 'helm-recenter-top-bottom-other-window 'helm-only t)
 
 (defun helm-reposition-window-other-window (&optional arg)
@@ -4998,8 +4999,9 @@ Meaning of prefix ARG is the same as in `recenter-top-bottom'."
 Meaning of prefix ARG is the same as in `reposition-window'."
   (interactive "P")
   (with-helm-alive-p
-    (with-selected-window (helm-persistent-action-display-window)
-      (reposition-window arg))))
+    (with-helm-window
+      (with-selected-window (helm-persistent-action-display-window)
+        (reposition-window arg)))))
 (put 'helm-reposition-window-other-window 'helm-only t)
 
 
