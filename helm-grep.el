@@ -315,6 +315,7 @@ You probably don't need to use this unless you know what you are doing."
 (defvar helm-grep-default-function 'helm-grep-init)
 (defvar helm-zgrep-recurse-flag nil)
 (defvar helm-grep-history nil)
+(defvar helm-grep-ag-history nil)
 (defvar helm-grep-last-targets nil)
 (defvar helm-grep-include-files nil)
 (defvar helm-grep-in-recurse nil)
@@ -1427,6 +1428,7 @@ if available with current AG version."
          :documentation
          "  Backend is using pcre regexp engine when non--nil.")
    (keymap :initform helm-grep-map)
+   (history :initform 'helm-grep-ag-history)
    (help-message :initform 'helm-grep-help-message)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
    (persistent-action :initform 'helm-grep-persistent-action)
@@ -1455,6 +1457,7 @@ if available with current AG version."
           (lambda () (helm-grep-ag-init directory type))))
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
+        :history 'helm-grep-ag-history
         :truncate-lines helm-grep-truncate-lines
         :buffer (format "*helm %s*" (helm-grep--ag-command))))
 
