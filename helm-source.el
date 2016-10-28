@@ -419,7 +419,11 @@
     :custom symbol
     :documentation
     "  Allow passing history variable to helm from source.
-  It should be a quoted symbol.")
+  It should be a quoted symbol.
+  Passing the history variable here have no effect
+  so add it also in the `helm' call with the :history keyword.
+  The main point of adding the variable here
+  is to make it available when resuming.")
 
    (coerce
     :initarg :coerce
