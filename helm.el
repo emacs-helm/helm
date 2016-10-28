@@ -3313,16 +3313,17 @@ pattern has changed.
 
 Selection is preserved to current candidate or moved to
 PRESELECT, if specified."
-  (let* ((source    (helm-get-current-source))
-         (selection (helm-aif (helm-get-selection nil t source)
-                        (regexp-quote it)
-                      it)))
-    (setq helm--force-updating-p t)
-    (when source
-      (mapc 'helm-force-update--reinit
-            (helm-get-sources)))
-    (helm-update (or preselect selection) source)
-    (with-helm-window (recenter))))
+  (with-helm-window
+    (let* ((source    (helm-get-current-source))
+           (selection (helm-aif (helm-get-selection nil t source)
+                          (regexp-quote it)
+                        it)))
+      (setq helm--force-updating-p t)
+      (when source
+        (mapc 'helm-force-update--reinit
+              (helm-get-sources)))
+      (helm-update (or preselect selection) source)
+      (recenter))))
 
 (defun helm-refresh ()
   "Force recalculation and update of candidates."
