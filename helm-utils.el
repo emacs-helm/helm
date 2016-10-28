@@ -791,7 +791,7 @@ If COUNT is non--nil add a number after each prompt."
       (while (re-search-forward "href=\\|^ *<DT><A HREF=" nil t)
         (forward-line 0)
         (when (re-search-forward url-regexp nil t)
-          (setq url (url-unhex-string (match-string 0))))
+          (setq url (match-string 0)))
         (when (re-search-forward bmk-regexp nil t)
           (setq title (url-unhex-string
                        (funcall helm-html-decode-entities-function
