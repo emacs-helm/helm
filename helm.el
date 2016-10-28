@@ -608,10 +608,19 @@ See `helm-log-save-maybe' for more info."
 
 (defcustom helm-show-action-window-other-window nil
   "Show action buffer beside `helm-buffer' when non-nil.
+
+If nil don't split and replace helm-buffer by the action buffer
+in same window.
+If left display the action buffer at the left of helm-buffer.
+If right or any other value, split at right.
+
 Note that this may not fit well with some helm window configurations,
 so it have only effect when `helm-always-two-windows' is non-nil."
   :group 'helm
-  :type 'boolean)
+  :type '(choice
+          (const :tag "Split at left" left)
+          (const :tag "Don't split" nil)
+          (other :tag "Split at right" right)))
 
 ;;; Faces
 ;;
@@ -3620,7 +3629,8 @@ If action buffer is selected, back to the helm buffer."
     (buffer-disable-undo)
     (set-window-buffer (if (and helm-show-action-window-other-window
                                 helm-always-two-windows)
-                           (split-window (get-buffer-window helm-buffer) nil 'right)
+                           (split-window (get-buffer-window helm-buffer)
+                                         nil helm-show-action-window-other-window)
                            (get-buffer-window helm-buffer))
                        helm-action-buffer)
     (set (make-local-variable 'helm-sources)
