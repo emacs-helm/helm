@@ -37,7 +37,7 @@
   :group 'helm)
 
 (defcustom helm-boring-buffer-regexp-list
-  '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*Minibuf")
+  '("\\` " "\\`\\*helm" "\\`\\*Echo Area" "\\`\\*Minibuf")
   "The regexp list that match boring buffers.
 Buffer candidates matching these regular expression will be
 filtered from the list of candidates if the
