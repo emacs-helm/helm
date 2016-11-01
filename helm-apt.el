@@ -243,20 +243,23 @@ Support install, remove and purge actions."
       (switch-to-buffer helm-apt-term-buffer)
     (ansi-term (getenv "SHELL") "term apt")
     (setq helm-apt-term-buffer (buffer-name)))
-  (term-line-mode)
-  (let* ((command   (cl-case action
-                      (install   "sudo apt-get install ")
-                      (reinstall "sudo apt-get install --reinstall ")
-                      (uninstall "sudo apt-get remove ")
-                      (purge     "sudo apt-get purge ")
-                      (t          (error "Unknown action"))))
-         (cands (helm-marked-candidates))
-         (cand-list (mapconcat (lambda (x) (format "'%s'" x)) cands " ")))
-    (with-helm-display-marked-candidates "*apt candidates*"
-      cands
-      (when (y-or-n-p (format "%s package(s)" (symbol-name action)))
-        (with-current-buffer helm-apt-term-buffer
-          (goto-char (point-max))
+  (with-current-buffer helm-apt-term-buffer
+    (term-line-mode)
+    (let* ((command   (cl-case action
+                        (install   "sudo apt-get install ")
+                        (reinstall "sudo apt-get install --reinstall ")
+                        (uninstall "sudo apt-get remove ")
+                        (purge     "sudo apt-get purge ")
+                        (t          (error "Unknown action"))))
+           (cands     (helm-marked-candidates))
+           (cand-list (mapconcat (lambda (x) (format "'%s'" x)) cands " "))
+           (proc      (get-buffer-process (current-buffer))))
+      (with-helm-display-marked-candidates
+        "*apt candidates*"
+        cands
+        (when (y-or-n-p (format "%s package(s)" (symbol-name action)))
+          (goto-char (process-mark proc))
+          (delete-region (point) (point-max))
           (insert (concat command cand-list))
           (setq helm-external-commands-list nil)
           (setq helm-apt-installed-packages nil)
