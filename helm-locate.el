@@ -97,7 +97,7 @@ directories of this list with `helm-projects-find-files'."
   :group 'helm-locate
   :type '(repeat string))
 
-(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex ^%s %s.*$"
+(defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex '^%s' '%s.*$'"
   "Command used in recursive directories completion in `helm-find-files'.
 For Windows and `es' use something like \"es -r ^%s.*%s.*$\"."
   :type 'string
