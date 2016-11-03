@@ -4719,13 +4719,13 @@ Returns the resulting buffer."
                 buffer)))) ; a symbol.
     (with-current-buffer buf
       (erase-buffer)
-      (if (listp data)
-          (insert (mapconcat (lambda (i)
-                               (cond ((symbolp i) (symbol-name i))
-                                     ((numberp i) (number-to-string i))
-                                     (t i)))
-                             data "\n"))
-        (and (stringp data) (insert data))))
+      (cond ((listp data)
+             (insert (mapconcat (lambda (i)
+                                  (cond ((symbolp i) (symbol-name i))
+                                        ((numberp i) (number-to-string i))
+                                        (t i)))
+                                data "\n")))
+            ((stringp data) (insert data))))
     buf))
 
 
