@@ -18,6 +18,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
+(require 'helm-lib)
 (require 'helm-help)
 (require 'helm-types)
 (require 'helm-utils)
@@ -362,7 +363,9 @@ in other window according to the value of `helm-elisp-help-function'."
 (defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
 Arg NAME specify the name of the top level function
-calling helm generic completion (e.g \"describe-function\")."
+calling helm generic completion (e.g \"describe-function\")
+which allow calling the right function when CANDIDATE symbol
+refers at the same time to variable and a function."
   (helm-elisp--persistent-help
    candidate 'helm-elisp--show-help-1 name))
 
@@ -673,29 +676,6 @@ Filename completion happen if string start after or between a double quote."
   ;; Running an idle-timer allow not catching RET
   ;; when exiting with the fallback source.
   (run-with-idle-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate))
-
-(defun helm-elisp--persistent-help (candidate fun &optional name)
-  (let ((hbuf (get-buffer (help-buffer))))
-    (cond  ((helm-follow-mode-p)
-            (if name
-                (funcall fun candidate name)
-                (funcall fun candidate)))
-           ((or (and (helm-attr 'help-running-p)
-                     (string= candidate (helm-attr 'help-current-symbol))))
-            (progn
-              ;; When started from a help buffer,
-              ;; Don't kill this buffer as it is helm-current-buffer.
-              (unless (equal hbuf helm-current-buffer)
-                (kill-buffer hbuf)
-                (set-window-buffer (get-buffer-window hbuf)
-                                   helm-current-buffer))
-              (helm-attrset 'help-running-p nil)))
-           (t
-            (if name
-                (funcall fun candidate name)
-                (funcall fun candidate))
-            (helm-attrset 'help-running-p t)))
-    (helm-attrset 'help-current-symbol candidate)))
 
 ;;;###autoload
 (defun helm-apropos (default)

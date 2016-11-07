@@ -3648,8 +3648,11 @@ If action buffer is selected, back to the helm buffer."
           (helm-build-sync-source "Actions"
             :volatile t
             :nomark t
-            :persistent-action (lambda (_candidate) (ignore))
-            :persistent-help "Do nothing"
+            :persistent-action (lambda (_candidate)
+                                 (helm-elisp--persistent-help
+                                  (helm-get-selection helm-action-buffer)
+                                  'helm-describe-function))
+            :persistent-help "Describe action"
             :keymap 'helm-map
             :candidates actions
             :mode-line '("Action(s)" "\\<helm-map>\\[helm-select-action]:BackToCands RET/f1/f2/fn:NthAct")

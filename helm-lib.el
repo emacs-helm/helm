@@ -555,6 +555,33 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
                          (mapcar 'helm-symbolify faces)
                          (helm-symbolify face))))))
 
+(defun helm-elisp--persistent-help (candidate fun &optional name)
+  "Used to build persistent actions describing CANDIDATE with FUN.
+Argument NAME is used internally to know which command to use when
+symbol CANDIDATE refers at the same time to variable and a function.
+See `helm-elisp--show-help'."
+  (let ((hbuf (get-buffer (help-buffer))))
+    (cond  ((helm-follow-mode-p)
+            (if name
+                (funcall fun candidate name)
+                (funcall fun candidate)))
+           ((or (and (helm-attr 'help-running-p)
+                     (string= candidate (helm-attr 'help-current-symbol))))
+            (progn
+              ;; When started from a help buffer,
+              ;; Don't kill this buffer as it is helm-current-buffer.
+              (unless (equal hbuf helm-current-buffer)
+                (kill-buffer hbuf)
+                (set-window-buffer (get-buffer-window hbuf)
+                                   helm-current-buffer))
+              (helm-attrset 'help-running-p nil)))
+           (t
+            (if name
+                (funcall fun candidate name)
+                (funcall fun candidate))
+            (helm-attrset 'help-running-p t)))
+    (helm-attrset 'help-current-symbol candidate)))
+
 (defun helm-find-function (func)
   "FUNC is symbol or string."
   (find-function (helm-symbolify func)))
