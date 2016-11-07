@@ -3649,9 +3649,10 @@ If action buffer is selected, back to the helm buffer."
             :volatile t
             :nomark t
             :persistent-action (lambda (_candidate)
-                                 (helm-elisp--persistent-help
-                                  (helm-get-selection helm-action-buffer)
-                                  'helm-describe-function))
+                                 (pcase (helm-get-selection helm-action-buffer)
+                                   ((pred byte-code-function-p) (ignore))
+                                   ((and fn) (helm-elisp--persistent-help
+                                              fn 'helm-describe-function))))
             :persistent-help "Describe action"
             :keymap 'helm-map
             :candidates actions
