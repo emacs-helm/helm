@@ -75,7 +75,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
     :candidates #'helm-kill-ring-candidates
     :filtered-candidate-transformer #'helm-kill-ring-transformer
     :action 'helm-kill-ring-actions
-    :persistent-action (lambda (_candidate) (ignore))
+    :persistent-action 'ignore
     :persistent-help "DoNothing"
     :keymap helm-kill-ring-map
     :migemo t
