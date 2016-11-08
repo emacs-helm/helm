@@ -240,20 +240,21 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
       (buffer              (switch-to-buffer buf))
       (buffer-other-window (switch-to-buffer-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
-    (helm-goto-line lineno)
-    ;; Move point to the nearest matching regexp from bol.
-    (cl-loop for reg in split-pat
-          when (save-excursion
-                 (condition-case _err
-                     (if helm-migemo-mode
-                         (helm-mm-migemo-forward reg (point-at-eol) t)
-                       (re-search-forward reg (point-at-eol) t))
-                   (invalid-regexp nil)))
-          collect (match-beginning 0) into pos-ls
-          finally (when pos-ls (goto-char (apply #'min pos-ls))))
-    (when mark
-      (set-marker (mark-marker) (point))
-      (push-mark (point) 'nomsg))))
+    (with-current-buffer buf
+      (helm-goto-line lineno)
+      ;; Move point to the nearest matching regexp from bol.
+      (cl-loop for reg in split-pat
+               when (save-excursion
+                      (condition-case _err
+                          (if helm-migemo-mode
+                              (helm-mm-migemo-forward reg (point-at-eol) t)
+                              (re-search-forward reg (point-at-eol) t))
+                        (invalid-regexp nil)))
+               collect (match-beginning 0) into pos-ls
+               finally (when pos-ls (goto-char (apply #'min pos-ls))))
+      (when mark
+        (set-marker (mark-marker) (point))
+        (push-mark (point) 'nomsg)))))
 
 (defun helm-moccur-persistent-action (candidate)
   (helm-moccur-goto-line candidate)

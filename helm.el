@@ -3648,8 +3648,12 @@ If action buffer is selected, back to the helm buffer."
           (helm-build-sync-source "Actions"
             :volatile t
             :nomark t
-            :persistent-action (lambda (_candidate) (ignore))
-            :persistent-help "Do nothing"
+            :persistent-action (lambda (_candidate)
+                                 (pcase (helm-get-selection helm-action-buffer)
+                                   ((pred byte-code-function-p) (ignore))
+                                   ((and fn) (helm-elisp--persistent-help
+                                              fn 'helm-describe-function))))
+            :persistent-help "Toggle describe action"
             :keymap 'helm-map
             :candidates actions
             :mode-line '("Action(s)" "\\<helm-map>\\[helm-select-action]:BackToCands RET/f1/f2/fn:NthAct")
@@ -4947,7 +4951,8 @@ window to maintain visibility."
                   special-display-regexps special-display-buffer-names)
               (helm-execute-selection-action-1
                selection (or fn (helm-get-actions-from-current-source source)) t)
-              (helm-log-run-hook 'helm-after-persistent-action-hook))
+              (unless (helm-action-window)
+                (helm-log-run-hook 'helm-after-persistent-action-hook)))
             ;; A typical case is when a persistent action delete
             ;; the buffer already displayed in
             ;; `helm-persistent-action-display-window' and `helm-full-frame'
