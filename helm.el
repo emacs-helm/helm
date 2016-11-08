@@ -3249,7 +3249,9 @@ to a particular place after finishing update."
   ;; So go back to one window when updating if `helm-full-frame'
   ;; is non-`nil'.
   (with-helm-window
-    (when helm-onewindow-p (delete-other-windows)))
+    (when (and helm-onewindow-p
+               (not (helm-action-window)))
+      (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (unwind-protect
@@ -3593,8 +3595,7 @@ If action buffer is selected, back to the helm buffer."
       (with-selected-frame (with-helm-window (selected-frame))
         (prog1
             (helm-acond ((get-buffer-window helm-action-buffer 'visible)
-                         (set-window-buffer (get-buffer-window helm-action-buffer)
-                                            helm-buffer)
+                         (set-window-buffer it helm-buffer)
                          (helm--set-action-prompt 'restore)
                          (when (and helm-show-action-window-other-window
                                     helm-always-two-windows
@@ -4935,6 +4936,8 @@ window to maintain visibility."
                           (cdr attr-val)))
            (cursor-in-echo-area t)
            mode-line-in-non-selected-windows)
+      (when (eq fn 'ignore)
+        (cl-return-from helm-execute-persistent-action nil))
       (when source
         (with-helm-window
           (save-selected-window
