@@ -560,7 +560,13 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
 Argument NAME is used internally to know which command to use when
 symbol CANDIDATE refers at the same time to variable and a function.
 See `helm-elisp--show-help'."
-  (with-selected-window (previous-window (helm-window))
+  (with-selected-window (cl-loop with win1 = (get-buffer-window helm-buffer)
+                                 with win2 = (get-buffer-window helm-action-buffer)
+                                 with win3 = (get-buffer-window helm-current-buffer)
+                                 for w in (window-list)
+                                 thereis (and (or (eql w win3)
+                                                  (not (memq w (list win1 win2))))
+                                              w))
     (let ((hbuf (get-buffer (help-buffer))))
       (cond  ((helm-follow-mode-p)
               (if name
