@@ -520,7 +520,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-variable))
-    :persistent-help "Describe variable"
+    :persistent-help "Toggle describe variable"
     :action '(("Describe variable" . helm-describe-variable)
               ("Find variable" . helm-find-variable)
               ("Info lookup" . helm-info-lookup-symbol)
@@ -558,7 +558,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-face))
-    :persistent-help "Describe face"
+    :persistent-help "Toggle describe face"
     :action '(("Describe face" . helm-describe-face)
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
@@ -575,7 +575,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
-    :persistent-help "Describe command"
+    :persistent-help "Toggle describe command"
     :action '(("Describe function" . helm-describe-function)
               ("Find function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -595,7 +595,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
-    :persistent-help "Describe function"
+    :persistent-help "Toggle describe function"
     :nomark t
     :action '(("Describe function" . helm-describe-function)
               ("Find function" . helm-find-function)
@@ -614,7 +614,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
-    :persistent-help "Describe class"
+    :persistent-help "Toggle describe class"
     :action '(("Describe function" . helm-describe-function)
               ("Find function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -632,7 +632,7 @@ Filename completion happen if string start after or between a double quote."
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
-    :persistent-help "Describe generic function"
+    :persistent-help "Toggle describe generic function"
     :action '(("Describe function" . helm-describe-function)
               ("Find function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -702,7 +702,7 @@ i.e the `symbol-name' of any existing symbol."
     :persistent-action 'helm-advice-persistent-action
     :nomark t
     :multiline t
-    :persistent-help "Describe function / C-u C-j: Toggle advice"))
+    :persistent-help "Toggle describe function / C-u C-j: Toggle advice"))
 
 (defun helm-advice-candidates ()
   (cl-loop for (fname) in ad-advised-functions

@@ -224,10 +224,7 @@ Only buffer names are fuzzy matched when this is enabled,
    (migemo :initform 'nomultimatch)
    (volatile :initform t)
    (resume :initform (lambda () (setq helm-buffers-in-project-p nil)))
-   (help-message :initform 'helm-buffer-help-message)
-   (persistent-help
-    :initform
-    "Show this buffer / C-u \\[helm-execute-persistent-action]: Kill this buffer")))
+   (help-message :initform 'helm-buffer-help-message)))
 
 (defvar helm-source-buffers-list nil)
 

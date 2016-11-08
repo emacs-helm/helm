@@ -1432,6 +1432,7 @@ if available with current AG version."
    (help-message :initform 'helm-grep-help-message)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
    (persistent-action :initform 'helm-grep-persistent-action)
+   (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
    (candidate-number-limit :initform 99999)
    (requires-pattern :initform 2)
    (nomark :initform t)
