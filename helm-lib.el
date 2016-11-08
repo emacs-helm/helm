@@ -561,8 +561,7 @@ Argument NAME is used internally to know which command to use when
 symbol CANDIDATE refers at the same time to variable and a function.
 See `helm-elisp--show-help'."
   (let ((hbuf (get-buffer (help-buffer))))
-    (cond  ((and (helm-follow-mode-p)
-                 (not (helm-action-window)))
+    (cond  ((helm-follow-mode-p)
             (if name
                 (funcall fun candidate name)
                 (funcall fun candidate)))
