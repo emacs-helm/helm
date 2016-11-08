@@ -3597,7 +3597,8 @@ If action buffer is selected, back to the helm buffer."
                                             helm-buffer)
                          (helm--set-action-prompt 'restore)
                          (when (and helm-show-action-window-other-window
-                                    helm-always-two-windows)
+                                    helm-always-two-windows
+                                    (eq helm-split-window-state 'vertical))
                            (delete-window it))
                          (kill-buffer helm-action-buffer)
                          (setq helm-saved-selection nil)
@@ -3638,7 +3639,8 @@ If action buffer is selected, back to the helm buffer."
     (erase-buffer)
     (buffer-disable-undo)
     (set-window-buffer (if (and helm-show-action-window-other-window
-                                helm-always-two-windows)
+                                helm-always-two-windows
+                                (eq helm-split-window-state 'vertical))
                            (split-window (get-buffer-window helm-buffer)
                                          nil helm-show-action-window-other-window)
                            (get-buffer-window helm-buffer))
