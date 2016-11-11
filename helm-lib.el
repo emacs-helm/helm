@@ -357,17 +357,22 @@ Default is `eq'."
         unless (gethash elm cont)
         collect (puthash elm elm cont)))
 
+(defun helm--concat-regexps (regexp-list)
+  "Return a regexp which matches any of the regexps in REGEXP-LIST."
+  (if regexp-list
+      (concat "\\(?:" (string-join regexp-list "\\)\\|\\(?:") "\\)")
+    "\\<\\>"))                          ; Match nothing
+
 (defun helm-skip-entries (seq black-regexp-list &optional white-regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
-  (cl-loop for i in seq
-           unless (and (cl-loop for re in black-regexp-list
-                                thereis (and (stringp i)
-                                             (string-match-p re i)))
-                       (null
-                        (cl-loop for re in white-regexp-list
-                                thereis (and (stringp i)
-                                             (string-match-p re i)))))
-           collect i))
+  (let ((black-regexp (helm--concat-regexps black-regexp-list))
+        (white-regexp (helm--concat-regexps white-regexp-list)))
+    (cl-loop for i in seq
+             unless (and (stringp i)
+                         (string-match-p black-regexp i)
+                         (null
+                          (string-match-p white-regexp i)))
+             collect i)))
 
 (defun helm-boring-directory-p (directory black-list)
   "Check if one regexp in BLACK-LIST match DIRECTORY."
