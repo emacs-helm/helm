@@ -357,10 +357,14 @@ Default is `eq'."
         unless (gethash elm cont)
         collect (puthash elm elm cont)))
 
+(defsubst helm--string-join (strings &optional separator)
+  "Join all STRINGS using SEPARATOR."
+  (mapconcat 'identity strings separator))
+
 (defun helm--concat-regexps (regexp-list)
   "Return a regexp which matches any of the regexps in REGEXP-LIST."
   (if regexp-list
-      (concat "\\(?:" (string-join regexp-list "\\)\\|\\(?:") "\\)")
+      (concat "\\(?:" (helm--string-join regexp-list "\\)\\|\\(?:") "\\)")
     "\\<\\>"))                          ; Match nothing
 
 (defun helm-skip-entries (seq black-regexp-list &optional white-regexp-list)
