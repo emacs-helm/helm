@@ -279,7 +279,7 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
 (provide 'helm-imenu)
 
 ;; Local Variables:
-;; byte-compile-warnings: (not cl-functions obsolete)
+;; byte-compile-warnings: (not obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; End:

@@ -920,7 +920,7 @@ i.e the `symbol-name' of any existing symbol."
 (provide 'helm-elisp)
 
 ;; Local Variables:
-;; byte-compile-warnings: (not cl-functions obsolete)
+;; byte-compile-warnings: (not obsolete)
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; End:
