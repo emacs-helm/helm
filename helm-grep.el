@@ -486,6 +486,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          ;; Use pipe only with grep, zgrep or git-grep.
          (process-connection-type (and (not zgrep) (helm-grep-use-ack-p)))
          (tramp-verbose helm-tramp-verbose)
+         (start-time (float-time))
+         (proc-name (if helm-grep-use-zgrep
+                        "Zgrep"
+                        (capitalize
+                         (if helm-grep-in-recurse
+                             (helm-grep-command t)
+                             (helm-grep-command)))))
          non-essential)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
@@ -493,7 +500,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
               (concat ">>> " (propertize cmd-line 'face 'helm-grep-cmd-line) "\n\n"))
     (prog1            ; This function should return the process first.
         (start-file-process-shell-command
-         "grep" helm-buffer cmd-line)
+         proc-name helm-buffer cmd-line)
       ;; Init sentinel.
       (set-process-sentinel
        (get-buffer-process helm-buffer)
@@ -514,17 +521,12 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                       (propertize helm-grep-last-cmd-line
                                                   'face 'helm-grep-cmd-line)))
                       (setq mode-line-format
-                            '(" " mode-line-buffer-identification " "
+                            `(" " mode-line-buffer-identification " "
                               (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                               (:eval (propertize
                                       (format
                                        "[%s process finished - (no results)] "
-                                       (if helm-grep-use-zgrep
-                                           "Zgrep"
-                                         (capitalize
-                                          (if helm-grep-in-recurse
-                                              (helm-grep-command t)
-                                            (helm-grep-command)))))
+                                       ,proc-name)
                                       'face 'helm-grep-finish))))))
                    ((or (string= event "finished\n")
                         (and noresult
@@ -532,26 +534,26 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                              ;; that exit with code 1
                              ;; after a certain amount of results.
                              (with-helm-buffer (not (helm-empty-buffer-p)))))
+                    (helm-log "%s process finished with %s results in %fs"
+                              proc-name
+                              (helm-get-candidate-number)
+                              (- (float-time) start-time))
                     (with-helm-window
                       (setq mode-line-format
-                            '(" " mode-line-buffer-identification " "
+                            `(" " mode-line-buffer-identification " "
                               (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                               (:eval (propertize
                                       (format
-                                       "[%s process finished - (%s results)] "
-                                       (if helm-grep-use-zgrep
-                                           "Zgrep"
-                                         (capitalize
-                                          (if helm-grep-in-recurse
-                                              (helm-grep-command t)
-                                            (helm-grep-command))))
+                                       "[%s process finished in %.2fs - (%s results)] "
+                                       ,proc-name
+                                       ,(- (float-time) start-time)
                                        (helm-get-candidate-number))
                                       'face 'helm-grep-finish))))
                       (force-mode-line-update)))
                    ;; Catch error output in log.
                    (t (helm-log
                        "Error: %s %s"
-                       (if helm-grep-use-zgrep "Zgrep" "Grep")
+                       proc-name
                        (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-grep-collect-candidates ()
@@ -1377,15 +1379,17 @@ if available with current AG version."
 (defun helm-grep-ag-init (directory &optional type)
   "Start AG process in DIRECTORY maybe searching only files of type TYPE."
   (let ((cmd-line (helm-grep-ag-prepare-cmd-line
-                   helm-pattern directory type)))
+                   helm-pattern directory type))
+        (start-time (float-time))
+        (proc-name (helm-grep--ag-command)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
     (helm-log "Starting %s process in directory `%s'"
-              (helm-grep--ag-command) directory)
+              proc-name directory)
     (helm-log "Command line used was:\n\n%s"
               (concat ">>> " cmd-line "\n\n"))
     (prog1
         (start-process-shell-command
-         "ag" helm-buffer cmd-line)
+         proc-name helm-buffer cmd-line)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
        (lambda (process event)
@@ -1403,23 +1407,28 @@ if available with current AG version."
                             (:eval (propertize
                                     (format
                                      "[%s process finished - (no results)] "
-                                     (upcase (helm-grep--ag-command)))
+                                     (upcase proc-name))
                                     'face 'helm-grep-finish))))))
                  ((string= event "finished\n")
+                  (helm-log "%s process finished with %s results in %fs"
+                              proc-name
+                              (helm-get-candidate-number)
+                              (- (float-time) start-time))
                   (with-helm-window
                     (setq mode-line-format
-                          '(" " mode-line-buffer-identification " "
+                          `(" " mode-line-buffer-identification " "
                             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                             (:eval (propertize
                                     (format
-                                     "[%s process finished - (%s results)] "
-                                     (upcase (helm-grep--ag-command))
+                                     "[%s process finished in %.2fs - (%s results)] "
+                                     ,(upcase proc-name)
+                                     ,(- (float-time) start-time)
                                      (helm-get-candidate-number))
                                     'face 'helm-grep-finish))))
                     (force-mode-line-update)))
                  (t (helm-log
                      "Error: %s %s"
-                     (helm-grep--ag-command)
+                     proc-name
                      (replace-regexp-in-string "\n" "" event))))))))))
 
 (defclass helm-grep-ag-class (helm-source-async)
