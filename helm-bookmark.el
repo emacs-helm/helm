@@ -545,7 +545,15 @@ than `w3m-browse-url' use it."
                       (lambda (candidate)
                         (let ((bmk (helm-bookmark-get-bookmark-from-name
                                     candidate)))
-                          (bookmark--jump-via bmk 'switch-to-buffer))))
+                          (if (and (get-buffer-window "*addressbook*" 'visible)
+                                   (string= bmk (with-current-buffer "*addressbook*"
+                                                  (save-excursion
+                                                    (search-forward "^Name: " nil t)
+                                                    (car (addressbook-get-contact-data))))))
+                              (kill-buffer "*addressbook*")
+                              (when (buffer-live-p (get-buffer "*addressbook*"))
+                                (kill-buffer "*addressbook*"))
+                              (bookmark--jump-via bmk 'switch-to-buffer)))))
    (persistent-help :initform "Show contact - Prefix with C-u to append")
    (mode-line :initform (list "Contact(s)" helm-mode-line-string))
    (filtered-candidate-transformer :initform
