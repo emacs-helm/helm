@@ -771,11 +771,22 @@ e.g prepended with *."
 (defun helm-filtered-bookmarks ()
   "Preconfigured helm for bookmarks (filtered by category).
 Optional source `helm-source-bookmark-addressbook' is loaded
-only if external library addressbook-bookmark.el is available."
+only if external addressbook-bookmark package is installed."
   (interactive)
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
+        :default (list (thing-at-point 'symbol)
+                       (buffer-name helm-current-buffer))))
+
+;;;###autoload
+(defun helm-addressbook-bookmarks ()
+  "Preconfigured helm for addressbook bookmarks.
+Need addressbook-bookmark package as dependencie."
+  (interactive)
+  (helm :sources 'helm-source-bookmark-addressbook
+        :prompt "Search Contact: "
+        :buffer "*helm addressbook*"
         :default (list (thing-at-point 'symbol)
                        (buffer-name helm-current-buffer))))
 
