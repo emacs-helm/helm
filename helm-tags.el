@@ -56,14 +56,6 @@ one match."
   :type 'boolean
   :group 'helm-tags)
 
-(defcustom helm-etags-compression-info-list
-  (purecopy '("" ".Z" ".bz2" ".gz" ".xz" ".tgz"))
-  "List of extensions tried by helm-tags when `auto-compression-mode' is on.
-An empty string means search the non-compressed file."
-  :version "24.1"			; added xz
-  :type  '(repeat string)
-  :group 'helm-tags)
-
 
 (defgroup helm-tags-faces nil
   "Customize the appearance of helm-tags faces."
@@ -265,7 +257,7 @@ If no entry in cache, create one."
   ;; If interested in compressed-files, search files with extensions.
   (let* ((split (helm-grep-split-line candidate))
          (file-search-extensions (if auto-compression-mode
-                                     helm-etags-compression-info-list
+                                     tags-compression-info-list
                                    '("")))
          (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
                       for f = (expand-file-name
