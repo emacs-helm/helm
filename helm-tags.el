@@ -254,10 +254,21 @@ If no entry in cache, create one."
   "Helm default action to jump to an etags entry in other window."
   (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
+  ;; If interested in compressed-files, search files with extensions.
   (let* ((split (helm-grep-split-line candidate))
+         (file-search-extensions (if auto-compression-mode
+                                     tags-compression-info-list
+                                   '("")))
          (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
                       for f = (expand-file-name
                                (car split) (file-name-directory tagf))
+
+                      ;; search the file with each possible extension
+                      do (while (and (not (file-exists-p f)) file-search-extensions)
+                            (if (not (file-exists-p (concat f (car file-search-extensions))))
+                                (setq file-search-extensions (cdr file-search-extensions))
+                              (setq f (concat f (car file-search-extensions)))))
+
                       when (file-exists-p f)
                       return f))
          (elm   (cl-caddr split))
