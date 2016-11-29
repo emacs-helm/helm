@@ -250,27 +250,24 @@ If no entry in cache, create one."
 
 (defvar find-tag-marker-ring)
 
+(defsubst helm-etags--file-from-tag (fname)
+  (cl-loop for ext in
+           (cons "" (remove "" tags-compression-info-list))
+           for file = (concat fname ext)
+           when (file-exists-p file)
+           return file))
+
 (defun helm-etags-action-goto (switcher candidate)
   "Helm default action to jump to an etags entry in other window."
   (require 'etags)
   (helm-log-run-hook 'helm-goto-line-before-hook)
-  ;; If interested in compressed-files, search files with extensions.
   (let* ((split (helm-grep-split-line candidate))
-         (file-search-extensions (if auto-compression-mode
-                                     tags-compression-info-list
-                                   '("")))
          (fname (cl-loop for tagf being the hash-keys of helm-etags-cache
-                      for f = (expand-file-name
-                               (car split) (file-name-directory tagf))
-
-                      ;; search the file with each possible extension
-                      do (while (and (not (file-exists-p f)) file-search-extensions)
-                            (if (not (file-exists-p (concat f (car file-search-extensions))))
-                                (setq file-search-extensions (cdr file-search-extensions))
-                              (setq f (concat f (car file-search-extensions)))))
-
-                      when (file-exists-p f)
-                      return f))
+                         for f = (expand-file-name
+                                  (car split) (file-name-directory tagf))
+                         ;; Try to find an existing file, possibly compressed.
+                         when (helm-etags--file-from-tag f)
+                         return it))
          (elm   (cl-caddr split))
          (linum (string-to-number (cadr split))))
     (if (null fname)
