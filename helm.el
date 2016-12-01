@@ -579,7 +579,7 @@ The default is to enable this by default and then toggle
   :type 'boolean)
 
 (defcustom helm-echo-input-in-header-line nil
-  "Send current input in header-line."
+  "Send current input in header-line when non-nil."
   :group 'helm
   :type 'boolean)
 
@@ -3796,18 +3796,14 @@ mode and header lines."
                                '(space :width left-fringe)
                                (propertize
                                 "->"
-                                'face 'helm-header-line-left-margin))))
-           (pos  (- (point) beg)))
+                                'face 'helm-header-line-left-margin)))))
       (with-helm-buffer
-        (setq header-line-format (concat pref cont " "))
-        (put-text-property
-         ;; Increment pos to handle the space before prompt (i.e `pref').
-         (1+ pos) (+ 2 pos)
-         'face ;don't just use 'cursor; this can hide the current character
-         (list :inverse-video t
-               :foreground (face-background 'cursor)
-               :background (face-background 'default))
-         header-line-format)
+        (setq header-line-format
+              (concat pref (replace-regexp-in-string "%" "%%" cont)
+                      (propertize
+                       " " 'face (list :inverse-video t
+                                       :foreground (face-background 'cursor)
+                                       :background (face-background 'default)))))
         (when update (force-mode-line-update))))))
 
 (defun helm--update-header-line ()
