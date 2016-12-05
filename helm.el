@@ -3796,14 +3796,18 @@ mode and header lines."
                                '(space :width left-fringe)
                                (propertize
                                 "->"
-                                'face 'helm-header-line-left-margin)))))
+                                'face 'helm-header-line-left-margin))))
+           (pos  (- (point) beg)))
       (with-helm-buffer
-        (setq header-line-format
-              (concat pref (replace-regexp-in-string "%" "%%" cont)
-                      (propertize
-                       " " 'face (list :inverse-video t
-                                       :foreground (face-background 'cursor)
-                                       :background (face-background 'default)))))
+        (setq header-line-format (concat pref cont " "))
+        (put-text-property
+         ;; Increment pos to handle the space before prompt (i.e `pref').
+         (1+ pos) (+ 2 pos)
+         'face ;don't just use 'cursor; this can hide the current character
+         (list :inverse-video t
+               :foreground (face-background 'cursor)
+               :background (face-background 'default))
+         header-line-format)
         (when update (force-mode-line-update))))))
 
 (defun helm--update-header-line ()
