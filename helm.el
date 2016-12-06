@@ -3798,11 +3798,13 @@ mode and header lines."
                                 "->"
                                 'face 'helm-header-line-left-margin))))
            (pos  (- (point) beg)))
+      (cl-loop for c across cont when (eql c ?%) do (cl-incf pos))
+      (setq cont (replace-regexp-in-string "%" "%%" cont))
       (with-helm-buffer
         (setq header-line-format (concat pref cont " "))
         (put-text-property
          ;; Increment pos to handle the space before prompt (i.e `pref').
-         (1+ pos) (+ 2 pos)
+         (+ 1 pos) (+ 2 pos)
          'face ;don't just use 'cursor; this can hide the current character
          (list :inverse-video t
                :foreground (face-background 'cursor)
