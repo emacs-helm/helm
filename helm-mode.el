@@ -309,6 +309,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             help-message
                             (keymap helm-comp-read-map)
                             (name "Helm Completions")
+                            header-name
                             candidates-in-buffer
                             match-part
                             exec-when-only-one
@@ -320,7 +321,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             marked-candidates
                             nomark
                             (alistp t)
-                            (candidate-number-limit helm-candidate-number-limit))
+                            (candidate-number-limit helm-candidate-number-limit)
+                            multiline
+                            allow-nest)
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -378,6 +381,8 @@ Keys description:
 
 - NAME: The name related to this local source.
 
+- HEADER-NAME: A function to alter NAME, see `helm'.
+
 - EXEC-WHEN-ONLY-ONE: Bound `helm-execute-action-at-once-if-one'
   to non--nil. (possibles values are t or nil).
 
@@ -407,6 +412,11 @@ Keys description:
 
 - MATCH-PART: Allow matching only one part of candidate.
   See match-part documentation in `helm-source'.
+
+- ALLOW-NEST: Allow nesting this `helm-comp-read' in a helm session.
+  See `helm'.
+
+- MULTILINE: See multiline in `helm-source'.
 
 Any prefix args passed during `helm-comp-read' invocation will be recorded
 in `helm-current-prefix-arg', otherwise if prefix args were given before
@@ -467,6 +477,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src-hist (helm-build-sync-source (format "%s History" name)
                          :candidates history-get-candidates
                          :fuzzy-match fuzzy
+                         :multiline multiline
                          :match-part match-part
                          :filtered-candidate-transformer
                          (append '((lambda (candidates sources)
@@ -486,6 +497,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :match-part match-part
+                  :multiline multiline
+                  :header-name header-name
                   :filtered-candidate-transformer fc-transformer
                   :requires-pattern requires-pattern
                   :persistent-action persistent-action
@@ -498,6 +511,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (src-1 (helm-build-in-buffer-source name
                     :data get-candidates
                     :match-part match-part
+                    :multiline multiline
+                    :header-name header-name
                     :filtered-candidate-transformer fc-transformer
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
@@ -525,6 +540,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :preselect preselect
                          :prompt prompt
                          :resume 'noresume
+                         :allow-nest allow-nest
                          :candidate-number-limit candidate-number-limit
                          :case-fold-search case-fold
                          :keymap loc-map
