@@ -195,6 +195,12 @@ It is added to `extended-command-history'.
 ;;; Minibuffer History
 ;;
 ;;
+(defvar helm-minibuffer-history-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map [remap helm-minibuffer-history] 'undefined)
+    map))
+
 (defvar helm-source-minibuffer-history
   (helm-build-sync-source "Minibuffer History"
     :header-name (lambda (name)
@@ -215,12 +221,6 @@ It is added to `extended-command-history'.
               (with-helm-current-buffer
                 (delete-minibuffer-contents)
                 (insert candidate)))))
-
-(defvar helm-minibuffer-history-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map [remap helm-minibuffer-history] 'undefined)
-    map))
 
 ;;; Shell history
 ;;
