@@ -3798,14 +3798,20 @@ mode and header lines."
                                 "->"
                                 'face 'helm-header-line-left-margin))))
            (pos  (- (point) beg)))
-      (cl-loop for c across cont when (eql c ?%) do (cl-incf pos))
+      ;; Increment pos each time we find a "%" up to current-pos (#1648).
+      (cl-loop for c across (buffer-substring-no-properties beg (point))
+            when (eql c ?%) do (cl-incf pos))
+      ;; Increment pos when cursor is on a "%" to make it visible in header-line
+      ;; i.e "%%|" and not "%|%" (#1649).
+      (when (looking-at "%") (setq pos (1+ pos)))
       (setq cont (replace-regexp-in-string "%" "%%" cont))
       (with-helm-buffer
         (setq header-line-format (concat pref cont " "))
         (put-text-property
          ;; Increment pos to handle the space before prompt (i.e `pref').
          (+ 1 pos) (+ 2 pos)
-         'face ;don't just use 'cursor; this can hide the current character
+         'face
+         ;; Don't just use 'cursor, this can hide the current character.
          (list :inverse-video t
                :foreground (face-background 'cursor)
                :background (face-background 'default))
