@@ -200,19 +200,27 @@ It is added to `extended-command-history'.
     :header-name (lambda (name)
                    (format "%s (%s)" name minibuffer-history-variable))
     :candidates
-     (lambda ()
-       (let ((history (cl-loop for i in
-                               (symbol-value minibuffer-history-variable)
-                               unless (string= "" i) collect i)))
-         (if (consp (car history))
-             (mapcar 'prin1-to-string history)
-             history)))
+    (lambda ()
+      (cl-loop for i in
+            (symbol-value minibuffer-history-variable)
+            unless (string= "" i) collect i into history
+            finally return
+            (if (consp (car history))
+                (mapcar 'prin1-to-string history)
+              history)))
+    :keymap helm-minibuffer-history-map
     :migemo t
     :multiline t
     :action (lambda (candidate)
               (with-helm-current-buffer
                 (delete-minibuffer-contents)
                 (insert candidate)))))
+
+(defvar helm-minibuffer-history-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map [remap helm-minibuffer-history] 'undefined)
+    map))
 
 ;;; Shell history
 ;;
