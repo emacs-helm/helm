@@ -870,6 +870,7 @@ Keys description:
              :nohighlight t
              :persistent-action persistent-action
              :persistent-help persistent-help
+             :keymap cmap
              :nomark nomark
              :action action-fn)
            ;; Other source.
@@ -902,6 +903,7 @@ Keys description:
              :persistent-action persistent-action
              :persistent-help persistent-help
              :volatile t
+             :keymap cmap
              :cleanup 'helm-find-files-cleanup
              :nomark nomark
              :action action-fn)))
