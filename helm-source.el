@@ -809,9 +809,10 @@ an eieio class."
                                (helm-append-at-nth
                                 actions new-action index))
                               (t actions)))))
-    (if (functionp actions)
-        (setf (slot-value source 'action) (list (cons "Default action" actions)))
-        (setf (slot-value source 'action) (helm-interpret-value actions source)))
+    (cond ((functionp actions)
+           (setf (slot-value source 'action) (list (cons "Default action" actions))))
+          ((listp actions)
+           (setf (slot-value source 'action) (helm-interpret-value actions source))))
     (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
     (setf (slot-value source 'action-transformer)
