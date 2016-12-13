@@ -1527,6 +1527,7 @@ This happen only when `helm-ff-auto-update-flag' is non--nil
 or when `helm-pattern' is equal to \"~/\"."
   (let ((src (helm-get-current-source)))
     (when (and (helm-file-completion-source-p src)
+               (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-ff-invalid-tramp-name-p)))
       (with-helm-window
         (let* ((history-p   (string= (assoc-default 'name src)
@@ -1556,7 +1557,6 @@ or when `helm-pattern' is equal to \"~/\"."
                              (helm-get-selection nil nil src))))
           (when (and (or (and helm-ff-auto-update-flag
                               (null helm-ff--deleting-char-backward)
-                              (not (get-buffer-window helm-action-buffer 'visible))
                               ;; Issue #295
                               ;; File predicates are returning t
                               ;; with paths like //home/foo.
