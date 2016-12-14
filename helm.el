@@ -3803,7 +3803,7 @@ mode and header lines."
             when (eql c ?%) do (cl-incf pos))
       ;; Increment pos when cursor is on a "%" to make it visible in header-line
       ;; i.e "%%|" and not "%|%" (#1649).
-      (when (eq (char-after) ?%) (setq pos (1+ pos)))
+      (when (eql (char-after) ?%) (setq pos (1+ pos)))
       (setq cont (replace-regexp-in-string "%" "%%" cont))
       (with-helm-buffer
         (setq header-line-format (concat pref cont " "))
