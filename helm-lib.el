@@ -152,12 +152,11 @@ a function.
 If NAME returns nil the pair is skipped.
 
 \(fn NAME ACTION ...)"
-  (cl-loop for i on args by #'cddr
-           for name  = (car i)
+  (cl-loop for (name fn) on args by #'cddr
            when (functionp name)
            do (setq name (funcall name))
            when name
-           collect (cons name (cadr i))))
+           collect (cons name fn)))
 
 ;;; Anaphoric macros.
 ;;
