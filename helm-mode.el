@@ -150,7 +150,7 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
 (defvar helm-cr-unknown-pattern-flag nil)
 
 
-;;; Helm `completing-read' replacement
+;;; helm-comp-read
 ;;
 ;;
 (defun helm-cr-empty-string ()
@@ -559,6 +559,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                (set history (list result)))))
       (or result (helm-mode--keyboard-quit)))))
 
+
 ;; Generic completing-read
 ;;
 ;; Support also function as collection.
@@ -1031,6 +1032,28 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
     (if (eq predicate 'file-directory-p) ; Using `read-directory-name'.
         (file-name-as-directory fname) fname)))
 
+;; Read file name handler with history (issue #1652)
+(defun helm-read-file-name-handler-1 (prompt dir default-filename
+                                      mustmatch initial predicate
+                                      name buffer)
+  "A `read-file-name' handler with history.
+Can be added to `helm-completing-read-handlers-alist' for functions
+that need a `read-file-name' function with directory history.
+The `helm-find-files' history `helm-ff-history' is used here."
+  (helm-read-file-name
+   prompt
+   :name name
+   :history helm-ff-history
+   :buffer buffer
+   :default default-filename
+   :initial-input (expand-file-name initial dir)
+   :alistp nil
+   :must-match mustmatch
+   :test predicate))
+
+
+;;; Completion in region
+;;
 (defun helm-mode--advice-lisp--local-variables (old--fn &rest args)
   (ignore-errors
     (apply old--fn args)))
