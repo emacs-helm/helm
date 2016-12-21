@@ -26,6 +26,13 @@
 (require 'cl-lib)
 (require 'dired)
 
+(declare-function helm-get-sources "helm.el")
+(declare-function helm-marked-candidates "helm.el")
+(declare-function helm-follow-mode-p "helm.el")
+(declare-function helm-attr "helm.el")
+(declare-function helm-attrset "helm.el")
+(defvar helm-current-position)
+
 
 ;;; User vars.
 ;;
