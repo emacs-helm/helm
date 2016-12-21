@@ -110,7 +110,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defvar helm-org-headings-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "<C-c i>") 'helm-org-run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-c i")   'helm-org-run-open-heading-in-indirect-buffer)
     (define-key map (kbd "C-c w")   'helm-org-run-heading-refile)
     (define-key map (kbd "C-c l")   'helm-org-run-insert-link-to-heading-at-marker)
     map)
