@@ -1075,6 +1075,27 @@ you don't choose from there a command using helm completion.
 ** Commands
 \\<helm-kmacro-map>")
 
+(defvar helm-org-headings-help-message
+  "* Helm org headings
+
+** Tips
+
+*** Refiling
+
+The heading to refile will be the one you were at when starting helm
+session, and the place to refile this heading will be the selected
+candidate (i.e the candidate at point in helm buffer). If you want to
+refile another one, move to it in helm buffer, mark it, then move to
+the candidate of your choice to refile at this place.
+NOTE that of course if you have marked more than one candidate,
+all the subsequent candidates will be ignored.
+
+** Commands
+\\<helm-org-headings-map>
+\\[helm-org-run-open-heading-in-indirect-buffer]\t\tOpen heading in indirect buffer.
+\\[helm-org-run-heading-refile]\t\tRefile current heading to selection.
+\\[helm-org-run-insert-link-to-heading-at-marker]\t\tInsert link at point to selection."
+  )
 
 ;;; Mode line strings
 ;;
