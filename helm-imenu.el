@@ -124,7 +124,7 @@ only '((foo . bar)) is needed."
                  :fuzzy-match helm-imenu-fuzzy-match))))
 
 (defun helm-imenu--maybe-switch-to-buffer (candidate)
-  (helm-aif (marker-buffer (cdr candidate))
+  (helm-aif (and (markerp (cdr candidate)) (marker-buffer (cdr candidate)))
       (switch-to-buffer it)))
 
 (defun helm-imenu--execute-action-at-once-p ()
@@ -191,19 +191,23 @@ only '((foo . bar)) is needed."
 
 (defun helm-imenu--candidates-1 (alist)
   (cl-loop for elm in alist
-           nconc (if (imenu--subalist-p elm)
-                     (helm-imenu--candidates-1
-                      (cl-loop for (e . v) in (cdr elm) collect
-                               (cons (propertize
-                                      e 'helm-imenu-type (car elm))
-                                     ;; If value is an integer, convert it
-                                     ;; to a marker, otherwise it is a cons cell
-                                     ;; and it will be converted on next recursions.
-                                     ;; (Issue #1060) [1]. 
-                                     (if (integerp v) (copy-marker v) v))))
-                     (and (cdr elm) ; bug in imenu, should not be needed.
-                          (setcdr elm (copy-marker (cdr elm))) ; Same as [1].
-                          (list elm)))))
+           nconc (cond
+                  ((imenu--subalist-p elm)
+                   (helm-imenu--candidates-1
+                    (cl-loop for (e . v) in (cdr elm) collect
+                             (cons (propertize
+                                    e 'helm-imenu-type (car elm))
+                                   ;; If value is an integer, convert it
+                                   ;; to a marker, otherwise it is a cons cell
+                                   ;; and it will be converted on next recursions.
+                                   ;; (Issue #1060) [1].
+                                   (if (integerp v) (copy-marker v) v)))))
+                  ((listp (cdr elm))
+                   (and elm (list elm)))
+                  (t
+                   (and (cdr elm) ; bug in imenu, should not be needed.
+                        (setcdr elm (copy-marker (cdr elm))) ; Same as [1].
+                        (list elm))))))
 
 (defun helm-imenu--get-prop (item)
   ;; property value of ITEM can have itself
@@ -222,7 +226,7 @@ only '((foo . bar)) is needed."
   (cl-loop for (k . v) in candidates
         for types = (or (helm-imenu--get-prop k)
                         (list "Function" k))
-        for bufname = (buffer-name (marker-buffer v))
+        for bufname = (and (markerp v) (buffer-name (marker-buffer v)))
         for disp1 = (mapconcat
                      (lambda (x)
                        (propertize
