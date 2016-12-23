@@ -124,8 +124,9 @@ only '((foo . bar)) is needed."
                  :fuzzy-match helm-imenu-fuzzy-match))))
 
 (defun helm-imenu--maybe-switch-to-buffer (candidate)
-  (helm-aif (and (markerp (cdr candidate)) (marker-buffer (cdr candidate)))
-      (switch-to-buffer it)))
+  (let ((cand (cdr candidate)))
+    (helm-aif (and (markerp cand) (marker-buffer cand))
+        (switch-to-buffer it))))
 
 (defun helm-imenu--execute-action-at-once-p ()
   (let ((cur (helm-get-selection))
