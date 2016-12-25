@@ -1445,20 +1445,21 @@ of \(action-display . function\)."
   "Return the source for the current selection.
 Return nil when `helm-buffer' is empty."
   (or helm-current-source
-      (get-text-property (point) 'helm-cur-source)
       (with-helm-buffer
-        ;; This is needed to not loose selection.
-        (goto-char (overlay-start helm-selection-overlay))
-        (let ((header-pos (or (helm-get-previous-header-pos)
-                              (helm-get-next-header-pos))))
-          ;; Return nil when no--candidates.
-          (when header-pos
-            (cl-loop with source-name = (save-excursion
-                                          (goto-char header-pos)
-                                          (helm-current-line-contents))
-                     for source in (helm-get-sources) thereis
-                     (and (equal (assoc-default 'name source) source-name)
-                          source)))))))
+        (or (get-text-property (point) 'helm-cur-source)
+            (progn
+              ;; This is needed to not loose selection.
+              (goto-char (overlay-start helm-selection-overlay))
+              (let ((header-pos (or (helm-get-previous-header-pos)
+                                    (helm-get-next-header-pos))))
+                ;; Return nil when no--candidates.
+                (when header-pos
+                  (cl-loop with source-name = (save-excursion
+                                                (goto-char header-pos)
+                                                (helm-current-line-contents))
+                           for source in (helm-get-sources) thereis
+                           (and (equal (assoc-default 'name source) source-name)
+                                source)))))))))
 
 (defun helm-buffer-is-modified (buffer)
   "Return non-`nil' when BUFFER is modified since `helm' was invoked."
