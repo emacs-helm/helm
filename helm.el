@@ -1445,6 +1445,7 @@ of \(action-display . function\)."
   "Return the source for the current selection.
 Return nil when `helm-buffer' is empty."
   (or helm-current-source
+      (get-text-property (point) 'helm-cur-source)
       (with-helm-buffer
         ;; This is needed to not loose selection.
         (goto-char (overlay-start helm-selection-overlay))
@@ -3180,7 +3181,7 @@ It is used for narrowing list of candidates to the
     (if (not (assq 'multiline source))
         (cl-loop for m in matches
                  for count from 1
-                 do (helm-insert-match m 'insert count))
+                 do (helm-insert-match m 'insert count source))
       (let ((start (point))
             (count 0)
             separate)
@@ -3189,7 +3190,7 @@ It is used for narrowing list of candidates to the
           (if separate
               (helm-insert-candidate-separator)
             (setq separate t))
-          (helm-insert-match match 'insert count))
+          (helm-insert-match match 'insert count source))
         (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
@@ -3356,7 +3357,7 @@ PRESELECT, if specified."
   "Remove SOURCE from `helm-candidate-cache'."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
-(defun helm-insert-match (match insert-function &optional num)
+(defun helm-insert-match (match insert-function &optional num source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
 If MATCH is a list then insert the string to display and store
 the real value in a text property."
@@ -3374,6 +3375,8 @@ the real value in a text property."
                                 'helm-realvalue realvalue)))
       (when num
         (put-text-property start (point-at-eol) 'helm-cand-num num))
+      (when source
+        (put-text-property start (point-at-eol) 'helm-cur-source source))
       (funcall insert-function "\n"))))
 
 (defun helm-insert-header-from-source (source)
@@ -3447,10 +3450,12 @@ this additional info after the source name by overlay."
         (let ((start (point)))
           (helm-insert-candidate-separator)
           (helm-insert-match candidate 'insert-before-markers
-                             (1+ (cdr (assoc 'item-count source))))
+                             (1+ (cdr (assoc 'item-count source)))
+                             source)
           (put-text-property start (point) 'helm-multiline t))
         (helm-insert-match candidate 'insert-before-markers
-                           (1+ (cdr (assoc 'item-count source)))))
+                           (1+ (cdr (assoc 'item-count source)))
+                           source))
     (cl-incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
