@@ -1507,7 +1507,7 @@ or hitting C-j on \"..\"."
                    (not (helm-empty-source-p))
                    (not (string-match
                          "\\`[Dd]ired-"
-                         (assoc-default 'name (helm-get-current-source))))
+                         (assoc-default 'name src)))
                    helm-ff--move-to-first-real-candidate
                    (helm-get-selection nil nil src))
         (unless (or (not (stringp it))
