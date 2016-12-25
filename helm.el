@@ -3359,9 +3359,11 @@ PRESELECT, if specified."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
 (defun helm-insert-match (match insert-function &optional num source)
-  "Insert MATCH into `helm-buffer' with INSERT-FUNCTION for SOURCE.
-If MATCH is a list then insert the string to display and store
-the real value in a text property."
+  "Insert MATCH into `helm-buffer' with INSERT-FUNCTION.
+If MATCH is a cons cell then insert the car as display with
+the cdr stored as real value in a `helm-realvalue' text property.
+Args NUM and SOURCE are also stored as text property when specified as
+respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match)))
