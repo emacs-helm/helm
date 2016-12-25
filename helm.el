@@ -4389,25 +4389,22 @@ Optional argument SOURCE is a Helm source object."
     (unless (helm-end-of-source-p t)
       (helm-mark-current-line))))
 
-(defun helm-end-of-source-p (&optional at-point)
-  "Return non-`nil' if we are at eob or end of source."
+(defun helm-end-of-source-1 (n at-point)
   (save-excursion
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
-      (forward-line (if at-point 0 1))
-      (or (eq (point-at-bol) (point-at-eol))
-          (helm-pos-header-line-p)
-          (eobp)))))
+        (forward-line (if at-point 0 n))
+        (or (eq (point-at-bol) (point-at-eol))
+            (helm-pos-header-line-p)
+            (if (< n 0) (bobp) (eobp))))))
+
+(defun helm-end-of-source-p (&optional at-point)
+  "Return non-`nil' if we are at eob or end of source."
+  (helm-end-of-source-1 1 at-point))
 
 (defun helm-beginning-of-source-p (&optional at-point)
   "Return non-`nil' if we are at bob or beginning of source."
-  (save-excursion
-    (if (and (helm-pos-multiline-p) (null at-point))
-        (null (helm-get-previous-candidate-separator-pos))
-      (forward-line (if at-point 0 -1))
-      (or (eq (point-at-bol) (point-at-eol))
-          (helm-pos-header-line-p)
-          (bobp)))))
+  (helm-end-of-source-1 -1 at-point))
 
 (defun helm--edit-current-selection-internal (func)
   (with-helm-window
