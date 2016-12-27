@@ -199,7 +199,12 @@ i.e `helm-read-file-name'."
   :type  'boolean)
 
 (defcustom helm-ff-candidate-number-limit 5000
-  "The `helm-candidate-number-limit' for `helm-find-files', `read-file-name' and friends."
+  "The `helm-candidate-number-limit' for `helm-find-files' and friends.
+Note that when going one level up with `\\<helm-find-files-map>\\[helm-find-files-up-one-level]'
+The length of directory will be used instead if it is higher than this
+value, this to avoid failing to preselect the previous directory/file if
+this one is situated lower than `helm-ff-candidate-number-limit' num
+candidate."
   :group 'helm-files
   :type 'integer)
 
@@ -448,6 +453,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff--move-to-first-real-candidate t)
 (defvar helm-find-files--toggle-bookmark nil)
 (defvar helm-ff--tramp-methods nil)
+(defvar helm-ff--directory-files-hash (make-hash-table :test 'equal))
 
 
 ;;; Helm-find-files
@@ -1446,6 +1452,11 @@ If prefix numeric arg is given go ARG level up."
         ;; in `helm-ff-last-expanded'.
         (let ((cur-cand (helm-get-selection nil nil src))
               (new-pattern (helm-reduce-file-name helm-pattern arg)))
+          ;; Ensure visibility on all candidates for preselection.
+          (helm-attrset 'candidate-number-limit
+                        (max (gethash new-pattern helm-ff--directory-files-hash
+                                      helm-ff-candidate-number-limit)
+                             helm-ff-candidate-number-limit))
           (cond ((file-directory-p helm-pattern)
                  (setq helm-ff-last-expanded helm-ff-default-directory))
                 ((file-exists-p helm-pattern)
@@ -1936,6 +1947,7 @@ systems."
                     (setq file-error t)))))
         (dot  (concat directory "."))
         (dot2 (concat directory "..")))
+    (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
     (append (and (not file-error) (list dot dot2)) ls)))
 
 (defun helm-ff-handle-backslash (fname)
@@ -2432,6 +2444,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                        (set-text-properties 0 (length fname)
                                                             nil fname)
                                        (insert fname))))))
+    (helm-attrset 'candidate-number-limit helm-ff-candidate-number-limit)
     (unless image-cand
       (when follow
         (helm-follow-mode -1)
