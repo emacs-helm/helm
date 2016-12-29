@@ -406,8 +406,9 @@ Show actions only on line starting by a PID."
                          (helm-delete-current-selection))
     :persistent-help "Kill Process"
     :action (helm-make-actions "Kill Process"
-                               (lambda (elm)
-                                 (delete-process (get-process elm))))))
+                               (lambda (_elm)
+                                 (cl-loop for p in (helm-marked-candidates)
+                                          do (delete-process (get-process p)))))))
 
 
 ;;;###autoload
