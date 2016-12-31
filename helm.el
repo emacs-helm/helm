@@ -1562,7 +1562,9 @@ was deleted and the candidates list not updated."
 (defun helm-funcall-with-source (source functions &rest args)
   "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
 FUNCTIONS is either a symbol or a list of functions.
-Return the result of last function call."
+Return the result of last function call.
+
+\(fn SOURCE FUNCTIONS &optional CANDIDATES SOURCE)"
   (let ((helm-source-name (assoc-default 'name source))
         (helm-current-source source)
         (funs (if (functionp functions) (list functions) functions)))
@@ -2938,7 +2940,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                              pat-lookup str-lookup :test 'equal))
                     2)))))
 
-(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+(defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real)
   "The transformer for sorting candidates in fuzzy matching.
 It sorts on the display part by default.
 
@@ -2979,6 +2981,9 @@ real part."
                 (cond ((= scr1 scr2)
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
+
+(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+  (helm-fuzzy-matching-default-sort-fn-1 candidates use-real))
 
 (defun helm--maybe-get-migemo-pattern (pattern)
   (or (and helm-migemo-mode
@@ -3136,7 +3141,7 @@ It is used for narrowing list of candidates to the
       ;; Filter candidates with this func, otherwise just compute
       ;; candidates.
       (helm-process-filtered-candidate-transformer
-       ;; ; Using in-buffer method or helm-pattern is empty
+       ;; Using in-buffer method or helm-pattern is empty
        ;; in this case compute all candidates.
        (if (or (equal helm-pattern "")
                (helm--candidates-in-buffer-p matchfns))
@@ -3217,7 +3222,7 @@ and `helm-pattern'."
 
 ;;; Helm update
 ;;
-(defun helm-update (&optional preselect source)
+(defun helm-update (&optional preselect source candidates)
   "Update candidates list in `helm-buffer' based on `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection
 to a particular place after finishing update."
@@ -3248,7 +3253,7 @@ to a particular place after finishing update."
            (unless sources (erase-buffer))
            ;; Compute matches without rendering the sources.
            (helm-log "Matches: %S"
-                     (setq matches (helm--collect-matches sources)))
+                     (setq matches (or candidates (helm--collect-matches sources))))
            ;; If computing matches finished and is not interrupted
            ;; erase the helm-buffer and render results (Fix #1157).
            (when matches
@@ -3330,6 +3335,24 @@ PRESELECT, if specified."
     (helm-aif (assoc-default attr source)
         (helm-funcall-with-source source it)))
   (helm-remove-candidate-cache source))
+
+(defun helm-redisplay-buffer (functions)
+  "Modify candidates with FUNCTIONS and redisplay them.
+This is needed when you want to redisplay candidates without
+recomputing them in async sources or volatile sources, on other
+sources, `helm-update' is enough because candidates are cached and not
+recomputed."
+  (with-helm-buffer
+    (goto-char (point-min))
+    (let (candidates
+          helm-move-to-line-cycle-in-source
+          (source (helm-get-current-source)))
+      (helm-awhile (helm-get-selection nil 'withprop source)
+        (push it candidates)
+        (when (save-excursion (forward-line 1) (eobp)) (cl-return nil))
+        (helm-next-line))
+      (setq candidates (helm-funcall-with-source source functions (nreverse candidates)))
+      (helm-update nil source (list candidates)))))
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
