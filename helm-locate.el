@@ -291,6 +291,8 @@ See also `helm-locate'."
                                       " command line was:\n\n "
                                       cmd)))))
                  ((string= event "finished\n")
+                  (when helm-locate-fuzzy-match
+                    (helm-redisplay-buffer 'helm-fuzzy-matching-default-sort-fn-1))
                   (with-helm-window
                     (setq mode-line-format
                           '(" " mode-line-buffer-identification " "
