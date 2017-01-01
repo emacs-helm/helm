@@ -381,7 +381,10 @@
   sources built with child class `helm-source-in-buffer' the SEARCH slot.
   This is an easy way of enabling fuzzy matching, but you can use the MATCH
   or SEARCH slots yourself if you want something more elaborated, mixing
-  different type of match (See `helm-source-buffers' class for example).")
+  different type of match (See `helm-source-buffers' class for example).
+
+  This attribute is not supported for asynchronous sources
+  since they perform pattern matching themselves.")
 
    (nomark
     :initarg :nomark
@@ -945,7 +948,9 @@ an eieio class."
   (cl-assert (null (slot-value source 'candidates))
              nil "Incorrect use of `candidates' use `candidates-process' instead")
   (cl-assert (null (slot-value source 'multimatch))
-             nil "`multimatch' not allowed in async sources."))
+             nil "`multimatch' not allowed in async sources.")
+  (cl-assert (null (slot-value source 'fuzzy-match))
+             nil "`fuzzy-match' not supported in async sources."))
 
 (defmethod helm--setup-source ((source helm-source-dummy))
   (let ((mtc (slot-value source 'match)))
