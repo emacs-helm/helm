@@ -1560,8 +1560,9 @@ was deleted and the candidates list not updated."
 ;; Tools
 ;;
 (defun helm-funcall-with-source (source functions &rest args)
-  "Call from SOURCE FUNCTIONS list or single function FUNCTIONS with ARGS.
-FUNCTIONS is either a symbol or a list of functions.
+  "From SOURCE apply FUNCTIONS on ARGS.
+FUNCTIONS is either a symbol or a list of functions, each function being
+applied on ARGS.
 Return the result of last function call."
   (let ((helm-source-name (assoc-default 'name source))
         (helm-current-source source)
@@ -2694,8 +2695,10 @@ WARNING: Do not use this mode yourself, it is internal to helm."
                (equal candidates '("")))
            nil)
           ((listp candidates)
-           ;; Transform candidates with `candidate-transformer' functions if
-           ;; some, otherwise return candidates.
+           ;; Transform candidates with `candidate-transformer' functions or
+           ;; `real-to-display' functions if those are found,
+           ;; otherwise return candidates unmodified.
+           ;; `filtered-candidate-transformer' is NOT called here.
            (helm-transform-candidates candidates source))
           (t (funcall notify-error)))))
 
@@ -2792,11 +2795,15 @@ functions if some, otherwise return CANDIDATES."
 
 (defun helm-transform-candidates (candidates source &optional process-p)
   "Transform CANDIDATES from SOURCE according to candidate transformers.
+
 When PROCESS-P is non-`nil' executes the
 `filtered-candidate-transformer' functions, otherwise processes
-`candidate-transformer' functions only. When `real-to-display'
-attribute is present, execute its function on all maybe filtered
-CANDIDATES."
+`candidate-transformer' functions only,
+`filtered-candidate-transformer' functions being processed later,
+after the candidates have been narrowed by
+`helm-candidate-number-limit', see `helm-compute-matches'.  When
+`real-to-display' attribute is present, execute its functions on all
+maybe filtered CANDIDATES."
   (helm-process-real-to-display
    (helm-process-filtered-candidate-transformer-maybe
     (helm-process-candidate-transformer
@@ -3135,6 +3142,9 @@ It is used for narrowing list of candidates to the
       ;; If source have a `filtered-candidate-transformer' attr
       ;; Filter candidates with this func, otherwise just compute
       ;; candidates.
+      ;; NOTE that this next block of code is returning nil on async sources,
+      ;; the candidates being processed directly in `helm-output-filter'
+      ;; process-filter. 
       (helm-process-filtered-candidate-transformer
        ;; ; Using in-buffer method or helm-pattern is empty
        ;; in this case compute all candidates.
