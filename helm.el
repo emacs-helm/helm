@@ -1562,7 +1562,7 @@ was deleted and the candidates list not updated."
 (defun helm-funcall-with-source (source functions &rest args)
   "From SOURCE apply FUNCTIONS on ARGS.
 FUNCTIONS is either a symbol or a list of functions, each function being
-applied on ARGS.
+applied on ARGS and called on the result of the precedent function.
 Return the result of last function call."
   (let ((helm-source-name (assoc-default 'name source))
         (helm-current-source source)
