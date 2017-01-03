@@ -2481,18 +2481,28 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
-           (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
-             (kill-buffer image-dired-display-image-buffer))
-           ;; Fix emacs bug never fixed upstream.
-           (unless (file-directory-p image-dired-dir)
-             (make-directory image-dired-dir))
-           (image-dired-display-image candidate)
-           (message nil)
-           (switch-to-buffer image-dired-display-image-buffer)
-           (with-current-buffer image-dired-display-image-buffer
-             (let ((exif-data (helm-ff-exif-data candidate)))
-               (setq default-directory helm-ff-default-directory)
-               (image-dired-update-property 'help-echo exif-data))))
+           (let ((remove-buf-only
+                  (and (get-buffer-window
+                        image-dired-display-image-buffer 'visible)
+                       (file-equal-p candidate
+                                     (with-current-buffer
+                                         image-dired-display-image-buffer
+                                       (get-text-property
+                                        (point-min)
+                                        'original-file-name))))))
+             (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
+               (kill-buffer image-dired-display-image-buffer))
+             (unless remove-buf-only
+               ;; Fix emacs bug never fixed upstream.
+               (unless (file-directory-p image-dired-dir)
+                 (make-directory image-dired-dir))
+               (image-dired-display-image candidate)
+               (message nil)
+               (switch-to-buffer image-dired-display-image-buffer)
+               (with-current-buffer image-dired-display-image-buffer
+                 (let ((exif-data (helm-ff-exif-data candidate)))
+                   (setq default-directory helm-ff-default-directory)
+                   (image-dired-update-property 'help-echo exif-data))))))
           ;; Allow browsing archive on avfs fs.
           ;; Assume volume is already mounted with mountavfs.
           ((and helm-ff-avfs-directory
