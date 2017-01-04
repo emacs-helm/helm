@@ -3739,6 +3739,11 @@ locate."
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (setq helm-multi-files--toggle-locate nil)
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
+        (helm-locate-command
+         (if helm-locate-fuzzy-match
+             (replace-regexp-in-string
+              "locate" "locate -b" helm-locate-command)
+             helm-locate-command))
         (old-key (lookup-key
                   helm-map
                   (read-kbd-macro helm-multi-files-toggle-locate-binding))))
