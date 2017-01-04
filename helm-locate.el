@@ -90,6 +90,12 @@ the opposite of \"locate\" command."
   :group 'helm-locate
   :type 'boolean)
 
+(defcustom helm-locate-fuzzy-sort-fn
+  #'helm-fuzzy-matching-default-sort-fn-1
+  "Default fuzzy matching sort function for locate."
+  :group 'helm-locate
+  :type 'boolean)
+
 (defcustom helm-locate-project-list nil
   "A list of directories, your projects.
 When set, allow browsing recursively files in all
@@ -230,7 +236,8 @@ See also `helm-locate'."
          (if db
              (replace-regexp-in-string
               "locate"
-              (format "locate -d %s"
+              (format (if helm-locate-fuzzy-match
+                          "locate -b -d %s" "locate -d %s")
                       (mapconcat 'identity
                                  ;; Remove eventually
                                  ;; marked directories by error.
@@ -238,7 +245,10 @@ See also `helm-locate'."
                                        unless (file-directory-p i)
                                        collect i) ":"))
               helm-locate-command)
-           helm-locate-command)))
+           (if helm-locate-fuzzy-match
+               (replace-regexp-in-string
+                "locate" "locate -b" helm-locate-command)
+               helm-locate-command))))
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))
     (helm :sources 'helm-source-locate
           :buffer "*helm locate*"
@@ -292,7 +302,7 @@ See also `helm-locate'."
                                       cmd)))))
                  ((string= event "finished\n")
                   (when helm-locate-fuzzy-match
-                    (helm-redisplay-buffer 'helm-fuzzy-matching-default-sort-fn-1))
+                    (helm-redisplay-buffer helm-locate-fuzzy-sort-fn))
                   (with-helm-window
                     (setq mode-line-format
                           '(" " mode-line-buffer-identification " "
