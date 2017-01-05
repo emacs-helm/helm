@@ -3360,7 +3360,9 @@ Use this for e.g sorting the whole list of async candidates once computed."
     (goto-char (point-min))
     (let ((get-cands (lambda (source fns)
                        (let (candidates helm-move-to-line-cycle-in-source)
-                         (helm-awhile (helm-get-selection nil 'withprop source)
+                         (helm-awhile (condition-case-unless-debug nil
+                                          (helm-get-selection nil 'withprop source)
+                                        (error nil))
                            (push it candidates)
                            (when (save-excursion
                                    (forward-line 1) (helm-end-of-source-p t))
