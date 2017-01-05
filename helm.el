@@ -935,6 +935,9 @@ It also accepts function or variable symbol.")
 
 (defvar helm-autoresize-mode) ;; Undefined in `helm-default-display-buffer'.
 
+(defvar helm-async-outer-limit-hook nil
+  "A hook that run in async sources when process output comes out of `candidate-number-limit'.
+Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 
 ;;; Internal Variables
 ;;
@@ -3482,6 +3485,7 @@ this additional info after the source name by overlay."
     (cl-incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
+      (helm-log-run-hook 'helm-async-outer-limit-hook)
       (cl-return))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info)

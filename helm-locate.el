@@ -410,6 +410,11 @@ To create a user specific db, use
 Where db_path is a filename matched by
 `helm-locate-db-file-regexp'."
   (interactive "P")
+  (helm-set-local-variable 'helm-async-outer-limit-hook
+                           (list (lambda ()
+                                   (when helm-locate-fuzzy-match
+                                     (helm-redisplay-buffer
+                                      helm-locate-fuzzy-sort-fn)))))
   (setq helm-ff-default-directory default-directory)
   (helm-locate-1 arg nil nil (thing-at-point 'filename)))
 
