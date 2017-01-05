@@ -413,7 +413,9 @@ Where db_path is a filename matched by
   (interactive "P")
   (helm-set-local-variable 'helm-async-outer-limit-hook
                            (list (lambda ()
-                                   (when helm-locate-fuzzy-match
+                                   (when (and helm-locate-fuzzy-match
+                                              (not (string-match-p
+                                                    "\\s-" helm-pattern)))
                                      (helm-redisplay-buffer
                                       helm-locate-fuzzy-sort-fn)))))
   (setq helm-ff-default-directory default-directory)
