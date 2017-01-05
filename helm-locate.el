@@ -301,7 +301,8 @@ See also `helm-locate'."
                                       " command line was:\n\n "
                                       cmd)))))
                  ((string= event "finished\n")
-                  (when helm-locate-fuzzy-match
+                  (when (and helm-locate-fuzzy-match
+                             (not (string-match-p "\\s-" helm-pattern)))
                     (helm-redisplay-buffer helm-locate-fuzzy-sort-fn))
                   (with-helm-window
                     (setq mode-line-format
