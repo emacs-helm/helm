@@ -333,12 +333,20 @@ See also `helm-locate'."
 
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
-      (cond ((string-match
-              " " (replace-regexp-in-string " -b" "" pattern)) pattern)
+      ;; When fuzzy is enabled helm add "-b" option on startup.
+      (cond ((string-match-p
+              " " (replace-regexp-in-string " -b" "" pattern))
+             (when (string-match-p "\\`locate -b" helm-locate-command)
+               (setq helm-locate-command (replace-regexp-in-string
+                                          "locate -b" "locate" helm-locate-command)))
+             pattern)
             ((string-match "\\([^ ]*\\) -b" pattern)
-             (concat (helm--mapconcat-pattern
-                      (match-string 1 pattern)) " -b"))
-            (t (helm--mapconcat-pattern pattern)))
+             (helm--mapconcat-pattern (match-string 1 pattern)))
+            (t
+             (unless (string-match-p "\\`locate -b" helm-locate-command)
+               (setq helm-locate-command (replace-regexp-in-string
+                                          "locate" "locate -b" helm-locate-command)))
+             (helm--mapconcat-pattern pattern)))
       pattern))
 
 (defun helm-locate-find-dbs-in-projects (&optional update)
