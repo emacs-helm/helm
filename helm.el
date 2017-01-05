@@ -935,6 +935,9 @@ It also accepts function or variable symbol.")
 
 (defvar helm-autoresize-mode) ;; Undefined in `helm-default-display-buffer'.
 
+(defvar helm-async-outer-limit-hook nil
+  "A hook that run in async sources when process output comes out of `candidate-number-limit'.
+Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 
 ;;; Internal Variables
 ;;
@@ -2945,7 +2948,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                              pat-lookup str-lookup :test 'equal))
                     2)))))
 
-(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+(defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real)
   "The transformer for sorting candidates in fuzzy matching.
 It sorts on the display part by default.
 
@@ -2986,6 +2989,9 @@ real part."
                 (cond ((= scr1 scr2)
                        (< len1 len2))
                       ((> scr1 scr2)))))))))
+
+(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+  (helm-fuzzy-matching-default-sort-fn-1 candidates use-real))
 
 (defun helm--maybe-get-migemo-pattern (pattern)
   (or (and helm-migemo-mode
@@ -3146,7 +3152,7 @@ It is used for narrowing list of candidates to the
       ;; the candidates being processed directly in `helm-output-filter'
       ;; process-filter. 
       (helm-process-filtered-candidate-transformer
-       ;; ; Using in-buffer method or helm-pattern is empty
+       ;; Using in-buffer method or helm-pattern is empty
        ;; in this case compute all candidates.
        (if (or (equal helm-pattern "")
                (helm--candidates-in-buffer-p matchfns))
@@ -3227,7 +3233,7 @@ and `helm-pattern'."
 
 ;;; Helm update
 ;;
-(defun helm-update (&optional preselect source)
+(defun helm-update (&optional preselect source candidates)
   "Update candidates list in `helm-buffer' based on `helm-pattern'.
 Argument PRESELECT is a string or regexp used to move selection
 to a particular place after finishing update."
@@ -3258,7 +3264,7 @@ to a particular place after finishing update."
            (unless sources (erase-buffer))
            ;; Compute matches without rendering the sources.
            (helm-log "Matches: %S"
-                     (setq matches (helm--collect-matches sources)))
+                     (setq matches (or candidates (helm--collect-matches sources))))
            ;; If computing matches finished and is not interrupted
            ;; erase the helm-buffer and render results (Fix #1157).
            (when matches
@@ -3340,6 +3346,36 @@ PRESELECT, if specified."
     (helm-aif (assoc-default attr source)
         (helm-funcall-with-source source it)))
   (helm-remove-candidate-cache source))
+
+(defun helm-redisplay-buffer (functions)
+  "Modify candidates in `helm-buffer' with FUNCTIONS and redisplay them.
+
+Candidates are not recomputed, only redisplayed after modifying the
+whole list of candidates in each source with FUNCTIONS.  Note that
+candidates are redisplayed with their display part with all properties
+included only.
+This function is used in async sources to transform the whole list of candidates
+from the sentinel functions (i.e when all candidates have been computed) because
+other filters like `candidate-transformer' are modifying only each chunk of candidates
+from process-filter as they come in and not the whole list.
+Use this for e.g sorting the whole list of async candidates once computed."
+  (with-helm-buffer
+    (goto-char (point-min))
+    (let ((get-cands (lambda (source fns)
+                       (let (candidates helm-move-to-line-cycle-in-source)
+                         (helm-awhile (condition-case-unless-debug nil
+                                          (helm-get-selection nil 'withprop source)
+                                        (error nil))
+                           (push it candidates)
+                           (when (save-excursion
+                                   (forward-line 1) (helm-end-of-source-p t))
+                             (cl-return nil))
+                           (helm-next-line))
+                         (helm-funcall-with-source
+                          source fns (nreverse candidates))))))
+      (helm-update nil (helm-get-current-source)
+                   (cl-loop for s in (helm-get-sources)
+                            collect (funcall get-cands s functions))))))
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
@@ -3449,6 +3485,7 @@ this additional info after the source name by overlay."
     (cl-incf (cdr (assoc 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
+      (helm-log-run-hook 'helm-async-outer-limit-hook)
       (cl-return))))
 
 (defun helm-output-filter--collect-candidates (lines incomplete-line-info)
