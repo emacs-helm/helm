@@ -336,16 +336,17 @@ See also `helm-locate'."
       ;; When fuzzy is enabled helm add "-b" option on startup.
       (cond ((string-match-p
               " " (replace-regexp-in-string " -b" "" pattern))
-             (when (string-match-p "\\`locate -b" helm-locate-command)
-               (setq helm-locate-command (replace-regexp-in-string
-                                          "locate -b" "locate" helm-locate-command)))
+             (when (string-match "\\`locate -b" helm-locate-command)
+               (setq helm-locate-command
+                     (replace-match "locate" t t helm-locate-command)))
              pattern)
             ((string-match "\\([^ ]*\\) -b" pattern)
              (helm--mapconcat-pattern (match-string 1 pattern)))
             (t
              (unless (string-match-p "\\`locate -b" helm-locate-command)
-               (setq helm-locate-command (replace-regexp-in-string
-                                          "locate" "locate -b" helm-locate-command)))
+               (setq helm-locate-command
+                     (replace-regexp-in-string
+                      "\\`locate" "locate -b" helm-locate-command)))
              (helm--mapconcat-pattern pattern)))
       pattern))
 
