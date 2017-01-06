@@ -3428,7 +3428,8 @@ See `helm-browse-project'."
 (defun helm-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
-  (cl-loop with mp-fn = (assoc-default 'match-part (helm-get-current-source))
+  (cl-loop with mp-fn = (or (assoc-default 'match-part (helm-get-current-source))
+                            'identity)
            for i in files
            for disp = (if (and helm-ff-transformer-show-only-basename
                                (not (helm-dir-is-dot i))
