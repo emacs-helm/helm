@@ -13,6 +13,8 @@ or [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0
 
 or with [Bitcoins](https://www.strongcoin.com/?ref=1HyxLfpdJL81rnk2n6dPmbCkaozk4zzPRh)
 
+Thanks.
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
