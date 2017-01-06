@@ -3428,33 +3428,37 @@ See `helm-browse-project'."
 (defun helm-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
-  (cl-loop for i in files
-        for disp = (if (and helm-ff-transformer-show-only-basename
-                            (not (helm-dir-is-dot i))
-                            (not (and ffap-url-regexp
-                                      (string-match ffap-url-regexp i)))
-                            (not (string-match helm-ff-url-regexp i)))
-                       (helm-basename i) i)
-        for type = (and (null helm-ff-tramp-not-fancy)
-                        (car (file-attributes i)))
-        collect
-        (cond ((and helm-ff-tramp-not-fancy
-                    (string-match helm-tramp-file-name-regexp i))
-               (cons disp i))
-              ((stringp type)
-               (cons (propertize disp
-                                 'face 'helm-ff-symlink
-                                 'help-echo (expand-file-name i))
-                     i))
-              ((eq type t)
-               (cons (propertize disp
-                                 'face 'helm-ff-directory
-                                 'help-echo (expand-file-name i))
-                     i))
-              (t (cons (propertize disp
-                                   'face 'helm-ff-file
-                                   'help-echo (expand-file-name i))
-                       i)))))
+  (cl-loop with mp-fn = (assoc-default 'match-part (helm-get-current-source))
+           for i in files
+           for disp = (if (and helm-ff-transformer-show-only-basename
+                               (not (helm-dir-is-dot i))
+                               (not (and ffap-url-regexp
+                                         (string-match ffap-url-regexp i)))
+                               (not (string-match helm-ff-url-regexp i)))
+                          (helm-basename i) i)
+           for type = (and (null helm-ff-tramp-not-fancy)
+                           (car (file-attributes i)))
+           collect
+           (cond ((and helm-ff-tramp-not-fancy
+                       (string-match helm-tramp-file-name-regexp i))
+                  (cons disp i))
+                 ((stringp type)
+                  (cons (propertize disp
+                                    'face 'helm-ff-symlink
+                                    'match-part (funcall mp-fn disp)
+                                    'help-echo (expand-file-name i))
+                        i))
+                 ((eq type t)
+                  (cons (propertize disp
+                                    'face 'helm-ff-directory
+                                    'match-part (funcall mp-fn disp)
+                                    'help-echo (expand-file-name i))
+                        i))
+                 (t (cons (propertize disp
+                                      'face 'helm-ff-file
+                                      'match-part (funcall mp-fn disp)
+                                      'help-echo (expand-file-name i))
+                          i)))))
 
 (defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
   ((candidates :initform (lambda ()

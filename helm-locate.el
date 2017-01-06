@@ -329,7 +329,12 @@ See also `helm-locate'."
 
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source
-    :pattern-transformer 'helm-locate-pattern-transformer))
+    :pattern-transformer 'helm-locate-pattern-transformer
+    :match-part (lambda (candidate)
+                  (if (and helm-locate-fuzzy-match
+                          (not (string-match "\\s-" helm-pattern)))
+                      (helm-basename candidate)
+                      candidate))))
 
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
