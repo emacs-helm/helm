@@ -510,7 +510,9 @@ With a value of 1 enable, a value of -1 or nil disable the mode.
   If source contain match-part attribute, match is computed only
   on part of candidate returned by the call of function provided
   by this attribute. The function should have one arg, candidate,
-  and return only a specific part of candidate.")
+  and return only a specific part of candidate.
+  On async sources, as matching is done by the backend, this have
+  no effect apart for highlighting matches.")
 
    (before-init-hook
     :initarg :before-init-hook
