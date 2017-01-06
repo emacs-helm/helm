@@ -3412,10 +3412,11 @@ See `helm-browse-project'."
 (defvar helm-source-session
   (helm-build-sync-source "Session"
     :candidates (lambda ()
-                  (cl-delete-if-not (lambda (f)
-                                        (or (string-match helm-tramp-file-name-regexp f)
-                                            (file-exists-p f)))
-                                    (mapcar 'car session-file-alist)))
+                  (cl-delete-if-not
+                   (lambda (f)
+                     (or (string-match helm-tramp-file-name-regexp f)
+                         (file-exists-p f)))
+                   (mapcar 'car session-file-alist)))
     :keymap helm-generic-files-map
     :help-message helm-generic-file-help-message
     :action 'helm-type-file-actions)
@@ -3428,7 +3429,8 @@ See `helm-browse-project'."
 (defun helm-highlight-files (files)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
-  (cl-loop with mp-fn = (or (assoc-default 'match-part (helm-get-current-source))
+  (cl-loop with mp-fn = (or (assoc-default
+                             'match-part (helm-get-current-source))
                             'identity)
            for i in files
            for disp = (if (and helm-ff-transformer-show-only-basename
