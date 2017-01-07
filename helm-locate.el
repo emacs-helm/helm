@@ -246,8 +246,9 @@ See also `helm-locate'."
                                        collect i) ":"))
               helm-locate-command)
            (if helm-locate-fuzzy-match
-               (replace-regexp-in-string
-                "locate" "locate -b" helm-locate-command)
+               (unless (string-match-p "\\`locate -b" helm-locate-command)
+                 (replace-regexp-in-string
+                  "\\`locate" "locate -b" helm-locate-command))
                helm-locate-command))))
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))
     (helm :sources 'helm-source-locate
@@ -336,16 +337,17 @@ See also `helm-locate'."
                       (helm-basename candidate)
                       candidate))))
 
+;; TODO Handle other options added at end of pattern (e.g -l 12) .
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
       ;; When fuzzy is enabled helm add "-b" option on startup.
       (cond ((string-match-p
-              " " (replace-regexp-in-string " -b" "" pattern))
+              " " (replace-regexp-in-string " -b\\'" "" pattern))
              (when (string-match "\\`locate -b" helm-locate-command)
                (setq helm-locate-command
                      (replace-match "locate" t t helm-locate-command)))
              pattern)
-            ((string-match "\\([^ ]*\\) -b" pattern)
+            ((string-match "\\([^ ]*\\) -b\\'" pattern)
              (helm--mapconcat-pattern (match-string 1 pattern)))
             (t
              (unless (string-match-p "\\`locate -b" helm-locate-command)
