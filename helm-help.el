@@ -608,6 +608,15 @@ See Man locate for more infos.
 Some other sources (at the moment recentf and file in current directory sources)
 support the -b flag for compatibility with locate when they are used with it.
 
+When you enable fuzzy matching on locate with
+`helm-locate-fuzzy-match', the search will be performed on basename
+only for efficiency (so don't add \"-b\" at prompt), as soon as you
+separate your patterns with spaces, fuzzy matching will be disabled
+and search will be done on the full filename.  Note that in multimatch
+fuzzy is completely disabled, which mean that each pattern should be a
+compliant regexp matching pattern (i.e \"helm\" will match \"helm\"
+but \"hlm\" will NOT match \"helm\").
+
 *** Browse project
 
 When your directory is not under version control,

@@ -90,7 +90,8 @@ the opposite of \"locate\" command."
   :type 'symbol)
 
 (defcustom helm-locate-fuzzy-match nil
-  "Enable fuzzy matching in `helm-locate'."
+  "Enable fuzzy matching in `helm-locate'.
+Note that when this is enabled searching is done on basename."
   :group 'helm-locate
   :type 'boolean)
 
