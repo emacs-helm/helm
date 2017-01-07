@@ -64,7 +64,11 @@ So don't set it directly but use `helm-locate-case-fold-search'
 for this.
 The last option must be the one preceding pattern i.e \"-r\" or \"--regex\".
 You will be able to pass other options such as \"-b\" or \"l\"
-during helm invocation after entering pattern."
+during helm invocation after entering pattern.
+Note that the \"-b\" option is added automatically by helm when
+var `helm-locate-fuzzy-match' is non-nil and switching back from
+multimatch to fuzzy matching (this is done automatically when a space
+is detected in pattern)."
   :type 'string
   :group 'helm-locate)
 
