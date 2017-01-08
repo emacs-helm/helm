@@ -59,32 +59,34 @@
                      (package--removable-packages))
                (fboundp 'package-autoremove))
       (package-autoremove))
-    (save-selected-window
-      (if (and helm-el-package--initialized-p
-               (fboundp 'package-show-package-list))
-          ;; Use this as `list-packages' doesn't work
-          ;; properly (empty buffer) when called from lisp
-          ;; with 'no-fetch (emacs-25 WA).
-          (package-show-package-list)
-        (when helm--force-updating-p (message "Refreshing packages list..."))  
-        (list-packages helm-el-package--initialized-p))
-      (setq helm-el-package--initialized-p t)
-      (message nil))
-    (helm-init-candidates-in-buffer
-        'global
-      (with-current-buffer (get-buffer "*Packages*")
-        (setq helm-el-package--tabulated-list tabulated-list-entries)
-        (buffer-string)))
-    (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
-    (if helm--force-updating-p
-        (if helm-el-package--upgrades
-            (message "Refreshing packages list done, [%d] package(s) to upgrade"
-                     (length helm-el-package--upgrades))
-          (message "Refreshing packages list done, no upgrades available"))
-      (setq helm-el-package--show-only (if helm-el-package--upgrades
-                                           'upgrade
-                                         helm-el-package-initial-filter)))
-    (kill-buffer "*Packages*")))
+    (unwind-protect
+         (progn
+           (save-selected-window
+             (if (and helm-el-package--initialized-p
+                      (fboundp 'package-show-package-list))
+                 ;; Use this as `list-packages' doesn't work
+                 ;; properly (empty buffer) when called from lisp
+                 ;; with 'no-fetch (emacs-25 WA).
+                 (package-show-package-list)
+               (when helm--force-updating-p (message "Refreshing packages list..."))  
+               (list-packages helm-el-package--initialized-p))
+             (setq helm-el-package--initialized-p t)
+             (message nil))
+           (helm-init-candidates-in-buffer
+               'global
+             (with-current-buffer (get-buffer "*Packages*")
+               (setq helm-el-package--tabulated-list tabulated-list-entries)
+               (buffer-string)))
+           (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
+           (if helm--force-updating-p
+               (if helm-el-package--upgrades
+                   (message "Refreshing packages list done, [%d] package(s) to upgrade"
+                            (length helm-el-package--upgrades))
+                 (message "Refreshing packages list done, no upgrades available"))
+             (setq helm-el-package--show-only (if helm-el-package--upgrades
+                                                  'upgrade
+                                                helm-el-package-initial-filter))))
+      (kill-buffer "*Packages*"))))
 
 (defun helm-el-package-describe (candidate)
   (let ((id (get-text-property 0 'tabulated-list-id candidate)))
