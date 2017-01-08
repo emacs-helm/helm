@@ -2699,10 +2699,18 @@ Use it for non--interactive calls of `helm-find-files'."
       (or (and input (or (and (file-remote-p input) input)
                          (expand-file-name input)))
           (helm-find-files-input
-           ;; Avoid "Stack overflow in regexp matcher" error
-           ;; in evil `ffap-guesser'.
-           (condition-case-unless-debug nil (ffap-guesser) (error nil))
+           (helm-ffap-guesser)
            (thing-at-point 'filename))))))
+
+(defun helm-ffap-guesser ()
+  "Same as `ffap-guesser' but without the crashing emacs stuff."
+  ;; Avoid "Stack overflow in regexp matcher" error
+  ;; in evil `ffap-guesser' by removing crap `ffap-gopher-at-point'
+  ;; and `ffap-machine-at-point'.
+  (or (and ffap-url-regexp
+	   (ffap-fixup-url (ffap-url-at-point)))
+      ;; may yield url!
+      (ffap-file-at-point)))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
