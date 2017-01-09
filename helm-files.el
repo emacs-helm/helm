@@ -3759,13 +3759,13 @@ locate."
                                    (when (and helm-locate-fuzzy-match
                                               (not (string-match-p
                                                     "\\s-" helm-pattern)))
-                                     (helm-redisplay-buffer
-                                      helm-locate-fuzzy-sort-fn)))))
+                                     (helm-redisplay-buffer)))))
   (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
         (helm-locate-command
          (if helm-locate-fuzzy-match
-             (replace-regexp-in-string
-              "locate" "locate -b" helm-locate-command)
+             (unless (string-match-p "\\`locate -b" helm-locate-command)
+               (replace-regexp-in-string
+                "\\`locate" "locate -b" helm-locate-command))
              helm-locate-command))
         (old-key (lookup-key
                   helm-map

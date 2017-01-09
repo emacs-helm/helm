@@ -386,6 +386,19 @@
   This attribute is not supported for asynchronous sources
   since they perform pattern matching themselves.")
 
+   (redisplay
+    :initarg :redisplay
+    :initform 'identity
+    :custom (choice list function)
+    :documentation
+    "  A function or a list of functions to apply to current list
+  of candidates when redisplaying buffer with `helm-redisplay-buffer'.
+  This is only interesting for modifying and redisplaying the whole list
+  of candidates in async sources.
+  It uses `identity' by default for when async sources are mixed with
+  normal sources, in this case these normal sources are not modified and
+  redisplayed as they are.")
+
    (nomark
     :initarg :nomark
     :initform nil

@@ -309,7 +309,7 @@ See also `helm-locate'."
                  ((string= event "finished\n")
                   (when (and helm-locate-fuzzy-match
                              (not (string-match-p "\\s-" helm-pattern)))
-                    (helm-redisplay-buffer helm-locate-fuzzy-sort-fn))
+                    (helm-redisplay-buffer))
                   (with-helm-window
                     (setq mode-line-format
                           '(" " mode-line-buffer-identification " "
@@ -331,7 +331,8 @@ See also `helm-locate'."
    (requires-pattern :initform 3)
    (history :initform 'helm-file-name-history)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)
-   (candidate-number-limit :initform 9999)))
+   (candidate-number-limit :initform 9999)
+   (redisplay :initform (progn helm-locate-fuzzy-sort-fn))))
 
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source
@@ -437,8 +438,7 @@ Where db_path is a filename matched by
                                    (when (and helm-locate-fuzzy-match
                                               (not (string-match-p
                                                     "\\s-" helm-pattern)))
-                                     (helm-redisplay-buffer
-                                      helm-locate-fuzzy-sort-fn)))))
+                                     (helm-redisplay-buffer)))))
   (setq helm-ff-default-directory default-directory)
   (helm-locate-1 arg nil nil (thing-at-point 'filename)))
 

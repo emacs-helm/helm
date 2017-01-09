@@ -3351,22 +3351,25 @@ PRESELECT, if specified."
         (helm-funcall-with-source source it)))
   (helm-remove-candidate-cache source))
 
-(defun helm-redisplay-buffer (functions)
-  "Modify candidates in `helm-buffer' with FUNCTIONS and redisplay them.
+(defun helm-redisplay-buffer ()
+  "Redisplay candidates in `helm-buffer'.
 
 Candidates are not recomputed, only redisplayed after modifying the
-whole list of candidates in each source with FUNCTIONS.  Note that
-candidates are redisplayed with their display part with all properties
-included only.
-This function is used in async sources to transform the whole list of candidates
-from the sentinel functions (i.e when all candidates have been computed) because
-other filters like `candidate-transformer' are modifying only each chunk of candidates
-from process-filter as they come in and not the whole list.
-Use this for e.g sorting the whole list of async candidates once computed."
+whole list of candidates in each source with functions found in
+`redisplay' attribute of current source.  Note that candidates are
+redisplayed with their display part with all properties included only.
+This function is used in async sources to transform the whole list of
+candidates from the sentinel functions (i.e when all candidates have
+been computed) because other filters like `candidate-transformer' are
+modifying only each chunk of candidates from process-filter as they
+come in and not the whole list.  Use this for e.g sorting the whole
+list of async candidates once computed."
   (with-helm-buffer
-    (goto-char (point-min))
-    (let ((get-cands (lambda (source fns)
-                       (let (candidates helm-move-to-line-cycle-in-source)
+    (let ((get-cands (lambda (source)
+                       (let ((fns (assoc-default 'redisplay source))
+                             candidates helm-move-to-line-cycle-in-source)
+                         (helm-goto-source source)
+                         (helm-next-line)
                          (helm-awhile (condition-case-unless-debug nil
                                           (helm-get-selection nil 'withprop source)
                                         (error nil))
@@ -3376,10 +3379,26 @@ Use this for e.g sorting the whole list of async candidates once computed."
                              (cl-return nil))
                            (helm-next-line))
                          (helm-funcall-with-source
-                          source fns (nreverse candidates))))))
+                          source fns (nreverse candidates)))))
+          (get-sources (lambda ()
+                         (let (sources helm-move-to-line-cycle-in-source)
+                           (helm-awhile (helm-get-current-source)
+                             (push it sources)
+                             (when (save-excursion
+                                     (helm-move--end-of-source)
+                                     (forward-line 1) (eobp))
+                             (cl-return nil))
+                             (helm-next-source))
+                           (nreverse sources)))))
+      (goto-char (point-min))
       (helm-update nil (helm-get-current-source)
-                   (cl-loop for s in (helm-get-sources)
-                            collect (funcall get-cands s functions))))))
+                   (cl-loop with sources = (funcall get-sources)
+                            for s in (helm-get-sources)
+                            for name =  (assoc-default 'name s) collect
+                            (when (cl-loop for src in sources thereis
+                                           (string= name
+                                                    (assoc-default 'name src)))
+                                      (funcall get-cands s)))))))
 
 (defun helm-remove-candidate-cache (source)
   "Remove SOURCE from `helm-candidate-cache'."
