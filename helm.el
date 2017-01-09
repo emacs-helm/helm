@@ -3363,7 +3363,10 @@ candidates from the sentinel functions (i.e when all candidates have
 been computed) because other filters like `candidate-transformer' are
 modifying only each chunk of candidates from process-filter as they
 come in and not the whole list.  Use this for e.g sorting the whole
-list of async candidates once computed."
+list of async candidates once computed.
+Note: To ensure redisplay is done in async sources after helm
+reached `candidate-number-limit' you will have also to redisplay your
+candidates from `helm-async-outer-limit-hook'."
   (with-helm-buffer
     (let ((get-cands (lambda (source)
                        (let ((fns (assoc-default 'redisplay source))
