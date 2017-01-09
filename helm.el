@@ -3371,7 +3371,9 @@ list of async candidates once computed."
                          (helm-goto-source source)
                          (helm-next-line)
                          (helm-awhile (condition-case-unless-debug nil
-                                          (helm-get-selection nil 'withprop source)
+                                          (and (not (helm-pos-header-line-p))
+                                               (helm-get-selection
+                                                nil 'withprop source))
                                         (error nil))
                            (push it candidates)
                            (when (save-excursion
