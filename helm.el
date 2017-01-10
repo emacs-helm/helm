@@ -2991,6 +2991,7 @@ real part."
                       ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+  "Default `filtered-candidate-transformer' to sort candidates in fuzzy matching."
   (helm-fuzzy-matching-default-sort-fn-1 candidates use-real))
 
 (defun helm--maybe-get-migemo-pattern (pattern)
