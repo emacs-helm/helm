@@ -63,10 +63,9 @@
 
 (defcustom helm-boring-file-regexp-list
   (mapcar (lambda (f)
-            (concat
-             (rx-to-string
-              (replace-regexp-in-string
-               "/$" "" f) t) "$"))
+            (let ((rx (rx-to-string f t))) 
+              (if (string-match-p "[^/]$" f)
+                  (concat rx "$") rx)))
           completion-ignored-extensions)
   "The regexp list matching boring files."
   :group 'helm-files
