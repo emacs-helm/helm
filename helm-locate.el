@@ -96,7 +96,7 @@ Note that when this is enabled searching is done on basename."
   :type 'boolean)
 
 (defcustom helm-locate-fuzzy-sort-fn
-  #'helm-fuzzy-matching-default-sort-fn-1
+  #'helm-locate-default-fuzzy-sort-fn
   "Default fuzzy matching sort function for locate."
   :group 'helm-locate
   :type 'boolean)
@@ -324,6 +324,11 @@ See also `helm-locate'."
                  (t
                   (helm-log "Error: Locate %s"
                             (replace-regexp-in-string "\n" "" event))))))))))
+
+(defun helm-locate-default-fuzzy-sort-fn (candidates)
+  "Default sort function for files in fuzzy matching.
+Sort is done on basename of CANDIDATES."
+  (helm-fuzzy-matching-default-sort-fn-1 candidates nil t))
 
 (defclass helm-locate-source (helm-source-async helm-type-file)
   ((init :initform 'helm-locate-set-command)
