@@ -250,10 +250,10 @@ See also `helm-locate'."
                                        unless (file-directory-p i)
                                        collect i) ":"))
               helm-locate-command)
-           (if helm-locate-fuzzy-match
-               (unless (string-match-p "\\`locate -b" helm-locate-command)
-                 (replace-regexp-in-string
-                  "\\`locate" "locate -b" helm-locate-command))
+           (if (and helm-locate-fuzzy-match
+                    (not (string-match-p "\\`locate -b" helm-locate-command)))
+               (replace-regexp-in-string
+                "\\`locate" "locate -b" helm-locate-command)
                helm-locate-command))))
     (setq helm-file-name-history (mapcar 'helm-basename file-name-history))
     (helm :sources 'helm-source-locate
