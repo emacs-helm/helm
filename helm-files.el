@@ -67,7 +67,8 @@
               (if (string-match-p "[^/]$" f)
                   (concat rx "$") rx)))
           completion-ignored-extensions)
-  "The regexp list matching boring files."
+  "The regexp list matching boring files.
+This list is build by default on `completion-ignored-extensions'."
   :group 'helm-files
   :type  '(repeat (choice regexp)))
 
