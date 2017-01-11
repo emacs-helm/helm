@@ -2691,25 +2691,28 @@ Use it for non--interactive calls of `helm-find-files'."
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (let ((ffap-machine-p-known 'reject)
-        (ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))
-        (ffap-url-regexp (and helm-ff-guess-ffap-urls ffap-url-regexp)))
-    (unless (eq major-mode 'image-mode)
-      (or (and input (or (and (file-remote-p input) input)
-                         (expand-file-name input)))
-          (helm-find-files-input
-           (helm-ffap-guesser)
-           (thing-at-point 'filename))))))
+  (unless (eq major-mode 'image-mode)
+    (or (and input (or (and (file-remote-p input) input)
+                       (expand-file-name input)))
+        (helm-find-files-input
+         (helm-ffap-guesser)
+         (thing-at-point 'filename)))))
 
 (defun helm-ffap-guesser ()
-  "Same as `ffap-guesser' but without the crashing emacs stuff."
+  "Same as `ffap-guesser' but without gopher and machine support."
   ;; Avoid "Stack overflow in regexp matcher" error
   ;; in evil `ffap-guesser' by removing crap `ffap-gopher-at-point'
-  ;; and `ffap-machine-at-point'.
-  (or (and ffap-url-regexp
-	   (ffap-fixup-url (ffap-url-at-point)))
-      ;; may yield url!
-      (ffap-file-at-point)))
+  ;; (bug fixed in emacs-26 #25391) .
+  ;; `ffap-machine-at-point' have been removed too as it was anyway
+  ;; disabled with `ffap-machine-p-known' bound to 'reject.
+  ;; `ffap-file-at-point' can be neutralized with
+  ;; `helm-ff-guess-ffap-filenames' and `ffap-url-at-point' with
+  ;; `helm-ff-guess-ffap-urls'.
+  (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))) 
+    (or (and helm-ff-guess-ffap-urls ffap-url-regexp
+             (ffap-fixup-url (ffap-url-at-point)))
+        ;; may yield url!
+        (ffap-file-at-point))))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
