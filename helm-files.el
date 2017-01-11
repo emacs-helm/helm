@@ -1277,16 +1277,19 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-locate (candidate)
   "Locate action function for `helm-find-files'."
   (helm-locate-set-command)
-  (let ((input (concat (helm-basename
+  (let ((default (concat (helm-basename
                         (expand-file-name
                          candidate
                          helm-ff-default-directory))
-                       ;; The locate '-b' option doesn't exists
-                       ;; in everything (es).
-                       (unless (and (eq system-type 'windows-nt)
-                                    (string-match "^es" helm-locate-command))
-                         " -b"))))
-    (helm-locate-1 helm-current-prefix-arg nil 'from-ff input)))
+                         (unless (or
+                                  ;; "-b" is already added when fuzzy matching.
+                                  helm-locate-fuzzy-match
+                                  ;; The locate '-b' option doesn't exists
+                                  ;; in everything (es).
+                                  (and (eq system-type 'windows-nt)
+                                       (string-match "^es" helm-locate-command)))
+                           " -b"))))
+    (helm-locate-1 helm-current-prefix-arg nil 'from-ff default)))
 
 (defun helm-ff-run-locate ()
   "Run locate action from `helm-source-find-files'."
