@@ -48,23 +48,27 @@ Note that this happen only when locate is launched with a prefix arg."
 
 (defcustom helm-locate-command nil
   "A list of arguments for locate program.
-Normally the default value should work on any system.
 
-If nil it will be calculated when `helm-locate' startup
-with these default values for different systems:
+Helm will calculate a default value for your system on startup unless
+`helm-locate-command' is non-nil, here the default values it will use
+according to your system:
 
-Gnu/linux: \"locate %s -e --regex %s\"
+Gnu/linux:     \"locate %s -e -A --regex %s\"
 berkeley-unix: \"locate %s %s\"
-windows-nt: \"es %s %s\"
-Others: \"locate %s %s\"
+windows-nt:    \"es %s %s\"
+Others:        \"locate %s %s\"
 
 This string will be passed to format so it should end with `%s'.
 The first format spec is used for the \"-i\" value of locate/es,
 So don't set it directly but use `helm-locate-case-fold-search'
 for this.
+
 The last option must be the one preceding pattern i.e \"-r\" or \"--regex\".
+
 You will be able to pass other options such as \"-b\" or \"l\"
-during helm invocation after entering pattern.
+during helm invocation after entering pattern only when multi matching,
+not when fuzzy matching.
+
 Note that the \"-b\" option is added automatically by helm when
 var `helm-locate-fuzzy-match' is non-nil and switching back from
 multimatch to fuzzy matching (this is done automatically when a space
@@ -348,18 +352,14 @@ Sort is done on basename of CANDIDATES."
                       (helm-basename candidate)
                       candidate))))
 
-;; TODO Handle other options added at end of pattern (e.g -l 12) .
 (defun helm-locate-pattern-transformer (pattern)
   (if helm-locate-fuzzy-match
       ;; When fuzzy is enabled helm add "-b" option on startup.
-      (cond ((string-match-p
-              " " (replace-regexp-in-string " -b\\'" "" pattern))
+      (cond ((string-match-p " " pattern)
              (when (string-match "\\`locate -b" helm-locate-command)
                (setq helm-locate-command
                      (replace-match "locate" t t helm-locate-command)))
              pattern)
-            ((string-match "\\([^ ]*\\) -b\\'" pattern)
-             (helm--mapconcat-pattern (match-string 1 pattern)))
             (t
              (unless (string-match-p "\\`locate -b" helm-locate-command)
                (setq helm-locate-command
