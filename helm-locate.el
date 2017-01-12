@@ -346,9 +346,12 @@ Sort is done on basename of CANDIDATES."
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source
     :pattern-transformer 'helm-locate-pattern-transformer
+    ;; :match-part is only used here to tell helm which part
+    ;; of candidate to highlight.
     :match-part (lambda (candidate)
-                  (if (and helm-locate-fuzzy-match
-                          (not (string-match "\\s-" helm-pattern)))
+                  (if (or (string-match-p " -b\\'" helm-pattern)
+                          (and helm-locate-fuzzy-match
+                               (not (string-match "\\s-" helm-pattern))))
                       (helm-basename candidate)
                       candidate))))
 
