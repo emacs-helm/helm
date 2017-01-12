@@ -1610,9 +1610,9 @@ only."
             (helm-empty-source-p))
         0
         (save-excursion
-          (if in-current-source
-              (goto-char (helm-get-previous-header-pos))
-              (goto-char (point-min)))
+          (helm-aif (and in-current-source (helm-get-previous-header-pos))
+              (goto-char it)
+            (goto-char (point-min)))
           (forward-line 1)
           (if (helm-pos-multiline-p)
               (cl-loop with count-multi = 1
