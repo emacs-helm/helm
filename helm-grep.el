@@ -1311,13 +1311,10 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 Takes three format specs, the first for type(s), the second for pattern
 and the third for directory.
 
-Here the command line to use with ripgrep:
+You can use safely \"--color\" (used by default) with AG RG and PT.
 
-    rg --smart-case --no-heading --line-number %s %s %s
-
-If you want native color output with ripgrep (--color=always)
-you have to use a workaround as ripgrep is not supporting emacs
-dumb terminal, here it is:
+For ripgrep you have to use a workaround as it is not supporting emacs dumb
+terminal to output colors properly here is the command line to use:
 
     TERM=eterm-color rg --color=always --smart-case --no-heading --line-number %s %s %s
 
@@ -1333,7 +1330,9 @@ The option \"--nogroup\" allow this.
 The option \"--line-numbers\" is also mandatory except with PT (not supported).
 For RG the options \"--no-heading\" and \"--line-number\" are the ones to use.
 
-You can use safely \"--color\" (used by default) with AG and PT."
+When modifying the default colors of matches with e.g \"--color-match\" option of AG
+you may want to modify as well `helm-grep-ag-pipe-cmd-switches' to have all matches
+colorized with same color in multi match."
   :group 'helm-grep
   :type 'string)
 
