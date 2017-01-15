@@ -48,7 +48,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
   :type  'integer)
 
 (defcustom helm-kill-ring-actions
-  '(("Yank" . helm-kill-ring-action)
+  '(("Yank" . helm-kill-ring-action-yank)
     ("Delete" . helm-kill-ring-action-delete))
   "List of actions for kill ring source."
   :group 'helm-ring
@@ -107,7 +107,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
                        "[...]")) i)
            else collect i))
 
-(defun helm-kill-ring-action (str)
+(defun helm-kill-ring-action-yank (str)
   "Insert STR in `kill-ring' and set STR to the head.
 If this action is executed just after `yank',
 replace with STR as yanked string."
@@ -140,6 +140,7 @@ replace with STR as yanked string."
           (goto-char (prog1 (mark t)
                        (set-marker (mark-marker) (point) helm-current-buffer))))))
     (kill-new str)))
+(define-obsolete-function-alias 'helm-kill-ring-action 'helm-kill-ring-action-yank "2.4.0")
 
 (defun helm-kill-ring-action-delete (_candidate)
   "Delete marked candidates from `kill-ring'."
