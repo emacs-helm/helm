@@ -48,11 +48,8 @@ If nil or zero (disabled), don't truncate candidate, show all."
   :type  'integer)
 
 (defcustom helm-kill-ring-actions
-  '(("Yank" . helm-kill-ring-action)
-    ("Delete" . (lambda (_candidate)
-                  (cl-loop for cand in (helm-marked-candidates)
-                           do (setq kill-ring
-                                    (delete cand kill-ring))))))
+  '(("Yank" . helm-kill-ring-action-yank)
+    ("Delete" . helm-kill-ring-action-delete))
   "List of actions for kill ring source."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
@@ -64,8 +61,9 @@ If nil or zero (disabled), don't truncate candidate, show all."
 (defvar helm-kill-ring-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-y") 'helm-next-line)
-    (define-key map (kbd "M-u") 'helm-previous-line)
+    (define-key map (kbd "M-y") #'helm-next-line)
+    (define-key map (kbd "M-u") #'helm-previous-line)
+    (define-key map (kbd "M-D") #'helm-kill-ring-delete)
     map)
   "Keymap for `helm-show-kill-ring'.")
 
@@ -109,7 +107,7 @@ If nil or zero (disabled), don't truncate candidate, show all."
                        "[...]")) i)
            else collect i))
 
-(defun helm-kill-ring-action (str)
+(defun helm-kill-ring-action-yank (str)
   "Insert STR in `kill-ring' and set STR to the head.
 If this action is executed just after `yank',
 replace with STR as yanked string."
@@ -142,6 +140,21 @@ replace with STR as yanked string."
           (goto-char (prog1 (mark t)
                        (set-marker (mark-marker) (point) helm-current-buffer))))))
     (kill-new str)))
+(define-obsolete-function-alias 'helm-kill-ring-action 'helm-kill-ring-action-yank "2.4.0")
+
+(defun helm-kill-ring-action-delete (_candidate)
+  "Delete marked candidates from `kill-ring'."
+  (cl-loop for c in (helm-marked-candidates)
+           do (setq kill-ring
+                    (delete c kill-ring))))
+
+(defun helm-kill-ring-delete ()
+  "Delete marked candidates from `kill-ring'.
+
+This is a command for `helm-kill-ring-map'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-kill-ring-action-delete)))
 
 
 ;;;; <Mark ring>
