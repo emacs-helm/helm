@@ -2484,15 +2484,19 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
-           (let ((remove-buf-only
-                  (and (get-buffer-window
-                        image-dired-display-image-buffer 'visible)
-                       (file-equal-p candidate
-                                     (with-current-buffer
-                                         image-dired-display-image-buffer
-                                       (get-text-property
-                                        (point-min)
-                                        'original-file-name))))))
+           (let* ((win (get-buffer-window
+                        image-dired-display-image-buffer 'visible))
+                  (remove-buf-only
+                   (and win
+                        (with-helm-buffer
+                          (file-equal-p candidate
+                                        (with-current-buffer
+                                            image-dired-display-image-buffer
+                                          (get-text-property
+                                           (point-min)
+                                           'original-file-name)))))))
+             (when remove-buf-only
+               (set-window-buffer win helm-current-buffer))
              (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
                (kill-buffer image-dired-display-image-buffer))
              (unless remove-buf-only
