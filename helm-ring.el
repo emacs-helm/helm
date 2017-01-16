@@ -73,12 +73,12 @@ If nil or zero (disabled), don't truncate candidate, show all."
     :candidates #'helm-kill-ring-candidates
     :filtered-candidate-transformer #'helm-kill-ring-transformer
     :action 'helm-kill-ring-actions
-    :persistent-action 'ignore
-    :persistent-help "DoNothing"
+    :persistent-action #'helm--kill-ring-preview
+    :persistent-help "Preview entry"
     :keymap helm-kill-ring-map
     :migemo t
     :multiline t)
-  "Source for browse and insert contents of kill-ring.")
+  "Helm source for browsing and inserting contents of `kill-ring.'")
 
 (defun helm-kill-ring-candidates ()
   (cl-loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
@@ -105,7 +105,28 @@ If nil or zero (disabled), don't truncate candidate, show all."
                           (forward-line helm-kill-ring-max-lines-number)
                           (point)))
                        "[...]")) i)
-           else collect i))
+           ;; Need to collect a cons b/c persistent action is
+           ;; executed on unpropertied string otherwise
+           ;; See: https://github.com/emacs-helm/helm/blob/v2.4.0/helm.el#L4999
+           else collect (cons i i)))
+
+(defun helm--kill-ring-preview (candidate)
+  "Preview kill ring entry CANDIDATE."
+  (let ((buf (get-buffer-create "*Helm Kill Ring Preview*")))
+    (cl-flet ((preview (candidate)
+                       (switch-to-buffer buf)
+                       (setq buffer-read-only nil)
+                       (erase-buffer)
+                       (insert candidate)
+                       (setq buffer-read-only t)))
+      (if (and (helm-attr 'previewp)
+               (string= candidate (helm-attr 'current-candidate)))
+          (progn
+            (kill-buffer buf)
+            (helm-attrset 'previewp nil))
+        (preview candidate)
+        (helm-attrset 'previewp t)))
+    (helm-attrset 'current-candidate candidate)))
 
 (defun helm-kill-ring-action-yank (str)
   "Insert STR in `kill-ring' and set STR to the head.
@@ -185,15 +206,19 @@ This is a command for `helm-kill-ring-map'."
              collect m into recip
              finally return recip)))
 
+(defun helm--mark-ring-preview (candidate)
+  "Preview mark ring position at CANDIDATE."
+  (switch-to-buffer helm-current-buffer)
+  (helm-goto-line (string-to-number candidate))
+  (helm-highlight-current-line))
+
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
     :candidates #'helm-mark-ring-get-candidates
     :action '(("Goto line"
                . (lambda (candidate)
-                   (helm-goto-line (string-to-number candidate))))) 
-    :persistent-action (lambda (candidate)
-                         (helm-goto-line (string-to-number candidate))
-                         (helm-highlight-current-line))
+                   (helm-goto-line (string-to-number candidate)))))
+    :persistent-action #'helm--mark-ring-preview
     :persistent-help "Show this line"))
 
 ;;; Global-mark-ring
@@ -424,7 +449,7 @@ the `global-mark-ring' after each new visit."
         :buffer "*helm register*"))
 
 ;;;###autoload
-(defun helm-show-kill-ring ()
+(defun helm-kill-ring ()
   "Preconfigured `helm' for `kill-ring'.
 It is drop-in replacement of `yank-pop'.
 
@@ -435,6 +460,7 @@ First call open the kill-ring browser, next calls move to next line."
           :buffer "*helm kill ring*"
           :resume 'noresume
           :allow-nest t)))
+(define-obsolete-function-alias 'helm-show-kill-ring 'helm-kill-ring "2.4.0")
 
 ;;;###autoload
 (defun helm-execute-kmacro ()
