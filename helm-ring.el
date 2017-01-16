@@ -206,15 +206,19 @@ This is a command for `helm-kill-ring-map'."
              collect m into recip
              finally return recip)))
 
+(defun helm--mark-ring-preview (candidate)
+  "Preview mark ring position at CANDIDATE."
+  (switch-to-buffer helm-current-buffer)
+  (helm-goto-line (string-to-number candidate))
+  (helm-highlight-current-line))
+
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
     :candidates #'helm-mark-ring-get-candidates
     :action '(("Goto line"
                . (lambda (candidate)
-                   (helm-goto-line (string-to-number candidate))))) 
-    :persistent-action (lambda (candidate)
-                         (helm-goto-line (string-to-number candidate))
-                         (helm-highlight-current-line))
+                   (helm-goto-line (string-to-number candidate)))))
+    :persistent-action #'helm--mark-ring-preview
     :persistent-help "Show this line"))
 
 ;;; Global-mark-ring
