@@ -192,8 +192,8 @@ This is a command for `helm-kill-ring-map'."
                . (lambda (candidate)
                    (helm-goto-line (string-to-number candidate))))) 
     :persistent-action (lambda (candidate)
-                         (helm-goto-line (string-to-number candidate))
-                         (helm-highlight-current-line))
+                         (switch-to-buffer helm-current-buffer)
+                         (helm-goto-line (string-to-number candidate)))
     :persistent-help "Show this line"))
 
 ;;; Global-mark-ring
@@ -208,8 +208,7 @@ This is a command for `helm-kill-ring-map'."
     :persistent-action (lambda (candidate)
                          (let ((items (split-string candidate ":")))
                            (switch-to-buffer (cl-second items))
-                           (helm-goto-line (string-to-number (car items)))
-                           (helm-highlight-current-line)))
+                           (helm-goto-line (string-to-number (car items)))))
     :persistent-help "Show this line"))
 
 (defun helm-global-mark-ring-format-buffer (marker)

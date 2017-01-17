@@ -5058,9 +5058,11 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
   "Select the window that will be used for persistent action.
 See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
   (select-window (get-buffer-window (helm-buffer-get)))
-  (select-window
-   (setq minibuffer-scroll-window
-         (helm-persistent-action-display-window split-onewindow))))
+  (prog1
+      (select-window
+       (setq minibuffer-scroll-window
+             (helm-persistent-action-display-window split-onewindow)))
+    (helm-log "Selected window is %S" minibuffer-scroll-window)))
 
 ;;; Scrolling - recentering
 ;;
