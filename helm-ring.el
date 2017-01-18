@@ -462,6 +462,7 @@ It is drop-in replacement of `yank-pop'.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
+  (setq helm-kill-ring--truncated-flag nil)
   (let ((enable-recursive-minibuffers t))
     (helm :sources helm-source-kill-ring
           :buffer "*helm kill ring*"
