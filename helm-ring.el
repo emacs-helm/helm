@@ -101,7 +101,8 @@ of 80 chars each i.e 80*5."
   (with-temp-buffer
     (insert candidate)
     (goto-char (point-min))
-    (if (> (buffer-size) helm-kill-ring-max-offset)
+    (if (and helm-kill-ring-max-offset
+             (> (buffer-size) helm-kill-ring-max-offset))
         (let ((end-str "[...]"))
           (concat
            (buffer-substring
