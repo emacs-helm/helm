@@ -37,7 +37,7 @@
 
 (defcustom helm-kill-ring-max-offset 400
   "Max number of chars displayed per candidate in kill-ring browser.
-If nil or zero (disabled), don't truncate candidate, show all.
+If nil, don't truncate candidate, show all.
 By default it is approximatively the number of bits contained in five lines
 of 80 chars each i.e 80*5."
   :type '(choice (const :tag "Disabled" nil)
