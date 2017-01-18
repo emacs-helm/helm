@@ -124,10 +124,12 @@ of 80 chars each i.e 80*5."
     (let* ((cur-cand (helm-get-selection))
            (presel-fn (lambda ()
                         (helm-kill-ring--preselect-fn cur-cand))))
-      (if helm-kill-ring--truncated-flag
-          (let ((helm-kill-ring-max-offset 15000000))
-            (helm-update presel-fn))
-          (helm-update presel-fn)))))
+      (let ((helm-kill-ring-max-offset
+             (if helm-kill-ring--truncated-flag
+                 15000000
+                 (default-toplevel-value
+                     'helm-kill-ring-max-offset))))
+        (helm-update presel-fn)))))
 (put 'helm-kill-ring-toggle-truncated 'helm-only t)
 
 (defun helm-kill-ring--preselect-fn (candidate)
