@@ -35,11 +35,13 @@
   :type 'integer
   :group 'helm-ring)
 
-(defcustom helm-kill-ring-max-lines-number 5
-  "Max number of lines displayed per candidate in kill-ring browser.
-If nil or zero (disabled), don't truncate candidate, show all."
+(defcustom helm-kill-ring-max-offset 400
+  "Max number of chars displayed per candidate in kill-ring browser.
+If nil or zero (disabled), don't truncate candidate, show all.
+By default it is approximatively the number of bits contained in five lines
+of 80 chars each i.e 80*5."
   :type '(choice (const :tag "Disabled" nil)
-          (integer :tag "Max number of lines"))
+          (integer :tag "Max candidate offset"))
   :group 'helm-ring)
 
 (defcustom helm-register-max-offset 160
@@ -61,9 +63,10 @@ If nil or zero (disabled), don't truncate candidate, show all."
 (defvar helm-kill-ring-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-y") #'helm-next-line)
-    (define-key map (kbd "M-u") #'helm-previous-line)
-    (define-key map (kbd "M-D") #'helm-kill-ring-delete)
+    (define-key map (kbd "M-y") 'helm-next-line)
+    (define-key map (kbd "M-u") 'helm-previous-line)
+    (define-key map (kbd "M-D") 'helm-kill-ring-delete)
+    (define-key map (kbd "C-]") 'helm-kill-ring-toggle-truncated)
     map)
   "Keymap for `helm-show-kill-ring'.")
 
@@ -91,21 +94,50 @@ If nil or zero (disabled), don't truncate candidate, show all."
   (cl-loop for i in candidates
            when (get-text-property 0 'read-only i)
            do (set-text-properties 0 (length i) '(read-only nil) i)
-           for nlines = (with-temp-buffer (insert i) (count-lines (point-min) (point-max)))
-           if (and helm-kill-ring-max-lines-number
-                   (> nlines helm-kill-ring-max-lines-number))
-           collect (cons
-                    (with-temp-buffer
-                      (insert i)
-                      (goto-char (point-min))
-                      (concat
-                       (buffer-substring
-                        (point-min)
-                        (save-excursion
-                          (forward-line helm-kill-ring-max-lines-number)
-                          (point)))
-                       "[...]")) i)
-           else collect i))
+           collect (cons (helm-kill-ring--get-truncated-candidate i) i)))
+
+(defun helm-kill-ring--get-truncated-candidate (candidate)
+  "Truncate CANDIDATE when its length is > than `helm-kill-ring-max-offset'."
+  (with-temp-buffer
+    (insert candidate)
+    (goto-char (point-min))
+    (if (> (buffer-size) helm-kill-ring-max-offset)
+        (let ((end-str "[...]"))
+          (concat
+           (buffer-substring
+            (point)
+            (save-excursion
+              (forward-char helm-kill-ring-max-offset)
+              (setq end-str (if (looking-at "\n")
+                                end-str (concat "\n" end-str)))
+              (point)))
+           end-str))
+        (buffer-string))))
+
+(defvar helm-kill-ring--truncated-flag nil)
+(defun helm-kill-ring-toggle-truncated ()
+  "Toggle truncated view of candidates in helm kill-ring browser."
+  (interactive)
+  (with-helm-alive-p
+    (setq helm-kill-ring--truncated-flag (not helm-kill-ring--truncated-flag))
+    (let* ((cur-cand (helm-get-selection))
+           (presel-fn (lambda ()
+                        (helm-kill-ring--preselect-fn cur-cand))))
+      (if helm-kill-ring--truncated-flag
+          (let ((helm-kill-ring-max-offset 15000000))
+            (helm-update presel-fn))
+          (helm-update presel-fn)))))
+(put 'helm-kill-ring-toggle-truncated 'helm-only t)
+
+(defun helm-kill-ring--preselect-fn (candidate)
+  "Internal, used to preselect CANDIDATE when toggling truncated view."
+  (helm-awhile (condition-case-unless-debug nil
+                   (and (not (helm-pos-header-line-p))
+                        (helm-get-selection))
+                 (error nil))
+    (if (string= it candidate)
+        (cl-return)
+        (helm-next-line))))
 
 (defun helm-kill-ring-action-yank (str)
   "Insert STR in `kill-ring' and set STR to the head.
