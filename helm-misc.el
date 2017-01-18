@@ -317,6 +317,8 @@ Default action change TZ environment variable locally to emacs."
   (cl-assert (minibuffer-window-active-p (selected-window)) nil
              "Error: Attempt to use minibuffer history outside a minibuffer")
   (let* ((enable-recursive-minibuffers t)
+         (query-replace-p (or (eq last-command 'query-replace)
+                              (eq last-command 'query-replace-regexp)))
          (elm (helm-comp-read "pattern: "
                               (cl-loop for i in
                                        (symbol-value minibuffer-history-variable)
@@ -334,7 +336,7 @@ Default action change TZ environment variable locally to emacs."
                               :keymap helm-minibuffer-history-map
                               :allow-nest t)))
     ;; Fix issue #1667 with emacs-25+ `query-replace-from-to-separator'.
-    (when (boundp 'query-replace-from-to-separator)
+    (when (and (boundp 'query-replace-from-to-separator) query-replace-p)
       (let ((pos (string-match "\0" elm)))
         (and pos
              (add-text-properties
