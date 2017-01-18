@@ -132,6 +132,8 @@ of 80 chars each i.e 80*5."
 
 (defun helm-kill-ring--preselect-fn (candidate)
   "Internal, used to preselect CANDIDATE when toggling truncated view."
+  ;; Preselection by regexp may not work if candidate is huge, so walk
+  ;; the helm buffer until selection is on CANDIDATE.
   (helm-awhile (condition-case-unless-debug nil
                    (and (not (helm-pos-header-line-p))
                         (helm-get-selection))
