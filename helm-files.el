@@ -3764,6 +3764,7 @@ locate."
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (setq helm-multi-files--toggle-locate nil)
+  (helm-locate-set-command)
   (helm-set-local-variable 'helm-async-outer-limit-hook
                            (list (lambda ()
                                    (when (and helm-locate-fuzzy-match
