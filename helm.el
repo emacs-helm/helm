@@ -1699,7 +1699,7 @@ Initially selected candidate.  Specified by exact candidate or a regexp.
 
 \:buffer
 
-`helm-buffer' instead of *helm*.
+The buffer name for this helm session. `helm-buffer' will take this value.
 
 \:keymap
 
