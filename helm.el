@@ -1703,7 +1703,11 @@ Initially selected candidate.  Specified by exact candidate or a regexp.
 
 \:keymap
 
-`helm-map' for current `helm' session.
+Keymap used at startup of this helm session.
+It will be overrided as soon a new keymap is found in another source.
+It will not be resumed.
+It is here only for backward compatibility, you should specify your keymaps
+inside the source instead with the :keymap slot of `helm-source'.
 
 \:default
 
@@ -2461,7 +2465,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                          ;; the local one which is in this order:
                          ;; - The keymap of current source.
                          ;; - The value passed in ANY-KEYMAP
-                         ;;   which will become buffer local.
                          ;; - Or fallback to the global value of helm-map.
                          (helm--maybe-update-keymap
                           (or src-keymap any-keymap helm-map))
