@@ -126,15 +126,11 @@
 
    (keymap
     :initarg :keymap
-    :initform nil
+    :initform helm-map
     :custom sexp
     :documentation
     "  Specific keymap for this source.
-  It is useful to have a keymap per source when using more than
-  one source.  Otherwise, a keymap can be set per command with
-  `helm' argument KEYMAP.  NOTE: when a source have `helm-map' as
-  keymap attr, the global value of `helm-map' will override the
-  actual local one.")
+  Default value is `helm-map'.")
 
    (action
     :initarg :action

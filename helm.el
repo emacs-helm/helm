@@ -1879,6 +1879,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (when helm-prevent-escaping-from-minibuffer
                  (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                (add-hook 'post-command-hook 'helm--maybe-update-keymap)
+               ;; Add also to update hook otherwise keymap is not updated
+               ;; until a key is hitted.
+               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
                (add-hook 'post-command-hook 'helm--update-header-line)
                (helm-log "show prompt")
                (unwind-protect
