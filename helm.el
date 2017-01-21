@@ -1703,11 +1703,17 @@ The buffer name for this helm session. `helm-buffer' will take this value.
 
 \:keymap
 
-Keymap used at startup of this helm session.
-It will be overrided as soon a new keymap is found in another source.
-It will not be resumed.
-It is here only for backward compatibility, you should specify your keymaps
-inside the source instead with the :keymap slot of `helm-source'.
+[Obsolete]
+
+Keymap used at start of this Helm session.
+
+It is overridden by keymaps specified in sources, and is here
+only for backward compatibility.
+
+Keymaps should be specified in sources using the :keymap slot
+instead.
+
+This keymap is not restored by `helm-resume'.
 
 \:default
 
