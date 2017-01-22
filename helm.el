@@ -4765,7 +4765,7 @@ Acceptable values of CREATE-OR-BUFFER:
   Register a buffer as a candidates buffer.
   The buffer needs to exists, it is not created.
   This allow you to use the buffer as a cache.
-  The buffer is not erased, it up to you to maintain
+  The buffer is not erased, it's up to you to maintain
   it in the init function.
 
 If for some reasons a global buffer and a local buffer exist and are
