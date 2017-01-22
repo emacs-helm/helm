@@ -4805,8 +4805,8 @@ global one and is used instead."
           (erase-buffer)
           (font-lock-mode -1))))
     ;; Finally return the candidates buffer.
-    (helm-acond ((get-buffer local-bname) it)
-                ((get-buffer global-bname) it)
+    (helm-acond ((get-buffer local-bname))
+                ((get-buffer global-bname))
                 ((assoc-default helm--source-name helm--candidate-buffer-alist)
                  (and (buffer-live-p it) it)))))
 

@@ -197,7 +197,7 @@ of `cl-return' is possible to exit the loop."
       (let ((clause1 (car clauses)))
         `(let ((,sym ,(car clause1)))
            (helm-aif ,sym
-               (progn ,@(cdr clause1))
+               (or (progn ,@(cdr clause1)) it)
              (helm-acond ,@(cdr clauses))))))))
 
 
