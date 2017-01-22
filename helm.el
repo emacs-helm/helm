@@ -4771,11 +4771,11 @@ Acceptable values of CREATE-OR-BUFFER:
 If for some reasons a global buffer and a local buffer exist and are
 belonging to the same source, the local buffer takes precedence on the
 global one and is used instead."
-  (let* ((global-bname (format " *helm candidates:%s*"
-                               helm--source-name))
-         (local-bname (format " *helm candidates:%s*%s"
-                              helm--source-name
-                              (buffer-name helm-current-buffer))))
+  (let ((global-bname (format " *helm candidates:%s*"
+                              helm--source-name))
+        (local-bname (format " *helm candidates:%s*%s"
+                             helm--source-name
+                             (buffer-name helm-current-buffer))))
     (when create-or-buffer
       ;; Register buffer in `helm--candidate-buffer-alist'.
       ;; This is used only to retrieve buffer associated to current source
