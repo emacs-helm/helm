@@ -3429,19 +3429,29 @@ See `helm-browse-project'."
 ;;  session (http://emacs-session.sourceforge.net/) is an alternative to
 ;;  recentf that saves recent file history and much more.
 (defvar session-file-alist)
-(defvar helm-source-session
-  (helm-build-sync-source "Session"
-    :candidates (lambda ()
-                  (cl-delete-if-not
-                   (lambda (f)
-                     (or (string-match helm-tramp-file-name-regexp f)
-                         (file-exists-p f)))
-                   (mapcar 'car session-file-alist)))
-    :keymap helm-generic-files-map
-    :help-message helm-generic-file-help-message
-    :action 'helm-type-file-actions
-    :fuzzy-match helm-recentf-fuzzy-match)
+(defclass helm-source-session-class (helm-source-sync)
+  ((candidates :initform (lambda ()
+                           (cl-delete-if-not
+                            (lambda (f)
+                              (or (string-match helm-tramp-file-name-regexp f)
+                                  (file-exists-p f)))
+                            (mapcar 'car session-file-alist))))
+   (keymap       :initform helm-generic-files-map)
+   (help-message :initform helm-generic-file-help-message)
+   (action       :initform 'helm-type-file-actions)))
+
+(defvar helm-source-session nil
   "File list from emacs-session.")
+
+(defcustom helm-session-fuzzy-match nil
+  "Enable fuzzy matching in `helm-source-session' when non--nil."
+  :group 'helm-files
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (setq helm-source-session
+               (helm-make-source "Session" 'helm-source-session-class
+                 :fuzzy-match val))))
 
 
 ;;; Files in current dir
