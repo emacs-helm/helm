@@ -3439,7 +3439,8 @@ See `helm-browse-project'."
                    (mapcar 'car session-file-alist)))
     :keymap helm-generic-files-map
     :help-message helm-generic-file-help-message
-    :action 'helm-type-file-actions)
+    :action 'helm-type-file-actions
+    :fuzzy-match helm-recentf-fuzzy-match)
   "File list from emacs-session.")
 
 
