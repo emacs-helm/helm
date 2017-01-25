@@ -2493,7 +2493,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                     (save-selected-window
                                       (helm-check-minibuffer-input)
                                       (helm-print-error-messages))))))
-                         (helm--update-header-line)) ; minibuffer has already been filled here
+                         ;; minibuffer has already been filled here.
+                         (helm--update-header-line))
                      (read-from-minibuffer (or any-prompt "pattern: ")
                                            any-input helm-map
                                            nil hist tap
@@ -2502,7 +2503,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
 
 (defun helm-toggle-suspend-update ()
   "Enable or disable update of display in helm.
-This can be useful for example for quietly writing a complex regexp."
+This can be useful for example for quietly writing a complex regexp
+without helm constantly updating."
   (interactive)
   (with-helm-alive-p
     (when (setq helm-suspend-update-flag (not helm-suspend-update-flag))
