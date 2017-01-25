@@ -1887,7 +1887,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                  (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                ;; Add also to update hook otherwise keymap is not updated
-               ;; until a key is hitted.
+               ;; until a key is hitted (Issue #1670).
                (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
                (add-hook 'post-command-hook 'helm--update-header-line)
                (helm-log "show prompt")
