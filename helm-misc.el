@@ -334,7 +334,8 @@ Default action change TZ environment variable locally to emacs."
                               :must-match helm-minibuffer-history-must-match
                               :multiline t
                               :keymap helm-minibuffer-history-map
-                              :allow-nest t)))
+                              :allow-nest (not (eq last-command
+                                                   'helm-minibuffer-history)))))
     ;; Fix issue #1667 with emacs-25+ `query-replace-from-to-separator'.
     (when (and (boundp 'query-replace-from-to-separator) query-replace-p)
       (let ((pos (string-match "\0" elm)))
