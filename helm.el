@@ -4791,9 +4791,9 @@ global one and is used instead."
       ;; create the buffer global-bname or local-bname, otherwise
       ;; reuse the named buffer.
       (unless (bufferp create-or-buffer)
-        ;; Global buffer are killed and recreated.
+        ;; Global buffers are killed and recreated.
         (and (eq create-or-buffer 'global)
-             (buffer-live-p global-bname)
+             (buffer-live-p (get-buffer global-bname))
              (kill-buffer global-bname))
         ;; Create global or local buffer.
         ;; Local buffer, once created are reused and a new one
