@@ -4802,8 +4802,11 @@ global one and is used instead."
                               (cl-ecase create-or-buffer
                                 (global global-bname)
                                 (local  local-bname)))
-          (set (make-local-variable 'buffer-read-only) nil) ; Fix (#1176)
-          (buffer-disable-undo)
+          ;; We need a buffer not read-only to perhaps insert later
+          ;; text coming from read-only buffers (issue #1176).
+          (set (make-local-variable 'buffer-read-only) nil)
+          ;; Undo is automatically disabled in buffer names starting
+          ;; with a space, so no need to disable it.
           (erase-buffer)
           (font-lock-mode -1))))
     ;; Finally return the candidates buffer.
