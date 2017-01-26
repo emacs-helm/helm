@@ -63,10 +63,11 @@ of 80 chars each i.e 80*5."
 (defvar helm-kill-ring-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-y") 'helm-next-line)
-    (define-key map (kbd "M-u") 'helm-previous-line)
-    (define-key map (kbd "M-D") 'helm-kill-ring-delete)
-    (define-key map (kbd "C-]") 'helm-kill-ring-toggle-truncated)
+    (define-key map (kbd "M-y")     'helm-next-line)
+    (define-key map (kbd "M-u")     'helm-previous-line)
+    (define-key map (kbd "M-D")     'helm-kill-ring-delete)
+    (define-key map (kbd "C-]")     'helm-kill-ring-toggle-truncated)
+    (define-key map (kbd "C-c C-k") 'helm-kill-ring-kill-selection)
     map)
   "Keymap for `helm-show-kill-ring'.")
 
@@ -77,6 +78,7 @@ of 80 chars each i.e 80*5."
     :filtered-candidate-transformer #'helm-kill-ring-transformer
     :action 'helm-kill-ring-actions
     :persistent-action 'ignore
+    :help-message 'helm-kill-ring-help-message
     :persistent-help "DoNothing"
     :keymap helm-kill-ring-map
     :migemo t
@@ -131,6 +133,13 @@ of 80 chars each i.e 80*5."
                      'helm-kill-ring-max-offset))))
         (helm-update presel-fn)))))
 (put 'helm-kill-ring-toggle-truncated 'helm-only t)
+
+(defun helm-kill-ring-kill-selection ()
+  "Store the real value of candidate in kill-ring.
+Same as `helm-kill-selection-and-quit' called with a prefix arg."
+  (interactive)
+  (helm-kill-selection-and-quit t))
+(put 'helm-kill-ring-kill-selection 'helm-only t)
 
 (defun helm-kill-ring--preselect-fn (candidate)
   "Internal, used to preselect CANDIDATE when toggling truncated view."

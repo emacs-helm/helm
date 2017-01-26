@@ -1084,6 +1084,36 @@ you don't choose from there a command using helm completion.
 ** Commands
 \\<helm-kmacro-map>")
 
+;;; Kill-ring
+;;
+;;
+(defvar helm-kill-ring-help-message
+  "* Helm kill-ring
+
+** Tips
+
+You can bring any candidate on top of kill-ring by using `\\<helm-map>\\[helm-kill-selection-and-quit]'
+on it, contrarily to the regular helm command `helm-kill-selection-and-quit'
+which is bound in helm to same key, it is here killing the real value
+without the need of prefix argument.
+
+The view of truncated candidates can be toggled, see command list below.
+
+You can bind globally `M-y' to `helm-show-kill-ring' and once in the helm kill-ring session
+you can navigate for conveniency to next/previous line with `M-y' and `M-u'.
+Of course `C-n' and `C-p' are still available.
+
+** Commands
+\\<helm-kill-ring-map>
+\\[helm-next-line]\t\tNext line.
+\\[helm-previous-line]\t\tPrevious line.
+\\[helm-kill-ring-delete]\t\tDelete entry.
+\\[helm-kill-ring-toggle-truncated]\t\tToggle truncated view of candidate.
+\\[helm-kill-ring-kill-selection]\t\tKill real value of selection.")
+
+;;; Org headings
+;;
+;;
 (defvar helm-org-headings-help-message
   "* Helm org headings
 
