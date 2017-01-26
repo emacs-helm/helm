@@ -813,7 +813,8 @@ Special commands:
 (defun helm-grep-mode-jump ()
   (interactive)
   (helm-grep-action
-   (buffer-substring (point-at-bol) (point-at-eol))))
+   (buffer-substring (point-at-bol) (point-at-eol)))
+  (helm-match-line-cleanup-pulse))
 
 (defun helm-grep-mode-jump-other-window-1 (arg)
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
@@ -821,6 +822,7 @@ Special commands:
         (progn
           (save-selected-window
             (helm-grep-action candidate 'other-window)
+            (helm-match-line-cleanup-pulse)
             (recenter))
           (forward-line arg))
       (error nil))))
@@ -837,7 +839,8 @@ Special commands:
   (interactive)
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
     (condition-case nil
-        (helm-grep-action candidate 'other-window)
+        (progn (helm-grep-action candidate 'other-window)
+               (helm-match-line-cleanup-pulse))
       (error nil))))
 
 

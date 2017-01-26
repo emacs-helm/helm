@@ -617,9 +617,13 @@ If STRING is non--nil return instead a space separated string."
       (cl-loop with ov
                for r in (helm-remove-if-match
                          "\\`!" (split-string
-                                 ;; Needed for highlighting AG matches.
-                                 (if (with-helm-buffer
-                                       (assq 'pcre (helm-get-current-source)))
+                                 ;; We are maybe not in helm when
+                                 ;; jumping from helm-grep-mode and
+                                 ;; helm-moccur-mode buffers.
+                                 (if (and helm-alive-p
+                                          (with-helm-buffer
+                                            ;; Needed for highlighting AG matches.
+                                            (assq 'pcre (helm-get-current-source))))
                                      (helm--translate-pcre-to-elisp helm-input)
                                      helm-input)))
                do (save-excursion

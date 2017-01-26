@@ -439,12 +439,12 @@ Same as `helm-moccur-goto-line' but go in new frame."
 (defun helm-moccur-mode-goto-line ()
   (interactive)
   (helm-aif (get-text-property (point) 'helm-realvalue)
-    (helm-moccur-goto-line it)))
+    (progn (helm-moccur-goto-line it) (helm-match-line-cleanup-pulse))))
 
 (defun helm-moccur-mode-goto-line-ow ()
   (interactive)
   (helm-aif (get-text-property (point) 'helm-realvalue)
-    (helm-moccur-goto-line-ow it)))
+    (progn (helm-moccur-goto-line-ow it) (helm-match-line-cleanup-pulse))))
 
 (defun helm-moccur-mode-goto-line-ow-forward-1 (arg)
   (condition-case nil
