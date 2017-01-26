@@ -188,12 +188,12 @@ a specialized info buffer.
 
 Use these embedded Info screens first before reporting bugs.
 
-`M-x helm-mode` to enable helm completion for common Emacs commands
-(e.g `M-x`, `C-x C-f`, etc...). Note that the helm functionality
-enabled through helm-mode comes from a generic implementation and does
-not include all helm features available through equivalent
-helm-specific commands. For example, `helm-M-x` has more features than
-helm completion through `M-x`.
+`M-x helm-mode` to enable helm completion for common Emacs
+commands. Note that the helm functionality enabled through helm-mode
+comes from a generic implementation and does not include all helm
+features available through equivalent helm-specific commands.
+See [FAQ](https://github.com/emacs-helm/helm/wiki/FAQ#why-after-enabling-helm-mode-m-x-and-c-x-c-f-are-not-helmized)
+about `M-x` and `C-x C-f`.
 
 To make helm-mode start with Emacs init file: 
 
