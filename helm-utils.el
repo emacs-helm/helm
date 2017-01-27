@@ -593,54 +593,50 @@ If STRING is non--nil return instead a space separated string."
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
-         (start-match (if (or (null helm-highlight-matches-around-point-max-lines)
-                              (zerop helm-highlight-matches-around-point-max-lines))
-                          start
-                        (save-excursion
-                          (forward-line
-                           (- helm-highlight-matches-around-point-max-lines))
-                          (point-at-bol))))
-         (end-match   (if (or (null helm-highlight-matches-around-point-max-lines)
-                              (zerop helm-highlight-matches-around-point-max-lines))
-                          end
-                        (save-excursion
-                          (forward-line
-                           helm-highlight-matches-around-point-max-lines)
-                          (point-at-eol))))
+         start-match end-match
          (args (list start end buf)))
+    ;; Highlight the current line.
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
       (apply 'move-overlay helm-match-line-overlay args))
     (overlay-put helm-match-line-overlay
                  'face (or face 'helm-selection-line))
-    (catch 'empty-line
-      (cl-loop with ov
-               for r in (helm-remove-if-match
-                         "\\`!" (split-string
-                                 ;; We are maybe not in helm when
-                                 ;; jumping from helm-grep-mode and
-                                 ;; helm-moccur-mode buffers.
-                                 (if (and helm-alive-p
-                                          (with-helm-buffer
-                                            ;; Needed for highlighting AG matches.
-                                            (assq 'pcre (helm-get-current-source))))
-                                     (helm--translate-pcre-to-elisp helm-input)
-                                     helm-input)))
-               do (save-excursion
-                    (goto-char start-match)
-                    (while (condition-case _err
-                               (if helm-migemo-mode
-                                   (helm-mm-migemo-forward r end-match t)
-                                 (re-search-forward r end-match t))
-                             (invalid-regexp nil))
-                      (let ((s (match-beginning 0))
-                            (e (match-end 0)))
-                        (if (= s e)
-                            (throw 'empty-line nil)
-                          (push (setq ov (make-overlay s e))
-                                helm--match-item-overlays)
-                          (overlay-put ov 'face 'helm-match-item)
-                          (overlay-put ov 'priority 1)))))))
+    ;; Now highlight matches only if we are in helm session, we are
+    ;; maybe coming from helm-grep-mode or helm-moccur-mode buffers.
+    (when helm-alive-p
+      (if (or (null helm-highlight-matches-around-point-max-lines)
+              (zerop helm-highlight-matches-around-point-max-lines))
+          (setq start-match start
+                end-match   end)
+          (save-excursion
+            (forward-line
+             (- helm-highlight-matches-around-point-max-lines))
+            (setq start-match (point-at-bol)
+                  end-match   (point-at-eol)))) 
+      (catch 'empty-line
+        (cl-loop with ov
+                 for r in (helm-remove-if-match
+                           "\\`!" (split-string
+                                   (if (with-helm-buffer
+                                         ;; Needed for highlighting AG matches.
+                                         (assq 'pcre (helm-get-current-source)))
+                                       (helm--translate-pcre-to-elisp helm-input)
+                                       helm-input)))
+                 do (save-excursion
+                      (goto-char start-match)
+                      (while (condition-case _err
+                                 (if helm-migemo-mode
+                                     (helm-mm-migemo-forward r end-match t)
+                                     (re-search-forward r end-match t))
+                               (invalid-regexp nil))
+                        (let ((s (match-beginning 0))
+                              (e (match-end 0)))
+                          (if (= s e)
+                              (throw 'empty-line nil)
+                              (push (setq ov (make-overlay s e))
+                                    helm--match-item-overlays)
+                              (overlay-put ov 'face 'helm-match-item)
+                              (overlay-put ov 'priority 1))))))))
     (recenter)))
 
 (defun helm--translate-pcre-to-elisp (regexp)
