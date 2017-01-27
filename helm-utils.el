@@ -617,7 +617,7 @@ If STRING is non--nil return instead a space separated string."
                   (save-excursion
                     (forward-line
                      helm-highlight-matches-around-point-max-lines)
-                    (point-at-bol)))))
+                    (point-at-bol))))
       (catch 'empty-line
         (cl-loop with ov
                  for r in (helm-remove-if-match
@@ -642,7 +642,7 @@ If STRING is non--nil return instead a space separated string."
                                     helm--match-item-overlays)
                               (overlay-put ov 'face 'helm-match-item)
                               (overlay-put ov 'priority 1))))))))
-    (recenter))
+    (recenter)))
 
 (defun helm--translate-pcre-to-elisp (regexp)
   "Should translate pcre REGEXP to elisp regexp.
