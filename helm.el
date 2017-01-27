@@ -4813,7 +4813,9 @@ global one and is used instead."
     (helm-acond ((get-buffer local-bname))
                 ((get-buffer global-bname))
                 ((assoc-default helm--source-name helm--candidate-buffer-alist)
-                 (and (buffer-live-p it) it)))))
+                 (and (or (stringp it) (bufferp it))
+                      (buffer-live-p (get-buffer it))
+                      it)))))
 
 (defun helm-init-candidates-in-buffer (buffer data)
   "Register BUFFER with DATA for a helm candidates-in-buffer session.
