@@ -504,6 +504,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :persistent-action persistent-action
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
+                  :keymap loc-map
                   :mode-line mode-line
                   :help-message help-message
                   :action action-fn
@@ -517,6 +518,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
+                    :keymap loc-map
                     :persistent-help persistent-help
                     :mode-line mode-line
                     :help-message help-message
@@ -543,7 +545,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :allow-nest allow-nest
                          :candidate-number-limit candidate-number-limit
                          :case-fold-search case-fold
-                         :keymap loc-map
                          :history (and (symbolp input-history) input-history)
                          :buffer buffer))
         (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
@@ -913,7 +914,6 @@ Keys description:
                   :sources src-list
                   :input (expand-file-name initial-input)
                   :prompt prompt
-                  :keymap cmap
                   :candidate-number-limit candidate-number-limit
                   :resume 'noresume
                   :case-fold-search case-fold

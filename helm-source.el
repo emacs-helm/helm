@@ -126,10 +126,11 @@
 
    (keymap
     :initarg :keymap
-    :initform nil
+    :initform helm-map
     :custom sexp
     :documentation
-    "  Specific keymap for this source.")
+    "  Specific keymap for this source.
+  default value is `helm-map'.")
 
    (action
     :initarg :action
