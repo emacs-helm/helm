@@ -198,7 +198,7 @@ It is added to `extended-command-history'.
 (defvar helm-minibuffer-history-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-r") 'undefined)
+    (define-key map [remap helm-minibuffer-history] 'undefined)
     map))
 
 (defcustom helm-minibuffer-history-must-match t
@@ -316,42 +316,35 @@ Default action change TZ environment variable locally to emacs."
   (interactive)
   (cl-assert (minibuffer-window-active-p (selected-window)) nil
              "Error: Attempt to use minibuffer history outside a minibuffer")
-  (let ((ori-key (car-safe (where-is-internal 'helm-minibuffer-history helm-map))))
-    ;; Disable C-r from helm-map which inherit this key from
-    ;; minibuffer-local-map.
-    (and ori-key (define-key helm-map ori-key 'undefined))
-    (unwind-protect
-         (let* ((enable-recursive-minibuffers t)
-                (query-replace-p (or (eq last-command 'query-replace)
-                                     (eq last-command 'query-replace-regexp)))
-                (elm (helm-comp-read "pattern: "
-                                     (cl-loop for i in
-                                              (symbol-value minibuffer-history-variable)
-                                              unless (string= "" i) collect i into history
-                                              finally return
-                                              (if (consp (car history))
-                                                  (mapcar 'prin1-to-string history)
-                                                  history))
-                                     :header-name
-                                     (lambda (name)
-                                       (format "%s (%s)" name minibuffer-history-variable))
-                                     :buffer "*helm minibuffer-history*"
-                                     :must-match helm-minibuffer-history-must-match
-                                     :multiline t
-                                     :keymap helm-minibuffer-history-map
-                                     :allow-nest t)))
-           ;; Fix issue #1667 with emacs-25+ `query-replace-from-to-separator'.
-           (when (and (boundp 'query-replace-from-to-separator) query-replace-p)
-             (let ((pos (string-match "\0" elm)))
-               (and pos
-                    (add-text-properties
-                     pos (1+ pos)
-                     `(display ,query-replace-from-to-separator separator t)
-                     elm))))
-           (delete-minibuffer-contents)
-           (insert elm))
-      ;; Reinit C-r in helm-map.
-      (and ori-key (define-key helm-map ori-key 'helm-minibuffer-history)))))
+  (let* ((enable-recursive-minibuffers t)
+         (query-replace-p (or (eq last-command 'query-replace)
+                              (eq last-command 'query-replace-regexp)))
+         (elm (helm-comp-read "pattern: "
+                              (cl-loop for i in
+                                       (symbol-value minibuffer-history-variable)
+                                       unless (string= "" i) collect i into history
+                                       finally return
+                                       (if (consp (car history))
+                                           (mapcar 'prin1-to-string history)
+                                           history))
+                              :header-name
+                              (lambda (name)
+                                (format "%s (%s)" name minibuffer-history-variable))
+                              :buffer "*helm minibuffer-history*"
+                              :must-match helm-minibuffer-history-must-match
+                              :multiline t
+                              :keymap helm-minibuffer-history-map
+                              :allow-nest t)))
+    ;; Fix issue #1667 with emacs-25+ `query-replace-from-to-separator'.
+    (when (and (boundp 'query-replace-from-to-separator) query-replace-p)
+      (let ((pos (string-match "\0" elm)))
+        (and pos
+             (add-text-properties
+              pos (1+ pos)
+              `(display ,query-replace-from-to-separator separator t)
+              elm))))
+    (delete-minibuffer-contents)
+    (insert elm)))
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
