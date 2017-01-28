@@ -3470,27 +3470,34 @@ Colorize only symlinks, directories and files."
                                          (string-match ffap-url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
                           (helm-basename i) i)
-           if (and helm-ff-tramp-not-fancy (file-remote-p i))
-           collect (cons disp i)
-           else collect
-           (let ((type (car (file-attributes i))))
-             (cond ((stringp type)
-                    (cons (propertize disp
-                                      'face 'helm-ff-symlink
+           for isremote = (file-remote-p i)
+           ;; Call file-attributes only if:
+           ;; - file is not remote
+           ;; - helm-ff-tramp-not-fancy is nil and file is remote AND
+           ;; connected. (Issue #1679)
+           for type = (and (or (null isremote)
+                               (and (null helm-ff-tramp-not-fancy)
+                                    (file-remote-p i nil t)))
+                           (car (file-attributes i)))
+           collect
+           (cond ((and (null type) isremote) (cons disp i))
+                 ((stringp type)
+                  (cons (propertize disp
+                                    'face 'helm-ff-symlink
+                                    'match-part (funcall mp-fn disp)
+                                    'help-echo (expand-file-name i))
+                        i))
+                 ((eq type t)
+                  (cons (propertize disp
+                                    'face 'helm-ff-directory
+                                    'match-part (funcall mp-fn disp)
+                                    'help-echo (expand-file-name i))
+                        i))
+                 (t (cons (propertize disp
+                                      'face 'helm-ff-file
                                       'match-part (funcall mp-fn disp)
                                       'help-echo (expand-file-name i))
-                          i))
-                   ((eq type t)
-                    (cons (propertize disp
-                                      'face 'helm-ff-directory
-                                      'match-part (funcall mp-fn disp)
-                                      'help-echo (expand-file-name i))
-                          i))
-                   (t (cons (propertize disp
-                                        'face 'helm-ff-file
-                                        'match-part (funcall mp-fn disp)
-                                        'help-echo (expand-file-name i))
-                            i))))))
+                          i)))))
 
 (defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
   ((candidates :initform (lambda ()
