@@ -4739,16 +4739,30 @@ this function is always called."
     (delete-char 1)
     (set-buffer-modified-p nil)))
 
-(defun helm-candidate-buffer (&optional create-or-buffer)
+(defun helm-candidate-buffer (&optional buffer-spec)
   "Register and return a buffer storing candidates of current source.
 
-Acceptable values of CREATE-OR-BUFFER:
+This is used to initialize a buffer for storing candidates for a
+candidates-in-buffer source, candidates will be searched in this
+buffer and displayed in `helm-buffer'.
+This should be used only in init functions, don't relay on this in
+other places unless you know what you are doing.
+
+This function is still in public API only for backward compatibility,
+you should use instead `helm-init-candidates-in-buffer' for
+initializing your sources.
+
+Internally, this function is called without argument and returns the
+buffer corresponding to current source i.e `helm--source-name' which
+is available in only some places.
+
+Acceptable values of BUFFER-SPEC:
 
 - global (a symbol)
   Create a new global candidates buffer,
   named \" *helm candidates:SOURCE*\".
   This is used by `helm-init-candidates-in-buffer' and it is
-  the most common usage of CREATE-OR-BUFFER.
+  the most common usage of BUFFER-SPEC.
   The buffer will be killed and recreated at each new helm-session.
 
 - local (a symbol)
@@ -4757,12 +4771,11 @@ Acceptable values of CREATE-OR-BUFFER:
   You may want to use this when you want to have a different buffer
   each time source is used from a different `helm-current-buffer'.
   The buffer is erased and refilled at each new session but not killed.
-  You probably don't want to use this value for CREATE-OR-BUFFER.
+  You probably don't want to use this value for BUFFER-SPEC.
 
 - nil (omit)
-  Only return the candidates buffer if found
-  in `helm--candidate-buffer-alist' and it is alive.
-
+  Only return the candidates buffer of current source if found.
+  
 - A buffer
   Register a buffer as a candidates buffer.
   The buffer needs to exists, it is not created.
@@ -4778,28 +4791,28 @@ global one and is used instead."
         (local-bname (format " *helm candidates:%s*%s"
                              helm--source-name
                              (buffer-name helm-current-buffer))))
-    (when create-or-buffer
+    (when buffer-spec
       ;; Register buffer in `helm--candidate-buffer-alist'.
       ;; This is used only to retrieve buffer associated to current source
-      ;; when using named buffer as value of CREATE-OR-BUFFER.
+      ;; when using named buffer as value of BUFFER-SPEC.
       (setq helm--candidate-buffer-alist
-            (cons (cons helm--source-name create-or-buffer)
+            (cons (cons helm--source-name buffer-spec)
                   (delete (assoc helm--source-name
                                  helm--candidate-buffer-alist)
                           helm--candidate-buffer-alist)))
       ;; When using global or local as value of CREATE-OR-BUFFER
       ;; create the buffer global-bname or local-bname, otherwise
       ;; reuse the named buffer.
-      (unless (bufferp create-or-buffer)
+      (unless (bufferp buffer-spec)
         ;; Global buffers are killed and recreated.
-        (and (eq create-or-buffer 'global)
+        (and (eq buffer-spec 'global)
              (buffer-live-p (get-buffer global-bname))
              (kill-buffer global-bname))
         ;; Create global or local buffer.
         ;; Local buffer, once created are reused and a new one
         ;; is created when `helm-current-buffer' change across sessions.
         (with-current-buffer (get-buffer-create
-                              (cl-ecase create-or-buffer
+                              (cl-ecase buffer-spec
                                 (global global-bname)
                                 (local  local-bname)))
           ;; We need a buffer not read-only to perhaps insert later
@@ -4817,28 +4830,41 @@ global one and is used instead."
                       (buffer-live-p (get-buffer it))
                       it)))))
 
-(defun helm-init-candidates-in-buffer (buffer data)
-  "Register BUFFER with DATA for a helm candidates-in-buffer session.
-Arg BUFFER can be a string, a buffer object (bufferp), or a symbol,
-either 'local or 'global which is passed to `helm-candidate-buffer'.
+(defun helm-init-candidates-in-buffer (buffer-spec data)
+  "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.
+
+Arg BUFFER-SPEC can be a buffer-name (stringp), a buffer-spec object
+\(bufferp), or a symbol, either 'local or 'global which is passed to
+`helm-candidate-buffer'.
+The most common usage of BUFFER-SPEC is 'global.
+
 Arg DATA can be either a list or a plain string.
-Returns the resulting buffer."
+Returns the resulting buffer.
+
+Use this in your init function to register a buffer for a
+`helm-source-in-buffer' session and feed it with DATA.
+You probably don't want to bother with this and use the :data slot
+when initializing a source with `helm-source-in-buffer' class."
   (declare (indent 1))
-  (let ((buf (helm-candidate-buffer
-              (if (or (stringp buffer)
-                      (bufferp buffer))
-                  (get-buffer-create buffer)
-                buffer)))) ; a symbol.
-    (with-current-buffer buf
-      (erase-buffer)
-      (cond ((listp data)
-             (insert (mapconcat (lambda (i)
-                                  (cond ((symbolp i) (symbol-name i))
-                                        ((numberp i) (number-to-string i))
-                                        (t i)))
-                                data "\n")))
-            ((stringp data) (insert data))))
-    buf))
+  (let ((caching (and (or (stringp buffer-spec)
+                          (bufferp buffer-spec))
+                      (buffer-live-p (get-buffer buffer-spec))))
+        (buf (helm-candidate-buffer
+              (if (or (stringp buffer-spec)
+                      (bufferp buffer-spec))
+                  (get-buffer-create buffer-spec)
+                buffer-spec)))) ; a symbol 'global or 'local.
+    (unless caching
+      (with-current-buffer buf
+        (erase-buffer)
+        (cond ((listp data)
+               (insert (mapconcat (lambda (i)
+                                    (cond ((symbolp i) (symbol-name i))
+                                          ((numberp i) (number-to-string i))
+                                          (t i)))
+                                  data "\n")))
+              ((stringp data) (insert data))))
+      buf)))
 
 
 ;;; Resplit helm window
