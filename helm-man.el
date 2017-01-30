@@ -60,20 +60,18 @@ source.")
 
 (defun helm-man-default-action (candidate)
   "Default action for jumping to a woman or man page from helm."
-  (let ((wfiles (mapcar
-                 'car (woman-file-name-all-completions candidate))))
-    (condition-case nil
-        (if (> (length wfiles) 1)
-            (let ((file (helm-comp-read
-                         "ManFile: " wfiles :must-match t)))
-              (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
-                  (manual-entry (format helm-man-format-switches file))
-                  (woman-find-file file)))
-          (funcall helm-man-or-woman-function candidate))
-      ;; If woman is unable to format correctly
-      ;; use man instead.
-      (error (kill-buffer)              ; Kill woman buffer.
-             (Man-getpage-in-background candidate)))))
+  (let ((wfiles (mapcar #'car (woman-file-name-all-completions candidate))))
+    (let ((file (if (> (length wfiles) 1)
+                    (helm-comp-read "ManFile: " wfiles :must-match t)
+                  (car wfiles))))
+      (if (eq helm-man-or-woman-function 'Man-getpage-in-background)
+          (man file)
+        (condition-case nil
+            (woman-find-file file)
+          ;; If woman is unable to format correctly
+          ;; use man instead.
+          (error (kill-buffer)
+                 (man file)))))))
 
 (defun helm-man--init ()
   (require 'woman)
