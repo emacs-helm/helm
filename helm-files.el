@@ -781,12 +781,12 @@ otherwise do
 \"eshell-command command baz\"
 
 Note:
-If `eshell' or `eshell-command' have not been run once,
-or if you have no eshell aliases `eshell-command-aliases-list'
-will not be loaded first time you use this."
+You have to setup some aliases in eshell with the `alias' command or
+by editing yourself the file `eshell-aliases-file' to make this
+working."
+  (require 'em-alias) (eshell-read-aliases-list)
   (when (or eshell-command-aliases-list
-            (y-or-n-p "Eshell is not loaded, run eshell-command without alias anyway? "))
-    (and eshell-command-aliases-list (eshell-read-aliases-list))
+            (y-or-n-p "No eshell aliases found, run eshell-command without alias anyway? "))
     (let* ((cand-list (helm-marked-candidates))
            (default-directory (or helm-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
