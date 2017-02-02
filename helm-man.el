@@ -70,9 +70,12 @@ source.")
             (condition-case nil
                 (woman-find-file file)
               ;; If woman is unable to format correctly
-              ;; use man instead.
+              ;; try Man instead.
               (error (kill-buffer)
                      (manual-entry (format helm-man-format-switches file))))))
+      ;; If even Man failed with file as argument, try again with Man
+      ;; but using Topic candidate instead of the file calculated by
+      ;; woman.
       (error (kill-buffer)
              (Man-getpage-in-background candidate)))))
 
