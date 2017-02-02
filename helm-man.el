@@ -72,7 +72,7 @@ source.")
               ;; If woman is unable to format correctly
               ;; use man instead.
               (error (kill-buffer)
-                     (Man-getpage-in-background file)))))
+                     (manual-entry (format helm-man-format-switches file))))))
       (error (kill-buffer)
              (Man-getpage-in-background candidate)))))
 
