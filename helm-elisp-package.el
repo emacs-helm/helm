@@ -381,7 +381,7 @@
           ((and (package-installed-p pkg-name)
                 (cdr (assq pkg-name helm-el-package--upgrades))
                 (string= status "available"))
-           (append '("Upgrade package(s)" . helm-el-package-upgrade)
+           (append '(("Upgrade package(s)" . helm-el-package-upgrade))
                    acts))
           ((and (package-installed-p pkg-name)
                 (or (null (package-built-in-p pkg-name))
