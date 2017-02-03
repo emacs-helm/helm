@@ -4075,7 +4075,7 @@ Key arg DIRECTION can be one of:
   (let ((name (if (stringp source-or-name)
                   source-or-name
                   (assoc-default 'name source-or-name))))
-    (if (string= name "")
+    (if (or (null name) (string= name ""))
         (forward-line 1)
         (condition-case err
             (while (not (string= name (helm-current-line-contents)))
@@ -4165,7 +4165,10 @@ next source)."
 (put 'helm-next-source 'helm-only t)
 
 (defun helm-goto-source (source-or-name)
-  "Move the selection to the source SOURCE-OR-NAME."
+  "Move the selection to the source named SOURCE-OR-NAME.
+
+If SOURCE-OR-NAME is empty string or nil go to the first candidate of
+first source."
   (helm-move-selection-common :where 'source :direction source-or-name))
 
 (defun helm--follow-action (arg)
