@@ -1370,7 +1370,7 @@ if available with current AG version."
          (pipe-cmd (pcase (helm-grep--ag-command)
                      ((and com (or "ag" "pt"))
                       (format "%s -S --color%s" com (concat " " pipe-switches)))
-                     (`"rg" (format "TERM=eterm-color rg -S --color=always%s"
+                     (`"rg" (format "TERM=eterm-color rg -N -S --color=always%s"
                                     (concat " " pipe-switches)))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
