@@ -4164,7 +4164,7 @@ next source)."
     (helm-move-selection-common :where 'source :direction 'next)))
 (put 'helm-next-source 'helm-only t)
 
-(defun helm-goto-source (source-or-name)
+(defun helm-goto-source (&optional source-or-name)
   "Move the selection to the source named SOURCE-OR-NAME.
 
 If SOURCE-OR-NAME is empty string or nil go to the first candidate of
