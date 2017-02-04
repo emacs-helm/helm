@@ -31,6 +31,7 @@
 (declare-function helm-follow-mode-p "helm.el")
 (declare-function helm-attr "helm.el")
 (declare-function helm-attrset "helm.el")
+(declare-function outline-show-all "org-compat.el")
 (defvar helm-current-position)
 
 
@@ -288,26 +289,28 @@ text to be displayed in BUFNAME."
 ;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
-                 "[SPC,C-v,down,next:NextPage  b,M-v,up,prior:PrevPage C-s/r:Isearch q:Quit]"
+                 "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
         scroll-error-top-bottom)
     (helm-awhile (read-key prompt)
       (cl-case it
-        ((?\C-v ? down next) (helm-help-scroll-up helm-scroll-amount))
-        ((?\M-v ?b up prior) (helm-help-scroll-down helm-scroll-amount))
+        ((?\C-v ? next) (helm-help-scroll-up helm-scroll-amount))
+        ((?\M-v ?b prior) (helm-help-scroll-down helm-scroll-amount))
         (?\C-s (isearch-forward))
         (?\C-r (isearch-backward))
         (?\C-a (call-interactively #'move-beginning-of-line))
         (?\C-e (call-interactively #'move-end-of-line))
         (?\C-f (call-interactively #'forward-char))
         (?\C-b (call-interactively #'backward-char))
-        (?\C-n (helm-help-next-line))
-        (?\C-p (helm-help-previous-line))
+        ((?\C-n down) (helm-help-next-line))
+        ((?\C-p up) (helm-help-previous-line))
         (?\M-a (call-interactively #'backward-sentence))
         (?\M-e (call-interactively #'forward-sentence))
         (?\M-f (call-interactively #'forward-word))
         (?\M-b (call-interactively #'backward-word))
         (?\C-  (helm-help-toggle-mark))
+        (?\t   (org-cycle))
+        (?\M-\t (outline-show-all))
         (?\M-w (copy-region-as-kill
                 (region-beginning) (region-end))
                (deactivate-mark))
