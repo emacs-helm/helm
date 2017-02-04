@@ -833,10 +833,26 @@ value of this var.")
 completions and narrowing selections.
 
 Helm narrows the list of candidates as the pattern is typed and
-updates the list in a live feedback. Helm accepts multiple
-patterns (entered with a space between patterns). Helm uses
-familiar Emacs navigation keys to move up and down the list.
-`RET' selects the candidate from the list.
+updates the list in a live feedback.
+
+Helm accepts multiple patterns (entered with a space between patterns).
+Helm support also fuzzy matching in some places when specified.
+
+Helm uses familiar Emacs navigation keys to move up and down the list,
+however some keybindings maybe confusing for new users, here are some:
+
+`\\<helm-map>\\[helm-maybe-exit-minibuffer]' selects the candidate from the list and execute default action
+on it, exiting helm session.
+
+`\\<helm-map>\\[helm-execute-persistent-action]' execute the default action
+but without exiting helm session, it may be not available in some places.
+
+`\\<helm-map>\\[helm-select-action]' show you a list of actions
+available on current candidate or all marked candidates, this maybe
+surprising for new helm users that expect
+`\\<helm-map>\\[helm-select-action]' for completions and have not
+realized they are already completing something as soon as helm is
+started!
 
 ** Helm Help
 
