@@ -5673,7 +5673,11 @@ See `fit-window-to-buffer' for more infos."
       (remove-hook 'helm-window-configuration-hook 'helm--autoresize-hook)))
 
 (defun helm-help ()
-  "Help of `helm'."
+  "Generate helm's help according to `help-message' attribute.
+
+If source is not available yet or doesn't have any `help-message'
+attribute, a generic message explaining this is added instead.  The
+global `helm-help-message' is always added after this local help."
   (interactive)
   (with-helm-alive-p
     (save-selected-window
