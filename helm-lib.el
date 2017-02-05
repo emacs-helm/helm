@@ -31,7 +31,6 @@
 (declare-function helm-follow-mode-p "helm.el")
 (declare-function helm-attr "helm.el")
 (declare-function helm-attrset "helm.el")
-(declare-function outline-show-all "org-compat.el")
 (defvar helm-current-position)
 
 
@@ -291,7 +290,8 @@ text to be displayed in BUFNAME."
   (let ((prompt (propertize
                  "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
-        scroll-error-top-bottom)
+        scroll-error-top-bottom
+        (show-all t))
     (helm-awhile (read-key prompt)
       (cl-case it
         ((?\C-v ? next) (helm-help-scroll-up helm-scroll-amount))
@@ -312,7 +312,8 @@ text to be displayed in BUFNAME."
         (?\M-< (call-interactively #'beginning-of-buffer))
         (?\C-  (helm-help-toggle-mark))
         (?\t   (org-cycle))
-        (?\M-\t (outline-show-all))
+        (?\M-\t (org-cycle (if (setq show-all (not show-all))
+                               '(64) '(16))))
         (?\M-w (copy-region-as-kill
                 (region-beginning) (region-end))
                (deactivate-mark))

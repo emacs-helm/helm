@@ -884,7 +884,7 @@ hardcoded and not modifiable, here they are:
 | M-<       |                  | Beginning of buffer |
 | C-<SPACE> |                  | Toggle mark         |
 | TAB       |                  | Org cycle           |
-| M-<TAB>   |                  | Outline show all    |
+| M-<TAB>   |                  | Toggle visibility   |
 | M-w       |                  | Copy region         |
 | q         |                  | Quit                |
 
