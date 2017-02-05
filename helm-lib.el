@@ -31,6 +31,7 @@
 (declare-function helm-follow-mode-p "helm.el")
 (declare-function helm-attr "helm.el")
 (declare-function helm-attrset "helm.el")
+(declare-function org-open-at-point "org.el")
 (defvar helm-current-position)
 
 
