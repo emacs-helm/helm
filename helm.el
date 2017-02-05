@@ -852,7 +852,7 @@ available on current candidate or all marked candidates, this maybe
 surprising for new helm users that expect
 `\\[helm-select-action]' for completions and have not
 realized they are already completing something as soon as helm is
-started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][FAQ]]
+started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]]
 
 ** Helm Help
 
