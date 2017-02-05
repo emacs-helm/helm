@@ -137,7 +137,7 @@ below).
 
 ## Installing just the helm-core package
 
-`helm-core` package is available on [MELPA](http://melpa.org/) for
+`helm-core` package is available on [MELPA](https://melpa.org/) for
 third party packages that depend on helm libraries. These packages
 should require helm as follows:
 
@@ -214,7 +214,7 @@ Helm contains many features, some of which are easier to follow
 visually. Here is a demo of `helm-buffers-list` used with
 `helm-moccur`. Demo starts with `Eval: START` in the minibuffer.
 
-![helm-buffers-list](doc/helm-buffers-list.gif)
+![helm-buffers-list](images/helm-buffers-list.gif)
 
 - Regexp `*C` selects the C buffers. `*Tcl` in the demo selects TCL
   buffers, then with `*C` switches back to C buffers.
