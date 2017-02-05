@@ -500,15 +500,15 @@ Note:
 When using marked files with this, the meaning of prefix arg is quite
 subtil: Say you have foo, bar and baz marked, when you run the alias
 command `example' on these files with no prefix arg it will loop on
-the file list and run:
+the file list and run sequentially `example' on each file:
 
-example foo
-example bar
-example baz
+    example foo
+    example bar
+    example baz
 
-However with a prefix arg it will do
+However with a prefix arg it will apply `example' on each file:
 
-example foo bar baz
+    example foo bar baz
 
 Of course the alias command should support this.
 
