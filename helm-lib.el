@@ -312,6 +312,7 @@ text to be displayed in BUFNAME."
         (?\M-< (call-interactively #'beginning-of-buffer))
         (?\C-  (helm-help-toggle-mark))
         (?\t   (org-cycle))
+        (?\C-m (ignore-errors (call-interactively #'org-open-at-point)))
         (?\M-\t (org-cycle (if (setq show-all (not show-all))
                                '(64) '(16))))
         (?\M-w (copy-region-as-kill

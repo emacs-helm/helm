@@ -841,22 +841,22 @@ Helm support also fuzzy matching in some places when specified.
 Helm uses familiar Emacs navigation keys to move up and down the list,
 however some keybindings maybe confusing for new users, here are some:
 
-`\\<helm-map>\\[helm-maybe-exit-minibuffer]' selects the candidate from the list and execute default action
+`\\[helm-maybe-exit-minibuffer]' selects the candidate from the list and execute default action
 on it, exiting helm session.
 
-`\\<helm-map>\\[helm-execute-persistent-action]' execute the default action
+`\\[helm-execute-persistent-action]' execute the default action
 but without exiting helm session, it may be not available in some places.
 
-`\\<helm-map>\\[helm-select-action]' show you a list of actions
+`\\[helm-select-action]' show you a list of actions
 available on current candidate or all marked candidates, this maybe
 surprising for new helm users that expect
-`\\<helm-map>\\[helm-select-action]' for completions and have not
+`\\[helm-select-action]' for completions and have not
 realized they are already completing something as soon as helm is
-started!
+started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][FAQ]]
 
 ** Helm Help
 
-C-h m\t\tShows this generic Helm help.
+\\[helm-help]\t\tShows this generic Helm help.
 
 While in the help buffer, you have most of the regular keybindings
 available in emacs buffers, the most important are shown in
