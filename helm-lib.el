@@ -32,6 +32,7 @@
 (declare-function helm-attr "helm.el")
 (declare-function helm-attrset "helm.el")
 (declare-function org-open-at-point "org.el")
+(declare-function org-content "org.el")
 (defvar helm-current-position)
 
 
@@ -149,22 +150,18 @@ and not `exit-minibuffer' or other unwanted functions."
         (setq lis (cdr lis))
         elm))))
 
+(defun helm-iter-circular (seq)
+  "Infinite iteration on SEQ."
+  (let ((lis seq))
+     (lambda ()
+       (let ((elm (car lis)))
+         (setq lis (pcase lis (`(,_ . ,ll) (or ll seq))))
+         elm))))
+
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
   (funcall iterator))
 
-(defun helm-make-actions (&rest args)
-  "Build an alist with (NAME . ACTION) elements with each pairs in ARGS.
-Where NAME is a string or a function returning a string or nil and ACTION
-a function.
-If NAME returns nil the pair is skipped.
-
-\(fn NAME ACTION ...)"
-  (cl-loop for (name fn) on args by #'cddr
-           when (functionp name)
-           do (setq name (funcall name))
-           when name
-           collect (cons name fn)))
 
 ;;; Anaphoric macros.
 ;;
@@ -292,7 +289,7 @@ text to be displayed in BUFNAME."
                  "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
         scroll-error-top-bottom
-        (show-all t))
+        (iter-org-state (helm-iter-circular '(1 (16) (64)))))
     (helm-awhile (read-key prompt)
       (cl-case it
         ((?\C-v ? next) (helm-help-scroll-up helm-scroll-amount))
@@ -314,8 +311,9 @@ text to be displayed in BUFNAME."
         (?\C-  (helm-help-toggle-mark))
         (?\t   (org-cycle))
         (?\C-m (ignore-errors (call-interactively #'org-open-at-point)))
-        (?\M-\t (org-cycle (if (setq show-all (not show-all))
-                               '(64) '(16))))
+        (?\M-\t (pcase (helm-iter-next iter-org-state)
+                  ((pred numberp) (org-content))
+                  ((and state) (org-cycle state))))
         (?\M-w (copy-region-as-kill
                 (region-beginning) (region-end))
                (deactivate-mark))
@@ -483,6 +481,18 @@ than specifying SOURCES because sources are cached."
            for source in src-list
            thereis (and (string= name (assoc-default 'name source)) source)))
 
+(defun helm-make-actions (&rest args)
+  "Build an alist with (NAME . ACTION) elements with each pairs in ARGS.
+Where NAME is a string or a function returning a string or nil and ACTION
+a function.
+If NAME returns nil the pair is skipped.
+
+\(fn NAME ACTION ...)"
+  (cl-loop for (name fn) on args by #'cddr
+           when (functionp name)
+           do (setq name (funcall name))
+           when name
+           collect (cons name fn)))
 
 ;;; Strings processing.
 ;;
