@@ -160,7 +160,7 @@ and not `exit-minibuffer' or other unwanted functions."
 
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
-  (funcall iterator))
+  (and iterator (funcall iterator)))
 
 
 ;;; Anaphoric macros.
