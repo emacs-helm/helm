@@ -2746,7 +2746,7 @@ Use it for non--interactive calls of `helm-find-files'."
           (hlink)    ; String at point is an hyperlink.
           (file-p    ; a regular file
            (helm-aif (ffap-file-at-point) (expand-file-name it)))
-          (urlp file-at-pt) ; possibly an url or email.
+          (urlp (helm-html-decode-entities-string file-at-pt)) ; possibly an url or email.
           ((and file-at-pt
                 (not remp)
                 (file-exists-p file-at-pt))
