@@ -321,6 +321,35 @@ text to be displayed in BUFNAME."
         (t     (ignore))))))
 
 
+;;; Multiline transformer
+;;
+(defun helm-multiline-transformer (candidates _source)
+  (cl-loop with offset = (helm-interpret-value
+                          (assoc-default 'multiline (helm-get-current-source)))
+           for i in candidates
+           if (numberp offset)
+           collect (cons (helm--multiline-get-truncated-candidate i offset) i)
+           else collect i))
+
+(defun helm--multiline-get-truncated-candidate (candidate offset)
+  "Truncate CANDIDATE when its length is > than OFFSET."
+  (with-temp-buffer
+    (insert candidate)
+    (goto-char (point-min))
+    (if (and offset
+             (> (buffer-size) offset))
+        (let ((end-str "[...]"))
+          (concat
+           (buffer-substring
+            (point)
+            (save-excursion
+              (forward-char offset)
+              (setq end-str (if (looking-at "\n")
+                                end-str (concat "\n" end-str)))
+              (point)))
+           end-str))
+        (buffer-string))))
+
 ;;; List processing
 ;;
 (defun helm-flatten-list (seq &optional omit-nulls)
