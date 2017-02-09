@@ -181,9 +181,14 @@
    (multiline
     :initarg :multiline
     :initform nil
-    :custom boolean
+    :custom (choice boolean integer)
     :documentation
-    "  Enable to selection multiline candidates.")
+    "  Allow multiline candidates.
+  When non-nil candidates will be separated by `helm-candidate-separator'.
+  You can customize the color of this separator with `helm-separator' face.
+  Value of multiline can be an integer which specify the maximum size of the
+  multiline string to display, if multiline string is longer than this value
+  it will be truncated.")
 
    (requires-pattern
     :initarg :requires-pattern
@@ -898,7 +903,13 @@ an eieio class."
           (helm-aif (slot-value source 'filtered-candidate-transformer)
               (append (helm-mklist it)
                       (list #'helm-fuzzy-highlight-matches))
-            (list #'helm-fuzzy-highlight-matches)))))
+            (list #'helm-fuzzy-highlight-matches))))
+  (when (numberp (helm-interpret-value (slot-value source 'multiline)))
+    (setf (slot-value source 'filtered-candidate-transformer)
+          (helm-aif (slot-value source 'filtered-candidate-transformer)
+              (append (helm-mklist it)
+                      (list #'helm-multiline-transformer))
+            (list #'helm-multiline-transformer)))))
 
 (defmethod helm-setup-user-source ((_source helm-source)))
 
