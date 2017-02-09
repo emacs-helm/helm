@@ -386,34 +386,33 @@ the `global-mark-ring' after each new visit."
 
 (defun helm-register-action-transformer (actions register-and-functions)
   "Decide actions by the contents of register."
-  (cl-loop with transformer-actions = nil
-           with func-actions =
-        '((insert-register
-           "Insert Register" .
-           (lambda (c) (insert-register (car c))))
-          (jump-to-register
-           "Jump to Register" .
-           (lambda (c) (jump-to-register (car c))))
-          (append-to-register
-           "Append Region to Register" .
-           (lambda (c) (append-to-register
-                        (car c) (region-beginning) (region-end))))
-          (prepend-to-register
-           "Prepend Region to Register" .
-           (lambda (c) (prepend-to-register
-                        (car c) (region-beginning) (region-end))))
-          (increment-register
-           "Increment Prefix Arg to Register" .
-           (lambda (c) (increment-register
-                        helm-current-prefix-arg (car c))))
-          (undo-tree-restore-state-from-register
-           "Restore Undo-tree register" .
-           (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
-                            (undo-tree-restore-state-from-register (car c))))))
-        for func in (cdr register-and-functions)
-        when (assq func func-actions)
-        collect (cdr it) into transformer-actions
-        finally return (append transformer-actions actions)))
+  (cl-loop with func-actions =
+           '((insert-register
+              "Insert Register" .
+              (lambda (c) (insert-register (car c))))
+             (jump-to-register
+              "Jump to Register" .
+              (lambda (c) (jump-to-register (car c))))
+             (append-to-register
+              "Append Region to Register" .
+              (lambda (c) (append-to-register
+                           (car c) (region-beginning) (region-end))))
+             (prepend-to-register
+              "Prepend Region to Register" .
+              (lambda (c) (prepend-to-register
+                           (car c) (region-beginning) (region-end))))
+             (increment-register
+              "Increment Prefix Arg to Register" .
+              (lambda (c) (increment-register
+                           helm-current-prefix-arg (car c))))
+             (undo-tree-restore-state-from-register
+              "Restore Undo-tree register" .
+              (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
+                               (undo-tree-restore-state-from-register (car c))))))
+           for func in (cdr register-and-functions)
+           when (assq func func-actions)
+           collect (cdr it) into transformer-actions
+           finally return (append transformer-actions actions)))
 
 ;;;###autoload
 (defun helm-mark-ring ()
