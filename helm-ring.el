@@ -411,10 +411,9 @@ the `global-mark-ring' after each new visit."
            (lambda (c) (and (fboundp 'undo-tree-restore-state-from-register)
                             (undo-tree-restore-state-from-register (car c))))))
         for func in (cdr register-and-functions)
-        for cell = (assq func func-actions)
-        when cell
-        do (push (cdr cell) transformer-actions)
-        finally return (append (nreverse transformer-actions) actions)))
+        when (assq func func-actions)
+        collect (cdr it) into transformer-actions
+        finally return (append transformer-actions actions)))
 
 ;;;###autoload
 (defun helm-mark-ring ()
