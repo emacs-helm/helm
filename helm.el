@@ -944,6 +944,7 @@ is non-nil.
 \\[helm-quit-and-find-file]\t\tDrop into `helm-find-files'.
 \\[helm-kill-selection-and-quit]\t\tKill display value of candidate and quit (with prefix arg, kill the real value).
 \\[helm-yank-selection]\t\tYank current selection into pattern.
+\\[helm-copy-to-buffer]\t\tCopy selected candidate at point in current-buffer.
 \\[helm-follow-mode]\t\tToggle automatic execution of persistent action.
 \\[helm-follow-action-forward]\tRun persistent action and then select next line.
 \\[helm-follow-action-backward]\t\tRun persistent action and then select previous line.
