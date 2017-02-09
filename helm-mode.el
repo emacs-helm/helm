@@ -475,25 +475,26 @@ that use `helm-comp-read' See `helm-M-x' for example."
                 (when cands
                   (delete "" (helm-cr-default default cands))))))
            (src-hist (helm-build-sync-source (format "%s History" name)
-                         :candidates history-get-candidates
-                         :fuzzy-match fuzzy
-                         :multiline multiline
-                         :match-part match-part
-                         :filtered-candidate-transformer
-                         (append '((lambda (candidates sources)
-                                     (cl-loop for i in candidates
-                                              ;; Input is added to history in completing-read's
-                                              ;; and may be regexp-quoted, so unquote it
-                                              ;; but check if cand is a string (it may be at this stage
-                                              ;; a symbol or nil) Issue #1553.
-                                              when (stringp i)
-                                              collect (replace-regexp-in-string "\\s\\" "" i))))
-                                 (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
-                         :persistent-action persistent-action
-                         :persistent-help persistent-help
-                         :mode-line mode-line
-                         :help-message help-message
-                         :action action-fn))
+                       :candidates history-get-candidates
+                       :fuzzy-match fuzzy
+                       :multiline multiline
+                       :match-part match-part
+                       :filtered-candidate-transformer
+                       (append '((lambda (candidates sources)
+                                   (cl-loop for i in candidates
+                                            ;; Input is added to history in completing-read's
+                                            ;; and may be regexp-quoted, so unquote it
+                                            ;; but check if cand is a string (it may be at this stage
+                                            ;; a symbol or nil) Issue #1553.
+                                            when (stringp i)
+                                            collect (replace-regexp-in-string "\\s\\" "" i))))
+                               (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
+                       :persistent-action persistent-action
+                       :persistent-help persistent-help
+                       :keymap loc-map
+                       :mode-line mode-line
+                       :help-message help-message
+                       :action action-fn))
            (src (helm-build-sync-source name
                   :candidates get-candidates
                   :match-part match-part
