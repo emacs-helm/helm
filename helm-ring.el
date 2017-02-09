@@ -75,7 +75,9 @@ will not have anymore separators between candidates."
 
 (defvar helm-source-kill-ring
   (helm-build-sync-source "Kill Ring"
-    :init (lambda () (helm-attrset 'last-command last-command))
+    :init (lambda ()
+            (helm-attrset 'last-command last-command)
+            (helm-attrset 'multiline helm-kill-ring-max-offset))
     :candidates #'helm-kill-ring-candidates
     :filtered-candidate-transformer #'helm-kill-ring-transformer
     :action 'helm-kill-ring-actions
