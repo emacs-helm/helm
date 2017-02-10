@@ -583,6 +583,22 @@ The default is to enable this by default and then toggle
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-header-line-space-before-prompt 'left-fringe
+  "Specify the space before prompt in header-line.
+
+This will be used when `helm-echo-input-in-header-line' is non-nil.
+
+Value can be one of the symbols 'left-fringe or 'left-margin or an
+integer specifying the number of spaces before prompt.
+Note that on input longer that `window-width' the continuation string
+will be shown on left side of window without taking care of this."
+  :group 'helm
+  :type '(choice
+          (symbol
+           (const :tag "Fringe" 'left-fringe)
+           (const :tag "Margin" 'left-margin))
+          integer))
+
 (defcustom helm-tramp-connection-min-time-diff 5
   "Value of `tramp-connection-min-time-diff' for helm remote processes.
 If set to zero helm remote processes are not delayed.
@@ -3927,7 +3943,7 @@ mode and header lines."
                   'display (if (string-match-p (regexp-opt `(,helm--prompt
                                                              ,helm--action-prompt))
                                                cont)
-                               '(space :width left-fringe)
+                               `(space :width ,helm-header-line-space-before-prompt)
                                (propertize
                                 "->"
                                 'face 'helm-header-line-left-margin))))
