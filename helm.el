@@ -2998,7 +2998,12 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                    candidate (helm-stringify candidate)))
          (pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string cand))
-         (bonus (if (equal (car pat-lookup) (car str-lookup)) 1 0))
+         (bonus (cond ((equal (car pat-lookup) (car str-lookup))
+                       1)
+                      ((and (null pat-lookup) ; length = 1
+                            (string= pattern (substring cand 0 1)))
+                       150)
+                      (t 0)))
          (bonus1 (and (string-match (concat "\\<" (regexp-quote pattern) "\\>")
                                     cand)
                       100)))
