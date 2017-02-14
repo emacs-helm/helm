@@ -278,6 +278,10 @@ in `current-buffer'."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-goto-first-real-dired-exceptions '(dired-goto-file)
+  "Dired commands that are allowed moving to first real candidate."
+  :group 'helm-files
+  :type '(repeat (choice symbol)))
 
 ;;; Faces
 ;;
@@ -1520,7 +1524,10 @@ or hitting C-j on \"..\"."
          (name (assoc-default 'name src)))
     (helm-aif (and (helm-file-completion-source-p src)
                    (not (helm-empty-source-p))
-                   (or (string= "dired-goto-file" name)
+                   ;; Prevent dired commands moving to first real
+                   ;; (Issue #910).
+                   (or (memq (intern-soft name)
+                             helm-ff-goto-first-real-dired-exceptions)
                        (not (string-match "\\`[Dd]ired-" name)))
                    helm-ff--move-to-first-real-candidate
                    (helm-get-selection nil nil src))
