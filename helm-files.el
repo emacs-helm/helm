@@ -1516,12 +1516,12 @@ or hitting C-j on \"..\"."
 
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
-  (let ((src (helm-get-current-source)))
+  (let* ((src (helm-get-current-source))
+         (name (assoc-default 'name src)))
     (helm-aif (and (helm-file-completion-source-p src)
                    (not (helm-empty-source-p))
-                   (not (string-match
-                         "\\`[Dd]ired-"
-                         (assoc-default 'name src)))
+                   (or (string= "dired-goto-file" name)
+                       (not (string-match "\\`[Dd]ired-" name)))
                    helm-ff--move-to-first-real-candidate
                    (helm-get-selection nil nil src))
         (unless (or (not (stringp it))
