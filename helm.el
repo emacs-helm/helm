@@ -870,6 +870,38 @@ surprising for new helm users that expect
 realized they are already completing something as soon as helm is
 started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]]
 
+** Helm mode
+
+`helm-mode' allows you enabling helm completion in native emacs functions,
+so when you turn on `helm-mode' commands like e.g `switch-to-buffer' will use
+helm completion instead of the usual emacs completion buffer.
+
+*** What is helmized and not when `helm-mode' is enabled ?
+
+Helm is providing completion on all functions in emacs using `completing-read'
+and derived and `completion-in-region', it uses generic functions for this.
+
+For the functions using `completing-read' and derived e.g `read-file-name' helm
+have a user variable that allows controlling which function to use for a specific
+emacs command, it is `helm-completing-read-handlers-alist', it allows also
+disabling helm completion for a specific command when the specified
+function is nil.
+See its documentation for more infos.
+
+*** Helm functions vs helmized emacs functions
+
+Sometimes you have helm functions that do the same completion as other
+emacs vanilla helmized functions, e.g `switch-to-buffer' and
+`helm-buffers-list', you have to understand that the native helm
+functions like `helm-buffers-list' can receive new features, allow
+marking candidates, have several actions and much more whereas the
+emacs vanilla helmized functions have only a helm completion, one
+action and no more what emacs provide for this function, it is the
+intended behavior.
+
+So generally you have better time using the native helm command generally
+much more featured than the emacs function helmized than `helm-mode'.
+
 ** Helm Help
 
 \\[helm-help]\t\tShows this generic Helm help.
