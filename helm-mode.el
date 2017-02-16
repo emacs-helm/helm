@@ -1073,6 +1073,7 @@ Can be used as value for `completion-in-region-function'."
         (let* ((enable-recursive-minibuffers t)
                (input (buffer-substring-no-properties start end))
                (current-command (or (helm-this-command) this-command))
+               (crm (eq current-command 'crm-complete))
                (str-command (helm-symbol-name current-command))
                (buf-name (format "*helm-mode-%s*" str-command))
                (require-match (or (and (boundp 'require-match) require-match)
@@ -1140,7 +1141,8 @@ Can be used as value for `completion-in-region-function'."
                               data))
                           :name str-command
                           :fuzzy helm-completion-in-region-fuzzy-match
-                          :nomark t
+                          :nomark (null crm)
+                          :marked-candidates crm
                           :initial-input
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
@@ -1166,11 +1168,14 @@ Can be used as value for `completion-in-region-function'."
                                (message "[No matches]")))
                             t) ; exit minibuffer immediately.
                           :must-match require-match))))
-          (when result
-            (choose-completion-string
-             result (current-buffer)
-             (list (+ start base-size) end)
-             completion-list-insert-choice-function)))
+          (cond ((stringp result)
+                 (choose-completion-string
+                  result (current-buffer)
+                  (list (+ start base-size) end)
+                  completion-list-insert-choice-function))
+                ((consp result) ; crm.
+                 (insert (mapconcat 'identity result ",")))
+                (t nil)))
       (advice-remove 'lisp--local-variables
                      #'helm-mode--advice-lisp--local-variables))))
 
