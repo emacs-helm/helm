@@ -58,6 +58,11 @@ will not have anymore separators between candidates."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-show-kill-ring-yank t
+  "*Insert entry from helm-show-kill-ring into the buffer."
+  :type '(boolean)
+  :group 'helm-ring)
+
 
 ;;; Kill ring
 ;;
@@ -150,7 +155,8 @@ replace with STR as yanked string."
     (when (and (region-active-p) delete-selection-mode)
       (delete-region (region-beginning) (region-end)))
     (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
-        (insert-for-yank str)
+        (when helm-show-kill-ring-yank
+          (insert-for-yank str))
       ;; from `yank-pop'
       (let ((inhibit-read-only t)
             (before (< (point) (mark t))))
