@@ -357,6 +357,10 @@ One way to ascertain that the bugs are helm-related, recreate the
 error either by using `Emacs -Q` or by running the included package
 script `./emacs-helm.sh` located in the helm directory.
 
+Helm comes now with a template for filling bugs, when reporting issues,
+be sure to fill all sections and to run helm from a minimal install as
+described above to reproduce your bug.
+ 
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
