@@ -170,19 +170,18 @@ This is a filtered candidate transformer you can use with the
     (if source-info
         (let ((usage
                ;; Assemble a list containing the (CANDIDATE . USAGE-COUNT) pairs.
-               (cl-loop with count = 0
-                        for (sn . infos) in (cdr source-info)
+               (cl-loop for (src-cand . infos) in (cdr source-info)
+                        for count = 0
                         do (cl-loop for (pattern . score) in infos
-                                    if (not (equal pattern helm-pattern))
-                                    do (cl-incf count score)
-                                    else return
                                     ;; If current pattern is equal to the previously
                                     ;; used one then this candidate has priority
                                     ;; (that's why its count is boosted by 10000) and
                                     ;; it only has to compete with other candidates
                                     ;; which were also selected with the same pattern.
-                                    (setq count (+ 10000 score)))
-                        and collect (cons sn count) into results
+                                    if (equal pattern helm-pattern)
+                                    return (setq count (+ 10000 score))
+                                    else do (cl-incf count score))
+                        and collect (cons src-cand count) into results
                         ;; Sort the list in descending order, so candidates with highest
                         ;; priority come first.
                         finally return (sort results (lambda (first second)
