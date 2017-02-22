@@ -169,34 +169,43 @@ This is a filtered candidate transformer you can use with the
          (source-info (assoc source-name helm-adaptive-history)))
     (if source-info
         (let ((usage
-               ;; Assemble a list containing the (CANDIDATE . USAGE-COUNT) pairs.
+               ;; Loop in the SOURCE entry of `helm-adaptive-history'
+               ;; and assemble a list containing the (CANDIDATE
+               ;; . USAGE-COUNT) pairs.
                (cl-loop for (src-cand . infos) in (cdr source-info)
                         for count = 0
                         do (cl-loop for (pattern . score) in infos
-                                    ;; If current pattern is equal to the previously
-                                    ;; used one then this candidate has priority
-                                    ;; (that's why its count is boosted by 10000) and
-                                    ;; it only has to compete with other candidates
-                                    ;; which were also selected with the same pattern.
+                                    ;; If current pattern is equal to
+                                    ;; the previously used one then
+                                    ;; this candidate has priority
+                                    ;; (that's why its count is
+                                    ;; boosted by 10000) and it only
+                                    ;; has to compete with other
+                                    ;; candidates which were also
+                                    ;; selected with the same pattern.
                                     if (equal pattern helm-pattern)
                                     return (setq count (+ 10000 score))
                                     else do (cl-incf count score))
                         and collect (cons src-cand count) into results
-                        ;; Sort the list in descending order, so candidates with highest
-                        ;; priority come first.
-                        finally return (sort results (lambda (first second)
-                                                       (> (cdr first) (cdr second)))))))
+                        ;; Sort the list in descending order, so
+                        ;; candidates with highest priority come
+                        ;; first.
+                        finally return
+                        (sort results (lambda (first second)
+                                        (> (cdr first) (cdr second)))))))
           (if (consp usage)
               ;; Put those candidates first which have the highest usage count.
-              (cl-loop for (info . _freq) in usage
-                       for mlinfo = (and (assq 'multiline source)
-                                         (replace-regexp-in-string "\n\\'" "" info))
-                       for member = (cl-member (or mlinfo info) candidates
-                                               :test 'helm-adaptive-compare)
-                       when member collect (car member) into sorted
-                       and do
-                       (setq candidates (cl-remove (or mlinfo info) candidates
-                                                   :test 'helm-adaptive-compare))
+              (cl-loop for (cand . _freq) in usage
+                       for info = (or (and (assq 'multiline source)
+                                           (replace-regexp-in-string
+                                            "\n\\'" "" cand))
+                                      cand)
+                       when (cl-member info candidates
+                                       :test 'helm-adaptive-compare)
+                       collect (car it) into sorted
+                       and do (setq candidates
+                                    (cl-remove info candidates
+                                               :test 'helm-adaptive-compare))
                        finally return (append sorted candidates))
               (message "Your `%s' is maybe corrupted or too old, \
 you should reinitialize it with `helm-reset-adaptive-history'"
