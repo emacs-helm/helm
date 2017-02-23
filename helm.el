@@ -2443,7 +2443,8 @@ Unuseful when used outside helm, don't use it.")
 
 (defun helm-create-helm-buffer ()
   "Create and setup `helm-buffer'."
-  (let ((root-dir default-directory))
+  (let ((root-dir default-directory)
+        (inhibit-read-only t))
     (with-current-buffer (get-buffer-create helm-buffer)
       (helm-log "Enabling major-mode %S" major-mode)
       (helm-log "kill local variables: %S" (buffer-local-variables))
@@ -3539,7 +3540,8 @@ Args NUM and SOURCE are also stored as text property when specified as
 respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
-        (realvalue (cdr-safe match)))
+        (realvalue (cdr-safe match))
+        (inhibit-read-only t))
     (when (and (stringp dispvalue)
                (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)
