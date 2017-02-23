@@ -203,7 +203,8 @@ This is a filtered candidate transformer you can use with the
                                        (assq 'timestamp infos))
                             (* cr (+ (float-time) (cdr it)))
                           0)
-                        do (cl-loop for (pattern . score) in infos
+                        do (cl-loop for (pattern . score) in
+                                    (remove (assq 'timestamp infos) infos)
                                     ;; If current pattern is equal to
                                     ;; the previously used one then
                                     ;; this candidate has priority
