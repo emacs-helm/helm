@@ -122,7 +122,6 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                                           (if (not found)
                                               ;; new entry
                                               (cons helm-pattern 0)
-
                                             ;; move entry to the beginning of the
                                             ;; list, so if two patterns used the
                                             ;; same number of times then the one
@@ -131,12 +130,16 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
                                                     (delete found (cdr selection-info)))
                                             found))
                                         (cdr selection-info)))
-                               (cadr selection-info))))
-
-          ;; increase usage count
+                               (cadr selection-info)))
+               (timestamp-info (helm-aif (assq 'timestamp (cdr selection-info))
+                                   it
+                                 (setcdr selection-info (cons (cons 'timestamp 0) (cdr selection-info)))
+                                 (cadr selection-info))))
+          ;; Increase usage count.
           (setcdr pattern-info (1+ (cdr pattern-info)))
-
-          ;; truncate history if needed
+          ;; Update timestamp.
+          (setcdr timestamp-info (float-time))
+          ;; Truncate history if needed.
           (if (> (length (cdr selection-info)) helm-adaptive-history-length)
               (setcdr selection-info
                       (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
@@ -172,21 +175,26 @@ This is a filtered candidate transformer you can use with the
                ;; Loop in the SOURCE entry of `helm-adaptive-history'
                ;; and assemble a list containing the (CANDIDATE
                ;; . USAGE-COUNT) pairs.
-               (cl-loop for (src-cand . infos) in (cdr source-info)
-                        for count = 0
+               (cl-loop with cf = 5
+                        with cr = 2
+                        for (src-cand . infos) in (cdr source-info)
+                        for count-freq = 0
+                        for count-rec = (helm-aif (assq 'timestamp infos)
+                                            (* cr (+ (float-time) (cdr it)))
+                                          0)
                         do (cl-loop for (pattern . score) in infos
                                     ;; If current pattern is equal to
                                     ;; the previously used one then
                                     ;; this candidate has priority
-                                    ;; (that's why its count is
+                                    ;; (that's why its count-freq is
                                     ;; boosted by 10000) and it only
                                     ;; has to compete with other
                                     ;; candidates which were also
                                     ;; selected with the same pattern.
                                     if (equal pattern helm-pattern)
-                                    return (setq count (+ 10000 score))
-                                    else do (cl-incf count score))
-                        and collect (cons src-cand count) into results
+                                    return (setq count-freq (+ 10000 score))
+                                    else do (cl-incf count-freq score))
+                        and collect (cons src-cand (+ (* count-freq cf) count-rec)) into results
                         ;; Sort the list in descending order, so
                         ;; candidates with highest priority come
                         ;; first.
