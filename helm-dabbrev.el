@@ -42,6 +42,12 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
 
+(defcustom helm-dabbrev-candidates-number-limit 500
+  "Maximum number of candidates to collect before stopping.
+Higher this number is slower the computation of candidates will be."
+  :group 'helm-dabbrev
+  :type 'integer)
+
 (defcustom helm-dabbrev-ignored-buffers-regexps
   '("\\*helm" "\\*Messages" "\\*Echo Area" "\\*Buffer List")
   "List of regexps matching names of buffers that helm-dabbrev should not check."
@@ -203,7 +209,7 @@ but the initial search for all candidates in buffer(s)."
   (with-current-buffer (current-buffer)
     (let* ((dabbrev-get (lambda (str all-bufs)
                             (helm-dabbrev--collect
-                             str helm-candidate-number-limit
+                             str helm-dabbrev-candidates-number-limit
                              (cl-case helm-dabbrev-case-fold-search
                                (smart (helm-set-case-fold-search-1 abbrev))
                                (t helm-dabbrev-case-fold-search))
