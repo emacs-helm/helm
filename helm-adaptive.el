@@ -39,6 +39,21 @@
   :type 'number
   :group 'helm-adapt)
 
+(defcustom helm-adaptive-sort-by-frequent-recent-usage t
+  "Try to sort on an average of frequent and recent usage when non-nil.
+
+When nil sort on frequency usage only.
+
+Only frequency:
+When candidate have low frequency, you have to hit on it many times to
+make it going up on top.
+
+Frequency+recent:
+Even with a low frequency, candidate go up on top. If a candidate
+have a high frequency but it is not used since some time, it goes
+down slowly, but as soon you reuse it it go up on top quickly."
+  :group 'helm-adapt
+  :type 'boolean)
 
 ;; Internal
 (defvar helm-adaptive-done nil
@@ -48,6 +63,9 @@ selection.")
 (defvar helm-adaptive-history nil
   "Contains the stored history information.
 Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
+
+(defconst helm-adaptive-freq-coefficient 5)
+(defconst helm-adaptive-recent-coefficient 2)
 
 (defun helm-adaptive-done-reset ()
   (setq helm-adaptive-done nil))
@@ -175,13 +193,16 @@ This is a filtered candidate transformer you can use with the
                ;; Loop in the SOURCE entry of `helm-adaptive-history'
                ;; and assemble a list containing the (CANDIDATE
                ;; . USAGE-COUNT) pairs.
-               (cl-loop with cf = 5
-                        with cr = 2
+               (cl-loop with cf = (if helm-adaptive-sort-by-frequent-recent-usage
+                                      helm-adaptive-freq-coefficient 1)
+                        with cr = helm-adaptive-recent-coefficient
                         for (src-cand . infos) in (cdr source-info)
                         for count-freq = 0
-                        for count-rec = (helm-aif (assq 'timestamp infos)
-                                            (* cr (+ (float-time) (cdr it)))
-                                          0)
+                        for count-rec =
+                        (helm-aif (and helm-adaptive-sort-by-frequent-recent-usage
+                                       (assq 'timestamp infos))
+                            (* cr (+ (float-time) (cdr it)))
+                          0)
                         do (cl-loop for (pattern . score) in infos
                                     ;; If current pattern is equal to
                                     ;; the previously used one then
@@ -194,7 +215,8 @@ This is a filtered candidate transformer you can use with the
                                     if (equal pattern helm-pattern)
                                     return (setq count-freq (+ 10000 score))
                                     else do (cl-incf count-freq score))
-                        and collect (cons src-cand (+ (* count-freq cf) count-rec)) into results
+                        and collect (cons src-cand (+ (* count-freq cf) count-rec))
+                        into results
                         ;; Sort the list in descending order, so
                         ;; candidates with highest priority come
                         ;; first.
