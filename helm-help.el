@@ -1154,11 +1154,17 @@ You can bind globally `M-y' to `helm-show-kill-ring' and once in the helm kill-r
 you can navigate for conveniency to next/previous line with `M-y' and `M-u'.
 Of course `C-n' and `C-p' are still available.
 
+It is possible to delete unwanted candidates from kill-ring.
+
+You can concatenate marked candidates and yank them in current buffer
+creating a new entry in kill-ring.
+
 ** Commands
 \\<helm-kill-ring-map>
 \\[helm-next-line]\t\tNext line.
 \\[helm-previous-line]\t\tPrevious line.
 \\[helm-kill-ring-delete]\t\tDelete entry.
+\\[helm-kill-ring-run-append]\t\tYank concatenated marked candidates.
 \\[helm-kill-ring-toggle-truncated]\t\tToggle truncated view of candidate.
 \\[helm-kill-ring-kill-selection]\t\tKill real value of selection.")
 
