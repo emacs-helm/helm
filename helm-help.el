@@ -1158,7 +1158,7 @@ It is possible to delete unwanted candidates from kill-ring.
 
 You can concatenate marked candidates and yank them in current buffer
 creating a new entry in kill-ring.
-Note: You can insert marked candidates as well with \\<helm-map>\\[helm-copy-to-buffer]
+Note: You can insert marked candidates as well with `\\<helm-map>\\[helm-copy-to-buffer]'
 but this will not push a new entry with concatenated candidates in kill-ring.
 
 ** Commands

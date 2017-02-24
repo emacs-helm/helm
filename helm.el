@@ -1024,6 +1024,37 @@ is set to a valid directory.
 
 NOTE: Be aware that helm log buffers grow really fast, so use `helm-debug' only when needed.
 
+** Writing your own helm sources
+
+It is easy writing simple sources for your own usage.
+Basically in a call to `helm' function, the sources are added as a
+single source which can be a symbol or a list of sources in the :sources slot.
+Sources can be builded with different eieio classes depending
+what you want to do, for simplifying this several `helm-build-*' macros are provided.
+We will not go further here, see [[https://github.com/emacs-helm/helm/wiki/Developing][Helm wiki]] for more infos.
+Below simple examples to start with.
+
+#+begin_src elisp
+
+    ;; Candidates are stored in a list.
+    (helm :sources (helm-build-sync-source \"test\"
+                     ;; A function can be used as well
+                     ;; to provide candidates.
+                     :candidates '(\"foo\" \"bar\" \"baz\"))
+          :buffer \"*helm test*\")
+
+    ;; Candidates are stored in a buffer.
+    ;; Generally faster but doesn't allow a dynamic updating
+    ;; of the candidates list i.e the list is fixed on start.
+    (helm :sources (helm-build-in-buffer-source \"test\"
+                     :data '(\"foo\" \"bar\" \"baz\"))
+          :buffer \"*helm test*\")
+
+#+end_src
+
+For more complex sources, See [[https://github.com/emacs-helm/helm/wiki/Developing][Helm wiki]]
+and the many examples you will find in helm source code.
+
 ** Helm Map
 \\{helm-map}"
   "Message string containing detailed help for `helm'.
