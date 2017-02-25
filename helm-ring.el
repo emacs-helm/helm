@@ -215,6 +215,7 @@ This is a command for `helm-kill-ring-map'."
     (goto-char pos)
     (forward-line 0)
     (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
+      (remove-text-properties 0 (length line) '(read-only) line)
       (if (string= "" line)
           "<EMPTY LINE>"
         line))))
@@ -267,6 +268,7 @@ This is a command for `helm-kill-ring-map'."
                         (guard (not (string-match-p "\\`\n?\\'" line))))
                    (car (split-string line "[\n\r]")))
                   (_ "<EMPTY LINE>"))))
+      (remove-text-properties 0 (length line) '(read-only) line)
       (format "%7d:%s:    %s"
               (line-number-at-pos) (marker-buffer marker) line))))
 
