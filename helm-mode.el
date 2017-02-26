@@ -259,13 +259,13 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         (cons (concat (propertize
                        " " 'display
                        (propertize "[?]" 'face 'helm-ff-prefix))
-                      c)
+                      cand)
               c)
         into lst
         else collect (if (and (stringp c)
                               (string-match "\n" c))
-                         (cons (replace-regexp-in-string "\n" "->" c) c)
-                         c)
+                         (cons (replace-regexp-in-string "\n" "->" cand) c)
+                         (cons cand c))
         into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
@@ -1168,6 +1168,7 @@ Can be used as value for `completion-in-region-function'."
                                (message "[No matches]")))
                             t) ; exit minibuffer immediately.
                           :must-match require-match))))
+          (setq result (replace-regexp-in-string "\\s\\" "" result))
           (cond ((stringp result)
                  (choose-completion-string
                   result (current-buffer)
