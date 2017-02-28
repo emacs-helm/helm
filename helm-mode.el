@@ -260,11 +260,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                        " " 'display
                        (propertize "[?]" 'face 'helm-ff-prefix))
                       cand)
-              c)
+              cand)
         into lst
-        else collect (if (and (stringp c)
-                              (string-match "\n" c))
-                         (cons (replace-regexp-in-string "\n" "->" cand) c)
+        else collect (if (and (stringp cand)
+                              (string-match "\n" cand))
+                         (cons (replace-regexp-in-string "\n" "->" cand) cand)
                          ;; FIXME: Only plain string is supported
                          ;; here, if we use a cons a bug happen with
                          ;; completion-at-point and fuzzy enabled,
