@@ -1174,11 +1174,10 @@ Can be used as value for `completion-in-region-function'."
                                (message "[No matches]")))
                             t) ; exit minibuffer immediately.
                           :must-match require-match))))
-          (and (stringp result) ;; Crm is returning a list.
-               (setq result (replace-regexp-in-string "\\s\\" "" result)))
           (cond ((stringp result)
                  (choose-completion-string
-                  result (current-buffer)
+                  (replace-regexp-in-string "\\s\\" "" result)
+                  (current-buffer)
                   (list (+ start base-size) end)
                   completion-list-insert-choice-function))
                 ((consp result) ; crm.
