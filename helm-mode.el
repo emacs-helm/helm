@@ -265,7 +265,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         else collect (if (and (stringp c)
                               (string-match "\n" c))
                          (cons (replace-regexp-in-string "\n" "->" cand) c)
-                         (cons cand c))
+                         cand)
         into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
