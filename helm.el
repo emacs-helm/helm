@@ -1785,108 +1785,130 @@ only."
 (defun helm (&rest plist)
   "Main function to execute helm sources.
 
-Keywords supported:
-:sources :input :prompt :resume :preselect
-:buffer :keymap :default :history :allow-nest
+PLIST is a list like
 
-Extra LOCAL-VARS keywords are supported, see below.
+\(:key1 val1 :key2 val2 ...\)
 
-PLIST is a list like \(:key1 val1 :key2 val2 ...\) or
+ or
+
 \(&optional sources input prompt resume
             preselect buffer keymap default history\).
 
+** Keywords
+
+Keywords supported:
+
+- :sources
+- :input
+- :prompt
+- :resume
+- :preselect
+- :buffer
+- :keymap
+- :default
+- :history
+- :allow-nest
+
+Extra LOCAL-VARS keywords are supported, see the \"** Other
+keywords\" section below.
+
 Basic keywords are the following:
 
-\:sources
+*** :sources
 
-A list of sources used for this session.  It also accepts a
-symbol, interpreted as a variable of a helm source
-i.e (a symbol can be passed instead of a list of sources).
-It also accepts an alist representing a helm source, which is
-detected by \(assq 'name ANY-SOURCES\).
-NOTE: In this case the source is embedded in the helm command and
-have no symbol name, so it is not reachable from outside.
-It will be referenced in `helm-sources' as a whole alist.
+One of the following:
 
-\:input
+- List of sources
+- Symbol whose value is a list of sources
+- Alist representing a Helm source.
+  - In this case the source has no name and is referenced in
+    `helm-sources' as a whole alist.
 
-Temporary value of `helm-pattern', ie. initial input of minibuffer.
+*** :input
 
-\:prompt
+Initial input of minibuffer (temporary value of `helm-pattern')
 
-Prompt other than \"pattern: \".
+*** :prompt
 
-\:resume
+Minibuffer prompt. Default value is `helm--prompt'.
 
-If t, Resurrect previously instance of `helm'.  Skip the initialization.
+*** :resume
+
+If t, allow resumption of the previous session of this Helm
+command, skipping initialization.
+
 If 'noresume, this instance of `helm' cannot be resumed.
 
-\:preselect
+*** :preselect
 
-Initially selected candidate.  Specified by exact candidate or a regexp.
+Initially selected candidate (string or regexp).
 
-\:buffer
+*** :buffer
 
-The buffer name for this helm session. `helm-buffer' will take this value.
+Buffer name for this Helm session. `helm-buffer' will take this value.
 
-\:keymap
+*** :keymap
 
 [Obsolete]
 
-Keymap used at start of this Helm session.
+Keymap used at the start of this Helm session.
 
-It is overridden by keymaps specified in sources, and is here
+It is overridden by keymaps specified in sources, and is kept
 only for backward compatibility.
 
 Keymaps should be specified in sources using the :keymap slot
-instead.
+instead. See `helm-source'.
 
 This keymap is not restored by `helm-resume'.
 
-\:default
+*** :default
 
-A default argument that will be inserted in minibuffer \ with
-\\<minibuffer-local-map>\\[next-history-element]. When nil or not
-present `thing-at-point' will be used instead. If
-`helm--maybe-use-default-as-input' is non-`nil' display will be
-updated using :default arg as input unless :input is specified,
-which in this case will take precedence over :default. This is a
-string or a list. If list, car of the list becomes initial
-default input. \\<minibuffer-local-map>\\[next-history-element]
-cycles through the list items.
+Default value inserted into the minibuffer \ with
+\\<minibuffer-local-map>\\[next-history-element].
 
-\:history
+One of the following:
 
-Minibuffer input, by default, is pushed to `minibuffer-history'.
-When an argument HISTORY is provided, input is pushed to
-HISTORY. The HISTORY element should be a valid symbol.
+- String
+- List
+  - \\<minibuffer-local-map>\\[next-history-element] cycles through
+the list items, starting with the first.
 
-\:allow-nest
+If nil, `thing-at-point' is used.
 
-Allow running this helm command in a running helm session.
+If `helm--maybe-use-default-as-input' is non-`nil', display is
+updated using this value, unless :input is specified, in which
+case that value is used instead.
 
-Standard arguments are supported. These two are the same:
+*** :history
 
-\(helm :sources sources :input input :prompt prompt :resume resume
-       :preselect preselect :buffer buffer :keymap keymap :default default
-       :history history\)
+Symbol whose value is a list where minibuffer input is pushed.
 
-and
+If nil, `minibuffer-history' is used.
 
-\(helm sources input prompt resume preselect buffer keymap default history\)
+*** :allow-nest
 
-are the same for now. However, the use of non-keyword args is
-deprecated and should not be used.
+Allow running this Helm command in a running Helm session.
 
-Other keywords are interpreted as local variables of this helm
+** Other keywords
+
+Other keywords are interpreted as local variables of this Helm
 session. The `helm-' prefix can be omitted. For example,
 
 \(helm :sources 'helm-source-buffers-list
-       :buffer \"*helm buffers*\" :candidate-number-limit 10\)
+       :buffer \"*helm buffers*\"
+       :candidate-number-limit 10\)
 
-starts helm session with `helm-source-buffers' source in
-*helm buffers* buffer and sets variable `helm-candidate-number-limit'
-to 10 as a session local variable.
+starts a Helm session with the variable
+`helm-candidate-number-limit' set to 10.
+
+** Backward compatibility
+
+For backward compatibility, positional parameters are
+supported:
+
+\(helm sources input prompt resume preselect buffer keymap default history\)
+
+However, the use of non-keyword args is deprecated.
 
 \(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY ALLOW-NEST OTHER-LOCAL-VARS)"
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
