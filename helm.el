@@ -2131,7 +2131,13 @@ Call `helm' only with ANY-SOURCES and ANY-BUFFER as args."
 
 (defun helm-nest (&rest same-as-helm)
   "Allows calling `helm' within a running helm session.
-Arguments SAME-AS-HELM are the same as `helm'"
+
+Arguments SAME-AS-HELM are the same as `helm'.
+
+Don't use this directly, use instead `helm' with the keyword
+:allow-nest.
+
+\(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY OTHER-LOCAL-VARS)"
   (with-helm-window
     (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
