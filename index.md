@@ -6,14 +6,19 @@
 
 <p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
 
-<p>Maintainance of Helm is a lot of work that I do freely on my sparse time,</p> 
-<p>please <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a> to help this project, </p> 
-or [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
+<p>Maintainance of Helm is a lot of work please consider making a donation, thank you!</p> 
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a>
+
+<a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
+    <img title="Donate monthly using Patreon"
+    alt="Donate monthly using Patreon"
+    style="height: 50px; width: auto;"
+    src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
 
 
-or with [Bitcoins](https://www.strongcoin.com/?ref=1HyxLfpdJL81rnk2n6dPmbCkaozk4zzPRh)
+[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
 
-Thanks.
+
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
@@ -52,12 +57,14 @@ Patrovic and can be considered to be its successor. `Helm` cleans the
 legacy code that is leaner, modular, and unchained from constraints of
 backward compatibility.
 
+![helm-grep-ag](images/helm-grep-ag-persistent.png)
+
 # Requirements
 
 Helm requires Emacs-24.4 or later versions.
 
 Helm installs [async](https://github.com/jwiegley/emacs-async) package as a dependency
-when Helm is installed using MELPA. 
+when Helm is installed using [MELPA](https://melpa.org/). 
 
 Helm installation from the git source repository does not include
 async. The async package is recommended for smooth asynchronous file
@@ -102,7 +109,7 @@ _NOTE:_ This script does not work on Windows systems.
 
 ## Install from Emacs packaging system
 
-Helm can also be installed from MELPA repository at http://melpa.org/.
+Helm can also be installed from MELPA repository at https://melpa.org/.
 You will find the instructions to install packages from MELPA [here](https://github.com/melpa/melpa#usage).
 
 No further configuration is necessary to run helm other than perhaps a
@@ -137,7 +144,7 @@ below).
 
 ## Installing just the helm-core package
 
-`helm-core` package is available on [MELPA](http://melpa.org/) for
+`helm-core` package is available on [MELPA](https://melpa.org/) for
 third party packages that depend on helm libraries. These packages
 should require helm as follows:
 
@@ -357,6 +364,10 @@ One way to ascertain that the bugs are helm-related, recreate the
 error either by using `Emacs -Q` or by running the included package
 script `./emacs-helm.sh` located in the helm directory.
 
+Helm comes now with a template for filling bugs, when reporting issues,
+be sure to fill all sections and to run helm from a minimal install as
+described above to reproduce your bug.
+ 
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
