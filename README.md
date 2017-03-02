@@ -52,6 +52,8 @@ Patrovic and can be considered to be its successor. `Helm` cleans the
 legacy code that is leaner, modular, and unchained from constraints of
 backward compatibility.
 
+![helm-grep-ag](images/helm-grep-ag-persistent.png)
+
 # Requirements
 
 Helm requires Emacs-24.4 or later versions.
