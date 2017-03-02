@@ -9,6 +9,13 @@
 <p>Maintainance of Helm is a lot of work please consider making a donation, thank you!</p> 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a>
 
+<a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
+    <img title="Donate monthly using Patreon"
+    alt="Donate monthly using Patreon"
+    style="height: 50px; width: auto;"
+    src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
+
+
 [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
 
 
