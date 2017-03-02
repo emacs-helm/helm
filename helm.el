@@ -1881,9 +1881,10 @@ case that value is used instead.
 
 *** :history
 
-Symbol whose value is a list where minibuffer input is pushed.
+Minibuffer input, by default, is pushed to `minibuffer-history'.
 
-If nil, `minibuffer-history' is used.
+When an argument HISTORY is provided, input is pushed to
+HISTORY. HISTORY should be a valid symbol.
 
 *** :allow-nest
 
