@@ -57,7 +57,7 @@ backward compatibility.
 Helm requires Emacs-24.4 or later versions.
 
 Helm installs [async](https://github.com/jwiegley/emacs-async) package as a dependency
-when Helm is installed using MELPA. 
+when Helm is installed using [MELPA](https://melpa.org/). 
 
 Helm installation from the git source repository does not include
 async. The async package is recommended for smooth asynchronous file
@@ -102,7 +102,7 @@ _NOTE:_ This script does not work on Windows systems.
 
 ## Install from Emacs packaging system
 
-Helm can also be installed from MELPA repository at http://melpa.org/.
+Helm can also be installed from MELPA repository at https://melpa.org/.
 You will find the instructions to install packages from MELPA [here](https://github.com/melpa/melpa#usage).
 
 No further configuration is necessary to run helm other than perhaps a
