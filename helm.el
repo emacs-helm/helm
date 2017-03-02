@@ -1915,7 +1915,7 @@ However, the use of non-keyword args is deprecated.
 \(fn &key SOURCES INPUT PROMPT RESUME PRESELECT BUFFER KEYMAP DEFAULT HISTORY ALLOW-NEST OTHER-LOCAL-VARS)"
   (let ((fn (cond ((or (and helm-alive-p (plist-get plist :allow-nest))
                        (and helm-alive-p (memq 'allow-nest plist)))
-                   #'helm-nest)
+                   #'helm--nest)
                   ((keywordp (car plist))
                    #'helm)
                   (t #'helm-internal))))
@@ -2153,8 +2153,8 @@ Return nil if no `helm-buffer' found."
 Call `helm' only with ANY-SOURCES and ANY-BUFFER as args."
   (helm :sources any-sources :buffer any-buffer))
 
-(defun helm-nest (&rest same-as-helm)
-  "Allows calling `helm' within a running helm session.
+(defun helm--nest (&rest same-as-helm)
+  "[internal]Allows calling `helm' within a running helm session.
 
 Arguments SAME-AS-HELM are the same as `helm'.
 
