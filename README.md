@@ -15,12 +15,6 @@
 <img alt="" border="0" src="https://www.paypalobjects.com/fr_XC/i/scr/pixel.gif" width="1" height="1">
 </form>
 
-<a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-    <img title="Donate monthly using Patreon"
-    alt="Donate monthly using Patreon"
-    style="height: 50px; width: auto;"
-    src="https://github.com/emacs-helm/helm/blob/master/images/patreon.png?raw=true"></a>
-
 [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
 
 
