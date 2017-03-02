@@ -1791,8 +1791,8 @@ PLIST is a list like
 
  or
 
-\(&optional sources input prompt resume
-            preselect buffer keymap default history\).
+\(&optional sources input prompt resume preselect
+            buffer keymap default history allow-nest\).
 
 ** Keywords
 
@@ -1907,7 +1907,8 @@ starts a Helm session with the variable
 For backward compatibility, positional parameters are
 supported:
 
-\(helm sources input prompt resume preselect buffer keymap default history\)
+\(helm sources input prompt resume preselect
+       buffer keymap default history allow-nest\)
 
 However, the use of non-keyword args is deprecated.
 
