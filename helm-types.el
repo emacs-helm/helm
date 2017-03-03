@@ -79,8 +79,9 @@
           helm-transform-file-cache))
   (setf (slot-value source 'candidate-transformer)
         '(helm-skip-boring-files
-          helm-highlight-files
           helm-w32-pathname-transformer))
+  (setf (slot-value source 'filtered-candidate-transformer)
+        'helm-highlight-files)
   (setf (slot-value source 'help-message) 'helm-generic-file-help-message)
   (setf (slot-value source 'mode-line) (list "File(s)" helm-mode-line-string))
   (setf (slot-value source 'keymap) helm-generic-files-map))
