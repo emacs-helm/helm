@@ -282,6 +282,16 @@ in `current-buffer'."
   "Dired commands that are allowed moving to first real candidate."
   :group 'helm-files
   :type '(repeat (choice symbol)))
+
+(defcustom helm-mounted-network-directories nil
+  "A list of directories used for mounting remotes filesystem.
+
+When nil `helm-file-on-mounted-network-p' always return nil otherwise
+it checks if a file is in one of these directories.
+
+Remote filesystem are generally mounted with sshfs."
+  :group 'helm-files
+  :type '(repeat string))
 
 ;;; Faces
 ;;
@@ -2260,7 +2270,8 @@ Return candidates prefixed with basename of `helm-input' first."
                         thereis (and (not (string-match "\\.$" file))
                                      (string-match r file))))
     ;; Handle tramp files.
-    (if (and (string-match helm-tramp-file-name-regexp helm-pattern)
+    (if (and (or (file-remote-p helm-pattern)
+                 (helm-file-on-mounted-network-p helm-pattern))
              helm-ff-tramp-not-fancy)
         (if helm-ff-transformer-show-only-basename
             (if (helm-dir-is-dot file)
@@ -3076,6 +3087,13 @@ Else return ACTIONS unmodified."
           (helm-set-source-filter nil)))))
 (put 'helm-multi-files-toggle-to-locate 'helm-only t)
 
+(defun helm-file-on-mounted-network-p (file)
+  "Returns non-nil when FILE is part of a mounted remote directory.
+
+This function is checking `helm-mounted-network-directories' list."
+  (when helm-mounted-network-directories
+    (cl-loop for dir in helm-mounted-network-directories
+             thereis (file-in-directory-p file dir))))
 
 ;;; List of files gleaned from every dired buffer
 ;;
@@ -3464,7 +3482,7 @@ See `helm-browse-project'."
 ;;; Files in current dir
 ;;
 ;;
-(defun helm-highlight-files (files)
+(defun helm-highlight-files (files _source)
   "A basic transformer for helm files sources.
 Colorize only symlinks, directories and files."
   (cl-loop with mp-fn = (or (assoc-default
@@ -3477,7 +3495,8 @@ Colorize only symlinks, directories and files."
                                          (string-match ffap-url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
                           (helm-basename i) i)
-           for isremote = (file-remote-p i)
+           for isremote = (or (file-remote-p i)
+                              (helm-file-on-mounted-network-p i))
            ;; Call file-attributes only if:
            ;; - file is not remote
            ;; - helm-ff-tramp-not-fancy is nil and file is remote AND
@@ -3534,7 +3553,8 @@ Colorize only symlinks, directories and files."
   (cl-loop for cand in candidates
            for path = (when (stringp helm-source-tracker-cand-incomplete)
                         (caar (helm-highlight-files
-                               (list helm-source-tracker-cand-incomplete))))
+                               (list helm-source-tracker-cand-incomplete)
+                               nil)))
            for built = (if (not (stringp cand)) cand
                          (let ((snippet cand))
                            (unless (or (null path)
