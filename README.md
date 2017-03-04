@@ -1,19 +1,31 @@
 <p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3" /></a>
-<a href="https://melpa.org/#/helm"><img alt="MELPA" src="https://melpa.org/packages/helm-badge.svg"/></a>
-<a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"/></a></p>
+  <a href="https://melpa.org/#/helm"><img alt="MELPA" src="https://melpa.org/packages/helm-badge.svg"/></a>
+  <a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"/></a></p>
 
 <h1>Emacs-helm</h1>
 
 <p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
 
-<p>Maintainance of Helm is a lot of work please consider making a donation, thank you!</p> 
+
+<p>
+Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
+I have done freely now since 2011.<br>
+As it is taking a lot of my time it starts to be more and more difficult<br>
+maintaining it without financial help.<br> 
+If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
+</p>
+
+<p>
+<i>Thank you! &mdash; Thierry Volpiatto</i>
+</p>
+
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a>
 
 <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-    <img title="Donate monthly using Patreon"
-    alt="Donate monthly using Patreon"
-    style="height: 50px; width: auto;"
-    src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
+  <img title="Donate monthly using Patreon"
+       alt="Donate monthly using Patreon"
+       style="height: 50px; width: auto;"
+       src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
 
 
 [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
