@@ -25,7 +25,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
   <img title="Donate monthly using Patreon"
        alt="Donate monthly using Patreon"
        style="height: 50px; width: auto;"
-       src="https://github.com/emacs-helm/helm/blob/gh-pages/images/patreon-25x.png"></a>
+       src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png"></a>
 
 
 [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
