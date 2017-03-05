@@ -1,36 +1,66 @@
-<p><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3" /></a>
+<p align="center"><a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img src="https://img.shields.io/badge/license-GPL_3-green.svg" alt="License GPL 3" /></a>
   <a href="https://melpa.org/#/helm"><img alt="MELPA" src="https://melpa.org/packages/helm-badge.svg"/></a>
-  <a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"/></a></p>
-
-<h1>Emacs-helm</h1>
-
-<p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
+  <a href="https://stable.melpa.org/#/helm"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/helm-badge.svg"/></a>
+</p>
 
 
-<p>
+<h1 align="center">Emacs-helm</h1>
+
+<p align="center">
+    <img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" />
+</p>
+
+***
+<p align="justify">
+  <b>Helm</b> is an Emacs framework for incremental completions and narrowing
+  selections. It helps to rapidly complete file names, buffer names, or
+  any other Emacs interactions requiring selecting an item from a list of
+  possible choices.
+  Helm is a fork of <b>anything.el</b>, which was originally written by Tamas
+  Patrovic and can be considered to be its successor. <b>Helm</b> cleans the
+  legacy code that is leaner, modular, and unchained from constraints of
+  backward compatibility.
+</p>
+***
+<p align="center">
+  <a href="https://emacs-helm.github.io/helm/"><b>Homepage</b></a> |
+  <a href="https://github.com/emacs-helm/helm/wiki#install"><b>Get started</b></a> |
+  <a href="https://github.com/emacs-helm/helm/wiki"><b>Helm wiki</b></a> |
+  <a href="https://github.com/emacs-helm/helm/wiki/FAQ"><b>FAQ</b></a>
+</p>
+***
+
+<p align="center">
 Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
 I have done freely since 2011.<br>
 As it is taking a lot of my time it starts to be more and more difficult<br>
-maintaining it without financial help.<br> 
+maintaining it without financial help.<br>
 If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
 </p>
 
-<p>
+<p align="center">
 <i>Thank you! &mdash; Thierry Volpiatto</i>
 </p>
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a>
-
-<a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-  <img title="Donate monthly using Patreon"
-       alt="Donate monthly using Patreon"
-       style="height: 50px; width: auto;"
-       src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
-
-
-[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/emacs-helm/)
-
-
+<div align="center"
+    <a href="https://www.paypal.me/thierryvolpiatto/10">
+      <img title="Donate with Paypal"
+      alt="Donate with Paypal"
+      style="height: 50px; width: auto;"
+      src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
+&nbsp;&nbsp;
+    <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
+      <img title="Donate monthly using Patreon"
+      alt="Donate monthly using Patreon"
+      style="height: 50px; width: auto;"
+      src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
+&nbsp;&nbsp;
+    <a href="https://gratipay.com/emacs-helm/">
+     <img title="Donate weekly using Gratipay"
+     alt="Donate monthly using Patreon"
+     style="height: 50px; width: auto;"
+     src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
+</div>
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
