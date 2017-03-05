@@ -31,7 +31,7 @@
 
 ***
 
-<div align="center">
+<div align="center"
   Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
   I have done freely since 2011.<br>
   As it is taking a lot of my time it starts to be more and more difficult<br>
@@ -42,8 +42,8 @@
 <div align="center">
   <i>Thank you! &mdash; Thierry Volpiatto</i>
 </div>
-<br>
-<div align="center"
+
+<div align="center">
      <a href="https://www.paypal.me/thierryvolpiatto/10">
        <img title="Donate with Paypal"
             alt="Donate with Paypal"
@@ -62,7 +62,7 @@
             style="height: 50px; width: auto;"
             src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
 </div>
-<br>
+
 ***
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
