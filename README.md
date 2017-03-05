@@ -19,7 +19,11 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 <i>Thank you! &mdash; Thierry Volpiatto</i>
 </p>
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=thierry.volpiatto@gmail.com&amp;lc=US&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="" /></a>
+<a href="https://www.paypal.me/thierryvolpiatto/10">
+  <img title="Donate with Paypal"
+       alt="Donate with Paypal"
+       style="height: 50px; width: auto;"
+       src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
 
 <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
   <img title="Donate monthly using Patreon"
