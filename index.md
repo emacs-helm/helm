@@ -21,11 +21,14 @@
   legacy code that is leaner, modular, and unchained from constraints of
   backward compatibility.
 </p>
+
 ***
+
 <p align="center">
   <a href="https://github.com/emacs-helm/helm/wiki"><b>Helm wiki</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki/FAQ"><b>FAQ</b></a>
 </p>
+
 ***
 
 <p align="center">
@@ -39,7 +42,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 <p align="center">
 <i>Thank you! &mdash; Thierry Volpiatto</i>
 </p>
-
+<br>
 <div align="center"
     <a href="https://www.paypal.me/thierryvolpiatto/10">
       <img title="Donate with Paypal"
