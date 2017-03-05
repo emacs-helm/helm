@@ -23,8 +23,6 @@
 </p>
 ***
 <p align="center">
-  <a href="https://emacs-helm.github.io/helm/"><b>Homepage</b></a> |
-  <a href="https://github.com/emacs-helm/helm/wiki#install"><b>Get started</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki"><b>Helm wiki</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki/FAQ"><b>FAQ</b></a>
 </p>
@@ -61,6 +59,8 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
      style="height: 50px; width: auto;"
      src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
 </div>
+
+***
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
