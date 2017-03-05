@@ -42,8 +42,8 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 <p align="center">
 <i>Thank you! &mdash; Thierry Volpiatto</i>
 </p>
-<br>
-<div align="center"
+
+<p align="center"
     <a href="https://www.paypal.me/thierryvolpiatto/10">
       <img title="Donate with Paypal"
       alt="Donate with Paypal"
@@ -61,7 +61,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
      alt="Donate monthly using Patreon"
      style="height: 50px; width: auto;"
      src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
-</div>
+</p>
 
 ***
 
