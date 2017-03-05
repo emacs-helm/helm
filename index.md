@@ -31,38 +31,38 @@
 
 ***
 
-<p align="center">
-Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
-I have done freely since 2011.<br>
-As it is taking a lot of my time it starts to be more and more difficult<br>
-maintaining it without financial help.<br>
-If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
-</p>
-
-<p align="center">
-<i>Thank you! &mdash; Thierry Volpiatto</i>
-</p>
-
-<p align="center"
-    <a href="https://www.paypal.me/thierryvolpiatto/10">
-      <img title="Donate with Paypal"
-      alt="Donate with Paypal"
-      style="height: 50px; width: auto;"
-      src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
-&nbsp;&nbsp;
-    <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-      <img title="Donate monthly using Patreon"
-      alt="Donate monthly using Patreon"
-      style="height: 50px; width: auto;"
-      src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
-&nbsp;&nbsp;
-    <a href="https://gratipay.com/emacs-helm/">
-     <img title="Donate weekly using Gratipay"
-     alt="Donate monthly using Patreon"
-     style="height: 50px; width: auto;"
-     src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
-</p>
-
+<div align="center">
+  Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
+  I have done freely since 2011.<br>
+  As it is taking a lot of my time it starts to be more and more difficult<br>
+  maintaining it without financial help.<br>
+  If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
+</div>
+<br>
+<div align="center">
+  <i>Thank you! &mdash; Thierry Volpiatto</i>
+</div>
+<br>
+<div align="center"
+     <a href="https://www.paypal.me/thierryvolpiatto/10">
+       <img title="Donate with Paypal"
+            alt="Donate with Paypal"
+            style="height: 50px; width: auto;"
+            src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
+     &nbsp;&nbsp;
+     <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
+       <img title="Donate monthly using Patreon"
+            alt="Donate monthly using Patreon"
+            style="height: 50px; width: auto;"
+            src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
+     &nbsp;&nbsp;
+     <a href="https://gratipay.com/emacs-helm/">
+       <img title="Donate weekly using Gratipay"
+            alt="Donate monthly using Patreon"
+            style="height: 50px; width: auto;"
+            src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
+</div>
+<br>
 ***
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
