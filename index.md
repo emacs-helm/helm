@@ -43,6 +43,7 @@
   <i>Thank you! &mdash; Thierry Volpiatto</i>
 </div>
 <br>
+
 <div align="center">
      <a href="https://www.paypal.me/thierryvolpiatto/10">
        <img title="Donate with Paypal"
