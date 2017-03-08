@@ -3183,6 +3183,23 @@ This function is checking `helm-mounted-network-directories' list."
         actions)))
 
 
+;;; Filesets
+;;
+;;
+(defun helm-make-source-filesets (fsname)
+  `((name . ,(format "%s Fileset" fsname))
+    (init
+     . (lambda ()
+         (require 'filesets nil t)))
+    (candidates . (lambda ()
+                    (with-helm-current-buffer
+                      (filesets-get-filelist (filesets-get-fileset-from-name ,fsname))
+                      )))
+    (keymap . ,helm-generic-files-map)
+    (help-message . helm-generic-file-help-message)
+    (mode-line . helm-generic-file-mode-line-string)
+    (type . file)))
+
 ;;; File name history
 ;;
 ;;
