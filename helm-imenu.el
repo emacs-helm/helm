@@ -208,7 +208,11 @@ only '((foo . bar)) is needed."
                    (and elm (list elm)))
                   (t
                    (and (cdr elm) ; bug in imenu, should not be needed.
-                        (setcdr elm (copy-marker (cdr elm))) ; Same as [1].
+                        (setcdr elm (pcase (cdr elm) ; Same as [1].
+                                      ((and ov (pred overlayp))
+                                       (copy-overlay ov))
+                                      ((and mk (pred markerp))
+                                       (copy-marker mk))))
                         (list elm))))))
 
 (defun helm-imenu--get-prop (item)
