@@ -100,6 +100,7 @@ only '((foo . bar)) is needed."
 (defvar helm-cached-imenu-tick nil)
 (make-variable-buffer-local 'helm-cached-imenu-tick)
 
+(defvar helm-imenu--in-all-buffers-cache nil)
 
 (defvar helm-source-imenu nil "See (info \"(emacs)Imenu\")")
 (defvar helm-source-imenu-all nil)
@@ -268,7 +269,13 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
   (unless helm-source-imenu-all
     (setq helm-source-imenu-all
           (helm-make-source "Imenu in all buffers" 'helm-imenu-source
-            :candidates 'helm-imenu-candidates-in-all-buffers
+            :init (lambda ()
+                    ;; Use a cache to avoid repeatedly sending
+                    ;; progress-reporter message when updating
+                    ;; (Issue #1704).
+                    (setq helm-imenu--in-all-buffers-cache
+                          (helm-imenu-candidates-in-all-buffers)))
+            :candidates 'helm-imenu--in-all-buffers-cache
             :fuzzy-match helm-imenu-fuzzy-match)))
   (let ((imenu-auto-rescan t)
         (str (thing-at-point 'symbol))
