@@ -314,6 +314,9 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
         (str (thing-at-point 'symbol))
         (helm-execute-action-at-once-if-one
          helm-imenu-execute-action-at-once-if-one)
+        (helm--maybe-use-default-as-input
+         (not (null (memq 'helm-source-imenu-all
+                          helm-sources-using-default-as-input))))
         (sources (if helm-imenu-in-all-buffers-separate-sources
                      (helm-imenu-collect-sources-from-all-buffers)
                      '(helm-source-imenu-all))))
