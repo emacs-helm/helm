@@ -204,11 +204,14 @@ only '((foo . bar)) is needed."
     (prog1
         (cl-loop with cur-buf = (current-buffer)
                  for b in lst
+                 for count from 1
                  when (and (with-current-buffer b
                              (derived-mode-p 'prog-mode))
                            (with-current-buffer b
                              (helm-same-major-mode-p cur-buf
                                                      helm-imenu-all-buffer-assoc)))
+                 do (progress-reporter-update progress-reporter count)
+                 and
                  collect (helm-make-source (format "Imenu in %s" (buffer-name b))
                              'helm-imenu-source
                            :candidates (with-current-buffer b
