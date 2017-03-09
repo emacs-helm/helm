@@ -189,9 +189,8 @@ only '((foo . bar)) is needed."
                                     (current-buffer) helm-current-buffer)
                  for b in lst
                  for count from 1
-                 when (and (with-current-buffer b
-                             (derived-mode-p 'prog-mode))
-                           (with-current-buffer b
+                 when (with-current-buffer b
+                        (and (derived-mode-p 'prog-mode)
                              (helm-same-major-mode-p
                               cur-buf helm-imenu-all-buffer-assoc)))
                  if build-sources
