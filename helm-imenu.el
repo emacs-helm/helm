@@ -178,45 +178,31 @@ only '((foo . bar)) is needed."
                         (delete (assoc "*Rescan*" index) index))))
           (setq helm-cached-imenu-tick tick))))))
 
-(defun helm-imenu-candidates-in-all-buffers ()
+(defun helm-imenu-candidates-in-all-buffers (&optional build-sources)
   (let* ((lst (buffer-list))
          (progress-reporter (make-progress-reporter
                              "Imenu indexing buffers..." 1 (length lst))))
     (prog1
-        (cl-loop for b in lst
-                 for count from 1
-                 when
-                 (and (with-current-buffer b
-                        (derived-mode-p 'prog-mode))
-                      (with-current-buffer b
-                        (helm-same-major-mode-p helm-current-buffer
-                                                helm-imenu-all-buffer-assoc)))
-                 do (progress-reporter-update progress-reporter count)
-                 and
-                 append (with-current-buffer b
-                          (helm-imenu-candidates b)))
-      (progress-reporter-done progress-reporter))))
-
-(defun helm-imenu-collect-sources-from-all-buffers ()
-  (let* ((lst (buffer-list))
-         (progress-reporter (make-progress-reporter
-                             "Imenu indexing buffers..." 1 (length lst))))
-    (prog1
-        (cl-loop with cur-buf = (current-buffer)
+        (cl-loop with cur-buf = (if build-sources
+                                    (current-buffer) helm-current-buffer)
                  for b in lst
                  for count from 1
                  when (and (with-current-buffer b
                              (derived-mode-p 'prog-mode))
                            (with-current-buffer b
-                             (helm-same-major-mode-p cur-buf
-                                                     helm-imenu-all-buffer-assoc)))
-                 do (progress-reporter-update progress-reporter count)
-                 and
-                 collect (helm-make-source (format "Imenu in %s" (buffer-name b))
+                             (helm-same-major-mode-p
+                              cur-buf helm-imenu-all-buffer-assoc)))
+                 if build-sources
+                 collect (helm-make-source
+                             (format "Imenu in %s" (buffer-name b))
                              'helm-imenu-source
                            :candidates (with-current-buffer b
                                          (helm-imenu-candidates b))
-                           :fuzzy-match helm-imenu-fuzzy-match))
+                           :fuzzy-match helm-imenu-fuzzy-match)
+                 else
+                 append (with-current-buffer b
+                          (helm-imenu-candidates b))
+                 do (progress-reporter-update progress-reporter count))
       (progress-reporter-done progress-reporter))))
 
 (defun helm-imenu--candidates-1 (alist)
@@ -318,7 +304,7 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
          (not (null (memq 'helm-source-imenu-all
                           helm-sources-using-default-as-input))))
         (sources (if helm-imenu-in-all-buffers-separate-sources
-                     (helm-imenu-collect-sources-from-all-buffers)
+                     (helm-imenu-candidates-in-all-buffers 'build-sources)
                      '(helm-source-imenu-all))))
     (helm :sources sources
           :default (list (concat "\\_<" str "\\_>") str)
