@@ -224,7 +224,10 @@ When nil all candidates are displayed in a single source."
                   ((listp (cdr elm))
                    (and elm (list elm)))
                   (t
-                   (and (cdr elm) ; bug in imenu, should not be needed.
+                   ;; bug in imenu, should not be needed.
+                   (and (cdr elm)
+                        ;; Semantic uses overlays whereas imenu uses
+                        ;; markers (issue #1706).
                         (setcdr elm (pcase (cdr elm) ; Same as [1].
                                       ((and ov (pred overlayp))
                                        (copy-overlay ov))
