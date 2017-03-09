@@ -55,7 +55,9 @@ only '((foo . bar)) is needed."
   :group 'helm-imenu)
 
 (defcustom helm-imenu-in-all-buffers-separate-sources t
-  "Display imenu index of each buffer in its own sources when non-nil."
+  "Display imenu index of each buffer in its own sources when non-nil.
+
+When nil all candidates are displayed in a single source."
   :type 'boolean
   :group 'helm-imenu)
 
