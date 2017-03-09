@@ -188,6 +188,7 @@ NOTE: SUBKEY and OTHER-SUBKEYS bindings support char syntax only
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)
     (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        'helm-next-source)
+    (define-key map (kbd "M-o")        'helm-previous-source)
     (define-key map (kbd "C-l")        'helm-recenter-top-bottom-other-window)
     (define-key map (kbd "M-C-l")      'helm-reposition-window-other-window)
     (define-key map (kbd "C-M-v")      'helm-scroll-other-window)
