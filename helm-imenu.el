@@ -67,8 +67,10 @@ only '((foo . bar)) is needed."
     (define-key map (kbd "M-<down>") 'helm-imenu-next-section)
     (define-key map (kbd "M-<up>")   'helm-imenu-previous-section)
     (when helm-imenu-lynx-style-map
-      (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
-      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
+      (define-key map (kbd "<left>")    'helm-maybe-exit-minibuffer)
+      (define-key map (kbd "<right>")   'helm-execute-persistent-action)
+      (define-key map (kbd "M-<left>")  'helm-previous-source)
+      (define-key map (kbd "M-<right>") 'helm-next-source))
     (delq nil map)))
 
 (defun helm-imenu-next-or-previous-section (n)
