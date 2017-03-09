@@ -730,16 +730,28 @@ See `helm-candidates-in-buffer' for more infos.")
 
 (defclass helm-source-in-file (helm-source-in-buffer)
   ((init :initform (lambda ()
-                     (let ((file (helm-attr 'candidates-file)))
+                     (let ((file (helm-attr 'candidates-file))
+                           (count 1))
                        (with-current-buffer (helm-candidate-buffer 'global)
-                         (insert-file-contents file)))))
+                         (insert-file-contents file)
+                         (goto-char (point-min))
+                         (while (not (eobp))
+                           (add-text-properties
+                            (point-at-bol) (point-at-eol)
+                            `(helm-linum ,count))
+                           (cl-incf count)
+                           (forward-line 1))))))
+   (get-line :initform #'buffer-substring)
    (candidates-file
     :initarg :candidates-file
     :initform nil
     :custom string
-    :documentation "A filename."))
+    :documentation
+    "  A filename.
+  Each line number of FILE is accessible with helm-linum property
+  from candidate display part."))
 
-  "The contents of the file will be used as candidates in buffer.")
+  "The contents of the FILE will be used as candidates in buffer.")
 
 
 ;;; Error functions
