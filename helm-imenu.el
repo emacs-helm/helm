@@ -247,15 +247,19 @@ only '((foo . bar)) is needed."
   (cl-loop for (k . v) in candidates
         for types = (or (helm-imenu--get-prop k)
                         (list "Function" k))
-        for bufname = (and (markerp v) (buffer-name (marker-buffer v)))
+        for bufname = (buffer-name
+                       (pcase v
+                         ((pred overlayp) (overlay-buffer v))
+                         ((pred markerp) (marker-buffer v))))
         for disp1 = (mapconcat
                      (lambda (x)
                        (propertize
-                        x 'face (cond ((string= x "Variables")
+                        x 'face (cond ((member x '("Variables" "Classes"))
                                        'font-lock-variable-name-face)
-                                      ((string= x "Function")
+                                      ((member x '("Function" "Defuns"))
                                        'font-lock-function-name-face)
-                                      ((string= x "Types")
+                                      ((member x '("Types" "Provides" "Requires"
+                                                   "Imports" "Misc" "Code"))
                                        'font-lock-type-face))))
                      types helm-imenu-delimiter)
         for disp = (propertize disp1 'help-echo bufname)
