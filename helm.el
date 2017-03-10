@@ -1850,7 +1850,7 @@ Buffer name for this Helm session. `helm-buffer' will take this value.
 
 *** :keymap
 
-[Obsolete]
+\[Obsolete]
 
 Keymap used at the start of this Helm session.
 
@@ -1867,11 +1867,8 @@ This keymap is not restored by `helm-resume'.
 Default value inserted into the minibuffer \ with
 \\<minibuffer-local-map>\\[next-history-element].
 
-One of the following:
-
-- String
-- List
-  - \\<minibuffer-local-map>\\[next-history-element] cycles through
+It can be a string or a list of strings, in this case
+\\<minibuffer-local-map>\\[next-history-element] cycles through
 the list items, starting with the first.
 
 If nil, `thing-at-point' is used.
