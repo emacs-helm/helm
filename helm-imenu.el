@@ -261,10 +261,10 @@ When nil all candidates are displayed in a single source."
                        (propertize
                         x 'face (cond ((member x '("Variables" "Classes"))
                                        'font-lock-variable-name-face)
-                                      ((member x '("Function" "Defuns"))
+                                      ((member x '("Function" "Functions" "Defuns"))
                                        'font-lock-function-name-face)
                                       ((member x '("Types" "Provides" "Requires"
-                                                   "Imports" "Misc" "Code"))
+                                                   "Includes" "Imports" "Misc" "Code"))
                                        'font-lock-type-face))))
                      types helm-imenu-delimiter)
         for disp = (propertize disp1 'help-echo bufname)
