@@ -259,12 +259,14 @@ When nil all candidates are displayed in a single source."
         for disp1 = (mapconcat
                      (lambda (x)
                        (propertize
-                        x 'face (cond ((member x '("Variables" "Classes"))
+                        x 'face (cond ((string= x "Variables")
                                        'font-lock-variable-name-face)
                                       ((member x '("Function" "Functions" "Defuns"))
                                        'font-lock-function-name-face)
-                                      ((member x '("Types" "Provides" "Requires"
-                                                   "Includes" "Imports" "Misc" "Code"))
+                                      ((member x '("Types" "Provides"
+                                                   "Requires" "Classes"
+                                                   "Includes" "Imports"
+                                                   "Misc" "Code"))
                                        'font-lock-type-face))))
                      types helm-imenu-delimiter)
         for disp = (propertize disp1 'help-echo bufname)
