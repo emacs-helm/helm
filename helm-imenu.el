@@ -232,7 +232,7 @@ When nil all candidates are displayed in a single source."
                                       ((and ov (pred overlayp))
                                        (copy-overlay ov))
                                       ((and mk (or (pred markerp)
-                                                   (pred numberp)))
+                                                   (pred integerp)))
                                        (copy-marker mk))))
                         (list elm))))))
 
