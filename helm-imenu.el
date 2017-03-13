@@ -231,7 +231,8 @@ When nil all candidates are displayed in a single source."
                         (setcdr elm (pcase (cdr elm) ; Same as [1].
                                       ((and ov (pred overlayp))
                                        (copy-overlay ov))
-                                      ((and mk (pred markerp))
+                                      ((and mk (or (pred markerp)
+                                                   (pred numberp)))
                                        (copy-marker mk))))
                         (list elm))))))
 
