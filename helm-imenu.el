@@ -61,6 +61,20 @@ When nil all candidates are displayed in a single source."
   :type 'boolean
   :group 'helm-imenu)
 
+(defcustom helm-imenu-type-faces
+  '(("^Variables$" . font-lock-variable-name-face)
+    ("^\\(Function\\|Functions\\|Defuns\\)$" . font-lock-function-name-face)
+    ("^\\(Types\\|Provides\\|Requires\\|Classes\\|Includes\\|Imports\\|Misc\\|Code\\)$" . font-lock-type-face))
+  "Faces for showing type in helm-imenu.
+This is a list of cons cells.  The cdr of each cell is a face to be used,
+and it can also just be like \\='(:foreground \"yellow\").
+Each car is a regexp match pattern of the imenu type string."
+  :group 'helm-faces
+  :type '(repeat
+          (cons
+           (regexp :tag "Imenu type regexp pattern")
+           (sexp :tag "Face"))))
+
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -260,15 +274,12 @@ When nil all candidates are displayed in a single source."
         for disp1 = (mapconcat
                      (lambda (x)
                        (propertize
-                        x 'face (cond ((string= x "Variables")
-                                       'font-lock-variable-name-face)
-                                      ((member x '("Function" "Functions" "Defuns"))
-                                       'font-lock-function-name-face)
-                                      ((member x '("Types" "Provides"
-                                                   "Requires" "Classes"
-                                                   "Includes" "Imports"
-                                                   "Misc" "Code"))
-                                       'font-lock-type-face))))
+                        x 'face
+                        (let (face)
+                          (dolist (pattern helm-imenu-type-faces face)
+                            (when (string-match (car pattern) x)
+                              (setq face (cdr pattern))
+                              (return face))))))
                      types helm-imenu-delimiter)
         for disp = (propertize disp1 'help-echo bufname)
         collect
