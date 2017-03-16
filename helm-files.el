@@ -3799,10 +3799,12 @@ Run all sources defined in `helm-for-files-preferred-list'."
 
 ;;;###autoload
 (defun helm-multi-files ()
-  "Preconfigured helm similar to `helm-for-files' but that don't run locate.
-Allow toggling from locate to others sources.
-This allow seeing first if what you search is in other sources before launching
-locate."
+  "Preconfigured helm like `helm-for-files' but running locate only on demand.
+
+Allow toggling back and forth from locate to others sources with
+`helm-multi-files-toggle-locate-binding' key.
+This avoid launching needlessly locate when what you search is already
+found."
   (interactive)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list

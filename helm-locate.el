@@ -113,11 +113,16 @@ directories of this list with `helm-projects-find-files'."
   :type '(repeat string))
 
 (defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex '^%s' '%s.*$'"
-  "Command used in recursive directories completion in `helm-find-files'.
+  "Command used for recursive directories completion in `helm-find-files'.
 
 For Windows and `es' use something like \"es -r ^%s.*%s.*$\"
 
-The two format specs are mandatory."
+The two format specs are mandatory.
+
+If for some reasons you can't use locate because your filesystem
+doesn't have a data base, you can use find command from findutils but
+be aware that it will be much slower, see `helm-find-files' embebded
+help for more infos."
   :type 'string
   :group 'helm-files)
 
