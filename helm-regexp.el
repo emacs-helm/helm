@@ -152,8 +152,9 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     (propertize
      (cl-loop with ln = (format "%5d: %s" (1- (line-number-at-pos s)) line)
            for i from 0 to (1- (/ (length matches) 2))
-           concat (format "\n         %s'%s'" (format "Group %d: " i)
-                          (match-string i))
+           if (match-string i)
+           concat (format "\n%s%s'%s'"
+                          (make-string 10 ? ) (format "Group %d: " i) it)
            into ln1
            finally return (concat ln ln1))
      'helm-realvalue s)))
