@@ -259,19 +259,13 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         (cons (concat (propertize
                        " " 'display
                        (propertize "[?]" 'face 'helm-ff-prefix))
-                      cand)
-              cand)
+                      c)
+              c)
         into lst
         else collect (if (and (stringp cand)
                               (string-match "\n" cand))
-                         (cons (replace-regexp-in-string "\n" "->" cand) cand)
-                         ;; FIXME: Only plain string is supported
-                         ;; here, if we use a cons a bug happen with
-                         ;; completion-at-point and fuzzy enabled,
-                         ;; where nil is passed to
-                         ;; helm--collect-pairs-in-string. It seems
-                         ;; cons are not handled in some places, fixit.
-                         cand)
+                         (cons (replace-regexp-in-string "\n" "->" c) c)
+                         c)
         into lst
         finally return (helm-fast-remove-dups lst :test 'equal)))
 
