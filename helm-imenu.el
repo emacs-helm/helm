@@ -270,7 +270,8 @@ Each car is a regexp match pattern of the imenu type string."
         for bufname = (buffer-name
                        (pcase v
                          ((pred overlayp) (overlay-buffer v))
-                         ((pred markerp) (marker-buffer v))))
+                         ((or (pred markerp) (pred integerp))
+                          (marker-buffer v))))
         for disp1 = (mapconcat
                      (lambda (x)
                        (propertize
