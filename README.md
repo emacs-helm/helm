@@ -73,3 +73,6 @@
 </p>
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
+
+
+[![Join the chat at https://gitter.im/emacs-helm/helm](https://badges.gitter.im/emacs-helm/helm.svg)](https://gitter.im/emacs-helm/helm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
