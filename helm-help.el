@@ -355,6 +355,12 @@ the command with `helm-locate-recursive-dirs-command'.
 Because this completion use an index, you may not have all the recent additions
 of directories until you update your index (with `updatedb' for locate).
 
+If for some reason you cannot use an index the find command from findutils can be
+used for this, it will be slower of course, you will have to pass the basedir as
+first argument of find and the subdir as the value for '-(i)regex' or '-(i)name'
+with the two format specs that are mandatory in `helm-locate-recursive-dirs-command',
+e.g \"find %s -name '*%s*'\" or \"find %s -regex .*%s.*$\".
+
 *** Insert filename at point or complete filename at point
 
 On insertion (no completion, i.e nothing at point):

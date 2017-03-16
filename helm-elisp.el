@@ -785,6 +785,7 @@ i.e the `symbol-name' of any existing symbol."
                                         (if helm-ff-transformer-show-only-basename
                                             (cons (helm-basename c) c) c))
                    :action (helm-actions-from-type-file))
+        :ff-transformer-show-only-basename nil
         :buffer "*helm locate library*"))
 
 (defun helm-set-variable (var)
