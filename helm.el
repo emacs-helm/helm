@@ -2937,7 +2937,7 @@ Cache the candidates if there is no cached value yet."
 
 (defun helm--initialize-one-by-one-candidates (candidates source)
   "Process the CANDIDATES with the `filter-one-by-one' function in SOURCE.
-Return CANDIDATES when pattern is empty."
+Return CANDIDATES unchanged when pattern is not empty."
   (helm-aif (and (string= helm-pattern "")
                  (assoc-default 'filter-one-by-one source))
       (cl-loop for cand in candidates collect
@@ -2981,7 +2981,7 @@ maybe filtered CANDIDATES."
   (helm-process-real-to-display
    (helm-process-filtered-candidate-transformer-maybe
     (helm-process-candidate-transformer
-     (helm--initialize-one-by-one-candidates candidates source) source)
+     candidates source)
     source process-p)
    source))
 
@@ -3339,11 +3339,19 @@ It is used for narrowing list of candidates to the
        (if (or (equal helm-pattern "")
                (helm--candidates-in-buffer-p matchfns))
            ;; Compute all candidates up to LIMIT.
-           (helm-take-first-elements
-            (helm-get-cached-candidates source) limit)
-         ;; Compute candidates according to pattern with their match fns.
-         (helm-match-from-candidates
-          (helm-get-cached-candidates source) matchfns matchpartfn limit source))
+           ;; one-by-one are computed here only for sources that
+           ;; display a list of  candidates even with an empty
+           ;; pattern.
+           (helm--initialize-one-by-one-candidates
+            (helm-take-first-elements
+             (helm-get-cached-candidates source) limit)
+            source)
+           ;; Compute candidates according to pattern with their match
+           ;; fns.
+           ;; one-by-one filtered candidates are computed during the
+           ;; execution of next loop in `helm-match-from-candidates'.
+           (helm-match-from-candidates
+            (helm-get-cached-candidates source) matchfns matchpartfn limit source))
        source))))
 
 (defun helm--candidates-in-buffer-p (matchfns)
