@@ -558,12 +558,12 @@ to complete your pattern in minibuffer.
 
 **** Completing host
 
-As soon as you enter the first \":\" after method e.g \"/scp:\" you will
-have some completion about previously used hosts or from your \"~/.ssh/config\"
+As soon as you enter the first \":\" after method e.g =/scp:\= you will
+have some completion about previously used hosts or from your =~/.ssh/config\=
 file, hitting `C-j' or `right' on a candidate will insert this host in minibuffer
 without addind the ending \":\".
-As soon the last \":\" Tramp will kick in and you should see the list of candidates
-a few seconds later.
+As soon the last \":\" is entered Tramp will kick in and you should see the list
+of candidates a few seconds later.
 
 When your connection fails, be sure to delete your tramp connection before retrying
 with M-x `helm-delete-tramp-connection'.
