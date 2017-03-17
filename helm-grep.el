@@ -340,59 +340,59 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
   ;; as grep doesn't accept quoted wildcards (e.g "dir/*.el").
   (if helm-zgrep-recurse-flag
       (mapconcat 'shell-quote-argument candidates " ")
-    ;; When candidate is a directory, search in all its files.
-    ;; NOTE that `file-expand-wildcards' will return also
-    ;; directories, they will be ignored by grep but not
-    ;; by ack-grep that will grep all files of this directory
-    ;; without recursing in their subdirs though, see that as a one
-    ;; level recursion with ack-grep.
-    ;; So I leave it as it is, considering it is a feature. [1]
-    (cl-loop for i in candidates append
-          (cond ((string-match "^git" helm-grep-default-command)
-                 (list i))
-                ;; Candidate is a directory and we use recursion or ack.
-                ((and (file-directory-p i)
-                      (or helm-grep-in-recurse
-                          ;; ack-grep accept directory [1].
-                          (helm-grep-use-ack-p)))
-                 (list (expand-file-name i)))
-                ;; Grep doesn't support directory only when not in recurse.
-                ((file-directory-p i)
-                 (file-expand-wildcards
-                  (concat (file-name-as-directory (expand-file-name i)) "*") t))
-                ;; Candidate is a file or wildcard and we use recursion, use the
-                ;; current directory instead of candidate.
-                ((and (or (file-exists-p i) (string-match "[*]" i))
-                      helm-grep-in-recurse)
-                 (list (expand-file-name
-                        (directory-file-name ; Needed for windoze.
-                         (file-name-directory (directory-file-name i))))))
-                ;; Else should be one or more file/directory
-                ;; possibly marked.
-                ;; When real is a normal filename without wildcard
-                ;; file-expand-wildcards returns a list of one file.
-                ;; wildcards should have been already handled by
-                ;; helm-read-file-name or helm-find-files but do it from
-                ;; here too in case we are called from elsewhere.
-                (t (file-expand-wildcards i t))) into all-files ; [1]
-          finally return
-          (let ((files (if (file-remote-p in-directory)
-                       ;; Grep don't understand tramp filenames
-                       ;; use the local name.
-                       (mapcar (lambda (x)
-                                   (file-remote-p x 'localname))
-                               all-files)
-                       all-files)))
-            ;; When user mark files and use recursion with grep
-            ;; backend enabled, the loop collect on each marked
-            ;; candidate its `file-name-directory' and we endup with
-            ;; duplicates (Issue #1714). FIXME: For now as a quick fix
-            ;; I just remove dups here but I should handle this inside
-            ;; the cond above.
-            (setq files (helm-fast-remove-dups files :test 'equal))
-            (if (string-match "^git" helm-grep-default-command)
-                (mapconcat 'identity files " ")
-                (mapconcat 'shell-quote-argument files " "))))))
+      ;; When candidate is a directory, search in all its files.
+      ;; NOTE that `file-expand-wildcards' will return also
+      ;; directories, they will be ignored by grep but not
+      ;; by ack-grep that will grep all files of this directory
+      ;; without recursing in their subdirs though, see that as a one
+      ;; level recursion with ack-grep.
+      ;; So I leave it as it is, considering it is a feature. [1]
+      (cl-loop for i in candidates append
+               (cond ((string-match "^git" helm-grep-default-command)
+                      (list i))
+                     ;; Candidate is a directory and we use recursion or ack.
+                     ((and (file-directory-p i)
+                           (or helm-grep-in-recurse
+                               ;; ack-grep accept directory [1].
+                               (helm-grep-use-ack-p)))
+                      (list (expand-file-name i)))
+                     ;; Grep doesn't support directory only when not in recurse.
+                     ((file-directory-p i)
+                      (file-expand-wildcards
+                       (concat (file-name-as-directory (expand-file-name i)) "*") t))
+                     ;; Candidate is a file or wildcard and we use recursion, use the
+                     ;; current directory instead of candidate.
+                     ((and (or (file-exists-p i) (string-match "[*]" i))
+                           helm-grep-in-recurse)
+                      (list (expand-file-name
+                             (directory-file-name ; Needed for windoze.
+                              (file-name-directory (directory-file-name i))))))
+                     ;; Else should be one or more file/directory
+                     ;; possibly marked.
+                     ;; When real is a normal filename without wildcard
+                     ;; file-expand-wildcards returns a list of one file.
+                     ;; wildcards should have been already handled by
+                     ;; helm-read-file-name or helm-find-files but do it from
+                     ;; here too in case we are called from elsewhere.
+                     (t (file-expand-wildcards i t))) into all-files ; [1]
+               finally return
+               (let ((files (if (file-remote-p in-directory)
+                                ;; Grep don't understand tramp filenames
+                                ;; use the local name.
+                                (mapcar (lambda (x)
+                                          (file-remote-p x 'localname))
+                                        all-files)
+                                all-files)))
+                 ;; When user mark files and use recursion with grep
+                 ;; backend enabled, the loop collect on each marked
+                 ;; candidate its `file-name-directory' and we endup with
+                 ;; duplicates (Issue #1714). FIXME: For now as a quick fix
+                 ;; I just remove dups here but I should handle this inside
+                 ;; the cond above.
+                 (setq files (helm-fast-remove-dups files :test 'equal))
+                 (if (string-match "^git" helm-grep-default-command)
+                     (mapconcat 'identity files " ")
+                     (mapconcat 'shell-quote-argument files " "))))))
 
 (defun helm-grep-command (&optional recursive grep)
   (let* ((com (if recursive
