@@ -383,6 +383,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                    (file-remote-p x 'localname))
                                all-files)
                        all-files)))
+            ;; When user mark files and use recursion with grep
+            ;; backend enabled, the loop collect on each marked
+            ;; candidate its `file-name-directory' and we endup with
+            ;; duplicates (Issue #1714). FIXME: For now as a quick fix
+            ;; I just remove dups here but I should handle this inside
+            ;; the cond above.
+            (setq files (helm-fast-remove-dups files :test 'equal))
             (if (string-match "^git" helm-grep-default-command)
                 (mapconcat 'identity files " ")
                 (mapconcat 'shell-quote-argument files " "))))))
