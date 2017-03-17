@@ -2270,7 +2270,7 @@ Return candidates prefixed with basename of `helm-input' first."
                         thereis (and (not (string-match "\\.$" file))
                                      (string-match r file))))
     ;; Handle tramp files.
-    (if (and (or (file-remote-p helm-pattern)
+    (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                  (helm-file-on-mounted-network-p helm-pattern))
              helm-ff-tramp-not-fancy)
         (if helm-ff-transformer-show-only-basename
