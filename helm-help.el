@@ -359,7 +359,7 @@ If for some reason you cannot use an index the find command from findutils can b
 used for this, it will be slower of course, you will have to pass the basedir as
 first argument of find and the subdir as the value for '-(i)regex' or '-(i)name'
 with the two format specs that are mandatory in `helm-locate-recursive-dirs-command',
-e.g \"find %s -name '*%s*'\" or \"find %s -regex .*%s.*$\".
+e.g \"find %s -type d -name '*%s*'\" or \"find %s -type d -regex .*%s.*$\".
 
 *** Insert filename at point or complete filename at point
 
