@@ -331,9 +331,7 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
                      '(helm-source-imenu-all))))
     (helm :sources sources
           :default (list (concat "\\_<" str "\\_>") str)
-          :preselect (unless (memq 'helm-source-imenu-all
-                                   helm-sources-using-default-as-input)
-                       str)
+          :preselect (unless helm--maybe-use-default-as-input str)
           :buffer "*helm imenu all*")))
 
 (provide 'helm-imenu)
