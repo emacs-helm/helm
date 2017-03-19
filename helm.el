@@ -3362,20 +3362,17 @@ It is used for narrowing list of candidates to the
   (helm-log "Source name = %S" (assoc-default 'name source))
   (when matches
     (helm-insert-header-from-source source)
-    (if (not (assq 'multiline source))
-        (cl-loop for m in matches
+    (cl-loop with separate = nil
+             with start = (point)
+             for m in matches
                  for count from 1
-                 do (helm-insert-match m 'insert count source))
-      (let ((start (point))
-            (count 0)
-            separate)
-        (cl-dolist (match matches)
-          (cl-incf count)
-          (if separate
-              (helm-insert-candidate-separator)
-            (setq separate t))
-          (helm-insert-match match 'insert count source))
-        (put-text-property start (point) 'helm-multiline t)))))
+                 do (if (not (assq 'multiline source))
+                        (helm-insert-match m 'insert count source)
+                        (if separate
+                            (helm-insert-candidate-separator)
+                            (setq separate t))
+                        (helm-insert-match m 'insert count source)
+                        (put-text-property start (point) 'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
   "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
