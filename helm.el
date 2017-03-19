@@ -3462,8 +3462,8 @@ without recomputing them, it should be a list of lists."
              (erase-buffer)             ; [1]
              (cl-loop for src in sources
                       for mtc in matches
-                      do (helm-render-source src mtc))))
-      (helm--update-move-first-line)
+                      do (helm-render-source src mtc))
+             (helm--update-move-first-line)))
       (let ((src (or source (helm-get-current-source))))
         (unless (assoc 'candidates-process src)
           (helm-display-mode-line src)
