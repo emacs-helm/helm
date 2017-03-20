@@ -3454,6 +3454,8 @@ without recomputing them, it should be a list of lists."
            ;; are computed.
            (unless sources (erase-buffer))
            ;; Compute matches without rendering the sources.
+           ;; This prevent the helm-buffer flickering when constantly
+           ;; updating.
            (helm-log "Matches: %S"
                      (setq matches (or candidates (helm--collect-matches sources))))
            ;; If computing matches finished and is not interrupted
@@ -3463,6 +3465,8 @@ without recomputing them, it should be a list of lists."
              (cl-loop for src in sources
                       for mtc in matches
                       do (helm-render-source src mtc))
+             ;; Move to first line only when there is matches
+             ;; to avoid cursor moving upside down (issue #1703).
              (helm--update-move-first-line)))
       (let ((src (or source (helm-get-current-source))))
         (unless (assoc 'candidates-process src)
