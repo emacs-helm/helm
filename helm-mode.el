@@ -782,6 +782,7 @@ See documentation of `completing-read' and `all-completions' for details."
        preselect
        history
        must-match
+       (fuzzy t)
        default
        marked-candidates
        (candidate-number-limit helm-ff-candidate-number-limit)
@@ -813,6 +814,8 @@ Keys description:
 
 - MUST-MATCH: Can be 'confirm, nil, or t.
 
+- FUZZY: Enable fuzzy matching when non-nil (Enabled by default).
+
 - MARKED-CANDIDATES: When non--nil return a list of marked candidates.
 
 - NOMARK: When non--nil don't allow marking candidates.
@@ -824,7 +827,7 @@ Keys description:
 - PERSISTENT-HELP: persistent help message.
 
 - MODE-LINE: A mode line message, default is `helm-read-file-name-mode-line-string'."
-  
+
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   ;; Assume completion have been already required,
@@ -847,6 +850,9 @@ Keys description:
                (not (minibuffer-window-active-p (minibuffer-window)))))
          helm-full-frame
          helm-follow-mode-persistent
+         (helm-ff-fuzzy-matching
+          (and fuzzy
+               (not (memq helm-mm-matching-method '(multi1 multi3p)))))
          (hist (and history (helm-comp-read-get-candidates
                              history nil nil alistp)))
          (minibuffer-completion-confirm must-match)
@@ -871,6 +877,7 @@ Keys description:
              :mode-line mode-line
              :candidates hist
              :nohighlight t
+             :fuzzy-match fuzzy
              :persistent-action persistent-action
              :persistent-help persistent-help
              :keymap cmap
