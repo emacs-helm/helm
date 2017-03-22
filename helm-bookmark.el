@@ -286,8 +286,8 @@ BOOKMARK is a bookmark name or a bookmark record."
 (defun helm-bookmark-image-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK bookmarks an image file."
   (if (stringp bookmark)
-      (assoc 'image-type (assoc bookmark bookmark-alist))
-    (assoc 'image-type bookmark)))
+      (assq 'image-type (assq bookmark bookmark-alist))
+    (assq 'image-type bookmark)))
 
 (defun helm-bookmark-file-p (bookmark)
   "Return non-nil if BOOKMARK bookmarks a file or directory.

@@ -101,7 +101,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
            (adapt-source (or (assoc-default 'filtered-candidate-transformer source)
                              (assoc-default 'candidate-transformer source))))
       (if (listp adapt-source)
-          (and (member 'helm-adaptive-sort adapt-source) source)
+          (and (memq 'helm-adaptive-sort adapt-source) source)
         (and (eq adapt-source 'helm-adaptive-sort) source)))))
 
 (defun helm-adaptive-store-selection ()

@@ -2367,8 +2367,8 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
                                  (if (symbolp s) (symbol-value s) s))
                  for searchfns = (helm-search-functions
                                   (if (symbolp s) (symbol-value s) s))
-                 when (or (member 'helm-fuzzy-match matchfns)
-                          (member 'helm-fuzzy-search searchfns))
+                 when (or (memq 'helm-fuzzy-match matchfns)
+                          (memq 'helm-fuzzy-search searchfns))
                  return t))
   (helm-log "sources = %S" helm-sources)
   (helm-current-position 'save)
@@ -2902,7 +2902,7 @@ Cache the candidates if there is no cached value yet."
                      helm-async-processes)
                (set-process-filter candidates 'helm-output-filter)
                (setq candidates nil))
-              ((not (assoc 'volatile source))
+              ((not (assq 'volatile source))
                (puthash name candidates helm-candidate-cache)))
         candidates))))
 
@@ -3469,7 +3469,7 @@ without recomputing them, it should be a list of lists."
              ;; to avoid cursor moving upside down (issue #1703).
              (helm--update-move-first-line)))
       (let ((src (or source (helm-get-current-source))))
-        (unless (assoc 'candidates-process src)
+        (unless (assq 'candidates-process src)
           (helm-display-mode-line src)
           (helm-log-run-hook 'helm-after-update-hook)))
       (when preselect
@@ -3481,7 +3481,7 @@ without recomputing them, it should be a list of lists."
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
   (let ((len (string-width
-              (if (assoc 'multimatch source)
+              (if (assq 'multimatch source)
                   ;; Don't count spaces entered when using
                   ;; multi-match.
                   (replace-regexp-in-string " " "" helm-pattern)
@@ -3489,7 +3489,7 @@ without recomputing them, it should be a list of lists."
     (and (or (not helm-source-filter)
              (member (assoc-default 'name source) helm-source-filter))
          (>= len
-             (helm-aif (assoc 'requires-pattern source) (or (cdr it) 1) 0))
+             (helm-aif (assq 'requires-pattern source) (or (cdr it) 1) 0))
          ;; These incomplete regexps hang helm forever
          ;; so defer update. Maybe replace spaces quoted when using
          ;; multi-match.
@@ -3688,7 +3688,7 @@ this additional info after the source name by overlay."
   (cl-dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
                           (split-string output-string "\n")
-                          (assoc 'incomplete-line source))
+                          (assq 'incomplete-line source))
                          source t))
     (setq candidate
           (helm--maybe-process-filter-one-by-one-candidate candidate source))
@@ -3696,13 +3696,13 @@ this additional info after the source name by overlay."
         (let ((start (point)))
           (helm-insert-candidate-separator)
           (helm-insert-match candidate 'insert-before-markers
-                             (1+ (cdr (assoc 'item-count source)))
+                             (1+ (cdr (assq 'item-count source)))
                              source)
           (put-text-property start (point) 'helm-multiline t))
         (helm-insert-match candidate 'insert-before-markers
-                           (1+ (cdr (assoc 'item-count source)))
+                           (1+ (cdr (assq 'item-count source)))
                            source))
-    (cl-incf (cdr (assoc 'item-count source)))
+    (cl-incf (cdr (assq 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
       (helm-log-run-hook 'helm-async-outer-limit-hook)
@@ -3818,7 +3818,7 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
                      (or selection
                          helm-saved-selection
                          (helm-get-selection nil nil source)
-                         (and (assoc 'accept-empty source) ""))
+                         (and (assq 'accept-empty source) ""))
                      source))
     (unless preserve-saved-action (setq helm-saved-action nil))
     (when (and selection action) (funcall action selection))))
@@ -5400,7 +5400,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (defun helm-file-completion-source-p (&optional source)
   "Return non-`nil' if current source is a file completion source."
   (or minibuffer-completing-file-name
-      (let ((cur-source (cdr (assoc 'name
+      (let ((cur-source (cdr (assq 'name
                                     (or source (helm-get-current-source))))))
         (cl-loop for i in helm--file-completion-sources
                  thereis (string= cur-source i)))))

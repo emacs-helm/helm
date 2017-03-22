@@ -187,7 +187,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
                               (point-min) (point-max)))
                         'CompleteSuggestion)
    for i in result-alist collect
-   (cdr (cl-caadr (assoc 'suggestion i)))))
+   (cdr (cl-caadr (assq 'suggestion i)))))
 
 (defun helm-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer."
@@ -316,9 +316,9 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defun helm-wikipedia--parse-summary ()
   (goto-char (point-min))
   (when (search-forward "{" nil t)
-    (let ((result (cdr (assoc '*
-                              (assoc 'text
-                                     (assoc 'parse
+    (let ((result (cdr (assq '*
+                              (assq 'text
+                                     (assq 'parse
                                             (json-read-from-string
                                              (buffer-substring-no-properties
                                               (1- (point)) (point-max)))))))))
