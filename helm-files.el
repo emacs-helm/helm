@@ -1531,7 +1531,10 @@ or hitting C-j on \"..\"."
 (defun helm-ff-move-to-first-real-candidate ()
   "When candidate is an incomplete file name move to first real candidate."
   (let* ((src (helm-get-current-source))
-         (name (assoc-default 'name src)))
+         (name (assoc-default 'name src))
+         ;; Ensure `helm-file-completion-source-p' returns nil on
+         ;; `helm-read-file-name' history.
+         minibuffer-completing-file-name)
     (helm-aif (and (helm-file-completion-source-p src)
                    (not (helm-empty-source-p))
                    ;; Prevent dired commands moving to first real
