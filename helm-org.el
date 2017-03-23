@@ -173,7 +173,10 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                                   (apply old-fn args)))))
       (save-excursion
         (save-restriction
-          (widen)
+          (unless (and (bufferp filename)
+                       (buffer-base-buffer filename))
+            ;; Only widen direct buffers, not indirect ones.
+            (widen))
           (unless parents (goto-char (point-min)))
           ;; clear cache for new version of org-get-outline-path
           (and (boundp 'org-outline-path-cache)
