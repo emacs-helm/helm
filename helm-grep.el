@@ -676,8 +676,9 @@ If N is positive go forward otherwise go backward."
                (goto-char it)
              (forward-line 1))
            (funcall mark-maybe)))
-    (helm-follow-execute-persistent-action-maybe)
-    (helm-log-run-hook 'helm-move-selection-after-hook)))
+    (unless allow-mode
+      (helm-follow-execute-persistent-action-maybe)
+      (helm-log-run-hook 'helm-move-selection-after-hook))))
 
 ;;;###autoload
 (defun helm-goto-precedent-file ()
