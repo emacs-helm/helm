@@ -940,22 +940,25 @@ hardcoded and not modifiable, here they are:
 
 ** Helm's Basic Operations and Default Key Bindings
 
-| Key     | Alternative Keys | Command                                                   |
-|---------+------------------+-----------------------------------------------------------|
-| C-p     | Up               | Previous Line                                             |
-| C-n     | Down             | Next Line                                                 |
-| M-v     | PageUp           | Previous Page                                             |
-| C-v     | PageDown         | Next Page                                                 |
-| Enter   |                  | Execute first (default) action / Select                   |
-| M-<     |                  | First Line                                                |
-| M->     |                  | Last Line                                                 |
-| C-M-S-v | M-PageUp, C-M-y  | Previous Page (other-window)                              |
-| C-M-v   | M-PageDown       | Next Page (other-window)                                  |
-| Tab     | C-i              | Show action list                                          |
-| Left    |                  | Previous Source                                           |
-| Right   | C-o              | Next Source                                               |
-| C-k     |                  | Delete pattern (with prefix arg delete from point to end) |
-| C-j     | C-z              | Persistent Action (Execute and keep helm session)         |
+| Key     | Alternative Keys | Command                                                              |
+|---------+------------------+----------------------------------------------------------------------|
+| C-p     | Up               | Previous Line                                                        |
+| C-n     | Down             | Next Line                                                            |
+| M-v     | PageUp           | Previous Page                                                        |
+| C-v     | PageDown         | Next Page                                                            |
+| Enter   |                  | Execute first (default) action / Select                              |
+| M-<     |                  | First Line                                                           |
+| M->     |                  | Last Line                                                            |
+| C-M-S-v | M-PageUp, C-M-y  | Previous Page (other-window)                                         |
+| C-M-v   | M-PageDown       | Next Page (other-window)                                             |
+| Tab     | C-i              | Show action list                                                     |
+| Left    |                  | Previous Source                                                      |
+| Right   | C-o              | Next Source                                                          |
+| C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [1]) |
+| C-j     | C-z              | Persistent Action (Execute and keep helm session)                    |
+
+\[1] Delete from point to end or all depending of
+`helm-delete-minibuffer-contents-from-point' value.
 
 ** Shortcuts For nth Action
 
