@@ -220,7 +220,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                                  'buffer-name)
               (save-restriction
                 (narrow-to-region (or (previous-single-property-change
-                                       (point) 'buffer-name) 1)
+                                       (point) 'buffer-name)
+                                      (point-at-bol 2))
                                   (or (next-single-property-change
                                        (if (= beg end)
                                            (helm-moccur--next-or-previous-char)
