@@ -4871,9 +4871,10 @@ use `search', `get-line' and `match-part' attributes."
 Because `helm-search-match-part' maybe called even if unspecified
 in source (negation), MATCH-PART-FN default to `identity'
 to match whole candidate.
-When using fuzzy matching and negation (i.e \"!\"),
-this function is always called."
-  (let ((part (get-text-property 0 'match-part candidate))
+When using fuzzy matching and/or negation (i.e \"!\"),
+this function is always called on whole candidate."
+  (let ((part (or (get-text-property 0 'match-part candidate)
+                  candidate))
         (fuzzy-regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache)))
         (matchfn (if helm-migemo-mode
                      'helm-mm-migemo-string-match 'string-match)))
