@@ -167,16 +167,22 @@ current local map, current global map, and all current minor maps."
 (defun helm-browse-menubar ()
   "Preconfigured helm to the menubar using lacarte.el."
   (interactive)
-  (require 'lacarte)
-  (helm :sources (mapcar 
-                  (lambda (spec) (helm-make-source (car spec) 'helm-lacarte
-                                   :candidates
-                                   (lambda ()
-                                     (helm-lacarte-get-candidates (cdr spec)))))
-                  '(("Major Mode"  . (local))
-                    ("Minor Modes" . (minor))
-                    ("Global Map"  . (global))))
-        :buffer "*helm lacarte*"))
+  (if (require 'lacarte nil t)
+      (helm :sources (mapcar
+                      (lambda (spec) (helm-make-source (car spec) 'helm-lacarte
+                                  :candidates
+                                  (lambda ()
+                                    (helm-lacarte-get-candidates (cdr spec)))))
+                      '(("Major Mode"  . (local))
+                        ("Minor Modes" . (minor))
+                        ("Global Map"  . (global))))
+            :buffer "*helm lacarte*")
+    (when (yes-or-no-p "lacarte.el is not installed. Install? ")
+      (condition-case nil
+          (progn
+            (package-install 'lacarte)
+            (helm-browse-menubar))
+        (error (error "lacarte.el is not available. Is MELPA in your `package-archives'?"))))))
 
 (defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
