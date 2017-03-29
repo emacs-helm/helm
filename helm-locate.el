@@ -282,7 +282,7 @@ See also `helm-locate'."
          (case-sensitive-flag (if locate-is-es "-i" ""))
          (ignore-case-flag (if (or locate-is-es
                                    (not real-locate)) "" "-i"))
-         (args (split-string helm-pattern " "))
+         (args (helm-mm-split-pattern helm-pattern))
          (cmd (format helm-locate-command
                       (cl-case helm-locate-case-fold-search
                         (smart (let ((case-fold-search nil))

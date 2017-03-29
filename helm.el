@@ -3222,7 +3222,7 @@ to the matching method in use."
                 (cl-loop with multi-match = (string-match-p " " helm-pattern)
                          with patterns = (if multi-match
                                              (mapcar #'helm--maybe-get-migemo-pattern
-                                                     (split-string helm-pattern))
+                                                     (helm-mm-split-pattern helm-pattern))
                                              (split-string helm-pattern "" t))
                          for p in patterns
                          ;; Multi matches (regexps patterns).
@@ -4879,7 +4879,7 @@ and stored in the match-part property."
         (matchfn (if helm-migemo-mode
                      'helm-mm-migemo-string-match 'string-match)))
     (if (string-match " " pattern)
-        (cl-loop for i in (split-string pattern) always
+        (cl-loop for i in (helm-mm-split-pattern pattern) always
                  (if (string-match "\\`!" i)
                      (not (funcall matchfn (substring i 1) part))
                      (funcall matchfn i part)))

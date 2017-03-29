@@ -503,7 +503,7 @@ i.e same color."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
          (regexp (cl-loop with pattern = helm-pattern
-                          for p in (split-string pattern)
+                          for p in (helm-mm-split-pattern pattern)
                           when (string-match "\\`\\*" p)
                           return p)))
     (if regexp
@@ -515,7 +515,7 @@ i.e same color."
 
 (defun helm-buffers--match-from-pat (candidate)
   (let ((regexp-list (cl-loop with pattern = helm-pattern
-                              for p in (split-string pattern)
+                              for p in (helm-mm-split-pattern pattern)
                               unless (string-match
                                       "\\`\\(\\*\\|/\\|@\\)" p)
                               collect p)))
@@ -528,7 +528,7 @@ i.e same color."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
          (regexp (cl-loop with pattern = helm-pattern
-                          for p in (split-string pattern)
+                          for p in (helm-mm-split-pattern pattern)
                           when (string-match "\\`@\\(.*\\)" p)
                           return (match-string 1 p))))
     (if (and buf regexp)
@@ -545,7 +545,7 @@ i.e same color."
          (buf  (get-buffer cand))
          (buf-fname (buffer-file-name buf))
          (regexps (cl-loop with pattern = helm-pattern
-                          for p in (split-string pattern)
+                          for p in (helm-mm-split-pattern pattern)
                           when (string-match "\\`/" p)
                           collect p)))
     (if regexps
