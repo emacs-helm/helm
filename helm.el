@@ -2013,6 +2013,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         mode-line-in-non-selected-windows
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (old--cua cua-mode)
+        (old--menu-bar menu-bar-mode)
         (helm--maybe-use-default-as-input
          (and (null any-input)
               (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
@@ -2021,6 +2022,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     ;; cua-mode override local helm bindings.
     ;; disable this stupid thing if enabled.
     (and cua-mode (cua-mode -1))
+    ;; Prevent users clicking the f*%;!: thing.
+    (and menu-bar-mode (menu-bar-mode -1))
     (unwind-protect
          (condition-case-unless-debug _v
              (let ( ;; `helm--source-name' is non-`nil'
@@ -2069,6 +2072,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       (setq helm-sources nil)
       (setq helm--ignore-errors nil)
       (and old--cua (cua-mode 1))
+      (and old--menu-bar (menu-bar-mode 1))
       (helm-log-save-maybe))))
 
 
