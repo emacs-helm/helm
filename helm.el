@@ -1177,6 +1177,11 @@ You should not modify this yourself unless you know what you are doing.")
 Should be set in candidates functions if needed, will be restored
 at end of session.")
 (defvar helm--action-prompt "Select action: ")
+(defvar helm-fuzzy-matching-sort-ties-by-length t
+  "When non-nil, fuzzy matches that tie in score will be sorted
+by length, shorter first.  When nil, fuzzy matches that tie in
+score will preserve their existing order, which may be preferable
+in, e.g. `helm-recentf'.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -3178,7 +3183,8 @@ and sort on basename of candidates."
                      (scr1 (car data1))
                      (scr2 (car data2)))
                 (cond ((= scr1 scr2)
-                       (< len1 len2))
+                       (when helm-fuzzy-matching-sort-ties-by-length
+                         (< len1 len2)))
                       ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
