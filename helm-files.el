@@ -3845,9 +3845,10 @@ found."
 (defun helm-recentf ()
   "Preconfigured `helm' for `recentf'."
   (interactive)
-  (helm :sources 'helm-source-recentf
-        :ff-transformer-show-only-basename nil
-        :buffer "*helm recentf*"))
+  (let ((helm-fuzzy-matching-sort-ties-by-length nil))
+    (helm :sources 'helm-source-recentf
+          :ff-transformer-show-only-basename nil
+          :buffer "*helm recentf*")))
 
 ;;;###autoload
 (defun helm-delete-tramp-connection ()
