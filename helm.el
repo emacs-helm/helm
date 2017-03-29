@@ -35,6 +35,23 @@
 (require 'helm-source)
 
 
+;;; Version
+
+(defconst helm-version "2.5.4")
+
+(defun helm-version (&optional interactivep)
+  "Return `helm-version' string.
+
+Optional parameter INTERACTIVEP is always t when called
+interactively.
+
+When called interactively, show version in echo area."
+  (interactive (list t))
+  (if interactivep
+      (message "Helm %s" helm-version)
+    helm-version))
+
+
 ;;; Multi keys
 ;;
 ;;
