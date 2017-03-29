@@ -3131,15 +3131,16 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                              pat-lookup str-lookup :test 'equal))
                     2)))))
 
-(defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real basename)
+(defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real basename preserve-tie-order)
   "The transformer for sorting candidates in fuzzy matching.
 It sorts on the display part by default.
 
 Sorts CANDIDATES by their scores as calculated by
-`helm-score-candidate-for-pattern'. Ties in scores are sorted by
-length of the candidates. Set USE-REAL to non-`nil' to sort on the
-real part.  If BASENAME is non-nil assume we are completing filenames
-and sort on basename of candidates."
+`helm-score-candidate-for-pattern'.  Set USE-REAL to non-`nil' to
+sort on the real part.  If BASENAME is non-nil assume we are
+completing filenames and sort on basename of candidates.  If
+PRESERVE-TIE-ORDER is nil, ties in scores are sorted by length of
+the candidates."
   (if (string= helm-pattern "")
       candidates
     (let ((table-scr (make-hash-table :test 'equal)))
@@ -3175,12 +3176,21 @@ and sort on basename of candidates."
                      (scr1 (car data1))
                      (scr2 (car data2)))
                 (cond ((= scr1 scr2)
-                       (< len1 len2))
+                       (unless preserve-tie-order
+                         (< len1 len2)))
                       ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
   "Default `filtered-candidate-transformer' to sort candidates in fuzzy matching."
   (helm-fuzzy-matching-default-sort-fn-1 candidates use-real))
+
+(defun helm-fuzzy-matching-sort-fn-preserve-ties-order (candidates _source &optional use-real)
+  "`filtered-candidate-transformer' to sort candidates in fuzzy matching, preserving order of ties.
+The default function, `helm-fuzzy-matching-default-sort-fn',
+sorts ties by length, shortest first.  This function may be more
+useful when the order of the candidates is meaningful, e.g. with
+`recentf-list'."
+  (helm-fuzzy-matching-default-sort-fn-1 candidates use-real t))
 
 (defun helm--maybe-get-migemo-pattern (pattern)
   (or (and helm-migemo-mode
