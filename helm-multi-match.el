@@ -74,7 +74,7 @@ but \"foo\\ bar baz\"=> (\"foo\\s-bar\" \"baz\")."
   (split-string
    ;; Match spaces litteraly because candidate buffer syntax-table
    ;; doesn't understand "\s-" properly.
-   (replace-regexp-in-string helm-mm-space-regexp "\\\\s-" pattern nil t)))
+   (replace-regexp-in-string helm-mm-space-regexp "\\s-" pattern nil t)))
 
 (defun helm-mm-1-make-regexp (pattern)
   "Replace spaces in PATTERN with \"\.*\"."

@@ -621,7 +621,7 @@ If STRING is non--nil return instead a space separated string."
       (catch 'empty-line
         (cl-loop with ov
                  for r in (helm-remove-if-match
-                           "\\`!" (split-string
+                           "\\`!" (helm-mm-split-pattern
                                    (if (with-helm-buffer
                                          ;; Needed for highlighting AG matches.
                                          (assq 'pcre (helm-get-current-source)))
