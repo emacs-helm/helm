@@ -870,6 +870,9 @@ surprising for new helm users that expect
 `\\[helm-select-action]' for completions and have not
 realized they are already completing something as soon as helm is
 started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]]
+NOTE: In addition to this fixed actions list, you will notice that depending
+of the type of candidate selected you may have additional actions
+appearing and disapearing when you select another type of candidate.
 
 ** Helm mode
 

@@ -574,6 +574,13 @@ Use the sudo method:
 
     /sudo:host: or just /sudo::
 
+*** Attach files to a mail buffer (message-mode)
+
+If you are in a message buffer, the action will appear in action menu, otherwise
+it available at any time with \\<helm-find-files-map>\\[helm-ff-run-gnus-attach-files]
+See how behave `gnus-attach-files' for more infos.
+NOTE: Even if called `gnus-attach-files' it works with mu4e and else.
+
 ** Commands
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\tRun Locate (C-u to specify locate db, M-n insert basename of candidate)
