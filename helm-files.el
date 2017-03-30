@@ -3296,9 +3296,10 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
   :type 'boolean
   :set (lambda (var val)
          (set var val)
-         (setq helm-source-recentf
-               (helm-make-source "Recentf" 'helm-recentf-source
-                 :fuzzy-match helm-recentf-fuzzy-match))))
+         (let ((helm-fuzzy-sort-fn 'helm-fuzzy-matching-sort-fn-preserve-ties-order))
+           (setq helm-source-recentf
+                 (helm-make-source "Recentf" 'helm-recentf-source
+                   :fuzzy-match helm-recentf-fuzzy-match)))))
 
 ;;; Browse project
 ;; Need dependencies:
