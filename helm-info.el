@@ -185,11 +185,24 @@ helm-info-<CANDIDATE>."
     :action '(("Search index" . helm-info-search-index))))
 
 ;;;###autoload
-(defun helm-info ()
-  "Preconfigured `helm' for searching Info files' indices."
-  (interactive)
+(defun helm-info (&optional refresh)
+  "Preconfigured `helm' for searching Info files' indices.
+
+With a prefix argument \\[universal-argument], set REFRESH to non-nil.
+
+Optional parameter REFRESH, when non-nil, reevaluates
+`helm-default-info-index-list'.  If the variable has been
+customized, set it to its saved value.  If not, set it to its
+standard value.  See `custom-reevaluate-setting' for more.
+
+REFRESH is useful when new Info files are installed.  If
+`helm-default-info-index-list' has not been customized, the new
+Info files are made available."
+  (interactive "P")
   (let ((default (unless (ring-empty-p helm-info-searched)
                    (ring-ref helm-info-searched 0))))
+    (when refresh
+      (custom-reevaluate-setting 'helm-default-info-index-list))
     (helm :sources (helm-def-source--info-files)
           :buffer "*helm Info*"
           :preselect (and default
