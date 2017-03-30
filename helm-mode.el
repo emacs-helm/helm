@@ -1177,8 +1177,7 @@ Can be used as value for `completion-in-region-function'."
                           :must-match require-match))))
           (cond ((stringp result)
                  (choose-completion-string
-                  (replace-regexp-in-string "\\s\\" "" result)
-                  (current-buffer)
+                  result (current-buffer)
                   (list (+ start base-size) end)
                   completion-list-insert-choice-function))
                 ((consp result) ; crm.
