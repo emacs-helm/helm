@@ -107,6 +107,18 @@ Affect among others `completion-at-point', `completing-read-multiple'."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-completion-in-region-default-sort-fn
+  'helm-completion-in-region-sort-fn
+  "The default sort function to sort candidates in completion-in-region.
+
+When nil no sorting is done.
+The function is a `filtered-candidate-transformer' function which takes
+two args CANDIDATES and SOURCE.
+It will be used only when `helm-completion-in-region-fuzzy-match' is
+nil otherwise fuzzy use its own sort function."
+  :group 'helm-mode
+  :type 'function)
+
 (defcustom helm-mode-fuzzy-match nil
   "Enable fuzzy matching in `helm-mode' globally.
 Note that this will slow down completion and modify sorting
@@ -1066,6 +1078,10 @@ The `helm-find-files' history `helm-ff-history' is used here."
   (ignore-errors
     (apply old--fn args)))
 
+(defun helm-completion-in-region-sort-fn (candidates _source)
+  "Default sort function for completion-in-region."
+  (sort candidates 'helm-generic-sort-fn))
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1161,10 +1177,10 @@ Can be used as value for `completion-in-region-function'."
                                  input)
                                 (t (concat input init-space-suffix)))
                           :buffer buf-name
-                          :fc-transformer (append (list 'helm-cr-default-transformer)
-                                                  (unless helm-completion-in-region-fuzzy-match
-                                                    (list (lambda (candidates _source)
-                                                            (sort candidates 'helm-generic-sort-fn)))))
+                          :fc-transformer (append '(helm-cr-default-transformer)
+                                                  (unless (or helm-completion-in-region-fuzzy-match
+                                                              (null helm-completion-in-region-default-sort-fn))
+                                                    (list helm-completion-in-region-default-sort-fn)))
                           :exec-when-only-one t
                           :quit-when-no-cand
                           (lambda ()
