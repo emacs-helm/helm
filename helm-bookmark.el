@@ -31,6 +31,7 @@
 (declare-function message-buffers "message.el")
 (declare-function addressbook-set-mail-buffer-1 "ext:addressbook-bookmark.el"
                   (&optional bookmark-name append cc))
+(declare-function addressbook-bookmark-set-1 "ext:addressbook-bookmark.el" (&optional contact))
 (declare-function helm-browse-project "helm-files" (arg))
 
 
@@ -591,6 +592,11 @@ than `w3m-browse-url' use it."
 (defvar helm-source-bookmark-addressbook
   (helm-make-source "Bookmark Addressbook" 'helm-bookmark-addressbook-class))
 
+(defvar helm-source-addressbook-set
+  (helm-build-dummy-source "Addressbook add contact"
+    :action (lambda (candidate)
+              (addressbook-bookmark-set-1 candidate))))
+
 ;;; Transformer
 ;;
 
@@ -804,7 +810,8 @@ only if external addressbook-bookmark package is installed."
   "Preconfigured helm for addressbook bookmarks.
 Need addressbook-bookmark package as dependencie."
   (interactive)
-  (helm :sources 'helm-source-bookmark-addressbook
+  (helm :sources '(helm-source-bookmark-addressbook
+                   helm-source-addressbook-set)
         :prompt "Search Contact: "
         :buffer "*helm addressbook*"
         :default (list (thing-at-point 'symbol)
