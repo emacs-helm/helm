@@ -52,8 +52,6 @@
             helm-source-bookmark-man
             helm-source-bookmark-images
             helm-source-bookmark-w3m)
-          (and (locate-library "addressbook-bookmark")
-               (list 'helm-source-bookmark-addressbook))
           (list 'helm-source-bookmark-uncategorized
                 'helm-source-bookmark-set))
   "List of sources to use in `helm-filtered-bookmarks'."
