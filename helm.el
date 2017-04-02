@@ -2931,8 +2931,8 @@ Cache the candidates if there is no cached value yet."
   "Execute `filter-one-by-one' function(s) on real value of CANDIDATE in SOURCE."
   `(helm-aif (assoc-default 'filter-one-by-one ,source)
        (let ((real (if (consp ,candidate)
-                       (cdr ,candidate)
-                       ,candidate)))
+                       (car ,candidate)
+                     ,candidate)))
          (if (and (listp it)
                   (not (functionp it))) ;; Don't treat lambda's as list.
              (cl-loop for f in it
