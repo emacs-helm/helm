@@ -49,6 +49,11 @@ Show all candidates on startup when 0 (default)."
   :group 'helm-command
   :type 'boolean)
 
+(defcustom helm-M-x-default-sort-fn #'helm-M-x-fuzzy-sort-candidates
+  "Default sort function for `helm-M-x'.
+It is used only when `helm-M-x-fuzzy-match' is enabled."
+  :group 'helm-command
+  :type 'function)
 
 ;;; Faces
 ;;
@@ -182,6 +187,9 @@ fuzzy matching is running its own sort function with a different algorithm."
     (universal-argument--mode)))
 (put 'helm-M-x-universal-argument 'helm-only t)
 
+(defun helm-M-x-fuzzy-sort-candidates (candidates _source)
+  (helm-fuzzy-matching-default-sort-fn-1 candidates t))
+
 (defun helm-M-x-read-extended-command (&optional collection history)
   "Read command name to invoke in `helm-M-x'.
 Helm completion is not provided when executing or defining
@@ -196,10 +204,7 @@ than the default which is OBARRAY."
                  (read-extended-command))
             (helm-mode 1))
           (read-extended-command))
-      (let* ((orig-fuzzy-sort-fn helm-fuzzy-sort-fn)
-             (helm-fuzzy-sort-fn (lambda (candidates source)
-                                   (funcall orig-fuzzy-sort-fn
-                                            candidates source 'real)))
+      (let* ((helm-fuzzy-sort-fn helm-M-x-default-sort-fn)
              (helm--mode-line-display-prefarg t)
              (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
              (helm-move-selection-after-hook

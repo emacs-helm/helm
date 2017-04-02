@@ -3179,17 +3179,17 @@ the candidates."
                          (< len1 len2)))
                       ((> scr1 scr2)))))))))
 
-(defun helm-fuzzy-matching-default-sort-fn (candidates _source &optional use-real)
+(defun helm-fuzzy-matching-default-sort-fn (candidates _source)
   "Default `filtered-candidate-transformer' to sort candidates in fuzzy matching."
-  (helm-fuzzy-matching-default-sort-fn-1 candidates use-real))
+  (helm-fuzzy-matching-default-sort-fn-1 candidates))
 
-(defun helm-fuzzy-matching-sort-fn-preserve-ties-order (candidates _source &optional use-real)
+(defun helm-fuzzy-matching-sort-fn-preserve-ties-order (candidates _source)
   "`filtered-candidate-transformer' to sort candidates in fuzzy matching, preserving order of ties.
 The default function, `helm-fuzzy-matching-default-sort-fn',
 sorts ties by length, shortest first.  This function may be more
 useful when the order of the candidates is meaningful, e.g. with
 `recentf-list'."
-  (helm-fuzzy-matching-default-sort-fn-1 candidates use-real t))
+  (helm-fuzzy-matching-default-sort-fn-1 candidates nil t))
 
 (defun helm--maybe-get-migemo-pattern (pattern)
   (or (and helm-migemo-mode
