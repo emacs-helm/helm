@@ -51,6 +51,9 @@ Show all candidates on startup when 0 (default)."
 
 (defcustom helm-M-x-default-sort-fn #'helm-M-x-fuzzy-sort-candidates
   "Default sort function for `helm-M-x'.
+
+It should sort against REAL value of candidates.
+
 It is used only when `helm-M-x-fuzzy-match' is enabled."
   :group 'helm-command
   :type 'function)
