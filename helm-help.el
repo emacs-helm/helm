@@ -226,6 +226,15 @@ On a symlinked directory a prefix arg will allow expanding to its true name.
 Note: The tree is reinitialized each time you enter a new tree with `C-j'
 or by entering some pattern in prompt.
 
+**** RET behavior
+
+Behave differently depending of `helm-selection' (current candidate in helm-buffer):
+
+- candidate basename is \".\"   => open it in dired.
+- candidate is a directory    => expand it.
+- candidate is a file         => open it.
+- marked candidates (1+)      => open them with default action.
+
 *** Find file at point
 
 Helm is using `ffap' partially or completely to find file at point
