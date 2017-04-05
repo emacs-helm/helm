@@ -364,6 +364,7 @@ Remote filesystem are generally mounted with sshfs."
 (defvar helm-find-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
+    (define-key map (kbd "RET")           'helm-ff-RET)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
@@ -1130,6 +1131,24 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-delete-char-backward--exit-fn ()
   (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
   (setq helm-ff--deleting-char-backward nil))
+
+(defun helm-ff-RET ()
+  "Default action for RET in `helm-find-files' and `helm-read-file-name'.
+
+Behave differently depending of `helm-selection':
+
+- candidate basename is \".\"   => open it in dired.
+- candidate is a directory    => expand it.
+- candidate is a file         => open it.
+- marked candidates (1+)      => open them with default action."
+  (interactive)
+  (let ((cands (helm-marked-candidates))
+        (sel   (helm-get-selection)))
+    (if (and (not (cdr cands))
+             (file-directory-p sel)
+             (not (string= "." (helm-basename sel))))
+        (helm-execute-persistent-action)
+        (helm-maybe-exit-minibuffer))))
 
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."
