@@ -140,6 +140,7 @@ Each car is a regexp match pattern of the imenu type string."
    (candidate-transformer :initform 'helm-imenu-transformer)
    (persistent-action :initform 'helm-imenu-persistent-action)
    (persistent-help :initform "Show this entry")
+   (nomark :initform t)
    (keymap :initform helm-imenu-map)
    (help-message :initform 'helm-imenu-help-message)
    (action :initform 'helm-imenu-action)))
