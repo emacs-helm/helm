@@ -426,6 +426,7 @@ Remote filesystem are generally mounted with sshfs."
 (defvar helm-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
+    (define-key map (kbd "RET")           'helm-ff-RET)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "<M-RET>")       'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
