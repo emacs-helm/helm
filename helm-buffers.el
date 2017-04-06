@@ -423,12 +423,14 @@ Should be called after others transformers i.e (boring buffers)."
       (helm-update preselect))))
 (put 'helm-toggle-buffers-details 'helm-only t)
 
-(defun helm-buffers-sort-transformer (candidates _source)
+(defun helm-buffers-sort-transformer (candidates source)
   (if (string= helm-pattern "")
       candidates
-    (sort candidates
-          (lambda (s1 s2)
-              (< (string-width s1) (string-width s2))))))
+    (if helm-buffers-fuzzy-matching
+        (funcall helm-fuzzy-sort-fn candidates source)
+        (sort candidates
+              (lambda (s1 s2)
+                (< (string-width s1) (string-width s2)))))))
 
 (defun helm-buffers-mark-similar-buffers-1 ()
   (with-helm-window
