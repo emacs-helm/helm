@@ -426,11 +426,15 @@ Should be called after others transformers i.e (boring buffers)."
 (defun helm-buffers-sort-transformer (candidates source)
   (if (string= helm-pattern "")
       candidates
-    (if helm-buffers-fuzzy-matching
-        (funcall helm-fuzzy-sort-fn candidates source)
-        (sort candidates
-              (lambda (s1 s2)
-                (< (string-width s1) (string-width s2)))))))
+      (if helm-buffers-fuzzy-matching
+          (let ((helm-pattern (cl-loop for p in (helm-mm-split-pattern helm-pattern)
+                                       unless (member (substring p 0 1) '("*" "/" "@"))
+                                       collect p into lst
+                                       finally return (mapconcat 'identity lst " "))))
+            (funcall helm-fuzzy-sort-fn candidates source))
+          (sort candidates
+                (lambda (s1 s2)
+                  (< (string-width s1) (string-width s2)))))))
 
 (defun helm-buffers-mark-similar-buffers-1 ()
   (with-helm-window
