@@ -223,6 +223,7 @@ Only buffer names are fuzzy matched when this is enabled,
    (keymap :initform helm-buffer-map)
    (migemo :initform 'nomultimatch)
    (volatile :initform t)
+   (nohighlight :initform t)
    (resume :initform (lambda () (setq helm-buffers-in-project-p nil)))
    (help-message :initform 'helm-buffer-help-message)))
 
@@ -394,9 +395,11 @@ Should be called after others transformers i.e (boring buffers)."
         ;; units, this is 7 characters.
         for formatted-size = (and size (format "%7s" size))
         collect (cons (if helm-buffer-details-flag
-                          (concat truncbuf "\t" formatted-size
-                                  "  " fmode "  " meta)
-                        name)
+                          (concat
+                           (funcall helm-fuzzy-matching-highlight-fn truncbuf)
+                           "\t" formatted-size
+                           "  " fmode "  " meta)
+                        (funcall helm-fuzzy-matching-highlight-fn name))
                       (get-buffer i))))
 
 (defun helm-buffer--get-preselection (buffer)
