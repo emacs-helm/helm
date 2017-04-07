@@ -393,13 +393,14 @@ Should be called after others transformers i.e (boring buffers)."
         ;; The max length of a number should be 1023.9X where X is the
         ;; units, this is 7 characters.
         for formatted-size = (and size (format "%7s" size))
-        collect (cons (if helm-buffer-details-flag
-                          (concat
-                           (funcall helm-fuzzy-matching-highlight-fn truncbuf)
-                           "\t" formatted-size
-                           "  " fmode "  " meta)
-                        (funcall helm-fuzzy-matching-highlight-fn name))
-                      (get-buffer i))))
+        collect           (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
+                            (cons (if helm-buffer-details-flag
+                                      (concat
+                                       (funcall helm-fuzzy-matching-highlight-fn truncbuf)
+                                       "\t" formatted-size
+                                       "  " fmode "  " meta)
+                                      (funcall helm-fuzzy-matching-highlight-fn name))
+                                  (get-buffer i)))))
 
 (defun helm-buffer--get-preselection (buffer)
   (let ((bufname (buffer-name buffer)))
@@ -425,14 +426,17 @@ Should be called after others transformers i.e (boring buffers)."
       (helm-update preselect))))
 (put 'helm-toggle-buffers-details 'helm-only t)
 
+(defun helm-buffers--pattern-sans-filters ()
+  (cl-loop for p in (helm-mm-split-pattern helm-pattern)
+           unless (member (substring p 0 1) '("*" "/" "@"))
+           collect p into lst
+           finally return (mapconcat 'identity lst " ")))
+
 (defun helm-buffers-sort-transformer (candidates source)
   (if (string= helm-pattern "")
       candidates
       (if helm-buffers-fuzzy-matching
-          (let ((helm-pattern (cl-loop for p in (helm-mm-split-pattern helm-pattern)
-                                       unless (member (substring p 0 1) '("*" "/" "@"))
-                                       collect p into lst
-                                       finally return (mapconcat 'identity lst " "))))
+          (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
             (funcall helm-fuzzy-sort-fn candidates source))
           (sort candidates
                 (lambda (s1 s2)
@@ -517,7 +521,7 @@ i.e same color."
     (if regexp
         (when buf
           (with-current-buffer buf
-            (let ((mjm (format-mode-line mode-name)))
+            (let ((mjm (symbol-name major-mode)))
               (helm-buffer--match-mjm regexp mjm))))
         t)))
 
