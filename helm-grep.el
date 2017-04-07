@@ -25,7 +25,6 @@
 (require 'wgrep-helm nil t)
 
 (declare-function helm-buffer-list "helm-buffers")
-(declare-function helm-elscreen-find-file "helm-elscreen" (file))
 (declare-function View-quit "view")
 (declare-function doc-view-goto-page "doc-view" (page))
 (declare-function helm-mm-split-pattern "helm-multi-match")
@@ -197,9 +196,6 @@ Possible value are:
   (helm-make-actions
    "Find File" 'helm-grep-action
    "Find file other frame" 'helm-grep-other-frame
-   (lambda () (and (locate-library "elscreen")
-                   "Find file in Elscreen"))
-   'helm-grep-jump-elscreen
    "Save results in grep buffer" 'helm-grep-save-results
    "Find file other window" 'helm-grep-other-window)
   "Actions for helm grep."
@@ -577,7 +573,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 ;;
 (defun helm-grep-action (candidate &optional where mark)
   "Define a default action for `helm-do-grep-1' on CANDIDATE.
-WHERE can be one of other-window, elscreen, other-frame."
+WHERE can be one of other-window, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
          (lineno       (string-to-number (nth 1 split)))
          (loc-fname        (or (with-current-buffer
@@ -595,7 +591,6 @@ WHERE can be one of other-window, elscreen, other-frame."
                            (concat tramp-prefix loc-fname) loc-fname)))
     (cl-case where
       (other-window (find-file-other-window fname))
-      (elscreen     (helm-elscreen-find-file fname))
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-grep-save-results-1))
       (pdf          (if helm-pdfgrep-default-read-command
@@ -635,10 +630,6 @@ With a prefix arg record CANDIDATE in `mark-ring'."
 (defun helm-grep-other-frame (candidate)
   "Jump to result in other frame from helm grep."
   (helm-grep-action candidate 'other-frame))
-
-(defun helm-grep-jump-elscreen (candidate)
-  "Jump to result in elscreen from helm grep."
-  (helm-grep-action candidate 'elscreen))
 
 (defun helm-goto-next-or-prec-file (n)
   "Go to next or precedent candidate file in helm grep/etags buffers.

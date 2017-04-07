@@ -134,9 +134,6 @@
    'helm-switch-to-buffers-other-window
    "Switch to buffer other frame `C-c C-o'"
    'switch-to-buffer-other-frame
-   (lambda () (and (locate-library "elscreen")
-                   "Display buffer in Elscreen"))
-   'helm-find-buffer-on-elscreen
    "Browse project from buffer"
    'helm-buffers-browse-project
    "Query replace regexp `C-M-%'"

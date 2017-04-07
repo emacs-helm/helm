@@ -21,7 +21,6 @@
 (require 'helm)
 (require 'helm-types)
 (require 'helm-utils)
-(require 'helm-elscreen)
 (require 'helm-grep)
 (require 'helm-regexp)
 (require 'helm-help)
@@ -722,13 +721,6 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
 (put 'helm-buffer-switch-other-frame 'helm-only t)
-
-(defun helm-buffer-switch-to-elscreen ()
-  "Run switch to elscreen  action from `helm-source-buffers-list'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-find-buffer-on-elscreen)))
-(put 'helm-buffer-switch-to-elscreen 'helm-only t)
 
 (defun helm-buffer-run-ediff ()
   "Run ediff action from `helm-source-buffers-list'."

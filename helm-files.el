@@ -478,8 +478,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   (helm-make-actions
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
-   (lambda () (and (locate-library "elscreen") "Find file in Elscreen"))
-   'helm-elscreen-find-file
    "View file" 'view-file
    "Checksum File" 'helm-ff-checksum
    "Query replace fnames on marked" 'helm-ff-query-replace-on-marked
