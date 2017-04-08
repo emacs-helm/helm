@@ -429,7 +429,7 @@ Should be called after others transformers i.e (boring buffers)."
 
 (defun helm-buffers--pattern-sans-filters (&optional separator)
   (cl-loop for p in (helm-mm-split-pattern helm-pattern)
-           unless (member (substring p 0 1) '("*" "/" "@"))
+           unless (member (substring p 0 1) '("*" "/" "@" "!"))
            collect p into lst
            finally return (mapconcat 'identity lst (or separator " "))))
 
