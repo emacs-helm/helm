@@ -127,9 +127,7 @@ You can specify more than one directory starting from helm v1.6.8
 
 Note that if `helm-buffers-fuzzy-matching' is non--nil you will have
 fuzzy matching on buffer names (not on directory name matching and major-mode though).
-A pattern starting with \"^\" will disable fuzzy matching and will match by exact regexp
-As soon as you enter filtering with \"*\", \"/\" or \"@\" the pattern matching buffer-name
-will not be fuzzy matched, IOW as soon you enter filtering, fuzzy matching will be disabled.
+A pattern starting with \"^\" will disable fuzzy matching and will match by exact regexp.
 
 **** Examples
 

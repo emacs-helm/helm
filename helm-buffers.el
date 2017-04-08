@@ -393,7 +393,8 @@ Should be called after others transformers i.e (boring buffers)."
         ;; The max length of a number should be 1023.9X where X is the
         ;; units, this is 7 characters.
         for formatted-size = (and size (format "%7s" size))
-        collect           (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
+        collect           (let ((helm-pattern (helm-buffers--pattern-sans-filters
+                                               (and helm-buffers-fuzzy-matching ""))))
                             (cons (if helm-buffer-details-flag
                                       (concat
                                        (funcall helm-fuzzy-matching-highlight-fn truncbuf)
@@ -426,11 +427,11 @@ Should be called after others transformers i.e (boring buffers)."
       (helm-update preselect))))
 (put 'helm-toggle-buffers-details 'helm-only t)
 
-(defun helm-buffers--pattern-sans-filters ()
+(defun helm-buffers--pattern-sans-filters (&optional separator)
   (cl-loop for p in (helm-mm-split-pattern helm-pattern)
            unless (member (substring p 0 1) '("*" "/" "@"))
            collect p into lst
-           finally return (mapconcat 'identity lst " ")))
+           finally return (mapconcat 'identity lst (or separator " "))))
 
 (defun helm-buffers-sort-transformer (candidates source)
   (if (string= helm-pattern "")
