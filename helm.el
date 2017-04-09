@@ -5520,16 +5520,21 @@ visible or invisible in all sources of current helm session"
       (setq coerced nil))
     (or wilds (and coerced (list coerced)))))
 
-(cl-defun helm-marked-candidates (&key with-wildcard)
+(cl-defun helm-marked-candidates (&key with-wildcard all-sources)
   "Return marked candidates of current source, if any.
+
 Otherwise return one element list consisting of the current
-selection. When key WITH-WILDCARD is specified, expand it."
+selection. When key WITH-WILDCARD is specified, expand it.
+When ALL-SOURCES key value is non-nil returns marked candidates of all
+sources."
   (with-current-buffer helm-buffer
     (let ((candidates
            (cl-loop with current-src = (helm-get-current-source)
                     for (source . real) in (reverse helm-marked-candidates)
                     for use-wc = (and with-wildcard (string-match-p "\\*" real))
-                    when (equal (assq 'name source) (assq 'name current-src))
+                    when (or all-sources
+                             (equal (assq 'name source)
+                                    (assq 'name current-src)))
                     append (helm--compute-marked real source use-wc)
                     into cands
                     finally return (or cands
