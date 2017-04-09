@@ -499,8 +499,9 @@ i.e same color."
                 (and pos pos-test)
                 (and neg neg-test (not neg-test)))))))
 
-(defun helm-buffer--match-pattern (pattern candidate)
+(defun helm-buffer--match-pattern (pattern candidate &optional nofuzzy)
   (let ((bfn (if (and helm-buffers-fuzzy-matching
+                      (not nofuzzy)
                       (not helm-migemo-mode)
                       (not (string-match "\\`\\^" pattern)))
                  #'helm--mapconcat-pattern
@@ -527,14 +528,15 @@ i.e same color."
         t)))
 
 (defun helm-buffers--match-from-pat (candidate)
-  (let ((regexp-list (cl-loop with pattern = helm-pattern
-                              for p in (helm-mm-split-pattern pattern)
-                              unless (string-match
-                                      "\\`\\(\\*\\|/\\|@\\)" p)
-                              collect p)))
+  (let* ((regexp-list (cl-loop with pattern = helm-pattern
+                               for p in (helm-mm-split-pattern pattern)
+                               unless (string-match
+                                       "\\`\\(\\*\\|/\\|@\\)" p)
+                               collect p))
+         (nofuzzy (cdr regexp-list)))
     (if regexp-list
         (cl-loop for re in regexp-list
-                 always (helm-buffer--match-pattern re candidate))
+                 always (helm-buffer--match-pattern re candidate nofuzzy))
         t)))
 
 (defun helm-buffers--match-from-inside (candidate)
