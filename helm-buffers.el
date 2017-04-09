@@ -158,7 +158,7 @@ Only buffer names are fuzzy matched when this is enabled,
     (define-key map (kbd "C-c =")     'helm-buffer-run-ediff)
     (define-key map (kbd "M-=")       'helm-buffer-run-ediff-merge)
     (define-key map (kbd "C-=")       'helm-buffer-diff-persistent)
-    (define-key map (kbd "M-U")       'helm-buffer-revert-persistent)
+    (define-key map (kbd "M-G")       'helm-buffer-revert-persistent)
     (define-key map (kbd "C-c d")     'helm-buffer-run-kill-persistent)
     (define-key map (kbd "M-D")       'helm-buffer-run-kill-buffers)
     (define-key map (kbd "C-x C-s")   'helm-buffer-save-persistent)
