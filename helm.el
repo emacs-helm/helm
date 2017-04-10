@@ -5384,11 +5384,13 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (defun helm-make-visible-mark (&optional src selection)
   (let* ((source (or src  (helm-get-current-source)))
          (sel    (or selection (helm-get-selection nil nil src)))
-         (o (make-overlay (point-at-bol)
-                          (if (helm-pos-multiline-p)
-                              (or (helm-get-next-candidate-separator-pos)
-                                  (point-max))
-                              (1+ (point-at-eol))))))
+         (selection-end (if (helm-pos-multiline-p)
+                            (or (helm-get-next-candidate-separator-pos)  ; Stays within source
+                                (helm-get-next-header-pos)
+                                (point-max))
+                          ;; Not multiline
+                          (1+ (point-at-eol))))
+         (o (make-overlay (point-at-bol) selection-end)))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source (assoc-default 'name source))
