@@ -499,12 +499,18 @@ i.e same color."
                 (and pos pos-test)
                 (and neg neg-test (not neg-test)))))))
 
+(defvar helm-buffer--memo-hash (make-hash-table :test 'equal))
+(defun helm-buffer--memo-pattern (pattern)
+  (or (gethash pattern helm-buffer--memo-hash)
+      (puthash pattern (helm--mapconcat-pattern pattern)
+               helm-buffer--memo-hash)))
+
 (defun helm-buffer--match-pattern (pattern candidate &optional nofuzzy)
   (let ((bfn (if (and helm-buffers-fuzzy-matching
                       (not nofuzzy)
                       (not helm-migemo-mode)
                       (not (string-match "\\`\\^" pattern)))
-                 #'helm--mapconcat-pattern
+                 #'helm-buffer--memo-pattern
                  #'identity))
         (mfn (if helm-migemo-mode
                  #'helm-mm-migemo-string-match #'string-match)))
