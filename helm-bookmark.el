@@ -592,6 +592,11 @@ than `w3m-browse-url' use it."
 
 (defvar helm-source-addressbook-set
   (helm-build-dummy-source "Addressbook add contact"
+    :filtered-candidate-transformer
+    (lambda (_candidates _source)
+      (list (or (and (not (string= helm-pattern ""))
+                     helm-pattern)
+                "Enter a contact name to record")))
     :action (lambda (candidate)
               (addressbook-bookmark-set-1 candidate))))
 
