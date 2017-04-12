@@ -985,7 +985,9 @@ of the current selected candidate only (See binding below).
 Most Helm actions operate on marked candidates unless marking candidates
 is prevented explicitely for a specific source.
 
-You can mark all visible candidates at once in current source with \\[helm-mark-all] or \\[helm-toggle-all-marks].
+To mark/unmark a candidate use \\[helm-toggle-visible-mark] (See bindings below).
+To mark all visible unmarked candidates at once in current source use \\[helm-mark-all].
+To mark/unmark all candidates at once use \\[helm-toggle-all-marks].
 
 NOTE: These two functions allow marking candidates in all sources with a prefix argument,
 but even if you mark all candidates of all sources, only those of current source will be used
