@@ -5455,7 +5455,8 @@ With a prefix arg mark all visible unmarked candidates in all sources."
           ;; the one used in `helm-mark-all-1', so save POS and back
           ;; to it when loop is finished.
           (goto-char pos)
-          (helm-mark-current-line)))))
+          (helm-mark-current-line)
+          (helm-display-mode-line (helm-get-current-source) t)))))
 
 (defun helm-mark-all-1 (&optional ensure-beg-of-source)
   "Mark all visible unmarked candidates in current source.
