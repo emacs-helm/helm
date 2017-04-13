@@ -45,7 +45,8 @@
   :type 'boolean)
 
 (defcustom helm-bookmark-default-filtered-sources
-  (append '(helm-source-bookmark-files&dirs
+  (append '(helm-source-bookmark-org
+            helm-source-bookmark-files&dirs
             helm-source-bookmark-helm-find-files
             helm-source-bookmark-info
             helm-source-bookmark-gnus
@@ -296,6 +297,11 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
          (isnonfile  (equal filename helm-bookmark--non-file-filename))) 
     (and filename (not isnonfile) (not (bookmark-get-handler bookmark)))))
 
+(defun helm-bookmark-org-file-p (bookmark)
+  (let* ((filename (bookmark-get-filename bookmark)))
+    (or (string-suffix-p ".org" filename t)
+        (string-suffix-p ".org_archive" filename t))))
+
 (defun helm-bookmark-helm-find-files-p (bookmark)
   "Return non-nil if BOOKMARK bookmarks a `helm-find-files' session.
 BOOKMARK is a bookmark name or a bookmark record."
@@ -311,7 +317,8 @@ BOOKMARK is a bookmark name or a bookmark record."
 
 (defun helm-bookmark-uncategorized-bookmark-p (bookmark)
   "Return non--nil if BOOKMARK match no known category."
-  (cl-loop for pred in '(helm-bookmark-addressbook-p
+  (cl-loop for pred in '(helm-bookmark-org-file-p
+                         helm-bookmark-addressbook-p
                          helm-bookmark-gnus-bookmark-p
                          helm-bookmark-w3m-bookmark-p
                          helm-bookmark-woman-man-bookmark-p
@@ -411,6 +418,19 @@ than `w3m-browse-url' use it."
             (bookmark-maybe-load-default-file)
             (helm-init-candidates-in-buffer
                 'global (helm-bookmark-man-setup-alist)))))
+
+;;; Org files
+;;
+(defun helm-bookmark-org-setup-alist ()
+  "Specialized filter function for Org file bookmarks."
+  (helm-bookmark-filter-setup-alist 'helm-bookmark-org-file-p))
+
+(defvar helm-source-bookmark-org
+  (helm-make-source " Bookmarked Org files" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-org-setup-alist)))))
 
 ;;; Gnus
 ;;
