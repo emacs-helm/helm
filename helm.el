@@ -5441,22 +5441,24 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 
 With a prefix arg mark all visible unmarked candidates in all sources."
   (interactive "P")
-  (with-helm-window ; Using `with-helm-buffer' for some unknow reasons infloop.
-    (if (null all)
-        (helm-mark-all-1 t)
-        (let ((pos (point)))
-          (goto-char (point-min))
-          (helm-awhile (helm-get-next-header-pos)
-            (goto-char it)
-            (forward-line 1)
+  (with-helm-alive-p
+    (with-helm-window ; Using `with-helm-buffer' for some unknow reasons infloop.
+      (if (null all)
+          (helm-mark-all-1 t)
+          (let ((pos (point)))
+            (goto-char (point-min))
+            (helm-awhile (helm-get-next-header-pos)
+              (goto-char it)
+              (forward-line 1)
+              (helm-mark-current-line)
+              (helm-mark-all-1))
+            ;; `save-excursion' seems confused if used in addition of
+            ;; the one used in `helm-mark-all-1', so save POS and back
+            ;; to it when loop is finished.
+            (goto-char pos)
             (helm-mark-current-line)
-            (helm-mark-all-1))
-          ;; `save-excursion' seems confused if used in addition of
-          ;; the one used in `helm-mark-all-1', so save POS and back
-          ;; to it when loop is finished.
-          (goto-char pos)
-          (helm-mark-current-line)
-          (helm-display-mode-line (helm-get-current-source) t)))))
+            (helm-display-mode-line (helm-get-current-source) t))))))
+(put 'helm-mark-all 'helm-only t)
 
 (defun helm-mark-all-1 (&optional ensure-beg-of-source)
   "Mark all visible unmarked candidates in current source.
@@ -5464,58 +5466,56 @@ Need to be wrapped in `with-helm-window'.
 Arg ENSURE-BEG-OF-SOURCE ensure we are at beginning of source when
 starting to mark candidates, if handled elsewhere before starting it
 is not needed."
-  (with-helm-alive-p
-    (let* ((src        (helm-get-current-source))
-           (follow     (if (helm-follow-mode-p src) 1 -1))
-           (nomark     (assq 'nomark src))
-           (src-name   (assoc-default 'name src))
-           (filecomp-p (or (helm-file-completion-source-p src)
-                           (string= src-name "Files from Current Directory")))
-           (remote-p (and filecomp-p (file-remote-p helm-pattern))))
-      ;; Note that `cl-letf' prevents edebug working properly.
-      (cl-letf (((symbol-function 'message) #'ignore))
-        (helm-follow-mode -1)
-        (unwind-protect
-             (if nomark
-                 (message "Marking not allowed in this source")
-                 (save-excursion
-                   (when ensure-beg-of-source
-                     (goto-char (helm-get-previous-header-pos))
-                     (forward-line 1))
-                   (let* ((next-head (helm-get-next-header-pos))
-                          (end       (and next-head
-                                          (save-excursion
-                                            (goto-char next-head)
-                                            (forward-line -1)
-                                            (point))))
-                          (maxpoint  (or end (point-max))))
-                     (while (< (point) maxpoint)
-                       (helm-mark-current-line)
-                       (let* ((prefix (get-text-property (point-at-bol) 'display))
-                              (cand   (helm-get-selection nil nil src))
-                              (bn     (and filecomp-p (helm-basename cand))))
-                         ;; Don't mark possibles directories ending with . or ..
-                         ;; autosave files/links and non--existent files.
-                         (unless
-                             (or (helm-this-visible-mark)
-                                 (string= prefix "[?]") ; doesn't match
-                                 (and filecomp-p
-                                      (or (string-match-p ; autosave or dot files
-                                           "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
-                                          ;; We need to test here when not using
-                                          ;; a transformer that put a prefix tag
-                                          ;; before candidate.
-                                          ;; (i.e no [?] prefix on tramp).
-                                          (and remote-p (not (file-exists-p cand))))))
-                           (helm-make-visible-mark src cand)))
-                       (when (helm-pos-multiline-p)
-                         (goto-char
-                          (or (helm-get-next-candidate-separator-pos)
-                              (point-max))))
-                       (forward-line 1))))
-                 (helm-mark-current-line))
-          (helm-follow-mode follow))))))
-(put 'helm-mark-all 'helm-only t)
+  (let* ((src        (helm-get-current-source))
+         (follow     (if (helm-follow-mode-p src) 1 -1))
+         (nomark     (assq 'nomark src))
+         (src-name   (assoc-default 'name src))
+         (filecomp-p (or (helm-file-completion-source-p src)
+                         (string= src-name "Files from Current Directory")))
+         (remote-p (and filecomp-p (file-remote-p helm-pattern))))
+    ;; Note that `cl-letf' prevents edebug working properly.
+    (cl-letf (((symbol-function 'message) #'ignore))
+      (helm-follow-mode -1)
+      (unwind-protect
+           (if nomark
+               (message "Marking not allowed in this source")
+               (save-excursion
+                 (when ensure-beg-of-source
+                   (goto-char (helm-get-previous-header-pos))
+                   (forward-line 1))
+                 (let* ((next-head (helm-get-next-header-pos))
+                        (end       (and next-head
+                                        (save-excursion
+                                          (goto-char next-head)
+                                          (forward-line -1)
+                                          (point))))
+                        (maxpoint  (or end (point-max))))
+                   (while (< (point) maxpoint)
+                     (helm-mark-current-line)
+                     (let* ((prefix (get-text-property (point-at-bol) 'display))
+                            (cand   (helm-get-selection nil nil src))
+                            (bn     (and filecomp-p (helm-basename cand))))
+                       ;; Don't mark possibles directories ending with . or ..
+                       ;; autosave files/links and non--existent files.
+                       (unless
+                           (or (helm-this-visible-mark)
+                               (string= prefix "[?]") ; doesn't match
+                               (and filecomp-p
+                                    (or (string-match-p ; autosave or dot files
+                                         "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
+                                        ;; We need to test here when not using
+                                        ;; a transformer that put a prefix tag
+                                        ;; before candidate.
+                                        ;; (i.e no [?] prefix on tramp).
+                                        (and remote-p (not (file-exists-p cand))))))
+                         (helm-make-visible-mark src cand)))
+                     (when (helm-pos-multiline-p)
+                       (goto-char
+                        (or (helm-get-next-candidate-separator-pos)
+                            (point-max))))
+                     (forward-line 1))))
+               (helm-mark-current-line))
+        (helm-follow-mode follow)))))
 
 (defun helm-unmark-all ()
   "Unmark all candidates in all sources of current helm session."
