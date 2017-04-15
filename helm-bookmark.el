@@ -695,12 +695,14 @@ than `w3m-browse-url' use it."
                                          (file-directory-p isfile))))
                            (propertize trunc 'face 'helm-bookmark-directory
                                        'help-echo isfile))
-                          ;; Non existing files.
-                          ;; We should be safe with `file-exists-p' as
-                          ;; `non-essential' is bound at top level,
-                          ;; but watch out as this behavior is
-                          ;; regularly changing upstream.
-                          ((and isfile (not (file-exists-p isfile)))
+                          ( ;; Non existing files.
+                           (and isfile
+                                ;; Be safe and call `file-exists-p'
+                                ;; only if file is not remote or
+                                ;; remote but connected.
+                                (or (and (file-remote-p isfile)
+                                         (not (file-remote-p isfile nil t)))
+                                    (not (file-exists-p isfile))))
                            (propertize trunc 'face 'helm-bookmark-file-not-found
                                        'help-echo isfile))
                           ( ;; regular files
