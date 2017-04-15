@@ -142,6 +142,11 @@
   "Face used for file bookmarks."
   :group 'helm-bookmark)
 
+(defface helm-bookmark-file-not-found
+    '((t (:foreground "Slategray4")))
+  "Face used for file bookmarks."
+  :group 'helm-bookmark)
+
 (defface helm-bookmark-directory
     '((t (:inherit helm-ff-directory)))
   "Face used for file bookmarks."
@@ -689,6 +694,14 @@ than `w3m-browse-url' use it."
                                     (and (not (file-remote-p isfile))
                                          (file-directory-p isfile))))
                            (propertize trunc 'face 'helm-bookmark-directory
+                                       'help-echo isfile))
+                          ;; Non existing files.
+                          ;; We should be safe with `file-exists-p' as
+                          ;; `non-essential' is bound at top level,
+                          ;; but watch out as this behavior is
+                          ;; regularly changing upstream.
+                          ((and isfile (not (file-exists-p isfile)))
+                           (propertize trunc 'face 'helm-bookmark-file-not-found
                                        'help-echo isfile))
                           ( ;; regular files
                            t
