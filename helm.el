@@ -4578,14 +4578,6 @@ to a list of forms.\n\n")
             (pp-to-string (with-current-buffer helm-buffer (eval v))) "\n"))
   (message "Calculating all helm-related values...Done"))
 
-;;;###autoload
-(defun helm-debug-toggle ()
-  "Enable/disable helm debugging from outside of helm session."
-  (interactive)
-  (setq helm-debug (not helm-debug))
-  (message "Helm Debug is now %s"
-           (if helm-debug "Enabled" "Disabled")))
-
 (defun helm-enable-or-switch-to-debug ()
   "First hit enable helm debugging, second hit switch to debug buffer."
   (interactive)
