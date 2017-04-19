@@ -580,7 +580,7 @@ WHERE can be one of other-window, other-frame."
                                    (if (eq major-mode 'helm-grep-mode)
                                        (current-buffer)
                                        helm-buffer)
-                                 (get-text-property (point-at-bol) 'help-echo))
+                                 (get-text-property (point-at-bol) 'helm-grep-fname))
                                (car split)))
          (tramp-method (file-remote-p (or helm-ff-default-directory
                                           default-directory) 'method))
@@ -655,7 +655,7 @@ If N is positive go forward otherwise go backward."
         (unless (or (string= current-fname
                              (car (helm-grep-split-line sel)))
                     (and (eq major-mode 'helm-grep-mode)
-                         (not (get-text-property (point-at-bol) 'help-echo))))
+                         (not (get-text-property (point-at-bol) 'helm-grep-fname))))
           (funcall mark-maybe)
           (throw 'break nil))))
     (cond ((and (> n 0) (eobp))
@@ -663,7 +663,7 @@ If N is positive go forward otherwise go backward."
            (forward-line 0)
            (funcall mark-maybe))
           ((and (< n 0) (bobp))
-           (helm-aif (next-single-property-change (point-at-bol) 'help-echo)
+           (helm-aif (next-single-property-change (point-at-bol) 'helm-grep-fname)
                (goto-char it)
              (forward-line 1))
            (funcall mark-maybe)))
@@ -1115,7 +1115,8 @@ in recurse, and ignore EXTS, search being made recursively on files matching
     (if (and display-fname lineno str)
         (cons (concat (propertize display-fname
                                   'face 'helm-grep-file
-                                  'help-echo fname)
+                                  'help-echo fname
+                                  'helm-grep-fname fname)
                       ":"
                       (propertize lineno 'face 'helm-grep-lineno)
                       ":"
@@ -1519,7 +1520,7 @@ arg INPUT is what you will have by default at prompt on startup."
   (require 'vc)
   (let* (helm-grep-default-recurse-command
          ;; Expand filename of each candidate with the git root dir.
-         ;; The filename will be in the help-echo prop.
+         ;; The filename will be in the helm-grep-fname prop.
          (helm-grep-default-directory-fn (lambda ()
                                            (vc-find-root directory ".git")))
          (helm-ff-default-directory (funcall helm-grep-default-directory-fn)))
