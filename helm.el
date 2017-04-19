@@ -507,7 +507,16 @@ source name in this variable."
   :type '(repeat (choice string)))
 
 (defcustom helm-prevent-escaping-from-minibuffer t
-  "Prevent escape from minibuffer during the helm session."
+  "Prevent escaping from minibuffer with `other-window' during the helm session."
+  :group 'helm
+  :type 'boolean)
+
+(defcustom helm-prevent-mouse t
+  "Prevent mouse usage during the helm session when non-nil.
+
+Note that this also allow moving out of minibuffer when clicking
+outside of `helm-buffer', up to you to get back to helm by clicking
+back in `helm-buffer' of minibuffer."
   :group 'helm
   :type 'boolean)
 
@@ -2050,7 +2059,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (helm-display-buffer helm-buffer)
                (select-window (helm-window))
                ;; We are now in helm-buffer.
-               (when helm-prevent-escaping-from-minibuffer
+               (when helm-prevent-mouse
                  (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                ;; Add also to update hook otherwise keymap is not updated
@@ -2219,7 +2228,7 @@ Don't use this directly, use instead `helm' with the keyword
                             :around #'helm--advice-ange-ftp-get-passwd))
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
-          (when helm-prevent-escaping-from-minibuffer
+          (when helm-prevent-mouse
             (helm--remap-mouse-mode 1))
           (unless (cl-loop for h in post-command-hook
                            thereis (memq h '(helm--maybe-update-keymap
@@ -3637,6 +3646,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
+        (map       (unless helm-prevent-mouse (make-sparse-keymap)))
         (inhibit-read-only t))
     (when (and (stringp dispvalue)
                (not (zerop (length dispvalue))))
@@ -3647,11 +3657,37 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (and realvalue
              (put-text-property start (point-at-eol)
                                 'helm-realvalue realvalue)))
+      (when map
+        (define-key map [mouse-1] 'helm-mouse-select-candidate)
+        (define-key map [mouse-2] 'ignore)
+        (define-key map [mouse-3] 'helm-select-action)
+        (add-text-properties start (point-at-eol)
+                             `(mouse-face highlight
+                                          keymap ,map
+                                          ;; FIXME: Append this to
+                                          ;; existing help-echo if
+                                          ;; some.
+                                          help-echo "mouse-1: select candidate\nmouse-3: menu actions")))
       (when num
         (put-text-property start (point-at-eol) 'helm-cand-num num))
       (when source
         (put-text-property start (point-at-eol) 'helm-cur-source source))
       (funcall insert-function "\n"))))
+
+(defun helm-mouse-select-candidate (event)
+  (interactive "e")
+  (let* ((window (posn-window (event-end event)))
+         (pos    (posn-point (event-end event)))
+         (map    (get-text-property pos 'keymap)))
+    (unwind-protect
+         (with-current-buffer (window-buffer window)
+           (goto-char pos)
+           (helm-mark-current-line)
+           (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
+           (put-text-property (point-at-bol) (point-at-eol)
+                              'help-echo "mouse-2: execute action"))
+      (select-window (minibuffer-window))
+      (set-buffer (window-buffer window)))))
 
 (defun helm-insert-header-from-source (source)
   "Insert SOURCE name in `helm-buffer' header.
