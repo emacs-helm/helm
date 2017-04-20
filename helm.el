@@ -511,7 +511,7 @@ source name in this variable."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-prevent-mouse t
+(defcustom helm-allow-mouse nil
   "Prevent mouse usage during the helm session when non-nil.
 
 Note that this also allow moving out of minibuffer when clicking
@@ -2059,7 +2059,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (helm-display-buffer helm-buffer)
                (select-window (helm-window))
                ;; We are now in helm-buffer.
-               (when helm-prevent-mouse
+               (unless helm-allow-mouse
                  (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
                (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                ;; Add also to update hook otherwise keymap is not updated
@@ -2228,7 +2228,7 @@ Don't use this directly, use instead `helm' with the keyword
                             :around #'helm--advice-ange-ftp-get-passwd))
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
-          (when helm-prevent-mouse
+          (unless helm-allow-mouse
             (helm--remap-mouse-mode 1))
           (unless (cl-loop for h in post-command-hook
                            thereis (memq h '(helm--maybe-update-keymap
@@ -3646,7 +3646,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
-        (map       (unless helm-prevent-mouse (make-sparse-keymap)))
+        (map       (when helm-allow-mouse (make-sparse-keymap)))
         (inhibit-read-only t))
     (when (and (stringp dispvalue)
                (not (zerop (length dispvalue))))
