@@ -3647,27 +3647,29 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
         (map       (when helm-allow-mouse (make-sparse-keymap)))
-        (inhibit-read-only t))
+        (inhibit-read-only t)
+        end)
     (when (and (stringp dispvalue)
                (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)
+      (setq end (point-at-eol))
       ;; Some sources with candidates-in-buffer have already added
       ;; 'helm-realvalue property when creating candidate buffer.
       (unless (get-text-property start 'helm-realvalue)
         (and realvalue
-             (put-text-property start (point-at-eol)
+             (put-text-property start end
                                 'helm-realvalue realvalue)))
       (when map
         (define-key map [mouse-1] 'helm-mouse-select-candidate)
         (define-key map [mouse-2] 'ignore)
         (define-key map [mouse-3] 'helm-select-action)
-        (add-text-properties start (point-at-eol)
-                             `(mouse-face highlight
-                                          keymap ,map
-                                          ;; FIXME: Append this to
-                                          ;; existing help-echo if
-                                          ;; some.
-                                          help-echo "mouse-1: select candidate\nmouse-3: menu actions")))
+        (add-text-properties
+         start end
+         `(mouse-face highlight
+           keymap ,map
+           help-echo ,(helm-aif (get-text-property start 'help-echo)
+                         (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
+                       "mouse-1: select candidate\nmouse-3: menu actions"))))
       (when num
         (put-text-property start (point-at-eol) 'helm-cand-num num))
       (when source
