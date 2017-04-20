@@ -277,37 +277,53 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
                                           helm-pattern)))))))
 
 (defvar helm-wikipedia--summary-cache (make-hash-table :test 'equal))
+(defun helm-wikipedia-show-summary (input)
+  "Show Wikipedia summary for INPUT in new buffer."
+  (interactive)
+  (let ((buffer (get-buffer-create "*helm wikipedia summary*"))
+        (summary (helm-wikipedia--get-summary input)))
+    (with-current-buffer buffer
+      (visual-line-mode)
+      (erase-buffer)
+      (insert summary)
+      (pop-to-buffer (current-buffer))
+      (goto-char (point-min)))))
+
 (defun helm-wikipedia-persistent-action (candidate)
   (unless (string= (format "Search for '%s' on wikipedia"
                            helm-pattern)
                    (helm-get-selection nil t))
     (message "Fetching summary from Wikipedia...")
     (let ((buf (get-buffer-create "*helm wikipedia summary*"))
-          result mess)
-      (while (progn
-               (setq result (or (gethash candidate helm-wikipedia--summary-cache)
-                                (puthash candidate
-                                         (prog1
-                                             (helm-wikipedia-fetch-summary candidate)
-                                           (setq mess "Done"))
-                                         helm-wikipedia--summary-cache)))
-               (when (and result
-                          (listp result))
-                 (setq candidate (cdr result))
-                 (message "Redirected to %s" candidate)
-                 t)))
-      (if (not result)
-          (message "Error when getting summary.")
-        (with-current-buffer buf
-          (erase-buffer)
-          (setq cursor-type nil)
-          (insert result)
-          (fill-region (point-min) (point-max))
-          (goto-char (point-min)))
-        (display-buffer buf)
-        (message mess)))))
+          (result (helm-wikipedia--get-summary candidate)))
+      (with-current-buffer buf
+        (erase-buffer)
+        (setq cursor-type nil)
+        (insert result)
+        (fill-region (point-min) (point-max))
+        (goto-char (point-min)))
+      (display-buffer buf))))
 
-(defun helm-wikipedia-fetch-summary (input)
+(defun helm-wikipedia--get-summary (input)
+  "Return Wikipedia summary for INPUT as string.
+Follows any redirections from Wikipedia, and stores results in
+`helm-wikipedia--summary-cache'."
+  (let (result)
+    (while (progn
+             (setq result (or (gethash input helm-wikipedia--summary-cache)
+                              (puthash input
+                                       (helm-wikipedia--fetch-summary input)
+                                       helm-wikipedia--summary-cache)))
+             (when (and result
+                        (listp result))
+               (setq input (cdr result))
+               (message "Redirected to %s" input)
+               t)))
+    (unless result
+      (error "Error when getting summary."))
+    result))
+
+(defun helm-wikipedia--fetch-summary (input)
   (let* ((request (concat helm-wikipedia-summary-url
                           (url-hexify-string input))))
     (helm-net--url-retrieve-sync
@@ -346,18 +362,31 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
                  (substring result (match-end 0)))))))))))))
 
 
+(defvar helm-wikipedia-map
+  (let ((map (copy-keymap helm-map)))
+    (define-key map (kbd "<C-return>") 'helm-wikipedia-show-summary-action)
+    map)
+  "Keymap for `helm-wikipedia-suggest'.")
+
 (defvar helm-source-wikipedia-suggest
   (helm-build-sync-source "Wikipedia Suggest"
     :candidates #'helm-wikipedia-suggest-fetch
     :action '(("Wikipedia" . (lambda (candidate)
                                (helm-search-suggest-perform-additional-action
                                 helm-search-suggest-action-wikipedia-url
-                                candidate))))
+                                candidate)))
+              ("Show summary in new buffer (C-RET)" . helm-wikipedia-show-summary))
     :persistent-action #'helm-wikipedia-persistent-action
     :persistent-help "show summary"
     :volatile t
-    :keymap helm-map
+    :keymap helm-wikipedia-map
     :requires-pattern 3))
+
+(defun helm-wikipedia-show-summary-action ()
+  "Exit Helm buffer and call `helm-wikipedia-show-summary' with selected candidate."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-wikipedia-show-summary)))
 
 
 ;;; Web browser functions.
