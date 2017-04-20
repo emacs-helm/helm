@@ -719,7 +719,8 @@ Assume regexp is a pcre based regexp."
              (save-selected-window
                (with-helm-window
                  (helm-aif (get-text-property (point-at-bol) 'help-echo)
-                     (popup-tip (concat " " (abbreviate-file-name it))
+                     (popup-tip (concat " " (abbreviate-file-name
+                                             (replace-regexp-in-string "\n.*" "" it)))
                                 :around nil
                                 :point (save-excursion
                                          (end-of-visual-line) (point)))))))))))
