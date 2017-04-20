@@ -263,6 +263,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates _source)
   "Default filter candidate function for `helm-comp-read'."
+  (when (and (null candidates) (not (string= helm-pattern "")))
+    (setq helm-cr--unknown-pattern-flag t
+          candidates (list helm-pattern)))
   (cl-loop for c in candidates
         for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)
         for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
@@ -463,7 +466,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
             (lambda ()
               (let ((cands (helm-comp-read-get-candidates
                             collection test sort alistp)))
-                (setq helm-cr--unknown-pattern-flag nil)
                 (unless (or (eq must-match t)
                             (string= helm-pattern "")
                             (assoc helm-pattern cands)
@@ -508,6 +510,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        :help-message help-message
                        :action action-fn))
            (src (helm-build-sync-source name
+                  :init (lambda ()
+                          (setq helm-cr--unknown-pattern-flag nil))
                   :candidates get-candidates
                   :match-part match-part
                   :multiline multiline
@@ -523,7 +527,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :action action-fn
                   :volatile volatile))
            (src-1 (helm-build-in-buffer-source name
-                    :data get-candidates
+                    :init (lambda ()
+                            (setq helm-cr--unknown-pattern-flag nil))
+                    :data  (lambda ()
+                             (let ((cands (helm-comp-read-get-candidates
+                                           collection test sort alistp)))
+                               (helm-cr-default default cands)))
                     :match-part match-part
                     :multiline multiline
                     :header-name header-name
