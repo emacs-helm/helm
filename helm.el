@@ -987,6 +987,14 @@ navigation keys. Also note that Helm candidates list by default
 do not display line numbers. Line numbers can be enabled with the
 linum-relative package.
 
+** Using the mouse in helm
+
+A basic usage of mouse is provided when user set `helm-allow-mouse' to non-nil.
+
+- mouse-1 allows selecting candidate.
+- mouse-2 execute default action on selected candidate.
+- mouse-3 pops up menu action.
+
 ** Marked candidates
 
 You can mark candidates to execute an action on them instead
