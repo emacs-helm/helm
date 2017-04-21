@@ -2856,7 +2856,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
    helm-exit-idle-delay nil
    (lambda () (setq helm--in-update nil))))
 
-(add-hook 'helm-after-update-hook #'helm--reset-update-flag)
+;; (add-hook 'helm-after-update-hook #'helm--reset-update-flag)
 
 
 ;; All candidates
@@ -3512,7 +3512,8 @@ without recomputing them, it should be a list of lists."
                       do (helm-render-source src mtc))
              ;; Move to first line only when there is matches
              ;; to avoid cursor moving upside down (issue #1703).
-             (helm--update-move-first-line)))
+             (helm--update-move-first-line)
+             (helm--reset-update-flag)))
       (let ((src (or source (helm-get-current-source))))
         (unless (assq 'candidates-process src)
           (helm-display-mode-line src)
@@ -3816,7 +3817,8 @@ this additional info after the source name by overlay."
         ;; FIXME Don't hardcode follow delay.
         (helm-follow-execute-persistent-action-maybe 0.5)
         (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-after-update-hook))))
+        (helm-log-run-hook 'helm-after-update-hook)
+        (helm--reset-update-flag))))
 
 (defun helm-process-deferred-sentinel-hook (process event file)
   "Defer remote processes in sentinels.
@@ -4538,8 +4540,10 @@ don't exit and send message 'no match'."
   (with-helm-alive-p
     (if (and (helm--updating-p)
              (null helm--reading-passwd-or-string))
-        (progn (message "[Display not ready]")
-               (sit-for 0.5) (message nil))
+        (progn
+          (message "[Display not ready]")
+          (sit-for 0.5) (message nil)
+          (helm-update))
         (helm-exit-minibuffer))))
 (put 'helm-maybe-exit-minibuffer 'helm-only t)
 
