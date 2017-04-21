@@ -1115,7 +1115,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
     (if (and display-fname lineno str)
         (cons (concat (propertize display-fname
                                   'face 'helm-grep-file
-                                  'help-echo fname
+                                  'help-echo (abbreviate-file-name fname)
                                   'helm-grep-fname fname)
                       ":"
                       (propertize lineno 'face 'helm-grep-lineno)
