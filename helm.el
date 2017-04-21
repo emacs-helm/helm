@@ -3699,11 +3699,15 @@ respectively `helm-cand-num' and `helm-cur-source'."
            (goto-char pos)
            (helm-mark-current-line)
            (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
-           (put-text-property (point-at-bol) (point-at-eol)
-                              'help-echo (helm-aif (get-text-property pos 'help-echo)
-                                             (concat (replace-regexp-in-string "\n.*" "" it)
-                                                     "\nmouse-2: execute action\nmouse-3: menu actions")
-                                           "mouse-2: execute action\nmouse-3: menu actions")))
+           (put-text-property
+            (point-at-bol) (point-at-eol)
+            ;; FIXME: Once help-echo is modified here, it is no more
+            ;; reset to nonselected candidate help-echo when the
+            ;; candidate is unselected.
+            'help-echo (helm-aif (get-text-property pos 'help-echo)
+                           (concat (replace-regexp-in-string "\n.*" "" it)
+                                   "\nmouse-2: execute action\nmouse-3: menu actions")
+                         "mouse-2: execute action\nmouse-3: menu actions")))
       (select-window (minibuffer-window))
       (set-buffer (window-buffer window)))))
 
