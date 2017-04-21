@@ -995,6 +995,10 @@ A basic usage of mouse is provided when user set `helm-allow-mouse' to non-nil.
 - mouse-2 execute default action on selected candidate.
 - mouse-3 pops up menu action.
 
+NOTE: When mouse usage is enabled in helm, it allow also clicking around and quit
+the minibuffer focus, it will be up to you to click back to helm buffer or minibuffer
+to retrieve control of your helm session.
+
 ** Marked candidates
 
 You can mark candidates to execute an action on them instead
