@@ -776,7 +776,17 @@ See documentation of `completing-read' and `all-completions' for details."
                 ;; If we are here `helm-mode' is now disabled.
                 def-com
                 (apply def-com def-args))
-               (t ; Fall back to classic `helm-comp-read'.
+               (;; Try to use an optimized helm with in-buffer if
+                ;; collection is a fixed list.
+                (and (listp collection)
+                     (not (functionp collection))
+                     (not (byte-code-function-p collection)))
+                (helm-completing-read-with-cands-in-buffer
+                 prompt collection predicate require-match
+                 initial-input hist def inherit-input-method
+                 str-command buf-name))
+               (;; Fall back to classic `helm-comp-read'.
+                t
                 (helm-completing-read-default-1
                  prompt collection predicate require-match
                  initial-input hist def inherit-input-method
