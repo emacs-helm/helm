@@ -2705,11 +2705,11 @@ Use it for non--interactive calls of `helm-find-files'."
                :default def
                :prompt "Find files or url: "
                :buffer "*helm find files*")
-      (helm-attrset 'resume (lambda ()
-                              (setq helm-ff-default-directory
-                                    helm-ff-default-directory
-                                    helm-ff-last-expanded
-                                    helm-ff-last-expanded))
+      (helm-attrset 'resume `(lambda ()
+                               (setq helm-ff-default-directory
+                                     ,helm-ff-default-directory
+                                     helm-ff-last-expanded
+                                     ,helm-ff-last-expanded))
                     helm-source-find-files)
       (setq helm-ff-default-directory nil))))
 
