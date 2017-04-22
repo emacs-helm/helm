@@ -3710,7 +3710,8 @@ respectively `helm-cand-num' and `helm-cur-source'."
        'help-echo (helm-aif (get-text-property pos 'help-echo)
                       (if (string-match "mouse-1: select candidate" it)
                           (replace-match "mouse-2: execute action" t t it)
-                          "mouse-2: execute action\nmouse-3: menu actions"))))))
+                          "mouse-2: execute action\nmouse-3: menu actions")
+                    "mouse-2: execute action\nmouse-3: menu actions")))))
 
 (defun helm-mouse-select-candidate (event)
   (interactive "e")
