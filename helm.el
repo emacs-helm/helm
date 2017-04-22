@@ -3689,6 +3689,17 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (put-text-property start (point-at-eol) 'helm-cur-source source))
       (funcall insert-function "\n"))))
 
+(defun helm-mouse-reset-selection-help-echo ()
+  (let* ((start (overlay-start helm-selection-overlay))
+         (end   (overlay-end helm-selection-overlay))
+         (help-echo (get-text-property start 'help-echo)))
+    (when (and help-echo
+               (string-match "mouse-2: execute action" help-echo))
+      (put-text-property
+       start end
+       'help-echo (replace-match "mouse-1: select candidate"
+                                 t t help-echo)))))
+
 (defun helm-mouse-select-candidate (event)
   (interactive "e")
   (let* ((window (posn-window (event-end event)))
@@ -3696,19 +3707,17 @@ respectively `helm-cand-num' and `helm-cur-source'."
          (map    (get-text-property pos 'keymap)))
     (unwind-protect
          (with-current-buffer (window-buffer window)
-           (let* ((start (overlay-start helm-selection-overlay))
-                  (end   (overlay-end helm-selection-overlay))
-                  (help-echo (get-text-property start 'help-echo)))
-             (when (string-match "mouse-2: execute action" help-echo)
-               (put-text-property
-                start end
-                'help-echo (replace-match "mouse-1: select candidate"
-                                          t t help-echo))))
+           (helm-mouse-reset-selection-help-echo)
            (goto-char pos)
+           (when (helm-pos-multiline-p)
+             (goto-char (or (helm-get-previous-candidate-separator-pos)
+                            (helm-get-previous-header-pos)))
+             (forward-line 1))
            (helm-mark-current-line)
            (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
            (put-text-property
-            (point-at-bol) (point-at-eol)
+            helm-selection-point
+            (overlay-end helm-selection-overlay)
             'help-echo (helm-aif (get-text-property pos 'help-echo)
                            (if (string-match "mouse-1: select candidate" it)
                                (replace-match "mouse-2: execute action" t t it)
@@ -4229,6 +4238,7 @@ Key arg DIRECTION can be one of:
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
+        (when helm-allow-mouse (helm-mouse-reset-selection-help-echo))
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
         (and (memq direction '(next previous))
