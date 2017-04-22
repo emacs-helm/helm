@@ -3715,6 +3715,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
                                "mouse-2: execute action\nmouse-3: menu actions")))
       (select-window (minibuffer-window))
       (set-buffer (window-buffer window))))))
+(put 'helm-mouse-select-candidate 'helm-only t)
 
 (defun helm-insert-header-from-source (source)
   "Insert SOURCE name in `helm-buffer' header.
