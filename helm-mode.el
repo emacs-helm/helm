@@ -778,6 +778,10 @@ See documentation of `completing-read' and `all-completions' for details."
                 (apply def-com def-args))
                (;; Try to use an optimized helm with in-buffer if
                 ;; collection is a fixed list.
+                ;; FIXME: Why limiting this to lists ? AFAIK all
+                ;; COLLECTION even when functions are returning a
+                ;; plain list from `helm-comp-read-get-candidates' so
+                ;; perhaps I can use this everywhere by default ?
                 (and (listp collection)
                      (not (functionp collection))
                      (not (byte-code-function-p collection)))
