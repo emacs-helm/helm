@@ -3696,20 +3696,25 @@ respectively `helm-cand-num' and `helm-cur-source'."
          (map    (get-text-property pos 'keymap)))
     (unwind-protect
          (with-current-buffer (window-buffer window)
+           (let* ((start (overlay-start helm-selection-overlay))
+                  (end   (overlay-end helm-selection-overlay))
+                  (help-echo (get-text-property start 'help-echo)))
+             (when (string-match "mouse-2: execute action" help-echo)
+               (put-text-property
+                start end
+                'help-echo (replace-match "mouse-1: select candidate"
+                                          t t help-echo))))
            (goto-char pos)
            (helm-mark-current-line)
            (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
            (put-text-property
             (point-at-bol) (point-at-eol)
-            ;; FIXME: Once help-echo is modified here, it is no more
-            ;; reset to nonselected candidate help-echo when the
-            ;; candidate is unselected.
             'help-echo (helm-aif (get-text-property pos 'help-echo)
-                           (concat (replace-regexp-in-string "\n.*" "" it)
-                                   "\nmouse-2: execute action\nmouse-3: menu actions")
-                         "mouse-2: execute action\nmouse-3: menu actions")))
+                           (if (string-match "mouse-1: select candidate" it)
+                               (replace-match "mouse-2: execute action" t t it)
+                               "mouse-2: execute action\nmouse-3: menu actions")))
       (select-window (minibuffer-window))
-      (set-buffer (window-buffer window)))))
+      (set-buffer (window-buffer window))))))
 
 (defun helm-insert-header-from-source (source)
   "Insert SOURCE name in `helm-buffer' header.
