@@ -3689,7 +3689,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (put-text-property start (point-at-eol) 'helm-cur-source source))
       (funcall insert-function "\n"))))
 
-(defun helm-mouse-reset-selection-help-echo ()
+(defun helm--mouse-reset-selection-help-echo ()
   (let* ((start (overlay-start helm-selection-overlay))
          (end   (overlay-end helm-selection-overlay))
          (help-echo (get-text-property start 'help-echo)))
@@ -3700,7 +3700,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
        'help-echo (replace-match "mouse-1: select candidate"
                                  t t help-echo)))))
 
-(defun helm-bind-mouse-for-selection (pos)
+(defun helm--bind-mouse-for-selection (pos)
   (let ((map (get-text-property pos 'keymap)))
     (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
     (put-text-property
@@ -3717,7 +3717,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
          (pos    (posn-point (event-end event))))
     (unwind-protect
          (with-current-buffer (window-buffer window)
-           (helm-mouse-reset-selection-help-echo)
+           (helm--mouse-reset-selection-help-echo)
            (goto-char pos)
            (when (helm-pos-multiline-p)
              (goto-char (or (helm-get-previous-candidate-separator-pos)
@@ -4241,7 +4241,7 @@ Key arg DIRECTION can be one of:
                 (not (helm-window)))
       (with-helm-window
         (when helm-allow-mouse
-          (helm-mouse-reset-selection-help-echo))
+          (helm--mouse-reset-selection-help-echo))
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
         (and (memq direction '(next previous))
@@ -4496,7 +4496,7 @@ candidates."
        (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when helm-allow-mouse
-      (helm-bind-mouse-for-selection helm-selection-point))))
+      (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
   "Maybe ask for confirmation when exiting helm.
