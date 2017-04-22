@@ -3984,6 +3984,7 @@ If action buffer is selected, back to the helm buffer."
   (with-current-buffer (get-buffer-create helm-action-buffer)
     (erase-buffer)
     (buffer-disable-undo)
+    (setq cursor-type nil)
     (set-window-buffer (if (and helm-show-action-window-other-window
                                 helm-always-two-windows
                                 (eq helm-split-window-state 'vertical))
