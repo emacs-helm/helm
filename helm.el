@@ -3702,14 +3702,15 @@ respectively `helm-cand-num' and `helm-cur-source'."
 
 (defun helm--bind-mouse-for-selection (pos)
   (let ((map (get-text-property pos 'keymap)))
-    (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
-    (put-text-property
-     helm-selection-point
-     (overlay-end helm-selection-overlay)
-     'help-echo (helm-aif (get-text-property pos 'help-echo)
-                    (if (string-match "mouse-1: select candidate" it)
-                        (replace-match "mouse-2: execute action" t t it)
-                        "mouse-2: execute action\nmouse-3: menu actions")))))
+    (when map
+      (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
+      (put-text-property
+       helm-selection-point
+       (overlay-end helm-selection-overlay)
+       'help-echo (helm-aif (get-text-property pos 'help-echo)
+                      (if (string-match "mouse-1: select candidate" it)
+                          (replace-match "mouse-2: execute action" t t it)
+                          "mouse-2: execute action\nmouse-3: menu actions"))))))
 
 (defun helm-mouse-select-candidate (event)
   (interactive "e")
