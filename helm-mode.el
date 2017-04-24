@@ -691,7 +691,8 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
   ;; So (re)calculate collection outside of main helm-session.
-  (let ((cands (all-completions (or init "") collection)))
+  (let* ((cands (helm-comp-read-get-candidates
+                 collection test nil nil "")))
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
                                     name buffer t)))
