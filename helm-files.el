@@ -416,7 +416,8 @@ Remote filesystem are generally mounted with sshfs."
     (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
-                                  nil nil 'helm-ff-delete-char-backward--exit-fn)
+                                  '((C-backspace . helm-ff-run-toggle-auto-update))
+                                  nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action))
@@ -436,7 +437,8 @@ Remote filesystem are generally mounted with sshfs."
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
-                                  nil nil 'helm-ff-delete-char-backward--exit-fn)
+                                  '((C-backspace . helm-ff-run-toggle-auto-update))
+                                  nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
       (define-key map (kbd "<right>")     'helm-execute-persistent-action)
@@ -1103,10 +1105,15 @@ This doesn't replace inside the files, only modify filenames."
 (put 'helm-ff-run-query-replace-regexp 'helm-only t)
 
 (defun helm-ff-toggle-auto-update (_candidate)
-  (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
-  (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
-  (message "[Auto expansion %s]"
-           (if helm-ff-auto-update-flag "enabled" "disabled")))
+  (if helm-ff--deleting-char-backward
+      (progn
+        (message "[Auto expansion disabled]")
+        (sit-for 1) (message nil)
+        (setq helm-ff--auto-update-state nil))
+      (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
+      (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
+      (message "[Auto expansion %s]"
+               (if helm-ff-auto-update-flag "enabled" "disabled"))))
 
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
