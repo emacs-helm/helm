@@ -538,6 +538,23 @@ NOTE: Probably not supported on some systems (e.g Windows)."
   (helm :sources 'helm-source-wikipedia-suggest
         :buffer "*helm wikipedia*"))
 
+;;;###autoload
+(defun helm-google-suggest-at-point (pattern-at-point)
+  "Preconfigured `helm' for google search with google suggest,
+  by default use the word at point point."
+  (interactive (list (thing-at-point 'word)))
+  (helm :sources 'helm-source-google-suggest
+        :buffer "*helm google*"
+        :input pattern-at-point))
+
+;;;###autoload
+(defun helm-wikipedia-suggest-at-point (pattern-at-point)
+  "Preconfigured `helm' for wikipedia search with wikipedia suggest,
+  by default use the word at point"
+  (interactive (list (thing-at-point 'word)))
+  (helm :sources 'helm-source-wikipedia-suggest
+        :buffer "*helm wikipedia*"
+        :input pattern-at-point))
 
 (provide 'helm-net)
 
