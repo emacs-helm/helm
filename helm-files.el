@@ -416,7 +416,8 @@ Remote filesystem are generally mounted with sshfs."
     (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
-                                  '((C-backspace . helm-ff-run-toggle-auto-update))
+                                  '((C-backspace . helm-ff-run-toggle-auto-update)
+                                    ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
@@ -437,7 +438,8 @@ Remote filesystem are generally mounted with sshfs."
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
-                                  '((C-backspace . helm-ff-run-toggle-auto-update))
+                                  '((C-backspace . helm-ff-run-toggle-auto-update)
+                                    ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
     (when helm-ff-lynx-style-map
       (define-key map (kbd "<left>")      'helm-find-files-up-one-level)

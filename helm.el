@@ -133,8 +133,8 @@ Arg EXIT-FN specifies a function to run on exit.
 For any other keys pressed, run their assigned command as defined
 in MAP and then exit the loop running EXIT-FN, if specified.
 
-NOTE: SUBKEY and OTHER-SUBKEYS bindings support char syntax only
-\(e.g ?n), so don't use strings or vectors to define them."
+NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax and
+vectors, so don't use strings to define them."
   (declare (indent 1))
   (define-key map key
     (lambda ()
