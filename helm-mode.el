@@ -647,7 +647,6 @@ Extra optional arg CANDS-IN-BUFFER mean use `candidates-in-buffer'
 method which is faster.
 It should be used when candidate list don't need to rebuild dynamically."
   (let ((history (or (car-safe hist) hist))
-        (alistp cands-in-buffer)
         (initial-input (helm-aif (pcase init
                                    ((pred (stringp)) init)
                                    ;; INIT is a cons cell.
@@ -661,7 +660,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp alistp
+     :alistp nil
      :name name
      :requires-pattern (if (and (stringp default)
                                 (string= default "")
@@ -704,7 +703,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   "Default `helm-mode' handler for all `completing-read'."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
-                                  name buffer))
+                                  name buffer t))
 
 (cl-defun helm--completing-read-default
     (prompt collection &optional
