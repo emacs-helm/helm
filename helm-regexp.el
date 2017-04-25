@@ -487,17 +487,43 @@ Same as `helm-moccur-goto-line' but go in new frame."
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
-      (let ((inhibit-read-only t))
+      (let ((inhibit-read-only t)
+            (map (make-sparse-keymap)))
         (erase-buffer)
         (insert "-*- mode: helm-moccur -*-\n\n"
                 (format "Moccur Results for `%s':\n\n" helm-input))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
-                    (buffer-substring (point) (point-max))))))
+                    (buffer-substring (point) (point-max)))))
+        (save-excursion
+          (while (not (eobp))
+            (add-text-properties
+             (point-at-bol) (point-at-eol)
+             `(keymap ,map
+               help-echo ,(concat
+                           (buffer-file-name
+                            (get-buffer (get-text-property
+                                         (point) 'buffer-name)))
+                           "\nmouse-1: set point\nmouse-2: jump to selection")
+               mouse-face highlight))
+            (define-key map [mouse-1] 'mouse-set-point)
+            (define-key map [mouse-2] 'helm-moccur-mode-mouse-goto-line)
+            (define-key map [mouse-3] 'ignore)
+            (forward-line 1))))
       (helm-moccur-mode))
     (pop-to-buffer buf)
     (message "Helm Moccur Results saved in `%s' buffer" buf)))
+
+(defun helm-moccur-mode-mouse-goto-line (event)
+  (interactive "e")
+  (let* ((window (posn-window (event-end event)))
+         (pos    (posn-point (event-end event))))
+    (with-selected-window window
+      (when (eq major-mode 'helm-moccur-mode)
+        (goto-char pos)
+        (helm-moccur-mode-goto-line)))))
+(put 'helm-moccur-mode-mouse-goto-line 'helm-only t)
 
 ;;;###autoload
 (define-derived-mode helm-moccur-mode

@@ -779,6 +779,7 @@ If N is positive go forward otherwise go backward."
       (when (eq major-mode 'helm-grep-mode)
         (goto-char pos)
         (helm-grep-mode-jump)))))
+(put 'helm-grep-mode-mouse-jump 'helm-only t)
 
 (define-derived-mode helm-grep-mode
     special-mode "helm-grep"
