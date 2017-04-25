@@ -3611,7 +3611,9 @@ candidates from `helm-async-outer-limit-hook'."
   (with-helm-buffer
     (let ((get-cands (lambda (source)
                        (let ((fns (assoc-default 'redisplay source))
-                             candidates helm-move-to-line-cycle-in-source)
+                             candidates
+                             helm-move-to-line-cycle-in-source
+                             helm-allow-mouse)
                          (helm-goto-source source)
                          (helm-next-line)
                          (helm-awhile (condition-case-unless-debug nil
@@ -3672,7 +3674,10 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (and realvalue
              (put-text-property start end
                                 'helm-realvalue realvalue)))
-      (when map
+      (when (and map
+                 ;; Don't overwrite mouse properties when
+                 ;; redisplaying.
+                 (not (get-text-property start 'keymap)))
         (define-key map [mouse-1] 'helm-mouse-select-candidate)
         (define-key map [mouse-2] 'ignore)
         (define-key map [mouse-3] 'helm-select-action)
