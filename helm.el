@@ -3853,7 +3853,7 @@ this additional info after the source name by overlay."
   (helm-aif (get-buffer-window helm-buffer 'visible)
       (with-selected-window it
         (helm-skip-noncandidate-line 'next)
-        (helm-mark-current-line)
+        (helm-mark-current-line nil 'nomouse)
         ;; FIXME Don't hardcode follow delay.
         (helm-follow-execute-persistent-action-maybe 0.5)
         (helm-display-mode-line (helm-get-current-source))
@@ -4487,7 +4487,7 @@ first source."
   (with-helm-alive-p (helm--follow-action -1)))
 (put 'helm-follow-action-backward 'helm-only t)
 
-(defun helm-mark-current-line (&optional resumep)
+(defun helm-mark-current-line (&optional resumep nomouse)
   "Move `helm-selection-overlay' to current line.
 Note that this is unrelated to visible marks used for marking
 candidates."
@@ -4507,7 +4507,7 @@ candidates."
                (point-max)))
        (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
-    (when helm-allow-mouse
+    (when (and helm-allow-mouse (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
