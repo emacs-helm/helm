@@ -748,13 +748,16 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 
 (defun helm-ff-pdfgrep (_candidate)
   "Default action to pdfgrep files from `helm-find-files'."
-  (let ((cands (cl-loop for file in (helm-marked-candidates :with-wildcard t)
-                     if (or (string= (file-name-extension file) "pdf")
-                            (string= (file-name-extension file) "PDF"))
-                     collect file))
-        (helm-pdfgrep-default-function 'helm-pdfgrep-init))
+  (let* ((recurse nil)
+         (cands (cl-loop for file in (helm-marked-candidates :with-wildcard t)
+                         for dir = (file-directory-p file)
+                         when dir do (setq recurse t)
+                         when (or dir
+                                  (string= (file-name-extension file) "pdf")
+                                  (string= (file-name-extension file) "PDF"))
+                         collect file)))
     (when cands
-      (helm-do-pdfgrep-1 cands))))
+      (helm-do-pdfgrep-1 cands recurse))))
 
 (defun helm-ff-etags-select (candidate)
   "Default action to jump to etags from `helm-find-files'."

@@ -124,6 +124,14 @@ when used matchs will be highlighted according to GREP_COLORS env var."
   :group 'helm-grep
   :type  'string)
 
+(defcustom helm-pdfgrep-default-recurse-command
+  "pdfgrep --color always -rniH %s %s"
+  "Default recurse command for pdfgrep.
+Option \"--color always\" is supported starting helm version 1.7.8,
+when used matchs will be highlighted according to GREP_COLORS env var."
+  :group 'helm-grep
+  :type  'string)
+
 (defcustom helm-grep-use-ioccur-style-keys t
   "Use Arrow keys to jump to occurences."
   :group 'helm-grep
@@ -1243,7 +1251,7 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
 ;;  and a pdf-reader (e.g xpdf) are needed.
 ;;
 (defvar helm-pdfgrep-default-function 'helm-pdfgrep-init)
-(defun helm-pdfgrep-init (only-files)
+(defun helm-pdfgrep-init (only-files &optional recurse)
   "Start an asynchronous pdfgrep process in ONLY-FILES list."
   (let* ((default-directory (or helm-ff-default-directory
                                 default-directory))
@@ -1254,7 +1262,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                                 only-files)
                       only-files)
                     default-directory))
-         (cmd-line (format helm-pdfgrep-default-command
+         (cmd-line (format (if recurse
+                               helm-pdfgrep-default-recurse-command
+                               helm-pdfgrep-default-command)
                            helm-pattern
                            fnargs))
          process-connection-type)
@@ -1283,11 +1293,11 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
              (helm-log "Error: Pdf grep %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
-(defun helm-do-pdfgrep-1 (only)
+(defun helm-do-pdfgrep-1 (only &optional recurse)
   "Launch pdfgrep with a list of ONLY files."
   (unless (executable-find "pdfgrep")
     (error "Error: No such program `pdfgrep'."))
-  (let* (helm-grep-in-recurse) ; recursion is never used in pdfgrep.
+  (let (helm-grep-in-recurse) ; recursion is implemented differently in *pdfgrep.
     ;; When called as action from an other source e.g *-find-files
     ;; we have to kill action buffer.
     (when (get-buffer helm-action-buffer)
@@ -1301,7 +1311,8 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                         (setq helm-ff-default-directory (or helm-ff-default-directory
                                                             default-directory)))
                 :candidates-process (lambda ()
-                                      (funcall helm-pdfgrep-default-function helm-pdfgrep-targets))
+                                      (funcall helm-pdfgrep-default-function
+                                               helm-pdfgrep-targets recurse))
                 :nohighlight t
                 :nomark t
                 :filter-one-by-one #'helm-grep-filter-one-by-one
