@@ -745,17 +745,40 @@ If N is positive go forward otherwise go backward."
                                   (helm-default-directory)
                                   default-directory))
       (setq buffer-read-only t)
-      (let ((inhibit-read-only t))
+      (let ((inhibit-read-only t)
+            (map (make-sparse-keymap)))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
                 (format "%s Results for `%s':\n\n" src-name pattern))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
-                    (buffer-substring (point) (point-max))))))
+                    (buffer-substring (point) (point-max)))))
+        (save-excursion
+          (while (not (eobp))
+            (add-text-properties (point-at-bol) (point-at-eol)
+                                 `(keymap ,map
+                                          help-echo ,(concat
+                                                      (get-text-property
+                                                       (point) 'helm-grep-fname)
+                                                      "\nmouse-1: set point\nmouse-2: jump to selection")
+                                          mouse-face highlight))
+            (define-key map [mouse-1] 'mouse-set-point)
+            (define-key map [mouse-2] 'helm-grep-mode-mouse-jump)
+            (define-key map [mouse-3] 'ignore)
+            (forward-line 1))))
       (helm-grep-mode))
     (pop-to-buffer buf)
     (message "Helm %s Results saved in `%s' buffer" src-name buf)))
+
+(defun helm-grep-mode-mouse-jump (event)
+  (interactive "e")
+  (let* ((window (posn-window (event-end event)))
+         (pos    (posn-point (event-end event))))
+    (with-selected-window window
+      (when (eq major-mode 'helm-grep-mode)
+        (goto-char pos)
+        (helm-grep-mode-jump)))))
 
 (define-derived-mode helm-grep-mode
     special-mode "helm-grep"
