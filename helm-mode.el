@@ -704,7 +704,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   "Default `helm-mode' handler for all `completing-read'."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
-                                  name buffer t))
+                                  name buffer))
 
 (cl-defun helm--completing-read-default
     (prompt collection &optional
