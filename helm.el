@@ -4731,6 +4731,8 @@ Optional argument SOURCE is a Helm source object."
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
+    (when helm-allow-mouse
+      (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
     (helm-display-mode-line (or source (helm-get-current-source)))
     (helm-log-run-hook 'helm-after-preselection-hook)))
