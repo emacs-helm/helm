@@ -985,7 +985,7 @@ C-c <n> => executes default action on number <n> candidate after current selecte
 n is limited only to 1 through 9. For larger jumps use other
 navigation keys. Also note that Helm candidates list by default
 do not display line numbers. Line numbers can be enabled with the
-linum-relative package.
+\[[https://github.com/coldnew/linum-relative][linum-relative]] package and `helm-linum-relative-mode'.
 
 ** Using the mouse in helm
 
