@@ -560,7 +560,9 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                        ,(- (float-time) start-time)
                                        (helm-get-candidate-number))
                                       'face 'helm-grep-finish))))
-                      (force-mode-line-update)))
+                      (force-mode-line-update)
+                      (when helm-allow-mouse
+                        (helm--bind-mouse-for-selection helm-selection-point))))
                    ;; Catch error output in log.
                    (t (helm-log
                        "Error: %s %s"
@@ -1289,7 +1291,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
                                          (max (1- (count-lines
                                                    (point-min) (point-max))) 0))
                                  'face 'helm-grep-finish))))
-                 (force-mode-line-update))
+                 (force-mode-line-update)
+                 (when helm-allow-mouse
+                   (helm--bind-mouse-for-selection helm-selection-point)))
              (helm-log "Error: Pdf grep %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
@@ -1466,7 +1470,9 @@ if available with current AG version."
                                      ,(- (float-time) start-time)
                                      (helm-get-candidate-number))
                                     'face 'helm-grep-finish))))
-                    (force-mode-line-update)))
+                    (force-mode-line-update)
+                    (when helm-allow-mouse
+                      (helm--bind-mouse-for-selection helm-selection-point))))
                  (t (helm-log
                      "Error: %s %s"
                      proc-name
