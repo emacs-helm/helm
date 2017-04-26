@@ -251,22 +251,51 @@ vectors, so don't use strings to define them."
                `(lambda ()
                   (interactive)
                   (helm-select-nth-action ,n))))
-    ;; Bind keys to allow executing default action
-    ;; on first 9 candidates before and after selection.
-    (cl-loop for n from 1 to 9
-             for key = (format "C-c %d" n)
-             for key- = (format "C-x %d" n)
-             for fn = `(lambda ()
-                         (interactive)
-                         (helm-execute-selection-action-at-nth ,n))
-             for fn- = `(lambda ()
-                          (interactive)
-                          (helm-execute-selection-action-at-nth ,(- n)))
-             do (progn
-                  (define-key map (kbd key) fn)
-                  (define-key map (kbd key-) fn-)))
     map)
   "Keymap for helm.")
+
+(defun helm--action-at-nth-set-fn-1 (value &optional negative)
+  (cl-loop for n from 1 to 9
+        for key = (format value n)
+        for sym = (make-symbol (format "helm-execute-selection-action-at-nth-+%d" n))
+        for fn = `(lambda ()
+                     (interactive)
+                     (helm-execute-selection-action-at-nth ,(if negative (- n) n)))
+        do (progn
+             (defalias sym fn)
+             (define-key helm-map (kbd key) sym))))
+
+(defun helm--action-at-nth-set-fn- (var val)
+  (set var val)
+  (helm--action-at-nth-set-fn-1 val 'negative))
+
+(defun helm--action-at-nth-set-fn+ (var val)
+  (set var val)
+  (helm--action-at-nth-set-fn-1 val))
+
+(defcustom helm-action-at-nth-negative-prefix-key "C-x %d"
+  "The prefix key to execute default action on nth <-n> candidate.
+
+This is a format spec where %d will be replaced by the candidate
+number.
+
+NOTE: `setq' have no effect until you restart emacs, use customize for
+immediate effect."
+  :group 'helm
+  :type 'string
+  :set #'helm--action-at-nth-set-fn-)
+
+(defcustom helm-action-at-nth-positive-prefix-key "C-c %d"
+  "The prefix key to execute default action on nth <+n> candidate.
+
+This is a format spec where %d will be replaced by the candidate
+number.
+
+NOTE: `setq' have no effect until you restart emacs, use customize for
+immediate effect."
+  :group 'helm
+  :type 'string
+  :set #'helm--action-at-nth-set-fn+)
 
 
 (defgroup helm nil
