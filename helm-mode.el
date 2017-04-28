@@ -43,6 +43,7 @@
     (ffap-alternate-file . nil)
     (tmm-menubar . nil)
     (find-file . nil)
+    (find-file-at-point . helm-completing-read-sync-default-handler)
     (execute-extended-command . nil))
   "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
 Each entry is a cons cell like \(emacs_command . completing-read_handler\)
@@ -695,6 +696,15 @@ It should be used when candidate list don't need to rebuild dynamically."
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
                                     name buffer t)))
+
+(defun helm-completing-read-sync-default-handler
+    (prompt collection test require-match
+     init hist default inherit-input-method
+     name buffer)
+  "`helm-mode' handler using sync source as backend."
+  (helm-completing-read-default-1 prompt collection test require-match
+                                  init hist default inherit-input-method
+                                  name buffer))
 
 (defun helm-completing-read-default-handler
     (prompt collection test require-match
