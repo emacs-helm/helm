@@ -2006,8 +2006,7 @@ systems."
   ;; Allow creation of filenames containing a backslash.
   (cl-loop with bad = '((92 . ""))
         for i across fname
-        for isbad = (assq i bad)
-        if isbad concat (cdr isbad)
+        if (assq i bad) concat (cdr it)
         else concat (string i)))
 
 (defun helm-ff-fuzzy-matching-p ()
