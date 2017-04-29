@@ -51,7 +51,8 @@
 (declare-function async-byte-recompile-directory "ext:async-bytecomp.el")
 
 (defun helm-el-package--init ()
-  (let (package-menu-async)
+  (let (package-menu-async
+        (inhibit-read-only t))
     (when (null package-alist)
       (setq helm-el-package--show-only 'all))
     (when (and (fboundp 'package--removable-packages)
@@ -76,6 +77,8 @@
                'global
              (with-current-buffer (get-buffer "*Packages*")
                (setq helm-el-package--tabulated-list tabulated-list-entries)
+               (remove-text-properties (point-min) (point-max)
+                                       '(read-only button follow-link category))
                (buffer-string)))
            (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
            (if helm--force-updating-p
