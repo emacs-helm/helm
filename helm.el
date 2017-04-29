@@ -3718,9 +3718,9 @@ respectively `helm-cand-num' and `helm-cur-source'."
                          (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
                        "mouse-1: select candidate\nmouse-3: menu actions"))))
       (when num
-        (put-text-property start (point-at-eol) 'helm-cand-num num))
+        (put-text-property start end 'helm-cand-num num))
       (when source
-        (put-text-property start (point-at-eol) 'helm-cur-source source))
+        (put-text-property start end 'helm-cur-source source))
       (funcall insert-function "\n"))))
 
 (defun helm--mouse-reset-selection-help-echo ()
