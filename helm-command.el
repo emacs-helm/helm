@@ -283,8 +283,8 @@ You can get help on each command by persistent action."
         ;; use the value of arg otherwise use helm-current-prefix-arg.
         (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
           (cl-flet ((save-hist (command)
-                               (setq extended-command-history
-                                     (cons (delete command extended-command-history)))))
+                      (setq extended-command-history
+                            (cons command (delete command extended-command-history)))))
             (condition-case nil
                 (progn
                   (command-execute sym-com 'record)
