@@ -282,14 +282,15 @@ You can get help on each command by persistent action."
         ;; If helm-M-x is called with regular emacs completion (kmacro)
         ;; use the value of arg otherwise use helm-current-prefix-arg.
         (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
-          ;; This ugly construct is to save history even on error.
-          (unless helm-M-x-always-save-history
-            (command-execute sym-com 'record))
-          (setq extended-command-history
-                (cons command-name
-                      (delete command-name extended-command-history)))
-          (when helm-M-x-always-save-history
-            (command-execute sym-com 'record)))))))
+          (cl-flet ((save-hist (command)
+                               (setq extended-command-history
+                                     (cons (delete command extended-command-history)))))
+            (condition-case nil
+                (progn
+                  (command-execute sym-com 'record)
+                  (save-hist command-name))
+              (error (when helm-M-x-always-save-history
+                       (save-hist command-name))))))))))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
