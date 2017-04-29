@@ -449,11 +449,13 @@
         :buffer "*helm list packages*"))
 
 ;;;###autoload
-(defun helm-list-elisp-packages-no-fetch ()
+(defun helm-list-elisp-packages-no-fetch (arg)
   "Preconfigured helm for emacs packages.
-Same as `helm-list-elisp-packages' but don't fetch packages on remote."
-  (interactive)
-  (let ((helm-el-package--initialized-p t))
+
+Same as `helm-list-elisp-packages' but don't fetch packages on remote.
+Called with a prefix ARG always fetch packages on remote."
+  (interactive "P")
+  (let ((helm-el-package--initialized-p (null arg)))
     (helm-list-elisp-packages nil)))
 
 (provide 'helm-elisp-package)
