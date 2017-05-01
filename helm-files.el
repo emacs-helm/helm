@@ -1435,29 +1435,16 @@ Same as `dired-do-print' but for helm."
     (helm-exit-and-execute-action 'helm-ff-print)))
 (put 'helm-ff-run-print-file 'helm-only t)
 
-(defun helm-ff-check-sum-1 (algo file)
-  (message "Calculating %s Checksum..." algo)
-  (if (fboundp 'async-let)
-      (async-let ((sum (with-temp-buffer
-                         (insert-file-contents-literally file)
-                         (secure-hash algo (current-buffer)))))
-        (when sum
-          (message "Calculating %s Checksum done and copied to kill-ring."
-                   algo)
-          (kill-new sum)))
-      (kill-new (with-temp-buffer
-                  (insert-file-contents-literally file)
-                  (secure-hash algo (current-buffer))))
-      (message "Calculating %s Checksum done and copied to kill-ring."
-               algo)))
-
 (defun helm-ff-checksum (file)
   "Calculate the checksum of FILE.
 The checksum is copied to kill-ring."
   (let ((algo (intern (helm-comp-read
                        "Algorithm: "
                        '(md5 sha1 sha224 sha256 sha384 sha512)))))
-    (helm-ff-check-sum-1 algo file)))
+    (kill-new (with-temp-buffer
+                (insert-file-contents-literally file)
+                (secure-hash algo (current-buffer))))
+    (message "Checksum copied to kill-ring.")))
 
 (defun helm-ff-toggle-basename (_candidate)
   (with-helm-buffer
