@@ -25,7 +25,7 @@
 # Emacs invocation
 EMACS_COMMAND   := emacs
 
-EMACS		:= $(EMACS_COMMAND) -Q -batch
+EMACS		:= $(EMACS_COMMAND) -q -batch
 
 EVAL := $(EMACS) --eval
 
