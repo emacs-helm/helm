@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'async)
 (require 'advice) ; Shutup byte compiler about ad-deactivate.
 (require 'helm-lib)
 (require 'helm-multi-match)
