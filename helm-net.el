@@ -36,7 +36,7 @@ See `helm-browse-url-default-browser-alist'."
   :group 'helm-net
   :type 'symbol)
 
-(defcustom helm-home-url "http://www.google.fr"
+(defcustom helm-home-url "https://www.google.com"
   "Default url to use as home url."
   :group 'helm-net
   :type 'string)
@@ -48,14 +48,16 @@ When nil, fallback to `browse-url-browser-function'."
   :type 'symbol)
 
 (defcustom helm-google-suggest-url
-  "http://google.com/complete/search?output=toolbar&q="
-  "URL used for looking up Google suggestions."
+  "https://encrypted.google.com/complete/search?output=toolbar&q=%s"
+  "URL used for looking up Google suggestions.
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-google-suggest-search-url
-  "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
-  "URL used for Google searching."
+  "https://encrypted.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+  "URL used for Google searching.
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
@@ -78,8 +80,9 @@ a personal url, see your settings on duckduckgo."
   :group 'helm-net)
 
 (defcustom helm-wikipedia-suggest-url
-  "https://en.wikipedia.org/w/api.php?action=opensearch&search="
-  "Url used for looking up Wikipedia suggestions."
+  "https://en.wikipedia.org/w/api.php?action=opensearch&search=%s"
+  "Url used for looking up Wikipedia suggestions.
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
@@ -91,13 +94,14 @@ This is a format string, don't forget the `%s'."
   :group 'helm-net)
 
 (defcustom helm-wikipedia-summary-url
-  "http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page="
-  "URL for getting the summary of a Wikipedia topic."
+  "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page=%s"
+  "URL for getting the summary of a Wikipedia topic.
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-youtube-url
-  "http://www.youtube.com/results?aq=f&search_query=%s"
+  "https://www.youtube.com/results?aq=f&search_query=%s"
   "The Youtube search url.
 This is a format string, don't forget the `%s'."
   :type 'string
@@ -111,14 +115,14 @@ This is a format string, don't forget the `%s'."
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-google-maps-url
-  "http://maps.google.com/maps?f=q&source=s_q&q=%s"
+  "https://maps.google.com/maps?f=q&source=s_q&q=%s"
   "The Google Maps search url.
 This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-google-news-url
-  "http://www.google.com/search?safe=off&prmd=nvlifd&source=lnms&tbs=nws:1&q=%s"
+  "https://www.google.com/search?safe=off&prmd=nvlifd&source=lnms&tbs=nws:1&q=%s"
   "The Google News search url.
 This is a format string, don't forget the `%s'."
   :type 'string
@@ -191,7 +195,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 
 (defun helm-google-suggest-fetch (input)
   "Fetch suggestions for INPUT from XML buffer."
-  (let ((request (concat helm-google-suggest-url
+  (let ((request (format helm-google-suggest-url
                          (url-hexify-string input))))
     (helm-net--url-retrieve-sync
      request #'helm-google-suggest-parser)))
@@ -259,7 +263,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defun helm-wikipedia-suggest-fetch ()
   "Fetch Wikipedia suggestions and return them as a list."
   (require 'json)
-  (let ((request (concat helm-wikipedia-suggest-url
+  (let ((request (format helm-wikipedia-suggest-url
                          (url-hexify-string helm-pattern))))
     (helm-net--url-retrieve-sync
      request #'helm-wikipedia--parse-buffer)))
@@ -324,7 +328,7 @@ Follows any redirections from Wikipedia, and stores results in
     result))
 
 (defun helm-wikipedia--fetch-summary (input)
-  (let* ((request (concat helm-wikipedia-summary-url
+  (let* ((request (format helm-wikipedia-summary-url
                           (url-hexify-string input))))
     (helm-net--url-retrieve-sync
      request #'helm-wikipedia--parse-summary)))
