@@ -40,6 +40,8 @@ case $1 in
         ;;
 esac
 
+LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
+
 cd $(dirname "$0")
 
 # Check if autoload file exists.
@@ -77,6 +79,7 @@ cat > $CONF_FILE <<EOF
 ;; You will find embeded help for most helm commands with \`C-h m'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
+(setq load-path (quote $LOAD_PATH))
 (setq package-user-dir (directory-file-name
                         (file-name-directory
                          (directory-file-name default-directory))))
