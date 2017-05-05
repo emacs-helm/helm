@@ -23,7 +23,7 @@
 # Run it from this directory or symlink it somewhere in your PATH.
 
 # If TEMP env var exists use it otherwise declare it.
-[ -z $TEMP ] && declare TEMP="/tmp"
+test -z "$TEMP" && declare TEMP="/tmp"
 
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
@@ -42,14 +42,14 @@ esac
 
 LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
 
-cd $(dirname "$0")
+cd "$(dirname "$0")" || exit 2
 
 # Check if autoload file exists.
 # It is maybe in a different directory if
 # emacs-helm.sh is a symlink.
-LS=$(ls -l $0 | awk '{print $11}')
-if [ ! -z $LS ]; then
-    AUTO_FILE="$(dirname $LS)/helm-autoloads.el"
+TRUENAME=$(find . -samefile "$0" -printf "%l")
+if [ ! -z "$TRUENAME" ]; then
+    AUTO_FILE="$(dirname "$TRUENAME")/helm-autoloads.el"
 else
     AUTO_FILE="helm-autoloads.el"
 fi
@@ -105,5 +105,5 @@ cat > $CONF_FILE <<EOF
 (add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
-$EMACS -Q -l $CONF_FILE $@
+$EMACS -Q -l $CONF_FILE "$@"
 
