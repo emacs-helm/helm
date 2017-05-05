@@ -25,6 +25,7 @@
 # Emacs invocation
 EMACS_COMMAND   := emacs
 
+# Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path 
 EMACS		:= $(EMACS_COMMAND) -q -batch
 
 EVAL := $(EMACS) --eval
@@ -32,7 +33,14 @@ EVAL := $(EMACS) --eval
 PKGDIR := .
 
 # Additional emacs loadpath
-LOADPATH	:= -L .
+LOADPATH	:= -L $(PKGDIR)
+ELPA_DIR        =  $(HOME)/.emacs.d/elpa
+ASYNC_ELPA_DIR  =  $(shell \
+  find -L $(ELPA_DIR) -maxdepth 1 -regex '.*/async-[.0-9]*' 2> /dev/null | \
+  sort | tail -n 1)
+ifneq "$(ASYNC_ELPA_DIR)" ""
+  LOADPATH += -L $(ASYNC_ELPA_DIR)
+endif
 
 # Files to compile
 EL			:= $(sort $(wildcard helm*.el))
