@@ -3443,15 +3443,20 @@ It is used for narrowing list of candidates to the
     (helm-insert-header-from-source source)
     (cl-loop with separate = nil
              with start = (point)
+             with singleline = (null (assq 'multiline source))
              for m in matches
              for count from 1
-             do (if (not (assq 'multiline source))
-                    (helm-insert-match m 'insert count source)
-                    (if separate
-                        (helm-insert-candidate-separator)
-                        (setq separate t))
-                    (helm-insert-match m 'insert count source)
-                    (put-text-property start (point) 'helm-multiline t)))))
+             if singleline
+             do (helm-insert-match m 'insert count source)
+             else
+             do (progn
+                  (if separate
+                      (helm-insert-candidate-separator)
+                    (setq separate t))
+                  (helm-insert-match m 'insert count source))
+             finally (and (null singleline)
+                          (put-text-property start (point)
+                                             'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
   "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
