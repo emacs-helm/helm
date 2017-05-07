@@ -16,4 +16,4 @@
 ## IMPORTANT NOTE:
 
 If you are using a Unix or GNU-Linux system there is no excuses 
-to not use `emac-helm.sh` to reproduce your bug in 99% of the cases.
+to not use `emacs-helm.sh` to reproduce your bug in 99% of the cases.
