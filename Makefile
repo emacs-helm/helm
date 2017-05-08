@@ -23,7 +23,7 @@
 ## Floor, Boston, MA 02110-1301, USA.
 
 # Emacs invocation
-EMACS_COMMAND   := emacs
+EMACS_COMMAND   ?= emacs
 
 # Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path 
 EMACS		:= $(EMACS_COMMAND) -q -batch
