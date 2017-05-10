@@ -403,12 +403,14 @@ Follows any redirections from Wikipedia, and stores results in
 (defvar helm-browse-url-chromium-program "chromium-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
 (defvar helm-browse-url-conkeror-program "conkeror")
+(defvar helm-browse-url-opera-program "opera")
 (defvar helm-browse-url-default-browser-alist
   `((,(or (and (boundp 'w3m-command) w3m-command)
           "/usr/bin/w3m") . w3m-browse-url)
     (,browse-url-firefox-program . browse-url-firefox)
     (,helm-browse-url-chromium-program . helm-browse-url-chromium)
     (,helm-browse-url-conkeror-program . helm-browse-url-conkeror)
+    (,helm-browse-url-opera-program . helm-browse-url-opera)
     (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
     (,browse-url-kde-program . browse-url-kde)
     (,browse-url-gnome-moz-program . browse-url-gnome-moz)
@@ -434,7 +436,8 @@ Follows any redirections from Wikipedia, and stores results in
 
 (defun helm-browse-url-firefox (url &optional _ignore)
   "Same as `browse-url-firefox' but detach from emacs.
-So when you quit emacs you can keep your firefox open
+
+So when you quit emacs you can keep your firefox session open
 and not be prompted to kill firefox process.
 
 NOTE: Probably not supported on some systems (e.g Windows)."
@@ -447,6 +450,21 @@ NOTE: Probably not supported on some systems (e.g Windows)."
              browse-url-firefox-program
              helm-browse-url-firefox-new-window
              (shell-quote-argument url)))))
+
+(defun helm-browse-url-opera (url &optional _ignore)
+  "Browse URL with opera browser and detach from emacs.
+
+So when you quit emacs you can keep your opera session open
+and not be prompted to kill opera process.
+
+NOTE: Probably not supported on some systems (e.g Windows)."
+  (interactive (list (read-string "URL: " (browse-url-url-at-point))
+                     nil))
+  (setq url (browse-url-encode-url url))
+  (let ((process-environment (browse-url-process-environment)))
+    (call-process-shell-command
+     (format "(%s %s &)"
+             helm-browse-url-opera-program (shell-quote-argument url)))))
 
 (defun helm-browse-url-chromium (url &optional _ignore)
   "Browse URL with google chrome browser."
