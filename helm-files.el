@@ -3815,7 +3815,8 @@ This is the starting point for nearly all actions you can do on files."
                                         (buffer-file-name (current-buffer))
                                         (and (eq major-mode 'dired-mode)
                                              smart-input))
-                              (if helm-ff-transformer-show-only-basename
+                              (if (and helm-ff-transformer-show-only-basename
+                                       (null hist))
                                   (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
     (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
