@@ -185,8 +185,7 @@ Returns nil if `helm-adaptive-history-file' doesn't exist."
   "Sort the CANDIDATES for SOURCE by usage frequency.
 This is a filtered candidate transformer you can use with the
 `filtered-candidate-transformer' attribute."
-  (let* ((source-name (or (assoc-default 'type source)
-                          (assoc-default 'name source)))
+  (let* ((source-name (assoc-default 'name source))
          (source-info (assoc source-name helm-adaptive-history)))
     (if source-info
         (let ((usage
