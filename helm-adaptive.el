@@ -110,8 +110,7 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
     (setq helm-adaptive-done t)
     (let ((source (helm-adapt-use-adaptive-p)))
       (when source
-        (let* ((source-name (or (assoc-default 'type source)
-                                (assoc-default 'name source)))
+        (let* ((source-name (assoc-default 'name source))
                (source-info (or (assoc source-name helm-adaptive-history)
                                 (progn
                                   (push (list source-name) helm-adaptive-history)
