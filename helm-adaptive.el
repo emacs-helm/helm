@@ -254,10 +254,11 @@ Useful when you have a old or corrupted `helm-adaptive-history-file'."
     (delete-file helm-adaptive-history-file)))
 
 (defun helm-adaptive-compare (x y)
-  "Compare candidates X and Y taking into account that the
-candidate can be in (DISPLAY . REAL) format."
-  (equal (if (listp x) (cdr x) x)
-         (if (listp y) (cdr y) y)))
+  "Compare display parts if some of candidates X and Y.
+
+Arguments X and Y are cons cell in (DISPLAY . REAL) format or atoms."
+  (equal (if (listp x) (car x) x)
+         (if (listp y) (car y) y)))
 
 
 (provide 'helm-adaptive)
