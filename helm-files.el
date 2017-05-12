@@ -483,7 +483,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
-   "Checksum File" 'helm-ff-checksum
    "Query replace fnames on marked" 'helm-ff-query-replace-on-marked
    "Query replace contents on marked" 'helm-ff-query-replace
    "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
@@ -2376,6 +2375,9 @@ Return candidates prefixed with basename of `helm-input' first."
   (let ((str-at-point (with-helm-current-buffer
                         (buffer-substring-no-properties
                          (point-at-bol) (point-at-eol)))))
+    (when (file-regular-p candidate)
+      (setq actions (helm-append-at-nth
+                     actions '(("Checksum File" . helm-ff-checksum)) 4)))
     (cond ((with-helm-current-buffer
              (eq major-mode 'message-mode))
            (append actions
