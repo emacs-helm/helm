@@ -2378,34 +2378,40 @@ Return candidates prefixed with basename of `helm-input' first."
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
-    (cond ((with-helm-current-buffer
-             (eq major-mode 'message-mode))
-           (append actions
-                   '(("Gnus attach file(s)" . helm-ff-gnus-attach-files))))
-          ((and ffap-url-regexp
+    (when (with-helm-current-buffer
+            (derived-mode-p major-mode 'message-mode))
+      (setq actions
+            (helm-append-at-nth
+             actions
+             '(("Gnus attach file(s)" . helm-ff-gnus-attach-files)) 4)))
+    (cond ((and ffap-url-regexp
                 (not (string-match-p ffap-url-regexp str-at-point))
                 (not (with-helm-current-buffer (eq major-mode 'dired-mode)))
                 (string-match-p ":\\([0-9]+:?\\)" str-at-point))
            (append '(("Find file to line number" . helm-ff-goto-linum))
                    actions))
           ((string-match (image-file-name-regexp) candidate)
-           (append actions
-                   '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
-                     ("Rotate image left `M-l'" . helm-ff-rotate-image-left))))
+           (helm-append-at-nth
+            actions
+            '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
+              ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
+            3))
           ((string-match "\.el$" (helm-aif (helm-marked-candidates)
                                      (car it) candidate))
-           (append actions
-                   '(("Byte compile lisp file(s) `M-B, C-u to load'"
-                      . helm-find-files-byte-compile)
-                     ("Load File(s) `M-L'" . helm-find-files-load-files))))
+           (helm-append-at-nth
+            actions
+            '(("Byte compile lisp file(s) `M-B, C-u to load'"
+               . helm-find-files-byte-compile)
+              ("Load File(s) `M-L'" . helm-find-files-load-files))
+            2))
           ((and (string-match "\.html?$" candidate)
                 (file-exists-p candidate))
-           (append actions
-                   '(("Browse url file" . browse-url-of-file))))
+           (helm-append-at-nth
+            actions '(("Browse url file" . browse-url-of-file)) 2))
           ((or (string= (file-name-extension candidate) "pdf")
                (string= (file-name-extension candidate) "PDF"))
-           (append actions
-                   '(("Pdfgrep File(s)" . helm-ff-pdfgrep))))
+           (helm-append-at-nth
+            actions '(("Pdfgrep File(s)" . helm-ff-pdfgrep)) 4))
           (t actions))))
 
 (defun helm-ff-goto-linum (candidate)
