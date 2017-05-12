@@ -1438,6 +1438,8 @@ Same as `dired-do-print' but for helm."
 (defun helm-ff-checksum (file)
   "Calculate the checksum of FILE.
 The checksum is copied to kill-ring."
+  (cl-assert (file-regular-p file)
+             nil "`%s' is not a regular file" file)
   (let ((algo (intern (helm-comp-read
                        "Algorithm: "
                        '(md5 sha1 sha224 sha256 sha384 sha512))))
