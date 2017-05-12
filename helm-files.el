@@ -404,7 +404,7 @@ Remote filesystem are generally mounted with sshfs."
     (define-key map (kbd "C-{")           'helm-enlarge-window)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
-    (define-key map (kbd "C-c C-a")       'helm-ff-run-gnus-attach-files)
+    (define-key map (kbd "C-c C-a")       'helm-ff-run-mail-attach-files)
     (define-key map (kbd "C-c p")         'helm-ff-run-print-file)
     (define-key map (kbd "C-c /")         'helm-ff-run-find-sh-command)
     ;; Next 2 have no effect if candidate is not an image file.
@@ -486,6 +486,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Query replace fnames on marked" 'helm-ff-query-replace-on-marked
    "Query replace contents on marked" 'helm-ff-query-replace
    "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
+   "Attach file(s) to mail buffer" 'helm-ff-mail-attach-files
    "Serial rename files" 'helm-ff-serial-rename
    "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
    "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
@@ -1362,12 +1363,12 @@ Behave differently depending of `helm-selection':
     (helm-exit-and-execute-action 'find-alternate-file)))
 (put 'helm-ff-run-find-alternate-file 'helm-only t)
 
-(defun helm-ff-run-gnus-attach-files ()
-  "Run gnus attach files command action from `helm-source-find-files'."
+(defun helm-ff-run-mail-attach-files ()
+  "Run mail attach files command action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-ff-gnus-attach-files)))
-(put 'helm-ff-run-gnus-attach-files 'helm-only t)
+    (helm-exit-and-execute-action 'helm-ff-mail-attach-files)))
+(put 'helm-ff-run-mail-attach-files 'helm-only t)
 
 (defun helm-ff-run-etags ()
   "Run Etags command action from `helm-source-find-files'."
@@ -2378,12 +2379,6 @@ Return candidates prefixed with basename of `helm-input' first."
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
-    (when (with-helm-current-buffer
-            (derived-mode-p major-mode 'message-mode))
-      (setq actions
-            (helm-append-at-nth
-             actions
-             '(("Gnus attach file(s)" . helm-ff-gnus-attach-files)) 4)))
     (cond ((and ffap-url-regexp
                 (not (string-match-p ffap-url-regexp str-at-point))
                 (not (with-helm-current-buffer (eq major-mode 'dired-mode)))
@@ -2427,7 +2422,7 @@ e.g \"foo:12\"."
     (and linum (not (string= linum ""))
          (helm-goto-line (string-to-number linum) t))))
 
-(defun helm-ff-gnus-attach-files (_candidate)
+(defun helm-ff-mail-attach-files (_candidate)
   "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
   (require 'gnus-dired)
   (let ((flist (helm-marked-candidates :with-wildcard t)))
