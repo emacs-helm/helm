@@ -223,40 +223,32 @@ This is a command for `helm-kill-ring-map'."
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
     (cl-loop with marks = (if (mark t) (cons (mark-marker) mark-ring) mark-ring)
-             for i in marks
+             for marker in marks
              with max-line-number = (line-number-at-pos (point-max))
              with width = (length (number-to-string max-line-number))
              for m = (format (concat "%" (number-to-string width) "d: %s")
-                             (line-number-at-pos i)
-                             (helm-mark-ring-line-string-at-pos i))
-             unless (and recip (member m recip))
-             collect m into recip
+                             (line-number-at-pos marker)
+                             (helm-mark-ring-line-string-at-pos marker))
+             unless (and recip (assoc m recip))
+             collect (cons m marker) into recip
              finally return recip)))
+
+(defun helm-mark-ring-default-action (candidate)
+  (switch-to-buffer (marker-buffer candidate))
+  (helm-goto-char candidate)
+  (helm-highlight-current-line))
 
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
     :candidates #'helm-mark-ring-get-candidates
-    :action '(("Goto line"
-               . (lambda (candidate)
-                   (helm-goto-line (string-to-number candidate))))) 
-    :persistent-action (lambda (candidate)
-                         (switch-to-buffer helm-current-buffer)
-                         (helm-goto-line (string-to-number candidate)))
+    :action '(("Goto line" . helm-mark-ring-default-action)) 
     :persistent-help "Show this line"))
 
 ;;; Global-mark-ring
 (defvar helm-source-global-mark-ring
   (helm-build-sync-source "global-mark-ring"
     :candidates #'helm-global-mark-ring-get-candidates
-    :action '(("Goto line"
-              . (lambda (candidate)
-                  (let ((items (split-string candidate ":")))
-                    (switch-to-buffer (cl-second items))
-                    (helm-goto-line (string-to-number (car items)))))))
-    :persistent-action (lambda (candidate)
-                         (let ((items (split-string candidate ":")))
-                           (switch-to-buffer (cl-second items))
-                           (helm-goto-line (string-to-number (car items)))))
+    :action '(("Goto line" . helm-mark-ring-default-action))
     :persistent-help "Show this line"))
 
 (defun helm-global-mark-ring-format-buffer (marker)
@@ -275,13 +267,13 @@ This is a command for `helm-kill-ring-map'."
 (defun helm-global-mark-ring-get-candidates ()
   (let ((marks global-mark-ring))
     (when marks
-      (cl-loop for i in marks
-               for mb = (marker-buffer i)
+      (cl-loop for marker in marks
+               for mb = (marker-buffer marker)
                for gm = (unless (or (string-match "^ " (format "%s" mb))
                                     (null mb))
-                          (helm-global-mark-ring-format-buffer i))
-               when (and gm (not (member gm recip)))
-               collect gm into recip
+                          (helm-global-mark-ring-format-buffer marker))
+               when (and gm (not (assoc gm recip)))
+               collect (cons gm marker) into recip
                finally return recip))))
 
 (defun helm--push-mark (&optional location nomsg activate)
