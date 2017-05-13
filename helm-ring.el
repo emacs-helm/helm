@@ -234,9 +234,14 @@ This is a command for `helm-kill-ring-map'."
              finally return recip)))
 
 (defun helm-mark-ring-default-action (candidate)
-  (switch-to-buffer (marker-buffer candidate))
-  (helm-goto-char candidate)
-  (helm-highlight-current-line))
+  (let ((target (copy-marker candidate)))
+    (switch-to-buffer (marker-buffer candidate))
+    (helm-log-run-hook 'helm-goto-line-before-hook)
+    (helm-match-line-cleanup)
+    (with-helm-current-buffer
+      (unless helm-yank-point (setq helm-yank-point (point))))
+    (helm-goto-char target)
+    (helm-highlight-current-line)))
 
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
