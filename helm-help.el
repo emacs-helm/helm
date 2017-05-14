@@ -815,14 +815,18 @@ Just add a space between each pattern like in most helm commands.
 
 *** Important
 
-Grepping on remote file will work only with grep, not ack-grep, but it is
-anyway bad supported as tramp doesn't support multiple process running in a
-short delay (less than 5s actually) among other things,
-so I strongly advice hitting `C-!' (i.e suspend process)
+Grepping works but it is badly supported as tramp doesn't support multiple process running in a
+short delay (less than 5s actually) among other things.
+
+Helm is suspending process automatically while you are typing with a special hook, however
+you are adviced doing this manually by hitting `C-!' (i.e suspend process)
 before entering anything in pattern, and hit again `C-!' when
 your regexp is ready to send to remote process, even if helm is handling
-this by delaying each process at 5s. 
-Or even better don't use tramp at all and mount your remote file system on SSHFS.
+this by delaying each process at 5s.
+
+If your regexp is simple enough, you can though try merely to type it directly.
+
+Another solution is to not use tramp at all and mount your remote file system on SSHFS.
 
 * Helm Gid
 
