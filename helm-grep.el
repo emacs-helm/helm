@@ -1026,10 +1026,6 @@ It is used actually to specify 'zgrep' or 'git'.
 When BACKEND 'zgrep' is used don't prompt for a choice
 in recurse, and ignore EXTS, search being made recursively on files matching
 `helm-zgrep-file-extension-regexp' only."
-  (when (and (string-match-p "\\`ack" (helm-grep-command recurse backend))
-             helm-ff-default-directory
-             (file-remote-p helm-ff-default-directory))
-    (error "Error: Remote operation not supported with ack-grep."))
   (let* (non-essential
          (ack-rec-p (helm-grep-use-ack-p :where 'recursive))
          (exts (and recurse
@@ -1423,8 +1419,13 @@ if available with current AG version."
 
 (defun helm-grep-ag-init (directory &optional type)
   "Start AG process in DIRECTORY maybe searching only files of type TYPE."
-  (let ((cmd-line (helm-grep-ag-prepare-cmd-line
-                   helm-pattern directory type))
+  (let ((default-directory (or helm-ff-default-directory
+                               (helm-default-directory)
+                               default-directory))
+        (cmd-line (helm-grep-ag-prepare-cmd-line
+                   helm-pattern (or (file-remote-p directory 'localname)
+                                    directory)
+                   type))
         (start-time (float-time))
         (proc-name (helm-grep--ag-command)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
@@ -1433,7 +1434,7 @@ if available with current AG version."
     (helm-log "Command line used was:\n\n%s"
               (concat ">>> " cmd-line "\n\n"))
     (prog1
-        (start-process-shell-command
+        (start-file-process-shell-command
          proc-name helm-buffer cmd-line)
       (set-process-sentinel
        (get-buffer-process helm-buffer)
