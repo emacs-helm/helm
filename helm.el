@@ -3610,7 +3610,7 @@ which is the default."
         (mapc 'helm-force-update--reinit
               (helm-get-sources)))
       (helm-update (or preselect selection) source)
-      (and recenter (recenter)))))
+      (and recenter (recenter (and (numberp recenter) recenter))))))
 
 (defun helm-refresh ()
   "Force recalculation and update of candidates."
