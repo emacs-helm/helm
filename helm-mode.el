@@ -962,7 +962,8 @@ Keys description:
              :action action-fn)))
          ;; Helm result.
          (result (helm
-                  :sources src-list
+                  :sources (if helm-mode-reverse-history
+                               (reverse src-list) src-list)
                   :input (expand-file-name initial-input)
                   :prompt prompt
                   :candidate-number-limit candidate-number-limit
