@@ -2687,8 +2687,7 @@ Show the first `helm-ff-history-max-length' elements of
            "Switch to Directory: "
            helm-ff-history
            :name "Helm Find Files History"
-           :must-match t
-           :fuzzy (helm-ff-fuzzy-matching-p))
+           :must-match t)
         helm-ff-history))))
 
 (defun helm-find-files-1 (fname &optional preselect)
