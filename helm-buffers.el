@@ -141,6 +141,11 @@ Only buffer names are fuzzy matched when this is enabled,
   "Face for buffer file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
+(defface helm-non-file-buffer
+    '((t (:inherit italic)))
+  "Face used for non-file buffers in `helm-buffers-list'."
+  :group 'helm-buffers-faces)
+
 
 ;;; Buffers keymap
 ;;
@@ -362,11 +367,11 @@ See `ido-make-buffer-list' for more infos."
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
           'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
-        ;; Any non--file buffer.=>grey italic
+        ;; Any non--file buffer.=>italic
         (t
          (helm-buffer--show-details
           name (and proc name-prefix) dir size mode dir
-          'italic 'helm-buffer-process proc details 'nofile))))))
+          'helm-non-file-buffer 'helm-buffer-process proc details 'nofile))))))
 
 (defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
