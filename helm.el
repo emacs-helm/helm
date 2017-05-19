@@ -47,14 +47,17 @@ If DELAY is specified, switch back to initial function of FUNCTIONS list
 after DELAY seconds.
 The functions in FUNCTIONS list take no args.
 e.g
-  \(defun foo ()
-    (message \"Run foo\"))
-  \(defun bar ()
-    (message \"Run bar\"))
-  \(defun baz ()
-    (message \"Run baz\"))
+    (defun foo ()
+      (interactive)
+      (message \"Run foo\"))
+    (defun bar ()
+      (interactive)
+      (message \"Run bar\"))
+    (defun baz ()
+      (interactive)
+      (message \"Run baz\"))
 
-\(helm-define-multi-key global-map \"<f5> q\" '(foo bar baz) 2)
+\(helm-define-multi-key global-map (kbd \"<f5> q\") '(foo bar baz) 2)
 
 Each time \"<f5> q\" is pressed, the next function is executed. Waiting
 more than 2 seconds between key presses switches back to executing the first
@@ -96,7 +99,7 @@ Run each function in the FUNCTIONS list in turn when called within DELAY seconds
       (setq next (helm-iter-next (symbol-value iterator))))
     (and next (symbol-value iterator) (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer delay nil (lambda ()
-                                                 (setq iterator nil))))))
+                                                 (set iterator nil))))))
 
 (helm-multi-key-defun helm-toggle-resplit-and-swap-windows
     "Multi key command to re-split and swap helm window.
