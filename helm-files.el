@@ -2709,11 +2709,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
-    (mapc (lambda (hook)
-            (add-hook 'helm-after-update-hook hook))
-          '(helm-ff-move-to-first-real-candidate
-            helm-ff-update-when-only-one-matched
-            helm-ff-auto-expand-to-home-or-root))
+    (helm-ff-setup-update-hook)
     (unwind-protect
          (helm :sources 'helm-source-find-files
                :input fname
@@ -2725,12 +2721,19 @@ Use it for non--interactive calls of `helm-find-files'."
                :prompt "Find files or url: "
                :buffer "*helm find files*")
       (helm-attrset 'resume `(lambda ()
+                               (helm-ff-setup-update-hook)
                                (setq helm-ff-default-directory
                                      ,helm-ff-default-directory
                                      helm-ff-last-expanded
                                      ,helm-ff-last-expanded))
                     helm-source-find-files)
       (setq helm-ff-default-directory nil))))
+
+(defun helm-ff-setup-update-hook ()
+  (dolist (hook '(helm-ff-move-to-first-real-candidate
+                  helm-ff-update-when-only-one-matched
+                  helm-ff-auto-expand-to-home-or-root))
+    (add-hook 'helm-after-update-hook hook)))
 
 (defun helm-find-files-cleanup ()
   (mapc (lambda (hook)
