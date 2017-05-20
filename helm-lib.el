@@ -158,6 +158,14 @@ and not `exit-minibuffer' or other unwanted functions."
          (setq lis (pcase lis (`(,_ . ,ll) (or ll seq))))
          elm))))
 
+(cl-defun helm-iter-sub-next-circular (seq elm &key (test 'eq))
+  "Infinite iteration of SEQ starting at ELM."
+  (let* ((pos      (1+ (helm-position elm seq :test test)))
+         (sub      (append (nthcdr pos seq) (cl-subseq seq 0 pos)))
+         (iterator (helm-iter-circular sub)))
+    (lambda ()
+      (helm-iter-next iterator))))
+
 (defun helm-iter-next (iterator)
   "Return next elm of ITERATOR."
   (and iterator (funcall iterator)))

@@ -235,6 +235,7 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
+    (define-key map (kbd "<S-f1>")     'helm-run-cycle-resume)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
@@ -1247,6 +1248,7 @@ You should not modify this yourself unless you know what you are doing.")
 Should be set in candidates functions if needed, will be restored
 at end of session.")
 (defvar helm--action-prompt "Select action: ")
+(defvar helm--cycle-resume-iterator nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2219,6 +2221,29 @@ Return nil if no `helm-buffer' found."
               :resume 'noresume
               :buffer "*helm resume*")
         (keyboard-quit))))
+
+;;;###autoload
+(defun helm-cycle-resume ()
+  (interactive)
+  (cl-assert helm-buffers nil "No helm buffers to resume")
+  (setq helm--cycle-resume-iterator
+        (helm-iter-sub-next-circular
+         helm-buffers helm-last-buffer :test 'equal))
+  (message "Resuming helm buffer `%s'" helm-last-buffer)
+  (if (sit-for 1.2)
+      (helm-resume helm-last-buffer)
+    (message "Resuming helm buffer `%s'"
+             (setq helm-last-buffer
+                   (helm-iter-next helm--cycle-resume-iterator)))
+    (sit-for 1)))
+
+(defun helm-run-cycle-resume ()
+  (interactive)
+  (when (cdr helm-buffers)
+    (setq helm-last-buffer
+          (helm-iter-next helm--cycle-resume-iterator)))
+  (helm-run-after-exit 'helm-cycle-resume))
+(put 'helm-run-cycle-resume 'helm-only t)
 
 
 ;;;###autoload
