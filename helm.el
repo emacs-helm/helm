@@ -2224,25 +2224,35 @@ Return nil if no `helm-buffer' found."
 
 ;;;###autoload
 (defun helm-cycle-resume ()
+  "Cycle in `helm-buffers' list and resume when waiting more than 1.2s."
   (interactive)
-  (cl-assert helm-buffers nil "No helm buffers to resume")
+  (cl-assert (and helm-buffers helm-last-buffer)
+             nil "No helm buffers to resume")
   (setq helm--cycle-resume-iterator
         (helm-iter-sub-next-circular
          helm-buffers helm-last-buffer :test 'equal))
+  (helm--resume-or-iter))
+
+(defun helm--resume-or-iter (&optional from-helm)
   (message "Resuming helm buffer `%s'" helm-last-buffer)
   (if (sit-for 1.2)
-      (helm-resume helm-last-buffer)
+      (if from-helm
+          (helm-run-after-exit (lambda () (helm-resume helm-last-buffer)))
+        (helm-resume helm-last-buffer))
     (message "Resuming helm buffer `%s'"
              (setq helm-last-buffer
-                   (helm-iter-next helm--cycle-resume-iterator)))
-    (sit-for 1)))
+                   (helm-iter-next helm--cycle-resume-iterator)))))
 
 (defun helm-run-cycle-resume ()
+  "Same as `helm-cycle-resume' but intended to be called only from helm."
   (interactive)
   (when (cdr helm-buffers)
+    (setq helm--cycle-resume-iterator
+          (helm-iter-sub-next-circular
+           helm-buffers helm-last-buffer :test 'equal))
     (setq helm-last-buffer
-          (helm-iter-next helm--cycle-resume-iterator)))
-  (helm-run-after-exit 'helm-cycle-resume))
+          (helm-iter-next helm--cycle-resume-iterator))
+    (helm--resume-or-iter 'from-helm)))
 (put 'helm-run-cycle-resume 'helm-only t)
 
 
