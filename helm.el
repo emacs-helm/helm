@@ -1077,12 +1077,34 @@ is non-nil.
 \\[helm-refresh]\t\tRecalculate and redisplay candidates.
 \\[helm-toggle-suspend-update]\t\tSuspend/reenable updates to candidates list.
 
+** Moving in `helm-buffer'
+
+You can move in `helm-buffer' with usual commands used in emacs
+\(\\<helm-map>\\[helm-next-line], \\<helm-map>\\[helm-previous-line] etc... see below all commands).
+When `helm-buffer' contains more than one source change source with \\<helm-map>\\[helm-next-source].
+
+NOTE: When at end of source \\<helm-map>\\[helm-next-line] will NOT go to next source if
+variable `helm-move-to-line-cycle-in-source' is non--nil, so you will have to use \\<helm-map>\\[helm-next-source].
+
+
+** Resume previous session from current helm session
+
+You can use \\<helm-map>\\[helm-run-cycle-resume] to cycle in resumables sources.
+You can also use  \\<helm-map>\\[helm-resume-previous-session-after-quit] to resume
+the previous session before this one, or \\<helm-map>\\[helm-resume-list-buffers-after-quit]
+to have completion on all resumables buffers.
+
 ** Global Commands
+
+*** Resume helm session from outside helm
 
 \\<global-map>\\[helm-resume] revives the last `helm' session.
 Very useful for resuming previous Helm. Binding a key to this
 command will greatly improve `helm' interactivity especially
 after an accidental exit.
+You can call  \\<global-map>\\[helm-resume] with a prefix arg to have completion on previous
+sources used and resumables.
+You can also cycle in these source with `helm-cycle-resume'.
 
 ** Debugging helm
 
