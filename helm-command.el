@@ -285,12 +285,14 @@ You can get help on each command by persistent action."
           (cl-flet ((save-hist (command)
                       (setq extended-command-history
                             (cons command (delete command extended-command-history)))))
-            (condition-case nil
+            (condition-case err
                 (progn
                   (command-execute sym-com 'record)
                   (save-hist command-name))
-              (error (when helm-M-x-always-save-history
-                       (save-hist command-name))))))))))
+              (error
+               (when helm-M-x-always-save-history
+                 (save-hist command-name))
+               (signal (car err) (cdr err))))))))))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
