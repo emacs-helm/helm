@@ -325,7 +325,7 @@ current heading."
       (let ((helm-completing-read-handlers-alist
              (rassq-delete-all
               'helm-org-completing-read-tags
-              helm-completing-read-handlers-alist)))
+              (copy-alist helm-completing-read-handlers-alist))))
         (org-icompleting-read
          prompt collection pred req initial hist def inherit-input-method))
     ;; Tags prompt
