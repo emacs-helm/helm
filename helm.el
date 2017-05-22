@@ -685,6 +685,12 @@ so it have only effect when `helm-always-two-windows' is non-nil."
           (const :tag "Split at left" left)
           (const :tag "Don't split" nil)
           (other :tag "Split at right" right)))
+
+(defcustom helm-cycle-resume-delay 1.0
+  "Delay used before resuming in `helm-run-cycle-resume'."
+  :type 'float
+  :group 'helm)
+
 
 ;;; Faces
 ;;
@@ -2263,7 +2269,7 @@ Return nil if no `helm-buffer' found."
 
 (defun helm--resume-or-iter (&optional from-helm)
   (message "Resuming helm buffer `%s'" helm-last-buffer)
-  (if (sit-for 1.2)
+  (if (sit-for helm-cycle-resume-delay)
       (if from-helm
           (helm-run-after-exit (lambda () (helm-resume helm-last-buffer)))
         (helm-resume helm-last-buffer))
