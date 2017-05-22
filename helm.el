@@ -235,7 +235,7 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    'helm-resume-list-buffers-after-quit)
-    (define-key map (kbd "<S-f1>")     'helm-run-cycle-resume)
+    (helm-define-key-with-subkeys map (kbd "C-c n") ?n 'helm-run-cycle-resume)
     ;; Disable `file-cache-minibuffer-complete'.
     (define-key map (kbd "<C-tab>")    'undefined)
     ;; Multi keys
@@ -892,34 +892,32 @@ value of this var.")
 
 (defvar helm-help-message
   "* Helm Generic Help
+** Basics
 
-\\<helm-map>`helm' is an Emacs framework for incremental
-completions and narrowing selections.
-
-Helm narrows the list of candidates as the pattern is typed and
+Helm allow you narrowing the list of candidates as the pattern is typed and
 updates the list in a live feedback.
 
 Helm accepts multiple patterns (entered with a space between patterns).
 Helm support also fuzzy matching in some places when specified.
 
 Helm uses familiar Emacs navigation keys to move up and down the list,
-however some keybindings maybe confusing for new users, here are some:
+however some keybindings are maybe confusing for new users, here are some:
 
 `\\[helm-maybe-exit-minibuffer]' selects the candidate from the list and execute default action
 on it, exiting helm session.
 
-`\\[helm-execute-persistent-action]' execute the default action
-but without exiting helm session, it may be not available in some places.
+`\\[helm-execute-persistent-action]' execute the default action but without exiting helm session,
+it may be not available in some places.
 
-`\\[helm-select-action]' show you a list of actions
-available on current candidate or all marked candidates, this maybe
-surprising for new helm users that expect
-`\\[helm-select-action]' for completions and have not
-realized they are already completing something as soon as helm is
-started! See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]]
+`\\[helm-select-action]' show you a list of actions available on current candidate or all marked candidates,
+this maybe surprising for new helm users that expect `\\[helm-select-action]' for completions and have not
+realized they are already completing something as soon as helm is started!
+See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]]
+
 NOTE: In addition to this fixed actions list, you will notice that depending
 of the type of candidate selected you may have additional actions
-appearing and disapearing when you select another type of candidate.
+appearing and disapearing when you select another type of candidate, they are called
+filtered actions.
 
 ** Helm mode
 
@@ -986,7 +984,6 @@ hardcoded and not modifiable, here they are:
 | M-<TAB>   |                  | Toggle visibility   |
 | M-w       |                  | Copy region         |
 | q         |                  | Quit                |
-
 
 ** Helm's Basic Operations and Default Key Bindings
 
@@ -1080,16 +1077,25 @@ is non-nil.
 ** Moving in `helm-buffer'
 
 You can move in `helm-buffer' with usual commands used in emacs
-\(\\<helm-map>\\[helm-next-line], \\<helm-map>\\[helm-previous-line] etc... see below all commands).
+\(\\<helm-map>\\[helm-next-line], \\<helm-map>\\[helm-previous-line] etc... see above basic commands).
 When `helm-buffer' contains more than one source change source with \\<helm-map>\\[helm-next-source].
 
 NOTE: When at end of source \\<helm-map>\\[helm-next-line] will NOT go to next source if
 variable `helm-move-to-line-cycle-in-source' is non--nil, so you will have to use \\<helm-map>\\[helm-next-source].
 
-
 ** Resume previous session from current helm session
 
-You can use \\<helm-map>\\[helm-run-cycle-resume] to cycle in resumables sources.
+You can use `C-c n' which is bound to `helm-run-cycle-resume' to cycle in resumables sources.
+`C-c n' is a special key bound with `helm-define-key-with-subkeys' which allow you
+to hit `C-c n' at first and then continue cycling with only `n'.
+Tip: You can bound the same key in `global-map' to `helm-cycle-resume'
+     with `helm-define-key-with-subkeys' to allow you cycling transparently
+     from outside and inside helm session.
+     You can also bind the cycling commands to single key pressed (e.g S-f1) this time
+     with a simple `define-key' (note that S-f1 is not available in terminals).
+
+NOTE: `helm-define-key-with-subkeys' is available only once helm is loaded.
+
 You can also use  \\<helm-map>\\[helm-resume-previous-session-after-quit] to resume
 the previous session before this one, or \\<helm-map>\\[helm-resume-list-buffers-after-quit]
 to have completion on all resumables buffers.
@@ -1104,7 +1110,7 @@ command will greatly improve `helm' interactivity especially
 after an accidental exit.
 You can call  \\<global-map>\\[helm-resume] with a prefix arg to have completion on previous
 sources used and resumables.
-You can also cycle in these source with `helm-cycle-resume'.
+You can also cycle in these source with `helm-cycle-resume' (see above).
 
 ** Debugging helm
 
