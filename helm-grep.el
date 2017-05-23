@@ -1192,7 +1192,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                                (> (- (setq end (match-end 0))
                                      (setq beg (match-beginning 0))) 0))
                      (helm-add-face-text-properties beg end 'helm-grep-match))
-                   do (goto-char (point-min))) 
+                   do (goto-char (point-min)))
           (buffer-string))
       (error nil))))
 
@@ -1514,6 +1514,9 @@ if available with current AG version."
           :candidates-process
           (lambda () (helm-grep-ag-init directory type))))
   (helm :sources 'helm-source-grep-ag
+        :input (if (region-active-p)
+                   (buffer-substring-no-properties (region-beginning) (region-end))
+                 (thing-at-point 'symbol))
         :keymap helm-grep-map
         :history 'helm-grep-ag-history
         :truncate-lines helm-grep-truncate-lines
