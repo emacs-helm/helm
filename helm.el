@@ -1000,6 +1000,14 @@ hardcoded and not modifiable, here they are:
 | M-w       |                  | Copy region         |
 | q         |                  | Quit                |
 
+** Customize helm
+
+Helm have a lot of user variables to configure it as you want,
+you can use from any helm session \\<helm-map>\\[helm-customize-group] to jump to the current source group.
+Helm have also a special group for faces you can access via M-x customize-group => helm-faces.
+
+NOTE: Some sources may not have their group set and default to `helm' group.
+
 ** Helm's Basic Operations and Default Key Bindings
 
 | Key     | Alternative Keys | Command                                                              |
