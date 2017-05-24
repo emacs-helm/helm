@@ -349,7 +349,8 @@ Sort is done on basename of CANDIDATES."
    (history :initform 'helm-file-name-history)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)
    (candidate-number-limit :initform 9999)
-   (redisplay :initform (progn helm-locate-fuzzy-sort-fn))))
+   (redisplay :initform (progn helm-locate-fuzzy-sort-fn))
+   (group :initform 'helm-locate)))
 
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source
@@ -405,7 +406,8 @@ Sort is done on basename of CANDIDATES."
    (subdir :initarg :subdir
            :initform nil
            :custom 'string)
-   (data :initform #'helm-locate-init-subdirs)))
+   (data :initform #'helm-locate-init-subdirs)
+   (group :initform 'helm-locate)))
 
 (defun helm-locate-init-subdirs ()
   (with-temp-buffer

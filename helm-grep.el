@@ -990,7 +990,8 @@ These extensions will be added to command line with --include arg of grep."
    (action :initform 'helm-grep-actions)
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
-   (requires-pattern :initform 2)))
+   (requires-pattern :initform 2)
+   (group :initform 'helm-grep)))
 
 (defvar helm-source-grep nil)
 
@@ -1493,7 +1494,8 @@ if available with current AG version."
    (candidate-number-limit :initform 99999)
    (requires-pattern :initform 2)
    (nomark :initform t)
-   (action :initform 'helm-grep-actions)))
+   (action :initform 'helm-grep-actions)
+   (group :initform 'helm-grep)))
 
 (defvar helm-source-grep-ag nil)
 

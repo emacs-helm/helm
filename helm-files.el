@@ -561,7 +561,8 @@ Should not be used among other sources.")
     :initform 'helm-find-files-action-transformer)
    (action :initform 'helm-find-files-actions)
    (before-init-hook :initform 'helm-find-files-before-init-hook)
-   (after-init-hook :initform 'helm-find-files-after-init-hook)))
+   (after-init-hook :initform 'helm-find-files-after-init-hook)
+   (group :initform 'helm-files)))
 
 ;; Bookmark handlers.
 ;;

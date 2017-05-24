@@ -88,7 +88,8 @@ will not have anymore separators between candidates."
     :persistent-help "DoNothing"
     :keymap helm-kill-ring-map
     :migemo t
-    :multiline 'helm-kill-ring-max-offset)
+    :multiline 'helm-kill-ring-max-offset
+    :group 'helm-ring)
   "Source for browse and insert contents of kill-ring.")
 
 (defun helm-kill-ring-candidates ()
@@ -247,14 +248,16 @@ This is a command for `helm-kill-ring-map'."
   (helm-build-sync-source "mark-ring"
     :candidates #'helm-mark-ring-get-candidates
     :action '(("Goto line" . helm-mark-ring-default-action)) 
-    :persistent-help "Show this line"))
+    :persistent-help "Show this line"
+    :group 'helm-ring))
 
 ;;; Global-mark-ring
 (defvar helm-source-global-mark-ring
   (helm-build-sync-source "global-mark-ring"
     :candidates #'helm-global-mark-ring-get-candidates
     :action '(("Goto line" . helm-mark-ring-default-action))
-    :persistent-help "Show this line"))
+    :persistent-help "Show this line"
+    :group 'helm-ring))
 
 (defun helm-global-mark-ring-format-buffer (marker)
   (with-current-buffer (marker-buffer marker)
@@ -332,7 +335,8 @@ the `global-mark-ring' after each new visit."
                           for register = (car candidate)
                           do (setq register-alist
                                 (delq (assoc register register-alist)
-                                      register-alist)))))))
+                                      register-alist))))))
+    :group 'helm-ring)
   "See (info \"(emacs)Registers\")")
 
 (defun helm-register-candidates ()
@@ -512,7 +516,8 @@ This command is useful when used with persistent action."
              (kmacro-push-ring)
              (kmacro-split-ring-element candidate)
              (kmacro-exec-ring-item
-              candidate helm-current-prefix-arg))))
+              candidate helm-current-prefix-arg)))
+          :group 'helm-ring)
         :buffer "*helm kmacro*"))
 
 (provide 'helm-ring)

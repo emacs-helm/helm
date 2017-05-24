@@ -130,7 +130,8 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                candidate))))
    (help-message :initform 'helm-org-headings-help-message)
    (action :initform 'helm-org-headings-actions)
-   (keymap :initform 'helm-org-headings-map)))
+   (keymap :initform 'helm-org-headings-map)
+   (group :initform 'helm-org)))
 
 (defmethod helm--setup-source :after ((source helm-org-headings-class))
   (let ((parents (slot-value source 'parents)))

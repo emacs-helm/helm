@@ -140,6 +140,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
     :multiline t
     :multimatch nil
     :requires-pattern 2
+    :group 'helm-regexp
     :mode-line "Press TAB to select action."
     :action '(("Kill Regexp as sexp" . helm-kill-regexp-as-sexp)
               ("Query Replace Regexp (C-u Not inside word.)"
@@ -329,7 +330,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (help-message :initform 'helm-moccur-help-message)
    (keymap :initform helm-moccur-map)
    (history :initform 'helm-occur-history)
-   (requires-pattern :initform 2)))
+   (requires-pattern :initform 2)
+   (group :initform 'helm-regexp)))
 
 (defun helm-moccur-resume-fn ()
   (with-helm-buffer

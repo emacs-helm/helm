@@ -188,7 +188,8 @@ This affect also sorting functions in the same way."
     :follow 'never
     :keymap helm-top-map
     :filtered-candidate-transformer #'helm-top-sort-transformer
-    :action-transformer #'helm-top-action-transformer))
+    :action-transformer #'helm-top-action-transformer
+    :group 'helm-sys))
 
 (defvar helm-top--line nil)
 (defun helm-top-transformer (candidates _source)

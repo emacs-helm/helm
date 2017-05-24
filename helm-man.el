@@ -96,7 +96,8 @@ source.")
     :filtered-candidate-transformer
      (lambda (candidates _source)
        (sort candidates #'helm-generic-sort-fn))
-    :action  '(("Display Man page" . helm-man-default-action))))
+    :action  '(("Display Man page" . helm-man-default-action))
+    :group 'helm-man))
 
 ;;;###autoload
 (defun helm-man-woman (arg)

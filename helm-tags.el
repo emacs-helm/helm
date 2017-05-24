@@ -234,6 +234,7 @@ If no entry in cache, create one."
                                               (helm-etags-action-goto
                                                'find-file-other-frame
                                                c))))
+    :group 'helm-tags
     :persistent-help "Go to line"
     :persistent-action (lambda (candidate)
                          (helm-etags-action-goto 'find-file candidate)

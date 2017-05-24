@@ -316,7 +316,8 @@ but the initial search for all candidates in buffer(s)."
                              :persistent-action 'ignore
                              :persistent-help "DoNothing"
                              :keymap helm-dabbrev-map
-                             :action 'helm-dabbrev-default-action)
+                             :action 'helm-dabbrev-default-action
+                             :group 'helm-dabbrev)
                   :buffer "*helm dabbrev*"
                   :input (concat "^" dabbrev " ")
                   :resume 'noresume

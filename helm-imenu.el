@@ -143,7 +143,8 @@ Each car is a regexp match pattern of the imenu type string."
    (nomark :initform t)
    (keymap :initform helm-imenu-map)
    (help-message :initform 'helm-imenu-help-message)
-   (action :initform 'helm-imenu-action)))
+   (action :initform 'helm-imenu-action)
+   (group :initform 'helm-imenu)))
 
 (defcustom helm-imenu-fuzzy-match nil
   "Enable fuzzy matching in `helm-source-imenu'."

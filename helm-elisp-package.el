@@ -361,7 +361,8 @@
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe package" . helm-el-package-describe)
-                       ("Visit homepage" . helm-el-package-visit-homepage)))))
+                       ("Visit homepage" . helm-el-package-visit-homepage)))
+   (group :initform 'helm-el-package)))
 
 (defun helm-el-package--action-transformer (actions candidate)
   (let* ((pkg-desc (get-text-property 0 'tabulated-list-id candidate))

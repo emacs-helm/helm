@@ -84,7 +84,8 @@
         'helm-highlight-files)
   (setf (slot-value source 'help-message) 'helm-generic-file-help-message)
   (setf (slot-value source 'mode-line) (list "File(s)" helm-mode-line-string))
-  (setf (slot-value source 'keymap) helm-generic-files-map))
+  (setf (slot-value source 'keymap) helm-generic-files-map)
+  (setf (slot-value source 'group) 'helm-files))
 
 
 ;; Bookmarks
@@ -117,7 +118,8 @@
   (setf (slot-value source 'mode-line) (list "Bookmark(s)" helm-mode-line-string))
   (setf (slot-value source 'help-message) 'helm-bookmark-help-message)
   (setf (slot-value source 'migemo) t)
-  (setf (slot-value source 'follow) 'never))
+  (setf (slot-value source 'follow) 'never)
+  (setf (slot-value source 'group) 'helm-bookmark))
 
 
 ;; Buffers
@@ -168,7 +170,8 @@
   (setf (slot-value source 'filtered-candidate-transformer)
         '(helm-skip-boring-buffers
           helm-buffers-sort-transformer
-          helm-highlight-buffers)))
+          helm-highlight-buffers))
+  (setf (slot-value source 'group) 'helm-buffers))
 
 ;; Functions
 (defclass helm-type-function (helm-source) ()
@@ -229,7 +232,8 @@
 (defmethod helm--setup-source :before ((source helm-type-command))
   (setf (slot-value source 'action) 'helm-type-command-actions)
   (setf (slot-value source 'coerce) 'helm-symbolify)
-  (setf (slot-value source 'persistent-action) 'describe-function))
+  (setf (slot-value source 'persistent-action) 'describe-function)
+  (setf (slot-value source 'group) 'helm-command))
 
 ;; Timers
 (defclass helm-type-timers (helm-source) ()
@@ -258,7 +262,8 @@
   (setf (slot-value source 'persistent-action)
         (lambda (tm)
           (describe-function (timer--function tm))))
-  (setf (slot-value source 'persistent-help) "Describe Function"))
+  (setf (slot-value source 'persistent-help) "Describe Function")
+  (setf (slot-value source 'group) 'helm-elisp))
 
 ;; Builders.
 (defun helm-build-type-file ()
