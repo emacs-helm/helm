@@ -1229,7 +1229,9 @@ Can be used as value for `completion-in-region-function'."
                   (list (+ start base-size) end)
                   completion-list-insert-choice-function))
                 ((consp result) ; crm.
-                 (insert (mapconcat 'identity result ",")))
+                 (funcall completion-list-insert-choice-function
+                          (+ start base-size) end
+                          (mapconcat 'identity result ",")))
                 (t nil)))
       (advice-remove 'lisp--local-variables
                      #'helm-mode--advice-lisp--local-variables))))
