@@ -558,7 +558,14 @@ With a value of 1 enable, a value of -1 or nil disable the mode.
     :custom (choice null integer)
     :documentation
     "  This slot have no more effect and is just kept for backward compatibility.
-  Please don't use it."))
+  Please don't use it.")
+
+   (group
+    :initarg :group
+    :initform helm
+    :custom symbol
+    :documentation
+    "  The current source group, default to `helm' when not specified."))
 
   "Main interface to define helm sources."
   :abstract t)

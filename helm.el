@@ -243,6 +243,7 @@ vectors, so don't use strings to define them."
     ;; Debugging command
     (define-key map (kbd "C-h C-d")    'undefined)
     (define-key map (kbd "C-h C-d")    'helm-enable-or-switch-to-debug)
+    (define-key map (kbd "C-h c")      'helm-customize-group)
     ;; Allow to eval keymap without errors.
     (define-key map [f1] nil)
     (define-key map (kbd "C-h C-h")    'undefined)
@@ -262,6 +263,14 @@ vectors, so don't use strings to define them."
                   (helm-select-nth-action ,n))))
     map)
   "Keymap for helm.")
+
+(defun helm-customize-group ()
+  "Jump to customization group of current source.
+
+Default to `helm' when group is not defined in source."
+  (interactive)
+  (helm-run-after-exit 'customize-group (helm-attr 'group)))
+(put 'helm-customize-group 'helm-only t)
 
 (defun helm--action-at-nth-set-fn-1 (value &optional negative)
   (cl-loop for n from 1 to 9
