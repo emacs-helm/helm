@@ -22,6 +22,8 @@
 (require 'helm-lib)
 (require 'helm-files)
 
+(defvar crm-separator)
+
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -1229,9 +1231,15 @@ Can be used as value for `completion-in-region-function'."
                   (list (+ start base-size) end)
                   completion-list-insert-choice-function))
                 ((consp result) ; crm.
-                 (funcall completion-list-insert-choice-function
-                          (+ start base-size) end
-                          (mapconcat 'identity result ",")))
+                 (let ((beg (+ start base-size))
+                       (sep ","))
+                   ;; Try to find a default separator.
+                   (save-excursion
+                     (goto-char beg)
+                     (when (looking-back crm-separator (1- (point)))
+                       (setq sep (match-string 0))))
+                   (funcall completion-list-insert-choice-function
+                            beg end (mapconcat 'identity result sep))))
                 (t nil)))
       (advice-remove 'lisp--local-variables
                      #'helm-mode--advice-lisp--local-variables))))
