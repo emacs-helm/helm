@@ -1748,7 +1748,16 @@ and should be used carefully elsewhere, or not at all, using
 
 (defun helm-create-tramp-name (fname)
   "Build filename for `helm-pattern' like /su:: or /sudo::."
-  (file-remote-p fname))
+  (apply #'tramp-make-tramp-file-name
+         ;; `tramp-dissect-file-name' returns a list in emacs-26
+         ;; whereas in 24.5 it returns a vector, thus the car is a
+         ;; symbol (`tramp-file-name') which is not needed as argument
+         ;; for `tramp-make-tramp-file-name' so transform the cdr in
+         ;; vector, and for 24.5 use directly the returned value.
+         (cl-loop with v = (pcase (tramp-dissect-file-name fname)
+                             (`(,_l . ,ll) (vconcat ll))
+                             ((and vec (pred vectorp)) vec))
+                  for i across v collect i)))
 
 (defun helm-ff-get-tramp-methods ()
   "Returns a list of the car of `tramp-methods'."
