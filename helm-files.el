@@ -1748,9 +1748,7 @@ and should be used carefully elsewhere, or not at all, using
 
 (defun helm-create-tramp-name (fname)
   "Build filename for `helm-pattern' like /su:: or /sudo::."
-  (apply #'tramp-make-tramp-file-name
-         (cl-loop with v = (tramp-dissect-file-name fname)
-               for i across v collect i)))
+  (file-remote-p fname))
 
 (defun helm-ff-get-tramp-methods ()
   "Returns a list of the car of `tramp-methods'."
