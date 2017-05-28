@@ -1747,7 +1747,9 @@ and should be used carefully elsewhere, or not at all, using
       (dired-goto-file target))))
 
 (defun helm-create-tramp-name (fname)
-  "Build filename for `helm-pattern' like /su:: or /sudo::."
+  "Build filename from `helm-pattern' like /su:: or /sudo::."
+  ;; `tramp-make-tramp-file-name' takes 7 args on emacs-26 whereas it
+  ;; takes only 5 args in emacs-24/25.
   (apply #'tramp-make-tramp-file-name
          ;; `tramp-dissect-file-name' returns a list in emacs-26
          ;; whereas in 24.5 it returns a vector, thus the car is a
