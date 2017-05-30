@@ -1449,12 +1449,12 @@ if available with current AG version."
                                     (propertize helm-grep-last-cmd-line
                                                 'face 'helm-grep-cmd-line)))
                     (setq mode-line-format
-                          '(" " mode-line-buffer-identification " "
+                          `(" " mode-line-buffer-identification " "
                             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                             (:eval (propertize
                                     (format
                                      "[%s process finished - (no results)] "
-                                     (upcase proc-name))
+                                     ,(upcase proc-name))
                                     'face 'helm-grep-finish))))))
                  ((string= event "finished\n")
                   (helm-log "%s process finished with %s results in %fs"
