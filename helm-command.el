@@ -285,7 +285,7 @@ You can get help on each command by persistent action."
           (cl-flet ((save-hist (command)
                       (setq extended-command-history
                             (cons command (delete command extended-command-history)))))
-            (condition-case err
+            (condition-case-unless-debug err
                 (progn
                   (command-execute sym-com 'record)
                   (save-hist command-name))
