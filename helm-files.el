@@ -292,6 +292,14 @@ it checks if a file is in one of these directories.
 Remote filesystem are generally mounted with sshfs."
   :group 'helm-files
   :type '(repeat string))
+
+(defcustom helm-browse-project-default-find-files-fn
+  #'helm-browse-project-walk-directory
+  "The default function to retrieve files in a non-vc directory.
+
+A function that takes a directory name as only arg."
+  :group 'helm-files
+  :type 'function)
 
 ;;; Faces
 ;;
@@ -3378,12 +3386,28 @@ Set `recentf-max-saved-items' to a bigger value if default is too small.")
                     name (abbreviate-file-name directory)))
     :buffer-list (lambda () (helm-browse-project-get-buffers directory))))
 
+(defun helm-browse-project-walk-directory (directory)
+  "Default function for `helm-browse-project-default-find-files-fn'."
+  (helm-walk-directory
+   directory
+   :directories nil :path 'full :skip-subdirs t))
+
+(defun helm-browse-project-ag-find-files (directory)
+  "A suitable function for `helm-browse-project-default-find-files-fn'.
+
+Needs AG as backend."
+  (with-temp-buffer
+    (call-process-shell-command
+     (format "ag --hidden -g '.*' %s" directory)
+     nil t nil)
+    (mapcar (lambda (f) (expand-file-name f directory))
+            (split-string (buffer-string) "\n"))))
+
 (defun helm-browse-project-find-files (directory &optional refresh)
   (when refresh (remhash directory helm--browse-project-cache))
   (unless (gethash directory helm--browse-project-cache)
-    (puthash directory (helm-walk-directory
-                        directory
-                        :directories nil :path 'full :skip-subdirs t)
+    (puthash directory (funcall helm-browse-project-default-find-files-fn
+                                directory)
              helm--browse-project-cache))
   (helm :sources `(,(helm-browse-project-build-buffers-source directory)
                    ,(helm-build-in-buffer-source "Browse project"
