@@ -158,14 +158,6 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
   "Keymap use as must-match-map in `helm-comp-read' and `helm-read-file-name'.")
 
 
-;;; Internal
-;;
-;;
-;; Flag to know if `helm-pattern' have been added
-;; to candidate list in `helm-comp-read'.
-(defvar helm-cr--unknown-pattern-flag nil)
-
-
 ;;; helm-comp-read
 ;;
 ;;
@@ -265,28 +257,46 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
-(defun helm-cr-default-transformer (candidates _source)
+(defun helm-cr--pattern-in-candidates-p (candidates)
+  (or (assoc helm-pattern candidates)
+      (assq (intern helm-pattern) candidates)
+      (member helm-pattern candidates)
+      (member (downcase helm-pattern) candidates)
+      (member (upcase helm-pattern) candidates)))
+
+(defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (when (and (null candidates) (not (string= helm-pattern "")))
-    (setq helm-cr--unknown-pattern-flag t
-          candidates (list helm-pattern)))
-  (cl-loop for c in candidates
-        for cand = (if (stringp c) (replace-regexp-in-string "\\s\\" "" c) c)
-        for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
-        if (and (equal cand pat) helm-cr--unknown-pattern-flag)
-        collect
-        (cons (concat (propertize
-                       " " 'display
-                       (propertize "[?]" 'face 'helm-ff-prefix))
-                      c)
-              c)
-        into lst
-        else collect (if (and (stringp cand)
-                              (string-match "\n" cand))
-                         (cons (replace-regexp-in-string "\n" "->" c) c)
-                         c)
-        into lst
-        finally return (helm-fast-remove-dups lst :test 'equal)))
+  (let ((must-match (helm-attr 'must-match source))
+        unknown-pattern)
+    (unless (or (eq must-match t)
+                (string= helm-pattern "")
+                (helm-cr--pattern-in-candidates-p candidates))
+      (setq candidates (append (list
+                                ;; Unquote helm-pattern
+                                ;; when it is added
+                                ;; as candidate.
+                                (replace-regexp-in-string
+                                 "\\s\\" "" helm-pattern))
+                               candidates))
+      ;; Notify pattern have been added to candidates.
+      (setq unknown-pattern t))
+    (cl-loop for c in candidates
+             for cand = (if (stringp c)
+                            (replace-regexp-in-string "\\s\\" "" c) c)
+             for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
+             if (and (equal c pat) unknown-pattern) collect
+             (cons (concat (propertize
+                            " " 'display
+                            (propertize "[?]" 'face 'helm-ff-prefix))
+                           c)
+                   c)
+             into lst
+             else collect (if (and (stringp cand)
+                                   (string-match "\n" cand))
+                              (cons (replace-regexp-in-string "\n" "->" c) c)
+                            c)
+             into lst
+             finally return (helm-fast-remove-dups lst :test 'equal))))
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
@@ -470,21 +480,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
             (lambda ()
               (let ((cands (helm-comp-read-get-candidates
                             collection test sort alistp)))
-                (unless (or (eq must-match t)
-                            (string= helm-pattern "")
-                            (assoc helm-pattern cands)
-                            (assoc (intern helm-pattern) cands)
-                            (member helm-pattern cands)
-                            (member (downcase helm-pattern) cands)
-                            (member (upcase helm-pattern) cands))
-                  (setq cands (append (list
-                                       ;; Unquote helm-pattern
-                                       ;; when it is added
-                                       ;; as candidate.
-                                       (replace-regexp-in-string
-                                        "\\s\\" "" helm-pattern))
-                                      cands))
-                  (setq helm-cr--unknown-pattern-flag t))
                 (helm-cr-default default cands))))
            (history-get-candidates
             (lambda ()
@@ -514,8 +509,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        :help-message help-message
                        :action action-fn))
            (src (helm-build-sync-source name
-                  :init (lambda ()
-                          (setq helm-cr--unknown-pattern-flag nil))
                   :candidates get-candidates
                   :match-part match-part
                   :multiline multiline
@@ -531,12 +524,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :action action-fn
                   :volatile volatile))
            (src-1 (helm-build-in-buffer-source name
-                    :init (lambda ()
-                            (setq helm-cr--unknown-pattern-flag nil))
-                    :data  (lambda ()
-                             (let ((cands (helm-comp-read-get-candidates
-                                           collection test sort alistp)))
-                               (helm-cr-default default cands)))
+                    :data get-candidates
                     :match-part match-part
                     :multiline multiline
                     :header-name header-name
@@ -550,8 +538,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :help-message help-message
                     :action action-fn))
            (src-list (list src-hist
-                           (if candidates-in-buffer
-                               src-1 src)))
+                           (cons (cons 'must-match must-match)
+                                 (if candidates-in-buffer
+                                     src-1 src))))
            (helm-execute-action-at-once-if-one exec-when-only-one)
            (helm-quit-if-no-candidate quit-when-no-cand)
            result)
