@@ -492,7 +492,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
-   "Marked files in dired" 'helm-marked-files-in-dired
+   "Marked files in dired `C-x C-q, C-u wdired'" 'helm-marked-files-in-dired
    "Query replace fnames on marked `M-%'" 'helm-ff-query-replace-on-marked
    "Query replace contents on marked" 'helm-ff-query-replace
    "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
