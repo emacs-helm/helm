@@ -74,7 +74,7 @@
                      ;; Remove it for the helm one. (Fixed in Emacs24)
                      (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
    (candidates :initform 'helm-esh-get-candidates)
-   (nomark :initform t)
+   ;(nomark :initform t)
    (persistent-action :initform 'ignore)
    (nohighlight :initform t)
    (filtered-candidate-transformer
@@ -104,14 +104,19 @@ The function that call this should set `helm-ec-target' to thing at point."
                (string= (buffer-substring (point) pt) helm-ec-target))
       (delete-region (point) pt)))
   (when (string-match "\\`\\*" helm-ec-target) (insert "*"))
-  (cond ((string-match "\\`~/?" helm-ec-target)
-         (insert (helm-quote-whitespace (abbreviate-file-name candidate))))
-        ((string-match "\\`/" helm-ec-target)
-         (insert (helm-quote-whitespace candidate)))
-        (t
-         (insert (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
-                         (helm-quote-whitespace
-                          (file-relative-name candidate)))))))
+  (let ((marked (helm-marked-candidates)))
+    (insert
+     (mapconcat
+      (lambda (x)
+        (cond ((string-match "\\`~/?" helm-ec-target)
+               (helm-quote-whitespace (abbreviate-file-name x)))
+              ((string-match "\\`/" helm-ec-target)
+               (helm-quote-whitespace x))
+              (t
+               (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
+                       (helm-quote-whitespace
+                        (file-relative-name x))))))
+      marked " "))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
