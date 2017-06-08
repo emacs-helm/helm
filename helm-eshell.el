@@ -95,7 +95,7 @@
 
 ;; Internal.
 (defvar helm-ec-target "")
-(defun helm-ec-insert (candidate)
+(defun helm-ec-insert (_candidate)
   "Replace text at point with CANDIDATE.
 The function that call this should set `helm-ec-target' to thing at point."
   (let ((pt (point)))
