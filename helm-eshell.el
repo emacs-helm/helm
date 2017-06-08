@@ -131,7 +131,10 @@ The function that call this should set `helm-ec-target' to thing at point."
                                     (not (string= entry ""))
                                     (file-name-as-directory
                                      (expand-file-name entry default-directory)))
-              for i in (all-completions pcomplete-stub table)
+              with comps = (all-completions pcomplete-stub table)
+              unless comps return (prog1 nil
+                                    (message "No completions of %s" pcomplete-stub))
+              for i in comps
               ;; Transform the related names to abs names.
               for file-cand = (and exp-entry
                                    (if (file-remote-p i) i
