@@ -1038,11 +1038,11 @@ This doesn't replace inside the files, only modify filenames."
                for new = (concat (helm-basedir old)
                                  (replace-regexp-in-string
                                   (cond ((string= regexp "%.")
-                                         (helm-basename old t))
+                                         (regexp-quote (helm-basename old t)))
                                         ((string= regexp ".%")
-                                         (file-name-extension old))
+                                         (regexp-quote (file-name-extension old)))
                                         ((string= regexp "%")
-                                         (helm-basename old))
+                                         (regexp-quote (helm-basename old)))
                                         (t regexp))
                                   (save-match-data
                                     (cond ((string-match "\\\\#" str)
