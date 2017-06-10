@@ -455,11 +455,6 @@ and are not renamed to current directory, IOW use this (\\#) to rename files ins
 In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
 are available, respectively `%u', `%d' and `%c'.
 
-*** Edit marked files in a dired buffer
-
-You can open a dired buffer with only marked files with `\\<helm-find-files-map>\\[helm-ff-run-marked-files-in-dired]'
-With a prefix arg you can open this same dired buffer in wdired mode for editing files.
-
 *** Copying renaming asynchronously
 
 If you use async library (if you have installed helm from MELPA you do) you can enable
