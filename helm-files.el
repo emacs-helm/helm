@@ -3885,6 +3885,7 @@ This is the starting point for nearly all actions you can do on files."
                                        (null hist))
                                   (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
+    (setq current-prefix-arg nil)
     (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
                                   (concat "^" (regexp-quote presel))))))
 
