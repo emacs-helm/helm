@@ -44,6 +44,7 @@
     "Find file other window"                'helm-find-files-other-window
     "Find file other frame"                 'find-file-other-frame
     "Open dired in file's directory"        'helm-open-dired
+    "Marked files in dired"                 'helm-marked-files-in-dired
     "Grep File(s) `C-u recurse'"            'helm-find-files-grep
     "Zgrep File(s) `C-u Recurse'"           'helm-ff-zgrep
     "Pdfgrep File(s)"                       'helm-ff-pdfgrep
