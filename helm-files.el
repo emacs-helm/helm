@@ -378,6 +378,7 @@ A function that takes a directory name as only arg."
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
     (define-key map (kbd "C-x r m")       'helm-ff-bookmark-set)
     (define-key map (kbd "C-x r b")       'helm-find-files-toggle-to-bookmark)
+    (define-key map (kbd "C-x C-q")       'helm-ff-run-marked-files-in-dired)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -492,6 +493,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
    "Query replace fnames on marked `M-%'" 'helm-ff-query-replace-on-marked
+   "Marked files in dired" 'helm-marked-files-in-dired
    "Query replace contents on marked" 'helm-ff-query-replace
    "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer" 'helm-ff-mail-attach-files
@@ -1753,6 +1755,28 @@ and should be used carefully elsewhere, or not at all, using
     (let ((target (expand-file-name (helm-substitute-in-filename file))))
       (dired (file-name-directory target))
       (dired-goto-file target))))
+
+(defun helm-marked-files-in-dired (_candidate)
+  "Open a dired buffer with only marked files.
+
+With a prefix arg toggle dired buffer to wdired mode."
+  (advice-add 'wdired-finish-edit :override #'helm--advice-wdired-finish-edit)
+  (let* ((marked (helm-marked-candidates))
+         (current (car marked)))
+    (unless (and ffap-url-regexp
+                 (string-match-p ffap-url-regexp current))
+      (let ((target (expand-file-name (helm-substitute-in-filename current))))
+        (dired (cons helm-ff-default-directory marked))
+        (dired-goto-file target)
+        (when (or helm-current-prefix-arg current-prefix-arg)
+          (call-interactively 'wdired-change-to-wdired-mode))))))
+
+(defun helm-ff-run-marked-files-in-dired ()
+  "Execute `helm-marked-files-in-dired' interactively."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-marked-files-in-dired)))
+(put 'helm-ff-run-marked-files-in-dired 'helm-only t)
 
 (defun helm-create-tramp-name (fname)
   "Build filename from `helm-pattern' like /su:: or /sudo::."
