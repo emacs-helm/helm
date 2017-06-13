@@ -160,11 +160,16 @@ When only `add-text-properties' is available APPEND is ignored."
                       (null some-file-names-unchanged)
                       (= (length files-renamed) 1))
                  (setq dired-directory (cdr (car files-renamed))))
-                ;; [1] Fixit.
+                ;; Fix [1].
                 ((and (consp dired-directory)
                       (cdr dired-directory)
-                      (null some-file-names-unchanged))
-                 (setcdr dired-directory (mapcar 'cdr files-renamed))))
+                      files-renamed)
+                 (setcdr dired-directory
+                         (cl-loop with old-to-rename = (mapcar 'car files-renamed)
+                                  for f in (cdr dired-directory)
+                                  if (member f old-to-rename)
+                                  collect (assoc-default f files-renamed)
+                                  else collect f))))
 	  ;; Re-sort the buffer.
 	  (revert-buffer)
 	  (let ((inhibit-read-only t))
