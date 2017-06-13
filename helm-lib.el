@@ -154,17 +154,21 @@ When only `add-text-properties' is available APPEND is ignored."
 	  ;; contents of a directory), change dired-directory if that
 	  ;; file was renamed.  (This ought to be generalized to
 	  ;; handle the multiple files case, but that's less trivial)
-          ;; fixit [1]. 
+          ;; fixit [1].
 	  (cond ((and (stringp dired-directory)
                       (not (file-directory-p dired-directory))
                       (null some-file-names-unchanged)
                       (= (length files-renamed) 1))
                  (setq dired-directory (cdr (car files-renamed))))
-                ;; Fix [1].
+                ;; Fix [1] i.e dired buffers created with
+                ;; (dired '(foo f1 f2 f3)).
                 ((and (consp dired-directory)
                       (cdr dired-directory)
                       files-renamed)
                  (setcdr dired-directory
+                         ;; Replace in `dired-directory' files that have
+                         ;; been modified with their new name keeping
+                         ;; the ones that are unmodified at the same place.
                          (cl-loop with old-to-rename = (mapcar 'car files-renamed)
                                   for f in (cdr dired-directory)
                                   if (member f old-to-rename)
