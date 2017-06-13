@@ -225,7 +225,7 @@ When only `add-text-properties' is available APPEND is ignored."
                                (wrong-number-of-arguments
                                 ;; emacs-24
                                 (wdired-normalize-filename file))))))
-      (if (or no-dir old (file-name-absolute-p file))
+      (if (or no-dir old (and file (file-name-absolute-p file)))
 	  file
 	(and file (> (length file) 0)
              (expand-file-name file (dired-current-directory)))))))
