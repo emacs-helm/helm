@@ -100,11 +100,11 @@ When only `add-text-properties' is available APPEND is ignored."
       (add-face-text-property beg end face append object)
       (add-text-properties beg end `(face ,face) object)))
 
-;; Emacs bug fixit:
+;; Override `wdired-finish-edit'.
+;; Fix emacs bug in `wdired-finish-edit' where
 ;; Wdired is not handling the case where `dired-directory' is a cons
-;; instead of a string.
+;; cell instead of a string.
 (defun helm--advice-wdired-finish-edit ()
-  "Actually rename files based on your editing in the Dired buffer."
   (interactive)
   (wdired-change-to-dired-mode)
   (let ((changes nil)
@@ -153,12 +153,14 @@ When only `add-text-properties' is available APPEND is ignored."
 	  ;; If we are displaying a single file (rather than the
 	  ;; contents of a directory), change dired-directory if that
 	  ;; file was renamed.  (This ought to be generalized to
-	  ;; handle the multiple files case, but that's less trivial).
+	  ;; handle the multiple files case, but that's less trivial)
+          ;; fixit [1]. 
 	  (cond ((and (stringp dired-directory)
                       (not (file-directory-p dired-directory))
                       (null some-file-names-unchanged)
                       (= (length files-renamed) 1))
                  (setq dired-directory (cdr (car files-renamed))))
+                ;; [1] Fixit.
                 ((and (consp dired-directory)
                       (cdr dired-directory)
                       (null some-file-names-unchanged))
@@ -179,6 +181,45 @@ When only `add-text-properties' is available APPEND is ignored."
       (dired-log-summary (format "%d rename actions failed" errors) nil)))
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil))
+
+;; Override `wdired-get-filename'.
+;; Fix emacs bug in `wdired-get-filename' which returns the current
+;; directory concatened with the filename i.e
+;; "/home/you//home/you/foo" when filename is absolute in dired
+;; buffer.
+;; In consequence Wdired try to rename files even when buffer have
+;; been modified and corrected, e.g delete one char and replace it so
+;; that no change to file is done.
+;; This also lead to ask confirmation for every files even when not
+;; modified and when `wdired-use-interactive-rename' is nil.
+(defun helm--advice-wdired-get-filename (&optional no-dir old)
+  ;; FIXME: Use dired-get-filename's new properties.
+  (let (beg end file)
+    (save-excursion
+      (setq end (line-end-position))
+      (beginning-of-line)
+      (setq beg (next-single-property-change (point) 'old-name nil end))
+      (unless (eq beg end)
+	(if old
+	    (setq file (get-text-property beg 'old-name))
+	  ;; In the following form changed `(1+ beg)' to `beg' so that
+	  ;; the filename end is found even when the filename is empty.
+	  ;; Fixes error and spurious newlines when marking files for
+	  ;; deletion.
+	  (setq end (next-single-property-change beg 'end-name))
+	  (setq file (buffer-substring-no-properties (1+ beg) end)))
+	;; Don't unquote the old name, it wasn't quoted in the first place
+        (and file (setq file (condition-case _err
+                                 ;; emacs-25+
+                                 (apply #'wdired-normalize-filename
+                                        (list file (not old)))
+                               (wrong-number-of-arguments
+                                ;; emacs-24
+                                (wdired-normalize-filename file))))))
+      (if (or no-dir old (file-name-absolute-p file))
+	  file
+	(and file (> (length file) 0)
+             (expand-file-name file (dired-current-directory)))))))
 
 ;;; Macros helper.
 ;;
