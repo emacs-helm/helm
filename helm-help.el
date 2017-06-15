@@ -235,6 +235,15 @@ Behave differently depending of `helm-selection' (current candidate in helm-buff
 - candidate is a file         => open it.
 - marked candidates (1+)      => open them with default action.
 
+Note that when copying, renaming etc... from `helm-find-files' you
+will have a file completion with `helm-read-file-name' to select the
+destination file; To not confuse users of `read-file-name' or
+`read-directory-name' RET behave normally, it exit the minibuffer as
+soon as you press RET, if you want the same behavior as in
+`helm-find-files', bind `helm-ff-RET' to the `helm-read-file-map':
+
+    (define-key helm-read-file-map (kbd \"RET\") 'helm-ff-RET)
+
 *** Find file at point
 
 Helm is using `ffap' partially or completely to find file at point
