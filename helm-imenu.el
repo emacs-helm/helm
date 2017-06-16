@@ -305,7 +305,7 @@ Each car is a regexp match pattern of the imenu type string."
         (helm-execute-action-at-once-if-one
          helm-imenu-execute-action-at-once-if-one))
     (helm :sources 'helm-source-imenu
-          :default (list (concat "\\_<" str "\\_>") str)
+          :default (list (concat "\\_<" (regexp-quote str) "\\_>") str)
           :preselect str
           :buffer "*helm imenu*")))
 
@@ -338,7 +338,7 @@ or it have an association in `helm-imenu-all-buffer-assoc'."
                      (helm-imenu-candidates-in-all-buffers 'build-sources)
                      '(helm-source-imenu-all))))
     (helm :sources sources
-          :default (list (concat "\\_<" str "\\_>") str)
+          :default (list (concat "\\_<" (regexp-quote str) "\\_>") str)
           :preselect (unless helm--maybe-use-default-as-input str)
           :buffer "*helm imenu all*")))
 
