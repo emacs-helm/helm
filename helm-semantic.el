@@ -208,9 +208,7 @@ Fill in the symbol at point by default."
                 (format "\\_<%s\\_>" (car (semantic-current-tag))))))
     (helm :sources source
           :candidate-number-limit 9999
-          :default (and imenu-p
-                        (list (concat "\\_<" (regexp-quote str) "\\_>")
-                              str))
+          :default (and imenu-p (list (concat "\\_<" (and str (regexp-quote str)) "\\_>") str))
           :preselect (if (or arg imenu-p) str tag)
           :buffer "*helm semantic/imenu*")))
 
