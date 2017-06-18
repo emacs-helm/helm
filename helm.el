@@ -1078,11 +1078,17 @@ you don't need the prefix arg when using \\[helm-mark-all] or \\[helm-toggle-all
 
 ** Follow candidates
 
-You can execute automatically an action specified in the source as persistent-action
-while moving up and down in helm-window or while updating the list of candidates by
-turning on `helm-follow-mode' while in helm.
-The follow behavior will be saved and used in next emacs sessions when `helm-follow-mode-persistent'
-is non-nil.
+You can execute automatically an action specified in the source as
+persistent-action while moving up and down in helm-window or while
+updating the list of candidates by turning on `helm-follow-mode' while
+in helm with \\<helm-map>\\[helm-follow-mode].  The follow behavior
+will be saved and used in next emacs sessions when
+`helm-follow-mode-persistent' is non-nil.
+
+If you just want to follow candidates occasionally without enabling
+`helm-follow-mode' you can use instead \\<helm-map>\\[helm-follow-action-forward] or \\[helm-follow-action-backward].
+Note that when `helm-follow-mode' is enabled these commands are just
+going to next/previous line without executing persistent action.
 
 ** Frequently Used Commands
 
