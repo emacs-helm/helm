@@ -4619,10 +4619,14 @@ first source."
   (helm-move-selection-common :where 'source :direction source-or-name))
 
 (defun helm--follow-action (arg)
-  (let ((helm--temp-follow-flag t))
+  (let ((helm--temp-follow-flag t) ; Needed in HFF.
+        (in-follow-mode (helm-follow-mode-p)))
+    ;; When follow-mode is already enabled, just go to next or
+    ;; previous line.
     (when (or (eq last-command 'helm-follow-action-forward)
               (eq last-command 'helm-follow-action-backward)
-              (eq last-command 'helm-execute-persistent-action))
+              (eq last-command 'helm-execute-persistent-action)
+              in-follow-mode)
       (if (> arg 0)
           (helm-move-selection-common :where 'line
                                       :direction 'next
@@ -4630,7 +4634,8 @@ first source."
           (helm-move-selection-common :where 'line
                                       :direction 'previous
                                       :follow nil)))
-    (helm-execute-persistent-action)))
+    (unless in-follow-mode
+      (helm-execute-persistent-action))))
 
 (defun helm-follow-action-forward ()
   "Go to next line and execute persistent action."
