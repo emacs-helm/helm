@@ -417,6 +417,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
               collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-moccur
         :buffer "*helm multi occur*"
+        :default (regexp-quote (thing-at-point 'symbol))
         :history 'helm-occur-history
         :keymap helm-moccur-map
         :input input
@@ -616,6 +617,7 @@ Special commands:
               collect (buffer-chars-modified-tick (get-buffer b)))))
   (helm :sources 'helm-source-occur
         :buffer "*helm occur*"
+        :default (regexp-quote (thing-at-point 'symbol))
         :history 'helm-occur-history
         :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
                         (format "%s:%d:" (regexp-quote (buffer-name))
