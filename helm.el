@@ -4452,14 +4452,26 @@ Key arg DIRECTION can be one of:
     (helm-skip-header-and-separator-line 'previous)
     (helm-move--beginning-of-multiline-candidate)))
 
+(defun helm--forward-candidate ()
+  (helm-aif (next-single-property-change
+             (point) 'helm-candidate)
+      (goto-char it)
+    (if (get-text-property (point) 'helm-candidate)
+        (goto-char (next-single-char-property-change
+                    (point) 'helm-candidate))
+      (forward-line 1))))
+
+(defun helm--backward-candidate ()
+  (helm-aif (previous-single-property-change
+             (point) 'helm-candidate nil
+             (and helm-move-to-line-cycle-in-source
+                  (helm-get-previous-header-pos)))
+      (goto-char it)
+    (forward-line -1)))
+
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
-      (helm-aif (previous-single-property-change
-                 (point) 'helm-candidate nil
-                 (and helm-move-to-line-cycle-in-source
-                      (helm-get-previous-header-pos)))
-          (goto-char it)
-        (forward-line -1))
+      (helm--backward-candidate)
     (helm-move--previous-multi-line-fn))
   (when (and helm-move-to-line-cycle-in-source
              (helm-pos-header-line-p))
@@ -4490,13 +4502,7 @@ Key arg DIRECTION can be one of:
               (helm-get-next-candidate-separator-pos))
          (forward-line 1))
          ((not (helm-pos-multiline-p))
-          (helm-aif (next-single-property-change
-                     (point) 'helm-candidate)
-              (goto-char it)
-            (if (get-text-property (point) 'helm-candidate)
-                (goto-char (next-single-char-property-change
-                            (point) 'helm-candidate))
-              (forward-line 1))))
+          (helm--forward-candidate))
          (t (helm-move--next-multi-line-fn)))
   (when (and helm-move-to-line-cycle-in-source
              (or (save-excursion (and (helm-pos-multiline-p)
@@ -4959,7 +4965,11 @@ Optional argument SOURCE is a Helm source object."
   (save-excursion
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
-      (forward-line (if at-point 0 n))
+      (cond (at-point (forward-line 0))
+            ((> n 0)
+             (helm--forward-candidate))
+            ((< n 0)
+             (helm--backward-candidate)))
       (or (eq (point-at-bol) (point-at-eol))
           (helm-pos-header-line-p)
           (if (< n 0) (bobp) (eobp))
