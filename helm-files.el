@@ -658,7 +658,12 @@ ACTION must be an action supported by `helm-dired-action'."
                                    (if helm-ff-transformer-show-only-basename
                                        (helm-basename cand) cand))
                       :initial-input (helm-dwim-target-directory)
-                      :history (helm-find-files-history :comp-read nil))))))
+                      :history (helm-find-files-history :comp-read nil)))))
+         (dest-dir-p (file-directory-p dest))
+         (dest-dir   (helm-basedir dest)))
+    (unless (or dest-dir-p (file-directory-p dest-dir))
+      (when (y-or-n-p (format "Create directory `%s'?" dest-dir))
+        (make-directory dest-dir t)))
     (helm-dired-action
      dest :files ifiles :action action :follow parg)))
 
