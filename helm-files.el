@@ -2466,10 +2466,31 @@ e.g \"foo:12\"."
          (helm-goto-line (string-to-number linum) t))))
 
 (defun helm-ff-mail-attach-files (_candidate)
-  "Run `gnus-dired-attach' on `helm-marked-candidates' or CANDIDATE."
-  (require 'gnus-dired)
-  (let ((flist (helm-marked-candidates :with-wildcard t)))
-    (gnus-dired-attach flist)))
+  "Run `mml-attach-file' on `helm-marked-candidates'."
+  (require 'mml)
+  (let ((flist (helm-marked-candidates :with-wildcard t))
+        (dest-buf (and (derived-mode-p 'message-mode 'mail-mode)
+                       (current-buffer)))
+        bufs)
+    (unless dest-buf
+      (setq bufs (cl-loop for b in (buffer-list)
+                          when (with-current-buffer b
+                                 (derived-mode-p 'message-mode 'mail-mode))
+                          collect (buffer-name b)))
+      (if (and bufs (y-or-n-p "Attach files to existing mail composition buffer? "))
+          (setq dest-buf
+                (if (cdr bufs)
+                    (helm-comp-read "Attach to buffer: " bufs :nomark t)
+                  (car bufs)))
+        (compose-mail)
+        (setq dest-buf (current-buffer))))
+    (switch-to-buffer dest-buf)
+    (save-restriction
+      (widen)
+      (goto-char (point-max))
+      (cl-loop for f in flist
+               do (mml-attach-file f (or (mm-default-file-encoding f)
+                                         "application/octet-stream"))))))
 
 (defvar image-dired-display-image-buffer)
 (defun helm-ff-rotate-current-image-1 (file &optional num-arg)
