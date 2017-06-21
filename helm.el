@@ -4964,7 +4964,7 @@ Optional argument SOURCE is a Helm source object."
           (helm-pos-header-line-p)
           (if (< n 0) (bobp) (eobp))
           (and (null at-point)
-               (null (next-single-property-change
+               (null (next-single-char-property-change
                       (point) 'helm-candidate)))))))
 
 (defun helm-end-of-source-p (&optional at-point)
