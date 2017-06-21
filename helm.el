@@ -3568,10 +3568,14 @@ It is used for narrowing list of candidates to the
     (cl-loop with separate = nil
              with start = (point)
              with singleline = (null (assq 'multiline source))
+             with inhibit-read-only = t
              for m in matches
              for count from 1
              if singleline
-             do (helm-insert-match m 'insert count source)
+             do (let ((beg (point)))
+                  (helm-insert-match m 'insert count source)
+                  (put-text-property beg (point) 'helm-candidate
+                                     (if (cl-oddp count) 'odd 'even)))
              else
              do (progn
                   (if separate
@@ -3977,9 +3981,11 @@ this additional info after the source name by overlay."
                              (1+ (cdr (assq 'item-count source)))
                              source)
           (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers
-                           (1+ (cdr (assq 'item-count source)))
-                           source))
+      (let ((beg (point))
+            (count (1+ (cdr (assq 'item-count source)))))
+        (helm-insert-match candidate 'insert-before-markers count source)
+        (put-text-property beg (point) 'helm-candidate
+                           (if (cl-oddp count) 'odd 'even))))
     (cl-incf (cdr (assq 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
@@ -4448,12 +4454,21 @@ Key arg DIRECTION can be one of:
 
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
-      (forward-line -1)
+      (helm-aif (previous-single-property-change
+                 (point) 'helm-candidate nil
+                 (and helm-move-to-line-cycle-in-source
+                      (helm-get-previous-header-pos)))
+          (goto-char it)
+        (forward-line -1))
     (helm-move--previous-multi-line-fn))
   (when (and helm-move-to-line-cycle-in-source
              (helm-pos-header-line-p))
     (forward-line 1)
     (helm-move--end-of-source)
+    (goto-char (point-at-eol))
+    (helm-aif (previous-single-property-change
+               (point) 'helm-candidate)
+        (goto-char it))
     ;; We are at end of helm-buffer
     ;; check if last candidate is a multiline candidate
     ;; and jump to it
@@ -4471,9 +4486,18 @@ Key arg DIRECTION can be one of:
            (goto-char header-pos)))))
 
 (defun helm-move--next-line-fn ()
-  (if (not (helm-pos-multiline-p))
-      (forward-line 1)
-    (helm-move--next-multi-line-fn))
+  (cond ((and (not (helm-pos-multiline-p))
+              (helm-get-next-candidate-separator-pos))
+         (forward-line 1))
+         ((not (helm-pos-multiline-p))
+          (helm-aif (next-single-property-change
+                     (point) 'helm-candidate)
+              (goto-char it)
+            (if (get-text-property (point) 'helm-candidate)
+                (goto-char (next-single-char-property-change
+                            (point) 'helm-candidate))
+              (forward-line 1))))
+         (t (helm-move--next-multi-line-fn)))
   (when (and helm-move-to-line-cycle-in-source
              (or (save-excursion (and (helm-pos-multiline-p)
                                       (goto-char (overlay-end
@@ -4664,16 +4688,18 @@ candidates."
       (goto-char helm-selection-point))
     (move-overlay
      helm-selection-overlay (point-at-bol)
-     (if (helm-pos-multiline-p)
-         (let ((header-pos (helm-get-next-header-pos))
-               (separator-pos (helm-get-next-candidate-separator-pos)))
+     (let ((header-pos (helm-get-next-header-pos))
+           (separator-pos (helm-get-next-candidate-separator-pos)))
+       (if (helm-pos-multiline-p)
            (or (and (null header-pos) separator-pos)
                (and header-pos separator-pos
                     (< separator-pos header-pos)
                     separator-pos)
                header-pos
-               (point-max)))
-       (1+ (point-at-eol))))
+               (point-max))
+         (helm-aif (next-single-property-change (point) 'helm-candidate)
+             it
+           (or header-pos (point-max))))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when (and helm-allow-mouse (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
@@ -4933,10 +4959,13 @@ Optional argument SOURCE is a Helm source object."
   (save-excursion
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
-        (forward-line (if at-point 0 n))
-        (or (eq (point-at-bol) (point-at-eol))
-            (helm-pos-header-line-p)
-            (if (< n 0) (bobp) (eobp))))))
+      (forward-line (if at-point 0 n))
+      (or (eq (point-at-bol) (point-at-eol))
+          (helm-pos-header-line-p)
+          (if (< n 0) (bobp) (eobp))
+          (and (null at-point)
+               (null (next-single-property-change
+                      (point) 'helm-candidate)))))))
 
 (defun helm-end-of-source-p (&optional at-point)
   "Return non-`nil' if we are at eob or end of source."
@@ -5653,12 +5682,15 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (defun helm-make-visible-mark (&optional src selection)
   (let* ((source (or src  (helm-get-current-source)))
          (sel    (or selection (helm-get-selection nil nil src)))
+         (header-pos (helm-get-next-header-pos))
          (selection-end (if (helm-pos-multiline-p)
                             (or (helm-get-next-candidate-separator-pos)  ; Stays within source
-                                (helm-get-next-header-pos)
+                                header-pos
                                 (point-max))
                           ;; Not multiline
-                          (1+ (point-at-eol))))
+                          (helm-aif (next-single-property-change (point) 'helm-candidate)
+                              it
+                            (or header-pos (point-max)))))
          (o (make-overlay (point-at-bol) selection-end)))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
