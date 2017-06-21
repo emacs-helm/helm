@@ -2487,10 +2487,11 @@ e.g \"foo:12\"."
     (switch-to-buffer dest-buf)
     (save-restriction
       (widen)
-      (goto-char (point-max))
-      (cl-loop for f in flist
-               do (mml-attach-file f (or (mm-default-file-encoding f)
-                                         "application/octet-stream"))))))
+      (save-excursion
+        (goto-char (point-max))
+        (cl-loop for f in flist
+                 do (mml-attach-file f (or (mm-default-file-encoding f)
+                                           "application/octet-stream")))))))
 
 (defvar image-dired-display-image-buffer)
 (defun helm-ff-rotate-current-image-1 (file &optional num-arg)
