@@ -80,12 +80,17 @@ cat > $CONF_FILE <<EOF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
 (setq load-path (quote $LOAD_PATH))
-(setq package-user-dir (directory-file-name
-                        (file-name-directory
-                         (directory-file-name default-directory))))
-(unless (member "helm.el" (directory-files default-directory))
-  (setq package-load-list '((helm-core t) (helm t) (async t) (popup t)))
-  (package-initialize))
+(require 'package)
+;; User is maybe using a non standard \`package-user-dir'.
+;; Don't modify \`package-user-dir' but \`package-directory-list'
+;; because user is perhaps starting helm from a non elpa installation.
+(unless (file-equal-p package-user-dir "~/.emacs.d/elpa")
+  (add-to-list 'package-directory-list (directory-file-name
+                                        (file-name-directory
+                                         (directory-file-name default-directory)))))
+
+(setq package-load-list '((helm-core t) (helm t) (async t) (popup t)))
+(package-initialize)
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (setq default-frame-alist '((vertical-scroll-bars . nil)
                             (tool-bar-lines . 0)
