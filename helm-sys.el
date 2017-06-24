@@ -179,7 +179,6 @@ This affect also sorting functions in the same way."
                  (cancel-timer helm-top--poll-timer))
                (remove-hook 'post-command-hook 'helm-top-poll-no-update)
                (remove-hook 'focus-in-hook 'helm-top-poll-no-update))
-    :nomark t
     :display-to-real #'helm-top-display-to-real
     :persistent-action #'helm-top-sh-persistent-action
     :persistent-help "SIGTERM"
@@ -217,33 +216,43 @@ Return empty string for non--valid candidates."
   "Action transformer for `top'.
 Show actions only on line starting by a PID."
   (let ((disp (helm-get-selection nil t)))
-    (cond ((string-match "^ *[0-9]+" disp)
-           (list '("kill (SIGTERM)" . (lambda (pid) (helm-top-sh "TERM" pid)))
-                 '("kill (SIGKILL)" . (lambda (pid) (helm-top-sh "KILL" pid)))
-                 '("kill (SIGINT)" .  (lambda (pid) (helm-top-sh "INT" pid)))
+    (cond ((string-match "\\` *[0-9]+" disp)
+           (list '("kill (SIGTERM)" . (lambda (_pid)
+                                        (helm-top-sh "TERM" (helm-top--marked-pids))))
+                 '("kill (SIGKILL)" . (lambda (_pid)
+                                        (helm-top-sh "KILL" (helm-top--marked-pids))))
+                 '("kill (SIGINT)" .  (lambda (_pid)
+                                        (helm-top-sh "INT" (helm-top--marked-pids))))
                  '("kill (Choose signal)"
-                   . (lambda (pid)
-                       (helm-top-sh
-                        (helm-comp-read (format "Kill [%s] with signal: " pid)
-                                        '("ALRM" "HUP" "INT" "KILL" "PIPE" "POLL"
-                                          "PROF" "TERM" "USR1" "USR2" "VTALRM"
-                                          "STKFLT" "PWR" "WINCH" "CHLD" "URG"
-                                          "TSTP" "TTIN" "TTOU" "STOP" "CONT"
-                                          "ABRT" "FPE" "ILL" "QUIT" "SEGV"
-                                          "TRAP" "SYS" "EMT" "BUS" "XCPU" "XFSZ")
-                                        :must-match t)
-                        pid)))))
+                   . (lambda (_pid)
+                       (let ((pids (helm-top--marked-pids)))
+                         (helm-top-sh
+                          (helm-comp-read (format "Kill %d pids with signal: "
+                                                  (length pids))
+                                          '("ALRM" "HUP" "INT" "KILL" "PIPE" "POLL"
+                                            "PROF" "TERM" "USR1" "USR2" "VTALRM"
+                                            "STKFLT" "PWR" "WINCH" "CHLD" "URG"
+                                            "TSTP" "TTIN" "TTOU" "STOP" "CONT"
+                                            "ABRT" "FPE" "ILL" "QUIT" "SEGV"
+                                            "TRAP" "SYS" "EMT" "BUS" "XCPU" "XFSZ")
+                                          :must-match t)
+                          pids))))))
           (t actions))))
 
-(defun helm-top-sh (sig pid)
-  "Run kill shell command with signal SIG on PID for `helm-top'."
-  (let ((cmd (format "kill -%s %s" sig pid)))
-    (message "Executed %s\n%s" cmd (shell-command-to-string cmd))))
+(defun helm-top--marked-pids ()
+  (helm-remove-if-not-match "\\`[0-9]+\\'" (helm-marked-candidates)))
+
+(defun helm-top-sh (sig pids)
+  "Run kill shell command with signal SIG on PIDS for `helm-top'."
+  (message "kill -%s %s exited with status %s"
+           sig (mapconcat 'identity pids " ")
+           (apply #'call-process
+                  "kill" nil nil nil (format "-%s" sig) pids)))
 
 (defun helm-top-sh-persistent-action (pid)
   (delete-other-windows)
-  (helm-top-sh "TERM" pid)
-  (helm-force-update))
+  (helm-top-sh "TERM" (list pid))
+  (helm-delete-current-selection))
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
