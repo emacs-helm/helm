@@ -1767,7 +1767,7 @@ and should be used carefully elsewhere, or not at all, using
 With a prefix arg toggle dired buffer to wdired mode."
   (advice-add 'wdired-finish-edit :override #'helm--advice-wdired-finish-edit)
   (advice-add 'wdired-get-filename :override #'helm--advice-wdired-get-filename)
-  (let* ((marked (helm-marked-candidates))
+  (let* ((marked (helm-marked-candidates :with-wildcard t))
          (current (car marked)))
     (unless (and ffap-url-regexp
                  (string-match-p ffap-url-regexp current))
