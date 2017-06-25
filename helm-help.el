@@ -468,6 +468,9 @@ are available, respectively `%u', `%d' and `%c'.
 
 You can open a dired buffer with only marked files with `\\<helm-find-files-map>\\[helm-ff-run-marked-files-in-dired]'
 With a prefix arg you can open this same dired buffer in wdired mode for editing files.
+Note that wildcards are supported as well, so you can use e.g \"*.txt\" to select all \".txt\" files
+in current directory or \"**.txt\" to select all files recursively from current directory
+\(See [[Using wildcard to select multiple files]] section above).
 
 *** Copying renaming asynchronously
 
@@ -477,6 +480,10 @@ async for copying/renaming etc... your files by enabling `dired-async-mode'.
 Note that even when async is enabled, running a copy/rename action with a prefix arg
 will execute action synchronously, it will follow also the first file of the marked files
 in its destination directory.
+
+When `dired-async-mode' is enabled and additional action named \"Backup files\" will be
+available (such command is not available in emacs natively).
+See [[Using wildcard to select multiple files]] for details.
 
 *** Bookmark your `helm-find-files' session
 
@@ -599,10 +606,17 @@ Use the sudo method:
 
 *** Attach files to a mail buffer (message-mode)
 
-If you are in a message buffer, the action will appear in action menu, otherwise
-it available at any time with \\<helm-find-files-map>\\[helm-ff-run-gnus-attach-files]
-See how behave `gnus-attach-files' for more infos.
-NOTE: Even if called `gnus-attach-files' it works with mu4e and else.
+If you are in a `message-mode' or `mail-mode' buffer, the action will
+appear in action menu, otherwise it is available at any time with
+\\<helm-find-files-map>\\[helm-ff-run-mail-attach-files] Here how it
+behave:
+- If you are in a (mail or message) buffer, files are attached
+there.
+- If you are not in a mail buffer but one or more mail buffer
+exists, you are prompted to add attached file to one of these mail
+buffer.
+- If you are not in a mail buffer and no mail buffer exists,
+a new mail buffer is created with tha attached files in it.
 
 ** Commands
 \\<helm-find-files-map>
