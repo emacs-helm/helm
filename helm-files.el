@@ -403,7 +403,9 @@ A function that takes a directory name as only arg."
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
-    (define-key map (kbd "M-%")           'helm-ff-run-query-replace-on-marked)
+    (define-key map (kbd "M-@")           'helm-ff-run-query-replace-on-marked)
+    (define-key map (kbd "M-%")           'helm-ff-run-query-replace)
+    (define-key map (kbd "C-M-%")         'helm-ff-run-query-replace-regexp)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-file)
     (define-key map (kbd "M-=")           'helm-ff-run-ediff-merge-file)
     (define-key map (kbd "M-p")           'helm-ff-run-switch-to-history)
@@ -492,10 +494,10 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
-   "Query replace fnames on marked `M-%'" 'helm-ff-query-replace-on-marked
+   "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-on-marked
    "Marked files in dired `C-x C-q, C-u wdired'" 'helm-marked-files-in-dired
-   "Query replace contents on marked" 'helm-ff-query-replace
-   "Query replace regexp contents on marked" 'helm-ff-query-replace-regexp
+   "Query replace contents on marked `M-%'" 'helm-ff-query-replace
+   "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
    "Serial rename files" 'helm-ff-serial-rename
    "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
