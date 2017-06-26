@@ -109,12 +109,12 @@ The function that call this should set `helm-ec-target' to thing at point."
      (mapconcat
       (lambda (x)
         (cond ((string-match "\\`~/?" helm-ec-target)
-               (helm-quote-whitespace (abbreviate-file-name x)))
+               (shell-quote-argument (abbreviate-file-name x)))
               ((string-match "\\`/" helm-ec-target)
-               (helm-quote-whitespace x))
+               (shell-quote-argument x))
               (t
                (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
-                       (helm-quote-whitespace
+                       (shell-quote-argument
                         (file-relative-name x))))))
       marked " "))))
 
