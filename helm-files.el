@@ -902,13 +902,27 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
   (helm-find-files-eshell-command-on-file-1 helm-current-prefix-arg))
 
 (defun helm-ff-switch-to-eshell (_candidate)
-  "Switch to eshell and cd to `helm-ff-default-directory'."
+  "Switch to eshell and cd to `helm-ff-default-directory'.
+
+With a numeric prefix arg switch to numbered eshell buffer, if no
+prefix arg provided and more than one eshell buffer exists, provide
+completions on those buffers.  If only one eshell buffer exists,
+switch to this one, if no eshell buffer exists or if the numeric
+prefix arg eshell buffer doesn't exists, create it and switch to it."
   (let ((cd-eshell (lambda ()
                      (eshell/cd helm-ff-default-directory)
-                     (eshell-reset))))
-    (if (get-buffer "*eshell*")
-        (switch-to-buffer "*eshell*")
-      (call-interactively 'eshell))
+                     (eshell-reset)))
+        (bufs (sort (cl-loop for b in (mapcar 'buffer-name (buffer-list))
+                                      when (with-current-buffer b
+                                             (eq major-mode 'eshell-mode))
+                                      collect b)
+                    'string<)))
+    (helm-aif (and (null helm-current-prefix-arg)
+                   (if (cdr bufs)
+                       (helm-comp-read "Switch to eshell buffer: " bufs)
+                     (car bufs)))
+        (switch-to-buffer it)
+      (eshell helm-current-prefix-arg))
     (unless (get-buffer-process (current-buffer))
       (funcall cd-eshell))))
 
