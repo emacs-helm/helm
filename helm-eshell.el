@@ -109,7 +109,9 @@ The function that call this should set `helm-ec-target' to thing at point."
      (mapconcat
       (lambda (x)
         (cond ((string-match "\\`~/?" helm-ec-target)
-               (shell-quote-argument (abbreviate-file-name x)))
+               ;; Strip out the first escape char added by
+               ;; `shell-quote-argument' before "~" (Issue #1803).
+               (substring (shell-quote-argument (abbreviate-file-name x)) 1))
               ((string-match "\\`/" helm-ec-target)
                (shell-quote-argument x))
               (t
