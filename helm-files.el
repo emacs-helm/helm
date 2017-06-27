@@ -912,11 +912,10 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
   (let ((cd-eshell (lambda ()
                      (eshell/cd helm-ff-default-directory)
                      (eshell-reset)))
-        (bufs (sort (cl-loop for b in (mapcar 'buffer-name (buffer-list))
-                                      when (with-current-buffer b
-                                             (eq major-mode 'eshell-mode))
-                                      collect b)
-                    'string<)))
+        (bufs (cl-loop for b in (mapcar 'buffer-name (buffer-list))
+                       when (with-current-buffer b
+                              (eq major-mode 'eshell-mode))
+                       collect b)))
     (helm-aif (and (null helm-current-prefix-arg)
                    (if (cdr bufs)
                        (helm-comp-read "Switch to eshell buffer: " bufs)
