@@ -38,6 +38,7 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
 (declare-function helm-quote-whitespace "helm-lib")
+(defvar eshell-special-chars-outside-quoting)
 
 
 (defgroup helm-eshell nil
@@ -98,6 +99,8 @@
 (defun helm-ec-insert (_candidate)
   "Replace text at point with CANDIDATE.
 The function that call this should set `helm-ec-target' to thing at point."
+  (set (make-local-variable 'comint-file-name-quote-list)
+       eshell-special-chars-outside-quoting)
   (let ((pt (point)))
     (when (and helm-ec-target
                (search-backward helm-ec-target nil t)
@@ -110,13 +113,13 @@ The function that call this should set `helm-ec-target' to thing at point."
       (lambda (x)
         (cond ((string-match "\\`~/?" helm-ec-target)
                ;; Strip out the first escape char added by
-               ;; `shell-quote-argument' before "~" (Issue #1803).
-               (substring (shell-quote-argument (abbreviate-file-name x)) 1))
+               ;; `comint-quote-filename' before "~" (Issue #1803).
+               (substring (comint-quote-filename (abbreviate-file-name x)) 1))
               ((string-match "\\`/" helm-ec-target)
-               (shell-quote-argument x))
+               (comint-quote-filename x))
               (t
                (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
-                       (shell-quote-argument
+                       (comint-quote-filename
                         (file-relative-name x))))))
       marked " "))))
 
