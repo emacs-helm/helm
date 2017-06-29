@@ -345,7 +345,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             quit-when-no-cand
                             (volatile t)
                             sort
-                            (fc-transformer 'helm-cr-default-transformer)
+                            fc-transformer
                             hist-fc-transformer
                             marked-candidates
                             nomark
@@ -513,7 +513,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :match-part match-part
                   :multiline multiline
                   :header-name header-name
-                  :filtered-candidate-transformer fc-transformer
+                  :filtered-candidate-transformer
+                  (append (helm-mklist fc-transformer)
+                          '(helm-cr-default-transformer))
                   :requires-pattern requires-pattern
                   :persistent-action persistent-action
                   :persistent-help persistent-help
@@ -528,7 +530,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :match-part match-part
                     :multiline multiline
                     :header-name header-name
-                    :filtered-candidate-transformer fc-transformer
+                    :filtered-candidate-transformer
+                    (append (helm-mklist fc-transformer)
+                            '(helm-cr-default-transformer))
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
