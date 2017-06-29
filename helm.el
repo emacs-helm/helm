@@ -4500,12 +4500,15 @@ Key arg DIRECTION can be one of:
   (goto-char (point-max)))
 
 (defun helm-move--end-of-source ()
-  (goto-char (or (helm-get-next-header-pos) (point-max)))
-  (when (helm-pos-header-line-p) (forward-line -2)))
+  (helm-aif (helm-get-next-header-pos)
+      (progn (goto-char it) (forward-line -2))
+    (goto-char (point-max))))
 
 (defun helm-move--beginning-of-source ()
-  (goto-char (helm-get-previous-header-pos))
-  (forward-line 1))
+  (helm-aif (helm-get-previous-header-pos)
+      (progn (goto-char it)
+             (forward-line 1))
+    (goto-char (point-min))))
 
 (defun helm-move--previous-source-fn ()
   (forward-line -1)
