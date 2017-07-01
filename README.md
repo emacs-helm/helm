@@ -13,18 +13,18 @@
 ***
 <p align="justify">
   <b>Helm</b> is an Emacs framework for incremental completions and narrowing
-  selections. It helps to rapidly complete file names, buffer names, or
-  any other Emacs interactions requiring selecting an item from a list of
-  possible choices.
-  Helm is a fork of <b>anything.el</b>, which was originally written by Tamas
-  Patrovic and can be considered to be its successor. <b>Helm</b> cleans the
-  legacy code that is leaner, modular, and unchained from constraints of
-  backward compatibility.
+  selections. It provides an easy to use API for developers wanting to build 
+  their own helm applications in Emacs and dozens of already build in commands
+  providing completion in almost everything and powerful search tools.
+  It is a must have for anyone wanting to use Emacs as its main working environment.
+  Helm is now popular and have been adopted by many power Emacs users.
+  It is available in Melpa for easy installation from the Emacs package manager.
 </p>
 
 ***
 <p align="center">
   <a href="https://emacs-helm.github.io/helm/"><b>Homepage</b></a> |
+  <a href="https://github.com/emacs-helm/helm/releases"><b>Downloads</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki#install"><b>Get started</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki"><b>Helm wiki</b></a> |
   <a href="https://github.com/emacs-helm/helm/wiki/FAQ"><b>FAQ</b></a>
