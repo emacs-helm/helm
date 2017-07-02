@@ -84,6 +84,7 @@
         - [Creating custom helm sources](#creating-custom-helm-sources)
 - [Helm Applications](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
+- [Other emacs extensions recommended with helm](#other-emacs-extensions-recommended-with-helm)
 - [Known issues](#known-issues)
 - [Contributors](#contributors)
 - [Bugs & Improvements](#bugs--improvements)
@@ -376,6 +377,7 @@ through the Emacs package manager. This list is not exhaustive.
 - [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
 - [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
 - [helm-firefox](https://github.com/emacs-helm/helm-firefox)
+- [helm-emms](https://github.com/emacs-helm/helm-emms)
 
 **Warning** Helm development has sparked quite a few extensions, many
 of which duplicate features already included in helm. Some of these
@@ -386,6 +388,10 @@ helm problems or unstable emacs, please look for comparable features
 within [helm](https://github.com/emacs-helm/helm) and
 [emacs-helm](https://github.com/emacs-helm) before installing such
 extensions.
+
+# Other emacs extensions recommended with helm
+
+- [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
 
 # Known issues
 
