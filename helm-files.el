@@ -918,7 +918,8 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
                        collect b)))
     (helm-aif (and (null helm-current-prefix-arg)
                    (if (cdr bufs)
-                       (helm-comp-read "Switch to eshell buffer: " bufs)
+                       (helm-comp-read "Switch to eshell buffer: " bufs
+                                       :must-match t)
                      (car bufs)))
         (switch-to-buffer it)
       (eshell helm-current-prefix-arg))
