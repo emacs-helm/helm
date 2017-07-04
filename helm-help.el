@@ -452,7 +452,29 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
     to \"foo-001.jpg\" \"foo-002.jpg\" \"foo-003.jpg\"
 
 Use as replace regexp \"%.\" and as replacement string \"foo-\\#\".
-Where \"%.\" is same as regexp \".*\\.jpg\".
+Where \"%.\" 
+
+When \"%\", \".%\" and \"%\" are used, \"\\@\" can be used as a placeholder which
+remember those values.
+
+e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
+    to \"foo-001.jpg\" \"bar-002.jpg\" \"baz-003.jpg\"
+
+Use as replace regexp \"%.\" and as replacement string \"\\@-\\#\".
+
+Modifying the placeholder (\\@) is possible
+(in contrast of renaming the placeholder with something else) with two methods:
+
+- By substring, i.e using only the substring of placeholder:
+    \\@:<from>:<to>
+  e.g \\@:0:2
+
+- By search and replace:
+    \\@/<regexp>/<replacement>
+  e.g \\@/foo/bar
+
+In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
+are available, respectively `%u', `%d' and `%c'.
 
 Note: You can do this with the serial renames actions you will find in the action menu
       for more sophisticated renaming, but using query replace regexp on filenames
@@ -460,9 +482,6 @@ Note: You can do this with the serial renames actions you will find in the actio
 
 Note also that unlike the serial rename actions the renamed files stay in their initial directory
 and are not renamed to current directory, IOW use this (\\#) to rename files inside current directory.
-
-In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
-are available, respectively `%u', `%d' and `%c'.
 
 *** Edit marked files in a dired buffer
 
