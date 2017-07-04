@@ -1073,6 +1073,21 @@ This doesn't replace inside the files, only modify filenames."
                                     (cond ((string-match "\\\\#" rep)
                                            (replace-match
                                             (format "%03d" (1+ count)) t t rep))
+                                          ((string-match
+                                            "\\\\@:\\([0-9]*\\):\\([0-9]*\\)" rep)
+                                           (replace-match (substring
+                                                           target
+                                                           (string-to-number
+                                                            (match-string 1 rep))
+                                                           (string-to-number
+                                                            (match-string 2 rep)))
+                                                          t t rep))
+                                          ((string-match "\\\\@/\\(.*\\)/\\(.*\\)" rep)
+                                           (replace-match (replace-regexp-in-string
+                                                           (match-string 1 rep)
+                                                           (match-string 2 rep)
+                                                           target)
+                                                          t t rep))
                                           ((string-match "\\\\@" rep)
                                            (replace-match target t t rep))
                                           ((string= rep "%u") #'upcase)
