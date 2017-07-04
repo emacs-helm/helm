@@ -1070,7 +1070,12 @@ This doesn't replace inside the files, only modify filenames."
                                           (setq target (helm-basename old))))
                                         (t regexp))
                                   (save-match-data
-                                    (cond ((string-match "\\\\#" rep)
+                                    (cond ((and (string-match-p "\\\\#" rep)
+                                                (string-match "\\\\@" rep))
+                                           (replace-regexp-in-string
+                                            "\\\\#" (format "%03d" (1+ count))
+                                            (replace-match target t t rep)))
+                                          ((string-match "\\\\#" rep)
                                            (replace-match
                                             (format "%03d" (1+ count)) t t rep))
                                           ((string-match
