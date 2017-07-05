@@ -426,7 +426,12 @@ The directory selection with \"**/\" like bash shopt globstar option is not supp
 
 *** Query replace regexp on filenames
 
-You can rename your files by replacing only part of filenames matching
+WARNING: This is designed to work ONLY in current directory, i.e
+         your marked files have to be from the same directory.
+         So do not mark files in different directories, [[Using wildcard to select multiple files][recursive globbing]] e.g \"**.txt\"
+         is not supported as well for same reasons. 
+
+You can rename your marked files by replacing only part of filenames matching
 a regexp.
 
 e.g Rename recursively all files with \".JPG\" extension to \".jpg\":
@@ -463,7 +468,7 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
 Use as replace regexp \"%.\" and as replacement string \"\\@-\\#\".
 
 Modifying the placeholder (\\@) is possible
-(in contrast of renaming the placeholder with something else) with two methods:
+\(in contrast of renaming the placeholder with something else) with two methods:
 
 - By substring, i.e using only the substring of placeholder:
     \\@:<from>:<to>
@@ -472,16 +477,26 @@ Modifying the placeholder (\\@) is possible
 - By search and replace:
     \\@/<regexp>/<replacement>
   e.g \\@/foo/bar
+  Incremental replacement is also handled in <replacement>
+  e.g \\@/foo/-\\#
 
 In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
 are available, respectively `%u', `%d' and `%c'.
 
-Note: You can do this with the serial renames actions you will find in the action menu
-      for more sophisticated renaming, but using query replace regexp on filenames
-      is a fast way for most common serial replacements.
+Note also that unlike the [[Serial renaming][serial rename]] actions the renamed files stay in their initial directory
+and are not renamed to current directory, IOW use this (\\#) to rename files inside the same directory.
 
-Note also that unlike the serial rename actions the renamed files stay in their initial directory
-and are not renamed to current directory, IOW use this (\\#) to rename files inside current directory.
+*** Serial renaming
+
+You can use the serial rename actions to rename, copy or symlink marked files to
+a specific directory or in the current one with all your files numbered incrementally.
+
+- Serial rename by renaming
+Rename all marked files with incremental number to a specific directory.
+- Serial rename by copying
+Copy all marked files with incremental number to a specific directory.
+-Serial rename by symlinking
+Symlink all marked files with incremental number to a specific directory.
 
 *** Edit marked files in a dired buffer
 
@@ -536,6 +551,11 @@ All these grep commands are using symbol at point as default pattern.
 Note that default is a different thing than input (nothing is added to
 prompt until you hit `M-n').
 
+**** Grepping on remote files
+On remote files grep is not well supported by tramp unless you suspend update before
+entering your pattern and reenable it once your pattern is ready.
+To toggle suspend update use \\<helm-map>\\[helm-toggle-suspend-update].
+
 *** Setting up aliases in eshell allows you to setup powerful customized commands
 
 Adding eshell aliases to your `eshell-aliases-file' or using the
@@ -575,8 +595,8 @@ Of course the alias command should support this.
 this is controled by `helm-ff-tramp-not-fancy' variable, if you change this,
 expect helm becoming very slow unless your connection is super fast.
 
-- Grepping files is not very well supported when used incrementally, see above
-grep section.
+- Grepping files is not very well supported when used incrementally,
+see above [[Grepping on remote files]].
 
 - Locate is not working on remote directories.
 
