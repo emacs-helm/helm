@@ -3691,7 +3691,7 @@ Colorize only symlinks, directories and files."
                                (not (and ffap-url-regexp
                                          (string-match ffap-url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
-                          (helm-basename i) i)
+                          (helm-basename i) (abbreviate-file-name i))
            for isremote = (or (file-remote-p i)
                               (helm-file-on-mounted-network-p i))
            ;; Call file-attributes only if:
