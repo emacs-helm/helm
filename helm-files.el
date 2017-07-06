@@ -3994,7 +3994,8 @@ Run all sources defined in `helm-for-files-preferred-list'."
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources helm-for-files-preferred-list
         :ff-transformer-show-only-basename nil
-        :buffer "*helm for files*"))
+        :buffer "*helm for files*"
+        :truncate-lines helm-buffers-truncate-lines))
 
 ;;;###autoload
 (defun helm-multi-files ()
@@ -4032,7 +4033,8 @@ found."
     (unwind-protect
          (helm :sources sources
                :ff-transformer-show-only-basename nil
-               :buffer "*helm multi files*")
+               :buffer "*helm multi files*"
+               :truncate-lines helm-buffers-truncate-lines)
       (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
         old-key))))
 
