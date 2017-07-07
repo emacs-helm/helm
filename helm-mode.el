@@ -975,8 +975,6 @@ Keys description:
                  (file-equal-p result initial-input)
                  default)
             (if (listp default) (car default) default))
-           ((and result (stringp result))
-            (expand-file-name result))
            ((and result (listp result))
             (mapcar #'expand-file-name result))
            (t result))
