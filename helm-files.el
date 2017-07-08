@@ -2916,9 +2916,10 @@ Use it for non--interactive calls of `helm-find-files'."
   ;; `helm-ff-guess-ffap-urls'.
   (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
     (if (eq major-mode 'dired-mode)
-        (let ((beg  (dired-move-to-filename))
-              (end (dired-move-to-end-of-filename)))
-          (helm-aif (member (buffer-substring beg end) '("." ".."))
+        (let ((beg  (save-excursion (dired-move-to-filename)))
+              (end  (save-excursion (dired-move-to-end-of-filename t))))
+          (helm-aif (and beg end (member (buffer-substring beg end)
+                                         '("." "..")))
               (concat (file-name-as-directory
                        (expand-file-name dired-directory))
                       (car it))
