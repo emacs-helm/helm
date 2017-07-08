@@ -3179,46 +3179,51 @@ Called with a prefix arg open files in background without selecting them."
                     (string-match ffap-url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
         (find-file-wildcards nil)
-        (make-dir-fn
-         (lambda (dir &optional helm-ff)
-             (when (or (not confirm-nonexistent-file-or-buffer)
-                     (y-or-n-p (format "Create directory `%s'? " dir)))
-               (let ((dirfname (directory-file-name dir)))
-                 (if (file-exists-p dirfname)
-                     (error
-                      "Mkdir: Unable to create directory `%s': file exists."
-                      (helm-basename dirfname))
-                   (make-directory dir 'parent)))
-               (when helm-ff
-                 ;; Allow having this new dir in history
-                 ;; to be able to retrieve it immediately
-                 ;; if we want to e.g copy a file from somewhere in it.
-                 (setq helm-ff-default-directory
-                       (file-name-as-directory dir))
-                 (push helm-ff-default-directory helm-ff-history))
-               (or (and helm-ff (helm-find-files-1 dir)) t))))
         (helm--reading-passwd-or-string t))
     (if (cdr marked)
         (if helm-current-prefix-arg
             (dired-simultaneous-find-file marked nil)
-            (mapc 'find-file-noselect (cdr marked))
-            (find-file (car marked)))
-      (if (and (not (file-exists-p candidate))
-               (not url-p)
-               (string-match "/$" candidate))
-          ;; A a non--existing filename ending with /
-          ;; Create a directory and jump to it.
-          (funcall make-dir-fn candidate 'helm-ff)
-        ;; A non--existing filename NOT ending with / or
-        ;; an existing filename, create or jump to it.
-        ;; If the basedir of candidate doesn't exists,
-        ;; ask for creating it.
-        (let ((dir (and (not url-p) (helm-basedir candidate))))
-          (find-file-at-point
-           (cond ((and dir (file-directory-p dir))
-                  (substitute-in-file-name candidate))
-                 (url-p candidate)
-                 ((funcall make-dir-fn dir) candidate))))))))
+          (mapc 'find-file-noselect (cdr marked))
+          (find-file (car marked)))
+      (let ((dir (and (not url-p) (helm-basedir candidate))))
+        (cond ((and dir (file-directory-p dir))
+               (find-file (substitute-in-file-name candidate)))
+              (url-p (find-file-at-point candidate))
+              ;; A a non--existing filename ending with /
+              ;; Create a directory and jump to it.
+              ((and (not (file-exists-p candidate))
+                    (string-match "/$" candidate))
+               (helm-ff--mkdir candidate 'helm-ff))
+              ;; A non--existing filename NOT ending with / or
+              ;; an existing filename, create or jump to it.
+              ;; If the basedir of candidate doesn't exists,
+              ;; ask for creating it.
+              (dir
+               (helm-ff--mkdir dir)
+               (find-file candidate))
+              ;; Find file at `default-directory' when basedir is
+              ;; unspecified e.g user hit C-k foo RET.
+              (t (find-file candidate)))))))
+
+(defun helm-ff--mkdir (dir &optional helm-ff)
+  (when (or (not confirm-nonexistent-file-or-buffer)
+            (y-or-n-p (format "Create directory `%s'? "
+                              (abbreviate-file-name
+                               (expand-file-name dir)))))
+    (let ((dirfname (directory-file-name dir)))
+      (if (file-exists-p dirfname)
+          (error
+           "Mkdir: Unable to create directory `%s': file exists."
+           (helm-basename dirfname))
+        (make-directory dir 'parent)))
+    (when helm-ff
+      ;; Allow having this new dir in history
+      ;; to be able to retrieve it immediately
+      ;; if we want to e.g copy a file from somewhere in it.
+      (setq helm-ff-default-directory
+            (file-name-as-directory (expand-file-name dir)))
+      (push helm-ff-default-directory helm-ff-history))
+    (or (and helm-ff (helm-find-files-1 dir)) t)))
 
 (defun helm-shadow-boring-files (files)
   "Files matching `helm-boring-file-regexp' will be
