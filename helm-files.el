@@ -2916,7 +2916,13 @@ Use it for non--interactive calls of `helm-find-files'."
   ;; `helm-ff-guess-ffap-urls'.
   (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
     (if (eq major-mode 'dired-mode)
-        (dired-get-filename 'no-dir t)
+        (let ((beg  (dired-move-to-filename))
+              (end (dired-move-to-end-of-filename)))
+          (helm-aif (member (buffer-substring beg end) '("." ".."))
+              (concat (file-name-as-directory
+                       (expand-file-name dired-directory))
+                      (car it))
+            (dired-get-filename 'no-dir t)))
       (or (and helm-ff-guess-ffap-urls ffap-url-regexp
                (ffap-fixup-url (ffap-url-at-point)))
           ;; may yield url!
@@ -2945,7 +2951,10 @@ Use it for non--interactive calls of `helm-find-files'."
     (cond (lib)      ; e.g we are inside a require sexp.
           (hlink)    ; String at point is an hyperlink.
           (file-p    ; a regular file
-           (and file-at-pt (expand-file-name file-at-pt)))
+           (and file-at-pt (if (not (member (helm-basename file-at-pt)
+                                            '("." "..")))
+                               (expand-file-name file-at-pt)
+                             file-at-pt)))
           (urlp (helm-html-decode-entities-string file-at-pt)) ; possibly an url or email.
           ((and file-at-pt
                 (not remp)
@@ -3979,7 +3988,8 @@ This is the starting point for nearly all actions you can do on files."
                                         (and (eq major-mode 'dired-mode)
                                              smart-input))
                               (if (and helm-ff-transformer-show-only-basename
-                                       (null hist))
+                                       (null hist)
+                                       (not (string-match-p "[.]\\{1,2\\}\\'" it)))
                                   (helm-basename it) it))))
     (set-text-properties 0 (length input) nil input)
     (setq current-prefix-arg nil)
