@@ -2914,11 +2914,13 @@ Use it for non--interactive calls of `helm-find-files'."
   ;; `ffap-file-at-point' can be neutralized with
   ;; `helm-ff-guess-ffap-filenames' and `ffap-url-at-point' with
   ;; `helm-ff-guess-ffap-urls'.
-  (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))) 
-    (or (and helm-ff-guess-ffap-urls ffap-url-regexp
-             (ffap-fixup-url (ffap-url-at-point)))
-        ;; may yield url!
-        (ffap-file-at-point))))
+  (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
+    (if (eq major-mode 'dired-mode)
+        (dired-get-filename 'no-dir t)
+      (or (and helm-ff-guess-ffap-urls ffap-url-regexp
+               (ffap-fixup-url (ffap-url-at-point)))
+          ;; may yield url!
+          (ffap-file-at-point)))))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
@@ -2943,7 +2945,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (cond (lib)      ; e.g we are inside a require sexp.
           (hlink)    ; String at point is an hyperlink.
           (file-p    ; a regular file
-           (helm-aif (ffap-file-at-point) (expand-file-name it)))
+           (and file-at-pt (expand-file-name file-at-pt)))
           (urlp (helm-html-decode-entities-string file-at-pt)) ; possibly an url or email.
           ((and file-at-pt
                 (not remp)
