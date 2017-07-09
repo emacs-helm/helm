@@ -1100,8 +1100,10 @@ This doesn't replace inside the files, only modify filenames."
                                                            target
                                                            (string-to-number
                                                             (match-string 1 rep))
-                                                           (string-to-number
-                                                            (match-string 2 rep)))
+                                                           (pcase (match-string 2 rep)
+                                                             ((and res (guard (string= res "")))
+                                                              (length target))
+                                                             (res (string-to-number res))))
                                                           t t rep))
                                           ;; Search and replace in
                                           ;; placeholder. Doesn't

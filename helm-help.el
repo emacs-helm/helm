@@ -457,9 +457,8 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
     to \"foo-001.jpg\" \"foo-002.jpg\" \"foo-003.jpg\"
 
 Use as replace regexp \"%.\" and as replacement string \"foo-\\#\".
-Where \"%.\" 
 
-When \"%\", \".%\" and \"%\" are used, \"\\@\" can be used as a placeholder which
+When \"%\", \".%\" or \"%\" are used, \"\\@\" can be used as a placeholder which
 remember those values.
 
 e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
@@ -468,17 +467,19 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
 Use as replace regexp \"%.\" and as replacement string \"\\@-\\#\".
 
 Modifying the placeholder (\\@) is possible
-\(in contrast of renaming the placeholder with something else) with two methods:
+\(in contrast of renaming the whole placeholder with something else) with two methods:
 
 - By substring, i.e using only the substring of placeholder:
     \\@:<from>:<to>
-  e.g \\@:0:2
+  e.g \\@:0:2 replaces from beginning to second char of placeholder
+  Note that length of placeholder is used for <to> when <to> is not specified
+  e.g \\@:2: replaces from second char of placeholder to end
 
 - By search and replace:
     \\@/<regexp>/<replacement>
-  e.g \\@/foo/bar
+  e.g \\@/foo/bar replaces \"foo\" in placeholder by \"bar\"
   Incremental replacement is also handled in <replacement>
-  e.g \\@/foo/-\\#
+  e.g \\@/foo/-\\# replaces \"foo\" in placeholder by 001, 002 etc...
 
 In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
 are available, respectively `%u', `%d' and `%c'.
