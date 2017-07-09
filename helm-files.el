@@ -1101,7 +1101,7 @@ This doesn't replace inside the files, only modify filenames."
                                                            (string-to-number
                                                             (match-string 1 rep))
                                                            (pcase (match-string 2 rep)
-                                                             ((and res (guard (string= res "")))
+                                                             ((pred (string= ""))
                                                               (length target))
                                                              (res (string-to-number res))))
                                                           t t rep))
