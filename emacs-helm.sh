@@ -42,14 +42,14 @@ esac
 
 LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
 
-cd "$(dirname "$0")" || exit 2
+cd "${0%/*}" || exit 2
 
 # Check if autoload file exists.
 # It is maybe in a different directory if
 # emacs-helm.sh is a symlink.
 TRUENAME=$(find . -samefile "$0" -printf "%l")
 if [ ! -z "$TRUENAME" ]; then
-    AUTO_FILE="$(dirname "$TRUENAME")/helm-autoloads.el"
+    AUTO_FILE="${TRUENAME%/*}/helm-autoloads.el"
 else
     AUTO_FILE="helm-autoloads.el"
 fi
