@@ -2306,7 +2306,8 @@ Note that only existing directories are saved here."
                                      (not (helm-ff-dot-file-p c)))
                                 (helm-basename c) c))
                            (when (y-or-n-p
-                                  (format "Really Delete file `%s'? " c))
+                                  (format "Really Delete file `%s'? "
+                                          (abbreviate-file-name c)))
                              (helm-delete-file
                               c helm-ff-signal-error-on-dot-files 'synchro)
                              (helm-delete-current-selection)
@@ -3147,7 +3148,8 @@ Ask to kill buffers associated with that file, too."
         (cond ((and (not (file-symlink-p file))
                     (file-directory-p file)
                     (directory-files file t dired-re-no-dot))
-               (when (y-or-n-p (format "Recursive delete of `%s'? " file))
+               (when (y-or-n-p (format "Recursive delete of `%s'? "
+                                       (abbreviate-file-name file)))
                  (delete-directory file 'recursive)))
               ((and (not (file-symlink-p file))
                     (file-directory-p file))
