@@ -300,6 +300,29 @@ Remote filesystem are generally mounted with sshfs."
 A function that takes a directory name as only arg."
   :group 'helm-files
   :type 'function)
+
+(defcustom helm-ff-kill-or-find-buffer-fname-fn
+  #'helm-ff-kill-or-find-buffer-fname
+  "Default function used to expand non-directory filenames in `helm-find-files'.
+
+This variable will take effect only in `helm-find-files', it affects
+the behavior of persistent-action on filenames and non-existing
+filenames.
+
+The default is to expand filename on first hit on
+\\<helm-map>\\[helm-execute-persistent-action], pop buffer in other
+window on second hit and finally kill this buffer on third hit, this
+is very handy to create several new buffers, or when navigating, show
+quickly the buffer of file to see its contents briefly before killing
+it and continue navigating.
+
+However some users may not want this, so to disable this behavior just
+set this to `ignore' function.
+
+Of course you can also write your own function to do something else."
+  :group 'helm-files
+  :type 'function)
+
 
 ;;; Faces
 ;;
@@ -2727,7 +2750,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
-           (helm-ff-kill-or-find-buffer-fname candidate)))))
+           (funcall helm-ff-kill-or-find-buffer-fname-fn candidate)))))
 
 
 ;;; Recursive dirs completion
