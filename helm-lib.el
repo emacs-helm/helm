@@ -344,6 +344,12 @@ The usage is the same as `cond'."
                  it)
              (helm-acond ,@(cdr clauses))))))))
 
+(defmacro helm-aand (&rest conditions)
+  "Anaphoric version of `and'."
+  (cond ((null conditions) t)
+        ((null (cdr conditions)) (car conditions))
+        (t `(helm-aif ,(car conditions)
+                (helm-aand ,@(cdr conditions))))))
 
 ;;; Fuzzy matching routines
 ;;

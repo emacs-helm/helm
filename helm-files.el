@@ -2732,11 +2732,12 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                    (image-dired-update-property 'help-echo exif-data))))))
           ;; Allow browsing archive on avfs fs.
           ;; Assume volume is already mounted with mountavfs.
-          ((and helm-ff-avfs-directory
-                (string-match
-                 (regexp-quote (expand-file-name helm-ff-avfs-directory))
-                 (file-name-directory candidate))
-                (helm-ff-file-compressed-p candidate))
+          ((helm-aand helm-ff-avfs-directory
+                      (file-name-directory candidate)
+                      (string-match
+                       (regexp-quote (expand-file-name helm-ff-avfs-directory))
+                       it)
+                      (helm-ff-file-compressed-p candidate))
            (funcall insert-in-minibuffer (concat candidate "#")))
           ;; File doesn't exists and basename starts with ".." or "  ",
           ;; Start a recursive search for directories.
