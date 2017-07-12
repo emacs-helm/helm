@@ -199,7 +199,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                             (concat (if (memql (char-after (point-min))
                                                '(? ?\t ?\n))
                                         "" " ")
-                                    (buffer-string)))
+                                    (buffer-substring-no-properties
+                                     (point-min) (point-max))))
              do (add-text-properties
                  0 (length bufstr)
                  `(buffer-name ,(buffer-name (get-buffer buf)))
@@ -561,7 +562,8 @@ Special commands:
              (cl-loop for buf in buflst
                       for bufstr = (or (and (buffer-live-p (get-buffer buf))
                                             (with-current-buffer buf
-                                              (buffer-string)))
+                                              (buffer-substring-no-properties
+                                               (point-min) (point-max))))
                                        "")
                       unless (string= bufstr "")
                       do (add-text-properties
