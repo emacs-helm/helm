@@ -2940,7 +2940,8 @@ Use it for non--interactive calls of `helm-find-files'."
   ;; `ffap-file-at-point' can be neutralized with
   ;; `helm-ff-guess-ffap-filenames' and `ffap-url-at-point' with
   ;; `helm-ff-guess-ffap-urls'.
-  (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist)))
+  (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))
+        (ffap-url-regexp helm--url-regexp))
     (if (eq major-mode 'dired-mode)
         (let ((beg  (save-excursion (dired-move-to-filename)))
               (end  (save-excursion (dired-move-to-end-of-filename t))))
@@ -2950,7 +2951,7 @@ Use it for non--interactive calls of `helm-find-files'."
                        (expand-file-name dired-directory))
                       (car it))
             (dired-get-filename 'no-dir t)))
-      (or (and helm-ff-guess-ffap-urls helm--url-regexp
+      (or (and helm-ff-guess-ffap-urls ffap-url-regexp
                (ffap-fixup-url (ffap-url-at-point)))
           ;; may yield url!
           (ffap-file-at-point)))))
