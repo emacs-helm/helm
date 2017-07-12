@@ -244,7 +244,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ((and (functionp collection) minibuffer-completing-file-name)
                   (cl-loop for f in (funcall collection helm-pattern test t)
                            unless (member f '("./" "../"))
-                           if (string-match ffap-url-regexp helm-pattern)
+                           if (string-match helm--url-regexp helm-pattern)
                            collect f
                            else
                            collect (concat (file-name-as-directory

@@ -377,8 +377,8 @@ from its directory."
               default-preselection))
          ;; Bookmark.
          (bmk (helm-aif (bookmark-get-filename bmk)
-                  (if (and ffap-url-regexp
-                           (string-match ffap-url-regexp it))
+                  (if (and helm--url-regexp
+                           (string-match helm--url-regexp it))
                       it (expand-file-name it))
                 (expand-file-name default-directory)))
          ((and (stringp sel) (or (file-remote-p sel)
@@ -392,7 +392,7 @@ from its directory."
           (with-current-buffer (get-buffer (car grep-line))
             (expand-file-name (or (buffer-file-name) default-directory))))
          ;; Url.
-         ((and (stringp sel) ffap-url-regexp (string-match ffap-url-regexp sel)) sel)
+         ((and (stringp sel) helm--url-regexp (string-match helm--url-regexp sel)) sel)
          ;; Default.
          (t (expand-file-name default-preselection)))))))
 (put 'helm-quit-and-find-file 'helm-only t)

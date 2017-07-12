@@ -906,7 +906,7 @@ working."
           ;; COMMAND on basename of each file, using
           ;; its basedir as `default-directory'.
           (cl-loop for f in cand-list
-                   for dir = (and (not (string-match ffap-url-regexp f))
+                   for dir = (and (not (string-match helm--url-regexp f))
                                   (helm-basedir f))
                    for file = (eshell-quote-argument
                                (format "%s" (if (and dir (file-remote-p dir))
@@ -1823,8 +1823,8 @@ On windows system substitute from start up to \"/[[:lower:]]:/\".
 This function is needed for `helm-ff-auto-expand-to-home-or-root'
 and should be used carefully elsewhere, or not at all, using
 `substitute-in-file-name' instead."
-  (cond ((and ffap-url-regexp
-              (string-match-p ffap-url-regexp fname))
+  (cond ((and helm--url-regexp
+              (string-match-p helm--url-regexp fname))
          fname)
         ((and (file-remote-p fname)
               helm-substitute-in-filename-stay-on-remote)
@@ -1847,8 +1847,8 @@ and should be used carefully elsewhere, or not at all, using
 
 (defun helm-point-file-in-dired (file)
   "Put point on filename FILE in dired buffer."
-  (unless (and ffap-url-regexp
-               (string-match-p ffap-url-regexp file))
+  (unless (and helm--url-regexp
+               (string-match-p helm--url-regexp file))
     (let ((target (expand-file-name (helm-substitute-in-filename file))))
       (dired (file-name-directory target))
       (dired-goto-file target))))
@@ -1861,8 +1861,8 @@ With a prefix arg toggle dired buffer to wdired mode."
   (advice-add 'wdired-get-filename :override #'helm--advice-wdired-get-filename)
   (let* ((marked (helm-marked-candidates :with-wildcard t))
          (current (car marked)))
-    (unless (and ffap-url-regexp
-                 (string-match-p ffap-url-regexp current))
+    (unless (and helm--url-regexp
+                 (string-match-p helm--url-regexp current))
       (let ((target (expand-file-name (helm-substitute-in-filename current))))
         (dired (cons helm-ff-default-directory marked))
         (dired-goto-file target)
@@ -2076,8 +2076,8 @@ purpose."
                 (expand-file-name "/")  ; Expand to "/" or "c:/"
                 ;; If path is an url *default-directory have to be nil.
                 (unless (or (string-match helm-ff-url-regexp path)
-                            (and ffap-url-regexp
-                                 (string-match ffap-url-regexp path)))
+                            (and helm--url-regexp
+                                 (string-match helm--url-regexp path)))
                   basedir))))
     (when (and (string-match ":\\'" path)
                (file-remote-p basedir nil t))
@@ -2100,7 +2100,7 @@ purpose."
                (string-match helm-ff-url-regexp path)
                invalid-basedir
                (and (not (file-exists-p path)) (string-match "/$" path))
-               (and ffap-url-regexp (string-match ffap-url-regexp path)))
+               (and helm--url-regexp (string-match helm--url-regexp path)))
            (list path))
           ((string= path "") (helm-ff-directory-files "/" t))
           ;; Check here if directory is accessible (not working on Windows).
@@ -2398,7 +2398,7 @@ return FNAME prefixed with [?]."
                       (propertize "[@]" 'face 'helm-ff-prefix))))
     (cond (file-or-symlinkp fname)
           ((or (string-match helm-ff-url-regexp fname)
-               (and ffap-url-regexp (string-match ffap-url-regexp fname)))
+               (and helm--url-regexp (string-match helm--url-regexp fname)))
            (concat prefix-url " " fname))
           (new-file (concat prefix-new " " fname)))))
 
@@ -2460,8 +2460,8 @@ Return candidates prefixed with basename of `helm-input' first."
       ;; Now highlight.
       (let* ((disp (if (and helm-ff-transformer-show-only-basename
                             (not (helm-dir-is-dot file))
-                            (not (and ffap-url-regexp
-                                      (string-match ffap-url-regexp file)))
+                            (not (and helm--url-regexp
+                                      (string-match helm--url-regexp file)))
                             (not (string-match helm-ff-url-regexp file)))
                        (or (helm-ff-get-host-from-tramp-invalid-fname file)
                            (helm-basename file)) file))
@@ -2520,8 +2520,8 @@ Return candidates prefixed with basename of `helm-input' first."
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
-    (cond ((and ffap-url-regexp
-                (not (string-match-p ffap-url-regexp str-at-point))
+    (cond ((and helm--url-regexp
+                (not (string-match-p helm--url-regexp str-at-point))
                 (not (with-helm-current-buffer (eq major-mode 'dired-mode)))
                 (string-match-p ":\\([0-9]+:?\\)" str-at-point))
            (append '(("Find file to line number" . helm-ff-goto-linum))
@@ -2950,7 +2950,7 @@ Use it for non--interactive calls of `helm-find-files'."
                        (expand-file-name dired-directory))
                       (car it))
             (dired-get-filename 'no-dir t)))
-      (or (and helm-ff-guess-ffap-urls ffap-url-regexp
+      (or (and helm-ff-guess-ffap-urls helm--url-regexp
                (ffap-fixup-url (ffap-url-at-point)))
           ;; may yield url!
           (ffap-file-at-point)))))
@@ -2961,8 +2961,8 @@ Use it for non--interactive calls of `helm-find-files'."
          (remp    (or (and file-at-pt (file-remote-p file-at-pt))
                       (and thing-at-pt (file-remote-p thing-at-pt))))
          (def-dir (helm-current-directory))
-         (urlp    (and file-at-pt ffap-url-regexp
-                       (string-match ffap-url-regexp file-at-pt)))
+         (urlp    (and file-at-pt helm--url-regexp
+                       (string-match helm--url-regexp file-at-pt)))
          (lib     (when helm-ff-search-library-in-sexp
                     (helm-find-library-at-point)))
          (hlink   (helm-ff-find-url-at-point))
@@ -3000,7 +3000,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (when (and (stringp he) (string-match "^LINK: " he))
       (setq he (replace-match "" t t he)))
     (cl-loop for i in (list he ov-he w3m-l nt-prop)
-          thereis (and (stringp i) ffap-url-regexp (string-match ffap-url-regexp i) i))))
+          thereis (and (stringp i) helm--url-regexp (string-match helm--url-regexp i) i))))
 
 (defun helm-find-library-at-point ()
   "Try to find library path at point.
@@ -3202,8 +3202,8 @@ Ask to kill buffers associated with that file, too."
   "Open file CANDIDATE or open helm marked files in separate windows.
 Called with a prefix arg open files in background without selecting them."
   (let ((marked (helm-marked-candidates :with-wildcard t))
-        (url-p (and ffap-url-regexp ; we should have only one candidate.
-                    (string-match ffap-url-regexp candidate)))
+        (url-p (and helm--url-regexp ; we should have only one candidate.
+                    (string-match helm--url-regexp candidate)))
         (ffap-newfile-prompt helm-ff-newfile-prompt-p)
         (find-file-wildcards nil)
         (helm--reading-passwd-or-string t))
@@ -3732,8 +3732,8 @@ Colorize only symlinks, directories and files."
            for i in files
            for disp = (if (and helm-ff-transformer-show-only-basename
                                (not (helm-dir-is-dot i))
-                               (not (and ffap-url-regexp
-                                         (string-match ffap-url-regexp i)))
+                               (not (and helm--url-regexp
+                                         (string-match helm--url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
                           (helm-basename i) (abbreviate-file-name i))
            for isremote = (or (file-remote-p i)

@@ -1300,7 +1300,7 @@ because they are automatically added.
 
 You should not modify this yourself unless you know what you are doing.")
 ;; Same as `ffap-url-regexp' but keep it here to ensure `ffap-url-regexp' is not nil.
-(defvar helm--url-regexp "\\(news\\(post\\)?:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\)://\\)")
+(defvar helm--url-regexp "\\`\\(news\\(post\\)?:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\)://\\)")
 (defvar helm--ignore-errors nil
   "Flag to prevent helm popping up errors in candidates functions.
 Should be set in candidates functions if needed, will be restored
