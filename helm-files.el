@@ -2748,6 +2748,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            ;; As soon as the final "/" is added the job is passed
            ;; to `helm-ff-auto-expand-to-home-or-root'.
            (funcall insert-in-minibuffer (concat candidate "/")))
+          ;; File is not existing and have no basedir, typically when
+          ;; user hit C-k (minibuffer is empty) and then write foo and
+          ;; hit C-j. This make clear that when no basedir, helm will
+          ;; create the file in default-directory.
+          ((and (not (file-exists-p candidate))
+                (not (helm-basedir candidate)))
+           (funcall insert-in-minibuffer
+                    (expand-file-name candidate default-directory)))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
