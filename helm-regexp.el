@@ -66,12 +66,7 @@ Any other non--nil value update after confirmation."
   :type 'boolean)
 
 (defcustom helm-moccur-show-buffer-fontification nil
-  "Show fontification of searched buffer in results.
-
-Can be one of `buffer-substring-no-properties' or `buffer-substring'.
-If you want to have fontification preserved in helm-buffer, you may
-prefer `buffer-substring' instead of default
-`buffer-substring-no-properties'."
+  "Show fontification of searched buffer in results when non nil."
   :group 'helm-regexp
   :type '(radio :tag "Allow preserving fontification of searched buffer in results"
                 (const :tag "Don't preserve buffer fontification" nil)
