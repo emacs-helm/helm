@@ -65,6 +65,17 @@ Any other non--nil value update after confirmation."
   :group 'helm-regexp
   :type 'boolean)
 
+(defcustom helm-moccur-show-buffer-fontification nil
+  "Show fontification of searched buffer in results.
+
+Can be one of `buffer-substring-no-properties' or `buffer-substring'.
+If you want to have fontification preserved in helm-buffer, you may
+prefer `buffer-substring' instead of default
+`buffer-substring-no-properties'."
+  :group 'helm-regexp
+  :type '(radio :tag "Allow preserving fontification of searched buffer in results"
+                (const :tag "Don't preserve buffer fontification" nil)
+                (const :tag "Preserve buffer fontification" t)))
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -191,6 +202,8 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (helm-init-candidates-in-buffer
       'global
     (cl-loop with buffers = (helm-attr 'moccur-buffers)
+             with bsubstring = (if helm-moccur-show-buffer-fontification
+                                   #'buffer-substring #'buffer-substring-no-properties)
              for buf in buffers
              for bufstr = (with-current-buffer buf
                             ;; A leading space is needed to allow helm
@@ -199,8 +212,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
                             (concat (if (memql (char-after (point-min))
                                                '(? ?\t ?\n))
                                         "" " ")
-                                    (buffer-substring-no-properties
-                                     (point-min) (point-max))))
+                                    (funcall bsubstring (point-min) (point-max))))
              do (add-text-properties
                  0 (length bufstr)
                  `(buffer-name ,(buffer-name (get-buffer buf)))
@@ -552,7 +564,9 @@ Special commands:
         (forward-line 1))
       (let ((inhibit-read-only t)
             (buffer (current-buffer))
-            (buflst helm-multi-occur-buffer-list))
+            (buflst helm-multi-occur-buffer-list)
+            (bsubstring (if helm-moccur-show-buffer-fontification
+                            #'buffer-substring #'buffer-substring-no-properties)))
         (delete-region (point) (point-max))
         (message "Reverting buffer...")
         (save-excursion
@@ -562,7 +576,7 @@ Special commands:
              (cl-loop for buf in buflst
                       for bufstr = (or (and (buffer-live-p (get-buffer buf))
                                             (with-current-buffer buf
-                                              (buffer-substring-no-properties
+                                              (funcall bsubstring
                                                (point-min) (point-max))))
                                        "")
                       unless (string= bufstr "")
