@@ -3667,24 +3667,32 @@ without recomputing them, it should be a list of lists."
            ;; updating.
            (helm-log "Matches: %S"
                      (setq matches (or candidates (helm--collect-matches sources))))
-           ;; If computing matches finished and is not interrupted
-           ;; erase the helm-buffer and render results (Fix #1157).
            (when matches
+             ;; If computing matches finished and is not interrupted
+             ;; erase the helm-buffer and render results (Fix #1157).
              (erase-buffer)             ; [1]
-             (cl-loop for src in sources
-                      for mtc in matches
-                      do (helm-render-source src mtc))
-             ;; Move to first line only when there is matches
-             ;; to avoid cursor moving upside down (issue #1703).
-             (helm--update-move-first-line)
-             (helm--reset-update-flag)))
-      (let ((src (or source (helm-get-current-source))))
-        (unless (assq 'candidates-process src)
-          (helm-display-mode-line src)
-          (helm-log-run-hook 'helm-after-update-hook)))
-      (when preselect
-        (helm-log "Update preselect candidate %s" preselect)
-        (helm-preselect preselect source))
+             (if (cl-loop for source in matches
+                          thereis source)
+                 (progn
+                   (helm-log "Matches found: %S" matches)
+                   (cl-loop for src in sources
+                            for mtc in matches
+                            do (helm-render-source src mtc))
+                   ;; Move to first line only when there is matches
+                   ;; to avoid cursor moving upside down (issue #1703).
+                   (helm--update-move-first-line)
+                   ;; Not sure if this should be outside the progn
+                   (let ((src (or source (helm-get-current-source))))
+                     (unless (assq 'candidates-process src)
+                       (helm-display-mode-line src)
+                       (helm-log-run-hook 'helm-after-update-hook)))
+                   (when preselect
+                     (helm-log "Update preselect candidate %s" preselect)
+                     (helm-preselect preselect source)))
+               ;; No matches; show results-not-found if input given
+               (when (not (string-empty-p helm-input))
+                 (helm-log "No matches for input: %S" helm-input)
+                 (helm-insert-match "No results found." 'insert)))))
       (setq helm--force-updating-p nil))
     (helm-log "end update")))
 
