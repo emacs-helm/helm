@@ -3661,15 +3661,17 @@ without recomputing them, it should be a list of lists."
            ;; when next chunk of update will arrive,
            ;; otherwise the buffer is erased AFTER [1] the results
            ;; are computed.
-           (unless sources (erase-buffer))
-           ;; Compute matches without rendering the sources.
-           ;; This prevent the helm-buffer flickering when constantly
-           ;; updating.
-           (helm-log "Matches: %S"
-                     (setq matches (or candidates (helm--collect-matches sources))))
-           ;; If computing matches finished and is not interrupted
-           ;; erase the helm-buffer and render results (Fix #1157).
-           (when matches
+           (if (null sources)
+               (erase-buffer)
+             ;; Compute matches without rendering the sources.
+             ;; This prevent the helm-buffer flickering when constantly
+             ;; updating.
+             (helm-log "Matches: %S"
+                       (setq matches (or candidates (helm--collect-matches sources))))
+             ;; If computing matches finished and is not interrupted
+             ;; erase the helm-buffer and render results (Fix #1157).
+             ;; Buffer is maybe erased before end of computing when
+             ;; source is async.
              (erase-buffer)             ; [1]
              (cl-loop for src in sources
                       for mtc in matches
