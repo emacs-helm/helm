@@ -2446,9 +2446,29 @@ frame configuration as per `helm-save-configuration-functions'."
                ;; This is needed for minibuffer own-frame config
                ;; when recursive minibuffers are in use.
                ;; e.g M-: + helm-minibuffer-history.
-               (let ((frame (if (minibufferp helm-current-buffer)
+               (cl-letf ((frame (if (minibufferp helm-current-buffer)
                                 (selected-frame)
-                              (last-nonminibuffer-frame))))
+                                (last-nonminibuffer-frame)))
+                         ;; This is a workaround, because the i3 window
+                         ;; manager developers are refusing to fix their
+                         ;; broken timestamp and event handling.
+                         ;;
+                         ;; We basically just disable the part of
+                         ;; select-frame-set-input-focus that would call
+                         ;; XSetInputFocus in Xlib (x-focus-frame), that
+                         ;; resets a timestamp in the xserver which the i3
+                         ;; developers fail to notice.
+                         ;;
+                         ;; Since they don't know about the new timestamp,
+                         ;; their keyboard handling can break after a helm
+                         ;; user quits emacs, as reported in #1641.
+                         ;;
+                         ;; Fortunately for us, we really don't need this
+                         ;; XSetInputFocus call, since we already have focus
+                         ;; for Emacs, the user is just using helm!  We call
+                         ;; select-frame-set-input-focus for the other
+                         ;; side-effects, not for x-focus-frame.
+                         ((symbol-function 'x-focus-frame) #'ignore))
                  (select-frame-set-input-focus frame))))))
 
 (defun helm-split-window-default-fn (window)
