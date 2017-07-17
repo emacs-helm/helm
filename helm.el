@@ -2447,8 +2447,8 @@ frame configuration as per `helm-save-configuration-functions'."
                ;; when recursive minibuffers are in use.
                ;; e.g M-: + helm-minibuffer-history.
                (cl-letf ((frame (if (minibufferp helm-current-buffer)
-                                (selected-frame)
-                                (last-nonminibuffer-frame)))
+                                    (selected-frame)
+                                  (last-nonminibuffer-frame)))
                          ;; This is a workaround, because the i3 window
                          ;; manager developers are refusing to fix their
                          ;; broken timestamp and event handling.
