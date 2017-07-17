@@ -3669,46 +3669,50 @@ without recomputing them, it should be a list of lists."
       (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
-    (unwind-protect
-         (let (sources matches)
-           ;; Collect sources ready to be updated.
-           (setq sources
-                 (cl-loop for src in (helm-get-sources)
-                          when (helm-update-source-p src)
-                          collect src))
-           ;; When no sources to update erase buffer
-           ;; to avoid duplication of header and candidates
-           ;; when next chunk of update will arrive,
-           ;; otherwise the buffer is erased AFTER [1] the results
-           ;; are computed.
-           (if (null sources)
-               (erase-buffer)
-             ;; Compute matches without rendering the sources.
-             ;; This prevent the helm-buffer flickering when constantly
-             ;; updating.
-             (helm-log "Matches: %S"
-                       (setq matches (or candidates (helm--collect-matches sources))))
-             ;; If computing matches finished and is not interrupted
-             ;; erase the helm-buffer and render results (Fix #1157).
-             ;; Buffer is maybe erased before end of computing when
-             ;; source is async.
-             (erase-buffer)             ; [1]
-             (cl-loop for src in sources
-                      for mtc in matches
-                      do (helm-render-source src mtc))
-             ;; Move to first line only when there is matches
-             ;; to avoid cursor moving upside down (issue #1703).
-             (helm--update-move-first-line)
-             (helm--reset-update-flag)))
-      (let ((src (or source (helm-get-current-source))))
-        (unless (assq 'candidates-process src)
-          (helm-display-mode-line src)
-          (helm-log-run-hook 'helm-after-update-hook)))
-      (when preselect
-        (helm-log "Update preselect candidate %s" preselect)
-        (helm-preselect preselect source))
-      (setq helm--force-updating-p nil))
-    (helm-log "end update")))
+    (let (async)
+      (unwind-protect
+          (let (sources matches)
+            ;; Collect sources ready to be updated.
+            (setq sources
+                  (cl-loop for src in (helm-get-sources)
+                           when (assq 'candidates-process src)
+                           do (setq async t)
+                           when (helm-update-source-p src)
+                           collect src))
+            ;; When no sources to update erase buffer
+            ;; to avoid duplication of header and candidates
+            ;; when next chunk of update will arrive,
+            ;; otherwise the buffer is erased AFTER [1] the results
+            ;; are computed.
+            (if (null sources)
+                (erase-buffer)
+              ;; Compute matches without rendering the sources.
+              ;; This prevent the helm-buffer flickering when constantly
+              ;; updating.
+              (helm-log "Matches: %S"
+                        (setq matches (or candidates (helm--collect-matches sources))))
+              ;; If computing matches finished and is not interrupted
+              ;; erase the helm-buffer and render results (Fix #1157).
+              (when (or async ;; Always render async sources.
+                        (cl-loop for sm in matches
+                                 thereis sm))
+                (erase-buffer) ;; [1]
+                (cl-loop for src in sources
+                         for mtc in matches
+                         do (helm-render-source src mtc))
+                ;; Move to first line only when there is matches
+                ;; to avoid cursor moving upside down (issue #1703).
+                (helm--update-move-first-line)
+                (helm--reset-update-flag))))
+        (let ((src (or source (helm-get-current-source))))
+          (unless async
+            (helm-display-mode-line src)
+            (helm-log-run-hook 'helm-after-update-hook)))
+        (when preselect
+          (helm-log "Update preselect candidate %s" preselect)
+          (helm-preselect preselect source))
+        (setq helm--force-updating-p nil))
+    (helm-log "end update"))))
 
 (defun helm-update-source-p (source)
   "Whether SOURCE need updating or not."
