@@ -3693,14 +3693,19 @@ without recomputing them, it should be a list of lists."
                         (setq matches (or candidates (helm--collect-matches sources))))
               ;; If computing matches finished and is not interrupted
               ;; erase the helm-buffer and render results (Fix #1157).
-              (erase-buffer) ;; [1]
-              (cl-loop for src in sources
-                       for mtc in matches
-                       do (helm-render-source src mtc))
-              ;; Move to first line only when there is matches
-              ;; to avoid cursor moving upside down (issue #1703).
-              (helm--update-move-first-line)
-              (helm--reset-update-flag)))
+              ;; `matches' is nil only when interrupted by
+              ;; `helm-while-no-input', otherwise it is a list of
+              ;; results even when no matches found e.g (nil nil nil)
+              ;; which is non-nil.
+              (when matches
+                (erase-buffer) ;; [1]
+                (cl-loop for src in sources
+                         for mtc in matches
+                         do (helm-render-source src mtc))
+                ;; Move to first line only when there is matches
+                ;; to avoid cursor moving upside down (issue #1703).
+                (helm--update-move-first-line)
+                (helm--reset-update-flag))))
         (let ((src (or source (helm-get-current-source))))
           (unless async
             ;; When there is an async source present among other sync
