@@ -3693,19 +3693,19 @@ without recomputing them, it should be a list of lists."
                         (setq matches (or candidates (helm--collect-matches sources))))
               ;; If computing matches finished and is not interrupted
               ;; erase the helm-buffer and render results (Fix #1157).
-              (when (or async ;; Always render async sources.
-                        (cl-loop for sm in matches
-                                 thereis sm))
-                (erase-buffer) ;; [1]
-                (cl-loop for src in sources
-                         for mtc in matches
-                         do (helm-render-source src mtc))
-                ;; Move to first line only when there is matches
-                ;; to avoid cursor moving upside down (issue #1703).
-                (helm--update-move-first-line)
-                (helm--reset-update-flag))))
+              (erase-buffer) ;; [1]
+              (cl-loop for src in sources
+                       for mtc in matches
+                       do (helm-render-source src mtc))
+              ;; Move to first line only when there is matches
+              ;; to avoid cursor moving upside down (issue #1703).
+              (helm--update-move-first-line)
+              (helm--reset-update-flag)))
         (let ((src (or source (helm-get-current-source))))
           (unless async
+            ;; When there is an async source present among other sync
+            ;; sources run `helm-after-update-hook' in output filter
+            ;; i.e wait the async source finish before running hook. 
             (helm-display-mode-line src)
             (helm-log-run-hook 'helm-after-update-hook)))
         (when preselect
