@@ -2325,9 +2325,10 @@ Note that only existing directories are saved here."
          (save-selected-window
            (cl-loop for c in marked do
                     (progn (helm-preselect
-                            (if (and helm-ff-transformer-show-only-basename
-                                     (not (helm-ff-dot-file-p c)))
-                                (helm-basename c) c))
+                            (concat "^" (regexp-quote
+                                         (if (and helm-ff-transformer-show-only-basename
+                                                  (not (helm-ff-dot-file-p c)))
+                                             (helm-basename c) c))))
                            (when (y-or-n-p
                                   (format "Really Delete file `%s'? "
                                           (abbreviate-file-name c)))
@@ -2341,9 +2342,9 @@ Note that only existing directories are saved here."
               helm-visible-mark-overlays nil))
       (helm-force-update
        (let ((presel (helm-get-selection)))
-         (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                (not (helm-ff-dot-file-p presel)))
-                           (helm-basename presel) presel)))))))
+         (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                            (not (helm-ff-dot-file-p presel)))
+                                       (helm-basename presel) presel))))))))
 
 (defun helm-ff-kill-buffer-fname (candidate)
   (let* ((buf      (get-file-buffer candidate))
