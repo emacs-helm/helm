@@ -1060,7 +1060,7 @@ That is what completion commands operate on."
         (helm-set-pattern
          (if (< arg 0)
              (with-temp-buffer
-               (insert helm-input)
+               (insert helm-pattern)
                (let ((end (point-max)))
                  (goto-char end)
                  (funcall fwd-fn -1)
@@ -1069,7 +1069,7 @@ That is what completion commands operate on."
                  (buffer-string)))
              (funcall fwd-fn arg)
              (concat
-              helm-input (replace-regexp-in-string
+              helm-pattern (replace-regexp-in-string
                             " *\n *" " "
                             (buffer-substring-no-properties
                              helm-yank-point (point))))))
