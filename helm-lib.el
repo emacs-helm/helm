@@ -1070,7 +1070,7 @@ That is what completion commands operate on."
              (funcall fwd-fn arg)
              (concat
               helm-input (replace-regexp-in-string
-                            "\\`\n" ""
+                            " *\n *" " "
                             (buffer-substring-no-properties
                              helm-yank-point (point))))))
         (setq helm-yank-point (if diff (- (point) diff) (point)))))))
