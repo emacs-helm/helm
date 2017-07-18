@@ -3614,6 +3614,13 @@ It is used for narrowing list of candidates to the
        (helm-while-no-input ,@body))))
 
 (defun helm--collect-matches (src-list)
+  "Returns a list of matches for each source in SRC-LIST.
+
+The resulting value is a list of lists, e.g ((a b c) (c d) (e f)) or
+\(nil nil nil) for three sources when no matches found, however this
+function can be interrupted by new input and in this case returns a
+plain `nil' i.e not (nil), in this case `helm-update' is not rendering
+the source, keeping previous candidates in display."
   (let ((matches (helm--maybe-use-while-no-input
                   (cl-loop for src in src-list
                            collect (helm-compute-matches src)))))
@@ -3690,7 +3697,8 @@ without recomputing them, it should be a list of lists."
               ;; This prevent the helm-buffer flickering when constantly
               ;; updating.
               (helm-log "Matches: %S"
-                        (setq matches (or candidates (helm--collect-matches sources))))
+                        (setq matches (or candidates
+                                          (helm--collect-matches sources))))
               ;; If computing matches finished and is not interrupted
               ;; erase the helm-buffer and render results (Fix #1157).
               ;; `matches' is nil only when interrupted by
@@ -3701,6 +3709,8 @@ without recomputing them, it should be a list of lists."
                 (erase-buffer) ;; [1]
                 (cl-loop for src in sources
                          for mtc in matches
+                         ;; `helm-render-source' returns nil when mtc
+                         ;; is nil.
                          do (helm-render-source src mtc))
                 ;; Move to first line only when there is matches
                 ;; to avoid cursor moving upside down (issue #1703).
