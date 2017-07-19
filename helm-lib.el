@@ -1069,8 +1069,10 @@ That is what completion commands operate on."
                  (buffer-string)))
              (funcall fwd-fn arg)
              (concat
+              ;; Allow yankink beyond eol allow inserting e.g long
+              ;; urls in mail buffers.
               helm-pattern (replace-regexp-in-string
-                            " *\n *" " "
+                            "\\`\n" ""
                             (buffer-substring-no-properties
                              helm-yank-point (point))))))
         (setq helm-yank-point (if diff (- (point) diff) (point)))))))
