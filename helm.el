@@ -812,10 +812,7 @@ This hook runs after `helm-buffer' is created but not from
 (make-obsolete-variable 'helm-update-hook 'helm-after-update-hook "1.9.9")
 
 (defvar helm-after-update-hook nil
-  "Runs after updating the helm buffer with the new input pattern.
-This is very similar to `helm-update-hook' except the selection
-is not moved. Hook is useful for selecting a particular object
-instead of the first one.")
+  "Runs after updating the helm buffer with the new input pattern.")
 
 (defvar helm-cleanup-hook nil
   "Runs after exiting the minibuffer and before performing an
