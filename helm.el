@@ -3702,6 +3702,11 @@ without recomputing them, it should be a list of lists."
              ;; to avoid cursor moving upside down (issue #1703).
              (helm--update-move-first-line)
              (helm--reset-update-flag)))
+      ;; When there is only one async source, update mode-line and run
+      ;; `helm-after-update-hook' in `helm-output-filter--post-process',
+      ;; when there is more than one source, update mode-line and run
+      ;; `helm-after-update-hook' now even if an async source is
+      ;; present and running in BG.
       (let ((src (or source (helm-get-current-source))))
         (unless (assq 'candidates-process src)
           (helm-display-mode-line src)
