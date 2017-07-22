@@ -458,6 +458,16 @@ e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
 
 Use as replace regexp \"%.\" and as replacement string \"foo-\\#\".
 
+Also \"%\" can be specified with a range of text to be replaced like this:
+    \"%:<from>:<to>\"
+
+e.g To rename files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
+    to \"fOo.jpg\" \"bAr.jpg\" and \"bAz.jpg\"
+
+Use as replace regexp \"%:1:2\" and as replacement string \"%u\" (aka upcase).
+
+NOTE that you can't use \"%.\" and \".%\" along with substring replacement.
+
 When \"%\", \".%\" or \"%\" are used, \"\\@\" can be used as a placeholder which
 remember those values.
 
@@ -474,15 +484,23 @@ Modifying the placeholder (\\@) is possible
   e.g \\@:0:2 replaces from beginning to second char of placeholder
   Note that length of placeholder is used for <to> when <to> is not specified
   e.g \\@:2: replaces from second char of placeholder to end
+  This is a quick way to strip out one part of string.
 
 - By search and replace:
-    \\@/<regexp>/<replacement>
-  e.g \\@/foo/bar replaces \"foo\" in placeholder by \"bar\"
+    \\@/<regexp>/<replacement>/
+  e.g \\@/foo/bar/ replaces \"foo\" in placeholder by \"bar\"
   Incremental replacement is also handled in <replacement>
-  e.g \\@/foo/-\\# replaces \"foo\" in placeholder by 001, 002 etc...
+  e.g \\@/foo/-\\#/ replaces \"foo\" in placeholder by 001, 002 etc...
 
 In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
 are available, respectively `%u', `%d' and `%c'.
+
+In all these replacements you may endup with same names as replacement, in such cases
+helm takes care of numbering the files that would overwrite prcedent file, e.g:
+Say you remove in files \"emacs-m1.txt\" \"emacs-m2.txt\" and \"emacs-m3.txt\" the \"-m<n>\" part
+you would endup with three files named \"emacs.txt\", the second renaming overwriting first file,
+and the second renaming overwriting second file and so on, instead helm will rename like
+\"emacs(1).txt\" and \"emacs(2).txt\" second an third file.
 
 Note also that unlike the [[Serial renaming][serial rename]] actions the renamed files stay in their initial directory
 and are not renamed to current directory, IOW use this (\\#) to rename files inside the same directory.

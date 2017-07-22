@@ -1075,30 +1075,40 @@ This doesn't replace inside the files, only modify filenames."
                                 nil 'helm-ff-query-replace-history-from
                                 (helm-basename (car candidates))))
            (rep    (read-string (format "Replace regexp `%s' with: " regexp)
-                                nil 'helm-ff-query-replace-history-to)))
+                                nil 'helm-ff-query-replace-history-to))
+           subexp)
       (cl-loop with query = "y"
                with count = 0
                with target = nil
                for old in candidates
                for new = (concat (helm-basedir old)
-                                 (replace-regexp-in-string
-                                  (cond ((string= regexp "%.")
-                                         (regexp-quote
-                                          (setq target (helm-basename old t))))
-                                        ((string= regexp ".%")
-                                         (regexp-quote
-                                          (setq target (file-name-extension old))))
-                                        ((string= regexp "%")
-                                         (regexp-quote
-                                          (setq target (helm-basename old))))
-                                        (t regexp))
+                                 (helm--replace-regexp-in-string
+                                  (save-match-data
+                                    (cond ((string= regexp "%.")
+                                           (setq subexp 1)
+                                           (helm-ff--prepare-str-with-regexp
+                                            (setq target (helm-basename old t))))
+                                          ((string= regexp ".%")
+                                           (setq subexp 1)
+                                           (helm-ff--prepare-str-with-regexp
+                                            (setq target (file-name-extension old))))
+                                          ((string= regexp "%")
+                                           (regexp-quote
+                                            (setq target (helm-basename old))))
+                                          ((string-match "%:\\([0-9]+\\):\\([0-9]+\\)" regexp)
+                                           (setq subexp 1)
+                                           (helm-ff--prepare-str-with-regexp
+                                            (setq target (helm-basename old))
+                                            (match-string 1 regexp)
+                                            (match-string 2 regexp)))
+                                          (t regexp)))
                                   (save-match-data
                                     (cond (;; Handle incremental
                                            ;; replacement with \# in
                                            ;; search and replace
                                            ;; feature in placeholder \@.
                                            (string-match
-                                            "\\\\@/\\(.*\\)/\\(\\(?99:.*\\)\\\\#\\)"
+                                            "\\\\@/\\(.*\\)/\\(\\(?99:.*\\)\\\\#\\)/"
                                             rep)
                                            (replace-regexp-in-string
                                             (match-string 1 rep)
@@ -1131,7 +1141,7 @@ This doesn't replace inside the files, only modify filenames."
                                           ;; Search and replace in
                                           ;; placeholder. Doesn't
                                           ;; handle incremental here.
-                                          ((string-match "\\\\@/\\(.*\\)/\\(.*\\)" rep)
+                                          ((string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
                                            (replace-match (replace-regexp-in-string
                                                            (match-string 1 rep)
                                                            (match-string 2 rep)
@@ -1149,7 +1159,7 @@ This doesn't replace inside the files, only modify filenames."
                                           ;; Simple replacement with
                                           ;; whole replacement regexp.
                                           (t rep)))
-                                  (helm-basename old) t))
+                                  (helm-basename old) t nil subexp))
                ;; If `regexp' is not matched in `old'
                ;; `replace-regexp-in-string' will
                ;; return `old' unmodified.
@@ -1182,6 +1192,27 @@ This doesn't replace inside the files, only modify filenames."
   (sit-for 0.1)
   (with-current-buffer (window-buffer (minibuffer-window))
     (delete-minibuffer-contents)))
+
+(defun helm-ff--prepare-str-with-regexp (str &optional rep1 rep2)
+  ;; This is used in `helm-ff-query-replace-on-filenames' to prepare
+  ;; STR when REGEXP is specified as substring e.g %:1:3 in this case
+  ;; substring from 1 to 3 in STR will be enclosed with parenthesis to
+  ;; match this substring as a subexp e.g %:1:3 on string "emacs" will
+  ;; be replaced by "e\\(ma\\)cs" using subexp 1 like this:
+  ;; (helm--replace-regexp-in-string "e\\(ma\\)cs" "fo" "emacs" nil t 1)
+  ;; => "efocs"
+  ;;      ^^
+  ;; Where "1" and "3" will be strings extracted with match-string
+  ;; from regexp and refered respectively in this function as REP1 and
+  ;; REP2.
+  (let* ((from   (or (and rep1 (string-to-number rep1)) 0))
+         (to     (or (and rep2 (string-to-number rep2)) (length str)))
+         (subexp (concat "\\(" (regexp-quote (substring str from to)) "\\)"))
+         (before-str (unless (zerop from)
+                       (regexp-quote (substring str 0 from))))
+         (after-str (unless (= to (length str))
+                      (regexp-quote (substring str to (length str))))))
+    (concat before-str subexp after-str)))
 
 ;; The action.
 (defun helm-ff-query-replace-on-marked (_candidate)
