@@ -1097,10 +1097,13 @@ This doesn't replace inside the files, only modify filenames."
                                             (setq target (helm-basename old))))
                                           ((string-match "%:\\([0-9]+\\):\\([0-9]+\\)" regexp)
                                            (setq subexp 1)
-                                           (helm-ff--prepare-str-with-regexp
-                                            (setq target (helm-basename old))
-                                            (match-string 1 regexp)
-                                            (match-string 2 regexp)))
+                                           (let ((beg (match-string 1 regexp))
+                                                 (end (match-string 2 regexp))
+                                                 (str (helm-basename old)))
+                                             (setq target (substring str
+                                                                     (string-to-number beg)
+                                                                     (string-to-number end)))
+                                             (helm-ff--prepare-str-with-regexp str beg end)))
                                           (t regexp)))
                                   (save-match-data
                                     (cond (;; Handle incremental
@@ -1145,7 +1148,7 @@ This doesn't replace inside the files, only modify filenames."
                                            (replace-match (replace-regexp-in-string
                                                            (match-string 1 rep)
                                                            (match-string 2 rep)
-                                                           target)
+                                                           target t)
                                                           t t rep))
                                           ;; Simple replacement by placeholder.
                                           ((string-match "\\\\@" rep)
