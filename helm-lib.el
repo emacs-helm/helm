@@ -763,8 +763,15 @@ e.g
     (replace-regexp-in-string \"f\" \"r\" \"foofoo\" t nil nil 3)
     => \"roo\"
 
+Unlike `replace-regexp-in-string' this function is buffer-based
+implemented i.e replacement is computed inside a temp buffer, so
+REGEXP should be used differently than with
+`replace-regexp-in-string'.
+
 NOTE: This function is used internally for
-`helm-ff-query-replace-on-filenames' and builded for this."
+`helm-ff-query-replace-on-filenames' and builded for this.
+You should use `replace-regexp-in-string' instead unless the behavior
+of this function is really needed."
   (with-temp-buffer
     (insert str)
     (goto-char (or start (point-min)))
