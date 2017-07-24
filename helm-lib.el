@@ -738,7 +738,7 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   "Current line string without properties."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
-(defun helm--replace-regexp-in-string (regexp rep str &optional fixedcase literal subexp)
+(defun helm--replace-regexp-in-string (regexp rep str &optional fixedcase literal subexp start)
   "Replace REGEXP by REP in string STR.
 
 Same as `replace-regexp-in-string' but handle properly REP as
@@ -752,14 +752,22 @@ e.g
     (replace-regexp-in-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
     => \"eEMACSacs\"
 
-Argument START of `replace-regexp-in-string' is not available.
+Also START argument behave as expected unlike
+`replace-regexp-in-string'.
+
+e.g
+
+    (helm--replace-regexp-in-string \"f\" \"r\" \"foofoo\" t nil nil 3)
+    => \"fooroo\"
+
+    (replace-regexp-in-string \"f\" \"r\" \"foofoo\" t nil nil 3)
+    => \"roo\"
 
 NOTE: This function is used internally for
-`helm-ff-query-replace-on-filenames' and builded for this, don't use it
-as a replacement of `replace-regexp-in-string' as it may behave differently."
+`helm-ff-query-replace-on-filenames' and builded for this."
   (with-temp-buffer
     (insert str)
-    (goto-char (point-min))
+    (goto-char (or start (point-min)))
     (while (re-search-forward regexp nil t)
       (replace-match (cond ((and (functionp rep) subexp)
                             (funcall rep (match-string subexp)))
