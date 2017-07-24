@@ -426,39 +426,71 @@ The directory selection with \"**/\" like bash shopt globstar option is not supp
 
 *** Query replace regexp on filenames
 
-WARNING: This is designed to work ONLY in current directory, i.e
-         your marked files have to be from the same directory.
-         So do not mark files in different directories, [[Using wildcard to select multiple files][recursive globbing]] e.g \"**.txt\"
-         is not supported as well for same reasons. 
+Allow replacing different parts of file's basename with something else.
 
-You can rename your marked files by replacing only part of filenames matching
-a regexp.
+When calling this action you will be prompted like in `query-replace' with two prompts,
+one for the matching part of text to replace and another one for the replacement text,
+however several facilities are provided to make the two prompts more powerfull.
 
-e.g Rename recursively all files with \".JPG\" extension to \".jpg\":
-Use the helm-file-globstar feature described in previous section by
-entering at end of helm-find-files pattern \"**.JPG\", then hit `M-%`,
-at first prompt enter \"JPG\", at second \"jpg\" and hit `RET`.
+**** Syntax available in first prompt:
 
-Shortcut for basename without extension, only extension or all are available:
+In addition to a simple regexp, these shortcuts are availables:
 
 - Basename without extension => \"%.\"
 - Only extension             => \".%\"
-- All                        => \"%\"
+- Substring                  => \"%:<from>:<to>\"
+- Whole basename             => \"%\"
+
+**** Syntax available in second prompt
+
+In addition to a simple string to use as replacement, here what you can use:
+
+- A placeholder refering to what you have selected in first prompt: \"\\@\"
+After this placeholder you can use a search and replace syntax ala sed:
+
+    \"\\@/<regexp>/<replacement>/
+
+You can remove substring part of string represented by placeholder:
+
+    \"\\@:<from>:<to>\"
+ 
+- A special character representing a number which is incremented:   \"\\#\"
+
+- shortcut for `upcase', `downcase' and `capitalize'
+are available, respectively `%u', `%d' and `%c'.
+
+**** Usage with examples
+
+***** Rename recursively all files with \".JPG\" extension to \".jpg\":
+
+Use the `helm-file-globstar' feature described in [[Using wildcard to select multiple files][recursive globbing]] by
+entering at end of helm-find-files pattern \"**.JPG\", then hit \\<helm-map>\\[helm-ff-query-replace-on-filenames],
+at first prompt enter \"JPG\", at second \"jpg\" and hit `RET`.
 
 So in the example above you could do instead:
 At first prompt enter \".%\", at second \"jpg\" and hit `RET`.
+
 Note that when using this instead of using \"JPG\" at first prompt, all extensions
 will be renamed to \"jpg\" even if the extension of one of the files is e.g \"png\".
+If you want to keep the original extension you can use at first prompt \".%\",
+and at second \"%d\" (downcase).
 
-If you want to rename a serie of files from number 001 to 00x use \\# inside the replacement
-string when you will be prompted for it.
+***** Rename a serie of files from number 001 to 00x
+
+Use \\# inside the second prompt
 
 e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
     to \"foo-001.jpg\" \"foo-002.jpg\" \"foo-003.jpg\"
 
 Use as replace regexp \"%.\" and as replacement string \"foo-\\#\".
 
-Also \"%\" can be specified with a range of text to be replaced like this:
+e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
+    to \"foo-001.jpg\" \"bar-002.jpg\" \"baz-003.jpg\"
+
+Use as replace regexp \"%.\" and as replacement string \"\\@-\\#\".
+
+***** Replace a range of text
+
     \"%:<from>:<to>\"
 
 e.g To rename files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
@@ -466,18 +498,9 @@ e.g To rename files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
 
 Use as replace regexp \"%:1:2\" and as replacement string \"%u\" (aka upcase).
 
-NOTE that you can't use \"%.\" and \".%\" along with substring replacement.
+NOTE that you CANNOT use \"%.\" and \".%\" along with substring replacement.
 
-When \"%\", \".%\" or \"%\" are used, \"\\@\" can be used as a placeholder which
-remember those values.
-
-e.g To rename the files \"foo.jpg\" \"bar.jpg\" and \"baz.jpg\"
-    to \"foo-001.jpg\" \"bar-002.jpg\" \"baz-003.jpg\"
-
-Use as replace regexp \"%.\" and as replacement string \"\\@-\\#\".
-
-Modifying the placeholder (\\@) is possible
-\(in contrast of renaming the whole placeholder with something else) with two methods:
+***** Modifying string from the placeholder (\\@)
 
 - By substring, i.e using only the substring of placeholder:
     \\@:<from>:<to>
@@ -492,18 +515,22 @@ Modifying the placeholder (\\@) is possible
   Incremental replacement is also handled in <replacement>
   e.g \\@/foo/-\\#/ replaces \"foo\" in placeholder by 001, 002 etc...
 
-In the second prompt (replace regexp with) shortcut for `upcase', `downcase' and `capitalize'
-are available, respectively `%u', `%d' and `%c'.
+***** Clash in replacements (avoid overwriting files)
 
 In all these replacements you may endup with same names as replacement, in such cases
-helm takes care of numbering the files that would overwrite prcedent file, e.g:
+helm takes care of numbering the files that would overwrite precedent file, e.g:
 Say you remove in files \"emacs-m1.txt\" \"emacs-m2.txt\" and \"emacs-m3.txt\" the \"-m<n>\" part
 you would endup with three files named \"emacs.txt\", the second renaming overwriting first file,
-and the second renaming overwriting second file and so on, instead helm will rename like
+and the third renaming overwriting second file and so on, instead helm will rename like
 \"emacs(1).txt\" and \"emacs(2).txt\" second an third file.
 
-Note also that unlike the [[Serial renaming][serial rename]] actions the renamed files stay in their initial directory
-and are not renamed to current directory, IOW use this (\\#) to rename files inside the same directory.
+***** Query-replace on filenames vs serial rename actions
+
+Note also that unlike the [[Serial renaming][serial rename]] actions
+the renamed files stay in their initial directory and are not renamed
+to current directory, so usage of \\# to serial rename files make
+sense only for files inside the same directory even it continues renaming
+files with an incremental number in next directories.
 
 *** Serial renaming
 
