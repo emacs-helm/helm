@@ -3732,7 +3732,7 @@ without recomputing them, it should be a list of lists."
          ;; Entering repeatedly these strings (*, ?) takes 100% CPU
          ;; and hang emacs on MacOs preventing deleting backward those
          ;; characters (issue #1802).
-         (not (string-match-p "[*]\\{2,\\}\\|[?]\\{3,\\}" helm-pattern))
+         (not (string-match-p "\\([*]\\{2,\\}\\|[?]\\{3,\\}\\)\\'" helm-pattern))
          ;; These incomplete regexps hang helm forever
          ;; so defer update. Maybe replace spaces quoted when using
          ;; multi-match.
