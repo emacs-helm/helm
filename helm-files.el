@@ -1082,7 +1082,7 @@ This doesn't replace inside the files, only modify filenames."
                with target = nil
                for old in candidates
                for new = (concat (helm-basedir old)
-                                 (helm--replace-regexp-in-string
+                                 (helm--replace-regexp-in-buffer-string
                                   (save-match-data
                                     (cond ((string= regexp "%.")
                                            (setq subexp 1)
@@ -1202,7 +1202,7 @@ This doesn't replace inside the files, only modify filenames."
   ;; substring from 1 to 3 in STR will be enclosed with parenthesis to
   ;; match this substring as a subexp e.g %:1:3 on string "emacs" will
   ;; be replaced by "e\\(ma\\)cs" using subexp 1 like this:
-  ;; (helm--replace-regexp-in-string "e\\(ma\\)cs" "fo" "emacs" nil t 1)
+  ;; (helm--replace-regexp-in-buffer-string "e\\(ma\\)cs" "fo" "emacs" nil t 1)
   ;; => "efocs"
   ;;      ^^
   ;; Where "1" and "3" will be strings extracted with match-string

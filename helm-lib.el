@@ -738,7 +738,7 @@ Add spaces at end if needed to reach WIDTH when STR is shorter than WIDTH."
   "Current line string without properties."
   (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
 
-(defun helm--replace-regexp-in-string (regexp rep str &optional fixedcase literal subexp start)
+(defun helm--replace-regexp-in-buffer-string (regexp rep str &optional fixedcase literal subexp start)
   "Replace REGEXP by REP in string STR.
 
 Same as `replace-regexp-in-string' but handle properly REP as
@@ -746,7 +746,7 @@ function with SUBEXP specified.
 
 e.g
 
-    (helm--replace-regexp-in-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
+    (helm--replace-regexp-in-buffer-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
     => \"eMacs\"
 
     (replace-regexp-in-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
@@ -757,7 +757,7 @@ Also START argument behave as expected unlike
 
 e.g
 
-    (helm--replace-regexp-in-string \"f\" \"r\" \"foofoo\" t nil nil 3)
+    (helm--replace-regexp-in-buffer-string \"f\" \"r\" \"foofoo\" t nil nil 3)
     => \"fooroo\"
 
     (replace-regexp-in-string \"f\" \"r\" \"foofoo\" t nil nil 3)
