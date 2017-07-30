@@ -1920,10 +1920,15 @@ With a prefix arg toggle dired buffer to wdired mode."
          ;; symbol (`tramp-file-name') which is not needed as argument
          ;; for `tramp-make-tramp-file-name' so transform the cdr in
          ;; vector, and for 24.5 use directly the returned value.
-         (cl-loop with v = (pcase (tramp-dissect-file-name fname)
-                             (`(,_l . ,ll) (vconcat ll))
-                             ((and vec (pred vectorp)) vec))
+         (cl-loop with v = (helm--tramp-cons-or-vector
+                            (tramp-dissect-file-name fname))
                   for i across v collect i)))
+
+(defun helm--tramp-cons-or-vector (vector-or-cons)
+  "Return VECTOR-OR-CONS as a vector."
+  (pcase vector-or-cons
+    (`(,_l . ,ll) (vconcat ll))
+    ((and vec (pred vectorp)) vec)))
 
 (defun helm-ff-get-tramp-methods ()
   "Returns a list of the car of `tramp-methods'."
@@ -4153,7 +4158,8 @@ It allows additionally to delete more than one connection at once."
                      :candidate-transformer (lambda (candidates)
                                               (cl-loop for v in candidates
                                                        for name = (apply #'tramp-make-tramp-file-name
-                                                                         (cl-loop for i across v collect i))
+                                                                         (cl-loop with v = (helm--tramp-cons-or-vector v)
+                                                                                  for i across v collect i))
                                                        when (or (processp (tramp-get-connection-process v))
                                                                 (buffer-live-p (get-buffer (tramp-buffer-name v))))
                                                        collect (cons name v)))
