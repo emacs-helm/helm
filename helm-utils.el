@@ -705,11 +705,12 @@ Assume regexp is a pcre based regexp."
     (cancel-timer helm--show-help-echo-timer)
     (setq helm--show-help-echo-timer nil)))
 
-(defun helm-show-help-echo ()
+(defun helm-maybe-show-help-echo ()
   (when helm--show-help-echo-timer
     (cancel-timer helm--show-help-echo-timer)
     (setq helm--show-help-echo-timer nil))
   (when (and helm-alive-p
+             helm-popup-tip-mode
              (member (assoc-default 'name (helm-get-current-source))
                      helm-sources-using-help-echo-popup))
     (setq helm--show-help-echo-timer
@@ -732,12 +733,10 @@ Assume regexp is a pcre based regexp."
   (require 'popup)
   (if helm-popup-tip-mode
       (progn
-        (add-hook 'helm-after-update-hook 'helm-show-help-echo) ; Needed for async sources.
-        (add-hook 'helm-move-selection-after-hook 'helm-show-help-echo)
+        (add-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
         (add-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer))
-      (remove-hook 'helm-after-update-hook 'helm-show-help-echo)
-      (remove-hook 'helm-move-selection-after-hook 'helm-show-help-echo)
-      (remove-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer)))
+    (remove-hook 'helm-move-selection-after-hook 'helm-maybe-show-help-echo)
+    (remove-hook 'helm-cleanup-hook 'helm-cancel-help-echo-timer)))
 
 (defun helm-open-file-with-default-tool (file)
   "Open FILE with the default tool on this platform."

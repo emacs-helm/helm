@@ -549,6 +549,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
+                    (helm-maybe-show-help-echo)
                     (with-helm-window
                       (setq mode-line-format
                             `(" " mode-line-buffer-identification " "
@@ -1461,6 +1462,7 @@ if available with current AG version."
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
+                  (helm-maybe-show-help-echo)
                   (with-helm-window
                     (setq mode-line-format
                           `(" " mode-line-buffer-identification " "
