@@ -627,22 +627,46 @@ Should not be used among other sources.")
     (message "Helm find files session bookmarked! ")))
 (put 'helm-ff-bookmark-set 'helm-only t)
 
+(defcustom helm-dwim-target nil
+  "Default target directory for file actions.
+
+Define the directory where you want to start navigating for the target
+directory when copying, renaming etc... You can use the
+`default-directory' of `next-window', the current
+`default-directory' or have completion on all the directories
+belonging to each window."
+  :group 'helm-files
+  :type '(radio :tag "Define default target directory for file actions."
+          (const :tag "Directory belonging to next window" next-window)
+          (const :tag "Completion on directories belonging to each window" completion)
+          (const :tag "Use initial directory or `default-directory'" nil)))
+
 (defun helm-dwim-target-directory ()
-  "Return value of `default-directory' of buffer in other window.
-If there is only one window return the value of currently visited directory
-if found in `helm-ff-history' or fallback to `default-directory'
-of current buffer."
+  "Try to return a suitable directory according to `helm-dwim-target'."
   (with-helm-current-buffer
-    (let ((num-windows (length (remove (get-buffer-window helm-marked-buffer-name)
-                                       (window-list)))))
+    (let* ((wins (remove (get-buffer-window helm-marked-buffer-name)
+                         (window-list)))
+           (num-windows (length wins)))
       (expand-file-name
-       (if (> num-windows 1)
-           (save-selected-window
-             (other-window 1)
-             default-directory)
-           ;; Using the car of *ff-history allow
-           ;; staying in the directory visited instead of current.
-           (or (car-safe helm-ff-history) default-directory))))))
+       (cond ((and (> num-windows 1)
+                   (eq helm-dwim-target 'completion))
+              (helm-comp-read "Browse target starting from: "
+                              (append (list (or (car-safe helm-ff-history)
+                                                default-directory)
+                                            default-directory)
+                                      (cl-loop for w in wins collect
+                                               (with-selected-window w
+                                                 default-directory)))))
+             ((and (> num-windows 1)
+                   (eq helm-dwim-target 'next-window))
+              (with-selected-window (next-window)
+                default-directory))
+             ((or (= num-windows 1)
+                  (null helm-dwim-target))
+              ;; Using the car of *ff-history allow
+              ;; staying in the directory visited instead of
+              ;; current.
+              (or (car-safe helm-ff-history) default-directory)))))))
 
 (defun helm-ff--count-and-collect-dups (files)
   (cl-loop with dups = (make-hash-table :test 'equal)
