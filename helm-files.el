@@ -629,9 +629,10 @@ Should not be used among other sources.")
 
 (defcustom helm-dwim-target 'completion
   "Default target directory for file actions.
+
 Define the directory where you want to start navigating for the target
 directory when copying, renaming etc... You can use the
-`default-directory' of `next-window' or the current
+`default-directory' of `next-window', the current
 `default-directory' or have completion on all the directories
 belonging to each window."
   :group 'helm-files
@@ -641,10 +642,7 @@ belonging to each window."
           (const :tag "Use initial directory or `default-directory'" nil)))
 
 (defun helm-dwim-target-directory ()
-  "Return value of `default-directory' of buffer in other window.
-If there is only one window return the value of currently visited directory
-if found in `helm-ff-history' or fallback to `default-directory'
-of current buffer."
+  "Try to return a suitable directory according to `helm-dwim-target'."
   (with-helm-current-buffer
     (let* ((wins (remove (get-buffer-window helm-marked-buffer-name)
                          (window-list)))

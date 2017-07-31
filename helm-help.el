@@ -552,6 +552,12 @@ Note that wildcards are supported as well, so you can use e.g \"*.txt\" to selec
 in current directory or \"**.txt\" to select all files recursively from current directory
 \(See [[Using wildcard to select multiple files]] section above).
 
+*** Defining default target directory for copying/renaming etc.. according to `helm-dwim-target'
+
+You can customize `helm-dwim-target' to behave differently according to the windows open
+in your current frame.
+Default is to provide completion on the directories belonging to these windows if some.
+
 *** Copying renaming asynchronously
 
 If you use async library (if you have installed helm from MELPA you do) you can enable
@@ -561,7 +567,7 @@ Note that even when async is enabled, running a copy/rename action with a prefix
 will execute action synchronously, it will follow also the first file of the marked files
 in its destination directory.
 
-When `dired-async-mode' is enabled and additional action named \"Backup files\" will be
+When `dired-async-mode' is enabled, an additional action named \"Backup files\" will be
 available (such command is not available in emacs natively).
 See [[Using wildcard to select multiple files]] for details.
 
