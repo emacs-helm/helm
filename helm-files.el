@@ -770,7 +770,8 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
-  (let* ((bname  (helm-basename candidate))
+  (let* ((helm-dwim-target 'next-window) 
+         (bname  (helm-basename candidate))
          (marked (helm-marked-candidates :with-wildcard t))
          (prompt (if merge "Ediff Merge `%s' With File: "
                    "Ediff `%s' With File: "))
