@@ -627,7 +627,7 @@ Should not be used among other sources.")
     (message "Helm find files session bookmarked! ")))
 (put 'helm-ff-bookmark-set 'helm-only t)
 
-(defcustom helm-dwim-target 'completion
+(defcustom helm-dwim-target nil
   "Default target directory for file actions.
 
 Define the directory where you want to start navigating for the target
@@ -650,7 +650,7 @@ belonging to each window."
       (expand-file-name
        (cond ((and (> num-windows 1)
                    (eq helm-dwim-target 'completion))
-              (helm-comp-read "Target directory: "
+              (helm-comp-read "Browse target starting from: "
                               (append (list (or (car-safe helm-ff-history)
                                                 default-directory)
                                             default-directory)
