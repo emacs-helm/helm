@@ -289,9 +289,9 @@ Interactively, BUFFER is the current buffer."
          ;; Checking buffer-base-buffer ensures that we handle
          ;; indirect buffers, e.g. created with
          ;; org-tree-to-indirect-buffer
-         (filename (buffer-file-name (or (buffer-base-buffer (current-buffer))
-                                         (current-buffer))))
-         (target (helm-comp-read "Refile to: " (helm-org--get-candidates-in-file filename)))
+         (filename (buffer-file-name (or (buffer-base-buffer buffer) buffer)))
+         (target (helm-comp-read "Refile to: "
+                                 (helm-org--get-candidates-in-file filename)))
          (rfloc (list nil filename nil target)))
     (org-refile nil nil rfloc)))
 
