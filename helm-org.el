@@ -21,6 +21,10 @@
 (require 'helm-utils)
 (require 'org)
 
+;; Load org-with-point-at macro when compiling
+(eval-when-compile
+  (require 'org-macs))
+
 (declare-function org-agenda-switch-to "org-agenda.el")
 
 (defgroup helm-org nil
@@ -58,6 +62,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
     ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
+    ("Refile this heading within this buffer `C-c C-w'" . helm-org-refile-within-buffer-action)
     ("Refile current or marked heading to selection `C-c w`" . helm-org-heading-refile)
     ("Insert link to this heading `C-c l`" . helm-org-insert-link-to-heading-at-marker))
   "Default actions alist for
@@ -111,6 +116,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-c C-w") 'helm-org-run-refile-within-buffer-action)
     (define-key map (kbd "C-c w") 'helm-org-run-heading-refile)
     (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
     map)
@@ -274,6 +280,35 @@ nothing to CANDIDATES."
   (with-helm-alive-p
     (helm-exit-and-execute-action
      'helm-org-insert-link-to-heading-at-marker)))
+
+(defun helm-org-refile-within-buffer (buffer)
+  "Refile current heading to another heading in BUFFER.
+Interactively, BUFFER is the current buffer."
+  (interactive (list (current-buffer)))
+  (let* ((org-reverse-note-order t)
+         ;; Checking buffer-base-buffer ensures that we handle
+         ;; indirect buffers, e.g. created with
+         ;; org-tree-to-indirect-buffer
+         (filename (buffer-file-name (or (buffer-base-buffer (current-buffer))
+                                         (current-buffer))))
+         (target (helm-comp-read "Refile to: " (helm-org--get-candidates-in-file filename)))
+         (rfloc (list nil filename nil target)))
+    (org-refile nil nil rfloc)))
+
+(defun helm-org-refile-within-buffer-action (pos)
+  "Action to refile heading at POS to another heading in current buffer.
+POS is an integer or marker, suitable for use with
+`org-with-point-at'."
+  (org-with-point-at pos
+    (helm-org-refile-within-buffer (current-buffer))))
+
+(defun helm-org-run-refile-within-buffer-action ()
+  "Run `helm-org-refile-within-buffer-action'.
+Call this with a keybinding in the Helm buffer."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'helm-org-refile-within-buffer-action)))
+(put 'helm-org-run-refile-within-buffer-action 'helm-only t)
 
 (defun helm-org-heading-refile (marker)
   "Refile current heading or marked to MARKER.
