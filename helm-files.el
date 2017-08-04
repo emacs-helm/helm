@@ -323,6 +323,11 @@ Of course you can also write your own function to do something else."
   :group 'helm-files
   :type 'function)
 
+(defcustom helm-modes-using-escaped-strings
+  '(eshell-mode shell-mode term-mode)
+  "Modes that requires string's insertion to be escaped."
+  :group 'helm-files
+  :type '(repeat symbol))
 
 ;;; Faces
 ;;
@@ -2891,7 +2896,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                     guess))))
              (escape-fn (with-helm-current-buffer
                           (if (memq major-mode
-                                    '(eshell-mode shell-mode term-mode))
+                                    helm-modes-using-escaped-strings)
                               #'shell-quote-argument #'identity))))
         (set-text-properties 0 (length candidate) nil candidate)
         (insert
