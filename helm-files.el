@@ -2888,24 +2888,31 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                     guess)
                                    (string-match-p
                                     "\\`\\(/\\|[[:lower:][:upper:]]:/\\)"
-                                    guess)))))
+                                    guess))))
+             (escape-fn (with-helm-current-buffer
+                          (if (memq major-mode
+                                    '(eshell-mode shell-mode term-mode))
+                              #'shell-quote-argument #'identity))))
         (set-text-properties 0 (length candidate) nil candidate)
-        (if (and guess (not (string= guess ""))
-                 (or (string-match "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
-                                   guess)
-                     (file-exists-p candidate)))
-            (progn
-              (delete-region beg end)
-              (insert (cond (full-path-p
-                             (expand-file-name candidate))
-                            ((string= (match-string 1 guess) "~/")
-                              (abbreviate-file-name candidate))
-                            (t (file-relative-name candidate)))))
-            (insert (cond ((equal helm-current-prefix-arg '(4))
+        (insert
+         (funcall escape-fn
+                  (if (and guess (not (string= guess ""))
+                           (or (string-match
+                                "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
+                                guess)
+                               (file-exists-p candidate)))
+                      (prog1
+                          (cond (full-path-p
+                                 (expand-file-name candidate))
+                                ((string= (match-string 1 guess) "~/")
+                                 (abbreviate-file-name candidate))
+                                (t (file-relative-name candidate)))
+                        (delete-region beg end))
+                    (cond ((equal helm-current-prefix-arg '(4))
                            (abbreviate-file-name candidate))
                           ((equal helm-current-prefix-arg '(16))
                            (file-relative-name candidate))
-                          (t candidate))))))))
+                          (t candidate)))))))))
 
 (cl-defun helm-find-files-history (&key (comp-read t))
   "The `helm-find-files' history.
