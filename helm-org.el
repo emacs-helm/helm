@@ -62,8 +62,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
     ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
-    ("Refile this heading within this buffer `C-c C-w'" . helm-org-refile-within-buffer-action)
-    ("Refile current or marked heading to selection `C-c w`" . helm-org-heading-refile)
+    ("Refile heading(s) (multiple-marked-to-selected, or current-to-selected) `C-c w`" . helm-org--refile-heading-to)
     ("Insert link to this heading `C-c l`" . helm-org-insert-link-to-heading-at-marker))
   "Default actions alist for
   `helm-source-org-headings-for-files'."
@@ -116,8 +115,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
-    (define-key map (kbd "C-c C-w") 'helm-org-run-refile-within-buffer-action)
-    (define-key map (kbd "C-c w") 'helm-org-run-heading-refile)
+    (define-key map (kbd "C-c w") 'helm-org-run-refile-heading-to)
     (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
     map)
   "Keymap for `helm-source-org-headings-for-files'.")
@@ -281,57 +279,25 @@ nothing to CANDIDATES."
     (helm-exit-and-execute-action
      'helm-org-insert-link-to-heading-at-marker)))
 
-(defun helm-org-refile-within-buffer (buffer)
-  "Refile current heading to another heading in BUFFER.
-Interactively, BUFFER is the current buffer."
-  (interactive (list (current-buffer)))
-  (let* ((org-reverse-note-order t)
-         ;; Checking buffer-base-buffer ensures that we handle
-         ;; indirect buffers, e.g. created with
-         ;; org-tree-to-indirect-buffer
-         (filename (buffer-file-name (or (buffer-base-buffer buffer) buffer)))
-         (target (helm-comp-read "Refile to: "
-                                 (helm-org--get-candidates-in-file filename)))
-         (rfloc (list nil filename nil target)))
-    (org-refile nil nil rfloc)))
-
-(defun helm-org-refile-within-buffer-action (pos)
-  "Action to refile heading at POS to another heading in current buffer.
-POS is an integer or marker, suitable for use with
-`org-with-point-at'."
-  (org-with-point-at pos
-    (helm-org-refile-within-buffer (current-buffer))))
-
-(defun helm-org-run-refile-within-buffer-action ()
-  "Run `helm-org-refile-within-buffer-action'.
-Call this with a keybinding in the Helm buffer."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action #'helm-org-refile-within-buffer-action)))
-(put 'helm-org-run-refile-within-buffer-action 'helm-only t)
-
-(defun helm-org-heading-refile (marker)
-  "Refile current heading or marked to MARKER.
-The current heading is the heading where cursor was
-before entering helm session, it will be used unless
-you mark a candidate, in this case helm will go to this marked
-candidate in org buffer and refile this candidate to MARKER.
-NOTE that of course if you have marked more than one candidate,
-all the subsequent candidates will be ignored."
-  (let ((mkd (with-helm-buffer
-               (and helm-marked-candidates
-                    (car (helm-marked-candidates))))))
-    (save-selected-window
-      (when (eq major-mode 'org-agenda-mode)
-        (org-agenda-switch-to))
-      (when mkd (helm-org-goto-marker mkd))
-      (org-cut-subtree)
-      (let ((target-level (with-current-buffer (marker-buffer marker)
-                            (goto-char (marker-position marker))
-                            (org-current-level))))
-        (helm-org-goto-marker marker)
-        (org-end-of-subtree t t)
-        (org-paste-subtree (+ target-level 1))))))
+(defun helm-org--refile-heading-to (marker)
+  "Refile headings to heading at MARKER.
+If multiple candidates are marked in the Helm session, they will
+all be refiled.  If no headings are marked, the selected heading
+will be refiled."
+  (let* ((victims (with-helm-buffer (helm-marked-candidates)))
+         (buffer (marker-buffer marker))
+         (filename (buffer-file-name buffer))
+         (rfloc (list nil filename nil marker)))
+    (when (and (= 1 (length victims))
+               (equal (helm-get-selection) (car victims)))
+      ;; No candidates are marked; we are refiling the entry at point
+      ;; to the selected heading
+      (setq victims (list (point))))
+    ;; Probably best to check that everything returned a value
+    (when (and victims buffer filename rfloc)
+      (cl-loop for victim in victims
+               do (org-with-point-at victim
+                    (org-refile nil nil rfloc))))))
 
 (defun helm-org-in-buffer-preselect ()
   (if (org-on-heading-p)
@@ -340,11 +306,11 @@ all the subsequent candidates will be ignored."
         (outline-previous-visible-heading 1)
         (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
 
-(defun helm-org-run-heading-refile ()
+(defun helm-org-run-refile-heading-to ()
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-org-heading-refile)))
-(put 'helm-org-run-heading-refile 'helm-only t)
+    (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
+(put 'helm-org-run-refile-heading-to 'helm-only t)
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
