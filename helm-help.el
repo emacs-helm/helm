@@ -1381,18 +1381,22 @@ but this will not push a new entry with concatenated candidates in kill-ring.
 
 *** Refiling
 
-The heading to refile will be the one you were at when starting helm
-session, and the place to refile this heading will be the selected
-candidate (i.e the candidate at point in helm buffer). If you want to
-refile another one, move to it in helm buffer, mark it, then move to
-the candidate of your choice to refile at this place.
-NOTE that of course if you have marked more than one candidate,
-all the subsequent candidates will be ignored.
+You can refile one heading or multiple headings at a time.
+
+To refile one heading, move the point to the entry you want to
+refile, and run \\[helm-org-in-buffer-headings].  Then select the
+heading you want to refile to, and press \\[C-c w], or select the
+refile action from the actions menu.
+
+To refile multiple headings, run \\[helm-org-in-buffer-headings]
+and mark the headings you want to refile.  Then select the
+heading you want to refile to (without marking it), and press
+\\[C-c w], or select the refile action from the actions menu.
 
 ** Commands
 \\<helm-org-headings-map>
 \\[helm-org-run-open-heading-in-indirect-buffer]\t\tOpen heading in indirect buffer.
-\\[helm-org-run-heading-refile]\t\tRefile current heading to selection.
+\\[helm-org-run-refile-heading-to]\t\tRefile current heading to selection, or marked headings to selection.
 \\[helm-org-run-insert-link-to-heading-at-marker]\t\tInsert link at point to selection."
   )
 
