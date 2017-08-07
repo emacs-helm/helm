@@ -3206,7 +3206,9 @@ e.g:
 If \(candidate-number-limit\) is in SOURCE, show all candidates in SOURCE.
 If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
   (helm-aif (assq 'candidate-number-limit source)
-      (or (cdr it) 99999999)
+      ;; When assoc value is nil use by default 99999999 otherwise use
+      ;; the assoc value, when it is a symbol interpret its value (#1831).
+      (or (helm-aand (cdr it) (helm-interpret-value it)) 99999999)
     (or helm-candidate-number-limit 99999999)))
 
 (defun helm-candidate-get-display (candidate)
