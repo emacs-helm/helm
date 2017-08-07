@@ -247,7 +247,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                          :keymap helm-esh-completion-map
                          :resume 'noresume
                          :input (and (stringp last)
-                                     (helm-ff-set-pattern last)))
+                                     (expand-file-name last)))
                    (and del-space (looking-back "\\s-" (1- (point)))
                         (delete-char -1))))))))
 
