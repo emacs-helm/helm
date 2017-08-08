@@ -325,7 +325,7 @@ will be refiled."
 (defun helm-org-in-buffer-headings ()
   "Preconfigured helm for org buffer headings."
   (interactive)
-  (let (helm-org-show-filename helm-org-format-outline-path)
+  (let (helm-org-show-filename)
     (helm :sources (helm-source-org-headings-for-files
                     (list (current-buffer)))
           :candidate-number-limit 99999
