@@ -246,7 +246,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                          :buffer "*helm pcomplete*"
                          :keymap helm-esh-completion-map
                          :resume 'noresume
-                         :input (if (and (stringp last) (file-exists-p last))
+                         :input (if (and (stringp last)
+                                         (not (string= last ""))
+                                         (file-exists-p last))
                                     (expand-file-name last)
                                   last))
                    (and del-space (looking-back "\\s-" (1- (point)))
