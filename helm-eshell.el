@@ -202,6 +202,9 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Helm class to define source for Eshell history.")
 
 
+
+(defvar helm-eshell--delete-space-flag nil)
+
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
@@ -241,18 +244,30 @@ The function that call this should set `helm-ec-target' to thing at point."
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
              (with-helm-show-completion beg end
-               (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
-                                    :fuzzy-match helm-eshell-fuzzy-match)
-                         :buffer "*helm pcomplete*"
-                         :keymap helm-esh-completion-map
-                         :resume 'noresume
-                         :input (if (and (stringp last)
-                                         (not (string= last ""))
-                                         (file-exists-p last))
-                                    (expand-file-name last)
-                                  last))
-                   (and del-space (looking-back "\\s-" (1- (point)))
-                        (delete-char -1))))))))
+               (add-hook 'helm-quit-hook 'helm-eshell--delete-space)
+               (unwind-protect
+                   (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
+                                        :fuzzy-match helm-eshell-fuzzy-match)
+                             :buffer "*helm pcomplete*"
+                             :keymap helm-esh-completion-map
+                             :resume 'noresume
+                             :input (if (and (stringp last)
+                                             (not (string= last ""))
+                                             (or (file-exists-p last)
+                                                 (helm-aand
+                                                  (file-name-directory last)
+                                                  (file-directory-p it))))
+                                        (expand-file-name last)
+                                      last))
+                       (and del-space (looking-back "\\s-" (1- (point)))
+                            (delete-char -1))
+                       (unless helm-eshell--delete-space-flag
+                         (insert " ")))
+                 (remove-hook 'helm-quit-hook 'helm-eshell--delete-space)
+                 (setq helm-eshell--delete-space-flag nil)))))))
+
+(defun helm-eshell--delete-space ()
+  (setq helm-eshell--delete-space-flag t))
 
 ;;;###autoload
 (defun helm-eshell-history ()
