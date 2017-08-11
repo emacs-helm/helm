@@ -221,6 +221,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                (save-excursion
                  (eshell-backward-argument 1) (point))
                end)))
+         (users-comp (string= target "~"))
          (first (car args)) ; Maybe lisp delimiter "(".
          last ; Will be the last but parsed by pcomplete.
          del-space)
@@ -253,14 +254,28 @@ The function that call this should set `helm-ec-target' to thing at point."
                              :resume 'noresume
                              :input (if (and (stringp last)
                                              (not (string= last ""))
+                                             (not users-comp)
+                                             ;; Fix completion on
+                                             ;; "../" see #1832.
                                              (or (file-exists-p last)
                                                  (helm-aand
                                                   (file-name-directory last)
                                                   (file-directory-p it))))
                                         (expand-file-name last)
-                                      last))
+                                      ;; Don't add "~" to input to
+                                      ;; provide completion on all
+                                      ;; users instead of only on
+                                      ;; current $HOME (#1832).
+                                      (unless users-comp last)))
+                       ;; A space is needed to have completion, remove
+                       ;; it when done.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
+                       ;; We need another flag for space here, but
+                       ;; global to pass it to `helm-quit-hook', this
+                       ;; space is added when point is just after
+                       ;; previous completion and there is there no
+                       ;; more completion, see issue #1832.
                        (unless helm-eshell--delete-space-flag
                          (insert " ")))
                  (remove-hook 'helm-quit-hook 'helm-eshell--delete-space)
