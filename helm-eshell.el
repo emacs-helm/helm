@@ -111,7 +111,7 @@ The function that call this should set `helm-ec-target' to thing at point."
     (insert
      (mapconcat
       (lambda (x)
-        (cond ((string-match "\\`~/?" helm-ec-target)
+        (cond ((string-match "\\`~/" helm-ec-target)
                ;; Strip out the first escape char added by
                ;; `comint-quote-filename' before "~" (Issue #1803).
                (substring (comint-quote-filename (abbreviate-file-name x)) 1))
