@@ -244,8 +244,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                          "\\`\\*" ""
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
+             (add-hook 'helm-quit-hook 'helm-eshell--delete-space)
              (with-helm-show-completion beg end
-               (add-hook 'helm-quit-hook 'helm-eshell--delete-space)
                (unwind-protect
                    (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
                                         :fuzzy-match helm-eshell-fuzzy-match)
@@ -276,7 +276,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                        ;; space is added when point is just after
                        ;; previous completion and there is there no
                        ;; more completion, see issue #1832.
-                       (unless helm-eshell--delete-space-flag
+                       (unless (or helm-eshell--delete-space-flag
+                                   (looking-back "/\\'" (1- (point))))
                          (insert " ")))
                  (remove-hook 'helm-quit-hook 'helm-eshell--delete-space)
                  (setq helm-eshell--delete-space-flag nil)))))))
