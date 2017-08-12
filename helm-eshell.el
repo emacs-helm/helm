@@ -205,6 +205,10 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 (defvar helm-eshell--delete-space-flag nil)
 
+;; FIXME: (These are emacs bugs we can work around)
+;; [X] ls ..<TAB> should complete to ../ (same for .<TAB>)
+;; [ ] cd ~/.<TAB> should complete to all hidden files under $HOME.
+
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
@@ -271,14 +275,16 @@ The function that call this should set `helm-ec-target' to thing at point."
                        ;; it when done.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
-                       ;; We need another flag for space here, but
-                       ;; global to pass it to `helm-quit-hook', this
-                       ;; space is added when point is just after
-                       ;; previous completion and there is there no
-                       ;; more completion, see issue #1832.
-                       (unless (or helm-eshell--delete-space-flag
-                                   (looking-back "/\\'" (1- (point))))
-                         (insert " ")))
+                       (if (looking-back "[.]\\{1,2\\}\\'" (1- (point)))
+                           (insert "/")
+                         ;; We need another flag for space here, but
+                         ;; global to pass it to `helm-quit-hook', this
+                         ;; space is added when point is just after
+                         ;; previous completion and there is there no
+                         ;; more completion, see issue #1832.
+                         (unless (or helm-eshell--delete-space-flag
+                                     (looking-back "/\\'" (1- (point))))
+                           (insert " "))))
                  (remove-hook 'helm-quit-hook 'helm-eshell--delete-space)
                  (setq helm-eshell--delete-space-flag nil)))))))
 
