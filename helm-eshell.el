@@ -251,6 +251,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                          "\\`\\*" ""
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
+             ;; Set helm-eshell--delete-suffix-flag to non-nil only on
+             ;; quit, this tells to not add final suffix when quitting
+             ;; helm.
              (add-hook 'helm-quit-hook 'helm-eshell--delete-space)
              (with-helm-show-completion beg end
                (unwind-protect
