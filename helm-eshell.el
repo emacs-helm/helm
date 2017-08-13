@@ -203,11 +203,12 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 
 
-(defvar helm-eshell--delete-space-flag nil)
+(defvar helm-eshell--delete-suffix-flag nil)
 
 ;; FIXME: (These are emacs bugs we can work around)
 ;; [X] ls ..<TAB> should complete to ../ (same for .<TAB>)
-;; [ ] cd ~/.<TAB> should complete to all hidden files under $HOME.
+;; [ ] cd ~/.<TAB> should complete to all hidden files under $HOME
+;; (emacs bug#28064).
 
 ;;;###autoload
 (defun helm-esh-pcomplete ()
@@ -248,7 +249,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                          "\\`\\*" ""
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
-             (add-hook 'helm-quit-hook 'helm-eshell--delete-space)
+             (add-hook 'helm-quit-hook 'helm-eshell--delete-suffix)
              (with-helm-show-completion beg end
                (unwind-protect
                    (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
@@ -275,21 +276,22 @@ The function that call this should set `helm-ec-target' to thing at point."
                        ;; it when done.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
-                       (if (looking-back "[.]\\{1,2\\}\\'" (1- (point)))
+                       (if (and (null helm-eshell--delete-suffix-flag)
+                                (looking-back "[.]\\{1,2\\}\\'" (1- (point))))
                            (insert "/")
                          ;; We need another flag for space here, but
                          ;; global to pass it to `helm-quit-hook', this
                          ;; space is added when point is just after
                          ;; previous completion and there is there no
                          ;; more completion, see issue #1832.
-                         (unless (or helm-eshell--delete-space-flag
+                         (unless (or helm-eshell--delete-suffix-flag
                                      (looking-back "/\\'" (1- (point))))
                            (insert " "))))
-                 (remove-hook 'helm-quit-hook 'helm-eshell--delete-space)
-                 (setq helm-eshell--delete-space-flag nil)))))))
+                 (remove-hook 'helm-quit-hook 'helm-eshell--delete-suffix)
+                 (setq helm-eshell--delete-suffix-flag nil)))))))
 
-(defun helm-eshell--delete-space ()
-  (setq helm-eshell--delete-space-flag t))
+(defun helm-eshell--delete-suffix ()
+  (setq helm-eshell--delete-suffix-flag t))
 
 ;;;###autoload
 (defun helm-eshell-history ()
