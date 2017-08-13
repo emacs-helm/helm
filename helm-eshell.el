@@ -205,11 +205,6 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 (defvar helm-eshell--delete-suffix-flag nil)
 
-;; FIXME: (These are emacs bugs we can work around)
-;; [X] ls ..<TAB> should complete to ../ (same for .<TAB>)
-;; [ ] cd ~/.<TAB> should complete to all hidden files under $HOME
-;; (emacs bug#28064).
-
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
@@ -237,7 +232,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                        (- end (length target)))
                   ;; Nothing at point.
                   (progn (insert " ") (setq del-space t) (point))))
-    (when (string-match "\\`[~]/.*[.]\\'" target)
+    (when (string-match "\\`[~.]*/.*[.]\\'" target)
+      ;; Fix completion on
+      ;; "~/.", "~/[...]/.", and "../."
       (delete-char -1)
       (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
     (cond ((eq first ?\()
@@ -273,7 +270,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                                                   (file-name-directory last)
                                                   (file-directory-p it))))
                                         (if (and (file-directory-p last)
-                                                 (string-match "\\`[~]/.*[.]\\'" target))
+                                                 (string-match "\\`[~.]*/.*[.]\\'" target))
+                                            ;; Fix completion on
+                                            ;; "~/.", "~/[...]/.", and "../."
                                             (concat (helm-basedir (file-name-as-directory last))
                                                     (regexp-quote (helm-basename target)))
                                           (expand-file-name last))
