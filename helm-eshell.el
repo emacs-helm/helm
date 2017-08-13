@@ -232,7 +232,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                        (- end (length target)))
                   ;; Nothing at point.
                   (progn (insert " ") (setq del-space t) (point))))
-    (when (string-match "\\`[~.]*/.*[.]\\'" target)
+    (when (string-match "\\`[~.]*.*/[.]\\'" target)
       ;; Fix completion on
       ;; "~/.", "~/[...]/.", and "../.". Note that removed dot is not
       ;; restored if nothing found or when quitting, FIXIT.
@@ -271,11 +271,12 @@ The function that call this should set `helm-ec-target' to thing at point."
                                                   (file-name-directory last)
                                                   (file-directory-p it))))
                                         (if (and (file-directory-p last)
-                                                 (string-match "\\`[~.]*/.*[.]\\'" target))
+                                                 (string-match "\\`[~.]*.*/[.]\\'" target))
                                             ;; Fix completion on
                                             ;; "~/.", "~/[...]/.", and "../."
-                                            (concat (helm-basedir (file-name-as-directory last))
-                                                    (regexp-quote (helm-basename target)))
+                                            (expand-file-name
+                                             (concat (helm-basedir (file-name-as-directory last))
+                                                     (regexp-quote (helm-basename target))))
                                           (expand-file-name last))
                                       ;; Don't add "~" to input to
                                       ;; provide completion on all
