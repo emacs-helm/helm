@@ -237,6 +237,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                        (- end (length target)))
                   ;; Nothing at point.
                   (progn (insert " ") (setq del-space t) (point))))
+    (when (string-match "\\`[~]/.*[.]\\'" target)
+      (delete-char -1)
+      (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
     (cond ((eq first ?\()
            (helm-lisp-completion-or-file-name-at-point))
           ;; In eshell `pcomplete-parse-arguments' is called
@@ -249,6 +252,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                          "\\`\\*" ""
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
+             ;; Set helm-eshell--delete-suffix-flag to non-nil only on
+             ;; quit, this tells to not add final suffix when quitting
+             ;; helm.
              (add-hook 'helm-quit-hook 'helm-eshell--delete-suffix)
              (with-helm-show-completion beg end
                (unwind-protect
@@ -266,7 +272,11 @@ The function that call this should set `helm-ec-target' to thing at point."
                                                  (helm-aand
                                                   (file-name-directory last)
                                                   (file-directory-p it))))
-                                        (expand-file-name last)
+                                        (if (and (file-directory-p last)
+                                                 (string-match "\\`[~]/.*[.]\\'" target))
+                                            (concat (helm-basedir (file-name-as-directory last))
+                                                    (regexp-quote (helm-basename target)))
+                                          (expand-file-name last))
                                       ;; Don't add "~" to input to
                                       ;; provide completion on all
                                       ;; users instead of only on
