@@ -234,7 +234,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                   (progn (insert " ") (setq del-space t) (point))))
     (when (string-match "\\`[~.]*/.*[.]\\'" target)
       ;; Fix completion on
-      ;; "~/.", "~/[...]/.", and "../."
+      ;; "~/.", "~/[...]/.", and "../.". Note that removed dot is not
+      ;; restored if nothing found or when quitting, FIXIT.
       (delete-char -1)
       (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
     (cond ((eq first ?\()
@@ -282,7 +283,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                                       ;; current $HOME (#1832).
                                       (unless users-comp last)))
                        ;; A space is needed to have completion, remove
-                       ;; it when done.
+                       ;; it when nothing found.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
                        (if (and (null helm-eshell--delete-suffix-flag)
@@ -291,7 +292,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                          ;; We need another flag for space here, but
                          ;; global to pass it to `helm-quit-hook', this
                          ;; space is added when point is just after
-                         ;; previous completion and there is there no
+                         ;; previous completion and there is no
                          ;; more completion, see issue #1832.
                          (unless (or helm-eshell--delete-suffix-flag
                                      (looking-back "/\\'" (1- (point))))
