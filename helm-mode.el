@@ -176,7 +176,9 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
   (let ((debug-on-quit nil))
     (signal 'quit nil)))
 
-(cl-defun helm-comp-read-get-candidates (collection &optional test sort-fn alistp (input ""))
+(cl-defun helm-comp-read-get-candidates (collection &optional
+                                                    test sort-fn alistp
+                                                    (input helm-pattern))
   "Convert COLLECTION to list removing elements that don't match TEST.
 See `helm-comp-read' about supported COLLECTION arguments.
 
@@ -186,7 +188,8 @@ ALISTP when non--nil will not use `all-completions' to collect
 candidates because it doesn't handle alists correctly for helm.
 i.e In `all-completions' the car of each pair is used as value.
 In helm we want to use the cdr instead like \(display . real\),
-so we return the alist as it is with no transformation by all-completions.
+so we return the alist as it is with no transformation by
+`all-completions'.
 
 e.g
 
@@ -203,6 +206,16 @@ e.g
 ==>\"1\"
 
 See docstring of `all-completions' for more info.
+
+INPUT is the string you want to complete against, defaulting to
+`helm-pattern' which is the value of what you enter in minibuffer.
+Note that when using a function as COLLECTION this value will be
+available with the input argument of the function only when using a
+sync source from `helm-comp-read', i.e not using
+`:candidates-in-buffer', otherwise the function is called only once
+with an empty string as value for `helm-pattern' because
+`helm-pattern' is not yet computed, which is what we want otherwise
+data would not be fully collected at init time.
 
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   ;; Ensure COLLECTION is computed from `helm-current-buffer'
@@ -242,13 +255,13 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; but special cases like `find-file-at-point' do it.
                  ;; Handle here specially such cases.
                  ((and (functionp collection) minibuffer-completing-file-name)
-                  (cl-loop for f in (funcall collection helm-pattern test t)
+                  (cl-loop for f in (funcall collection input test t)
                            unless (member f '("./" "../"))
-                           if (string-match helm--url-regexp helm-pattern)
+                           if (string-match helm--url-regexp input)
                            collect f
                            else
                            collect (concat (file-name-as-directory
-                                            (helm-basedir helm-pattern)) f)))
+                                            (helm-basedir input)) f)))
                  ((functionp collection)
                   (funcall collection input test t))
                  ((and alistp (null test)) collection)
@@ -479,7 +492,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (get-candidates
             (lambda ()
               (let ((cands (helm-comp-read-get-candidates
-                            collection test sort alistp)))
+                            collection test sort alistp
+                            ;; This should not be needed as
+                            ;; `helm-pattern' is not yet computed when
+                            ;; calling this from :init when
+                            ;; candidates-in-buffer is in use.
+                            (if candidates-in-buffer "" helm-pattern))))
                 (helm-cr-default default cands))))
            (history-get-candidates
             (lambda ()
@@ -688,7 +706,7 @@ It should be used when candidate list don't need to rebuild dynamically."
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
   ;; So (re)calculate collection outside of main helm-session.
   (let* ((cands (helm-comp-read-get-candidates
-                 collection test nil nil "")))
+                 collection test nil nil)))
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
                                     name buffer t)))
