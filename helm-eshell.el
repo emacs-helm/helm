@@ -203,7 +203,7 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 
 
-(defvar helm-eshell--delete-suffix-flag nil)
+(defvar helm-eshell--quit-flag nil)
 
 ;;;###autoload
 (defun helm-esh-pcomplete ()
@@ -250,10 +250,10 @@ The function that call this should set `helm-ec-target' to thing at point."
                          "\\`\\*" ""
                          (car (last (ignore-errors
                                       (pcomplete-parse-arguments))))))
-             ;; Set helm-eshell--delete-suffix-flag to non-nil only on
+             ;; Set helm-eshell--quit-flag to non-nil only on
              ;; quit, this tells to not add final suffix when quitting
              ;; helm.
-             (add-hook 'helm-quit-hook 'helm-eshell--delete-suffix)
+             (add-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
              (with-helm-show-completion beg end
                (unwind-protect
                    (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
@@ -283,12 +283,13 @@ The function that call this should set `helm-ec-target' to thing at point."
                                       ;; users instead of only on
                                       ;; current $HOME (#1832).
                                       (unless users-comp last)))
-                       (and del-dot (insert "."))
+                       ;; Delete removed dot on quit
+                       (and del-dot helm-eshell--quit-flag (insert "."))
                        ;; A space is needed to have completion, remove
                        ;; it when nothing found.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
-                       (if (and (null helm-eshell--delete-suffix-flag)
+                       (if (and (null helm-eshell--quit-flag)
                                 (looking-back "[.]\\{1,2\\}\\'" (1- (point))))
                            (insert "/")
                          ;; We need another flag for space here, but
@@ -296,14 +297,14 @@ The function that call this should set `helm-ec-target' to thing at point."
                          ;; space is added when point is just after
                          ;; previous completion and there is no
                          ;; more completion, see issue #1832.
-                         (unless (or helm-eshell--delete-suffix-flag
+                         (unless (or helm-eshell--quit-flag
                                      (looking-back "/\\'" (1- (point))))
                            (insert " "))))
-                 (remove-hook 'helm-quit-hook 'helm-eshell--delete-suffix)
-                 (setq helm-eshell--delete-suffix-flag nil)))))))
+                 (remove-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
+                 (setq helm-eshell--quit-flag nil)))))))
 
-(defun helm-eshell--delete-suffix ()
-  (setq helm-eshell--delete-suffix-flag t))
+(defun helm-eshell--quit-hook-fn ()
+  (setq helm-eshell--quit-flag t))
 
 ;;;###autoload
 (defun helm-eshell-history ()
