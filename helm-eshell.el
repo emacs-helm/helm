@@ -224,7 +224,8 @@ The function that call this should set `helm-ec-target' to thing at point."
          (users-comp (string= target "~"))
          (first (car args)) ; Maybe lisp delimiter "(".
          last ; Will be the last but parsed by pcomplete.
-         del-space)
+         del-space
+         del-dot)
     (setq helm-ec-target (or target " ")
           end (point)
           ;; Reset beg for `with-helm-show-completion'.
@@ -234,9 +235,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                   (progn (insert " ") (setq del-space t) (point))))
     (when (string-match "\\`[~.]*.*/[.]\\'" target)
       ;; Fix completion on
-      ;; "~/.", "~/[...]/.", and "../.". Note that removed dot is not
-      ;; restored if nothing found or when quitting, FIXIT.
-      (delete-char -1)
+      ;; "~/.", "~/[...]/.", and "../."
+      (delete-char -1) (setq del-dot t)
       (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
     (cond ((eq first ?\()
            (helm-lisp-completion-or-file-name-at-point))
@@ -283,6 +283,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                                       ;; users instead of only on
                                       ;; current $HOME (#1832).
                                       (unless users-comp last)))
+                       (and del-dot (insert "."))
                        ;; A space is needed to have completion, remove
                        ;; it when nothing found.
                        (and del-space (looking-back "\\s-" (1- (point)))
