@@ -108,20 +108,21 @@ The function that call this should set `helm-ec-target' to thing at point."
       (delete-region (point) pt)))
   (when (string-match "\\`\\*" helm-ec-target) (insert "*"))
   (let ((marked (helm-marked-candidates)))
-    (insert
-     (mapconcat
-      (lambda (x)
-        (cond ((string-match "\\`~/" helm-ec-target)
-               ;; Strip out the first escape char added by
-               ;; `comint-quote-filename' before "~" (Issue #1803).
-               (substring (comint-quote-filename (abbreviate-file-name x)) 1))
-              ((string-match "\\`/" helm-ec-target)
-               (comint-quote-filename x))
-              (t
-               (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
-                       (comint-quote-filename
-                        (file-relative-name x))))))
-      marked " "))))
+    (prog1 t ;; Makes helm returns t on action.
+      (insert
+       (mapconcat
+        (lambda (x)
+          (cond ((string-match "\\`~/" helm-ec-target)
+                 ;; Strip out the first escape char added by
+                 ;; `comint-quote-filename' before "~" (Issue #1803).
+                 (substring (comint-quote-filename (abbreviate-file-name x)) 1))
+                ((string-match "\\`/" helm-ec-target)
+                 (comint-quote-filename x))
+                (t
+                 (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
+                         (comint-quote-filename
+                          (file-relative-name x))))))
+        marked " ")))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
@@ -284,14 +285,14 @@ The function that call this should set `helm-ec-target' to thing at point."
                                       ;; current $HOME (#1832).
                                       (unless users-comp last)))
                        ;; Delete removed dot on quit
-                       (and del-dot helm-eshell--quit-flag (insert "."))
+                       (and del-dot (prog1 t (insert ".")))
                        ;; A space is needed to have completion, remove
                        ;; it when nothing found.
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
                        (if (and (null helm-eshell--quit-flag)
                                 (looking-back "[.]\\{1,2\\}\\'" (1- (point))))
-                           (insert "/")
+                           (prog1 t (insert "/"))
                          ;; We need another flag for space here, but
                          ;; global to pass it to `helm-quit-hook', this
                          ;; space is added when point is just after
@@ -299,7 +300,7 @@ The function that call this should set `helm-ec-target' to thing at point."
                          ;; more completion, see issue #1832.
                          (unless (or helm-eshell--quit-flag
                                      (looking-back "/\\'" (1- (point))))
-                           (insert " "))))
+                           (prog1 t (insert " ")))))
                  (remove-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
                  (setq helm-eshell--quit-flag nil)))))))
 
