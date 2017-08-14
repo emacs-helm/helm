@@ -122,7 +122,8 @@ The function that call this should set `helm-ec-target' to thing at point."
                  (concat (and (string-match "\\`[.]/" helm-ec-target) "./")
                          (comint-quote-filename
                           (file-relative-name x))))))
-        marked " ")))))
+        marked " ")
+       (unless (string-match "/\\'" (car (last marked))) " ")))))
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
