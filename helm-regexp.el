@@ -320,6 +320,12 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (helm-exit-and-execute-action 'helm-moccur-goto-line)))
 (put 'helm-moccur-run-default-action 'helm-only t)
 
+(defvar helm-moccur-before-init-hook nil
+  "Hook that runs before initialization of the helm buffer.")
+
+(defvar helm-moccur-after-init-hook nil
+  "Hook that runs after initialization of the helm buffer.")
+
 (defvar helm-source-moccur nil)
 (defclass helm-source-multi-occur (helm-source-in-buffer)
   ((init :initform (lambda ()
@@ -339,6 +345,8 @@ Same as `helm-moccur-goto-line' but go in new frame."
    (keymap :initform helm-moccur-map)
    (history :initform 'helm-occur-history)
    (requires-pattern :initform 2)
+   (before-init-hook :initform 'helm-moccur-before-init-hook)
+   (after-init-hook :initform 'helm-moccur-after-init-hook)
    (group :initform 'helm-regexp)))
 
 (defun helm-moccur-resume-fn ()
