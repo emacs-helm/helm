@@ -969,6 +969,12 @@ These extensions will be added to command line with --include arg of grep."
 ;;; Set up source
 ;;
 ;;
+(defvar helm-grep-before-init-hook nil
+  "Hook that runs before initialization of the helm buffer.")
+
+(defvar helm-grep-after-init-hook nil
+  "Hook that runs after initialization of the helm buffer.")
+
 (defclass helm-grep-class (helm-source-async)
   ((candidates-process :initform 'helm-grep-collect-candidates)
    (filter-one-by-one :initform 'helm-grep-filter-one-by-one)
@@ -992,6 +998,8 @@ These extensions will be added to command line with --include arg of grep."
    (persistent-action :initform 'helm-grep-persistent-action)
    (persistent-help :initform "Jump to line (`C-u' Record in mark ring)")
    (requires-pattern :initform 2)
+   (before-init-hook :initform 'helm-grep-before-init-hook)
+   (after-init-hook :initform 'helm-grep-after-init-hook)
    (group :initform 'helm-grep)))
 
 (defvar helm-source-grep nil)
