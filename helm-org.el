@@ -20,7 +20,7 @@
 (require 'helm)
 (require 'helm-utils)
 (require 'org)
-
+
 ;; Load org-with-point-at macro when compiling
 (eval-when-compile
   (require 'org-macs))
@@ -74,6 +74,12 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   :type 'boolean
   :group 'helm-org)
 
+(defcustom helm-org-ignore-autosaves nil
+  "Ignore autosave files when starting `helm-org-agenda-files-headings'."
+  :type 'boolean
+  :group 'helm-org)
+
+
 ;;; Org capture templates
 ;;
 ;;
@@ -84,7 +90,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                          collect (cons (nth 1 template) (nth 0 template)))
     :action '(("Do capture" . (lambda (template-shortcut)
                                 (org-capture nil template-shortcut))))))
-
+
 ;;; Org headings
 ;;
 ;;
@@ -208,7 +214,7 @@ nothing to CANDIDATES."
 (defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
-                         ((pred stringp) (find-file-noselect filename)))
+                         ((pred stringp) (find-file-noselect filename t)))
     (let ((match-fn (if fontify
                         #'match-string
                       #'match-string-no-properties))
@@ -311,15 +317,25 @@ will be refiled."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
 (put 'helm-org-run-refile-heading-to 'helm-only t)
-
+
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
   "Preconfigured helm for org files headings."
   (interactive)
-  (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
-        :candidate-number-limit 99999
-        :truncate-lines helm-org-truncate-lines
-        :buffer "*helm org headings*"))
+  (let ((autosaves (cl-loop for f in (org-agenda-files)
+                            when (file-exists-p
+                                  (expand-file-name
+                                   (concat "#" (helm-basename f) "#")
+                                   (helm-basedir f)))
+                            collect (helm-basename f))))
+    (when (or (null autosaves)
+              helm-org-ignore-autosaves
+              (y-or-n-p (format "%s have auto save data, continue?"
+                                (mapconcat 'identity autosaves ", "))))
+      (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
+            :candidate-number-limit 99999
+            :truncate-lines helm-org-truncate-lines
+            :buffer "*helm org headings*"))))
 
 ;;;###autoload
 (defun helm-org-in-buffer-headings ()
@@ -355,7 +371,7 @@ current heading."
         :candidate-number-limit 99999
         :truncate-lines helm-org-truncate-lines
         :buffer "*helm org capture templates*"))
-
+
 ;;; Org tag completion
 
 ;; Based on code from Anders Johansson posted on 3 Mar 2016 at
