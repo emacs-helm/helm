@@ -155,7 +155,9 @@ replace with STR as yanked string."
            (when (and (region-active-p) delete-selection-mode)
              (delete-region (region-beginning) (region-end)))
            (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
-               (insert-for-yank str)
+               ;; When yanking in a helm minibuffer we need a small
+               ;; delay to detect the mark in previous minibuffer. [1]
+               (run-with-timer 0.01 nil (lambda () (insert-for-yank str)))
                ;; from `yank-pop'
                (let ((inhibit-read-only t)
                      (before (< (point) (mark t))))
@@ -164,7 +166,8 @@ replace with STR as yanked string."
                      (funcall (or yank-undo-function 'delete-region) (mark t) (point)))
                  (setq yank-undo-function nil)
                  (set-marker (mark-marker) (point) helm-current-buffer)
-                 (insert-for-yank str)
+                 ;; Same as [1]
+                 (run-with-timer 0.01 nil (lambda () (insert-for-yank str)))
                  ;; Set the window start back where it was in the yank command,
                  ;; if possible.
                  (set-window-start (selected-window) yank-window-start t)
