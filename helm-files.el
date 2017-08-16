@@ -1855,7 +1855,7 @@ or when `helm-pattern' is equal to \"~/\"."
            (helm-ff-recursive-dirs helm-pattern)
            (with-helm-window (helm-check-minibuffer-input)))
           ((and (string-match
-                 "/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
+                 "\\(?:\\`~/\\)\\|/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
                  helm-pattern))
            (let* ((match (match-string 0 helm-pattern))
                   (input (cond ((string= match "/./")
@@ -2053,6 +2053,8 @@ purpose."
            (expand-file-name "/"))      ; Expand to "/" or "c:/"
           ((string-match "\\`\\(~/\\|.*/~/\\)\\'" pattern)
            (expand-file-name "~/"))
+          ((string-match "\\`~/" pattern)
+           (expand-file-name pattern))
           ;; Match "/method:maybe_hostname:~"
           ((and (string-match (concat reg "~") pattern)
                 postfixed
