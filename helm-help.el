@@ -1358,9 +1358,17 @@ Of course `C-n' and `C-p' are still available.
 It is possible to delete unwanted candidates from kill-ring.
 
 You can concatenate marked candidates and yank them in current buffer
-creating a new entry in kill-ring.
+creating a new entry in kill-ring, candidates are concatenated with
+a newline as separator.
 Note: You can insert marked candidates as well with `\\<helm-map>\\[helm-copy-to-buffer]'
 but this will not push a new entry with concatenated candidates in kill-ring.
+
+When inserting candidate with default action (RET) `point' is placed at end of candidate
+and `mark' at beginning, you can revert this behavior by using a prefix arg i.e `C-u RET'
+like regular `yank' command does.
+Note: Of course numeric prefix args like `yank' are not available due to the nature
+of helm which allow you to see and move to the desired candidate and also because
+it is already available in helm with [[Shortcuts for executing Default Action on the nth candidate][Shortcuts for executing Default Action on the nth candidate]].
 
 ** Commands
 \\<helm-kill-ring-map>
