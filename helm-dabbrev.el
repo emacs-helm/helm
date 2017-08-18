@@ -161,7 +161,8 @@ but the initial search for all candidates in buffer(s)."
                                             (concat "\\(" helm-dabbrev--regexp "\\)"
                                                     "\\(?99:\\(" pattern "\\(\\sw\\|\\s_\\)+\\)\\)")
                                             (point-at-eol) t)
-                                       (match-string-no-properties 99)))))
+                                       (replace-regexp-in-string
+                                        replace-regexp "" (match-string-no-properties 99))))))
                   (unless (member match-word result)
                     (push match-word result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
