@@ -141,6 +141,21 @@ and all functions belonging in this list from `minibuffer-setup-hook'."
   :group 'helm-mode
   :type '(repeat (choice symbol)))
 
+(defcustom helm-completing-read-dynamic-complete nil
+  "Use dynamic completion in `completing-read' when non-nil.
+
+The default is to not use this because it is most of the time unneeded
+in `completing-read' and thus it is much more slower.
+If you feel one emacs function need this you have better time to tell
+`helm-mode' to use a dynamic completion for this function only by using
+`helm-completing-read-handlers-alist' with an entry like this:
+
+    (my-function . helm-completing-read-sync-default-handler)
+
+So you should not change the default setting of this variable unless you
+know what you are doing."
+  :group 'helm-mode
+  :type 'boolean)
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -727,7 +742,8 @@ It should be used when candidate list don't need to rebuild dynamically."
   "Default `helm-mode' handler for all `completing-read'."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
-                                  name buffer t))
+                                  name buffer
+                                  (null helm-completing-read-dynamic-complete)))
 
 (cl-defun helm--completing-read-default
     (prompt collection &optional
