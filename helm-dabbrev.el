@@ -154,7 +154,7 @@ but the initial search for all candidates in buffer(s)."
                               (setq pos-before pos)
                               (search-backward pattern pos t))))
                 (let* ((replace-regexp (concat "\\(" helm-dabbrev--regexp "\\)\\'"))
-                       (match-1 (helm-aif (thing-at-point 'symbol)
+                       (match-1 (helm-aif (thing-at-point 'symbol t)
                                     ;; `thing-at-point' returns
                                     ;; the quote outside of e-lisp mode,
                                     ;; e.g in message mode,
@@ -163,13 +163,11 @@ but the initial search for all candidates in buffer(s)."
                                     ;; `foo' => foo
                                     ;; so remove it [1].
                                     (replace-regexp-in-string
-                                     replace-regexp
-                                     "" (substring-no-properties it))))
-                       (match-2 (helm-aif (thing-at-point 'filename)
+                                     replace-regexp "" it)))
+                       (match-2 (helm-aif (thing-at-point 'filename t)
                                     ;; Same as in [1].
                                     (replace-regexp-in-string
-                                     replace-regexp
-                                     "" (substring-no-properties it))))
+                                     replace-regexp "" it)))
                        (lst (if (string= match-1 match-2)
                                 (list match-1)
                               (list match-1 match-2))))
