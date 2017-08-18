@@ -153,28 +153,17 @@ but the initial search for all candidates in buffer(s)."
                                      (point))))
                               (setq pos-before pos)
                               (search-backward pattern pos t))))
-                (let* ((replace-regexp (concat "\\(" helm-dabbrev--regexp "\\)\\'"))
-                       (match-1 (helm-aif (thing-at-point 'symbol t)
-                                    ;; `thing-at-point' returns
-                                    ;; the quote outside of e-lisp mode,
-                                    ;; e.g in message mode,
-                                    ;; `foo' => foo'
-                                    ;; but in e-lisp like modes:
-                                    ;; `foo' => foo
-                                    ;; so remove it [1].
-                                    (replace-regexp-in-string
-                                     replace-regexp "" it)))
-                       (match-2 (helm-aif (thing-at-point 'filename t)
-                                    ;; Same as in [1].
-                                    (replace-regexp-in-string
-                                     replace-regexp "" it)))
-                       (lst (if (string= match-1 match-2)
-                                (list match-1)
-                              (list match-1 match-2))))
-                  (cl-loop for match in lst
-                        unless (or (string= str match)
-                                   (member match result))
-                        do (push match result)))))))
+                (let* ((pbeg (match-beginning 0))
+                       (replace-regexp (concat "\\(" helm-dabbrev--regexp "\\)\\'"))
+                       (match-word (save-excursion
+                                     (goto-char (1- pbeg))
+                                     (when (re-search-forward
+                                            (concat "\\(" helm-dabbrev--regexp "\\)"
+                                                    "\\(?99:\\(" pattern "\\(\\sw\\|\\s_\\)+\\)\\)")
+                                            (point-at-eol) t)
+                                       (match-string-no-properties 99)))))
+                  (unless (member match-word result)
+                    (push match-word result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
                           (list (current-buffer)))
           
