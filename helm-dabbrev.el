@@ -173,7 +173,6 @@ but the initial search for all candidates in buffer(s)."
                   (push match-word result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
                           (list (current-buffer)))
-          
              do (with-current-buffer buf
                   (when (or minibuf ; check against all buffers when in minibuffer.
                             (if helm-dabbrev-related-buffer-fn
