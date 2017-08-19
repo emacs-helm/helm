@@ -162,7 +162,8 @@ but the initial search for all candidates in buffer(s)."
                                           (concat "\\("
                                                   helm-dabbrev--regexp
                                                   "\\)"
-                                                  "\\(?99:\\(" pattern
+                                                  "\\(?99:\\("
+                                                  (regexp-quote pattern)
                                                   "\\(\\sw\\|\\s_\\)+\\)\\)")
                                           (point-at-eol) t)
                                      (replace-regexp-in-string
