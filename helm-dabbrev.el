@@ -226,6 +226,13 @@ but the initial search for all candidates in buffer(s)."
        'helm-insert-completion-at-point
        beg end candidate))))
 
+(defvar helm-dabbrev--hash (make-hash-table :test 'equal))
+
+(defun helm-dabbrev--cache-data (dabbrev)
+  (or (gethash dabbrev helm-dabbrev--hash)
+      (puthash dabbrev (helm-dabbrev--get-candidates dabbrev)
+               helm-dabbrev--hash)))
+
 ;;;###autoload
 (defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
@@ -249,10 +256,10 @@ but the initial search for all candidates in buffer(s)."
            (not (eq last-command 'helm-dabbrev)))
       (setq helm-dabbrev--data nil))
     (when cycling-disabled-p
-      (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
+      (setq helm-dabbrev--cache (helm-dabbrev--cache-data dabbrev)))
     (unless (or cycling-disabled-p
                 (helm-dabbrev-info-p helm-dabbrev--data))
-      (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev))
+      (setq helm-dabbrev--cache (helm-dabbrev--cache-data dabbrev))
       (setq helm-dabbrev--data
             (make-helm-dabbrev-info
              :dabbrev dabbrev
