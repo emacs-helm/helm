@@ -42,7 +42,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
 
-(defcustom helm-dabbrev-candidates-number-limit 500
+(defcustom helm-dabbrev-candidates-number-limit 1000
   "Maximum number of candidates to collect before stopping.
 Higher this number is slower the computation of candidates will be."
   :group 'helm-dabbrev
@@ -106,6 +106,9 @@ but the initial search for all candidates in buffer(s)."
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp "2.8.3")
 
+(defvar helm-dabbrev-cache-candidates nil
+  "When non-nil cache candidates.
+This is experimental and not fully working, you should not use this.")
 
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
@@ -236,19 +239,31 @@ but the initial search for all candidates in buffer(s)."
        beg end candidate))))
 
 (defun helm-dabbrev--cache-data (dabbrev)
-  (cl-assert dabbrev nil "[No Match]")
-  (unless (string= dabbrev "")
-    (or (cl-loop for count downfrom (length dabbrev) to 1
-                 when (gethash (substring-no-properties dabbrev 0 count)
-                               helm-dabbrev--hash)
-                 return it)
-        (puthash dabbrev (helm-dabbrev--get-candidates dabbrev)
-                 helm-dabbrev--hash))))
+  (if helm-dabbrev-cache-candidates
+      ;; FIXME: When using caching, if user add new data to some
+      ;; buffer it will not be present in cache so I have to set tick
+      ;; for each buffer and refresh cache if one buffer have been
+      ;; modified, ideally only the data for modified buffers should
+      ;; be updated.
+      (progn
+        (cl-assert dabbrev nil "[No Match]")
+        (unless (string= dabbrev "")
+          (or (cl-loop for count downfrom (length dabbrev) to 1
+                       when (gethash (substring-no-properties dabbrev 0 count)
+                                     helm-dabbrev--hash)
+                       return it)
+              (puthash dabbrev (helm-dabbrev--get-candidates dabbrev)
+                       helm-dabbrev--hash))))
+    (helm-dabbrev--get-candidates dabbrev)))
 
 (defun helm-dabbrev--get-candidates-info (dabbrev)
-  ;; Find only the first `helm-dabbrev-cycle-threshold' candidates.
-  (let ((helm-dabbrev-candidates-number-limit helm-dabbrev-cycle-threshold))
-    (helm-dabbrev--get-candidates dabbrev)))
+  (if helm-dabbrev-cache-candidates
+      ;; Find only the first `helm-dabbrev-cycle-threshold' candidates.
+      ;; FIXME: try to find one half of candidates before and the other
+      ;; half after when there is a lot of data before and after.
+      (let ((helm-dabbrev-candidates-number-limit helm-dabbrev-cycle-threshold))
+        (helm-dabbrev--get-candidates dabbrev))
+    helm-dabbrev--cache))
 
 ;;;###autoload
 (defun helm-dabbrev ()
