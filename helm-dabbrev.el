@@ -233,7 +233,8 @@ but the initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev--hash (make-hash-table :test 'equal))
 
 (defun helm-dabbrev--cache-data (dabbrev)
-  (unless (or (null dabbrev) (string= dabbrev ""))
+  (cl-assert dabbrev nil "[No Match]")
+  (unless (string= dabbrev "")
     (or (cl-loop for count downfrom (length dabbrev) to 1
                  when (gethash (substring-no-properties dabbrev 0 count)
                                helm-dabbrev--hash)
