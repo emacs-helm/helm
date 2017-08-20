@@ -42,7 +42,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
 
-(defcustom helm-dabbrev-candidates-number-limit 1000
+(defcustom helm-dabbrev-candidates-number-limit 600
   "Maximum number of candidates to collect before stopping.
 Higher this number is slower the computation of candidates will be."
   :group 'helm-dabbrev
