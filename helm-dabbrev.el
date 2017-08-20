@@ -241,6 +241,11 @@ but the initial search for all candidates in buffer(s)."
         (puthash dabbrev (helm-dabbrev--get-candidates dabbrev)
                  helm-dabbrev--hash))))
 
+(defun helm-dabbrev--get-candidates-info (dabbrev)
+  ;; Find only the first `helm-dabbrev-cycle-threshold' candidates.
+  (let ((helm-dabbrev-candidates-number-limit helm-dabbrev-cycle-threshold))
+    (helm-dabbrev--get-candidates dabbrev)))
+
 ;;;###autoload
 (defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
@@ -274,9 +279,9 @@ but the initial search for all candidates in buffer(s)."
              :limits limits
              :iterator
              (helm-iter-list
-              (cl-loop for i in helm-dabbrev--cache when
-                       (and i (string-match
-                               (concat "^" (regexp-quote dabbrev)) i))
+              (cl-loop for i in (helm-dabbrev--get-candidates-info dabbrev)
+                       when (and i (string-match
+                                    (concat "^" (regexp-quote dabbrev)) i))
                        collect i into selection
                        when (and selection
                                  (= (length selection)
