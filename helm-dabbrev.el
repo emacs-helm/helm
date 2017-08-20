@@ -156,19 +156,8 @@ but the initial search for all candidates in buffer(s)."
               (let* ((pbeg (match-beginning 0))
                      (replace-regexp (concat "\\(" helm-dabbrev--regexp
                                              "\\)\\'"))
-                     (match-word (save-excursion
-                                   (goto-char (1- pbeg))
-                                   (when (re-search-forward
-                                          (concat "\\("
-                                                  helm-dabbrev--regexp
-                                                  "\\)"
-                                                  "\\(?99:\\("
-                                                  (regexp-quote pattern)
-                                                  "\\(\\sw\\|\\s_\\)+\\)\\)")
-                                          (point-at-eol) t)
-                                     (replace-regexp-in-string
-                                      replace-regexp ""
-                                      (match-string-no-properties 99))))))
+                     (match-word (helm--dabbrev--search
+                                  pattern pbeg replace-regexp)))
                 (unless (member match-word result)
                   (push match-word result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
@@ -196,6 +185,21 @@ but the initial search for all candidates in buffer(s)."
                       (funcall search-and-store str 1))))
              when (> (length result) limit) return (nreverse result)
              finally return (nreverse result))))
+
+(defun helm--dabbrev--search (pattern beg sep-regexp)
+  (save-excursion
+    (goto-char (1- beg))
+    (when (re-search-forward
+           (concat "\\("
+                   helm-dabbrev--regexp
+                   "\\)"
+                   "\\(?99:\\("
+                   (regexp-quote pattern)
+                   "\\(\\sw\\|\\s_\\)+\\)\\)")
+           (point-at-eol) t)
+      (replace-regexp-in-string
+       sep-regexp ""
+       (match-string-no-properties 99)))))
 
 (defun helm-dabbrev--get-candidates (abbrev)
   (cl-assert abbrev nil "[No Match]")
