@@ -101,6 +101,11 @@ but the initial search for all candidates in buffer(s)."
           (const :tag "Respect case" nil)
           (other :tag "Smart" 'smart)))
 
+(defvar helm-dabbrev-separator-regexp "\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\\\|^"
+  "Regexp matching the start of a dabbrev candidate.")
+(defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
+(make-obsolete-variable 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp "2.8.3")
+
 
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
@@ -113,7 +118,7 @@ but the initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev--exclude-current-buffer-flag nil)
 (defvar helm-dabbrev--cache nil)
 (defvar helm-dabbrev--data nil)
-(defvar helm-dabbrev--regexp "\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\\\|^")
+(defvar helm-dabbrev--hash (make-hash-table :test 'equal))
 (cl-defstruct helm-dabbrev-info dabbrev limits iterator)
 
 
@@ -154,7 +159,7 @@ but the initial search for all candidates in buffer(s)."
                             (setq pos-before pos)
                             (search-backward pattern pos t))))
               (let* ((pbeg (match-beginning 0))
-                     (replace-regexp (concat "\\(" helm-dabbrev--regexp
+                     (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
                                              "\\)\\'"))
                      (match-word (helm--dabbrev--search
                                   pattern pbeg replace-regexp)))
@@ -191,7 +196,7 @@ but the initial search for all candidates in buffer(s)."
     (goto-char (1- beg))
     (when (re-search-forward
            (concat "\\("
-                   helm-dabbrev--regexp
+                   helm-dabbrev-separator-regexp
                    "\\)"
                    "\\(?99:\\("
                    (regexp-quote pattern)
@@ -222,15 +227,13 @@ but the initial search for all candidates in buffer(s)."
 (defun helm-dabbrev-default-action (candidate)
   (with-helm-current-buffer
     (let* ((limits (helm-bounds-of-thing-before-point
-                    helm-dabbrev--regexp))
+                    helm-dabbrev-separator-regexp))
            (beg (car limits))
            (end (point)))
       (run-with-timer
        0.01 nil
        'helm-insert-completion-at-point
        beg end candidate))))
-
-(defvar helm-dabbrev--hash (make-hash-table :test 'equal))
 
 (defun helm-dabbrev--cache-data (dabbrev)
   (cl-assert dabbrev nil "[No Match]")
@@ -251,8 +254,8 @@ but the initial search for all candidates in buffer(s)."
 (defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
   (interactive)
-  (let ((dabbrev (helm-thing-before-point nil helm-dabbrev--regexp))
-        (limits (helm-bounds-of-thing-before-point helm-dabbrev--regexp))
+  (let ((dabbrev (helm-thing-before-point nil helm-dabbrev-separator-regexp))
+        (limits (helm-bounds-of-thing-before-point helm-dabbrev-separator-regexp))
         (enable-recursive-minibuffers t)
         (cycling-disabled-p (or (null helm-dabbrev-cycle-threshold)
                                 (zerop helm-dabbrev-cycle-threshold)))
