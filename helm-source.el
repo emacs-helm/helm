@@ -966,9 +966,11 @@ an eieio class."
                                cur-init))
                      cur-init)
                 (lambda ()
-                  (helm-init-candidates-in-buffer
-                      'global
-                    (if (functionp it) (funcall it) it))))))))
+                  (if (and (bufferp it) (buffer-live-p it))
+                      (helm-candidate-buffer it)
+                    (helm-init-candidates-in-buffer
+                        'global
+                      (if (functionp it) (funcall it) it)))))))))
   (when (slot-value source 'fuzzy-match)
     (helm-aif (slot-value source 'search)
         (setf (slot-value source 'search)
