@@ -3768,8 +3768,7 @@ passed as argument to `recenter'."
   (with-helm-window
     (let* ((source    (helm-get-current-source))
            (selection (helm-aif (helm-get-selection nil t source)
-                          (regexp-quote it)
-                        it)))
+                          (regexp-quote it))))
       (setq helm--force-updating-p t)
       (mapc 'helm-force-update--reinit (helm-get-sources))
       (helm-update (or preselect selection) source)
