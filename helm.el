@@ -3783,8 +3783,12 @@ passed as argument to `recenter'."
 
 (defun helm-force-update--reinit (source)
   "Reinit SOURCE by calling its update and init functions."
-  (helm-aif (helm-funcall-with-source
-             source 'helm-candidate-buffer)
+  ;; When using a specific buffer as cache, don't kill it.
+  (helm-aif (and (null (bufferp (assoc-default
+                                 (helm-attr 'name source)
+                                 helm--candidate-buffer-alist)))
+                 (helm-funcall-with-source
+                  source 'helm-candidate-buffer))
       (kill-buffer it))
   (cl-dolist (attr '(update init))
     (helm-aif (assoc-default attr source)
@@ -5283,10 +5287,15 @@ Acceptable values of BUFFER-SPEC:
   This allow you to use the buffer as a cache.
   The buffer is not erased, it's up to you to maintain
   it in the init function.
-
+  Generally it is better to use a copy of buffer inserted
+  in a global or local buffer.
+  
 If for some reasons a global buffer and a local buffer exist and are
 belonging to the same source, the local buffer takes precedence on the
-global one and is used instead."
+global one and is used instead.
+
+When forcing update only the global and local buffers are killed
+before running again the init function."
   (let ((global-bname (format " *helm candidates:%s*"
                               helm--source-name))
         (local-bname (format " *helm candidates:%s*%s"
