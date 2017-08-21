@@ -636,9 +636,10 @@ inherit from `helm-source'.")
     :initform nil
     :custom (choice list string)
     :documentation
-    "  A string or a list that will be used to feed the `helm-candidates-buffer'.
+    "  A string, a list or a buffer that will be used to feed the `helm-candidates-buffer'.
   This data will be passed in a function added to the init slot and
-  the buffer will be build with `helm-init-candidates-in-buffer'.
+  the buffer will be build with `helm-init-candidates-in-buffer' or directly
+  with `helm-candidates-buffer' if data is a buffer.
   This is an easy and fast method to build a `candidates-in-buffer' source.")
 
    (migemo
