@@ -3771,9 +3771,7 @@ passed as argument to `recenter'."
                           (regexp-quote it)
                         it)))
       (setq helm--force-updating-p t)
-      (when source
-        (mapc 'helm-force-update--reinit
-              (helm-get-sources)))
+      (mapc 'helm-force-update--reinit (helm-get-sources))
       (helm-update (or preselect selection) source)
       (and recenter (recenter (and (numberp recenter) recenter))))))
 
