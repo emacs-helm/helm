@@ -5284,10 +5284,13 @@ Acceptable values of BUFFER-SPEC:
 - A buffer
   Register a buffer as a candidates buffer.
   The buffer needs to exists, it is not created.
-  This allow you to use the buffer as a cache.
-  The buffer is not erased, it's up to you to maintain
-  it in the init function.
-  Generally it is better to use a copy of buffer inserted
+  This allow you to use the buffer as a cache, it is faster because
+  the buffer is already drawn, but be careful when using this as you
+  may mangle your buffer depending what you write in your init(s)
+  function, IOW don't modify the contents of the buffer in init(s)
+  function but in a transformer.
+  The buffer is not erased nor deleted.
+  Generally it is safer to use a copy of buffer inserted
   in a global or local buffer.
   
 If for some reasons a global buffer and a local buffer exist and are
