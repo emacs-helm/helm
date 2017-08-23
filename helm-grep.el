@@ -1361,14 +1361,14 @@ and the third for directory.
 
 You can use safely \"--color\" (used by default) with AG RG and PT.
 
-For ripgrep you have to use a workaround as it is not supporting emacs dumb
-terminal to output colors properly here is the command line to use:
+For ripgrep here is the command line to use:
 
-    TERM=eterm-color rg --color=always --smart-case --no-heading --line-number %s %s %s
+    rg --color=always --smart-case --no-heading --line-number %s %s %s
 
-NOTE: With rg compiled from master you don't need anymore to set environment
-TERM=eterm-color in your command to output colors.
-See issue https://github.com/BurntSushi/ripgrep/issues/182.
+NOTE: Old versions of ripgrep was not supporting colors in emacs and a
+workaround had to be used (i.e prefixing command line with
+\"TERM=eterm-color\"), this is no more needed.
+See issue <https://github.com/BurntSushi/ripgrep/issues/182> for more infos.
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1415,7 +1415,7 @@ if available with current AG version."
          (pipe-cmd (pcase (helm-grep--ag-command)
                      ((and com (or "ag" "pt"))
                       (format "%s -S --color%s" com (concat " " pipe-switches)))
-                     (`"rg" (format "TERM=eterm-color rg -N -S --color=always%s"
+                     (`"rg" (format "rg -N -S --color=always%s"
                                     (concat " " pipe-switches)))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
