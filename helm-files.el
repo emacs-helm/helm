@@ -696,10 +696,12 @@ ACTION must be an action supported by `helm-dired-action'."
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
          (prompt (format "%s %s file(s) to: "
-                         (capitalize (symbol-name action))
+                         (if (and dired-async-mode
+                                  (null helm-current-prefix-arg))
+                             (concat "Async " (symbol-name action)) 
+                           (capitalize (symbol-name action)))
                          (length ifiles)))
          helm-ff--move-to-first-real-candidate
-         (parg   helm-current-prefix-arg)
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-initial-value
          (dest   (with-helm-display-marked-candidates
@@ -719,7 +721,7 @@ ACTION must be an action supported by `helm-dired-action'."
       (when (y-or-n-p (format "Create directory `%s'?" dest-dir))
         (make-directory dest-dir t)))
     (helm-dired-action
-     dest :files ifiles :action action :follow parg)))
+     dest :files ifiles :action action :follow helm-current-prefix-arg)))
 
 (defun helm-find-files-copy (_candidate)
   "Copy files from `helm-find-files'."
