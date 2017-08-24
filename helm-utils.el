@@ -64,7 +64,7 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :type 'integer)
 
 (defcustom helm-sources-using-help-echo-popup '("Moccur" "Imenu in all buffers"
-                                                "Ack-Grep" "AG" "Gid" "Git-Grep")
+                                                "Ack-Grep" "AG" "RG" "Gid" "Git-Grep")
   "Show the buffer name or the filename in a popup at selection."
   :group 'helm-utils
   :type '(repeat (choice string)))
