@@ -101,7 +101,7 @@ but the initial search for all candidates in buffer(s)."
           (const :tag "Respect case" nil)
           (other :tag "Smart" 'smart)))
 
-(defvar helm-dabbrev-separator-regexp "\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\\\|^"
+(defvar helm-dabbrev-separator-regexp "^\n\\|\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\"
   "Regexp matching the start of a dabbrev candidate.")
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp "2.8.3")
@@ -191,19 +191,20 @@ but the initial search for all candidates in buffer(s)."
              finally return (nreverse result))))
 
 (defun helm--dabbrev--search (pattern beg sep-regexp)
-  (save-excursion
-    (goto-char (1- beg))
-    (when (re-search-forward
-           (concat "\\("
-                   helm-dabbrev-separator-regexp
-                   "\\)"
-                   "\\(?99:\\("
-                   (regexp-quote pattern)
-                   "\\(\\sw\\|\\s_\\)+\\)\\)")
-           (point-at-eol) t)
-      (replace-regexp-in-string
-       sep-regexp ""
-       (match-string-no-properties 99)))))
+  (let ((eol (point-at-eol))) 
+    (save-excursion
+      (goto-char (1- beg))
+      (when (re-search-forward
+             (concat "\\("
+                     helm-dabbrev-separator-regexp
+                     "\\)"
+                     "\\(?99:\\("
+                     (regexp-quote pattern)
+                     "\\(\\sw\\|\\s_\\)+\\)\\)")
+             eol t)
+        (replace-regexp-in-string
+         sep-regexp ""
+         (match-string-no-properties 99))))))
 
 (defun helm-dabbrev--get-candidates (abbrev)
   (cl-assert abbrev nil "[No Match]")
