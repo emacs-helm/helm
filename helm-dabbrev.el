@@ -101,7 +101,7 @@ but the initial search for all candidates in buffer(s)."
           (const :tag "Respect case" nil)
           (other :tag "Smart" 'smart)))
 
-(defvar helm-dabbrev-separator-regexp "^\n\\|\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\"
+(defvar helm-dabbrev-separator-regexp "^\n\\|^\\|\\s-\\|\t\\|[(\[\{\"'`=<$;,@.#+]\\|\\s\\"
   "Regexp matching the start of a dabbrev candidate.")
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp "2.8.3")
