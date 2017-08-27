@@ -141,29 +141,30 @@ but the initial search for all candidates in buffer(s)."
          result pos-before pos-after
          (search-and-store
           (lambda (pattern direction)
-            (while (cl-case direction
-                     (1   (search-forward pattern nil t))
-                     (-1  (search-backward pattern nil t))
-                     (2   (let ((pos
-                                 (save-excursion
-                                   (forward-line
-                                    helm-dabbrev-lineno-around)
-                                   (point))))
-                            (setq pos-after pos)
-                            (search-forward pattern pos t)))
-                     (-2  (let ((pos
-                                 (save-excursion
-                                   (forward-line
-                                    (- helm-dabbrev-lineno-around))
-                                   (point))))
-                            (setq pos-before pos)
-                            (search-backward pattern pos t))))
+            (while (and (<= (length result) limit)
+                        (cl-case direction
+                          (1   (search-forward pattern nil t))
+                          (-1  (search-backward pattern nil t))
+                          (2   (let ((pos
+                                      (save-excursion
+                                        (forward-line
+                                         helm-dabbrev-lineno-around)
+                                        (point))))
+                                 (setq pos-after pos)
+                                 (search-forward pattern pos t)))
+                          (-2  (let ((pos
+                                      (save-excursion
+                                        (forward-line
+                                         (- helm-dabbrev-lineno-around))
+                                        (point))))
+                                 (setq pos-before pos)
+                                 (search-backward pattern pos t)))))
               (let* ((pbeg (match-beginning 0))
                      (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
                                              "\\)\\'"))
                      (match-word (helm-dabbrev--search
                                   pattern pbeg replace-regexp)))
-                (unless (member match-word result)
+                (when (and match-word (not (member match-word result)))
                   (push match-word result)))))))
     (cl-loop for buf in (if all (helm-dabbrev--buffer-list)
                           (list (current-buffer)))
@@ -188,7 +189,7 @@ but the initial search for all candidates in buffer(s)."
                       ;; Search all after point.
                       (goto-char pos-after) ; start from [2]
                       (funcall search-and-store str 1))))
-             when (> (length result) limit) return (nreverse result)
+             when (>= (length result) limit) return (nreverse result)
              finally return (nreverse result))))
 
 (defun helm-dabbrev--search (pattern beg sep-regexp)
