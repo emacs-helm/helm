@@ -72,6 +72,15 @@ Any other non--nil value update after confirmation."
                 (const :tag "Don't preserve buffer fontification" nil)
                 (const :tag "Preserve buffer fontification" t)))
 
+(defcustom helm-moccur-buffer-substring-fn-for-modes
+  '((mu4e-headers-mode . buffer-substring))
+  "Alist that allow configuring the function to use for storing a buffer.
+
+Allow overriding the global effect of `helm-moccur-show-buffer-fontification'
+for a specific mode."
+  :group 'helm-regexp
+  :type '(alist :key-type symbol :value-type function))
+
 (defcustom helm-occur-show-buffer-name nil
   "Show buffer name in `helm-occur' results when non-nil.
 
@@ -213,6 +222,9 @@ Should be a local var to helm-buffer to allow resuming.")
                                    #'buffer-substring #'buffer-substring-no-properties)
              for buf in buffers
              for bufstr = (with-current-buffer buf
+                            (helm-aif (assq major-mode
+                                            helm-moccur-buffer-substring-fn-for-modes)
+                                (setq bsubstring (cdr it)))
                             ;; A leading space is needed to allow helm
                             ;; searching the first line of buffer
                             ;; (#1725).
