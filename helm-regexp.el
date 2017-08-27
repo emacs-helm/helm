@@ -76,6 +76,7 @@ Any other non--nil value update after confirmation."
   '((mu4e-headers-mode . buffer-substring))
   "Alist that allow configuring the function to use for storing a buffer.
 
+Can be one of `buffer-substring' or `buffer-substring-no-properties'.
 Allow overriding the global effect of `helm-moccur-show-buffer-fontification'
 for a specific mode."
   :group 'helm-regexp
