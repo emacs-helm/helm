@@ -85,7 +85,7 @@ bound to a function that doesn't handle this var."
   :group 'helm-dabbrev
   :type 'integer)
 
-(defcustom helm-dabbrev-cycle-threshold nil
+(defcustom helm-dabbrev-cycle-threshold 5
   "Number of time helm-dabbrev cycle before displaying helm completion.
 When nil or 0 disable cycling."
   :group 'helm-dabbrev
