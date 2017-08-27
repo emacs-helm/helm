@@ -73,7 +73,8 @@ Any other non--nil value update after confirmation."
                 (const :tag "Preserve buffer fontification" t)))
 
 (defcustom helm-moccur-buffer-substring-fn-for-modes
-  '((mu4e-headers-mode . buffer-substring))
+  '((mu4e-headers-mode . buffer-substring)
+    (package-menu-mode . buffer-substring-no-properties))
   "Alist that allow configuring the function to use for storing a buffer.
 
 Can be one of `buffer-substring' or `buffer-substring-no-properties'.
