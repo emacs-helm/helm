@@ -84,7 +84,9 @@ Can be one of `buffer-substring' or `buffer-substring-no-properties'.
 Allow overriding the global effect of `helm-moccur-show-buffer-fontification'
 for a specific mode."
   :group 'helm-regexp
-  :type '(alist :key-type symbol :value-type function))
+  :type '(alist :key-type (symbol :tag "Mode")
+                :value-type (radio (const :tag "With text properties" buffer-substring)
+                                   (const :tag "Without text properties" buffer-substring-no-properties))))
 
 (defcustom helm-occur-show-buffer-name nil
   "Show buffer name in `helm-occur' results when non-nil.
