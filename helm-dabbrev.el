@@ -183,12 +183,18 @@ but the initial search for all candidates in buffer(s)."
                       (funcall search-and-store str 2)) ; store pos [2]
                     (save-excursion
                       ;; Search all before point.
-                      (goto-char pos-before) ; start from [1]
-                      (funcall search-and-store str -1))
+                      ;; If limit is reached in previous call of
+                      ;; search-and-store pos-before is never set and
+                      ;; goto-char will fail, so check it.
+                      (when pos-before
+                        (goto-char pos-before) ; start from [1]
+                        (funcall search-and-store str -1)))
                     (save-excursion
                       ;; Search all after point.
-                      (goto-char pos-after) ; start from [2]
-                      (funcall search-and-store str 1))))
+                      ;; Same comment as above for pos-after.
+                      (when pos-after
+                        (goto-char pos-after) ; start from [2]
+                        (funcall search-and-store str 1)))))
              when (>= (length result) limit) return (nreverse result)
              finally return (nreverse result))))
 
