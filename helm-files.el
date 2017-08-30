@@ -63,11 +63,18 @@
 
 (defcustom helm-boring-file-regexp-list
   (mapcar (lambda (f)
-            (let ((rx (rx-to-string f t))) 
+            (let ((rgx (regexp-quote f))) 
               (if (string-match-p "[^/]$" f)
-                  (concat rx "$") rx)))
+                  ;; files: e.g .o => \\.o$
+                  (concat rgx "$")
+                ;; directories: e.g .git/ => \\.git/\\|\\.git$
+                (format "%s\\|%s"
+                        rgx
+                        (concat (substring
+                                 rgx 0 (1- (length rgx))) "$")))))
           completion-ignored-extensions)
-  "The regexp list matching boring files.
+  "A list of regexps matching boring files.
+
 This list is build by default on `completion-ignored-extensions'."
   :group 'helm-files
   :type  '(repeat (choice regexp)))
