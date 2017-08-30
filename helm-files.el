@@ -199,9 +199,12 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :type 'boolean)
 
 (defcustom helm-ff-skip-boring-files nil
-  "Non--nil to skip files matching regexps in `helm-boring-file-regexp-list'.
+  "Non--nil to skip files matching regexps in
+`helm-boring-file-regexp-list'.
+
 This take effect in `helm-find-files' and file completion used by `helm-mode'
-i.e `helm-read-file-name'."
+i.e `helm-read-file-name'.
+Note that when non-nil this will slow down slightly `helm-find-files'."
   :group 'helm-files
   :type  'boolean)
 
