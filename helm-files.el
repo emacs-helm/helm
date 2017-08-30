@@ -596,7 +596,6 @@ Should not be used among other sources.")
                                                (lambda (candidates _source)
                                                  (cl-loop for f in candidates collect
                                                           (helm-ff-filter-candidate-one-by-one f)))))
-   ;; (filter-one-by-one :initform 'helm-ff-filter-candidate-one-by-one)
    (persistent-action :initform 'helm-find-files-persistent-action)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
@@ -2521,15 +2520,18 @@ Return candidates prefixed with basename of `helm-input' first."
                                     ((> sc1 sc2))))))))
         (if cand1 (cons cand1 all) all))))
 
+(defsubst helm-ff-boring-file-p (file)
+  (and (not (string-match "\\.$" file))
+       (cl-loop for r in helm-boring-file-regexp-list
+                ;; Prevent user doing silly thing like
+                ;; adding the dotted files to boring regexps (#924).
+                thereis (string-match r file))))
+
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
   (unless (and helm-ff-skip-boring-files
-               (cl-loop for r in helm-boring-file-regexp-list
-                        ;; Prevent user doing silly thing like
-                        ;; adding the dotted files to boring regexps (#924).
-                        thereis (and (not (string-match "\\.$" file))
-                                     (string-match r file))))
+               (helm-ff-boring-file-p file))
     ;; Handle tramp files.
     (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                  (helm-file-on-mounted-network-p helm-pattern))
