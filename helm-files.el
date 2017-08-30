@@ -595,10 +595,12 @@ Should not be used among other sources.")
                 (helm-set-local-variable 'bookmark-make-record-function
                                          #'helm-ff-make-bookmark-record)))
    (candidates :initform 'helm-find-files-get-candidates)
-   (filtered-candidate-transformer :initform '(helm-ff-sort-candidates
-                                               (lambda (candidates _source)
-                                                 (cl-loop for f in candidates collect
-                                                          (helm-ff-filter-candidate-one-by-one f)))))
+   (filtered-candidate-transformer
+    :initform '(helm-ff-sort-candidates
+                (lambda (candidates _source)
+                  (cl-loop for f in candidates
+                           for ff = (helm-ff-filter-candidate-one-by-one f)
+                           when ff collect ff))))
    (persistent-action :initform 'helm-find-files-persistent-action)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
