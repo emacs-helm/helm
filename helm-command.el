@@ -77,7 +77,7 @@ It is used only when `helm-M-x-fuzzy-match' is enabled."
   "Prefix argument before calling `helm-M-x'.")
 
 
-(cl-defun helm-M-x-get-major-mode-command-alist (mode-map)
+(defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
   (when mode-map
     (cl-loop for key being the key-seqs of mode-map using (key-bindings com)
