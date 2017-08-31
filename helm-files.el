@@ -2526,10 +2526,10 @@ Return candidates prefixed with basename of `helm-input' first."
         (if cand1 (cons cand1 all) all))))
 
 (defsubst helm-ff-boring-file-p (file)
+  ;; Prevent user doing silly thing like
+  ;; adding the dotted files to boring regexps (#924).
   (and (not (string-match "\\.$" file))
        (cl-loop for r in helm-boring-file-regexp-list
-                ;; Prevent user doing silly thing like
-                ;; adding the dotted files to boring regexps (#924).
                 thereis (string-match r file))))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
