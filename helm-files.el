@@ -1881,11 +1881,9 @@ or when `helm-pattern' is equal to \"~/\"."
                                 (let ((sub (substitute-in-file-name match)))
                                   (if (file-directory-p sub)
                                       sub (replace-regexp-in-string "/\\'" "" sub))))
-                               ;; "~/." expand to $HOME (issue #1844)
-                               ((string-match-p "~/.\\'" helm-pattern)
-                                (concat (helm-ff--expand-substitued-pattern helm-pattern) "/."))
                                (t (helm-ff--expand-substitued-pattern helm-pattern)))))
-             (if (and (file-directory-p input) ; Returns t on "/home/me/."
+             ;; `file-directory-p' returns t on "/home/me/." (issue #1844).
+             (if (and (file-directory-p input)
                       (not (string-match-p "[^.]\\.\\'" input)))
                  (setq helm-ff-default-directory
                        (setq input (file-name-as-directory input)))
@@ -1895,8 +1893,14 @@ or when `helm-pattern' is equal to \"~/\"."
                (helm-set-pattern input)
                (helm-check-minibuffer-input)))))))
 
+(defun helm-ff--expand-file-name-no-dot (name &optional directory)
+  "Prevent expanding \"/home/user/.\" to \"/home/user\"."
+  ;; Issue #1844.
+  (concat (expand-file-name name directory)
+          (and (string-match "[^.]\\.\\'" name) "/.")))
+
 (defun helm-ff--expand-substitued-pattern (pattern)
-  (expand-file-name
+  (helm-ff--expand-file-name-no-dot
    (helm-substitute-in-filename pattern)
    ;; [Windows] On UNC paths "/" expand to current machine,
    ;; so use the root of current Drive. (i.e "C:/")
