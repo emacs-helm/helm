@@ -188,9 +188,15 @@ Only math* symbols are collected."
         :buffer "*helm select xfont*"))
 
 ;;;###autoload
-(defun helm-ucs ()
-  "Preconfigured helm for `ucs-names' math symbols."
-  (interactive)
+(defun helm-ucs (arg)
+  "Preconfigured helm for `ucs-names'.
+
+Called with a prefix arg force reloading cache."
+  (interactive "P")
+  (when arg
+    (setq helm-ucs--names nil
+          helm-ucs--max-len nil
+          ucs-names nil))
   (let ((char (helm-aif (char-after) (string it))))
     (helm :sources 'helm-source-ucs
           :keymap  helm-ucs-map
