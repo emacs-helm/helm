@@ -90,7 +90,11 @@ Only math* symbols are collected."
           (helm-calculate-ucs-max-len)))
   (or helm-ucs--names
       (setq helm-ucs--names
-            (cl-loop for (n . v) in (ucs-names)
+            (cl-loop with pr = (make-progress-reporter
+                                "collecting ucs names"
+                                0 (length (ucs-names)))
+                     for (n . v) in (ucs-names)
+                     for count from 1
                      for xcode = (format "#x%x:" v)
                      for len = (length xcode)
                      for diff = (- (car helm-ucs--max-len) len)
@@ -101,7 +105,8 @@ Only math* symbols are collected."
                                 (not (char-displayable-p (read xcode))))
                      collect
                      (concat code (make-string diff ? )
-                             char "  " n)))))
+                             char "  " n)
+                     and do (progress-reporter-update pr count)))))
 
 (defun helm-ucs-forward-char (_candidate)
   (with-helm-current-buffer
