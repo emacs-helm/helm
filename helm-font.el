@@ -91,12 +91,15 @@ Only math* symbols are collected."
   (or helm-ucs--names
       (setq helm-ucs--names
             (cl-loop for (n . v) in (ucs-names)
-                     for len = (length (format "#x%x:" v))
+                     for xcode = (format "#x%x:" v)
+                     for len = (length xcode)
                      for diff = (- (car helm-ucs--max-len) len)
                      for code = (format "(#x%x): " v)
                      for char = (propertize (format "%c" v)
                                             'face 'helm-ucs-char)
-                     unless (string= "" n) collect
+                     unless (or (string= "" n)
+                                (not (char-displayable-p (read xcode))))
+                     collect
                      (concat code (make-string diff ? )
                              char "  " n)))))
 
