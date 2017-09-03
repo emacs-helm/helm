@@ -174,10 +174,8 @@ Only math* symbols are collected."
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
     :action '(("Insert character" . helm-ucs-insert-char)
               ("Insert character name" . helm-ucs-insert-name)
-              ("Insert character code in hex" . helm-ucs-insert-code)
-              ("Forward char" . helm-ucs-forward-char)
-              ("Backward char" . helm-ucs-backward-char)
-              ("Delete char backward" . helm-ucs-delete-backward)))
+              ("Insert character code in hex" . helm-ucs-insert-code))
+    :keymap  helm-ucs-map)
   "Source for collecting `ucs-names' math symbols.")
 
 ;;;###autoload
@@ -199,7 +197,6 @@ Called with a prefix arg force reloading cache."
           ucs-names nil))
   (let ((char (helm-aif (char-after) (string it))))
     (helm :sources 'helm-source-ucs
-          :keymap  helm-ucs-map
           :history 'helm-ucs-history
           :input (and char (multibyte-string-p char) char)
           :buffer "*helm ucs*")))
