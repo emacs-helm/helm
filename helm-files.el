@@ -631,9 +631,14 @@ Should not be used among other sources.")
   "bookmark handler for `helm-find-files'."
   (let ((fname (bookmark-prop-get bookmark 'filename))
         (presel (bookmark-prop-get bookmark 'presel)))
-    (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
-                                 (helm-basename presel)
-                                 presel))))
+    ;; Force tramp connection with `file-directory-p' before lauching
+    ;; hff otherwise the directory name is inserted on top before
+    ;; tramp starts and display candidates.  FNAME is here always a
+    ;; directory.
+    (when (file-directory-p fname)
+      (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
+                                   (helm-basename presel)
+                                 presel)))))
 
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
