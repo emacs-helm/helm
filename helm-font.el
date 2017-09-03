@@ -32,6 +32,7 @@
     (define-key map (kbd "<C-left>")      'helm-ucs-persistent-backward)
     (define-key map (kbd "<C-right>")     'helm-ucs-persistent-forward)
     (define-key map (kbd "<C-return>")    'helm-ucs-persistent-insert)
+    (define-key map (kbd "C-c SPC")       'helm-ucs-persistent-insert-space)
     map)
   "Keymap for `helm-ucs'.")
 
@@ -108,17 +109,7 @@ Only math* symbols are collected."
                              char "  " n)
                      and do (progress-reporter-update pr count)))))
 
-(defun helm-ucs-forward-char (_candidate)
-  (with-helm-current-buffer
-    (forward-char 1)))
-
-(defun helm-ucs-backward-char (_candidate)
-  (with-helm-current-buffer
-    (forward-char -1)))
-
-(defun helm-ucs-delete-backward (_candidate)
-  (with-helm-current-buffer
-    (delete-char -1)))
+;; Actions (insertion)
 
 (defun helm-ucs-insert (candidate n)
   (when (string-match
@@ -143,6 +134,24 @@ Only math* symbols are collected."
     (helm-execute-persistent-action 'action-insert)))
 (put 'helm-ucs-persistent-insert 'helm-only t)
 
+;; Navigation in current-buffer (persistent)
+
+(defun helm-ucs-forward-char (_candidate)
+  (with-helm-current-buffer
+    (forward-char 1)))
+
+(defun helm-ucs-backward-char (_candidate)
+  (with-helm-current-buffer
+    (forward-char -1)))
+
+(defun helm-ucs-delete-backward (_candidate)
+  (with-helm-current-buffer
+    (delete-char -1)))
+
+(defun helm-ucs-insert-space (_candidate)
+  (with-helm-current-buffer
+    (insert " ")))
+
 (defun helm-ucs-persistent-forward ()
   (interactive)
   (with-helm-alive-p
@@ -163,6 +172,12 @@ Only math* symbols are collected."
     (helm-attrset 'action-delete 'helm-ucs-delete-backward)
     (helm-execute-persistent-action 'action-delete)))
 (put 'helm-ucs-persistent-delete 'helm-only t)
+
+(defun helm-ucs-persistent-insert-space ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'action-insert-space 'helm-ucs-insert-space)
+    (helm-execute-persistent-action 'action-insert-space)))
 
 (defvar helm-source-ucs
   (helm-build-in-buffer-source "Ucs names"
