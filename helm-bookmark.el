@@ -27,13 +27,8 @@
 (require 'helm-adaptive)
 (require 'helm-net)
 
-(declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
-(declare-function message-buffers "message.el")
-(declare-function addressbook-set-mail-buffer-1 "ext:addressbook-bookmark.el"
-                  (&optional bookmark-name append cc))
-(declare-function addressbook-bookmark-set-1 "ext:addressbook-bookmark.el" (&optional contact))
 (declare-function helm-browse-project "helm-files" (arg))
-
+(declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
 
 (defgroup helm-bookmark nil
   "Predefined configurations for `helm.el'."
@@ -58,63 +53,6 @@
   "List of sources to use in `helm-filtered-bookmarks'."
   :group 'helm-bookmark
   :type '(repeat (choice symbol)))
-
-(defcustom helm-bookmark-addressbook-actions
-  '(("Show Contact(s)"
-     . (lambda (candidate)
-         (let* ((contacts (helm-marked-candidates))
-                (current-prefix-arg helm-current-prefix-arg))
-           (bookmark-jump
-            (helm-bookmark-get-bookmark-from-name (car contacts)))
-           (helm-aif (cdr contacts)
-               (let ((current-prefix-arg '(4)))
-                 (cl-loop for bmk in it do
-                          (bookmark-jump
-                           (helm-bookmark-get-bookmark-from-name bmk))))))))
-    ("Mail To" . helm-bookmark-addressbook-send-mail-1)
-    ("Mail Cc" . (lambda (_candidate)
-                   (helm-bookmark-addressbook-send-mail-1 nil 'cc)))
-    ("Mail Bcc" . (lambda (_candidate)
-                    (helm-bookmark-addressbook-send-mail-1 nil 'bcc)))
-    ("Edit Bookmark"
-     . (lambda (candidate)
-         (let ((bmk (helm-bookmark-get-bookmark-from-name
-                     candidate)))
-           (addressbook-bookmark-edit
-            (assoc bmk bookmark-alist)))))
-    ("Delete bookmark(s)" . helm-delete-marked-bookmarks)
-    ("Insert Email at point"
-     . (lambda (candidate)
-         (let* ((bmk   (helm-bookmark-get-bookmark-from-name
-                        candidate))
-                (mlist (split-string
-                        (assoc-default
-                         'email (assoc bmk bookmark-alist))
-                        ", ")))
-           (insert
-            (if (> (length mlist) 1)
-                (helm-comp-read
-                 "Insert Mail Address: " mlist :must-match t)
-                (car mlist))))))
-    ("Show annotation"
-     . (lambda (candidate)
-         (let ((bmk (helm-bookmark-get-bookmark-from-name
-                     candidate)))
-           (bookmark-show-annotation bmk))))
-    ("Edit annotation"
-     . (lambda (candidate)
-         (let ((bmk (helm-bookmark-get-bookmark-from-name
-                     candidate)))
-           (bookmark-edit-annotation bmk))))
-    ("Show Google map"
-     . (lambda (candidate)
-         (let* ((bmk (helm-bookmark-get-bookmark-from-name
-                      candidate))
-                (full-bmk (assoc bmk bookmark-alist)))
-           (addressbook-google-map full-bmk)))))
-  "Actions for addressbook bookmarks."
-  :group 'helm-bookmark
-  :type '(alist :key-type string :value-type function))
 
 
 (defface helm-bookmark-info
@@ -540,91 +478,6 @@ than `w3m-browse-url' use it."
             (helm-init-candidates-in-buffer
                 'global (helm-bookmark-uncategorized-setup-alist)))))
 
-;;; Addressbook.
-;;
-;;
-(defun helm-bookmark--addressbook-search-mail (pattern)
-  (helm-awhile (next-single-property-change (point) 'email)
-    (goto-char it)
-    (end-of-line)
-    (when (string-match pattern
-                        (get-text-property
-                         0 'email (buffer-substring
-                                   (point-at-bol) (point-at-eol))))
-      (cl-return
-       (+ (point) (match-end 0))))))
-
-(defun helm-bookmark--addressbook-search-group (pattern)
-  (helm-awhile (next-single-property-change (point) 'group)
-    (goto-char it)
-    (end-of-line)
-    (when (string-match pattern
-                        (get-text-property
-                         0 'group (buffer-substring
-                                   (point-at-bol) (point-at-eol))))
-      (cl-return
-       (+ (point) (match-end 0))))))
-
-(defclass helm-bookmark-addressbook-class (helm-source-in-buffer)
-  ((init :initform (lambda ()
-                     (require 'addressbook-bookmark nil t)
-                     (bookmark-maybe-load-default-file)
-                     (helm-init-candidates-in-buffer
-                         'global
-                       (cl-loop for b in (helm-bookmark-addressbook-setup-alist)
-                                collect (propertize b
-                                                    'email (bookmark-prop-get b 'email)
-                                                    'group (bookmark-prop-get b 'group))))))
-   (search :initform '(helm-bookmark--addressbook-search-group
-                       helm-bookmark--addressbook-search-mail))
-   (persistent-action :initform
-                      (lambda (candidate)
-                        (let ((bmk (helm-bookmark-get-bookmark-from-name
-                                    candidate)))
-                          (if (and (get-buffer-window addressbook-buffer-name 'visible)
-                                   (string= bmk (with-current-buffer addressbook-buffer-name
-                                                  (save-excursion
-                                                    (search-forward "^Name: " nil t)
-                                                    (car (addressbook-get-contact-data))))))
-                              (kill-buffer addressbook-buffer-name)
-                              (when (buffer-live-p (get-buffer addressbook-buffer-name))
-                                (kill-buffer addressbook-buffer-name))
-                              (bookmark--jump-via bmk 'switch-to-buffer)))))
-   (persistent-help :initform "Show contact - Prefix with C-u to append")
-   (mode-line :initform (list "Contact(s)" helm-mode-line-string))
-   (filtered-candidate-transformer :initform
-                                   '(helm-adaptive-sort
-                                     helm-highlight-bookmark))
-   (action :initform 'helm-bookmark-addressbook-actions)))
-
-(defun helm-bookmark-addressbook-send-mail-1 (_candidate &optional cc)
-  (let* ((contacts (helm-marked-candidates))
-         (bookmark      (helm-bookmark-get-bookmark-from-name
-                         (car contacts)))
-         (append   (message-buffers)))
-    (addressbook-set-mail-buffer-1 bookmark append cc)
-    (helm-aif (cdr contacts)
-        (cl-loop for bmk in it do
-                 (addressbook-set-mail-buffer-1
-                  (helm-bookmark-get-bookmark-from-name bmk) 'append cc)))))
-
-(defun helm-bookmark-addressbook-setup-alist ()
-  "Specialized filter function for addressbook bookmarks."
-  (helm-bookmark-filter-setup-alist 'helm-bookmark-addressbook-p))
-
-(defvar helm-source-bookmark-addressbook
-  (helm-make-source "Bookmark Addressbook" 'helm-bookmark-addressbook-class))
-
-(defvar helm-source-addressbook-set
-  (helm-build-dummy-source "Addressbook add contact"
-    :filtered-candidate-transformer
-    (lambda (_candidates _source)
-      (list (or (and (not (string= helm-pattern ""))
-                     helm-pattern)
-                "Enter a contact name to record")))
-    :action (lambda (candidate)
-              (addressbook-bookmark-set-1 candidate))))
-
 ;;; Transformer
 ;;
 
@@ -847,18 +700,6 @@ only if external addressbook-bookmark package is installed."
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
-        :default (list (thing-at-point 'symbol)
-                       (buffer-name helm-current-buffer))))
-
-;;;###autoload
-(defun helm-addressbook-bookmarks ()
-  "Preconfigured helm for addressbook bookmarks.
-Need addressbook-bookmark package as dependencie."
-  (interactive)
-  (helm :sources '(helm-source-bookmark-addressbook
-                   helm-source-addressbook-set)
-        :prompt "Search Contact: "
-        :buffer "*helm addressbook*"
         :default (list (thing-at-point 'symbol)
                        (buffer-name helm-current-buffer))))
 
