@@ -714,9 +714,10 @@ ACTION must be an action supported by `helm-dired-action'."
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
+         (prefarg helm-current-prefix-arg)
          (prompt (format "%s %s file(s) to: "
                          (if (and dired-async-mode
-                                  (null helm-current-prefix-arg))
+                                  (null prefarg))
                              (concat "Async " (symbol-name action)) 
                            (capitalize (symbol-name action)))
                          (length ifiles)))
@@ -740,7 +741,7 @@ ACTION must be an action supported by `helm-dired-action'."
       (when (y-or-n-p (format "Create directory `%s'?" dest-dir))
         (make-directory dest-dir t)))
     (helm-dired-action
-     dest :files ifiles :action action :follow helm-current-prefix-arg)))
+     dest :files ifiles :action action :follow prefarg)))
 
 (defun helm-find-files-copy (_candidate)
   "Copy files from `helm-find-files'."
