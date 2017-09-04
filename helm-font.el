@@ -111,28 +111,51 @@ Only math* symbols are collected."
 
 ;; Actions (insertion)
 
-(defun helm-ucs-insert (candidate n)
+(defun helm-ucs-match (candidate n)
+  "Return the N part of an ucs CANDIDATE.
+Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
   (when (string-match
          "^(\\(#x[a-f0-9]+\\)): *\\(.\\) *\\([^:]+\\)+"
          candidate)
-    (with-helm-current-buffer
-      (insert (match-string n candidate)))))
+    (match-string n candidate)))
+
+(defun helm-ucs-insert (candidate n)
+  "Insert the N part of CANDIDATE."
+  (with-helm-current-buffer
+    (insert (helm-ucs-match candidate n))))
 
 (defun helm-ucs-insert-char (candidate)
+  "Insert ucs char part of CANDIDATE at point."
   (helm-ucs-insert candidate 2))
 
 (defun helm-ucs-insert-code (candidate)
+  "Insert ucs code part of CANDIDATE at point."
   (helm-ucs-insert candidate 1))
 
 (defun helm-ucs-insert-name (candidate)
+  "Insert ucs name part of CANDIDATE at point."
   (helm-ucs-insert candidate 3))
 
 (defun helm-ucs-persistent-insert ()
+  "Insert ucs char without quitting helm."
   (interactive)
   (with-helm-alive-p
     (helm-attrset 'action-insert 'helm-ucs-insert-char)
     (helm-execute-persistent-action 'action-insert)))
 (put 'helm-ucs-persistent-insert 'helm-only t)
+
+;; Kill actions
+(defun helm-ucs-kill-char (_candidate)
+  "Action that concatenate ucs marked chars."
+  (kill-new (mapconcat (lambda (x)
+                         (helm-ucs-match x 2))
+                       (helm-marked-candidates) "")))
+
+(defun helm-ucs-kill-code (candidate)
+  (kill-new (helm-ucs-match candidate 1)))
+
+(defun helm-ucs-kill-name (candidate)
+  (kill-new (helm-ucs-match candidate 3)))
 
 ;; Navigation in current-buffer (persistent)
 
@@ -189,7 +212,10 @@ Only math* symbols are collected."
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
     :action '(("Insert character" . helm-ucs-insert-char)
               ("Insert character name" . helm-ucs-insert-name)
-              ("Insert character code in hex" . helm-ucs-insert-code))
+              ("Insert character code in hex" . helm-ucs-insert-code)
+              ("Kill character" . helm-ucs-kill-char)
+              ("Kill name" . helm-ucs-kill-name)
+              ("Kill code" . helm-ucs-kill-code))
     :keymap  helm-ucs-map)
   "Source for collecting `ucs-names' math symbols.")
 
