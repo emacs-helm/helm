@@ -213,7 +213,7 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
     :action '(("Insert character" . helm-ucs-insert-char)
               ("Insert character name" . helm-ucs-insert-name)
               ("Insert character code in hex" . helm-ucs-insert-code)
-              ("Kill character" . helm-ucs-kill-char)
+              ("Kill marked characters" . helm-ucs-kill-char)
               ("Kill name" . helm-ucs-kill-name)
               ("Kill code" . helm-ucs-kill-code))
     :keymap  helm-ucs-map)
