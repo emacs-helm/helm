@@ -55,7 +55,7 @@
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
 (defvar dired-async-mode)
-
+(defvar org-directory)
 
 (defgroup helm-files nil
   "Files applications and libraries for Helm."
@@ -3827,7 +3827,6 @@ are passed to \"find\" literally."
            default-directory)))
     (helm-find-1 directory)))
 
-(defvar org-directory)
 ;;;###autoload
 (defun helm-find-files (arg)
   "Preconfigured `helm' for helm implementation of `find-file'.
