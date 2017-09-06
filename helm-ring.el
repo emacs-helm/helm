@@ -302,43 +302,6 @@ This is a command for `helm-kill-ring-map'."
                when (and gm (not (assoc gm recip)))
                collect (cons gm marker) into recip
                finally return recip))))
-
-(defun helm--push-mark (&optional location nomsg activate)
-  "[Internal] Don't use directly, use instead `helm-push-mark-mode'."
-  (unless (null (mark t))
-    (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
-    (when (> (length mark-ring) mark-ring-max)
-      (move-marker (car (nthcdr mark-ring-max mark-ring)) nil)
-      (setcdr (nthcdr (1- mark-ring-max) mark-ring) nil)))
-  (set-marker (mark-marker) (or location (point)) (current-buffer))
-  ;; Now push the mark on the global mark ring.
-  (setq global-mark-ring (cons (copy-marker (mark-marker))
-                               ;; Avoid having multiple entries
-                               ;; for same buffer in `global-mark-ring'.
-                               (cl-loop with mb = (current-buffer)
-                                        for m in global-mark-ring
-                                        for nmb = (marker-buffer m)
-                                        unless (eq mb nmb)
-                                        collect m)))
-  (when (> (length global-mark-ring) global-mark-ring-max)
-    (move-marker (car (nthcdr global-mark-ring-max global-mark-ring)) nil)
-    (setcdr (nthcdr (1- global-mark-ring-max) global-mark-ring) nil))
-  (or nomsg executing-kbd-macro (> (minibuffer-depth) 0)
-      (message "Mark set"))
-  (when (or activate (not transient-mark-mode))
-    (set-mark (mark t)))
-  nil)
-
-;;;###autoload
-(define-minor-mode helm-push-mark-mode
-    "Provide an improved version of `push-mark'.
-Modify the behavior of `push-mark' to update
-the `global-mark-ring' after each new visit."
-  :group 'helm-ring
-  :global t
-  (if helm-push-mark-mode
-      (advice-add 'push-mark :override #'helm--push-mark)
-      (advice-remove 'push-mark #'helm--push-mark)))
 
 ;;;; <Register>
 ;;; Insert from register
