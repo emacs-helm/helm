@@ -941,6 +941,31 @@ Useful in dired buffers when there is inserted subdirs."
        (dired-current-directory)
        default-directory)))
 
+(defun helm-shadow-boring-files (files)
+  "Files matching `helm-boring-file-regexp' will be
+displayed with the `file-name-shadow' face if available."
+  (helm-shadow-entries files helm-boring-file-regexp-list))
+
+(defun helm-skip-boring-files (files)
+  "Files matching `helm-boring-file-regexp' will be skipped."
+  (helm-skip-entries files helm-boring-file-regexp-list))
+
+(defun helm-skip-current-file (files)
+  "Current file will be skipped."
+  (remove (buffer-file-name helm-current-buffer) files))
+
+(defun helm-w32-pathname-transformer (args)
+  "Change undesirable features of windows pathnames to ones more acceptable to
+other candidate transformers."
+  (if (eq system-type 'windows-nt)
+      (helm-transform-mapcar
+       (lambda (x)
+         (replace-regexp-in-string
+          "/cygdrive/\\(.\\)" "\\1:"
+          (replace-regexp-in-string "\\\\" "/" x)))
+       args)
+    args))
+
 (defun helm-w32-prepare-filename (file)
   "Convert filename FILE to something usable by external w32 executables."
   (replace-regexp-in-string ; For UNC paths

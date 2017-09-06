@@ -3382,31 +3382,6 @@ Called with a prefix arg open files in background without selecting them."
       (push helm-ff-default-directory helm-ff-history))
     (or (and helm-ff (helm-find-files-1 dir)) t)))
 
-(defun helm-shadow-boring-files (files)
-  "Files matching `helm-boring-file-regexp' will be
-displayed with the `file-name-shadow' face if available."
-  (helm-shadow-entries files helm-boring-file-regexp-list))
-
-(defun helm-skip-boring-files (files)
-  "Files matching `helm-boring-file-regexp' will be skipped."
-  (helm-skip-entries files helm-boring-file-regexp-list))
-
-(defun helm-skip-current-file (files)
-  "Current file will be skipped."
-  (remove (buffer-file-name helm-current-buffer) files))
-
-(defun helm-w32-pathname-transformer (args)
-  "Change undesirable features of windows pathnames to ones more acceptable to
-other candidate transformers."
-  (if (eq system-type 'windows-nt)
-      (helm-transform-mapcar
-       (lambda (x)
-         (replace-regexp-in-string
-          "/cygdrive/\\(.\\)" "\\1:"
-          (replace-regexp-in-string "\\\\" "/" x)))
-       args)
-    args))
-
 (defun helm-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an emacs lisp
 file.  Else return ACTIONS unmodified."
