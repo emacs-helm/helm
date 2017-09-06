@@ -3423,23 +3423,6 @@ Else return ACTIONS unmodified."
            (append actions (list browse-action)))
           (t actions))))
 
-(defun helm-multi-files-toggle-to-locate ()
-  (interactive)
-  (with-helm-alive-p
-    (with-helm-buffer
-      (if (setq helm-multi-files--toggle-locate
-                (not helm-multi-files--toggle-locate))
-          (progn
-            (helm-set-sources (unless (memq 'helm-source-locate
-                                            helm-sources)
-                                (cons 'helm-source-locate helm-sources)))
-            (helm-set-source-filter '(helm-source-locate)))
-          (helm-kill-async-processes)
-          (helm-set-sources (remove 'helm-source-locate
-                                    helm-for-files-preferred-list))
-          (helm-set-source-filter nil)))))
-(put 'helm-multi-files-toggle-to-locate 'helm-only t)
-
 (defun helm-file-on-mounted-network-p (file)
   "Returns non-nil when FILE is part of a mounted remote directory.
 
@@ -3447,64 +3430,9 @@ This function is checking `helm-mounted-network-directories' list."
   (when helm-mounted-network-directories
     (cl-loop for dir in helm-mounted-network-directories
              thereis (file-in-directory-p file dir))))
-
-;;; List of files gleaned from every dired buffer
-;;
-;;
-(defun helm-files-in-all-dired-candidates ()
-  (save-excursion
-    (cl-loop for (f . b) in dired-buffers
-          when (buffer-live-p b)
-          append (let ((dir (with-current-buffer b dired-directory)))
-                   (if (listp dir) (cdr dir)
-                     (directory-files f t dired-re-no-dot))))))
 
-;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
-
-(defclass helm-files-dired-source (helm-source-sync helm-type-file)
-  ((candidates :initform #'helm-files-in-all-dired-candidates)))
-
-(defvar helm-source-files-in-all-dired
-  (helm-make-source "Files in all dired buffer." 'helm-files-dired-source))
-
-
-;;; File Cache
-;;
-;;
+;; helm-find-files bindings for filecache
 (defvar file-cache-alist)
-
-(defclass helm-file-cache (helm-source-in-buffer helm-type-file)
-  ((init :initform (lambda () (require 'filecache)))))
-
-(defun helm-file-cache-get-candidates ()
-  (cl-loop for item in file-cache-alist append
-           (cl-destructuring-bind (base &rest dirs) item
-             (cl-loop for dir in dirs collect
-                      (concat dir base)))))
-
-(defvar helm-source-file-cache nil)
-
-(defcustom helm-file-cache-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-file-cache' when non--nil."
-  :group 'helm-files
-  :type 'boolean
-  :set (lambda (var val)
-         (set var val)
-         (setq helm-source-file-cache
-               (helm-make-source "File Cache" 'helm-file-cache
-                 :fuzzy-match helm-file-cache-fuzzy-match
-                 :data 'helm-file-cache-get-candidates))))
-
-(cl-defun helm-file-cache-add-directory-recursively
-    (dir &optional match (ignore-dirs t))
-  (require 'filecache)
-  (cl-loop for f in (helm-walk-directory
-                     dir
-                     :path 'full
-                     :directories nil
-                     :match match
-                     :skip-subdirs ignore-dirs)
-           do (file-cache-add-file f)))
 
 (defun helm-ff-cache-add-file (_candidate)
   (require 'filecache)
@@ -3526,14 +3454,6 @@ This function is checking `helm-mounted-network-directories' list."
   "Remove marked files from `file-cache-alist.'"
   (let ((mkd (helm-marked-candidates)))
     (mapc 'helm-ff-file-cache-remove-file-1 mkd)))
-
-(defun helm-transform-file-cache (actions _candidate)
-  (let ((source (helm-get-current-source)))
-    (if (string= (assoc-default 'name source) "File Cache")
-        (append actions
-                '(("Remove marked files from file-cache"
-                   . helm-ff-file-cache-remove-file)))
-        actions)))
 
 
 ;;; File name history
@@ -3591,65 +3511,7 @@ Don't use it in your own code unless you know what you are doing.")
           :allow-nest t
           :resume 'noresume)))
 (put 'helm-ff-file-name-history 'helm-only t)
-
-;;; Recentf files
-;;
-;;
-(defvar helm-recentf--basename-flag nil)
-
-(defun helm-recentf-pattern-transformer (pattern)
-  (let ((pattern-no-flag (replace-regexp-in-string " -b" "" pattern)))
-    (cond ((and (string-match " " pattern-no-flag)
-                (string-match " -b\\'" pattern))
-           (setq helm-recentf--basename-flag t)
-           pattern-no-flag)
-        ((string-match "\\([^ ]*\\) -b\\'" pattern)
-         (prog1 (match-string 1 pattern)
-           (setq helm-recentf--basename-flag t)))
-        (t (setq helm-recentf--basename-flag nil)
-           pattern))))
-
-(defcustom helm-turn-on-recentf t
-  "Automatically turn on `recentf-mode' when non-nil."
-  :group 'helm-files
-  :type 'boolean)
-
-(defclass helm-recentf-source (helm-source-sync helm-type-file)
-  ((init :initform (lambda ()
-                     (require 'recentf)
-                     (when helm-turn-on-recentf (recentf-mode 1))))
-   (candidates :initform (lambda () recentf-list))
-   (pattern-transformer :initform 'helm-recentf-pattern-transformer)
-   (match-part :initform (lambda (candidate)
-                           (if (or helm-ff-transformer-show-only-basename
-                                   helm-recentf--basename-flag)
-                               (helm-basename candidate) candidate)))
-   (migemo :initform t)
-   (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)))
-
-(defmethod helm--setup-source :after ((source helm-recentf-source))
-  (setf (slot-value source 'action)
-        (append (symbol-value (helm-actions-from-type-file))
-                '(("Delete file(s) from recentf" .
-                   (lambda (_candidate)
-                     (cl-loop for file in (helm-marked-candidates)
-                              do (setq recentf-list (delq file recentf-list)))))))))
-
-(defvar helm-source-recentf nil
-  "See (info \"(emacs)File Conveniences\").
-Set `recentf-max-saved-items' to a bigger value if default is too small.")
-
-(defcustom helm-recentf-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-recentf' when non--nil."
-  :group 'helm-files
-  :type 'boolean
-  :set (lambda (var val)
-         (set var val)
-         (let ((helm-fuzzy-sort-fn 'helm-fuzzy-matching-sort-fn-preserve-ties-order))
-           (setq helm-source-recentf
-                 (helm-make-source "Recentf" 'helm-recentf-source
-                   :fuzzy-match helm-recentf-fuzzy-match)))))
-
+
 ;;; Browse project
 ;; Need dependencies:
 ;; <https://github.com/emacs-helm/helm-ls-git>
@@ -3818,162 +3680,6 @@ See `helm-browse-project'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-gid)))
 (put 'helm-ff-run-gid 'helm-only t)
-
-;;; session.el files
-;;
-;;  session (http://emacs-session.sourceforge.net/) is an alternative to
-;;  recentf that saves recent file history and much more.
-(defvar session-file-alist)
-(defclass helm-source-session-class (helm-source-sync)
-  ((candidates :initform (lambda ()
-                           (cl-delete-if-not
-                            (lambda (f)
-                              (or (string-match helm-tramp-file-name-regexp f)
-                                  (file-exists-p f)))
-                            (mapcar 'car session-file-alist))))
-   (keymap       :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
-   (action       :initform 'helm-type-file-actions)))
-
-(defvar helm-source-session nil
-  "File list from emacs-session.")
-
-(defcustom helm-session-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-session' when non--nil."
-  :group 'helm-files
-  :type 'boolean
-  :set (lambda (var val)
-         (set var val)
-         (setq helm-source-session
-               (helm-make-source "Session" 'helm-source-session-class
-                 :fuzzy-match val))))
-
-
-;;; Files in current dir
-;;
-;;
-(defun helm-highlight-files (files _source)
-  "A basic transformer for helm files sources.
-Colorize only symlinks, directories and files."
-  (cl-loop with mp-fn = (or (assoc-default
-                             'match-part (helm-get-current-source))
-                            'identity)
-           for i in files
-           for disp = (if (and helm-ff-transformer-show-only-basename
-                               (not (helm-dir-is-dot i))
-                               (not (and helm--url-regexp
-                                         (string-match helm--url-regexp i)))
-                               (not (string-match helm-ff-url-regexp i)))
-                          (helm-basename i) (abbreviate-file-name i))
-           for isremote = (or (file-remote-p i)
-                              (helm-file-on-mounted-network-p i))
-           ;; Call file-attributes only if:
-           ;; - file is not remote
-           ;; - helm-ff-tramp-not-fancy is nil and file is remote AND
-           ;; connected. (Issue #1679)
-           for type = (and (or (null isremote)
-                               (and (null helm-ff-tramp-not-fancy)
-                                    (file-remote-p i nil t)))
-                           (car (file-attributes i)))
-           collect
-           (cond ((and (null type) isremote) (cons disp i))
-                 ((stringp type)
-                  (cons (propertize disp
-                                    'face 'helm-ff-symlink
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
-                 ((eq type t)
-                  (cons (propertize disp
-                                    'face 'helm-ff-directory
-                                    'match-part (funcall mp-fn disp)
-                                    'help-echo (expand-file-name i))
-                        i))
-                 (t (cons (propertize disp
-                                      'face 'helm-ff-file
-                                      'match-part (funcall mp-fn disp)
-                                      'help-echo (expand-file-name i))
-                          i)))))
-
-(defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
-  ((candidates :initform (lambda ()
-                           (with-helm-current-buffer
-                             (let ((dir (helm-current-directory)))
-                               (when (file-accessible-directory-p dir)
-                                 (directory-files dir t))))))
-   (pattern-transformer :initform 'helm-recentf-pattern-transformer)
-   (match-part :initform (lambda (candidate)
-                           (if (or helm-ff-transformer-show-only-basename
-                                   helm-recentf--basename-flag)
-                               (helm-basename candidate) candidate)))
-   (fuzzy-match :initform t)
-   (migemo :initform t)))
-
-(defvar helm-source-files-in-current-dir
-  (helm-make-source "Files from Current Directory"
-      helm-files-in-current-dir-source))
-
-
-;;; External searching file tools.
-;;
-;; Tracker desktop search
-(defvar helm-source-tracker-cand-incomplete nil "Contains incomplete candidate")
-(defun helm-source-tracker-transformer (candidates _source)
-  (helm-log "received: %S" candidates)
-  (cl-loop for cand in candidates
-           for path = (when (stringp helm-source-tracker-cand-incomplete)
-                        (caar (helm-highlight-files
-                               (list helm-source-tracker-cand-incomplete)
-                               nil)))
-           for built = (if (not (stringp cand)) cand
-                         (let ((snippet cand))
-                           (unless (or (null path)
-                                      (string= "" path)
-                                      (not (string-match-p
-                                          "\\`[[:space:]]*\\.\\.\\."
-                                          snippet)))
-                             (let ((complete-candidate
-                                    (cons (concat path "\n" snippet) path)))
-                               (setq helm-source-tracker-cand-incomplete nil)
-                               (helm-log "built: %S" complete-candidate)
-                               complete-candidate))))
-           when (and (stringp cand)
-                   (string-match "\\`[[:space:]]*file://" cand))
-           do (setq helm-source-tracker-cand-incomplete ; save path
-                    (replace-match "" t t cand)) end
-           collect built))
-
-(defvar helm-source-tracker-search
-  (helm-build-async-source "Tracker Search"
-    :candidates-process
-     (lambda ()
-       (start-process "tracker-search-process" nil
-                      "tracker-search"
-                      "--disable-color"
-                      "--limit=512"
-                      helm-pattern))
-    :filtered-candidate-transformer #'helm-source-tracker-transformer
-    ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
-    :keymap helm-generic-files-map
-    :action 'helm-type-file-actions
-    :action-transformer '(helm-transform-file-load-el
-                          helm-transform-file-browse-url)
-    :requires-pattern 3)
-  "Source for retrieving files matching the current input pattern
-with the tracker desktop search.")
-
-;; Spotlight (MacOS X desktop search)
-(defclass helm-mac-spotlight-source (helm-source-async helm-type-file)
-  ((candidates-process :initform
-                       (lambda ()
-                         (start-process
-                          "mdfind-process" nil "mdfind" helm-pattern)))
-   (requires-pattern :initform 3)))
-
-(defvar helm-source-mac-spotlight
-  (helm-make-source "mdfind" helm-mac-spotlight-source)
-  "Source for retrieving files via Spotlight's command line
-utility mdfind.")
 
 
 ;;; Findutils
@@ -4157,70 +3863,6 @@ This is the starting point for nearly all actions you can do on files."
     (setq current-prefix-arg nil)
     (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
                                   (concat "^" (regexp-quote presel))))))
-
-;;;###autoload
-(defun helm-for-files ()
-  "Preconfigured `helm' for opening files.
-Run all sources defined in `helm-for-files-preferred-list'."
-  (interactive)
-  (require 'helm-bookmark)
-  (unless helm-source-buffers-list
-    (setq helm-source-buffers-list
-          (helm-make-source "Buffers" 'helm-source-buffers)))
-  (helm :sources helm-for-files-preferred-list
-        :ff-transformer-show-only-basename nil
-        :buffer "*helm for files*"
-        :truncate-lines helm-buffers-truncate-lines))
-
-;;;###autoload
-(defun helm-multi-files ()
-  "Preconfigured helm like `helm-for-files' but running locate only on demand.
-
-Allow toggling back and forth from locate to others sources with
-`helm-multi-files-toggle-locate-binding' key.
-This avoid launching needlessly locate when what you search is already
-found."
-  (interactive)
-  (require 'helm-bookmark)
-  (unless helm-source-buffers-list
-    (setq helm-source-buffers-list
-          (helm-make-source "Buffers" 'helm-source-buffers)))
-  (setq helm-multi-files--toggle-locate nil)
-  (helm-locate-set-command)
-  (helm-set-local-variable 'helm-async-outer-limit-hook
-                           (list (lambda ()
-                                   (when (and helm-locate-fuzzy-match
-                                              (not (string-match-p
-                                                    "\\s-" helm-pattern)))
-                                     (helm-redisplay-buffer)))))
-  (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
-        (helm-locate-command
-         (if helm-locate-fuzzy-match
-             (unless (string-match-p "\\`locate -b" helm-locate-command)
-               (replace-regexp-in-string
-                "\\`locate" "locate -b" helm-locate-command))
-             helm-locate-command))
-        (old-key (lookup-key
-                  helm-map
-                  (read-kbd-macro helm-multi-files-toggle-locate-binding))))
-    (with-helm-temp-hook 'helm-after-initialize-hook
-      (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
-        'helm-multi-files-toggle-to-locate))
-    (unwind-protect
-         (helm :sources sources
-               :ff-transformer-show-only-basename nil
-               :buffer "*helm multi files*"
-               :truncate-lines helm-buffers-truncate-lines)
-      (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
-        old-key))))
-
-;;;###autoload
-(defun helm-recentf ()
-  "Preconfigured `helm' for `recentf'."
-  (interactive)
-  (helm :sources 'helm-source-recentf
-        :ff-transformer-show-only-basename nil
-        :buffer "*helm recentf*"))
 
 ;;;###autoload
 (defun helm-delete-tramp-connection ()
