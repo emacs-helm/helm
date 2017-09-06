@@ -194,6 +194,7 @@ Only buffer names are fuzzy matched when this is enabled,
 (defvar helm-buffers-in-project-p nil)
 
 (defun helm-buffers-list--init ()
+  (require 'dired)
   ;; Issue #51 Create the list before `helm-buffer' creation.
   (setq helm-buffers-list-cache (funcall (helm-attr 'buffer-list)))
   (let ((result (cl-loop for b in helm-buffers-list-cache
@@ -917,7 +918,7 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-mini ()
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
-  (require 'helm-files)
+  (require 'helm-for-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
