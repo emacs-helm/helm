@@ -24,7 +24,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'dired)
+(eval-when-compile (require 'wdired))
 
 (declare-function helm-get-sources "helm.el")
 (declare-function helm-marked-candidates "helm.el")
@@ -34,8 +34,6 @@
 (declare-function org-open-at-point "org.el")
 (declare-function org-content "org.el")
 (defvar helm-current-position)
-
-(eval-when-compile (require 'wdired))
 (defvar wdired-old-marks)
 
 ;;; User vars.

@@ -20,8 +20,7 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-help)
-(require 'compile) ; Fixme: Is this needed?
-(require 'dired)
+(eval-when-compile (require 'dired))
 
 (declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 (declare-function popup-tip "ext:popup")

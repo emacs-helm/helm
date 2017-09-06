@@ -25,15 +25,15 @@
 (require 'helm-grep)
 (require 'helm-help)
 (require 'helm-locate)
-(require 'helm-bookmark)
 (require 'helm-tags)
 (require 'helm-buffers)
-(require 'thingatpt)
-(require 'ffap)
-(require 'dired-aux)
-(require 'dired-x)
-(require 'tramp)
-(require 'image-dired)
+(eval-when-compile
+  (require 'thingatpt)
+  (require 'ffap)
+  (require 'dired-aux)
+  (require 'dired-x)
+  (require 'tramp)
+  (require 'image-dired))
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
@@ -2812,6 +2812,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
+           (require 'image-dired)
            (let* ((win (get-buffer-window
                         image-dired-display-image-buffer 'visible))
                   (remove-buf-only
@@ -2982,6 +2983,7 @@ Show the first `helm-ff-history-max-length' elements of
   "Find FNAME with `helm' completion.
 Like `find-file' but with `helm' support.
 Use it for non--interactive calls of `helm-find-files'."
+  (require 'tramp)
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (setq helm-find-files--toggle-bookmark nil)
@@ -3032,6 +3034,7 @@ Use it for non--interactive calls of `helm-find-files'."
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
   (interactive)
+  (require 'helm-bookmark)
   (with-helm-alive-p
     (with-helm-buffer
       (if (setq helm-find-files--toggle-bookmark
@@ -3056,6 +3059,7 @@ Use it for non--interactive calls of `helm-find-files'."
 
 (defun helm-ffap-guesser ()
   "Same as `ffap-guesser' but without gopher and machine support."
+  (require 'ffap)
   ;; Avoid "Stack overflow in regexp matcher" error
   ;; in evil `ffap-guesser' by removing crap `ffap-gopher-at-point'
   ;; (bug fixed in emacs-26 #25391) .
