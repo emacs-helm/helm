@@ -4163,6 +4163,7 @@ This is the starting point for nearly all actions you can do on files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
+  (require 'helm-bookmark)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
@@ -4180,6 +4181,7 @@ Allow toggling back and forth from locate to others sources with
 This avoid launching needlessly locate when what you search is already
 found."
   (interactive)
+  (require 'helm-bookmark)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
