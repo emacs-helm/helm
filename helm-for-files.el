@@ -25,6 +25,17 @@
 ;;
 (defvar file-cache-alist)
 
+(defcustom helm-for-files-preferred-list
+  '(helm-source-buffers-list
+    helm-source-recentf
+    helm-source-bookmarks
+    helm-source-file-cache
+    helm-source-files-in-current-dir
+    helm-source-locate)
+  "Your preferred sources to find files."
+  :type '(repeat (choice symbol))
+  :group 'helm-files)
+
 (defclass helm-file-cache (helm-source-in-buffer helm-type-file)
   ((init :initform (lambda () (require 'filecache)))))
 
