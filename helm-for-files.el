@@ -206,6 +206,7 @@ Colorize only symlinks, directories and files."
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
   (require 'helm-bookmark)
+  (require 'helm-x-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
@@ -241,6 +242,7 @@ This avoid launching needlessly locate when what you search is already
 found."
   (interactive)
   (require 'helm-bookmark)
+  (require 'helm-x-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))

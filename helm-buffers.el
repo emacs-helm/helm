@@ -918,7 +918,7 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-mini ()
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
-  (require 'helm-for-files)
+  (require 'helm-x-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
