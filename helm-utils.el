@@ -430,15 +430,6 @@ that is sorting is done against real value of candidate."
            (< (length str1) (length str2)))
           (t (> sc1 sc2)))))
 
-(defun helm-ff-get-host-from-tramp-invalid-fname (fname)
-  "Extract hostname from an incomplete tramp file name.
-Return nil on valid file name remote or not."
-  (let* ((str (helm-basename fname))
-         (split (split-string str ":" t))
-         (meth (car (member (car split)
-                            (helm-ff-get-tramp-methods))))) 
-    (when meth (car (last split)))))
-
 (cl-defun helm-file-human-size (size &optional (kbsize helm-default-kbsize))
   "Return a string showing SIZE of a file in human readable form.
 SIZE can be an integer or a float depending it's value.

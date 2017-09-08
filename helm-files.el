@@ -1662,7 +1662,7 @@ If prefix numeric arg is given go ARG level up."
   (with-helm-alive-p
     (let ((src (helm-get-current-source)))
       (when (and (helm-file-completion-source-p src)
-                 (not (helm-ff-invalid-tramp-name-p)))
+                 (not (helm-ff--invalid-tramp-name-p)))
         (with-helm-window
           (when (helm-follow-mode-p)
             (helm-follow-mode -1) (message nil)))
@@ -1697,7 +1697,7 @@ If prefix numeric arg is given go ARG level up."
   (interactive)
   (with-helm-alive-p
     (when (and (helm-file-completion-source-p)
-               (not (helm-ff-invalid-tramp-name-p)))
+               (not (helm-ff--invalid-tramp-name-p)))
       (unless helm-find-files--level-tree-iterator
         (setq helm-find-files--level-tree-iterator
               (helm-iter-list (cdr helm-find-files--level-tree))))
@@ -1764,13 +1764,13 @@ or when `helm-pattern' is equal to \"~/\"."
   (let ((src (helm-get-current-source)))
     (when (and (helm-file-completion-source-p src)
                (not (get-buffer-window helm-action-buffer 'visible))
-               (not (helm-ff-invalid-tramp-name-p)))
+               (not (helm-ff--invalid-tramp-name-p)))
       (with-helm-window
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
                (pat         (if (string-match helm-tramp-file-name-regexp
                                               helm-pattern)
-                                (helm-create-tramp-name helm-pattern)
+                                (helm-ff--create-tramp-name helm-pattern)
                                 helm-pattern))
                (completed-p (string= (file-name-as-directory
                                       (expand-file-name
@@ -1947,7 +1947,7 @@ With a prefix arg toggle dired buffer to wdired mode."
     (helm-exit-and-execute-action 'helm-marked-files-in-dired)))
 (put 'helm-ff-run-marked-files-in-dired 'helm-only t)
 
-(defun helm-create-tramp-name (fname)
+(defun helm-ff--create-tramp-name (fname)
   "Build filename from `helm-pattern' like /su:: or /sudo::."
   ;; `tramp-make-tramp-file-name' takes 7 args on emacs-26 whereas it
   ;; takes only 5 args in emacs-24/25.
@@ -1957,46 +1957,55 @@ With a prefix arg toggle dired buffer to wdired mode."
          ;; symbol (`tramp-file-name') which is not needed as argument
          ;; for `tramp-make-tramp-file-name' so transform the cdr in
          ;; vector, and for 24.5 use directly the returned value.
-         (cl-loop with v = (helm--tramp-cons-or-vector
+         (cl-loop with v = (helm-ff--tramp-cons-or-vector
                             (tramp-dissect-file-name fname))
                   for i across v collect i)))
 
-(defun helm--tramp-cons-or-vector (vector-or-cons)
+(defun helm-ff--tramp-cons-or-vector (vector-or-cons)
   "Return VECTOR-OR-CONS as a vector."
   (pcase vector-or-cons
     (`(,_l . ,ll) (vconcat ll))
     ((and vec (pred vectorp)) vec)))
 
-(defun helm-ff-get-tramp-methods ()
+(defun helm-ff--get-tramp-methods ()
   "Returns a list of the car of `tramp-methods'."
   (or helm-ff--tramp-methods
       (setq helm-ff--tramp-methods (mapcar 'car tramp-methods))))
 
-(defun helm-ff-previous-mh-tramp-method (str)
+(defun helm-ff--previous-mh-tramp-method (str)
   (save-match-data
     (with-temp-buffer
       (insert str)
       (when (re-search-backward
              (concat "\\([|]\\)\\("
-                     (mapconcat 'identity (helm-ff-get-tramp-methods) "\\|")
+                     (mapconcat 'identity (helm-ff--get-tramp-methods) "\\|")
                      "\\):")
              nil t)
         (list
          (buffer-substring-no-properties (point-at-bol) (match-beginning 2))
          (buffer-substring-no-properties (match-beginning 2) (match-end 2)))))))
 
-(cl-defun helm-ff-tramp-hostnames (&optional (pattern helm-pattern))
+(defun helm-ff--get-host-from-tramp-invalid-fname (fname)
+  "Extract hostname from an incomplete tramp file name.
+Return nil on valid file name remote or not."
+  (let* ((str (helm-basename fname))
+         (split (split-string str ":" t))
+         (meth (car (member (car split)
+                            (helm-ff--get-tramp-methods))))) 
+    (when meth (car (last split)))))
+
+(cl-defun helm-ff--tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
 Argument PATTERN default to `helm-pattern', it is here only for debugging
 purpose."
   (when (string-match helm-tramp-file-name-regexp pattern)
-    (let* ((mh-method   (helm-ff-previous-mh-tramp-method pattern))
+    (let* ((mh-method   (helm-ff--previous-mh-tramp-method pattern))
            (method      (or (cadr mh-method) (match-string 1 pattern)))
            (current-mh-host (helm-aif (and mh-method
-                                           (helm-ff-get-host-from-tramp-invalid-fname pattern))
+                                           (helm-ff--get-host-from-tramp-invalid-fname pattern))
                                 (concat (car mh-method) method ":"
                                         (car (split-string it "|" t)))))
-           (all-methods (helm-ff-get-tramp-methods)))
+           (all-methods (helm-ff--get-tramp-methods)))
       (helm-fast-remove-dups
        (cons current-mh-host
              (cl-loop for (f . h) in (tramp-get-completion-function method)
@@ -2013,17 +2022,17 @@ purpose."
          (cand (helm-get-selection nil nil src)))
     (when (and (helm-file-completion-source-p src)
                (stringp cand)
-               (helm-ff-invalid-tramp-name-p cand) ; Check candidate.
-               (helm-ff-invalid-tramp-name-p)) ; check helm-pattern.
+               (helm-ff--invalid-tramp-name-p cand) ; Check candidate.
+               (helm-ff--invalid-tramp-name-p)) ; check helm-pattern.
       (error "Error: Unknown file or directory `%s'" cand))))
 (add-hook 'helm-before-action-hook 'helm-ff-before-action-hook-fn)
 
-(cl-defun helm-ff-invalid-tramp-name-p (&optional (pattern helm-pattern))
+(cl-defun helm-ff--invalid-tramp-name-p (&optional (pattern helm-pattern))
   "Return non--nil when PATTERN is an invalid tramp filename."
   (string= (helm-ff-set-pattern pattern)
            "Invalid tramp file name"))
 
-(defun helm-ff-tramp-postfixed-p (str)
+(defun helm-ff--tramp-postfixed-p (str)
   (let (result)
     (save-match-data
       (with-temp-buffer
@@ -2032,7 +2041,7 @@ purpose."
           (if (save-excursion
                 (forward-char -1)
                 (looking-back
-                 (mapconcat 'identity (helm-ff-get-tramp-methods) "\\|")
+                 (mapconcat 'identity (helm-ff--get-tramp-methods) "\\|")
                  (point-at-bol)))
               (setq result nil)
               (setq result it)))))
@@ -2040,9 +2049,9 @@ purpose."
 
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
-  (let* ((methods (helm-ff-get-tramp-methods))
+  (let* ((methods (helm-ff--get-tramp-methods))
          ;; Returns the position of last ":" entered.
-         (postfixed (helm-ff-tramp-postfixed-p pattern))
+         (postfixed (helm-ff--tramp-postfixed-p pattern))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
          cur-method tramp-name)
     ;; In some rare cases tramp can return a nil input,
@@ -2068,7 +2077,7 @@ purpose."
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
            (setq tramp-name (expand-file-name
-                             (helm-create-tramp-name
+                             (helm-ff--create-tramp-name
                               (match-string 0 pattern))))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:maybe_hostname:"
@@ -2076,7 +2085,7 @@ purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (member cur-method methods))
-           (setq tramp-name (helm-create-tramp-name
+           (setq tramp-name (helm-ff--create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/hostname:"
@@ -2084,7 +2093,7 @@ purpose."
                 postfixed
                 (setq cur-method (match-string 1 pattern))
                 (and cur-method (not (member cur-method methods))))
-           (setq tramp-name (helm-create-tramp-name
+           (setq tramp-name (helm-ff--create-tramp-name
                              (match-string 0 pattern)))
            (replace-match tramp-name nil t pattern))
           ;; Match "/method:" in this case don't try to connect.
@@ -2114,7 +2123,7 @@ purpose."
              ;; An empty pattern
              (string= path "")
              (and (string-match-p ":\\'" path)
-                  (helm-ff-tramp-postfixed-p path))
+                  (helm-ff--tramp-postfixed-p path))
              ;; Check if base directory of PATH is valid.
              (helm-aif (file-name-directory path)
                  ;; If PATH is a valid directory IT=PATH,
@@ -2126,7 +2135,7 @@ purpose."
       (setq invalid-basedir t))
     ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
     ;; like that the actual value (e.g /ssh:) is passed to
-    ;; `helm-ff-tramp-hostnames'.
+    ;; `helm-ff--tramp-hostnames'.
     (unless (or (string= path "Invalid tramp file name")
                 invalid-basedir)      ; Leave  helm-pattern unchanged.
       (setq helm-ff-auto-update-flag  ; [1]
@@ -2161,7 +2170,7 @@ purpose."
                (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
     (cond ((string= path "Invalid tramp file name")
-           (or (helm-ff-tramp-hostnames) ; Hostnames completion.
+           (or (helm-ff--tramp-hostnames) ; Hostnames completion.
                (prog2
                    ;; `helm-pattern' have not been modified yet.
                    ;; Set it here to the value of `path' that should be now
@@ -2535,7 +2544,7 @@ Return candidates prefixed with basename of `helm-input' first."
         (if helm-ff-transformer-show-only-basename
             (if (helm-dir-is-dot file)
                 file
-              (cons (or (helm-ff-get-host-from-tramp-invalid-fname file)
+              (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
                         (helm-basename file))
                     file))
           file)
@@ -2545,7 +2554,7 @@ Return candidates prefixed with basename of `helm-input' first."
                             (not (and helm--url-regexp
                                       (string-match helm--url-regexp file)))
                             (not (string-match helm-ff-url-regexp file)))
-                       (or (helm-ff-get-host-from-tramp-invalid-fname file)
+                       (or (helm-ff--get-host-from-tramp-invalid-fname file)
                            (helm-basename file)) file))
              (attr (file-attributes file))
              (type (car attr)))
@@ -2755,7 +2764,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
         (helm-follow-mode -1)
         (cl-return-from helm-find-files-persistent-action
           (message "Helm-follow-mode allowed only on images, disabling"))))
-    (cond ((and (helm-ff-invalid-tramp-name-p)
+    (cond ((and (helm-ff--invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
            ;; First hit insert hostname and
            ;; second hit insert ":" and expand.
@@ -3697,7 +3706,7 @@ It allows additionally to delete more than one connection at once."
                      :candidate-transformer (lambda (candidates)
                                               (cl-loop for v in candidates
                                                        for name = (apply #'tramp-make-tramp-file-name
-                                                                         (cl-loop with v = (helm--tramp-cons-or-vector v)
+                                                                         (cl-loop with v = (helm-ff--tramp-cons-or-vector v)
                                                                                   for i across v collect i))
                                                        when (or (processp (tramp-get-connection-process v))
                                                                 (buffer-live-p (get-buffer (tramp-buffer-name v))))

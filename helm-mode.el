@@ -973,7 +973,7 @@ Keys description:
                (append (and (not (file-exists-p helm-pattern))
                             (list helm-pattern))
                        (if test
-                           (cl-loop with hn = (helm-ff-tramp-hostnames)
+                           (cl-loop with hn = (helm-ff--tramp-hostnames)
                                     for i in (helm-find-files-get-candidates
                                               must-match)
                                     when (or (member i hn) ; A tramp host
