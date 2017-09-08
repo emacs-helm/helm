@@ -20,11 +20,10 @@
 (require 'helm-files)
 (require 'helm-external)
 
-
-;;; File Cache
-;;
-;;
-(defvar file-cache-alist)
+(defcustom helm-multi-files-toggle-locate-binding "C-c p"
+  "Default binding to switch back and forth locate in `helm-multi-files'."
+  :group 'helm-files
+  :type 'string)
 
 (defcustom helm-for-files-preferred-list
   '(helm-source-buffers-list
@@ -36,6 +35,11 @@
   "Your preferred sources to find files."
   :type '(repeat (choice symbol))
   :group 'helm-files)
+
+;;; File Cache
+;;
+;;
+(defvar file-cache-alist)
 
 (defclass helm-file-cache (helm-source-in-buffer helm-type-file)
   ((init :initform (lambda () (require 'filecache)))))

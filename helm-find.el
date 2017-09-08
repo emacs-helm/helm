@@ -20,9 +20,17 @@
 (require 'helm-files)
 (require 'helm-external)
 
-;;; Findutils
-;;
-;;
+(defcustom helm-findutils-skip-boring-files t
+  "Ignore boring files in find command results."
+  :group 'helm-files
+  :type  'boolean)
+
+(defcustom helm-findutils-search-full-path nil
+  "Search in full path with shell command find when non--nil.
+I.e use the -path/ipath arguments of find instead of -name/iname."
+  :group 'helm-files
+  :type 'boolean)
+
 (defvar helm-source-findutils
   (helm-build-async-source "Find"
     :header-name (lambda (name)

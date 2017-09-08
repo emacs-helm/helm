@@ -207,17 +207,6 @@ candidate."
   :group 'helm-files
   :type 'integer)
 
-(defcustom helm-findutils-skip-boring-files t
-  "Ignore files matching regexps in `completion-ignored-extensions'."
-  :group 'helm-files
-  :type  'boolean)
-
-(defcustom helm-findutils-search-full-path nil
-  "Search in full path with shell command find when non--nil.
-I.e use the -path/ipath arguments of find instead of -name/iname."
-  :group 'helm-files
-  :type 'boolean)
-
 (defcustom helm-files-save-history-extra-sources
   '("Find" "Locate" "Recentf"
     "Files from Current Directory" "File Cache")
@@ -234,11 +223,6 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   "Hook that run after initialization of `helm-find-files'."
   :group 'helm-files
   :type 'hook)
-
-(defcustom helm-multi-files-toggle-locate-binding "C-c p"
-  "Default binding to switch back and forth locate in `helm-multi-files'."
-  :group 'helm-files
-  :type 'string)
 
 (defcustom helm-find-files-bookmark-prefix "Helm-find-files: "
   "bookmark name prefix of `helm-find-files' sessions."
@@ -264,7 +248,7 @@ see `helm-ff-guess-ffap-filenames' for this."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-find-file-ignore-thing-at-point nil
+(defcustom helm-find-files-ignore-thing-at-point nil
   "Use only `default-directory' as default input in `helm-find-files'.
 I.e text under cursor in `current-buffer' is ignored.
 Note that when non-nil you will be unable to complete filename at point
@@ -3670,7 +3654,7 @@ This is the starting point for nearly all actions you can do on files."
   (let* ((hist            (and arg helm-ff-history (helm-find-files-history)))
          (smart-input     (or hist (helm-find-files-initial-input)))
          (default-input   (expand-file-name (helm-current-directory)))
-         (input           (cond (helm-find-file-ignore-thing-at-point
+         (input           (cond (helm-find-files-ignore-thing-at-point
                                  default-input)
                                 ((and (eq major-mode 'org-agenda-mode)
                                       org-directory
