@@ -21,7 +21,6 @@
 (require 'helm)
 (require 'helm-types)
 (require 'helm-utils)
-(require 'helm-external)
 (require 'helm-grep)
 (require 'helm-help)
 (require 'helm-locate)
@@ -583,7 +582,8 @@ Should not be used among other sources.")
                 (setq helm-ff--auto-update-state
                       helm-ff-auto-update-flag)
                 (helm-set-local-variable 'bookmark-make-record-function
-                                         #'helm-ff-make-bookmark-record)))
+                                         #'helm-ff-make-bookmark-record)
+                (require 'helm-external)))
    (candidates :initform 'helm-find-files-get-candidates)
    (filtered-candidate-transformer
     :initform '(helm-ff-sort-candidates

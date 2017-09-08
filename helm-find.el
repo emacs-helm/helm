@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'helm-files)
+(require 'helm-external)
 
 ;;; Findutils
 ;;
