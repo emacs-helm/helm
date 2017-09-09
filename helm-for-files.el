@@ -35,11 +35,9 @@
     (helm-source-locate . helm-locate))
   "Your preferred sources to find files.
 
-Note: Normally all common sources should be loaded when you will call
-`helm-for-files' or `helm-multi-files', at least the sources that are
-provided as default, if you encounter an error saying one of your
-sources is void, ensure to require the relevant library in your config."
-  :type '(repeat (choice symbol))
+It is an alist where each element is a cons cell where the car is the source
+to use and the cdr the library where the source belong to e.g (source . lib)."
+  :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-files)
 
 ;;; File Cache

@@ -91,14 +91,12 @@ Only buffer names are fuzzy matched when this is enabled,
 (defcustom helm-mini-default-sources '((helm-source-buffers-list . helm-buffers)
                                        (helm-source-recentf . helm-for-files)
                                        (helm-source-buffer-not-found . helm-buffers))
-  "Default sources list used in `helm-mini'.
+  "Alist defining default sources with their libraries in `helm-mini'.
 
-Note: Normally all common sources should be loaded when you will call
-helm-mini', at least the sources that are provided as default, if you
-encounter an error saying one of your sources is void, ensure to
-require the relevant library in your config."
+It is an alist where each element is a cons cell where the car is the source
+to use and the cdr the library where the source belong to e.g (source . lib)."
   :group 'helm-buffers
-  :type '(repeat (choice symbol)))
+  :type '(alist :key-type symbol :value-type symbol))
 
 (defcustom helm-buffers-end-truncated-string "..."
   "The string to display at end of truncated buffer names."
@@ -927,8 +925,8 @@ displayed with the `file-name-shadow' face if available."
     (condition-case err
         (setq sources
               (cl-loop for (source . lib) in helm-mini-default-sources
-                       do (require lib)
-                       and collect source))
+                       when (require lib nil t)
+                       collect source))
       (wrong-type-argument
        (error "%S: Please define your sources as a cons cell in `helm-mini-default-sources'" (cdr err))))
     (unless helm-source-buffers-list
