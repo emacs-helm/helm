@@ -27,13 +27,18 @@
   :type 'string)
 
 (defcustom helm-for-files-preferred-list
-  '(helm-source-buffers-list
-    helm-source-recentf
-    helm-source-bookmarks
-    helm-source-file-cache
-    helm-source-files-in-current-dir
-    helm-source-locate)
-  "Your preferred sources to find files."
+  '((helm-source-buffers-list . helm-buffers)
+    (helm-source-recentf . helm-for-files)
+    (helm-source-bookmarks . helm-bookmarks)
+    (helm-source-file-cache . helm-for-files)
+    (helm-source-files-in-current-dir . helm-for-files)
+    (helm-source-locate . helm-locate))
+  "Your preferred sources to find files.
+
+Note: Normally all common sources should be loaded when you will call
+`helm-for-files' or `helm-multi-files', at least the sources that are
+provided as default, if you encounter an error saying one of your
+sources is void, ensure to require the relevant library in your config."
   :type '(repeat (choice symbol))
   :group 'helm-files)
 
@@ -211,14 +216,22 @@ Colorize only symlinks, directories and files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
-  (require 'helm-x-files)
-  (unless helm-source-buffers-list
-    (setq helm-source-buffers-list
-          (helm-make-source "Buffers" 'helm-source-buffers)))
-  (helm :sources helm-for-files-preferred-list
-        :ff-transformer-show-only-basename nil
-        :buffer "*helm for files*"
-        :truncate-lines helm-buffers-truncate-lines))
+  (let (sources)
+    (condition-case err
+        (setq sources
+              (cl-loop for (source . lib) in helm-for-files-preferred-list
+                       do (require lib)
+                       and collect source))
+      (wrong-type-argument
+       (error "%S: Please define your sources as a cons cell in `helm-for-files-preferred-list'"
+              (cdr err))))
+    (unless helm-source-buffers-list
+      (setq helm-source-buffers-list
+            (helm-make-source "Buffers" 'helm-source-buffers)))
+    (helm :sources sources
+          :ff-transformer-show-only-basename nil
+          :buffer "*helm for files*"
+          :truncate-lines helm-buffers-truncate-lines)))
 
 (defun helm-multi-files-toggle-to-locate ()
   (interactive)

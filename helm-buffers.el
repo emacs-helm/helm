@@ -88,10 +88,15 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers
   :type 'boolean)
 
-(defcustom helm-mini-default-sources '(helm-source-buffers-list
-                                       helm-source-recentf
-                                       helm-source-buffer-not-found)
-  "Default sources list used in `helm-mini'."
+(defcustom helm-mini-default-sources '((helm-source-buffers-list . helm-buffers)
+                                       (helm-source-recentf . helm-for-files)
+                                       (helm-source-buffer-not-found . helm-buffers))
+  "Default sources list used in `helm-mini'.
+
+Note: Normally all common sources should be loaded when you will call
+helm-mini', at least the sources that are provided as default, if you
+encounter an error saying one of your sources is void, ensure to
+require the relevant library in your config."
   :group 'helm-buffers
   :type '(repeat (choice symbol)))
 
@@ -918,14 +923,21 @@ displayed with the `file-name-shadow' face if available."
 (defun helm-mini ()
   "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
   (interactive)
-  (require 'helm-x-files)
-  (unless helm-source-buffers-list
-    (setq helm-source-buffers-list
-          (helm-make-source "Buffers" 'helm-source-buffers)))
-  (helm :sources helm-mini-default-sources
-        :buffer "*helm mini*"
-        :ff-transformer-show-only-basename nil
-        :truncate-lines helm-buffers-truncate-lines))
+  (let (sources)
+    (condition-case err
+        (setq sources
+              (cl-loop for (source . lib) in helm-mini-default-sources
+                       do (require lib)
+                       and collect source))
+      (wrong-type-argument
+       (error "%S: Please define your sources as a cons cell in `helm-mini-default-sources'" (cdr err))))
+    (unless helm-source-buffers-list
+      (setq helm-source-buffers-list
+            (helm-make-source "Buffers" 'helm-source-buffers)))
+    (helm :sources sources
+          :buffer "*helm mini*"
+          :ff-transformer-show-only-basename nil
+          :truncate-lines helm-buffers-truncate-lines)))
 
 (defun helm-quit-and-helm-mini ()
   "Drop into `helm-mini' from `helm'."
