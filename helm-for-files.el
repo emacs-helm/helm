@@ -245,8 +245,11 @@ Run all sources defined in `helm-for-files-preferred-list'."
                                 (cons 'helm-source-locate helm-sources)))
             (helm-set-source-filter '(helm-source-locate)))
           (helm-kill-async-processes)
-          (helm-set-sources (remove 'helm-source-locate
-                                    helm-for-files-preferred-list))
+          (helm-set-sources
+           (mapcar 'car
+                   (remove (assq 'helm-source-locate
+                                 helm-for-files-preferred-list)
+                           helm-for-files-preferred-list)))
           (helm-set-source-filter nil)))))
 (put 'helm-multi-files-toggle-to-locate 'helm-only t)
 
@@ -271,7 +274,7 @@ found."
                                               (not (string-match-p
                                                     "\\s-" helm-pattern)))
                                      (helm-redisplay-buffer)))))
-  (let ((sources (remove 'helm-source-locate helm-for-files-preferred-list))
+  (let (sources
         (helm-locate-command
          (if helm-locate-fuzzy-match
              (unless (string-match-p "\\`locate -b" helm-locate-command)
@@ -281,6 +284,14 @@ found."
         (old-key (lookup-key
                   helm-map
                   (read-kbd-macro helm-multi-files-toggle-locate-binding))))
+    (condition-case err
+        (setq sources
+              (cl-loop for (source . lib) in (remove (assq 'helm-source-locate helm-for-files-preferred-list)
+                                                     helm-for-files-preferred-list)
+                       when (require lib nil t)
+                       collect source))
+      (wrong-type-argument
+       (error "%S: Please define your sources as a cons cell in `helm-for-files-preferred-list'" (cdr err))))
     (with-helm-temp-hook 'helm-after-initialize-hook
       (define-key helm-map (kbd helm-multi-files-toggle-locate-binding)
         'helm-multi-files-toggle-to-locate))
