@@ -19,6 +19,7 @@
 
 (require 'helm-files)
 (require 'helm-external)
+(require 'helm-bookmark)
 
 (defcustom helm-multi-files-toggle-locate-binding "C-c p"
   "Default binding to switch back and forth locate in `helm-multi-files'."
@@ -210,7 +211,6 @@ Colorize only symlinks, directories and files."
   "Preconfigured `helm' for opening files.
 Run all sources defined in `helm-for-files-preferred-list'."
   (interactive)
-  (require 'helm-bookmark)
   (require 'helm-x-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
@@ -246,7 +246,6 @@ Allow toggling back and forth from locate to others sources with
 This avoid launching needlessly locate when what you search is already
 found."
   (interactive)
-  (require 'helm-bookmark)
   (require 'helm-x-files)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
