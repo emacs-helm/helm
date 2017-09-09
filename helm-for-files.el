@@ -33,7 +33,10 @@
     helm-source-file-cache
     helm-source-files-in-current-dir
     helm-source-locate)
-  "Your preferred sources to find files."
+  "Your preferred sources for `helm-for-files' and `helm-multi-files'.
+
+When adding a source here it is up to you to ensure the library of
+this source is accessible and properly loaded."
   :type '(repeat (choice symbol))
   :group 'helm-files)
 
