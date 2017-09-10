@@ -950,6 +950,7 @@ These extensions will be added to command line with --include arg of grep."
 
 (defun helm-grep-get-file-extensions (files)
   "Try to return a list of file extensions to pass to '--include' arg of grep."
+  (require 'helm-adaptive)
   (let* ((all-exts (helm-grep-guess-extensions
                     (mapcar 'expand-file-name files)))
          (extensions (helm-comp-read "Search Only in: " all-exts
@@ -1534,6 +1535,7 @@ if available with current AG version."
 (defun helm-grep-ag (directory with-types)
   "Start grep AG in DIRECTORY.
 When WITH-TYPES is non-nil provide completion on AG types."
+  (require 'helm-adaptive)
   (helm-grep-ag-1 directory
                   (helm-aif (and with-types
                                  (helm-grep-ag-get-types))
