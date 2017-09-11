@@ -2,24 +2,23 @@
 
 
 ## Copyright (C) 2012 ~ 2017 Thierry Volpiatto <thierry.volpiatto@gmail.com>
-## 
+##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
-## 
+##
 ## This program is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Commentary:
 
-# Preconfigured Emacs with a basic helm configuration.
-# Useful to start quickly an emacs -Q with helm.
+# Preconfigured `emacs -Q' with a basic Helm configuration.
 # Run it from this directory or symlink it somewhere in your PATH.
 
 # If TEMP env var exists, use it, otherwise declare it.
@@ -45,8 +44,7 @@ LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
 cd "${0%/*}" || exit 1
 
 # Check if autoload file exists.
-# It is maybe in a different directory if
-# emacs-helm.sh is a symlink.
+# It may be in a different directory if emacs-helm.sh is a symlink.
 TRUENAME=$(find . -samefile "$0" -printf "%l")
 if [ ! -z "$TRUENAME" ]; then
     AUTO_FILE="${TRUENAME%/*}/helm-autoloads.el"
@@ -65,25 +63,25 @@ cat > $CONF_FILE <<EOF
 ;; This Emacs is Powered by \`HELM' using\n\
 ;; emacs program \"$EMACS\".\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
-;; You can retrieve this minimal configuration in \"$CONF_FILE\" \n\
-;; Some originals emacs commands have been replaced by own \`helm' commands:\n\n\
+;; You can retrieve this minimal configuration in \"$CONF_FILE\".\n\
+;; Some original Emacs commands are replaced by their \`helm' counterparts:\n\n\
 ;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\n\
 ;; - \`occur'(M-s o)                  =>\`helm-occur'\n\
 ;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\n\
 ;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\n\
 ;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\n\n\
 ;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\n\n
-;; Some others native emacs commands are \"helmized\" by \`helm-mode'.\n\
-;; [1] Coming with emacs-24.4 \`completion-at-point' is \"helmized\" by \`helm-mode'\n\
-;; which provide helm completion in many other places like \`shell-mode'.\n\
-;; You will find embeded help for most helm commands with \`C-h m'.\n\
+;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\n\
+;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\n\
+;; which provides Helm completion in many places like \`shell-mode'.\n\
+;; Find context help for most Helm commands with \`C-h m'.\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
 
 (setq load-path (quote $LOAD_PATH))
 (require 'package)
-;; User is maybe using a non standard \`package-user-dir'.
-;; Don't modify \`package-user-dir' but \`package-directory-list'
-;; because user is perhaps starting helm from a non elpa installation.
+;; User may be using a non standard \`package-user-dir'.
+;; Modify \`package-directory-list' instead of \`package-user-dir'
+;; in case the user starts Helm from a non-ELPA installation.
 (unless (file-equal-p package-user-dir "~/.emacs.d/elpa")
   (add-to-list 'package-directory-list (directory-file-name
                                         (file-name-directory
