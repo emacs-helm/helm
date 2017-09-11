@@ -559,13 +559,26 @@ source name in this variable."
   :type 'boolean)
 
 (defcustom helm-allow-mouse nil
-  "Prevent mouse usage during the helm session when non-nil.
+  "Allow mouse usage during the helm session when non-nil.
 
-Note that this also allow moving out of minibuffer when clicking
-outside of `helm-buffer', up to you to get back to helm by clicking
-back in `helm-buffer' of minibuffer."
+If set to 'no-mode-bindings, no local nor text-specific mouse bindings
+are made so global mouse bindings continue in effect.
+
+If t, the following local mouse bindings are made for the helm
+completions buffer:
+
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
+
+This allows selection of windows other than the minibuffer; 
+the minibuffer window must then be selected again to exit helm."
   :group 'helm
   :type 'boolean)
+
+(defun helm-local-mouse-bindings-p ()
+  "Return t if helm is configured to use local/mode-specific mouse bindings."
+  (and helm-allow-mouse (not (eq helm-allow-mouse 'no-mode-bindings))))
 
 (defcustom helm-move-to-line-cycle-in-source nil
   "Cycle to the beginning or end of the list after reaching the bottom or top.
@@ -1044,32 +1057,31 @@ do not display line numbers. Line numbers can be enabled with the
 
 ** Using the mouse in helm
 
-A basic usage of mouse is provided when user set `helm-allow-mouse' to non-nil.
+Basic usage of the mouse is provided when `helm-allow-mouse' is set to t.
 
-- mouse-1 allows selecting candidate.
-- mouse-2 execute default action on selected candidate.
-- mouse-3 pops up menu action.
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
 
-NOTE: When mouse usage is enabled in helm, it allow also clicking around and quit
-the minibuffer focus, it will be up to you to click back to helm buffer or minibuffer
-to retrieve control of your helm session.
+NOTE: When mouse usage is enabled in helm, it allows selection of windows other than the
+minibuffer; the minibuffer window must then be selected again to regain control of your helm
+session.
 
-** Marked candidates
+  ** Marked candidates
 
-You can mark candidates to execute an action on them instead
-of the current selected candidate only (See binding below).
-Most Helm actions operate on marked candidates unless marking candidates
-is prevented explicitely for a specific source.
+  You can mark candidates to execute an action on them instead of the current selected
+  candidate only (See binding below).  Most Helm actions operate on marked candidates unless
+  marking candidates is prevented explicitely for a specific source.
 
-To mark/unmark a candidate use \\[helm-toggle-visible-mark] (See bindings below).
-To mark all visible unmarked candidates at once in current source use \\[helm-mark-all].
-To mark/unmark all candidates at once use \\[helm-toggle-all-marks].
+  To mark/unmark a candidate use \\[helm-toggle-visible-mark] (See bindings below).
+  To mark all visible unmarked candidates at once in current source use \\[helm-mark-all].
+  To mark/unmark all candidates at once use \\[helm-toggle-all-marks].
 
-NOTE: These two functions allow marking candidates in all sources with a prefix argument,
-but even if you mark all candidates of all sources, only those of current source will be used
-when executing your action unless this action specify to use candidates of all sources, which
-is not the case in most sources for evident reasons
-\(i.e Each action handle only a specific type of candidate).
+  NOTE: These two functions allow marking candidates in all sources with a prefix argument,
+  but even if you mark all candidates of all sources, only those of current source will be used
+  when executing your action unless this action specify to use candidates of all sources, which
+  is not the case in most sources for evident reasons
+  \(i.e Each action handle only a specific type of candidate).
 IOW Unless you use specific sources that have actions handling candidates of all other sources
 you don't need the prefix arg when using \\[helm-mark-all] or \\[helm-toggle-all-marks].
 
@@ -3864,7 +3876,8 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
-        (map       (when helm-allow-mouse (make-sparse-keymap)))
+        (map       (and (helm-local-mouse-bindings-p)
+                        (make-sparse-keymap)))
         (inhibit-read-only t)
         end)
     (when (and (stringp dispvalue)
@@ -4142,7 +4155,10 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
                          (and (assq 'accept-empty source) ""))
                      source))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (when (and selection action) (funcall action selection))))
+    ;; Selection may be a string when `helm-allow-mouse' is non-nil when
+    ;; a section header is selected; make sure we don't try to activate
+    ;; such selections with the (listp) test below.
+    (when (and selection (listp selection) action) (funcall action selection))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.
@@ -4457,7 +4473,7 @@ Key arg DIRECTION can be one of:
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
-        (when helm-allow-mouse
+        (when (helm-local-mouse-bindings-p)
           (helm--mouse-reset-selection-help-echo))
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
@@ -4720,7 +4736,7 @@ candidates."
                (point-max)))
        (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
-    (when (and helm-allow-mouse (null nomouse))
+    (when (and (helm-local-mouse-bindings-p) (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
@@ -4936,15 +4952,15 @@ Optional argument SOURCE is a Helm source object."
                              (and (re-search-forward (car candidate-or-regexp) nil t)
                                   (re-search-forward (cdr candidate-or-regexp) nil t))
                              (re-search-forward candidate-or-regexp nil t))
-              ;; If search fall on an header line continue loop
-              ;; until it match or fail (Issue #1509).
+              ;; If a search falls on an header line, continue the loop until it matches
+              ;; or fails (Issue #1509).
               (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
             (goto-char (or mp start)))))
     (forward-line 0) ; Avoid scrolling right on long lines.
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
-    (when helm-allow-mouse
+    (when (helm-local-mouse-bindings-p)
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
     (helm-display-mode-line (or source (helm-get-current-source)))
