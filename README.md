@@ -13,12 +13,12 @@
 ***
 <p align="justify">
   <b>Helm</b> is an Emacs framework for incremental completions and narrowing
-  selections. It provides an easy to use API for developers wanting to build 
-  their own helm applications in Emacs and dozens of already build in commands
-  providing completion in almost everything and powerful search tools.
-  It is a must have for anyone wanting to use Emacs as its main working environment.
-  Helm is now popular and have been adopted by many power Emacs users.
-  It is available in Melpa for easy installation from the Emacs package manager.
+  selections. It provides an easy-to-use API for developers wishing to build
+  their own Helm applications in Emacs, powerful search tools and dozens of
+  already built-in commands providing completion to almost everything.
+  It is a must-have for anyone using Emacs as a main work environment.
+  Helm has been widely adopted by many Emacs power-users.
+  It is available in Melpa and can be easily installed from the Emacs package manager.
 </p>
 
 ***
@@ -33,11 +33,11 @@
 ***
 
 <p align="center">
-  Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
-  I have done freely since 2011.<br>
-  As it is taking a lot of my time it starts to be more and more difficult<br>
+  Maintaining Helm requires a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>lot of work</b></a>
+  I have done voluntarily since 2011.<br>
+  As it demands lots of my time it gets increasingly difficult<br>
   maintaining it without financial help.<br>
-  If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
+  If you think Helm makes your life easier,<br><b>please consider making a donation.</b>
 </p>
 
 <p align="center">
