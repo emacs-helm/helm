@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 
 ## Copyright (C) 2012 ~ 2017 Thierry Volpiatto <thierry.volpiatto@gmail.com>
@@ -22,8 +22,8 @@
 # Useful to start quickly an emacs -Q with helm.
 # Run it from this directory or symlink it somewhere in your PATH.
 
-# If TEMP env var exists use it otherwise declare it.
-test -z "$TEMP" && declare TEMP="/tmp"
+# If TEMP env var exists, use it, otherwise declare it.
+test -z "$TEMP" && TEMP="/tmp"
 
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
@@ -31,7 +31,7 @@ EMACS=emacs
 case $1 in
     -P)
         shift 1
-        declare EMACS=$1
+        EMACS=$1
         shift 1
         ;;
     -h)
