@@ -36,13 +36,13 @@ case $1 in
         ;;
     -h)
         echo "Usage: ${0##*/} [-P} Emacs path [-h} help [--] EMACS ARGS"
-        exit 2
+        exit 1
         ;;
 esac
 
 LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
 
-cd "${0%/*}" || exit 2
+cd "${0%/*}" || exit 1
 
 # Check if autoload file exists.
 # It is maybe in a different directory if
@@ -55,7 +55,7 @@ else
 fi
 if [ ! -e "$AUTO_FILE" ]; then
     echo No autoloads found, please run make first to generate autoload file
-    exit 2
+    exit 1
 fi
 
 
