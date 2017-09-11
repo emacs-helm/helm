@@ -110,5 +110,4 @@ cat > $CONF_FILE <<EOF
 (add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
-$EMACS -Q -l $CONF_FILE "$@"
-
+$EMACS -Q -l "$CONF_FILE" "$@"
