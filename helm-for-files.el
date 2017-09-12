@@ -207,7 +207,7 @@ Colorize only symlinks, directories and files."
 
 (defvar helm-source-files-in-current-dir
   (helm-make-source "Files from Current Directory"
-      helm-files-in-current-dir-source))
+      'helm-files-in-current-dir-source))
 
 ;;;###autoload
 (defun helm-for-files ()
