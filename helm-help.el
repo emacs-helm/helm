@@ -27,12 +27,12 @@
   :group 'helm)
 
 (defface helm-helper
-    '((t :inherit helm-header))
-  "Face for helm help string in minibuffer."
+  '((t :inherit helm-header))
+  "Face for Helm help string in minibuffer."
   :group 'helm-help)
 
 (defcustom helm-documentation-file "~/.emacs.d/helm-doc.org"
-  "The file where you want to save helm documentation."
+  "The file where to save Helm documentation."
   :group 'helm-help
   :type 'string)
 
@@ -61,10 +61,10 @@
 
 ;;;###autoload
 (defun helm-documentation (arg)
-  "Preconfigured helm for helm documentation.
+  "Preconfigured Helm for Helm documentation.
 With a prefix arg refresh the documentation.
 
-Find here the documentation of all sources actually documented."
+Find here the documentation of all documented sources."
   (interactive "P")
   (require 'helm-org)
   (when arg (delete-file helm-documentation-file)
