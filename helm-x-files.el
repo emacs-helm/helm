@@ -126,7 +126,7 @@ with the tracker desktop search.")
    (requires-pattern :initform 3)))
 
 (defvar helm-source-mac-spotlight
-  (helm-make-source "mdfind" helm-mac-spotlight-source)
+  (helm-make-source "mdfind" 'helm-mac-spotlight-source)
   "Source for retrieving files via Spotlight's command line
 utility mdfind.")
 
