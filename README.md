@@ -4,7 +4,7 @@
 </p>
 
 
-<h1 align="center">Emacs-helm</h1>
+<h1 align="center">Emacs-Helm</h1>
 
 <p align="center">
   <img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" />
