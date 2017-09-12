@@ -98,108 +98,119 @@ Find here the documentation of all documented sources."
 
 **** Major-mode
 
-You can enter a partial name of major-mode (e.g. lisp, sh) to narrow down buffers.
+You can enter a partial major-mode name (e.g. lisp, sh) to narrow down buffers.
 To specify the major-mode, prefix it with \"*\" e.g. \"*lisp\".
-If you want to match all buffers but the ones with a specific major-mode (negation),
-prefix the major-mode with \"!\" e.g. \"*!lisp\".
-If you want to specify more than one major-mode, separate them with \",\",
-e.g. \"*!lisp,!sh,!fun\" will list all buffers but the ones in lisp-mode, sh-mode and
-fundamental-mode.
 
-Enter then a space and a pattern to narrow down to buffers matching this pattern.
+If you want to match all buffers but the ones with a specific major-mode
+\(negation), prefix the major-mode with \"!\" e.g. \"*!lisp\".
+
+If you want to specify more than one major-mode, separate them with \",\",
+e.g. \"*!lisp,!sh,!fun\" lists all buffers but the ones in lisp-mode, sh-mode
+and fundamental-mode.
+
+Then enter a space followed by a pattern to narrow down to buffers matching this
+pattern.
 
 **** Search inside buffers
 
-If you enter a space and a pattern prefixed by \"@\" helm will search for text matching
-this pattern INSIDE the buffer (i.e not in the name of buffer).
-NOTE that if you enter your pattern prefixed with \"@\" but escaped, helm will search a buffer
-matching \"@pattern\" but will not search inside.
+If you enter a space and a pattern prefixed by \"@\", Helm searches for text
+matching this pattern \*inside* the buffer (i.e. not in the name of the buffer).
+
+If you enter a pattern prefixed with an escaped \"@\", Helm searches for a
+buffer matching \"@pattern\" but does not search inside.
 
 **** Search by directory name
 
-If you prefix the beginning of pattern with \"/\" the match will occur on directory name
-of buffer, it is interesting to narrow down to one directory for example, subsequent string
-entered after a space will match on buffer-name only.
-Note that negation is not supported for matching on buffer-file-name.
-You can specify more than one directory starting from helm v1.6.8
- 
+If you prefix the pattern with \"/\", Helm matches over the directory names
+of the buffers.
+
+This feature can be used to narrow down the search to one directory while
+subsequent strings entered after a space match over the buffer name only.
+
+Note that negation is not supported for matching on buffer filename.
+
+Starting from Helm v1.6.8, you can specify more than one directory.
+
 **** Fuzzy matching
 
-Note that if `helm-buffers-fuzzy-matching' is non--nil you will have
-fuzzy matching on buffer names (not on directory name matching and major-mode though).
-A pattern starting with \"^\" will disable fuzzy matching and will match by exact regexp.
+`helm-buffers-fuzzy-matching' turns on fuzzy matching on buffer names, but not
+on directory names or major modes.  A pattern starting with \"^\" disables fuzzy
+matching and matches by exact regexp.
 
 **** Examples
 
-if I enter in pattern prompt:
+With the following pattern
 
     \"*lisp ^helm @moc\"
 
-helm will narrow down the list by selecting only buffers that are in lisp mode, start by helm
-and match \"moc\" in their contents.
+Helm narrows down the list by selecting only the buffers that are in lisp mode,
+start with \"helm\" and which content matches \"moc\".
 
-if I enter in pattern prompt:
+Without the \"@\"
 
     \"*lisp ^helm moc\"
 
-Notice there is no \"@\" this time
-helm will look for lisp mode buffers starting by \"helm\" and have \"moc\" in their name.
+Helm looks for lisp mode buffers starting with \"helm\" and containing \"moc\"
+in their name.
 
-if I enter in pattern prompt:
+With this other pattern
 
     \"*!lisp !helm\"
 
-helm will narrow down to buffers that are not in \"lisp\" mode and that do not match \"helm\"
+Helm narrows down to buffers that are not in \"lisp\" mode and that do not match
+\"helm\".
 
-if I enter in pattern prompt:
+With this last pattern
 
     /helm/ w3
 
-helm will narrow down to buffers that are in any \"helm\" subdirectory and matching w3.
+Helm narrows down to buffers that are in any \"helm\" subdirectory and
+matching \"w3\".
 
 *** Creating buffers
 
-When creating a new buffer use \\[universal-argument] to choose a mode for your buffer in a list.
-This list is customizable, see `helm-buffers-favorite-modes'.
+When creating a new buffer, use `\\[universal-argument]' to choose a mode from a
+list.  This list is customizable, see `helm-buffers-favorite-modes'.
 
 *** Killing buffers
 
-You have a command to kill buffer(s) and quit emacs and a command to kill buffers one by one
-\(no marked\) without quitting helm.
+You can kill buffers either one by one or all the marked buffers at once.
 
-You can run this persistent kill buffer command either with the regular
-`helm-execute-persistent-action' called with a prefix arg (C-u C-j) or with its specific command
-`helm-buffer-run-kill-persistent' see binding below.
+One kill-buffer command leaves Helm while the other is persistent.  Run the
+persistent kill-buffer command either with the regular
+`helm-execute-persistent-action' called with a prefix argument (`\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]')
+or with its specific command `helm-buffer-run-kill-persistent'.  See the
+bindings below.
 
 *** Meaning of colors and prefixes for buffers
 
 Remote buffers are prefixed with '@'.
-Red        => Buffer have its file modified on disk by an external process.
-Indianred2 => Buffer exists but its file have been deleted.
-Orange     => Buffer is modified and its file not saved to disk.
-Italic     => A non--file buffer.
+Red        => Buffer's file was modified on disk by an external process.
+Indianred2 => Buffer exists but its file has been deleted.
+Orange     => Buffer is modified and not saved to disk.
+Italic     => A non-file buffer.
 
 ** Commands
 \\<helm-buffer-map>
-\\[helm-buffer-run-zgrep]\t\tGrep Buffer(s) works as zgrep too (C-u grep all buffers but non--file buffers).
-\\[helm-buffers-run-multi-occur]\t\tMulti Occur buffer or marked buffers. (C-u toggle force searching current-buffer).
-\\[helm-buffer-switch-other-window]\t\tSwitch other window.
-\\[helm-buffer-switch-other-frame]\t\tSwitch other frame.
-\\[helm-buffers-run-browse-project]\t\tBrowse Project from buffer.
-\\[helm-buffer-run-query-replace-regexp]\t\tQuery replace regexp in marked buffers.
-\\[helm-buffer-run-query-replace]\t\tQuery replace in marked buffers.
-\\[helm-buffer-run-ediff]\t\tEdiff current buffer with candidate.  If two marked buffers ediff those buffers.
-\\[helm-buffer-run-ediff-merge]\t\tEdiff merge current buffer with candidate.  If two marked buffers ediff merge those buffers.
-\\[helm-buffer-diff-persistent]\t\tToggle Diff buffer with saved file without quitting.
-\\[helm-buffer-revert-persistent]\t\tRevert buffer without quitting.
-\\[helm-buffer-save-persistent]\t\tSave buffer without quitting.
-\\[helm-buffer-run-kill-buffers]\t\tDelete marked buffers and quit.
-\\[helm-buffer-run-kill-persistent]\t\tDelete buffer without quitting helm.
+\\[helm-buffer-run-zgrep]\t\tGrep Buffer(s) works as zgrep too (`\\[universal-argument]' to grep all buffers but non-file buffers).
+\\[helm-buffers-run-multi-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
+\\[helm-buffer-switch-other-window]\t\tSwitch to other window.
+\\[helm-buffer-switch-other-frame]\t\tSwitch to other frame.
+\\[helm-buffers-run-browse-project]\t\tBrowse project from buffer.
+\\[helm-buffer-run-query-replace-regexp]\t\tQuery-replace-regexp in marked buffers.
+\\[helm-buffer-run-query-replace]\t\tQuery-replace in marked buffers.
+\\[helm-buffer-run-ediff]\t\tEdiff current buffer with candidate.  With two marked buffers, ediff those buffers.
+\\[helm-buffer-run-ediff-merge]\t\tEdiff-merge current buffer with candidate.  With two marked buffers, ediff-merge those buffers.
+\\[helm-buffer-diff-persistent]\t\tToggle Diff-buffer with saved file without leaving Helm.
+\\[helm-buffer-revert-persistent]\t\tRevert buffer without leaving Helm.
+\\[helm-buffer-save-persistent]\t\tSave buffer without leaving Helm.
+\\[helm-buffer-run-kill-buffers]\t\tDelete marked buffers and leave Helm.
+\\[helm-buffer-run-kill-persistent]\t\tDelete buffer without leaving Helm.
 \\[helm-toggle-all-marks]\t\tToggle all marks.
 \\[helm-mark-all]\t\tMark all.
 \\[helm-toggle-buffers-details]\t\tToggle details.
 \\[helm-buffers-toggle-show-hidden-buffers]\t\tShow hidden buffers.
-\\[helm-buffers-mark-similar-buffers]\t\tMark all buffers with same type (color) than current.")
+\\[helm-buffers-mark-similar-buffers]\t\tMark all buffers of the same type (color) as current buffer.")
 
 ;;; Find files help (`helm-find-files')
 ;;
@@ -453,7 +464,7 @@ After this placeholder you can use a search and replace syntax ala sed:
 You can remove substring part of string represented by placeholder:
 
     \"\\@:<from>:<to>\"
- 
+
 - A special character representing a number which is incremented:   \"\\#\"
 
 - shortcut for `upcase', `downcase' and `capitalize'
@@ -817,7 +828,7 @@ NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>
 
 **** Create a new directory and a new file at the same time
 
-You can create a new directory and a new file at the same time, 
+You can create a new directory and a new file at the same time,
 just write the path in prompt and press <RET>.
 E.g. You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
 
@@ -1214,9 +1225,9 @@ to modify occurences in your buffer.
 When using async (if you have installed from MELPA you do), only helm, helm-core,
 and magit are compiled asynchronously, if you want all your packages compiled async,
 add to your init file:
-    
+
      (setq async-bytecomp-allowed-packages '(all))
-    
+
 *** Upgrade elisp packages
 
 On initial start (when emacs is fetching packages on remote), if helm find
