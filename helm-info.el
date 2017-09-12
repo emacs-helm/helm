@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-lib)
 (require 'info)
+(require 'helm-utils) ; for helm-goto-line
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
