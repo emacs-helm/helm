@@ -1196,59 +1196,57 @@ the command is called once for each file like this:
 
 *** Matching
 
-Multiple regexp matching is allowed, just enter a space to separate your regexps.
+Multiple regexp matching is allowed, simply enter a space to separate the regexps.
 
-Matching empty lines is supported with the regexp \"^$\", you will get the results
-with only the buffer-name and the line number, you can of course save and edit these
-results (i.e add text to the empty line) .
+Matching empty lines is supported with the regexp \"^$\", you then get the
+results displayed as the buffer-name and the line number only.  You can
+save and edit these results, i.e. add text to the empty line.
 
-*** Automatically matching symbol at point
+*** Automatically match symbol at point.
 
-You can match automatically the symbol at point, but keeping
-the minibuffer empty ready to write into.
-This is disabled by default, to enable this you have to add `helm-source-occur'
-and `helm-source-moccur' to `helm-sources-using-default-as-input'.
+Helm can automatically match the symbol at point while keeping the minibuffer
+empty, ready to be written to.  This behaviour is disabled by default.  To
+enable this you need to add `helm-source-occur' and `helm-source-moccur' to
+`helm-sources-using-default-as-input'.
 
-*** Jump to the corresponding line in the searched buffer
+*** Jump to the corresponding line in the searched buffer.
 
-You can do this with `C-j' (persistent-action), to do it repetitively
-you can use `C-<up>' and `C-<down>' or enable `helm-follow-mode' with `C-c C-f'.
+You can do this with `\\<helm-map>\\[helm-execute-persistent-action]' (persistent-action), to do it repeatedly
+you can use `\\<helm-map>\\[helm-follow-action-forward]' and `\\<helm-map>\\[helm-follow-action-backward]' or enable `helm-follow-mode' with `\\<helm-map>\\[helm-follow-mode]'.
 
-*** Saving results
+*** Save the results.
 
-Same as with helm-grep, you can save the results with `C-x C-s'.
-Of course if you don't save your results, you can get back your session
-with `helm-resume'.
+Similarly to Helm-grep, you can save the results with `\\<helm-map>\\[helm-moccur-run-save-buffer]'.
+Of course if you don't save the results, you can resume the Helm session with
+`helm-resume'.
 
-*** Refreshing the resumed session.
+*** Refresh the resumed session.
 
-When the buffer(s) where you ran helm-(m)occur have been modified, you will be
-warned of this with the buffer flashing to red, you can refresh the buffer by running
-`C-c C-u'.
+When the buffer(s) where you ran helm-(m)occur get(s) modified, the Helm buffer
+will flash red as a warning.  You can refresh the buffer by running `\\<helm-map>\\[helm-refresh]'.
 This can be done automatically by customizing `helm-moccur-auto-update-on-resume'.
 
-*** Refreshing a saved buffer
+*** Refresh a saved buffer.
 
-Type `g' to update your buffer.
+Type `g' to update the buffer.
 
-*** Edit a saved buffer
+*** Edit a saved buffer.
 
-First, install wgrep https://github.com/mhayashi1120/Emacs-wgrep
-and then:
+First, install wgrep (https://github.com/mhayashi1120/Emacs-wgrep) and then:
 
-1) C-c C-p to edit the buffer(s).
-2) C-x C-s to save your changes.
+1) `C-c C-p' to edit the buffer(s).
+2) `C-x C-s' to save your changes.
 
-Tip: Use the excellent iedit https://github.com/tsdh/iedit
-to modify occurences in your buffer.
+Tip: Use the excellent iedit (https://github.com/tsdh/iedit) to modify all
+occurences at once in the buffer.
 
 ** Commands
 \\<helm-moccur-map>
-\\[helm-goto-next-file]\t\tNext Buffer.
-\\[helm-goto-precedent-file]\t\tPrecedent Buffer.
-\\[helm-yank-text-at-point]\t\tYank Text at point in minibuffer.
-\\[helm-moccur-run-goto-line-ow]\t\tGoto line in other window.
-\\[helm-moccur-run-goto-line-of]\t\tGoto line in new frame.")
+\\[helm-goto-next-file]\t\tNext buffer.
+\\[helm-goto-precedent-file]\t\tPrevious buffer.
+\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.
+\\[helm-moccur-run-goto-line-ow]\t\tGo to line in other window.
+\\[helm-moccur-run-goto-line-of]\t\tGo to line in new frame.")
 
 ;;; Helm Top
 ;;
