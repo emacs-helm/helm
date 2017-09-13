@@ -828,77 +828,82 @@ a new mail buffer is created with the attached files in it.
 ** Tips
 
 If you are here, you are probably using a vanilla command like `find-file'
-helmized by `helm-mode', this is cool, but it is even better for your file
-navigation to use `helm-find-files' which is fully featured.
+helmized by `helm-mode', which is cool, but for an even better file navigation
+experience, give the full-featured `helm-find-files' a try.
 
 *** Navigation
 
-**** Enter `~/' at end of pattern to quickly reach home directory
+**** Enter `~/' at end of pattern to quickly reach home directory.
 
-**** Enter `/' at end of pattern to quickly reach root of your file system
+**** Enter `/' at end of pattern to quickly reach the file system root.
 
-**** Enter `./' at end of pattern to quickly reach `default-directory' (initial start of session)
+**** Enter `./' at end of pattern to quickly reach `default-directory'.
 
-If you are in `default-directory' move cursor on top.
+\(As per its value at the beginning of the session.)
+
+If you already are in the `default-directory' this will move the cursor to the top.
 
 **** Enter `../' at end of pattern will reach upper directory, moving cursor on top
 
-NOTE: This different to using `C-l' in that `C-l' don't move cursor on top but stay on previous
-subdir name.
+This is different from using `\\[helm-find-files-up-one-level]' in that it moves
+the cursor to the top instead of remaining on the previous subdir name.
 
-**** You can complete with partial basename (start on third char entered)
+**** You can complete with partial basename.
 
-E.g. \"fob\" or \"fbr\" will complete \"foobar\"
-but \"fb\" will wait for a third char for completing.
+It starts from the third character of the pattern.
+
+For instance \"fob\" or \"fbr\" will complete \"foobar\" but \"fb\" needs a
+third character in order to complete it.
 
 *** Persistent actions
 
-By default `helm-read-file-name' use the persistent actions of `helm-find-files'
+By default `helm-read-file-name' uses the persistent actions of `helm-find-files'.
 
-**** Use `C-u C-j' to watch an image
+**** Use `\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]' to display an image.
 
-**** `C-j' on a filename will expand in helm-buffer to this filename
+**** `\\<helm-map>\\[helm-execute-persistent-action]' on a filename will expand to this filename in Helm-buffer.
 
-Second hit on `C-j' will display buffer filename.
-Third hit on `C-j' will kill buffer filename.
-NOTE: `C-u C-j' will display buffer directly.
+Second hit displays the buffer filename.
+Third hit kills the buffer filename.
+Note: `\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]' displays the buffer directly.
 
-**** To browse images directories turn on `helm-follow-mode' and navigate with arrow keys
+**** Browse images directories with `helm-follow-mode' and navigate up/down.
 
 *** Delete characters backward
 
-When you want to delete backward characters, e.g. to create a new file or directory,
-autoupdate may keep updating to an existent directory preventing you from doing so.
-In this case, type C-<backspace> and then <backspace>.
+When you want to delete characters backward, e.g. to create a new file or directory,
+auto-update may come in the way when it keeps updating to an existent directory.
+In that case, type `C-<backspace>' and then `<backspace>'.
 This should not be needed when copying/renaming files because autoupdate is disabled
 by default in that case.
-NOTE: On a terminal C-<backspace> may not work, use in this case C-c <backspace>.
 
-*** Create new directory and files
+Note: On a terminal, the default binding `C-<backspace>' may not work.
+In this case use `C-c <backspace>'.
 
-**** Create a new directory and a new file at the same time
+*** Create new directories and files
 
-You can create a new directory and a new file at the same time,
-just write the path in prompt and press <RET>.
-E.g. You can create \"~/new/newnew/newnewnew/my_newfile.txt\".
+**** You can create a new directory and a new file at the same time.
 
-**** To create a new directory, add a \"/\" at end of new name and press <RET>
+Simply write the path in prompt and press `RET', e.g.
+\"~/new/newnew/newnewnew/my_newfile.txt\".
 
-**** To create a new file just write the filename not ending with \"/\"
+**** To create a new directory, append a \"/\" at to the new name and press `RET'.
 
-_NOTE_: File and directory creation work only in some commands (e.g `find-file')
-and will not work in other commands where it is not intended to return a file or a directory
-\(e.g `list-directory').
+**** To create a new file, enter a filename not ending with \"/\".
+
+File and directory creation works only with some commands (e.g. `find-file')
+and it will not work with others where it is not intended to return a file or
+a directory \(e.g `list-directory').
 
 ** Commands
 \\<helm-read-file-map>
-\\[helm-find-files-up-one-level]\t\tGo down precedent directory.
-\\[helm-ff-run-toggle-auto-update]\t\tToggle auto expansion of directories.
+\\[helm-find-files-up-one-level]\t\tGo to parent directory.
+\\[helm-ff-run-toggle-auto-update]\t\tToggle auto-expansion of directories.
 \\[helm-ff-run-toggle-basename]\t\tToggle basename.
 \\[helm-ff-file-name-history]\t\tFile name history.
-C/\\[helm-cr-empty-string]\t\tMaybe return empty string (unless `must-match').
-\\[helm-next-source]\t\tGoto next source.
-\\[helm-previous-source]\t\tGoto previous source.")
+C/\\[helm-cr-empty-string]\t\tReturn empty string unless `must-match' is non-nil.
+\\[helm-next-source]\t\tGo to next source.
+\\[helm-previous-source]\t\tGo to previous source.")
 
 ;;; Generic file help - Used by locate.
 ;;
