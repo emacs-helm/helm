@@ -1254,12 +1254,10 @@ occurences at once in the buffer.
 (defvar helm-top-help-message
   "* Helm Top
 
-** Tips
-
 ** Commands
 \\<helm-top-map>
 \\[helm-top-run-sort-by-com]\t\tSort by commands.
-\\[helm-top-run-sort-by-cpu]\t\tSort by cpu usage.
+\\[helm-top-run-sort-by-cpu]\t\tSort by CPU usage.
 \\[helm-top-run-sort-by-user]\t\tSort alphabetically by user.
 \\[helm-top-run-sort-by-mem]\t\tSort by memory.")
 
