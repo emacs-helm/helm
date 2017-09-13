@@ -1095,23 +1095,23 @@ use a prefix argument.
 \\[helm-goto-precedent-file]\t\tPrevious file.
 \\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.")
 
-;;; Ucs help
+;;; UCS help
 ;;
 ;;
 (defvar helm-ucs-help-message
-  "* Helm Ucs
+  "* Helm UCS
 
 ** Tips
 
-Use commands below to insert unicode characters
-in current-buffer without quitting helm.
+Use commands below to insert unicode characters in current buffer without
+leaving Helm.
 
 ** Commands
 \\<helm-ucs-map>
-\\[helm-ucs-persistent-insert]\t\tInsert char.
-\\[helm-ucs-persistent-forward]\t\tForward char.
-\\[helm-ucs-persistent-backward]\t\tBackward char.
-\\[helm-ucs-persistent-delete]\t\tDelete char backward.")
+\\[helm-ucs-persistent-insert]\t\tInsert character.
+\\[helm-ucs-persistent-forward]\t\tForward character.
+\\[helm-ucs-persistent-backward]\t\tBackward character.
+\\[helm-ucs-persistent-delete]\t\tDelete character backward.")
 
 ;;; Bookmark help
 ;;
