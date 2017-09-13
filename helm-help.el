@@ -1340,16 +1340,15 @@ marking it (`C-c u' or `RET') .
 
 ** Tips
 
-*** You can get help on any command with persistent action (C-j)
+*** You can get help on any command with persistent action (\\[helm-execute-persistent-action]).
 
-*** Prefix Args
+*** Prefix arguments
 
-When you want pass prefix args, you should pass prefix args AFTER starting `helm-M-x',
-you will see a prefix arg counter appearing in mode-line notifying you
-the number of prefix args entered.
+You must pass prefix arguments \*after* starting `helm-M-x'.  A mode-line
+counter will display the number of given prefix arguments.
 
-If you pass prefix args before running `helm-M-x', it will be displayed in prompt,
-then the first C-u after `helm-M-x' will be used to clear that prefix args.")
+If you pass prefix arguments before running `helm-M-x', it will be displayed in the prompt.
+The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.")
 
 ;;; helm-imenu
 ;;
