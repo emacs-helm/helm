@@ -1071,17 +1071,17 @@ use a prefix argument.
 \\[helm-grep-run-default-action]\t\tRun default action (same as `RET').
 \\[helm-grep-run-save-buffer]\t\tSave to a `helm-grep-mode' enabled buffer.")
 
-;;; Pdf grep help
+;;; PDF grep help
 ;;
 ;;
 (defvar helm-pdfgrep-help-message
-  "* Helm PdfGrep Map
+  "* Helm PDFgrep Map
 
 ** Commands
 \\<helm-pdfgrep-map>
-\\[helm-goto-next-file]\t\tNext File.
-\\[helm-goto-precedent-file]\t\tPrecedent File.
-\\[helm-yank-text-at-point]\t\tYank Text at point in minibuffer.")
+\\[helm-goto-next-file]\t\tNext file.
+\\[helm-goto-precedent-file]\t\tPrevious file.
+\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.")
 
 ;;; Etags help
 ;;
