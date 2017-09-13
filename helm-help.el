@@ -1091,9 +1091,9 @@ use a prefix argument.
 
 ** Commands
 \\<helm-etags-map>
-\\[helm-goto-next-file]\t\tNext File.
-\\[helm-goto-precedent-file]\t\tPrecedent File.
-\\[helm-yank-text-at-point]\t\tYank Text at point in minibuffer.")
+\\[helm-goto-next-file]\t\tNext file.
+\\[helm-goto-precedent-file]\t\tPrevious file.
+\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.")
 
 ;;; Ucs help
 ;;
