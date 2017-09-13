@@ -915,36 +915,34 @@ C/\\[helm-cr-empty-string]\t\tReturn empty string unless `must-match' is non-nil
 
 *** Locate
 
-You can add after writing search pattern any of the locate command line options.
-e.g. -b, -e, -n <number>...etc.
-See Man locate for more infos.
+You can append to the search pattern any of the locate command line options,
+e.g. -b, -e, -n <number>, etc.  See the locate(1) man page for more details.
 
-Some other sources (at the moment recentf and file in current directory sources)
+Some other sources (at the moment \"recentf\" and \"file in current directory\")
 support the -b flag for compatibility with locate when they are used with it.
 
-When you enable fuzzy matching on locate with
-`helm-locate-fuzzy-match', the search will be performed on basename
-only for efficiency (so don't add \"-b\" at prompt), as soon as you
-separate your patterns with spaces, fuzzy matching will be disabled
-and search will be done on the full filename.  Note that in multimatch
-fuzzy is completely disabled, which mean that each pattern should be a
-compliant regexp matching pattern (i.e \"helm\" will match \"helm\"
-but \"hlm\" will NOT match \"helm\").
+When you enable fuzzy matching on locate with `helm-locate-fuzzy-match', the
+search will be performed on basename only for efficiency (so don't add \"-b\" at
+prompt).  As soon as you separate the patterns with spaces, fuzzy matching will
+be disabled and search will be done on the full filename.  Note that in
+multi-match, fuzzy is completely disabled, which means that each pattern is a
+match regexp (i.e. \"helm\" will match \"helm\" but \"hlm\" will \*not* match
+\"helm\").
 
 *** Browse project
 
-When your directory is not under version control,
-don't forget to refresh your cache when files have been added/removed in your directory.
+When the current directory is not under version control, don't forget to refresh
+the cache when files have been added/removed in the directory.
 
 *** Find command
 
-Recursively search files using \"find\" shell command.
+Recursively search files using the \"find\" shell command.
 
-Candidates are all filenames that match all given globbing patterns.
-This respects the options `helm-case-fold-search' and
+Candidates are all filenames that match all given globbing patterns.  This
+respects the options `helm-case-fold-search' and
 `helm-findutils-search-full-path'.
 
-You can pass arbitrary options directly to find after a \"*\" separator.
+You can pass arbitrary \"find\" options directly after a \"*\" separator.
 For example, this would find all files matching \"book\" that are larger
 than 1 megabyte:
 
@@ -953,24 +951,24 @@ than 1 megabyte:
 ** Commands
 \\<helm-generic-files-map>
 \\[helm-ff-run-toggle-basename]\t\tToggle basename.
-\\[helm-ff-run-grep]\t\tRun grep (C-u recurse).
+\\[helm-ff-run-grep]\t\tRun grep (`\\[universal-argument]' to recurse).
 \\[helm-ff-run-zgrep]\t\tRun zgrep.
-\\[helm-ff-run-gid]\t\tRun gid (id-utils).
-\\[helm-ff-run-pdfgrep]\t\tRun Pdfgrep on marked files.
+\\[helm-ff-run-gid]\t\tRun GID (id-utils).
+\\[helm-ff-run-pdfgrep]\t\tRun PDFgrep on marked files.
 \\[helm-ff-run-copy-file]\t\tCopy file(s)
 \\[helm-ff-run-rename-file]\t\tRename file(s).
 \\[helm-ff-run-symlink-file]\t\tSymlink file(s).
 \\[helm-ff-run-hardlink-file]\t\tHardlink file(s).
 \\[helm-ff-run-delete-file]\t\tDelete file(s).
-\\[helm-ff-run-byte-compile-file]\t\tByte compile file(s) (C-u load) (elisp).
-\\[helm-ff-run-load-file]\t\tLoad file(s) (elisp).
+\\[helm-ff-run-byte-compile-file]\t\tByte compile Elisp file(s) (`\\[universal-argument]' to load).
+\\[helm-ff-run-load-file]\t\tLoad Elisp file(s).
 \\[helm-ff-run-ediff-file]\t\tEdiff file.
-\\[helm-ff-run-ediff-merge-file]\t\tEdiff merge file.
-\\[helm-ff-run-switch-other-window]\t\tSwitch other window.
+\\[helm-ff-run-ediff-merge-file]\t\tEdiff-merge file.
+\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
 \\[helm-ff-properties-persistent]\t\tShow file properties.
-\\[helm-ff-run-etags]\t\tRun etags (C-u use tap, C-u C-u reload DB).
+\\[helm-ff-run-etags]\t\tRun etags (`\\[universal-argument]' to use tap, `\\[universal-argument] \\[universal-argument]' to reload the database).
 \\[helm-yank-text-at-point]\t\tYank text at point.
-\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (C-u to choose).
+\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
 \\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
 \\[helm-ff-run-insert-org-link]\t\tInsert org link.")
 
