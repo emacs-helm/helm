@@ -1175,12 +1175,12 @@ the command is called once for each file like this:
 ;;
 ;;
 (defvar helm-buffers-ido-virtual-help-message
-  "* Helm ido virtual buffers
+  "* Helm Ido virtual buffers
 
 ** Commands
 \\<helm-buffers-ido-virtual-map>
-\\[helm-ff-run-switch-other-window]\t\tSwitch other window.
-\\[helm-ff-run-switch-other-frame]\t\tSwitch other frame.
+\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
+\\[helm-ff-run-switch-other-frame]\t\tSwitch to other frame.
 \\[helm-ff-run-grep]\t\tGrep file.
 \\[helm-ff-run-zgrep]\t\tZgrep file.
 \\[helm-ff-run-delete-file]\t\tDelete file.
