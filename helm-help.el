@@ -1274,62 +1274,62 @@ occurences at once in the buffer.
 \\[helm-apt-show-only-not-installed]\t\tShow non-installed packages only.
 \\[helm-apt-show-only-deinstalled]\t\tShow uninstalled (not purged yet) packages only.")
 
-;;; Helm elisp package
+;;; Helm Elisp package
 ;;
 ;;
 (defvar helm-el-package-help-message
-  "* Helm elisp package
+  "* Helm Elisp package
 
 ** Tips
 
-*** Compile all your packages asynchronously
+*** Compile all your packages asynchronously.
 
-When using async (if you have installed from MELPA you do), only helm, helm-core,
-and magit are compiled asynchronously, if you want all your packages compiled async,
-add to your init file:
+If you use async (if you have installed Helm from MELPA you do), only \"helm\",
+\"helm-core\", and \"magit\" are compiled asynchronously.  If you want all your
+packages compiled asynchronously, add this to your init file:
 
      (setq async-bytecomp-allowed-packages '(all))
 
-*** Upgrade elisp packages
+*** Upgrade Elisp packages
 
-On initial start (when emacs is fetching packages on remote), if helm find
-package to upgrade it will start in the upgradables packages view showing the packages
-availables to upgrade.
-On further starts, you will have to refresh the list with `C-c C-u', if helm find upgrades
-you will have a message telling you some packages are available for upgrade, you can switch to
-upgrade view (see below) to see what packages are available for upgrade or just hit `C-c U'.
-to upgrade all.
+On initialization (when Emacs is fetching packages on remote), if Helm finds
+packages to upgrade, it will start in the upgradable packages view showing the packages
+available for upgrade.
 
-To see upgradables packages hit <M-U>.
+On subsequent runs, you will have to refresh the list with `C-c \\[universal-argument]'.  If Helm
+finds upgrades you can switch to upgrade view (see below) to see what packages
+are available for upgrade or simply hit `C-c U' to upgrade them all.
 
-Then you can install all upgradables packages with the upgrade all action (`C-c C-u'),
-or upgrade only the specific packages by marking them (the new ones) and running
-the upgrade action (visible only when there is upgradables packages).
-Of course you can upgrade a single package by just running the upgrade action
-without marking it (`C-c u' or RET) .
+To see upgradable packages hit `M-U'.
 
-\*WARNING* You are strongly advised to RESTART emacs after UPGRADING packages.
+Then you can install all upgradable packages with the \"upgrade all\" action
+\(`C-c \\[universal-argument]'), or upgrade only specific packages by marking them and running the
+\"upgrade\" action (visible only when there are upgradable packages).  Of course
+you can upgrade a single package by just running the \"upgrade\" action without
+marking it (`C-c u' or `RET') .
 
-*** Meaning of flags prefixing packages (Emacs-25)
+\*Warning:* You are strongly advised to \*restart* Emacs after \*upgrading* packages.
 
-- The flag \"S\" that prefix package names mean that this package is one of `package-selected-packages'.
-This feature is only available with emacs-25.
+*** Meaning of flags prefixing packages
+
+\(Emacs ≥25)
+
+- The flag \"S\" that prefixes package names means that the packages belong to `package-selected-packages'.
 
 - The flag \"U\" that prefix package names mean that this package is no more needed.
-This feature is only available with emacs-25.
 
 ** Commands
 \\<helm-el-package-map>
 \\[helm-el-package-show-all]\t\tShow all packages.
 \\[helm-el-package-show-installed]\t\tShow installed packages only.
-\\[helm-el-package-show-uninstalled]\t\tShow not installed packages only.
+\\[helm-el-package-show-uninstalled]\t\tShow non-installed packages only.
 \\[helm-el-package-show-upgrade]\t\tShow upgradable packages only.
 \\[helm-el-package-show-built-in]\t\tShow built-in packages only.
 \\[helm-el-run-package-install]\t\tInstall package(s).
 \\[helm-el-run-package-reinstall]\t\tReinstall package(s).
 \\[helm-el-run-package-uninstall]\t\tUninstall package(s).
 \\[helm-el-run-package-upgrade]\t\tUpgrade package(s).
-\\[helm-el-run-package-upgrade-all]\t\tUpgrade all packages upgradables.
+\\[helm-el-run-package-upgrade-all]\t\tUpgrade all packages.
 \\[helm-el-run-visit-homepage]\t\tVisit package homepage.")
 
 ;;; Helm M-x
