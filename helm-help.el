@@ -1451,28 +1451,27 @@ it is already available in helm with [[Shortcuts for executing Default Action on
 ;;
 ;;
 (defvar helm-org-headings-help-message
-  "* Helm org headings
+  "* Helm Org headings
 
 ** Tips
 
 *** Refiling
 
-You can refile one heading or multiple headings at a time.
+You can refile one or more headings at a time.
 
-To refile one heading, move the point to the entry you want to
-refile, and run \\[helm-org-in-buffer-headings].  Then select the
-heading you want to refile to, and press \\[C-c w], or select the
-refile action from the actions menu.
+To refile one heading, move the point to the entry you want to refile and run
+\\[helm-org-in-buffer-headings].  Then select the heading you want to refile to
+and press \\[C-c w] or select the refile action from the actions menu.
 
-To refile multiple headings, run \\[helm-org-in-buffer-headings]
-and mark the headings you want to refile.  Then select the
-heading you want to refile to (without marking it), and press
-\\[C-c w], or select the refile action from the actions menu.
+To refile multiple headings, run \\[helm-org-in-buffer-headings] and mark the
+headings you want to refile.  Then select the heading you want to refile to
+\(without marking it) and press \\[C-c w] or select the refile action from the
+actions menu.
 
 ** Commands
 \\<helm-org-headings-map>
 \\[helm-org-run-open-heading-in-indirect-buffer]\t\tOpen heading in indirect buffer.
-\\[helm-org-run-refile-heading-to]\t\tRefile current heading to selection, or marked headings to selection.
+\\[helm-org-run-refile-heading-to]\t\tRefile current or marked headings to selection.
 \\[helm-org-run-insert-link-to-heading-at-marker]\t\tInsert link at point to selection."
   )
 
