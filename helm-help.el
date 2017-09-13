@@ -1361,7 +1361,7 @@ The first `\\[universal-argument]' after `helm-M-x' clears those prefix argument
 \\[helm-imenu-next-section]\t\tGo to next section.
 \\[helm-imenu-previous-section]\t\tGo to previous section.")
 
-;;; helm-colors
+;;; Helm colors
 ;;
 ;;
 (defvar helm-colors-help-message
@@ -1369,8 +1369,8 @@ The first `\\[universal-argument]' after `helm-M-x' clears those prefix argument
 
 ** Commands
 \\<helm-color-map>
-\\[helm-color-run-insert-name]\t\tInsert the entry'name.
-\\[helm-color-run-kill-name]\t\tKill the entry's name.
+\\[helm-color-run-insert-name]\t\tInsert the entry name.
+\\[helm-color-run-kill-name]\t\tKill the entry name.
 \\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
 \\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.")
 
