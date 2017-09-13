@@ -1350,13 +1350,11 @@ counter will display the number of given prefix arguments.
 If you pass prefix arguments before running `helm-M-x', it will be displayed in the prompt.
 The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.")
 
-;;; helm-imenu
+;;; Helm imenu
 ;;
 ;;
 (defvar helm-imenu-help-message
-  "* Helm imenu
-
-** Tips
+  "* Helm Imenu
 
 ** Commands
 \\<helm-imenu-map>
