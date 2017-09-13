@@ -1130,39 +1130,43 @@ leaving Helm.
 ;;
 ;;
 (defvar helm-esh-help-message
-  "* Helm eshell on file
+  "* Helm Eshell on file
 
 ** Tips
 
-*** Passing extra args after filename
+*** Pass extra arguments after filename.
 
-Normally your command or alias will be called with file as argument. E.g.,
+Normally the command or alias will be called with file as argument.  For instance
 
-    <command> 'candidate_file'
+    <command> candidate_file
 
-But you can also pass an argument or more after 'candidate_file' like this:
+But you can also pass an argument or more after \"candidate_file\" like this:
 
     <command> %s [extra_args]
 
-'candidate_file' will be added at '%s' and your command will look at this:
+\"candidate_file\" will be added at \"%s\" and the command will look at this:
 
-    <command> 'candidate_file' [extra_args]
+    <command> candidate_file [extra_args]
 
-*** Specify many files as args (marked files)
+*** Specify marked files as arguments.
 
-E.g. <command> file1 file2 ...
+Example:
 
-Call `helm-find-files-eshell-command-on-file' with one prefix-arg
-Otherwise you can pass one prefix-arg from the command selection buffer.
-NOTE: This is not working on remote files.
+    <command> file1 file2...
 
-With two prefix-arg before starting or from the command selection buffer
-the output is printed to your `current-buffer'.
+Call `helm-find-files-eshell-command-on-file' with one prefix argument.  Otherwise
+you can pass one prefix argument from the command selection buffer.
 
-Note that with no prefix-arg or a prefix-arg value of '(16) (C-u C-u)
+Note: This does not work on remote files.
+
+With two prefix-args the output is printed to the `current-buffer'.
+
+With no prefix argument or a prefix argument value of '(16) (`\\[universal-argument] \\[universal-argument]')
 the command is called once for each file like this:
 
-    <command> file1 <command> file2 etc...
+    <command> file1
+    <command> file2
+    ...
 
 ** Commands
 \\<helm-esh-on-file-map>")
