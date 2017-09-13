@@ -1383,7 +1383,7 @@ The first `\\[universal-argument]' after `helm-M-x' clears those prefix argument
 ** Commands
 \\<helm-semantic-map>")
 
-;;; helm kmacro
+;;; Helm kmacro
 ;;
 ;;
 (defvar helm-kmacro-help-message
@@ -1391,15 +1391,15 @@ The first `\\[universal-argument]' after `helm-M-x' clears those prefix argument
 
 ** Tips
 
-- Start recording some keys with `f3'
-- Record new kmacro with `f4'
-- Start `helm-execute-kmacro' to list all your macros.
+- Start recording a kmacro with `f3'.
+- End the kmacro recording with `f4'.
+- Run `helm-execute-kmacro' to list all your kmacros.
 
-Use persistent action to run your kmacro as many time as needed,
-you can change of kmacro with `helm-next-line' `helm-previous-line'.
+Use persistent action to run your kmacro as many time as needed.
+You can browse the kmacros with `helm-next-line' and `helm-previous-line'.
 
-NOTE: You can't record keys running helm commands except `helm-M-x' unless
-you don't choose from there a command using helm completion.
+Note: You can't record keys running Helm commands except `helm-M-x', under the
+condition that you don't choose a command using Helm completion.
 
 ** Commands
 \\<helm-kmacro-map>")
