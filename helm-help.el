@@ -980,84 +980,95 @@ than 1 megabyte:
 
 ** Tips
 
-*** You can start grep with a prefix arg to recurse in subdirectories
-However now that helm support git-grep and AG, you have better time
-using one of those for your recursives search.
+*** Use a prefix argument to grep recursively.
 
-*** You can use wild card when selecting files (e.g. *.el)
+With Helm supporting git-grep and AG however, you are better off using one of
+them for recursive searches.
 
-*** You can grep in many differents directories by marking files or wild cards
+*** You can use wild cards when selecting files (e.g. \"*.el\").
 
-*** You can save your results in a `helm-grep-mode' buffer, see commands below
+*** You can grep in many different directories by marking files or using wild cards.
 
-Once in this buffer you can use emacs-wgrep (external package not bundled with helm)
+*** You can save the result in a `helm-grep-mode' buffer.
+
+See commands below.
+
+Once in that buffer you can use \"emacs-wgrep\" (external package not bundled with Helm)
 to edit your changes.
 
-*** Helm grep is supporting multi matching starting from version 1.9.4.
-Just add a space between each pattern like in most helm commands.
+*** Helm-grep supports multi-matching.
 
-*** Important
+\(Starting from version 1.9.4.)
 
-Grepping works but it is badly supported as tramp doesn't support multiple process running in a
-short delay (less than 5s actually) among other things.
+Simply add a space between each pattern as for most Helm commands.
 
-Helm is suspending process automatically while you are typing with a special hook, however
-you are adviced doing this manually by hitting `C-!' (i.e suspend process)
-before entering anything in pattern, and hit again `C-!' when
-your regexp is ready to send to remote process, even if helm is handling
-this by delaying each process at 5s.
+*** Performance over TRAMP
 
-If your regexp is simple enough, you can though try merely to type it directly.
+Grepping works but it is badly supported as TRAMP doesn't support multiple
+processes running in a short delay (less than 5s) among other things.
 
-Another solution is to not use tramp at all and mount your remote file system on SSHFS.
+Helm uses a special hook to suspend the process automatically while you are
+typing.  Even if Helm handles this automatically by delaying each process by 5s,
+you are adviced to this manually by hitting `\\<helm-map>\\[helm-toggle-suspend-update]' (suspend process) before
+typing, and hit again `\\<helm-map>\\[helm-toggle-suspend-update]' when the regexp is ready to send to the remote
+process.  For simple regexps, there should be no need for this.
 
-* Helm Gid
+Another solution is to not use TRAMP at all and mount your remote file system via
+SSHFS.
+
+* Helm GID
 
 ** Tips
 
-Helm gid read the database created with the `mkid' command from id-utils.
+Helm-GID reads the database created with the `mkid' command from id-utils.
 The name of the database file can be customized with `helm-gid-db-file-name', it
 is usually \"ID\".
-Helm Gid use the symbol at point as default-input.
-You have access to this command also from `helm-find-files' which allow you to
-navigate to another directory to consult its database.
 
-NOTE: Helm gid support multi matches but only the last pattern entered will be
-highlighted due to the lack of ~--color~ support in GID itself.
+Helm-GID use the symbol at point as default-input.  This command is also
+accessible from `helm-find-files' which allow you to navigate to another
+directory to consult its database.
+
+Note: Helm-GID supports multi-matches but only the last pattern entered will be
+highlighted since there is no ~--color~-like option in GID itself.
 
 * Helm AG
 
 ** Tips
 
-Helm AG is different from grep or ack-grep in that it works on a directory and not
-a list of files.
-You can ignore files and directories by using a \".agignore\" file, local to directory
-or global when placed in home directory (See AG man page for more infos).
-This file supports same entries as what you will find in `helm-grep-ignored-files' and
-`helm-grep-ignored-directories'.
-As always you can access helm AG from `helm-find-files'.
+Helm-AG is different from grep or ack-grep in that it works on a directory and
+not on a list of files.
 
-Starting at version 0.30 AG allow providing one or more TYPE argument on its command line.
-Helm provide completion on these TYPES arguments when available with your AG version,
-Use a prefix argument when starting helm ag session to get this completion.
-NOTE: You can mark several types to match in your ag query, however on the first versions of
-AG providing this, only one type was allowed, so in this case the last marked will take effect.
+You can ignore files and directories with a \".agignore\" file, local to a
+directory or global when placed in the home directory. \(See the AG man page for
+more details.)  That file follows the same syntax as `helm-grep-ignored-files'
+and `helm-grep-ignored-directories'.
+
+As always you can access Helm AG from `helm-find-files'.
+
+Starting with version 0.30, AG accepts one or more TYPE arguments on its command
+line.  Helm provides completion on these TYPE arguments when available with your
+AG version.  Use a prefix argument when starting a Helm-AG session to enable this
+completion.
+
+Note: You can mark several types to match in the AG query.  The first AG
+versions providing this feature allowed only one type, so in this case only the
+last mark will be used.
 
 * Helm git-grep
 
-Helm git-grep is searching from current directory
-(i.e default-directory or the directory currently browsed by helm-find-files).
-If this current directory is a subdirectory of project and you want to match
-also upper directories (i.e the whole project) use a prefix arg.
+Helm-git-grep searches the current directory, i.e the default directory or the
+directory in Helm-find-files.  If this current directory is a subdirectory of a
+project and you want to also match parent directories (i.e the whole project),
+use a prefix argument.
 
 ** Commands
 \\<helm-grep-map>
 \\[helm-goto-next-file]\t\tNext File.
-\\[helm-goto-precedent-file]\t\tPrecedent File.
-\\[helm-yank-text-at-point]\t\tYank Text at point in minibuffer.
-\\[helm-grep-run-other-window-action]\t\tJump other window.
-\\[helm-grep-run-other-frame-action]\t\tJump other frame.
-\\[helm-grep-run-default-action]\t\tRun default action (Same as RET).
+\\[helm-goto-precedent-file]\t\tPrevious File.
+\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.
+\\[helm-grep-run-other-window-action]\t\tJump to other window.
+\\[helm-grep-run-other-frame-action]\t\tJump to other frame.
+\\[helm-grep-run-default-action]\t\tRun default action (same as `RET').
 \\[helm-grep-run-save-buffer]\t\tSave to a `helm-grep-mode' enabled buffer.")
 
 ;;; Pdf grep help
