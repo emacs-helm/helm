@@ -1374,13 +1374,11 @@ The first `\\[universal-argument]' after `helm-M-x' clears those prefix argument
 \\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
 \\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.")
 
-;;; helm semantic
+;;; Helm Semantic
 ;;
 ;;
 (defvar helm-semantic-help-message
-  "* Helm semantic
-
-** Tips
+  "* Helm Semantic
 
 ** Commands
 \\<helm-semantic-map>")
