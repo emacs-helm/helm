@@ -112,6 +112,7 @@
            for char = (propertize (format "%c" v)
                                   'face 'helm-ucs-char)
            unless (or (string= "" n)
+                      (= v 10) ; 10=="\n"
                       (not (char-displayable-p (read xcode))))
            collect
            (concat code (make-string diff ? )
@@ -133,6 +134,7 @@
            for char = (propertize (format "%c" v)
                                   'face 'helm-ucs-char)
            unless (or (string= "" n)
+                      (= v 10) ; 10=="\n"
                       (not (char-displayable-p (read xcode))))
            collect
            (concat code (make-string diff ? )
