@@ -76,12 +76,77 @@
 (defvar helm-ucs--names nil)
 (defvar helm-ucs-history nil)
 
-(defun helm-calculate-ucs-max-len ()
-  "Calculate the length of longest `ucs-names' candidate."
-  (cl-loop for (_n . v) in (ucs-names)
+(defun helm-calculate-ucs-alist-max-len (names)
+  "Calculate the length of the longest NAMES list candidate."
+  (cl-loop for (_n . v) in names
            maximize (length (format "#x%x:" v)) into code
            maximize (max 1 (string-width (format "%c" v))) into char
            finally return (cons code char)))
+
+(defun helm-calculate-ucs-hash-table-max-len (names)
+  "Calculate the length of the longest NAMES hash table candidate."
+  (cl-loop for _n being the hash-keys of names
+           using (hash-values v)
+           maximize (length (format "#x%x:" v)) into code
+           maximize (max 1 (string-width (format "%c" v))) into char
+           finally return (cons code char)))
+
+(defun helm-calculate-ucs-max-len ()
+  "Calculate the length of longest `ucs-names' candidate."
+  (let ((ucs-struct (ucs-names)))
+    (if (hash-table-p ucs-struct)
+        (helm-calculate-ucs-hash-table-max-len ucs-struct)
+      (helm-calculate-ucs-alist-max-len ucs-struct))))
+
+(defun helm-ucs-collect-symbols-alist (names)
+  "Collect ucs symbols from the NAMES list."
+  (cl-loop with pr = (make-progress-reporter
+                      "collecting ucs names"
+                      0 (length names))
+           for (n . v) in names
+           for count from 1
+           for xcode = (format "#x%x:" v)
+           for len = (length xcode)
+           for diff = (- (car helm-ucs--max-len) len)
+           for code = (format "(#x%x): " v)
+           for char = (propertize (format "%c" v)
+                                  'face 'helm-ucs-char)
+           unless (or (string= "" n)
+                      (not (char-displayable-p (read xcode))))
+           collect
+           (concat code (make-string diff ? )
+                   char "  " n)
+           and do (progress-reporter-update pr count)))
+
+(defun helm-ucs-collect-symbols-hash-table (names)
+  "Collect ucs symbols from the NAMES hash-table."
+  (cl-loop with pr = (make-progress-reporter
+                      "collecting ucs names"
+                      0 (hash-table-count names))
+           for n being the hash-keys of names
+           using (hash-values v)
+           for count from 1
+           for xcode = (format "#x%x:" v)
+           for len = (length xcode)
+           for diff = (- (car helm-ucs--max-len) len)
+           for code = (format "(#x%x): " v)
+           for char = (propertize (format "%c" v)
+                                  'face 'helm-ucs-char)
+           unless (or (string= "" n)
+                      (not (char-displayable-p (read xcode))))
+           collect
+           (concat code (make-string diff ? )
+                   char "  " n)
+           and do (progress-reporter-update pr count)))
+
+(defun helm-ucs-collect-symbols (ucs-struct)
+  "Collect ucs symbols from UCS-STRUCT.
+
+Depending on the Emacs version, the variable `ucs-names' can
+either be an alist or a hash-table."
+  (if (hash-table-p ucs-struct)
+      (helm-ucs-collect-symbols-hash-table ucs-struct)
+    (helm-ucs-collect-symbols-alist ucs-struct)))
 
 (defun helm-ucs-init ()
   "Initialize an helm buffer with ucs symbols.
@@ -91,23 +156,7 @@ Only math* symbols are collected."
           (helm-calculate-ucs-max-len)))
   (or helm-ucs--names
       (setq helm-ucs--names
-            (cl-loop with pr = (make-progress-reporter
-                                "collecting ucs names"
-                                0 (length (ucs-names)))
-                     for (n . v) in (ucs-names)
-                     for count from 1
-                     for xcode = (format "#x%x:" v)
-                     for len = (length xcode)
-                     for diff = (- (car helm-ucs--max-len) len)
-                     for code = (format "(#x%x): " v)
-                     for char = (propertize (format "%c" v)
-                                            'face 'helm-ucs-char)
-                     unless (or (string= "" n)
-                                (not (char-displayable-p (read xcode))))
-                     collect
-                     (concat code (make-string diff ? )
-                             char "  " n)
-                     and do (progress-reporter-update pr count)))))
+            (helm-ucs-collect-symbols (ucs-names)))))
 
 ;; Actions (insertion)
 
