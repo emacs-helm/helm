@@ -3992,6 +3992,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
          (pos    (posn-point (event-end event))))
     (unwind-protect
          (with-current-buffer (window-buffer window)
+           (mouse-set-point event)
            (if (and (helm-action-window)
                     (eql window (get-buffer-window helm-buffer)))
                (user-error "selection in helm-window not available while selecting action")
