@@ -566,17 +566,16 @@ source name in this variable."
 To modify its value interactively, use M-x customize-option RET.
 
 To modify its value programmatically, set it like so:
-  (custom-set-variables '(helm-allow-mouse <setting>))
-where <setting> is one of: t, nil or 'global-mouse-bindings.  Do not
-use setq.
+  (setq helm-allow-mouse <setting>)
+where <setting> is one of: t, nil or 'global-mouse-bindings.
 
 If set to 'global-mouse-bindings, no local nor text-specific mouse bindings
 are made; global mouse bindings continue in effect.
 
 If set to nil, it disables use of all mouse buttons in helm.
 
-If set to t, the following local mouse bindings are made for the helm
-completion buffer:
+If set to t, the following local mouse bindings are made for helm
+completion buffers:
 
 - mouse-1 selects candidates
 - mouse-2 executes the default action on selected candidates
