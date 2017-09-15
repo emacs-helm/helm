@@ -558,6 +558,8 @@ source name in this variable."
   :group 'helm
   :type 'boolean)
 
+(defvar helm-alive-p nil)
+
 (defcustom helm-allow-mouse nil
   "Allow mouse usage during the helm session when non-nil.
 
@@ -586,6 +588,55 @@ the minibuffer window must then be selected again to exit helm."
   :type '(radio (const :tag "Helm Mouse Buttons" t)
                 (const :tag "Global Mouse Buttons" 'global-mouse-bindings)
                 (const :tag "No Mouse Buttons" nil)))
+
+;;; Prevent losing focus when using mouse.
+;;
+(defconst helm--mouse-keys
+  '([mouse-1] [mouse-2] [mouse-3]
+    [down-mouse-1] [down-mouse-2] [down-mouse-3]
+    [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
+    [double-mouse-1] [double-mouse-2] [double-mouse-3]
+    [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
+  "Mouse keys rebound in helm.")
+
+(defun helm-local-mouse-bindings-p ()
+  "Return t if helm is configured to use local/mode-specific mouse bindings."
+  (and helm-allow-mouse (not (eq helm-allow-mouse 'global-mouse-bindings))))
+
+(defun helm--make-disable-mouse-mode-map ()
+  "Create a keymap that disables all global mouse bindings."
+  (let ((map (make-sparse-keymap)))
+    (cl-loop for k in helm--mouse-keys
+             do (define-key map k 'ignore))
+    map))
+
+(defvar helm--disable-mouse-mode-map (helm--make-disable-mouse-mode-map)
+  "A keymap that disables all global mouse bindings.")
+
+(define-minor-mode helm--disable-mouse-mode
+  "[INTERNAL] Disable all mouse clicks; prevents escaping from helm minibuffer.
+Do nothing when used outside of helm context.
+
+WARNING: Do not use this mode yourself, it is internal to helm."
+  :group 'helm
+  :global t
+  :keymap helm--disable-mouse-mode-map
+  (unless helm-alive-p
+    (setq helm--disable-mouse-mode-map nil)))
+(put 'helm--disable-mouse-mode 'helm-only t)
+
+(defvar helm--allow-mouse-changed nil
+  "If different than the value of `helm-allow-mouse', then need to refresh helm buffer because mouse settings have changed.")
+
+(defun helm--if-allow-mouse-changed ()
+  "If `helm-allow-mouse' value has changed, force a reset of helm mouse bindings."
+  (unless (eq helm-allow-mouse helm--allow-mouse-changed)
+    ;; Force Helm refresh next time through the command event loop to
+    ;; regenerate text property mouse bindings.
+    (setq unread-command-events (nconc (listify-key-sequence (kbd "C-c C-u")) unread-command-events))
+    ;; For this buffer only, track that the change will be handled.
+    (make-local-variable 'helm--allow-mouse-changed)
+    (setq helm--allow-mouse-changed helm-allow-mouse)))
 
 (defcustom helm-move-to-line-cycle-in-source nil
   "Cycle to the beginning or end of the list after reaching the bottom or top.
@@ -1268,7 +1319,6 @@ to modify it.")
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
-(defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\_<" "\\_>" ".*"
@@ -2964,55 +3014,6 @@ map)."
         ;; i.e update keymap+check input.
         (with-current-buffer (window-buffer (minibuffer-window))
           (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
-
-;;; Prevent losing focus when using mouse.
-;;
-(defconst helm--mouse-keys
-  '([mouse-1] [mouse-2] [mouse-3]
-    [down-mouse-1] [down-mouse-2] [down-mouse-3]
-    [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
-    [double-mouse-1] [double-mouse-2] [double-mouse-3]
-    [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
-  "Mouse keys rebound in helm.")
-
-(defun helm-local-mouse-bindings-p ()
-  "Return t if helm is configured to use local/mode-specific mouse bindings."
-  (and helm-allow-mouse (not (eq helm-allow-mouse 'global-mouse-bindings))))
-
-(defun helm--make-disable-mouse-mode-map ()
-  "Create a keymap that disables all global mouse bindings."
-  (let ((map (make-sparse-keymap)))
-    (cl-loop for k in helm--mouse-keys
-             do (define-key map k 'ignore))
-    map))
-
-(defvar helm--disable-mouse-mode-map (helm--make-disable-mouse-mode-map)
-  "A keymap that disables all global mouse bindings.")
-
-(define-minor-mode helm--disable-mouse-mode
-  "[INTERNAL] Disable all mouse clicks; prevents escaping from helm minibuffer.
-Do nothing when used outside of helm context.
-
-WARNING: Do not use this mode yourself, it is internal to helm."
-  :group 'helm
-  :global t
-  :keymap helm--disable-mouse-mode-map
-  (unless helm-alive-p
-    (setq helm--disable-mouse-mode-map nil)))
-(put 'helm--disable-mouse-mode 'helm-only t)
-
-(defvar helm--allow-mouse-changed nil
-  "If different than the value of `helm-allow-mouse', then need to refresh helm buffer because mouse settings have changed.")
-
-(defun helm--if-allow-mouse-changed ()
-  "If `helm-allow-mouse' value has changed, force a reset of helm mouse bindings."
-  (unless (eq helm-allow-mouse helm--allow-mouse-changed)
-    ;; Force Helm refresh next time through the command event loop to
-    ;; regenerate text property mouse bindings.
-    (setq unread-command-events (nconc (listify-key-sequence (kbd "C-c C-u")) unread-command-events))
-    ;; For this buffer only, track that the change will be handled.
-    (make-local-variable 'helm--allow-mouse-changed)
-    (setq helm--allow-mouse-changed helm-allow-mouse)))
 
 ;; Clean up
 
