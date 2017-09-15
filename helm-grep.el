@@ -730,8 +730,37 @@ If N is positive go forward otherwise go backward."
 ;;; helm-grep-mode
 ;;
 ;;
+(defvar helm-grep-keymap (make-sparse-keymap)
+  "Text property keymap for mouse bindings applied to helm grep entries.")
+
 (defun helm-grep-save-results (candidate)
   (helm-grep-action candidate 'grep))
+
+(defun helm-grep-propertize (start end map)
+  "On helm grep matches between START and END, add text property mouse bindings to key MAP.
+Also add mouse navigation properties."
+  (when map
+    (save-excursion
+      (while (not (eobp))
+        (if (eq helm-allow-mouse 'global-mouse-bindings)
+            (progn (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+                   (remove-text-properties start end '(help-echo t))
+                   (add-text-properties start end `(mouse-face highlight
+                                                               keymap ,map)))
+          (add-text-properties start end
+                               `(keymap ,map
+                                        help-echo ,(concat
+                                                    (get-text-property
+                                                     (point) 'helm-grep-fname)
+                                                    "\nmouse-1: set point\nmouse-2: jump to selection")
+                                        mouse-face highlight))
+          (define-key map [down-mouse-1] 'mouse-set-point)
+          (define-key map [mouse-1]      'ignore)
+          (define-key map [down-mouse-2] 'helm-grep-mode-mouse-jump)
+          (define-key map [mouse-2]      'ignore)
+          (define-key map [down-mouse-3] 'ignore)
+          (define-key map [mouse-3]      'ignore))
+        (forward-line 1)))))
 
 (defun helm-grep-save-results-1 ()
   "Save helm grep result in a `helm-grep-mode' buffer."
@@ -757,7 +786,7 @@ If N is positive go forward otherwise go backward."
                                   default-directory))
       (setq buffer-read-only t)
       (let ((inhibit-read-only t)
-            (map (make-sparse-keymap)))
+            (map helm-grep-keymap))
         (erase-buffer)
         (insert "-*- mode: helm-grep -*-\n\n"
                 (format "%s Results for `%s':\n\n" src-name pattern))
@@ -765,19 +794,7 @@ If N is positive go forward otherwise go backward."
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max)))))
-        (save-excursion
-          (while (not (eobp))
-            (add-text-properties (point-at-bol) (point-at-eol)
-                                 `(keymap ,map
-                                          help-echo ,(concat
-                                                      (get-text-property
-                                                       (point) 'helm-grep-fname)
-                                                      "\nmouse-1: set point\nmouse-2: jump to selection")
-                                          mouse-face highlight))
-            (define-key map [mouse-1] 'mouse-set-point)
-            (define-key map [mouse-2] 'helm-grep-mode-mouse-jump)
-            (define-key map [mouse-3] 'ignore)
-            (forward-line 1))))
+        (helm-grep-propertize (point-at-bol) (point-at-eol) map))
       (helm-grep-mode))
     (pop-to-buffer buf)
     (message "Helm %s Results saved in `%s' buffer" src-name buf)))
@@ -1230,9 +1247,9 @@ If a prefix arg is given run grep on all buffers ignoring non--file-buffers."
          (win-conf (current-window-configuration))
          ;; Non--fname and remote buffers are ignored.
          (bufs (cl-loop for buf in cands
-                     for fname = (buffer-file-name (get-buffer buf))
-                     when (and fname (not (file-remote-p fname)))
-                     collect (expand-file-name fname))))
+                        for fname = (buffer-file-name (get-buffer buf))
+                        when (and fname (not (file-remote-p fname)))
+                        collect (expand-file-name fname))))
     (if bufs
         (if zgrep
             (helm-do-grep-1 bufs nil 'zgrep)

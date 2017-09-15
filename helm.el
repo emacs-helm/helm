@@ -3909,9 +3909,13 @@ candidates from `helm-async-outer-limit-hook'."
   "On helm matches between START and END, add text property mouse bindings to key MAP.
 Also add mouse navigation properties."
   ;; Don't overwrite mouse properties when redisplaying.
-  (when (and map (not (get-text-property start 'keymap)))
+  (when (and map (not (and (get-text-property start 'keymap)
+                           (eq helm-allow-mouse helm--allow-mouse-changed))))
     (if (eq helm-allow-mouse 'global-mouse-bindings)
-        (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+        (progn (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+               (remove-text-properties start end '(help-echo t))
+               (add-text-properties start end `(mouse-face highlight
+                                                keymap ,map)))
       (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
       (define-key map [mouse-1] 'ignore)
       (define-key map [down-mouse-3] 'helm-select-action)
@@ -3973,7 +3977,10 @@ respectively `helm-cand-num' and `helm-cur-source'."
     (when map
       (if (eq helm-allow-mouse 'global-mouse-bindings)
           (progn (define-key map [mouse-2] nil)
-                 (define-key map [down-mouse-2] nil))
+                 (define-key map [down-mouse-2] nil)
+                 (remove-text-properties helm-selection-point
+                                         (overlay-end helm-selection-overlay)
+                                         '(help-echo t)))
         (define-key map [down-mouse-2] 'helm-maybe-exit-minibuffer)
         (define-key map [mouse-2] 'ignore)
         (put-text-property
