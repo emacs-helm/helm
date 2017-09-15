@@ -559,16 +559,33 @@ source name in this variable."
   :type 'boolean)
 
 (defcustom helm-allow-mouse nil
-  "Prevent mouse usage during the helm session when non-nil.
+  "Allow mouse usage during the helm session when non-nil.
 
-Note that this also allow moving out of minibuffer when clicking
-outside of `helm-buffer', up to you to get back to helm by clicking
-back in `helm-buffer' of minibuffer."
+To modify its value interactively, use M-x customize-option RET.
+
+To modify its value programmatically, set it like so:
+  (custom-set-variables '(helm-allow-mouse <setting>))
+where <setting> is one of: t, nil or 'global-mouse-bindings.  Do not
+use setq.
+
+If set to 'global-mouse-bindings, no local nor text-specific mouse bindings
+are made; global mouse bindings continue in effect.
+
+If set to nil, it disables use of all mouse buttons in helm.
+
+If set to t, the following local mouse bindings are made for the helm
+completion buffer:
+
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
+
+This allows selection of windows other than the minibuffer; 
+the minibuffer window must then be selected again to exit helm."
   :group 'helm
-  :type '(radio :tag "Enable mouse usage in Helm"
-                (const :tag "Global usage of mouse" global)
-                (const :tag "Helm specific usage of mouse" t)
-                (const :tag "Disable mouse usage" nil)))
+  :type '(radio (const :tag "Helm Mouse Buttons" t)
+                (const :tag "Global Mouse Buttons" 'global-mouse-bindings)
+                (const :tag "No Mouse Buttons" nil)))
 
 (defcustom helm-move-to-line-cycle-in-source nil
   "Cycle to the beginning or end of the list after reaching the bottom or top.
@@ -1050,15 +1067,15 @@ do not display line numbers. Line numbers can be enabled with the
 
 ** Using the mouse in helm
 
-A basic usage of mouse is provided when user set `helm-allow-mouse' to non-nil.
+Helm-specic mouse bindings are provided when `helm-allow-mouse' is set to t:
 
-- mouse-1 allows selecting candidate.
-- mouse-2 execute default action on selected candidate.
-- mouse-3 pops up menu action.
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
 
-NOTE: When mouse usage is enabled in helm, it allow also clicking around and quit
-the minibuffer focus, it will be up to you to click back to helm buffer or minibuffer
-to retrieve control of your helm session.
+NOTE: When mouse usage is enabled in helm, it allows selection of windows other than the
+minibuffer; the minibuffer window must then be selected again to regain control of your helm
+session.
 
 ** Marked candidates
 
@@ -2186,7 +2203,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
               (select-window (helm-window))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
-                (helm--disable-mouse-mode 1)) ; Disable mouse bindings.
+                (helm--disable-mouse-mode 1)) ; Disable all mouse bindings.
               (add-hook 'post-command-hook 'helm--maybe-update-keymap)
               ;; Add also to update hook otherwise keymap is not updated
               ;; until a key is hitted (Issue #1670).
@@ -2403,7 +2420,7 @@ Don't use this directly, use instead `helm' with the keyword
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
           (unless helm-allow-mouse
-            (helm--disable-mouse-mode 1))
+            (helm--disable-mouse-mode 1)) ; Disable all mouse bindings.
           (unless (cl-loop for h in post-command-hook
                            thereis (memq h '(helm--maybe-update-keymap
                                              helm--update-header-line)))
@@ -2955,6 +2972,10 @@ map)."
     [double-mouse-1] [double-mouse-2] [double-mouse-3]
     [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
   "Mouse keys rebound in helm.")
+
+(defun helm-local-mouse-bindings-p ()
+  "Return t if helm is configured to use local/mode-specific mouse bindings."
+  (and helm-allow-mouse (not (eq helm-allow-mouse 'global-mouse-bindings))))
 
 (defun helm--make-disable-mouse-mode-map ()
   "Create a keymap that disables all global mouse bindings."
@@ -3878,7 +3899,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
-        (map       (when (eq helm-allow-mouse t) (make-sparse-keymap)))
+        (map       (when helm-allow-mouse (make-sparse-keymap)))
         (inhibit-read-only t)
         end)
     (when (and (stringp dispvalue)
@@ -3896,16 +3917,20 @@ respectively `helm-cand-num' and `helm-cur-source'."
                  ;; Don't overwrite mouse properties when
                  ;; redisplaying.
                  (not (get-text-property start 'keymap)))
-        (define-key map [mouse-1] 'helm-mouse-select-candidate)
-        (define-key map [mouse-2] 'ignore)
-        (define-key map [mouse-3] 'helm-select-action)
-        (add-text-properties
-         start end
-         `(mouse-face highlight
-           keymap ,map
-           help-echo ,(helm-aif (get-text-property start 'help-echo)
-                         (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
-                       "mouse-1: select candidate\nmouse-3: menu actions"))))
+        (if (eq helm-allow-mouse 'global-mouse-bindings)
+            (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+          (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
+          (define-key map [mouse-1]      'ignore)
+          (define-key map [down-mouse-3] 'helm-select-action)
+          (mapc (lambda (key) (define-key map key 'ignore))
+                '([mouse-2] [down-mouse-2] [mouse-3]))
+          (add-text-properties
+           start end
+           `(mouse-face highlight
+                        keymap ,map
+                        help-echo ,(helm-aif (get-text-property start 'help-echo)
+                                       (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
+                                     "mouse-1: select candidate\nmouse-3: menu actions")))))
       (when num
         (put-text-property start end 'helm-cand-num num))
       (when source
@@ -3928,15 +3953,19 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((inhibit-read-only t)
         (map (get-text-property pos 'keymap)))
     (when map
-      (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
-      (put-text-property
-       helm-selection-point
-       (overlay-end helm-selection-overlay)
-       'help-echo (helm-aif (get-text-property pos 'help-echo)
-                      (if (string-match "mouse-1: select candidate" it)
-                          (replace-match "mouse-2: execute action" t t it)
+      (if (eq helm-allow-mouse 'global-mouse-bindings)
+          (progn (define-key map [mouse-2] nil)
+                 (define-key map [down-mouse-2] nil))
+        (define-key map [down-mouse-2] 'helm-maybe-exit-minibuffer)
+        (define-key map [mouse-2] 'ignore)
+        (put-text-property
+         helm-selection-point
+         (overlay-end helm-selection-overlay)
+         'help-echo (helm-aif (get-text-property pos 'help-echo)
+                        (if (string-match "mouse-1: select candidate" it)
+                            (replace-match "mouse-2: execute action" t t it)
                           "mouse-2: execute action\nmouse-3: menu actions")
-                    "mouse-2: execute action\nmouse-3: menu actions")))))
+                      "mouse-2: execute action\nmouse-3: menu actions"))))))
 
 (defun helm-mouse-select-candidate (event)
   (interactive "e")
@@ -4734,7 +4763,7 @@ candidates."
                (point-max)))
        (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
-    (when (and (eq helm-allow-mouse t) (null nomouse))
+    (when (and helm-allow-mouse (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
