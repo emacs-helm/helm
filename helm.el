@@ -2726,6 +2726,8 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
+  ;; If `helm-allow-mouse' value has changed, force a reset of helm mouse bindings.
+  (helm--if-allow-mouse-changed)
   ;; Run global hook.
   (helm-log-run-hook 'helm-after-initialize-hook)
   ;; Run local source hook.
@@ -2998,6 +3000,19 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   (unless helm-alive-p
     (setq helm--disable-mouse-mode-map nil)))
 (put 'helm--disable-mouse-mode 'helm-only t)
+
+(defvar helm--allow-mouse-changed nil
+  "If different than the value of `helm-allow-mouse', then need to refresh helm buffer because mouse settings have changed.")
+
+(defun helm--if-allow-mouse-changed ()
+  "If `helm-allow-mouse' value has changed, force a reset of helm mouse bindings."
+  (unless (eq helm-allow-mouse helm--allow-mouse-changed)
+    ;; Force Helm refresh next time through the command event loop to
+    ;; regenerate text property mouse bindings.
+    (setq unread-command-events (nconc (listify-key-sequence (kbd "C-c C-u")) unread-command-events))
+    ;; For this buffer only, track that the change will be handled.
+    (make-local-variable 'helm--allow-mouse-changed)
+    (setq helm--allow-mouse-changed helm-allow-mouse)))
 
 ;; Clean up
 
