@@ -1420,9 +1420,12 @@ condition that you don't choose a command using Helm completion.
 ** Tips
 
 You can bring any candidate on top of kill-ring by using `\\<helm-map>\\[helm-kill-selection-and-quit]'
-on it, contrarily to the regular helm command `helm-kill-selection-and-quit'
-which is bound in helm to same key, it is here killing the real value
-without the need of prefix argument.
+on it, this allow for example to paste this candidate using x-selection in an external application like
+firefox.
+
+Contrarily to the regular helm command `helm-kill-selection-and-quit'
+which is bound in helm to same key, it is here killing the real value (i.e the whole candidate not truncated)
+without the need of a prefix argument.
 
 The view of truncated candidates can be toggled, see command list below.
 
