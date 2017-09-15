@@ -2138,12 +2138,12 @@ However, the use of non-keyword args is deprecated.
     (if (and helm-alive-p (eq fn #'helm))
         (if (helm-alive-p)
             ;; A helm session is normally running.
-            (error "Error: Trying to run helm within a running helm session")
-          ;; A helm session is already running and user jump somewhere else
-          ;; without deactivating it.
+            (error "Error: Attempt to run helm within another helm session")
+          ;; A helm session is already running and the user jumped
+          ;; somewhere else without deactivating it.
           (with-helm-buffer
             (prog1
-                (message "Aborting an helm session running in background")
+                (message "Aborting helm session running in background")
               ;; `helm-alive-p' will be reset in unwind-protect forms.
               (helm-keyboard-quit))))
       (if (keywordp (car plist))
@@ -2155,7 +2155,7 @@ However, the use of non-keyword args is deprecated.
             (setq helm--local-variables
                   (append helm--local-variables
                           ;; Vars passed by keyword on helm call
-                          ;; take precedence on same vars
+                          ;; take precedence over same vars
                           ;; that may have been passed before helm call.
                           (helm-parse-keys plist)))
             (apply fn (mapcar (lambda (key) (plist-get plist key))
@@ -2254,7 +2254,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                 (helm--disable-mouse-mode 1)) ; Disable all mouse bindings.
               (add-hook 'post-command-hook 'helm--maybe-update-keymap)
               ;; Add also to update hook otherwise keymap is not updated
-              ;; until a key is hitted (Issue #1670).
+              ;; until a key is hit (Issue #1670).
               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
               (add-hook 'post-command-hook 'helm--update-header-line)
               (helm-log "show prompt")
@@ -2277,7 +2277,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (advice-remove 'cua-delete-region #'cua-delete-region--advice)
         (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-      (helm--disable-mouse-mode -1)       ; Reenable mouse bindings.
+      (helm--disable-mouse-mode -1)       ; Re-enable helm or global mouse bindings.
       (setq helm-alive-p nil)
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
@@ -3027,9 +3027,8 @@ map)."
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
-  ;; Remove the temporary hooks added
-  ;; by `with-helm-temp-hook' that
-  ;; may not have been consumed.
+  ;; Remove the temporary hooks added by `with-helm-temp-hook'
+  ;; that may not have been consumed.
   (when helm--temp-hooks
     (cl-loop for (fn . hook) in helm--temp-hooks
              do (set hook (delete fn (symbol-value hook)))))
@@ -3052,8 +3051,8 @@ map)."
 (defun helm-clean-up-minibuffer ()
   "Remove contents of minibuffer."
   (let ((miniwin (minibuffer-window)))
-    ;; Clean only current minibuffer used by helm.
-    ;; i.e The precedent one is active.
+    ;; Clean only current minibuffer used by helm,
+    ;; i.e. the one that is active.
     (unless (minibuffer-window-active-p miniwin)
       (with-current-buffer (window-buffer miniwin)
         (delete-minibuffer-contents)))))
@@ -4999,8 +4998,8 @@ Optional argument SOURCE is a Helm source object."
                              (and (re-search-forward (car candidate-or-regexp) nil t)
                                   (re-search-forward (cdr candidate-or-regexp) nil t))
                              (re-search-forward candidate-or-regexp nil t))
-              ;; If search fall on an header line continue loop
-              ;; until it match or fail (Issue #1509).
+              ;; If a search falls on an header line, continue the loop until it matches
+              ;; or fails (Issue #1509).
               (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
             (goto-char (or mp start)))))
     (forward-line 0) ; Avoid scrolling right on long lines.
