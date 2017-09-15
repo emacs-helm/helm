@@ -3908,6 +3908,26 @@ candidates from `helm-async-outer-limit-hook'."
 (defvar helm-match-keymap (make-sparse-keymap)
   "Text property keymap for mouse bindings applied to helm match entries.")
 
+(defun helm-match-propertize (start end map)
+  "On helm matches between START and END, add text property mouse bindings to key MAP.
+Also add mouse navigation properties."
+  ;; Don't overwrite mouse properties when redisplaying.
+  (when (and map (not (get-text-property start 'keymap)))
+    (if (eq helm-allow-mouse 'global-mouse-bindings)
+        (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+      (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
+      (define-key map [mouse-1] 'ignore)
+      (define-key map [down-mouse-3] 'helm-select-action)
+      (mapc (lambda (key) (define-key map key 'ignore))
+            '([mouse-2] [down-mouse-2] [mouse-3]))
+      (add-text-properties
+       start end
+       `(mouse-face highlight
+                    keymap ,map
+                    help-echo ,(helm-aif (get-text-property start 'help-echo)
+                                   (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
+                                 "mouse-1: select candidate\nmouse-3: menu actions"))))))
+
 (defun helm-insert-match (match insert-function &optional num source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION.
 If MATCH is a cons cell then insert the car as display with
@@ -3931,24 +3951,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (and realvalue
              (put-text-property start end
                                 'helm-realvalue realvalue)))
-      (when (and map
-                 ;; Don't overwrite mouse properties when
-                 ;; redisplaying.
-                 (not (get-text-property start 'keymap)))
-        (if (eq helm-allow-mouse 'global-mouse-bindings)
-            (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
-          (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
-          (define-key map [mouse-1]      'ignore)
-          (define-key map [down-mouse-3] 'helm-select-action)
-          (mapc (lambda (key) (define-key map key 'ignore))
-                '([mouse-2] [down-mouse-2] [mouse-3]))
-          (add-text-properties
-           start end
-           `(mouse-face highlight
-                        keymap ,map
-                        help-echo ,(helm-aif (get-text-property start 'help-echo)
-                                       (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
-                                     "mouse-1: select candidate\nmouse-3: menu actions")))))
+      (helm-match-propertize start end map)
       (when num
         (put-text-property start end 'helm-cand-num num))
       (when source
