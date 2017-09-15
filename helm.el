@@ -4205,7 +4205,14 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
                          (and (assq 'accept-empty source) ""))
                      source))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (when (and selection action) (funcall action selection))))
+    ;; Selection may be a header line, candidate separator line or end
+    ;; of buffer when `helm-allow-mouse' is non-nil, but helm may have
+    ;; imputed an action for such a line, so ensure no action is
+    ;; executed in these cases.
+    (when (and selection action
+               (not (or (eobp) (helm-pos-header-line-p)
+                        (helm-pos-candidate-separator-p))))
+      (funcall action selection))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.
@@ -4520,7 +4527,7 @@ Key arg DIRECTION can be one of:
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
-        (when (eq helm-allow-mouse t)
+        (when helm-allow-mouse
           (helm--mouse-reset-selection-help-echo))
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
@@ -5007,7 +5014,7 @@ Optional argument SOURCE is a Helm source object."
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
-    (when (eq helm-allow-mouse t)
+    (when helm-allow-mouse
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
     (helm-display-mode-line (or source (helm-get-current-source)))
