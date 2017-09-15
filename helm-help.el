@@ -1411,42 +1411,42 @@ condition that you don't choose a command using Helm completion.
 ** Commands
 \\<helm-kmacro-map>")
 
-;;; Kill-ring
+;;; Kill ring
 ;;
 ;;
 (defvar helm-kill-ring-help-message
-  "* Helm kill-ring
+  "* Helm kill ring
 
 ** Tips
 
-You can bring any candidate on top of kill-ring by using `\\<helm-map>\\[helm-kill-selection-and-quit]'
-on it, this allow for example to paste this candidate using x-selection in an external application like
-firefox.
+Every Helm session lets you save a candidate to the kill-ring / clipboard /
+primary-selection with `\\<helm-map>\\[helm-kill-selection-and-quit]'.
 
-Contrarily to the regular helm command `helm-kill-selection-and-quit'
-which is bound in helm to same key, it is here killing the real value (i.e the whole candidate not truncated)
-without the need of a prefix argument.
+To save space, Helm-kill-ring truncates the candidates longer than
+`helm-kill-ring-max-offset'.
+`\\<helm-kill-ring-map>\\[helm-kill-ring-kill-selection]' then saves the whole
+text and not the truncated value.  The view of truncated candidates can be
+toggled; see the command list below.
 
-The view of truncated candidates can be toggled, see command list below.
+As opposed to `yank', numeric prefix arguments are ignored with
+`helm-show-kill-ring': there is no need for them since selection happens within
+Helm.  Moreover Helm has [[Shortcuts for executing Default Action on the nth
+candidate][Shortcuts for executing Default Action on the nth candidate]].
 
-You can bind globally `M-y' to `helm-show-kill-ring' and once in the helm kill-ring session
-you can navigate for conveniency to next/previous line with `M-y' and `M-u'.
-Of course `C-n' and `C-p' are still available.
+It is recommended to globally bind `M-y' to `helm-show-kill-ring'.  Once in the
+Helm-kill-ring session you can navigate to next/previous line with `M-y' and
+`M-u' for convenience.  Of course `\\[helm-next-line]' and `\\[helm-previous-line]' are still available.
 
-It is possible to delete unwanted candidates from kill-ring.
+It is possible to delete candidates from the kill ring.
 
-You can concatenate marked candidates and yank them in current buffer
-creating a new entry in kill-ring, candidates are concatenated with
-a newline as separator.
-Note: You can insert marked candidates as well with `\\<helm-map>\\[helm-copy-to-buffer]'
-but this will not push a new entry with concatenated candidates in kill-ring.
+You can concatenate marked candidates and yank them in the current buffer, thus
+creating a new entry in the kill ring.  See the commands below.  Candidates are
+concatenated with a newline as separator.  Alternatively, use
+`\\<helm-map>\\[helm-copy-to-buffer]' to not push a new entry in the kill ring.
 
-When inserting candidate with default action (RET) `point' is placed at end of candidate
-and `mark' at beginning, you can revert this behavior by using a prefix arg i.e `C-u RET'
-like regular `yank' command does.
-Note: Of course numeric prefix args like `yank' are not available due to the nature
-of helm which allow you to see and move to the desired candidate and also because
-it is already available in helm with [[Shortcuts for executing Default Action on the nth candidate][Shortcuts for executing Default Action on the nth candidate]].
+When inserting candidates with the default action (`RET'), `point' is placed at
+the end of the candidate and `mark' at the beginning.  You can revert this behavior
+by using a prefix argument, i.e. `C-u RET', like the regular `yank' command does.
 
 ** Commands
 \\<helm-kill-ring-map>
@@ -1455,7 +1455,7 @@ it is already available in helm with [[Shortcuts for executing Default Action on
 \\[helm-kill-ring-delete]\t\tDelete entry.
 \\[helm-kill-ring-run-append]\t\tYank concatenated marked candidates.
 \\[helm-kill-ring-toggle-truncated]\t\tToggle truncated view of candidate.
-\\[helm-kill-ring-kill-selection]\t\tKill real value of selection.")
+\\[helm-kill-ring-kill-selection]\t\tKill non-truncated of selection.")
 
 ;;; Org headings
 ;;
