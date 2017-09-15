@@ -565,7 +565,10 @@ Note that this also allow moving out of minibuffer when clicking
 outside of `helm-buffer', up to you to get back to helm by clicking
 back in `helm-buffer' of minibuffer."
   :group 'helm
-  :type 'boolean)
+  :type '(radio :tag "Enable mouse usage in Helm"
+                (const :tag "Global usage of mouse" global)
+                (const :tag "Helm specific usage of mouse" t)
+                (const :tag "Disable mouse usage" nil)))
 
 (defcustom helm-move-to-line-cycle-in-source nil
   "Cycle to the beginning or end of the list after reaching the bottom or top.
@@ -3867,7 +3870,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
-        (map       (when helm-allow-mouse (make-sparse-keymap)))
+        (map       (when (eq helm-allow-mouse t) (make-sparse-keymap)))
         (inhibit-read-only t)
         end)
     (when (and (stringp dispvalue)
@@ -4460,7 +4463,7 @@ Key arg DIRECTION can be one of:
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
-        (when helm-allow-mouse
+        (when (eq helm-allow-mouse t)
           (helm--mouse-reset-selection-help-echo))
         (helm-log-run-hook 'helm-move-selection-before-hook)
         (funcall move-func)
@@ -4723,7 +4726,7 @@ candidates."
                (point-max)))
        (1+ (point-at-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
-    (when (and helm-allow-mouse (null nomouse))
+    (when (and (eq helm-allow-mouse t) (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
 
 (defun helm-confirm-and-exit-minibuffer ()
@@ -4947,7 +4950,7 @@ Optional argument SOURCE is a Helm source object."
     (when (helm-pos-multiline-p)
       (helm-move--beginning-of-multiline-candidate))
     (when (helm-pos-header-line-p) (forward-line 1))
-    (when helm-allow-mouse
+    (when (eq helm-allow-mouse t)
       (helm--mouse-reset-selection-help-echo))
     (helm-mark-current-line)
     (helm-display-mode-line (or source (helm-get-current-source)))
