@@ -2132,10 +2132,10 @@ example, :candidate-number-limit is bound to
 
 ;;; Entry point helper
 (defun helm-internal (&optional
-                        any-sources any-input
-                        any-prompt any-resume
-                        any-preselect any-buffer
-                        any-keymap any-default any-history)
+                      any-sources any-input
+                      any-prompt any-resume
+                      any-preselect any-buffer
+                      any-keymap any-default any-history)
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
@@ -2172,47 +2172,47 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     ;; disable this stupid thing if enabled.
     (and cua-mode (cua-mode -1))
     (unwind-protect
-         (condition-case-unless-debug _v
-             (let ( ;; `helm--source-name' is non-`nil'
-                   ;; when `helm' is invoked by action, reset it.
-                   helm--source-name
-                   helm-current-source
-                   helm-in-persistent-action
-                   helm-quit
-                   (helm-buffer (or any-buffer helm-buffer)))
-               (helm-initialize
-                any-resume any-input any-default any-sources)
-               (helm-display-buffer helm-buffer)
-               (select-window (helm-window))
-               ;; We are now in helm-buffer.
-               (unless helm-allow-mouse
-                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
-               (add-hook 'post-command-hook 'helm--maybe-update-keymap)
-               ;; Add also to update hook otherwise keymap is not updated
-               ;; until a key is hitted (Issue #1670).
-               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
-               (add-hook 'post-command-hook 'helm--update-header-line)
-               (helm-log "show prompt")
-               (unwind-protect
-                    (helm-read-pattern-maybe
-                     any-prompt any-input any-preselect
-                     any-resume any-keymap any-default any-history)
-                 (helm-cleanup))
-               (prog1
-                   (unless helm-quit (helm-execute-selection-action))
-                 (helm-log (concat "[End session] " (make-string 41 ?-)))))
-           (quit
-            (helm-restore-position-on-quit)
-            (helm-log-run-hook 'helm-quit-hook)
-            (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
-            nil))
+        (condition-case-unless-debug _v
+            (let ( ;; `helm--source-name' is non-`nil'
+                  ;; when `helm' is invoked by action, reset it.
+                  helm--source-name
+                  helm-current-source
+                  helm-in-persistent-action
+                  helm-quit
+                  (helm-buffer (or any-buffer helm-buffer)))
+              (helm-initialize
+               any-resume any-input any-default any-sources)
+              (helm-display-buffer helm-buffer)
+              (select-window (helm-window))
+              ;; We are now in helm-buffer.
+              (unless helm-allow-mouse
+                (helm--disable-mouse-mode 1)) ; Disable mouse bindings.
+              (add-hook 'post-command-hook 'helm--maybe-update-keymap)
+              ;; Add also to update hook otherwise keymap is not updated
+              ;; until a key is hitted (Issue #1670).
+              (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
+              (add-hook 'post-command-hook 'helm--update-header-line)
+              (helm-log "show prompt")
+              (unwind-protect
+                  (helm-read-pattern-maybe
+                   any-prompt any-input any-preselect
+                   any-resume any-keymap any-default any-history)
+                (helm-cleanup))
+              (prog1
+                  (unless helm-quit (helm-execute-selection-action))
+                (helm-log (concat "[End session] " (make-string 41 ?-)))))
+          (quit
+           (helm-restore-position-on-quit)
+           (helm-log-run-hook 'helm-quit-hook)
+           (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
+           nil))
       (when (fboundp 'advice-remove)
         (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
         (advice-remove 'ange-ftp-get-passwd #'helm--advice-ange-ftp-get-passwd)
         (advice-remove 'cua-delete-region #'cua-delete-region--advice)
         (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-      (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
+      (helm--disable-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
@@ -2403,7 +2403,7 @@ Don't use this directly, use instead `helm' with the keyword
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
           (unless helm-allow-mouse
-            (helm--remap-mouse-mode 1))
+            (helm--disable-mouse-mode 1))
           (unless (cl-loop for h in post-command-hook
                            thereis (memq h '(helm--maybe-update-keymap
                                              helm--update-header-line)))
@@ -2948,7 +2948,7 @@ map)."
 
 ;;; Prevent loosing focus when using mouse.
 ;;
-(defvar helm--remap-mouse-mode-map
+(defvar helm--disable-mouse-mode-map
   (let ((map (make-sparse-keymap)))
     (cl-loop for k in '([mouse-1] [mouse-2] [mouse-3]
                         [down-mouse-1] [down-mouse-2] [down-mouse-3]
@@ -2958,17 +2958,17 @@ map)."
              do (define-key map k 'ignore))
     map))
 
-(define-minor-mode helm--remap-mouse-mode
-    "[INTERNAL] Prevent escaping helm minibuffer with mouse clicks.
+(define-minor-mode helm--disable-mouse-mode
+  "[INTERNAL] Disable all mouse clicks; prevents escaping from helm minibuffer.
 Do nothing when used outside of helm context.
 
 WARNING: Do not use this mode yourself, it is internal to helm."
   :group 'helm
   :global t
-  :keymap helm--remap-mouse-mode-map
+  :keymap helm--disable-mouse-mode-map
   (unless helm-alive-p
-    (setq helm--remap-mouse-mode-map nil)))
-(put 'helm--remap-mouse-mode 'helm-only t)
+    (setq helm--disable-mouse-mode-map nil)))
+(put 'helm--disable-mouse-mode 'helm-only t)
 
 ;; Clean up
 
