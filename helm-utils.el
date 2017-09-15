@@ -219,9 +219,11 @@ In this case last position is added to the register
 ;;
 (defun helm-switch-to-buffers (buffer-or-name &optional other-window)
   "Switch to buffer BUFFER-OR-NAME.
+
 If more than one buffer marked switch to these buffers in separate windows.
 If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
-in separate windows."
+in separate windows.
+If a prefix arg is given split windows vertically."
   (let* ((mkds (helm-marked-candidates))
          (size (/ (window-height) (length mkds))))
     (or (<= window-min-height size)
@@ -234,10 +236,15 @@ in separate windows."
           (save-selected-window
             (cl-loop for b in it
                   do (progn
-                       (select-window (split-window))
+                       (select-window (split-window
+                                       nil nil helm-current-prefix-arg))
+                       (balance-windows)
                        (switch-to-buffer b)))))
       (if other-window
-          (switch-to-buffer-other-window buffer-or-name)
+          (progn
+            (select-window (split-window
+                            nil nil helm-current-prefix-arg))
+            (switch-to-buffer buffer-or-name))
         (switch-to-buffer buffer-or-name)))))
 
 (defun helm-switch-to-buffers-other-window (buffer-or-name)

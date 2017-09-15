@@ -182,6 +182,13 @@ persistent kill-buffer command either with the regular
 or with its specific command `helm-buffer-run-kill-persistent'.  See the
 bindings below.
 
+*** Switching to buffers
+
+To switch to a buffer, press RET, to switch to a buffer in another window, select this buffer
+and press \\<helm-buffer-map>\\[helm-buffer-switch-other-window], when called with a prefix arg
+the buffer will be displayed vertically in other window.
+If you mark more than one buffer, the marked buffers will be displayed in different windows.
+
 *** Meaning of colors and prefixes for buffers
 
 Remote buffers are prefixed with '@'.
