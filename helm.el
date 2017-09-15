@@ -620,9 +620,7 @@ Do nothing when used outside of helm context.
 WARNING: Do not use this mode yourself, it is internal to helm."
   :group 'helm
   :global t
-  :keymap helm--disable-mouse-mode-map
-  (unless helm-alive-p
-    (setq helm--disable-mouse-mode-map nil)))
+  :keymap helm--disable-mouse-mode-map)
 (put 'helm--disable-mouse-mode 'helm-only t)
 
 (defvar helm--allow-mouse-changed nil
