@@ -2946,17 +2946,25 @@ map)."
         (with-current-buffer (window-buffer (minibuffer-window))
           (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
 
-;;; Prevent loosing focus when using mouse.
+;;; Prevent losing focus when using mouse.
 ;;
-(defvar helm--disable-mouse-mode-map
+(defconst helm--mouse-keys
+  '([mouse-1] [mouse-2] [mouse-3]
+    [down-mouse-1] [down-mouse-2] [down-mouse-3]
+    [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
+    [double-mouse-1] [double-mouse-2] [double-mouse-3]
+    [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
+  "Mouse keys rebound in helm.")
+
+(defun helm--make-disable-mouse-mode-map ()
+  "Create a keymap that disables all global mouse bindings."
   (let ((map (make-sparse-keymap)))
-    (cl-loop for k in '([mouse-1] [mouse-2] [mouse-3]
-                        [down-mouse-1] [down-mouse-2] [down-mouse-3]
-                        [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
-                        [double-mouse-1] [double-mouse-2] [double-mouse-3]
-                        [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
+    (cl-loop for k in helm--mouse-keys
              do (define-key map k 'ignore))
     map))
+
+(defvar helm--disable-mouse-mode-map (helm--make-disable-mouse-mode-map)
+  "A keymap that disables all global mouse bindings.")
 
 (define-minor-mode helm--disable-mouse-mode
   "[INTERNAL] Disable all mouse clicks; prevents escaping from helm minibuffer.
