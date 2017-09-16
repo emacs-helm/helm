@@ -235,17 +235,16 @@ If a prefix arg is given split windows vertically."
             (switch-to-buffer (car mkds)))
           (save-selected-window
             (cl-loop for b in it
-                  do (progn
-                       (select-window (split-window
-                                       nil nil helm-current-prefix-arg))
-                       (balance-windows)
-                       (switch-to-buffer b)))))
+                  do (helm--switch-to-buffer-other-window b 'balance))))
       (if other-window
-          (progn
-            (select-window (split-window
-                            nil nil helm-current-prefix-arg))
-            (switch-to-buffer buffer-or-name))
+          (helm--switch-to-buffer-other-window buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
+
+(defun helm--switch-to-buffer-other-window (buffer-or-name &optional balance)
+  (select-window (split-window
+                  nil nil helm-current-prefix-arg))
+  (and balance (balance-windows))
+  (switch-to-buffer buffer-or-name))
 
 (defun helm-switch-to-buffers-other-window (buffer-or-name)
   "switch to buffer BUFFER-OR-NAME in other window.
