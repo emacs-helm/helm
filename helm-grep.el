@@ -601,7 +601,7 @@ WHERE can be one of other-window, other-frame."
          (fname        (if tramp-host
                            (concat tramp-prefix loc-fname) loc-fname)))
     (cl-case where
-      (other-window (helm--switch-to-buffer-other-window
+      (other-window (helm-switch-to-buffer-other-window
                      (find-file-noselect fname)))
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-grep-save-results-1))

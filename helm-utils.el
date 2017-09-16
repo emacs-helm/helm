@@ -231,13 +231,13 @@ If a prefix arg is given split windows vertically."
     (helm-aif (cdr mkds)
         (progn
           (if other-window
-              (helm--switch-to-buffer-other-window (car mkds))
+              (helm-switch-to-buffer-other-window (car mkds))
             (switch-to-buffer (car mkds)))
           (save-selected-window
             (cl-loop for b in it
-                  do (helm--switch-to-buffer-other-window b 'balance))))
+                  do (helm-switch-to-buffer-other-window b 'balance))))
       (if other-window
-          (helm--switch-to-buffer-other-window buffer-or-name)
+          (helm-switch-to-buffer-other-window buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
 
 (defun helm-simultaneous-find-file (files)
@@ -254,10 +254,10 @@ When called with a prefix arg split is done vertically."
                    for buf = (find-file-noselect f)
                    unless nosplit
                    do (condition-case-unless-debug _err
-                          (helm--switch-to-buffer-other-window buf 'balance)
+                          (helm-switch-to-buffer-other-window buf 'balance)
                         (error (setq nosplit t) nil)))))))
 
-(defun helm--switch-to-buffer-other-window (buffer-or-name &optional balance)
+(defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   (select-window (split-window
                   nil nil helm-current-prefix-arg))
   (and balance (balance-windows))

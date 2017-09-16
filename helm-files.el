@@ -748,11 +748,11 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
   "Keep current-buffer and open files in separate windows."
   (let* ((files (helm-marked-candidates))
          (buffers (mapcar 'find-file-noselect files)))
-    (helm--switch-to-buffer-other-window (car buffers))
+    (helm-switch-to-buffer-other-window (car buffers))
     (helm-aif (cdr buffers)
         (save-selected-window
           (cl-loop for buffer in it
-                   do (helm--switch-to-buffer-other-window
+                   do (helm-switch-to-buffer-other-window
                        buffer 'balance))))))
 
 (defun helm-find-files-byte-compile (_candidate)
