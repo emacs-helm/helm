@@ -267,7 +267,7 @@ You probably don't need to use this unless you know what you are doing."
   :group 'helm-grep-faces)
 
 (defface helm-grep-cmd-line
-    '((t (:inherit diff-added)))
+    '((t (:inherit font-lock-type-face)))
   "Face used to highlight grep command line when no results."
   :group 'helm-grep-faces)
 
