@@ -558,14 +558,95 @@ source name in this variable."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-allow-mouse nil
-  "Prevent mouse usage during the helm session when non-nil.
+(defvar helm-alive-p nil)
 
-Note that this also allow moving out of minibuffer when clicking
-outside of `helm-buffer', up to you to get back to helm by clicking
-back in `helm-buffer' of minibuffer."
+;;; Prevent losing focus when using mouse.
+;;
+(defconst helm--mouse-keys
+  '([mouse-1] [mouse-2] [mouse-3]
+    [down-mouse-1] [down-mouse-2] [down-mouse-3]
+    [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
+    [double-mouse-1] [double-mouse-2] [double-mouse-3]
+    [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
+  "Mouse keys rebound in helm.")
+
+(defun helm-local-mouse-bindings-p ()
+  "Return t if helm is configured to use local/mode-specific mouse bindings."
+  (and helm-allow-mouse (not (eq helm-allow-mouse 'global-mouse-bindings))))
+
+(defun helm--make-disable-mouse-mode-map ()
+  "Create a keymap that disables all global mouse bindings."
+  (let ((map (make-sparse-keymap)))
+    (cl-loop for k in helm--mouse-keys
+             do (define-key map k 'ignore))
+    map))
+
+(defvar helm--disable-mouse-mode-map (helm--make-disable-mouse-mode-map)
+  "A keymap that disables all global mouse bindings.")
+
+(define-minor-mode helm--disable-mouse-mode
+  "[INTERNAL] Disable all mouse clicks; prevents escaping from helm minibuffer.
+Do nothing when used outside of helm context.
+
+WARNING: Do not use this mode yourself, it is internal to helm."
   :group 'helm
-  :type 'boolean)
+  :global t
+  :keymap helm--disable-mouse-mode-map)
+(put 'helm--disable-mouse-mode 'helm-only t)
+
+(defvar helm--allow-mouse-changed nil
+  "Flag indicated need to refresh helm buffers because mouse support setting changed.")
+
+(defun helm--maybe-refresh ()
+  (when helm--allow-mouse-changed
+    (make-local-variable 'helm--allow-mouse-changed)
+    (setq helm--allow-mouse-changed nil)
+    (add-hook 'helm-after-initialize-hook
+              (lambda ()
+                (setq unread-command-events
+                      (nconc (listify-key-sequence (kbd "C-c C-u")) unread-command-events))))))
+
+(defun helm--set-allow-mouse (symbol value)
+  (let ((lexical-binding t))
+    (set-default symbol value)
+    ;; Force regeneration of helm text property mouse bindings next
+    ;; time helm is invoked in each helm buffer.
+    (setq-default helm--allow-mouse-changed t)
+    ;; Remove any buffer-local values of this variable.
+    (mapc (lambda (buf) (with-current-buffer buf
+                          (kill-local-variable 'helm--allow-mouse-changed)))
+          (buffer-list))
+    (helm--maybe-refresh)))
+
+(defcustom helm-allow-mouse nil
+  "Allow mouse usage during the helm session when non-nil.
+
+To modify its value interactively, use M-x customize-option RET.
+
+To modify its value programmatically, set it like so:
+  (custom-set-variables '(helm-allow-mouse <setting>))
+where <setting> is one of: t, nil or 'global-mouse-bindings.  Do not
+use setq.
+
+If set to 'global-mouse-bindings, no local nor text-specific mouse bindings
+are made; global mouse bindings continue in effect.
+
+If set to nil, it disables use of all mouse buttons in helm.
+
+If set to t, the following local mouse bindings are made for the helm
+completion buffer:
+
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
+
+This allows selection of windows other than the minibuffer; 
+the minibuffer window must then be selected again to exit helm."
+  :group 'helm
+  :type '(radio (const :tag "Helm Mouse Buttons" t)
+                (const :tag "Global Mouse Buttons" 'global-mouse-bindings)
+                (const :tag "No Mouse Buttons" nil))
+  :set #'helm--set-allow-mouse)
 
 (defcustom helm-move-to-line-cycle-in-source nil
   "Cycle to the beginning or end of the list after reaching the bottom or top.
@@ -1047,22 +1128,21 @@ do not display line numbers. Line numbers can be enabled with the
 
 ** Using the mouse in helm
 
-A basic usage of mouse is provided when user set `helm-allow-mouse' to non-nil.
+Helm-specif mouse bindings are provided when `helm-allow-mouse' is set to t:
 
-- mouse-1 allows selecting candidate.
-- mouse-2 execute default action on selected candidate.
-- mouse-3 pops up menu action.
+- mouse-1 selects candidates
+- mouse-2 executes the default action on selected candidates
+- mouse-3 pops up a menu of commands.
 
-NOTE: When mouse usage is enabled in helm, it allow also clicking around and quit
-the minibuffer focus, it will be up to you to click back to helm buffer or minibuffer
-to retrieve control of your helm session.
+NOTE: When mouse usage is enabled in helm, it allows selection of windows other than the
+minibuffer; the minibuffer window must then be selected again to regain control of your helm
+session.
 
 ** Marked candidates
 
-You can mark candidates to execute an action on them instead
-of the current selected candidate only (See binding below).
-Most Helm actions operate on marked candidates unless marking candidates
-is prevented explicitely for a specific source.
+You can mark candidates to execute an action on them instead of the current selected
+candidate only (See binding below).  Most Helm actions operate on marked candidates unless
+marking candidates is prevented explicitely for a specific source.
 
 To mark/unmark a candidate use \\[helm-toggle-visible-mark] (See bindings below).
 To mark all visible unmarked candidates at once in current source use \\[helm-mark-all].
@@ -1073,6 +1153,7 @@ but even if you mark all candidates of all sources, only those of current source
 when executing your action unless this action specify to use candidates of all sources, which
 is not the case in most sources for evident reasons
 \(i.e Each action handle only a specific type of candidate).
+
 IOW Unless you use specific sources that have actions handling candidates of all other sources
 you don't need the prefix arg when using \\[helm-mark-all] or \\[helm-toggle-all-marks].
 
@@ -1248,7 +1329,6 @@ to modify it.")
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
 (defvar helm-selection-point nil)
-(defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
                                         "\\<" "\\>" "\\_<" "\\_>" ".*"
@@ -2070,12 +2150,12 @@ However, the use of non-keyword args is deprecated.
     (if (and helm-alive-p (eq fn #'helm))
         (if (helm-alive-p)
             ;; A helm session is normally running.
-            (error "Error: Trying to run helm within a running helm session")
-          ;; A helm session is already running and user jump somewhere else
-          ;; without deactivating it.
+            (error "Error: Attempt to run helm within another helm session")
+          ;; A helm session is already running and the user jumped
+          ;; somewhere else without deactivating it.
           (with-helm-buffer
             (prog1
-                (message "Aborting an helm session running in background")
+                (message "Aborting helm session running in background")
               ;; `helm-alive-p' will be reset in unwind-protect forms.
               (helm-keyboard-quit))))
       (if (keywordp (car plist))
@@ -2087,7 +2167,7 @@ However, the use of non-keyword args is deprecated.
             (setq helm--local-variables
                   (append helm--local-variables
                           ;; Vars passed by keyword on helm call
-                          ;; take precedence on same vars
+                          ;; take precedence over same vars
                           ;; that may have been passed before helm call.
                           (helm-parse-keys plist)))
             (apply fn (mapcar (lambda (key) (plist-get plist key))
@@ -2183,10 +2263,10 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                (select-window (helm-window))
                ;; We are now in helm-buffer.
                (unless helm-allow-mouse
-                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
+                 (helm--disable-mouse-mode 1)) ; Disable all mouse bindings.
                (add-hook 'post-command-hook 'helm--maybe-update-keymap)
                ;; Add also to update hook otherwise keymap is not updated
-               ;; until a key is hitted (Issue #1670).
+               ;; until a key is hit (Issue #1670).
                (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
                (add-hook 'post-command-hook 'helm--update-header-line)
                (helm-log "show prompt")
@@ -2209,7 +2289,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         (advice-remove 'cua-delete-region #'cua-delete-region--advice)
         (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
-      (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
+      (helm--disable-mouse-mode -1)       ; Re-enable helm or global mouse bindings.
       (setq helm-alive-p nil)
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
@@ -2400,7 +2480,7 @@ Don't use this directly, use instead `helm' with the keyword
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
           (unless helm-allow-mouse
-            (helm--remap-mouse-mode 1))
+            (helm--disable-mouse-mode 1)) ; Disable all mouse bindings.
           (unless (cl-loop for h in post-command-hook
                            thereis (memq h '(helm--maybe-update-keymap
                                              helm--update-header-line)))
@@ -2943,29 +3023,6 @@ map)."
         (with-current-buffer (window-buffer (minibuffer-window))
           (setq minor-mode-overriding-map-alist `((helm--minor-mode . ,it)))))))
 
-;;; Prevent loosing focus when using mouse.
-;;
-(defvar helm--remap-mouse-mode-map
-  (let ((map (make-sparse-keymap)))
-    (cl-loop for k in '([mouse-1] [mouse-2] [mouse-3]
-                        [down-mouse-1] [down-mouse-2] [down-mouse-3]
-                        [drag-mouse-1] [drag-mouse-2] [drag-mouse-3]
-                        [double-mouse-1] [double-mouse-2] [double-mouse-3]
-                        [triple-mouse-1] [triple-mouse-2] [triple-mouse-3])
-             do (define-key map k 'ignore))
-    map))
-
-(define-minor-mode helm--remap-mouse-mode
-    "[INTERNAL] Prevent escaping helm minibuffer with mouse clicks.
-Do nothing when used outside of helm context.
-
-WARNING: Do not use this mode yourself, it is internal to helm."
-  :group 'helm
-  :global t
-  :keymap helm--remap-mouse-mode-map
-  (unless helm-alive-p
-    (setq helm--remap-mouse-mode-map nil)))
-(put 'helm--remap-mouse-mode 'helm-only t)
 
 ;; Clean up
 
@@ -2981,9 +3038,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup))
   (helm-kill-async-processes)
-  ;; Remove the temporary hooks added
-  ;; by `with-helm-temp-hook' that
-  ;; may not have been consumed.
+  ;; Remove the temporary hooks added by `with-helm-temp-hook'
+  ;; that may not have been consumed.
   (when helm--temp-hooks
     (cl-loop for (fn . hook) in helm--temp-hooks
              do (set hook (delete fn (symbol-value hook)))))
@@ -3006,8 +3062,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
 (defun helm-clean-up-minibuffer ()
   "Remove contents of minibuffer."
   (let ((miniwin (minibuffer-window)))
-    ;; Clean only current minibuffer used by helm.
-    ;; i.e The precedent one is active.
+    ;; Clean only current minibuffer used by helm,
+    ;; i.e. the one that is active.
     (unless (minibuffer-window-active-p miniwin)
       (with-current-buffer (window-buffer miniwin)
         (delete-minibuffer-contents)))))
@@ -3858,6 +3914,29 @@ candidates from `helm-async-outer-limit-hook'."
   "Remove SOURCE from `helm-candidate-cache'."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
+(defvar helm-match-keymap (make-sparse-keymap)
+  "Text property keymap for mouse bindings applied to helm match entries.")
+
+(defun helm-match-propertize (start end map)
+  "On helm matches between START and END, add text property mouse bindings to key MAP.
+Also add mouse navigation properties."
+  ;; Don't overwrite mouse properties when redisplaying.
+  (when (and map (not (get-text-property start 'keymap)))
+    (if (eq helm-allow-mouse 'global-mouse-bindings)
+        (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+      (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
+      (define-key map [mouse-1] 'ignore)
+      (define-key map [down-mouse-3] 'helm-select-action)
+      (mapc (lambda (key) (define-key map key 'ignore))
+            '([mouse-2] [down-mouse-2] [mouse-3]))
+      (add-text-properties
+       start end
+       `(mouse-face highlight
+                    keymap ,map
+                    help-echo ,(helm-aif (get-text-property start 'help-echo)
+                                   (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
+                                 "mouse-1: select candidate\nmouse-3: menu actions"))))))
+
 (defun helm-insert-match (match insert-function &optional num source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION.
 If MATCH is a cons cell then insert the car as display with
@@ -3867,7 +3946,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((start     (point-at-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
-        (map       (when helm-allow-mouse (make-sparse-keymap)))
+        (map       (when helm-allow-mouse helm-match-keymap))
         (inhibit-read-only t)
         end)
     (when (and (stringp dispvalue)
@@ -3881,20 +3960,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (and realvalue
              (put-text-property start end
                                 'helm-realvalue realvalue)))
-      (when (and map
-                 ;; Don't overwrite mouse properties when
-                 ;; redisplaying.
-                 (not (get-text-property start 'keymap)))
-        (define-key map [mouse-1] 'helm-mouse-select-candidate)
-        (define-key map [mouse-2] 'ignore)
-        (define-key map [mouse-3] 'helm-select-action)
-        (add-text-properties
-         start end
-         `(mouse-face highlight
-           keymap ,map
-           help-echo ,(helm-aif (get-text-property start 'help-echo)
-                         (concat it "\nmouse-1: select candidate\nmouse-3: menu actions")
-                       "mouse-1: select candidate\nmouse-3: menu actions"))))
+      (helm-match-propertize start end map)
       (when num
         (put-text-property start end 'helm-cand-num num))
       (when source
@@ -3917,15 +3983,19 @@ respectively `helm-cand-num' and `helm-cur-source'."
   (let ((inhibit-read-only t)
         (map (get-text-property pos 'keymap)))
     (when map
-      (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
-      (put-text-property
-       helm-selection-point
-       (overlay-end helm-selection-overlay)
-       'help-echo (helm-aif (get-text-property pos 'help-echo)
-                      (if (string-match "mouse-1: select candidate" it)
-                          (replace-match "mouse-2: execute action" t t it)
+      (if (eq helm-allow-mouse 'global-mouse-bindings)
+          (progn (define-key map [mouse-2] nil)
+                 (define-key map [down-mouse-2] nil))
+        (define-key map [down-mouse-2] 'helm-maybe-exit-minibuffer)
+        (define-key map [mouse-2] 'ignore)
+        (put-text-property
+         helm-selection-point
+         (overlay-end helm-selection-overlay)
+         'help-echo (helm-aif (get-text-property pos 'help-echo)
+                        (if (string-match "mouse-1: select candidate" it)
+                            (replace-match "mouse-2: execute action" t t it)
                           "mouse-2: execute action\nmouse-3: menu actions")
-                    "mouse-2: execute action\nmouse-3: menu actions")))))
+                      "mouse-2: execute action\nmouse-3: menu actions"))))))
 
 (defun helm-mouse-select-candidate (event)
   (interactive "e")
@@ -3933,6 +4003,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
          (pos    (posn-point (event-end event))))
     (unwind-protect
          (with-current-buffer (window-buffer window)
+           (mouse-set-point event)
            (if (and (helm-action-window)
                     (eql window (get-buffer-window helm-buffer)))
                (user-error "selection in helm-window not available while selecting action")
@@ -4145,7 +4216,14 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
                          (and (assq 'accept-empty source) ""))
                      source))
     (unless preserve-saved-action (setq helm-saved-action nil))
-    (when (and selection action) (funcall action selection))))
+    ;; Selection may be a header line, candidate separator line or end
+    ;; of buffer when `helm-allow-mouse' is non-nil, but helm may have
+    ;; imputed an action for such a line, so ensure no action is
+    ;; executed in these cases.
+    (when (and selection action
+               (not (or (eobp) (helm-pos-header-line-p)
+                        (helm-pos-candidate-separator-p))))
+      (funcall action selection))))
 
 (defun helm-coerce-selection (selection source)
   "Apply coerce attribute function to SELECTION in SOURCE.
@@ -4939,8 +5017,8 @@ Optional argument SOURCE is a Helm source object."
                              (and (re-search-forward (car candidate-or-regexp) nil t)
                                   (re-search-forward (cdr candidate-or-regexp) nil t))
                              (re-search-forward candidate-or-regexp nil t))
-              ;; If search fall on an header line continue loop
-              ;; until it match or fail (Issue #1509).
+              ;; If a search falls on an header line, continue the loop until it matches
+              ;; or fails (Issue #1509).
               (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
             (goto-char (or mp start)))))
     (forward-line 0) ; Avoid scrolling right on long lines.
