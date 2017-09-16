@@ -245,10 +245,10 @@ If a prefix arg is given split windows vertically."
 If frame is too small to display all windows, continue finding files
 in background.
 When called with a prefix arg split is done vertically."
-  (save-selected-window
-    (helm-aif (cdr files)
-        (progn
-          (switch-to-buffer (find-file-noselect (car files)))
+  (helm-aif (cdr files)
+      (progn
+        (switch-to-buffer (find-file-noselect (car files)))
+        (save-selected-window
           (cl-loop with nosplit
                    for f in it
                    for buf = (find-file-noselect f)
