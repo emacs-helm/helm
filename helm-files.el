@@ -3313,6 +3313,7 @@ Ask to kill buffers associated with that file, too."
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
 Called with a prefix arg open files in background without selecting them."
+  (require 'dired-x)
   (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and helm--url-regexp ; we should have only one candidate.
                     (string-match helm--url-regexp candidate)))
