@@ -231,7 +231,7 @@ If a prefix arg is given split windows vertically."
     (helm-aif (cdr mkds)
         (progn
           (if other-window
-              (switch-to-buffer-other-window (car mkds))
+              (helm--switch-to-buffer-other-window (car mkds))
             (switch-to-buffer (car mkds)))
           (save-selected-window
             (cl-loop for b in it
