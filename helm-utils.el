@@ -240,6 +240,23 @@ If a prefix arg is given split windows vertically."
           (helm--switch-to-buffer-other-window buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
 
+(defun helm-simultaneous-find-file (files)
+  "Find files in FILES list in separate windows.
+If frame is too small to display all windows, continue finding files
+in background.
+When called with a prefix arg split is done vertically."
+  (save-selected-window
+    (helm-aif (cdr files)
+        (progn
+          (switch-to-buffer (find-file-noselect (car files)))
+          (cl-loop with nosplit
+                   for f in it
+                   for buf = (find-file-noselect f)
+                   unless nosplit
+                   do (condition-case-unless-debug _err
+                          (helm--switch-to-buffer-other-window buf 'balance)
+                        (error (setq nosplit t) nil)))))))
+
 (defun helm--switch-to-buffer-other-window (buffer-or-name &optional balance)
   (select-window (split-window
                   nil nil helm-current-prefix-arg))
