@@ -586,6 +586,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
   "Define a default action for `helm-do-grep-1' on CANDIDATE.
 WHERE can be one of other-window, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
+         (split-pat    (helm-mm-split-pattern helm-input))
          (lineno       (string-to-number (nth 1 split)))
          (loc-fname        (or (with-current-buffer
                                    (if (eq major-mode 'helm-grep-mode)
@@ -611,6 +612,15 @@ WHERE can be one of other-window, other-frame."
       (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
+    (cl-loop for reg in split-pat
+             when (save-excursion
+                    (condition-case _err
+                        (if helm-migemo-mode
+                            (helm-mm-migemo-forward reg (point-at-eol) t)
+                          (re-search-forward reg (point-at-eol) t))
+                      (invalid-regexp nil)))
+             collect (match-beginning 0) into pos-ls
+             finally (when pos-ls (goto-char (apply #'min pos-ls))))
     (when mark
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))
