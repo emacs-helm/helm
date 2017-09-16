@@ -612,6 +612,7 @@ WHERE can be one of other-window, other-frame."
       (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
+    ;; Move point to the nearest matching regexp from bol.
     (cl-loop for reg in split-pat
              when (save-excursion
                     (condition-case _err
