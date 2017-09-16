@@ -112,8 +112,11 @@
            for char = (propertize (format "%c" v)
                                   'face 'helm-ucs-char)
            unless (or (string= "" n)
-                      (= v 10) ; 10=="\n"
-                      (not (char-displayable-p (read xcode))))
+                      ;; `char-displayable-p' return a font object or
+                      ;; t for some char that are displayable but have
+                      ;; no special font (e.g 10) so filter out char
+                      ;; with no font.
+                      (not (fontp (char-displayable-p (read xcode)))))
            collect
            (concat code (make-string diff ? )
                    char "  " n)
@@ -134,8 +137,7 @@
            for char = (propertize (format "%c" v)
                                   'face 'helm-ucs-char)
            unless (or (string= "" n)
-                      (= v 10) ; 10=="\n"
-                      (not (char-displayable-p (read xcode))))
+                      (not (fontp (char-displayable-p (read xcode)))))
            collect
            (concat code (make-string diff ? )
                    char "  " n)
