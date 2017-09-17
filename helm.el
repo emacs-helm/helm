@@ -559,7 +559,7 @@ source name in this variable."
   :type 'boolean)
 
 (defcustom helm-allow-mouse nil
-  "Prevent mouse usage during the helm session when non-nil.
+  "Allow mouse usage during the helm session when non-nil.
 
 Note that this also allow moving out of minibuffer when clicking
 outside of `helm-buffer', up to you to get back to helm by clicking
