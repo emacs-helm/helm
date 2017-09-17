@@ -134,7 +134,7 @@
                    "Switch to buffer in popup window"))
    'popwin:popup-buffer
    "Switch to buffer(s) other window `C-c o'"
-   'helm-switch-to-buffers-other-window
+   'helm-display-buffers-other-windows
    "Switch to buffer other frame `C-c C-o'"
    'switch-to-buffer-other-frame
    "Browse project from buffer"

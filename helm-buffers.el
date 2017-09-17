@@ -735,7 +735,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Run switch to other window action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-switch-to-buffers-other-window)))
+    (helm-exit-and-execute-action 'helm-display-buffers-other-windows)))
 (put 'helm-buffer-switch-other-window 'helm-only t)
 
 (defun helm-buffer-switch-other-frame ()

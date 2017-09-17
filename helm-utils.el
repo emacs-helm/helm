@@ -263,7 +263,7 @@ When called with a prefix arg split is done vertically."
   (and balance (balance-windows))
   (switch-to-buffer buffer-or-name))
 
-(defun helm-switch-to-buffers-other-window (buffer-or-name)
+(defun helm-display-buffers-other-windows (buffer-or-name)
   "switch to buffer BUFFER-OR-NAME in other window.
 See `helm-switch-to-buffers' for switching to marked buffers."
   (helm-switch-to-buffers buffer-or-name t))
