@@ -123,6 +123,11 @@ this source is accessible and properly loaded."
   "Face used for buffer files not already saved on disk."
   :group 'helm-buffers-faces)
 
+(defface helm-buffer-modified
+    '((t :inherit helm-ff-symlink))
+  "Face used for modified buffers."
+  :group 'helm-buffers-faces)
+
 (defface helm-buffer-size
     '((((background dark)) :foreground "RosyBrown")
       (((background light)) :foreground "SlateGray"))
@@ -365,7 +370,7 @@ See `ido-make-buffer-list' for more infos."
         ((and file-name (buffer-modified-p buf))
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
-          'helm-ff-symlink 'helm-buffer-process nil details 'mod))
+          'helm-buffer-modified 'helm-buffer-process nil details 'mod))
         ;; A buffer file not modified and saved on disk.=>green
         (file-name
          (helm-buffer--show-details
