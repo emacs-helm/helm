@@ -205,7 +205,7 @@ Possible value are:
    "Find File" 'helm-grep-action
    "Find file other frame" 'helm-grep-other-frame
    "Save results in grep buffer" 'helm-grep-save-results
-   "Find file other window" 'helm-grep-other-window)
+   "Find file other window (C-u vertically)" 'helm-grep-other-window)
   "Actions for helm grep."
   :group 'helm-grep
   :type '(alist :key-type string :value-type function))

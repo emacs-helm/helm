@@ -641,8 +641,8 @@ argument will execute action synchronously. Moreover it will follow the first
 file of the marked files in its destination directory.
 
 When `dired-async-mode' is enabled, an additional action named \"Backup files\"
-will be available. (Such command is not natively available in Emacs.)  See
-[[Using wildcard to select multiple files]] for details.
+will be available. (Such command is not natively available in Emacs).
+See [[Using wildcard to select multiple files]] for details.
 
 *** Bookmark the `helm-find-files' session.
 
@@ -776,6 +776,16 @@ prompted to attach files to one of these mail buffers.
 
 - If you are not in a mail buffer and no mail buffer exists,
 a new mail buffer is created with the attached files in it.
+
+*** Open files in separate windows.
+
+When [[Marked candidates][marking]] multiple files or using [[Use the wildcard to select multiple files.][wildcard]], helm allow opening all
+this files in separate windows using an horizontal layout or a
+vertical layout if you used a prefix arg, when no more windows can be
+displayed in frame, next files are opened in background without being
+displayed.  When using \\<helm-find-files-map>\\[helm-ff-run-switch-other-window] the current
+buffer is kept and files are displayed next to it.
+
 
 ** Commands
 \\<helm-find-files-map>
