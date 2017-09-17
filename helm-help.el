@@ -441,16 +441,17 @@ files under the current directory.
 Note that when recursively copying files, you may have files with same name
 dispatched across different subdirectories, so when copying them in the same
 directory they will get overwritten.  To avoid this Helm has a special action
-called \"backup files\" that has the same behavior as the command line \"cp
+called \"backup files\" that has the same behavior as the command line \"cp -f
 --backup=numbered\": it allows you to copy many files with the same name from
 different subdirectories into one directory.  Files with same name are renamed
-as follows: \"foo.txt.~1~\".
+as follows: \"foo.txt.~1~\".  Like with the --force option of cp, it is possible
+to backup files in current directory.
 
 This command is available only when `dired-async-mode' is active.
 
 When using an action that involves an external backend (e.g. grep), using \"**\"
 is not recommended (even thought it works fine) because it will be slower to
-select all the files.  You are better off leaving the backed to to it, it will
+select all the files.  You are better off leaving the backend to do it, it will
 be faster.  However, if you know you have not many files it is reasonable to use
 this, also using not recursive wilcard (e.g. \"*.el\") is perfectly fine for
 this.
