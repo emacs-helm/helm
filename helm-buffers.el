@@ -124,7 +124,7 @@ this source is accessible and properly loaded."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-modified
-    '((t :inherit helm-ff-symlink))
+    '((t :inherit font-lock-comment-face))
   "Face used for modified buffers."
   :group 'helm-buffers-faces)
 

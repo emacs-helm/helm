@@ -347,7 +347,7 @@ Of course you can also write your own function to do something else."
   :group 'helm-files-faces)
 
 (defface helm-ff-symlink
-    '((t (:foreground "DarkOrange")))
+    '((t :inherit font-lock-comment-face))
   "Face used for symlinks in `helm-find-files'."
   :group 'helm-files-faces)
 
