@@ -258,6 +258,9 @@ When called with a prefix arg split is done vertically."
                         (error (setq nosplit t) nil)))))))
 
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
+  "Switch to buffer-or-name in other window.
+If a prefix arg is detected split vertically.
+When argument balance is provided `balance-windows'."
   (select-window (split-window
                   nil nil helm-current-prefix-arg))
   (and balance (balance-windows))
