@@ -1008,7 +1008,7 @@ them for recursive searches.
 
 *** You can save the result in a `helm-grep-mode' buffer.
 
-See commands below.
+See [[Commands][commands]] below.
 
 Once in that buffer you can use \"emacs-wgrep\" (external package not bundled with Helm)
 to edit your changes.
@@ -1019,6 +1019,16 @@ to edit your changes.
 
 Simply add a space between each pattern as for most Helm commands.
 
+*** See full path of selected candidate
+
+Add (helm-popup-tip-mode 1) in your init file or enable it interactively with
+M-x helm-popup-tip-mode.
+
+*** Open file in other window
+
+The command \\<helm-grep-map>\\[helm-grep-run-other-window-action] allow you to open file
+in other window horizontally or vertically if a prefix arg is supplied.
+ 
 *** Performance over TRAMP
 
 Grepping works but it is badly supported as TRAMP doesn't support multiple
@@ -1230,6 +1240,11 @@ enable this you need to add `helm-source-occur' and `helm-source-moccur' to
 
 You can do this with `\\<helm-map>\\[helm-execute-persistent-action]' (persistent-action), to do it repeatedly
 you can use `\\<helm-map>\\[helm-follow-action-forward]' and `\\<helm-map>\\[helm-follow-action-backward]' or enable `helm-follow-mode' with `\\<helm-map>\\[helm-follow-mode]'.
+
+*** Switch to buffer in other window.
+
+The command \\<helm-moccur-map>\\[helm-moccur-run-goto-line-ow] allow you to switch to buffer
+in other window horizontally or vertically if a prefix arg is supplied.
 
 *** Save the results.
 
