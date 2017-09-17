@@ -3976,8 +3976,8 @@ respectively `helm-cand-num' and `helm-cur-source'."
         (map (get-text-property pos 'keymap)))
     (when map
       (if (eq helm-allow-mouse 'global-mouse-bindings)
-          (progn (define-key map [mouse-2] nil)
-                 (define-key map [down-mouse-2] nil)
+          (progn (define-key map [down-mouse-2] nil)
+                 (define-key map [mouse-2]      nil)
                  (remove-text-properties helm-selection-point
                                          (overlay-end helm-selection-overlay)
                                          '(help-echo t)))
@@ -4177,6 +4177,14 @@ function."
 
 ;;; Actions
 ;;
+(defun helm-get-current-action (&optional action)
+  "Return the default action either from optional ACTION, the helm saved action or from the selected helm item."
+  (helm-get-default-action (or action
+                               helm-saved-action
+                               (if (get-buffer helm-action-buffer)
+                                   (helm-get-selection helm-action-buffer)
+                                 (helm-get-actions-from-current-source)))))
+
 (defun helm-execute-selection-action ()
   "Execute current action."
   (helm-log-run-hook 'helm-before-action-hook)
@@ -4192,12 +4200,7 @@ function."
   "Execute ACTION on current SELECTION.
 If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
   (helm-log "executing action")
-  (setq action (helm-get-default-action
-                (or action
-                    helm-saved-action
-                    (if (get-buffer helm-action-buffer)
-                        (helm-get-selection helm-action-buffer)
-                      (helm-get-actions-from-current-source)))))
+  (setq action (helm-get-current-action action))
   (helm-aif (and (not helm-in-persistent-action)
                  (get-buffer helm-action-buffer))
       (kill-buffer it))
