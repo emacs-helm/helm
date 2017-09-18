@@ -224,18 +224,20 @@ If more than one buffer marked switch to these buffers in separate windows.
 If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
-  (let* ((mkds (helm-marked-candidates))
-         (size (/ (window-height) (length mkds))))
-    (or (<= window-min-height size)
-        (error "Too many buffers to visit simultaneously."))
+  (let ((mkds (helm-marked-candidates)))
     (helm-aif (cdr mkds)
         (progn
           (if other-window
               (helm-switch-to-buffer-other-window (car mkds))
             (switch-to-buffer (car mkds)))
           (save-selected-window
-            (cl-loop for b in it
-                  do (helm-switch-to-buffer-other-window b 'balance))))
+            (cl-loop with nosplit
+                     for b in it
+                     when nosplit return
+                     (message "Too many buffers to visit simultaneously")
+                     do (condition-case _err
+                            (helm-switch-to-buffer-other-window b 'balance)
+                          (error (setq nosplit t) nil)))))
       (if other-window
           (helm-switch-to-buffer-other-window buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
