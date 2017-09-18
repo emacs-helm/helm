@@ -258,15 +258,21 @@ When called with a prefix arg split is done vertically."
                    for f in it
                    for count from 1
                    for buf = (find-file-noselect f)
-                   unless nosplit
-                   do (condition-case-unless-debug _err
-                          (helm-switch-to-buffer-other-window buf 'balance)
-                        (error (setq nosplit t)
-                               (message "%d files displayed, %d files opening in background..."
-                                        (setq displayed count)
-                                        (setq remaining (- len count))) nil))
-                   finally (when nosplit (message "%d files displayed, %d files opened in background"
-                                                  displayed remaining)))))))
+                   unless nosplit do
+                   (condition-case-unless-debug _err
+                       (helm-switch-to-buffer-other-window buf 'balance)
+                     (error
+                      (setq nosplit t)
+                      (message
+                       "%d files displayed, %d files opening in background..."
+                       (setq displayed count)
+                       (setq remaining (- len count)))
+                      nil))
+                   finally
+                   (when nosplit
+                     (message
+                      "%d files displayed, %d files opened in background"
+                      displayed remaining)))))))
 
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   "Switch to buffer-or-name in other window.
