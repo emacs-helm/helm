@@ -596,6 +596,7 @@ If STRING is non--nil return instead a space separated string."
 
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
+  (require 'dired)
   (helm-with-gensyms (buffer window)
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
             (helm-always-two-windows t)
