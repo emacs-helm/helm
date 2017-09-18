@@ -2148,7 +2148,9 @@ purpose."
                         (and dir-p (not (string-match-p "/\\'" path))))
               (or (>= (length (helm-basename path)) 3) dir-p)))
       ;; At this point the tramp connection is triggered.
-      (setq helm-pattern (helm-ff--transform-pattern-for-completion path))
+      (helm-log
+       "Pattern=%S"
+       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
       ;; This have to be set after [1] to allow deleting char backward.
       (setq basedir (expand-file-name
                      (if (and dir-p helm-ff-auto-update-flag)
