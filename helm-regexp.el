@@ -538,7 +538,7 @@ Also add mouse navigation properties."
       (while (not (eobp))
         (if (eq helm-allow-mouse 'global-mouse-bindings)
             (progn (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
-                   (remove-text-properties start end '(help-echo t))
+                   (remove-text-properties start end '(help-echo))
                    (add-text-properties start end `(mouse-face highlight
                                                                keymap ,map
                                                                invisible nil)))

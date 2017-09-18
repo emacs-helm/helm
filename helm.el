@@ -3913,7 +3913,7 @@ Also add mouse navigation properties."
                            (eq helm-allow-mouse helm--allow-mouse-changed))))
     (if (eq helm-allow-mouse 'global-mouse-bindings)
         (progn (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
-               (remove-text-properties start end '(help-echo t))
+               (remove-text-properties start end '(help-echo))
                (add-text-properties start end `(mouse-face highlight
                                                 keymap ,map)))
       (define-key map [down-mouse-1] 'helm-mouse-select-candidate)
@@ -3980,7 +3980,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
                  (define-key map [mouse-2]      nil)
                  (remove-text-properties helm-selection-point
                                          (overlay-end helm-selection-overlay)
-                                         '(help-echo t)))
+                                         '(help-echo)))
         (define-key map [down-mouse-2] 'helm-maybe-exit-minibuffer)
         (define-key map [mouse-2] 'ignore)
         (put-text-property
