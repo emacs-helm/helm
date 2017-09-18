@@ -799,7 +799,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                           (format "^%s"
                                   (helm-buffers--quote-truncated-buffer b)))
                          (save-selected-window
-                           (when (y-or-n-p (format "kill buffer (%s)? " b))
+                           (when (or (not (buffer-modified-p b))
+                                     (y-or-n-p
+                                      (format "`%s' modified kill it anyway? " b)))
                              (helm-buffers-persistent-kill-1 b)))
                          (message nil)
                          (helm--remove-marked-and-update-mode-line b)))
