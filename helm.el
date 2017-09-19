@@ -2068,7 +2068,7 @@ However, the use of non-keyword args is deprecated.
                    #'helm)
                   (t #'helm-internal))))
     (if (and helm-alive-p (eq fn #'helm))
-        (if (helm-alive-p)
+        (if (helm--alive-p)
             ;; A helm session is normally running.
             (error "Error: Trying to run helm within a running helm session")
           ;; A helm session is already running and user jump somewhere else
@@ -2094,13 +2094,13 @@ However, the use of non-keyword args is deprecated.
                               helm-argument-keys)))
         (apply fn plist))))) ; [1] fn == helm-internal.
 
-(defun helm-alive-p ()
-  "Check if `helm' is alive.
-An `helm' session is considered alive if `helm-alive-p' returns
+(defun helm--alive-p ()
+  "[Internal] Check if `helm' is alive.
+An `helm' session is considered alive if `helm-alive-p' value is
 non-`nil', the `helm-buffer' is visible, and cursor is in the
 minibuffer."
   (and helm-alive-p
-       (get-buffer-window helm-buffer 'visible)
+       (get-buffer-window (helm-buffer-get) 'visible)
        (minibuffer-window-active-p (minibuffer-window))
        (minibufferp (current-buffer))))
 
