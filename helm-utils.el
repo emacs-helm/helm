@@ -224,11 +224,14 @@ If more than one buffer marked switch to these buffers in separate windows.
 If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
-  (let ((mkds (helm-marked-candidates)))
+  (let ((mkds          (helm-marked-candidates))
+        (initial-ow-fn (if (cdr (window-list))
+                           #'switch-to-buffer-other-window
+                         #'helm-switch-to-buffer-other-window)))
     (helm-aif (cdr mkds)
         (progn
           (if other-window
-              (helm-switch-to-buffer-other-window (car mkds))
+              (funcall initial-ow-fn (car mkds))
             (switch-to-buffer (car mkds)))
           (save-selected-window
             (cl-loop with nosplit
@@ -239,7 +242,7 @@ If a prefix arg is given split windows vertically."
                             (helm-switch-to-buffer-other-window b 'balance)
                           (error (setq nosplit t) nil)))))
       (if other-window
-          (helm-switch-to-buffer-other-window buffer-or-name)
+          (funcall initial-ow-fn buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
 
 (defun helm-simultaneous-find-file (files)
