@@ -111,7 +111,8 @@ Arg SOURCE will be an existing helm source named
   (defalias (intern (concat "helm-info-" name))
       (lambda ()
         (interactive)
-        (helm :sources source
+        (helm :allow-nest t
+              :sources source
               :buffer buffer
               :candidate-number-limit 1000))
     doc))
