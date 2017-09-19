@@ -584,9 +584,9 @@ completion buffers:
 This allows selection of windows other than the minibuffer; 
 the minibuffer window must then be selected again to exit helm."
   :group 'helm
-  :type '(radio (const :tag "Helm Mouse Buttons" t)
-                (const :tag "Global Mouse Buttons" 'global-mouse-bindings)
-                (const :tag "No Mouse Buttons" nil)))
+  :type '(radio (const :tag "Helm Mouse Buttons" :value t)
+                (const :tag "Global Mouse Buttons" :value global-mouse-bindings)
+                (const :tag "No Mouse Buttons" :value nil)))
 
 ;;; Prevent losing focus when using mouse.
 ;;
