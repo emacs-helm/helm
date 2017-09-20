@@ -1519,7 +1519,7 @@ actions menu.
      "* Helm completing-read completion for `%s'
 
 Command `%s' is using a `completing-read' for completion on your input,
-this completion have been \"helmized\" because you have enabled `helm-mode'.
+this completion have been \"helmized\" because you have enabled [[Helm mode][helm-mode]]'.
 
 ** Tips
 
