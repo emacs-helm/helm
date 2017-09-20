@@ -650,6 +650,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                                  (not (keywordp x))))
                                           (or (car-safe default) default)))
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
+               :help-message #'helm-comp-read-help-message
                :fuzzy-match helm-mode-fuzzy-match
                :persistent-action
                (lambda (candidate)
