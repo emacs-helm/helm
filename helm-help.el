@@ -256,7 +256,7 @@ It behaves differently depending on `helm-selection' (current candidate in helm-
 Note that when copying, renaming, etc. from `helm-find-files' the
 destination file is selected with `helm-read-file-name'.
 
-To void confusion when using `read-file-name' or `read-directory-name', `RET'
+To avoid confusion when using `read-file-name' or `read-directory-name', `RET'
 follows its standard Emacs behaviour, i.e. it exits the minibuffer as soon as
 you press `RET'.  If you want the same behavior as in `helm-find-files', bind
 `helm-ff-RET' to the `helm-read-file-map':
@@ -1510,6 +1510,34 @@ actions menu.
 \\[helm-org-run-refile-heading-to]\t\tRefile current or marked headings to selection.
 \\[helm-org-run-insert-link-to-heading-at-marker]\t\tInsert link at point to selection."
   )
+
+;;; Completing-read
+;;
+(defun helm-comp-read-help-message ()
+  (let ((com (assoc-default 'name (helm-get-current-source))))
+     (format
+     "* Helm completing-read completion for `%s'
+
+Command `%s' is using a `completing-read' for completion on your input,
+this completion have been \"helmized\" because you have enabled `helm-mode'.
+
+** Tips
+
+*** Disabling or use something else than helm for completion of some commands
+
+You can disable helm completion or use something else for specific commands of your choice,
+for this customize variable `helm-completing-read-handlers-alist'.
+
+*** Exiting minibuffer with empty string
+
+You can exit minibuffer with empty string with \\<helm-comp-read-map>\\[helm-cr-empty-string].
+It is useful when some commands are prompting continuously until you enter an empty prompt.
+
+** Commands
+\\<helm-comp-read-map>
+\\[helm-cr-empty-string]\t\tExit minibuffer with empty string."
+     com com)))
+
 
 ;;; Mode line strings
 ;;

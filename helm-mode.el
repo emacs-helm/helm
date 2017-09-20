@@ -691,6 +691,7 @@ It should be used when candidate list don't need to rebuild dynamically."
      :input-history history
      :must-match require-match
      :alistp nil
+     :help-message #'helm-comp-read-help-message
      :name name
      :requires-pattern (if (and (stringp default)
                                 (string= default "")
