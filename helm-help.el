@@ -58,31 +58,30 @@
                                  helm-semantic-help-message
                                  helm-kmacro-help-message))
 
+(defvar helm-documentation-buffer-name "*helm documentation*")
 
 ;;;###autoload
-(defun helm-documentation (arg)
+(defun helm-documentation ()
   "Preconfigured Helm for Helm documentation.
 With a prefix arg refresh the documentation.
 
 Find here the documentation of all documented sources."
-  (interactive "P")
+  (interactive)
   (require 'helm-org)
-  (when arg (delete-file helm-documentation-file)
-        (helm-aif (get-file-buffer helm-documentation-file)
-            (kill-buffer it)))
-  (unless (file-exists-p helm-documentation-file)
-    (with-temp-file helm-documentation-file
+  (with-current-buffer (get-buffer-create helm-documentation-buffer-name)
+    (let ((inhibit-read-only t))
       (erase-buffer)
       (cl-loop for elm in helm-help--string-list
-               for str = (symbol-value elm)
-               do (insert (substitute-command-keys
-                           (if (functionp str) (funcall str) str))
-                          "\n\n"))))
+               for str = (helm-interpret-value elm)
+               do (insert (substitute-command-keys str) "\n\n"))
+      (org-mode))
+    (setq buffer-read-only t)
+    (view-mode))
   (let ((helm-org-headings--nofilename t))
     (helm :sources (helm-source-org-headings-for-files
-                    (list helm-documentation-file))
+                    (list (get-buffer helm-documentation-buffer-name)))
           :candidate-number-limit 99999
-          :buffer "*helm documentation*")))
+          :buffer "*helm doc*")))
 
 ;;; Local help messages.
 
