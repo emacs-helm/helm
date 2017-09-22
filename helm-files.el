@@ -685,7 +685,7 @@ belonging to each window."
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
-  (require 'dired)
+  (require 'dired-async)
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
@@ -3165,6 +3165,7 @@ Where ACTION is a symbol that can be one of:
 'copy, 'rename, 'symlink,'relsymlink, 'hardlink or 'backup.
 Argument FOLLOW when non--nil specify to follow FILES to destination for the actions
 copy and rename."
+  (require 'dired-async)
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
   ;; When default-directory in current-buffer is an invalid directory,
   ;; (e.g buffer-file directory have been renamed somewhere else)
