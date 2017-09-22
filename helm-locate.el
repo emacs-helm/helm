@@ -55,6 +55,7 @@ according to your system:
 
 Gnu/linux:     \"locate %s -e -A --regex %s\"
 berkeley-unix: \"locate %s %s\"
+darwin (macos) \"mdfind %s -name %s\"
 windows-nt:    \"es %s %s\"
 Others:        \"locate %s %s\"
 
@@ -237,6 +238,7 @@ See `helm-locate-with-db' and `helm-locate'."
           (cl-case system-type
             (gnu/linux "locate %s -e -A --regex %s")
             (berkeley-unix "locate %s %s")
+            (darwin "mdfind %s -name %s")
             (windows-nt "es %s %s")
             (t "locate %s %s")))))
 
