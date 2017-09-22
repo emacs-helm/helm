@@ -685,12 +685,14 @@ belonging to each window."
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION must be an action supported by `helm-dired-action'."
+  (require 'dired)
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
          (prefarg helm-current-prefix-arg)
          (prompt (format "%s %s file(s) to: "
-                         (if (and dired-async-mode
+                         (if (and (and (fboundp 'dired-async-mode)
+                                       dired-async-mode)
                                   (null prefarg))
                              (concat "Async " (symbol-name action)) 
                            (capitalize (symbol-name action)))
@@ -3277,6 +3279,7 @@ following files to destination."
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro)
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
+  (require 'dired)
   (when (and error-if-dot-file-p
              (helm-ff-dot-file-p file))
     (error "Error: Cannot operate on `.' or `..'"))

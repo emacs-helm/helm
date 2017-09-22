@@ -597,9 +597,15 @@ If STRING is non--nil return instead a space separated string."
             (mapconcat 'identity (list type user group other) " ")
           (list :mode-type type :user user :group group :other other))))
 
+(defun helm-format-columns-of-files (files)
+  "Same as `dired-format-columns-of-files'.
+Inlined here for compatibility."
+  (let ((beg (point)))
+    (completion--insert-strings files)
+    (put-text-property beg (point) 'mouse-face nil)))
+
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
-  (require 'dired)
   (helm-with-gensyms (buffer window)
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
             (helm-always-two-windows t)
@@ -610,7 +616,7 @@ If STRING is non--nil return instead a space separated string."
             helm-reuse-last-window-split-state
             ,window)
        (with-current-buffer ,buffer
-         (dired-format-columns-of-files ,candidates))
+         (helm-format-columns-of-files ,candidates))
        (unwind-protect
             (with-selected-window
                 (setq ,window (temp-buffer-window-show
