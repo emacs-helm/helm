@@ -15,5 +15,10 @@
 
 ## IMPORTANT NOTE:
 
-If you are using a Unix or GNU-Linux system there is no excuses 
-to not use `emacs-helm.sh` to reproduce your bug in 99% of the cases.
+Helm is providing a script named `emacs-helm.sh` which allows running Helm
+in a neutral environment with only helm installed with minimal settings.
+When possible it is important to use it to reproduce your helm bugs 
+to ensure no other package is interfering.
+To run it, just cd to the directory where helm is installed and call ./emacs-helm.sh.
+
+Thanks.
