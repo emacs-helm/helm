@@ -844,10 +844,6 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
-(defvar helm--completing-file-name nil
-  "Non nil when `helm-read-file-name' is running.
-Used for `helm-file-completion-source-p'.")
-
 ;;;###autoload
 (cl-defun helm-read-file-name
     (prompt
