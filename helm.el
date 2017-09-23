@@ -114,7 +114,7 @@ and second call within 0.5s runs `helm-swap-windows'."
 
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
-                                         &optional other-subkeys menu exit-fn)
+                                         &optional other-subkeys prompt exit-fn)
   "Defines in MAP a KEY and SUBKEY to COMMAND.
 
 This allows typing KEY to call COMMAND the first time and
@@ -134,8 +134,8 @@ In this example, `C-x v n' will run `git-gutter:next-hunk'
 subsequent \"n\"'s run this command again
 and subsequent \"p\"'s run `git-gutter:previous-hunk'.
 
-Arg MENU is a string displayed in minibuffer that
-describes SUBKEY and OTHER-SUBKEYS.
+If specified PROMPT can be displayed in minibuffer to
+describe SUBKEY and OTHER-SUBKEYS.
 Arg EXIT-FN specifies a function to run on exit.
 
 For any other keys pressed, run their assigned command as defined
@@ -150,7 +150,7 @@ vectors, so don't use strings to define them."
       (unwind-protect
           (progn
             (call-interactively command)
-            (while (let ((input (read-key menu)) other kb com)
+            (while (let ((input (read-key prompt)) other kb com)
                      (setq last-command-event input)
                      (cond
                       ((eq input subkey)
