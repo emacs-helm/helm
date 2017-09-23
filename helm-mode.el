@@ -844,6 +844,10 @@ See documentation of `completing-read' and `all-completions' for details."
 ;;; Generic read-file-name
 ;;
 ;;
+(defvar helm--completing-file-name nil
+  "Non nil when `helm-read-file-name' is running.
+Used for `helm-file-completion-source-p'.")
+
 ;;;###autoload
 (cl-defun helm-read-file-name
     (prompt
@@ -937,6 +941,7 @@ Keys description:
                  helm-read-file-map))
          (minibuffer-completion-predicate test)
          (minibuffer-completing-file-name t)
+         (helm--completing-file-name t)
          (helm-read-file-name-mode-line-string
           (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                     "helm-confirm-and-exit-minibuffer"

@@ -5743,7 +5743,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 
 (defun helm-file-completion-source-p (&optional source)
   "Return non-`nil' if current source is a file completion source."
-  (or minibuffer-completing-file-name
+  (or helm--completing-file-name ; helm-read-file-name
       (let ((cur-source (cdr (assq 'name
                                     (or source (helm-get-current-source))))))
         (cl-loop for i in helm--file-completion-sources
