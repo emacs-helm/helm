@@ -853,6 +853,9 @@ layout."
 This is done possibly with an eshell alias, if no alias found, you can type in
 an eshell command.
 
+Only aliases accepting a file as argument at the end of command line
+are collected, i.e aliases ending with \"$1\" or \"$*\".
+
 Basename of CANDIDATE can be a wild-card.
 e.g you can do \"eshell-command command *.el\"
 Where \"*.el\" is the CANDIDATE.
@@ -887,9 +890,11 @@ working."
                                   default-directory))
            (command (helm-comp-read
                      "Command: "
-                     (cl-loop for (a . c) in eshell-command-aliases-list
-                              when (string-match "\\(\\$1\\|\\$\\*\\)$" (car c))
-                              collect (propertize a 'help-echo (car c)) into ls
+                     (cl-loop for (a c) in (eshell-read-aliases-list)
+                              ;; Positional arguments may be double
+                              ;; quoted (Issue #1881).
+                              when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
+                              collect (propertize a 'help-echo c) into ls
                               finally return (sort ls 'string<))
                      :buffer "*helm eshell on file*"
                      :name "Eshell command"
