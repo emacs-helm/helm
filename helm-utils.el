@@ -217,6 +217,13 @@ In this case last position is added to the register
 ;;; Utils functions
 ;;
 ;;
+(defcustom helm-switch-to-buffer-ow-vertically nil
+  "Switch to other window vertically when non nil.
+This also change the behavior of prefix arg in
+`helm-switch-to-buffer-other-window'."
+  :group 'helm-utils
+  :type 'boolean)
+
 (defun helm-switch-to-buffers (buffer-or-name &optional other-window)
   "Switch to buffer BUFFER-OR-NAME.
 
@@ -281,10 +288,12 @@ When called with a prefix arg split is done vertically."
   "Switch to buffer-or-name in other window.
 If a prefix arg is detected split vertically.
 When argument balance is provided `balance-windows'."
-  (select-window (split-window
-                  nil nil helm-current-prefix-arg))
-  (and balance (balance-windows))
-  (switch-to-buffer buffer-or-name))
+  (let ((right-side (if helm-switch-to-buffer-ow-vertically
+                        (not helm-current-prefix-arg)
+                      helm-current-prefix-arg)))
+    (select-window (split-window nil nil right-side))
+    (and balance (balance-windows))
+    (switch-to-buffer buffer-or-name)))
 
 (defun helm-display-buffers-other-windows (buffer-or-name)
   "switch to buffer BUFFER-OR-NAME in other window.
