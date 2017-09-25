@@ -218,11 +218,23 @@ In this case last position is added to the register
 ;;
 ;;
 (defcustom helm-switch-to-buffer-ow-vertically nil
-  "Switch to other window vertically when non nil.
-This also change the behavior of prefix arg in
-`helm-switch-to-buffer-other-window'."
+  "Maybe switch to other window vertically when non nil.
+
+Possible values are `t', `nil' and `decide'.
+
+When `t' switch vertically.
+When nil switch horizontally.
+When `decide' try to guess if it is possible to switch vertically
+according to the setting of `split-width-threshold' and the size of
+the window from where splitting is done.
+
+Note that when using `decide' and `split-width-threshold' is nil, the
+behavior is the same that with a nil value."
   :group 'helm-utils
-  :type 'boolean)
+  :type '(choice
+           (const :tag "Split window vertically" t)
+           (const :tag "Split window horizontally" nil)
+           (symbol :tag "Guess how to split window" 'decide)))
 
 (defun helm-switch-to-buffers (buffer-or-name &optional other-window)
   "Switch to buffer BUFFER-OR-NAME.
@@ -288,7 +300,13 @@ When called with a prefix arg split is done vertically."
   "Switch to buffer-or-name in other window.
 If a prefix arg is detected split vertically.
 When argument balance is provided `balance-windows'."
-  (let ((right-side (if helm-switch-to-buffer-ow-vertically
+  (let* ((helm-switch-to-buffer-ow-vertically
+          (if (eq helm-switch-to-buffer-ow-vertically 'decide)
+              (and (numberp split-width-threshold)
+                   (>= (window-width (selected-window))
+                       split-width-threshold))
+            helm-switch-to-buffer-ow-vertically))
+         (right-side (if helm-switch-to-buffer-ow-vertically
                         (not helm-current-prefix-arg)
                       helm-current-prefix-arg)))
     (select-window (split-window nil nil right-side))
