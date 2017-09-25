@@ -57,6 +57,12 @@ Note that this may be a buffer different than where the release occurs.")
 (defvar assist-key-help-flag nil
   "When non-nil, forces display of help for next Assist Key release.")
 
+(defcustom hkey-debug nil
+  "If non-nil, displays a message with the context and values from each Smart Key activation.
+Default is nil."
+  :type 'boolean
+  :group 'hyperbole-commands)
+
 (defvar hkey-region nil
   "Used to pass the value of a selected region between a Smart Key depress and release.
 This permits the Smart Keys to behave as paste keys.")
@@ -1086,35 +1092,34 @@ Use nil as cmd values to unbind a key."
 	   [mode-line mouse-3])
 	  ))))
 
-(add-hook 'after-init-hook
-	  (lambda ()
-	    ;; Redefine this function from Emacs to add before and after hooks.
-	    (defun posn-set-point (position)
-	      "Move point to POSITION.
+;; Redefine this function from Emacs to add before and after hooks.
+(defun posn-set-point (position)
+  "Move point to POSITION.
 Select the corresponding window as well."
-	      (if (not (windowp (posn-window position)))
-		  (error "Position not in text area of window"))
-	      (run-hooks 'before-set-point-hook)
-	      (select-window (posn-window position))
-	      (prog1 (if (numberp (posn-point position))
-			 (goto-char (posn-point position)))
-		(run-hooks 'after-set-point-hook)))
+  (if (not (windowp (posn-window position)))
+      (error "Position not in text area of window"))
+  (run-hooks 'before-set-point-hook)
+  (select-window (posn-window position))
+  (prog1 (if (numberp (posn-point position))
+	     (goto-char (posn-point position)))
+    (run-hooks 'after-set-point-hook)))
 
-	    ;; In helm, make [mouse-1] mark any chosen line that has an action.
-	    (add-hook 'after-set-point-hook
-		      (lambda ()
-			(when (eq major-mode 'helm-major-mode)
-			  (unless (region-active-p)
-			    ;; Marks current line only if it has an action.
-			    (smart-helm-line-has-action))
-			  (if (and (eq last-command 'mouse-set-point)
-				   helm-alive-p (> (minibuffer-depth) 0))
-			      (select-window (minibuffer-window))))))
+;; In helm, make [mouse-1] mark any chosen line that has an action.
+(add-hook 'after-set-point-hook
+	  (lambda ()
+	    (when (or (eq major-mode 'helm-major-mode)
+		      (equal "*helm action*" (buffer-name)))
+	      (unless (region-active-p)
+		;; Marks current line only if it has an action.
+		(smart-helm-line-has-action))
+	      (when (and (eq last-command 'mouse-set-point)
+			 helm-alive-p (> (minibuffer-depth) 0))
+		(select-window (minibuffer-window))))))
 
-	    (hmouse-bind-key 2 #'action-key-depress-emacs #'action-mouse-key-emacs)
-	    (hmouse-bind-key 3 #'assist-key-depress-emacs #'assist-mouse-key-emacs)
+(hmouse-bind-key 2 #'action-key-depress-emacs #'action-mouse-key-emacs)
+(hmouse-bind-key 3 #'assist-key-depress-emacs #'assist-mouse-key-emacs)
 
-	    ;; Ensure setting has changed so helm will reinstall proper keymap in
-	    ;; helm buffer.
-	    (setq helm-allow-mouse nil)
-	    (setq helm-allow-mouse 'global-mouse-bindings)))
+;; Ensure setting has changed so helm will reinstall proper keymap in
+;; helm buffer.
+(setq helm-allow-mouse nil)
+(setq helm-allow-mouse 'global-mouse-bindings)
