@@ -13,6 +13,9 @@
 ## Describe versions of helm, emacs, operating system etc.
 
 
+## Are you using `emacs-helm.sh` to reproduce this bug (yes/no): 
+
+
 ## IMPORTANT NOTE:
 
 Helm is providing a script named `emacs-helm.sh` which allows running Helm
