@@ -527,6 +527,39 @@ Same as `helm-moccur-goto-line' but go in new frame."
   (interactive)
   (helm-moccur-mode-goto-line-ow-forward-1 -1))
 
+(defvar helm-moccur-keymap (make-sparse-keymap)
+  "Text property keymap for mouse bindings applied to helm moccur entries.")
+
+(defun helm-moccur-propertize (start end map)
+  "On moccur matches between START and END, add text property mouse bindings to key MAP.
+Also add mouse navigation properties."
+  (when map
+    (save-excursion
+      (while (not (eobp))
+        (if (eq helm-allow-mouse 'global-mouse-bindings)
+            (progn (mapc (lambda (key) (define-key map key nil)) helm--mouse-keys)
+                   (remove-text-properties start end '(help-echo))
+                   (add-text-properties start end `(mouse-face highlight
+                                                               keymap ,map
+                                                               invisible nil)))
+          (add-text-properties
+           (point-at-bol) (point-at-eol)
+           `(keymap ,map
+                    help-echo ,(concat
+                                (buffer-file-name
+                                 (get-buffer (get-text-property
+                                              (point) 'buffer-name)))
+                                "\nmouse-1: set point\nmouse-2: jump to selection")
+                    mouse-face highlight
+                    invisible nil))
+          (define-key map [down-mouse-1] 'mouse-set-point)
+          (define-key map [mouse-1]      'ignore)
+          (define-key map [down-mouse-2] 'helm-moccur-mode-mouse-goto-line)
+          (define-key map [mouse-2]      'ignore)
+          (define-key map [down-mouse-3] 'ignore)
+          (define-key map [mouse-3]      'ignore))
+        (forward-line 1)))))
+
 (defun helm-moccur-save-results (_candidate)
   "Save helm moccur results in a `helm-moccur-mode' buffer."
   (let ((buf "*hmoccur*")
@@ -534,16 +567,16 @@ Same as `helm-moccur-goto-line' but go in new frame."
     (when (get-buffer buf)
       (setq new-buf (helm-read-string "OccurBufferName: " buf))
       (cl-loop for b in (helm-buffer-list)
-            when (and (string= new-buf b)
-                      (not (y-or-n-p
-                            (format "Buffer `%s' already exists overwrite? "
-                                    new-buf))))
-            do (setq new-buf (helm-read-string "OccurBufferName: " "*hmoccur ")))
+               when (and (string= new-buf b)
+                         (not (y-or-n-p
+                               (format "Buffer `%s' already exists overwrite? "
+                                       new-buf))))
+               do (setq new-buf (helm-read-string "OccurBufferName: " "*hmoccur ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t)
-            (map (make-sparse-keymap)))
+            (map helm-moccur-keymap))
         (erase-buffer)
         (insert "-*- mode: helm-moccur -*-\n\n"
                 (format "Moccur Results for `%s':\n\n" helm-input))
@@ -551,22 +584,7 @@ Same as `helm-moccur-goto-line' but go in new frame."
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min)) (forward-line 1)
                     (buffer-substring (point) (point-max)))))
-        (save-excursion
-          (while (not (eobp))
-            (add-text-properties
-             (point-at-bol) (point-at-eol)
-             `(keymap ,map
-               help-echo ,(concat
-                           (buffer-file-name
-                            (get-buffer (get-text-property
-                                         (point) 'buffer-name)))
-                           "\nmouse-1: set point\nmouse-2: jump to selection")
-               mouse-face highlight
-               invisible nil))
-            (define-key map [mouse-1] 'mouse-set-point)
-            (define-key map [mouse-2] 'helm-moccur-mode-mouse-goto-line)
-            (define-key map [mouse-3] 'ignore)
-            (forward-line 1))))
+        (helm-moccur-propertize (point-at-bol) (point-at-eol) map))
       (helm-moccur-mode))
     (pop-to-buffer buf)
     (message "Helm Moccur Results saved in `%s' buffer" buf)))

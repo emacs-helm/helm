@@ -1097,7 +1097,7 @@ That is what completion commands operate on."
     helm-buffer))
 
 (defun helm-window ()
-  "Window of `helm-buffer'."
+  "Window of `helm-action-buffer' if active or of `helm-buffer' otherwise."
   (get-buffer-window (helm-buffer-get) 0))
 
 (defun helm-action-window ()
