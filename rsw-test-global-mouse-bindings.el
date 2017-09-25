@@ -127,17 +127,22 @@ Action and Assist Mouse Keys.")
 	  ((funcall (key-binding (kbd "RET"))) . (smart-completion-help)))
     ;;
     ;; If reading a Hyperbole menu item and nothing is selected, just return.
-    ;; If in a helm session, quit the session and activate the selected item.
+    ;; Or if in a helm session with point in the minibuffer, quit the
+    ;; session and activate the selected item.
     ((and (> (minibuffer-depth) 0)
 	  (eq (selected-window) (minibuffer-window))
 	  (or (eq hargs:reading-p 'hmenu)
 	      (smart-helm-alive-p))) .
 	  ((funcall (key-binding (kbd "RET"))) . (funcall (key-binding (kbd "RET")))))
     ;;
+    ;; If at the end of a line (eol), invoke the associated Smart Key handler EOL handler.
+    ((smart-eolp) .
+     ((funcall action-key-eol-function) . (funcall assist-key-eol-function)))
+    ;;
     ;; Direct access selection of helm-major-mode completions
     ((setq hkey-value (and (or (eq major-mode 'helm-major-mode)
 			       (and (featurep 'helm) (equal helm-action-buffer (buffer-name))))
-			   (or (eobp)
+			   (or (eolp)
 			       (smart-helm-at-header)
 			       (smart-helm-line-has-action)))) .
      ((smart-helm) . (smart-helm-assist)))
@@ -793,6 +798,25 @@ not."
     (or rtn (progn (beep) (message "End of buffer")))
     rtn))
 
+(defun smart-outline-char-invisible-p (&optional pos)
+  "Return t if the character after point is invisible/hidden, else nil."
+  (or pos (setq pos (point)))
+  (when (or
+	 ;; New-style Emacs outlines with invisible properties to hide lines
+	 (kproperty:get pos 'invisible)
+	 (delq nil (mapcar (lambda (o) (overlay-get o 'invisible))
+			   (overlays-at (or pos (point)))))
+	 ;; Old-style Emacs outlines using \r (^M) characters to hide lines
+	 (and selective-display (eq (following-char) ?\r)))
+    t))
+
+(defun smart-eolp ()
+  "Return t if point is at the end of a visible line but not the end of the buffer."
+  ;; smart-helm handles eol for helm buffers
+  (unless (and (smart-helm-alive-p) (equal (helm-buffer-get) (buffer-name)))
+    (and (not (eobp)) (eolp) (or (not (smart-outline-char-invisible-p))
+				 (not (smart-outline-char-invisible-p (1- (point))))))))
+
 (provide 'hmouse-drv)
 
 ;;; ************************************************************************
@@ -800,7 +824,7 @@ not."
 ;;; ************************************************************************
 
 (defun smart-helm-at-header ()
-  "Return t iff Action Mouse Key depress was on the first header line of the current buffer."
+  "Return t iff Action Mouse Key depress was on the first fixed header line or a helm section header of the current buffer."
   (or (helm-pos-header-line-p)
       (and (eventp action-key-depress-args)
 	   (eq (posn-area (event-start action-key-depress-args))
@@ -808,11 +832,11 @@ not."
 
 (defun smart-helm-line-has-action ()
   "Marks and returns the actions for the helm selection item at point, or nil if line lacks any action.
-Assumes Hyperbole has already checked that point is in a helm buffer."
+Assumes Hyperbole has already checked that helm is active."
   (let ((helm-buffer (if (equal helm-action-buffer (buffer-name)) helm-buffer (buffer-name))))
     (save-excursion
       (with-helm-buffer
-	(setq cursor-type t) ;; For testing that mouse presses set point.
+	(if hkey-debug (setq cursor-type t)) ; For testing where mouse presses set point.
 	(when (not (or (eobp)
 		       (smart-helm-at-header)
 		       (helm-pos-candidate-separator-p)))
@@ -821,7 +845,7 @@ Assumes Hyperbole has already checked that point is in a helm buffer."
 
 (defun smart-helm-alive-p ()
   ;; Handles case where helm-action-buffer is visible but helm-buffer
-  ;; is not, which (helm-alive-p) doesn't handle.
+  ;; is not; fixed in helm with commit gh#emacs-helm/helm/cc15f73.
   (and (featurep 'helm)
        helm-alive-p
        (window-live-p (helm-window))
@@ -836,52 +860,156 @@ Assumes Hyperbole has already checked that point is in a helm buffer."
     (helm-resume helm-buffer)
     (sit-for 0.2)))
 
+(defun smart-helm-at (depress-event)
+  "Return non-nil iff Smart Mouse DEPRESS-EVENT was on a helm section header, candidate separator or at eob or eol.
+If non-nil, returns a property list of the form: (section-header <bool> separator <bool> eob <bool> or eol <bool>).
+If a section-header or separator, selects the first following candidate line.
+Assumes Hyperbole has already checked that helm is active."
+  (and (eventp depress-event)
+       ;; Nil means in the buffer text area
+       (not (posn-area (event-start depress-event)))
+       (with-helm-buffer
+	 (let ((opoint (point))
+	       things)
+	   (mouse-set-point depress-event)
+	   (setq things (list 'section-header (helm-pos-header-line-p)
+			      'separator (helm-pos-candidate-separator-p)
+			      'eob (eobp)
+			      'eol (eolp)))
+	   (cond ((or (plist-get things 'section-header) (plist-get things 'separator))
+		  (helm-next-line 1)
+		  things)
+		 ((plist-get things 'eol)
+		  (helm-mark-current-line)
+		  things)
+		 ((plist-get things 'eob)
+		  things)
+		 (t
+		  (goto-char opoint)
+		  nil))))))
+
 (defun smart-helm()
   "Executes helm actions based on Action Key click locations:
-  On a candidate line, performs the candidate's first action and remains in the minibuffer;
-  On the first header line, displays a list of actions available for the selected candidate;
-  On an action list line, performs the action after exiting the minibuffer;
   At the end of the buffer, quits from helm and exits the minibuffer.
+  On a candidate line, performs the candidate's first action and remains in the minibuffer;
+  On the top, fixed header line, toggles display of the selected candidate's possible actions;
+  On an action list line, performs the action after exiting the minibuffer;
+  On a source section header, moves to the next source section or first if on last.
   On a candidate separator line, does nothing.
   In the minibuffer window, ends the helm session and performs the selected item's action."
-  (let ((non-text-area-p (and (eventp action-key-depress-args)
-			      (posn-area (event-start action-key-depress-args))))
-	(separator (helm-pos-candidate-separator-p))
-	(eob (eobp)))
+  (unless (hmouse-check-action-key)
+    (error "(smart-helm): Hyperbole Action Mouse Key - either depress or release event is improperly configured"))
+  (let* ((non-text-area-p (and (eventp action-key-depress-args)
+			       (posn-area (event-start action-key-depress-args))))
+	 (at-plist (smart-helm-at action-key-depress-args))
+	 (section-hdr (plist-get at-plist 'section-header))
+	 (separator (plist-get at-plist 'separator))
+	 (eob (plist-get at-plist 'eob))
+	 (eol (plist-get at-plist 'eol)))
     (smart-helm-resume-helm)
-    (if (> (minibuffer-depth) 0)
-	(select-window (minibuffer-window)))
-    (when (and (smart-helm-alive-p) (not separator))
-      (let* ((key (kbd (cond
+    ;; Handle end-of-line clicks.
+    (if (and eol (not eob) (not non-text-area-p))
+	(progn (with-helm-buffer (funcall action-key-eol-function))
+	       (if (> (minibuffer-depth) 0)
+		   (select-window (minibuffer-window))))
+      (if (> (minibuffer-depth) 0)
+	  (select-window (minibuffer-window)))
+      (when (and (smart-helm-alive-p) (not separator))
+	(let* ((key (kbd (cond
+			  ;; Exit
+			  (eob "C-g")
+			  ;; Move to next source section or first if on last.
+			  (section-hdr "C-o")
+			  ;; If line of the key press is the first /
+			  ;; header line in the window or outside the
+			  ;; buffer area, then use {TAB} command to
+			  ;; switch between match list and action list.
+			  (non-text-area-p "TAB")
+			  ;; RET: Performs action of selection and exits the minibuffer.
+			  ;; C-j: Performs action of selection and stays in minibuffer.
+			  (hkey-value
+			   (if (helm-action-window) "RET" "C-j"))
+			  (t "RET"))))
+	       (binding (key-binding key)))
+	  (if hkey-debug
+	      (message "(HyDebug): In smart-helm, key to execute is: {%s}; binding is: %s"
+		       (key-description key) binding))
+	  (call-interactively binding))))))
+
+(defun smart-helm-assist()
+  "Executes helm actions based on Assist Key click locations:
+  At the end of the buffer, quits from helm and exits the minibuffer.
+  On a candidate line, display's the candidate's first action and remains in the minibuffer;
+  On the top, fixed header line, toggles display of the selected candidate's possible actions;
+  On an action list line, performs the action after exiting the minibuffer;
+  On a source section header, moves to the previous source section or last if on first.
+  On a candidate separator line, does nothing.
+  In the minibuffer window, ends the helm session and performs the selected item's action."
+  ;; Hyperbole has checked that this line has an action prior to
+  ;; invoking this function.
+  (unless (hmouse-check-assist-key)
+    (error "(smart-helm-assist): Hyperbole Assist Mouse Key - either depress or release event is improperly configured"))
+  (let* ((non-text-area-p (and (eventp assist-key-depress-args)
+			       (posn-area (event-start assist-key-depress-args))))
+	 (at-plist (smart-helm-at assist-key-depress-args))
+	 (section-hdr (plist-get at-plist 'section-header))
+	 (separator (plist-get at-plist 'separator))
+	 (eob (plist-get at-plist 'eob))
+	 (eol (plist-get at-plist 'eol))
+	 (key))
+    (unwind-protect
+	(smart-helm-resume-helm)
+      ;; Handle end-of-line clicks.
+      (cond ((and eol (not eob) (not non-text-area-p))
+	     (with-helm-buffer (funcall assist-key-eol-function)))
+	    ((and (smart-helm-alive-p) (not separator))
+	     (setq key (cond
+			;; Exit
 			(eob "C-g")
+			;; Move to previous source section or last if on last.
+			(section-hdr "M-o")
 			;; If line of the key press is the first /
 			;; header line in the window or outside the
 			;; buffer area, then use {TAB} command to
 			;; switch between match list and action list.
 			(non-text-area-p "TAB")
-			;; RET: Performs action of selection and exits the minibuffer.
-			;; C-j: Performs action of selection and stays in minibuffer.
-			(hkey-value
-			 (if (helm-action-window) "RET" "C-j"))
-			(t "RET"))))
-	     (binding (key-binding key)))
-	(call-interactively binding)))))
+			;; Display action for the current line and
+			;; return nil.
+			(t (with-help-window "*Helm Help*"
+			     (let ((helm-buffer (if (equal helm-action-buffer (buffer-name))
+						    helm-buffer (buffer-name))))
+			       (with-helm-buffer
+				 (princ "The current helm selection item is:\n\t")
+				 (princ (helm-get-selection (helm-buffer-get)))
+				 (princ "\nwith an action of:\n\t")
+				 (princ (helm-get-current-action)))
+			       nil)))))
+	     (if hkey-debug
+		 (message "(HyDebug): In smart-helm-assist, key to execute is: {%s}; binding is: %s"
+			  (if key (key-description key) "Help" (if key binding "None"))))))
+      (if (> (minibuffer-depth) 0)
+	  (select-window (minibuffer-window))))
+    (if key (call-interactively (key-binding (kbd key))))))
 
-(defun smart-helm-assist()
-  "Displays the selected item (including its action for the helm line at point."
-  (smart-helm-resume-helm)
-  ;; Hyperbole has checked that this line has an action prior
-  ;; to invoking this function.
-  (unwind-protect
-      (with-help-window "*Helm Help*"
-	(let ((helm-buffer (if (equal helm-action-buffer (buffer-name)) helm-buffer (buffer-name))))
-	    (with-helm-buffer
-	      (princ "The current helm selection item is:\n\t")
-	      (princ (helm-get-selection (helm-buffer-get)))
-	      (princ "\nwith an action of:\n\t")
-	      (princ (helm-get-current-action)))))
-    (if (> (minibuffer-depth) 0)
-	(select-window (minibuffer-window)))))
+;;; ************************************************************************
+;;; Global mouse key bindings for helm
+;;; ************************************************************************
+
+(defun hmouse-check-action-key ()
+  "After use of the Action Mouse Key, ensure both depress and release events are assigned to the key.
+Returns t iff the key is properly bound, else nil."
+  (and (or (and (eventp action-key-depress-args) (eventp action-key-release-args))
+	   (not (or action-key-depress-args action-key-release-args)))
+       (where-is-internal 'action-key-depress-emacs (current-global-map) t)
+       (where-is-internal 'action-mouse-key-emacs (current-global-map) t)))
+
+(defun hmouse-check-assist-key ()
+  "After use of the Assist Mouse Key, ensure both depress and release events are assigned to the key.
+Returns t iff the key is properly bound, else nil."
+  (and (or (and (eventp assist-key-depress-args) (eventp assist-key-release-args))
+	   (not (or assist-key-depress-args assist-key-release-args)))
+       (where-is-internal 'assist-key-depress-emacs (current-global-map) t)
+       (where-is-internal 'assist-mouse-key-emacs (current-global-map) t)))
 
 (defun hmouse-set-key-list (binding key-list)
   (mapc (lambda (key) (global-set-key key binding)) key-list)
@@ -958,14 +1086,35 @@ Use nil as cmd values to unbind a key."
 	   [mode-line mouse-3])
 	  ))))
 
-;;; ************************************************************************
-;;; Mouse Key Bindings
-;;; ************************************************************************
+(add-hook 'after-init-hook
+	  (lambda ()
+	    ;; Redefine this function from Emacs to add before and after hooks.
+	    (defun posn-set-point (position)
+	      "Move point to POSITION.
+Select the corresponding window as well."
+	      (if (not (windowp (posn-window position)))
+		  (error "Position not in text area of window"))
+	      (run-hooks 'before-set-point-hook)
+	      (select-window (posn-window position))
+	      (prog1 (if (numberp (posn-point position))
+			 (goto-char (posn-point position)))
+		(run-hooks 'after-set-point-hook)))
 
-(hmouse-bind-key 2 #'action-key-depress-emacs #'action-mouse-key-emacs)
-(hmouse-bind-key 3 #'assist-key-depress-emacs #'assist-mouse-key-emacs)
+	    ;; In helm, make [mouse-1] mark any chosen line that has an action.
+	    (add-hook 'after-set-point-hook
+		      (lambda ()
+			(when (eq major-mode 'helm-major-mode)
+			  (unless (region-active-p)
+			    ;; Marks current line only if it has an action.
+			    (smart-helm-line-has-action))
+			  (if (and (eq last-command 'mouse-set-point)
+				   helm-alive-p (> (minibuffer-depth) 0))
+			      (select-window (minibuffer-window))))))
 
-;; Ensure setting has changed so helm will reinstall proper keymap in
-;; helm buffer.
-(setq helm-allow-mouse nil)
-(setq helm-allow-mouse 'global-mouse-bindings)
+	    (hmouse-bind-key 2 #'action-key-depress-emacs #'action-mouse-key-emacs)
+	    (hmouse-bind-key 3 #'assist-key-depress-emacs #'assist-mouse-key-emacs)
+
+	    ;; Ensure setting has changed so helm will reinstall proper keymap in
+	    ;; helm buffer.
+	    (setq helm-allow-mouse nil)
+	    (setq helm-allow-mouse 'global-mouse-bindings)))
