@@ -420,6 +420,18 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                       (or (and norm-com norm-com-ack-p)
                           (and rec-com rec-com-ack-p)))))))
 
+(defun helm-grep--pipe-command-for-grep-command (smartcase pipe-switches &optional grep-cmd)
+  (pcase (or grep-cmd (helm-grep-command))
+    ;; Use grep for GNU regexp based tools.
+    ((or "grep" "zgrep" "git-grep")
+     (format "grep --color=always%s %s"
+             (if smartcase " -i" "")
+             pipe-switches))
+    ;; Use ack-grep for PCRE based tools.
+    ;; Sometimes ack-grep cmd is ack only.
+    ((and (pred (string-match-p "ack")) ack)
+     (format "%s --smart-case --color %s" ack pipe-switches))))
+
 (defun helm-grep--prepare-cmd-line (only-files &optional include zgrep)
   (let* ((default-directory (or helm-ff-default-directory
                                 (helm-default-directory)
@@ -463,16 +475,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
          (pipe-switches (mapconcat 'identity helm-grep-pipe-cmd-switches " "))
          (pipes
           (helm-aif (cdr patterns)
-              (cl-loop with pipcom = (pcase (helm-grep-command)
-                                       ;; Use grep for GNU regexp based tools.
-                                       ((or "grep" "zgrep" "git-grep")
-                                        (format "grep --color=always%s %s"
-                                                 (if smartcase " -i" "")
-                                                 pipe-switches))
-                                       ;; Use ack-grep for PCRE based tools.
-                                       ;; Sometimes ack-grep cmd is ack only.
-                                       ((and (pred (string-match-p "ack")) ack)
-                                        (format "%s --smart-case --color %s" ack pipe-switches)))
+              (cl-loop with pipcom = (helm-grep--pipe-command-for-grep-command smartcase pipe-switches)
                        for p in it concat
                        (format " | %s %s" pipcom (shell-quote-argument p)))
             "")))
