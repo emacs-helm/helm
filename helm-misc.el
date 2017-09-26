@@ -113,6 +113,7 @@
 
 (defvar helm-source-time-world
   (helm-build-in-buffer-source "Time World List"
+    :init (lambda () (require 'time))
     :data (lambda ()
             (with-temp-buffer
               (display-time-world-display display-time-world-list)
