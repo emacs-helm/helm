@@ -1321,23 +1321,37 @@ This doesn't replace inside the files, only modify filenames."
   (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
   (setq helm-ff--deleting-char-backward nil))
 
-(defun helm-ff-RET ()
-  "Default action for RET in `helm-find-files'.
-
-Behave differently depending of `helm-selection':
-
-- candidate basename is \".\"   => open it in dired.
-- candidate is a directory    => expand it.
-- candidate is a file         => open it.
-- marked candidates (1+)      => open them with default action."
-  (interactive)
+(defun helm-ff-RET-1 (&optional must-match)
+  "Used for RET action in `helm-find-files'.
+See `helm-ff-RET' for details.
+If MUST-MATCH is specified exit with
+`helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
   (let ((cands (helm-marked-candidates))
         (sel   (helm-get-selection)))
     (if (and (not (cdr cands))
              (file-directory-p sel)
              (not (string= "." (helm-basename sel))))
         (helm-execute-persistent-action)
-        (helm-maybe-exit-minibuffer))))
+      (if must-match
+          (helm-confirm-and-exit-minibuffer)
+        (helm-maybe-exit-minibuffer)))))
+
+(defun helm-ff-RET ()
+  "Default action for RET in `helm-find-files'.
+
+Behave differently depending of `helm-selection':
+
+- candidate basename is \".\" => open it in dired.
+- candidate is a directory    => expand it.
+- candidate is a file         => open it.
+- marked candidates (1+)      => open them with default action."
+  (interactive)
+  (helm-ff-RET-1))
+
+(defun helm-ff-RET-must-match ()
+  "Same as `helm-ff-RET' but used in must-match map."
+  (interactive)
+  (helm-ff-RET-1 t))
 
 (defun helm-ff-run-switch-to-history ()
   "Run Switch to history action from `helm-source-find-files'."

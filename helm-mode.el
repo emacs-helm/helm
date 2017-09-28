@@ -929,7 +929,10 @@ Keys description:
          (must-match-map (when must-match
                            (let ((map (make-sparse-keymap)))
                              (define-key map (kbd "RET")
-                               'helm-confirm-and-exit-minibuffer)
+                               (let ((fn (lookup-key helm-read-file-map (kbd "RET"))))
+                                 (if (eq fn 'helm-ff-RET)
+                                     #'helm-ff-RET-must-match
+                                   #'helm-confirm-and-exit-minibuffer)))
                              map)))
          (cmap (if must-match-map
                    (make-composed-keymap
