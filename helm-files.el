@@ -63,7 +63,7 @@
 
 (defcustom helm-boring-file-regexp-list
   (mapcar (lambda (f)
-            (let ((rgx (regexp-quote f))) 
+            (let ((rgx (regexp-quote f)))
               (if (string-match-p "[^/]$" f)
                   ;; files: e.g .o => \\.o$
                   (concat rgx "$")
@@ -694,7 +694,7 @@ ACTION must be an action supported by `helm-dired-action'."
                          (if (and (and (fboundp 'dired-async-mode)
                                        dired-async-mode)
                                   (null prefarg))
-                             (concat "Async " (symbol-name action)) 
+                             (concat "Async " (symbol-name action))
                            (capitalize (symbol-name action)))
                          (length ifiles)))
          helm-ff--move-to-first-real-candidate
@@ -772,7 +772,7 @@ layout."
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
-  (let* ((helm-dwim-target 'next-window) 
+  (let* ((helm-dwim-target 'next-window)
          (bname  (helm-basename candidate))
          (marked (helm-marked-candidates :with-wildcard t))
          (prompt (if merge "Ediff Merge `%s' With File: "
@@ -2012,7 +2012,7 @@ Return nil on valid file name remote or not."
   (let* ((str (helm-basename fname))
          (split (split-string str ":" t))
          (meth (car (member (car split)
-                            (helm-ff--get-tramp-methods))))) 
+                            (helm-ff--get-tramp-methods)))))
     (when meth (car (last split)))))
 
 (cl-defun helm-ff--tramp-hostnames (&optional (pattern helm-pattern))
