@@ -217,6 +217,7 @@ In this case last position is added to the register
 ;;; Utils functions
 ;;
 ;;
+;; TODO: Rename to `helm-window-prefer-horizontal-split'.
 (defcustom helm-switch-to-buffer-ow-vertically nil
   "Maybe switch to other window vertically when non nil.
 
@@ -306,6 +307,7 @@ This function is suitable for `helm-switch-to-buffers-function'."
                         (switch-to-buffer b))
                     (error (setq nosplit t) nil))))))
 
+;; TODO: Rename to `helm-window-other-window'.
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
 If a prefix arg is detected split vertically.
