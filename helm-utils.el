@@ -286,6 +286,25 @@ This function is suitable for `helm-switch-to-buffers-function'."
                     (helm-switch-to-buffer-other-window b 'balance)
                   (error (setq nosplit t) nil)))))
 
+(defun helm-window-alternate-split-fn (candidates &optional other-window-fn)
+  "Alternatively split last window left and right.
+
+This function is suitable for `helm-switch-to-buffers-function'."
+  (if other-window-fn
+      (funcall other-window-fn (car candidates))
+    (switch-to-buffer (car candidates)))
+  (let (right-split)
+    (save-selected-window
+      (cl-loop with nosplit
+               for b in candidates
+               when nosplit return
+               (message "Too many buffers to visit simultaneously")
+               do (condition-case _err
+                      (progn
+                        (select-window (split-window (get-buffer-window) nil right-split))
+                        (setq right-split (not right-split))
+                        (switch-to-buffer b))
+                    (error (setq nosplit t) nil))))))
 
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
