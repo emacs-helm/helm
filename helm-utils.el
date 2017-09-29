@@ -236,33 +236,55 @@ behavior is the same that with a nil value."
            (const :tag "Split window horizontally" nil)
            (symbol :tag "Guess how to split window" 'decide)))
 
-(defun helm-switch-to-buffers (buffer-or-name &optional other-window)
-  "Switch to buffer BUFFER-OR-NAME.
+(defcustom helm-window-show-buffers-function #'helm-window-default-split-fn
+  "The default function to use when opening several buffers at once.
+It is typically used to rearrange windows."
+  :group 'helm-utils
+  :type 'function)
+
+;; TODO: Move this function to helm-buffers and rename `helm-buffer-switch-to-buffers'.
+(defun helm-switch-to-buffers (_candidate)
+  "Switch to BUFFERS and replace current buffer.
 
 If more than one buffer marked switch to these buffers in separate windows.
-If OTHER-WINDOW is specified, keep current buffer and switch to others buffers
+If a prefix arg is given split windows vertically."
+  (let ((buffers (helm-marked-candidates)))
+    (helm-window-show-buffers buffers)))
+
+(defun helm-window-show-buffers (buffers &optional other-window)
+  "Show BUFFERS.
+
+If more than one buffer marked switch to these buffers in separate windows.
+If OTHER-WINDOW is non-nil, keep current buffer and switch to others buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
-  (let ((mkds          (helm-marked-candidates))
-        (initial-ow-fn (if (cdr (window-list))
+  (let ((initial-ow-fn (if (cdr (window-list))
                            #'switch-to-buffer-other-window
                          #'helm-switch-to-buffer-other-window)))
-    (helm-aif (cdr mkds)
-        (progn
-          (if other-window
-              (funcall initial-ow-fn (car mkds))
-            (switch-to-buffer (car mkds)))
-          (save-selected-window
-            (cl-loop with nosplit
-                     for b in it
-                     when nosplit return
-                     (message "Too many buffers to visit simultaneously")
-                     do (condition-case _err
-                            (helm-switch-to-buffer-other-window b 'balance)
-                          (error (setq nosplit t) nil)))))
+    (if (cdr buffers)
+        (funcall helm-window-show-buffers-function buffers
+                 (and other-window initial-ow-fn))
       (if other-window
-          (funcall initial-ow-fn buffer-or-name)
-        (switch-to-buffer buffer-or-name)))))
+          (funcall initial-ow-fn (car buffers))
+        (switch-to-buffer (car buffers))))))
+
+(defun helm-window-default-split-fn (candidates &optional other-window-fn)
+  "Split windows in one direction and balance them.
+
+Direction can be controlled via `helm-switch-to-buffer-ow-vertically'.
+If a prefix arg is given split windows vertically.
+This function is suitable for `helm-switch-to-buffers-function'."
+  (if other-window-fn
+      (funcall other-window-fn (car candidates))
+    (switch-to-buffer (car candidates)))
+  (save-selected-window
+    (cl-loop with nosplit
+             for b in (cdr candidates)
+             when nosplit return
+             (message "Too many buffers to visit simultaneously")
+             do (condition-case _err
+                    (helm-switch-to-buffer-other-window b 'balance)
+                  (error (setq nosplit t) nil)))))
 
 (defun helm-simultaneous-find-file (files &optional other-window)
   "Find files in FILES list in separate windows.
@@ -314,10 +336,13 @@ When argument BALANCE is provided `balance-windows'."
     (and balance (balance-windows))
     (switch-to-buffer buffer-or-name)))
 
-(defun helm-display-buffers-other-windows (buffer-or-name)
-  "Switch to buffer BUFFER-OR-NAME in other window.
+;; TODO: Move this function to helm-buffers and rename `helm-buffer-switch-to-buffers-other-window'.
+;; The comment on `helm-switch-to-buffers' is then obsoleted.
+(defun helm-display-buffers-other-windows (_candidate)
+  "Switch to BUFFERS in other windows.
 See `helm-switch-to-buffers' for switching to marked buffers."
-  (helm-switch-to-buffers buffer-or-name t))
+  (let ((buffers (helm-marked-candidates)))
+    (helm-window-show-buffers buffers t)))
 
 (cl-defun helm-current-buffer-narrowed-p (&optional
                                             (buffer helm-current-buffer))
