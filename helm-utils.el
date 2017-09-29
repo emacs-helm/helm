@@ -264,14 +264,15 @@ If a prefix arg is given split windows vertically."
           (funcall initial-ow-fn buffer-or-name)
         (switch-to-buffer buffer-or-name)))))
 
-(defun helm-simultaneous-find-file (files)
+(defun helm-simultaneous-find-file (files &optional other-window)
   "Find files in FILES list in separate windows.
 If frame is too small to display all windows, continue finding files
 in background.
 When called with a prefix arg split is done vertically."
   (helm-aif (cdr files)
       (progn
-        (switch-to-buffer (find-file-noselect (car files)))
+        (unless other-window
+          (switch-to-buffer (find-file-noselect (car files))))
         (save-selected-window
           (cl-loop with nosplit
                    with len = (length it)
