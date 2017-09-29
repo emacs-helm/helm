@@ -107,7 +107,7 @@ In this case last position is added to the register
     ("&yen"     . 165)  ;; ¥
     ("&brvbar;" . 166)  ;; ¦
     ("&sect;"   . 167)  ;; §
-    ("&uml;"    . 32)   ;; SPC 
+    ("&uml;"    . 32)   ;; SPC
     ("&copy;"   . 169)  ;; ©
     ("&ordf;"   . 97)   ;; a
     ("&laquo;"  . 171)  ;; «
@@ -121,7 +121,7 @@ In this case last position is added to the register
     ("&micro;"  . 956)  ;; μ
     ("&para;"   . 182)  ;; ¶
     ("&middot;" . 183)  ;; ·
-    ("&cedil;"  . 32)   ;; SPC 
+    ("&cedil;"  . 32)   ;; SPC
     ("&sup1;"   . 49)   ;; 1
     ("&ordm;"   . 111)  ;; o
     ("&raquo;"  . 187)  ;; »
@@ -220,9 +220,9 @@ In this case last position is added to the register
 (defcustom helm-switch-to-buffer-ow-vertically nil
   "Maybe switch to other window vertically when non nil.
 
-Possible values are `t', `nil' and `decide'.
+Possible values are t, nil and `decide'.
 
-When `t' switch vertically.
+When t switch vertically.
 When nil switch horizontally.
 When `decide' try to guess if it is possible to switch vertically
 according to the setting of `split-width-threshold' and the size of
@@ -240,7 +240,7 @@ behavior is the same that with a nil value."
   "Switch to buffer BUFFER-OR-NAME.
 
 If more than one buffer marked switch to these buffers in separate windows.
-If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
+If OTHER-WINDOW is specified, keep current buffer and switch to others buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
   (let ((mkds          (helm-marked-candidates))
@@ -298,9 +298,9 @@ When called with a prefix arg split is done vertically."
                       displayed remaining)))))))
 
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
-  "Switch to buffer-or-name in other window.
+  "Switch to BUFFER-OR-NAME in other window.
 If a prefix arg is detected split vertically.
-When argument balance is provided `balance-windows'."
+When argument BALANCE is provided `balance-windows'."
   (let* ((helm-switch-to-buffer-ow-vertically
           (if (eq helm-switch-to-buffer-ow-vertically 'decide)
               (and (numberp split-width-threshold)
@@ -315,7 +315,7 @@ When argument balance is provided `balance-windows'."
     (switch-to-buffer buffer-or-name)))
 
 (defun helm-display-buffers-other-windows (buffer-or-name)
-  "switch to buffer BUFFER-OR-NAME in other window.
+  "Switch to buffer BUFFER-OR-NAME in other window.
 See `helm-switch-to-buffers' for switching to marked buffers."
   (helm-switch-to-buffers buffer-or-name t))
 
