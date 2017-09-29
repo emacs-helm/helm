@@ -307,6 +307,47 @@ This function is suitable for `helm-switch-to-buffers-function'."
                         (switch-to-buffer b))
                     (error (setq nosplit t) nil))))))
 
+(defun helm-window-mosaic-fn (candidates &optional other-window-fn)
+  "Make an as-square-as-possible window mosaic of the CANDIDATES buffers.
+
+The outer splits are done in the direction given by
+`helm-switch-to-buffer-ow-vertically'.
+If OTHER-WINDOW-FN is non-nil, current windows are included in the mosaic.
+This function is suitable for `helm-switch-to-buffers-function'."
+  (when other-window-fn
+    (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
+  (delete-other-windows)
+  (let* ((mosaic-side-tile-count (ceiling (sqrt (length candidates))))
+         ;; We lower-bound the tile size, otherwise the function would fail during the first inner split.
+         ;; There is consequently no need to check for errors when splitting.
+         (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count) window-min-width))
+         (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count) window-min-height))
+         (helm-switch-to-buffer-ow-vertically
+          (if (eq helm-switch-to-buffer-ow-vertically 'decide)
+              (and (numberp split-width-threshold)
+                   (>= (window-width (selected-window))
+                       split-width-threshold))
+            helm-switch-to-buffer-ow-vertically))
+         (mosaic-outer-split-size (if helm-switch-to-buffer-ow-vertically mosaic-tile-width mosaic-tile-height))
+         (mosaic-inner-split-size (if helm-switch-to-buffer-ow-vertically mosaic-tile-height mosaic-tile-width))
+         next-window)
+    (let ((max-tiles (* (/ (frame-width) mosaic-tile-width) (/ (frame-height) mosaic-tile-height))))
+      (when (> (length candidates) max-tiles)
+        (message "Too many buffers to visit simultaneously")
+        ;; Shorten `candidates' to `max-tiles' elements.
+        (setcdr (nthcdr (- max-tiles 1) candidates) nil)))
+    (while candidates
+      (when (> (length candidates) mosaic-side-tile-count)
+        (setq next-window (split-window (get-buffer-window) mosaic-outer-split-size helm-switch-to-buffer-ow-vertically)))
+      (switch-to-buffer (car candidates))
+      (setq candidates (cdr candidates))
+      (dotimes (_ (min (- mosaic-side-tile-count 1) (length candidates)))
+        (select-window (split-window (get-buffer-window) mosaic-inner-split-size (not helm-switch-to-buffer-ow-vertically)))
+        (switch-to-buffer (car candidates))
+        (setq candidates (cdr candidates)))
+      (when next-window
+        (select-window next-window)))))
+
 ;; TODO: Rename to `helm-window-other-window'.
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
