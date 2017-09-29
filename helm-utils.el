@@ -286,38 +286,6 @@ This function is suitable for `helm-switch-to-buffers-function'."
                     (helm-switch-to-buffer-other-window b 'balance)
                   (error (setq nosplit t) nil)))))
 
-(defun helm-simultaneous-find-file (files &optional other-window)
-  "Find files in FILES list in separate windows.
-If frame is too small to display all windows, continue finding files
-in background.
-When called with a prefix arg split is done vertically."
-  (helm-aif (cdr files)
-      (progn
-        (unless other-window
-          (switch-to-buffer (find-file-noselect (car files))))
-        (save-selected-window
-          (cl-loop with nosplit
-                   with len = (length it)
-                   with remaining = 0
-                   with displayed = 0
-                   for f in it
-                   for count from 1
-                   for buf = (find-file-noselect f)
-                   unless nosplit do
-                   (condition-case-unless-debug _err
-                       (helm-switch-to-buffer-other-window buf 'balance)
-                     (error
-                      (setq nosplit t)
-                      (message
-                       "%d files displayed, %d files opening in background..."
-                       (setq displayed count)
-                       (setq remaining (- len count)))
-                      nil))
-                   finally
-                   (when nosplit
-                     (message
-                      "%d files displayed, %d files opened in background"
-                      displayed remaining)))))))
 
 (defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.

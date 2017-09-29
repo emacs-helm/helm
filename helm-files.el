@@ -750,12 +750,9 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
   "Keep current-buffer and open files in separate windows.
 When a prefix arg is detected files are opened in a vertical windows
 layout."
-  (let* ((files         (helm-marked-candidates))
-         (initial-ow-fn (if (cdr (window-list))
-                            #'switch-to-buffer-other-window
-                          #'helm-switch-to-buffer-other-window)))
-    (funcall initial-ow-fn (find-file-noselect (car files)))
-    (helm-simultaneous-find-file files t)))
+  (let* ((files (helm-marked-candidates))
+         (buffers (mapcar 'find-file-noselect files)))
+    (helm-window-show-buffers buffers t)))
 
 (defun helm-find-files-byte-compile (_candidate)
   "Byte compile elisp files from `helm-find-files'."
@@ -3347,7 +3344,7 @@ Called with a prefix arg open files in background without selecting them."
     (if (cdr marked)
         ;; If helm-current-prefix-arg is detected split is done
         ;; vertically.
-        (helm-simultaneous-find-file marked)
+        (helm-window-show-buffers (mapcar 'find-file-noselect marked))
       (let ((dir (and (not url-p) (helm-basedir candidate))))
         (cond ((and dir (file-directory-p dir))
                (find-file (substitute-in-file-name candidate)))
