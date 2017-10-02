@@ -217,8 +217,7 @@ In this case last position is added to the register
 ;;; Utils functions
 ;;
 ;;
-;; TODO: Rename to `helm-window-prefer-horizontal-split'.
-(defcustom helm-switch-to-buffer-ow-vertically nil
+(defcustom helm-window-prefer-horizontal-split nil
   "Maybe switch to other window vertically when non nil.
 
 Possible values are t, nil and `decide'.
@@ -243,15 +242,6 @@ It is typically used to rearrange windows."
   :group 'helm-utils
   :type 'function)
 
-;; TODO: Move this function to helm-buffers and rename `helm-buffer-switch-to-buffers'.
-(defun helm-switch-to-buffers (_candidate)
-  "Switch to BUFFERS and replace current buffer.
-
-If more than one buffer marked switch to these buffers in separate windows.
-If a prefix arg is given split windows vertically."
-  (let ((buffers (helm-marked-candidates)))
-    (helm-window-show-buffers buffers)))
-
 (defun helm-window-show-buffers (buffers &optional other-window)
   "Show BUFFERS.
 
@@ -261,7 +251,7 @@ in separate windows.
 If a prefix arg is given split windows vertically."
   (let ((initial-ow-fn (if (cdr (window-list))
                            #'switch-to-buffer-other-window
-                         #'helm-switch-to-buffer-other-window)))
+                         #'helm-window-other-window)))
     (if (cdr buffers)
         (funcall helm-window-show-buffers-function buffers
                  (and other-window initial-ow-fn))
@@ -272,9 +262,9 @@ If a prefix arg is given split windows vertically."
 (defun helm-window-default-split-fn (candidates &optional other-window-fn)
   "Split windows in one direction and balance them.
 
-Direction can be controlled via `helm-switch-to-buffer-ow-vertically'.
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
 If a prefix arg is given split windows vertically.
-This function is suitable for `helm-switch-to-buffers-function'."
+This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
     (switch-to-buffer (car candidates)))
@@ -284,13 +274,13 @@ This function is suitable for `helm-switch-to-buffers-function'."
              when nosplit return
              (message "Too many buffers to visit simultaneously")
              do (condition-case _err
-                    (helm-switch-to-buffer-other-window b 'balance)
+                    (helm-window-other-window b 'balance)
                   (error (setq nosplit t) nil)))))
 
 (defun helm-window-alternate-split-fn (candidates &optional other-window-fn)
   "Alternatively split last window left and right.
 
-This function is suitable for `helm-switch-to-buffers-function'."
+This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
     (switch-to-buffer (car candidates)))
@@ -311,9 +301,9 @@ This function is suitable for `helm-switch-to-buffers-function'."
   "Make an as-square-as-possible window mosaic of the CANDIDATES buffers.
 
 The outer splits are done in the direction given by
-`helm-switch-to-buffer-ow-vertically'.
+`helm-window-prefer-horizontal-split'.
 If OTHER-WINDOW-FN is non-nil, current windows are included in the mosaic.
-This function is suitable for `helm-switch-to-buffers-function'."
+This function is suitable for `helm-window-show-buffers-function'."
   (when other-window-fn
     (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
   (delete-other-windows)
@@ -322,14 +312,14 @@ This function is suitable for `helm-switch-to-buffers-function'."
          ;; There is consequently no need to check for errors when splitting.
          (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count) window-min-width))
          (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count) window-min-height))
-         (helm-switch-to-buffer-ow-vertically
-          (if (eq helm-switch-to-buffer-ow-vertically 'decide)
+         (helm-window-prefer-horizontal-split
+          (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
                    (>= (window-width (selected-window))
                        split-width-threshold))
-            helm-switch-to-buffer-ow-vertically))
-         (mosaic-outer-split-size (if helm-switch-to-buffer-ow-vertically mosaic-tile-width mosaic-tile-height))
-         (mosaic-inner-split-size (if helm-switch-to-buffer-ow-vertically mosaic-tile-height mosaic-tile-width))
+            helm-window-prefer-horizontal-split))
+         (mosaic-outer-split-size (if helm-window-prefer-horizontal-split mosaic-tile-width mosaic-tile-height))
+         (mosaic-inner-split-size (if helm-window-prefer-horizontal-split mosaic-tile-height mosaic-tile-width))
          next-window)
     (let ((max-tiles (* (/ (frame-width) mosaic-tile-width) (/ (frame-height) mosaic-tile-height))))
       (when (> (length candidates) max-tiles)
@@ -338,41 +328,32 @@ This function is suitable for `helm-switch-to-buffers-function'."
         (setcdr (nthcdr (- max-tiles 1) candidates) nil)))
     (while candidates
       (when (> (length candidates) mosaic-side-tile-count)
-        (setq next-window (split-window (get-buffer-window) mosaic-outer-split-size helm-switch-to-buffer-ow-vertically)))
+        (setq next-window (split-window (get-buffer-window) mosaic-outer-split-size helm-window-prefer-horizontal-split)))
       (switch-to-buffer (car candidates))
       (setq candidates (cdr candidates))
       (dotimes (_ (min (- mosaic-side-tile-count 1) (length candidates)))
-        (select-window (split-window (get-buffer-window) mosaic-inner-split-size (not helm-switch-to-buffer-ow-vertically)))
+        (select-window (split-window (get-buffer-window) mosaic-inner-split-size (not helm-window-prefer-horizontal-split)))
         (switch-to-buffer (car candidates))
         (setq candidates (cdr candidates)))
       (when next-window
         (select-window next-window)))))
 
-;; TODO: Rename to `helm-window-other-window'.
-(defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
+(defun helm-window-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
 If a prefix arg is detected split vertically.
 When argument BALANCE is provided `balance-windows'."
-  (let* ((helm-switch-to-buffer-ow-vertically
-          (if (eq helm-switch-to-buffer-ow-vertically 'decide)
+  (let* ((helm-window-prefer-horizontal-split
+          (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
                    (>= (window-width (selected-window))
                        split-width-threshold))
-            helm-switch-to-buffer-ow-vertically))
-         (right-side (if helm-switch-to-buffer-ow-vertically
-                        (not helm-current-prefix-arg)
-                      helm-current-prefix-arg)))
+            helm-window-prefer-horizontal-split))
+         (right-side (if helm-window-prefer-horizontal-split
+                         (not helm-current-prefix-arg)
+                       helm-current-prefix-arg)))
     (select-window (split-window nil nil right-side))
     (and balance (balance-windows))
     (switch-to-buffer buffer-or-name)))
-
-;; TODO: Move this function to helm-buffers and rename `helm-buffer-switch-to-buffers-other-window'.
-;; The comment on `helm-switch-to-buffers' is then obsoleted.
-(defun helm-display-buffers-other-windows (_candidate)
-  "Switch to BUFFERS in other windows.
-See `helm-switch-to-buffers' for switching to marked buffers."
-  (let ((buffers (helm-marked-candidates)))
-    (helm-window-show-buffers buffers t)))
 
 (cl-defun helm-current-buffer-narrowed-p (&optional
                                             (buffer helm-current-buffer))
