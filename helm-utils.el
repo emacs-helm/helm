@@ -294,7 +294,7 @@ This function is suitable for `helm-window-show-buffers-function'."
   (let (right-split)
     (save-selected-window
       (cl-loop with nosplit
-               for b in candidates
+               for b in (cdr candidates)
                when nosplit return
                (message "Too many buffers to visit simultaneously")
                do (condition-case _err
