@@ -759,7 +759,7 @@ If a prefix arg is given split windows vertically."
     (helm-window-show-buffers buffers)))
 
 (defun helm-buffer-switch-buffers-other-window (_candidate)
-  "Switch to buffer candidates in other windows."
+  "Switch to marked buffers in other windows."
   (let ((buffers (helm-marked-candidates)))
     (helm-window-show-buffers buffers t)))
 

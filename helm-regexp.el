@@ -287,7 +287,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
          (split-pat (helm-mm-split-pattern helm-input)))
     (cl-case method
       (buffer              (switch-to-buffer buf))
-      (buffer-other-window (helm-buffer-switch-buffers-other-window buf))
+      (buffer-other-window (helm-window-other-window buf))
       (buffer-other-frame  (switch-to-buffer-other-frame buf)))
     (with-current-buffer buf
       (helm-goto-line lineno)
