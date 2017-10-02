@@ -63,7 +63,7 @@
 
 (defcustom helm-boring-file-regexp-list
   (mapcar (lambda (f)
-            (let ((rgx (regexp-quote f))) 
+            (let ((rgx (regexp-quote f)))
               (if (string-match-p "[^/]$" f)
                   ;; files: e.g .o => \\.o$
                   (concat rgx "$")
@@ -694,7 +694,7 @@ ACTION must be an action supported by `helm-dired-action'."
                          (if (and (and (fboundp 'dired-async-mode)
                                        dired-async-mode)
                                   (null prefarg))
-                             (concat "Async " (symbol-name action)) 
+                             (concat "Async " (symbol-name action))
                            (capitalize (symbol-name action)))
                          (length ifiles)))
          helm-ff--move-to-first-real-candidate
@@ -750,12 +750,9 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
   "Keep current-buffer and open files in separate windows.
 When a prefix arg is detected files are opened in a vertical windows
 layout."
-  (let* ((files         (helm-marked-candidates))
-         (initial-ow-fn (if (cdr (window-list))
-                            #'switch-to-buffer-other-window
-                          #'helm-switch-to-buffer-other-window)))
-    (funcall initial-ow-fn (find-file-noselect (car files)))
-    (helm-simultaneous-find-file files t)))
+  (let* ((files (helm-marked-candidates))
+         (buffers (mapcar 'find-file-noselect files)))
+    (helm-window-show-buffers buffers t)))
 
 (defun helm-find-files-byte-compile (_candidate)
   "Byte compile elisp files from `helm-find-files'."
@@ -772,7 +769,7 @@ layout."
 
 (defun helm-find-files-ediff-files-1 (candidate &optional merge)
   "Generic function to ediff/merge files in `helm-find-files'."
-  (let* ((helm-dwim-target 'next-window) 
+  (let* ((helm-dwim-target 'next-window)
          (bname  (helm-basename candidate))
          (marked (helm-marked-candidates :with-wildcard t))
          (prompt (if merge "Ediff Merge `%s' With File: "
@@ -2012,7 +2009,7 @@ Return nil on valid file name remote or not."
   (let* ((str (helm-basename fname))
          (split (split-string str ":" t))
          (meth (car (member (car split)
-                            (helm-ff--get-tramp-methods))))) 
+                            (helm-ff--get-tramp-methods)))))
     (when meth (car (last split)))))
 
 (cl-defun helm-ff--tramp-hostnames (&optional (pattern helm-pattern))
@@ -3347,7 +3344,7 @@ Called with a prefix arg open files in background without selecting them."
     (if (cdr marked)
         ;; If helm-current-prefix-arg is detected split is done
         ;; vertically.
-        (helm-simultaneous-find-file marked)
+        (helm-window-show-buffers (mapcar 'find-file-noselect marked))
       (let ((dir (and (not url-p) (helm-basedir candidate))))
         (cond ((and dir (file-directory-p dir))
                (find-file (substitute-in-file-name candidate)))

@@ -107,7 +107,7 @@ In this case last position is added to the register
     ("&yen"     . 165)  ;; ¥
     ("&brvbar;" . 166)  ;; ¦
     ("&sect;"   . 167)  ;; §
-    ("&uml;"    . 32)   ;; SPC 
+    ("&uml;"    . 32)   ;; SPC
     ("&copy;"   . 169)  ;; ©
     ("&ordf;"   . 97)   ;; a
     ("&laquo;"  . 171)  ;; «
@@ -121,7 +121,7 @@ In this case last position is added to the register
     ("&micro;"  . 956)  ;; μ
     ("&para;"   . 182)  ;; ¶
     ("&middot;" . 183)  ;; ·
-    ("&cedil;"  . 32)   ;; SPC 
+    ("&cedil;"  . 32)   ;; SPC
     ("&sup1;"   . 49)   ;; 1
     ("&ordm;"   . 111)  ;; o
     ("&raquo;"  . 187)  ;; »
@@ -217,12 +217,12 @@ In this case last position is added to the register
 ;;; Utils functions
 ;;
 ;;
-(defcustom helm-switch-to-buffer-ow-vertically nil
+(defcustom helm-window-prefer-horizontal-split nil
   "Maybe switch to other window vertically when non nil.
 
-Possible values are `t', `nil' and `decide'.
+Possible values are t, nil and `decide'.
 
-When `t' switch vertically.
+When t switch vertically.
 When nil switch horizontally.
 When `decide' try to guess if it is possible to switch vertically
 according to the setting of `split-width-threshold' and the size of
@@ -236,88 +236,131 @@ behavior is the same that with a nil value."
            (const :tag "Split window horizontally" nil)
            (symbol :tag "Guess how to split window" 'decide)))
 
-(defun helm-switch-to-buffers (buffer-or-name &optional other-window)
-  "Switch to buffer BUFFER-OR-NAME.
+(defcustom helm-window-show-buffers-function #'helm-window-default-split-fn
+  "The default function to use when opening several buffers at once.
+It is typically used to rearrange windows."
+  :group 'helm-utils
+  :type '(choice
+          (function
+           (const :tag "Split windows vertically or horizontally"
+                  #'helm-window-default-split-fn)
+           (const :tag "Split in alternate windows"
+                  #'helm-window-alternate-split-fn)
+           (const :tag "Split windows in mosaic"
+                  #'helm-window-mosaic-fn))))
+
+(defun helm-window-show-buffers (buffers &optional other-window)
+  "Show BUFFERS.
 
 If more than one buffer marked switch to these buffers in separate windows.
-If OTHER-WINDOW is specified keep current-buffer and switch to others buffers
+If OTHER-WINDOW is non-nil, keep current buffer and switch to others buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
-  (let ((mkds          (helm-marked-candidates))
-        (initial-ow-fn (if (cdr (window-list))
+  (let ((initial-ow-fn (if (cdr (window-list))
                            #'switch-to-buffer-other-window
-                         #'helm-switch-to-buffer-other-window)))
-    (helm-aif (cdr mkds)
-        (progn
-          (if other-window
-              (funcall initial-ow-fn (car mkds))
-            (switch-to-buffer (car mkds)))
-          (save-selected-window
-            (cl-loop with nosplit
-                     for b in it
-                     when nosplit return
-                     (message "Too many buffers to visit simultaneously")
-                     do (condition-case _err
-                            (helm-switch-to-buffer-other-window b 'balance)
-                          (error (setq nosplit t) nil)))))
+                         #'helm-window-other-window)))
+    (if (cdr buffers)
+        (funcall helm-window-show-buffers-function buffers
+                 (and other-window initial-ow-fn))
       (if other-window
-          (funcall initial-ow-fn buffer-or-name)
-        (switch-to-buffer buffer-or-name)))))
+          (funcall initial-ow-fn (car buffers))
+        (switch-to-buffer (car buffers))))))
 
-(defun helm-simultaneous-find-file (files &optional other-window)
-  "Find files in FILES list in separate windows.
-If frame is too small to display all windows, continue finding files
-in background.
-When called with a prefix arg split is done vertically."
-  (helm-aif (cdr files)
-      (progn
-        (unless other-window
-          (switch-to-buffer (find-file-noselect (car files))))
-        (save-selected-window
-          (cl-loop with nosplit
-                   with len = (length it)
-                   with remaining = 0
-                   with displayed = 0
-                   for f in it
-                   for count from 1
-                   for buf = (find-file-noselect f)
-                   unless nosplit do
-                   (condition-case-unless-debug _err
-                       (helm-switch-to-buffer-other-window buf 'balance)
-                     (error
-                      (setq nosplit t)
-                      (message
-                       "%d files displayed, %d files opening in background..."
-                       (setq displayed count)
-                       (setq remaining (- len count)))
-                      nil))
-                   finally
-                   (when nosplit
-                     (message
-                      "%d files displayed, %d files opened in background"
-                      displayed remaining)))))))
+(defun helm-window-default-split-fn (candidates &optional other-window-fn)
+  "Split windows in one direction and balance them.
 
-(defun helm-switch-to-buffer-other-window (buffer-or-name &optional balance)
-  "Switch to buffer-or-name in other window.
-If a prefix arg is detected split vertically.
-When argument balance is provided `balance-windows'."
-  (let* ((helm-switch-to-buffer-ow-vertically
-          (if (eq helm-switch-to-buffer-ow-vertically 'decide)
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
+If a prefix arg is given split windows vertically.
+This function is suitable for `helm-window-show-buffers-function'."
+  (if other-window-fn
+      (funcall other-window-fn (car candidates))
+    (switch-to-buffer (car candidates)))
+  (save-selected-window
+    (cl-loop with nosplit
+             for b in (cdr candidates)
+             when nosplit return
+             (message "Too many buffers to visit simultaneously")
+             do (condition-case _err
+                    (helm-window-other-window b 'balance)
+                  (error (setq nosplit t) nil)))))
+
+(defun helm-window-alternate-split-fn (candidates &optional other-window-fn)
+  "Alternatively split last window left and right.
+
+This function is suitable for `helm-window-show-buffers-function'."
+  (if other-window-fn
+      (funcall other-window-fn (car candidates))
+    (switch-to-buffer (car candidates)))
+  (let (right-split)
+    (save-selected-window
+      (cl-loop with nosplit
+               for b in (cdr candidates)
+               when nosplit return
+               (message "Too many buffers to visit simultaneously")
+               do (condition-case _err
+                      (progn
+                        (select-window (split-window (get-buffer-window) nil right-split))
+                        (setq right-split (not right-split))
+                        (switch-to-buffer b))
+                    (error (setq nosplit t) nil))))))
+
+(defun helm-window-mosaic-fn (candidates &optional other-window-fn)
+  "Make an as-square-as-possible window mosaic of the CANDIDATES buffers.
+
+The outer splits are done in the direction given by
+`helm-window-prefer-horizontal-split'.
+If OTHER-WINDOW-FN is non-nil, current windows are included in the mosaic.
+This function is suitable for `helm-window-show-buffers-function'."
+  (when other-window-fn
+    (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
+  (delete-other-windows)
+  (let* ((mosaic-side-tile-count (ceiling (sqrt (length candidates))))
+         ;; We lower-bound the tile size, otherwise the function would fail during the first inner split.
+         ;; There is consequently no need to check for errors when splitting.
+         (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count) window-min-width))
+         (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count) window-min-height))
+         (helm-window-prefer-horizontal-split
+          (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
                    (>= (window-width (selected-window))
                        split-width-threshold))
-            helm-switch-to-buffer-ow-vertically))
-         (right-side (if helm-switch-to-buffer-ow-vertically
-                        (not helm-current-prefix-arg)
-                      helm-current-prefix-arg)))
+            helm-window-prefer-horizontal-split))
+         (mosaic-outer-split-size (if helm-window-prefer-horizontal-split mosaic-tile-width mosaic-tile-height))
+         (mosaic-inner-split-size (if helm-window-prefer-horizontal-split mosaic-tile-height mosaic-tile-width))
+         next-window)
+    (let ((max-tiles (* (/ (frame-width) mosaic-tile-width) (/ (frame-height) mosaic-tile-height))))
+      (when (> (length candidates) max-tiles)
+        (message "Too many buffers to visit simultaneously")
+        ;; Shorten `candidates' to `max-tiles' elements.
+        (setcdr (nthcdr (- max-tiles 1) candidates) nil)))
+    (while candidates
+      (when (> (length candidates) mosaic-side-tile-count)
+        (setq next-window (split-window (get-buffer-window) mosaic-outer-split-size helm-window-prefer-horizontal-split)))
+      (switch-to-buffer (car candidates))
+      (setq candidates (cdr candidates))
+      (dotimes (_ (min (- mosaic-side-tile-count 1) (length candidates)))
+        (select-window (split-window (get-buffer-window) mosaic-inner-split-size (not helm-window-prefer-horizontal-split)))
+        (switch-to-buffer (car candidates))
+        (setq candidates (cdr candidates)))
+      (when next-window
+        (select-window next-window)))))
+
+(defun helm-window-other-window (buffer-or-name &optional balance)
+  "Switch to BUFFER-OR-NAME in other window.
+If a prefix arg is detected split vertically.
+When argument BALANCE is provided `balance-windows'."
+  (let* ((helm-window-prefer-horizontal-split
+          (if (eq helm-window-prefer-horizontal-split 'decide)
+              (and (numberp split-width-threshold)
+                   (>= (window-width (selected-window))
+                       split-width-threshold))
+            helm-window-prefer-horizontal-split))
+         (right-side (if helm-window-prefer-horizontal-split
+                         (not helm-current-prefix-arg)
+                       helm-current-prefix-arg)))
     (select-window (split-window nil nil right-side))
     (and balance (balance-windows))
     (switch-to-buffer buffer-or-name)))
-
-(defun helm-display-buffers-other-windows (buffer-or-name)
-  "switch to buffer BUFFER-OR-NAME in other window.
-See `helm-switch-to-buffers' for switching to marked buffers."
-  (helm-switch-to-buffers buffer-or-name t))
 
 (cl-defun helm-current-buffer-narrowed-p (&optional
                                             (buffer helm-current-buffer))

@@ -740,7 +740,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Run switch to other window action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-display-buffers-other-windows)))
+    (helm-exit-and-execute-action 'helm-buffer-switch-buffers-other-window)))
 (put 'helm-buffer-switch-other-window 'helm-only t)
 
 (defun helm-buffer-switch-other-frame ()
@@ -749,6 +749,19 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
 (put 'helm-buffer-switch-other-frame 'helm-only t)
+
+(defun helm-buffer-switch-buffers (_candidate)
+  "Switch to buffer candidates and replace current buffer.
+
+If more than one buffer marked switch to these buffers in separate windows.
+If a prefix arg is given split windows vertically."
+  (let ((buffers (helm-marked-candidates)))
+    (helm-window-show-buffers buffers)))
+
+(defun helm-buffer-switch-buffers-other-window (_candidate)
+  "Switch to buffer candidates in other windows."
+  (let ((buffers (helm-marked-candidates)))
+    (helm-window-show-buffers buffers t)))
 
 (defun helm-buffer-run-ediff ()
   "Run ediff action from `helm-source-buffers-list'."

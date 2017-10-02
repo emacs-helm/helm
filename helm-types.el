@@ -129,12 +129,12 @@
 
 (defcustom helm-type-buffer-actions
   (helm-make-actions
-   "Switch to buffer(s)" 'helm-switch-to-buffers
+   "Switch to buffer(s)" 'helm-buffer-switch-buffers
    (lambda () (and (locate-library "popwin")
                    "Switch to buffer in popup window"))
    'popwin:popup-buffer
    "Switch to buffer(s) other window `C-c o'"
-   'helm-display-buffers-other-windows
+   'helm-buffer-switch-buffers-other-window
    "Switch to buffer other frame `C-c C-o'"
    'switch-to-buffer-other-frame
    "Browse project from buffer"
