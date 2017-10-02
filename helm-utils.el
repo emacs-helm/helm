@@ -299,7 +299,8 @@ This function is suitable for `helm-window-show-buffers-function'."
                (message "Too many buffers to visit simultaneously")
                do (condition-case _err
                       (progn
-                        (select-window (split-window (get-buffer-window) nil right-split))
+                        (select-window (split-window
+                                        (get-buffer-window) nil right-split))
                         (setq right-split (not right-split))
                         (switch-to-buffer b))
                     (error (setq nosplit t) nil))))))
@@ -315,31 +316,42 @@ This function is suitable for `helm-window-show-buffers-function'."
     (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
   (delete-other-windows)
   (let* ((mosaic-side-tile-count (ceiling (sqrt (length candidates))))
-         ;; We lower-bound the tile size, otherwise the function would fail during the first inner split.
-         ;; There is consequently no need to check for errors when splitting.
-         (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count) window-min-width))
-         (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count) window-min-height))
+         ;; We lower-bound the tile size, otherwise the function would
+         ;; fail during the first inner split.
+         ;; There is consequently no need to check for errors when
+         ;; splitting.
+         (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count)
+                                 window-min-width))
+         (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count)
+                                  window-min-height))
          (helm-window-prefer-horizontal-split
           (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
                    (>= (window-width (selected-window))
                        split-width-threshold))
             helm-window-prefer-horizontal-split))
-         (mosaic-outer-split-size (if helm-window-prefer-horizontal-split mosaic-tile-width mosaic-tile-height))
-         (mosaic-inner-split-size (if helm-window-prefer-horizontal-split mosaic-tile-height mosaic-tile-width))
+         (mosaic-outer-split-size (if helm-window-prefer-horizontal-split
+                                      mosaic-tile-width mosaic-tile-height))
+         (mosaic-inner-split-size (if helm-window-prefer-horizontal-split
+                                      mosaic-tile-height mosaic-tile-width))
          next-window)
-    (let ((max-tiles (* (/ (frame-width) mosaic-tile-width) (/ (frame-height) mosaic-tile-height))))
+    (let ((max-tiles (* (/ (frame-width) mosaic-tile-width)
+                        (/ (frame-height) mosaic-tile-height))))
       (when (> (length candidates) max-tiles)
         (message "Too many buffers to visit simultaneously")
         ;; Shorten `candidates' to `max-tiles' elements.
         (setcdr (nthcdr (- max-tiles 1) candidates) nil)))
     (while candidates
       (when (> (length candidates) mosaic-side-tile-count)
-        (setq next-window (split-window (get-buffer-window) mosaic-outer-split-size helm-window-prefer-horizontal-split)))
+        (setq next-window (split-window (get-buffer-window)
+                                        mosaic-outer-split-size
+                                        helm-window-prefer-horizontal-split)))
       (switch-to-buffer (car candidates))
       (setq candidates (cdr candidates))
       (dotimes (_ (min (- mosaic-side-tile-count 1) (length candidates)))
-        (select-window (split-window (get-buffer-window) mosaic-inner-split-size (not helm-window-prefer-horizontal-split)))
+        (select-window (split-window (get-buffer-window)
+                                     mosaic-inner-split-size
+                                     (not helm-window-prefer-horizontal-split)))
         (switch-to-buffer (car candidates))
         (setq candidates (cdr candidates)))
       (when next-window
@@ -363,7 +375,7 @@ When argument BALANCE is provided `balance-windows'."
     (switch-to-buffer buffer-or-name)))
 
 (cl-defun helm-current-buffer-narrowed-p (&optional
-                                            (buffer helm-current-buffer))
+                                          (buffer helm-current-buffer))
   "Check if BUFFER is narrowed.
 Default is `helm-current-buffer'."
   (with-current-buffer buffer
