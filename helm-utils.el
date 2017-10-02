@@ -241,13 +241,12 @@ behavior is the same that with a nil value."
 It is typically used to rearrange windows."
   :group 'helm-utils
   :type '(choice
-          (function
-           (const :tag "Split windows vertically or horizontally"
-                  #'helm-window-default-split-fn)
-           (const :tag "Split in alternate windows"
-                  #'helm-window-alternate-split-fn)
-           (const :tag "Split windows in mosaic"
-                  #'helm-window-mosaic-fn))))
+          (function :tag "Split windows vertically or horizontally"
+                    helm-window-default-split-fn)
+          (function :tag "Split in alternate windows"
+                    helm-window-alternate-split-fn)
+          (function :tag "Split windows in mosaic"
+                    helm-window-mosaic-fn)))
 
 (defun helm-window-show-buffers (buffers &optional other-window)
   "Show BUFFERS.
