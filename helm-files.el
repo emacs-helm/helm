@@ -707,8 +707,11 @@ ACTION must be an action supported by `helm-dired-action'."
                      (helm-read-file-name
                       prompt
                       :preselect (unless (cdr ifiles)
-                                   (if helm-ff-transformer-show-only-basename
-                                       (helm-basename cand) cand))
+                                   (concat
+                                    "^"
+                                    (regexp-quote
+                                     (if helm-ff-transformer-show-only-basename
+                                         (helm-basename cand) cand))))
                       :initial-input (helm-dwim-target-directory)
                       :history (helm-find-files-history :comp-read nil)))))
          (dest-dir-p (file-directory-p dest))
