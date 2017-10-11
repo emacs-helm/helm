@@ -605,8 +605,8 @@ WHERE can be one of other-window, other-frame."
          (fname        (if tramp-host
                            (concat tramp-prefix loc-fname) loc-fname)))
     (cl-case where
-      (other-window (helm-window-other-window
-                     (find-file-noselect fname)))
+      (other-window (helm-window-show-buffers
+                     (list (find-file-noselect fname)) t))
       (other-frame  (find-file-other-frame fname))
       (grep         (helm-grep-save-results-1))
       (pdf          (if helm-pdfgrep-default-read-command
