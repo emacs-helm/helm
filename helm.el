@@ -759,19 +759,11 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   :group 'helm-faces)
 
 (defface helm-selection-even
-  '((((background dark)) :background "DeepSkyBlue1"
+  '((((background dark)) :background "DimGrey"
      :distant-foreground "black")
-    (((background light)) :background "turquoise1"
+    (((background light)) :background "LightGrey"
      :distant-foreground "black"))
   "Face for even items in the Helm multiline buffer."
-  :group 'helm-faces)
-
-(defface helm-selection-odd
-  '((((background dark)) :background "DeepSkyBlue3"
-     :distant-foreground "black")
-    (((background light)) :background "turquoise3"
-     :distant-foreground "black"))
-  "Face for odd items in the Helm multiline buffer."
   :group 'helm-faces)
 
 (defface helm-separator
@@ -3635,8 +3627,9 @@ It is used for narrowing list of candidates to the
                   (helm-insert-match m 'insert count source)
                   (put-text-property beg (point) 'helm-candidate
                                      (if (cl-oddp count) 'odd 'even))
-                  (unless helm-use-multiline-separator
-                    (add-face-text-property beg (point) (if (cl-oddp count) 'helm-selection-odd 'helm-selection-even) t)))
+                  (and (not helm-use-multiline-separator)
+                       (cl-evenp count)
+                       (add-face-text-property beg (point) 'helm-selection-even t)))
              finally (and (null singleline)
                           (put-text-property start (point)
                                              'helm-multiline t)))))
