@@ -3625,11 +3625,11 @@ It is used for narrowing list of candidates to the
                         (helm-insert-candidate-separator)
                       (setq separate t)))
                   (helm-insert-match m 'insert count source)
-                  (put-text-property beg (point) 'helm-candidate
-                                     (if (cl-oddp count) 'odd 'even))
-                  (and (not helm-use-multiline-separator)
-                       (cl-evenp count)
-                       (add-face-text-property beg (point) 'helm-selection-even t)))
+                  (unless helm-use-multiline-separator
+                    (put-text-property beg (point) 'helm-candidate
+                                       (if (cl-oddp count) 'odd 'even))
+                    (when (cl-evenp count)
+                      (add-face-text-property beg (point) 'helm-selection-even t))))
              finally (and (null singleline)
                           (put-text-property start (point)
                                              'helm-multiline t)))))
@@ -4493,6 +4493,8 @@ Key arg DIRECTION can be one of:
         (funcall move-func)
         (and (memq direction '(next previous))
              (helm-skip-noncandidate-line direction))
+        (and helm-use-multiline-separator (helm-pos-multiline-p)
+             (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
         (helm-mark-current-line)
         (when follow
@@ -4512,7 +4514,8 @@ Key arg DIRECTION can be one of:
         (forward-line 1)))))
 
 (defun helm-move--previous-multi-line-fn ()
-  (forward-line -1)
+  (when helm-use-multiline-separator
+    (forward-line -1))
   (unless (helm-pos-header-line-p)
     (helm-skip-header-and-separator-line 'previous)
     (helm-move--beginning-of-multiline-candidate)))
