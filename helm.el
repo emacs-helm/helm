@@ -5711,7 +5711,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 
 (defun helm-make-visible-mark (&optional src selection)
   (let* ((source (or src  (helm-get-current-source)))
-         (sel    (or selection (helm-get-selection nil nil src)))
+         (sel    (or selection (helm-get-selection nil nil source)))
          (selection-end (if (helm-pos-multiline-p)
                             (or (helm-get-next-candidate-separator-pos)  ; Stays within source
                                 (helm-get-next-header-pos)
