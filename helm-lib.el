@@ -527,10 +527,12 @@ Otherwise make a list with one element."
 
 (cl-defmacro helm-position (item seq &key test all)
   "A simple and faster replacement of CL `position'.
-Return position of first occurence of ITEM found in SEQ.
-Argument SEQ can be a string, in this case ITEM have to be a char.
-Argument ALL, if non--nil specify to return a list of positions of
-all ITEM found in SEQ."
+
+Returns ITEM first occurence position found in SEQ.
+When SEQ is a string, ITEM have to be specified as a char.
+Argument TEST when unspecified default to `eq'.
+When argument ALL is non--nil return a list of all ITEM positions
+found in SEQ."
   (let ((key (if (stringp seq) 'across 'in)))
     `(cl-loop with deftest = 'eq
               for c ,key ,seq
