@@ -525,19 +525,20 @@ Otherwise make a list with one element."
       obj
     (list obj)))
 
-(cl-defmacro helm-position (item seq &key (test 'eq) all)
+(cl-defmacro helm-position (item seq &key test all)
   "A simple and faster replacement of CL `position'.
 Return position of first occurence of ITEM found in SEQ.
 Argument SEQ can be a string, in this case ITEM have to be a char.
 Argument ALL, if non--nil specify to return a list of positions of
 all ITEM found in SEQ."
   (let ((key (if (stringp seq) 'across 'in)))
-    `(cl-loop for c ,key ,seq
-           for index from 0
-           when (funcall ,test c ,item)
-           if ,all collect index into ls
-           else return index
-           finally return ls)))
+    `(cl-loop with deftest = 'eq
+              for c ,key ,seq
+              for index from 0
+              when (funcall (or ,test deftest) c ,item)
+              if ,all collect index into ls
+              else return index
+              finally return ls)))
 
 (cl-defun helm-fast-remove-dups (seq &key (test 'eq))
   "Remove duplicates elements in list SEQ.
