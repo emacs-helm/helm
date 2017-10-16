@@ -269,7 +269,7 @@ If a prefix arg is given split windows vertically."
   "Split windows in one direction and balance them.
 
 Direction can be controlled via `helm-window-prefer-horizontal-split'.
-If a prefix arg is given split windows vertically.
+If a prefix arg is given split windows the other direction.
 This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
@@ -284,81 +284,100 @@ This function is suitable for `helm-window-show-buffers-function'."
                   (error (setq nosplit t) nil)))))
 
 (defun helm-window-alternate-split-fn (candidates &optional other-window-fn)
-  "Alternatively split last window left and right.
+  "Split windows horizontally and vertically in alternate fashion.
 
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
+If a prefix arg is given split windows the other direction.
 This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
     (switch-to-buffer (car candidates)))
-  (let (right-split)
+  (let (right-side)
     (save-selected-window
       (cl-loop with nosplit
                for b in (cdr candidates)
                when nosplit return
                (message "Too many buffers to visit simultaneously")
                do (condition-case _err
-                      (progn
-                        (select-window (split-window
-                                        (get-buffer-window) nil right-split))
-                        (setq right-split (not right-split))
-                        (switch-to-buffer b))
+                      (let ((helm-current-prefix-arg right-side))
+                        (helm-window-other-window b)
+                        (setq right-side (not right-side)))
                     (error (setq nosplit t) nil))))))
 
 (defun helm-window-mosaic-fn (candidates &optional other-window-fn)
   "Make an as-square-as-possible window mosaic of the CANDIDATES buffers.
 
-The outer splits are done in the direction given by
-`helm-window-prefer-horizontal-split'.
+If rectangular, the long side is in the direction given by
+`helm-window-prefer-horizontal-split': if non-nil, it is horizontal, vertical
+otherwise.
 If OTHER-WINDOW-FN is non-nil, current windows are included in the mosaic.
 This function is suitable for `helm-window-show-buffers-function'."
   (when other-window-fn
     (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
   (delete-other-windows)
-  (let* ((mosaic-side-tile-count (ceiling (sqrt (length candidates))))
-         ;; We lower-bound the tile size, otherwise the function would
-         ;; fail during the first inner split.
-         ;; There is consequently no need to check for errors when
-         ;; splitting.
-         (mosaic-tile-width (max (/ (frame-width) mosaic-side-tile-count)
-                                 window-min-width))
-         (mosaic-tile-height (max (/ (frame-height) mosaic-side-tile-count)
-                                  window-min-height))
-         (helm-window-prefer-horizontal-split
+  (let* ((helm-window-prefer-horizontal-split
           (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
                    (>= (window-width (selected-window))
                        split-width-threshold))
             helm-window-prefer-horizontal-split))
-         (mosaic-outer-split-size (if helm-window-prefer-horizontal-split
-                                      mosaic-tile-width mosaic-tile-height))
-         (mosaic-inner-split-size (if helm-window-prefer-horizontal-split
-                                      mosaic-tile-height mosaic-tile-width))
+         mosaic-length-tile-count
+         mosaic-width-tile-count
+         mosaic-length-tile-size
+         mosaic-width-tile-size
          next-window)
-    (let ((max-tiles (* (/ (frame-width) mosaic-tile-width)
-                        (/ (frame-height) mosaic-tile-height))))
-      (when (> (length candidates) max-tiles)
-        (message "Too many buffers to visit simultaneously")
-        ;; Shorten `candidates' to `max-tiles' elements.
-        (setcdr (nthcdr (- max-tiles 1) candidates) nil)))
+    ;; If 4 tiles, make 2x2 mosaic.
+    ;; If 5-6 tiles, make 2x3 mosaic with direction depending on `helm-window-prefer-horizontal-split'.
+    ;; If 7-9 tiles, make 3x3 mosaic.  And so on.
+    (setq mosaic-length-tile-count (ceiling (sqrt (length candidates))))
+    (setq mosaic-width-tile-count
+          (if (<= (length candidates) (* mosaic-length-tile-count (1- mosaic-length-tile-count)))
+              (1- mosaic-length-tile-count)
+            mosaic-length-tile-count))
+    ;; We lower-bound the tile size, otherwise the function would
+    ;; fail during the first inner split.
+    ;; There is consequently no need to check for errors when
+    ;; splitting.
+    (let ((frame-mosaic-length-direction-size (frame-height))
+          (frame-mosaic-width-direction-size (frame-width))
+          (window-mosaic-length-direction-min-size window-min-height)
+          (window-mosaic-width-direction-min-size window-min-width))
+      (if helm-window-prefer-horizontal-split
+          (setq frame-mosaic-length-direction-size (frame-width)
+                frame-mosaic-width-direction-size (frame-height)
+                window-mosaic-length-direction-min-size window-min-width
+                window-mosaic-width-direction-min-size window-min-height))
+      (setq mosaic-length-tile-size (max
+                                     (/ frame-mosaic-length-direction-size mosaic-length-tile-count)
+                                     window-mosaic-length-direction-min-size)
+            mosaic-width-tile-size (max
+                                    (/ frame-mosaic-width-direction-size mosaic-width-tile-count)
+                                    window-mosaic-width-direction-min-size))
+      ;; Shorten `candidates' to `max-tiles' elements.
+      (let ((max-tiles (* (/ frame-mosaic-length-direction-size mosaic-length-tile-size)
+                          (/ frame-mosaic-width-direction-size mosaic-width-tile-size))))
+        (when (> (length candidates) max-tiles)
+          (message "Too many buffers to visit simultaneously")
+          (setcdr (nthcdr (- max-tiles 1) candidates) nil))))
+    ;; Make the mosaic.
     (while candidates
-      (when (> (length candidates) mosaic-side-tile-count)
-        (setq next-window (split-window (get-buffer-window)
-                                        mosaic-outer-split-size
-                                        helm-window-prefer-horizontal-split)))
-      (switch-to-buffer (car candidates))
-      (setq candidates (cdr candidates))
-      (dotimes (_ (min (- mosaic-side-tile-count 1) (length candidates)))
-        (select-window (split-window (get-buffer-window)
-                                     mosaic-inner-split-size
-                                     (not helm-window-prefer-horizontal-split)))
-        (switch-to-buffer (car candidates))
-        (setq candidates (cdr candidates)))
+      (when (> (length candidates) mosaic-length-tile-count)
+        (setq next-window (split-window nil
+                                        mosaic-width-tile-size
+                                        (not helm-window-prefer-horizontal-split))))
+      (switch-to-buffer (pop candidates))
+      (dotimes (_ (min (1- mosaic-length-tile-count) (length candidates)))
+        (select-window (split-window nil
+                                     mosaic-length-tile-size
+                                     helm-window-prefer-horizontal-split))
+        (switch-to-buffer (pop candidates)))
       (when next-window
         (select-window next-window)))))
 
 (defun helm-window-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
-If a prefix arg is detected split vertically.
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
+If a prefix arg is given split windows the other direction.
 When argument BALANCE is provided `balance-windows'."
   (let* ((helm-window-prefer-horizontal-split
           (if (eq helm-window-prefer-horizontal-split 'decide)
