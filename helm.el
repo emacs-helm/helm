@@ -4765,17 +4765,18 @@ candidates."
       (goto-char helm-selection-point))
     (move-overlay
      helm-selection-overlay (point-at-bol)
-     (let ((header-pos (helm-get-next-header-pos))
-           (separator-pos (helm-get-next-candidate-separator-pos)))
-       (if (helm-pos-multiline-p)
+     (if (helm-pos-multiline-p)
+         (let ((header-pos (helm-get-next-header-pos))
+               (separator-pos (helm-get-next-candidate-separator-pos)))
            (or (and (null header-pos) separator-pos)
                (and header-pos separator-pos
                     (< separator-pos header-pos)
                     separator-pos)
                header-pos
-               (point-max))
-         (helm-aif (next-single-property-change (point) 'helm-candidate)
-             it
+               (point-max)))
+       (helm-aif (next-single-property-change (point) 'helm-candidate)
+           it
+         (let ((header-pos (helm-get-next-header-pos)))
            (or header-pos (point-max))))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when (and helm-allow-mouse (null nomouse))
