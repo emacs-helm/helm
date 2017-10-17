@@ -434,6 +434,7 @@ Follows any redirections from Wikipedia, and stores results in
          (when (string= event "finished\n")
            (message "%s process %s" process event))))))
 
+;;;###autoload
 (defun helm-browse-url-firefox (url &optional _ignore)
   "Same as `browse-url-firefox' but detach from emacs.
 
@@ -451,6 +452,7 @@ NOTE: Probably not supported on some systems (e.g Windows)."
              helm-browse-url-firefox-new-window
              (shell-quote-argument url)))))
 
+;;;###autoload
 (defun helm-browse-url-opera (url &optional _ignore)
   "Browse URL with opera browser and detach from emacs.
 
@@ -466,17 +468,20 @@ NOTE: Probably not supported on some systems (e.g Windows)."
      (format "(%s %s &)"
              helm-browse-url-opera-program (shell-quote-argument url)))))
 
+;;;###autoload
 (defun helm-browse-url-chromium (url &optional _ignore)
   "Browse URL with google chrome browser."
   (interactive "sURL: ")
   (helm-generic-browser
    url helm-browse-url-chromium-program))
 
+;;;###autoload
 (defun helm-browse-url-uzbl (url &optional _ignore)
   "Browse URL with uzbl browser."
   (interactive "sURL: ")
   (helm-generic-browser url helm-browse-url-uzbl-program "-u"))
 
+;;;###autoload
 (defun helm-browse-url-conkeror (url &optional _ignore)
   "Browse URL with conkeror browser."
   (interactive "sURL: ")
