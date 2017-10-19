@@ -272,6 +272,23 @@ and not `exit-minibuffer' or other unwanted functions."
 
 ;;; Iterators
 ;;
+(cl-defmacro helm-position (item seq &key test all)
+  "A simple and faster replacement of CL `position'.
+
+Returns ITEM first occurence position found in SEQ.
+When SEQ is a string, ITEM have to be specified as a char.
+Argument TEST when unspecified default to `eq'.
+When argument ALL is non--nil return a list of all ITEM positions
+found in SEQ."
+  (let ((key (if (stringp seq) 'across 'in)))
+    `(cl-loop with deftest = 'eq
+              for c ,key ,seq
+              for index from 0
+              when (funcall (or ,test deftest) c ,item)
+              if ,all collect index into ls
+              else return index
+              finally return ls)))
+
 (defun helm-iter-list (seq)
   "Return an iterator object from SEQ."
   (let ((lis seq))
@@ -524,23 +541,6 @@ Otherwise make a list with one element."
   (if (and (listp obj) (not (functionp obj)))
       obj
     (list obj)))
-
-(cl-defmacro helm-position (item seq &key test all)
-  "A simple and faster replacement of CL `position'.
-
-Returns ITEM first occurence position found in SEQ.
-When SEQ is a string, ITEM have to be specified as a char.
-Argument TEST when unspecified default to `eq'.
-When argument ALL is non--nil return a list of all ITEM positions
-found in SEQ."
-  (let ((key (if (stringp seq) 'across 'in)))
-    `(cl-loop with deftest = 'eq
-              for c ,key ,seq
-              for index from 0
-              when (funcall (or ,test deftest) c ,item)
-              if ,all collect index into ls
-              else return index
-              finally return ls)))
 
 (cl-defun helm-fast-remove-dups (seq &key (test 'eq))
   "Remove duplicates elements in list SEQ.
