@@ -451,7 +451,7 @@ Other acceptable values are `same' which always display
 A nil value has same effect as `below'.
 If `helm-full-frame' is non-`nil', it take precedence over this setting.
 
-See also `helm-split-window-in-side-p' and `helm-always-two-windows' that
+See also `helm-split-window-inside-p' and `helm-always-two-windows' that
 take precedence over this.
 
 NOTE: this have no effect if `helm-split-window-preferred-function' is not
@@ -479,7 +479,7 @@ See `display-buffer' for more info."
   :group 'helm
   :type '(choice integer function))
 
-(defcustom helm-split-window-in-side-p nil
+(defcustom helm-split-window-inside-p nil
   "Forces split inside selected window when non-`nil'.
 See also `helm-split-window-default-side'.
 
@@ -489,13 +489,15 @@ NOTE: this has no effect if
 handle this."
   :group 'helm
   :type 'boolean)
+(defvaralias 'helm-split-window-in-side-p 'helm-split-window-inside-p)
+(make-obsolete-variable 'helm-split-window-in-side-p 'helm-split-window-inside-p "2.8.6")
 
 (defcustom helm-always-two-windows nil
   "When non-`nil' helm uses two windows in this frame.
 To display `helm-buffer' in one window and `helm-current-buffer'
 in the other.
 
-Note: this has no effect when `helm-split-window-in-side-p' is non-`nil',
+Note: this has no effect when `helm-split-window-inside-p' is non-`nil',
 or when `helm-split-window-default-side' is set to 'same.
 
 When `helm-autoresize-mode' is enabled, setting this to nil
@@ -2493,7 +2495,7 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
              ;; e.g M-: and try to use helm-show-kill-ring.
              (not (minibufferp helm-current-buffer)))
         (if (or (one-window-p t)
-                helm-split-window-in-side-p)
+                helm-split-window-inside-p)
             (split-window
              (selected-window) nil (if (eq helm-split-window-default-side 'other)
                                        'below helm-split-window-default-side))
@@ -2571,7 +2573,7 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
     (when (and (or helm-always-two-windows helm-autoresize-mode)
                (not (eq helm-split-window-default-side 'same))
                (not (minibufferp helm-current-buffer))
-               (not helm-split-window-in-side-p))
+               (not helm-split-window-inside-p))
       (delete-other-windows))
     (display-buffer
      buffer `(nil . ((window-height . ,helm-display-buffer-default-height)

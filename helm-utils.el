@@ -713,7 +713,7 @@ Inlined here for compatibility."
             (helm-split-window-default-side
              (if (eq helm-split-window-default-side 'same)
                  'below helm-split-window-default-side))
-            helm-split-window-in-side-p
+            helm-split-window-inside-p
             helm-reuse-last-window-split-state
             ,window)
        (with-current-buffer ,buffer

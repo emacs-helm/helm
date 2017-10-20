@@ -189,7 +189,7 @@ If `helm-turn-on-show-completion' is nil just do nothing."
          (helm-split-window-default-side
           (if (eq helm-split-window-default-side 'same)
               'below helm-split-window-default-side))
-         helm-split-window-in-side-p
+         helm-split-window-inside-p
          helm-reuse-last-window-split-state)
      (helm-set-local-variable
       'helm-display-function
