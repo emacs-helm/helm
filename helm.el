@@ -2557,12 +2557,7 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
       (progn (and (not (minibufferp helm-current-buffer))
                   (delete-other-windows))
              (switch-to-buffer buffer))
-    (when (and (or helm-always-two-windows helm-autoresize-mode
-                   (and (not helm-split-window-in-side-p)
-                        (eq (save-selected-window
-                              (funcall helm-split-window-preferred-function
-                                       (selected-window)))
-                            (get-buffer-window helm-current-buffer))))
+    (when (and (or helm-always-two-windows helm-autoresize-mode)
                (not (eq helm-split-window-default-side 'same))
                (not (minibufferp helm-current-buffer))
                (not helm-split-window-in-side-p))
