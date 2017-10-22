@@ -382,6 +382,14 @@ current heading."
 ;;;###autoload
 (defun helm-org-completing-read-tags (prompt collection pred req initial
                                       hist def inherit-input-method _name _buffer)
+  "Completing read function for Org tags.
+
+This function is used as a `completing-read' function in
+`helm-completing-read-handlers-alist' by `org-set-tags' and
+`org-capture'.
+
+NOTE: Org tag completion will work only if you disable org fast tag
+selection, see (info \"(org) setting tags\")."
   (if (not (string= "Tags: " prompt))
       ;; Not a tags prompt.  Use normal completion by calling
       ;; `org-icompleting-read' again without this function in
