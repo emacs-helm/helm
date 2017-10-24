@@ -333,6 +333,7 @@ See `ido-make-buffer-list' for more infos."
                'face face2)))))
 
 (defun helm-buffer--details (buffer &optional details)
+  (require 'dired)
   (let* ((mode (with-current-buffer buffer (format-mode-line mode-name)))
          (buf (get-buffer buffer))
          (size (propertize (helm-buffer-size buf)
