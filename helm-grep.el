@@ -585,7 +585,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
 ;;; Actions
 ;;
 ;;
-(defun helm-grep-action (candidate &optional where mark)
+(defun helm-grep-action (candidate &optional where)
   "Define a default action for `helm-do-grep-1' on CANDIDATE.
 WHERE can be one of other-window, other-frame."
   (let* ((split        (helm-grep-split-line candidate))
@@ -625,9 +625,6 @@ WHERE can be one of other-window, other-frame."
                       (invalid-regexp nil)))
              collect (match-beginning 0) into pos-ls
              finally (when pos-ls (goto-char (apply #'min pos-ls))))
-    (when mark
-      (set-marker (mark-marker) (point))
-      (push-mark (point) 'nomsg))
     ;; Save history
     (unless (or helm-in-persistent-action
                 (eq major-mode 'helm-grep-mode)
@@ -644,9 +641,7 @@ WHERE can be one of other-window, other-frame."
 (defun helm-grep-persistent-action (candidate)
   "Persistent action for `helm-do-grep-1'.
 With a prefix arg record CANDIDATE in `mark-ring'."
-  (if current-prefix-arg
-      (helm-grep-action candidate nil 'mark)
-    (helm-grep-action candidate))
+  (helm-grep-action candidate)
   (helm-highlight-current-line))
 
 (defun helm-grep-other-window (candidate)

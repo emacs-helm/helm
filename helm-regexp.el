@@ -277,7 +277,7 @@ Should be a local var to helm-buffer to allow resuming.")
     (when (= beg end) (forward-char 1))))
 
 (cl-defun helm-moccur-action (candidate
-                              &optional (method (quote buffer)) mark)
+                              &optional (method (quote buffer)))
   "Jump to CANDIDATE with METHOD.
 arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
@@ -300,10 +300,7 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
                               (re-search-forward reg (point-at-eol) t))
                         (invalid-regexp nil)))
                collect (match-beginning 0) into pos-ls
-               finally (when pos-ls (goto-char (apply #'min pos-ls))))
-      (when mark
-        (set-marker (mark-marker) (point))
-        (push-mark (point) 'nomsg)))))
+               finally (when pos-ls (goto-char (apply #'min pos-ls)))))))
 
 (defun helm-moccur-persistent-action (candidate)
   (helm-moccur-goto-line candidate)
@@ -312,24 +309,19 @@ arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 (defun helm-moccur-goto-line (candidate)
   "From multi occur, switch to buffer and go to nth 1 CANDIDATE line."
   (helm-moccur-action
-   candidate 'buffer (or current-prefix-arg         ; persistent.
-                         helm-current-prefix-arg))) ; exit.
+   candidate 'buffer))
 
 (defun helm-moccur-goto-line-ow (candidate)
   "Go to CANDIDATE line in other window.
 Same as `helm-moccur-goto-line' but go in other window."
   (helm-moccur-action
-   candidate 'buffer-other-window
-   (or current-prefix-arg         ; persistent.
-       helm-current-prefix-arg))) ; exit.
+   candidate 'buffer-other-window))
 
 (defun helm-moccur-goto-line-of (candidate)
   "Go to CANDIDATE line in new frame.
 Same as `helm-moccur-goto-line' but go in new frame."
   (helm-moccur-action
-   candidate 'buffer-other-frame
-   (or current-prefix-arg         ; persistent.
-       helm-current-prefix-arg))) ; exit.
+   candidate 'buffer-other-frame))
 
 (defun helm-moccur-run-goto-line-ow ()
   "Run goto line other window action from `helm-source-moccur'."
