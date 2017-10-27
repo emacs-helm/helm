@@ -436,8 +436,7 @@ To use this add it to `helm-goto-line-before-hook'."
   (with-helm-current-buffer
     (unless helm-in-persistent-action
       (set-marker (mark-marker) (point))
-      (push-mark (point) 'nomsg)
-      (setcdr mark-ring (delete (mark-marker) (cdr mark-ring))))))
+      (push-mark (point) 'nomsg))))
 
 (defun helm-show-all-in-this-source-only (arg)
   "Show only current source of this helm session with all its candidates.
