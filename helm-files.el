@@ -2946,7 +2946,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                     helm-modes-using-escaped-strings)
                               #'shell-quote-argument #'identity))))
         (insert
-         (helm-ff--insert-fname beg end full-path-p guess candidate)
+         (funcall escape-fn (helm-ff--insert-fname
+                             beg end full-path-p guess candidate))
          (if (cdr mkds) " " "")
          (mapconcat escape-fn
                     (cl-loop for f in (cdr mkds)
