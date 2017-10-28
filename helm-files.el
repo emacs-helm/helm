@@ -2923,12 +2923,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
   (member (file-name-extension candidate)
           helm-ff-file-compressed-list))
 
-(defun helm-insert-file-name-completion-at-point (candidate)
+(defun helm-insert-file-name-completion-at-point (_candidate)
   "Insert file name completion at point."
   (with-helm-current-buffer
     (if buffer-read-only
         (error "Error: Buffer `%s' is read-only" (buffer-name))
-      (let* ((end         (point))
+      (let* ((mkds        (helm-marked-candidates :with-wildcard t))
+             (candidate   (car mkds))
+             (end         (point))
              (tap         (thing-at-point 'filename))
              (guess       (and (stringp tap) (substring-no-properties tap)))
              (beg         (- (point) (length guess)))
@@ -2943,26 +2945,34 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                           (if (memq major-mode
                                     helm-modes-using-escaped-strings)
                               #'shell-quote-argument #'identity))))
-        (set-text-properties 0 (length candidate) nil candidate)
         (insert
-         (funcall escape-fn
-                  (if (and guess (not (string= guess ""))
-                           (or (string-match
-                                "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
-                                guess)
-                               (file-exists-p candidate)))
-                      (prog1
-                          (cond (full-path-p
-                                 (expand-file-name candidate))
-                                ((string= (match-string 1 guess) "~/")
-                                 (abbreviate-file-name candidate))
-                                (t (file-relative-name candidate)))
-                        (delete-region beg end))
-                    (cond ((equal helm-current-prefix-arg '(4))
-                           (abbreviate-file-name candidate))
-                          ((equal helm-current-prefix-arg '(16))
-                           (file-relative-name candidate))
-                          (t candidate)))))))))
+         (helm-ff--insert-fname beg end full-path-p guess candidate)
+         (if (cdr mkds) " " "")
+         (mapconcat escape-fn
+                    (cl-loop for f in (cdr mkds)
+                             collect (helm-ff--insert-fname
+                                      nil nil nil nil f))
+                    " "))))))
+
+(defun helm-ff--insert-fname (beg end full-path guess candidate)
+  (set-text-properties 0 (length candidate) nil candidate)
+  (if (and guess (not (string= guess ""))
+           (or (string-match
+                "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
+                guess)
+               (file-exists-p candidate)))
+      (prog1
+          (cond (full-path
+                 (expand-file-name candidate))
+                ((string= (match-string 1 guess) "~/")
+                 (abbreviate-file-name candidate))
+                (t (file-relative-name candidate)))
+        (delete-region beg end))
+    (cond ((equal helm-current-prefix-arg '(4))
+           (abbreviate-file-name candidate))
+          ((equal helm-current-prefix-arg '(16))
+           (file-relative-name candidate))
+          (t candidate))))
 
 (cl-defun helm-find-files-history (&key (comp-read t))
   "The `helm-find-files' history.
