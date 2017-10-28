@@ -544,10 +544,13 @@ Otherwise make a list with one element."
 
 (cl-defun helm-fast-remove-dups (seq &key (test 'eq))
   "Remove duplicates elements in list SEQ.
+
 This is same as `remove-duplicates' but with memoisation.
 It is much faster, especially in large lists.
 A test function can be provided with TEST argument key.
-Default is `eq'."
+Default is `eq'.
+NOTE: Comparison of special elisp objects fails in hash-tables (bug in
+gethash) so using this on e.g. markers will fail."
   (cl-loop with cont = (make-hash-table :test test)
         for elm in seq
         unless (gethash elm cont)
