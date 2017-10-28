@@ -243,7 +243,7 @@ This is a command for `helm-kill-ring-map'."
 (defun helm-mark-ring-get-candidates ()
   (with-helm-current-buffer
     (cl-loop with marks = (if (mark t)
-                              (push (mark-marker) mark-ring)
+                              (cons (mark-marker) mark-ring)
                             mark-ring)
              for marker in marks
              with max-line-number = (line-number-at-pos (point-max))
