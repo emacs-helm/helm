@@ -39,6 +39,7 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
 (declare-function helm-quote-whitespace "helm-lib")
+(declare-function eshell-next-prompt "em-prompt")
 (defvar eshell-special-chars-outside-quoting)
 
 
@@ -336,7 +337,8 @@ The function that call this should set `helm-ec-target' to thing at point."
         (delete-char -1)))))
 
 
-
+;;; Eshell prompts
+;;
 (defface helm-eshell-prompts-promptidx
   '((t (:foreground "cyan")))
   "Face used to highlight Eshell prompt index."
@@ -366,10 +368,12 @@ If BUFFER is nil, use current buffer."
           (let ((promptno 1))
             (while (not (eobp))
               (eshell-next-prompt 1)
-              (setq list (cons (list (buffer-substring-no-properties (point) (line-end-position))
+              (setq list (cons (list (buffer-substring-no-properties
+                                      (point) (line-end-position))
                                      (point)
                                      (buffer-name)
-                                     (if helm-eshell-prompts-promptidx-p promptno))
+                                     (and helm-eshell-prompts-promptidx-p
+                                          promptno))
                                list)
                     promptno (1+ promptno)))))))
     (nreverse list)))
@@ -387,13 +391,15 @@ See `helm-eshell-prompts-list'."
     (setcar c
             (concat
              (when all
-               (concat (propertize (nth 2 c) 'face 'helm-eshell-prompts-buffer-name) ":"))
+               (concat (propertize (nth 2 c)
+                                   'face 'helm-eshell-prompts-buffer-name) ":"))
              (when helm-eshell-prompts-promptidx-p
-               (concat (propertize (number-to-string (nth 3 c)) 'face 'helm-eshell-prompts-promptidx) ":"))
+               (concat (propertize (number-to-string (nth 3 c))
+                                   'face 'helm-eshell-prompts-promptidx) ":"))
              (car c))))
   candidates)
 
-(defun helm-eshell-prompts-all-transformer (candidates &optional all)
+(defun helm-eshell-prompts-all-transformer (candidates)
   (helm-eshell-prompts-transformer candidates t))
 
 (defun helm-eshell-prompts-goto (candidate)
@@ -426,8 +432,7 @@ See `helm-eshell-prompts-list'."
             (helm-build-sync-source "Eshell prompts"
               :candidates (helm-eshell-prompts-list)
               :candidate-transformer 'helm-eshell-prompts-transformer
-              :action '(("Go to prompt" . helm-eshell-prompts-goto))
-              )
+              :action '(("Go to prompt" . helm-eshell-prompts-goto)))
             :buffer "*helm Eshell prompts*")
     (message "Current buffer is not an Eshell buffer")))
 
@@ -440,8 +445,10 @@ See `helm-eshell-prompts-list'."
           :candidates (helm-eshell-prompts-list-all)
           :candidate-transformer 'helm-eshell-prompts-all-transformer
           :action '(("Go to prompt" . helm-eshell-prompts-goto)
-                    ("Go to prompt in other window `C-c o`" . helm-eshell-prompts-goto-other-window)
-                    ("Go to prompt in other frame `C-c C-o`" . helm-eshell-prompts-goto-other-frame)))
+                    ("Go to prompt in other window `C-c o`" .
+                     helm-eshell-prompts-goto-other-window)
+                    ("Go to prompt in other frame `C-c C-o`" .
+                     helm-eshell-prompts-goto-other-frame)))
         :buffer "*helm Eshell all prompts*"))
 
 (provide 'helm-eshell)
