@@ -359,24 +359,19 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 Return a list of (\"prompt\" (point) (buffer-name) prompt-index)).
 If BUFFER is nil, use current buffer."
-  (let ((buffer (or buffer (current-buffer)))
-        list)
-    (with-current-buffer buffer
-      (when (eq major-mode 'eshell-mode)
-        (save-excursion
-          (goto-char (point-min))
-          (let ((promptno 1))
-            (while (not (eobp))
-              (eshell-next-prompt 1)
-              (setq list (cons (list (buffer-substring-no-properties
-                                      (point) (line-end-position))
-                                     (point)
-                                     (buffer-name)
-                                     (and helm-eshell-prompts-promptidx-p
-                                          promptno))
-                               list)
-                    promptno (1+ promptno)))))))
-    (nreverse list)))
+  (with-current-buffer (or buffer (current-buffer))
+    (when (eq major-mode 'eshell-mode)
+      (save-excursion
+        (goto-char (point-min))
+        (cl-loop while (not (eobp))
+                 for promptno from 1
+                 do (eshell-next-prompt 1)
+                 collect (list (buffer-substring-no-properties
+                                (point) (line-end-position))
+                               (point)
+                               (buffer-name)
+                               (and helm-eshell-prompts-promptidx-p
+                                    promptno)))))))
 
 (defun helm-eshell-prompts-list-all ()
   "List the prompts of all Eshell buffers.
