@@ -507,6 +507,15 @@ Filename completion happen if string start after or between a double quote."
       candidates
       (sort candidates #'helm-generic-sort-fn)))
 
+(defun helm-apropos-clean-history-variable (candidate)
+  (let* ((sym   (intern-soft candidate))
+         (cands (symbol-value sym))
+         (mkds  (and (listp cands)
+                     (helm-comp-read "Delete entry: "
+                                     cands :marked-candidates t))))
+    (cl-assert (listp mkds) nil "Variable value is not a list")
+    (cl-loop for elm in mkds do (set sym (setq cands (delete elm cands))))))
+
 (defun helm-def-source--emacs-variables (&optional default)
   (helm-build-in-buffer-source "Variables"
     :init (lambda ()
@@ -527,19 +536,21 @@ Filename completion happen if string start after or between a double quote."
     :action-transformer
     (lambda (actions candidate)
       (let ((sym (helm-symbolify candidate)))
-        (if (custom-variable-p sym)
-            (append
-             actions
-             (let ((standard-value (eval (car (get sym 'standard-value)))))
-               (unless (equal standard-value (symbol-value sym))
-                 `(("Reset Variable to default value" .
-                    ,(lambda (candidate)
-                       (let ((sym (helm-symbolify candidate)))
-                         (set sym standard-value)))))))
-             '(("Customize variable" .
-                (lambda (candidate)
-                  (customize-option (helm-symbolify candidate))))))
-          actions)))))
+        (cond ((custom-variable-p sym)
+               (append
+                actions
+                (let ((standard-value (eval (car (get sym 'standard-value)))))
+                  (unless (equal standard-value (symbol-value sym))
+                    `(("Reset Variable to default value" .
+                                                         ,(lambda (candidate)
+                                                            (let ((sym (helm-symbolify candidate)))
+                                                              (set sym standard-value)))))))
+                '(("Customize variable" .
+                   (lambda (candidate)
+                     (customize-option (helm-symbolify candidate)))))))
+              ((string-match-p "history" candidate)
+               (append actions '(("Clean variable" . helm-apropos-clean-history-variable))))
+              (t actions))))))
 
 (defun helm-def-source--emacs-faces (&optional default)
   "Create `helm' source for faces to be displayed with
