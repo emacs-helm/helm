@@ -541,15 +541,17 @@ Filename completion happen if string start after or between a double quote."
                 actions
                 (let ((standard-value (eval (car (get sym 'standard-value)))))
                   (unless (equal standard-value (symbol-value sym))
-                    `(("Reset Variable to default value" .
-                                                         ,(lambda (candidate)
-                                                            (let ((sym (helm-symbolify candidate)))
-                                                              (set sym standard-value)))))))
+                    `(("Reset Variable to default value"
+                       . ,(lambda (candidate)
+                            (let ((sym (helm-symbolify candidate)))
+                              (set sym standard-value)))))))
                 '(("Customize variable" .
                    (lambda (candidate)
                      (customize-option (helm-symbolify candidate)))))))
               ((string-match-p "history" candidate)
-               (append actions '(("Clean variable" . helm-apropos-clean-history-variable))))
+               (append actions
+                       '(("Clean variable" .
+                          helm-apropos-clean-history-variable))))
               (t actions))))))
 
 (defun helm-def-source--emacs-faces (&optional default)
