@@ -266,9 +266,10 @@ This is a command for `helm-kill-ring-map'."
             (unless helm-yank-point (setq helm-yank-point (point))))
           (helm-goto-char target)
           (helm-highlight-current-line))
-      ;; marker point to no buffer, no need to dereference it, just
+      ;; marker points to no buffer, no need to dereference it, just
       ;; delete it.
-      (setq mark-ring (delete target mark-ring)))))
+      (setq mark-ring (delete target mark-ring))
+      (error "Marker points to no buffer"))))
 
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
