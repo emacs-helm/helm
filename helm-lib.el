@@ -258,7 +258,16 @@ When only `add-text-properties' is available APPEND is ignored."
   (when (or activate (not transient-mark-mode))
     (set-mark (mark t)))
   nil)
-(advice-add 'push-mark :override #'helm--advice-push-mark)
+
+(defcustom helm-advice-push-mark t
+  "Override `push-mark' with a version avoiding duplicates when non nil."
+  :group 'helm
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if var
+             (advice-add 'push-mark :override #'helm--advice-push-mark)
+           (advice-remove 'push-mark #'helm--advice-push-mark))))
 
 ;;; Macros helper.
 ;;
