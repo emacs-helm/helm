@@ -347,7 +347,7 @@ Show actions only on line starting by a PID."
     ;; I'm not sure under what condition this made sense though, it
     ;; set the CPU sort to null (disabled) if the helm-top-command was
     ;; indeed a 'top' (although specific to 'top' being in slot 2 in
-    ;; the command position.
+    ;; the command position).
     (setq helm-top-sort-fn 'helm-top-sort-by-cpu)
     (helm-update (helm-top--preselect-fn))))
 
