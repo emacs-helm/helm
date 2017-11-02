@@ -46,18 +46,18 @@ is used instead by default.
 Normally 'top' command output have 12 columns, but in some versions you may
 have less than this, so you can either customize top to use 12 columns with the
 interactives 'f' and 'W' commands of top, or modify
-`helm-top-sort-colums-alist' to fit with the number of columns
+`helm-top-sort-columns-alist' to fit with the number of columns
 your 'top' command is using.
 
 If you modify 'ps' command be sure that 'pid' comes in first
 and \"env COLUMNS=%s\" is specified at beginning of command.
 Ensure also that no elements contain spaces (e.g use start_time and not start).
-Same as for 'top' you can customize `helm-top-sort-colums-alist' to make sort commands
+Same as for 'top' you can customize `helm-top-sort-columns-alist' to make sort commands
 working properly according to your settings."
   :group 'helm-sys
   :type 'string)
 
-(defcustom helm-top-sort-colums-alist '((com . 11)
+(defcustom helm-top-sort-columns-alist '((com . 11)
                                         (mem . 9)
                                         (cpu . 8)
                                         (user . 1))
@@ -290,7 +290,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-by-com (s1 s2)
   (let* ((split-1 (split-string s1))
          (split-2 (split-string s2))
-         (col (cdr (assq 'com helm-top-sort-colums-alist)))
+         (col (cdr (assq 'com helm-top-sort-columns-alist)))
          (com-1 (nth col split-1))
          (com-2 (nth col split-2)))
     (string< com-1 com-2)))
@@ -298,7 +298,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-by-mem (s1 s2)
   (let* ((split-1 (split-string s1))
          (split-2 (split-string s2))
-         (col (cdr (assq 'mem helm-top-sort-colums-alist)))
+         (col (cdr (assq 'mem helm-top-sort-columns-alist)))
          (mem-1 (string-to-number (nth col split-1)))
          (mem-2 (string-to-number (nth col split-2))))
     (> mem-1 mem-2)))
@@ -306,7 +306,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-by-cpu (s1 s2)
   (let* ((split-1 (split-string s1))
          (split-2 (split-string s2))
-         (col (cdr (assq 'cpu helm-top-sort-colums-alist)))
+         (col (cdr (assq 'cpu helm-top-sort-columns-alist)))
          (cpu-1 (string-to-number (nth col split-1)))
          (cpu-2 (string-to-number (nth col split-2))))
     (> cpu-1 cpu-2)))
@@ -314,7 +314,7 @@ Show actions only on line starting by a PID."
 (defun helm-top-sort-by-user (s1 s2)
   (let* ((split-1 (split-string s1))
          (split-2 (split-string s2))
-         (col (cdr (assq 'user helm-top-sort-colums-alist)))
+         (col (cdr (assq 'user helm-top-sort-columns-alist)))
          (user-1 (nth col split-1))
          (user-2 (nth col split-2)))
     (string< user-1 user-2)))
@@ -338,8 +338,17 @@ Show actions only on line starting by a PID."
   (interactive)
   (let ((com (nth 2 (split-string helm-top-command))))
     (helm-top-set-mode-line "CPU")
-    (setq helm-top-sort-fn (and (null (string= com "top"))
-                                'helm-top-sort-by-cpu))
+    ;; Commit mentioned a null sort fixed sorting with ps - it breaks
+    ;; sorting with 'top' (which is default on GNU/Linux).
+
+    ;; FIXME: Make this a defcustom if user needs to use ps with it
+    ;; set to the top sort null for some reason.
+
+    ;; I'm not sure under what condition this made sense though, it
+    ;; set the CPU sort to null (disabled) if the helm-top-command was
+    ;; indeed a 'top' (although specific to 'top' being in slot 2 in
+    ;; the command position).
+    (setq helm-top-sort-fn 'helm-top-sort-by-cpu)
     (helm-update (helm-top--preselect-fn))))
 
 (defun helm-top-run-sort-by-mem ()
