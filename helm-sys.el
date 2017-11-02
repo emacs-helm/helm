@@ -336,20 +336,11 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-run-sort-by-cpu ()
   (interactive)
-  (let ((com (nth 2 (split-string helm-top-command))))
-    (helm-top-set-mode-line "CPU")
-    ;; Commit mentioned a null sort fixed sorting with ps - it breaks
-    ;; sorting with 'top' (which is default on GNU/Linux).
-
-    ;; FIXME: Make this a defcustom if user needs to use ps with it
-    ;; set to the top sort null for some reason.
-
-    ;; I'm not sure under what condition this made sense though, it
-    ;; set the CPU sort to null (disabled) if the helm-top-command was
-    ;; indeed a 'top' (although specific to 'top' being in slot 2 in
-    ;; the command position).
-    (setq helm-top-sort-fn 'helm-top-sort-by-cpu)
-    (helm-update (helm-top--preselect-fn))))
+  (helm-top-set-mode-line "CPU")
+  ;; Force sorting by CPU even if some versions of top are using by
+  ;; default CPU sorting (Issue #1908).
+  (setq helm-top-sort-fn 'helm-top-sort-by-cpu)
+  (helm-update (helm-top--preselect-fn)))
 
 (defun helm-top-run-sort-by-mem ()
   (interactive)
