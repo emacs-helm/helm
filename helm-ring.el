@@ -257,13 +257,18 @@ This is a command for `helm-kill-ring-map'."
 
 (defun helm-mark-ring-default-action (candidate)
   (let ((target (copy-marker candidate)))
-    (switch-to-buffer (marker-buffer candidate))
-    (helm-log-run-hook 'helm-goto-line-before-hook)
-    (helm-match-line-cleanup)
-    (with-helm-current-buffer
-      (unless helm-yank-point (setq helm-yank-point (point))))
-    (helm-goto-char target)
-    (helm-highlight-current-line)))
+    (helm-aif (marker-buffer candidate)
+        (progn
+          (switch-to-buffer it)
+          (helm-log-run-hook 'helm-goto-line-before-hook)
+          (helm-match-line-cleanup)
+          (with-helm-current-buffer
+            (unless helm-yank-point (setq helm-yank-point (point))))
+          (helm-goto-char target)
+          (helm-highlight-current-line))
+      ;; marker point to no buffer, no need to dereference it, just
+      ;; delete it.
+      (setq mark-ring (delete target mark-ring)))))
 
 (defvar helm-source-mark-ring
   (helm-build-sync-source "mark-ring"
