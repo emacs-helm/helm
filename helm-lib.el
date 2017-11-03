@@ -265,7 +265,7 @@ When only `add-text-properties' is available APPEND is ignored."
   :type 'boolean
   :set (lambda (var val)
          (set var val)
-         (if var
+         (if val
              (advice-add 'push-mark :override #'helm--advice-push-mark)
            (advice-remove 'push-mark #'helm--advice-push-mark))))
 
