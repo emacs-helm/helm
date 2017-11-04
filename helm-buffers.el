@@ -387,7 +387,8 @@ Should be called after others transformers i.e (boring buffers)."
                                       (helm-buffer--details i))
         for truncbuf = (if (> (string-width name) helm-buffer-max-length)
                            (helm-substring-by-width
-                            name helm-buffer-max-length
+                            name (- helm-buffer-max-length
+                                    (length helm-buffers-end-truncated-string))
                             helm-buffers-end-truncated-string)
                          (concat name
                                  (make-string
@@ -422,7 +423,8 @@ Should be called after others transformers i.e (boring buffers)."
                         helm-buffer-max-length))
                 (regexp-quote
                  (helm-substring-by-width
-                  bufname helm-buffer-max-length
+                  bufname (- helm-buffer-max-length
+                             (length helm-buffers-end-truncated-string))
                   helm-buffers-end-truncated-string))
                 (concat (regexp-quote bufname)
                         (if helm-buffer-details-flag
