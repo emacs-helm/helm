@@ -3075,7 +3075,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
            (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
                  candidate-fn))
           ((and candidate-proc (not (processp candidates)))
-           (error "Candidates function `%s' is not a process" candidate-proc)))
+           (error "Candidates function `%s' should run a process" candidate-proc)))
     (cond ((processp candidates)
            ;; Candidates will be filtered later in process filter.
            candidates)
