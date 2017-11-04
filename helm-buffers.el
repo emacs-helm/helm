@@ -228,11 +228,6 @@ this source is accessible and properly loaded."
    (multimatch :initform nil)
    (match :initform 'helm-buffers-match-function)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
-   (resume :initform (lambda ()
-                       (run-with-idle-timer
-                        0.1 nil (lambda ()
-                                  (with-helm-buffer
-                                    (helm-force-update))))))
    (keymap :initform helm-buffer-map)
    (migemo :initform 'nomultimatch)
    (volatile :initform t)
