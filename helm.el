@@ -3071,9 +3071,11 @@ WARNING: Do not use this mode yourself, it is internal to helm."
                              (helm-interpret-value candidate-proc)
                            (helm-interpret-value candidate-fn source))
                        (error (helm-log "Error: %S" (setq cfn-error err)) nil))))
-    (when (and (processp candidates) (not candidate-proc))
-      (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
-            candidate-fn))
+    (cond ((and (processp candidates) (not candidate-proc))
+           (warn "Candidates function `%s' should be called in a `candidates-process' attribute"
+                 candidate-fn))
+          ((and candidate-proc (not (processp candidates)))
+           (error "Candidates function `%s' is not a process" candidate-proc)))
     (cond ((processp candidates)
            ;; Candidates will be filtered later in process filter.
            candidates)
