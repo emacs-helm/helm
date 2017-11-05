@@ -391,13 +391,16 @@ Should be called after others transformers i.e (boring buffers)."
            for truncbuf = (if (> (string-width name) helm-buffer-max-length)
                               (helm-substring-by-width
                                name (- helm-buffer-max-length
-                                       (length helm-buffers-end-truncated-string))
+                                       (length
+                                        helm-buffers-end-truncated-string))
                                helm-buffers-end-truncated-string)
                             (concat name
                                     (make-string
                                      (- (+ helm-buffer-max-length
-                                           (length helm-buffers-end-truncated-string))
-                                        (string-width name)) ? )))
+                                           (length
+                                            helm-buffers-end-truncated-string))
+                                        (string-width name))
+                                     ? )))
            for len = (length mode)
            when (> len helm-buffer-max-len-mode)
            do (setq helm-buffer-max-len-mode len)
@@ -407,15 +410,16 @@ Should be called after others transformers i.e (boring buffers)."
            ;; The max length of a number should be 1023.9X where X is the
            ;; units, this is 7 characters.
            for formatted-size = (and size (format "%7s" size))
-           collect           (let ((helm-pattern (helm-buffers--pattern-sans-filters
-                                                  (and helm-buffers-fuzzy-matching ""))))
-                               (cons (if helm-buffer-details-flag
-                                         (concat
-                                          (funcall helm-fuzzy-matching-highlight-fn truncbuf)
-                                          "\t" formatted-size
-                                          "  " fmode "  " meta)
-                                       (funcall helm-fuzzy-matching-highlight-fn name))
-                                     (get-buffer i)))))
+           collect (let ((helm-pattern (helm-buffers--pattern-sans-filters
+                                        (and helm-buffers-fuzzy-matching ""))))
+                     (cons (if helm-buffer-details-flag
+                               (concat
+                                (funcall helm-fuzzy-matching-highlight-fn
+                                         truncbuf)
+                                "\t" formatted-size
+                                "  " fmode "  " meta)
+                             (funcall helm-fuzzy-matching-highlight-fn name))
+                           (get-buffer i)))))
 
 (defun helm-buffer--get-preselection (buffer)
   (let ((bufname (buffer-name buffer)))
