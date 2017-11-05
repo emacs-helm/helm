@@ -203,6 +203,11 @@ this source is accessible and properly loaded."
 (defun helm-buffers-list--init ()
   (require 'dired)
   ;; Issue #51 Create the list before `helm-buffer' creation.
+  ;; We were using a global cache in the past and 'candidates was
+  ;; bound to this cache, this was a problem when using more than one
+  ;; source with a different 'buffer-list fn as the same cache was
+  ;; reused in each source (issue #1907), now 'candidates attr is set
+  ;; directly so that each list of candidates is local to source.
   (helm-attrset 'candidates (funcall (helm-attr 'buffer-list)))
   (let ((result (cl-loop for b in (helm-attr 'candidates)
                          maximize (length b) into len-buf
