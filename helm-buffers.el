@@ -197,15 +197,14 @@ this source is accessible and properly loaded."
     map))
 
 
-(defvar helm-buffers-list-cache nil)
 (defvar helm-buffer-max-len-mode nil)
 (defvar helm-buffers-in-project-p nil)
 
 (defun helm-buffers-list--init ()
   (require 'dired)
   ;; Issue #51 Create the list before `helm-buffer' creation.
-  (setq helm-buffers-list-cache (funcall (helm-attr 'buffer-list)))
-  (let ((result (cl-loop for b in helm-buffers-list-cache
+  (helm-attrset 'candidates (funcall (helm-attr 'buffer-list)))
+  (let ((result (cl-loop for b in (helm-attr 'candidates)
                          maximize (length b) into len-buf
                          maximize (length (with-current-buffer b
                                             (format-mode-line mode-name)))
@@ -224,7 +223,6 @@ this source is accessible and properly loaded."
     :documentation
     "  A function with no arguments to create buffer list.")
    (init :initform 'helm-buffers-list--init)
-   (candidates :initform helm-buffers-list-cache)
    (multimatch :initform nil)
    (match :initform 'helm-buffers-match-function)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
