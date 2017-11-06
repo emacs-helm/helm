@@ -558,7 +558,7 @@ Filename completion happen if string start after or between a double quote."
           ((and val (with-helm-current-buffer (ring-p (symbol-value sym))))
            (append actions
                    '(("Clean ring" . helm-apropos-clean-ring))))
-          ((and (string-match-p "history" candidate) (listp candidate))
+          ((and (string-match-p "history" candidate) (listp val))
            (append actions
                    '(("Clean variable" .
                       helm-apropos-clean-history-variable))))
