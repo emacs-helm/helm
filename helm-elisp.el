@@ -508,13 +508,61 @@ Filename completion happen if string start after or between a double quote."
       (sort candidates #'helm-generic-sort-fn)))
 
 (defun helm-apropos-clean-history-variable (candidate)
-  (let* ((sym   (intern-soft candidate))
-         (cands (symbol-value sym))
-         (mkds  (and (listp cands)
-                     (helm-comp-read "Delete entry: "
-                                     cands :marked-candidates t))))
-    (cl-assert (listp mkds) nil "Variable value is not a list")
-    (cl-loop for elm in mkds do (set sym (setq cands (delete elm cands))))))
+  (with-helm-current-buffer ; var is maybe local
+    (let* ((sym   (intern-soft candidate))
+           (cands (symbol-value sym))
+           (mkds  (and (listp cands)
+                       (helm-comp-read "Delete entry: "
+                                       cands :marked-candidates t))))
+      (cl-assert (listp mkds) nil "Variable value is not a list")
+      (cl-loop for elm in mkds do
+               (if (local-variable-p sym)
+                   (set (make-local-variable sym)
+                        (setq cands (delete elm cands)))
+                 (set sym (setq cands (delete elm cands))))))))
+
+(defun helm-apropos-clean-ring (candidate)
+  (with-helm-current-buffer ; var is maybe local
+    (let* ((sym   (intern-soft candidate))
+           (val   (symbol-value sym))
+           (cands (and (ring-p val) (ring-elements val)))
+           (mkds  (and cands (helm-comp-read
+                                "Delete entry: "
+                                cands :marked-candidates t))))
+      (when mkds
+        (cl-loop for elm in mkds do
+                 (ring-remove
+                  val (helm-position
+                       elm
+                       (ring-elements val)
+                       :test 'equal))
+                 and do (if (local-variable-p sym)
+                            (set (make-local-variable sym) val)
+                          (set sym val)))))))
+
+(defun helm-apropos-action-transformer (actions candidate)
+  (let* ((sym (helm-symbolify candidate))
+         (val (with-helm-current-buffer (symbol-value sym))))
+    (cond ((custom-variable-p sym)
+           (append
+            actions
+            (let ((standard-value (eval (car (get sym 'standard-value)))))
+              (unless (equal standard-value (symbol-value sym))
+                `(("Reset Variable to default value"
+                   . ,(lambda (candidate)
+                        (let ((sym (helm-symbolify candidate)))
+                          (set sym standard-value)))))))
+            '(("Customize variable" .
+               (lambda (candidate)
+                 (customize-option (helm-symbolify candidate)))))))
+          ((and val (with-helm-current-buffer (ring-p (symbol-value sym))))
+           (append actions
+                   '(("Clean ring" . helm-apropos-clean-ring))))
+          ((and (string-match-p "history" candidate) (listp candidate))
+           (append actions
+                   '(("Clean variable" .
+                      helm-apropos-clean-history-variable))))
+          (t actions))))
 
 (defun helm-def-source--emacs-variables (&optional default)
   (helm-build-in-buffer-source "Variables"
@@ -533,26 +581,7 @@ Filename completion happen if string start after or between a double quote."
               ("Find variable" . helm-find-variable)
               ("Info lookup" . helm-info-lookup-symbol)
               ("Set variable" . helm-set-variable))
-    :action-transformer
-    (lambda (actions candidate)
-      (let ((sym (helm-symbolify candidate)))
-        (cond ((custom-variable-p sym)
-               (append
-                actions
-                (let ((standard-value (eval (car (get sym 'standard-value)))))
-                  (unless (equal standard-value (symbol-value sym))
-                    `(("Reset Variable to default value"
-                       . ,(lambda (candidate)
-                            (let ((sym (helm-symbolify candidate)))
-                              (set sym standard-value)))))))
-                '(("Customize variable" .
-                   (lambda (candidate)
-                     (customize-option (helm-symbolify candidate)))))))
-              ((string-match-p "history" candidate)
-               (append actions
-                       '(("Clean variable" .
-                          helm-apropos-clean-history-variable))))
-              (t actions))))))
+    :action-transformer 'helm-apropos-action-transformer))
 
 (defun helm-def-source--emacs-faces (&optional default)
   "Create `helm' source for faces to be displayed with
