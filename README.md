@@ -57,11 +57,6 @@
          style="height: 50px; width: auto;"
          src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
   &nbsp;&nbsp;
-  <a href="https://gratipay.com/emacs-helm/">
-    <img title="Donate weekly using Gratipay"
-         alt="Donate monthly using Patreon"
-         style="height: 50px; width: auto;"
-         src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png"></a>
 </div>
 
 ***
