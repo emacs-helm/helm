@@ -375,6 +375,11 @@ See `ido-make-buffer-list' for more infos."
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
           'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
+        ;; A non-file, modified buffer
+        ((buffer-modified-p buf)
+         (helm-buffer--show-details
+          name (and proc name-prefix) dir size mode dir
+          'helm-buffer-modified 'helm-buffer-process proc details 'nofile-mod))
         ;; Any non--file buffer.=>italic
         (t
          (helm-buffer--show-details
