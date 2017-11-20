@@ -154,6 +154,18 @@ this source is accessible and properly loaded."
   "Face used for non-file buffers in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
+(defvar helm-buffers-tick-counter nil
+  "Allows recording local changes to a non-file buffer.
+Typical usage of this var is for modes that want to see if
+their buffers have changed since last visit.
+Such programs may want to record tick counter after visiting their
+buffers like this:
+
+    (setq helm-buffers-tick-counter (buffer-modified-tick))
+
+Note that this variable is buffer-local.")
+(make-variable-buffer-local 'helm-buffers-tick-counter)
+
 
 ;;; Buffers keymap
 ;;
@@ -375,6 +387,13 @@ See `ido-make-buffer-list' for more infos."
          (helm-buffer--show-details
           name name-prefix file-name size mode dir
           'helm-buffer-file 'helm-buffer-process nil details 'filebuf))
+        ;; A non-file, modified buffer
+        ((with-current-buffer name
+           (and helm-buffers-tick-counter
+                (/= helm-buffers-tick-counter (buffer-modified-tick))))
+         (helm-buffer--show-details
+          name (and proc name-prefix) dir size mode dir
+          'helm-buffer-modified 'helm-buffer-process proc details 'nofile-mod))
         ;; Any non--file buffer.=>italic
         (t
          (helm-buffer--show-details
