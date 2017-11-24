@@ -1017,7 +1017,9 @@ Keys description:
             (if (listp default) (car default) default))
            ((and result (listp result))
             (mapcar #'expand-file-name result))
-           (t result))
+           ((and result (file-directory-p result))
+            (file-name-as-directory (expand-file-name result)))
+           (t (expand-file-name result)))
      (helm-mode--keyboard-quit))))
 
 (defun helm-mode--default-filename (fname dir initial)
