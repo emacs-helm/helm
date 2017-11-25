@@ -404,12 +404,13 @@ Default is `helm-current-buffer'."
 
 (defun helm-goto-char (loc)
   "Go to char, revealing if necessary."
+  (require 'org) ; On some old Emacs versions org may not be loaded.
   (goto-char loc)
-  (when (or (eq major-mode 'org-mode)
-            (and (boundp 'outline-minor-mode)
-                 outline-minor-mode))
-    (require 'org) ; On some old Emacs versions org may not be loaded.
-    (org-reveal)))
+  (let ((fn (cond ((eq major-mode 'org-mode) #'org-reveal)
+                  ((and (boundp 'outline-minor-mode)
+                        outline-minor-mode)
+                   #'outline-show-subtree))))
+    (and fn (funcall fn))))
 
 (defun helm-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
