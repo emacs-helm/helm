@@ -410,7 +410,11 @@ Default is `helm-current-buffer'."
                   ((and (boundp 'outline-minor-mode)
                         outline-minor-mode)
                    #'outline-show-subtree))))
-    (and fn (funcall fn))))
+    ;; outline may fail in some conditions e.g. with markdown enabled
+    ;; (issue #1919).
+    (condition-case nil
+        (and fn (funcall fn))
+      (error nil))))
 
 (defun helm-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
