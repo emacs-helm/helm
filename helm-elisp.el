@@ -185,7 +185,6 @@ If `helm-turn-on-show-completion' is nil just do nothing."
           (and helm-turn-on-show-completion
                (append (list 'helm-show-completion)
                        helm-move-selection-after-hook)))
-         (helm-always-two-windows t)
          (helm-split-window-default-side
           (if (eq helm-split-window-default-side 'same)
               'below helm-split-window-default-side))
