@@ -5730,20 +5730,22 @@ Meaning of prefix ARG is the same as in `reposition-window'."
     (cl-pushnew o helm-visible-mark-overlays)
     (push (cons source sel) helm-marked-candidates)))
 
-(defun helm-toggle-visible-mark ()
+(defun helm-toggle-visible-mark (arg)
   "Toggle helm visible mark at point."
-  (interactive)
+  (interactive "p")
   (with-helm-alive-p
     (with-helm-window
       (let ((nomark (assq 'nomark (helm-get-current-source))))
         (if nomark
             (message "Marking not allowed in this source")
-            (helm-aif (helm-this-visible-mark)
-                (helm-delete-visible-mark it)
-              (helm-make-visible-mark))
-            (if (helm-end-of-source-p)
-                (helm-display-mode-line (helm-get-current-source))
-                (helm-next-line)))))))
+          (cl-loop repeat arg do
+                   (progn
+                     (helm-aif (helm-this-visible-mark)
+                         (helm-delete-visible-mark it)
+                       (helm-make-visible-mark))
+                     (if (helm-end-of-source-p)
+                         (helm-display-mode-line (helm-get-current-source))
+                       (helm-next-line)))))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
 (defun helm-file-completion-source-p (&optional source)
