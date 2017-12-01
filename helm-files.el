@@ -2923,6 +2923,15 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
   (member (file-name-extension candidate)
           helm-ff-file-compressed-list))
 
+(defun helm-ff--fname-at-point ()
+  "Try to guess fname at point."
+  (let ((end (point))
+        (limit (car (bounds-of-thing-at-point 'filename))))
+    (save-excursion
+      (while (re-search-backward "\\(~\\|/\\|[[:lower:][:upper:]]:/\\)"
+                                 limit t))
+      (buffer-substring-no-properties (point) end))))
+
 (defun helm-insert-file-name-completion-at-point (_candidate)
   "Insert file name completion at point."
   (with-helm-current-buffer
@@ -2931,9 +2940,10 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
       (let* ((mkds        (helm-marked-candidates :with-wildcard t))
              (candidate   (car mkds))
              (end         (point))
-             (tap         (thing-at-point 'filename))
-             (guess       (and (stringp tap) (substring-no-properties tap)))
-             (beg         (- (point) (length guess)))
+             (tap         (helm-ff--fname-at-point))
+             (guess       (and (stringp tap)
+                               (substring-no-properties tap)))
+             (beg         (if guess (- (point) (length guess)) (point)))
              (full-path-p (and (stringp guess)
                                (or (string-match-p
                                     (concat "^" (getenv "HOME"))
