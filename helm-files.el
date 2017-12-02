@@ -2926,7 +2926,9 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
 (defun helm-ff--fname-at-point ()
   "Try to guess fname at point."
   (let ((end (point))
-        (limit (car (bounds-of-thing-at-point 'filename))))
+        (limit (helm-aif (bounds-of-thing-at-point 'filename)
+                   (car it)
+                 (point))))
     (save-excursion
       (while (re-search-backward "\\(~\\|/\\|[[:lower:][:upper:]]:/\\)"
                                  limit t))
