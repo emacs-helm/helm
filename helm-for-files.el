@@ -127,7 +127,7 @@ this source is accessible and properly loaded."
                 '(("Delete file(s) from recentf" .
                    (lambda (_candidate)
                      (cl-loop for file in (helm-marked-candidates)
-                              do (setq recentf-list (delq file recentf-list)))))))))
+                              do (setq recentf-list (delete file recentf-list)))))))))
 
 (defvar helm-source-recentf nil
   "See (info \"(emacs)File Conveniences\").
