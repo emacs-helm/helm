@@ -150,10 +150,9 @@ fuzzy completion is not available in `completion-at-point'."
                            (helm-get-selection)))))
 
 (defun helm-show-completion-init-overlay (beg end)
-  (when (and helm-turn-on-show-completion beg end)
-    (setq helm-show-completion-overlay (make-overlay beg end))
-    (overlay-put helm-show-completion-overlay
-                 'face 'helm-lisp-show-completion)))
+  (setq helm-show-completion-overlay (make-overlay beg end))
+  (overlay-put helm-show-completion-overlay
+               'face 'helm-lisp-show-completion))
 
 (defun helm-show-completion-display-function (buffer &rest _args)
   "A special resized helm window is used depending on position in BUFFER."
@@ -179,31 +178,29 @@ fuzzy completion is not available in `completion-at-point'."
 BEG and END are the beginning and end position of the current completion
 in `helm-current-buffer'.
 BODY is an helm call where we want to enable show completion.
-If `helm-turn-on-show-completion' is nil just do nothing."
+If `helm-turn-on-show-completion' is nil do nothing."
   (declare (indent 2) (debug t))
-  `(let ((helm-move-selection-after-hook
-          (and helm-turn-on-show-completion
-               (append (list 'helm-show-completion)
-                       helm-move-selection-after-hook)))
-         (helm-always-two-windows t)
-         (helm-split-window-default-side
-          (if (eq helm-split-window-default-side 'same)
-              'below helm-split-window-default-side))
-         helm-split-window-inside-p
-         helm-reuse-last-window-split-state)
-     (helm-set-local-variable
-      'helm-display-function
-      (if helm-show-completion-use-special-display
-          'helm-show-completion-display-function
-          'helm-default-display-buffer))
-     (unwind-protect
-          (progn
-            (helm-show-completion-init-overlay ,beg ,end)
-            ,@body)
-       (when (and helm-turn-on-show-completion
-                  helm-show-completion-overlay
-                  (overlayp helm-show-completion-overlay))
-         (delete-overlay helm-show-completion-overlay)))))
+  `(unwind-protect
+        (if helm-turn-on-show-completion
+            (let ((helm-move-selection-after-hook
+                   (append (list 'helm-show-completion)
+                           helm-move-selection-after-hook))
+                  (helm-split-window-default-side
+                   (if (eq helm-split-window-default-side 'same)
+                       'below helm-split-window-default-side))
+                  helm-split-window-inside-p
+                  helm-reuse-last-window-split-state)
+              (helm-set-local-variable
+               'helm-display-function
+               (if helm-show-completion-use-special-display
+                   'helm-show-completion-display-function
+                 'helm-default-display-buffer))
+              (helm-show-completion-init-overlay ,beg ,end)
+              ,@body)
+          ,@body)
+     (when (and helm-show-completion-overlay
+                (overlayp helm-show-completion-overlay))
+       (delete-overlay helm-show-completion-overlay))))
 
 
 ;;; Lisp symbol completion.
