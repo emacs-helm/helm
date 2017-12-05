@@ -499,16 +499,37 @@ This command is useful when used with persistent action."
           :action
           (helm-make-actions
            "Execute kmacro (`C-u <n>' to execute <n> times)"
-           (lambda (candidate)
-             (interactive)
-             ;; Move candidate on top of list for next use.
-             (setq kmacro-ring (delete candidate kmacro-ring))
-             (kmacro-push-ring)
-             (kmacro-split-ring-element candidate)
-             (kmacro-exec-ring-item
-              candidate helm-current-prefix-arg)))
+           'helm-kbd-macro-execute
+           "Join marked macros"
+           'helm-kbd-macro-concat-macros
+           "Delete marked macros"
+           'helm-kbd-macro-delete-macro)
           :group 'helm-ring)
         :buffer "*helm kmacro*"))
+
+(defun helm-kbd-macro-execute (candidate)
+  ;; Move candidate on top of list for next use.
+  (setq kmacro-ring (delete candidate kmacro-ring))
+  (kmacro-push-ring)
+  (kmacro-split-ring-element candidate)
+  (kmacro-exec-ring-item
+   candidate helm-current-prefix-arg))
+
+(defun helm-kbd-macro-concat-macros (candidate)
+  (let ((mkd (helm-marked-candidates)))
+    (when (cdr mkd)
+      (kmacro-push-ring)
+      (setq last-kbd-macro
+            (mapconcat 'identity
+                       (cl-loop for km in mkd
+                                collect (car km))
+                       "")))))
+
+(defun helm-kbd-macro-delete-macro (_candidate)
+  (let ((mkd (helm-marked-candidates)))
+    (cl-loop for km in mkd
+             do (setq kmacro-ring (delete km kmacro-ring)))
+    (kmacro-pop-ring1)))
 
 (provide 'helm-ring)
 
