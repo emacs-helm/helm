@@ -515,7 +515,7 @@ This command is useful when used with persistent action."
   (kmacro-exec-ring-item
    candidate helm-current-prefix-arg))
 
-(defun helm-kbd-macro-concat-macros (candidate)
+(defun helm-kbd-macro-concat-macros (_candidate)
   (let ((mkd (helm-marked-candidates)))
     (when (cdr mkd)
       (kmacro-push-ring)
