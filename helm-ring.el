@@ -500,7 +500,7 @@ This command is useful when used with persistent action."
           (helm-make-actions
            "Execute kmacro (`C-u <n>' to execute <n> times)"
            'helm-kbd-macro-execute
-           "Join marked macros"
+           "Concat marked macros"
            'helm-kbd-macro-concat-macros
            "Delete marked macros"
            'helm-kbd-macro-delete-macro)
