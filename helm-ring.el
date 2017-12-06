@@ -481,31 +481,33 @@ Define your macros with `f3' and `f4'.
 See (info \"(emacs) Keyboard Macros\") for detailed infos.
 This command is useful when used with persistent action."
   (interactive)
-  (helm :sources
-        (helm-build-sync-source "Kmacro"
-          :candidates (lambda ()
-                        (helm-fast-remove-dups
-                         (cons (kmacro-ring-head)
-                               kmacro-ring)
-                         :test 'equal))
-          :multiline t
-          :candidate-transformer
-          (lambda (candidates)
-            (cl-loop for c in candidates collect
-                     (propertize (help-key-description (car c) nil)
-                                 'helm-realvalue c)))
-          :persistent-help "Execute kmacro"
-          :help-message 'helm-kmacro-help-message
-          :action
-          (helm-make-actions
-           "Execute kmacro (`C-u <n>' to execute <n> times)"
-           'helm-kbd-macro-execute
-           "Concat marked macros"
-           'helm-kbd-macro-concat-macros
-           "Delete marked macros"
-           'helm-kbd-macro-delete-macro)
-          :group 'helm-ring)
-        :buffer "*helm kmacro*"))
+  (let ((helm-quit-if-no-candidate
+         (lambda () (message "No macros yet defined"))))
+    (helm :sources
+          (helm-build-sync-source "Kmacro"
+            :candidates (lambda ()
+                          (helm-fast-remove-dups
+                           (cons (kmacro-ring-head)
+                                 kmacro-ring)
+                           :test 'equal))
+            :multiline t
+            :candidate-transformer
+            (lambda (candidates)
+              (cl-loop for c in candidates collect
+                       (propertize (help-key-description (car c) nil)
+                                   'helm-realvalue c)))
+            :persistent-help "Execute kmacro"
+            :help-message 'helm-kmacro-help-message
+            :action
+            (helm-make-actions
+             "Execute kmacro (`C-u <n>' to execute <n> times)"
+             'helm-kbd-macro-execute
+             "Concat marked macros"
+             'helm-kbd-macro-concat-macros
+             "Delete marked macros"
+             'helm-kbd-macro-delete-macro)
+            :group 'helm-ring)
+          :buffer "*helm kmacro*")))
 
 (defun helm-kbd-macro-execute (candidate)
   ;; Move candidate on top of list for next use.
