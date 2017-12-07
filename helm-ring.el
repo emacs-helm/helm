@@ -482,7 +482,7 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos.
 This command is useful when used with persistent action."
   (interactive)
   (let ((helm-quit-if-no-candidate
-         (lambda () (message "No macros yet defined"))))
+         (lambda () (message "No kbd macro has been defined"))))
     (helm :sources
           (helm-build-sync-source "Kmacro"
             :candidates (lambda ()
