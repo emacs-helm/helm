@@ -160,6 +160,15 @@
   that inform `helm-execute-persistent-action'to not split his
   window to execute this persistent action.")
 
+   (persistent-action-if
+    :initarg :persistent-action-if
+    :initform nil
+    :custom function
+    :documentation
+    "  Similar from persistent action but it is a function that should
+  return an object suitable for persistent action when called , i.e. a
+  function or a cons cell.")
+
    (persistent-help
     :initarg :persistent-help
     :initform nil

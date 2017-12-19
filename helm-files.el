@@ -575,7 +575,7 @@ Should not be used among other sources.")
                   (cl-loop for f in candidates
                            for ff = (helm-ff-filter-candidate-one-by-one f)
                            when ff collect ff))))
-   (persistent-action :initform 'helm-find-files-persistent-action)
+   (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
    (mode-line :initform (list "File(s)" helm-mode-line-string))
@@ -2761,7 +2761,7 @@ This affect directly file CANDIDATE."
     (format "No program %s found to extract exif"
             helm-ff-exif-data-program)))
 
-(cl-defun helm-find-files-persistent-action (candidate)
+(cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
 If CANDIDATE is alone, open file CANDIDATE filename.
@@ -2785,66 +2785,77 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
     (unless image-cand
       (when follow
         (helm-follow-mode -1)
-        (cl-return-from helm-find-files-persistent-action
+        (cl-return-from helm-find-files-persistent-action-if
           (message "Helm-follow-mode allowed only on images, disabling"))))
     (cond ((and (helm-ff--invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
-           ;; First hit insert hostname and
-           ;; second hit insert ":" and expand.
-           (if (string= candidate helm-pattern)
-               (funcall insert-in-minibuffer (concat candidate ":"))
-               (funcall insert-in-minibuffer candidate)))
+           (cons (lambda (_candidate)
+                   ;; First hit insert hostname and
+                   ;; second hit insert ":" and expand.
+                   (if (string= candidate helm-pattern)
+                       (funcall insert-in-minibuffer (concat candidate ":"))
+                     (funcall insert-in-minibuffer candidate)))
+                 'no-split))
           (;; A symlink directory, expand it but not to its truename
            ;; unless a prefix arg is given.
            (and (file-directory-p candidate) (file-symlink-p candidate))
-           (funcall insert-in-minibuffer
-                    (file-name-as-directory
-                     (if current-prefix-arg
-                         (file-truename (expand-file-name candidate))
-                         (expand-file-name candidate)))))
+           (cons (lambda (_candidate)
+                   (funcall insert-in-minibuffer
+                            (file-name-as-directory
+                             (if current-prefix-arg
+                                 (file-truename (expand-file-name candidate))
+                               (expand-file-name candidate)))))
+                 'no-split))
           ;; A directory, open it.
           ((file-directory-p candidate)
-           (when (string= (helm-basename candidate) "..")
-             (setq helm-ff-last-expanded helm-ff-default-directory))
-           (funcall insert-in-minibuffer (file-name-as-directory
-                                          (expand-file-name candidate))))
+           (cons (lambda (_candidate)
+                   (when (string= (helm-basename candidate) "..")
+                     (setq helm-ff-last-expanded helm-ff-default-directory))
+                   (funcall insert-in-minibuffer (file-name-as-directory
+                                                  (expand-file-name candidate))))
+                 'no-split))
           ;; A symlink file, expand to it's true name. (first hit)
           ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
-           (funcall insert-in-minibuffer (file-truename candidate)))
+           (cons (lambda (_candidate)
+                   (funcall insert-in-minibuffer (file-truename candidate)))
+                 'no-split))
           ;; A regular file, expand it, (first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
-           (setq helm-pattern "")       ; Force update.
-           (funcall insert-in-minibuffer new-pattern))
+           (cons (lambda (_candidate)
+                   (setq helm-pattern "")       ; Force update.
+                   (funcall insert-in-minibuffer new-pattern))
+                 'no-split))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
-           (require 'image-dired)
-           (let* ((win (get-buffer-window
-                        image-dired-display-image-buffer 'visible))
-                  (remove-buf-only
-                   (and win
-                        (with-helm-buffer
-                          (file-equal-p candidate
-                                        (with-current-buffer
-                                            image-dired-display-image-buffer
-                                          (get-text-property
-                                           (point-min)
-                                           'original-file-name)))))))
-             (when remove-buf-only
-               (set-window-buffer win helm-current-buffer))
-             (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
-               (kill-buffer image-dired-display-image-buffer))
-             (unless remove-buf-only
-               ;; Fix emacs bug never fixed upstream.
-               (unless (file-directory-p image-dired-dir)
-                 (make-directory image-dired-dir))
-               (image-dired-display-image candidate)
-               (message nil)
-               (switch-to-buffer image-dired-display-image-buffer)
-               (with-current-buffer image-dired-display-image-buffer
-                 (let ((exif-data (helm-ff-exif-data candidate)))
-                   (setq default-directory helm-ff-default-directory)
-                   (image-dired-update-property 'help-echo exif-data))))))
+           (lambda (_candidate)
+             (require 'image-dired)
+             (let* ((win (get-buffer-window
+                          image-dired-display-image-buffer 'visible))
+                    (remove-buf-only
+                     (and win
+                          (with-helm-buffer
+                            (file-equal-p candidate
+                                          (with-current-buffer
+                                              image-dired-display-image-buffer
+                                            (get-text-property
+                                             (point-min)
+                                             'original-file-name)))))))
+               (when remove-buf-only
+                 (set-window-buffer win helm-current-buffer))
+               (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
+                 (kill-buffer image-dired-display-image-buffer))
+               (unless remove-buf-only
+                 ;; Fix emacs bug never fixed upstream.
+                 (unless (file-directory-p image-dired-dir)
+                   (make-directory image-dired-dir))
+                 (image-dired-display-image candidate)
+                 (message nil)
+                 (switch-to-buffer image-dired-display-image-buffer)
+                 (with-current-buffer image-dired-display-image-buffer
+                   (let ((exif-data (helm-ff-exif-data candidate)))
+                     (setq default-directory helm-ff-default-directory)
+                     (image-dired-update-property 'help-echo exif-data)))))))
           ;; Allow browsing archive on avfs fs.
           ;; Assume volume is already mounted with mountavfs.
           ((helm-aand helm-ff-avfs-directory
@@ -2853,7 +2864,9 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                        (regexp-quote (expand-file-name helm-ff-avfs-directory))
                        it)
                       (helm-ff-file-compressed-p candidate))
-           (funcall insert-in-minibuffer (concat candidate "#")))
+           (cons (lambda (_candidate)
+                   (funcall insert-in-minibuffer (concat candidate "#")))
+                 'no-split))
           ;; File doesn't exists and basename starts with ".." or "  ",
           ;; Start a recursive search for directories.
           ((and (not (file-exists-p candidate))
@@ -2862,19 +2875,24 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                 (helm-basename candidate)))
            ;; As soon as the final "/" is added the job is passed
            ;; to `helm-ff-auto-expand-to-home-or-root'.
-           (funcall insert-in-minibuffer (concat candidate "/")))
+           (cons (lambda (_candidate)
+                   (funcall insert-in-minibuffer (concat candidate "/")))
+                 'no-split))
           ;; File is not existing and have no basedir, typically when
           ;; user hit C-k (minibuffer is empty) and then write foo and
           ;; hit C-j. This make clear that when no basedir, helm will
           ;; create the file in default-directory.
           ((and (not (file-exists-p candidate))
                 (not (helm-basedir candidate)))
-           (funcall insert-in-minibuffer
-                    (expand-file-name candidate default-directory)))
+           (cons (lambda (_candidate)
+                   (funcall insert-in-minibuffer
+                            (expand-file-name candidate default-directory)))
+                 'no-split))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
-           (funcall helm-ff-kill-or-find-buffer-fname-fn candidate)))))
+           (lambda (_candidate)
+             (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
 
 
 ;;; Recursive dirs completion
