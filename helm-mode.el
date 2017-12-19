@@ -261,14 +261,16 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Normally file completion should not be handled here,
                  ;; but special cases like `find-file-at-point' do it.
                  ;; Handle here specially such cases.
-                 ((and (functionp collection) minibuffer-completing-file-name)
+                 ((and (functionp collection) (not (string= input ""))
+                       minibuffer-completing-file-name)
                   (cl-loop for f in (funcall collection input test t)
                            unless (member f '("./" "../"))
                            if (string-match helm--url-regexp input)
                            collect f
                            else
                            collect (concat (file-name-as-directory
-                                            (helm-basedir input)) f)))
+                                            (helm-basedir input))
+                                           f)))
                  ((functionp collection)
                   (funcall collection input test t))
                  ((and alistp (null test)) collection)
@@ -1019,7 +1021,7 @@ Keys description:
             (mapcar #'expand-file-name result))
            ((and result (file-directory-p result))
             (file-name-as-directory (expand-file-name result)))
-           (t (expand-file-name result)))
+           (result (expand-file-name result)))
      (helm-mode--keyboard-quit))))
 
 (defun helm-mode--default-filename (fname dir initial)
