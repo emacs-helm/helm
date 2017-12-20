@@ -5592,8 +5592,12 @@ Possible values are 'left 'right 'below or 'above."
 
 (cl-defun helm-execute-persistent-action (&optional attr split-onewindow)
   "Perform the associated action ATTR without quitting helm.
-ATTR default is 'persistent-action', but it can be anything else.
+Arg ATTR default will be `persistent-action' or `persistent-action-if'
+if unspecified depending on what's found in source, but it can be
+anything else.
 In this case you have to add this new attribute to your source.
+See `persistent-action' and `persistent-action-if' slot documentation
+in `helm-source'.
 
 When `helm-full-frame' or SPLIT-ONEWINDOW are non-`nil', and
 `helm-buffer' is displayed in only one window, the helm window is
