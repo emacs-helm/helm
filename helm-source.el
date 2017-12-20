@@ -157,8 +157,35 @@
     "  Can be a either a Function called with one parameter (the
   selected candidate) or a cons cell where first element is this
   same function and second element a symbol (e.g never-split)
-  that inform `helm-execute-persistent-action'to not split his
-  window to execute this persistent action.")
+  that inform `helm-execute-persistent-action' to not split his
+  window to execute this persistent action.
+  Example:
+
+    (defun foo-persistent-action (candidate)
+       (do-something candidate))
+
+    :persistent-action '(foo-persistent-action . never-split) ; Don't split
+  or
+    :persistent-action 'foo-persistent-action ; Split
+
+  When specifying :persistent-action by slot directly, foo-persistent-action
+  will be executed without quitting helm when hitting `C-j'.
+
+  Note that other persistent actions can be defined using other
+  bindings than `C-j' by simply defining an interactive function bound
+  to a key in the keymap source.
+  The function should create a new attribute in source before calling
+  `helm-execute-persistent-action' on this attribute.
+  Example:
+
+     (defun helm-ff-persistent-delete ()
+       \"Delete current candidate without quitting.\"
+       (interactive)
+       (with-helm-alive-p
+         (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
+         (helm-execute-persistent-action 'quick-delete)))
+
+  This function is then bound in `helm-find-files-map'.")
 
    (persistent-action-if
     :initarg :persistent-action-if
@@ -167,7 +194,26 @@
     :documentation
     "  Similar from persistent action but it is a function that should
   return an object suitable for persistent action when called , i.e. a
-  function or a cons cell.")
+  function or a cons cell.
+  Example:
+
+     (defun foo-persistent-action (candidate)
+       (cond (something
+              ;; Don't split helm-window.
+              (cons (lambda (_ignore)
+                      (do-something candidate))
+                    'no-split))
+             ;; Split helm-window.
+             (something-else
+              (lambda (_ignore)
+                (do-something-else candidate)))))
+
+     :persistent-action-if 'foo-persistent-action
+
+  Here when hitting `C-j' one of the lambda's will be executed
+  depending on something or something-else condition, splitting or not
+  splitting as needed.
+  See `helm-find-files-persistent-action-if' definition as another example.")
 
    (persistent-help
     :initarg :persistent-help

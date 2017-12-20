@@ -2795,7 +2795,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                    (if (string= candidate helm-pattern)
                        (funcall insert-in-minibuffer (concat candidate ":"))
                      (funcall insert-in-minibuffer candidate)))
-                 'no-split))
+                 'never-split))
           (;; A symlink directory, expand it but not to its truename
            ;; unless a prefix arg is given.
            (and (file-directory-p candidate) (file-symlink-p candidate))
@@ -2805,7 +2805,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                              (if current-prefix-arg
                                  (file-truename (expand-file-name candidate))
                                (expand-file-name candidate)))))
-                 'no-split))
+                 'never-split))
           ;; A directory, open it.
           ((file-directory-p candidate)
            (cons (lambda (_candidate)
@@ -2813,18 +2813,18 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                      (setq helm-ff-last-expanded helm-ff-default-directory))
                    (funcall insert-in-minibuffer (file-name-as-directory
                                                   (expand-file-name candidate))))
-                 'no-split))
+                 'never-split))
           ;; A symlink file, expand to it's true name. (first hit)
           ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
            (cons (lambda (_candidate)
                    (funcall insert-in-minibuffer (file-truename candidate)))
-                 'no-split))
+                 'never-split))
           ;; A regular file, expand it, (first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
            (cons (lambda (_candidate)
                    (setq helm-pattern "")       ; Force update.
                    (funcall insert-in-minibuffer new-pattern))
-                 'no-split))
+                 'never-split))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
@@ -2866,7 +2866,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                       (helm-ff-file-compressed-p candidate))
            (cons (lambda (_candidate)
                    (funcall insert-in-minibuffer (concat candidate "#")))
-                 'no-split))
+                 'never-split))
           ;; File doesn't exists and basename starts with ".." or "  ",
           ;; Start a recursive search for directories.
           ((and (not (file-exists-p candidate))
@@ -2877,7 +2877,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            ;; to `helm-ff-auto-expand-to-home-or-root'.
            (cons (lambda (_candidate)
                    (funcall insert-in-minibuffer (concat candidate "/")))
-                 'no-split))
+                 'never-split))
           ;; File is not existing and have no basedir, typically when
           ;; user hit C-k (minibuffer is empty) and then write foo and
           ;; hit C-j. This make clear that when no basedir, helm will
@@ -2887,7 +2887,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
            (cons (lambda (_candidate)
                    (funcall insert-in-minibuffer
                             (expand-file-name candidate default-directory)))
-                 'no-split))
+                 'never-split))
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
