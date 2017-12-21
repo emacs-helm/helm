@@ -920,7 +920,6 @@ Keys description:
          (helm-ff-auto-update-initial-value
           (and helm-ff-auto-update-initial-value
                (not (minibuffer-window-active-p (minibuffer-window)))))
-         helm-full-frame
          helm-follow-mode-persistent
          (helm-ff-fuzzy-matching
           (and fuzzy
@@ -1008,6 +1007,7 @@ Keys description:
                   :case-fold-search case-fold
                   :default default
                   :buffer buffer
+                  :full-frame nil
                   :preselect preselect)))
     (or
      (cond ((and result (stringp result)

@@ -2371,6 +2371,9 @@ Don't use this directly, use instead `helm' with the keyword
           (orig-helm-last-frame-or-window-configuration
            helm-last-frame-or-window-configuration)
           (orig-one-window-p helm-onewindow-p))
+      ;; FIXME Using helm-full-frame here allow showing the new
+      ;; helm-buffer in the same window as old helm-buffer, why? 
+      (helm-set-local-variable 'helm-full-frame t)
       (unwind-protect
           (let (helm-current-position
                 helm-current-buffer
@@ -2380,7 +2383,6 @@ Don't use this directly, use instead `helm' with the keyword
                                  "*Helm*"))
                 helm-sources
                 helm-compiled-sources
-                (helm-full-frame t)
                 (enable-recursive-minibuffers t))
             (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
