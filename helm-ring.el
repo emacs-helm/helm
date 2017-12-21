@@ -148,19 +148,18 @@ activating region.
 If this action is executed just after `yank',
 replace with STR as yanked string."
   (let ((yank-fn (lambda (&optional before yank-pop)
-                   (with-helm-current-buffer
-                     (insert-for-yank str)
-                     ;; Set the window start back where it was in
-                     ;; the yank command, if possible.
-                     (when yank-pop
-                       (set-window-start (selected-window) yank-window-start t))
-                     (when (or helm-current-prefix-arg before)
-                       ;; Same as exchange-point-and-mark but without
-                       ;; activating region.
-                       (goto-char (prog1 (mark t)
-                                    (set-marker (mark-marker)
-                                                (point)
-                                                helm-current-buffer))))))))
+                   (insert-for-yank str)
+                   ;; Set the window start back where it was in
+                   ;; the yank command, if possible.
+                   (when yank-pop
+                     (set-window-start (selected-window) yank-window-start t))
+                   (when (or helm-current-prefix-arg before)
+                     ;; Same as exchange-point-and-mark but without
+                     ;; activating region.
+                     (goto-char (prog1 (mark t)
+                                  (set-marker (mark-marker)
+                                              (point)
+                                              helm-current-buffer)))))))
     (with-helm-current-buffer
       (unwind-protect
            (progn
