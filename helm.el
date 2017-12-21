@@ -2388,6 +2388,7 @@ Don't use this directly, use instead `helm' with the keyword
         (with-current-buffer orig-helm-buffer
           (setq helm-alive-p t) ; Nested session set this to nil on exit.
           (setq helm-buffer orig-helm-buffer)
+          (setq helm-full-frame nil)
           (setq helm--prompt orig-helm--prompt)
           (setq helm--in-fuzzy orig-helm--in-fuzzy)
           (helm-initialize-overlays helm-buffer)
@@ -5473,7 +5474,7 @@ If N is positive enlarge, if negative narrow."
   (interactive)
   (if (or helm-onewindow-p
           (buffer-local-value 'helm-full-frame (get-buffer helm-buffer)))
-      (with-helm-buffer
+      (with-helm-window
         (setq-local helm-full-frame nil)
         (setq helm-onewindow-p nil)
         (let ((split-window-preferred-function
