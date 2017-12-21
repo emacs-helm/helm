@@ -52,9 +52,8 @@ will not have anymore separators between candidates."
   :type  'integer)
 
 (defcustom helm-kill-ring-actions
-  '(("Yank" . helm-kill-ring-action-yank)
-    ("Delete" . helm-kill-ring-action-delete)
-    ("Append" . helm-kill-ring-append))
+  '(("Yank marked" . helm-kill-ring-action-yank)
+    ("Delete marked" . helm-kill-ring-action-delete))
   "List of actions for kill ring source."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
@@ -69,7 +68,6 @@ will not have anymore separators between candidates."
     (define-key map (kbd "M-y")     'helm-next-line)
     (define-key map (kbd "M-u")     'helm-previous-line)
     (define-key map (kbd "M-D")     'helm-kill-ring-delete)
-    (define-key map (kbd "C-M-w")   'helm-kill-ring-run-append)
     (define-key map (kbd "C-]")     'helm-kill-ring-toggle-truncated)
     (define-key map (kbd "C-c C-k") 'helm-kill-ring-kill-selection)
     map)
@@ -140,7 +138,21 @@ Same as `helm-kill-selection-and-quit' called with a prefix arg."
         (cl-return)
         (helm-next-line))))
 
-(defun helm-kill-ring-action-yank (str)
+(defun helm-kill-ring-action-yank (_str)
+  "Insert concatenated marked candidates in current-buffer.
+
+When two prefix args are given prompt to choose separator, otherwise
+a new line as default separator is used."
+  (let ((marked (helm-marked-candidates))
+        (sep (if (equal helm-current-prefix-arg '(16))
+                 (read-string "Separator: ")
+               "\n")))
+    (helm-kill-ring-action-yank-1
+     (cl-loop for c in (butlast marked)
+              concat (concat c sep) into str
+              finally return (concat str (car (last marked)))))))
+  
+(defun helm-kill-ring-action-yank-1 (str)
   "Insert STR in `kill-ring' and set STR to the head.
 
 When called with a prefix arg, point and mark are exchanged without
@@ -153,7 +165,7 @@ replace with STR as yanked string."
                    ;; the yank command, if possible.
                    (when yank-pop
                      (set-window-start (selected-window) yank-window-start t))
-                   (when (or helm-current-prefix-arg before)
+                   (when (or (equal helm-current-prefix-arg '(4)) before)
                      ;; Same as exchange-point-and-mark but without
                      ;; activating region.
                      (goto-char (prog1 (mark t)
@@ -206,19 +218,6 @@ This is a command for `helm-kill-ring-map'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-kill-ring-action-delete)))
 
-(defun helm-kill-ring-append (_candidate)
-  "Yank concatenated marked candidates."
-  (let ((marked (helm-marked-candidates)))
-    (helm-kill-ring-action-yank
-     (cl-loop for cand in marked
-              for sep = (if (string-match "\n\\'" cand) "" "\n")
-              concat (concat cand sep)))))
-
-(defun helm-kill-ring-run-append ()
-  "Yank concatenated marked candidates."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-kill-ring-append)))
 
 ;;;; <Mark ring>
 ;; DO NOT use these sources with other sources use
