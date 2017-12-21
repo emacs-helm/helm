@@ -2471,7 +2471,7 @@ Never kill `helm-current-buffer'.
 Never kill buffer modified.
 This is called normally on third hit of \
 \\<helm-map>\\[helm-execute-persistent-action]
-in `helm-find-files-persistent-action'."
+in `helm-find-files-persistent-action-if'."
   (let* ((buf      (get-file-buffer candidate))
          (buf-name (buffer-name buf))
          (win (get-buffer-window buf))
