@@ -46,11 +46,6 @@ will not have anymore separators between candidates."
           (integer :tag "Max candidate offset"))
   :group 'helm-ring)
 
-(defcustom helm-register-max-offset 160
-  "Max size of string register entries before truncating."
-  :group 'helm-ring
-  :type  'integer)
-
 (defcustom helm-kill-ring-actions
   '(("Yank marked" . helm-kill-ring-action-yank)
     ("Delete marked" . helm-kill-ring-action-delete))
@@ -58,6 +53,15 @@ will not have anymore separators between candidates."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
 
+(defcustom helm-kill-ring-separator "\n"
+  "The separator used to separate marked candidates when yanking."
+  :group 'helm-ring
+  :type 'string)
+
+(defcustom helm-register-max-offset 160
+  "Max size of string register entries before truncating."
+  :group 'helm-ring
+  :type  'integer)
 
 ;;; Kill ring
 ;;
@@ -142,11 +146,11 @@ Same as `helm-kill-selection-and-quit' called with a prefix arg."
   "Insert concatenated marked candidates in current-buffer.
 
 When two prefix args are given prompt to choose separator, otherwise
-a new line as default separator is used."
+use `helm-kill-ring-separator' as default."
   (let ((marked (helm-marked-candidates))
         (sep (if (equal helm-current-prefix-arg '(16))
                  (read-string "Separator: ")
-               "\n")))
+               helm-kill-ring-separator)))
     (helm-kill-ring-action-yank-1
      (cl-loop for c in (butlast marked)
               concat (concat c sep) into str
