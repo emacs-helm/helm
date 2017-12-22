@@ -1476,9 +1476,13 @@ Helm-kill-ring session you can navigate to next/previous line with `M-y' and
 It is possible to delete candidates from the kill ring.
 
 You can concatenate marked candidates and yank them in the current buffer, thus
-creating a new entry in the kill ring.  See the commands below.  Candidates are
-concatenated with a newline as separator.  Alternatively, use
-`\\<helm-map>\\[helm-copy-to-buffer]' to not push a new entry in the kill ring.
+creating a new entry in the kill ring.  Candidates are
+concatenated with `helm-kill-ring-separator' as default but you can
+change interactively the separator while yanking by using two prefix
+args.
+
+To not push a new entry in the kill ring, use `\\<helm-map>\\[helm-copy-to-buffer]' instead of RET
+\(note that you can't change separator with this).
 
 When inserting candidates with the default action (`RET'), `point' is placed at
 the end of the candidate and `mark' at the beginning.  You can revert this behavior
@@ -1489,7 +1493,6 @@ by using a prefix argument, i.e. `C-u RET', like the regular `yank' command does
 \\[helm-next-line]\t\tNext line.
 \\[helm-previous-line]\t\tPrevious line.
 \\[helm-kill-ring-delete]\t\tDelete entry.
-\\[helm-kill-ring-run-append]\t\tYank concatenated marked candidates.
 \\[helm-kill-ring-toggle-truncated]\t\tToggle truncated view of candidate.
 \\[helm-kill-ring-kill-selection]\t\tKill non-truncated of selection.")
 
