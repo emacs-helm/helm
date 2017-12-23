@@ -1479,8 +1479,8 @@ You can concatenate marked candidates and yank them in the current
 buffer, thus creating a new entry in the kill ring.  Candidates are
 concatenated with `helm-kill-ring-separator' as default but you can
 change interactively the separator while yanking by using two prefix
-args.  When you have something else than \"\n\" as default value for
-`helm-kill-ring-separator' and you want to use \"\n\" from prompt, use
+args.  When you have something else than \"\\n\" as default value for
+`helm-kill-ring-separator' and you want to use \"\\n\" from prompt, use
 `C-q C-j' to enter a newline in prompt.
 
 To not push a new entry in the kill ring, use `\\<helm-map>\\[helm-copy-to-buffer]' instead of RET
