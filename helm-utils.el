@@ -409,7 +409,7 @@ Default is `helm-current-buffer'."
   (let ((fn (cond ((eq major-mode 'org-mode) #'org-reveal)
                   ((and (boundp 'outline-minor-mode)
                         outline-minor-mode)
-                   #'outline-show-subtree))))
+                   (lambda () (outline-flag-subtree nil))))))
     ;; outline may fail in some conditions e.g. with markdown enabled
     ;; (issue #1919).
     (condition-case nil
