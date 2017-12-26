@@ -814,20 +814,19 @@ If a prefix arg is given split windows vertically."
           (sit-for 1))
         (with-current-buffer buf
           (kill-buffer buffer-or-name))
-        (helm-delete-current-selection)
-        (with-helm-temp-hook 'helm-after-persistent-action-hook
-          (helm-force-update (regexp-quote (helm-get-selection nil t)))))))
+        (helm-delete-current-selection))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
                       (buffer-name buffer))))
     (when bufname
       (regexp-quote
-       (if helm-buffer-max-length
+       (if (and helm-buffer-max-length
+                helm-buffer-details-flag)
            (helm-substring-by-width
             bufname helm-buffer-max-length
             "")
-           bufname)))))
+         bufname)))))
 
 (defun helm-buffers-persistent-kill (_buffer)
   (let ((marked (helm-marked-candidates)))
