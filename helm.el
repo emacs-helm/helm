@@ -2587,6 +2587,14 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 (defun helm-display-buffer-in-own-frame (buffer)
+  "Display `helm-buffer' in a separate frame.
+
+Function suitable for `helm-display-function'
+and/or `helm-show-completion-default-display-function'.
+This is experimental, persistent actions are limited to actions not
+splitting helm window, frame setting are hard coded for now, and
+position of frame is limited to top right corner for now.
+IOW use this with caution."
   (setq helm--buffer-in-new-frame-p t)
   (let ((default-frame-alist `((width . 60)
                                (height . 20)
