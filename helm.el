@@ -703,6 +703,15 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   :type 'float
   :group 'helm)
 
+(defcustom helm-display-buffer-width 60
+  "Frame width when displaying helm-buffer in own frame."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-display-buffer-height 20
+  "Frame height when displaying helm-buffer in own frame."
+  :group 'helm
+  :type 'integer)
 
 ;;; Faces
 ;;
@@ -2596,8 +2605,8 @@ splitting helm window, frame setting are hard coded for now, and
 position of frame is limited to top right corner for now.
 IOW use this with caution."
   (setq helm--buffer-in-new-frame-p t)
-  (let ((default-frame-alist `((width . 60)
-                               (height . 20)
+  (let ((default-frame-alist `((width . ,helm-display-buffer-width)
+                               (height . ,helm-display-buffer-height)
                                (tool-bar-lines . 0)
                                (vertical-scroll-bars . nil)
                                (menu-bar-lines . 0)
