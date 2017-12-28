@@ -101,6 +101,11 @@ fuzzy completion is not available in `completion-at-point'."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
+(defcustom helm-show-completion-display-function
+  #'helm-show-completion-default-display-function
+  "The function to use to display completion buffer."
+  :group 'helm-elisp
+  :type 'function)
 
 ;;; Faces
 ;;
@@ -154,7 +159,7 @@ fuzzy completion is not available in `completion-at-point'."
   (overlay-put helm-show-completion-overlay
                'face 'helm-lisp-show-completion))
 
-(defun helm-show-completion-display-function (buffer &rest _args)
+(defun helm-show-completion-default-display-function (buffer &rest _args)
   "A special resized helm window is used depending on position in BUFFER."
   (with-selected-window (selected-window)
     (if (window-dedicated-p)
@@ -193,7 +198,7 @@ If `helm-turn-on-show-completion' is nil do nothing."
               (helm-set-local-variable
                'helm-display-function
                (if helm-show-completion-use-special-display
-                   'helm-show-completion-display-function
+                   helm-show-completion-display-function
                  'helm-default-display-buffer))
               (helm-show-completion-init-overlay ,beg ,end)
               ,@body)
