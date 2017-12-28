@@ -2601,8 +2601,8 @@ IOW use this with caution."
                                (tool-bar-lines . 0)
                                (vertical-scroll-bars . nil)
                                (menu-bar-lines . 0)
-                               (left . ,(- (* (window-width) 8) 60))
-                               (fullscreen . nil))))
+                               (fullscreen . nil)
+                               (minibuffer . t))))
     (display-buffer
      buffer '(display-buffer-pop-up-frame . nil)))
   (helm-log-run-hook 'helm-window-configuration-hook))
