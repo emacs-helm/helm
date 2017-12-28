@@ -2598,12 +2598,14 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
 (defun helm-display-buffer-in-own-frame (buffer)
   "Display `helm-buffer' in a separate frame.
 
-Function suitable for `helm-display-function'
+Function suitable for `helm-display-function',
+`helm-completion-in-region-display-function'
 and/or `helm-show-completion-default-display-function'.
-This is experimental, persistent actions are limited to actions not
-splitting helm window, frame setting are hard coded for now, and
-position of frame is limited to top right corner for now.
-IOW use this with caution."
+
+See `helm-display-buffer-height' and `helm-display-buffer-width' to
+configure frame size.
+
+When using this persistent actions splitting helm window will be disabled."
   (setq helm--buffer-in-new-frame-p t)
   (let ((default-frame-alist `((width . ,helm-display-buffer-width)
                                (height . ,helm-display-buffer-height)
