@@ -5510,7 +5510,10 @@ If N is positive enlarge, if negative narrow."
 (defun helm-toggle-full-frame ()
   "Toggle helm-buffer full-frame view."
   (interactive)
-  (cl-assert (null (helm-action-window)) nil "Unable to toggle full frame from action window")
+  (cl-assert (null (helm-action-window))
+             nil "Unable to toggle full frame from action window")
+  (cl-assert (null helm--buffer-in-new-frame-p)
+             nil "Can't toggle full frame when using helm own frame")
   (if (or helm-onewindow-p
           (buffer-local-value 'helm-full-frame (get-buffer helm-buffer)))
       (with-helm-window
