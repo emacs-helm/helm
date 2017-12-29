@@ -316,7 +316,10 @@ Return a cons \(beg . end\)."
           (helm
            :sources (helm-build-in-buffer-source "Lisp completion"
                       :data helm-lisp-completion--cache
-                      :persistent-action 'helm-lisp-completion-persistent-action
+                      :persistent-action `(helm-lisp-completion-persistent-action .
+                                           ,(and (eq helm-elisp-help-function
+                                                     'helm-elisp-show-doc-modeline)
+                                                 'never-split))
                       :nomark t
                       :match-part (lambda (c) (car (split-string c)))
                       :fuzzy-match helm-lisp-fuzzy-completion
