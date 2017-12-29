@@ -67,11 +67,8 @@
               (if (string-match-p "[^/]$" f)
                   ;; files: e.g .o => \\.o$
                   (concat rgx "$")
-                ;; directories: e.g .git/ => \\.git/\\|\\.git$
-                (format "%s\\|%s"
-                        rgx
-                        (concat (substring
-                                 rgx 0 (1- (length rgx))) "$")))))
+                ;; directories: e.g .git/ => \\.git/?$
+                (concat rgx "?$"))))
           completion-ignored-extensions)
   "A list of regexps matching boring files.
 
@@ -2552,8 +2549,7 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; Prevent user doing silly thing like
   ;; adding the dotted files to boring regexps (#924).
   (and (not (string-match "\\.$" file))
-       (cl-loop for r in helm-boring-file-regexp-list
-                thereis (string-match r file))))
+       (string-match (mapconcat 'identity helm-boring-file-regexp-list "\\|") file)))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
