@@ -3044,7 +3044,7 @@ Use it for non--interactive calls of `helm-find-files'."
     (helm-ff-setup-update-hook)
     (unwind-protect
          (helm :sources 'helm-source-find-files
-               :input fname
+               :input (expand-file-name fname)
                :case-fold-search helm-file-name-case-fold-search
                :preselect preselect
                :ff-transformer-show-only-basename
