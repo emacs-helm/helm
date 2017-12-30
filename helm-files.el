@@ -3047,7 +3047,14 @@ Use it for non--interactive calls of `helm-find-files'."
     (helm-ff-setup-update-hook)
     (unwind-protect
          (helm :sources 'helm-source-find-files
-               :input (expand-file-name fname)
+               ;; When `helm-find-files-1' is used directly from lisp
+               ;; and FNAME is an abbreviated path, for some reasons
+               ;; `helm-update' is called many times before resolving
+               ;; the abbreviated path so ensure it is expanded
+               ;; here (Issue #1939) but only on abbreviated paths,
+               ;; url's should not be expanded.
+               :input (if (string-match-p "\\`~" fname)
+                          (expand-file-name fname) fname)
                :case-fold-search helm-file-name-case-fold-search
                :preselect preselect
                :ff-transformer-show-only-basename
