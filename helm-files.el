@@ -2081,6 +2081,7 @@ purpose."
           ((string= pattern "") "")
           ((string-match "\\`[.]\\{1,2\\}/\\'" pattern)
            (expand-file-name pattern))
+          ;; Directories ending by a dot (issue #1940)
           ((string-match "[^/][.]/\\'" pattern)
            (expand-file-name pattern))
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
