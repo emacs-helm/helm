@@ -2606,7 +2606,10 @@ and/or `helm-show-completion-default-display-function'.
 See `helm-display-buffer-height' and `helm-display-buffer-width' to
 configure frame size.
 
-When using this persistent actions splitting helm window will be disabled."
+Note that persistent actions splitting helm window are disabled when
+using this function.
+Also note that using this with a terminal (emacs -nw) displays
+helm-buffer in full frame."
   (setq helm--buffer-in-new-frame-p t)
   (let* ((pos (posn-x-y (posn-at-point)))
          (default-frame-alist
