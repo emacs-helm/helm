@@ -5929,13 +5929,16 @@ is not needed."
                            (or (helm-this-visible-mark)
                                (string= prefix "[?]") ; doesn't match
                                (and filecomp-p
-                                    (or (string-match-p ; autosave or dot files
-                                         "^[.]?#.*#?$\\|[^#]*[.]\\{1,2\\}$" bn)
-                                        ;; We need to test here when not using
-                                        ;; a transformer that put a prefix tag
-                                        ;; before candidate.
-                                        ;; (i.e no [?] prefix on tramp).
-                                        (and remote-p (not (file-exists-p cand))))))
+                                    (or
+                                     ;; autosave files
+                                     (string-match-p "^[.]?#.*#?$" bn)
+                                     ;; dot files
+                                     (member bn '("." ".."))
+                                     ;; We need to test here when not using
+                                     ;; a transformer that put a prefix tag
+                                     ;; before candidate.
+                                     ;; (i.e no [?] prefix on tramp).
+                                     (and remote-p (not (file-exists-p cand))))))
                          (helm-make-visible-mark src cand)))
                      (when (helm-pos-multiline-p)
                        (goto-char
