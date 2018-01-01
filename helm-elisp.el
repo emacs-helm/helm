@@ -38,14 +38,7 @@
   :group 'helm)
 
 (defcustom helm-turn-on-show-completion t
-  "Display candidate in buffer while moving selection when non--nil."
-  :group 'helm-elisp
-  :type  'boolean)
-
-(defcustom helm-show-completion-use-special-display t
-  "A special display will be used in Lisp completion if non--nil.
-All functions that are wrapped in macro `with-helm-show-completion'
-will be affected."
+  "Display candidate in `current-buffer' while moving selection when non--nil."
   :group 'helm-elisp
   :type  'boolean)
 
@@ -103,7 +96,10 @@ fuzzy completion is not available in `completion-at-point'."
 
 (defcustom helm-show-completion-display-function
   #'helm-show-completion-default-display-function
-  "The function to use to display completion buffer."
+  "The function used to display helm completion buffer.
+
+This function is used by `with-helm-show-completion', when nil
+fallback to `helm-default-display-buffer'."
   :group 'helm-elisp
   :type 'function)
 
@@ -197,9 +193,8 @@ If `helm-turn-on-show-completion' is nil do nothing."
                   helm-reuse-last-window-split-state)
               (helm-set-local-variable
                'helm-display-function
-               (if helm-show-completion-use-special-display
-                   helm-show-completion-display-function
-                 'helm-default-display-buffer))
+               (or helm-show-completion-display-function
+                   'helm-default-display-buffer))
               (helm-show-completion-init-overlay ,beg ,end)
               ,@body)
           ,@body)
