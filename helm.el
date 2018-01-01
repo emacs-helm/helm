@@ -2607,29 +2607,32 @@ and/or `helm-show-completion-default-display-function'.
 
 See `helm-display-buffer-height' and `helm-display-buffer-width' to
 configure frame size."
-  (setq helm--buffer-in-new-frame-p t)
-  (let* ((pos (posn-x-y (posn-at-point)))
-         (default-frame-alist
-          `((width . ,helm-display-buffer-width)
-            (height . ,helm-display-buffer-height)
-            (tool-bar-lines . 0)
-            (left . ,(car pos))
-            ;; Frame should be below point if enough
-            ;; place, otherwise above point and
-            ;; current line should not be hidden
-            ;; by helm frame.
-            (top . ,(if (> (count-screen-lines (window-start) (point))
-                           (/ (window-height) 2))
-                        (- (cdr pos) (/ (window-pixel-height) 2))
-                      (+ (cdr pos) (* (frame-char-height) 3))))
-            (title . "Helm")
-            (vertical-scroll-bars . nil)
-            (menu-bar-lines . 0)
-            (fullscreen . nil)
-            (minibuffer . t))))
-    (display-buffer
-     buffer '(display-buffer-pop-up-frame . nil)))
-  (helm-log-run-hook 'helm-window-configuration-hook))
+  (if (not (display-graphic-p))
+      ;; Fallback to default when frames are not usable.
+      (helm-default-display-buffer buffer)
+    (setq helm--buffer-in-new-frame-p t)
+    (let* ((pos (posn-x-y (posn-at-point)))
+           (default-frame-alist
+            `((width . ,helm-display-buffer-width)
+              (height . ,helm-display-buffer-height)
+              (tool-bar-lines . 0)
+              (left . ,(car pos))
+              ;; Frame should be below point if enough
+              ;; place, otherwise above point and
+              ;; current line should not be hidden
+              ;; by helm frame.
+              (top . ,(if (> (count-screen-lines (window-start) (point))
+                             (/ (window-height) 2))
+                          (- (cdr pos) (/ (window-pixel-height) 2))
+                        (+ (cdr pos) (* (frame-char-height) 3))))
+              (title . "Helm")
+              (vertical-scroll-bars . nil)
+              (menu-bar-lines . 0)
+              (fullscreen . nil)
+              (minibuffer . t))))
+      (display-buffer
+       buffer '(display-buffer-pop-up-frame . nil)))
+    (helm-log-run-hook 'helm-window-configuration-hook)))
 
 
 ;;; Initialize
