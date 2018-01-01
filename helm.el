@@ -2623,13 +2623,16 @@ configure frame size."
               ;; by helm frame.
               (top . ,(if (> (count-screen-lines (window-start) (point))
                              (/ (window-height) 2))
+                          ;; Above point
                           (- (cdr pos) (/ (window-pixel-height) 2))
+                        ;; Below point
                         (+ (cdr pos) (* (frame-char-height) 3))))
               (title . "Helm")
               (vertical-scroll-bars . nil)
               (menu-bar-lines . 0)
               (fullscreen . nil)
-              (minibuffer . t))))
+              (minibuffer . t)))
+           display-buffer-alist)
       (display-buffer
        buffer '(display-buffer-pop-up-frame . nil)))
     (helm-log-run-hook 'helm-window-configuration-hook)))
