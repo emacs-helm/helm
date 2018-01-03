@@ -3132,10 +3132,20 @@ Use it for non--interactive calls of `helm-find-files'."
                        (expand-file-name dired-directory))
                       (car it))
             (dired-get-filename 'no-dir t)))
-      (or (and helm-ff-guess-ffap-urls ffap-url-regexp
-               (ffap-fixup-url (ffap-url-at-point)))
-          ;; may yield url!
-          (ffap-file-at-point)))))
+      (let* ((beg (and (use-region-p) (region-beginning)))
+             (end (and (use-region-p) (region-end)))
+             (str (and beg end (buffer-substring-no-properties beg end)))
+             (ffap (or (and helm-ff-guess-ffap-urls ffap-url-regexp
+                            (ffap-fixup-url (ffap-url-at-point)))
+                       (ffap-file-at-point))))
+        ;; Workaround emacs bugs:
+        ;; When the region is active and a file is detected
+        ;; `ffap-string-at-point' returns the region prefixed with
+        ;; "/", e.g. at a beginning of a patch (first bug) and make
+        ;; `file-remote-p' returning an error (second bug), so in such
+        ;; case returns the region itself instead of the region
+        ;; corrupted by ffap. 
+        (if (and str ffap) str ffap)))))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
@@ -3169,6 +3179,8 @@ Use it for non--interactive calls of `helm-find-files'."
                 (not remp)
                 (file-exists-p file-at-pt))
            (expand-file-name file-at-pt)))))
+
+;; +++ helm-improved-frame.el      2018-01-03 03:17:55.825597660 +0700
 
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
