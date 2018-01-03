@@ -3180,8 +3180,6 @@ Use it for non--interactive calls of `helm-find-files'."
                 (file-exists-p file-at-pt))
            (expand-file-name file-at-pt)))))
 
-;; +++ helm-improved-frame.el      2018-01-03 03:17:55.825597660 +0700
-
 (defun helm-ff-find-url-at-point ()
   "Try to find link to an url in text-property at point."
   (let* ((he      (get-text-property (point) 'help-echo))
