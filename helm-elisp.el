@@ -330,6 +330,7 @@ Return a cons \(beg . end\)."
            :input (if helm-lisp-fuzzy-completion
                       target (concat target " "))
            :resume 'noresume
+           :truncate-lines t
            :buffer "*helm lisp completion*"
            :allow-nest t))
       (message "[No Match]"))))
