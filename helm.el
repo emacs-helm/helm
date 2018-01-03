@@ -391,9 +391,20 @@ the default has changed now to avoid flickering."
   :type 'sexp)
 
 (defcustom helm-display-function 'helm-default-display-buffer
-  "Function to display *helm* buffer.
-By default, it is `helm-default-display-buffer', which affects
-`helm-full-frame' among others."
+  "Function used to display `helm-buffer'.
+
+When set globally it will affect all helm sessions however it is possible
+to set it locally to helm-buffer in helm sources by using
+`helm-set-local-variable'.  It is also easy to set it locally for any
+helm command with a before advice e.g.
+
+    (advice-add 'helm-find-files
+                :before (lambda (&rest args)
+                          (helm-set-local-variable
+                           'helm-display-function
+                           'helm-display-buffer-in-own-frame)))
+
+"
   :group 'helm
   :type 'symbol)
 
