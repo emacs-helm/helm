@@ -722,6 +722,11 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   "Frame height when displaying helm-buffer in own frame."
   :group 'helm
   :type 'integer)
+
+(defcustom helm-display-buffer-reuse-frame nil
+  "When non nil helm frame is not deleted and reused in next sessions."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -1335,7 +1340,14 @@ at end of session.")
 (defvar helm--action-prompt "Select action: ")
 (defvar helm--cycle-resume-iterator nil)
 (defvar helm--buffer-in-new-frame-p nil)
-(defvar helm-initial-frame nil)
+(defvar helm-initial-frame nil
+  "The selected frame before starting helm.")
+(defvar helm-popup-frame nil
+  "The frame where helm is displayed.
+
+This is only used when helm is using
+`helm-display-buffer-in-own-frame' as `helm-display-function' and
+`helm-display-buffer-reuse-frame' is non nil.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2642,6 +2654,7 @@ configure frame size."
               (vertical-scroll-bars . nil)
               (menu-bar-lines . 0)
               (fullscreen . nil)
+              (visible . ,(null helm-display-buffer-reuse-frame))
               (minibuffer . ,(> (cdr pos) half-screen-size))))
            display-buffer-alist)
       (with-helm-buffer
@@ -2653,10 +2666,26 @@ configure frame size."
           (setq-local helm-echo-input-in-header-line t)
           (add-hook 'helm-minibuffer-set-up-hook
                     'helm-hide-minibuffer-maybe)))
-      (display-buffer
-       buffer '(display-buffer-pop-up-frame . nil)))
+      (helm-display-buffer-popup-frame buffer default-frame-alist))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
+(defun helm-display-buffer-popup-frame (buffer frame-alist)
+  (if helm-display-buffer-reuse-frame
+      (let ((x (cdr (assoc 'left frame-alist)))
+            (y (cdr (assoc 'top frame-alist))))
+        (unless (frame-live-p helm-popup-frame)
+          (setq helm-popup-frame (make-frame frame-alist)))
+        (select-frame helm-popup-frame)
+        (set-frame-position helm-popup-frame x y)
+        (switch-to-buffer buffer)
+        (make-frame-visible helm-popup-frame)
+        (raise-frame helm-popup-frame))
+    ;; If user have changed `helm-display-buffer-reuse-frame' to nil
+    ;; maybe kill the frame.
+    (when (frame-live-p helm-popup-frame)
+      (delete-frame helm-popup-frame))
+    (display-buffer
+     buffer '(display-buffer-pop-up-frame . nil))))
 
 ;;; Initialize
 ;;
@@ -3069,7 +3098,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup)
     (when helm--buffer-in-new-frame-p
-      (delete-frame)))
+      (if helm-display-buffer-reuse-frame
+          (make-frame-invisible) (delete-frame))))
   (helm-kill-async-processes)
   ;; Remove the temporary hooks added
   ;; by `with-helm-temp-hook' that
