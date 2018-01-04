@@ -2642,8 +2642,17 @@ configure frame size."
               (vertical-scroll-bars . nil)
               (menu-bar-lines . 0)
               (fullscreen . nil)
-              (minibuffer . ,(null helm-echo-input-in-header-line))))
+              (minibuffer . ,(> (cdr pos) half-screen-size))))
            display-buffer-alist)
+      (with-helm-buffer
+        (if (> (cdr pos) half-screen-size)
+            (progn
+              (setq-local helm-echo-input-in-header-line nil)
+              (remove-hook 'helm-minibuffer-set-up-hook
+                           'helm-hide-minibuffer-maybe))
+          (setq-local helm-echo-input-in-header-line t)
+          (add-hook 'helm-minibuffer-set-up-hook
+                    'helm-hide-minibuffer-maybe)))
       (display-buffer
        buffer '(display-buffer-pop-up-frame . nil)))
     (helm-log-run-hook 'helm-window-configuration-hook)))
