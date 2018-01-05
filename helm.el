@@ -2657,15 +2657,15 @@ configure frame size."
               (visible . ,(null helm-display-buffer-reuse-frame))
               (minibuffer . ,(> (cdr pos) half-screen-size))))
            display-buffer-alist)
+      ;; Add the hook inconditionally, if
+      ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
+      ;; will have anyway no effect so no need to remove the hook.
+      (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
       (with-helm-buffer
         (if (> (cdr pos) half-screen-size)
             (progn
-              (setq-local helm-echo-input-in-header-line nil)
-              (remove-hook 'helm-minibuffer-set-up-hook
-                           'helm-hide-minibuffer-maybe))
-          (setq-local helm-echo-input-in-header-line t)
-          (add-hook 'helm-minibuffer-set-up-hook
-                    'helm-hide-minibuffer-maybe)))
+              (setq-local helm-echo-input-in-header-line nil))
+          (setq-local helm-echo-input-in-header-line t)))
       (helm-display-buffer-popup-frame buffer default-frame-alist))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
