@@ -2565,6 +2565,14 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
 ;;; Display helm buffer
 ;;
 ;;
+(defvar helm-commands-using-frame
+  '(helm-find-files helm-M-x completion-at-point))
+(defun helm-resolve-display-function (com)
+  (or (with-helm-buffer helm-display-function)
+      (if (memq com helm-commands-using-frame)
+          #'helm-display-buffer-in-own-frame
+        #'helm-default-display-buffer)))
+
 (defun helm-display-buffer (buffer)
   "Display BUFFER.
 
@@ -2583,7 +2591,9 @@ The function used to display `helm-buffer' by calling
                    (t helm-split-window-default-side))
            helm-split-window-default-side)))
     (prog1
-        (funcall (with-current-buffer buffer helm-display-function) buffer)
+        (funcall (with-current-buffer buffer
+                   (helm-resolve-display-function (helm-this-command)))
+                 buffer)
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
       (when helm-prevent-escaping-from-minibuffer
@@ -2859,7 +2869,7 @@ Unuseful when used outside helm, don't use it.")
       (set (make-local-variable 'helm-map) helm-map)
       (set (make-local-variable 'helm-source-filter) nil)
       (make-local-variable 'helm-sources)
-      (set (make-local-variable 'helm-display-function) helm-display-function)
+      (set (make-local-variable 'helm-display-function) nil)
       (set (make-local-variable 'helm-selection-point) nil)
       (set (make-local-variable 'scroll-margin)
            (if helm-display-source-at-screen-top
