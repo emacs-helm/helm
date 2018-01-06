@@ -2675,8 +2675,15 @@ configure frame size."
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
   (if helm-display-buffer-reuse-frame
       (let ((x (cdr (assoc 'left frame-alist)))
-            (y (cdr (assoc 'top frame-alist))))
-        (unless (frame-live-p helm-popup-frame)
+            (y (cdr (assoc 'top frame-alist)))
+            (minibuf (frame-parameter helm-popup-frame 'minibuffer))
+            (frame-live-p (frame-live-p helm-popup-frame)))
+        ;; Minibuffer frame-parameter is not modifiable once frame is
+        ;; created so frame needs to be deleted and recreated when the
+        ;; minibuffer parameter change in FRAME-ALIST.
+        (unless (and frame-live-p
+                     (eq minibuf (assoc-default 'minibuffer frame-alist)))
+          (and frame-live-p (delete-frame helm-popup-frame))
           (setq helm-popup-frame (make-frame frame-alist)))
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
