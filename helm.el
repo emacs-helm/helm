@@ -2635,6 +2635,7 @@ configure frame size."
     (setq helm--buffer-in-new-frame-p t)
     (let* ((pos (window-absolute-pixel-position))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
+           (frame-info (frame-geometry))
            (default-frame-alist
             `((width . ,helm-display-buffer-width)
               (height . ,helm-display-buffer-height)
@@ -2647,7 +2648,9 @@ configure frame size."
               ;; by helm frame.
               (top . ,(if (> (cdr pos) half-screen-size)
                           ;; Above point
-                          (- (cdr pos) half-screen-size)
+                          (+ (- (cdr pos) half-screen-size)
+                             (cddr (assq 'title-bar-size frame-info))
+                             (cddr (assq 'external-border-size frame-info)))
                         ;; Below point
                         (+ (cdr pos) (frame-char-height))))
               (title . "Helm")
@@ -2678,7 +2681,6 @@ configure frame size."
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
         (switch-to-buffer buffer)
-        (make-frame-visible helm-popup-frame)
         (raise-frame helm-popup-frame))
     ;; If user have changed `helm-display-buffer-reuse-frame' to nil
     ;; maybe kill the frame.
