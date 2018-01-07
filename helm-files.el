@@ -3028,7 +3028,11 @@ Show the first `helm-ff-history-max-length' elements of
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME with `helm' completion.
-Like `find-file' but with `helm' support.
+
+Even if it works with an abbreviated path FNAME should be an absolute
+path path to avoid multiples calls to helm-update to resolve the
+abbreviated path.
+
 Use it for non--interactive calls of `helm-find-files'."
   (require 'tramp)
   (when (get-buffer helm-action-buffer)
@@ -3051,11 +3055,12 @@ Use it for non--interactive calls of `helm-find-files'."
                ;; When `helm-find-files-1' is used directly from lisp
                ;; and FNAME is an abbreviated path, for some reasons
                ;; `helm-update' is called many times before resolving
-               ;; the abbreviated path so ensure it is expanded
-               ;; here (Issue #1939) but only on abbreviated paths,
-               ;; url's should not be expanded.
-               :input (if (string-match-p "\\`~" fname)
-                          (expand-file-name fname) fname)
+               ;; the abbreviated (Issue #1939) so be sure to pass a
+               ;; full path to helm-find-files-1.  Also when expanding
+               ;; here, it is done twice as helm-find-files and
+               ;; friends are already passing an expanded path to
+               ;; helm-find-files-1.
+               :input fname
                :case-fold-search helm-file-name-case-fold-search
                :preselect preselect
                :ff-transformer-show-only-basename
