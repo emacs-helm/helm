@@ -2658,9 +2658,11 @@ configure frame size."
               ;; by helm frame.
               (top . ,(if (> (cdr pos) half-screen-size)
                           ;; Above point
-                          (+ (- (cdr pos) half-screen-size)
-                             (cddr (assq 'title-bar-size frame-info))
-                             (cddr (assq 'external-border-size frame-info)))
+                          (- (cdr pos)
+                             ;; add 2 lines to make sure there is always a gap
+                             (* (+ helm-display-buffer-height 2) (frame-char-height))
+                             ;; account for title bar height too
+                             (cddr (assq 'title-bar-size frame-info)))
                         ;; Below point
                         (+ (cdr pos) (frame-char-height))))
               (title . "Helm")
