@@ -35,6 +35,7 @@
 (declare-function org-content "org.el")
 (defvar helm-current-position)
 (defvar wdired-old-marks)
+(defvar helm-persistent-action-display-window)
 
 ;;; User vars.
 ;;
@@ -877,9 +878,9 @@ See `helm-elisp-show-help'."
               ;; When started from a help buffer,
               ;; Don't kill this buffer as it is helm-current-buffer.
               (unless (equal hbuf helm-current-buffer)
-                (kill-buffer hbuf)
                 (set-window-buffer (get-buffer-window hbuf)
-                                   helm-current-buffer))
+                                   helm-current-buffer)
+                (kill-buffer hbuf))
               (helm-attrset 'help-running-p nil)))
            (t
             (if name
