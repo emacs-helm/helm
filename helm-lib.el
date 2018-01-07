@@ -865,7 +865,7 @@ of this function is really needed."
   "Used to build persistent actions describing CANDIDATE with FUN.
 Argument NAME is used internally to know which command to use when
 symbol CANDIDATE refers at the same time to variable and a function.
-See `helm-elisp--show-help'."
+See `helm-elisp-show-help'."
   (let ((hbuf (get-buffer (help-buffer))))
     (cond  ((helm-follow-mode-p)
             (if name
