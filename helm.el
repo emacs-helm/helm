@@ -5816,7 +5816,15 @@ See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
 (defun helm-other-window-base (command &optional arg)
   (let ((minibuffer-scroll-window
          (helm-persistent-action-display-window)))
-    (funcall command (or arg helm-scroll-amount))))
+    (if (and helm--buffer-in-new-frame-p
+             (with-helm-buffer
+               helm-echo-input-in-header-line))
+        ;; helm is displayed in a frame with no minibuffer, scroll OW
+        ;; from helm-window.
+        (with-helm-window
+          (funcall command (or arg helm-scroll-amount)))
+      ;; Otherwise scroll according to minibuffer-scroll-window.
+      (funcall command (or arg helm-scroll-amount)))))
 
 (defun helm-scroll-other-window (&optional arg)
   "Scroll other window upward ARG many lines.
