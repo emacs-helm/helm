@@ -2774,7 +2774,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
          (num-lines-buf (with-current-buffer helm-buffer
                           (count-lines (point-min) (point-max))))
          (insert-in-minibuffer (lambda (fname)
-                                   (with-selected-window (minibuffer-window)
+                                   (with-selected-window (or (active-minibuffer-window)
+                                                             (minibuffer-window))
                                      (unless follow
                                        (delete-minibuffer-contents)
                                        (set-text-properties 0 (length fname)
@@ -2848,9 +2849,9 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  ;; Fix emacs bug never fixed upstream.
                  (unless (file-directory-p image-dired-dir)
                    (make-directory image-dired-dir))
+                 (switch-to-buffer image-dired-display-image-buffer)
                  (image-dired-display-image candidate)
                  (message nil)
-                 (switch-to-buffer image-dired-display-image-buffer)
                  (with-current-buffer image-dired-display-image-buffer
                    (let ((exif-data (helm-ff-exif-data candidate)))
                      (setq default-directory helm-ff-default-directory)
