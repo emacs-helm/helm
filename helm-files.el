@@ -3077,8 +3077,15 @@ Use it for non--interactive calls of `helm-find-files'."
                     helm-source-find-files)
       (setq helm-ff-default-directory nil))))
 
+(defun helm-ff-clean-initial-input ()
+  ;; When using hff in an external frame initial input is printed in
+  ;; the minibuffer of initial-frame, delete it.
+  (with-selected-frame helm-initial-frame
+    (helm-clean-up-minibuffer)))
+
 (defun helm-ff-setup-update-hook ()
-  (dolist (hook '(helm-ff-move-to-first-real-candidate
+  (dolist (hook '(helm-ff-clean-initial-input ; Add to be called first.
+                  helm-ff-move-to-first-real-candidate
                   helm-ff-update-when-only-one-matched
                   helm-ff-auto-expand-to-home-or-root))
     (add-hook 'helm-after-update-hook hook)))
@@ -3088,7 +3095,8 @@ Use it for non--interactive calls of `helm-find-files'."
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
           helm-ff-update-when-only-one-matched
-          helm-ff-move-to-first-real-candidate)))
+          helm-ff-move-to-first-real-candidate
+          helm-ff-clean-initial-input)))
 
 (defun helm-find-files-toggle-to-bookmark ()
   "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
