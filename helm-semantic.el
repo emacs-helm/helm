@@ -1,6 +1,8 @@
 ;;; helm-semantic.el --- Helm interface for Semantic -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2017 Daniel Hackney <dan@haxney.org>
+;;               2012 ~ 2018  Thierry Volpiatto<thierry.volpiatto@gmail.com>
+
 ;; Author: Daniel Hackney <dan@haxney.org>
 
 ;; This program is free software; you can redistribute it and/or modify

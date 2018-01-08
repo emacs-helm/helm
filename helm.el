@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2007         Tamas Patrovics
 ;;               2008 ~ 2011  rubikitch <rubikitch@ruby-lang.org>
-;;               2011 ~ 2017  Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;;               2011 ~ 2018  Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; This is a fork of anything.el wrote by Tamas Patrovics.
 
