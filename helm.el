@@ -727,6 +727,11 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   "When non nil helm frame is not deleted and reused in next sessions."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-commands-using-frame nil
+  "A list of commands where `helm-buffer' is displayed in a frame."
+  :group 'helm
+  :type '(repeat symbol))
 
 ;;; Faces
 ;;
@@ -2565,13 +2570,17 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
 ;;; Display helm buffer
 ;;
 ;;
-(defvar helm-commands-using-frame
-  '(helm-find-files helm-M-x completion-at-point))
 (defun helm-resolve-display-function (com)
+  "Decide which display function use according to `helm-commands-using-frame'.
+
+The `helm-display-function' buffer local value takes precedence on
+`helm-commands-using-frame'.
+Fallback to global value of `helm-display-function' when no local
+value found and current command is not in `helm-commands-using-frame'."
   (or (with-helm-buffer helm-display-function)
-      (if (memq com helm-commands-using-frame)
-          #'helm-display-buffer-in-own-frame
-        #'helm-default-display-buffer)))
+      (and (memq com helm-commands-using-frame)
+           #'helm-display-buffer-in-own-frame)
+      (default-value 'helm-display-function)))
 
 (defun helm-display-buffer (buffer)
   "Display BUFFER.
