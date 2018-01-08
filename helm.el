@@ -1363,6 +1363,7 @@ at end of session.")
 This is only used when helm is using
 `helm-display-buffer-in-own-frame' as `helm-display-function' and
 `helm-display-buffer-reuse-frame' is non nil.")
+(defvar helm--nested nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2404,6 +2405,9 @@ Return nil if no `helm-buffer' found."
 Call `helm' only with ANY-SOURCES and ANY-BUFFER as args."
   (helm :sources any-sources :buffer any-buffer))
 
+;;; Nested sessions
+;;
+;;
 (defun helm--nest (&rest same-as-helm)
   "[internal]Allows calling `helm' within a running helm session.
 
@@ -2418,9 +2422,11 @@ Don't use this directly, use instead `helm' with the keyword
           (orig-helm-buffer helm-buffer)
           (orig-helm--prompt helm--prompt)
           (orig-helm--in-fuzzy helm--in-fuzzy)
+          (orig-helm--display-frame helm--buffer-in-new-frame-p)
           (orig-helm-last-frame-or-window-configuration
            helm-last-frame-or-window-configuration)
-          (orig-one-window-p helm-onewindow-p))
+          (orig-one-window-p helm-onewindow-p)
+          (helm--nested t))
       ;; FIXME Using helm-full-frame here allow showing the new
       ;; helm-buffer in the same window as old helm-buffer, why? 
       (helm-set-local-variable 'helm-full-frame t)
@@ -2436,6 +2442,8 @@ Don't use this directly, use instead `helm' with the keyword
                 (enable-recursive-minibuffers t))
             (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
+          (setq helm--nested nil)
+          (setq helm--buffer-in-new-frame-p orig-helm--display-frame)
           (setq helm-alive-p t) ; Nested session set this to nil on exit.
           (setq helm-buffer orig-helm-buffer)
           (setq helm-full-frame nil)
@@ -3144,7 +3152,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     (remove-hook 'post-command-hook 'helm--update-header-line)
     ;; Be sure we call this from helm-buffer.
     (helm-funcall-foreach 'cleanup)
-    (when helm--buffer-in-new-frame-p
+    (when (and helm--buffer-in-new-frame-p (null helm--nested))
       (if helm-display-buffer-reuse-frame
           (make-frame-invisible) (delete-frame))))
   (helm-kill-async-processes)
