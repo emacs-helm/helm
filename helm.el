@@ -2589,8 +2589,7 @@ value found and current command is not in `helm-commands-using-frame'."
 The function used to display `helm-buffer' by calling
 `helm-display-function' which split window with
 `helm-split-window-preferred-function'."
-  (let (pop-up-frames
-        (split-window-preferred-function
+  (let ((split-window-preferred-function
          helm-split-window-preferred-function)
         (helm-split-window-default-side
          (if (and (not helm-full-frame)
@@ -2624,21 +2623,22 @@ Arg ENABLE is the value of `no-other-window' window property."
 It is the default value of `helm-display-function'
 It uses `switch-to-buffer' or `display-buffer' depending on the
 value of `helm-full-frame' or `helm-split-window-default-side'."
-  (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
-          (and (eq helm-split-window-default-side 'same)
-               (one-window-p t)))
-      (progn (and (not (minibufferp helm-current-buffer))
-                  (delete-other-windows))
-             (switch-to-buffer buffer))
-    (when (and (or helm-always-two-windows helm-autoresize-mode)
-               (not (eq helm-split-window-default-side 'same))
-               (not (minibufferp helm-current-buffer))
-               (not helm-split-window-inside-p))
-      (delete-other-windows))
-    (display-buffer
-     buffer `(nil . ((window-height . ,helm-display-buffer-default-height)
-                     (window-width  . ,helm-display-buffer-default-width))))
-    (helm-log-run-hook 'helm-window-configuration-hook)))
+  (let (pop-up-frames)
+    (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
+            (and (eq helm-split-window-default-side 'same)
+                 (one-window-p t)))
+        (progn (and (not (minibufferp helm-current-buffer))
+                    (delete-other-windows))
+               (switch-to-buffer buffer))
+      (when (and (or helm-always-two-windows helm-autoresize-mode)
+                 (not (eq helm-split-window-default-side 'same))
+                 (not (minibufferp helm-current-buffer))
+                 (not helm-split-window-inside-p))
+        (delete-other-windows))
+      (display-buffer
+       buffer `(nil . ((window-height . ,helm-display-buffer-default-height)
+                       (window-width  . ,helm-display-buffer-default-width))))
+      (helm-log-run-hook 'helm-window-configuration-hook))))
 
 (defun helm-display-buffer-in-own-frame (buffer)
   "Display `helm-buffer' in a separate frame.
