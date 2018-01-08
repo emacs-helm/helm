@@ -2656,11 +2656,15 @@ configure frame size."
     (let* ((pos (window-absolute-pixel-position))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
            (frame-info (frame-geometry))
+           (prmt-size (length helm--prompt))
            (default-frame-alist
             `((width . ,helm-display-buffer-width)
               (height . ,helm-display-buffer-height)
               (tool-bar-lines . 0)
-              (left . ,(car pos))
+              (left . ,(- (car pos) (* (frame-char-width)
+                         (if (< (- (point) (point-at-bol)) prmt-size)
+                             (- (point) (point-at-bol))
+                           prmt-size))))
               ;; Try to put frame at the best possible place.
               ;; Frame should be below point if enough
               ;; place, otherwise above point and
