@@ -393,17 +393,18 @@ the default has changed now to avoid flickering."
 (defcustom helm-display-function 'helm-default-display-buffer
   "Function used to display `helm-buffer'.
 
-When set globally it will affect all helm sessions however it is
-possible to set it locally to helm-buffer in helm sources by using
-`helm-set-local-variable' in init function or by using
-:display-function slot in `helm' call.  It is also easy to set it
-locally for any helm command with a before advice e.g.
-
-    (advice-add 'helm-find-files
-                :before (lambda (&rest args)
-                          (helm-set-local-variable
-                           'helm-display-function
-                           'helm-display-buffer-in-own-frame)))"
+Local value in `helm-buffer' will take precedence on this default
+value. Commands that are in `helm-commands-using-frame' will have
+`helm-buffer' displayed in frame, `helm-display-function' being
+ignored.
+If no local value found and current command is not one of
+`helm-commands-using-frame' use this default value.
+Function in charge of deciding which value use is
+`helm-resolve-display-function'.
+ 
+To set it locally to `helm-buffer' in helm sources use
+`helm-set-local-variable' in init function or use
+:display-function slot in `helm' call."
   :group 'helm
   :type 'symbol)
 
