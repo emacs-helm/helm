@@ -2602,7 +2602,7 @@ The function used to display `helm-buffer' by calling
            helm-split-window-default-side)))
     (prog1
         (funcall (with-current-buffer buffer
-                   (helm-resolve-display-function (helm-this-command)))
+                   (helm-resolve-display-function this-command))
                  buffer)
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
