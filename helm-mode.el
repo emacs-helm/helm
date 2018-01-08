@@ -157,12 +157,6 @@ know what you are doing."
   :group 'helm-mode
   :type 'boolean)
 
-(defcustom helm-completion-in-region-display-function nil
-  "Function used to display helm window in `completion-in-region'.
-
-Default is `helm-display-function' value."
-  :group 'helm-mode
-  :type 'function)
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -1172,9 +1166,7 @@ Can be used as value for `completion-in-region-function'."
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
     (unwind-protect
-        (let* ((helm-display-function (or helm-completion-in-region-display-function
-                                          helm-display-function))
-               (enable-recursive-minibuffers t)
+        (let* ((enable-recursive-minibuffers t)
                (input (buffer-substring-no-properties start end))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
