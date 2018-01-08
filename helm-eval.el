@@ -96,6 +96,7 @@ Should take one arg: the string to display."
                                                   (eval (read helm-pattern)))))
                                          (error "Error"))))
     :nohighlight t
+    :keymap helm-eval-expression-map
     :action '(("Copy result to kill-ring" . (lambda (candidate)
                                               (kill-new
                                                (replace-regexp-in-string
@@ -167,8 +168,7 @@ Should take one arg: the string to display."
         :input (when arg (thing-at-point 'sexp))
         :buffer "*helm eval*"
         :echo-input-in-header-line nil
-        :history 'read-expression-history
-        :keymap helm-eval-expression-map))
+        :history 'read-expression-history))
 
 (defvar eldoc-idle-delay)
 ;;;###autoload
