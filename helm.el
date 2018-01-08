@@ -2661,10 +2661,11 @@ configure frame size."
             `((width . ,helm-display-buffer-width)
               (height . ,helm-display-buffer-height)
               (tool-bar-lines . 0)
-              (left . ,(- (car pos) (* (frame-char-width)
-                         (if (< (- (point) (point-at-bol)) prmt-size)
-                             (- (point) (point-at-bol))
-                           prmt-size))))
+              (left . ,(- (car pos)
+                          (* (frame-char-width)
+                             (if (< (- (point) (point-at-bol)) prmt-size)
+                                 (- (point) (point-at-bol))
+                               prmt-size))))
               ;; Try to put frame at the best possible place.
               ;; Frame should be below point if enough
               ;; place, otherwise above point and
