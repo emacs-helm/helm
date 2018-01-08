@@ -733,6 +733,15 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   "A list of commands where `helm-buffer' is displayed in a frame."
   :group 'helm
   :type '(repeat symbol))
+
+(defcustom helm-actions-inherit-frame-settings nil
+  "Actions inherit frame settings of initial command when non nil.
+
+The actions running from commands that are in
+`helm-commands-using-frame' that are themselves running helm will have
+a frame to display their `helm-buffer' when non nil."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -2601,7 +2610,9 @@ The function used to display `helm-buffer' by calling
            helm-split-window-default-side)))
     (prog1
         (funcall (with-current-buffer buffer
-                   (helm-resolve-display-function this-command))
+                   (helm-resolve-display-function
+                    (if helm-actions-inherit-frame-settings
+                        (helm-this-command) this-command)))
                  buffer)
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
