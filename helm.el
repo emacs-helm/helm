@@ -2615,13 +2615,14 @@ The function used to display `helm-buffer' by calling
                    ((eq helm-split-window-default-side 'other) 'other)
                    (helm--window-side-state)
                    (t helm-split-window-default-side))
-           helm-split-window-default-side)))
-    (prog1
-        (funcall (with-current-buffer buffer
+           helm-split-window-default-side))
+        (disp-fn (with-current-buffer buffer
                    (helm-resolve-display-function
                     (if helm-actions-inherit-frame-settings
-                        (helm-this-command) this-command)))
-                 buffer)
+                        (helm-this-command) this-command)))))
+    (prog1
+        (funcall disp-fn buffer)
+      (with-helm-buffer (setq-local helm-display-function disp-fn))
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
       (when helm-prevent-escaping-from-minibuffer
