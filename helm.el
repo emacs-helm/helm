@@ -2190,10 +2190,10 @@ example, :candidate-number-limit is bound to
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
+  (unless helm--nested (setq helm-initial-frame (selected-frame)))
   ;; Activate the advice for `tramp-read-passwd' and cua.
   ;; Advices will be available only in >=emacs-24.4, but
   ;; allow compiling without errors on lower emacs.
-  (setq helm-initial-frame (selected-frame))
   (when (fboundp 'advice-add)
     (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
     (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd)
