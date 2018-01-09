@@ -2902,32 +2902,34 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
     (setq input (replace-match "" nil t input)))
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
-  (helm :sources
-        (helm-make-source
-            "Recursive directories" 'helm-locate-subdirs-source
-          :basedir (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
-		       directory
+  ;; Ensure to not create a new frame
+  (let (helm-actions-inherit-frame-settings)
+    (helm :sources
+          (helm-make-source
+              "Recursive directories" 'helm-locate-subdirs-source
+            :basedir (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
+                         directory
                        (shell-quote-argument directory))
-          :subdir (shell-quote-argument input)
-          :candidate-transformer
-          `((lambda (candidates)
-              (cl-loop for c in candidates
-                       when (and (file-directory-p c)
-                                 (null (helm-boring-directory-p
-                                        c helm-boring-file-regexp-list))
-                                 (string-match-p ,(regexp-quote input)
-                                                 (helm-basename c)))
-                       collect (propertize c 'face 'helm-ff-dirs)))
-            helm-w32-pathname-transformer)
-          :persistent-action 'ignore
-          :action (lambda (c)
-                    (helm-set-pattern
-                     (file-name-as-directory (expand-file-name c)))))
-        :candidate-number-limit 999999
-        :allow-nest t
-        :resume 'noresume
-        :ff-transformer-show-only-basename nil
-        :buffer "*helm recursive dirs*"))
+            :subdir (shell-quote-argument input)
+            :candidate-transformer
+            `((lambda (candidates)
+                (cl-loop for c in candidates
+                         when (and (file-directory-p c)
+                                   (null (helm-boring-directory-p
+                                          c helm-boring-file-regexp-list))
+                                   (string-match-p ,(regexp-quote input)
+                                                   (helm-basename c)))
+                         collect (propertize c 'face 'helm-ff-dirs)))
+              helm-w32-pathname-transformer)
+            :persistent-action 'ignore
+            :action (lambda (c)
+                      (helm-set-pattern
+                       (file-name-as-directory (expand-file-name c)))))
+          :candidate-number-limit 999999
+          :allow-nest t
+          :resume 'noresume
+          :ff-transformer-show-only-basename nil
+          :buffer "*helm recursive dirs*")))
 
 (defun helm-ff-recursive-dirs (_candidate)
   "Launch a recursive search in `helm-ff-default-directory'."
