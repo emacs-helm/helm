@@ -1244,6 +1244,14 @@ Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 
 (defvar helm-quit-hook nil
   "A hook that run when quitting helm.")
+
+(defvar helm-inhibit-minibuffer-in-header-line nil
+  "Don't show minibuffer in header line when non-nil.
+
+This affects only helm sessions displayed in a separate frame.
+It is intended to not be used globally, but let-bounded.
+It is useful for helm sessions having actions using recursive
+minibuffer, in this case frame is created with a minibuffer.")
 
 ;;; Internal Variables
 ;;
@@ -2675,7 +2683,8 @@ configure frame size."
     (setq helm--buffer-in-new-frame-p t)
     (let* ((pos (window-absolute-pixel-position))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
-           (minibuf (> (cdr pos) half-screen-size))
+           (minibuf (or helm-inhibit-minibuffer-in-header-line
+                        (> (cdr pos) half-screen-size)))
            (frame-info (frame-geometry))
            (prmt-size (length helm--prompt))
            (line-height (frame-char-height))

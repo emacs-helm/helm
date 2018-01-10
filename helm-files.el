@@ -3046,7 +3046,8 @@ Use it for non--interactive calls of `helm-find-files'."
                (not (minibuffer-window-active-p (minibuffer-window)))))
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
-                           (expand-file-name tap)))))
+                           (expand-file-name tap))))
+         (helm-inhibit-minibuffer-in-header-line t))
     (helm-set-local-variable 'helm-follow-mode-persistent nil)
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
