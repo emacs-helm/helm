@@ -1249,13 +1249,6 @@ Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 (defvar helm-quit-hook nil
   "A hook that run when quitting helm.")
 
-(defvar helm-inhibit-minibuffer-in-header-line nil
-  "Don't show minibuffer in header line when non-nil.
-
-This affects only helm sessions displayed in a separate frame.
-It is intended to not be used globally, but let-bounded.
-It is useful for helm sessions having actions using recursive
-minibuffer, in this case frame is created with a minibuffer.")
 
 ;;; Internal Variables
 ;;
@@ -2687,8 +2680,6 @@ configure frame size."
     (setq helm--buffer-in-new-frame-p t)
     (let* ((pos (window-absolute-pixel-position))
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
-           (minibuf (or helm-inhibit-minibuffer-in-header-line
-                        (> (cdr pos) half-screen-size)))
            (frame-info (frame-geometry))
            (prmt-size (length helm--prompt))
            (line-height (frame-char-height))
@@ -2720,31 +2711,21 @@ configure frame size."
               (menu-bar-lines . 0)
               (fullscreen . nil)
               (visible . ,(null helm-display-buffer-reuse-frame))
-              (minibuffer . ,minibuf)))
+              (minibuffer . t)))
            display-buffer-alist)
       ;; Add the hook inconditionally, if
       ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
       ;; will have anyway no effect so no need to remove the hook.
       (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
       (with-helm-buffer
-        (setq-local helm-echo-input-in-header-line (not minibuf)))
+        (setq-local helm-echo-input-in-header-line (not (> (cdr pos) half-screen-size))))
       (helm-display-buffer-popup-frame buffer default-frame-alist))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
   (if helm-display-buffer-reuse-frame
       (let* ((x (cdr (assoc 'left frame-alist)))
-             (y (cdr (assoc 'top frame-alist)))
-             (frame-live-p (frame-live-p helm-popup-frame))
-             (minibuf (and frame-live-p
-                           (frame-parameter helm-popup-frame 'minibuffer))))
-        ;; Minibuffer frame-parameter is not modifiable once frame is
-        ;; created so frame needs to be deleted and recreated when the
-        ;; minibuffer parameter change in FRAME-ALIST.
-        (unless (and frame-live-p
-                     (eq minibuf (assoc-default 'minibuffer frame-alist)))
-          (and frame-live-p (delete-frame helm-popup-frame))
-          (setq helm-popup-frame (make-frame frame-alist)))
+             (y (cdr (assoc 'top frame-alist))))
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
         (switch-to-buffer buffer)
