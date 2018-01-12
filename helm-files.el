@@ -697,6 +697,8 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff--move-to-first-real-candidate
          helm-display-source-at-screen-top ; prevent setting window-start.
          helm-ff-auto-update-initial-value
+         ;; If HFF is using a frame use a frame as well.
+         (helm-actions-inherit-frame-settings t)
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
                    (helm-ff--count-and-collect-dups ifiles)
