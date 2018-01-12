@@ -2718,7 +2718,8 @@ configure frame size."
       ;; will have anyway no effect so no need to remove the hook.
       (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
       (with-helm-buffer
-        (setq-local helm-echo-input-in-header-line (not (> (cdr pos) half-screen-size))))
+        (setq-local helm-echo-input-in-header-line
+                    (not (> (cdr pos) half-screen-size))))
       (helm-display-buffer-popup-frame buffer default-frame-alist))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
@@ -2726,13 +2727,17 @@ configure frame size."
   (if helm-display-buffer-reuse-frame
       (let* ((x (cdr (assoc 'left frame-alist)))
              (y (cdr (assoc 'top frame-alist))))
+        (unless (and helm-popup-frame
+                     (frame-live-p helm-popup-frame))
+          (setq helm-popup-frame (make-frame frame-alist)))
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
         (switch-to-buffer buffer)
         (raise-frame helm-popup-frame))
     ;; If user have changed `helm-display-buffer-reuse-frame' to nil
     ;; maybe kill the frame.
-    (when (frame-live-p helm-popup-frame)
+    (when (and helm-popup-frame
+               (frame-live-p helm-popup-frame))
       (delete-frame helm-popup-frame))
     (display-buffer
      buffer '(display-buffer-pop-up-frame . nil))))
