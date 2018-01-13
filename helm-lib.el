@@ -444,21 +444,25 @@ e.g helm.el$
   "Show long message during `helm' session in BUFNAME.
 INSERT-CONTENT-FN is the function that insert
 text to be displayed in BUFNAME."
-  (let ((winconf (current-frame-configuration)))
-    (unwind-protect
-         (progn
-           (setq helm-suspend-update-flag t)
-           (set-buffer (get-buffer-create bufname))
-           (switch-to-buffer bufname)
-           (when helm-help-full-frame (delete-other-windows))
-           (delete-region (point-min) (point-max))
-           (org-mode)
-           (save-excursion
-             (funcall insert-content-fn))
-           (buffer-disable-undo)
-           (helm-help-event-loop))
-      (setq helm-suspend-update-flag nil)
-      (set-frame-configuration winconf))))
+  (let ((winconf (current-frame-configuration))
+        (hframe (selected-frame)))
+    (with-selected-frame helm-initial-frame
+      (select-frame-set-input-focus helm-initial-frame)
+      (unwind-protect
+           (progn
+             (setq helm-suspend-update-flag t)
+             (set-buffer (get-buffer-create bufname))
+             (switch-to-buffer bufname)
+             (when helm-help-full-frame (delete-other-windows))
+             (delete-region (point-min) (point-max))
+             (org-mode)
+             (save-excursion
+               (funcall insert-content-fn))
+             (buffer-disable-undo)
+             (helm-help-event-loop))
+        (raise-frame hframe)
+        (setq helm-suspend-update-flag nil)
+        (set-frame-configuration winconf)))))
 
 (defun helm-help-scroll-up (amount)
   (condition-case _err
