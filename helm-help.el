@@ -427,7 +427,7 @@ On completion:
 - target starts with \"/\" or \"[a-z]:/\": insert full path.
 - Otherwise: insert relative file name.
 
-*** Use the wildcard to select multiple files.
+*** Use the wildcard to select multiple files
 
 Use of wilcard is supported to run an action over a set of files.
 
@@ -642,7 +642,7 @@ file of the marked files in its destination directory.
 
 When `dired-async-mode' is enabled, an additional action named \"Backup files\"
 will be available. (Such command is not natively available in Emacs).
-See [[Using wildcard to select multiple files]] for details.
+See [[Use the wildcard to select multiple files]] for details.
 
 *** Bookmark the `helm-find-files' session.
 
