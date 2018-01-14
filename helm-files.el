@@ -65,14 +65,16 @@
   (mapcar (lambda (f)
             (let ((rgx (regexp-quote f)))
               (if (string-match-p "[^/]$" f)
-                  ;; files: e.g .o => \\.o$
+                  ;; files: e.g .o => \\.o
                   rgx
                 ;; directories: e.g .git/ => \\.git/?
                 (concat rgx "?"))))
           completion-ignored-extensions)
   "A list of regexps matching boring files.
 
-This list is build by default on `completion-ignored-extensions'."
+This list is build by default on `completion-ignored-extensions'.
+Don't add a final \"$\" at end of your regexps, helm will add it when
+needed."
   :group 'helm-files
   :type  '(repeat (choice regexp)))
 
