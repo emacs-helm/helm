@@ -232,13 +232,13 @@ For a better experience you can enable auto completion by setting
 `helm-ff-auto-update-initial-value' to non-nil in your init file.  It is not
 enabled by default to not confuse new users.
 
-**** Use `\\<helm-find-files-map>\\[helm-execute-persistent-action]' (persistent action) on a directory to go down one level.
+**** Use `\\<helm-find-files-map>\\[helm-execute-persistent-action]' (persistent action) on a directory to go down one level
 
 On a symlinked directory a prefix argument expands to its true name.
 
-**** Use `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' on a directory to go up one level.
+**** Use `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' on a directory to go up one level
 
-**** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-map>\\[helm-execute-persistent-action]' you did.
+**** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-map>\\[helm-execute-persistent-action]' you did
 
 The tree is reinitialized each time you browse a new tree with
 `\\<helm-map>\\[helm-execute-persistent-action]' or by entering some pattern in the prompt.
@@ -289,56 +289,56 @@ e-mail address.
 
 *** Quick pattern expansion
 
-**** Enter `~/' at end of pattern to quickly reach home directory.
+**** Enter `~/' at end of pattern to quickly reach home directory
 
-**** Enter `/' at end of pattern to quickly reach the file system root.
+**** Enter `/' at end of pattern to quickly reach the file system root
 
-**** Enter `./' at end of pattern to quickly reach `default-directory'.
+**** Enter `./' at end of pattern to quickly reach `default-directory'
 
 \(As per its value at the beginning of the session.)
 
 If you already are in the `default-directory' this will move the cursor to the top.
 
-**** Enter `../' at end of pattern will reach upper directory, moving cursor to the top.
+**** Enter `../' at end of pattern will reach upper directory, moving cursor to the top
 
 This is different from using `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' in that it moves
 the cursor to the top instead of remaining on the previous subdir name.
 
-**** Enter `..name/' at end of pattern to start a recursive search.
+**** Enter `..name/' at end of pattern to start a recursive search
 
 It searches directories matching \"name\" under the current directory, see the
 \"Recursive completion on subdirectories\" section below for more details.
 
-**** Any environment variable (e.g. `$HOME') at end of pattern gets expanded.
+**** Any environment variable (e.g. `$HOME') at end of pattern gets expanded
 
-**** Any valid filename yanked after pattern gets expanded.
+**** Any valid filename yanked after pattern gets expanded
 
 **** Special case: URL at point
 
 The quick expansions do not take effect after end a URL, you must kill the
 pattern first (`\\[helm-delete-minibuffer-contents]').
 
-*** Helm-find-files supports fuzzy matching.
+*** Helm-find-files supports fuzzy matching
 
 It starts from the third character of the pattern.
 
 For instance \"fob\" or \"fbr\" will complete \"foobar\" but \"fb\" needs a
 third character in order to complete it.
 
-*** Use `\\[universal-argument] \\[helm-execute-persistent-action]' or `\\[helm-follow-action-forward]' to display an image.
+*** Use `\\[universal-argument] \\[helm-execute-persistent-action]' or `\\[helm-follow-action-forward]' to display an image
 
-*** `\\[helm-execute-persistent-action]' on a filename expands to that filename in the Helm buffer.
+*** `\\[helm-execute-persistent-action]' on a filename expands to that filename in the Helm buffer
 
 Second hit displays the buffer filename.
 Third hit kills the buffer filename.
 Note: `\\[universal-argument] \\[helm-execute-persistent-action]' displays the buffer directly.
 
-*** Browse images directories with `helm-follow-mode' and navigate up/down.
+*** Browse images directories with `helm-follow-mode' and navigate up/down
 
 You can also use `helm-follow-action-forward' and `helm-follow-action-backward' with
 `\\[helm-follow-action-forward]' and `\\[helm-follow-action-backward]' respectively.
 
-*** Toggle auto-completion with `\\[helm-ff-run-toggle-auto-update]'.
+*** Toggle auto-completion with `\\[helm-ff-run-toggle-auto-update]'
 
 It is useful when trying to create a new file or directory and you don't want
 Helm to complete what you are writing.
@@ -346,18 +346,18 @@ Helm to complete what you are writing.
 Note: On a terminal, the default binding `C-<backspace>' may not work.
 In this case use `C-c <backspace>'.
 
-*** You can create a new directory and a new file at the same time.
+*** You can create a new directory and a new file at the same time
 
 Simply write the path in the prompt and press `RET', e.g.
 \"~/new/newnew/newnewnew/my_newfile.txt\".
 
-*** To create a new directory, append a \"/\" to the new name and press `RET'.
+*** To create a new directory, append a \"/\" to the new name and press `RET'
 
-*** To create a new file, enter a filename not ending with \"/\".
+*** To create a new file, enter a filename not ending with \"/\"
 
-*** Recursive search from Helm-find-files.
+*** Recursive search from Helm-find-files
 
-**** You can use Helm-browse-project (see binding below).
+**** You can use Helm-browse-project (see binding below)
 
 - With no prefix argument:
 If the current directory is under version control with either git or hg and
@@ -373,7 +373,7 @@ List all the files under this directory and other subdirectories
 - With two prefix arguments:
 Same but the cache is refreshed.
 
-**** You can start a recursive search with \"locate\" or \"find\".
+**** You can start a recursive search with \"locate\" or \"find\"
 
 See \"Note\" in the [[Recusive completion on subdirectories][section on subdirectories]].
 
@@ -413,7 +413,7 @@ Examples:
 - \"find %s -type d -name '*%s*'\"
 - \"find %s -type d -regex .*%s.*$\"
 
-*** Insert filename at point or complete filename at point.
+*** Insert filename at point or complete filename at point
 
 On insertion (not on completion, i.e. there is nothing at point):
 
@@ -461,7 +461,7 @@ a named extension recursively you would write \"**.el\" whereas in Bash it would
 be \"**/*.el\".  Directory selection with \"**/\" like Bash \"shopt globstar\"
 option is not supported yet.
 
-*** Query replace regexp on filenames.
+*** Query replace regexp on filenames
 
 Replace different parts of a file basename with something else.
 
@@ -500,7 +500,7 @@ are available as`%u', `%d' and `%c' respectively.
 
 **** Examples
 
-***** Recursively rename all files with \".JPG\" extension to \".jpg\".
+***** Recursively rename all files with \".JPG\" extension to \".jpg\"
 
 Use the `helm-file-globstar' feature described in [[Using wildcard to select multiple files][recursive globbing]]
 by entering \"**.JPG\" at the end of the Helm-find-files pattern, then hit
@@ -513,7 +513,7 @@ all extensions will be renamed to \"jpg\" even if the extension of one of the
 files is, say, \"png\".  If you want to keep the original extension you can use
 \"%d\" at the second prompt (downcase).
 
-***** Batch-rename files from number 001 to 00x.
+***** Batch-rename files from number 001 to 00x
 
 Use \"\\#\" inside the second prompt.
 
@@ -545,7 +545,7 @@ to
 
 use as matching regexp \"%.\" and as replacement string \"\\@-\\#\".
 
-***** Replace a substring.
+***** Replace a substring
 
 Use \"%:<from>:<to>\".
 
@@ -565,7 +565,7 @@ use as matching regexp \"%:1:2\" and as replacement string \"%u\" (upcase).
 
 Note that you \*cannot* use \"%.\" and \".%\" along with substring replacement.
 
-***** Modify the string from the placeholder (\\@).
+***** Modify the string from the placeholder (\\@)
 
 - By substring, i.e. only using the substring of the placeholder: \"\\@:<from>:<to>\".
 The length of placeholder is used for <to> when unspecified.
@@ -582,7 +582,7 @@ Example 3: \"\\@/foo/bar/\" replaces \"foo\" by \"bar\" in the placeholder.
 
 Example 4: \"\\@/foo/-\\#/\" replaces \"foo\" in the placeholder by 001, 002, etc.
 
-***** Clash in replacements (avoid overwriting files).
+***** Clash in replacements (avoid overwriting files)
 
 When performing any of these replacement operations you may end up with same
 names as replacement.  In such cases Helm numbers the file that would otherwise
@@ -593,7 +593,7 @@ the third renaming overwriting second file and so on.  Instead Helm will
 automatically rename the second and third files as \"emacs(1).txt\" and
 \"emacs(2).txt\" respectively.
 
-***** Query-replace on filenames vs. serial-rename action.
+***** Query-replace on filenames vs. serial-rename action
 
 Unlike the [[Serial renaming][serial rename]] actions, the files renamed with
 the query-replace action stay in their initial directory and are not moved to
@@ -601,7 +601,7 @@ the current directory.  As such, using \"\\#\" to serial-rename files only makes
 sense for files inside the same directory.  It even keeps renaming files
 with an incremental number in the next directories.
 
-*** Serial-rename.
+*** Serial-rename
 
 You can use the serial-rename actions to rename, copy or symlink marked files to
 a specific directory or in the current directory with all the files numbered
@@ -616,7 +616,7 @@ Copy all marked files with incremental numbering to a specific directory.
 - Serial-rename by symlinking:
 Symlink all marked files with incremental numbering to a specific directory.
 
-*** Edit marked files in a dired buffer.
+*** Edit marked files in a dired buffer
 
 You can open a dired buffer containing only marked files with `\\<helm-find-files-map>\\[helm-ff-run-marked-files-in-dired]'.
 With a prefix argument you can open this same dired buffer in wdired mode for
@@ -625,13 +625,13 @@ editing.  Note that wildcards are supported as well, so you can use e.g.
 select all files recursively from the current directory.  See [[Using wildcard to
 select multiple files]] section above.
 
-*** Defining default target directory for copying, renaming, etc.
+*** Defining default target directory for copying, renaming, etc
 
 You can customize `helm-dwim-target' to behave differently depending on the
 windows open in the current frame.  Default is to provide completion on all
 directories associated to each window.
 
-*** Copying and renaming asynchronously.
+*** Copying and renaming asynchronously
 
 If you have the async library installed (if you got Helm from MELPA you do), you
 can use it for copying/renaming files by enabling `dired-async-mode'.
@@ -644,13 +644,13 @@ When `dired-async-mode' is enabled, an additional action named \"Backup files\"
 will be available. (Such command is not natively available in Emacs).
 See [[Use the wildcard to select multiple files]] for details.
 
-*** Bookmark the `helm-find-files' session.
+*** Bookmark the `helm-find-files' session
 
 You can bookmark the `helm-find-files' session with `\\[helm-ff-bookmark-set]'.
 You can later retrieve these bookmarks by calling `helm-filtered-bookmarks'
 or, from the current `helm-find-files' session, by hitting `\\[helm-find-files-toggle-to-bookmark]'.
 
-*** Grep files from `helm-find-files'.
+*** Grep files from `helm-find-files'
 
 You can grep individual files from `helm-find-files' by using
 \`\\<helm-find-files-map>\\[helm-ff-run-grep]'.  This same command can also
@@ -671,13 +671,13 @@ All those grep commands use the symbol at point as the default pattern.
 Note that default is different from input (nothing is added to the prompt until
 you hit `\\[next-history-element]').
 
-**** Grepping on remote files.
+**** Grepping on remote files
 
 On remote files grep is not well supported by TRAMP unless you suspend updates before
 entering the pattern and re-enable it once your pattern is ready.
 To toggle suspend-update, use `\\<helm-map>\\[helm-toggle-suspend-update]'.
 
-*** Setting up aliases in Eshell allows you to set up powerful customized commands.
+*** Setting up aliases in Eshell allows you to set up powerful customized commands
 
 Adding Eshell aliases to your `eshell-aliases-file' or using the
 `alias' command from Eshell allows you to create personalized
@@ -707,7 +707,7 @@ $ example foo bar baz
 
 Of course the alias command should support this.
 
-*** Using TRAMP with `helm-find-files' to read remote directories.
+*** Using TRAMP with `helm-find-files' to read remote directories
 
 `helm-find-files' works fine with TRAMP despite some limitations.
 
@@ -720,7 +720,7 @@ See [[Grepping on remote files]].
 
 - Locate does not work on remote directories.
 
-**** A TRAMP syntax crash course.
+**** A TRAMP syntax crash course
 
 Please refer to TRAMP's documentation for more details.
 
@@ -745,7 +745,7 @@ works with the ssh method), especially when copying large files.
 You need to hit `C-j' once on top of a directory on the first connection
 to complete the pattern in the minibuffer.
 
-**** Completing host.
+**** Completing host
 
 As soon as you enter the first \":\" after method e.g =/scp:\= you will
 have some completion about previously used hosts or from your =~/.ssh/config\=
@@ -757,13 +757,13 @@ of candidates soon after.
 When connection fails, be sure to delete your TRAMP connection with M-x
 `helm-delete-tramp-connection' before retrying.
 
-**** Editing local files as root.
+**** Editing local files as root
 
 Use the sudo method:
 
 \"/sudo:host:\" or simply \"/sudo::\".
 
-*** Attach files to a mail buffer (message-mode).
+*** Attach files to a mail buffer (message-mode)
 
 If you are in a `message-mode' or `mail-mode' buffer, that action will appear
 in action menu, otherwise it is available at any time with \\<helm-find-files-map>\\[helm-ff-run-mail-attach-files].
@@ -777,9 +777,9 @@ prompted to attach files to one of these mail buffers.
 - If you are not in a mail buffer and no mail buffer exists,
 a new mail buffer is created with the attached files in it.
 
-*** Open files in separate windows.
+*** Open files in separate windows
 
-When [[Marked candidates][marking]] multiple files or using [[Use the wildcard to select multiple files.][wildcard]], helm allow opening all
+When [[Marked candidates][marking]] multiple files or using [[Use the wildcard to select multiple files][wildcard]], helm allow opening all
 this files in separate windows using an horizontal layout or a
 vertical layout if you used a prefix arg, when no more windows can be
 displayed in frame, next files are opened in background without being
@@ -855,11 +855,11 @@ see [[Helm functions vs helmized emacs functions]].
 
 *** Navigation
 
-**** Enter `~/' at end of pattern to quickly reach home directory.
+**** Enter `~/' at end of pattern to quickly reach home directory
 
-**** Enter `/' at end of pattern to quickly reach the file system root.
+**** Enter `/' at end of pattern to quickly reach the file system root
 
-**** Enter `./' at end of pattern to quickly reach `default-directory'.
+**** Enter `./' at end of pattern to quickly reach `default-directory'
 
 \(As per its value at the beginning of the session.)
 
@@ -870,7 +870,7 @@ If you already are in the `default-directory' this will move the cursor to the t
 This is different from using `\\[helm-find-files-up-one-level]' in that it moves
 the cursor to the top instead of remaining on the previous subdir name.
 
-**** You can complete with partial basename.
+**** You can complete with partial basename
 
 It starts from the third character of the pattern.
 
@@ -881,15 +881,15 @@ third character in order to complete it.
 
 By default `helm-read-file-name' uses the persistent actions of `helm-find-files'.
 
-**** Use `\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]' to display an image.
+**** Use `\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]' to display an image
 
-**** `\\<helm-map>\\[helm-execute-persistent-action]' on a filename will expand to this filename in Helm-buffer.
+**** `\\<helm-map>\\[helm-execute-persistent-action]' on a filename will expand to this filename in Helm-buffer
 
 Second hit displays the buffer filename.
 Third hit kills the buffer filename.
 Note: `\\[universal-argument] \\<helm-map>\\[helm-execute-persistent-action]' displays the buffer directly.
 
-**** Browse images directories with `helm-follow-mode' and navigate up/down.
+**** Browse images directories with `helm-follow-mode' and navigate up/down
 
 *** Delete characters backward
 
@@ -904,14 +904,14 @@ In this case use `C-c <backspace>'.
 
 *** Create new directories and files
 
-**** You can create a new directory and a new file at the same time.
+**** You can create a new directory and a new file at the same time
 
 Simply write the path in prompt and press `RET', e.g.
 \"~/new/newnew/newnewnew/my_newfile.txt\".
 
-**** To create a new directory, append a \"/\" at to the new name and press `RET'.
+**** To create a new directory, append a \"/\" at to the new name and press `RET'
 
-**** To create a new file, enter a filename not ending with \"/\".
+**** To create a new file, enter a filename not ending with \"/\"
 
 File and directory creation works only with some commands (e.g. `find-file')
 and it will not work with others where it is not intended to return a file or
@@ -1008,23 +1008,23 @@ than 1 megabyte:
 
 ** Tips
 
-*** Use a prefix argument to grep recursively.
+*** Use a prefix argument to grep recursively
 
 With Helm supporting git-grep and AG however, you are better off using one of
 them for recursive searches.
 
-*** You can use wild cards when selecting files (e.g. \"*.el\").
+*** You can use wild cards when selecting files (e.g. \"*.el\")
 
-*** You can grep in many different directories by marking files or using wild cards.
+*** You can grep in many different directories by marking files or using wild cards
 
-*** You can save the result in a `helm-grep-mode' buffer.
+*** You can save the result in a `helm-grep-mode' buffer
 
 See [[Commands][commands]] below.
 
 Once in that buffer you can use \"emacs-wgrep\" (external package not bundled with Helm)
 to edit your changes.
 
-*** Helm-grep supports multi-matching.
+*** Helm-grep supports multi-matching
 
 \(Starting from version 1.9.4.)
 
@@ -1172,7 +1172,7 @@ leaving Helm.
 
 ** Tips
 
-*** Pass extra arguments after filename.
+*** Pass extra arguments after filename
 
 Normally the command or alias will be called with file as argument.  For instance
 
@@ -1186,7 +1186,7 @@ But you can also pass an argument or more after \"candidate_file\" like this:
 
     <command> candidate_file [extra_args]
 
-*** Specify marked files as arguments.
+*** Specify marked files as arguments
 
 Example:
 
@@ -1240,40 +1240,40 @@ Matching empty lines is supported with the regexp \"^$\", you then get the
 results displayed as the buffer-name and the line number only.  You can
 save and edit these results, i.e. add text to the empty line.
 
-*** Automatically match symbol at point.
+*** Automatically match symbol at point
 
 Helm can automatically match the symbol at point while keeping the minibuffer
 empty, ready to be written to.  This behaviour is disabled by default.  To
 enable this you need to add `helm-source-occur' and `helm-source-moccur' to
 `helm-sources-using-default-as-input'.
 
-*** Jump to the corresponding line in the searched buffer.
+*** Jump to the corresponding line in the searched buffer
 
 You can do this with `\\<helm-map>\\[helm-execute-persistent-action]' (persistent-action), to do it repeatedly
 you can use `\\<helm-map>\\[helm-follow-action-forward]' and `\\<helm-map>\\[helm-follow-action-backward]' or enable `helm-follow-mode' with `\\<helm-map>\\[helm-follow-mode]'.
 
-*** Switch to buffer in other window.
+*** Switch to buffer in other window
 
 The command \\<helm-moccur-map>\\[helm-moccur-run-goto-line-ow] allow you to switch to buffer
 in other window horizontally or vertically if a prefix arg is supplied.
 
-*** Save the results.
+*** Save the results
 
 Similarly to Helm-grep, you can save the results with `\\<helm-map>\\[helm-moccur-run-save-buffer]'.
 Of course if you don't save the results, you can resume the Helm session with
 `helm-resume'.
 
-*** Refresh the resumed session.
+*** Refresh the resumed session
 
 When the buffer(s) where you ran helm-(m)occur get(s) modified, the Helm buffer
 will flash red as a warning.  You can refresh the buffer by running `\\<helm-map>\\[helm-refresh]'.
 This can be done automatically by customizing `helm-moccur-auto-update-on-resume'.
 
-*** Refresh a saved buffer.
+*** Refresh a saved buffer
 
 Type `g' to update the buffer.
 
-*** Edit a saved buffer.
+*** Edit a saved buffer
 
 First, install wgrep (https://github.com/mhayashi1120/Emacs-wgrep) and then:
 
@@ -1325,7 +1325,7 @@ occurences at once in the buffer.
 
 ** Tips
 
-*** Compile all your packages asynchronously.
+*** Compile all your packages asynchronously
 
 If you use async (if you have installed Helm from MELPA you do), only \"helm\",
 \"helm-core\", and \"magit\" are compiled asynchronously.  If you want all your
@@ -1383,7 +1383,7 @@ marking it (`C-c u' or `RET') .
 
 ** Tips
 
-*** You can get help on any command with persistent action (\\[helm-execute-persistent-action]).
+*** You can get help on any command with persistent action (\\[helm-execute-persistent-action])
 
 *** Prefix arguments
 
