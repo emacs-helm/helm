@@ -25,6 +25,7 @@
 (declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 (declare-function popup-tip "ext:popup")
 (defvar winner-boring-buffers)
+(defvar helm-show-completion-overlay)
 
 
 (defgroup helm-utils nil
@@ -544,6 +545,12 @@ from its directory."
             (expand-file-name (or (buffer-file-name) default-directory))))
          ;; Url.
          ((and (stringp sel) helm--url-regexp (string-match helm--url-regexp sel)) sel)
+         ;; Exit brutally from a `with-helm-show-completion'
+         ((and helm-show-completion-overlay
+               (overlayp helm-show-completion-overlay))
+          (delete-overlay helm-show-completion-overlay)
+          (remove-hook 'helm-move-selection-after-hook 'helm-show-completion)
+          (expand-file-name default-preselection))
          ;; Default.
          (t (expand-file-name default-preselection)))))))
 (put 'helm-quit-and-find-file 'helm-only t)
