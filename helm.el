@@ -2673,7 +2673,12 @@ Function suitable for `helm-display-function',
 and/or `helm-show-completion-default-display-function'.
 
 See `helm-display-buffer-height' and `helm-display-buffer-width' to
-configure frame size."
+configure frame size.
+
+Note that this feature is available only with emacs-25+."
+  (cl-assert (and (fboundp 'window-absolute-pixel-edges)
+                  (fboundp 'frame-geometry))
+             nil "Helm buffer in own frame is only available starting at emacs-25+")
   (if (not (display-graphic-p))
       ;; Fallback to default when frames are not usable.
       (helm-default-display-buffer buffer)
