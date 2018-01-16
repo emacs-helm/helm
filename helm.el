@@ -4587,8 +4587,17 @@ It has no effect if `helm-echo-input-in-header-line' is nil."
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
       (overlay-put ov 'window (selected-window))
-      (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
-                              `(:background ,bg-color :foreground ,bg-color)))
+      (helm-aif (helm-attr 'persistent-help)
+          (progn
+            (overlay-put ov 'display
+                         (truncate-string-to-width
+                          (substitute-command-keys
+                           (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
+                                   (format "%s (keeping session)" it)))
+                          (- (window-width) 1)))
+            (overlay-put ov 'face 'helm-header))
+        (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
+                                  `(:background ,bg-color :foreground ,bg-color))))
       (setq cursor-type nil))))
 
 (defun helm-show-candidate-number (&optional name)
