@@ -90,7 +90,7 @@ much more convenient to use a simple boolean value here."
   (mapcar (lambda (f)
             (let ((rgx (regexp-quote f)))
               (if (string-match-p "[^/]$" f)
-                  ;; files: e.g .o => \\.o
+                  ;; files: e.g .o => \\.o$
                   (concat rgx "$")
                 ;; directories: e.g .git/ => \\.git/?
                 (concat rgx "?"))))
@@ -98,8 +98,8 @@ much more convenient to use a simple boolean value here."
   "A list of regexps matching boring files.
 
 This list is build by default on `completion-ignored-extensions'.
-Don't add a final \"$\" at end of your regexps, helm will add it when
-needed."
+The directory names should end with \"/?\" e.g. \"\\.git/?\" and the
+file names should end with \"$\" e.g. \"\\.o$\"."
   :group 'helm-files
   :type  '(repeat (choice regexp))
   :set 'helm-ff--setup-boring-regex)
