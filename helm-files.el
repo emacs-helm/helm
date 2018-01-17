@@ -61,23 +61,6 @@
   "Files applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-boring-file-regexp-list
-  (mapcar (lambda (f)
-            (let ((rgx (regexp-quote f)))
-              (if (string-match-p "[^/]$" f)
-                  ;; files: e.g .o => \\.o
-                  rgx
-                ;; directories: e.g .git/ => \\.git/?
-                (concat rgx "?"))))
-          completion-ignored-extensions)
-  "A list of regexps matching boring files.
-
-This list is build by default on `completion-ignored-extensions'.
-Don't add a final \"$\" at end of your regexps, helm will add it when
-needed."
-  :group 'helm-files
-  :type  '(repeat (choice regexp)))
-
 (defcustom helm-tramp-verbose 0
   "Just like `tramp-verbose' but specific to helm.
 When set to 0 don't show tramp messages in helm.
@@ -2555,11 +2538,11 @@ Return candidates prefixed with basename of `helm-input' first."
                                     ((> sc1 sc2))))))))
         (if cand1 (cons cand1 all) all))))
 
-(defsubst helm-ff-boring-file-p (file)
+(defun helm-ff-boring-file-p (file)
   ;; Prevent user doing silly thing like
   ;; adding the dotted files to boring regexps (#924).
   (and (not (string-match "\\.$" file))
-       (string-match (mapconcat 'identity helm-boring-file-regexp-list "$\\|") file)))
+       (string-match  helm-ff--boring-regexp file)))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
