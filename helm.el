@@ -746,6 +746,13 @@ The actions running from commands that are in
 a frame to display their `helm-buffer' when non nil."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-use-undecorated-frame-option nil
+  "Display helm frame undecorated when non nil.
+
+This option have no effect with emacs versions lower than 26."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -2712,6 +2719,7 @@ Note that this feature is available only with emacs-25+."
                         ;; Below point
                         (+ (cdr pos) line-height)))
               (title . "Helm")
+              (undecorated . ,helm-use-undecorated-frame-option)
               (vertical-scroll-bars . nil)
               (menu-bar-lines . 0)
               (fullscreen . nil)
