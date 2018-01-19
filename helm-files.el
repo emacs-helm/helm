@@ -396,7 +396,7 @@ Of course you can also write your own function to do something else."
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
-    (define-key map (kbd "M-@")           'helm-ff-run-query-replace-on-marked)
+    (define-key map (kbd "M-@")           'helm-ff-run-query-replace-fnames-on-marked)
     (define-key map (kbd "M-%")           'helm-ff-run-query-replace)
     (define-key map (kbd "C-M-%")         'helm-ff-run-query-replace-regexp)
     (define-key map (kbd "C-c =")         'helm-ff-run-ediff-file)
@@ -487,7 +487,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find File" 'helm-find-file-or-marked
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
-   "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-on-marked
+   "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-fnames-on-marked
    "Marked files in dired `C-x C-q, C-u wdired'" 'helm-marked-files-in-dired
    "Query replace contents on marked `M-%'" 'helm-ff-query-replace
    "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
@@ -1237,16 +1237,16 @@ This doesn't replace inside the files, only modify filenames."
     (concat before-str subexp after-str)))
 
 ;; The action.
-(defun helm-ff-query-replace-on-marked (_candidate)
+(defun helm-ff-query-replace-fnames-on-marked (_candidate)
   (let ((marked (helm-marked-candidates :with-wildcard t)))
     (helm-ff-query-replace-on-filenames marked)))
 
 ;; The command for `helm-find-files-map'.
-(defun helm-ff-run-query-replace-on-marked ()
+(defun helm-ff-run-query-replace-fnames-on-marked ()
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-ff-query-replace-on-marked)))
-(put 'helm-ff-run-query-replace-on-marked 'helm-only t)
+    (helm-exit-and-execute-action 'helm-ff-query-replace-fnames-on-marked)))
+(put 'helm-ff-run-query-replace-fnames-on-marked 'helm-only t)
 
 (defun helm-ff-query-replace (_candidate)
   (let ((bufs (cl-loop for f in (helm-marked-candidates :with-wildcard t)

@@ -800,7 +800,7 @@ buffer is kept and files are displayed next to it.
 \\[helm-ff-run-gid]\t\tRun gid (id-utils).
 \\[helm-ff-run-etags]\t\tRun Etags (`\\[universal-argument]' to use thing-at-point, `\\[universal-argument] \\[universal-argument]' to reload cache).
 \\[helm-ff-run-rename-file]\t\tRename File (`\\[universal-argument]' to follow).
-\\[helm-ff-run-query-replace-on-marked]\t\tQuery replace on marked files.
+\\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace on marked files.
 \\[helm-ff-run-copy-file]\t\tCopy File (`\\[universal-argument]' to follow).
 \\[helm-ff-run-byte-compile-file]\t\tByte Compile File (`\\[universal-argument]' to load).
 \\[helm-ff-run-load-file]\t\tLoad File.
