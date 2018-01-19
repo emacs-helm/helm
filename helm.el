@@ -4600,7 +4600,8 @@ It has no effect if `helm-echo-input-in-header-line' is nil."
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
       (overlay-put ov 'window (selected-window))
-      (helm-aif (helm-attr 'persistent-help)
+      (helm-aif (and helm-display-header-line
+                     (helm-attr 'persistent-help))
           (progn
             (overlay-put ov 'display
                          (truncate-string-to-width
