@@ -2762,9 +2762,10 @@ Note that this feature is available only with emacs-25+."
   (interactive)
   (with-helm-alive-p
     (with-helm-window
-      (set-frame-position (selected-frame)
-                          (car helm--last-frame-position)
-                          (cdr helm--last-frame-position)))))
+      (when helm--last-frame-position
+        (set-frame-position (selected-frame)
+                            (car helm--last-frame-position)
+                            (cdr helm--last-frame-position))))))
 (put 'helm-restore-last-frame-position 'helm-only t)
 
 ;;; Initialize
