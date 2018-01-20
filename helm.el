@@ -2748,7 +2748,8 @@ Note that this feature is available only with emacs-25+."
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
         (switch-to-buffer buffer)
-        (raise-frame helm-popup-frame))
+        (raise-frame helm-popup-frame)
+        (select-frame-set-input-focus helm-popup-frame t))
     ;; If user have changed `helm-display-buffer-reuse-frame' to nil
     ;; maybe kill the frame.
     (when (and helm-popup-frame
