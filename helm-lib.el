@@ -33,6 +33,8 @@
 (declare-function helm-attrset "helm.el")
 (declare-function org-open-at-point "org.el")
 (declare-function org-content "org.el")
+(declare-function org-mark-ring-goto "org.el")
+(declare-function org-mark-ring-push "org.el")
 (defvar helm-current-position)
 (defvar wdired-old-marks)
 (defvar helm-persistent-action-display-window)
@@ -487,6 +489,7 @@ text to be displayed in BUFNAME."
              (when helm-help-full-frame (delete-other-windows))
              (delete-region (point-min) (point-max))
              (org-mode)
+             (org-mark-ring-push) ; Put mark at bob
              (save-excursion
                (funcall insert-content-fn))
              (buffer-disable-undo)
@@ -553,6 +556,8 @@ text to be displayed in BUFNAME."
         (?\C-  (helm-help-toggle-mark))
         (?\t   (org-cycle))
         (?\C-m (ignore-errors (call-interactively #'org-open-at-point)))
+        (?\C-& (ignore-errors (call-interactively #'org-mark-ring-goto)))
+        (?\C-% (call-interactively #'org-mark-ring-push))
         (?\M-\t (pcase (helm-iter-next iter-org-state)
                   ((pred numberp) (org-content))
                   ((and state) (org-cycle state))))

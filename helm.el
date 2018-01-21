@@ -1042,6 +1042,9 @@ The hard-coded documentation bindings are:
 | M->       |                  | End of buffer       |
 | M-<       |                  | Beginning of buffer |
 | C-<SPACE> |                  | Toggle mark         |
+| RET       |                  | Follow org link     |
+| C-%       |                  | Push org mark       |
+| C-&       |                  | Goto org mark-ring  |
 | TAB       |                  | Org cycle           |
 | M-<TAB>   |                  | Toggle visibility   |
 | M-w       |                  | Copy region         |
