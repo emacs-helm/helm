@@ -714,7 +714,7 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   :type 'float
   :group 'helm)
 
-(defcustom helm-display-buffer-width 60
+(defcustom helm-display-buffer-width 72
   "Frame width when displaying helm-buffer in own frame."
   :group 'helm
   :type 'integer)
