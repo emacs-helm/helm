@@ -2766,10 +2766,13 @@ Note that this feature is available only with emacs-25+."
     (display-buffer
      buffer '(display-buffer-pop-up-frame . nil))))
 
-;; When user delete manually helm frame ensure helm session is
-;; quitted.
-(defun helm--delete-frame-function (_frame)
-  (when helm-alive-p (helm-keyboard-quit)))
+;; Ensure to quit helm when user delete helm frame manually.
+;; If user deletes another frame keep session running.
+(defun helm--delete-frame-function (frame)
+  (when (and helm-alive-p
+             ;; FRAME is handling helm-buffer
+             (get-buffer-window helm-buffer frame))
+    (helm-keyboard-quit)))
 (add-hook 'delete-frame-functions 'helm--delete-frame-function)
 
 ;;; Initialize
