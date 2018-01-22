@@ -1522,6 +1522,13 @@ Messages are logged to a file named with todays date and time in this directory.
          (progn ,@body)
        (error "Running helm command outside of context"))))
 
+(defmacro with-helm-in-frame (&rest body)
+  "Execute helm function in BODY displaying `helm-buffer' in separate frame."
+  (declare (debug t) (indent 0))
+  `(progn
+     (helm-set-local-variable
+      'helm-display-function 'helm-display-buffer-in-own-frame)
+     ,@body))
 
 ;;; helm-attributes
 ;;
