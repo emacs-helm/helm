@@ -477,7 +477,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-find-files--toggle-bookmark nil)
 (defvar helm-ff--tramp-methods nil)
 (defvar helm-ff--directory-files-hash (make-hash-table :test 'equal))
-
+(defvar helm-ff-history-buffer-name "*helm-find-files history*")
 
 ;;; Helm-find-files
 ;;
@@ -1340,7 +1340,8 @@ Behave differently depending of `helm-selection':
   (interactive)
   (with-helm-alive-p
     (when (helm-file-completion-source-p)
-      (helm-exit-and-execute-action 'helm-find-files-switch-to-hist))))
+      (let ((helm-actions-inherit-frame-settings t))
+        (helm-exit-and-execute-action 'helm-find-files-switch-to-hist)))))
 (put 'helm-ff-run-switch-to-history 'helm-only t)
 
 (defun helm-ff-run-grep ()
@@ -3015,7 +3016,8 @@ Show the first `helm-ff-history-max-length' elements of
            helm-ff-history
            :name "Helm Find Files History"
            :must-match t
-           :fuzzy (helm-ff-fuzzy-matching-p))
+           :fuzzy (helm-ff-fuzzy-matching-p)
+           :buffer helm-ff-history-buffer-name)
         helm-ff-history))))
 
 (defun helm-find-files-1 (fname &optional preselect)
@@ -3771,6 +3773,13 @@ This is the starting point for nearly all actions you can do on files."
                                        (null hist)
                                        (not (string-match-p "[.]\\{1,2\\}\\'" it)))
                                   (helm-basename it) it))))
+    ;; Continue using the same display function as history which used
+    ;; probably itself the same display function as inner HFF call,
+    ;; i.e. if history was using frame use a frame otherwise use a window.
+    (when (and hist (buffer-live-p (get-buffer helm-ff-history-buffer-name)))
+      (helm-set-local-variable 'helm-display-function
+                               (with-current-buffer helm-ff-history-buffer-name
+                                 helm-display-function)))
     (set-text-properties 0 (length input) nil input)
     (setq current-prefix-arg nil)
     (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
