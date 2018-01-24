@@ -1843,6 +1843,11 @@ on action functions invoked as action from the action menu,
 i.e functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
+  ;; Ensure action use same display function as initial helm-buffer when
+  ;; helm-actions-inherit-frame-settings is non nil.
+  (when helm-actions-inherit-frame-settings
+    (helm-set-local-variable 'helm-display-function
+                             (with-helm-buffer helm-display-function)))
   (helm-exit-minibuffer))
 
 (defalias 'helm-run-after-quit 'helm-run-after-exit)
