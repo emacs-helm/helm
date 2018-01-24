@@ -50,7 +50,6 @@
                                  helm-buffers-ido-virtual-help-message
                                  helm-moccur-help-message
                                  helm-top-help-message
-                                 helm-apt-help-message
                                  helm-el-package-help-message
                                  helm-M-x-help-message
                                  helm-imenu-help-message
@@ -1303,19 +1302,6 @@ occurences at once in the buffer.
 \\[helm-top-run-sort-by-cpu]\t\tSort by CPU usage.
 \\[helm-top-run-sort-by-user]\t\tSort alphabetically by user.
 \\[helm-top-run-sort-by-mem]\t\tSort by memory.")
-
-;;; Helm APT
-;;
-;;
-(defvar helm-apt-help-message
-  "* Helm APT
-
-** Commands
-\\<helm-apt-map>
-\\[helm-apt-show-all]\t\tShow all packages.
-\\[helm-apt-show-only-installed]\t\tShow installed packages only.
-\\[helm-apt-show-only-not-installed]\t\tShow non-installed packages only.
-\\[helm-apt-show-only-deinstalled]\t\tShow uninstalled (not purged yet) packages only.")
 
 ;;; Helm Elisp package
 ;;

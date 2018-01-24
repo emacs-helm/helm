@@ -51,6 +51,7 @@
 (declare-function helm-gid "helm-id-utils.el")
 (declare-function helm-ls-svn-ls "ext:helm-ls-svn")
 (declare-function helm-find-1 "helm-find")
+(declare-function helm-get-default-program-for-file "helm-external")
 
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
@@ -2359,6 +2360,7 @@ Note that only existing directories are saved here."
 
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
+  (require 'helm-external) ; For `helm-get-default-program-for-file'. 
   (let* ((all                (helm-file-attributes candidate))
          (dired-line         (helm-file-attributes
                               candidate :dired t :human-size t))
