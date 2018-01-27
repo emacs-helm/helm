@@ -190,6 +190,19 @@ candidate."
   :group 'helm-files
   :type 'integer)
 
+(defcustom helm-ff-up-one-level-preselect t
+  "Always preselect previous directory when going one level up.
+
+When non nil `candidate-number-limit' source value is modified
+dynamically when going one level up if the position of previous
+candidate in its directory is > to `helm-ff-candidate-number-limit'.
+
+This can be helpful to disable this and reduce
+`helm-ff-candidate-number-limit' if you often navigate across very
+large directories."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-files-save-history-extra-sources
   '("Find" "Locate" "Recentf"
     "Files from Current Directory" "File Cache")
@@ -1683,9 +1696,12 @@ If prefix numeric arg is given go ARG level up."
               (new-pattern (helm-reduce-file-name helm-pattern arg)))
           ;; Ensure visibility on all candidates for preselection.
           (helm-attrset 'candidate-number-limit
-                        (max (gethash new-pattern helm-ff--directory-files-hash
-                                      helm-ff-candidate-number-limit)
-                             helm-ff-candidate-number-limit))
+                        (if helm-ff-up-one-level-preselect
+                            (max (gethash new-pattern
+                                          helm-ff--directory-files-hash
+                                          helm-ff-candidate-number-limit)
+                                 helm-ff-candidate-number-limit)
+                          helm-ff-candidate-number-limit))
           (cond ((file-directory-p helm-pattern)
                  (setq helm-ff-last-expanded helm-ff-default-directory))
                 ((file-exists-p helm-pattern)
