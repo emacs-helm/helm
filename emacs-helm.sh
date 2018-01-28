@@ -59,23 +59,23 @@ fi
 
 cat > $CONF_FILE <<EOF
 (setq initial-scratch-message (concat initial-scratch-message
-";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\
-;; This Emacs is Powered by \`HELM' using\n\
-;; emacs program \"$EMACS\".\n\
-;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\n\
-;; You can retrieve this minimal configuration in \"$CONF_FILE\".\n\
-;; Some original Emacs commands are replaced by their \`helm' counterparts:\n\n\
-;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\n\
-;; - \`occur'(M-s o)                  =>\`helm-occur'\n\
-;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\n\
-;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\n\
-;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\n\n\
-;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\n\n
-;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\n\
-;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\n\
-;; which provides Helm completion in many places like \`shell-mode'.\n\
-;; Find context help for most Helm commands with \`C-h m'.\n\
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n"))
+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\
+;; This Emacs is Powered by \`HELM' using\\n\
+;; emacs program \"$EMACS\".\\n\
+;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\\n\
+;; You can retrieve this minimal configuration in \"$CONF_FILE\".\\n\
+;; Some original Emacs commands are replaced by their \`helm' counterparts:\\n\\n\
+;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\\n\
+;; - \`occur'(M-s o)                  =>\`helm-occur'\\n\
+;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\\n\
+;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\\n\
+;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\\n\
+;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\\n
+;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\\n\
+;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\\n\
+;; which provides Helm completion in many places like \`shell-mode'.\\n\
+;; Find context help for most Helm commands with \`C-h m'.\\n\
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n"))
 
 (setq load-path (quote $LOAD_PATH))
 (require 'package)
