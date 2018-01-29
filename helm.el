@@ -1379,7 +1379,14 @@ This is only used when helm is using
 `helm-display-buffer-in-own-frame' as `helm-display-function' and
 `helm-display-buffer-reuse-frame' is non nil.")
 (defvar helm--nested nil)
-(defvar helm--last-frame-position nil)
+(defconst helm--frame-default-attributes
+  '(width height tool-bar-lines left top
+    title undecorated vertical-scroll-bars
+    visible fullscreen menu-bar-lines undecorated)
+  "Frame parameters to save in `helm--last-frame-parameters'.")
+(defvar helm--last-frame-parameters nil
+  "Frame parameters to save for later resuming.
+Local to `helm-buffer'.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2710,29 +2717,25 @@ Note that this feature is available only with emacs-25+."
            (half-screen-size (/ (display-pixel-height x-display-name) 2))
            (frame-info (frame-geometry))
            (prmt-size (length helm--prompt))
-           (lastpos (buffer-local-value
-                     'helm--last-frame-position
-                     (get-buffer buffer)))
            (line-height (frame-char-height))
            (default-frame-alist
-            `((width . ,helm-display-buffer-width)
-              (height . ,helm-display-buffer-height)
-              (tool-bar-lines . 0)
-              (left . ,(if (and lastpos resume)
-                           (car lastpos)
-                         (- (car pos)
+            (if resume
+                (buffer-local-value 'helm--last-frame-parameters
+                                    (get-buffer buffer))
+              `((width . ,helm-display-buffer-width)
+                (height . ,helm-display-buffer-height)
+                (tool-bar-lines . 0)
+                (left . ,(- (car pos)
                             (* (frame-char-width)
                                (if (< (- (point) (point-at-bol)) prmt-size)
                                    (- (point) (point-at-bol))
-                                 prmt-size)))))
-              ;; Try to put frame at the best possible place.
-              ;; Frame should be below point if enough
-              ;; place, otherwise above point and
-              ;; current line should not be hidden
-              ;; by helm frame.
-              (top . ,(if (and lastpos resume)
-                          (cdr lastpos)
-                        (if (> (cdr pos) half-screen-size)
+                                 prmt-size))))
+                ;; Try to put frame at the best possible place.
+                ;; Frame should be below point if enough
+                ;; place, otherwise above point and
+                ;; current line should not be hidden
+                ;; by helm frame.
+                (top . ,(if (> (cdr pos) half-screen-size)
                             ;; Above point
                             (- (cdr pos)
                                ;; add 2 lines to make sure there is always a gap
@@ -2740,14 +2743,14 @@ Note that this feature is available only with emacs-25+."
                                ;; account for title bar height too
                                (cddr (assq 'title-bar-size frame-info)))
                           ;; Below point
-                          (+ (cdr pos) line-height))))
-              (title . "Helm")
-              (undecorated . ,helm-use-undecorated-frame-option)
-              (vertical-scroll-bars . nil)
-              (menu-bar-lines . 0)
-              (fullscreen . nil)
-              (visible . ,(null helm-display-buffer-reuse-frame))
-              (minibuffer . t)))
+                          (+ (cdr pos) line-height)))
+                (title . "Helm")
+                (undecorated . ,helm-use-undecorated-frame-option)
+                (vertical-scroll-bars . nil)
+                (menu-bar-lines . 0)
+                (fullscreen . nil)
+                (visible . ,(null helm-display-buffer-reuse-frame))
+                (minibuffer . t))))
            display-buffer-alist)
       ;; Add the hook inconditionally, if
       ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
@@ -2756,7 +2759,9 @@ Note that this feature is available only with emacs-25+."
       (with-helm-buffer
         (setq-local helm-echo-input-in-header-line
                     (not (> (cdr pos) half-screen-size))))
-      (helm-display-buffer-popup-frame buffer default-frame-alist))
+      (helm-display-buffer-popup-frame buffer default-frame-alist)
+      (unless (or resume (not helm-display-buffer-reuse-frame))
+        (modify-frame-parameters (selected-frame) default-frame-alist)))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
@@ -3199,7 +3204,10 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     (helm-funcall-foreach 'cleanup)
     (when (and helm--buffer-in-new-frame-p (null helm--nested))
       (with-helm-buffer
-        (setq-local helm--last-frame-position (frame-position)))
+        (setq-local helm--last-frame-parameters
+                    (cl-loop with params = (frame-parameters)
+                             for p in helm--frame-default-attributes
+                             when (assq p params) collect it)))
       (if helm-display-buffer-reuse-frame
           (make-frame-invisible) (delete-frame))))
   (helm-kill-async-processes)
