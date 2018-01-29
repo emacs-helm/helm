@@ -738,12 +738,8 @@ regression)."
   :group 'helm
   :type '(repeat symbol))
 
-(defcustom helm-actions-inherit-frame-settings nil
-  "Actions inherit frame settings of initial command when non nil.
-
-The actions running from commands that are in
-`helm-commands-using-frame' that are themselves running helm will have
-a frame to display their `helm-buffer' when non nil."
+(defcustom helm-actions-inherit-frame-settings t
+  "Actions inherit helm frame settings of initial command when non nil."
   :group 'helm
   :type 'boolean)
 
@@ -1387,6 +1383,9 @@ This is only used when helm is using
 (defvar helm--last-frame-parameters nil
   "Frame parameters to save for later resuming.
 Local to `helm-buffer'.")
+(defvar helm--executing-helm-action nil
+  "Non nil when action is triggering a new helm-session.
+This happen when action is executed from `helm-exit-and-execute-action'")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -1850,12 +1849,21 @@ on action functions invoked as action from the action menu,
 i.e functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
+  (setq helm--executing-helm-action t)
   ;; Ensure action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
   (when helm-actions-inherit-frame-settings
     (helm-set-local-variable 'helm-display-function
-                             (with-helm-buffer helm-display-function)))
+                             (with-helm-buffer helm-display-function)
+                             'helm--last-frame-parameters
+                             (with-helm-buffer
+                               (helm--get-frame-parameters))))
   (helm-exit-minibuffer))
+
+(defun helm--get-frame-parameters (&optional frame)
+  (cl-loop with params = (frame-parameters frame)
+           for p in helm--frame-default-attributes
+           when (assq p params) collect it))
 
 (defalias 'helm-run-after-quit 'helm-run-after-exit)
 (make-obsolete 'helm-run-after-quit 'helm-run-after-exit "1.7.7")
@@ -2656,7 +2664,9 @@ The function used to display `helm-buffer' by calling
                     (if helm-actions-inherit-frame-settings
                         (helm-this-command) this-command)))))
     (prog1
-        (funcall disp-fn buffer (helm-resume-p resume))
+        (funcall disp-fn buffer (or (helm-resume-p resume)
+                                    (and helm-actions-inherit-frame-settings
+                                         helm--executing-helm-action)))
       (with-helm-buffer (setq-local helm-display-function disp-fn))
       (setq helm-onewindow-p (one-window-p t))
       ;; Don't allow other-window and friends switching out of minibuffer.
@@ -3205,9 +3215,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     (when (and helm--buffer-in-new-frame-p (null helm--nested))
       (with-helm-buffer
         (setq-local helm--last-frame-parameters
-                    (cl-loop with params = (frame-parameters)
-                             for p in helm--frame-default-attributes
-                             when (assq p params) collect it)))
+                    (helm--get-frame-parameters)))
       (if helm-display-buffer-reuse-frame
           (make-frame-invisible) (delete-frame))))
   (helm-kill-async-processes)
@@ -4351,8 +4359,10 @@ function."
   ;; Position can be change when `helm-current-buffer'
   ;; is split, so jump to this position before executing action.
   (helm-current-position 'restore)
-  (prog1 (helm-execute-selection-action-1)
-    (helm-log-run-hook 'helm-after-action-hook)))
+  (unwind-protect
+       (prog1 (helm-execute-selection-action-1)
+         (helm-log-run-hook 'helm-after-action-hook))
+    (setq helm--executing-helm-action nil)))
 
 (defun helm-execute-selection-action-1 (&optional
                                         selection action
