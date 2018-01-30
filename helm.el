@@ -2770,8 +2770,15 @@ Note that this feature is available only with emacs-25+."
         (setq-local helm-echo-input-in-header-line
                     (not (> (cdr pos) half-screen-size))))
       (helm-display-buffer-popup-frame buffer default-frame-alist)
+      ;; When frame size have been modified manually by user restore
+      ;; it to default value unless resuming or not using
+      ;; `helm-display-buffer-reuse-frame'.
+      ;; This have to be done AFTER raising the frame otherwise
+      ;; minibuffer visibility is lost until next session.
       (unless (or resume (not helm-display-buffer-reuse-frame))
-        (modify-frame-parameters (selected-frame) default-frame-alist)))
+        (set-frame-size helm-popup-frame
+                        (cdr (assq 'width default-frame-alist))
+                        (cdr (assq 'height default-frame-alist)))))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
