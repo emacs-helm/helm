@@ -77,7 +77,7 @@ is detected in pattern)."
   :group 'helm-locate)
 
 (defcustom helm-locate-create-db-command
-  "updatedb -l 0 -o %s -U %s"
+  "updatedb -l 0 -o '%s' -U '%s'"
   "Command used to create a locale locate db file."
   :type 'string
   :group 'helm-locate)
@@ -260,7 +260,7 @@ See also `helm-locate'."
              (replace-regexp-in-string
               "locate"
               (format (if helm-locate-fuzzy-match
-                          "locate -b -d %s" "locate -d %s")
+                          "locate -b -d '%s'" "locate -d '%s'")
                       (mapconcat 'identity
                                  ;; Remove eventually
                                  ;; marked directories by error.
