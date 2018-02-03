@@ -1913,6 +1913,22 @@ IOW Don't use VALUE of previous VAR to set the VALUE of next VAR.
                              collect (cons (car i) (cadr i)))
                     helm--local-variables))))
 
+(defun helm--set-local-variables-internal ()
+  (cl-loop for (var . val) in helm--local-variables
+           ;; If `helm-set-local-variable' is called twice or more
+           ;; on same variable use the last value entered which is
+           ;; the first on stack e.g.
+           ;; (helm-set-local-variable 'helm-foo 1)
+           ;; (helm-set-local-variable 'helm-foo 2)
+           ;; helm--local-variables => 
+           ;; '((helm-foo . 2) (helm-foo. 1))
+           ;; (helm-foo . 2) is retained and (helm-foo . 1)
+           ;; ignored.
+           unless (memq var computed)
+           do (set (make-local-variable var) val)
+           collect var into computed
+           finally (setq helm--local-variables nil)))
+
 
 ;; API helper
 (cl-defun helm-empty-buffer-p (&optional (buffer helm-buffer))
@@ -2983,9 +2999,7 @@ Unuseful when used outside helm, don't use it.")
       (helm-initialize-persistent-action)
       (helm-log "helm-display-function = %S" helm-display-function)
       (helm-log "helm--local-variables = %S" helm--local-variables)
-      (cl-loop for (var . val) in helm--local-variables
-               do (set (make-local-variable var) val)
-               finally (setq helm--local-variables nil))
+      (helm--set-local-variables-internal)
       (setq truncate-lines helm-truncate-lines) ; already local.
       (setq cursor-type nil))
     (helm-initialize-overlays helm-buffer)
