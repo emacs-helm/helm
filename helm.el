@@ -1852,7 +1852,8 @@ i.e functions called with RET."
   (setq helm--executing-helm-action t)
   ;; Ensure action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
-  (when helm-actions-inherit-frame-settings
+  (when (and helm-actions-inherit-frame-settings
+             helm--buffer-in-new-frame-p)
     (helm-set-local-variable 'helm-display-function
                              (with-helm-buffer helm-display-function)
                              'helm--last-frame-parameters
