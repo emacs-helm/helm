@@ -102,6 +102,11 @@ much more convenient to use a simple boolean value here."
 This list is build by default on `completion-ignored-extensions'.
 The directory names should end with \"/?\" e.g. \"\\.git/?\" and the
 file names should end with \"$\" e.g. \"\\.o$\".
+
+These regexps may be used to match the entire path, not just the file
+name, so for example to ignore files with a prefix \".bak.\", use
+\"\\.bak\\..*$\" as the regexp.
+
 NOTE: When modifying this, be sure to use customize interface or the
 customize functions e.g. `customize-set-variable' and NOT `setq'."
   :group 'helm-files
