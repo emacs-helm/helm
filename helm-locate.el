@@ -180,7 +180,8 @@ fall back to `default-directory' if FROM-FF is nil."
   "Default function used to create a locale locate db file.
 Argument DB-NAME name of the db file.
 Argument DIRECTORY root of file system subtree to scan."
-  (format helm-locate-create-db-command db-name directory))
+  (format helm-locate-create-db-command
+          db-name (expand-file-name directory)))
 
 (defvar helm-locate-create-db-function
   #'helm-locate-create-db-default-function
@@ -266,7 +267,12 @@ See also `helm-locate'."
                                  ;; marked directories by error.
                                  (cl-loop for i in db
                                        unless (file-directory-p i)
-                                       collect i) ":"))
+                                       ;; expand-file-name to resolve
+                                       ;; abbreviated fnames which
+                                       ;; doesn't expand inside single
+                                       ;; quotes i.e. '%s'.
+                                       collect (expand-file-name i))
+                                 ":"))
               helm-locate-command)
            (if (and helm-locate-fuzzy-match
                     (not (string-match-p "\\`locate -b" helm-locate-command)))
