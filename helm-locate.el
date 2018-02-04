@@ -268,8 +268,8 @@ See also `helm-locate'."
                                  (cl-loop for i in db
                                        unless (file-directory-p i)
                                        ;; expand-file-name to resolve
-                                       ;; abbreviated fnames which
-                                       ;; doesn't expand inside single
+                                       ;; abbreviated fnames not
+                                       ;; expanding inside single
                                        ;; quotes i.e. '%s'.
                                        collect (expand-file-name i))
                                  ":"))
