@@ -57,10 +57,39 @@ Each key is an Emacs command that use originaly `completing-read'.
 Each value maybe an helm function that take same arguments as
 `completing-read' plus NAME and BUFFER, where NAME is the name of the new
 helm source and BUFFER the name of the buffer we will use.
-This function prefix name must start by \"helm\".
 
-See `helm-completing-read-symbols' for example.
+`helm' will use the name of the command calling `completing-read' as
+NAME and BUFFER will be computed as well with NAME but prefixed with
+\"*helm-mode-\".
 
+This function prefix name must start by \"helm-\", if it doesn't `helm'
+assumes the function is not a helm function and takes same args as
+`completing-read'.
+This allow you to define an handler not using helm completion, in this
+case give it the same args as `completing-read'.
+
+Example:
+
+    (defun foo/test ()
+      (interactive)
+      (message \"%S\" (completing-read \"test: \" '(a b c d e))))
+
+    (defun helm-foo/test-completing-read-handler (prompt collection
+                                                  predicate require-match
+                                                  initial-input hist def
+                                                  inherit-input-method
+                                                  name buffer)
+      (helm-comp-read prompt collection :marked-candidates t
+                                        :name name
+                                        :buffer buffer))
+
+    (add-to-list 'helm-completing-read-handlers-alist
+                 '(foo/test . helm-foo/test-completing-read-handler))
+
+
+We want here to make the regular `completing-read' in `foo/test'
+returns a list of candidate(s) instead of a single candidate.
+ 
 Note that this function will be reused for ALL the `completing-read'
 of this command, so it should handle all cases, e.g
 If first `completing-read' complete against symbols and
