@@ -98,16 +98,25 @@ your specialized function should handle the both.
 
 If the value of an entry is nil completion will fall back to
 emacs vanilla behavior.
-e.g If you want to disable helm completion for `describe-function':
-\(describe-function . nil\).
+Example:
+
+If you want to disable helm completion for `describe-function':
+
+    (describe-function . nil)
 
 Ido is also supported, you can use `ido-completing-read' and
 `ido-read-file-name' as value of an entry or just 'ido.
-e.g ido completion for `find-file':
-\(find-file . ido\)
+Example:
+Enable ido completion for `find-file':
+
+    (find-file . ido)
+
 same as
-\(find-file . ido-read-file-name\)
-Note that you don't need to enable `ido-mode' for this to work."
+
+    (find-file . ido-read-file-name)
+
+Note that you don't need to enable `ido-mode' for this to work.
+See `helm-mode' documentation."
   :group 'helm-mode
   :type '(alist :key-type symbol :value-type symbol))
 
@@ -1337,6 +1346,11 @@ Some crap emacs functions may not be supported,
 e.g `ffap-alternate-file' and maybe others
 You can add such functions to `helm-completing-read-handlers-alist'
 with a nil value.
+
+About `ido-mode':
+When you are using `helm-mode', DO NOT use `ido-mode', instead if you
+want some commands use `ido' add these commands to
+`helm-completing-read-handlers-alist' with ido as value.
 
 Note: This mode is incompatible with Emacs23."
   :group 'helm-mode
