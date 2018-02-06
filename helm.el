@@ -1367,7 +1367,9 @@ at end of session.")
 (defvar helm--cycle-resume-iterator nil)
 (defvar helm--buffer-in-new-frame-p nil)
 (defvar helm-initial-frame nil
-  "The selected frame before starting helm.")
+  "[INTERNAL] The selected frame before starting helm.
+Helm use this internally to know in which frame it started, don't
+modify this yourself.")
 (defvar helm-popup-frame nil
   "The frame where helm is displayed.
 
