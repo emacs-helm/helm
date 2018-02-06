@@ -211,6 +211,7 @@ Note that this variable is buffer-local.")
 
 (defvar helm-buffer-max-len-mode nil)
 (defvar helm-buffers-in-project-p nil)
+(defvar helm-source-buffers-list nil)
 
 (defun helm-buffers-list--init ()
   (require 'dired)
@@ -257,8 +258,6 @@ Note that this variable is buffer-local.")
    (nohighlight :initform t)
    (resume :initform (lambda () (setq helm-buffers-in-project-p nil)))
    (help-message :initform 'helm-buffer-help-message)))
-
-(defvar helm-source-buffers-list nil)
 
 (defvar helm-source-buffer-not-found
   (helm-build-dummy-source
