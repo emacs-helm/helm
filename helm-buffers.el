@@ -221,7 +221,15 @@ Note that this variable is buffer-local.")
   ;; reused in each source (issue #1907), now 'candidates attr is set
   ;; directly so that each list of candidates is local to source.
   (helm-attrset 'candidates (funcall (helm-attr 'buffer-list)))
-  (let ((result (cl-loop for b in (helm-attr 'candidates)
+  (let ((result (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers
+                                              (helm-attr
+                                               'filtered-candidate-transformer
+                                               helm-source-buffers-list))
+                         for b in (if allbufs
+                                      (helm-attr 'candidates)
+                                    (helm-skip-boring-buffers
+                                     (helm-attr 'candidates)
+                                     helm-source-buffers-list))
                          maximize (length b) into len-buf
                          maximize (length (with-current-buffer b
                                             (format-mode-line mode-name)))
