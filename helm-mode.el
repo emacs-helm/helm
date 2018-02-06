@@ -48,13 +48,20 @@
     (find-file-at-point . helm-completing-read-sync-default-handler)
     (ffap . helm-completing-read-sync-default-handler)
     (execute-extended-command . nil))
-  "Alist of handlers to replace `completing-read', `read-file-name' in `helm-mode'.
-Each entry is a cons cell like \(emacs_command . completing-read_handler\)
+  "Completing read functions for specific Emacs commands.
+
+By default `helm-mode' use `helm-completing-read-default-handler' to
+provide helm completion in each `completing-read' or `read-file-name'
+found, but other functions can be specified here for specific
+commands. This also allow disabling helm completion for some commands
+when needed.
+ 
+Each entry is a cons cell like (EMACS_COMMAND . COMPLETING-READ_HANDLER)
 where key and value are symbols.
 
 Each key is an Emacs command that use originaly `completing-read'.
 
-Each value maybe a helm function that take same arguments as
+Each value maybe a helm function that takes same arguments as
 `completing-read' plus NAME and BUFFER, where NAME is the name of the new
 helm source and BUFFER the name of the buffer we will use, but it can
 be also a function not using helm, in this case the function should
