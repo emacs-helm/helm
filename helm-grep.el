@@ -673,6 +673,8 @@ If N is positive go forward otherwise go backward."
         ;; Exit when current-fname is not matched or in `helm-grep-mode'
         ;; the line is not a grep line i.e 'fname:num:tag'.
         (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
+        (when helm-allow-mouse
+          (helm--mouse-reset-selection-help-echo))
         (unless (or (string= current-fname
                              (car (helm-grep-split-line sel)))
                     (and (eq major-mode 'helm-grep-mode)
