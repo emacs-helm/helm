@@ -3049,7 +3049,8 @@ Use it for non--interactive calls of `helm-find-files'."
   ;; `helm-update' is called many times before resolving
   ;; the abbreviated path (Issue #1939) so be sure to pass a
   ;; full path to helm-find-files-1.
-  (setq fname (expand-file-name (substitute-in-file-name fname)))
+  (unless (string-match-p helm-ff-url-regexp fname)
+    (setq fname (expand-file-name (substitute-in-file-name fname))))
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (setq helm-find-files--toggle-bookmark nil)
