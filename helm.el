@@ -2796,8 +2796,8 @@ Note that this feature is available only with emacs-25+."
       ;; minibuffer visibility is lost until next session.
       (unless (or resume (not helm-display-buffer-reuse-frame))
         (set-frame-size helm-popup-frame
-                        (cdr (assq 'width default-frame-alist))
-                        (cdr (assq 'height default-frame-alist)))))
+                        helm-display-buffer-width
+                        helm-display-buffer-height)))
     (helm-log-run-hook 'helm-window-configuration-hook)))
 
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
