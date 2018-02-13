@@ -875,7 +875,7 @@ With optional arg MERGE call `ediff-merge-buffers'."
        (setq buf1 (cl-first (helm-marked-candidates))
              buf2 (cl-second (helm-marked-candidates))))
       (t
-       (error "Error:To much buffers marked!")))
+       (error "Error:Too many buffers marked!")))
     (if merge
         (ediff-merge-buffers buf1 buf2)
       (ediff-buffers buf1 buf2))))
