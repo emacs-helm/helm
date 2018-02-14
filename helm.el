@@ -860,6 +860,9 @@ This hook runs after `helm-buffer' is created but not from
 (defvaralias 'helm-update-hook 'helm-after-update-hook)
 (make-obsolete-variable 'helm-update-hook 'helm-after-update-hook "1.9.9")
 
+(defvar helm-before-update-hook nil
+  "Runs before updating the helm buffer with the new input pattern.")
+
 (defvar helm-after-update-hook nil
   "Runs after updating the helm buffer with the new input pattern.")
 
@@ -1335,6 +1338,8 @@ See `helm-exit-minibuffer' and `helm-keyboard-quit'.")
   "[INTERNAL] A simple flag to notify persistent action we are following.")
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
+(defvar helm--updating-p nil
+  "Set to non-nil while `helm-update' is running.")
 (defvar helm--in-fuzzy nil)
 (defvar helm--maybe-use-default-as-input nil
   "Flag to notify the use of use-default-as-input.
@@ -3941,6 +3946,7 @@ without recomputing them, it should be a list of lists."
   ;; we have two windows even with `helm-full-frame'.
   ;; So go back to one window when updating if `helm-full-frame'
   ;; is non-`nil'.
+  (setq helm--updating-p t)
   (with-helm-window
     (when (and helm-onewindow-p
                (not (helm-action-window)))
@@ -3975,7 +3981,8 @@ without recomputing them, it should be a list of lists."
              ;; Move to first line only when there is matches
              ;; to avoid cursor moving upside down (issue #1703).
              (helm--update-move-first-line)
-             (helm--reset-update-flag)))
+             (helm--reset-update-flag)
+             (setq helm--updating-p nil)))
       ;; When there is only one async source, update mode-line and run
       ;; `helm-after-update-hook' in `helm-output-filter--post-process',
       ;; when there is more than one source, update mode-line and run
@@ -3988,7 +3995,8 @@ without recomputing them, it should be a list of lists."
       (when preselect
         (helm-log "Update preselect candidate %s" preselect)
         (helm-preselect preselect source))
-      (setq helm--force-updating-p nil))
+      (setq helm--force-updating-p nil)
+      (setq helm--updating-p nil))
     (helm-log "end update")))
 
 (defun helm-update-source-p (source)
@@ -4046,6 +4054,7 @@ passed as argument to `recenter'."
   "Force recalculation and update of candidates."
   (interactive)
   (with-helm-alive-p
+    (helm-log-run-hook 'helm-before-update-hook)
     (helm-force-update)))
 (put 'helm-refresh 'helm-only t)
 
