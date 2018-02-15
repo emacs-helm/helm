@@ -621,8 +621,8 @@ You can open a dired buffer containing only marked files with `\\<helm-find-file
 With a prefix argument you can open this same dired buffer in wdired mode for
 editing.  Note that wildcards are supported as well, so you can use e.g.
 \"*.txt\" to select all \".txt\" files in the current directory or \"**.txt\" to
-select all files recursively from the current directory.  See [[Using wildcard to
-select multiple files]] section above.
+select all files recursively from the current directory.
+See [[Use the wildcard to select multiple files]] section above.
 
 *** Defining default target directory for copying, renaming, etc
 
