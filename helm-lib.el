@@ -638,8 +638,12 @@ This is same as `remove-duplicates' but with memoisation.
 It is much faster, especially in large lists.
 A test function can be provided with TEST argument key.
 Default is `eq'.
-NOTE: Comparison of special elisp objects fails because their printed
-representation which is stored in hash-tables can't be compared."
+NOTE: Comparison of special elisp objects (e.g. markers etc...) fails
+because their printed representations which are stored in hash-table
+can't be compared with with the real object in SEQ.
+This is a bug in `puthash' which store the printable representation of
+object instead of storing the object itself, this to provide at the
+end a printable representation of hashtable itself."
   (cl-loop with cont = (make-hash-table :test test)
            for elm in seq
            unless (gethash elm cont)
