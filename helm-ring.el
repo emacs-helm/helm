@@ -523,7 +523,12 @@ This command is useful when used with persistent action."
       (setq last-kbd-macro
             (mapconcat 'identity
                        (cl-loop for km in mkd
-                                collect (car km))
+                                if (vectorp km)
+                                append (cl-loop for k across km collect
+                                                (key-description (vector k)))
+                                into result
+                                else collect (car km) into result
+                                finally return result)
                        "")))))
 
 (defun helm-kbd-macro-delete-macro (_candidate)
