@@ -1852,7 +1852,7 @@ i.e functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
   (setq helm--executing-helm-action t)
-  ;; Ensure action use same display function as initial helm-buffer when
+  ;; Ensure next action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
   (when (and helm-actions-inherit-frame-settings
              helm--buffer-in-new-frame-p)
