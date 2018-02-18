@@ -3093,7 +3093,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                       (funcall helm-execute-action-at-once-if-one)
                     helm-execute-action-at-once-if-one)
                   (= (helm-get-candidate-number
-                      (eq helm-execute-action-at-once-if-one 'current-source)) 1))
+                      (eq helm-execute-action-at-once-if-one 'current-source))
+                     1))
              (ignore))              ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
                   (= (helm-get-candidate-number) 0))
