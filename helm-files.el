@@ -2859,8 +2859,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (unless (file-directory-p image-dired-dir)
                    (make-directory image-dired-dir))
                  (switch-to-buffer image-dired-display-image-buffer)
-                 (image-dired-display-image candidate)
-                 (message nil)
+                 (cl-letf (((symbol-function 'message) #'ignore))
+                   (image-dired-display-image candidate))
                  (with-current-buffer image-dired-display-image-buffer
                    (let ((exif-data (helm-ff-exif-data candidate)))
                      (setq default-directory helm-ff-default-directory)
