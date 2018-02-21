@@ -2304,8 +2304,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-buffer (or any-buffer helm-buffer)))
                (helm-initialize
                 any-resume any-input any-default any-sources)
-               (helm-display-buffer helm-buffer any-resume)
-               (select-window (helm-window))
+               (unless helm-execute-action-at-once-if-one
+                 (helm-display-buffer helm-buffer any-resume)
+                 (select-window (helm-window)))
                ;; We are now in helm-buffer.
                (unless helm-allow-mouse
                  (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
@@ -3036,13 +3037,15 @@ please don't use it outside helm.
                                            any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
-  (if (and (helm-resume-p any-resume)
+  (with-helm-buffer
+    (if (and (helm-resume-p any-resume)
            ;; When no source, helm-buffer is empty
            ;; or contain non--candidate lines (e.g grep exit status)
            (helm-get-current-source))
       (helm-mark-current-line t)
-    (helm-update any-preselect))
-  (with-helm-buffer
+    (helm-update any-preselect)
+    (helm-skip-noncandidate-line 'next)
+    (helm-mark-current-line))
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
            (hist       (or (and any-history (symbolp any-history) any-history)
@@ -3105,6 +3108,9 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
              (let ((tap (or any-default
                             (with-helm-current-buffer
                               (thing-at-point 'symbol)))))
+               (when helm-execute-action-at-once-if-one
+                 (helm-display-buffer helm-buffer any-resume)
+                 (select-window (helm-window)))
                (unwind-protect
                    (minibuffer-with-setup-hook
                        (lambda ()
@@ -3950,10 +3956,14 @@ without recomputing them, it should be a list of lists."
   ;; we have two windows even with `helm-full-frame'.
   ;; So go back to one window when updating if `helm-full-frame'
   ;; is non-`nil'.
-  (with-helm-window
-    (when (and helm-onewindow-p
-               (not (helm-action-window)))
-      (delete-other-windows)))
+  (when (with-helm-buffer
+          (and helm-onewindow-p
+               ;; We are not displaying helm-buffer in a frame and
+               ;; helm-window is already displayed.
+               (not helm--buffer-in-new-frame-p)
+               (helm-window)
+               (not (helm-action-window))))
+    (with-helm-window (delete-other-windows)))
   (with-current-buffer (helm-buffer-get)
     (set (make-local-variable 'helm-input-local) helm-pattern)
     (unwind-protect
@@ -4994,7 +5004,7 @@ first source."
   "Move `helm-selection-overlay' to current line.
 Note that this is unrelated to visible marks used for marking
 candidates."
-  (with-helm-window
+  (with-helm-buffer
     (when resumep
       (goto-char helm-selection-point))
     (move-overlay
