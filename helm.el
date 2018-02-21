@@ -2304,6 +2304,12 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                    (helm-buffer (or any-buffer helm-buffer)))
                (helm-initialize
                 any-resume any-input any-default any-sources)
+               ;; We don't display helm-buffer here to avoid popping
+               ;; up a window or a frame when exiting immediately when
+               ;; only one candidate (this avoid having the helm frame
+               ;; flashing), lets first compute candidates and if more
+               ;; than one display helm-buffer (this is done later in
+               ;; helm-read-pattern-maybe).
                (unless helm-execute-action-at-once-if-one
                  (helm-display-buffer helm-buffer any-resume)
                  (select-window (helm-window)))
@@ -3044,6 +3050,10 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            (helm-get-current-source))
       (helm-mark-current-line t)
     (helm-update any-preselect)
+    ;; FIXME normally this should not be needed because `helm-update'
+    ;; calls `helm--update-move-first-line', but since we are not
+    ;; displaying helm-buffer before helm-read-pattern-maybe is called
+    ;; we ends up with a helm buffer with selection on header line.
     (helm-skip-noncandidate-line 'next)
     (helm-mark-current-line))
     (let* ((src        (helm-get-current-source))
@@ -5002,7 +5012,10 @@ first source."
 
 (defun helm-mark-current-line (&optional resumep nomouse)
   "Move `helm-selection-overlay' to current line.
-Note that this is unrelated to visible marks used for marking
+When RESUMEP is non nil move overlay to `helm-selection-point'.
+When NOMOUSE is specified do not set mouse bindings.
+
+Note that selection is unrelated to visible marks used for marking
 candidates."
   (with-helm-buffer
     (when resumep
