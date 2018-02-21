@@ -5236,7 +5236,7 @@ element of the cons cell, then the second, and so on. This allows
 selection of duplicate candidates after the first.
 
 Optional argument SOURCE is a Helm source object."
-  (with-helm-window
+  (with-helm-buffer
     (when candidate-or-regexp
       (if source
           (helm-goto-source source)
