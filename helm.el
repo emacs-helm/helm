@@ -3039,8 +3039,8 @@ please don't use it outside helm.
   (setq helm--maybe-use-default-as-input nil))
 
 (defun helm-read-pattern-maybe (any-prompt any-input
-                                           any-preselect any-resume any-keymap
-                                           any-default any-history)
+                                any-preselect any-resume any-keymap
+                                any-default any-history)
   "Read pattern with prompt ANY-PROMPT and initial input ANY-INPUT.
 For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
   (with-helm-buffer
@@ -4021,7 +4021,7 @@ without recomputing them, it should be a list of lists."
     (helm-log "end update")))
 
 (defun helm-update-source-p (source)
-  "Whether SOURCE need updating or not."
+  "Whether SOURCE needs updating or not."
   (let ((len (string-width
               (if (assq 'multimatch source)
                   ;; Don't count spaces entered when using
@@ -4563,7 +4563,7 @@ Returns nil for any other value of UNIT."
   "Skip source header or candidates separator when going in DIRECTION.
 DIRECTION is either 'next or 'previous.
 Same as `helm-skip-header-and-separator-line' but ensure
-point is moved to the right place when at bop or eob."
+point is moved to the right place when at bob or eob."
   (helm-skip-header-and-separator-line direction)
   (and (bobp) (forward-line 1))     ; Skip first header.
   (and (eobp) (forward-line -1)))   ; Avoid last empty line.
