@@ -4012,7 +4012,9 @@ without recomputing them, it should be a list of lists."
           (helm-log-run-hook 'helm-after-update-hook)))
       (when preselect
         (helm-log "Update preselect candidate %s" preselect)
-        (helm-preselect preselect source))
+        (if (helm-window)
+            (with-helm-window (helm-preselect preselect source))
+          (helm-preselect preselect source)))
       (setq helm--force-updating-p nil))
     (helm-log "end update")))
 
