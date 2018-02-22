@@ -3051,13 +3051,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            ;; or contain non--candidate lines (e.g grep exit status)
            (helm-get-current-source))
       (helm-mark-current-line t)
-    (helm-update any-preselect)
-    ;; FIXME normally this should not be needed because `helm-update'
-    ;; calls `helm--update-move-first-line', but since we are not
-    ;; displaying helm-buffer before helm-read-pattern-maybe is called
-    ;; we ends up with a helm buffer with selection on header line.
-    (helm-skip-noncandidate-line 'next)
-    (helm-mark-current-line))
+    (helm-update any-preselect))
     (let* ((src        (helm-get-current-source))
            (src-keymap (assoc-default 'keymap src))
            (hist       (or (and any-history (symbolp any-history) any-history)
@@ -4047,9 +4041,13 @@ without recomputing them, it should be a list of lists."
 (defun helm--update-move-first-line ()
   "Goto first line of `helm-buffer'."
   (goto-char (point-min))
-  (helm-move-selection-common :where 'line
-                              :direction 'next
-                              :follow t))
+  (if (helm-window)
+      (helm-move-selection-common :where 'line
+                                  :direction 'next
+                                  :follow t)
+    (forward-line 1)
+    (helm-mark-current-line)
+    (helm-follow-execute-persistent-action-maybe)))
 
 (cl-defun helm-force-update (&optional preselect (recenter t))
   "Force recalculation and update of candidates.
