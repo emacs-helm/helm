@@ -1734,12 +1734,14 @@ If NO-UPDATE is non-`nil', skip executing `helm-update'."
 
 (defun helm-get-selection (&optional buffer force-display-part source)
   "Return the currently selected item or nil.
+
 if BUFFER is nil or unspecified, use helm-buffer as default value.
 If FORCE-DISPLAY-PART is non-`nil', return the display string.
-If FORCE-DISPLAY-PART value is 'withprop the display string is returned
+If FORCE-DISPLAY-PART value is `withprop' the display string is returned
 with its properties."
   (setq buffer (or buffer helm-buffer))
-  (unless (helm-empty-buffer-p buffer)
+  (unless (or (helm-empty-buffer-p buffer)
+              (helm-pos-header-line-p))
     (with-current-buffer buffer
       (let* ((disp-fn (if (eq force-display-part 'withprop)
                           'buffer-substring
