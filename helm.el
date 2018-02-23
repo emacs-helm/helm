@@ -2795,7 +2795,7 @@ Note that this feature is available only with emacs-25+."
                 (vertical-scroll-bars . nil)
                 (menu-bar-lines . 0)
                 (fullscreen . nil)
-                (visible . ,(null helm-display-buffer-reuse-frame))
+                (visibility . ,(null helm-display-buffer-reuse-frame))
                 (minibuffer . t))))
            display-buffer-alist)
       ;; Add the hook inconditionally, if
