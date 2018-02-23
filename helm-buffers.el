@@ -103,6 +103,10 @@ this source is accessible and properly loaded."
   :type 'string
   :group 'helm-buffers)
 
+(defcustom helm-buffers-column-separator "  "
+  "Separator for columns in buffer listing."
+  :type 'string
+  :group 'helm-buffers)
 
 ;;; Faces
 ;;
@@ -440,8 +444,12 @@ Should be called after others transformers i.e (boring buffers)."
                                (concat
                                 (funcall helm-fuzzy-matching-highlight-fn
                                          truncbuf)
-                                "\t" formatted-size
-                                "  " fmode "  " meta)
+                                helm-buffers-column-separator
+                                formatted-size
+                                helm-buffers-column-separator
+                                fmode
+                                helm-buffers-column-separator
+                                meta)
                              (funcall helm-fuzzy-matching-highlight-fn name))
                            (get-buffer i)))))
 
