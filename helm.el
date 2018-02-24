@@ -1380,7 +1380,7 @@ This is only used when helm is using
 (defconst helm--frame-default-attributes
   '(width height tool-bar-lines left top
     title undecorated vertical-scroll-bars
-    visible fullscreen menu-bar-lines undecorated)
+    visibility fullscreen menu-bar-lines undecorated)
   "Frame parameters to save in `helm--last-frame-parameters'.")
 (defvar helm--last-frame-parameters nil
   "Frame parameters to save for later resuming.
