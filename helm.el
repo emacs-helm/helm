@@ -225,6 +225,7 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-{")        'helm-enlarge-window)
     (define-key map (kbd "C-c -")      'helm-swap-windows)
     (define-key map (kbd "C-c _")      'helm-toggle-full-frame)
+    (define-key map (kbd "C-c %")      'helm-exchange-minibuffer-and-header-line)
     (define-key map (kbd "C-c C-y")    'helm-yank-selection)
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
     (define-key map (kbd "C-c C-i")    'helm-copy-to-buffer)
@@ -4697,6 +4698,23 @@ mode and header lines."
                :background (face-background 'default))
          header-line-format)
         (when update (force-mode-line-update))))))
+
+(defun helm-exchange-minibuffer-and-header-line ()
+  "Display minibuffer in header-line and vice versa.
+
+This is a toggle command."
+  (interactive)
+  (with-helm-window
+    (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
+    (setq-local helm-echo-input-in-header-line
+                (not helm-echo-input-in-header-line))
+    (with-selected-window (minibuffer-window)
+      (if (with-helm-buffer helm-echo-input-in-header-line)
+          (helm-hide-minibuffer-maybe)
+        (remove-overlays)
+        (setq cursor-type t)))
+    (helm-display-mode-line (helm-get-current-source) t)))
+(put 'helm-exchange-minibuffer-and-header-line 'helm-only t)
 
 (defun helm--update-header-line ()
   ;; This should be used in `post-command-hook',
