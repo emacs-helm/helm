@@ -222,8 +222,8 @@
     :documentation
     "  A string to explain persistent-action of this source. It also
   accepts a function or a variable name.
-  It will be displayed in `header-line'.
-  Have no effect when `helm-echo-input-in-header-line' is non--nil.")
+  It will be displayed in `header-line' or in `minibuffer' depending
+  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.")
 
    (help-message
     :initarg :help-message
@@ -525,7 +525,8 @@
     :custom (choice string function)
     :documentation
     "  Source local `header-line-format'.
-  Have no effect when `helm-echo-input-in-header-line' is non--nil.
+  It will be displayed in `header-line' or in `minibuffer' depending
+  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.")
   It accepts also variable/function name.")
 
    (resume
