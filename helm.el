@@ -1857,6 +1857,10 @@ i.e functions called with RET."
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
   (setq helm--executing-helm-action t)
+  ;; When toggling minibuffer and header-line, we want next action
+  ;; inherit this setting.
+  (helm-set-local-variable 'helm-echo-input-in-header-line
+                           (with-helm-buffer helm-echo-input-in-header-line))
   ;; Ensure next action use same display function as initial helm-buffer when
   ;; helm-actions-inherit-frame-settings is non nil.
   (when (and helm-actions-inherit-frame-settings
@@ -2801,13 +2805,18 @@ Note that this feature is available only with emacs-25+."
                 (visibility . ,(null helm-display-buffer-reuse-frame))
                 (minibuffer . t))))
            display-buffer-alist)
-      ;; Add the hook inconditionally, if
-      ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
-      ;; will have anyway no effect so no need to remove the hook.
-      (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
-      (with-helm-buffer
-        (setq-local helm-echo-input-in-header-line
-                    (not (> (cdr pos) half-screen-size))))
+      ;; Display minibuffer above or below only in initial session,
+      ;; not on a session triggered by action, this way if user have
+      ;; toggled minibuffer and header-line manually she keeps this
+      ;; setting in next action.
+      (unless helm--executing-helm-action
+        ;; Add the hook inconditionally, if
+        ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
+        ;; will have anyway no effect so no need to remove the hook.
+        (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
+        (with-helm-buffer
+          (setq-local helm-echo-input-in-header-line
+                      (not (> (cdr pos) half-screen-size)))))
       (helm-display-buffer-popup-frame buffer default-frame-alist)
       ;; When frame size have been modified manually by user restore
       ;; it to default value unless resuming or not using
