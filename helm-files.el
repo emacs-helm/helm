@@ -3792,6 +3792,8 @@ This is the starting point for nearly all actions you can do on files."
                                  helm--last-frame-parameters)))
     (set-text-properties 0 (length input) nil input)
     (setq current-prefix-arg nil)
+    ;; Allow next helm session to reuse helm--last-frame-parameters as
+    ;; resume would do.
     (let ((helm--executing-helm-action (not (null hist))))
       (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
                                     (concat "^" (regexp-quote presel)))))))

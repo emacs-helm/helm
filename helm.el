@@ -1387,7 +1387,9 @@ This is only used when helm is using
 Local to `helm-buffer'.")
 (defvar helm--executing-helm-action nil
   "Non nil when action is triggering a new helm-session.
-This happen when action is executed from `helm-exit-and-execute-action'")
+This may be let bounded in other places to notify the display function
+to reuse the same frame parameters as the previous helm session just
+like resume would do.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
