@@ -3030,6 +3030,7 @@ Show the first `helm-ff-history-max-length' elements of
                   :buffer helm-ff-history-buffer-name
                   :allow-nest t))
         helm-ff-history))))
+(put 'helm-find-files-history 'helm-only t)
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
