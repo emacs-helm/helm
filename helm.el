@@ -4700,7 +4700,7 @@ mode and header lines."
         (when update (force-mode-line-update))))))
 
 (defun helm-exchange-minibuffer-and-header-line ()
-  "Display minibuffer in header-line and vice versa.
+  "Display minibuffer in header-line and vice versa for current helm session.
 
 This is a toggle command."
   (interactive)
