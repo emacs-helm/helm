@@ -526,7 +526,7 @@
     :documentation
     "  Source local `header-line-format'.
   It will be displayed in `header-line' or in `minibuffer' depending
-  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.")
+  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.
   It accepts also variable/function name.")
 
    (resume
