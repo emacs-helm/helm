@@ -2809,7 +2809,7 @@ Note that this feature is available only with emacs-25+."
       ;; not on a session triggered by action, this way if user have
       ;; toggled minibuffer and header-line manually she keeps this
       ;; setting in next action.
-      (unless helm--executing-helm-action
+      (unless (or helm--executing-helm-action resume)
         ;; Add the hook inconditionally, if
         ;; helm-echo-input-in-header-line is nil helm-hide-minibuffer-maybe
         ;; will have anyway no effect so no need to remove the hook.
