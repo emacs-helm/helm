@@ -211,6 +211,7 @@ Italic     => A non-file buffer.
 \\[helm-buffer-save-persistent]\t\tSave buffer without leaving Helm.
 \\[helm-buffer-run-kill-buffers]\t\tDelete marked buffers and leave Helm.
 \\[helm-buffer-run-kill-persistent]\t\tDelete buffer without leaving Helm.
+\\[helm-buffer-run-rename-buffer]\t\tRename buffer.
 \\[helm-toggle-all-marks]\t\tToggle all marks.
 \\[helm-mark-all]\t\tMark all.
 \\[helm-toggle-buffers-details]\t\tToggle details.

@@ -141,6 +141,7 @@
    "Query replace `M-%'" 'helm-buffer-query-replace
    "View buffer" 'view-buffer
    "Display buffer" 'display-buffer
+   "Rename buffer" 'helm-buffers-rename-buffer
    "Grep buffers `M-g s' (C-u grep all buffers)"
    'helm-zgrep-buffers
    "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action

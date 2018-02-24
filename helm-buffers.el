@@ -193,6 +193,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-x C-s")   'helm-buffer-save-persistent)
     (define-key map (kbd "C-M-%")     'helm-buffer-run-query-replace-regexp)
     (define-key map (kbd "M-%")       'helm-buffer-run-query-replace)
+    (define-key map (kbd "M-R")       'helm-buffer-run-rename-buffer)
     (define-key map (kbd "M-m")       'helm-toggle-all-marks)
     (define-key map (kbd "M-a")       'helm-mark-all)
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
@@ -723,6 +724,17 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
     (helm-execute-persistent-action 'save-action)))
 (put 'helm-buffer-save-persistent 'helm-only t)
+
+(defun helm-buffers-rename-buffer (candidate)
+  (with-current-buffer candidate
+    (rename-buffer (helm-read-string "New name: " (buffer-name)) t)))
+
+(defun helm-buffer-run-rename-buffer ()
+  "Run rename buffer action from `helm-source-buffers-list'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-buffers-rename-buffer)))
+(put 'helm-buffer-run-rename-buffer 'helm-only t)
 
 (defun helm-buffer-run-kill-persistent ()
   "Kill buffer without quitting helm."
