@@ -3780,10 +3780,21 @@ This is the starting point for nearly all actions you can do on files."
                                        (null hist)
                                        (not (string-match-p "[.]\\{1,2\\}\\'" it)))
                                   (helm-basename it) it))))
+    ;; Continue using the same display function as history which used
+    ;; probably itself the same display function as inner HFF call,
+    ;; i.e. if history was using frame use a frame otherwise use a window.
+    (when (and hist (buffer-live-p (get-buffer helm-ff-history-buffer-name)))
+      (helm-set-local-variable 'helm-display-function
+                               (with-current-buffer helm-ff-history-buffer-name
+                                 helm-display-function)
+                               'helm--last-frame-parameters
+                               (with-current-buffer helm-ff-history-buffer-name
+                                 helm--last-frame-parameters)))
     (set-text-properties 0 (length input) nil input)
     (setq current-prefix-arg nil)
-    (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
-                                  (concat "^" (regexp-quote presel))))))
+    (let ((helm--executing-helm-action (not (null hist))))
+      (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
+                                    (concat "^" (regexp-quote presel)))))))
 
 ;;;###autoload
 (defun helm-delete-tramp-connection ()
