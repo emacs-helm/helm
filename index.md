@@ -106,88 +106,33 @@ backward compatibility.
 
 ![helm-grep-ag](images/helm-grep-ag-persistent.png)
 
+# Features
+
+In addition of its framework where you can build your own `Helm` applications, `Helm` provides preconfigured commands to
+browse and search incrementally in files, buffers, bookmarks etc... and much more.
+
+_Note:_ You will find many helm extensions providing diverse features sometimes already implemented in `Helm`, 
+prefer generally the ones that are natively in `Helm`, e.g. `Helm` support natively most grep implementations as backend (ack, ag, rg),
+no need to install 3rd party packages for this.
+
 # Requirements
 
 Helm requires Emacs-24.4 or later versions.
 
-Helm installs [async](https://github.com/jwiegley/emacs-async) package as a dependency
+Helm installs [async](https://github.com/jwiegley/emacs-async) and [popup-el](https://github.com/auto-complete/popup-el) package as dependencies
 when Helm is installed using [MELPA](https://melpa.org/). 
-
-Helm installation from the git source repository does not include
-async. The async package is recommended for smooth asynchronous file
-and dired operations in Helm.
 
 # Getting Started
 
 ## Quick install from git
 
-  1. Clone the `helm` repository to some directory:
-  
-    ```elisp
-    $ git clone https://github.com/emacs-helm/helm.git /path/to/helm/directory
-    ```
+See https://github.com/emacs-helm/helm/wiki#from-source
 
-  2. Clone the `async` repository to some directory (facultative)
-
-    ```elisp
-    $ git clone https://github.com/jwiegley/emacs-async.git /path/to/async/directory
-    ```
-  3. Run `make` from the `helm` directory.
-  
-  3. Add to `.emacs.el` (or equivalent):
-
-    ```elisp
-    ;; If async is installed
-    (add-to-list 'load-path "/path/to/async/directory")
-    
-    (add-to-list 'load-path "/path/to/helm/directory")
-    (require 'helm-config)
-    ```
-    
 _NOTE:_ Installing helm using git and make is the safest way.
-
-To quickly run `helm`, launch this script from helm directory:
-
-`./emacs-helm.sh`
-
-Also use the same script above for bug reporting.
-
-_NOTE:_ This script does not work on Windows systems.
 
 ## Install from Emacs packaging system
 
-Helm can also be installed from MELPA repository at https://melpa.org/.
-You will find the instructions to install packages from MELPA [here](https://github.com/melpa/melpa#usage).
-
-No further configuration is necessary to run helm other than perhaps a
-one-line entry in the Emacs init file:
-
-```elisp
-(require 'helm-config)
-```
-
-_WARNING:_ Helm upgrades from MELPA repository encountered errors
-because of the way package.el fetched and compiled updates for
-existing packages. To get around these errors, Helm adds
-[Async](https://github.com/jwiegley/emacs-async) as a dependency
-package install. Async forces compilation in a clean environment,
-which solves those compilation errors. Since async has other benefits
-as well, both for Helm and other packages, we recommend installing
-async even for Helm installs using git. See
-[FAQ](https://github.com/emacs-helm/helm/wiki#faq) for details.
-
-_Note:_ Restart Emacs for Helm updates from MELPA repositories to take
-effect.
-
-**Note to Linux Distributions Maintainers**
-
-`Only the extensions in the github emacs-helm repository are supported.`
-
-## Debian and Ubuntu
-
-Users of Debian 9 or later or Ubuntu 16.04 or later may simply
-`apt-get install elpa-helm` (or `apt-get install elpa-helm-core`; see
-below).
+See https://github.com/emacs-helm/helm/wiki#from-melpa
 
 ## Installing just the helm-core package
 
@@ -230,15 +175,11 @@ To bind to `M-x`:
 
 - _IMPORTANT:_
 
-In any helm session (after `helm-M-x` or `helm-` command)
+In any helm session, as soon there is candidates in the helm buffer
 
-`C-h m` pops a general info buffer about helm
+`C-h m` pops an org buffer with detailed documentation about current command and more generalized infos about helm.
 
-`C-c ?` pops a special info buffer of the current helm command
-
-Not all helm commands have specialized info buffers. Look for `C-c ?`
-in the mode-line. `C-h m` is shown for any command that does not have
-a specialized info buffer.
+Use it with no moderation!
 
 Use these embedded Info screens first before reporting bugs.
 
@@ -255,12 +196,16 @@ To make helm-mode start with Emacs init file:
 (helm-mode 1)
 ```
 
-To discover helm commands, look at helm menu item in Emacs menu. 
+To discover basic helm commands, look at helm menu item in Emacs menu. 
 
 Another way to discover helm commands: run the shell script:
-`./emacs-helm.sh` and then look in the scratch buffer. `emacs-helm.sh`
-accepts emacs command line options. `emacs-helm.sh -h` opens an Info
-screen with more details.
+`./emacs-helm.sh` from helm directory and then look in the scratch
+buffer. `emacs-helm.sh` accepts emacs command line
+options. `emacs-helm.sh -h` opens an Info screen with more details.
+
+_Note:_ When helm is installed with "make install" 
+you will have a shell command named helm that you can run from any
+places i.e. not only the helm directory
 
 ## Advanced usage
 
