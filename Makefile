@@ -81,7 +81,7 @@ install:
 	cp -vf *.elc $(DESTDIR)
 	cp -vf helm-autoloads.el $(DESTDIR)
 	cp -vf emacs-helm.sh $(DESTDIR)
-	ln -s ${DESTDIR}emacs-helm.sh ${BIN}helm
+	ln -fs ${DESTDIR}emacs-helm.sh ${BIN}helm
 uninstall:
 	rm -vf ${DESTDIR}*.elc
 	rm -vf ${DESTDIR}*.el
