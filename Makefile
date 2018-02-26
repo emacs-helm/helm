@@ -72,3 +72,18 @@ clean:
 autoloads:
 	$(EVAL) "(let ((generated-autoload-file (expand-file-name \"helm-autoloads.el\" \"$(PKGDIR)\")) \
 (backup-inhibited t)) (update-directory-autoloads \"$(PKGDIR)\"))"
+
+PREFIX=/usr/local/
+BIN=${PREFIX}bin/
+DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
+install:
+	test -d ${DESTDIR} || mkdir ${DESTDIR}
+	cp -vf *.elc $(DESTDIR)
+	cp -vf helm-autoloads.el $(DESTDIR)
+	cp -vf emacs-helm.sh $(DESTDIR)
+	ln -s ${DESTDIR}emacs-helm.sh ${BIN}helm
+uninstall:
+	rm -vf ${DESTDIR}*.elc
+	rm -vf ${DESTDIR}*.el
+	rm -vf ${DESTDIR}emacs-helm.sh
+	rm -vf ${BIN}helm
