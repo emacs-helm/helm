@@ -126,13 +126,13 @@ when Helm is installed using [MELPA](https://melpa.org/).
 
 ## Quick install from git
 
-See https://github.com/emacs-helm/helm/wiki#from-source
+See [Install Helm from Git](https://github.com/emacs-helm/helm/wiki#from-source)
 
 _NOTE:_ Installing helm using git and make is the safest way.
 
 ## Install from Emacs packaging system
 
-See https://github.com/emacs-helm/helm/wiki#from-melpa
+See [Install Helm from Melpa](https://github.com/emacs-helm/helm/wiki#from-melpa)
 
 ## Installing just the helm-core package
 
