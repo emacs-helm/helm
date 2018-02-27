@@ -2425,9 +2425,9 @@ Note that only existing directories are saved here."
 
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting."
-  (let ((marked (helm-marked-candidates)))
-    (unwind-protect
-         (save-selected-window
+  (with-helm-window
+    (let ((marked (helm-marked-candidates)))
+      (unwind-protect
            (cl-loop for c in marked do
                     (progn (helm-preselect
                             (concat "^" (regexp-quote
@@ -2441,15 +2441,14 @@ Note that only existing directories are saved here."
                               c helm-ff-signal-error-on-dot-files 'synchro)
                              (helm-delete-current-selection)
                              (message nil)
-                             (helm--remove-marked-and-update-mode-line c)))))
-      (with-helm-buffer
+                             (helm--remove-marked-and-update-mode-line c))))
         (setq helm-marked-candidates nil
-              helm-visible-mark-overlays nil))
-      (helm-force-update
-       (let ((presel (helm-get-selection)))
-         (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                            (not (helm-ff-dot-file-p presel)))
-                                       (helm-basename presel) presel))))))))
+              helm-visible-mark-overlays nil)
+        (helm-force-update
+         (let ((presel (helm-get-selection)))
+           (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                              (not (helm-ff-dot-file-p presel)))
+                                         (helm-basename presel) presel)))))))))
 
 (defun helm-ff-kill-buffer-fname (candidate)
   (let* ((buf      (get-file-buffer candidate))
