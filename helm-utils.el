@@ -492,7 +492,8 @@ from its directory."
      (lambda (f)
        ;; Ensure specifics `helm-execute-action-at-once-if-one'
        ;; fns don't run here.
-       (let (helm-execute-action-at-once-if-one)
+       (let (helm-execute-action-at-once-if-one
+             helm-actions-inherit-frame-settings) ; use this-command
          (if (file-exists-p f)
              (helm-find-files-1 (file-name-directory f)
                                 (concat
