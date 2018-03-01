@@ -6550,14 +6550,15 @@ or `helm-follow-input-idle-delay' or `helm-input-idle-delay' secs."
 ;;; Auto-resize mode
 ;;
 (defun helm--autoresize-hook (&optional max-height min-height)
-  (with-helm-buffer
-    (fit-window-to-buffer nil
-                          (/ (* (frame-height)
-                                (or max-height helm-autoresize-max-height))
-                             100)
-                          (/ (* (frame-height)
-                                (or min-height helm-autoresize-min-height))
-                             100))))
+  (when (helm-window)
+    (with-helm-window
+      (fit-window-to-buffer nil
+                            (/ (* (frame-height)
+                                  (or max-height helm-autoresize-max-height))
+                               100)
+                            (/ (* (frame-height)
+                                  (or min-height helm-autoresize-min-height))
+                               100)))))
 
 (define-minor-mode helm-autoresize-mode
     "Auto resize helm window when enabled.
