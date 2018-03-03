@@ -2859,7 +2859,7 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                        it)
                       (helm-ff-file-compressed-p candidate))
            (cons (lambda (_candidate)
-                   (funcall insert-in-minibuffer (concat candidate "#")))
+                   (funcall insert-in-minibuffer (concat candidate "#/")))
                  'never-split))
           ;; File doesn't exists and basename starts with ".." or "  ",
           ;; Start a recursive search for directories.
