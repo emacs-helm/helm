@@ -365,7 +365,9 @@ If BUFFER is nil, use current buffer."
         (goto-char (point-min))
         (cl-loop while (not (eobp))
                  for promptno from 1
+                 for prev-point = (point)
                  do (eshell-next-prompt 1)
+                 until (= (point) prev-point)
                  collect (list (buffer-substring-no-properties
                                 (point) (line-end-position))
                                (point)
