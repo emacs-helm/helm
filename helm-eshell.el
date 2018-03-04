@@ -376,10 +376,7 @@ If BUFFER is nil, use current buffer."
           (helm-awhile (eshell-next-prompt 1)
             (push (list (buffer-substring-no-properties
                          it (point-at-eol))
-                        it
-                        (buffer-name)
-                        (and helm-eshell-prompts-promptidx-p
-                             count))
+                        it (buffer-name) count)
                   result)
             (setq count (1+ count)))
           (nreverse result))))))
