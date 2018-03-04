@@ -354,6 +354,14 @@ The function that call this should set `helm-ec-target' to thing at point."
   :group 'helm-eshell
   :type 'boolean)
 
+(defvar helm-eshell-prompts-keymap
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c o")   'helm-eshell-prompts-other-window)
+    (define-key map (kbd "C-c C-o") 'helm-eshell-prompts-other-frame)
+    map)
+  "Keymap for `helm-eshell-prompt-all'.")
+
 (defun helm-eshell-prompts-list (&optional buffer)
   "List the prompts in Eshell BUFFER.
 
@@ -417,13 +425,17 @@ See `helm-eshell-prompts-list'."
 (defun helm-eshell-prompts-goto-other-frame (candidate)
   (helm-eshell-prompts-goto candidate 'switch-to-buffer-other-frame))
 
-(defvar helm-eshell-prompts-keymap
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o") 'helm-eshell-prompts-goto-other-window)
-    (define-key map (kbd "C-c C-o") 'helm-eshell-prompts-goto-other-frame)
-    map)
-  "Keymap for `helm-eshell-prompt-all'.")
+(defun helm-eshell-prompts-other-window ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-eshell-prompts-goto-other-window)))
+(put 'helm-eshell-prompts-other-window 'helm-only t)
+
+(defun helm-eshell-prompts-other-frame ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-eshell-prompts-goto-other-frame)))
+(put 'helm-eshell-prompts-other-frame 'helm-only t)
 
 ;;;###autoload
 (defun helm-eshell-prompts ()
@@ -450,7 +462,8 @@ See `helm-eshell-prompts-list'."
                     ("Go to prompt in other window `C-c o`" .
                      helm-eshell-prompts-goto-other-window)
                     ("Go to prompt in other frame `C-c C-o`" .
-                     helm-eshell-prompts-goto-other-frame)))
+                     helm-eshell-prompts-goto-other-frame))
+          :keymap helm-eshell-prompts-keymap)
         :buffer "*helm Eshell all prompts*"))
 
 (provide 'helm-eshell)
