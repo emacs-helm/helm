@@ -357,58 +357,65 @@ The function that call this should set `helm-ec-target' to thing at point."
 (defun helm-eshell-prompts-list (&optional buffer)
   "List the prompts in Eshell BUFFER.
 
-Return a list of (\"prompt\" (point) (buffer-name) prompt-index)).
+Return a list of (\"prompt\" (point) (buffer-name) prompt-index))
+e.g. (\"ls\" 162 \"*eshell*\" 3).
 If BUFFER is nil, use current buffer."
   (with-current-buffer (or buffer (current-buffer))
     (when (eq major-mode 'eshell-mode)
       (save-excursion
         (goto-char (point-min))
-        (cl-loop while (not (eobp))
-                 for promptno from 1
-                 do (eshell-next-prompt 1)
-                 collect (list (buffer-substring-no-properties
-                                (point) (line-end-position))
-                               (point)
-                               (buffer-name)
-                               (and helm-eshell-prompts-promptidx-p
-                                    promptno)))))))
+        (let (result (count 1))
+          (helm-awhile (eshell-next-prompt 1)
+            (push (list (buffer-substring-no-properties
+                         it (point-at-eol))
+                        it
+                        (buffer-name)
+                        (and helm-eshell-prompts-promptidx-p
+                             count))
+                  result)
+            (setq count (1+ count)))
+          (nreverse result))))))
 
 (defun helm-eshell-prompts-list-all ()
   "List the prompts of all Eshell buffers.
 See `helm-eshell-prompts-list'."
-  (let (list)
-    (dolist (b (buffer-list))
-      (setq list (append (helm-eshell-prompts-list b) list)))
-    list))
+  (cl-loop for b in (buffer-list)
+           append (helm-eshell-prompts-list b)))
 
 (defun helm-eshell-prompts-transformer (candidates &optional all)
-  (dolist (c candidates)
-    (setcar c
-            (concat
-             (when all
-               (concat (propertize (nth 2 c)
-                                   'face 'helm-eshell-prompts-buffer-name) ":"))
-             (when helm-eshell-prompts-promptidx-p
-               (concat (propertize (number-to-string (nth 3 c))
-                                   'face 'helm-eshell-prompts-promptidx) ":"))
-             (car c))))
-  candidates)
+  ;; ("ls" 162 "*eshell*" 3) => (*eshell*:3:ls . ("ls" 162 "*eshell*" 3))
+  (cl-loop for (prt pos buf id) in candidates
+           collect `(,(concat
+                       (when all
+                         (concat (propertize
+                                  buf
+                                  'face 'helm-eshell-prompts-buffer-name)
+                                 ":"))
+                       (when helm-eshell-prompts-promptidx-p
+                         (concat (propertize
+                                  (number-to-string id)
+                                  'face 'helm-eshell-prompts-promptidx)
+                                 ":"))
+                       prt)
+                      . ,(list prt pos buf id))))
 
 (defun helm-eshell-prompts-all-transformer (candidates)
   (helm-eshell-prompts-transformer candidates t))
 
-(defun helm-eshell-prompts-goto (candidate)
-  (when (nth 1 candidate)
-    (switch-to-buffer (nth 1 candidate)))
-  (goto-char (car candidate)))
+(cl-defun helm-eshell-prompts-goto (candidate &optional (action 'switch-to-buffer))
+  ;; Candidate format: ("ls" 162 "*eshell*" 3)
+  (let ((buf (nth 2 candidate)))
+    (unless (and (string= (buffer-name) buf)
+                 (eq action 'switch-to-buffer))
+      (funcall action buf))
+    (goto-char (nth 1 candidate))
+    (recenter)))
 
 (defun helm-eshell-prompts-goto-other-window (candidate)
-  (switch-to-buffer-other-window (cdr candidate))
-  (goto-char (car candidate)))
+  (helm-eshell-prompts-goto candidate 'switch-to-buffer-other-window))
 
 (defun helm-eshell-prompts-goto-other-frame (candidate)
-  (switch-to-buffer-other-frame (cdr candidate))
-  (goto-char (car candidate)))
+  (helm-eshell-prompts-goto candidate 'switch-to-buffer-other-frame))
 
 (defvar helm-eshell-prompts-keymap
   (let ((map (make-sparse-keymap)))
