@@ -388,7 +388,7 @@ See `helm-eshell-prompts-list'."
            append (helm-eshell-prompts-list b)))
 
 (defun helm-eshell-prompts-transformer (candidates &optional all)
-  ;; ("ls" 162 "*eshell*" 3) => (*eshell*:3:ls . ("ls" 162 "*eshell*" 3))
+  ;; ("ls" 162 "*eshell*" 3) => ("*eshell*:3:ls" . ("ls" 162 "*eshell*" 3))
   (cl-loop for (prt pos buf id) in candidates
            collect `(,(concat
                        (when all
