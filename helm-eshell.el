@@ -39,7 +39,6 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
 (declare-function helm-quote-whitespace "helm-lib")
-(declare-function eshell-next-prompt "em-prompt")
 (defvar eshell-special-chars-outside-quoting)
 
 
@@ -362,6 +361,8 @@ The function that call this should set `helm-ec-target' to thing at point."
     map)
   "Keymap for `helm-eshell-prompt-all'.")
 
+(defvar eshell-prompt-regexp)
+
 (defun helm-eshell-prompts-list (&optional buffer)
   "List the prompts in Eshell BUFFER.
 
@@ -373,7 +374,7 @@ If BUFFER is nil, use current buffer."
       (save-excursion
         (goto-char (point-min))
         (let (result (count 1))
-          (helm-awhile (eshell-next-prompt 1)
+          (helm-awhile (re-search-forward eshell-prompt-regexp nil t 1)
             (push (list (buffer-substring-no-properties
                          it (point-at-eol))
                         it (buffer-name) count)
