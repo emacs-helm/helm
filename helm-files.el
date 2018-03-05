@@ -1777,7 +1777,7 @@ or when `helm-pattern' is equal to \"~/\"."
     (when (and (helm-file-completion-source-p src)
                (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-ff--invalid-tramp-name-p)))
-      (with-helm-window
+      (with-helm-buffer
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
                (pat         (if (string-match helm-tramp-file-name-regexp
