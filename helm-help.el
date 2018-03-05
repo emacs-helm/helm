@@ -786,6 +786,11 @@ displayed in frame, next files are opened in background without being
 displayed.  When using \\<helm-find-files-map>\\[helm-ff-run-switch-other-window] the current
 buffer is kept and files are displayed next to it.
 
+*** Expand archives as directories in a avfs directory
+
+If you have mounted your filesystem with mountavfs,
+you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-execute-persistent-action].
+
 
 ** Commands
 \\<helm-find-files-map>
