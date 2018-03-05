@@ -363,6 +363,7 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Keymap for `helm-eshell-prompt-all'.")
 
 (defvar eshell-prompt-regexp)
+(defvar eshell-highlight-prompt)
 
 (defun helm-eshell-prompts-list (&optional buffer)
   "List the prompts in Eshell BUFFER.
