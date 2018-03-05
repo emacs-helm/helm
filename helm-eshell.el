@@ -39,6 +39,7 @@
 (declare-function eshell-parse-arguments "esh-arg" (beg end))
 (declare-function eshell-backward-argument "esh-mode" (&optional arg))
 (declare-function helm-quote-whitespace "helm-lib")
+(declare-function eshell-skip-prompt "em-prompt")
 (defvar eshell-special-chars-outside-quoting)
 
 
@@ -374,13 +375,21 @@ If BUFFER is nil, use current buffer."
       (save-excursion
         (goto-char (point-min))
         (let (result (count 1))
-          (helm-awhile (re-search-forward eshell-prompt-regexp nil t 1)
+          (helm-awhile (helm-eshell-next-prompt)
             (push (list (buffer-substring-no-properties
                          it (point-at-eol))
                         it (buffer-name) count)
                   result)
             (setq count (1+ count)))
           (nreverse result))))))
+
+(defun helm-eshell-next-prompt ()
+  ;; eshell-next-prompt seems unreliable on emacs-26+ see emacs bug
+  ;; #27405.
+  (helm-aif (and eshell-highlight-prompt
+                 (next-single-property-change (point) 'read-only))
+      (progn (goto-char it) (eshell-skip-prompt))
+    (re-search-forward eshell-prompt-regexp nil t 1)))
 
 (defun helm-eshell-prompts-list-all ()
   "List the prompts of all Eshell buffers.
