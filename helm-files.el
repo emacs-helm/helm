@@ -2949,7 +2949,13 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
       (buffer-substring-no-properties (point) end))))
 
 (defun helm-insert-file-name-completion-at-point (_candidate)
-  "Insert file name completion at point."
+  "Insert file name completion at point.
+
+When completing i.e. there is already something at point, insert
+filename abbreviated, relative or full according to initial input,
+whereas when inserting i.e. there is nothing at point, insert filename
+full, abbreviated or relative according to prefix arg, respectively no
+prefix arg, one prefix arg or two prefix arg."
   (with-helm-current-buffer
     (if buffer-read-only
         (error "Error: Buffer `%s' is read-only" (buffer-name))
@@ -2973,17 +2979,16 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                               #'shell-quote-argument #'identity))))
         (insert
          (funcall escape-fn (helm-ff--insert-fname
-                             beg end full-path-p guess candidate))
+                             candidate beg end full-path-p guess))
          (if (cdr mkds) " " "")
          (mapconcat escape-fn
                     (cl-loop for f in (cdr mkds)
-                             collect (helm-ff--insert-fname
-                                      nil nil nil nil f))
+                             collect (helm-ff--insert-fname f))
                     " "))))))
 
-(defun helm-ff--insert-fname (beg end full-path guess candidate)
+(defun helm-ff--insert-fname (candidate &optional beg end full-path guess)
   (set-text-properties 0 (length candidate) nil candidate)
-  (if (and guess (not (string= guess ""))
+  (if (and beg end guess (not (string= guess ""))
            (or (string-match
                 "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
                 guess)
