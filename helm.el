@@ -2679,10 +2679,13 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
 
 The `helm-display-function' buffer local value takes precedence on
 `helm-commands-using-frame'.
+If `helm-initial-frame' has no minibuffer, use
+`helm-display-buffer-in-own-frame' function.
 Fallback to global value of `helm-display-function' when no local
 value found and current command is not in `helm-commands-using-frame'."
   (or (with-helm-buffer helm-display-function)
-      (and (memq com helm-commands-using-frame)
+      (and (or (memq com helm-commands-using-frame)
+               (null (frame-parameter helm-initial-frame 'minibuffer)))
            #'helm-display-buffer-in-own-frame)
       (default-value 'helm-display-function)))
 
