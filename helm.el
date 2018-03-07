@@ -750,6 +750,11 @@ regression)."
 This option have no effect with emacs versions lower than 26."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-use-frame-when-more-than-two-windows t
+  "Display helm buffer in frame when more than two windows."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -2685,6 +2690,8 @@ Fallback to global value of `helm-display-function' when no local
 value found and current command is not in `helm-commands-using-frame'."
   (or (with-helm-buffer helm-display-function)
       (and (or (memq com helm-commands-using-frame)
+               (and helm-use-frame-when-more-than-two-windows
+                    (> (length (window-list)) 2))
                (null (frame-parameter helm-initial-frame 'minibuffer)))
            #'helm-display-buffer-in-own-frame)
       (default-value 'helm-display-function)))
