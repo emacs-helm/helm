@@ -37,7 +37,12 @@
   I have done voluntarily since 2011.<br>
   As it demands lots of my time it gets increasingly difficult<br>
   maintaining it without financial help.<br>
-  If you think Helm makes your life easier,<br><b>please consider making a donation.</b>
+  Thanks to all people that are helping or have helped Helm development,<br>
+  but they are actually to few to continue serenely,<br>
+  by the way after the release of version 3.0 I will have to stop<br>
+  developing Helm seriously until I get enough support,<br> 
+  only providing a minimal bugfix maintainance.<br>
+  Thanks for your understanding<br>
 </p>
 
 <p align="center">
