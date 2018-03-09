@@ -751,7 +751,7 @@ This option have no effect with emacs versions lower than 26."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-use-frame-when-more-than-two-windows t
+(defcustom helm-use-frame-when-more-than-two-windows nil
   "Display helm buffer in frame when more than two windows."
   :group 'helm
   :type 'boolean)
