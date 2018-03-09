@@ -389,8 +389,17 @@ If BUFFER is nil, use current buffer."
   ;; #27405.
   (helm-aif (and eshell-highlight-prompt
                  (next-single-property-change (point) 'read-only))
-      (progn (goto-char it) (eshell-skip-prompt))
+      (progn (goto-char it) (helm-eshell-skip-prompt))
     (re-search-forward eshell-prompt-regexp nil t 1)))
+
+(defun helm-eshell-skip-prompt ()
+  "Skip past the text matching regexp `eshell-prompt-regexp'.
+If this takes us past the end of the current line, don't skip at all."
+  (let ((eol (line-end-position)))
+    (if (and (looking-at eshell-prompt-regexp)
+	     (<= (match-end 0) eol))
+	(goto-char (match-end 0))
+      (point))))
 
 (defun helm-eshell-prompts-list-all ()
   "List the prompts of all Eshell buffers.
