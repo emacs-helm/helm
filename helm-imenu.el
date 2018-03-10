@@ -273,24 +273,25 @@ Each car is a regexp match pattern of the imenu type string."
 
 (defun helm-imenu-transformer (candidates)
   (cl-loop for (k . v) in candidates
-        for types = (or (helm-imenu--get-prop k)
-                        (list "Function" k))
-        for bufname = (buffer-name
-                       (pcase v
-                         ((pred overlayp) (overlay-buffer v))
-                         ((or (pred markerp) (pred integerp))
-                          (marker-buffer v))))
-        for disp1 = (mapconcat
-                     (lambda (x)
-                       (propertize
-                        x 'face
-                        (cl-loop for (p . f) in helm-imenu-type-faces
-                                 when (string-match p x)
-                                 return f)))
-                     types helm-imenu-delimiter)
-        for disp = (propertize disp1 'help-echo bufname)
-        collect
-        (cons disp (cons k v))))
+           for types = (or (helm-imenu--get-prop k)
+                           (list "Function" k))
+           for bufname = (buffer-name
+                          (pcase v
+                            ((pred overlayp) (overlay-buffer v))
+                            ((or (pred markerp) (pred integerp))
+                             (marker-buffer v))))
+           for disp1 = (mapconcat
+                        (lambda (x)
+                          (let ((face (cl-loop for (p . f) in helm-imenu-type-faces
+                                               when (string-match p x)
+                                               return f)))
+                            (if face
+                                (propertize x 'face face)
+                              x)))
+                        types helm-imenu-delimiter)
+           for disp = (propertize disp1 'help-echo bufname)
+           collect
+           (cons disp (cons k v))))
 
 ;;;###autoload
 (defun helm-imenu ()
