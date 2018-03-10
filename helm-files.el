@@ -700,6 +700,7 @@ ACTION must be an action supported by `helm-dired-action'."
          helm-ff-skip-boring-files
          ;; If HFF is using a frame use a frame as well.
          (helm-actions-inherit-frame-settings t)
+         helm-use-frame-when-more-than-two-windows
          (dest   (with-helm-display-marked-candidates
                    helm-marked-buffer-name
                    (helm-ff--count-and-collect-dups ifiles)

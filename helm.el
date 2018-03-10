@@ -2691,6 +2691,7 @@ value found and current command is not in `helm-commands-using-frame'."
   (or (with-helm-buffer helm-display-function)
       (and (or (memq com helm-commands-using-frame)
                (and helm-use-frame-when-more-than-two-windows
+                    (null helm--nested)
                     (> (length (window-list)) 2))
                (null (frame-parameter helm-initial-frame 'minibuffer)))
            #'helm-display-buffer-in-own-frame)
