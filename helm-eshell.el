@@ -376,7 +376,7 @@ If BUFFER is nil, use current buffer."
       (save-excursion
         (goto-char (point-min))
         (let (result (count 1))
-          (helm-awhile (re-search-forward eshell-prompt-regexp nil t 1)
+          (helm-awhile (re-search-forward eshell-prompt-regexp nil t)
             (push (list (buffer-substring-no-properties
                          it (point-at-eol))
                         it (buffer-name) count)
