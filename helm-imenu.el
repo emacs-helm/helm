@@ -282,12 +282,11 @@ Each car is a regexp match pattern of the imenu type string."
                              (marker-buffer v))))
            for disp1 = (mapconcat
                         (lambda (x)
-                          (let ((face (cl-loop for (p . f) in helm-imenu-type-faces
-                                               when (string-match p x)
-                                               return f)))
-                            (if face
-                                (propertize x 'face face)
-                              x)))
+                          (propertize
+                           x 'face
+                           (cl-loop for (p . f) in helm-imenu-type-faces
+                                    when (string-match p x) return f
+                                    finally return 'default)))
                         types helm-imenu-delimiter)
            for disp = (propertize disp1 'help-echo bufname)
            collect
