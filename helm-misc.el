@@ -99,6 +99,9 @@
 
 ;;; World time
 ;;
+(defvar zoneinfo-style-world-list)
+(defvar legacy-style-world-list)
+
 (defun helm-time-zone-transformer (candidates _source)
   (cl-loop for i in candidates
            for (z . p) in display-time-world-list
@@ -113,7 +116,22 @@
 
 (defvar helm-source-time-world
   (helm-build-in-buffer-source "Time World List"
-    :init (lambda () (require 'time))
+    :init (lambda ()
+            (require 'time)
+            (setq display-time-world-list
+                  ;; inlined from `time--display-world-list' from
+                  ;; emacs-27 for compatibility as
+                  ;; `display-time-world-list' is set by default to
+                  ;; `t' on emacs-26+...
+                  (if (listp display-time-world-list)
+                      display-time-world-list
+                    ;; Determine if zoneinfo style timezones are supported by testing that
+                    ;; America/New York and Europe/London return different timezones.
+                    (let ((nyt (format-time-string "%z" nil "America/New_York"))
+                          (gmt (format-time-string "%z" nil "Europe/London")))
+                      (if (string-equal nyt gmt)
+                          legacy-style-world-list
+                        zoneinfo-style-world-list)))))
     :data (lambda ()
             (with-temp-buffer
               (display-time-world-display display-time-world-list)
