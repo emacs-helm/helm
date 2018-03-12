@@ -377,11 +377,14 @@ If BUFFER is nil, use current buffer."
         (goto-char (point-min))
         (let (result (count 1))
           (helm-awhile (re-search-forward eshell-prompt-regexp nil t)
-            (push (list (buffer-substring-no-properties
-                         it (point-at-eol))
-                        it (buffer-name) count)
-                  result)
-            (setq count (1+ count)))
+            (when (or (and eshell-highlight-prompt
+                           (get-text-property (match-beginning 0) 'read-only))
+                      (null eshell-highlight-prompt))
+              (push (list (buffer-substring-no-properties
+                           it (point-at-eol))
+                          it (buffer-name) count)
+                    result)
+              (setq count (1+ count))))
           (nreverse result))))))
 
 (defun helm-eshell-prompts-list-all ()
