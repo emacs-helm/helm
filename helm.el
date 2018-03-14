@@ -755,6 +755,12 @@ This option have no effect with emacs versions lower than 26."
   "Display helm buffer in frame when more than two windows."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-default-cursor-face-function
+  #'helm--set-default-cursor-face
+  "The function to use to set face of fake cursor in header-line."
+  :group 'helm
+  :type 'function)
 
 ;;; Faces
 ;;
@@ -4712,12 +4718,15 @@ mode and header lines."
          ;; Increment pos to handle the space before prompt (i.e `pref').
          (+ 1 pos) (+ 2 pos)
          'face
-         ;; Don't just use 'cursor, this can hide the current character.
-         (list :inverse-video t
-               :foreground (face-background 'cursor)
-               :background (face-background 'default))
+         (funcall helm-default-cursor-face-function)
          header-line-format)
         (when update (force-mode-line-update))))))
+
+(defun helm--set-default-cursor-face ()
+  ;; Don't just use cursor face, this can hide the current character.
+  (list :inverse-video t
+        :foreground (face-background 'cursor)
+        :background (face-background 'default)))
 
 (defun helm-exchange-minibuffer-and-header-line ()
   "Display minibuffer in header-line and vice versa for current helm session.
