@@ -1168,7 +1168,12 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
       (ido-mode (if ido-state 1 -1))
       ;; Same comment as in `helm--completing-read-default'.
       (setq this-command current-command))
-    (if (eq predicate 'file-directory-p) ; Using `read-directory-name'.
+    (if (and
+         ;; Using `read-directory-name'.
+         (eq predicate 'file-directory-p)
+         ;; `file-name-as-directory' return "./" when FNAME is
+         ;; empty string.
+         (not (string= fname "")))
         (file-name-as-directory fname) fname)))
 
 ;; Read file name handler with history (issue #1652)
