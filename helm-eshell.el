@@ -68,6 +68,8 @@
     map)
   "Keymap for `helm-esh-pcomplete'.")
 
+(defvar helm-eshell--quit-flag nil)
+
 
 (defclass helm-esh-source (helm-source-sync)
   ((init :initform (lambda ()
@@ -150,6 +152,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                                      (expand-file-name entry default-directory)))
               with comps = (all-completions pcomplete-stub table)
               unless comps return (prog1 nil
+                                    ;; Don't add final space when
+                                    ;; there is no completion (issue #1990).
+                                    (setq helm-eshell--quit-flag t)
                                     (message "No completions of %s" pcomplete-stub))
               for i in comps
               ;; Transform the related names to abs names.
@@ -209,9 +214,6 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Helm class to define source for Eshell history.")
 
 
-
-(defvar helm-eshell--quit-flag nil)
-
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
