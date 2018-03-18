@@ -1991,7 +1991,8 @@ Return the result of last function call."
 
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function(s) to SYM for each source if any."
-  (let ((sources (or sources helm-sources)))
+  (let ((sources (or (helm-get-sources sources)
+                     helm-sources)))
     (cl-dolist (source sources)
       (helm-aif (assoc-default sym source)
           (helm-funcall-with-source source it)))))
@@ -2856,11 +2857,12 @@ Note that this feature is available only with emacs-25+."
 ;;
 (defun helm-get-sources (sources)
   "Transform each element of SOURCES in alist.
-Returns the resulting list"
-  (mapcar (lambda (source)
-            (if (listp source)
-                source (symbol-value source)))
-          (helm-normalize-sources sources)))
+Returns the resulting list."
+  (when sources
+    (mapcar (lambda (source)
+              (if (listp source)
+                  source (symbol-value source)))
+            (helm-normalize-sources sources))))
 
 (defun helm-initialize (any-resume any-input any-default any-sources)
   "Start initialization of `helm' session.
