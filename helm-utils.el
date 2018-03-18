@@ -488,6 +488,7 @@ from its directory."
   (interactive)
   (with-helm-alive-p
     (require 'helm-grep)
+    (require 'helm-elisp)
     (helm-run-after-exit
      (lambda (f)
        ;; Ensure specifics `helm-execute-action-at-once-if-one'
