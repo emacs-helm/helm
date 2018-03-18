@@ -3078,11 +3078,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
            (resize-mini-windows (and (null helm-echo-input-in-header-line)
                                      resize-mini-windows))
            (first-src (car helm-sources))
-           (first-src-val (if (symbolp first-src)
-                              (symbol-value first-src)
-                            first-src))
            (source-process-p (or (assq 'candidates-process src)
-                                 (assq 'candidates-process first-src-val))))
+                                 (assq 'candidates-process first-src))))
       (helm-log "helm-get-candidate-number => %S"
                 (helm-get-candidate-number))
       (helm-log "helm-execute-action-at-once-if-one = %S"
@@ -6469,11 +6466,6 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
     (with-current-buffer helm-buffer
       (let* ((src      (helm-get-current-source))
              (name     (assoc-default 'name src))
-             (sym      (cl-loop for s in helm-sources
-                                for sname = (and (symbolp s)
-                                                 (assoc-default
-                                                  'name (symbol-value s)))
-                                thereis (and sname (string= sname name) s)))
              (fol-attr (assq 'follow src))
              (enabled  (or (helm-follow-mode-p src)
                            (and helm-follow-mode-persistent
@@ -6507,9 +6499,7 @@ They are bound by default to \\[helm-follow-action-forward] and \\[helm-follow-a
                   (message "helm-follow-mode is %s"
                            (if (helm-follow-mode-p src)
                                "enabled" "disabled"))
-                  (helm-display-mode-line src t))
-              (unless helm-follow-mode-persistent
-                (and sym (set sym (remove (assq 'follow src) src)))))
+                  (helm-display-mode-line src t)))
             (message "Not enough candidates for helm-follow-mode"))))))
 (put 'helm-follow-mode 'helm-only t)
 
