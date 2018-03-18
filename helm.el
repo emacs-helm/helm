@@ -2856,7 +2856,8 @@ Note that this feature is available only with emacs-25+."
 ;;; Initialize
 ;;
 (defun helm-get-sources (sources)
-  "Collect SOURCES as alists."
+  "Transform each element of SOURCES in alist.
+Returns the resulting list"
   (mapcar (lambda (source)
             (if (listp source)
                 source (symbol-value source)))
@@ -2871,15 +2872,15 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (let ((sources (helm-get-sources any-sources)))
     (setq helm--in-fuzzy
           (cl-loop for s in sources
-                   for matchfns = (helm-match-functions
-                                   (if (symbolp s) (symbol-value s) s))
-                   for searchfns = (helm-search-functions
-                                    (if (symbolp s) (symbol-value s) s))
+                   for matchfns = (helm-match-functions s)
+                   for searchfns = (helm-search-functions s)
                    when (or (memq 'helm-fuzzy-match matchfns)
                             (memq 'helm-fuzzy-search searchfns))
                    return t))
     (helm-log "sources = %S" sources)
     (helm-set-local-variable 'helm-sources sources)
+    ;; Once `helm-buffer' is created `helm-sources' will be a local
+    ;; variable which value is a list of alists.
     (helm-current-position 'save)
     (if (helm-resume-p any-resume)
         (helm-initialize-overlays (helm-buffer-get))
