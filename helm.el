@@ -1998,11 +1998,10 @@ Return the result of last function call."
 
 (defun helm-normalize-sources (sources)
   "If SOURCES is only one source, make a list of one element."
-  (cond ((or (and sources (symbolp sources))
-             (and (listp sources) (assq 'name sources)))
-         (list sources))
-        (sources)
-        (t helm-sources)))
+  (if (or (and sources (symbolp sources))
+          (and (listp sources) (assq 'name sources)))
+      (list sources)
+    sources))
 
 (defun helm-get-candidate-number (&optional in-current-source)
   "Return candidates number in `helm-buffer'.
