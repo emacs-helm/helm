@@ -2496,6 +2496,7 @@ Don't use this directly, use instead `helm' with the keyword
     (let ((orig-helm-current-buffer helm-current-buffer)
           (orig-helm-buffer helm-buffer)
           (orig-helm--prompt helm--prompt)
+          (orig-helm-sources helm-sources)
           (orig-helm--in-fuzzy helm--in-fuzzy)
           (orig-helm--display-frame helm--buffer-in-new-frame-p)
           (orig-helm-last-frame-or-window-configuration
@@ -2512,10 +2513,11 @@ Don't use this directly, use instead `helm' with the keyword
                 (helm-buffer (or (cl-getf same-as-helm :buffer)
                                  (nth 5 same-as-helm)
                                  "*Helm*"))
-                helm-sources
                 (enable-recursive-minibuffers t))
+            (setq helm-sources nil)
             (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
+          (setq helm-sources orig-helm-sources)
           (setq helm--nested nil)
           (setq helm--buffer-in-new-frame-p orig-helm--display-frame)
           (setq helm-alive-p t) ; Nested session set this to nil on exit.
