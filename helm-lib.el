@@ -745,15 +745,14 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 (defun helm-source-by-name (name &optional sources)
   "Get a Helm source in SOURCES by NAME.
 
-Optional argument SOURCES is a list of Helm sources. The default
-value is computed with `helm-get-sources' which is faster
-than specifying SOURCES because sources are cached."
+Optional argument SOURCES is a list of Helm sources which default to
+`helm-sources'."
   (cl-loop with src-list = (if sources
                                (cl-loop for src in sources
                                         collect (if (listp src)
                                                     src
                                                     (symbol-value src)))
-                               (helm-get-sources))
+                               helm-sources)
            for source in src-list
            thereis (and (string= name (assoc-default 'name source)) source)))
 

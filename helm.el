@@ -1283,8 +1283,6 @@ to modify it.")
   "Saved value of the currently selected action by key.")
 (defvar helm-saved-current-source nil
   "Value of the current source when the action list is shown.")
-(defvar helm-compiled-sources nil
-  "Compiled version of `helm-sources'.")
 (defvar helm-in-persistent-action nil
   "Flag whether in persistent-action or not.")
 (defvar helm-last-buffer nil
@@ -1723,28 +1721,10 @@ existing Helm function names."
 If NO-INIT is non-`nil', skip executing init functions of SOURCES.
 If NO-UPDATE is non-`nil', skip executing `helm-update'."
   (with-current-buffer helm-buffer
-    (setq helm-compiled-sources nil
-          helm-sources sources)
-    (helm-log "helm-compiled-sources = %S" helm-compiled-sources)
+    (setq helm-sources (helm-get-sources sources))
     (helm-log "helm-sources = %S" helm-sources))
   (unless no-init (helm-funcall-foreach 'init))
   (unless no-update (helm-update)))
-
-(defun helm-get-sources ()
-  "Return compiled `helm-sources', which is memoized."
-  (cond
-    ;; action
-    ((helm-action-window) helm-sources)
-    ;; memoized
-    (helm-compiled-sources)
-    ;; first time
-    (t
-     (prog1
-         (setq helm-compiled-sources
-               (mapcar (lambda (source)
-                         (if (listp source) source (symbol-value source)))
-                       helm-sources))
-       (helm-log "helm-compiled-sources = %S" helm-compiled-sources)))))
 
 (defun helm-get-selection (&optional buffer force-display-part source)
   "Return the currently selected item or nil.
@@ -1821,7 +1801,7 @@ Return nil when `helm-buffer' is empty."
                   (cl-loop with source-name = (save-excursion
                                                 (goto-char header-pos)
                                                 (helm-current-line-contents))
-                           for source in (helm-get-sources) thereis
+                           for source in helm-sources thereis
                            (and (equal (assoc-default 'name source) source-name)
                                 source)))))))))
 
@@ -2011,7 +1991,7 @@ Return the result of last function call."
 
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function(s) to SYM for each source if any."
-  (let ((sources (or sources (helm-get-sources))))
+  (let ((sources (or sources helm-sources)))
     (cl-dolist (source sources)
       (helm-aif (assoc-default sym source)
           (helm-funcall-with-source source it)))))
@@ -2367,7 +2347,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
       (setq helm-pattern "")
-      (setq helm-sources nil)
       (setq helm--ignore-errors nil)
       (and old--cua (cua-mode 1))
       (helm-log-save-maybe))))
@@ -2397,7 +2376,6 @@ as a string with ARG."
     (with-current-buffer any-buffer (setq cursor-type nil))
     (setq helm-full-frame (buffer-local-value
                            'helm-full-frame (get-buffer any-buffer)))
-    (setq helm-compiled-sources nil)
     (setq cur-dir (buffer-local-value
                    'default-directory (get-buffer any-buffer)))
     (setq helm-saved-selection nil
@@ -2535,7 +2513,6 @@ Don't use this directly, use instead `helm' with the keyword
                                  (nth 5 same-as-helm)
                                  "*Helm*"))
                 helm-sources
-                helm-compiled-sources
                 (enable-recursive-minibuffers t))
             (apply #'helm same-as-helm))
         (with-current-buffer orig-helm-buffer
@@ -2876,40 +2853,48 @@ Note that this feature is available only with emacs-25+."
 
 ;;; Initialize
 ;;
+(defun helm-get-sources (sources)
+  "Collect SOURCES as alists."
+  (mapcar (lambda (source)
+            (if (listp source)
+                source (symbol-value source)))
+          (helm-normalize-sources sources)))
+
 (defun helm-initialize (any-resume any-input any-default any-sources)
   "Start initialization of `helm' session.
 For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   (helm-log "start initialization: any-resume=%S any-input=%S"
             any-resume any-input)
   (helm-frame-or-window-configuration 'save)
-  (setq helm-sources (helm-normalize-sources any-sources))
-  (setq helm--in-fuzzy
-        (cl-loop for s in helm-sources
-                 for matchfns = (helm-match-functions
-                                 (if (symbolp s) (symbol-value s) s))
-                 for searchfns = (helm-search-functions
-                                  (if (symbolp s) (symbol-value s) s))
-                 when (or (memq 'helm-fuzzy-match matchfns)
-                          (memq 'helm-fuzzy-search searchfns))
-                 return t))
-  (helm-log "sources = %S" helm-sources)
-  (helm-current-position 'save)
-  (if (helm-resume-p any-resume)
-      (helm-initialize-overlays (helm-buffer-get))
-    (helm-initial-setup any-default))
-  (setq helm-alive-p t)
-  (unless (eq any-resume 'noresume)
-    (helm--recent-push helm-buffer 'helm-buffers)
-    (setq helm-last-buffer helm-buffer))
-  (when any-input
-    (setq helm-input any-input
-          helm-pattern any-input)
-    (helm--fuzzy-match-maybe-set-pattern))
-  ;; If a `resume' attribute is present `helm-funcall-foreach'
-  ;; will run its function.
-  (when (helm-resume-p any-resume)
-    (helm-funcall-foreach 'resume))
-  (helm-log "end initialization"))
+  (let ((sources (helm-get-sources any-sources)))
+    (setq helm--in-fuzzy
+          (cl-loop for s in sources
+                   for matchfns = (helm-match-functions
+                                   (if (symbolp s) (symbol-value s) s))
+                   for searchfns = (helm-search-functions
+                                    (if (symbolp s) (symbol-value s) s))
+                   when (or (memq 'helm-fuzzy-match matchfns)
+                            (memq 'helm-fuzzy-search searchfns))
+                   return t))
+    (helm-log "sources = %S" sources)
+    (helm-set-local-variable 'helm-sources sources)
+    (helm-current-position 'save)
+    (if (helm-resume-p any-resume)
+        (helm-initialize-overlays (helm-buffer-get))
+      (helm-initial-setup any-default sources))
+    (setq helm-alive-p t)
+    (unless (eq any-resume 'noresume)
+      (helm--recent-push helm-buffer 'helm-buffers)
+      (setq helm-last-buffer helm-buffer))
+    (when any-input
+      (setq helm-input any-input
+            helm-pattern any-input)
+      (helm--fuzzy-match-maybe-set-pattern))
+    ;; If a `resume' attribute is present `helm-funcall-foreach'
+    ;; will run its function.
+    (when (helm-resume-p any-resume)
+      (helm-funcall-foreach 'resume))
+    (helm-log "end initialization")))
 
 (defun helm-initialize-overlays (buffer)
   "Initialize helm overlays in BUFFER."
@@ -2955,26 +2940,26 @@ helm was started, use `helm-current-buffer' instead."
     (window-buffer (with-selected-window (minibuffer-window)
                      (minibuffer-selected-window)))))
 
-(defun helm--run-init-hooks (hook)
+(defun helm--run-init-hooks (hook sources)
   "Run after and before init hooks local to source.
 See :after-init-hook and :before-init-hook in `helm-source'."
   (cl-loop with sname = (cl-ecase hook
                           (before-init-hook "h-before-init-hook")
                           (after-init-hook "h-after-init-hook"))
            with h = (cl-gensym sname)
-           for s in (helm-get-sources)
+           for s in sources
            for hv = (assoc-default hook s)
            if (and hv (not (symbolp hv)))
            do (set h hv)
            and do (helm-log-run-hook h)
            else do (helm-log-run-hook hv)))
 
-(defun helm-initial-setup (any-default)
+(defun helm-initial-setup (any-default sources)
   "Initialize helm settings and set up the helm buffer."
   ;; Run global hook.
   (helm-log-run-hook 'helm-before-initialize-hook)
   ;; Run local source hook.
-  (helm--run-init-hooks 'before-init-hook)
+  (helm--run-init-hooks 'before-init-hook sources)
   ;; For initialization of helm locals vars that need
   ;; a value from current buffer, it is here.
   (helm-set-local-variable 'current-input-method current-input-method)
@@ -2986,7 +2971,6 @@ See :after-init-hook and :before-init-hook in `helm-source'."
         helm-current-buffer (helm--current-buffer)
         helm-buffer-file-name buffer-file-name
         helm-issued-errors nil
-        helm-compiled-sources nil
         helm-saved-current-source nil)
   (unless (and (or helm-split-window-state
                    helm--window-side-state)
@@ -2999,7 +2983,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
     (setq helm--window-side-state
           (or helm-split-window-default-side 'below)))
   ;; Call the init function for sources where appropriate
-  (helm-funcall-foreach 'init)
+  (helm-funcall-foreach 'init sources)
   (setq helm-pattern (or (and helm--maybe-use-default-as-input
                               (or (if (listp any-default)
                                       (car any-default) any-default)
@@ -3013,7 +2997,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   ;; Run global hook.
   (helm-log-run-hook 'helm-after-initialize-hook)
   ;; Run local source hook.
-  (helm--run-init-hooks 'after-init-hook))
+  (helm--run-init-hooks 'after-init-hook sources))
 
 (define-derived-mode helm-major-mode
     fundamental-mode "Hmm"
@@ -4005,7 +3989,7 @@ without recomputing them, it should be a list of lists."
          (let (sources matches)
            ;; Collect sources ready to be updated.
            (setq sources
-                 (cl-loop for src in (helm-get-sources)
+                 (cl-loop for src in helm-sources
                           when (helm-update-source-p src)
                           collect src))
            ;; When no sources to update erase buffer
@@ -4098,7 +4082,7 @@ passed as argument to `recenter'."
            (selection (helm-aif (helm-get-selection nil t source)
                           (regexp-quote it))))
       (setq helm--force-updating-p t)
-      (mapc 'helm-force-update--reinit (helm-get-sources))
+      (mapc 'helm-force-update--reinit helm-sources)
       (helm-update (or preselect selection) source)
       (when (and (helm-window) recenter)
         (with-helm-window
@@ -4174,7 +4158,7 @@ candidates from `helm-async-outer-limit-hook'."
       (goto-char (point-min))
       (helm-update nil (helm-get-current-source)
                    (cl-loop with sources = (funcall get-sources)
-                            for s in (helm-get-sources)
+                            for s in helm-sources
                             for name =  (assoc-default 'name s) collect
                             (when (cl-loop for src in sources thereis
                                            (string= name
