@@ -17,6 +17,7 @@
 
 ;;; Code:
 (require 'cl-lib)
+(require 'format-spec)
 (require 'helm)
 (require 'helm-help)
 (require 'helm-regexp)
