@@ -796,7 +796,9 @@ you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-ex
 In the completion buffer, you can choose the default which is the current-time, it is
 the first candidate or the timestamp of one of the selected files.
 If you need to use something else, use \\<helm-map>\\[next-history-element] and edit
-the date in minibuffer. 
+the date in minibuffer.
+It is also a way to quickly create a new file without opening a buffer, saving it
+and killing it. 
 
 ** Commands
 \\<helm-find-files-map>
