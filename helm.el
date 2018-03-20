@@ -756,8 +756,8 @@ This option have no effect with emacs versions lower than 26."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-default-cursor-face-function
-  #'helm--set-default-cursor-face
+(defcustom helm-default-prompt-display-function
+  #'helm--set-default-prompt-display
   "The function to use to set face of fake cursor in header-line."
   :group 'helm
   :type 'function)
@@ -4699,19 +4699,19 @@ mode and header lines."
       (setq cont (replace-regexp-in-string "%" "%%" cont))
       (with-helm-buffer
         (setq header-line-format (concat pref cont " "))
-        (put-text-property
-         ;; Increment pos to handle the space before prompt (i.e `pref').
-         (+ 1 pos) (+ 2 pos)
-         'face
-         (funcall helm-default-cursor-face-function)
-         header-line-format)
+        (funcall helm-default-prompt-display-function pos)
         (when update (force-mode-line-update))))))
 
-(defun helm--set-default-cursor-face ()
-  ;; Don't just use cursor face, this can hide the current character.
-  (list :inverse-video t
-        :foreground (face-background 'cursor)
-        :background (face-background 'default)))
+(defun helm--set-default-prompt-display (pos)
+  (put-text-property
+   ;; Increment pos to handle the space before prompt (i.e `pref').
+   (+ 1 pos) (+ 2 pos)
+   'face
+   ;; Don't just use cursor face, this can hide the current character.
+   (list :inverse-video t
+         :foreground (face-background 'cursor)
+         :background (face-background 'default))
+   header-line-format))
 
 (defun helm-exchange-minibuffer-and-header-line ()
   "Display minibuffer in header-line and vice versa for current helm session.
