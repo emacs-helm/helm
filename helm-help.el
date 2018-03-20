@@ -791,6 +791,12 @@ buffer is kept and files are displayed next to it.
 If you have mounted your filesystem with mountavfs,
 you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-execute-persistent-action].
 
+*** Touch files
+
+In the completion buffer, you can choose the default which is the current-time, it is
+the first candidate or the timestamp of one of the selected files.
+If you need to use something else, use \\<helm-map>\\[next-history-element] and edit
+the date in minibuffer. 
 
 ** Commands
 \\<helm-find-files-map>
@@ -804,14 +810,15 @@ you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-ex
 \\[helm-ff-run-git-grep]\t\tRun git-grep on current directory.
 \\[helm-ff-run-gid]\t\tRun gid (id-utils).
 \\[helm-ff-run-etags]\t\tRun Etags (`\\[universal-argument]' to use thing-at-point, `\\[universal-argument] \\[universal-argument]' to reload cache).
-\\[helm-ff-run-rename-file]\t\tRename File (`\\[universal-argument]' to follow).
+\\[helm-ff-run-rename-file]\t\tRename Files (`\\[universal-argument]' to follow).
 \\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace on marked files.
-\\[helm-ff-run-copy-file]\t\tCopy File (`\\[universal-argument]' to follow).
-\\[helm-ff-run-byte-compile-file]\t\tByte Compile File (`\\[universal-argument]' to load).
-\\[helm-ff-run-load-file]\t\tLoad File.
-\\[helm-ff-run-symlink-file]\t\tSymlink File.
-\\[helm-ff-run-hardlink-file]\t\tHardlink file.
-\\[helm-ff-run-delete-file]\t\tDelete File.
+\\[helm-ff-run-copy-file]\t\tCopy Files (`\\[universal-argument]' to follow).
+\\[helm-ff-run-byte-compile-file]\t\tByte Compile Files (`\\[universal-argument]' to load).
+\\[helm-ff-run-load-file]\t\tLoad Files.
+\\[helm-ff-run-symlink-file]\t\tSymlink Files.
+\\[helm-ff-run-hardlink-file]\t\tHardlink files.
+\\[helm-ff-run-delete-file]\t\tDelete Files.
+\\[helm-ff-run-touch-files]\t\tTouch files.
 \\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate without leaving Helm.
 \\[helm-ff-persistent-delete]\t\tDelete file without leaving Helm.
 \\[helm-ff-run-switch-to-eshell]\t\tSwitch to Eshell.

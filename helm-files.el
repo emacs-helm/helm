@@ -402,6 +402,7 @@ Of course you can also write your own function to do something else."
     (define-key map (kbd "M-H")           'helm-ff-run-hardlink-file)
     (define-key map (kbd "M-D")           'helm-ff-run-delete-file)
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
+    (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
     (define-key map (kbd "C-c d")         'helm-ff-persistent-delete)
     (define-key map (kbd "M-e")           'helm-ff-run-switch-to-eshell)
     (define-key map (kbd "C-c i")         'helm-ff-run-complete-fn-at-point)
@@ -531,6 +532,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Ediff File `C-c ='" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
    "Delete File(s) `M-D'" 'helm-delete-marked-files
+   "Touch File(s) `M-T'" 'helm-ff-touch-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
@@ -977,6 +979,37 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
       (eshell helm-current-prefix-arg))
     (unless (get-buffer-process (current-buffer))
       (funcall cd-eshell))))
+
+(defun helm-ff-touch-files (_candidate)
+  (let* ((files (helm-marked-candidates))
+         (timestamp (helm-comp-read
+                     "Timestamp (default Now): "
+                     (cl-loop for f in files
+                              for date = (format-time-string
+                                          "%Y-%m-%d %H:%M:%S"
+                                          (nth 5 (file-attributes f)))
+                              collect (cons (format "%s: %s"
+                                                    (helm-basename f) date)
+                                            date))
+                     :default
+                     (format-time-string "%Y-%m-%d %H:%M:%S"
+                                         (current-time))))
+         (failures
+          (cl-loop for f in files
+                   when (> (call-process
+                            "touch" nil nil nil "-d" timestamp f)
+                           0)
+                   collect f)))
+    (when failures
+      (message "Failed to touch *%s files:\n%s"
+               (length failures)
+               (mapconcat (lambda (f) (format "- %s\n" f)) failures "")))))
+
+(defun helm-ff-run-touch-files ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-touch-files)))
+(put 'helm-ff-run-touch-files 'helm-only t)
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
