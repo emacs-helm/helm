@@ -2265,8 +2265,10 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   ;; Advices will be available only in >=emacs-24.4, but
   ;; allow compiling without errors on lower emacs.
   (when (fboundp 'advice-add)
-    (advice-add 'tramp-read-passwd :around #'helm--advice-tramp-read-passwd)
-    (advice-add 'ange-ftp-get-passwd :around #'helm--advice-ange-ftp-get-passwd)
+    (advice-add 'tramp-read-passwd :around #'helm--suspend-read-passwd)
+    (advice-add 'ange-ftp-get-passwd :around #'helm--suspend-read-passwd)
+    (advice-add 'epa-passphrase-callback-function
+                :around #'helm--suspend-read-passwd)
     (advice-add 'cua-delete-region :around #'cua-delete-region--advice)
     (advice-add 'copy-region-as-kill :around #'copy-region-as-kill--advice))
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
@@ -2336,8 +2338,9 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
             (helm-log (concat "[End session (quit)] " (make-string 34 ?-)))
             nil))
       (when (fboundp 'advice-remove)
-        (advice-remove 'tramp-read-passwd #'helm--advice-tramp-read-passwd)
-        (advice-remove 'ange-ftp-get-passwd #'helm--advice-ange-ftp-get-passwd)
+        (advice-remove 'tramp-read-passwd #'helm--suspend-read-passwd)
+        (advice-remove 'ange-ftp-get-passwd #'helm--suspend-read-passwd)
+        (advice-remove 'epa-passphrase-callback-function #'helm--suspend-read-passwd)
         (advice-remove 'cua-delete-region #'cua-delete-region--advice)
         (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
@@ -2536,9 +2539,11 @@ Don't use this directly, use instead `helm' with the keyword
           (if (fboundp 'advice-add)
               (progn
                 (advice-add 'tramp-read-passwd
-                            :around #'helm--advice-tramp-read-passwd)
+                            :around #'helm--suspend-read-passwd)
                 (advice-add 'ange-ftp-get-passwd
-                            :around #'helm--advice-ange-ftp-get-passwd))
+                            :around #'helm--suspend-read-passwd)
+                (advice-add 'epa-passphrase-callback-function
+                            :around #'helm--suspend-read-passwd))
             (ad-activate 'tramp-read-passwd)
             (ad-activate 'ange-ftp-get-passwd))
           (unless helm-allow-mouse
@@ -3182,7 +3187,10 @@ without helm constantly updating."
         (with-helm-buffer (helm-display-mode-line it t)))))
 (put 'helm-toggle-suspend-update 'helm-only t)
 
-(defun helm--advice-tramp-read-passwd (old--fn &rest args)
+(defun helm--suspend-read-passwd (old--fn &rest args)
+  "Suspend helm while reading password.
+This is used to advice `tramp-read-passwd', `ange-ftp-get-passwd' and
+`epa-passphrase-callback-function'."
   ;; Suspend update when prompting for a tramp password.
   (setq helm-suspend-update-flag t)
   (setq overriding-terminal-local-map nil)
@@ -3190,16 +3198,6 @@ without helm constantly updating."
   (unwind-protect
        ;; No need to suspend timer in emacs-24.4
        ;; it is fixed upstream.
-       (apply old--fn args)
-    (setq helm--reading-passwd-or-string nil)
-    (setq helm-suspend-update-flag nil)))
-
-(defun helm--advice-ange-ftp-get-passwd (old--fn &rest args)
-  ;; Suspend update when prompting for a ange password.
-  (setq helm-suspend-update-flag t)
-  (setq overriding-terminal-local-map nil)
-  (setq helm--reading-passwd-or-string t)
-  (unwind-protect
        (apply old--fn args)
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
