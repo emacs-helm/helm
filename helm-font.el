@@ -20,10 +20,16 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-help)
+(require 'ring)
 
 (defgroup helm-font nil
   "Related applications to display fonts in helm."
   :group 'helm)
+
+(defcustom helm-ucs-recent-size 10
+  "Number of recent chars to keep."
+  :type 'integer
+  :group 'helm-font)
 
 (defvar helm-ucs-map
   (let ((map (make-sparse-keymap)))
@@ -255,21 +261,42 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
     (helm-attrset 'action-insert-space 'helm-ucs-insert-space)
     (helm-execute-persistent-action 'action-insert-space)))
 
+(defvar helm-ucs-recent (make-ring helm-ucs-recent-size)
+  "Ring of recent `helm-ucs' selections.")
+
+(defvar helm-ucs-actions
+  (let ((actions '(("Insert character" . helm-ucs-insert-char)
+                   ("Insert character name" . helm-ucs-insert-name)
+                   ("Insert character code in hex" . helm-ucs-insert-code)
+                   ("Kill marked characters" . helm-ucs-kill-char)
+                   ("Kill name" . helm-ucs-kill-name)
+                   ("Kill code" . helm-ucs-kill-code))))
+    (cl-loop for (name . action) in actions
+             for new-action = `(lambda (candidate)
+                                 (ring-remove+insert+extend helm-ucs-recent candidate)
+                                 (funcall #',action candidate))
+             collect (cons name new-action)))
+  "Actions for `helm-source-ucs'.")
+
+(defvar helm-source-ucs-recent
+  (helm-build-sync-source "Recent UCS"
+    :action helm-ucs-actions
+    :candidates (lambda () (ring-elements helm-ucs-recent))
+    :help-message helm-ucs-help-message
+    :keymap helm-ucs-map
+    :match-part (lambda (candidate) (cadr (split-string candidate ":")))
+    :volatile t))
+
 (defvar helm-source-ucs
-  (helm-build-in-buffer-source "Ucs names"
+  (helm-build-in-buffer-source "UCS names"
     :data #'helm-ucs-init
     :get-line #'buffer-substring
     :help-message 'helm-ucs-help-message
     :match-part (lambda (candidate) (cadr (split-string candidate ":")))
     :filtered-candidate-transformer
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
-    :action '(("Insert character" . helm-ucs-insert-char)
-              ("Insert character name" . helm-ucs-insert-name)
-              ("Insert character code in hex" . helm-ucs-insert-code)
-              ("Kill marked characters" . helm-ucs-kill-char)
-              ("Kill name" . helm-ucs-kill-name)
-              ("Kill code" . helm-ucs-kill-code))
-    :keymap  helm-ucs-map)
+    :action helm-ucs-actions
+    :keymap helm-ucs-map)
   "Source for collecting `ucs-names' math symbols.")
 
 ;;;###autoload
@@ -290,7 +317,7 @@ Called with a prefix arg force reloading cache."
           helm-ucs--max-len nil
           ucs-names nil))
   (let ((char (helm-aif (char-after) (string it))))
-    (helm :sources 'helm-source-ucs
+    (helm :sources (list helm-source-ucs-recent helm-source-ucs)
           :history 'helm-ucs-history
           :input (and char (multibyte-string-p char) char)
           :buffer "*helm ucs*")))
