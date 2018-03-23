@@ -299,7 +299,9 @@ The function that call this should set `helm-ec-target' to thing at point."
                        (and del-space (looking-back "\\s-" (1- (point)))
                             (delete-char -1))
                        (if (and (null helm-eshell--quit-flag)
-                                (looking-back "[.]\\{1,2\\}\\'" (1- (point))))
+                                (and (stringp last) (file-directory-p last))
+                                (looking-back "\\([.]\\{1,2\\}\\|[^/]\\)\\'"
+                                              (1- (point))))
                            (prog1 t (insert "/"))
                          ;; We need another flag for space here, but
                          ;; global to pass it to `helm-quit-hook', this
@@ -308,7 +310,10 @@ The function that call this should set `helm-ec-target' to thing at point."
                          ;; more completion, see issue #1832.
                          (unless (or helm-eshell--quit-flag
                                      (looking-back "/\\'" (1- (point))))
-                           (prog1 t (insert " ")))))
+                           (prog1 t (insert " ")))
+                         (when (and helm-eshell--quit-flag
+                                    (string-match-p "[.]\\{2\\}\\'" last))
+                           (insert "/"))))
                  (remove-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
                  (setq helm-eshell--quit-flag nil)))))))
 
