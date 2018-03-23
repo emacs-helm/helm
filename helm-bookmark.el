@@ -287,11 +287,18 @@ BOOKMARK is a bookmark name or a bookmark record."
 If `browse-url-browser-function' is set to something else
 than `w3m-browse-url' use it."
   (require 'helm-net)
-  (let ((file  (or (bookmark-prop-get bookmark 'filename)
-                   (bookmark-prop-get bookmark 'url)))
-        (buf   (generate-new-buffer-name "*w3m*"))
-        (w3m-async-exec nil)
-        (really-use-w3m (equal browse-url-browser-function 'w3m-browse-url)))
+  (let* ((file  (or (bookmark-prop-get bookmark 'filename)
+                    (bookmark-prop-get bookmark 'url)))
+         (buf   (generate-new-buffer-name "*w3m*"))
+         (w3m-async-exec nil)
+         ;; If user don't have anymore w3m installed let it browse its
+         ;; bookmarks with default browser otherwise assume bookmark
+         ;; have been bookmarked from w3m and use w3m.
+         (browse-url-browser-function (or (and (fboundp 'w3m-browse-url)
+                                               (executable-find "w3m")
+                                               'w3m-browse-url)
+                                          browse-url-browser-function))
+         (really-use-w3m (equal browse-url-browser-function 'w3m-browse-url)))
     (helm-browse-url file really-use-w3m)
     (when really-use-w3m
       (bookmark-default-handler
