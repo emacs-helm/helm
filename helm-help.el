@@ -798,7 +798,8 @@ the first candidate or the timestamp of one of the selected files.
 If you need to use something else, use \\<helm-map>\\[next-history-element] and edit
 the date in minibuffer.
 It is also a way to quickly create a new file without opening a buffer, saving it
-and killing it. 
+and killing it.
+To touch more than one new file, separate you filenames with a comma (\",\").
 
 ** Commands
 \\<helm-find-files-map>

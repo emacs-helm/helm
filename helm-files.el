@@ -982,12 +982,21 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
 
 (defun helm-ff-touch-files (_candidate)
   (let* ((files (helm-marked-candidates))
+         (split (if (or (cdr files)
+                        (file-exists-p (car files)))
+                    files
+                  (cl-loop for f in (split-string (car files) ", ?")
+                           collect (expand-file-name
+                                    f helm-ff-default-directory))))
          (timestamp (helm-comp-read
                      "Timestamp (default Now): "
-                     (cl-loop for f in files
-                              for date = (format-time-string
-                                          "%Y-%m-%d %H:%M:%S"
-                                          (nth 5 (file-attributes f)))
+                     (cl-loop for f in split
+                              for time = (file-attributes f)
+                              for date = (and time
+                                              (format-time-string
+                                               "%Y-%m-%d %H:%M:%S"
+                                               (nth 5 time)))
+                              when date
                               collect (cons (format "%s: %s"
                                                     (helm-basename f) date)
                                             date))
@@ -995,9 +1004,11 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
                      (format-time-string "%Y-%m-%d %H:%M:%S"
                                          (current-time))))
          (failures
-          (cl-loop for f in files
-                   when (> (call-process
-                            "touch" nil nil nil "-d" timestamp f)
+          (cl-loop with default-directory = helm-ff-default-directory
+                   for f in split
+                   for file = (or (file-remote-p f 'localname) f)
+                   when (> (process-file
+                            "touch" nil nil nil "-d" timestamp file)
                            0)
                    collect f)))
     (when failures
