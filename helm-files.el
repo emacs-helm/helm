@@ -983,6 +983,7 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
 (defun helm-ff-touch-files (_candidate)
   (let* ((files (helm-marked-candidates))
          (split (if (or (cdr files)
+                        helm-current-prefix-arg
                         (file-exists-p (car files)))
                     files
                   (cl-loop for f in (split-string (car files) ", ?")

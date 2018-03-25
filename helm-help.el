@@ -800,6 +800,8 @@ the date in minibuffer.
 It is also a way to quickly create a new file without opening a buffer, saving it
 and killing it.
 To touch more than one new file, separate you filenames with a comma (\",\").
+If one wants to create (touch) a new file with comma inside the name use a prefix arg,
+this will prevent splitting the name and create multiple files.
 
 ** Commands
 \\<helm-find-files-map>
