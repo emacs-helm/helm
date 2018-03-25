@@ -981,6 +981,7 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
       (funcall cd-eshell))))
 
 (defun helm-ff-touch-files (_candidate)
+  "The touch files action for helm-find-files."
   (let* ((files (helm-marked-candidates))
          (split (if (or (cdr files)
                         helm-current-prefix-arg
@@ -1018,6 +1019,7 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
                (mapconcat (lambda (f) (format "- %s\n" f)) failures "")))))
 
 (defun helm-ff-run-touch-files ()
+  "Used to interactively run touch file action from keyboard."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-touch-files)))
