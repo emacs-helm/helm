@@ -1166,7 +1166,8 @@ leaving Helm.
 \\[helm-ucs-persistent-insert]\t\tInsert character.
 \\[helm-ucs-persistent-forward]\t\tForward character.
 \\[helm-ucs-persistent-backward]\t\tBackward character.
-\\[helm-ucs-persistent-delete]\t\tDelete character backward.")
+\\[helm-ucs-persistent-delete]\t\tDelete character backward.
+\\[helm-ucs-persistent-insert-space]\t\tInsert space.")
 
 ;;; Bookmark help
 ;;
