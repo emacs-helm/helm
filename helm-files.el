@@ -2379,7 +2379,7 @@ Note that only existing directories are saved here."
          (src-name (assoc-default 'name src)))
     (when (or force (helm-file-completion-source-p src)
               (member src-name helm-files-save-history-extra-sources))
-      (let ((mkd (helm-marked-candidates))
+      (let ((mkd (helm-marked-candidates :with-wildcard t))
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
               when (and sel
