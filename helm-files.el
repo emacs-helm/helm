@@ -2374,7 +2374,7 @@ Note that only existing directories are saved here."
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
 (defun helm-files-save-file-name-history (&optional force)
-  "Save selected file to `file-name-history'."
+  "Save marked files to `file-name-history'."
   (let* ((src (helm-get-current-source))
          (src-name (assoc-default 'name src)))
     (when (or force (helm-file-completion-source-p src)
