@@ -1824,7 +1824,9 @@ or when `helm-pattern' is equal to \"~/\"."
   (let ((src (helm-get-current-source)))
     (when (and (helm-file-completion-source-p src)
                (not (get-buffer-window helm-action-buffer 'visible))
-               (not (helm-ff--invalid-tramp-name-p)))
+               (not (helm-ff--invalid-tramp-name-p))
+               (not (string-match-p "\\`[.]\\{2\\}[^/]+"
+                                    (helm-basename helm-pattern))))
       (with-helm-buffer
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
