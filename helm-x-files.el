@@ -98,16 +98,28 @@
                     (replace-match "" t t cand)) end
            collect built))
 
+(defun helm-source-tracker-1_6-transformer (candidates _source)
+  ;; loop through tracker candidates selecting out file:// lines
+  ;; then select part after file:// and url decode to get straight filenames
+  (cl-loop for cand in candidates
+           when (and (stringp cand)
+                     (string-match "\\`[[:space:]]*file://\\(.*\\)" cand))
+           collect (url-unhex-string(match-string 1 cand))))
+
 (defvar helm-source-tracker-search
   (helm-build-async-source "Tracker Search"
     :candidates-process
      (lambda ()
+       ;; the tracker-search command has been deprecated, now invoke via tracker
+       ;; also, disable the contextual snippets which we don't currently use
        (start-process "tracker-search-process" nil
-                      "tracker-search"
+                      "tracker" "search"
+                      "--disable-snippets"
                       "--disable-color"
                       "--limit=512"
                       helm-pattern))
-    :filtered-candidate-transformer #'helm-source-tracker-transformer
+    ;; new simplified transformer of tracker search results
+    :filtered-candidate-transformer #'helm-source-tracker-1_6-transformer
     ;;(multiline) ; https://github.com/emacs-helm/helm/issues/529
     :keymap helm-generic-files-map
     :action 'helm-type-file-actions
