@@ -3462,7 +3462,9 @@ Ask to kill buffers associated with that file, too."
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
-Called with a prefix arg open files in background without selecting them."
+Called with one prefix arg open files in separate windows in a
+vertical split.
+Called with two prefix arg open files in background without selecting them."
   (let ((marked (helm-marked-candidates :with-wildcard t))
         (url-p (and helm--url-regexp ; we should have only one candidate.
                     (string-match helm--url-regexp candidate)))
@@ -3470,9 +3472,11 @@ Called with a prefix arg open files in background without selecting them."
         (find-file-wildcards nil)
         (helm--reading-passwd-or-string t))
     (if (cdr marked)
-        ;; If helm-current-prefix-arg is detected split is done
-        ;; vertically.
-        (helm-window-show-buffers (mapcar 'find-file-noselect marked))
+        (if (equal helm-current-prefix-arg '(16))
+            (mapcar 'find-file-noselect marked)
+          ;; If helm-current-prefix-arg is detected split is done
+          ;; vertically.
+          (helm-window-show-buffers (mapcar 'find-file-noselect marked)))
       (let ((dir (and (not url-p) (helm-basedir candidate))))
         (cond ((and dir (file-directory-p dir))
                (find-file (substitute-in-file-name candidate)))
