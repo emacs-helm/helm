@@ -784,7 +784,8 @@ this files in separate windows using an horizontal layout or a
 vertical layout if you used a prefix arg, when no more windows can be
 displayed in frame, next files are opened in background without being
 displayed.  When using \\<helm-find-files-map>\\[helm-ff-run-switch-other-window] the current
-buffer is kept and files are displayed next to it.
+buffer is kept and files are displayed next to it with same behavior as above.
+When using two prefix args, files are opened in background without beeing displayed.
 
 *** Expand archives as directories in a avfs directory
 
