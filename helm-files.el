@@ -1937,18 +1937,26 @@ or when `helm-pattern' is equal to \"~/\"."
 
 (defun helm-ff--expand-file-name-no-dot (name &optional directory)
   "Prevent expanding \"/home/user/.\" to \"/home/user\"."
-  ;; Issue #1844.
+  ;; Issue #1844 - If user enter "~/." to type an hidden filename
+  ;; don't expand to /home/him e.g.
+  ;; (expand-file-name "~/.") =>"/home/thierry"
+  ;; (helm-ff--expand-substitued-pattern "~/.") =>"/home/thierry/."
   (concat (expand-file-name name directory)
           (and (string-match "[^.]\\.\\'" name) "/.")))
 
 (defun helm-ff--expand-substitued-pattern (pattern)
-  (helm-ff--expand-file-name-no-dot
-   (helm-substitute-in-filename pattern)
-   ;; [Windows] On UNC paths "/" expand to current machine,
-   ;; so use the root of current Drive. (i.e "C:/")
-   (and (memq system-type '(windows-nt ms-dos))
-        (getenv "SystemDrive"))         ; nil on Unix.
-   ))
+  ;; [Windows] On UNC paths "/" expand to current machine,
+  ;; so use the root of current Drive. (i.e "C:/")
+  (let* ((directory (and (memq system-type '(windows-nt ms-dos))
+                         (getenv "SystemDrive")))
+         ;; On Windows use a simple call to `expand-file-name' to
+         ;; avoid Issue #2004.
+         (expand-fn (if directory
+                        #'expand-file-name
+                      #'helm-ff--expand-file-name-no-dot)))
+    (funcall expand-fn (helm-substitute-in-filename pattern)
+             ;; directory is nil on Nix.
+             directory)))
 
 (defun helm-substitute-in-filename (fname)
   "Substitute all parts of FNAME from start up to \"~/\" or \"/\".
