@@ -1694,21 +1694,11 @@ The checksum is copied to kill-ring."
 
 (defun helm-reduce-file-name (fname level)
   "Reduce FNAME by number LEVEL from end."
-  (cl-loop with result
-           with iter = (helm-iter-reduce-fname (expand-file-name fname))
-           repeat level do (setq result (helm-iter-next iter))
-           finally return (or result (expand-file-name "/"))))
-
-(defun helm-iter-reduce-fname (fname)
-  "Yield FNAME reduced by one level at each call."
-  (let ((split (split-string fname "/" t)))
-    (unless (or (null split)
-                (string-match "\\`\\(~\\|[[:alpha:]]:\\)" (car split)))
-      (setq split (cons "/" split)))
-    (lambda ()
-      (when (and split (cdr split))
-        (cl-loop for i in (setq split (butlast split))
-                 concat (if (string= i "/") i (concat i "/")))))))
+  ;; This version comes from issue #2004 (UNC paths) and should fix it.
+  (while (> level 0)
+    (setq fname (expand-file-name (concat fname "/../")))
+    (setq level (1- level)))
+    fname)
 
 (defvar helm-find-files--level-tree nil)
 (defvar helm-find-files--level-tree-iterator nil)
