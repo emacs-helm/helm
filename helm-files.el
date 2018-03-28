@@ -1966,7 +1966,8 @@ and should be used carefully elsewhere, or not at all, using
          (with-temp-buffer
            (insert fname)
            (goto-char (point-min))
-           (skip-chars-forward "/") ;; Avoid infloop in UNC paths Issue #424
+           (when (memq system-type '(windows-nt ms-dos))
+             (skip-chars-forward "/")) ;; Avoid infloop in UNC paths Issue #424
            (if (re-search-forward "~.*/?\\|//\\|/[[:alpha:]]:/" nil t)
                (let ((match (match-string 0)))
                  (goto-char (if (or (string= match "//")
