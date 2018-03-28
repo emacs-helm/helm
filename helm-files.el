@@ -1698,7 +1698,7 @@ The checksum is copied to kill-ring."
   (while (> level 0)
     (setq fname (expand-file-name (concat fname "/../")))
     (setq level (1- level)))
-    fname)
+  fname)
 
 (defvar helm-find-files--level-tree nil)
 (defvar helm-find-files--level-tree-iterator nil)
