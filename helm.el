@@ -1992,7 +1992,8 @@ Return the result of last function call."
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function(s) to SYM for each source if any."
   (let ((sources (or (helm-get-sources sources)
-                     helm-sources)))
+                     ;; `helm-sources' are local to helm-buffer.
+                     (with-helm-buffer helm-sources))))
     (cl-dolist (source sources)
       (helm-aif (assoc-default sym source)
           (helm-funcall-with-source source it)))))
