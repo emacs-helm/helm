@@ -3272,9 +3272,9 @@ WARNING: Do not use this mode yourself, it is internal to helm."
     (when (and helm--buffer-in-new-frame-p (null helm--nested))
       (with-helm-buffer
         (setq-local helm--last-frame-parameters
-                    (helm--get-frame-parameters)))
-      (if helm-display-buffer-reuse-frame
-          (make-frame-invisible) (delete-frame)))
+                    (helm--get-frame-parameters))
+        (if helm-display-buffer-reuse-frame
+            (make-frame-invisible) (delete-frame))))
     ;; bury-buffer from this window.
     ;; Do it at end to make sure buffer is still current.
     (bury-buffer)) ;[1]
