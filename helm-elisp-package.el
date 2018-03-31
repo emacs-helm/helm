@@ -160,8 +160,9 @@
                                 (package-version-join (cdr id)))))
           (error (message (cadr err))))
         ;; Seems like package-descs are symbols with props instead of
-        ;; vectors in emacs-27.
-        unless (assoc (if (sequencep id) (elt id 1) id) package-alist)
+        ;; vectors in emacs-27, use package-desc-name to ensure
+        ;; compatibility in all emacs versions.
+        unless (assoc (package-desc-name id) package-alist)
         collect (if (fboundp 'package-desc-full-name)
                         id
                       (cons (symbol-name (car id))
