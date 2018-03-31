@@ -361,11 +361,17 @@ See `ido-make-buffer-list' for more infos."
          (size (propertize (helm-buffer-size buf)
                            'face 'helm-buffer-size))
          (proc (get-buffer-process buf))
-         (dir (with-current-buffer buffer (helm-aif default-directory (abbreviate-file-name it))))
+         (dir (with-current-buffer buffer
+                (helm-aif default-directory (abbreviate-file-name it))))
          (file-name (helm-aif (buffer-file-name buf) (abbreviate-file-name it)))
          (name (buffer-name buf))
-         (name-prefix (when (and dir (file-remote-p dir))
+         (name-prefix (when (and dir (or (file-remote-p dir)
+                                         (and (fboundp 'tramp-archive-file-name-p)
+                                              (tramp-archive-file-name-p dir))))
                         (propertize "@ " 'face 'helm-ff-prefix))))
+    (when name-prefix
+      (setq dir (helm-url-unhex-string dir)
+            name (helm-url-unhex-string name)))
     ;; No fancy things on remote buffers.
     (if (and name-prefix helm-buffer-skip-remote-checking)
         (helm-buffer--show-details
