@@ -103,6 +103,11 @@ This list is build by default on `completion-ignored-extensions'.
 The directory names should end with \"/?\" e.g. \"\\.git/?\" and the
 file names should end with \"$\" e.g. \"\\.o$\".
 
+To forbid directories but allow filenames with same prefix e.g. forbid
+\".git\" directories but allow \".gitignore\", you can specify the
+both in list like \"\\.git/\" and \"\\.git$\" to be sure it works both
+in `helm-find-files' and other file tools like locate.
+
 These regexps may be used to match the entire path, not just the file
 name, so for example to ignore files with a prefix \".bak.\", use
 \"\\.bak\\..*$\" as the regexp.
