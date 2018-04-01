@@ -462,6 +462,10 @@ Should be called after others transformers i.e (boring buffers)."
 
 (defun helm-buffer--get-preselection (buffer)
   (let ((bufname (buffer-name buffer)))
+    (when (and bufname
+               (file-remote-p (with-current-buffer bufname
+                                default-directory)))
+      (setq bufname (concat "@ " (helm-url-unhex-string bufname))))
     (concat "^"
             (if (and (null helm-buffer-details-flag)
                      (numberp helm-buffer-max-length)
@@ -852,6 +856,10 @@ If a prefix arg is given split windows vertically."
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
                       (buffer-name buffer))))
+    (when (and bufname
+               (file-remote-p (with-current-buffer bufname
+                                default-directory)))
+      (setq bufname (concat "@ " (helm-url-unhex-string bufname))))
     (when bufname
       (regexp-quote
        (if (and helm-buffer-max-length
