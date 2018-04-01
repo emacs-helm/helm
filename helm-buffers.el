@@ -232,24 +232,27 @@ Note that this variable is buffer-local.")
   ;; reused in each source (issue #1907), now 'candidates attr is set
   ;; directly so that each list of candidates is local to source.
   (helm-attrset 'candidates (funcall (helm-attr 'buffer-list)))
-  (let ((result (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers
-                                              (helm-attr
-                                               'filtered-candidate-transformer
-                                               helm-source-buffers-list))
-                         for b in (if allbufs
-                                      (helm-attr 'candidates)
-                                    (helm-skip-boring-buffers
-                                     (helm-attr 'candidates)
-                                     helm-source-buffers-list))
-                         maximize (length b) into len-buf
-                         maximize (length (with-current-buffer b
-                                            (format-mode-line mode-name)))
-                         into len-mode
-                         finally return (cons len-buf len-mode))))
-    (unless (default-value 'helm-buffer-max-length)
-      (helm-set-local-variable 'helm-buffer-max-length (car result)))
-    (unless (default-value 'helm-buffer-max-len-mode)
-      (helm-set-local-variable 'helm-buffer-max-len-mode (cdr result)))))
+  (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers
+                                (helm-attr
+                                 'filtered-candidate-transformer
+                                 helm-source-buffers-list))
+           for b in (if allbufs
+                        (helm-attr 'candidates)
+                      (helm-skip-boring-buffers
+                       (helm-attr 'candidates)
+                       helm-source-buffers-list))
+           unless (default-value
+                    'helm-buffer-max-len-mode)
+           maximize (length b) into len-buf
+           and do (helm-set-local-variable
+                   'helm-buffer-max-length len-buf)
+           unless (default-value
+                    'helm-buffer-max-len-mode)
+           maximize (length (with-current-buffer b
+                              (format-mode-line mode-name)))
+           into len-mode
+           and do (helm-set-local-variable
+                   'helm-buffer-max-length len-mode)))
 
 (defclass helm-source-buffers (helm-source-sync helm-type-buffer)
   ((buffer-list
@@ -448,7 +451,8 @@ Should be called after others transformers i.e (boring buffers)."
                                         (string-width name))
                                      ? )))
            for len = (length mode)
-           when (> len helm-buffer-max-len-mode)
+           when (or (null helm-buffer-max-len-mode)
+                    (> len helm-buffer-max-len-mode))
            do (setq helm-buffer-max-len-mode len)
            for fmode = (concat (make-string
                                 (- (max helm-buffer-max-len-mode len) len) ? )
