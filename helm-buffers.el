@@ -243,7 +243,9 @@ Note that this variable is buffer-local.")
                                      helm-source-buffers-list))
                          maximize (length b) into len-buf
                          maximize (length (with-current-buffer b
-                                            (format-mode-line mode-name)))
+                                            (if (stringp mode-name)
+                                                mode-name
+                                              (format-mode-line mode-name))))
                          into len-mode
                          finally return (cons len-buf len-mode))))
     (unless (default-value 'helm-buffer-max-length)
