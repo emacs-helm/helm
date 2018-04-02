@@ -796,7 +796,7 @@ you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-ex
 *** Tramp archive support (emacs-27+ only)
 
 If your emacs have library tramp-archive.el, you can browse the
-content of it with emacs and BTW helm-find-files. However this beeing
+content of archives with emacs and BTW helm-find-files. However this beeing
 experimental and not very fast, helm doesn't provide an automatic
 expansion and detection of archives, you will have to add the final /
 manually and may have to force update (\\<helm-map>\\[helm-refresh])
