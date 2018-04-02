@@ -881,20 +881,18 @@ of this function is really needed."
     (buffer-string)))
 
 (defun helm-url-unhex-string (str)
-  "Same as `url-unhex-string' but ensure STR is completely decoded.
-
-Doesn't work properly with accentued characters."
+  "Same as `url-unhex-string' but ensure STR is completely decoded."
   (setq str (or str ""))
   (with-temp-buffer
     (save-excursion (insert str))
     (while (re-search-forward "%[A-Za-z0-9]\\{2\\}" nil t)
-      (replace-match (string (string-to-number
-			      (substring (match-string 0) 1)
-                              16))
+      (replace-match (byte-to-string (string-to-number
+                                      (substring (match-string 0) 1)
+                                      16))
                      t t)
       ;; Restart from beginning until string is completely decoded.
       (goto-char (point-min)))
-    (buffer-string)))
+    (decode-coding-string (buffer-string) 'utf-8)))
 
 ;;; Symbols routines
 ;;
