@@ -3272,10 +3272,9 @@ WARNING: Do not use this mode yourself, it is internal to helm."
       ;; Delete or make invisible helm frame.
       (if (and helm--buffer-in-new-frame-p (null helm--nested))
           (progn
-            (with-helm-buffer
-              (setq-local helm--last-frame-parameters
-                          (helm--get-frame-parameters))
-              (bury-buffer))
+            (setq-local helm--last-frame-parameters
+                        (helm--get-frame-parameters))
+            (bury-buffer)
             (if helm-display-buffer-reuse-frame
                 (make-frame-invisible frame) (delete-frame frame)))
         ;; bury-buffer from this window [1].
