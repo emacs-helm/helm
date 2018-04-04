@@ -3263,21 +3263,24 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   "Clean up the mess when helm exit or quit."
   (helm-log "start cleanup")
   (with-current-buffer helm-buffer
-    (setq cursor-type t)
-    (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
-    (remove-hook 'post-command-hook 'helm--update-header-line)
-    ;; Be sure we call cleanup functions from helm-buffer.
-    (helm-funcall-foreach 'cleanup)
-    ;; Delete or make invisible helm frame.
-    (when (and helm--buffer-in-new-frame-p (null helm--nested))
-      (with-helm-buffer
-        (setq-local helm--last-frame-parameters
-                    (helm--get-frame-parameters))
-        (if helm-display-buffer-reuse-frame
-            (make-frame-invisible) (delete-frame))))
-    ;; bury-buffer from this window.
-    ;; Do it at end to make sure buffer is still current.
-    (bury-buffer)) ;[1]
+    (let ((frame (selected-frame)))
+      (setq cursor-type t)
+      (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
+      (remove-hook 'post-command-hook 'helm--update-header-line)
+      ;; Be sure we call cleanup functions from helm-buffer.
+      (helm-funcall-foreach 'cleanup)
+      ;; Delete or make invisible helm frame.
+      (if (and helm--buffer-in-new-frame-p (null helm--nested))
+          (progn
+            (with-helm-buffer
+              (setq-local helm--last-frame-parameters
+                          (helm--get-frame-parameters))
+              (bury-buffer))
+            (if helm-display-buffer-reuse-frame
+                (make-frame-invisible frame) (delete-frame frame)))
+        ;; bury-buffer from this window [1].
+        ;; Do it at end to make sure buffer is still current.
+        (bury-buffer))))
   (helm-kill-async-processes)
   ;; Remove the temporary hooks added
   ;; by `with-helm-temp-hook' that
