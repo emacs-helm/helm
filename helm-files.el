@@ -2217,13 +2217,15 @@ purpose."
        "Pattern=%S"
        (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
       ;; This have to be set after [1] to allow deleting char backward.
-      (setq basedir (expand-file-name
-                     (if (and dir-p helm-ff-auto-update-flag)
-                         ;; Add the final "/" to path
-                         ;; when `helm-ff-auto-update-flag' is enabled.
-                         (file-name-as-directory path)
-                         (if (string= path "")
-                             "/" (file-name-directory path)))))
+      (setq basedir (or (helm-aand
+                         (if (and dir-p helm-ff-auto-update-flag)
+                             ;; Add the final "/" to path
+                             ;; when `helm-ff-auto-update-flag' is enabled.
+                             (file-name-as-directory path)
+                           (if (string= path "")
+                               "/" (file-name-directory path)))
+                         (expand-file-name it))
+                        default-directory))
       (setq helm-ff-default-directory
             (if (string= helm-pattern "")
                 (expand-file-name "/")  ; Expand to "/" or "c:/"
