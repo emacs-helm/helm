@@ -793,6 +793,15 @@ When using two prefix args, files are opened in background without beeing displa
 If you have mounted your filesystem with mountavfs,
 you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-execute-persistent-action].
 
+*** Tramp archive support (emacs-27+ only)
+
+If your emacs have library tramp-archive.el, you can browse the
+content of archives with emacs and BTW helm-find-files. However this beeing
+experimental and not very fast, helm doesn't provide an automatic
+expansion and detection of archives, you will have to add the final /
+manually and may have to force update (\\<helm-map>\\[helm-refresh])
+or remove and add again the final / until tramp finish decompressing archive.
+
 *** Touch files
 
 In the completion buffer, you can choose the default which is the current-time, it is

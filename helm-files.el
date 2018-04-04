@@ -2217,13 +2217,15 @@ purpose."
        "Pattern=%S"
        (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
       ;; This have to be set after [1] to allow deleting char backward.
-      (setq basedir (expand-file-name
-                     (if (and dir-p helm-ff-auto-update-flag)
-                         ;; Add the final "/" to path
-                         ;; when `helm-ff-auto-update-flag' is enabled.
-                         (file-name-as-directory path)
-                         (if (string= path "")
-                             "/" (file-name-directory path)))))
+      (setq basedir (or (helm-aand
+                         (if (and dir-p helm-ff-auto-update-flag)
+                             ;; Add the final "/" to path
+                             ;; when `helm-ff-auto-update-flag' is enabled.
+                             (file-name-as-directory path)
+                           (if (string= path "")
+                               "/" (file-name-directory path)))
+                         (expand-file-name it))
+                        default-directory))
       (setq helm-ff-default-directory
             (if (string= helm-pattern "")
                 (expand-file-name "/")  ; Expand to "/" or "c:/"
@@ -3584,7 +3586,9 @@ Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop for c in candidates collect
-        (cond ((file-remote-p c)
+        (cond ((or (file-remote-p c)
+                   (and (fboundp 'tramp-archive-file-name-p)
+                        (tramp-archive-file-name-p c)))
                (cons (propertize c 'face 'helm-history-remote) c))
               ((file-exists-p c)
                (cons (propertize c 'face 'helm-ff-file) c))
@@ -3598,6 +3602,7 @@ Don't use it in your own code unless you know what you are doing.")
           (helm-build-sync-source "File name history"
             :init (lambda ()
                     (with-helm-alive-p
+                      (require 'tramp-archive nil t)
                       (when helm-ff-file-name-history-use-recentf
                         (require 'recentf)
                         (or recentf-mode (recentf-mode 1)))))

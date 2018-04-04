@@ -79,7 +79,7 @@
   (cl-loop for cand in candidates
            when (and (stringp cand)
                      (string-match "\\`[[:space:]]*file://\\(.*\\)" cand))
-           collect (url-unhex-string(match-string 1 cand))))
+           collect (url-unhex-string (match-string 1 cand))))
 
 (defvar helm-source-tracker-search
   (helm-build-async-source "Tracker Search"
