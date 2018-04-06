@@ -20,7 +20,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-help)
-(require 'ring)
 
 
 (defgroup helm-font nil
@@ -93,7 +92,7 @@
 (defvar helm-ucs--max-len nil)
 (defvar helm-ucs--names nil)
 (defvar helm-ucs-history nil)
-(defvar helm-ucs-recent (make-ring helm-ucs-recent-size)
+(defvar helm-ucs-recent nil
   "Ring of recent `helm-ucs' selections.")
 
 (defun helm-calculate-ucs-alist-max-len (names)
@@ -192,10 +191,17 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
          candidate)
     (match-string n candidate)))
 
+(defun helm-ucs-save-recentest (candidate)
+  (let ((lst (cons candidate (delete candidate helm-ucs-recent))))
+    (setq helm-ucs-recent
+          (if (> (length lst) helm-ucs-recent-size)
+              (nbutlast lst 1)
+            lst))))
+
 (defun helm-ucs-insert (candidate n)
   "Insert the N part of CANDIDATE."
   (with-helm-current-buffer
-    (ring-remove+insert+extend helm-ucs-recent candidate)
+    (helm-ucs-save-recentest candidate)
     (insert (helm-ucs-match candidate n))))
 
 (defun helm-ucs-insert-char (candidate)
@@ -215,17 +221,17 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
   "Action that concatenate ucs marked chars."
   (let ((marked (helm-marked-candidates)))
     (cl-loop for candidate in marked
-             do (ring-remove+insert+extend helm-ucs-recent candidate))
+             do (helm-ucs-save-recentest candidate))
     (kill-new (mapconcat (lambda (x)
                            (helm-ucs-match x 2))
                          marked ""))))
 
 (defun helm-ucs-kill-code (candidate)
-  (ring-remove+insert+extend helm-ucs-recent candidate)
+  (helm-ucs-save-recentest candidate)
   (kill-new (helm-ucs-match candidate 1)))
 
 (defun helm-ucs-kill-name (candidate)
-  (ring-remove+insert+extend helm-ucs-recent candidate)
+  (helm-ucs-save-recentest candidate)
   (kill-new (helm-ucs-match candidate 3)))
 
 ;; Navigation in current-buffer (persistent)
@@ -276,7 +282,7 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
 (defvar helm-source-ucs-recent
   (helm-build-sync-source "Recent UCS"
     :action helm-ucs-actions
-    :candidates (lambda () (ring-elements helm-ucs-recent))
+    :candidates (lambda () helm-ucs-recent)
     :help-message helm-ucs-help-message
     :keymap helm-ucs-map
     :match-part (lambda (candidate) (cadr (split-string candidate ":")))
