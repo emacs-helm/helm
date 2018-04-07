@@ -343,17 +343,21 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (setq candidates (append (list
                                 ;; Unquote helm-pattern
                                 ;; when it is added
-                                ;; as candidate.
-                                (replace-regexp-in-string
-                                 "\\s\\" "" helm-pattern))
+                                ;; as candidate: Why? #2015
+                                ;; (replace-regexp-in-string
+                                ;;  "\\s\\" "" helm-pattern)
+                                helm-pattern)
                                candidates))
       ;; Notify pattern have been added to candidates.
       (setq unknown-pattern t))
     (cl-loop for c in candidates
              for cand = (if (stringp c)
-                            (replace-regexp-in-string "\\s\\" "" c) c)
+                            (replace-regexp-in-string "\\s\\" "" c)
+                          c)
              for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
-             if (and (equal c pat) unknown-pattern) collect
+             if (and (or (equal c pat) (equal c helm-pattern))
+                     unknown-pattern)
+             collect
              (cons (concat (propertize
                             " " 'display
                             (propertize "[?]" 'face 'helm-ff-prefix))
@@ -639,6 +643,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :preselect preselect
                          :prompt prompt
                          :resume 'noresume
+                         :keymap loc-map ;; Needed with empty collection.
                          :allow-nest allow-nest
                          :candidate-number-limit candidate-number-limit
                          :case-fold-search case-fold
