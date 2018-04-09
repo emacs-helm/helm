@@ -1400,7 +1400,7 @@ Local to `helm-buffer'.")
 This may be let bounded in other places to notify the display function
 to reuse the same frame parameters as the previous helm session just
 like resume would do.")
-(defvar helm--current-buffer-narrowed-p nil)
+(defvar helm--current-buffer-narrowed nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2368,6 +2368,7 @@ as a string with ARG."
   (interactive "P")
   (let (any-buffer
         cur-dir
+        narrow-pos
         (helm-full-frame (default-value 'helm-full-frame)))
     (if arg
         (if (and (stringp arg) (bufferp (get-buffer arg)))
@@ -2388,9 +2389,13 @@ as a string with ARG."
     (unless (buffer-live-p helm-current-buffer)
       ;; `helm-current-buffer' may have been killed.
       (setq helm-current-buffer (current-buffer)))
+    (helm-aif (with-current-buffer any-buffer
+                helm--current-buffer-narrowed)
+          (progn
+            (set-buffer (car it))
+            (setq narrow-pos (cdr it))))
     (save-restriction
-      (helm-aif (with-current-buffer any-buffer helm--current-buffer-narrowed-p)
-          (apply #'narrow-to-region it))
+      (when narrow-pos (apply #'narrow-to-region narrow-pos))
       ;; Restart with same `default-directory' value this session
       ;; was initially started with.
       (with-helm-default-directory cur-dir
@@ -2988,8 +2993,9 @@ See :after-init-hook and :before-init-hook in `helm-source'."
         helm-saved-current-source nil)
   (when (and (with-helm-current-buffer (buffer-narrowed-p))
              (not helm--nested))
-    (helm-set-local-variable 'helm--current-buffer-narrowed-p
-                             (list (region-beginning) (region-end))))
+    (helm-set-local-variable 'helm--current-buffer-narrowed
+                             (list (current-buffer)
+                                   (region-beginning) (region-end))))
   (unless (and (or helm-split-window-state
                    helm--window-side-state)
                helm-reuse-last-window-split-state)
