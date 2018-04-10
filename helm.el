@@ -2991,7 +2991,9 @@ See :after-init-hook and :before-init-hook in `helm-source'."
         helm-buffer-file-name buffer-file-name
         helm-issued-errors nil
         helm-saved-current-source nil)
-  (when (and (with-helm-current-buffer (buffer-narrowed-p))
+  (when (and (with-helm-current-buffer
+               (and (buffer-narrowed-p)
+                    (use-region-p)))
              (not helm--nested))
     (helm-set-local-variable 'helm--current-buffer-narrowed
                              (list (current-buffer)
