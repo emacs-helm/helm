@@ -666,18 +666,26 @@ Special commands:
   (helm-set-local-variable 'helm-occur--invisible
                            (null helm-occur-show-buffer-name))
   (save-restriction
-    (when (use-region-p)
-      (narrow-to-region (region-beginning) (region-end)))
-    (unwind-protect
-         (helm :sources 'helm-source-occur
-               :buffer "*helm occur*"
-               :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
-               :history 'helm-occur-history
-               :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
-                               (format "%s:%d:" (regexp-quote (buffer-name))
-                                       (line-number-at-pos (point))))
-               :truncate-lines helm-moccur-truncate-lines)
-      (deactivate-mark t))))
+    (let (def pos)
+      (when (use-region-p)
+        ;; When user mark defun with `mark-defun' with intention of
+        ;; using helm-occur on this region, it is relevant to use the
+        ;; thing-at-point located at previous position which have been
+        ;; pushed to `mark-ring'.
+        (setq def (save-excursion
+                    (goto-char (setq pos (car mark-ring)))
+                    (helm-aif (thing-at-point 'symbol) (regexp-quote it))))
+        (narrow-to-region (region-beginning) (region-end)))
+      (unwind-protect
+           (helm :sources 'helm-source-occur
+                 :buffer "*helm occur*"
+                 :default (or def (helm-aif (thing-at-point 'symbol) (regexp-quote it)))
+                 :history 'helm-occur-history
+                 :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
+                                 (format "%s:%d:" (regexp-quote (buffer-name))
+                                         (line-number-at-pos (or pos (point)))))
+                 :truncate-lines helm-moccur-truncate-lines)
+        (deactivate-mark t)))))
 
 ;;;###autoload
 (defun helm-occur-from-isearch ()
