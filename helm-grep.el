@@ -248,7 +248,8 @@ You probably don't need to use this unless you know what you are doing."
 (defface helm-grep-match
   '((((background light)) :foreground "#b00000")
     (((background dark))  :foreground "gold1"))
-  "Face used to highlight grep matches."
+  "Face used to highlight grep matches.
+Have no effect when grep backend use \"--color=\"."
   :group 'helm-grep-faces)
 
 (defface helm-grep-file
