@@ -667,16 +667,17 @@ Special commands:
                            (null helm-occur-show-buffer-name))
   (save-restriction
     (when (use-region-p)
-      (narrow-to-region (region-beginning) (region-end))
-      (deactivate-mark t))
-    (helm :sources 'helm-source-occur
-          :buffer "*helm occur*"
-          :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
-          :history 'helm-occur-history
-          :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
-                          (format "%s:%d:" (regexp-quote (buffer-name))
-                                  (line-number-at-pos (point))))
-          :truncate-lines helm-moccur-truncate-lines)))
+      (narrow-to-region (region-beginning) (region-end)))
+    (unwind-protect
+         (helm :sources 'helm-source-occur
+               :buffer "*helm occur*"
+               :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
+               :history 'helm-occur-history
+               :preselect (and (memq 'helm-source-occur helm-sources-using-default-as-input)
+                               (format "%s:%d:" (regexp-quote (buffer-name))
+                                       (line-number-at-pos (point))))
+               :truncate-lines helm-moccur-truncate-lines)
+      (deactivate-mark t))))
 
 ;;;###autoload
 (defun helm-occur-from-isearch ()
