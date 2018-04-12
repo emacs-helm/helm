@@ -1289,6 +1289,8 @@ in other window horizontally or vertically if a prefix arg is supplied.
 *** Save the results
 
 Similarly to Helm-grep, you can save the results with `\\<helm-map>\\[helm-moccur-run-save-buffer]'.
+Once in the saved buffer, you can edit it, see [[Edit a saved buffer][below]].
+
 Of course if you don't save the results, you can resume the Helm session with
 `helm-resume'.
 
@@ -1306,11 +1308,19 @@ Type `g' to update the buffer.
 
 First, install wgrep (https://github.com/mhayashi1120/Emacs-wgrep) and then:
 
-1) `C-c C-p' to edit the buffer(s).
+1) `C-c C-p' (`wgrep-change-to-wgrep-mode') to edit the buffer(s).
 2) `C-x C-s' to save your changes.
 
-Tip: Use the excellent iedit (https://github.com/tsdh/iedit) to modify all
+Tip: Use the excellent iedit (https://github.com/victorhge/iedit) to modify all
 occurences at once in the buffer.
+
+*** Search in region
+
+When searching in current-buffer with `helm-occur', if a region
+is found helm will search in this region only.  If you marked
+this region with `mark-defun' the symbol that was at point before
+marking defun will be used when `helm-source-occur' is member of
+`helm-sources-using-default-as-input'.
 
 ** Commands
 \\<helm-moccur-map>

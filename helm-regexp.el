@@ -653,7 +653,21 @@ Special commands:
 
 ;;;###autoload
 (defun helm-occur ()
-  "Preconfigured helm for Occur."
+  "Preconfigured helm for searching lines matching pattern in `current-buffer'.
+
+When `helm-source-occur' is member of
+`helm-sources-using-default-as-input' which is the default,
+symbol at point is searched at startup.
+
+When a region is marked search only in this region by narrowing.
+
+To search in multiples buffers start from one of the commands listing
+buffers (i.e. a helm command using `helm-source-buffers-list' like
+`helm-mini') and use the multi occur buffers action.
+
+This is the helm implementation that collect lines matching pattern
+like vanilla emacs `occur' but have nothing to do with it, the search
+engine beeing completely different."
   (interactive)
   (helm-occur-init-source)
   (let ((bufs (list (buffer-name (current-buffer)))))
