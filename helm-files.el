@@ -49,7 +49,6 @@
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 (declare-function helm-gid "helm-id-utils.el")
-(declare-function helm-ls-svn-ls "ext:helm-ls-svn")
 (declare-function helm-find-1 "helm-find")
 (declare-function helm-get-default-program-for-file "helm-external")
 
@@ -3734,9 +3733,7 @@ NOTE: The prefix ARG have no effect on the VCS controlled directories.
 Needed dependencies for VCS:
 <https://github.com/emacs-helm/helm-ls-git>
 and
-<https://github.com/emacs-helm/helm-ls-hg>
-and
-<http://melpa.org/#/helm-ls-svn>."
+<https://github.com/emacs-helm/helm-ls-hg>."
   (interactive "P")
   (let ((helm-type-buffer-actions
          (remove (assoc "Browse project from buffer"
@@ -3756,11 +3753,6 @@ and
                         (helm-hg-root))
                    (push-to-hist it)
                    (helm-hg-find-files-in-project))
-                  ((and (require 'helm-ls-svn nil t)
-                        (fboundp 'helm-ls-svn-root-dir)
-                        (helm-ls-svn-root-dir))
-                   (push-to-hist it)
-                   (helm-ls-svn-ls))
                   ((helm-browse-project-get--root-dir (helm-current-directory))
                    (if (or arg (gethash it helm--browse-project-cache))
                        (progn
