@@ -2878,15 +2878,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
              (require 'image-dired)
              (let* ((win (get-buffer-window
                           image-dired-display-image-buffer 'visible))
-                    (remove-buf-only
-                     (and win
-                          (with-helm-buffer
-                            (file-equal-p candidate
-                                          (with-current-buffer
-                                              image-dired-display-image-buffer
-                                            (get-text-property
-                                             (point-min)
-                                             'original-file-name)))))))
+                    (fname (and (buffer-live-p image-dired-display-image-buffer)
+                                (with-current-buffer image-dired-display-image-buffer
+                                  (get-text-property (point-min)
+                                                     'original-file-name))))
+                    (remove-buf-only (and win
+                                          fname
+                                          (with-helm-buffer
+                                            (file-equal-p candidate fname)))))
                (when remove-buf-only
                  (set-window-buffer win helm-current-buffer))
                (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
@@ -2896,8 +2895,10 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                  (unless (file-directory-p image-dired-dir)
                    (make-directory image-dired-dir))
                  (switch-to-buffer image-dired-display-image-buffer)
+                 (message "Resizing image...")
                  (cl-letf (((symbol-function 'message) #'ignore))
                    (image-dired-display-image candidate))
+                 (message "Resizing image done")
                  (with-current-buffer image-dired-display-image-buffer
                    (let ((exif-data (helm-ff-exif-data candidate)))
                      (setq default-directory helm-ff-default-directory)
