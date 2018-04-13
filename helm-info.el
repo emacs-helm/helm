@@ -53,8 +53,8 @@ files with `helm-info-at-point'."
                  (helm-candidate-buffer))
       (kill-buffer it))
   (unless (helm-candidate-buffer)
-    (save-window-excursion
-      (info file)
+    (save-selected-window
+      (info file " *helm info temp buffer*")
       (let ((tobuf (helm-candidate-buffer 'global))
             Info-history
             start end line)
@@ -78,7 +78,8 @@ files with `helm-info-at-point'."
                           "\n" "" (buffer-substring start end)))
               (with-current-buffer tobuf
                 (insert line)
-                (insert "\n")))))))))
+                (insert "\n")))))
+        (bury-buffer)))))
 
 (defun helm-info-goto (node-line)
   (Info-goto-node (car node-line))
