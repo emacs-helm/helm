@@ -213,8 +213,8 @@ When only `add-text-properties' is available APPEND is ignored."
                                   if (member f old-to-rename)
                                   collect (assoc-default f files-renamed)
                                   else collect f))))
-	  ;; Re-sort the buffer.
-	  (revert-buffer)
+	  ;; Re-sort the buffer if all went well.
+	  (unless (> errors 0) (revert-buffer))
 	  (let ((inhibit-read-only t))
 	    (dired-mark-remembered wdired-old-marks)))
       (let ((inhibit-read-only t))
