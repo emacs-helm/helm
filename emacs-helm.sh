@@ -69,7 +69,7 @@ cat > $CONF_FILE <<EOF
 ;; - \`occur'(M-s o)                  =>\`helm-occur'\\n\
 ;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\\n\
 ;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\\n\
-;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\\n\
+;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\
 ;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\\n
 ;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\\n\
 ;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\\n\
