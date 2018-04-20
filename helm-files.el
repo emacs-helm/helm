@@ -982,13 +982,15 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
 (defun helm-ff-touch-files (_candidate)
   "The touch files action for helm-find-files."
   (let* ((files (helm-marked-candidates))
-         (split (if (or (cdr files)
-                        helm-current-prefix-arg
-                        (file-exists-p (car files)))
-                    files
-                  (cl-loop for f in (split-string (car files) ", ?")
-                           collect (expand-file-name
-                                    f helm-ff-default-directory))))
+         (split (cl-loop for f in files
+                         for spt = (unless helm-current-prefix-arg
+                                     (cons (helm-basedir f)
+                                           (split-string f ", ?")))
+                         if spt
+                         append (cl-loop with dir = (car spt)
+                                         for ff in (cdr spt)
+                                         collect (expand-file-name ff dir))
+                         else collect f))
          (timestamp (helm-comp-read
                      "Timestamp (default Now): "
                      (cl-loop for f in split
