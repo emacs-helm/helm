@@ -34,8 +34,15 @@
 <div align="center">
   Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
   I have done freely since 2011.<br>
-  As it is taking a lot of my time it starts to be more and more difficult<br>
+  As it demands lots of my time it gets increasingly difficult<br>
   maintaining it without financial help.<br>
+  Thanks to all the people that are helping or have helped Helm development,<br>
+  but they are actually too few to continue serenely.<br>
+  By the way, after the release of version 3.0 I will have to stop<br>
+  developing Helm seriously until I get enough financial support,<br> 
+  only providing a minimal bugfix maintenance.<br>
+  Thanks for your understanding<br>
+
   If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
 </div>
 
