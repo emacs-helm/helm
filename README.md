@@ -43,8 +43,8 @@
   developing Helm seriously until I get enough support,<br> 
   only providing a minimal bugfix maintenance.<br>
   Thanks for your understanding<br>
-
-  If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
+  If you feel Helm is making your daily work easier,<br>
+  <b>please consider making a donation.</b><br>
 
 </p>
 
