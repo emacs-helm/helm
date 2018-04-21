@@ -2960,7 +2960,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
     (helm :sources
           (helm-make-source
               "Recursive directories" 'helm-locate-subdirs-source
-            :basedir (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
+            :basedir (if (string-match-p
+                          "\\`es" helm-locate-recursive-dirs-command)
                          directory
                        (shell-quote-argument directory))
             :subdir (shell-quote-argument input)
