@@ -862,9 +862,8 @@ If a prefix arg is given split windows vertically."
         (progn
           (message "Can't kill `%s' without quitting session" helm-buf-or-cur)
           (sit-for 1))
-        (with-current-buffer buf
-          (kill-buffer buffer-or-name))
-        (helm-delete-current-selection))))
+      (kill-buffer buf)
+      (helm-delete-current-selection))))
 
 (defun helm-buffers--quote-truncated-buffer (buffer)
   (let ((bufname (and (bufferp buffer)
@@ -883,21 +882,24 @@ If a prefix arg is given split windows vertically."
          bufname)))))
 
 (defun helm-buffers-persistent-kill (_buffer)
-  (let ((marked (helm-marked-candidates)))
+  (let ((marked (helm-marked-candidates))
+        (sel    (helm-get-selection)))
     (unwind-protect
          (cl-loop for b in marked
-               do (progn (helm-preselect
-                          (format "^%s"
-                                  (helm-buffers--quote-truncated-buffer b)))
-                         (save-selected-window
-                           (helm-buffers-persistent-kill-1 b))
-                         (message nil)
-                         (helm--remove-marked-and-update-mode-line b)))
+                  do (progn
+                       ;; We need to preselect each marked because
+                       ;; helm-buffers-persistent-kill is deleting
+                       ;; current selection.
+                       (helm-preselect
+                        (format "^%s"
+                                (helm-buffers--quote-truncated-buffer b)))
+                       (helm-buffers-persistent-kill-1 b)
+                       (message nil)
+                       (helm--remove-marked-and-update-mode-line b)))
       (with-helm-buffer
         (setq helm-marked-candidates nil
               helm-visible-mark-overlays nil))
-      (helm-force-update (helm-buffers--quote-truncated-buffer
-                          (helm-get-selection))))))
+      (helm-force-update (helm-buffers--quote-truncated-buffer sel)))))
 
 (defun helm-buffers-list-persistent-action (candidate)
   (let ((current (window-buffer helm-persistent-action-display-window)))
