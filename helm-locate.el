@@ -154,6 +154,7 @@ help for more infos."
     (define-key map (kbd "M-.")     'helm-ff-run-etags)
     (define-key map (kbd "C-c @")   'helm-ff-run-insert-org-link)
     (define-key map (kbd "C-x C-q") 'helm-ff-run-marked-files-in-dired)
+    (define-key map (kbd "C-c C-a") 'helm-ff-run-mail-attach-files)
     map)
   "Generic Keymap for files.")
 
