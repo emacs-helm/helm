@@ -245,8 +245,7 @@ Info files are made available."
 
 ;;;###autoload
 (defun helm-info-at-point ()
-  "Preconfigured `helm' for searching info at point.
-With a prefix-arg insert symbol at point."
+  "Preconfigured `helm' for searching info at point."
   (interactive)
   (helm :sources helm-info-default-sources
         :buffer "*helm info*"))
