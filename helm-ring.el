@@ -176,6 +176,8 @@ replace with STR as yanked string."
                                   (set-marker (mark-marker)
                                               (point)
                                               helm-current-buffer)))))))
+    ;; Prevent inserting and saving highlighted items.
+    (set-text-properties 0 (length str) nil str)
     (with-helm-current-buffer
       (unwind-protect
            (progn
