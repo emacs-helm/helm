@@ -753,7 +753,8 @@ Inlined here for compatibility."
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
          start-match end-match
-         (args (list start end buf)))
+         (args (list start end buf))
+         (case-fold-search (helm-set-case-fold-search)))
     ;; Highlight the current line.
     (if (not helm-match-line-overlay)
         (setq helm-match-line-overlay (apply 'make-overlay args))
