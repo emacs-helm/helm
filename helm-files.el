@@ -2626,13 +2626,16 @@ Return candidates prefixed with basename of `helm-input' first."
                helm-ff-tramp-not-fancy)
           (if helm-ff-transformer-show-only-basename
               (if (helm-dir-is-dot file)
-                  file
+                  (propertize file 'face 'helm-ff-dotted-directory)
                 (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
                           (if (get-text-property 1 'helm-ff-dir file)
                               (propertize basename 'face 'helm-ff-directory)
                             basename))
                       file))
-            file)
+            (cons (if (get-text-property 1 'helm-ff-dir file)
+                      (propertize file 'face 'helm-ff-directory)
+                    file)
+                  file))
         ;; Now highlight.
         (let* ((disp (if (and helm-ff-transformer-show-only-basename
                               (not (helm-dir-is-dot file))
@@ -2640,7 +2643,8 @@ Return candidates prefixed with basename of `helm-input' first."
                                         (string-match helm--url-regexp file)))
                               (not (string-match helm-ff-url-regexp file)))
                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                             basename) file))
+                             basename)
+                       file))
                (attr (file-attributes file))
                (type (car attr)))
 
