@@ -2274,6 +2274,16 @@ purpose."
                        (list path))
                      (helm-ff-directory-files basedir t))))))
 
+(defun helm-list-directory (directory)
+  (cl-loop for f in (sort (file-name-all-completions "" directory)
+                          'string-lessp)
+           unless (or (member f '("./" "../"))
+                      (char-equal (aref f (1- (length f))) ?:))
+           if (and (helm--dir-name-p f)
+                   (helm--dir-file-name f directory))
+           collect (propertize it 'helm-ff-dir t)
+           else collect (expand-file-name f directory)))
+
 (defun helm-ff-directory-files (directory &optional full)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -2284,8 +2294,7 @@ systems."
                    (expand-file-name directory)))
   (let* (file-error
          (ls   (condition-case err
-                   (directory-files
-                    directory full directory-files-no-dot-files-regexp)
+                   (helm-list-directory directory)
                  ;; Handle file-error from here for Windows
                  ;; because predicates like `file-readable-p' and friends
                  ;; seem broken on emacs for Windows systems (always returns t).
@@ -2619,7 +2628,9 @@ Return candidates prefixed with basename of `helm-input' first."
               (if (helm-dir-is-dot file)
                   file
                 (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                          basename)
+                          (if (get-text-property 1 'helm-ff-dir file)
+                              (propertize basename 'face 'helm-ff-directory)
+                            basename))
                       file))
             file)
         ;; Now highlight.
