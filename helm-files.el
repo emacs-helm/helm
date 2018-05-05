@@ -1697,7 +1697,10 @@ The checksum is copied to kill-ring."
   "Reduce FNAME by number LEVEL from end."
   ;; This version comes from issue #2004 (UNC paths) and should fix it.
   (while (> level 0)
-    (setq fname (expand-file-name (concat fname "/../")))
+    (unless (or (string= fname "/")
+                (string= (file-remote-p fname 'localname) "/"))
+      (setq fname (expand-file-name
+                   (concat (expand-file-name fname) "/../"))))
     (setq level (1- level)))
   fname)
 
