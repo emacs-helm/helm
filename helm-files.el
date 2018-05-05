@@ -102,7 +102,7 @@ See `helm-ff--transform-pattern-for-completion' for more info."
 When 'dirs-only is passed as value (default) only directories are
 shown.
 
-Be aware that a nil value will make tramp display very slow.."
+Be aware that a nil value will make tramp display very slow."
   :group 'helm-files
   :type  '(choice
            (const :tag "Show directories only" dirs-only)
@@ -1691,7 +1691,7 @@ The checksum is copied to kill-ring."
     (let* ((cand   (helm-get-selection nil t))
            (target (if helm-ff-transformer-show-only-basename
                        (helm-basename cand) cand)))
-      (helm-force-update (regexp-quote target)))))
+      (helm-force-update (concat (regexp-quote target) "$")))))
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
