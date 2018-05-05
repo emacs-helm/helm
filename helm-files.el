@@ -2258,21 +2258,21 @@ purpose."
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
            (list path))
-          ((string= path "") (helm-ff-directory-files "/" t))
+          ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
            (list (format "file-error: Opening directory permission denied `%s'" path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
-           (helm-ff-directory-files path t))
+           (helm-ff-directory-files path))
           (t (append (unless (or require-match
                                  ;; When `helm-ff-auto-update-flag' has been
                                  ;; disabled, whe don't want PATH to be added on top
                                  ;; if it is a directory.
                                  dir-p)
                        (list path))
-                     (helm-ff-directory-files basedir t))))))
+                     (helm-ff-directory-files basedir))))))
 
 (defun helm-list-directory (directory)
   (cl-loop for f in (sort (file-name-all-completions "" directory)
@@ -2284,7 +2284,7 @@ purpose."
            collect (propertize it 'helm-ff-dir t)
            else collect (expand-file-name f directory)))
 
-(defun helm-ff-directory-files (directory &optional full)
+(defun helm-ff-directory-files (directory)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
