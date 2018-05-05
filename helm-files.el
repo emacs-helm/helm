@@ -96,11 +96,18 @@ See `helm-ff--transform-pattern-for-completion' for more info."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-ff-tramp-not-fancy t
-  "No colors when listing remote files when set to non--nil.
-This make listing much faster, specially on slow machines."
+(defcustom helm-ff-tramp-not-fancy 'dirs-only
+  "Colorize remote files when non nil.
+
+When 'dirs-only is passed as value (default) only directories are
+shown.
+
+Be aware that a nil value will make tramp display very slow."
   :group 'helm-files
-  :type  'boolean)
+  :type  '(choice
+           (const :tag "Show directories only" dirs-only)
+           (const :tag "No colors" t)
+           (const :tag "Colorize all" nil)))
 
 (defcustom helm-ff-exif-data-program "exiftran"
   "Program used to extract exif data of an image file."
@@ -1684,7 +1691,7 @@ The checksum is copied to kill-ring."
     (let* ((cand   (helm-get-selection nil t))
            (target (if helm-ff-transformer-show-only-basename
                        (helm-basename cand) cand)))
-      (helm-force-update (regexp-quote target)))))
+      (helm-force-update (concat (regexp-quote target) "$")))))
 
 (defun helm-ff-run-toggle-basename ()
   (interactive)
@@ -2261,23 +2268,35 @@ purpose."
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
            (list path))
-          ((string= path "") (helm-ff-directory-files "/" t))
+          ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
            (list (format "file-error: Opening directory permission denied `%s'" path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
-           (helm-ff-directory-files path t))
+           (helm-ff-directory-files path))
           (t (append (unless (or require-match
                                  ;; When `helm-ff-auto-update-flag' has been
                                  ;; disabled, whe don't want PATH to be added on top
                                  ;; if it is a directory.
                                  dir-p)
                        (list path))
-                     (helm-ff-directory-files basedir t))))))
+                     (helm-ff-directory-files basedir))))))
 
-(defun helm-ff-directory-files (directory &optional full)
+(defun helm-list-directory (directory)
+  (if (file-remote-p directory)
+      (cl-loop for f in (sort (file-name-all-completions "" directory)
+                              'string-lessp)
+               unless (or (member f '("./" "../"))
+                          (char-equal (aref f (1- (length f))) ?:))
+               if (and (helm--dir-name-p f)
+                       (helm--dir-file-name f directory))
+               collect (propertize it 'helm-ff-dir t)
+               else collect (expand-file-name f directory))
+    (directory-files directory t directory-files-no-dot-files-regexp)))
+
+(defun helm-ff-directory-files (directory)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the
@@ -2287,8 +2306,7 @@ systems."
                    (expand-file-name directory)))
   (let* (file-error
          (ls   (condition-case err
-                   (directory-files
-                    directory full directory-files-no-dot-files-regexp)
+                   (helm-list-directory directory)
                  ;; Handle file-error from here for Windows
                  ;; because predicates like `file-readable-p' and friends
                  ;; seem broken on emacs for Windows systems (always returns t).
@@ -2620,11 +2638,20 @@ Return candidates prefixed with basename of `helm-input' first."
                helm-ff-tramp-not-fancy)
           (if helm-ff-transformer-show-only-basename
               (if (helm-dir-is-dot file)
-                  file
+                  (if (eq helm-ff-tramp-not-fancy 'dirs-only)
+                      (propertize file 'face 'helm-ff-dotted-directory)
+                    file)
                 (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                          basename)
+                          (if (and (get-text-property 1 'helm-ff-dir file)
+                                   (eq helm-ff-tramp-not-fancy 'dirs-only))
+                              (propertize basename 'face 'helm-ff-directory)
+                            basename))
                       file))
-            file)
+            (cons (if (and (get-text-property 1 'helm-ff-dir file)
+                           (eq helm-ff-tramp-not-fancy 'dirs-only))
+                      (propertize file 'face 'helm-ff-directory)
+                    file)
+                  file))
         ;; Now highlight.
         (let* ((disp (if (and helm-ff-transformer-show-only-basename
                               (not (helm-dir-is-dot file))
@@ -2632,7 +2659,8 @@ Return candidates prefixed with basename of `helm-input' first."
                                         (string-match helm--url-regexp file)))
                               (not (string-match helm-ff-url-regexp file)))
                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                             basename) file))
+                             basename)
+                       file))
                (attr (file-attributes file))
                (type (car attr)))
 
