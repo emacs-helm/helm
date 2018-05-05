@@ -96,11 +96,18 @@ See `helm-ff--transform-pattern-for-completion' for more info."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-ff-tramp-not-fancy t
-  "No colors when listing remote files when set to non--nil.
-This make listing much faster, specially on slow machines."
+(defcustom helm-ff-tramp-not-fancy 'dirs-only
+  "Colorize remote files when non nil.
+
+When 'dirs-only is passed as value (default) only directories are
+shown.
+
+Be aware that a nil value will make tramp display very slow.."
   :group 'helm-files
-  :type  'boolean)
+  :type  '(choice
+           (const :tag "Show directories only" dirs-only)
+           (const :tag "No colors" t)
+           (const :tag "Colorize all" nil)))
 
 (defcustom helm-ff-exif-data-program "exiftran"
   "Program used to extract exif data of an image file."
@@ -2626,13 +2633,17 @@ Return candidates prefixed with basename of `helm-input' first."
                helm-ff-tramp-not-fancy)
           (if helm-ff-transformer-show-only-basename
               (if (helm-dir-is-dot file)
-                  (propertize file 'face 'helm-ff-dotted-directory)
+                  (if (eq helm-ff-tramp-not-fancy 'dirs-only)
+                      (propertize file 'face 'helm-ff-dotted-directory)
+                    file)
                 (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                          (if (get-text-property 1 'helm-ff-dir file)
+                          (if (and (get-text-property 1 'helm-ff-dir file)
+                                   (eq helm-ff-tramp-not-fancy 'dirs-only))
                               (propertize basename 'face 'helm-ff-directory)
                             basename))
                       file))
-            (cons (if (get-text-property 1 'helm-ff-dir file)
+            (cons (if (and (get-text-property 1 'helm-ff-dir file)
+                           (eq helm-ff-tramp-not-fancy 'dirs-only))
                       (propertize file 'face 'helm-ff-directory)
                     file)
                   file))
