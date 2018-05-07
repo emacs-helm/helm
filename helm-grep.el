@@ -1158,7 +1158,13 @@ in recurse, and ignore EXTS, search being made recursively on files matching
          (line   (if ansi-p (helm--ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
          (fname  (if (and root split)
-                     (expand-file-name (car split) root)
+                     ;; Filename should always be provided as a local
+                     ;; path, if the root directory is remote, the
+                     ;; tramp prefix will be added before executing
+                     ;; action, see `helm-grep-action' and issue #2032.
+                     (expand-file-name (car split)
+                                       (or (file-remote-p root 'localname)
+                                           root))
                    (car-safe split)))
          (lineno (nth 1 split))
          (str    (nth 2 split))
