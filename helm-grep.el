@@ -604,7 +604,7 @@ WHERE can be one of other-window, other-frame."
          (tramp-host   (file-remote-p (or helm-ff-default-directory
                                           default-directory) 'host))
          (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host
+         (fname        (if (and tramp-host (not (file-remote-p loc-fname)))
                            (concat tramp-prefix loc-fname) loc-fname)))
     (cl-case where
       (other-window (helm-window-show-buffers
