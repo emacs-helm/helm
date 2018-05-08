@@ -1749,12 +1749,18 @@ with its properties."
                   ;; It is needed to return properties of DISP in some case,
                   ;; e.g for `helm-confirm-and-exit-minibuffer',
                   ;; so use `buffer-substring' here when 'withprop is specified.
-                  (let ((disp (funcall
-                               disp-fn
-                               (overlay-start helm-selection-overlay)
-                               (1- (overlay-end helm-selection-overlay))))
-                        (src (or source (helm-get-current-source))))
-                    (helm-aif (and (not force-display-part)
+                  (let* ((beg  (overlay-start helm-selection-overlay))
+                         (end  (overlay-end helm-selection-overlay))
+                         ;; If there is no selection at point, the
+                         ;; overlay is at its initial pos, (point-min)
+                         ;; (point-min), that's mean the helm-buffer
+                         ;; is not empty but have no selection yet,
+                         ;; this happen with grep sentinel sending an
+                         ;; error message in helm-buffer when no matches.
+                         (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
+                         (src (or source (helm-get-current-source))))
+                    (helm-aif (and src disp
+                                   (not force-display-part)
                                    (assoc-default 'display-to-real src))
                         (helm-funcall-with-source source it disp)
                       disp)))))
