@@ -1452,11 +1452,13 @@ e.g (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
       (cl-pushnew msg helm-issued-errors :test 'equal))))
 
 (defun helm-log-save-maybe ()
-  "Save log buffer if `helm-debug-root-directory' is set to a valid directory.
+  "Save log buffer when `helm-debug-root-directory' is non nil.
+Create `helm-debug-root-directory' directory if necessary.
 Messages are logged to a file named with todays date and time in this directory."
   (when (and (stringp helm-debug-root-directory)
-             (file-directory-p helm-debug-root-directory)
-             helm-debug)
+             (not (file-directory-p helm-debug-root-directory)))
+    (make-directory helm-debug-root-directory t))
+  (when helm-debug
     (let ((logdir (expand-file-name (concat "helm-debug-"
                                             (format-time-string "%Y%m%d"))
                                     helm-debug-root-directory)))
