@@ -819,6 +819,14 @@ This option have no effect with emacs versions lower than 26."
   "Face for currently selected item in the helm buffer."
   :group 'helm-faces)
 
+(defface helm-selection-even
+  '((((background dark)) :background "DimGrey"
+     :distant-foreground "black")
+    (((background light)) :background "LightGrey"
+     :distant-foreground "black"))
+  "Face for even items in the Helm multiline buffer."
+  :group 'helm-faces)
+
 (defface helm-separator
   '((((background dark)) :foreground "red")
     (((background light)) :foreground "#ffbfb5"))
@@ -2034,7 +2042,9 @@ only."
                                              (forward-line 2)
                                              (or (helm-pos-header-line-p) (eobp)))
                                            (eobp)))
-                                  (search-forward helm-candidate-separator nil t))
+                                  (if helm-use-multiline-separator
+                                      (search-forward helm-candidate-separator nil t)
+                                    (helm--forward-candidate)))
                        do (cl-incf count-multi)
                        finally return count-multi)
               (cl-loop with ln = 0
@@ -3889,7 +3899,7 @@ It is used for narrowing list of candidates to the
       ;; candidates.
       ;; NOTE that this next block of code is returning nil on async sources,
       ;; the candidates being processed directly in `helm-output-filter'
-      ;; process-filter. 
+      ;; process-filter.
       (helm-process-filtered-candidate-transformer
        ;; Using in-buffer method or helm-pattern is empty
        ;; in this case compute all candidates.
@@ -3914,6 +3924,8 @@ It is used for narrowing list of candidates to the
 (defun helm--candidates-in-buffer-p (matchfns)
   (equal matchfns '(identity)))
 
+(defvar helm-use-multiline-separator t)
+
 (defun helm-render-source (source matches)
   "Display MATCHES from SOURCE according to its settings."
   (helm-log "Source name = %S" (assoc-default 'name source))
@@ -3922,16 +3934,26 @@ It is used for narrowing list of candidates to the
     (cl-loop with separate = nil
              with start = (point)
              with singleline = (null (assq 'multiline source))
+             with inhibit-read-only = t
              for m in matches
              for count from 1
              if singleline
-             do (helm-insert-match m 'insert count source)
+             do (let ((beg (point)))
+                  (helm-insert-match m 'insert count source)
+                  (put-text-property beg (point) 'helm-candidate
+                                     (if (cl-oddp count) 'odd 'even)))
              else
-             do (progn
-                  (if separate
-                      (helm-insert-candidate-separator)
-                    (setq separate t))
-                  (helm-insert-match m 'insert count source))
+             do (let ((beg (point)))
+                  (when helm-use-multiline-separator
+                    (if separate
+                        (helm-insert-candidate-separator)
+                      (setq separate t)))
+                  (helm-insert-match m 'insert count source)
+                  (unless helm-use-multiline-separator
+                    (put-text-property beg (point) 'helm-candidate
+                                       (if (cl-oddp count) 'odd 'even))
+                    (when (cl-evenp count)
+                      (add-face-text-property beg (point) 'helm-selection-even t))))
              finally (and (null singleline)
                           (put-text-property start (point)
                                              'helm-multiline t)))))
@@ -4362,9 +4384,11 @@ this additional info after the source name by overlay."
                              (1+ (cdr (assq 'item-count source)))
                              source)
           (put-text-property start (point) 'helm-multiline t))
-        (helm-insert-match candidate 'insert-before-markers
-                           (1+ (cdr (assq 'item-count source)))
-                           source))
+      (let ((beg (point))
+            (count (1+ (cdr (assq 'item-count source)))))
+        (helm-insert-match candidate 'insert-before-markers count source)
+        (put-text-property beg (point) 'helm-candidate
+                           (if (cl-oddp count) 'odd 'even))))
     (cl-incf (cdr (assq 'item-count source)))
     (when (>= (assoc-default 'item-count source) limit)
       (helm-kill-async-process process)
@@ -4838,8 +4862,8 @@ Key arg DIRECTION can be one of:
         (funcall move-func)
         (and (memq direction '(next previous))
              (helm-skip-noncandidate-line direction))
-        (when (helm-pos-multiline-p)
-          (helm-move--beginning-of-multiline-candidate))
+        (and helm-use-multiline-separator (helm-pos-multiline-p)
+             (helm-move--beginning-of-multiline-candidate))
         (helm-display-source-at-screen-top-maybe where)
         (helm-mark-current-line)
         (when follow
@@ -4855,22 +4879,45 @@ Key arg DIRECTION can be one of:
                          (< separator-pos header-pos))
                      header-pos
                      separator-pos))
-      (forward-line 1))))
+      (when helm-use-multiline-separator
+        (forward-line 1)))))
 
 (defun helm-move--previous-multi-line-fn ()
-  (forward-line -1)
+  (when helm-use-multiline-separator
+    (forward-line -1))
   (unless (helm-pos-header-line-p)
     (helm-skip-header-and-separator-line 'previous)
     (helm-move--beginning-of-multiline-candidate)))
 
+(defun helm--forward-candidate ()
+  (helm-aif (next-single-property-change
+             (point) 'helm-candidate)
+      (goto-char it)
+    (if (get-text-property (point) 'helm-candidate)
+        (goto-char (next-single-char-property-change
+                    (point) 'helm-candidate))
+      (forward-line 1))))
+
+(defun helm--backward-candidate ()
+  (helm-aif (previous-single-property-change
+             (point) 'helm-candidate nil
+             (and helm-move-to-line-cycle-in-source
+                  (helm-get-previous-header-pos)))
+      (goto-char it)
+    (forward-line -1)))
+
 (defun helm-move--previous-line-fn ()
   (if (not (helm-pos-multiline-p))
-      (forward-line -1)
+      (helm--backward-candidate)
     (helm-move--previous-multi-line-fn))
   (when (and helm-move-to-line-cycle-in-source
              (helm-pos-header-line-p))
     (forward-line 1)
     (helm-move--end-of-source)
+    (goto-char (point-at-eol))
+    (helm-aif (previous-single-property-change
+               (point) 'helm-candidate)
+        (goto-char it))
     ;; We are at end of helm-buffer
     ;; check if last candidate is a multiline candidate
     ;; and jump to it
@@ -4888,9 +4935,12 @@ Key arg DIRECTION can be one of:
            (goto-char header-pos)))))
 
 (defun helm-move--next-line-fn ()
-  (if (not (helm-pos-multiline-p))
-      (forward-line 1)
-    (helm-move--next-multi-line-fn))
+  (cond ((and (not (helm-pos-multiline-p))
+              (helm-get-next-candidate-separator-pos))
+         (forward-line 1))
+         ((not (helm-pos-multiline-p))
+          (helm--forward-candidate))
+         (t (helm-move--next-multi-line-fn)))
   (when (and helm-move-to-line-cycle-in-source
              (or (save-excursion (and (helm-pos-multiline-p)
                                       (goto-char (overlay-end
@@ -5096,7 +5146,10 @@ candidates."
                     separator-pos)
                header-pos
                (point-max)))
-       (1+ (point-at-eol))))
+       (helm-aif (next-single-property-change (point) 'helm-candidate)
+           it
+         (let ((header-pos (helm-get-next-header-pos)))
+           (or header-pos (point-max))))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when (and helm-allow-mouse (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
@@ -5217,7 +5270,7 @@ If action buffer is displayed, kill it."
 (defun helm-get-next-candidate-separator-pos ()
   "Return the position of the next candidate separator from point."
   (let ((hp (helm-get-next-header-pos)))
-    (helm-aif (next-single-property-change (point) 'helm-candidate-separator)
+    (helm-aif (next-single-property-change (point) (if helm-use-multiline-separator 'helm-candidate-separator 'helm-candidate))
         (or
          ;; Be sure we don't catch
          ;; the separator of next source.
@@ -5230,7 +5283,7 @@ If action buffer is displayed, kill it."
 
 (defun helm-get-previous-candidate-separator-pos ()
   "Return the position of the previous candidate separator from point."
-  (previous-single-property-change (point) 'helm-candidate-separator))
+  (previous-single-property-change (point) (if helm-use-multiline-separator 'helm-candidate-separator 'helm-candidate)))
 
 (defun helm-pos-header-line-p ()
   "Return t if the current line is a header line."
@@ -5356,10 +5409,17 @@ Optional argument SOURCE is a Helm source object."
   (save-excursion
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
-        (forward-line (if at-point 0 n))
-        (or (eq (point-at-bol) (point-at-eol))
-            (helm-pos-header-line-p)
-            (if (< n 0) (bobp) (eobp))))))
+      (cond (at-point (forward-line 0))
+            ((> n 0)
+             (helm--forward-candidate))
+            ((< n 0)
+             (helm--backward-candidate)))
+      (or (eq (point-at-bol) (point-at-eol))
+          (helm-pos-header-line-p)
+          (if (< n 0) (bobp) (eobp))
+          (and (null at-point)
+               (null (next-single-char-property-change
+                      (point) 'helm-candidate)))))))
 
 (defun helm-end-of-source-p (&optional at-point)
   "Return non-`nil' if we are at eob or end of source."
@@ -5658,7 +5718,7 @@ Acceptable values of BUFFER-SPEC:
 
 - nil (omit)
   Only return the candidates buffer of current source if found.
-  
+
 - A buffer
   Register a buffer as a candidates buffer.
   The buffer needs to exists, it is not created.
@@ -5670,7 +5730,7 @@ Acceptable values of BUFFER-SPEC:
   The buffer is not erased nor deleted.
   Generally it is safer to use a copy of buffer inserted
   in a global or local buffer.
-  
+
 If for some reasons a global buffer and a local buffer exist and are
 belonging to the same source, the local buffer takes precedence on the
 global one and is used instead.
@@ -6122,12 +6182,15 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (defun helm-make-visible-mark (&optional src selection)
   (let* ((source (or src  (helm-get-current-source)))
          (sel    (or selection (helm-get-selection nil nil source)))
+         (header-pos (helm-get-next-header-pos))
          (selection-end (if (helm-pos-multiline-p)
                             (or (helm-get-next-candidate-separator-pos)  ; Stays within source
-                                (helm-get-next-header-pos)
+                                header-pos
                                 (point-max))
                           ;; Not multiline
-                          (1+ (point-at-eol))))
+                          (helm-aif (next-single-property-change (point) 'helm-candidate)
+                              it
+                            (or header-pos (point-max)))))
          (o (make-overlay (point-at-bol) selection-end)))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
