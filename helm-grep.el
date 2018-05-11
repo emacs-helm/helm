@@ -1173,10 +1173,6 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                           (absolute fname)
                           (relative (and fname root
                                          (file-relative-name fname root))))))
-    (helm-log "Filtering %S" candidate)
-    (helm-log "Root directory is: %S" root)
-    (helm-log "Filename is %S" (substring-no-properties (car-safe split)))
-    (helm-log "Expanded fname against root is %S" (substring-no-properties fname))
     (if (and display-fname lineno str)
         (cons (concat (propertize display-fname
                                   'face 'helm-grep-file
