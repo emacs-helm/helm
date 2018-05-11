@@ -80,7 +80,9 @@
                      (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
    (candidates :initform 'helm-esh-get-candidates)
    ;(nomark :initform t)
-   (persistent-action :initform 'ignore)
+   (persistent-action :initform (lambda (_candidate)
+                                  (setq helm-eshell--repeat t)
+                                  (helm-exit-and-execute-action 'helm-ec-insert)))
    (nohighlight :initform t)
    (filtered-candidate-transformer
     :initform
@@ -214,108 +216,112 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Helm class to define source for Eshell history.")
 
 
+(defvar helm-eshell--repeat)
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
   (interactive)
-  (let* ((helm-quit-if-no-candidate t)
-         (helm-execute-action-at-once-if-one t)
-         (end (point-marker))
-         (beg (save-excursion (eshell-bol) (point)))
-         (args (catch 'eshell-incomplete
-                 (eshell-parse-arguments beg end)))
-         (target
-          (or (and (looking-back " " (1- (point))) " ")
-              (buffer-substring-no-properties
-               (save-excursion
-                 (eshell-backward-argument 1) (point))
-               end)))
-         (users-comp (string= target "~"))
-         (first (car args)) ; Maybe lisp delimiter "(".
-         last ; Will be the last but parsed by pcomplete.
-         del-space
-         del-dot)
-    (setq helm-ec-target (or target " ")
-          end (point)
-          ;; Reset beg for `with-helm-show-completion'.
-          beg (or (and target (not (string= target " "))
-                       (- end (length target)))
-                  ;; Nothing at point.
-                  (progn (insert " ") (setq del-space t) (point))))
-    (when (string-match "\\`[~.]*.*/[.]\\'" target)
-      ;; Fix completion on
-      ;; "~/.", "~/[...]/.", and "../."
-      (delete-char -1) (setq del-dot t)
-      (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
-    (cond ((eq first ?\()
-           (helm-lisp-completion-or-file-name-at-point))
-          ;; In eshell `pcomplete-parse-arguments' is called
-          ;; with `pcomplete-parse-arguments-function'
-          ;; locally bound to `eshell-complete-parse-arguments'
-          ;; which is calling `lisp-complete-symbol',
-          ;; calling it before would popup the
-          ;; *completions* buffer.
-          (t (setq last (replace-regexp-in-string
-                         "\\`\\*" ""
-                         (car (last (ignore-errors
-                                      (pcomplete-parse-arguments))))))
-             ;; Set helm-eshell--quit-flag to non-nil only on
-             ;; quit, this tells to not add final suffix when quitting
-             ;; helm.
-             (add-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
-             (with-helm-show-completion beg end
-               (unwind-protect
-                   (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
-                                        :fuzzy-match helm-eshell-fuzzy-match)
-                             :buffer "*helm pcomplete*"
-                             :keymap helm-esh-completion-map
-                             :resume 'noresume
-                             :input (if (and (stringp last)
-                                             (not (string= last ""))
-                                             (not users-comp)
-                                             ;; Fix completion on
-                                             ;; "../" see #1832.
-                                             (or (file-exists-p last)
-                                                 (helm-aand
-                                                  (file-name-directory last)
-                                                  (file-directory-p it))))
-                                        (if (and (file-directory-p last)
-                                                 (string-match "\\`[~.]*.*/[.]\\'" target))
-                                            ;; Fix completion on
-                                            ;; "~/.", "~/[...]/.", and "../."
-                                            (expand-file-name
-                                             (concat (helm-basedir (file-name-as-directory last))
-                                                     (regexp-quote (helm-basename target))))
-                                          (expand-file-name last))
-                                      ;; Don't add "~" to input to
-                                      ;; provide completion on all
-                                      ;; users instead of only on
-                                      ;; current $HOME (#1832).
-                                      (unless users-comp last)))
-                       ;; Delete removed dot on quit
-                       (and del-dot (prog1 t (insert ".")))
-                       ;; A space is needed to have completion, remove
-                       ;; it when nothing found.
-                       (and del-space (looking-back "\\s-" (1- (point)))
-                            (delete-char -1))
-                       (if (and (null helm-eshell--quit-flag)
-                                (and (stringp last) (file-directory-p last))
-                                (looking-back "\\([.]\\{1,2\\}\\|[^/]\\)\\'"
-                                              (1- (point))))
-                           (prog1 t (insert "/"))
-                         ;; We need another flag for space here, but
-                         ;; global to pass it to `helm-quit-hook', this
-                         ;; space is added when point is just after
-                         ;; previous completion and there is no
-                         ;; more completion, see issue #1832.
-                         (unless (or helm-eshell--quit-flag
-                                     (looking-back "/\\'" (1- (point))))
-                           (prog1 t (insert " ")))
-                         (when (and helm-eshell--quit-flag
-                                    (string-match-p "[.]\\{2\\}\\'" last))
-                           (insert "/"))))
-                 (remove-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
-                 (setq helm-eshell--quit-flag nil)))))))
+  (setq helm-eshell--repeat 'first)
+  (while helm-eshell--repeat
+    (let* ((helm-quit-if-no-candidate 'first-iteration)
+           (helm-execute-action-at-once-if-one (eq helm-eshell--repeat 'first))
+           (end (point-marker))
+           (beg (save-excursion (eshell-bol) (point)))
+           (args (catch 'eshell-incomplete
+                   (eshell-parse-arguments beg end)))
+           (target
+            (or (and (looking-back " " (1- (point))) " ")
+                (buffer-substring-no-properties
+                 (save-excursion
+                   (eshell-backward-argument 1) (point))
+                 end)))
+           (users-comp (string= target "~"))
+           (first (car args)) ; Maybe lisp delimiter "(".
+           last ; Will be the last but parsed by pcomplete.
+           del-space
+           del-dot)
+      (setq helm-eshell--repeat nil
+            helm-ec-target (or target " ")
+            end (point)
+            ;; Reset beg for `with-helm-show-completion'.
+            beg (or (and target (not (string= target " "))
+                         (- end (length target)))
+                    ;; Nothing at point.
+                    (progn (insert " ") (setq del-space t) (point))))
+      (when (string-match "\\`[~.]*.*/[.]\\'" target)
+        ;; Fix completion on
+        ;; "~/.", "~/[...]/.", and "../."
+        (delete-char -1) (setq del-dot t)
+        (setq helm-ec-target (substring helm-ec-target 0 (1- (length helm-ec-target)))))
+      (cond ((eq first ?\()
+             (helm-lisp-completion-or-file-name-at-point))
+            ;; In eshell `pcomplete-parse-arguments' is called
+            ;; with `pcomplete-parse-arguments-function'
+            ;; locally bound to `eshell-complete-parse-arguments'
+            ;; which is calling `lisp-complete-symbol',
+            ;; calling it before would popup the
+            ;; *completions* buffer.
+            (t (setq last (replace-regexp-in-string
+                           "\\`\\*" ""
+                           (car (last (ignore-errors
+                                        (pcomplete-parse-arguments))))))
+               ;; Set helm-eshell--quit-flag to non-nil only on
+               ;; quit, this tells to not add final suffix when quitting
+               ;; helm.
+               (add-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
+               (with-helm-show-completion beg end
+                 (unwind-protect
+                     (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
+                                          :fuzzy-match helm-eshell-fuzzy-match)
+                               :buffer "*helm pcomplete*"
+                               ;; :keymap helm-esh-completion-map
+                               :resume 'noresume
+                               :input (if (and (stringp last)
+                                               (not (string= last ""))
+                                               (not users-comp)
+                                               ;; Fix completion on
+                                               ;; "../" see #1832.
+                                               (or (file-exists-p last)
+                                                   (helm-aand
+                                                    (file-name-directory last)
+                                                    (file-directory-p it))))
+                                          (if (and (file-directory-p last)
+                                                   (string-match "\\`[~.]*.*/[.]\\'" target))
+                                              ;; Fix completion on
+                                              ;; "~/.", "~/[...]/.", and "../."
+                                              (expand-file-name
+                                               (concat (helm-basedir (file-name-as-directory last))
+                                                       (regexp-quote (helm-basename target))))
+                                            (expand-file-name last))
+                                        ;; Don't add "~" to input to
+                                        ;; provide completion on all
+                                        ;; users instead of only on
+                                        ;; current $HOME (#1832).
+                                        (unless users-comp last)))
+                         ;; Delete removed dot on quit
+                         (and del-dot (prog1 t (insert ".")))
+                         ;; A space is needed to have completion, remove
+                         ;; it when nothing found.
+                         (and del-space (looking-back "\\s-" (1- (point)))
+                              (delete-char -1))
+                         (if (and (null helm-eshell--quit-flag)
+                                  (and (stringp last) (file-directory-p last))
+                                  (looking-back "\\([.]\\{1,2\\}\\|[^/]\\)\\'"
+                                                (1- (point))))
+                             (prog1 t (insert "/"))
+                           ;; We need another flag for space here, but
+                           ;; global to pass it to `helm-quit-hook', this
+                           ;; space is added when point is just after
+                           ;; previous completion and there is no
+                           ;; more completion, see issue #1832.
+                           (unless (or helm-eshell--quit-flag
+                                       (looking-back "/\\'" (1- (point))))
+                             (prog1 t (insert " ")))
+                           (when (and helm-eshell--quit-flag
+                                      (string-match-p "[.]\\{2\\}\\'" last))
+                             (insert "/"))))
+                   (remove-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
+                   (setq helm-eshell--quit-flag nil))))))))
 
 (defun helm-eshell--quit-hook-fn ()
   (setq helm-eshell--quit-flag t))
