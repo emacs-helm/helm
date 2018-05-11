@@ -30,11 +30,6 @@
   '((t :inherit helm-header))
   "Face for Helm help string in minibuffer."
   :group 'helm-help)
-
-(defcustom helm-documentation-file "~/.emacs.d/helm-doc.org"
-  "The file where to save Helm documentation."
-  :group 'helm-help
-  :type 'string)
 
 (defvar helm-help--string-list '(helm-help-message
                                  helm-buffer-help-message
