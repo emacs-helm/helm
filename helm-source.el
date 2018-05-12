@@ -350,6 +350,15 @@
   It is unuseful as the same can be performed by using more than
   one function in transformers, it is kept only for backward compatibility.")
 
+   (marked-with-props
+    :initarg :marked-with-props
+    :initform nil
+    :custom (choice boolean symbol)
+    :documentation
+    "  Get candidates with their properties in `helm-marked-candidates'.
+  Allow using the FORCE-DISPLAY-PART of `helm-get-selection' in marked
+  candidates, use t or 'withprop to pass it to `helm-get-selection'.")
+
    (action-transformer
     :initarg :action-transformer
     :initform nil
