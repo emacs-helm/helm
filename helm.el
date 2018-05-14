@@ -4521,6 +4521,7 @@ Coerce source with coerce function."
 
 (defun helm--show-action-window-other-window-p ()
   (and helm-show-action-window-other-window
+       (window-splittable-p (helm-window))
        (or helm-always-two-windows
            helm--buffer-in-new-frame-p)
        (eq helm-split-window-state 'vertical)))
