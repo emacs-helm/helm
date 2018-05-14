@@ -725,6 +725,18 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   :group 'helm
   :type 'integer)
 
+(defcustom helm-default-display-buffer-functions nil
+  "Action functions to pass to `display-buffer'."
+  :group 'helm
+  :type '(repeat symbol))
+
+(defcustom helm-default-display-buffer-alist nil
+  "Additional alist to pass to `display-buffer' action.
+Note that window-height and window-width have to be configured in
+`helm-display-buffer-height' and `helm-display-buffer-width'."
+  :group 'helm
+  :type '(alist :key-type symbol :value-type sexp))
+
 (defcustom helm-display-buffer-reuse-frame nil
   "When non nil helm frame is not deleted and reused in next sessions.
 
@@ -2763,8 +2775,10 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                  (not helm-split-window-inside-p))
         (delete-other-windows))
       (display-buffer
-       buffer `(nil . ((window-height . ,helm-display-buffer-default-height)
-                       (window-width  . ,helm-display-buffer-default-width))))
+       buffer `(,helm-default-display-buffer-functions
+                . ,(append helm-default-display-buffer-alist
+                           `((window-height . ,helm-display-buffer-default-height)
+                             (window-width  . ,helm-display-buffer-default-width)))))
       (helm-log-run-hook 'helm-window-configuration-hook))))
 
 (defun helm-display-buffer-in-own-frame (buffer &optional resume)
