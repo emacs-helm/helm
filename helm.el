@@ -533,7 +533,10 @@ set to `other'."
 
 (defcustom helm-default-display-buffer-functions nil
   "Action functions to pass to `display-buffer'.
-See (info \"(elisp) Display Action Functions\")."
+See (info \"(elisp) Display Action Functions\").
+
+Have no effect when `helm-always-two-windows' is non-nil and may
+override other settings like `helm-split-window-inside-p'."
   :group 'helm
   :type '(repeat symbol))
 
@@ -541,6 +544,8 @@ See (info \"(elisp) Display Action Functions\")."
   "Additional alist to pass to `display-buffer' action.
 See (info \"(elisp) Display Action Functions\").
 
+Have no effect when `helm-always-two-windows' is non-nil and may
+override other settings like `helm-split-window-inside-p'.
 Note that window-height and window-width have to be configured in
 `helm-display-buffer-height' and `helm-display-buffer-width'."
   :group 'helm
@@ -4521,7 +4526,6 @@ Coerce source with coerce function."
 
 (defun helm--show-action-window-other-window-p ()
   (and helm-show-action-window-other-window
-       (window-splittable-p (helm-window))
        (or helm-always-two-windows
            helm--buffer-in-new-frame-p)
        (eq helm-split-window-state 'vertical)))
