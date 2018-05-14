@@ -521,6 +521,31 @@ set to `other'."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-display-buffer-width 72
+  "Frame width when displaying helm-buffer in own frame."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-display-buffer-height 20
+  "Frame height when displaying helm-buffer in own frame."
+  :group 'helm
+  :type 'integer)
+
+(defcustom helm-default-display-buffer-functions nil
+  "Action functions to pass to `display-buffer'.
+See (info \"(elisp) Display Action Functions\")."
+  :group 'helm
+  :type '(repeat symbol))
+
+(defcustom helm-default-display-buffer-alist nil
+  "Additional alist to pass to `display-buffer' action.
+See (info \"(elisp) Display Action Functions\").
+
+Note that window-height and window-width have to be configured in
+`helm-display-buffer-height' and `helm-display-buffer-width'."
+  :group 'helm
+  :type '(alist :key-type symbol :value-type sexp))
+
 (defcustom helm-sources-using-default-as-input '(helm-source-imenu
                                                  helm-source-imenu-all
                                                  helm-source-info-elisp
@@ -714,28 +739,6 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   "Delay used before resuming in `helm-run-cycle-resume'."
   :type 'float
   :group 'helm)
-
-(defcustom helm-display-buffer-width 72
-  "Frame width when displaying helm-buffer in own frame."
-  :group 'helm
-  :type 'integer)
-
-(defcustom helm-display-buffer-height 20
-  "Frame height when displaying helm-buffer in own frame."
-  :group 'helm
-  :type 'integer)
-
-(defcustom helm-default-display-buffer-functions nil
-  "Action functions to pass to `display-buffer'."
-  :group 'helm
-  :type '(repeat symbol))
-
-(defcustom helm-default-display-buffer-alist nil
-  "Additional alist to pass to `display-buffer' action.
-Note that window-height and window-width have to be configured in
-`helm-display-buffer-height' and `helm-display-buffer-width'."
-  :group 'helm
-  :type '(alist :key-type symbol :value-type sexp))
 
 (defcustom helm-display-buffer-reuse-frame nil
   "When non nil helm frame is not deleted and reused in next sessions.
@@ -4516,6 +4519,12 @@ Coerce source with coerce function."
       (cdar action)
     action))
 
+(defun helm--show-action-window-other-window-p ()
+  (and helm-show-action-window-other-window
+       (or helm-always-two-windows
+           helm--buffer-in-new-frame-p)
+       (eq helm-split-window-state 'vertical)))
+
 (defun helm-select-action ()
   "Select an action for the currently selected candidate.
 If action buffer is selected, back to the helm buffer."
@@ -4529,9 +4538,7 @@ If action buffer is selected, back to the helm buffer."
             (helm-acond ((get-buffer-window helm-action-buffer 'visible)
                          (set-window-buffer it helm-buffer)
                          (helm--set-action-prompt 'restore)
-                         (when (and helm-show-action-window-other-window
-                                    helm-always-two-windows
-                                    (eq helm-split-window-state 'vertical))
+                         (when (helm--show-action-window-other-window-p)
                            (delete-window it))
                          (kill-buffer helm-action-buffer)
                          (setq helm-saved-selection nil)
@@ -4572,9 +4579,7 @@ If action buffer is selected, back to the helm buffer."
     (erase-buffer)
     (buffer-disable-undo)
     (setq cursor-type nil)
-    (set-window-buffer (if (and helm-show-action-window-other-window
-                                helm-always-two-windows
-                                (eq helm-split-window-state 'vertical))
+    (set-window-buffer (if (helm--show-action-window-other-window-p)
                            (split-window (get-buffer-window helm-buffer)
                                          nil helm-show-action-window-other-window)
                            (get-buffer-window helm-buffer))
