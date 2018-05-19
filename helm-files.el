@@ -489,7 +489,11 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff-url-regexp
   "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
   "Same as `ffap-url-regexp' but match earlier possible url.")
-(defvar helm-tramp-file-name-regexp "\\`/\\([^[/:]+\\|[^/]+]\\):")
+;; helm-tramp-file-name-regexp is based on old version of
+;; tramp-file-name-regexp i.e. "\\`/\\([^[/:]+\\|[^/]+]\\):" but it
+;; seems it is wrong and a simpler regexp is enough, let's try it and
+;; watch out!
+(defvar helm-tramp-file-name-regexp "\\`/\\([^/:|]+\\):")
 (defvar helm-marked-buffer-name "*helm marked*")
 (defvar helm-ff--auto-update-state nil)
 (defvar helm-ff--deleting-char-backward nil)
