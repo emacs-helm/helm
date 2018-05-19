@@ -2063,12 +2063,15 @@ Return nil on valid file name remote or not."
   ;; Check first if whole file is remote (file-remote-p is inefficient
   ;; in this case) otherwise we are matching e.g. /home/you/ssh:foo/
   ;; which is not a remote name.
+  ;; FIXME this will not work with a directory or a file named like
+  ;; "ssh:foo" and located at root (/).
   (when (string-match-p helm-tramp-file-name-regexp fname)
-    (let* ((str   (helm-basename fname))
-           (split (split-string str ":" t))
+    (let* ((bn    (helm-basename fname))
+           (bd    (replace-regexp-in-string bn "" fname))
+           (split (split-string bn ":" t))
            (meth  (car (member (car split)
                                (helm-ff--get-tramp-methods)))))
-      (and meth (car (last split))))))
+      (and meth (string= bd "/") (car (last split))))))
 
 (cl-defun helm-ff--tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
