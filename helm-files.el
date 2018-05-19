@@ -2060,11 +2060,15 @@ With a prefix arg toggle dired buffer to wdired mode."
 (defun helm-ff--get-host-from-tramp-invalid-fname (fname)
   "Extract hostname from an incomplete tramp file name.
 Return nil on valid file name remote or not."
-  (let* ((str (helm-basename fname))
-         (split (split-string str ":" t))
-         (meth (car (member (car split)
-                            (helm-ff--get-tramp-methods)))))
-    (when meth (car (last split)))))
+  ;; Check first if whole file is remote (file-remote-p is inefficient
+  ;; in this case) otherwise we are matching e.g. /home/you/ssh:foo/
+  ;; which is not a remote name.
+  (when (string-match-p helm-tramp-file-name-regexp fname)
+    (let* ((str   (helm-basename fname))
+           (split (split-string str ":" t))
+           (meth  (car (member (car split)
+                               (helm-ff--get-tramp-methods)))))
+      (and meth (car (last split))))))
 
 (cl-defun helm-ff--tramp-hostnames (&optional (pattern helm-pattern))
   "Get a list of hosts for tramp method found in `helm-pattern'.
