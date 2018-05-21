@@ -2068,7 +2068,11 @@ Return nil on valid file name remote or not."
   ;; in this case) otherwise we are matching e.g. /home/you/ssh:foo/
   ;; which is not a remote name.
   ;; FIXME this will not work with a directory or a file named like
-  ;; "ssh:foo" and located at root (/).
+  ;; "ssh:foo" and located at root (/) but it seems there is no real
+  ;; solution apart disabling tramp-mode when a file/dir located at /
+  ;; is matching helm-tramp-file-name-regexp; This would prevent usage
+  ;; of tramp if one have such a directory at / (who would want to
+  ;; have such a dir at / ???)  See emacs-bug#31489.
   (when (string-match-p helm-tramp-file-name-regexp fname)
     (let* ((bn    (helm-basename fname))
            (bd    (replace-regexp-in-string bn "" fname))
