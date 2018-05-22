@@ -842,7 +842,12 @@ See documentation of `completing-read' and `all-completions' for details."
                    collect h))
          ;; Disable hack that could be used before `completing-read'.
          ;; i.e (push ?\t unread-command-events).
-         unread-command-events)
+         unread-command-events
+         (handler
+         (if (and (functionp collection)
+                  minibuffer-completing-file-name)
+             #'helm-completing-read-sync-default-handler
+           #'helm-completing-read-default-handler)))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
@@ -880,10 +885,10 @@ See documentation of `completing-read' and `all-completions' for details."
                (;; Use by default a cands-in-buffer handler which
                 ;; should work everywhere, it is much faster. 
                 t
-                (helm-completing-read-default-handler
-                 prompt collection predicate require-match
-                 initial-input hist def inherit-input-method
-                 str-command buf-name)))
+                (funcall handler
+                         prompt collection predicate require-match
+                         initial-input hist def inherit-input-method
+                         str-command buf-name)))
       (helm-mode 1)
       ;; When exiting minibuffer, `this-command' is set to
       ;; `helm-exit-minibuffer', which is unwanted when starting
