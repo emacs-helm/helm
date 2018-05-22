@@ -2092,15 +2092,15 @@ purpose."
                                            (helm-ff--get-host-from-tramp-invalid-fname pattern))
                                 (concat (car mh-method) method ":"
                                         (car (split-string it "|" t)))))
-           (all-methods (helm-ff--get-tramp-methods)))
+           (all-methods (helm-ff--get-tramp-methods))
+           (comps (cl-loop for (f . h) in (tramp-get-completion-function method)
+                           append (cl-loop for e in (funcall f (car h))
+                                           for host = (and (consp e) (cadr e))
+                                           when (and host (not (member host all-methods)))
+                                           collect (concat (or (car mh-method) "/")
+                                                           method ":" host)))))
       (helm-fast-remove-dups
-       (cons current-mh-host
-             (cl-loop for (f . h) in (tramp-get-completion-function method)
-                      append (cl-loop for e in (funcall f (car h))
-                                      for host = (and (consp e) (cadr e))
-                                      when (and host (not (member host all-methods)))
-                                      collect (concat (or (car mh-method) "/")
-                                                      method ":" host))))
+       (delq nil (cons current-mh-host comps))
        :test 'equal))))
 
 (defun helm-ff-before-action-hook-fn ()
