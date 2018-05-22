@@ -844,10 +844,14 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; i.e (push ?\t unread-command-events).
          unread-command-events
          (handler
-         (if (and (functionp collection)
-                  minibuffer-completing-file-name)
-             #'helm-completing-read-sync-default-handler
-           #'helm-completing-read-default-handler)))
+          ;; Use sync handler when completing-read is used to complete
+          ;; filenames or dirnames, typically the worst usage is
+          ;; generally completing-read+read-file-name-internal like
+          ;; find-file-at-point does.
+          (if (and (functionp collection)
+                   minibuffer-completing-file-name)
+              #'helm-completing-read-sync-default-handler
+            #'helm-completing-read-default-handler)))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
