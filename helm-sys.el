@@ -250,9 +250,10 @@ Show actions only on line starting by a PID."
                   "kill" nil nil nil (format "-%s" sig) pids)))
 
 (defun helm-top-sh-persistent-action (pid)
-  (delete-other-windows)
   (helm-top-sh "TERM" (list pid))
-  (helm-delete-current-selection))
+  (delete-other-windows (helm-window))
+  (unless helm-top-poll-mode
+    (helm-delete-current-selection)))
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
