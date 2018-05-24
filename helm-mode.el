@@ -843,13 +843,13 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; Disable hack that could be used before `completing-read'.
          ;; i.e (push ?\t unread-command-events).
          unread-command-events
-         (handler
-          ;; Use sync handler when completing-read is used to complete
-          ;; filenames or dirnames, typically the worst usage is
-          ;; generally completing-read+read-file-name-internal like
-          ;; find-file-at-point does.
-          (if (and (functionp collection)
-                   minibuffer-completing-file-name)
+         (default-handler
+          ;; Typically when COLLECTION is a function, we can assume
+          ;; the intention is completing dynamically according to
+          ;; input; If one want to use in-buffer handler for specific
+          ;; usage with a function as collection he can specify it in
+          ;; helm-completing-read-handlers-alist.
+          (if (functionp collection)
               #'helm-completing-read-sync-default-handler
             #'helm-completing-read-default-handler)))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
@@ -886,10 +886,10 @@ See documentation of `completing-read' and `all-completions' for details."
                 ;; If we are here `helm-mode' is now disabled.
                 def-com
                 (apply def-com def-args))
-               (;; Use by default a cands-in-buffer handler which
-                ;; should work everywhere, it is much faster. 
+               (;; Use by default a in-buffer handler unless
+                ;; COLLECTION is a function. 
                 t
-                (funcall handler
+                (funcall default-handler
                          prompt collection predicate require-match
                          initial-input hist def inherit-input-method
                          str-command buf-name)))
