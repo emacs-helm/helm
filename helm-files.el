@@ -2075,7 +2075,7 @@ Return nil on valid file name remote or not."
   ;; have such a dir at / ???)  See emacs-bug#31489.
   (when (string-match-p helm-tramp-file-name-regexp fname)
     (let* ((bn    (helm-basename fname))
-           (bd    (replace-regexp-in-string bn "" fname))
+           (bd    (replace-regexp-in-string (regexp-quote bn) "" fname))
            (split (split-string bn ":" t))
            (meth  (car (member (car split)
                                (helm-ff--get-tramp-methods)))))
