@@ -180,7 +180,7 @@ This affect also sorting functions in the same way."
                (remove-hook 'post-command-hook 'helm-top-poll-no-update)
                (remove-hook 'focus-in-hook 'helm-top-poll-no-update))
     :display-to-real #'helm-top-display-to-real
-    :persistent-action #'helm-top-sh-persistent-action
+    :persistent-action '(helm-top-sh-persistent-action . never-split)
     :persistent-help "SIGTERM"
     :help-message 'helm-top-help-message
     :mode-line 'helm-top-mode-line
@@ -251,9 +251,7 @@ Show actions only on line starting by a PID."
 
 (defun helm-top-sh-persistent-action (pid)
   (helm-top-sh "TERM" (list pid))
-  (delete-other-windows (helm-window))
-  (unless helm-top-poll-mode
-    (helm-delete-current-selection)))
+  (helm-delete-current-selection))
 
 (defun helm-top-init ()
   "Insert output of top command in candidate buffer."
