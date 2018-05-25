@@ -333,6 +333,11 @@ Of course you can also write your own function to do something else."
   "Face used for executable files in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-suid
+    '((t (:background "red" :foreground "white")))
+  "Face used for suid files in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-directory
     '((t (:foreground "DarkRed" :background "LightGray")))
   "Face used for directories in `helm-find-files'."
@@ -2684,7 +2689,8 @@ Return candidates prefixed with basename of `helm-input' first."
                              basename)
                        file))
                (attr (file-attributes file))
-               (type (car attr)))
+               (type (car attr))
+               x-bit)
 
           (cond ((string-match "file-error" file) file)
                 ( ;; A not already saved file.
@@ -2715,9 +2721,16 @@ Return candidates prefixed with basename of `helm-input' first."
                         (propertize disp 'face 'helm-ff-directory) t)
                        file))
                 ;; An executable file.
-                ((and attr (string-match "x" (nth 8 attr)))
+                ((and attr
+                      (string-match
+                       "x\\'" (setq x-bit (substring (nth 8 attr) 0 4))))
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-executable) t)
+                       file))
+                ;; An executable file with suid
+                ((and attr (string-match "s\\'" x-bit))
+                 (cons (helm-ff-prefix-filename
+                        (propertize disp 'face 'helm-ff-suid) t)
                        file))
                 ;; A file.
                 ((and attr (null type))
