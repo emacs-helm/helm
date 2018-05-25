@@ -2304,6 +2304,8 @@ purpose."
       (cl-loop for f in (sort (file-name-all-completions "" directory)
                               'string-lessp)
                unless (or (member f '("./" "../"))
+                          ;; Ignore the tramp names from /
+                          ;; completion, e.g. ssh:/ scp:/ etc...
                           (char-equal (aref f (1- (length f))) ?:))
                if (and (helm--dir-name-p f)
                        (helm--dir-file-name f directory))
