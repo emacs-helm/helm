@@ -78,6 +78,7 @@ BIN=${PREFIX}bin/
 DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
 install:
 	test -d ${DESTDIR} || mkdir ${DESTDIR}
+	cp -vf *.el $(DESTDIR)
 	cp -vf *.elc $(DESTDIR)
 	cp -vf helm-autoloads.el $(DESTDIR)
 	cp -vf emacs-helm.sh $(DESTDIR)
