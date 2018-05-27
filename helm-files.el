@@ -2950,8 +2950,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
              (require 'image-dired)
              (let* ((win (get-buffer-window
                           image-dired-display-image-buffer 'visible))
-                    (fname (and (buffer-live-p image-dired-display-image-buffer)
-                                (with-current-buffer image-dired-display-image-buffer
+                    (fname (and win
+                                (with-selected-window win
                                   (get-text-property (point-min)
                                                      'original-file-name))))
                     (remove-buf-only (and win
