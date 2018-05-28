@@ -99,7 +99,9 @@ fuzzy completion is not available in `completion-at-point'."
   "The function used to display helm completion buffer.
 
 This function is used by `with-helm-show-completion', when nil
-fallback to `helm-default-display-buffer'."
+fallback to `helm-default-display-buffer'.
+If you want to have completion displayed in a separate frame, use
+`helm-display-buffer-in-own-frame' as value."
   :group 'helm-elisp
   :type 'function)
 
