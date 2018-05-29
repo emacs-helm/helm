@@ -989,8 +989,11 @@ value of this var.")
 
 Helm narrows down the list of candidates as you type a filter pattern.
 
-Helm accepts multiple space-separated patterns.
-Helm also supports fuzzy matching in some places when specified.
+Helm accepts multiple space-separated patterns, each pattern can be negated with \"!\".
+
+Helm also supports fuzzy matching in some places when specified, you will find
+several variables to enable fuzzy matching in diverse sources,
+see [[https://github.com/emacs-helm/helm/wiki/Fuzzy-matching][fuzzy-matching]] in helm-wiki for more infos.
 
 Helm generally uses familiar Emacs keys to navigate the list.
 Here follow some of the less obvious bindings:
