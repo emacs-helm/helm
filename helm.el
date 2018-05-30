@@ -6058,16 +6058,24 @@ window to maintain visibility."
   "Return the window that will be used for persistent action.
 If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
   (with-helm-window
-    (setq helm-persistent-action-display-window
-          (cond ((and (window-live-p helm-persistent-action-display-window)
-                      (not (member helm-persistent-action-display-window
-                                   (get-buffer-window-list helm-buffer))))
-                 helm-persistent-action-display-window)
-                ((and helm--buffer-in-new-frame-p helm-initial-frame)
-                 (with-selected-frame helm-initial-frame (selected-window)))
-                (split-onewindow (split-window))
-                ((get-buffer-window helm-current-buffer))
-                (t (next-window (selected-window) 1))))))
+    (let (next-win cur-win)
+      (setq helm-persistent-action-display-window
+            (cond ((and (window-live-p helm-persistent-action-display-window)
+                        (not (member helm-persistent-action-display-window
+                                     (get-buffer-window-list helm-buffer))))
+                   helm-persistent-action-display-window)
+                  ((and helm--buffer-in-new-frame-p helm-initial-frame)
+                   (with-selected-frame helm-initial-frame (selected-window)))
+                  (split-onewindow (split-window))
+                  ;; Fix Issue #2050 with dedicatd window.
+                  ((window-dedicated-p
+                    (setq cur-win (get-buffer-window helm-current-buffer)))
+                   (split-window cur-win))
+                  (cur-win)
+                  ((window-dedicated-p
+                    (setq next-win (next-window (selected-window) 1)))
+                   (split-window next-win))
+                  (t next-win))))))
 
 (defun helm-select-persistent-action-window (&optional split-onewindow)
   "Select the window that will be used for persistent action.
