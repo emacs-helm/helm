@@ -748,9 +748,9 @@ so it have only effect when `helm-always-two-windows' is non-nil."
 (defcustom helm-display-buffer-reuse-frame nil
   "When non nil helm frame is not deleted and reused in next sessions.
 
-Probably you don't need to change this unless you use emacs-26+ where
-frame displaying is much more slower than on emacs-24/25 series (emacs
-regression)."
+This was used to workaround a bug in emacs where frames where
+popping up slowly, now that the bug have been fixed upstream probably
+you don't want to use this anymore."
   :group 'helm
   :type 'boolean)
 
