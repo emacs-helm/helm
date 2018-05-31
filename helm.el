@@ -1290,6 +1290,8 @@ Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 (defvar helm-quit-hook nil
   "A hook that run when quitting helm.")
 
+(defvar helm-resume-after-hook nil
+  "A hook that run after resuming a helm session.")
 
 ;;; Internal Variables
 ;;
@@ -2430,13 +2432,15 @@ as a string with ARG."
       ;; Restart with same `default-directory' value this session
       ;; was initially started with.
       (with-helm-default-directory cur-dir
-          (helm
-           :sources (buffer-local-value
-                     'helm-sources (get-buffer any-buffer))
-           :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
-           :prompt (buffer-local-value 'helm--prompt (get-buffer any-buffer))
-           :resume t
-           :buffer any-buffer)))))
+          (unwind-protect
+               (helm
+                :sources (buffer-local-value
+                          'helm-sources (get-buffer any-buffer))
+                :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
+                :prompt (buffer-local-value 'helm--prompt (get-buffer any-buffer))
+                :resume t
+                :buffer any-buffer)
+            (helm-log-run-hook 'helm-resume-after-hook))))))
 
 (defun helm-resume-previous-session-after-quit (arg)
   "Resume previous helm session within a running helm."
