@@ -2724,7 +2724,8 @@ value found and current command is not in `helm-commands-using-frame'."
                (and helm-use-frame-when-more-than-two-windows
                     (null helm--nested)
                     (> (length (window-list)) 2))
-               (null (frame-parameter helm-initial-frame 'minibuffer)))
+               (null (with-selected-frame helm-initial-frame
+                       (eq nil (assq 'minibuffer (frame-parameters))))))
            #'helm-display-buffer-in-own-frame)
       (default-value 'helm-display-function)))
 
