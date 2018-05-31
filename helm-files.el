@@ -3159,6 +3159,7 @@ Show the first `helm-ff-history-max-length' elements of
                                       (expand-file-name candidate))
                                    (identity candidate))))))
             (helm :sources src
+                  :resume 'noresume
                   :buffer helm-ff-history-buffer-name
                   :allow-nest t))
         helm-ff-history))))
