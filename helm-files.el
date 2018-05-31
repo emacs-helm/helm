@@ -3198,7 +3198,7 @@ Use it for non--interactive calls of `helm-find-files'."
     ;; so we run a function that do this when quitting/exiting HFF.
     ;; The problem is when HFF is restarted again from resume, the
     ;; resume lambda is not updated, so we do this from a hook that
-    ;; run at end of resume remove itself from this same hook.  
+    ;; run at end of resume remove itself from this same hook.
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
          (helm :sources 'helm-source-find-files
