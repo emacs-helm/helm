@@ -6068,14 +6068,17 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                   ((and helm--buffer-in-new-frame-p helm-initial-frame)
                    (with-selected-frame helm-initial-frame (selected-window)))
                   (split-onewindow (split-window))
-                  ;; Fix Issue #2050 with dedicatd window.
-                  ((window-dedicated-p
-                    (setq cur-win (get-buffer-window helm-current-buffer)))
-                   (split-window cur-win))
-                  (cur-win)
+                  ;; Fix Issue #2050 with dedicated window.
                   ((window-dedicated-p
                     (setq next-win (next-window (selected-window) 1)))
-                   (split-window next-win))
+                   (with-helm-after-update-hook
+                     (and (window-live-p helm-persistent-action-display-window)
+                          (delete-window helm-persistent-action-display-window)))
+                   (split-window))
+                  ((window-dedicated-p
+                    (setq cur-win (get-buffer-window helm-current-buffer)))
+                   (split-window))
+                  (cur-win)
                   (t next-win))))))
 
 (defun helm-select-persistent-action-window (&optional split-onewindow)

@@ -2577,7 +2577,10 @@ in `helm-find-files-persistent-action-if'."
            (message "Can't kill modified buffer, please save it before"))
           ((and buf win)
            (kill-buffer buf)
-           (set-window-buffer win helm-current-buffer)
+           (if (and helm-persistent-action-display-window
+                    (window-dedicated-p (next-window win 1)))
+               (delete-window helm-persistent-action-display-window)
+             (set-window-buffer win helm-current-buffer))
            (message "Buffer `%s' killed" buf-name))
           (t (find-file candidate)))))
 
