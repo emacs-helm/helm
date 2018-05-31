@@ -2724,7 +2724,8 @@ value found and current command is not in `helm-commands-using-frame'."
                (and helm-use-frame-when-more-than-two-windows
                     (null helm--nested)
                     (> (length (window-list)) 2))
-               (null (frame-parameter helm-initial-frame 'minibuffer)))
+               ;; Frame parameter is unreliable for minibuffer on emacs-26.
+               (null (member helm-initial-frame (minibuffer-frame-list))))
            #'helm-display-buffer-in-own-frame)
       (default-value 'helm-display-function)))
 
