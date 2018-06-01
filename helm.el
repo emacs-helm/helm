@@ -1291,7 +1291,8 @@ Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
   "A hook that run when quitting helm.")
 
 (defvar helm-resume-after-hook nil
-  "A hook that run after resuming a helm session.")
+  "A hook that run after resuming a helm session.
+The hook should take one arg SOURCES.")
 
 ;;; Internal Variables
 ;;
@@ -2402,7 +2403,8 @@ as a string with ARG."
   (let (any-buffer
         cur-dir
         narrow-pos
-        (helm-full-frame (default-value 'helm-full-frame)))
+        (helm-full-frame (default-value 'helm-full-frame))
+        sources)
     (if arg
         (if (and (stringp arg) (bufferp (get-buffer arg)))
             (setq any-buffer arg)
@@ -2410,6 +2412,8 @@ as a string with ARG."
       (setq any-buffer helm-last-buffer))
     (cl-assert any-buffer nil
                "helm-resume: No helm buffers found to resume")
+    (setq sources (buffer-local-value
+                   'helm-sources (get-buffer any-buffer)))
     ;; Reset `cursor-type' to nil as it have been set to t
     ;; when quitting previous session.
     (with-current-buffer any-buffer (setq cursor-type nil))
@@ -2434,13 +2438,12 @@ as a string with ARG."
       (with-helm-default-directory cur-dir
           (unwind-protect
                (helm
-                :sources (buffer-local-value
-                          'helm-sources (get-buffer any-buffer))
+                :sources sources
                 :input (buffer-local-value 'helm-input-local (get-buffer any-buffer))
                 :prompt (buffer-local-value 'helm--prompt (get-buffer any-buffer))
                 :resume t
                 :buffer any-buffer)
-            (helm-log-run-hook 'helm-resume-after-hook))))))
+            (run-hook-with-args 'helm-resume-after-hook sources))))))
 
 (defun helm-resume-previous-session-after-quit (arg)
   "Resume previous helm session within a running helm."

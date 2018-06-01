@@ -3196,14 +3196,6 @@ Use it for non--interactive calls of `helm-find-files'."
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
     (helm-ff-setup-update-hook)
-    ;; When HFF finish we have to set among other things the
-    ;; helm-ff-default-directory and helm-ff-last-expanded variables,
-    ;; so we run a function that do this when quitting/exiting HFF.
-    ;; The problem is when HFF is restarted again from resume, the
-    ;; resume lambda is not updated, so we do this from a hook that
-    ;; run at end of resume remove itself from this same hook.
-    ;; FIXME this add one more level when resuming but the problem
-    ;; remains after 3th resume.
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
          (helm :sources 'helm-source-find-files
@@ -3215,21 +3207,22 @@ Use it for non--interactive calls of `helm-find-files'."
                :default def
                :prompt "Find files or url: "
                :buffer "*helm find files*")
-      (helm-ff--update-resume-after-hook 'nohook)
+      (helm-ff--update-resume-after-hook nil t)
       (setq helm-ff-default-directory nil))))
 
-(defun helm-ff--update-resume-after-hook (&optional nohook)
+(defun helm-ff--update-resume-after-hook (sources &optional nohook)
   "Meant to be used in `helm-resume-after-hook'.
-Remove itself from this same hook when NOHOOK is non nil."
-  (helm-attrset 'resume `(lambda ()
-                           (helm-ff-setup-update-hook)
-                           (setq helm-ff-default-directory
-                                 ,helm-ff-default-directory
-                                 helm-ff-last-expanded
-                                 ,helm-ff-last-expanded))
-                helm-source-find-files)
-  (unless nohook
-    (remove-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)))
+When NOHOOK is non nil run inconditionally, otherwise only when source
+is helm-source-find-files."
+  (when (or nohook (string= "Find Files"
+                            (assoc-default 'name (car sources))))
+    (helm-attrset 'resume `(lambda ()
+                             (helm-ff-setup-update-hook)
+                             (setq helm-ff-default-directory
+                                   ,helm-ff-default-directory
+                                   helm-ff-last-expanded
+                                   ,helm-ff-last-expanded))
+                  helm-source-find-files)))
 
 (defun helm-ff-clean-initial-input ()
   ;; When using hff in an external frame initial input is printed in
