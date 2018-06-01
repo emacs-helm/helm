@@ -2962,7 +2962,11 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                                           (with-helm-buffer
                                             (file-equal-p candidate fname)))))
                (when remove-buf-only
-                 (set-window-buffer win helm-current-buffer))
+                 (with-helm-window
+                   (if (and helm-persistent-action-display-window
+                            (window-dedicated-p (next-window win 1)))
+                       (delete-window helm-persistent-action-display-window)
+                     (set-window-buffer win helm-current-buffer))))
                (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
                  (kill-buffer image-dired-display-image-buffer))
                (unless remove-buf-only
