@@ -47,7 +47,12 @@
     (find-file . nil)
     (find-file-at-point . helm-completing-read-sync-default-handler)
     (ffap . helm-completing-read-sync-default-handler)
-    (execute-extended-command . nil))
+    (execute-extended-command . nil)
+    (dired-do-rename . helm-read-file-name-handler-1)
+    (dired-do-copy . helm-read-file-name-handler-1)
+    (dired-do-symlink . helm-read-file-name-handler-1)
+    (dired-do-relsymlink . helm-read-file-name-handler-1)
+    (dired-do-hardlink . helm-read-file-name-handler-1))
   "Completing read functions for specific Emacs commands.
 
 By default `helm-mode' use `helm-completing-read-default-handler' to
@@ -1115,7 +1120,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                       helm-completing-read-handlers-alist))
          (def-com  (cdr-safe entry))
          (str-defcom (and def-com (helm-symbol-name def-com)))
-         (def-args (list prompt dir default-filename mustmatch initial predicate))
+         (def-args (list prompt dir default-filename mustmatch init predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
          (any-args (append def-args (list str-command buf-name)))
@@ -1199,16 +1204,22 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
 Can be added to `helm-completing-read-handlers-alist' for functions
 that need a `read-file-name' function with directory history.
 The `helm-find-files' history `helm-ff-history' is used here."
-  (helm-read-file-name
-   prompt
-   :name name
-   :history helm-ff-history
-   :buffer buffer
-   :default default-filename
-   :initial-input (expand-file-name initial dir)
-   :alistp nil
-   :must-match mustmatch
-   :test predicate))
+  (let ((helm-always-two-windows t)
+        (helm-split-window-default-side
+         (if (eq helm-split-window-default-side 'same)
+             'below helm-split-window-default-side))
+        helm-split-window-inside-p
+        helm-reuse-last-window-split-state)
+    (helm-read-file-name
+     prompt
+     :name name
+     :history helm-ff-history
+     :buffer buffer
+     :default default-filename
+     :initial-input (and initial dir (expand-file-name initial dir))
+     :alistp nil
+     :must-match mustmatch
+     :test predicate)))
 
 
 ;;; Completion in region
