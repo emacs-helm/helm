@@ -313,6 +313,17 @@ Of course you can also write your own function to do something else."
   "Modes that requires string's insertion to be escaped."
   :group 'helm-files
   :type '(repeat symbol))
+
+(defcustom helm-ff-allow-recursive-deletes nil
+  "when 'always don't prompt for recursive deletion of directories.
+When nil, will ask for recursive deletion.
+Note that when deleting multiple directories you can answer ! when
+prompted to avoid beeing asked for next directories, so it is probably
+better to not modify this variable."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Delete non-empty directories" always)
+          (const :tag "Confirm for each directory" nil)))
 
 ;;; Faces
 ;;
@@ -3537,13 +3548,13 @@ Ask to kill buffers associated with that file, too."
                ;; directory. This is not persistent for all session
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
-               (if (eq dired-recursive-deletes 'always)
+               (if (eq helm-ff-allow-recursive-deletes 'always)
                    (delete-directory file 'recursive)
                  (pcase (helm-read-query (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
                    ('"y" (delete-directory file 'recursive))
-                   ('"!" (setq dired-recursive-deletes 'always)
+                   ('"!" (setq helm-ff-allow-recursive-deletes 'always)
                          (delete-directory file 'recursive))
                    ('"n" (cl-return 'skip))
                    ('"q" (throw 'helm-abort-delete-file
@@ -3560,7 +3571,7 @@ Ask to kill buffers associated with that file, too."
 (defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len (length files))
-         (old--dired-recursive-deletes dired-recursive-deletes))
+         (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
@@ -3573,8 +3584,10 @@ Ask to kill buffers associated with that file, too."
                  (when (eq (helm-delete-file
                             i helm-ff-signal-error-on-dot-files)
                            'skip)
+                   (message "Directory is not empty, skipping")
+                   (sleep-for 1)
                    (setq len (1- len))))
-            (setq dired-recursive-deletes old--dired-recursive-deletes))
+            (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes))
           (message "%s File(s) deleted" len))))))
 
 (defun helm-find-file-or-marked (candidate)
