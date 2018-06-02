@@ -893,6 +893,25 @@ of this function is really needed."
       ;; Restart from beginning until string is completely decoded.
       (goto-char (point-min)))
     (decode-coding-string (buffer-string) 'utf-8)))
+
+(defun helm-read-query (prompt answer-list)
+  "Prompt user for an answer.
+Arg PROMPT is the prompt to present user the different possible
+answers, ANSWER-LIST is a list of strings.
+If user enter an answer which is one of ANSWER-LIST return this
+answer, otherwise keep prompting for a valid answer."
+  (let ((answer))
+    (while (not (member
+                 (setq answer
+                       (string
+                        (read-key
+                         (propertize
+                          prompt
+                          'face 'minibuffer-prompt))))
+                 answer-list))
+      (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
+      (sit-for 1))
+    answer))
 
 ;;; Symbols routines
 ;;

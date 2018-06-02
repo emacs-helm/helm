@@ -3517,45 +3517,65 @@ following files to destination."
   "Delete the given file after querying the user.
 Ask to kill buffers associated with that file, too."
   (require 'dired)
-  (when (and error-if-dot-file-p
-             (helm-ff-dot-file-p file))
-    (error "Error: Cannot operate on `.' or `..'"))
-  (let ((buffers (helm-file-buffers file))
-        (helm--reading-passwd-or-string t))
-    (if (or (< emacs-major-version 24) synchro)
-        ;; `dired-delete-file' in Emacs versions < 24
-        ;; doesn't support delete-by-moving-to-trash
-        ;; so use `delete-directory' and `delete-file'
-        ;; that handle it.
-        (cond ((and (not (file-symlink-p file))
-                    (file-directory-p file)
-                    (directory-files file t dired-re-no-dot))
-               (when (y-or-n-p (format "Recursive delete of `%s'? "
-                                       (abbreviate-file-name file)))
-                 (delete-directory file 'recursive)))
-              ((and (not (file-symlink-p file))
-                    (file-directory-p file))
-               (delete-directory file))
-              (t (delete-file file)))
-      (dired-delete-file
-       file dired-recursive-deletes delete-by-moving-to-trash))
-    (when buffers
-      (cl-dolist (buf buffers)
-        (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-          (kill-buffer buf))))))
+  (cl-block nil
+    (when (and error-if-dot-file-p
+               (helm-ff-dot-file-p file))
+      (error "Error: Cannot operate on `.' or `..'"))
+    (let ((buffers (helm-file-buffers file))
+          (helm--reading-passwd-or-string t))
+      (cond ((and (not (file-symlink-p file))
+                  (file-directory-p file)
+                  (directory-files file t dired-re-no-dot))
+             ;; Synchro means persistent deletion from HFF.
+             (if synchro
+                 (when (y-or-n-p (format "Recursive delete of `%s'? "
+                                         (abbreviate-file-name file)))
+                   (delete-directory file 'recursive))
+               ;; Avoid using dired-delete-file really annoying in
+               ;; emacs-26 but allows using ! (instead of all) to not
+               ;; confirm anymore for recursive deletion of
+               ;; directory. This is not persistent for all session
+               ;; like emacs-26 does with dired-delete-file (think it
+               ;; is a bug).
+               (if (eq dired-recursive-deletes 'always)
+                   (delete-directory file 'recursive)
+                 (pcase (helm-read-query (format "Recursive delete of `%s'? [y,n,!,q]"
+                                                 (abbreviate-file-name file))
+                                         '("y" "n" "!" "q"))
+                   ('"y" (delete-directory file 'recursive))
+                   ('"!" (setq dired-recursive-deletes 'always)
+                         (delete-directory file 'recursive))
+                   ('"n" (cl-return 'skip))
+                   ('"q" (throw 'helm-abort-delete-file
+                           (message "Abort file deletion")))))))
+            ((and (not (file-symlink-p file))
+                  (file-directory-p file))
+             (delete-directory file))
+            (t (delete-file file)))
+      (when buffers
+        (cl-dolist (buf buffers)
+          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
+            (kill-buffer buf)))))))
 
 (defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates :with-wildcard t))
-         (len (length files)))
+         (len (length files))
+         (old--dired-recursive-deletes dired-recursive-deletes))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
           (message "(No deletions performed)")
-        (cl-dolist (i files)
-          (set-text-properties 0 (length i) nil i)
-          (helm-delete-file i helm-ff-signal-error-on-dot-files))
-        (message "%s File(s) deleted" len)))))
+        (catch 'helm-abort-delete-file
+          (unwind-protect
+               (cl-dolist (i files)
+                 (set-text-properties 0 (length i) nil i)
+                 (when (eq (helm-delete-file
+                            i helm-ff-signal-error-on-dot-files)
+                           'skip)
+                   (setq len (1- len))))
+            (setq dired-recursive-deletes old--dired-recursive-deletes))
+          (message "%s File(s) deleted" len))))))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
