@@ -894,7 +894,7 @@ of this function is really needed."
       (goto-char (point-min)))
     (decode-coding-string (buffer-string) 'utf-8)))
 
-(defun helm-read-query (prompt answer-list)
+(defun helm-read-answer (prompt answer-list)
   "Prompt user for an answer.
 Arg PROMPT is the prompt to present user the different possible
 answers, ANSWER-LIST is a list of strings.

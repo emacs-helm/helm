@@ -3550,7 +3550,7 @@ Ask to kill buffers associated with that file, too."
                ;; is a bug).
                (if (eq helm-ff-allow-recursive-deletes 'always)
                    (delete-directory file 'recursive)
-                 (pcase (helm-read-query (format "Recursive delete of `%s'? [y,n,!,q]"
+                 (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
                    ('"y" (delete-directory file 'recursive))
