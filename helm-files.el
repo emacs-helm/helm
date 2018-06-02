@@ -3553,11 +3553,11 @@ Ask to kill buffers associated with that file, too."
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
-                   ('"y" (delete-directory file 'recursive))
-                   ('"!" (setq helm-ff-allow-recursive-deletes 'always)
+                   ("y" (delete-directory file 'recursive))
+                   ("!" (setq helm-ff-allow-recursive-deletes 'always)
                          (delete-directory file 'recursive))
-                   ('"n" (cl-return 'skip))
-                   ('"q" (throw 'helm-abort-delete-file
+                   ("n" (cl-return 'skip))
+                   ("q" (throw 'helm-abort-delete-file
                            (message "Abort file deletion")))))))
             ((and (not (file-symlink-p file))
                   (file-directory-p file))
