@@ -322,7 +322,7 @@ prompted to avoid beeing asked for next directories, so it is probably
 better to not modify this variable."
   :group 'helm-files
   :type '(choice
-          (const :tag "Delete non-empty directories" always)
+          (const :tag "Delete non-empty directories" t)
           (const :tag "Confirm for each directory" nil)))
 
 ;;; Faces
@@ -3548,13 +3548,13 @@ Ask to kill buffers associated with that file, too."
                ;; directory. This is not persistent for all session
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
-               (if (eq helm-ff-allow-recursive-deletes 'always)
+               (if helm-ff-allow-recursive-deletes
                    (delete-directory file 'recursive)
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
                    ("y" (delete-directory file 'recursive))
-                   ("!" (setq helm-ff-allow-recursive-deletes 'always)
+                   ("!" (setq helm-ff-allow-recursive-deletes t)
                          (delete-directory file 'recursive))
                    ("n" (cl-return 'skip))
                    ("q" (throw 'helm-abort-delete-file
