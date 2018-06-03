@@ -3558,7 +3558,8 @@ Ask to kill buffers associated with that file, too."
                          (delete-directory file 'recursive))
                    ("n" (cl-return 'skip))
                    ("q" (throw 'helm-abort-delete-file
-                           (message "Abort file deletion")))))))
+                           (progn
+                             (message "Abort file deletion") (sleep-for 1))))))))
             ((and (not (file-symlink-p file))
                   (file-directory-p file))
              (delete-directory file))
@@ -3570,25 +3571,25 @@ Ask to kill buffers associated with that file, too."
 
 (defun helm-delete-marked-files (_ignore)
   (let* ((files (helm-marked-candidates :with-wildcard t))
-         (len (length files))
+         (len 0)
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
-      (if (not (y-or-n-p (format "Delete *%s File(s)" len)))
+      (if (not (y-or-n-p (format "Delete *%s File(s)" (length files))))
           (message "(No deletions performed)")
         (catch 'helm-abort-delete-file
           (unwind-protect
                (cl-dolist (i files)
                  (set-text-properties 0 (length i) nil i)
-                 (when (eq (helm-delete-file
-                            i helm-ff-signal-error-on-dot-files)
-                           'skip)
-                   (message "Directory is not empty, skipping")
-                   (sleep-for 1)
-                   (setq len (1- len))))
-            (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes))
-          (message "%s File(s) deleted" len))))))
+                 (let ((res (helm-delete-file
+                             i helm-ff-signal-error-on-dot-files)))
+                   (if (eq res 'skip)
+                       (progn (message "Directory is not empty, skipping")
+                              (sleep-for 1))
+                     (cl-incf len))))
+            (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
+        (message "%s File(s) deleted" len)))))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
