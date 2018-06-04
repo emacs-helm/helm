@@ -1277,17 +1277,10 @@ This doesn't replace inside the files, only modify filenames."
                                         (format "(%s)" count)
                                         (file-name-extension new t))))
                     (unless (string= query "!")
-                      (while (not (member
-                                   (setq query
-                                         (string
-                                          (read-key
-                                           (propertize
-                                            (format
-                                             "Replace `%s' by `%s' [!,y,n,q]"
-                                             old new)
-                                            'face 'minibuffer-prompt))))
-                                   '("y" "!" "n" "q")))
-                        (message "Please answer by y,n,! or q") (sit-for 1)))
+                      (setq query (helm-read-answer (format
+                                                     "Replace `%s' by `%s' [!,y,n,q]"
+                                                     old new)
+                                                    '("y" "n" "!" "q"))))
                     (when (string= query "q")
                       (cl-return (message "Operation aborted")))
                     (unless (string= query "n")
