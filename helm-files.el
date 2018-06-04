@@ -3534,7 +3534,7 @@ Ask to kill buffers associated with that file, too."
              (if synchro
                  (when (y-or-n-p (format "Recursive delete of `%s'? "
                                          (abbreviate-file-name file)))
-                   (delete-directory file 'recursive))
+                   (delete-directory file 'recursive delete-by-moving-to-trash))
                ;; Avoid using dired-delete-file really annoying in
                ;; emacs-26 but allows using ! (instead of all) to not
                ;; confirm anymore for recursive deletion of
@@ -3542,21 +3542,21 @@ Ask to kill buffers associated with that file, too."
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
                (if helm-ff-allow-recursive-deletes
-                   (delete-directory file 'recursive)
+                   (delete-directory file 'recursive delete-by-moving-to-trash)
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
-                   ("y" (delete-directory file 'recursive))
+                   ("y" (delete-directory file 'recursive delete-by-moving-to-trash))
                    ("!" (setq helm-ff-allow-recursive-deletes t)
-                         (delete-directory file 'recursive))
+                         (delete-directory file 'recursive delete-by-moving-to-trash))
                    ("n" (cl-return 'skip))
                    ("q" (throw 'helm-abort-delete-file
                            (progn
                              (message "Abort file deletion") (sleep-for 1))))))))
             ((and (not (file-symlink-p file))
                   (file-directory-p file))
-             (delete-directory file))
-            (t (delete-file file)))
+             (delete-directory file nil delete-by-moving-to-trash))
+            (t (delete-file file delete-by-moving-to-trash)))
       (when buffers
         (cl-dolist (buf buffers)
           (when (y-or-n-p (format "Kill buffer %s, too? " buf))
