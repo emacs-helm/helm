@@ -915,18 +915,12 @@ Example:
           (\"q\" \"quit\")))
 
 "
-  (let ((answer))
-    (while (not (member
-                 (setq answer
-                       (string
-                        (read-key
-                         (propertize
-                          prompt
-                          'face 'minibuffer-prompt))))
-                 answer-list))
+  (helm-awhile (string
+                (read-key (propertize prompt 'face 'minibuffer-prompt)))
+    (if (member it answer-list)
+        (cl-return it)
       (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
-      (sit-for 1))
-    answer))
+      (sit-for 1))))
 
 ;;; Symbols routines
 ;;
