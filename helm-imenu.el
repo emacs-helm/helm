@@ -81,6 +81,10 @@ Each car is a regexp match pattern of the imenu type string."
            (regexp :tag "Imenu type regexp pattern")
            (sexp :tag "Face"))))
 
+(defcustom helm-imenu-extra-modes nil
+  "Extra modes where helm-imenu-in-all-buffers should look into."
+  :group 'helm-imenu
+  :type '(repeat symbol))
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -214,7 +218,8 @@ Each car is a regexp match pattern of the imenu type string."
                  for b in lst
                  for count from 1
                  when (with-current-buffer b
-                        (and (derived-mode-p 'prog-mode)
+                        (and (or (member major-mode helm-imenu-extra-modes)
+                                 (derived-mode-p 'prog-mode))
                              (helm-same-major-mode-p
                               cur-buf helm-imenu-all-buffer-assoc)))
                  if build-sources
