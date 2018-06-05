@@ -2027,11 +2027,15 @@ Return the result of last function call."
 (defun helm-funcall-foreach (sym &optional sources)
   "Call the associated function(s) to SYM for each source if any."
   (let ((sources (or (helm-get-sources sources)
-                     ;; `helm-sources' are local to helm-buffer.
-                     (with-helm-buffer helm-sources))))
-    (cl-dolist (source sources)
-      (helm-aif (assoc-default sym source)
-          (helm-funcall-with-source source it)))))
+                     ;; Fix error no buffer named *helm... by checking
+                     ;; if helm-buffer exists.
+                     (and (buffer-live-p (get-buffer (helm-buffer-get)))
+                          ;; `helm-sources' are local to helm-buffer.
+                          (with-helm-buffer helm-sources)))))
+    (when sources
+      (cl-dolist (source sources)
+        (helm-aif (assoc-default sym source)
+            (helm-funcall-with-source source it))))))
 
 (defun helm-normalize-sources (sources)
   "If SOURCES is only one source, make a list of one element."
