@@ -1161,7 +1161,11 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
     (unwind-protect
          (setq fname
                (cond (;; A specialized function exists, run it
-                      ;; with the two extra args specific to helm..
+                      ;; with the two extra args specific to helm.
+                      ;; Note that the helm handler should ensure
+                      ;; :initial-input is not nil i.e. Use init
+                      ;; which fallback to default-directory instead
+                      ;; of INITIAL.
                       (and def-com helm-mode
                            (not (eq def-com 'ido-read-file-name))
                            (not (eq def-com 'incompatible)))
