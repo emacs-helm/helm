@@ -1120,7 +1120,8 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                       helm-completing-read-handlers-alist))
          (def-com  (cdr-safe entry))
          (str-defcom (and def-com (helm-symbol-name def-com)))
-         (def-args (list prompt dir default-filename mustmatch init predicate))
+         ;; Don't modify the original args list for emacs generic functions.
+         (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
          (any-args (append def-args (list str-command buf-name)))
@@ -1180,6 +1181,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        :name str-command
                        :buffer buf-name
                        :default default-filename
+                       ;; Helm handlers should always have a non nil INITIAL arg.
                        :initial-input (expand-file-name init dir)
                        :alistp nil
                        :must-match mustmatch
@@ -1209,14 +1211,16 @@ The `helm-find-files' history `helm-ff-history' is used here."
          (if (eq helm-split-window-default-side 'same)
              'below helm-split-window-default-side))
         helm-split-window-inside-p
-        helm-reuse-last-window-split-state)
+        helm-reuse-last-window-split-state
+        ;; Helm handlers should always have a non nil INITIAL arg.
+        (init (or initial dir default-directory)))
     (helm-read-file-name
      prompt
      :name name
      :history helm-ff-history
      :buffer buffer
      :default default-filename
-     :initial-input (and initial dir (expand-file-name initial dir))
+     :initial-input (expand-file-name init dir)
      :alistp nil
      :must-match mustmatch
      :test predicate)))
