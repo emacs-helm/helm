@@ -324,6 +324,24 @@ better to not modify this variable."
   :type '(choice
           (const :tag "Delete non-empty directories" t)
           (const :tag "Confirm for each directory" nil)))
+
+(defcustom helm-ff-delete-files-function #'helm-delete-marked-files
+  "The function to use by default to delete files.
+
+Default is to delete files synchronously, other choice is to delete
+files asynchronously.
+
+BE AWARE that when deleting async you will not be warned about
+recursive deletion of directories, IOW non empty directories will be
+deleted with no warnings in background!!!
+
+It is the function that will be used when using `\\<helm-find-files-map>\\[helm-ff-run-delete-file]'
+from `helm-find-files'."
+  :group 'helm-files
+  :type '(choice (function :tag "Delete files synchronously."
+                  helm-delete-marked-files)
+                 (function :tag "Delete files asynchronously."
+                  helm-delete-marked-files-async)))
 
 ;;; Faces
 ;;
@@ -394,6 +412,10 @@ better to not modify this variable."
   "Face used for remote files in `file-name-history'."
   :group 'helm-files-faces)
 
+(defface helm-delete-async-message
+    '((t (:foreground "yellow")))
+  "Face used for mode-line message."
+  :group 'helm-files-faces)
 
 ;;; Helm-find-files - The helm file browser.
 ;;
@@ -557,7 +579,14 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find alternate file `C-x C-v'" 'find-alternate-file
    "Ediff File `C-c ='" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
-   "Delete File(s) `M-D'" 'helm-delete-marked-files
+   (lambda () (format "Delete File(s)%s" (if (eq helm-ff-delete-files-function
+                                                 'helm-delete-marked-files)
+                                             " `M-D'" "")))
+   'helm-delete-marked-files
+   (lambda () (format "Delete File(s) async%s" (if (eq helm-ff-delete-files-function
+                                                       'helm-delete-marked-files-async)
+                                                    " `M-D'" "")))
+   'helm-delete-marked-files-async
    "Touch File(s) `M-T'" 'helm-ff-touch-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
@@ -1516,7 +1545,7 @@ Behave differently depending of `helm-selection':
   "Run Delete file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-delete-marked-files)))
+    (helm-exit-and-execute-action helm-ff-delete-files-function)))
 (put 'helm-ff-run-delete-file 'helm-only t)
 
 (defun helm-ff-run-complete-fn-at-point ()
@@ -3583,6 +3612,56 @@ Ask to kill buffers associated with that file, too."
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
         (message "%s File(s) deleted" len)))))
+
+(define-minor-mode helm-delete-async--modeline-mode
+    "Notify mode-line that an async process run."
+  :group 'dired-async
+  :global t
+  :lighter (:eval (propertize " Deleting files async ..."
+                              'face 'helm-delete-async-message))
+  (unless helm-delete-async--modeline-mode
+    (let ((visible-bell t)) (ding))))
+
+(defun helm-delete-async-mode-line-message (text face &rest args)
+  "Notify end of async operation in `mode-line'."
+  (message nil)
+  (let ((mode-line-format (concat
+                           " " (propertize
+                                (if args
+                                    (apply #'format text args)
+                                    text)
+                                'face face))))
+    (force-mode-line-update)
+    (sit-for 3)
+    (force-mode-line-update)))
+
+(defun helm-delete-marked-files-async (_ignore)
+  (let* ((files (helm-marked-candidates :with-wildcard t))
+         (buffers (cl-loop for file in files
+                           for buf = (helm-file-buffers file)
+                           when buf append buf))
+         (callback (lambda (&optional _ignore)
+                     (helm-delete-async--modeline-mode -1)
+                     (helm-delete-async-mode-line-message "Deleting %s files async done"
+                                                          'helm-delete-async-message
+                                                          (length files))
+                     (when buffers
+                       (dolist (buf buffers)
+                         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
+                           (kill-buffer buf)))))))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (helm-ff--count-and-collect-dups files)
+      (if (not (y-or-n-p (format "Delete *%s File(s)" (length files))))
+          (message "(No deletions performed)")
+        (async-start `(lambda ()
+                        (dolist (file ',files)
+                          (cond ((and (not (file-symlink-p file))
+                                      (file-directory-p file))
+                                 (delete-directory file 'recursive ,delete-by-moving-to-trash))
+                                (t (delete-file file ,delete-by-moving-to-trash)))))
+                     callback)
+        (helm-delete-async--modeline-mode 1)))))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
