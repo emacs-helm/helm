@@ -1189,6 +1189,19 @@ go to previous/next line without executing the persistent action.
 \\[helm-refresh]\t\tRecalculate and redisplay candidates.
 \\[helm-toggle-suspend-update]\t\tToggle candidate updates.
 
+** Special yes, no or yes for all answers
+
+You may be prompted in the minibuffer to answer by [y,n,!,q] in some places
+for confirmation.
+
+- y  mean yes
+- no mean no
+- !  mean yes for all
+- q  mean quit or abort current operation.
+
+When using ! you will not be prompted anymore for the same thing in current operation
+e.g. file deletion, file copy etc...
+
 ** Moving in `helm-buffer'
 
 You can move in `helm-buffer' with the usual commands used in Emacs:
