@@ -3560,7 +3560,16 @@ following files to destination."
         collect (buffer-name buf)))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro)
-  "Delete the given file after querying the user.
+  "Delete FILE after querying the user.
+
+Return error when ERROR-IF-DOT-FILE-P is non nil and user tries to
+delete a dotted file i.e. \".\" or \"..\".
+
+Ask user when directory are not empty to allow recursive deletion
+unless `helm-ff-allow-recursive-deletes' is non nil.
+When user is asked and reply with \"!\" don't ask for remaining
+directories.
+
 Ask to kill buffers associated with that file, too."
   (require 'dired)
   (cl-block nil
@@ -3605,6 +3614,7 @@ Ask to kill buffers associated with that file, too."
             (kill-buffer buf)))))))
 
 (defun helm-delete-marked-files (_ignore)
+  "Delete marked files with `helm-delete-file'."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
@@ -3656,6 +3666,10 @@ Ask to kill buffers associated with that file, too."
     (force-mode-line-update)))
 
 (defun helm-delete-marked-files-async (_ignore)
+  "Same as `helm-delete-marked-files' but async.
+This function is not using `helm-delete-file' and BTW not asking user
+for recursive deletion of directory, be warned that directories are
+always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
@@ -3674,7 +3688,8 @@ Ask to kill buffers associated with that file, too."
                                           (buffer-string))
                                         :error
                                         "*helm delete files*")
-                       (fit-window-to-buffer (get-buffer-window "*helm delete files*"))
+                       (fit-window-to-buffer (get-buffer-window
+                                              "*helm delete files*"))
                        (delete-file helm-ff-delete-log-file))
                      (when buffers
                        (dolist (buf buffers)
