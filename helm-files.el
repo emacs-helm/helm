@@ -3626,6 +3626,13 @@ Ask to kill buffers associated with that file, too."
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
         (message "%s File(s) deleted" len)))))
 
+;;; Delete files async
+;;
+;;
+(defvar helm-ff-delete-log-file
+  (expand-file-name "helm-delete-file.log" user-emacs-directory)
+  "The file use to communicate with emacs child when deleting files async.")
+
 (define-minor-mode helm-delete-async--modeline-mode
     "Notify mode-line that an async process run."
   :group 'dired-async
@@ -3653,11 +3660,22 @@ Ask to kill buffers associated with that file, too."
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
                            when buf append buf))
-         (callback (lambda (&optional _ignore)
+         (callback (lambda (result)
                      (helm-delete-async--modeline-mode -1)
-                     (helm-delete-async-mode-line-message "Deleting %s file(s) async done"
-                                                          'helm-delete-async-message
-                                                          (length files))
+                     (helm-delete-async-mode-line-message
+                      "Deleting (%s/%s) file(s) async done"
+                      'helm-delete-async-message
+                      result (length files))
+                     (when (file-exists-p helm-ff-delete-log-file)
+                       (display-warning 'helm
+                                        (with-temp-buffer
+                                          (insert-file-contents
+                                           helm-ff-delete-log-file)
+                                          (buffer-string))
+                                        :error
+                                        "*helm delete files*")
+                       (fit-window-to-buffer (get-buffer-window "*helm delete files*"))
+                       (delete-file helm-ff-delete-log-file))
                      (when buffers
                        (dolist (buf buffers)
                          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
@@ -3667,12 +3685,24 @@ Ask to kill buffers associated with that file, too."
       (helm-ff--count-and-collect-dups files)
       (if (not (y-or-n-p (format "Delete *%s File(s)" (length files))))
           (message "(No deletions performed)")
-        (async-start `(lambda ()
-                        (dolist (file ',files)
-                          (cond ((and (not (file-symlink-p file))
-                                      (file-directory-p file))
-                                 (delete-directory file 'recursive ,delete-by-moving-to-trash))
-                                (t (delete-file file ,delete-by-moving-to-trash)))))
+        (async-start
+         `(lambda ()
+            (let ((result 0))
+              (dolist (file ',files result)
+                (condition-case err
+                    (cond ((and (not (file-symlink-p file))
+                                (file-directory-p file))
+                           (delete-directory file 'recursive
+                                             ,delete-by-moving-to-trash)
+                           (setq result (1+ result)))
+                          (t (delete-file file
+                                          ,delete-by-moving-to-trash)
+                             (setq result (1+ result))))
+                  (error (with-temp-file ,helm-ff-delete-log-file
+                           (insert (format-time-string "%x:%H:%M:%S\n"))
+                           (insert (format "%s:%s\n"
+                                           (car err)
+                                           (mapconcat 'identity (cdr err) " ")))))))))
                      callback)
         (helm-delete-async--modeline-mode 1)))))
 
