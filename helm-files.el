@@ -3637,7 +3637,7 @@ Ask to kill buffers associated with that file, too."
     "Notify mode-line that an async process run."
   :group 'dired-async
   :global t
-  :lighter (:eval (propertize " Deleting files async ..."
+  :lighter (:eval (propertize " Deleting file(s) async ..."
                               'face 'helm-delete-async-message))
   (unless helm-delete-async--modeline-mode
     (let ((visible-bell t)) (ding))))
