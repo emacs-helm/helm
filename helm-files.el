@@ -443,6 +443,7 @@ from `helm-find-files'."
     (define-key map (kbd "M-B")           'helm-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'helm-ff-run-load-file)
     (define-key map (kbd "M-S")           'helm-ff-run-symlink-file)
+    (define-key map (kbd "M-Y")           'helm-ff-run-relsymlink-file)
     (define-key map (kbd "M-H")           'helm-ff-run-hardlink-file)
     (define-key map (kbd "M-D")           'helm-ff-run-delete-file)
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
@@ -1533,6 +1534,13 @@ Behave differently depending of `helm-selection':
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-find-files-symlink)))
 (put 'helm-ff-run-symlink-file 'helm-only t)
+
+(defun helm-ff-run-relsymlink-file ()
+  "Run Symlink file action from `helm-source-find-files'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-find-files-relsymlink)))
+(put 'helm-ff-run-relsymlink-file 'helm-only t)
 
 (defun helm-ff-run-hardlink-file ()
   "Run Hardlink file action from `helm-source-find-files'."
