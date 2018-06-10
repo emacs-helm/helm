@@ -3655,7 +3655,7 @@ Ask to kill buffers associated with that file, too."
                            when buf append buf))
          (callback (lambda (&optional _ignore)
                      (helm-delete-async--modeline-mode -1)
-                     (helm-delete-async-mode-line-message "Deleting %s files async done"
+                     (helm-delete-async-mode-line-message "Deleting %s file(s) async done"
                                                           'helm-delete-async-message
                                                           (length files))
                      (when buffers
