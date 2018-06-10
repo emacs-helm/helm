@@ -3722,7 +3722,7 @@ always deleted with no warnings."
                            (insert (format "%s:%s\n"
                                            (car err)
                                            (mapconcat 'identity (cdr err) " ")))))))))
-                     callback)
+         callback)
         (helm-delete-async--modeline-mode 1)))))
 
 (defun helm-find-file-or-marked (candidate)
