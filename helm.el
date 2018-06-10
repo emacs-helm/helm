@@ -1765,7 +1765,7 @@ If NO-UPDATE is non-`nil', skip executing `helm-update'."
   (with-current-buffer helm-buffer
     (setq helm-sources (helm-get-sources sources))
     (helm-log "helm-sources = %S" helm-sources))
-  (unless no-init (helm-funcall-foreach 'init))
+  (unless no-init (helm-compute-attr-in-sources 'init))
   (unless no-update (helm-update)))
 
 (defun helm-get-selection (&optional buffer force-display-part source)
@@ -1803,7 +1803,7 @@ with its properties."
                     (helm-aif (and src disp
                                    (not force-display-part)
                                    (assoc-default 'display-to-real src))
-                        (helm-funcall-with-source source it disp)
+                        (helm-apply-functions-from-source source it disp)
                       disp)))))
         (unless (equal selection "")
           (helm-log "selection = %S" selection)
@@ -1816,7 +1816,7 @@ of \(action-display . function\)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (let ((src (helm-get-current-source)))
       (helm-aif (helm-attr 'action-transformer)
-          (helm-funcall-with-source
+          (helm-apply-functions-from-source
            (or source src) it
            (helm-attr 'action nil 'ignorefn)
            ;; Check if the first given transformer
@@ -1938,7 +1938,7 @@ If VALUE is a variable, return the value.
 If VALUE is a symbol, but it is not a function or a variable, cause an error.
 Otherwise, return VALUE itself."
   (cond ((and source (functionp value) (not (eq compute 'ignorefn)))
-         (helm-funcall-with-source source value))
+         (helm-apply-functions-from-source source value))
         ((and (functionp value) (not (eq compute 'ignorefn)))
          (funcall value))
         ((and (symbolp value) (boundp value))
@@ -2013,9 +2013,20 @@ was deleted and the candidates list not updated."
 
 ;; Tools
 ;;
-(defun helm-funcall-with-source (source functions &rest args)
+(defun helm-apply-functions-from-source (source functions &rest args)
   "From SOURCE apply FUNCTIONS on ARGS.
-FUNCTIONS is either a symbol or a list of functions, each function being
+
+This function is used to process filter functions, when filter is a
+\`filtered-candidate-transformer', we pass to ARGS candidates+source
+whereas when the filter is `candidate-transformer' we pass to ARGS
+candidates only.
+This function is used also to process functions called with no args,
+e.g. init functions, in this case it is called without ARGS.
+See `helm-process-filtered-candidate-transformer'
+\`helm-compute-attr-in-sources' and 
+\`helm-process-candidate-transformer'.
+
+Arg FUNCTIONS is either a symbol or a list of functions, each function being
 applied on ARGS and called on the result of the precedent function.
 Return the result of last function call."
   (let ((helm--source-name (assoc-default 'name source))
@@ -2037,8 +2048,11 @@ Return the result of last function call."
              do (setcar args result)
              finally return result)))
 
-(defun helm-funcall-foreach (sym &optional sources)
-  "Call the associated function(s) to SYM for each source if any."
+(defalias 'helm-funcall-with-source 'helm-apply-functions-from-source)
+(make-obsolete 'helm-funcall-with-source 'helm-apply-functions-from-source "2.9.7")
+
+(defun helm-compute-attr-in-sources (attr &optional sources)
+  "Call the associated function(s) to ATTR for each source if any."
   (let ((sources (or (helm-get-sources sources)
                      ;; Fix error no buffer named *helm... by checking
                      ;; if helm-buffer exists.
@@ -2047,8 +2061,11 @@ Return the result of last function call."
                           (with-helm-buffer helm-sources)))))
     (when sources
       (cl-dolist (source sources)
-        (helm-aif (assoc-default sym source)
-            (helm-funcall-with-source source it))))))
+        (helm-aif (assoc-default attr source)
+            (helm-apply-functions-from-source source it))))))
+
+(defalias 'helm-funcall-foreach 'helm-compute-attr-in-sources)
+(make-obsolete 'helm-funcall-foreach 'helm-compute-attr-in-sources "2.9.7")
 
 (defun helm-normalize-sources (sources)
   "If SOURCES is only one source, make a list of one element."
@@ -2967,10 +2984,10 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
       (setq helm-input any-input
             helm-pattern any-input)
       (helm--fuzzy-match-maybe-set-pattern))
-    ;; If a `resume' attribute is present `helm-funcall-foreach'
+    ;; If a `resume' attribute is present `helm-compute-attr-in-sources'
     ;; will run its function.
     (when (helm-resume-p any-resume)
-      (helm-funcall-foreach 'resume))
+      (helm-compute-attr-in-sources 'resume))
     (helm-log "end initialization")))
 
 (defun helm-initialize-overlays (buffer)
@@ -3067,7 +3084,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
     (setq helm--window-side-state
           (or helm-split-window-default-side 'below)))
   ;; Call the init function for sources where appropriate
-  (helm-funcall-foreach 'init sources)
+  (helm-compute-attr-in-sources 'init sources)
   (setq helm-pattern (or (and helm--maybe-use-default-as-input
                               (or (if (listp any-default)
                                       (car any-default) any-default)
@@ -3342,7 +3359,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
       (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
       (remove-hook 'post-command-hook 'helm--update-header-line)
       ;; Be sure we call cleanup functions from helm-buffer.
-      (helm-funcall-foreach 'cleanup)
+      (helm-compute-attr-in-sources 'cleanup)
       ;; Delete or make invisible helm frame.
       (if (and helm--buffer-in-new-frame-p (null helm--nested))
           (progn
@@ -3439,7 +3456,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
                          (if candidate-proc
                              ;; Calling `helm-interpret-value' with no
                              ;; SOURCE arg force the use of `funcall'
-                             ;; and not `helm-funcall-with-source'.
+                             ;; and not `helm-apply-functions-from-source'.
                              (helm-interpret-value candidate-proc)
                            (helm-interpret-value candidate-fn source))
                        (error (helm-log "Error: %S" (setq cfn-error err)) nil))))
@@ -3507,13 +3524,13 @@ Cache the candidates if there is no cached value yet."
 (defun helm-process-candidate-transformer (candidates source)
   "Execute `candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'candidate-transformer source)
-      (helm-funcall-with-source source it candidates)
+      (helm-apply-functions-from-source source it candidates)
     candidates))
 
 (defun helm-process-filtered-candidate-transformer (candidates source)
   "Execute `filtered-candidate-transformer' function(s) on CANDIDATES in SOURCE."
   (helm-aif (assoc-default 'filtered-candidate-transformer source)
-      (helm-funcall-with-source source it candidates source)
+      (helm-apply-functions-from-source source it candidates source)
     candidates))
 
 (defmacro helm--maybe-process-filter-one-by-one-candidate (candidate source)
@@ -3552,7 +3569,7 @@ functions if some, otherwise return CANDIDATES."
 (defun helm-process-real-to-display (candidates source)
   "Execute real-to-display function on all CANDIDATES of SOURCE."
   (helm-aif (assoc-default 'real-to-display source)
-      (setq candidates (helm-funcall-with-source
+      (setq candidates (helm-apply-functions-from-source
                         source 'mapcar
                         (lambda (cand)
                           (if (consp cand)
@@ -3609,7 +3626,7 @@ cons cell."
 (defun helm-process-pattern-transformer (pattern source)
   "Execute pattern-transformer attribute function(s) on PATTERN in SOURCE."
   (helm-aif (assoc-default 'pattern-transformer source)
-      (helm-funcall-with-source source it pattern)
+      (helm-apply-functions-from-source source it pattern)
     pattern))
 
 (defun helm-default-match-function (candidate)
@@ -4179,12 +4196,12 @@ passed as argument to `recenter'."
   (helm-aif (and (null (bufferp (assoc-default
                                  (helm-attr 'name source)
                                  helm--candidate-buffer-alist)))
-                 (helm-funcall-with-source
+                 (helm-apply-functions-from-source
                   source 'helm-candidate-buffer))
       (kill-buffer it))
   (cl-dolist (attr '(update init))
     (helm-aif (assoc-default attr source)
-        (helm-funcall-with-source source it)))
+        (helm-apply-functions-from-source source it)))
   (helm-remove-candidate-cache source))
 
 (defun helm-redisplay-buffer ()
@@ -4221,7 +4238,7 @@ candidates from `helm-async-outer-limit-hook'."
                                    (forward-line 1) (helm-end-of-source-p t))
                              (cl-return nil))
                            (helm-next-line))
-                         (helm-funcall-with-source
+                         (helm-apply-functions-from-source
                           source fns (nreverse candidates)))))
           (get-sources (lambda ()
                          (let (sources helm-move-to-line-cycle-in-source)
@@ -4346,7 +4363,7 @@ if SOURCE has header-name attribute."
     (helm-insert-header
      name
      (helm-aif (assoc-default 'header-name source)
-         (helm-funcall-with-source source it name)))))
+         (helm-apply-functions-from-source source it name)))))
 
 (defun helm-insert-header (name &optional display-string)
   "Insert header of source NAME into the helm buffer.
@@ -4543,7 +4560,7 @@ If PRESERVE-SAVED-ACTION is non-`nil', then save the action."
   "Apply coerce attribute function to SELECTION in SOURCE.
 Coerce source with coerce function."
   (helm-aif (assoc-default 'coerce source)
-      (helm-funcall-with-source source it selection)
+      (helm-apply-functions-from-source source it selection)
     selection))
 
 (defun helm-get-default-action (action)
