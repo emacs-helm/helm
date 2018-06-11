@@ -809,6 +809,42 @@ To touch more than one new file, separate you filenames with a comma (\",\").
 If one wants to create (touch) a new file with comma inside the name use a prefix arg,
 this will prevent splitting the name and create multiple files.
 
+*** Delete files
+
+You can delete files without quitting helm with
+`\\<helm-find-files-map>\\[helm-ff-persistent-delete]' or delete files and quit helm with `\\[helm-ff-run-delete-file]'.
+
+In the second method you can choose to
+make this command asynchronous by customizing
+\`helm-ff-delete-files-function'.
+
+_WARNING_: When deleting files asynchronously you will NOT be
+WARNED if directories are not empty, non empty directories will
+be deleted without asking in background.
+
+A good compromise is to trash your files
+when using asynchronous method (see [[Trashing files][Trashing files]]).
+
+Note that emacs is always making a backup of your files when
+deleting, media though are definitely deleted with no backup.
+
+When choosing synchronous delete, you can allow recursive
+deletion of directories with `helm-ff-allow-recursive-deletes'.
+
+Note that `helm-ff-allow-recursive-deletes' have no effect when
+deleting asynchronously.
+
+First method (persistent delete) is always synchronous.
+
+Note that delete async and delete sync are always accessible from
+actions menu so that you can use one or the other if needed.
+
+**** Trashing files
+
+If you want to trash your files instead of deleting them you can
+set `delete-by-moving-to-trash' to non nil, like this your files
+will be moved to trash instead of beeing deleted.
+
 ** Commands
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\tRun `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
