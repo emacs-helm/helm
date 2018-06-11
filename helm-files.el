@@ -3680,10 +3680,6 @@ always deleted with no warnings."
                            when buf append buf))
          (callback (lambda (result)
                      (helm-delete-async--modeline-mode -1)
-                     (helm-delete-async-mode-line-message
-                      "Deleting (%s/%s) file(s) async done"
-                      'helm-delete-async-message
-                      result (length files))
                      (when (file-exists-p helm-ff-delete-log-file)
                        (display-warning 'helm
                                         (with-temp-buffer
@@ -3695,6 +3691,10 @@ always deleted with no warnings."
                        (fit-window-to-buffer (get-buffer-window
                                               "*helm delete files*"))
                        (delete-file helm-ff-delete-log-file))
+                     (helm-delete-async-mode-line-message
+                      "Deleting (%s/%s) file(s) async done"
+                      'helm-delete-async-message
+                      result (length files))
                      (when buffers
                        (dolist (buf buffers)
                          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
