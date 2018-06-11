@@ -3698,7 +3698,10 @@ always deleted with no warnings."
                      (when buffers
                        (dolist (buf buffers)
                          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-                           (kill-buffer buf)))))))
+                           (kill-buffer buf))))))
+         ;; Workaround emacs-26 bug with tramp see
+         ;; https://github.com/jwiegley/emacs-async/issues/80.
+         (async-quiet-switch "-q"))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
