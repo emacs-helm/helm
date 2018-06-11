@@ -828,6 +828,7 @@ this will prevent splitting the name and create multiple files.
 \\[helm-ff-run-load-file]\t\tLoad Files.
 \\[helm-ff-run-symlink-file]\t\tSymlink Files.
 \\[helm-ff-run-hardlink-file]\t\tHardlink files.
+\\[helm-ff-run-relsymlink-file]\t\tRelative symlink Files.
 \\[helm-ff-run-delete-file]\t\tDelete Files.
 \\[helm-ff-run-touch-files]\t\tTouch files.
 \\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate without leaving Helm.
