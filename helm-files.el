@@ -3706,16 +3706,20 @@ always deleted with no warnings."
           (message "(No deletions performed)")
         (async-start
          `(lambda ()
+            ;; `delete-by-moving-to-trash' have to be set globally,
+            ;; using the TRASH argument of delete-file or
+            ;; delete-directory is not enough.
+            (setq delete-by-moving-to-trash ,delete-by-moving-to-trash)
             (let ((result 0))
               (dolist (file ',files result)
                 (condition-case err
                     (cond ((and (not (file-symlink-p file))
                                 (file-directory-p file))
                            (delete-directory file 'recursive
-                                             ,delete-by-moving-to-trash)
+                                             delete-by-moving-to-trash)
                            (setq result (1+ result)))
                           (t (delete-file file
-                                          ,delete-by-moving-to-trash)
+                                          delete-by-moving-to-trash)
                              (setq result (1+ result))))
                   (error (with-temp-file ,helm-ff-delete-log-file
                            (insert (format-time-string "%x:%H:%M:%S\n"))
