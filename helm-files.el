@@ -3583,8 +3583,10 @@ Ask to kill buffers associated with that file, too."
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
              (if synchro
-                 (when (y-or-n-p (format "Recursive delete of `%s'? "
-                                         (abbreviate-file-name file)))
+                 (when (or helm-ff-allow-recursive-deletes
+                           delete-by-moving-to-trash
+                           (y-or-n-p (format "Recursive delete of `%s'? "
+                                             (abbreviate-file-name file))))
                    (delete-directory file 'recursive delete-by-moving-to-trash))
                ;; Avoid using dired-delete-file really annoying in
                ;; emacs-26 but allows using ! (instead of all) to not
@@ -3592,7 +3594,7 @@ Ask to kill buffers associated with that file, too."
                ;; directory. This is not persistent for all session
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
-               (if helm-ff-allow-recursive-deletes
+               (if (or helm-ff-allow-recursive-deletes delete-by-moving-to-trash)
                    (delete-directory file 'recursive delete-by-moving-to-trash)
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
@@ -3617,11 +3619,12 @@ Ask to kill buffers associated with that file, too."
   "Delete marked files with `helm-delete-file'."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
+         (prmt (if delete-by-moving-to-trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
-      (if (not (y-or-n-p (format "Delete *%s File(s)" (length files))))
+      (if (not (y-or-n-p (format "%s *%s File(s)" prmt (length files))))
           (message "(No deletions performed)")
         (catch 'helm-abort-delete-file
           (unwind-protect
@@ -3634,7 +3637,7 @@ Ask to kill buffers associated with that file, too."
                               (sleep-for 1))
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
-        (message "%s File(s) deleted" len)))))
+        (message "%s File(s) %sd" len (downcase prmt))))))
 
 ;;; Delete files async
 ;;
@@ -3651,7 +3654,9 @@ Ask to kill buffers associated with that file, too."
   ;; naming properly processes in async, they are actually all named
   ;; emacs and running `async-batch-invoke', so if one copy a file and
   ;; delete another file at the same time it may clash.
-  :lighter (:eval (propertize " Deleting file(s) async ..."
+  :lighter (:eval (propertize (format " %s file(s) async ..."
+                                      (if delete-by-moving-to-trash
+                                          "Trashing" "Deleting"))
                               'face 'helm-delete-async-message))
   (unless helm-delete-async--modeline-mode
     (let ((visible-bell t)) (ding))))
@@ -3675,6 +3680,7 @@ This function is not using `helm-delete-file' and BTW not asking user
 for recursive deletion of directory, be warned that directories are
 always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
+         (prmt (if delete-by-moving-to-trash "Trash" "Delete"))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
                            when buf append buf))
@@ -3692,9 +3698,9 @@ always deleted with no warnings."
                                               "*helm delete files*"))
                        (delete-file helm-ff-delete-log-file))
                      (helm-delete-async-mode-line-message
-                      "Deleting (%s/%s) file(s) async done"
+                      "%sing (%s/%s) file(s) async done"
                       'helm-delete-async-message
-                      result (length files))
+                      prmt result (length files))
                      (when buffers
                        (dolist (buf buffers)
                          (when (y-or-n-p (format "Kill buffer %s, too? " buf))
@@ -3705,7 +3711,7 @@ always deleted with no warnings."
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
-      (if (not (y-or-n-p (format "Delete *%s File(s)" (length files))))
+      (if (not (y-or-n-p (format "%s *%s File(s)" prmt (length files))))
           (message "(No deletions performed)")
         (async-start
          `(lambda ()
