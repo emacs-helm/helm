@@ -826,7 +826,7 @@ A good compromise is to trash your files
 when using asynchronous method (see [[Trashing files][Trashing files]]).
 
 Note that emacs is always making a backup of your files when
-deleting, media though are definitely deleted with no backup.
+deleting, medias though are definitely deleted with no backup.
 
 When choosing synchronous delete, you can allow recursive
 deletion of directories with `helm-ff-allow-recursive-deletes'.
