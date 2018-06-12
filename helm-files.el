@@ -3579,9 +3579,9 @@ Ask to kill buffers associated with that file, too."
                (helm-ff-dot-file-p file))
       (error "Error: Cannot operate on `.' or `..'"))
     (let ((buffers (helm-file-buffers file))
-          (helm--reading-passwd-or-string t))
-      (cond ((and (not (file-symlink-p file))
-                  (file-directory-p file)
+          (helm--reading-passwd-or-string t)
+          (file-attrs (file-attributes file)))
+      (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
              (if synchro
@@ -3608,8 +3608,7 @@ Ask to kill buffers associated with that file, too."
                    ("q" (throw 'helm-abort-delete-file
                            (progn
                              (message "Abort file deletion") (sleep-for 1))))))))
-            ((and (not (file-symlink-p file))
-                  (file-directory-p file))
+            ((eq (nth 0 file-attrs) t)
              (delete-directory file nil delete-by-moving-to-trash))
             (t (delete-file file delete-by-moving-to-trash)))
       (when buffers
@@ -3724,8 +3723,7 @@ always deleted with no warnings."
             (let ((result 0))
               (dolist (file ',files result)
                 (condition-case err
-                    (cond ((and (not (file-symlink-p file))
-                                (file-directory-p file))
+                    (cond ((eq (nth 0 (file-attributes file)) t)
                            (delete-directory file 'recursive
                                              delete-by-moving-to-trash)
                            (setq result (1+ result)))
