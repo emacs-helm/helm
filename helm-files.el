@@ -2576,7 +2576,9 @@ Note that only existing directories are saved here."
                                                   (not (helm-ff-dot-file-p c)))
                                              (helm-basename c) c))))
                            (when (y-or-n-p
-                                  (format "Really Delete file `%s'? "
+                                  (format "Really %s file `%s'? "
+                                          (if delete-by-moving-to-trash
+                                              "Trash" "Delete")
                                           (abbreviate-file-name c)))
                              (helm-delete-file
                               c helm-ff-signal-error-on-dot-files 'synchro)
