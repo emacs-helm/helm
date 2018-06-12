@@ -3698,14 +3698,17 @@ always deleted with no warnings."
                        (fit-window-to-buffer (get-buffer-window
                                               "*helm delete files*"))
                        (delete-file helm-ff-delete-log-file))
-                     (helm-delete-async-mode-line-message
-                      "%sing (%s/%s) file(s) async done"
-                      'helm-delete-async-message
-                      prmt result (length files))
-                     (when buffers
-                       (dolist (buf buffers)
-                         (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-                           (kill-buffer buf))))))
+                     (run-with-timer
+                      0.1 nil
+                      (lambda ()
+                        (helm-delete-async-mode-line-message
+                         "%sing (%s/%s) file(s) async done"
+                         'helm-delete-async-message
+                         prmt result (length files))
+                        (when buffers
+                          (dolist (buf buffers)
+                            (when (y-or-n-p (format "Kill buffer %s, too? " buf))
+                              (kill-buffer buf))))))))
          ;; Workaround emacs-26 bug with tramp see
          ;; https://github.com/jwiegley/emacs-async/issues/80.
          (async-quiet-switch "-q"))
