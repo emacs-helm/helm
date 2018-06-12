@@ -3702,9 +3702,10 @@ always deleted with no warnings."
                       0.1 nil
                       (lambda ()
                         (helm-delete-async-mode-line-message
-                         "%sing (%s/%s) file(s) async done"
+                         "%s (%s/%s) file(s) async done"
                          'helm-delete-async-message
-                         prmt result (length files))
+                         (if delete-by-moving-to-trash "Trashing" "Deleting")
+                         result (length files))
                         (when buffers
                           (dolist (buf buffers)
                             (when (y-or-n-p (format "Kill buffer %s, too? " buf))
