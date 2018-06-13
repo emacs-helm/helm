@@ -819,8 +819,8 @@ make this command asynchronous by customizing
 \`helm-ff-delete-files-function'.
 
 _WARNING_: When deleting files asynchronously you will NOT be
-WARNED if directories are not empty, non empty directories will
-be deleted without asking in background.
+WARNED if directories are not empty, that's mean non empty directories will
+be deleted in background without asking.
 
 A good compromise is to trash your files
 when using asynchronous method (see [[Trashing files][Trashing files]]).
@@ -830,6 +830,7 @@ deleting, medias though are definitely deleted with no backup.
 
 When choosing synchronous delete, you can allow recursive
 deletion of directories with `helm-ff-allow-recursive-deletes'.
+Note that when trashing (synchronous) you are not asked for recursive deletion.
 
 Note that `helm-ff-allow-recursive-deletes' have no effect when
 deleting asynchronously.
