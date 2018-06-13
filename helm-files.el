@@ -3589,6 +3589,7 @@ Ask to kill buffers associated with that file, too."
           (helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
           (trash (and delete-by-moving-to-trash
+                      (null helm-current-prefix-arg)
                       (null current-prefix-arg))))
       (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
@@ -3598,14 +3599,14 @@ Ask to kill buffers associated with that file, too."
                            trash
                            (y-or-n-p (format "Recursive delete of `%s'? "
                                              (abbreviate-file-name file))))
-                   (delete-directory file trash))
+                   (delete-directory file 'recursive trash))
                ;; Avoid using dired-delete-file really annoying in
                ;; emacs-26 but allows using ! (instead of all) to not
                ;; confirm anymore for recursive deletion of
                ;; directory. This is not persistent for all session
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
-               (if (or helm-ff-allow-recursive-deletes delete-by-moving-to-trash)
+               (if (or helm-ff-allow-recursive-deletes trash)
                    (delete-directory file 'recursive trash)
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
@@ -3630,7 +3631,8 @@ Ask to kill buffers associated with that file, too."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
          (trash (and delete-by-moving-to-trash
-                     (null helm-current-prefix-arg)))
+                      (null helm-current-prefix-arg)
+                      (null current-prefix-arg)))
          (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
@@ -3649,7 +3651,7 @@ Ask to kill buffers associated with that file, too."
                               (sleep-for 1))
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
-        (message "%s File(s) %sd" len (downcase prmt))))))
+        (message "%s File(s) %s" len (if trash "trashed" "deleted"))))))
 
 ;;; Delete files async
 ;;
@@ -3697,7 +3699,8 @@ for recursive deletion of directory, be warned that directories are
 always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (trash (and delete-by-moving-to-trash
-                     (null helm-current-prefix-arg)))
+                     (null helm-current-prefix-arg)
+                     (null current-prefix-arg)))
          (prmt (if trash "Trash" "Delete"))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
