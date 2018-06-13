@@ -839,11 +839,17 @@ First method (persistent delete) is always synchronous.
 Note that delete async and delete sync are always accessible from
 actions menu so that you can use one or the other if needed.
 
+Note that when a prefix arg is given, trashing is disabled see [[Trashing files][Trashing files]].
+
 **** Trashing files
 
 If you want to trash your files instead of deleting them you can
 set `delete-by-moving-to-trash' to non nil, like this your files
 will be moved to trash instead of beeing deleted.
+
+Note that all the delete commands called with a prefix arg (C-u)
+disable `delete-by-moving-to-trash' and BTW delete files instead
+of trashing them.
 
 ** Commands
 \\<helm-find-files-map>

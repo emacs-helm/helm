@@ -580,11 +580,11 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find alternate file `C-x C-v'" 'find-alternate-file
    "Ediff File `C-c ='" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
-   (lambda () (format "Delete File(s)%s" (if (eq helm-ff-delete-files-function
+   (lambda () (format "Delete File(s)%s (C-u no trash)" (if (eq helm-ff-delete-files-function
                                                  'helm-delete-marked-files)
                                              " `M-D'" "")))
    'helm-delete-marked-files
-   (lambda () (format "Delete File(s) async%s" (if (eq helm-ff-delete-files-function
+   (lambda () (format "Delete File(s) async%s (C-u no trash)" (if (eq helm-ff-delete-files-function
                                                        'helm-delete-marked-files-async)
                                                     " `M-D'" "")))
    'helm-delete-marked-files-async
@@ -2565,7 +2565,10 @@ Note that only existing directories are saved here."
   (member (helm-basename file) '("." "..")))
 
 (defun helm-ff-quick-delete (_candidate)
-  "Delete file CANDIDATE without quitting."
+  "Delete file CANDIDATE without quitting.
+
+When a prefix arg is given, files are deleted and not trashed even if
+\`delete-by-moving-to-trash' is non nil."
   (with-helm-window
     (let ((marked (helm-marked-candidates)))
       (unwind-protect
@@ -2577,7 +2580,8 @@ Note that only existing directories are saved here."
                                              (helm-basename c) c))))
                            (when (y-or-n-p
                                   (format "Really %s file `%s'? "
-                                          (if delete-by-moving-to-trash
+                                          (if (and delete-by-moving-to-trash
+                                                   (null current-prefix-arg))
                                               "Trash" "Delete")
                                           (abbreviate-file-name c)))
                              (helm-delete-file
@@ -3564,6 +3568,9 @@ following files to destination."
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro)
   "Delete FILE after querying the user.
 
+When a prefix arg is given, files are deleted and not trashed even if
+\`delete-by-moving-to-trash' is non nil.
+
 Return error when ERROR-IF-DOT-FILE-P is non nil and user tries to
 delete a dotted file i.e. \".\" or \"..\".
 
@@ -3580,16 +3587,18 @@ Ask to kill buffers associated with that file, too."
       (error "Error: Cannot operate on `.' or `..'"))
     (let ((buffers (helm-file-buffers file))
           (helm--reading-passwd-or-string t)
-          (file-attrs (file-attributes file)))
+          (file-attrs (file-attributes file))
+          (trash (and delete-by-moving-to-trash
+                      (null current-prefix-arg))))
       (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
              (if synchro
                  (when (or helm-ff-allow-recursive-deletes
-                           delete-by-moving-to-trash
+                           trash
                            (y-or-n-p (format "Recursive delete of `%s'? "
                                              (abbreviate-file-name file))))
-                   (delete-directory file 'recursive delete-by-moving-to-trash))
+                   (delete-directory file trash))
                ;; Avoid using dired-delete-file really annoying in
                ;; emacs-26 but allows using ! (instead of all) to not
                ;; confirm anymore for recursive deletion of
@@ -3597,20 +3606,20 @@ Ask to kill buffers associated with that file, too."
                ;; like emacs-26 does with dired-delete-file (think it
                ;; is a bug).
                (if (or helm-ff-allow-recursive-deletes delete-by-moving-to-trash)
-                   (delete-directory file 'recursive delete-by-moving-to-trash)
+                   (delete-directory file 'recursive trash)
                  (pcase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                  (abbreviate-file-name file))
                                          '("y" "n" "!" "q"))
-                   ("y" (delete-directory file 'recursive delete-by-moving-to-trash))
+                   ("y" (delete-directory file 'recursive trash))
                    ("!" (setq helm-ff-allow-recursive-deletes t)
-                         (delete-directory file 'recursive delete-by-moving-to-trash))
+                         (delete-directory file 'recursive trash))
                    ("n" (cl-return 'skip))
                    ("q" (throw 'helm-abort-delete-file
                            (progn
                              (message "Abort file deletion") (sleep-for 1))))))))
             ((eq (nth 0 file-attrs) t)
-             (delete-directory file nil delete-by-moving-to-trash))
-            (t (delete-file file delete-by-moving-to-trash)))
+             (delete-directory file nil trash))
+            (t (delete-file file trash)))
       (when buffers
         (cl-dolist (buf buffers)
           (when (y-or-n-p (format "Kill buffer %s, too? " buf))
@@ -3620,7 +3629,9 @@ Ask to kill buffers associated with that file, too."
   "Delete marked files with `helm-delete-file'."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
-         (prmt (if delete-by-moving-to-trash "Trash" "Delete"))
+         (trash (and delete-by-moving-to-trash
+                     (null helm-current-prefix-arg)))
+         (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
@@ -3677,11 +3688,17 @@ Ask to kill buffers associated with that file, too."
 
 (defun helm-delete-marked-files-async (_ignore)
   "Same as `helm-delete-marked-files' but async.
+
+When a prefix arg is given, files are deleted and NOT trashed even if
+\`delete-by-moving-to-trash' is non nil.
+
 This function is not using `helm-delete-file' and BTW not asking user
 for recursive deletion of directory, be warned that directories are
 always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
-         (prmt (if delete-by-moving-to-trash "Trash" "Delete"))
+         (trash (and delete-by-moving-to-trash
+                     (null helm-current-prefix-arg)))
+         (prmt (if trash "Trash" "Delete"))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
                            when buf append buf))
@@ -3704,7 +3721,7 @@ always deleted with no warnings."
                         (helm-delete-async-mode-line-message
                          "%s (%s/%s) file(s) async done"
                          'helm-delete-async-message
-                         (if delete-by-moving-to-trash "Trashing" "Deleting")
+                         (if trash "Trashing" "Deleting")
                          result (length files))
                         (when buffers
                           (dolist (buf buffers)
@@ -3728,11 +3745,9 @@ always deleted with no warnings."
               (dolist (file ',files result)
                 (condition-case err
                     (cond ((eq (nth 0 (file-attributes file)) t)
-                           (delete-directory file 'recursive
-                                             delete-by-moving-to-trash)
+                           (delete-directory file 'recursive ,trash)
                            (setq result (1+ result)))
-                          (t (delete-file file
-                                          delete-by-moving-to-trash)
+                          (t (delete-file file ,trash)
                              (setq result (1+ result))))
                   (error (with-temp-file ,helm-ff-delete-log-file
                            (insert (format-time-string "%x:%H:%M:%S\n"))
