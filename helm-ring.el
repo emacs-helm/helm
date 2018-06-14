@@ -155,7 +155,7 @@ use `helm-kill-ring-separator' as default."
      (cl-loop for c in (butlast marked)
               concat (concat c sep) into str
               finally return (concat str (car (last marked)))))))
-  
+
 (defun helm-kill-ring-action-yank-1 (str)
   "Insert STR in `kill-ring' and set STR to the head.
 
@@ -535,6 +535,7 @@ This command is useful when used with persistent action."
 
 (defun helm-kbd-macro-delete-macro (_candidate)
   (let ((mkd (helm-marked-candidates)))
+    (kmacro-push-ring)
     (cl-loop for km in mkd
              do (setq kmacro-ring (delete km kmacro-ring)))
     (kmacro-pop-ring1)))
