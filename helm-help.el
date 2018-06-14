@@ -884,6 +884,7 @@ of trashing them.
 \\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
 \\[helm-ff-run-switch-other-frame]\t\tSwitch to other frame.
 \\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
+\\[helm-ff-run-preview-file-externally]\t\tPreview file with external program.
 \\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
 \\[helm-ff-rotate-left-persistent]\t\tRotate image left.
 \\[helm-ff-rotate-right-persistent]\t\tRotate image right.

@@ -51,6 +51,7 @@
 (declare-function helm-gid "helm-id-utils.el")
 (declare-function helm-find-1 "helm-find")
 (declare-function helm-get-default-program-for-file "helm-external")
+(declare-function helm-open-file-externally "helm-external")
 
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
@@ -454,6 +455,7 @@ from `helm-find-files'."
     (define-key map (kbd "C-c o")         'helm-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-o")       'helm-ff-run-switch-other-frame)
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
+    (define-key map (kbd "C-c C-v")       'helm-ff-run-preview-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
     (define-key map (kbd "M-@")           'helm-ff-run-query-replace-fnames-on-marked)
@@ -2638,6 +2640,21 @@ in `helm-find-files-persistent-action-if'."
     (helm-attrset 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
     (helm-execute-persistent-action 'kill-buffer-fname)))
 (put 'helm-ff-run-kill-buffer-persistent 'helm-only t)
+
+;; Preview with external tool
+(defun helm-ff-persistent-open-file-externally (file)
+  (require 'helm-external)
+  (if (helm-get-default-program-for-file file)
+      (helm-open-file-externally file)
+    (message "Please configure an external program for `*%s' file in `helm-external-programs-associations'"
+             (file-name-extension file t))))
+
+(defun helm-ff-run-preview-file-externally ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'open-file-externally '(helm-ff-persistent-open-file-externally . never-split))
+    (helm-execute-persistent-action 'open-file-externally)))
+(put 'helm-ff-run-preview-file-externally 'helm-only t)
 
 (defun helm-ff-prefix-filename (fname &optional file-or-symlinkp new-file)
   "Return filename FNAME maybe prefixed with [?] or [@].
