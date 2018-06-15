@@ -2780,10 +2780,11 @@ Return candidates prefixed with basename of `helm-input' first."
                 ;; A symlink.
                 ((stringp type)
                  (cons (helm-ff-prefix-filename
-                        (concat (propertize disp 'face 'helm-ff-symlink)
-                                " -> "
-                                (propertize (abbreviate-file-name type)
-                                            'face 'helm-ff-file))
+                        (propertize disp 'display
+                                    (concat (propertize disp 'face 'helm-ff-symlink)
+                                            " -> "
+                                            (propertize (abbreviate-file-name type)
+                                                        'face 'helm-ff-file)))
                         t)
                        file))
                 ;; A directory.
