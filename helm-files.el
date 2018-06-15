@@ -3692,8 +3692,8 @@ Ask to kill buffers associated with that file, too."
                                       (if helm-ff--trash-flag
                                           "Trashing" "Deleting"))
                               'face 'helm-delete-async-message))
-  (if helm-ff--delete-async-modeline-mode
-      (let ((visible-bell t)) (ding))
+  (unless helm-ff--delete-async-modeline-mode
+    (let ((visible-bell t)) (ding))
     (setq helm-ff--trash-flag nil)))
 
 (defun helm-delete-async-mode-line-message (text face &rest args)
