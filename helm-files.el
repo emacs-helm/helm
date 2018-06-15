@@ -3678,7 +3678,9 @@ Ask to kill buffers associated with that file, too."
   (expand-file-name "helm-delete-file.log" user-emacs-directory)
   "The file use to communicate with emacs child when deleting files async.")
 
-(define-minor-mode helm-delete-async--modeline-mode
+(defvar helm-ff--trash-flag nil)
+
+(define-minor-mode helm-ff--delete-async-modeline-mode
     "Notify mode-line that an async process run."
   :group 'dired-async
   :global t
@@ -3687,11 +3689,12 @@ Ask to kill buffers associated with that file, too."
   ;; emacs and running `async-batch-invoke', so if one copy a file and
   ;; delete another file at the same time it may clash.
   :lighter (:eval (propertize (format " %s file(s) async ..."
-                                      (if delete-by-moving-to-trash
+                                      (if helm-ff--trash-flag
                                           "Trashing" "Deleting"))
                               'face 'helm-delete-async-message))
-  (unless helm-delete-async--modeline-mode
-    (let ((visible-bell t)) (ding))))
+  (if helm-ff--delete-async-modeline-mode
+      (let ((visible-bell t)) (ding))
+    (setq helm-ff--trash-flag nil)))
 
 (defun helm-delete-async-mode-line-message (text face &rest args)
   "Notify end of async operation in `mode-line'."
@@ -3724,7 +3727,7 @@ always deleted with no warnings."
                            for buf = (helm-file-buffers file)
                            when buf append buf))
          (callback (lambda (result)
-                     (helm-delete-async--modeline-mode -1)
+                     (helm-ff--delete-async-modeline-mode -1)
                      (when (file-exists-p helm-ff-delete-log-file)
                        (display-warning 'helm
                                         (with-temp-buffer
@@ -3751,6 +3754,7 @@ always deleted with no warnings."
          ;; Workaround emacs-26 bug with tramp see
          ;; https://github.com/jwiegley/emacs-async/issues/80.
          (async-quiet-switch "-q"))
+    (setq helm-ff--trash-flag trash)
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
       (helm-ff--count-and-collect-dups files)
@@ -3776,7 +3780,7 @@ always deleted with no warnings."
                                            (car err)
                                            (mapconcat 'identity (cdr err) " ")))))))))
          callback)
-        (helm-delete-async--modeline-mode 1)))))
+        (helm-ff--delete-async-modeline-mode 1)))))
 
 (defun helm-find-file-or-marked (candidate)
   "Open file CANDIDATE or open helm marked files in separate windows.
