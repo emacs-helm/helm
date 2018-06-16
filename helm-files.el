@@ -2353,10 +2353,15 @@ purpose."
 If DIRECTORY is remote use `file-name-all-completions' and add a
 `helm-ff-dir' property on each one ending with \"/\" otherwise use
 `directory-files'."
+  ;; NOTE: `file-name-all-completions' and `directory-files' and most
+  ;; tramp file handlers don't handle cntrl characters in fnames, so
+  ;; the displayed files will be plain wrong in this case, even worst
+  ;; the filenames will be splitted in two or more filenames.
   (if (file-remote-p directory)
       (cl-loop for f in (sort (file-name-all-completions "" directory)
                               'string-lessp)
-               unless (or (member f '("./" "../"))
+               unless (or (string= f "")
+                          (member f '("./" "../"))
                           ;; Ignore the tramp names from /
                           ;; completion, e.g. ssh: scp: etc...
                           (char-equal (aref f (1- (length f))) ?:))
@@ -2723,32 +2728,38 @@ Return candidates prefixed with basename of `helm-input' first."
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
-  (let ((basename (helm-basename file)))
+  (let ((basename (helm-basename file))
+        dot)
     (unless (and helm-ff-skip-boring-files
                  (helm-ff-boring-file-p basename))
-      ;; Handle tramp files.
+
+      ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                    (helm-file-on-mounted-network-p helm-pattern))
                helm-ff-tramp-not-fancy)
-          (if helm-ff-transformer-show-only-basename
-              (if (helm-dir-is-dot file)
-                  (if (eq helm-ff-tramp-not-fancy 'dirs-only)
-                      (propertize file 'face 'helm-ff-dotted-directory)
-                    file)
-                (cons (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                          (if (and (get-text-property 1 'helm-ff-dir file)
-                                   (eq helm-ff-tramp-not-fancy 'dirs-only))
-                              (propertize basename 'face 'helm-ff-directory)
-                            basename))
-                      file))
-            (cons (if (and (get-text-property 1 'helm-ff-dir file)
-                           (eq helm-ff-tramp-not-fancy 'dirs-only))
-                      (propertize file 'face 'helm-ff-directory)
-                    file)
-                  file))
-        ;; Now highlight.
+          (let ((disp (if (and helm-ff-transformer-show-only-basename
+                               (not (setq dot (helm-dir-is-dot file))))
+                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
+                              basename)
+                        file)))
+            ;; Filename with cntrl chars e.g. foo^J
+            ;; This will not work as long as most tramp file handlers doesn't
+            ;; handle such case, e.g. file-name-all-completions,
+            ;; directory-files, file-name-nondirectory etc...
+            ;; Keep it though in case they fix this upstream...
+            (setq disp (replace-regexp-in-string "[[:cntrl:]]" "?" disp))
+            (cond (dot (if (eq helm-ff-tramp-not-fancy 'dirs-only)
+                           (propertize file 'face 'helm-ff-dotted-directory)
+                         file))
+                  ((and (get-text-property 1 'helm-ff-dir file)
+                                    (eq helm-ff-tramp-not-fancy 'dirs-only))
+                   (cons (propertize disp 'face 'helm-ff-directory) file))
+                  (t (cons disp file))))
+
+        ;; Highlight local files showing everything, symlinks, exe,
+        ;; dirs etc...
         (let* ((disp (if (and helm-ff-transformer-show-only-basename
-                              (not (helm-dir-is-dot file))
+                              (not (setq dot (helm-dir-is-dot file)))
                               (not (and helm--url-regexp
                                         (string-match helm--url-regexp file)))
                               (not (string-match helm-ff-url-regexp file)))
@@ -2758,17 +2769,18 @@ Return candidates prefixed with basename of `helm-input' first."
                (attr (file-attributes file))
                (type (car attr))
                x-bit)
-
+          ;; Filename cntrl chars e.g. foo^J
+          (setq disp (replace-regexp-in-string "[[:cntrl:]]" "?" disp))
           (cond ((string-match "file-error" file) file)
-                ( ;; A not already saved file.
+                (;; A not already saved file.
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
-                      (not (string-match "^\.#" basename)))
+                      (not (string-match "^\\.#" basename)))
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-invalid-symlink) t)
                        file))
                 ;; A dotted directory symlinked.
-                ((and (helm-ff-dot-file-p file) (stringp type))
+                ((and dot (stringp type))
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-dotted-symlink-directory) t)
                        file))
