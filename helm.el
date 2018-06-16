@@ -361,14 +361,13 @@ delay in this condition\)."
   :group 'helm
   :type 'float)
 
+(defvaralias 'helm-samewindow 'helm-full-frame)
+(make-obsolete-variable 'helm-samewindow 'helm-full-frame "1.4.8.1")
 (defcustom helm-full-frame nil
   "Use current window for showing candidates.
 If t, then Helm does not pop-up new window."
   :group 'helm
   :type 'boolean)
-
-(defvaralias 'helm-samewindow 'helm-full-frame)
-(make-obsolete-variable 'helm-samewindow 'helm-full-frame "1.4.8.1")
 
 (defcustom helm-candidate-separator
   "--------------------"
@@ -492,6 +491,8 @@ See `display-buffer' for more info."
   :group 'helm
   :type '(choice integer function))
 
+(defvaralias 'helm-split-window-in-side-p 'helm-split-window-inside-p)
+(make-obsolete-variable 'helm-split-window-in-side-p 'helm-split-window-inside-p "2.8.6")
 (defcustom helm-split-window-inside-p nil
   "Forces split inside selected window when non-`nil'.
 See also `helm-split-window-default-side'.
@@ -502,8 +503,6 @@ NOTE: this has no effect if
 handle this."
   :group 'helm
   :type 'boolean)
-(defvaralias 'helm-split-window-in-side-p 'helm-split-window-inside-p)
-(make-obsolete-variable 'helm-split-window-in-side-p 'helm-split-window-inside-p "2.8.6")
 
 (defcustom helm-always-two-windows nil
   "When non-`nil' helm uses two windows in this frame.

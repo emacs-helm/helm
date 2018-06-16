@@ -61,14 +61,14 @@ This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
+(defvaralias 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl)
+(make-obsolete-variable 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl "1.7.7")
+
 (defcustom helm-net-prefer-curl nil
   "When non--nil use CURL external program to fetch data.
 Otherwise `url-retrieve-synchronously' is used."
   :type 'boolean
   :group 'helm-net)
-
-(defvaralias 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl)
-(make-obsolete-variable 'helm-google-suggest-use-curl-p 'helm-net-prefer-curl "1.7.7")
 
 (defcustom helm-surfraw-duckduckgo-url
   "https://duckduckgo.com/lite/?q=%s&kp=1"
