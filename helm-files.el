@@ -404,6 +404,11 @@ from `helm-find-files'."
   "Face used for file names in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-truename
+    '((t (:inherit font-lock-string-face)))
+  "Face used for symlink truenames in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-dirs
     '((t (:inherit font-lock-function-name-face)))
   "Face used for file names in recursive dirs completion in `helm-find-files'."
@@ -2805,7 +2810,7 @@ Return candidates prefixed with basename of `helm-input' first."
                                    (concat (propertize disp 'face 'helm-ff-symlink)
                                            " -> "
                                            (propertize (abbreviate-file-name type)
-                                                       'face 'helm-ff-file)))
+                                                       'face 'helm-ff-truename)))
                        file))
                 ;; A directory.
                 ((eq t type)
