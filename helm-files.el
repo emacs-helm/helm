@@ -2515,46 +2515,48 @@ Note that only existing directories are saved here."
 
 (defun helm-ff-properties (candidate)
   "Show file properties of CANDIDATE in a tooltip or message."
-  (require 'helm-external) ; For `helm-get-default-program-for-file'. 
-  (let* ((all                (helm-file-attributes candidate))
-         (dired-line         (helm-file-attributes
-                              candidate :dired t :human-size t))
-         (type               (cl-getf all :type))
-         (mode-type          (cl-getf all :mode-type))
-         (owner              (cl-getf all :uid))
-         (owner-right        (cl-getf all :user t))
-         (group              (cl-getf all :gid))
-         (group-right        (cl-getf all :group))
-         (other-right        (cl-getf all :other))
-         (size               (helm-file-human-size (cl-getf all :size)))
-         (modif              (cl-getf all :modif-time))
-         (access             (cl-getf all :access-time))
-         (ext                (helm-get-default-program-for-file candidate))
-         (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
-    (if (and (window-system) tooltip-mode)
-        (tooltip-show
-         (concat
-          (helm-basename candidate) "\n"
-          dired-line "\n"
-          (format "Mode: %s\n" (helm-get-default-mode-for-file candidate))
-          (format "Ext prog: %s\n" (or (and ext (replace-regexp-in-string
-                                                 " %s" "" ext))
-                                       "Not defined"))
-          (format "Type: %s: %s\n" type mode-type)
-          (when (string= type "symlink")
-            (format "True name: '%s'\n"
-                    (cond ((string-match "^\.#" (helm-basename candidate))
-                           "Autosave symlink")
-                          ((helm-ff-valid-symlink-p candidate)
-                           (file-truename candidate))
-                          (t "Invalid Symlink"))))
-          (format "Owner: %s: %s\n" owner owner-right)
-          (format "Group: %s: %s\n" group group-right)
-          (format "Others: %s\n" other-right)
-          (format "Size: %s\n" size)
-          (format "Modified: %s\n" modif)
-          (format "Accessed: %s\n" access)))
-      (message dired-line) (sit-for 5))))
+  (require 'helm-external) ; For `helm-get-default-program-for-file'.
+  (helm-aif (helm-file-attributes candidate)
+      (let* ((all                it)
+             (dired-line         (helm-file-attributes
+                                  candidate :dired t :human-size t))
+             (type               (cl-getf all :type))
+             (mode-type          (cl-getf all :mode-type))
+             (owner              (cl-getf all :uid))
+             (owner-right        (cl-getf all :user t))
+             (group              (cl-getf all :gid))
+             (group-right        (cl-getf all :group))
+             (other-right        (cl-getf all :other))
+             (size               (helm-file-human-size (cl-getf all :size)))
+             (modif              (cl-getf all :modif-time))
+             (access             (cl-getf all :access-time))
+             (ext                (helm-get-default-program-for-file candidate))
+             (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
+        (if (and (window-system) tooltip-mode)
+            (tooltip-show
+             (concat
+              (helm-basename candidate) "\n"
+              dired-line "\n"
+              (format "Mode: %s\n" (helm-get-default-mode-for-file candidate))
+              (format "Ext prog: %s\n" (or (and ext (replace-regexp-in-string
+                                                     " %s" "" ext))
+                                           "Not defined"))
+              (format "Type: %s: %s\n" type mode-type)
+              (when (string= type "symlink")
+                (format "True name: '%s'\n"
+                        (cond ((string-match "^\.#" (helm-basename candidate))
+                               "Autosave symlink")
+                              ((helm-ff-valid-symlink-p candidate)
+                               (file-truename candidate))
+                              (t "Invalid Symlink"))))
+              (format "Owner: %s: %s\n" owner owner-right)
+              (format "Group: %s: %s\n" group group-right)
+              (format "Others: %s\n" other-right)
+              (format "Size: %s\n" size)
+              (format "Modified: %s\n" modif)
+              (format "Accessed: %s\n" access)))
+          (message dired-line) (sit-for 5)))
+    (message "Permission denied, file not readable")))
 
 (defun helm-ff-properties-persistent ()
   "Show properties without quitting helm."

@@ -635,64 +635,65 @@ If you want the same behavior as `files-attributes' ,
 \(but with return values in proplist\) use a nil value for STRING.
 However when STRING is non--nil, time and type value are different from what
 you have in `file-attributes'."
-  (let* ((all (cl-destructuring-bind
-                    (type links uid gid access-time modif-time
-                          status size mode gid-change inode device-num)
-                  (file-attributes file string)
-                (list :type        (if string
-                                       (cond ((stringp type) "symlink") ; fname
-                                             (type "directory")         ; t
-                                             (t "file"))                ; nil
-                                     type)
-                      :links       links
-                      :uid         uid
-                      :gid         gid
-                      :access-time (if string
-                                       (format-time-string
-                                        "%Y-%m-%d %R" access-time)
-                                     access-time)
-                      :modif-time  (if string
-                                       (format-time-string
-                                        "%Y-%m-%d %R" modif-time)
-                                     modif-time)
-                      :status      (if string
-                                       (format-time-string
-                                        "%Y-%m-%d %R" status)
-                                     status)
-                      :size        size
-                      :mode        mode
-                      :gid-change  gid-change
-                      :inode       inode
-                      :device-num  device-num)))
-         (modes (helm-split-mode-file-attributes (cl-getf all :mode))))
-    (cond (type        (cl-getf all :type))
-          (links       (cl-getf all :links))
-          (uid         (cl-getf all :uid))
-          (gid         (cl-getf all :gid))
-          (access-time (cl-getf all :access-time))
-          (modif-time  (cl-getf all :modif-time))
-          (status      (cl-getf all :status))
-          (size        (cl-getf all :size))
-          (mode        (cl-getf all :mode))
-          (gid-change  (cl-getf all :gid-change))
-          (inode       (cl-getf all :inode))
-          (device-num  (cl-getf all :device-num))
-          (dired       (concat
-                        (helm-split-mode-file-attributes
-                         (cl-getf all :mode) t) " "
-                        (number-to-string (cl-getf all :links)) " "
-                        (cl-getf all :uid) ":"
-                        (cl-getf all :gid) " "
-                        (if human-size
-                            (helm-file-human-size (cl-getf all :size))
-                            (int-to-string (cl-getf all :size))) " "
-                        (cl-getf all :modif-time)))
-          (human-size (helm-file-human-size (cl-getf all :size)))
-          (mode-type  (cl-getf modes :mode-type))
-          (mode-owner (cl-getf modes :user))
-          (mode-group (cl-getf modes :group))
-          (mode-other (cl-getf modes :other))
-          (t          (append all modes)))))
+  (helm-aif (file-attributes file string)
+      (let* ((all (cl-destructuring-bind
+                        (type links uid gid access-time modif-time
+                              status size mode gid-change inode device-num)
+                      it
+                    (list :type        (if string
+                                           (cond ((stringp type) "symlink") ; fname
+                                                 (type "directory") ; t
+                                                 (t "file")) ; nil
+                                         type)
+                          :links       links
+                          :uid         uid
+                          :gid         gid
+                          :access-time (if string
+                                           (format-time-string
+                                            "%Y-%m-%d %R" access-time)
+                                         access-time)
+                          :modif-time  (if string
+                                           (format-time-string
+                                            "%Y-%m-%d %R" modif-time)
+                                         modif-time)
+                          :status      (if string
+                                           (format-time-string
+                                            "%Y-%m-%d %R" status)
+                                         status)
+                          :size        size
+                          :mode        mode
+                          :gid-change  gid-change
+                          :inode       inode
+                          :device-num  device-num)))
+             (modes (helm-split-mode-file-attributes (cl-getf all :mode))))
+        (cond (type        (cl-getf all :type))
+              (links       (cl-getf all :links))
+              (uid         (cl-getf all :uid))
+              (gid         (cl-getf all :gid))
+              (access-time (cl-getf all :access-time))
+              (modif-time  (cl-getf all :modif-time))
+              (status      (cl-getf all :status))
+              (size        (cl-getf all :size))
+              (mode        (cl-getf all :mode))
+              (gid-change  (cl-getf all :gid-change))
+              (inode       (cl-getf all :inode))
+              (device-num  (cl-getf all :device-num))
+              (dired       (concat
+                            (helm-split-mode-file-attributes
+                             (cl-getf all :mode) t) " "
+                            (number-to-string (cl-getf all :links)) " "
+                            (cl-getf all :uid) ":"
+                            (cl-getf all :gid) " "
+                            (if human-size
+                                (helm-file-human-size (cl-getf all :size))
+                              (int-to-string (cl-getf all :size))) " "
+                            (cl-getf all :modif-time)))
+              (human-size (helm-file-human-size (cl-getf all :size)))
+              (mode-type  (cl-getf modes :mode-type))
+              (mode-owner (cl-getf modes :user))
+              (mode-group (cl-getf modes :group))
+              (mode-other (cl-getf modes :other))
+              (t          (append all modes))))))
 
 (defun helm-split-mode-file-attributes (str &optional string)
   "Split mode file attributes STR into a proplist.
