@@ -2741,7 +2741,7 @@ Return candidates prefixed with basename of `helm-input' first."
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
   (let ((basename (helm-basename file))
-        dot)
+        dot url-p)
     (unless (and helm-ff-skip-boring-files
                  (helm-ff-boring-file-p basename))
 
@@ -2773,7 +2773,7 @@ Return candidates prefixed with basename of `helm-input' first."
         (let* ((disp (if (and helm-ff-transformer-show-only-basename
                               (not (setq dot (helm-dir-is-dot file)))
                               (not (and helm--url-regexp
-                                        (string-match helm--url-regexp file)))
+                                        (setq url-p (string-match helm--url-regexp file))))
                               (not (string-match helm-ff-url-regexp file)))
                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
                              basename)
@@ -2788,58 +2788,48 @@ Return candidates prefixed with basename of `helm-input' first."
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-invalid-symlink) t)
+                 (cons (propertize disp 'face 'helm-ff-invalid-symlink)
                        file))
                 ;; A dotted directory symlinked.
                 ((and dot (stringp type))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-dotted-symlink-directory) t)
+                 (cons (propertize disp 'face 'helm-ff-dotted-symlink-directory)
                        file))
                 ;; A dotted directory.
                 ((helm-ff-dot-file-p file)
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-dotted-directory) t)
+                 (cons (propertize disp 'face 'helm-ff-dotted-directory)
                        file))
                 ;; A symlink.
                 ((stringp type)
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'display
-                                    (concat (propertize disp 'face 'helm-ff-symlink)
-                                            " -> "
-                                            (propertize (abbreviate-file-name type)
-                                                        'face 'helm-ff-file)))
-                        t)
+                 (cons (propertize disp 'display
+                                   (concat (propertize disp 'face 'helm-ff-symlink)
+                                           " -> "
+                                           (propertize (abbreviate-file-name type)
+                                                       'face 'helm-ff-file)))
                        file))
                 ;; A directory.
                 ((eq t type)
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-directory) t)
+                 (cons (propertize disp 'face 'helm-ff-directory)
                        file))
                 ;; An executable file.
                 ((and attr
                       (string-match
                        "x\\'" (setq x-bit (substring (nth 8 attr) 0 4))))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-executable) t)
+                 (cons (propertize disp 'face 'helm-ff-executable)
                        file))
                 ;; An executable file with suid
                 ((and attr (string-match "s\\'" x-bit))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-suid) t)
+                 (cons (propertize disp 'face 'helm-ff-suid)
                        file))
                 ;; A socket
                 ((and attr (string-match "\\`c" x-bit))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-socket) t)
+                 (cons (propertize disp 'face 'helm-ff-socket)
                        file))
                 ;; A file.
                 ((and attr (null type))
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-file) t)
+                 (cons (propertize disp 'face 'helm-ff-file)
                        file))
                 ;; A non--existing file.
-                ((file-writable-p file)
+                ((or (file-writable-p file) url-p)
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-file) nil 'new-file)
                        file))
