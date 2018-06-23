@@ -242,7 +242,8 @@ This doesn't disable url or mail at point, see
 (defcustom helm-ff-guess-ffap-urls t
   "Use ffap to guess local urls at point in `helm-find-files'.
 This doesn't disable guessing filenames at point,
-see `helm-ff-guess-ffap-filenames' for this."
+see `helm-ff-guess-ffap-filenames' for this.
+See also `ffap-url-unwrap-remote' that may override this variable."
   :group 'helm-files
   :type 'boolean)
 
@@ -2764,7 +2765,7 @@ Return candidates prefixed with basename of `helm-input' first."
                            (propertize file 'face 'helm-ff-dotted-directory)
                          file))
                   ((and (get-text-property 1 'helm-ff-dir file)
-                                    (eq helm-ff-tramp-not-fancy 'dirs-only))
+                        (eq helm-ff-tramp-not-fancy 'dirs-only))
                    (cons (propertize disp 'face 'helm-ff-directory) file))
                   (t (cons disp file))))
 
@@ -3375,7 +3376,9 @@ is helm-source-find-files."
   ;; disabled with `ffap-machine-p-known' bound to 'reject.
   ;; `ffap-file-at-point' can be neutralized with
   ;; `helm-ff-guess-ffap-filenames' and `ffap-url-at-point' with
-  ;; `helm-ff-guess-ffap-urls'.
+  ;; `helm-ff-guess-ffap-urls'
+  ;; Note also that `ffap-url-unwrap-remote' can override these
+  ;; variables.
   (let ((ffap-alist (and helm-ff-guess-ffap-filenames ffap-alist))
         (ffap-url-regexp helm--url-regexp))
     (if (eq major-mode 'dired-mode)
