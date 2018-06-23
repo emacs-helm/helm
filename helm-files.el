@@ -403,6 +403,11 @@ from `helm-find-files'."
   "Face used for file names in recursive dirs completion in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-socket
+    '((t (:foreground "yellow" :background "black")))
+  "Face used for invalid symlinks in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-history-deleted
     '((t (:inherit helm-ff-invalid-symlink)))
   "Face used for deleted files in `file-name-history'."
@@ -2815,6 +2820,11 @@ Return candidates prefixed with basename of `helm-input' first."
                 ((and attr (string-match "s\\'" x-bit))
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-suid) t)
+                       file))
+                ;; A socket
+                ((and attr (string-match "\\`c" x-bit))
+                 (cons (helm-ff-prefix-filename
+                        (propertize disp 'face 'helm-ff-socket) t)
                        file))
                 ;; A file.
                 ((and attr (null type))
