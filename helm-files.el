@@ -393,6 +393,11 @@ from `helm-find-files'."
   "Face used for invalid symlinks in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-denied
+    '((t (:foreground "red" :background "black")))
+  "Face used for non accessible files in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-file
     '((t (:inherit font-lock-builtin-face)))
   "Face used for file names in `helm-find-files'."
@@ -405,7 +410,7 @@ from `helm-find-files'."
 
 (defface helm-ff-socket
     '((t (:foreground "yellow" :background "black")))
-  "Face used for invalid symlinks in `helm-find-files'."
+  "Face used for socket files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-history-deleted
@@ -2779,7 +2784,7 @@ Return candidates prefixed with basename of `helm-input' first."
           ;; Filename cntrl chars e.g. foo^J
           (setq disp (replace-regexp-in-string "[[:cntrl:]]" "?" disp))
           (cond ((string-match "file-error" file) file)
-                (;; A not already saved file.
+                (;; A dead symlink.
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
@@ -2834,10 +2839,12 @@ Return candidates prefixed with basename of `helm-input' first."
                         (propertize disp 'face 'helm-ff-file) t)
                        file))
                 ;; A non--existing file.
-                (t
+                ((file-writable-p file)
                  (cons (helm-ff-prefix-filename
                         (propertize disp 'face 'helm-ff-file) nil 'new-file)
-                       file))))))))
+                       file))
+                ;; A file not accessible.
+                ((null attr) (propertize disp 'face 'helm-ff-denied))))))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
