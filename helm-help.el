@@ -351,6 +351,12 @@ Simply write the path in the prompt and press `RET', e.g.
 
 *** To create a new file, enter a filename not ending with \"/\"
 
+Note that when you enter a new name, this one is prefixed with
+\[?] if you are in a writable directory.  If you are in a directory
+where you have no write permission the new file name is not
+prefixed and is colored in red.  There is not such distinction
+when using tramp, new filename just appear on top of buffer.
+
 *** Recursive search from Helm-find-files
 
 **** You can use Helm-browse-project (see binding below)
@@ -753,7 +759,7 @@ other, this make helm-find-files unusable for current usage.
 However starting at helm version 2.9.7 it is somewhat possible to
 colorize fnames by listing files without loosing performances with
 external commands i.e. ls+awk if your system have these commands
-(common by default on all Linux systems).  For this you can use
+\(common by default on all Linux systems).  For this you can use
 `helm-list-dir-external' as value for `helm-list-directory-function'.
 The only limitation to use this is that internally helm is using the
 ls -F feature which append special characters at end of filenames,
