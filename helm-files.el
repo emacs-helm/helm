@@ -2818,19 +2818,24 @@ Return candidates prefixed with basename of `helm-input' first."
             ;; directory-files, file-name-nondirectory etc...
             ;; Keep it though in case they fix this upstream...
             (setq disp (replace-regexp-in-string "[[:cntrl:]]" "?" disp))
-            (cond (dot (if (eq helm-ff-tramp-not-fancy 'dirs-only)
+            (cond (;; Dot directories . and ..
+                   dot (if (eq helm-ff-tramp-not-fancy 'dirs-only)
                            (propertize file 'face 'helm-ff-dotted-directory)
                          file))
+                  ;; Directories.
                   ((and (get-text-property 1 'helm-ff-dir file)
                         (eq helm-ff-tramp-not-fancy 'dirs-only))
                    (cons (propertize disp 'face 'helm-ff-directory) file))
+                  ;; Executable files.
                   ((and (get-text-property 1 'helm-ff-exe file)
                         (eq helm-ff-tramp-not-fancy 'dirs-only))
                    (cons (propertize disp 'face 'helm-ff-executable) file))
+                  ;; Symlinks.
                   ((and (get-text-property 1 'helm-ff-sym file)
                         (eq helm-ff-tramp-not-fancy 'dirs-only))
                    (cons (propertize disp 'face 'helm-ff-symlink) file))
-                  (t (cons disp file))))
+                  ;; Any other files.
+                  (t (cons (propertize disp 'face 'helm-ff-file) file))))
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
