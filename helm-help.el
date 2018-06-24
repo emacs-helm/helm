@@ -741,6 +741,29 @@ works with the ssh method), especially when copying large files.
 You need to hit `C-j' once on top of a directory on the first connection
 to complete the pattern in the minibuffer.
 
+**** Display color for directories, symlinks etc... with tramp
+
+Helm by default is colorizing only directories wheras when
+navigating without tramp in local file system you have perhaps
+noticed all is colorized, this is for sake of performances.  All
+the predicates needed to determine the type of a file are very
+costly and tramp itself is something really slow so one in the
+other, this make helm-find-files unusable for current usage.
+
+However starting at helm version 2.9.7 it is somewhat possible to
+colorize fnames by listing files without loosing performances with
+external commands i.e. ls+awk if your system have these commands
+(common by default on all Linux systems).  For this you can use
+`helm-list-dir-external' as value for `helm-list-directory-function'.
+The only limitation to use this is that internally helm is using the
+ls -F feature which append special characters at end of filenames,
+namely \"*\", \"@\", \"|\", \">\", and \"=\", so be sure that filename
+convention with files not ending with such characters is respected on
+the system you are working on, if not you have better time using the
+default function `helm-list-dir-lisp'.
+
+Related variables are `helm-list-directory-function' and `helm-ff-tramp-not-fancy'.
+ 
 **** Completing host
 
 As soon as you enter the first \":\" after method e.g =/scp:\= you will
