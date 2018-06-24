@@ -356,7 +356,9 @@ provided with local files i.e. colorized symlinks, executables files
 etc... whereas using `helm-list-dir-lisp' will allow colorizing only
 directories, being however more safe than `helm-list-dir-external'
 because it will not corrupt weird filenames ending with *,/,@,| or =
-which is rare but may happen."
+which is rare but may happen.
+
+NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
   :type 'function
   :group 'helm-files)
 
