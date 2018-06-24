@@ -2425,7 +2425,7 @@ these last finishing chars."
                  nil t t)
                 0)
         (goto-char (point-min))
-        (while (re-search-forward "[*=@|/]$" nil t)
+        (while (re-search-forward "[*=@|/>]$" nil t)
           (pcase (match-string 0)
             ("*" (replace-match "" t t)
                  (put-text-property
@@ -2436,7 +2436,7 @@ these last finishing chars."
             ("/" (replace-match "" t t)
                  (put-text-property
                   (point-at-bol) (point-at-eol) 'helm-ff-dir t))
-            ((or "=" "|") (replace-match "" t t))))
+            ((or "=" "|" ">") (replace-match "" t t))))
         (split-string (buffer-string) "\n" t)))))
 
 (defun helm-ff-directory-files (directory)
