@@ -344,6 +344,21 @@ from `helm-find-files'."
                   helm-delete-marked-files)
                  (function :tag "Delete files asynchronously."
                   helm-delete-marked-files-async)))
+
+(defcustom helm-list-directory-function #'helm-list-dir-lisp
+  "The function used in `helm-find-files' to list remote directories.
+
+Actually helm provides two functions to do this: `helm-list-dir-lisp'
+and `helm-list-dir-external'.
+
+Using `helm-list-dir-external' will provides a similar display to what
+provided with local files i.e. colorized symlinks, executables files
+etc... whereas using `helm-list-dir-lisp' will allow colorizing only
+directories, being however more safe than `helm-list-dir-external'
+because it will not corrupt weird filenames ending with *,/,@,| or =
+which is rare but may happen."
+  :type 'function
+  :group 'helm-files)
 
 ;;; Faces
 ;;
@@ -2366,26 +2381,63 @@ purpose."
 (defun helm-list-directory (directory)
   "List directory DIRECTORY.
 
-If DIRECTORY is remote use `file-name-all-completions' and add a
-`helm-ff-dir' property on each one ending with \"/\" otherwise use
+If DIRECTORY is remote use `helm-list-directory-function' otherwise use
 `directory-files'."
+  (if (file-remote-p directory)
+      (funcall helm-list-directory-function directory)
+    (directory-files directory t directory-files-no-dot-files-regexp)))
+
+(defun helm-list-dir-lisp (directory)
+  "List DIRECTORY with `file-name-all-completions' as backend.
+
+Add a `helm-ff-dir' property on each fname ending with \"/\"."
   ;; NOTE: `file-name-all-completions' and `directory-files' and most
   ;; tramp file handlers don't handle cntrl characters in fnames, so
   ;; the displayed files will be plain wrong in this case, even worst
   ;; the filenames will be splitted in two or more filenames.
-  (if (file-remote-p directory)
-      (cl-loop for f in (sort (file-name-all-completions "" directory)
-                              'string-lessp)
-               unless (or (string= f "")
-                          (member f '("./" "../"))
-                          ;; Ignore the tramp names from /
-                          ;; completion, e.g. ssh: scp: etc...
-                          (char-equal (aref f (1- (length f))) ?:))
-               if (and (helm--dir-name-p f)
-                       (helm--dir-file-name f directory))
-               collect (propertize it 'helm-ff-dir t)
-               else collect (expand-file-name f directory))
-    (directory-files directory t directory-files-no-dot-files-regexp)))
+  (cl-loop for f in (sort (file-name-all-completions "" directory)
+                          'string-lessp)
+           unless (or (string= f "")
+                      (member f '("./" "../"))
+                      ;; Ignore the tramp names from /
+                      ;; completion, e.g. ssh: scp: etc...
+                      (char-equal (aref f (1- (length f))) ?:))
+           if (and (helm--dir-name-p f)
+                   (helm--dir-file-name f directory))
+           collect (propertize it 'helm-ff-dir t)
+           else collect (expand-file-name f directory)))
+
+(defun helm-list-dir-external (dir)
+  "List directory DIR with external shell command as backend.
+
+This function is fast enough to be used for remote files and save the
+type of files at the same time in a property for using it later in the
+transformer.  However as this is relaying on ls -F feature, the weird
+filenames really finishing with [*=@|] may be corrupted by removing
+these last finishing chars."
+  (let ((default-directory (file-name-as-directory
+                            (expand-file-name dir))))
+    (with-temp-buffer
+      (when (eq (process-file-shell-command
+                 (format
+                  "ls -A -1 -F -b | awk -v a=%s '{print a $1}'"
+                  default-directory)
+                 nil t t)
+                0)
+        (goto-char (point-min))
+        (while (re-search-forward "[*=@|/]$" nil t)
+          (pcase (match-string 0)
+            ("*" (replace-match "" t t)
+                 (put-text-property
+                  (point-at-bol) (point-at-eol) 'helm-ff-exe t))
+            ("@" (replace-match "" t t)
+                 (put-text-property
+                  (point-at-bol) (point-at-eol) 'helm-ff-sym t))
+            ("/" (replace-match "" t t)
+                 (put-text-property
+                  (point-at-bol) (point-at-eol) 'helm-ff-dir t))
+            ((or "=" "|") (replace-match "" t t))))
+        (split-string (buffer-string) "\n" t)))))
 
 (defun helm-ff-directory-files (directory)
   "List contents of DIRECTORY.
@@ -2772,6 +2824,12 @@ Return candidates prefixed with basename of `helm-input' first."
                   ((and (get-text-property 1 'helm-ff-dir file)
                         (eq helm-ff-tramp-not-fancy 'dirs-only))
                    (cons (propertize disp 'face 'helm-ff-directory) file))
+                  ((and (get-text-property 1 'helm-ff-exe file)
+                        (eq helm-ff-tramp-not-fancy 'dirs-only))
+                   (cons (propertize disp 'face 'helm-ff-executable) file))
+                  ((and (get-text-property 1 'helm-ff-sym file)
+                        (eq helm-ff-tramp-not-fancy 'dirs-only))
+                   (cons (propertize disp 'face 'helm-ff-symlink) file))
                   (t (cons disp file))))
 
         ;; Highlight local files showing everything, symlinks, exe,
