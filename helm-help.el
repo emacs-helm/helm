@@ -713,10 +713,6 @@ Of course the alias command should support this.
 
 `helm-find-files' works fine with TRAMP despite some limitations.
 
-- By default filenames are not highlighted when working on remote directories,
-this is controled by `helm-ff-tramp-not-fancy' variable.  If you change this,
-expect Helm to be very slow unless your connection is super fast.
-
 - Grepping files is not very well supported when used incrementally.
 See [[Grepping on remote files]].
 
@@ -762,7 +758,7 @@ external commands i.e. ls+awk if your system have these commands
 \(common by default on all Linux systems).  For this you can use
 `helm-list-dir-external' as value for `helm-list-directory-function'.
 
-Related variables are `helm-list-directory-function' and `helm-ff-tramp-not-fancy'.
+See `helm-list-directory-function' documentation for more infos.
  
 **** Completing host
 

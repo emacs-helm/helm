@@ -40,6 +40,13 @@ this source is accessible and properly loaded."
   :type '(repeat (choice symbol))
   :group 'helm-files)
 
+(defcustom helm-for-files-tramp-not-fancy t
+  "Colorize remote files when non nil.
+
+Be aware that a nil value will make tramp display very slow."
+  :group 'helm-files
+  :type  'boolean)
+
 ;;; File Cache
 ;;
 ;;
@@ -165,10 +172,10 @@ Colorize only symlinks, directories and files."
                               (helm-file-on-mounted-network-p i))
            ;; Call file-attributes only if:
            ;; - file is not remote
-           ;; - helm-ff-tramp-not-fancy is nil and file is remote AND
+           ;; - helm-for-files--tramp-not-fancy is nil and file is remote AND
            ;; connected. (Issue #1679)
            for type = (and (or (null isremote)
-                               (and (null helm-ff-tramp-not-fancy)
+                               (and (null helm-for-files-tramp-not-fancy)
                                     (file-remote-p i nil t)))
                            (car (file-attributes i)))
            collect
