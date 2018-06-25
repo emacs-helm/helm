@@ -345,7 +345,12 @@ from `helm-find-files'."
                  (function :tag "Delete files asynchronously."
                   helm-delete-marked-files-async)))
 
-(defcustom helm-list-directory-function #'helm-list-dir-lisp
+(defcustom helm-list-directory-function
+  (cl-case system-type
+    (gnu/linux #'helm-list-dir-external)
+    (berkeley-unix #'helm-list-dir-external)
+    (windows-nt #'helm-list-dir-lisp)
+    (t #'helm-list-dir-lisp))
   "The function used in `helm-find-files' to list remote directories.
 
 Actually helm provides two functions to do this: `helm-list-dir-lisp'
