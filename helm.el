@@ -6409,11 +6409,7 @@ sources."
                    current-src))
         (setq candidates
               (helm--compute-marked
-               (helm-get-selection
-                nil (helm-attr 'marked-with-props
-                               current-src)
-                current-src)
-               current-src
+               sel current-src
                (and with-wildcard (null (file-exists-p sel))))))
       (helm-log "Marked candidates = %S" candidates)
       candidates)))
