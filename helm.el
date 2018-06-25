@@ -6391,25 +6391,30 @@ selection. When key WITH-WILDCARD is specified, expand it.
 When ALL-SOURCES key value is non-nil returns marked candidates of all
 sources."
   (with-current-buffer helm-buffer
-    (let ((candidates
-           (cl-loop with current-src = (helm-get-current-source)
-                    for (source . real) in (reverse helm-marked-candidates)
-                    for use-wc = (and with-wildcard (string-match-p "\\*" real))
-                    when (or all-sources
-                             (equal (assq 'name source)
-                                    (assq 'name current-src)))
-                    append (helm--compute-marked real source use-wc)
-                    into cands
-                    finally return (or cands
-                                       (append
-                                        (helm--compute-marked
-                                         (helm-get-selection
-                                          nil (helm-attr 'marked-with-props
-                                                         current-src)
-                                          current-src)
-                                         current-src
-                                         with-wildcard)
-                                        cands)))))
+    (let* ((current-src (helm-get-current-source))
+           (candidates
+            (cl-loop for (source . real) in (reverse helm-marked-candidates)
+                     for use-wc = (and with-wildcard
+                                       (string-match-p "\\*" real)
+                                       (null (file-exists-p real)))
+                     when (or all-sources
+                              (equal (assq 'name source)
+                                     (assq 'name current-src)))
+                     append (helm--compute-marked real source use-wc)))
+           sel)
+      (unless candidates
+        (setq sel (helm-get-selection
+                   nil (helm-attr 'marked-with-props
+                                  current-src)
+                   current-src))
+        (setq candidates
+              (helm--compute-marked
+               (helm-get-selection
+                nil (helm-attr 'marked-with-props
+                               current-src)
+                current-src)
+               current-src
+               (and with-wildcard (null (file-exists-p sel))))))
       (helm-log "Marked candidates = %S" candidates)
       candidates)))
 
