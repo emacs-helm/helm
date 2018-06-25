@@ -761,12 +761,6 @@ colorize fnames by listing files without loosing performances with
 external commands i.e. ls+awk if your system have these commands
 \(common by default on all Linux systems).  For this you can use
 `helm-list-dir-external' as value for `helm-list-directory-function'.
-The only limitation to use this is that internally helm is using the
-ls -F feature which append special characters at end of filenames,
-namely \"*\", \"@\", \"|\", \">\", and \"=\", so be sure that filename
-convention with files not ending with such characters is respected on
-the system you are working on, if not you have better time using the
-default function `helm-list-dir-lisp'.
 
 Related variables are `helm-list-directory-function' and `helm-ff-tramp-not-fancy'.
  

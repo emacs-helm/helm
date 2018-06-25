@@ -354,9 +354,7 @@ and `helm-list-dir-external'.
 Using `helm-list-dir-external' will provides a similar display to what
 provided with local files i.e. colorized symlinks, executables files
 etc... whereas using `helm-list-dir-lisp' will allow colorizing only
-directories, being however more safe than `helm-list-dir-external'
-because it will not corrupt weird filenames ending with *,/,@,| or =
-which is rare but may happen.
+directories but is more portable.
 
 NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
   :type 'function
@@ -2414,31 +2412,41 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
 
 This function is fast enough to be used for remote files and save the
 type of files at the same time in a property for using it later in the
-transformer.  However as this is relaying on ls -F feature, the weird
-filenames really finishing with [*=@|] may be corrupted by removing
-these last finishing chars."
+transformer."
   (let ((default-directory (file-name-as-directory
                             (expand-file-name dir))))
     (with-temp-buffer
       (when (eq (process-file-shell-command
                  (format
-                  "ls -A -1 -F -b | awk -v a=%s '{print a $1}'"
+                  ;; -A remove dot files, -F append [*=@|/>] at eof
+                  ;; and -Q quote the real filename.  If not using -Q,
+                  ;; there is no way to distinguish if foo* is a real
+                  ;; file or if it is foo the executable file so with
+                  ;; -Q we have "foo"* for the executable file foo and
+                  ;; "foo*" for the real file foo. The downside is
+                  ;; that we need an extra step to remove the quotes
+                  ;; at the end which impact performances.
+                  "ls -A -1 -F -b -Q | awk -v a=%s '{print a $1}'"
                   default-directory)
                  nil t t)
                 0)
         (goto-char (point-min))
-        (while (re-search-forward "[*=@|/>]$" nil t)
-          (pcase (match-string 0)
-            ("*" (replace-match "" t t)
-                 (put-text-property
-                  (point-at-bol) (point-at-eol) 'helm-ff-exe t))
-            ("@" (replace-match "" t t)
-                 (put-text-property
-                  (point-at-bol) (point-at-eol) 'helm-ff-sym t))
-            ("/" (replace-match "" t t)
-                 (put-text-property
-                  (point-at-bol) (point-at-eol) 'helm-ff-dir t))
-            ((or "=" "|" ">") (replace-match "" t t))))
+        (save-excursion
+          (while (re-search-forward "[*=@|/>]$" nil t)
+            ;; A line looks like /home/you/"foo"@
+            (pcase (match-string 0)
+              ("*" (replace-match "")
+                   (put-text-property
+                    (point-at-bol) (point-at-eol) 'helm-ff-exe t))
+              ("@" (replace-match "")
+                   (put-text-property
+                    (point-at-bol) (point-at-eol) 'helm-ff-sym t))
+              ("/" (replace-match "")
+                   (put-text-property
+                    (point-at-bol) (point-at-eol) 'helm-ff-dir t))
+              ((or "=" "|" ">") (replace-match "")))))
+        (while (re-search-forward "[\"]" nil t)
+          (replace-match ""))
         (split-string (buffer-string) "\n" t)))))
 
 (defun helm-ff-directory-files (directory)
