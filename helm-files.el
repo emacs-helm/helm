@@ -2894,12 +2894,9 @@ Return candidates prefixed with basename of `helm-input' first."
                  (cons (propertize disp 'face 'helm-ff-file)
                        file))
                 ;; A non--existing file.
-                ((or (file-writable-p file) url-p)
-                 (cons (helm-ff-prefix-filename
-                        (propertize disp 'face 'helm-ff-file) nil 'new-file)
-                       file))
-                ;; A file not accessible.
-                ((null attr) (propertize disp 'face 'helm-ff-denied))))))))
+                (t (cons (helm-ff-prefix-filename
+                          (propertize disp 'face 'helm-ff-file) nil 'new-file)
+                         file))))))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
