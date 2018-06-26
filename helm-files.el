@@ -2801,7 +2801,7 @@ Return candidates prefixed with basename of `helm-input' first."
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
   (let ((basename (helm-basename file))
-        dot url-p)
+        dot)
     (unless (and helm-ff-skip-boring-files
                  (helm-ff-boring-file-p basename))
 
@@ -2838,7 +2838,7 @@ Return candidates prefixed with basename of `helm-input' first."
         (let* ((disp (if (and helm-ff-transformer-show-only-basename
                               (not (setq dot (helm-dir-is-dot file)))
                               (not (and helm--url-regexp
-                                        (setq url-p (string-match helm--url-regexp file))))
+                                        (string-match helm--url-regexp file)))
                               (not (string-match helm-ff-url-regexp file)))
                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
                              basename)
