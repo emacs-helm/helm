@@ -71,7 +71,7 @@ when these options are used."
 If spaces in PATTERN are escaped, don't split at this place.
 i.e \"foo bar baz\"=> (\"foo\" \"bar\" \"baz\")
 but \"foo\\ bar baz\"=> (\"foo\\s-bar\" \"baz\").
-If grep-space is used translate escaped space to \"\s\" instead of \"\s-\"."
+If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
   (split-string
    ;; Match spaces litteraly because candidate buffer syntax-table
    ;; doesn't understand "\s-" properly.
