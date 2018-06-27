@@ -422,8 +422,13 @@ NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
   :group 'helm-files-faces)
 
 (defface helm-ff-socket
-    '((t (:foreground "yellow" :background "black")))
+    '((t (:foreground "DeepPink")))
   "Face used for socket files in `helm-find-files'."
+  :group 'helm-files-faces)
+
+(defface helm-ff-pipe
+    '((t (:foreground "yellow" :background "black")))
+  "Face used for named pipes and character device files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-history-deleted
@@ -2875,19 +2880,24 @@ Return candidates prefixed with basename of `helm-input' first."
                 ((eq t type)
                  (cons (propertize disp 'face 'helm-ff-directory)
                        file))
+                ;; A character device file.
+                ((and attr (string-match
+                            "\\`[cp]" (setq x-bit (substring (nth 8 attr) 0 4))))
+                 (cons (propertize disp 'face 'helm-ff-pipe)
+                       file))
+                ;; A socket file.
+                ((and attr (string-match "\\`[s]" x-bit))
+                 (cons (propertize disp 'face 'helm-ff-socket)
+                       file))
                 ;; An executable file.
                 ((and attr
                       (string-match
-                       "x\\'" (setq x-bit (substring (nth 8 attr) 0 4))))
+                       "x\\'" x-bit))
                  (cons (propertize disp 'face 'helm-ff-executable)
                        file))
                 ;; An executable file with suid
                 ((and attr (string-match "s\\'" x-bit))
                  (cons (propertize disp 'face 'helm-ff-suid)
-                       file))
-                ;; A socket
-                ((and attr (string-match "\\`c" x-bit))
-                 (cons (propertize disp 'face 'helm-ff-socket)
                        file))
                 ;; A file.
                 ((and attr (null type))
