@@ -2425,7 +2425,7 @@ transformer."
                   ;; at the end which impact performances.
                   "ls -A -1 -F -b -Q | awk -v a=%s '{print a $1}'"
                   default-directory)
-                 nil t t)
+                 nil t nil)
                 0)
         (goto-char (point-min))
         (save-excursion
