@@ -45,6 +45,7 @@
 (declare-function eshell-bol "esh-mode")
 (declare-function eshell-reset "esh-mode.el")
 (declare-function eshell/cd "em-dirs.el")
+(declare-function eshell-next-prompt "em-prompt.el")
 (declare-function eshell-quote-argument "esh-arg.el")
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
@@ -1053,8 +1054,7 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
                      (eshell/cd helm-ff-default-directory)
                      (eshell-reset)))
         (bufs (cl-loop for b in (mapcar 'buffer-name (buffer-list))
-                       when (with-current-buffer b
-                              (eq major-mode 'eshell-mode))
+                       when (helm-ff--eshell-interactive-buffer-p b)
                        collect b)))
     (helm-aif (and (null helm-current-prefix-arg)
                    (if (cdr bufs)
@@ -1065,6 +1065,14 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
       (eshell helm-current-prefix-arg))
     (unless (get-buffer-process (current-buffer))
       (funcall cd-eshell))))
+
+(defun helm-ff--eshell-interactive-buffer-p (buffer)
+  (with-current-buffer buffer
+    (and (eq major-mode 'eshell-mode)
+         (save-excursion
+           (goto-char (point-min))
+           (eshell-next-prompt 1)
+           (null (eql (point) (point-min)))))))
 
 (defun helm-ff-touch-files (_candidate)
   "The touch files action for helm-find-files."
