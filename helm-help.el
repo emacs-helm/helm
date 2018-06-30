@@ -755,8 +755,8 @@ See `helm-list-directory-function' documentation for more infos.
  
 **** Completing host
 
-As soon as you enter the first \":\" after method e.g =/scp:\= you will
-have some completion about previously used hosts or from your =~/.ssh/config\=
+As soon as you enter the first \":\" after method e.g =/scp:= you will
+have some completion about previously used hosts or from your =~/.ssh/config=
 file, hitting `\\[helm-execute-persistent-action]' or `right' on a candidate will insert this host in minibuffer
 without addind the ending \":\".
 As soon the last \":\" is entered TRAMP will kick in and you should see the list
