@@ -2410,7 +2410,8 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
            if (and (helm--dir-name-p f)
                    (helm--dir-file-name f directory))
            collect (propertize it 'helm-ff-dir t)
-           else collect (expand-file-name f directory)))
+           else collect (propertize (expand-file-name f directory)
+                                    'helm-ff-file t)))
 
 (defun helm-list-dir-external (dir)
   "List directory DIR with external shell command as backend.
