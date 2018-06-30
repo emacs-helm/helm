@@ -2851,7 +2851,7 @@ Return candidates prefixed with basename of `helm-input' first."
                   ;; Regular files.
                   ((get-text-property 1 'helm-ff-file file)
                    (cons (propertize disp 'face 'helm-ff-file) file))
-                  ;; Any other files.
+                  ;; non existing files.
                   (t (cons (helm-ff-prefix-filename
                             (propertize disp 'face 'helm-ff-file)
                             hostp (unless hostp 'new-file))
