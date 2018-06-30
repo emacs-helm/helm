@@ -2452,6 +2452,7 @@ transformer."
               ((or "=" "|" ">") (replace-match "")))))
         (while (re-search-forward "[\"]" nil t)
           (replace-match ""))
+        (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
 (defun helm-ff-directory-files (directory)
@@ -2843,8 +2844,13 @@ Return candidates prefixed with basename of `helm-input' first."
                   ;; Symlinks.
                   ((get-text-property 1 'helm-ff-sym file)
                    (cons (propertize disp 'face 'helm-ff-symlink) file))
+                  ;; Regular files.
+                  ((get-text-property 1 'helm-ff-file file)
+                   (cons (propertize disp 'face 'helm-ff-file) file))
                   ;; Any other files.
-                  (t (cons (propertize disp 'face 'helm-ff-file) file))))
+                  (t (cons (helm-ff-prefix-filename
+                            (propertize disp 'face 'helm-ff-file) nil 'new-file)
+                           file))))
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
