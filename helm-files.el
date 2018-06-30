@@ -2823,11 +2823,14 @@ Return candidates prefixed with basename of `helm-input' first."
       ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                    (helm-file-on-mounted-network-p helm-pattern)))
-          (let ((disp (if (and helm-ff-transformer-show-only-basename
-                               (not (setq dot (helm-dir-is-dot file))))
-                          (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                              basename)
-                        file)))
+          (let* (hostp
+                 (disp (if (and helm-ff-transformer-show-only-basename
+                                (not (setq dot (helm-dir-is-dot file))))
+                           (or (setq hostp
+                                     (helm-ff--get-host-from-tramp-invalid-fname
+                                      file))
+                               basename)
+                         file)))
             ;; Filename with cntrl chars e.g. foo^J
             ;; This will not work as long as most tramp file handlers doesn't
             ;; handle such case, e.g. file-name-all-completions,
@@ -2850,7 +2853,8 @@ Return candidates prefixed with basename of `helm-input' first."
                    (cons (propertize disp 'face 'helm-ff-file) file))
                   ;; Any other files.
                   (t (cons (helm-ff-prefix-filename
-                            (propertize disp 'face 'helm-ff-file) nil 'new-file)
+                            (propertize disp 'face 'helm-ff-file)
+                            hostp (unless hostp 'new-file))
                            file))))
 
         ;; Highlight local files showing everything, symlinks, exe,
