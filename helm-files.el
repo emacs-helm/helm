@@ -611,16 +611,11 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find alternate file `C-x C-v'" 'find-alternate-file
    "Ediff File `C-c ='" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
-   (lambda () (format "Delete File(s)%s (C-u no trash)"
-                      (if (eq helm-ff-delete-files-function
-                              'helm-delete-marked-files)
-                          " `M-D'" "")))
-   'helm-delete-marked-files
-   (lambda () (format "Delete File(s) async%s (C-u no trash)"
+   (lambda () (format "Delete File(s)%s `M-D' (C-u no trash)"
                       (if (eq helm-ff-delete-files-function
                               'helm-delete-marked-files-async)
-                          " `M-D'" "")))
-   'helm-delete-marked-files-async
+                          " async" "")))
+   'helm-delete-marked-files
    "Touch File(s) `M-T'" 'helm-ff-touch-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
@@ -1589,11 +1584,15 @@ Behave differently depending of `helm-selection':
     (helm-exit-and-execute-action 'helm-find-files-hardlink)))
 (put 'helm-ff-run-hardlink-file 'helm-only t)
 
+(defun helm-ff-delete-files (candidate)
+  "Delete files default action."
+  (funcall helm-ff-delete-files-function candidate))
+
 (defun helm-ff-run-delete-file ()
   "Run Delete file action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action helm-ff-delete-files-function)))
+    (helm-exit-and-execute-action #'helm-ff-delete-files)))
 (put 'helm-ff-run-delete-file 'helm-only t)
 
 (defun helm-ff-run-complete-fn-at-point ()

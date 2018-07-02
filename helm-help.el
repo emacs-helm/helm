@@ -849,9 +849,6 @@ deleting asynchronously.
 
 First method (persistent delete) is always synchronous.
 
-Note that delete async and delete sync are always accessible from
-actions menu so that you can use one or the other if needed.
-
 Note that when a prefix arg is given, trashing is disabled see [[Trashing files][Trashing files]].
 
 **** Trashing files

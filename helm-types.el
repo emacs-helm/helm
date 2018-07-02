@@ -57,7 +57,7 @@
     "View file"                               'view-file
     "Insert file"                             'insert-file
     "Add marked files to file-cache"          'helm-ff-cache-add-file
-    "Delete file(s)"                          'helm-delete-marked-files
+    "Delete file(s)"                          'helm-ff-delete-files
     "Copy file(s) `M-C, C-u to follow'"       'helm-find-files-copy
     "Rename file(s) `M-R, C-u to follow'"     'helm-find-files-rename
     "Symlink files(s) `M-S, C-u to follow'"   'helm-find-files-symlink
