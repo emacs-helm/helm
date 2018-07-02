@@ -3675,7 +3675,8 @@ When a prefix arg is given, files are deleted and not trashed even if
     (let ((marked (helm-marked-candidates)))
       (unwind-protect
            (cl-loop with trash = (and delete-by-moving-to-trash
-                                      (null current-prefix-arg))
+                                      (null current-prefix-arg)
+                                      (null (file-remote-p (car marked))))
                     for c in marked do
                     (progn (helm-preselect
                             (concat "^" (regexp-quote
@@ -3725,7 +3726,8 @@ Ask to kill buffers associated with that file, too."
           (trash (or trash
                      (and delete-by-moving-to-trash
                           (null helm-current-prefix-arg)
-                          (null current-prefix-arg)))))
+                          (null current-prefix-arg)
+                          (null (file-remote-p file))))))
       (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
@@ -3766,8 +3768,9 @@ Ask to kill buffers associated with that file, too."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
          (trash (and delete-by-moving-to-trash
-                      (null helm-current-prefix-arg)
-                      (null current-prefix-arg)))
+                     (null helm-current-prefix-arg)
+                     (null current-prefix-arg)
+                     (null (file-remote-p (car files)))))
          (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
@@ -3838,7 +3841,8 @@ always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (trash (and delete-by-moving-to-trash
                      (null helm-current-prefix-arg)
-                     (null current-prefix-arg)))
+                     (null current-prefix-arg)
+                     (null (file-remote-p (car files)))))
          (prmt (if trash "Trash" "Delete"))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
