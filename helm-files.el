@@ -2660,39 +2660,6 @@ Note that only existing directories are saved here."
   "Check if FILE is `.' or `..'."
   (member (helm-basename file) '("." "..")))
 
-(defun helm-ff-quick-delete (_candidate)
-  "Delete file CANDIDATE without quitting.
-
-When a prefix arg is given, files are deleted and not trashed even if
-\`delete-by-moving-to-trash' is non nil."
-  (with-helm-window
-    (let ((marked (helm-marked-candidates)))
-      (unwind-protect
-           (cl-loop with trash = (and delete-by-moving-to-trash
-                                      (null current-prefix-arg))
-                    for c in marked do
-                    (progn (helm-preselect
-                            (concat "^" (regexp-quote
-                                         (if (and helm-ff-transformer-show-only-basename
-                                                  (not (helm-ff-dot-file-p c)))
-                                             (helm-basename c) c))))
-                           (when (y-or-n-p
-                                  (format "Really %s file `%s'? "
-                                          (if trash "Trash" "Delete")
-                                          (abbreviate-file-name c)))
-                             (helm-delete-file
-                              c helm-ff-signal-error-on-dot-files 'synchro trash)
-                             (helm-delete-current-selection)
-                             (message nil)
-                             (helm--remove-marked-and-update-mode-line c))))
-        (setq helm-marked-candidates nil
-              helm-visible-mark-overlays nil)
-        (helm-force-update
-         (let ((presel (helm-get-selection)))
-           (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                              (not (helm-ff-dot-file-p presel)))
-                                         (helm-basename presel) presel)))))))))
-
 (defun helm-ff-kill-buffer-fname (candidate)
   (let* ((buf      (get-file-buffer candidate))
          (buf-name (buffer-name buf)))
@@ -3698,6 +3665,39 @@ following files to destination."
         for bfn = (buffer-file-name buf)
         when (and bfn (string= name bfn))
         collect (buffer-name buf)))
+
+(defun helm-ff-quick-delete (_candidate)
+  "Delete file CANDIDATE without quitting.
+
+When a prefix arg is given, files are deleted and not trashed even if
+\`delete-by-moving-to-trash' is non nil."
+  (with-helm-window
+    (let ((marked (helm-marked-candidates)))
+      (unwind-protect
+           (cl-loop with trash = (and delete-by-moving-to-trash
+                                      (null current-prefix-arg))
+                    for c in marked do
+                    (progn (helm-preselect
+                            (concat "^" (regexp-quote
+                                         (if (and helm-ff-transformer-show-only-basename
+                                                  (not (helm-ff-dot-file-p c)))
+                                             (helm-basename c) c))))
+                           (when (y-or-n-p
+                                  (format "Really %s file `%s'? "
+                                          (if trash "Trash" "Delete")
+                                          (abbreviate-file-name c)))
+                             (helm-delete-file
+                              c helm-ff-signal-error-on-dot-files 'synchro trash)
+                             (helm-delete-current-selection)
+                             (message nil)
+                             (helm--remove-marked-and-update-mode-line c))))
+        (setq helm-marked-candidates nil
+              helm-visible-mark-overlays nil)
+        (helm-force-update
+         (let ((presel (helm-get-selection)))
+           (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                              (not (helm-ff-dot-file-p presel)))
+                                         (helm-basename presel) presel)))))))))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
