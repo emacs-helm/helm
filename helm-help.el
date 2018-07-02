@@ -868,12 +868,14 @@ WARNING: Trashing in Emacs have several bugs or misbehavior:
 
 - If you have an ENV var XDG_DATA_HOME in your .profile or .bash_profile
   and this var is set to something like $HOME/.local/share (like preconized)
-  be aware that a bug in move-file-to-trash may lead to copy of the whole HOME directory
-  in the directory where you are trashing file instead of moving it to ~/.local/share/Trash/files
-  because move-file-to-trash is not interpreting XDG_DATA_HOME with substitute-in-file-name.
+  `move-file-to-trash' may try to create $HOME/.local/share/Trash (literally)
+  and its subdirs in the directory where you are actually trying to trash files.
+  because `move-file-to-trash' is interpreting XDG_DATA_HOME literally instead
+  of evaling its value (with `substitute-in-file-name').
 
 - You may expect you files goes to $HOME/.local/share... when trashing with /sudo:
-  be aware that they will be deleted, the tramp handler is not supporting trasing.
+  be aware that they will be deleted, the tramp handler is not supporting trashing.
+  Fortunately the prompt in helm is telling you if you are actually deleting or trashing.
 
 - Sometimes emacs may copy the file to trash but forget to copy the *.info file as well
   which may prevent restoring file from trash.
