@@ -2668,7 +2668,9 @@ When a prefix arg is given, files are deleted and not trashed even if
   (with-helm-window
     (let ((marked (helm-marked-candidates)))
       (unwind-protect
-           (cl-loop for c in marked do
+           (cl-loop with trash = (and delete-by-moving-to-trash
+                                      (null current-prefix-arg))
+                    for c in marked do
                     (progn (helm-preselect
                             (concat "^" (regexp-quote
                                          (if (and helm-ff-transformer-show-only-basename
@@ -2676,12 +2678,10 @@ When a prefix arg is given, files are deleted and not trashed even if
                                              (helm-basename c) c))))
                            (when (y-or-n-p
                                   (format "Really %s file `%s'? "
-                                          (if (and delete-by-moving-to-trash
-                                                   (null current-prefix-arg))
-                                              "Trash" "Delete")
+                                          (if trash "Trash" "Delete")
                                           (abbreviate-file-name c)))
                              (helm-delete-file
-                              c helm-ff-signal-error-on-dot-files 'synchro)
+                              c helm-ff-signal-error-on-dot-files 'synchro trash)
                              (helm-delete-current-selection)
                              (message nil)
                              (helm--remove-marked-and-update-mode-line c))))
@@ -3699,7 +3699,7 @@ following files to destination."
         when (and bfn (string= name bfn))
         collect (buffer-name buf)))
 
-(defun helm-delete-file (file &optional error-if-dot-file-p synchro)
+(defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
 
 When a prefix arg is given, files are deleted and not trashed even if
@@ -3722,9 +3722,10 @@ Ask to kill buffers associated with that file, too."
     (let ((buffers (helm-file-buffers file))
           (helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
-          (trash (and delete-by-moving-to-trash
-                      (null helm-current-prefix-arg)
-                      (null current-prefix-arg))))
+          (trash (or trash
+                     (and delete-by-moving-to-trash
+                          (null helm-current-prefix-arg)
+                          (null current-prefix-arg)))))
       (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
@@ -3779,7 +3780,7 @@ Ask to kill buffers associated with that file, too."
                (cl-dolist (i files)
                  (set-text-properties 0 (length i) nil i)
                  (let ((res (helm-delete-file
-                             i helm-ff-signal-error-on-dot-files)))
+                             i helm-ff-signal-error-on-dot-files nil trash)))
                    (if (eq res 'skip)
                        (progn (message "Directory is not empty, skipping")
                               (sleep-for 1))
