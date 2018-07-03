@@ -2977,7 +2977,7 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
       (helm-initial-setup any-default sources))
     (setq helm-alive-p t)
     (unless (eq any-resume 'noresume)
-      (helm--recent-push helm-buffer 'helm-buffers)
+      (helm--push-and-remove-dups helm-buffer 'helm-buffers)
       (setq helm-last-buffer helm-buffer))
     (when any-input
       (setq helm-input any-input
@@ -3007,12 +3007,9 @@ For ANY-RESUME ANY-INPUT ANY-DEFAULT and ANY-SOURCES See `helm'."
   "Restore position in `helm-current-buffer' when quitting."
   (helm-current-position 'restore))
 
-(defun helm--recent-push (elm sym)
+(defun helm--push-and-remove-dups (elm sym)
   "Move ELM of SYM value on top and set SYM to this new value."
-  (pcase (symbol-value sym)
-    ((and (pred (member elm)) l)
-     (set sym (delete elm l))))
-  (push elm (symbol-value sym)))
+  (set sym (cons elm (delete elm (symbol-value sym)))))
 
 (defun helm--current-buffer ()
   "[internal] Return `current-buffer' BEFORE `helm-buffer' is initialized.
