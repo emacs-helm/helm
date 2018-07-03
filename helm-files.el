@@ -3665,17 +3665,28 @@ following files to destination."
         when (and bfn (string= name bfn))
         collect (buffer-name buf)))
 
+(defun helm-ff--delete-by-moving-to-trash (file)
+  "Decide to trash or delete FILE.
+Returns non-nil when FILE needs to be trashed."
+  (or
+   (and delete-by-moving-to-trash
+        (null helm-current-prefix-arg)
+        (null current-prefix-arg)
+        (null (file-remote-p file)))
+   (and (null delete-by-moving-to-trash)
+        (or helm-current-prefix-arg
+            current-prefix-arg)
+        (null (file-remote-p file)))))
+
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting.
 
-When a prefix arg is given, files are deleted and not trashed even if
-\`delete-by-moving-to-trash' is non nil."
+When a prefix arg is given, meaning of `delete-by-moving-to-trash' is
+inversed."
   (with-helm-window
     (let ((marked (helm-marked-candidates)))
       (unwind-protect
-           (cl-loop with trash = (and delete-by-moving-to-trash
-                                      (null current-prefix-arg)
-                                      (null (file-remote-p (car marked))))
+           (cl-loop with trash = (helm-ff--delete-by-moving-to-trash (car marked))
                     for c in marked do
                     (progn (helm-preselect
                             (concat "^" (regexp-quote
@@ -3702,8 +3713,8 @@ When a prefix arg is given, files are deleted and not trashed even if
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
 
-When a prefix arg is given, files are deleted and not trashed even if
-\`delete-by-moving-to-trash' is non nil.
+When a prefix arg is given, meaning of `delete-by-moving-to-trash' is
+inversed.
 
 Return error when ERROR-IF-DOT-FILE-P is non nil and user tries to
 delete a dotted file i.e. \".\" or \"..\".
@@ -3713,7 +3724,10 @@ unless `helm-ff-allow-recursive-deletes' is non nil.
 When user is asked and reply with \"!\" don't ask for remaining
 directories.
 
-Ask to kill buffers associated with that file, too."
+Ask to kill buffers associated with that file, too.
+
+When TRASH is non nil, trash FILE even if `delete-by-moving-to-trash'
+is nil."
   (require 'dired)
   (cl-block nil
     (when (and error-if-dot-file-p
@@ -3722,11 +3736,8 @@ Ask to kill buffers associated with that file, too."
     (let ((buffers (helm-file-buffers file))
           (helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
-          (trash (or trash
-                     (and delete-by-moving-to-trash
-                          (null helm-current-prefix-arg)
-                          (null current-prefix-arg)
-                          (null (file-remote-p file))))))
+          (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
+          (delete-by-moving-to-trash trash))
       (cond ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t dired-re-no-dot))
              ;; Synchro means persistent deletion from HFF.
@@ -3763,13 +3774,13 @@ Ask to kill buffers associated with that file, too."
             (kill-buffer buf)))))))
 
 (defun helm-delete-marked-files (_ignore)
-  "Delete marked files with `helm-delete-file'."
+  "Delete marked files with `helm-delete-file'.
+
+When a prefix arg is given, meaning of `delete-by-moving-to-trash' is
+inversed."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
-         (trash (and delete-by-moving-to-trash
-                     (null helm-current-prefix-arg)
-                     (null current-prefix-arg)
-                     (null (file-remote-p (car files)))))
+         (trash (helm-ff--delete-by-moving-to-trash (car files)))
          (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
@@ -3831,17 +3842,14 @@ Ask to kill buffers associated with that file, too."
 (defun helm-delete-marked-files-async (_ignore)
   "Same as `helm-delete-marked-files' but async.
 
-When a prefix arg is given, files are deleted and NOT trashed even if
-\`delete-by-moving-to-trash' is non nil.
+When a prefix arg is given, meaning of `delete-by-moving-to-trash' is
+inversed.
 
 This function is not using `helm-delete-file' and BTW not asking user
 for recursive deletion of directory, be warned that directories are
 always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
-         (trash (and delete-by-moving-to-trash
-                     (null helm-current-prefix-arg)
-                     (null current-prefix-arg)
-                     (null (file-remote-p (car files)))))
+         (trash (helm-ff--delete-by-moving-to-trash (car files)))
          (prmt (if trash "Trash" "Delete"))
          (buffers (cl-loop for file in files
                            for buf = (helm-file-buffers file)
@@ -3886,7 +3894,7 @@ always deleted with no warnings."
             ;; `delete-by-moving-to-trash' have to be set globally,
             ;; using the TRASH argument of delete-file or
             ;; delete-directory is not enough.
-            (setq delete-by-moving-to-trash ,delete-by-moving-to-trash)
+            (setq delete-by-moving-to-trash ,trash)
             (let ((result 0))
               (dolist (file ',files result)
                 (condition-case err

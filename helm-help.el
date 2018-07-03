@@ -849,7 +849,8 @@ deleting asynchronously.
 
 First method (persistent delete) is always synchronous.
 
-Note that when a prefix arg is given, trashing is disabled see [[Trashing files][Trashing files]].
+Note that when a prefix arg is given, trashing behavior is inversed.
+See [[Trashing files][Trashing files]].
 
 **** Trashing files
 
@@ -858,8 +859,7 @@ set `delete-by-moving-to-trash' to non nil, like this your files
 will be moved to trash instead of beeing deleted.
 
 Note that all the delete commands called with a prefix arg (C-u)
-disable `delete-by-moving-to-trash' and BTW delete files instead
-of trashing them.
+disable `delete-by-moving-to-trash' if it is enabled or enable it if disabled.
 
 WARNING: Trashing in Emacs have several bugs or misbehavior:
 
