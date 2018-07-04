@@ -333,6 +333,25 @@ from `helm-find-files'."
                  (function :tag "Delete files asynchronously."
                   helm-delete-marked-files-async)))
 
+(defcustom helm-trash-remote-files nil
+  "Allow trashing remote files when non-nil.
+
+Deleting remote files with tramp doesn't work out of the box, it is
+why it is disabled by default.
+
+Following is NOT documented in tramp AFAIK but tramp is using
+external trash command in its `delete-file' and `delete-directory'
+handlers.
+
+If you want to enable this you will have to install the 'trash' command
+on remote (or locally if you want to trash as root) the package on
+Ubuntu based distribution is 'trash-cli'. You will also need perhaps
+to create a Trash directory according to
+http://freedesktop.org/wiki/Specifications/trash-spec, see the Trash
+documentation at https://github.com/andreafrancia/trash-cli for more infos."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-list-directory-function
   (cl-case system-type
     (gnu/linux #'helm-list-dir-external)
@@ -3668,15 +3687,18 @@ following files to destination."
 (defun helm-ff--delete-by-moving-to-trash (file)
   "Decide to trash or delete FILE.
 Returns non-nil when FILE needs to be trashed."
-  (or
-   (and delete-by-moving-to-trash
-        (null helm-current-prefix-arg)
-        (null current-prefix-arg)
-        (null (file-remote-p file)))
-   (and (null delete-by-moving-to-trash)
-        (or helm-current-prefix-arg
-            current-prefix-arg)
-        (null (file-remote-p file)))))
+  (let ((remote (file-remote-p file)))
+    (or
+     (and delete-by-moving-to-trash
+          (null helm-current-prefix-arg)
+          (null current-prefix-arg)
+          (or (and remote helm-trash-remote-files)
+              (null remote)))
+     (and (null delete-by-moving-to-trash)
+          (or helm-current-prefix-arg
+              current-prefix-arg)
+          (or (and remote helm-trash-remote-files)
+              (null remote))))))
 
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting.
