@@ -630,7 +630,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Find alternate file `C-x C-v'" 'find-alternate-file
    "Ediff File `C-c ='" 'helm-find-files-ediff-files
    "Ediff Merge File `M-='" 'helm-find-files-ediff-merge-files
-   (lambda () (format "Delete File(s)%s `M-D' (C-u no trash)"
+   (lambda () (format "Delete File(s)%s `M-D' (C-u reverse trash)"
                       (if (eq helm-ff-delete-files-function
                               'helm-delete-marked-files-async)
                           " async" "")))
