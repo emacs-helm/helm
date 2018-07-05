@@ -871,8 +871,12 @@ of evaling its value (with `substitute-in-file-name').
 
 Trashing remote files (or local files with sudo method) is disabled by default
 because tramp is requiring the 'trash' command to be installed, if you want to
-trash your remote files, customize `helm-trash-remote-files' variable and read
-its docstring for more infos.
+trash your remote files, customize `helm-trash-remote-files'.
+The package on most GNU/Linux based distributions is trash-cli, it is available [[https://github.com/andreafrancia/trash-cli][here]].
+
+NOTE:
+When deleting your files with sudo method, your trashed files will not be listed
+with trash-list until you log in as root.
 
 ** Commands
 \\<helm-find-files-map>
