@@ -2959,7 +2959,7 @@ Return candidates prefixed with basename of `helm-input' first."
   "Restore FILE from a Trash directory.
 
 The Trash directory should be a directory compliant with
-http://freedesktop.org/wiki/Specifications/trash-spec and FILE should
+<http://freedesktop.org/wiki/Specifications/trash-spec> and FILE should
 have its '*.trashinfo' correspondent file in Trash/info directory."
   (let* ((default-directory (file-name-as-directory
                              helm-ff-default-directory))
