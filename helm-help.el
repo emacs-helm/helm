@@ -855,8 +855,13 @@ If you want to trash your files instead of deleting them you can
 set `delete-by-moving-to-trash' to non nil, like this your files
 will be moved to trash instead of beeing deleted.
 
-Note that all the delete commands called with a prefix arg (C-u)
-disable `delete-by-moving-to-trash' if it is enabled or enable it if disabled.
+You can reverse at any time the behavior of `delete-by-moving-to-trash' by using
+a prefix arg with any of the delete files command.
+
+On GNULinux distribution, when navigating to a Trash directory you
+can restore any file in ..Trash/files directory with the 'Restore
+from trash' action you will find in action menu (needs the
+trash-cli package installed).
 
 _WARNING:_
 
