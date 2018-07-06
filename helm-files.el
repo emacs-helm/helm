@@ -820,7 +820,7 @@ ACTION must be an action supported by `helm-dired-action'."
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (helm-basedir dest)))
     (unless (or dest-dir-p (file-directory-p dest-dir))
-      (when (y-or-n-p (format "Create directory `%s'?" dest-dir))
+      (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
         (make-directory dest-dir t)))
     (helm-dired-action
      dest :files ifiles :action action :follow prefarg)))
