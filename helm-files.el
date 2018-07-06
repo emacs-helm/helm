@@ -2970,11 +2970,10 @@ have its '*.trashinfo' correspondent file in Trash/info directory."
                             "info/"
                             (helm-basename file)
                             ".trashinfo")))
-    (cl-assert (file-exists-p info-file)
+    (cl-assert (and (file-exists-p info-file) trashed-files)
                nil "Unknow file or directory `%s'" info-file)
-    (when (and (y-or-n-p (format "Really restore `%s' from trash? "
-                                 (abbreviate-file-name file)))
-               trashed-files)
+    (when (y-or-n-p (format "Really restore `%s' from trash? "
+                            (abbreviate-file-name file)))
       (rename-file
        file
        (replace-regexp-in-string
