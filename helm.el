@@ -1810,8 +1810,8 @@ with its properties."
 
 (defun helm-get-actions-from-current-source (&optional source)
   "Return the associated action for the selected candidate.
-It is a function symbol \(sole action\) or list
-of \(action-display . function\)."
+It is a function symbol (sole action) or list
+of (action-display . function)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (let ((src (helm-get-current-source)))
       (helm-aif (helm-attr 'action-transformer)

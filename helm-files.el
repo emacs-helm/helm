@@ -2939,7 +2939,7 @@ Return candidates prefixed with basename of `helm-input' first."
             '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
               ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
             3))
-          ((string-match "\.el$" (helm-aif (helm-marked-candidates)
+          ((string-match "\\.el$" (helm-aif (helm-marked-candidates)
                                      (car it) candidate))
            (helm-append-at-nth
             actions
@@ -2947,7 +2947,7 @@ Return candidates prefixed with basename of `helm-input' first."
                . helm-find-files-byte-compile)
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
-          ((and (string-match "\.html?$" candidate)
+          ((and (string-match "\\.html?$" candidate)
                 (file-exists-p candidate))
            (helm-append-at-nth
             actions '(("Browse url file" . browse-url-of-file)) 2))
