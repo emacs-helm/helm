@@ -2971,23 +2971,25 @@ Return candidates prefixed with basename of `helm-input' first."
         (mapcar 'helm-basename mkd)
         (when (y-or-n-p (format "Restore %s files from trash? "
                                 (length mkd)))
+          (message "Restoring files from trash...")
           (cl-loop for f in mkd do
                    (condition-case err
                        (helm-restore-file-from-trash-1 f trashed-files)
                      (error (push (format "%s" (cadr err)) errors)
                             nil))))))
-    (when errors
-      (display-warning 'helm
-                       (with-temp-buffer
-                         (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
-                                         (current-time)))
-                         (insert (format
-                                  "Failed to restore %s/%s files from trash\n"
-                                  (length errors) (length mkd)))
-                         (insert (mapconcat 'identity errors "\n") "\n")
-                         (buffer-string))
-                       :error
-                       "*helm restore files*"))))
+    (if errors
+        (display-warning 'helm
+                         (with-temp-buffer
+                           (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
+                                                       (current-time)))
+                           (insert (format
+                                    "Failed to restore %s/%s files from trash\n"
+                                    (length errors) (length mkd)))
+                           (insert (mapconcat 'identity errors "\n") "\n")
+                           (buffer-string))
+                         :error
+                         "*helm restore files*")
+      (message "Restored %s files from trash done" (length mkd)))))
   
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a Trash directory.
