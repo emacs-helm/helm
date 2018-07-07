@@ -2958,6 +2958,12 @@ Return candidates prefixed with basename of `helm-input' first."
           (t actions))))
 
 (defun helm-restore-file-from-trash (_candidate)
+    "Restore marked-files from a Trash directory.
+
+The Trash directory should be a directory compliant with
+<http://freedesktop.org/wiki/Specifications/trash-spec> and each file
+should have its '*.trashinfo' correspondent file in Trash/info
+directory."
   (let* ((mkd (helm-marked-candidates :with-wildcard t))
          (default-directory (file-name-as-directory
                              helm-ff-default-directory))
@@ -2992,11 +2998,9 @@ Return candidates prefixed with basename of `helm-input' first."
       (message "Restored %s files from trash done" (length mkd)))))
   
 (defun helm-restore-file-from-trash-1 (file trashed-files)
-  "Restore FILE from a Trash directory.
-
-The Trash directory should be a directory compliant with
-<http://freedesktop.org/wiki/Specifications/trash-spec> and FILE should
-have its '*.trashinfo' correspondent file in Trash/info directory."
+  "Restore FILE from a trash directory.
+Arg TRASHED-FILES is the list of files in the trash directory obtained
+with 'trash-list' command."
   (let ((info-file (concat (helm-reduce-file-name file 2)
                            "info/"
                            (helm-basename file)
