@@ -2925,7 +2925,7 @@ Return candidates prefixed with basename of `helm-input' first."
                 (executable-find "trash"))
            (helm-append-at-nth
             actions
-            '(("Restore file from trash" . helm-restore-file-from-trash))
+            '(("Restore file(s) from trash" . helm-restore-file-from-trash))
             1))
           ((and helm--url-regexp
                 (not (string-match-p helm--url-regexp str-at-point))
