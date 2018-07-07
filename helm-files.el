@@ -2963,15 +2963,31 @@ Return candidates prefixed with basename of `helm-input' first."
                              helm-ff-default-directory))
          (trashed-files (with-temp-buffer
                           (process-file "trash-list" nil t nil)
-                          (split-string (buffer-string) "\n"))))
+                          (split-string (buffer-string) "\n")))
+         errors)
     (when trashed-files
       (with-helm-display-marked-candidates
         helm-marked-buffer-name
         (mapcar 'helm-basename mkd)
-        (when (y-or-n-p (format "Really restore `%s' files from trash? "
+        (when (y-or-n-p (format "Restore %s files from trash? "
                                 (length mkd)))
           (cl-loop for f in mkd do
-                   (helm-restore-file-from-trash-1 f trashed-files)))))))
+                   (condition-case err
+                       (helm-restore-file-from-trash-1 f trashed-files)
+                     (error (push (format "%s" (cadr err)) errors)
+                            nil))))))
+    (when errors
+      (display-warning 'helm
+                       (with-temp-buffer
+                         (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
+                                         (current-time)))
+                         (insert (format
+                                  "Failed to restore %s/%s files from trash\n"
+                                  (length errors) (length mkd)))
+                         (insert (mapconcat 'identity errors "\n") "\n")
+                         (buffer-string))
+                       :error
+                       "*helm restore files*"))))
   
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a Trash directory.
@@ -2983,11 +2999,13 @@ have its '*.trashinfo' correspondent file in Trash/info directory."
                            "info/"
                            (helm-basename file)
                            ".trashinfo"))
-        (dest-file (helm-ff--get-dest-file-from-trash trashed-files
-                                                           file)))
-    (unless (or (file-exists-p dest-file) (null dest-file))
-      (rename-file file dest-file)
-      (delete-file info-file))))
+        (dest-file (helm-ff--get-dest-file-from-trash
+                    trashed-files file)))
+    (cl-assert (not (file-exists-p dest-file)) nil
+               (format "File `%s' already exists" dest-file))
+    (cl-assert dest-file nil "No such file in trash")
+    (rename-file file dest-file)
+    (delete-file info-file)))
 
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
   (cl-loop for f in trashed-files
