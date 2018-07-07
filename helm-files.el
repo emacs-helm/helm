@@ -2957,35 +2957,48 @@ Return candidates prefixed with basename of `helm-input' first."
             actions '(("Pdfgrep File(s)" . helm-ff-pdfgrep)) 4))
           (t actions))))
 
-(defun helm-restore-file-from-trash (file)
+(defun helm-restore-file-from-trash (_candidate)
+  (let* ((mkd (helm-marked-candidates :with-wildcard t))
+         (default-directory (file-name-as-directory
+                             helm-ff-default-directory))
+         (trashed-files (with-temp-buffer
+                          (process-file "trash-list" nil t nil)
+                          (split-string (buffer-string) "\n"))))
+    (when trashed-files
+      (with-helm-display-marked-candidates
+        helm-marked-buffer-name
+        (mapcar 'helm-basename mkd)
+        (when (y-or-n-p (format "Really restore `%s' files from trash? "
+                                (length mkd)))
+          (cl-loop for f in mkd do
+                   (helm-restore-file-from-trash-1 f trashed-files)))))))
+  
+(defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a Trash directory.
 
 The Trash directory should be a directory compliant with
 <http://freedesktop.org/wiki/Specifications/trash-spec> and FILE should
 have its '*.trashinfo' correspondent file in Trash/info directory."
-  (let* ((default-directory (file-name-as-directory
-                             helm-ff-default-directory))
-         (trashed-files (with-temp-buffer
-                          (process-file "trash-list" nil t nil)
-                          (split-string (buffer-string) "\n")))
-         (info-file (concat (helm-reduce-file-name file 2)
-                            "info/"
-                            (helm-basename file)
-                            ".trashinfo")))
-    (cl-assert (file-exists-p info-file)
-               nil "Unknow file or directory `%s'" info-file)
-    (when (and trashed-files
-               (y-or-n-p (format "Really restore `%s' from trash? "
-                                 (abbreviate-file-name file))))
-      (rename-file
-       file
-       (replace-regexp-in-string
-        "\\`\\([0-9]\\{2,4\\}[-:][0-9]\\{2\\}[:-][0-9]\\{2\\} \\)\\{2\\}"
-        ""
-        (completing-read (format "Restore `%s' to: "
-                                 (abbreviate-file-name file))
-                         trashed-files)))
+  (let ((info-file (concat (helm-reduce-file-name file 2)
+                           "info/"
+                           (helm-basename file)
+                           ".trashinfo"))
+        (dest-file (helm-ff--get-dest-file-from-trash trashed-files
+                                                           file)))
+    (unless (or (file-exists-p dest-file) (null dest-file))
+      (rename-file file dest-file)
       (delete-file info-file))))
+
+(defun helm-ff--get-dest-file-from-trash (trashed-files file)
+  (cl-loop for f in trashed-files
+           when (string-match
+                 (concat (regexp-quote (helm-basename file))
+                         "\\'")
+                 f)
+           return
+           (replace-regexp-in-string
+            "\\`\\([0-9]\\{2,4\\}[-:][0-9]\\{2\\}[:-][0-9]\\{2\\} \\)\\{2\\}"
+            "" f)))
 
 (defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
