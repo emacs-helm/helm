@@ -2974,7 +2974,7 @@ directory."
     (when trashed-files
       (with-helm-display-marked-candidates
         helm-marked-buffer-name
-        (mapcar 'helm-basename mkd)
+        (helm-ff--count-and-collect-dups (mapcar 'helm-basename mkd))
         (when (y-or-n-p (format "Restore %s files from trash? "
                                 (length mkd)))
           (message "Restoring files from trash...")
