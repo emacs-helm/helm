@@ -57,13 +57,43 @@
 
 
 ;;; Latex completion
+;;
+;; Test
+;; (setq LaTeX-math-menu '("Math"
+;; ["foo" val0 t]
+;; ("bar"
+;; ["baz" val1 t])
+;; ("aze"
+;; ["zer" val2 t])
+;; ("AMS"
+;; ("rec"
+;; ["fer" val3 t])
+;; ("rty"
+;; ["der" val4 t]))
+;; ("ABC"
+;; ("xcv"
+;; ["sdf" val5 t])
+;; ("dfg"
+;; ["fgh" val6 t]))))
+;; (helm-latex-math-candidates)
+;; =>
+;; (("foo" . val0)
+;; ("baz" . val1)
+;; ("zer" . val2)
+;; ("fer" . val3)
+;; ("der" . val4)
+;; ("sdf" . val5)
+;; ("fgh" . val6))
+
 (defvar LaTeX-math-menu)
 (defun helm-latex-math-candidates ()
-  "Collect candidates for latex math completion."
-  (cl-loop for i in (cddr LaTeX-math-menu)
-        for elm = (cl-loop for s in i when (vectorp s)
-                        collect (cons (aref s 0) (aref s 1)))
-        append elm))
+  (cl-labels ((helm-latex--math-collect (L)
+                (cond ((vectorp L)
+                       (list (cons (aref L 0) (aref L 1))))
+                      ((listp L)
+                       (cl-loop for a in L nconc
+                                (helm-latex--math-collect a))))))
+    (helm-latex--math-collect LaTeX-math-menu)))
 
 (defvar helm-source-latex-math
   (helm-build-sync-source "Latex Math Menu"
