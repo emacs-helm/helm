@@ -2994,7 +2994,7 @@ directory."
                            (insert (mapconcat 'identity errors "\n") "\n")
                            (buffer-string))
                          :error
-                         "*helm restore files*")
+                         "*helm restore warnings*")
       (message "Restored %s files from trash done" (length mkd)))))
   
 (defun helm-restore-file-from-trash-1 (file trashed-files)
