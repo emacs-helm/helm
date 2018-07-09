@@ -1609,12 +1609,34 @@ You can refile one or more headings at a time.
 
 To refile one heading, move the point to the entry you want to refile and run
 \\[helm-org-in-buffer-headings].  Then select the heading you want to refile to
-and press \\[C-c w] or select the refile action from the actions menu.
+and press \\<helm-org-headings-map>\\[helm-org-run-refile-heading-to] or select the refile action from the actions menu.
 
 To refile multiple headings, run \\[helm-org-in-buffer-headings] and mark the
 headings you want to refile.  Then select the heading you want to refile to
-\(without marking it) and press \\[C-c w] or select the refile action from the
+\(without marking it) and press \\<helm-org-headings-map>\\[helm-org-run-refile-heading-to] or select the refile action from the
 actions menu.
+
+*** Tags completion
+
+Tags completion use `completing-read-multiple', perhaps have a
+look at its docstring.
+
+**** Single tag
+
+From an org heading hit C-c C-c which provide a
+\"Tags\" prompt, then hit TAB and RET if you want to enter an
+existing tag or write a new tag in prompt.  At this point you end
+up with an entry in your prompt, if you enter RET, the entry is
+added as tag in your org header.
+
+**** Multiple tags
+
+If you want to add more tag to your org header, add a separator[1] after
+your tag and write a new tag or hit TAB to find another existing
+tag, and so on until you have all the tags you want
+e.g \"foo,bar,baz\" then press RET to finally add the tags to your
+org header.
+Note: [1] A separator can be a comma, a colon i.e. [,:] or a space.
 
 ** Commands
 \\<helm-org-headings-map>
