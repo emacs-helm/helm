@@ -2959,6 +2959,10 @@ Return candidates prefixed with basename of `helm-input' first."
           (t actions))))
 
 (defun helm-ff-trash-action (fn names &rest args)
+  "Execute a trash action FN on marked files.
+
+Arg NAMES is a list of strings to pass to messages
+e.g. '(\"delete\" \"deleting\"), ARGS are other args to be passed to FN."
   (let ((mkd (helm-marked-candidates))
         errors)
     (with-helm-display-marked-candidates
@@ -2989,7 +2993,12 @@ Return candidates prefixed with basename of `helm-input' first."
                (capitalize (cadr names)) (length mkd)))))
 
 (defun helm-ff-trash-rm (_candidate)
-  "Delete marked-files from a Trash directory."
+  "Delete marked-files from a Trash directory.
+
+The Trash directory should be a directory compliant with
+<http://freedesktop.org/wiki/Specifications/trash-spec> and each file
+should have its '*.trashinfo' correspondent file in Trash/info
+directory."
   (helm-ff-trash-action 'helm-ff-trash-rm-1 '("delete" "deleting")))
 
 (defun helm-restore-file-from-trash (_candidate)
