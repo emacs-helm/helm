@@ -862,6 +862,11 @@ On GNULinux distribution, when navigating to a Trash directory you
 can restore any file in ..Trash/files directory with the 'Restore
 from trash' action you will find in action menu (needs the
 trash-cli package installed).
+You can as well delete files from Trash directories with the 'delete files from trash'
+action.
+
+Tip: Navigate to your Trash/files directories with `helm-find-files' and set a bookmark
+there with \\<helm-find-files-map>\\[helm-ff-bookmark-set] for fast access to Trash.
 
 _WARNING:_
 
@@ -933,7 +938,9 @@ with trash-list until you log in as root.
 \\[helm-ff-run-toggle-basename]\t\tToggle basename/fullpath.
 \\[helm-ff-run-find-file-as-root]\t\tFind file as root.
 \\[helm-ff-run-find-alternate-file]\t\tFind alternate file.
-\\[helm-ff-run-insert-org-link]\t\tInsert org link.")
+\\[helm-ff-run-insert-org-link]\t\tInsert org link.
+\\[helm-ff-bookmark-set]\t\tSet bookmark to current directory.
+\\[helm-find-files-toggle-to-bookmark]\t\tJump to bookmark list.")
 
 ;;; Help for `helm-read-file-name'
 ;;
