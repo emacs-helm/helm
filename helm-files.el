@@ -3013,7 +3013,8 @@ directory."
          (trashed-files (with-temp-buffer
                           (process-file "trash-list" nil t nil)
                           (split-string (buffer-string) "\n"))))
-    (helm-ff-trash-action 'helm-restore-file-from-trash-1 '("restore" "restoring")
+    (helm-ff-trash-action 'helm-restore-file-from-trash-1
+                          '("restore" "restoring")
                           trashed-files)))
 
 (defun helm-ff-trash-rm-1 (file)
