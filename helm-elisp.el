@@ -95,13 +95,17 @@ fuzzy completion is not available in `completion-at-point'."
   :type '(repeat (choice symbol)))
 
 (defcustom helm-show-completion-display-function
-  #'helm-show-completion-default-display-function
+  (if (window-system)
+      #'helm-display-buffer-in-own-frame
+    #'helm-show-completion-default-display-function)
   "The function used to display helm completion buffer.
 
 This function is used by `with-helm-show-completion', when nil
 fallback to `helm-default-display-buffer'.
-If you want to have completion displayed in a separate frame, use
-`helm-display-buffer-in-own-frame' as value."
+
+Default is to use a separate frame on `window-system' and
+`helm-show-completion-default-display-function' on non graphic
+display."
   :group 'helm-elisp
   :type 'function)
 
