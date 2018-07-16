@@ -2629,7 +2629,7 @@ Note that only existing directories are saved here."
              (access             (cl-getf all :access-time))
              (ext                (helm-get-default-program-for-file candidate))
              (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
-        (if (and (window-system) tooltip-mode)
+        (if (and (display-graphic-p) tooltip-mode)
             (tooltip-show
              (concat
               (helm-basename candidate) "\n"
