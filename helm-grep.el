@@ -1573,7 +1573,7 @@ When WITH-TYPES is non-nil provide completion on AG types."
 (defvar helm-source-grep-git nil)
 
 (defcustom helm-grep-git-grep-command
-  "git --no-pager grep -n%cH --color=always --exclude-standard --no-index --full-name -e %p -- %f"
+  "git --no-pager grep -n%cH --color=always --full-name -e %p -- %f"
   "The git grep default command line.
 The option \"--color=always\" can be used safely.
 The color of matched items can be customized in your .gitconfig
@@ -1581,7 +1581,8 @@ See `helm-grep-default-command' for more infos.
 
 The \"--exclude-standard\" and \"--no-index\" switches allow
 skipping unwanted files specified in ~/.gitignore_global
-and searching files not already staged.
+and searching files not already staged (not enabled by default).
+
 You have also to enable this in global \".gitconfig\" with
     \"git config --global core.excludesfile ~/.gitignore_global\"."
   :group 'helm-grep
