@@ -328,7 +328,8 @@ removed."
             (push it helm-dabbrev--already-tried))
         ;; Cycling is finished, ensure helm-dabbrev--cache have
         ;; finished to complete before continuing by blocking thread.
-        (when (fboundp 'thread-join)
+        (when (and (fboundp 'thread-join)
+                   (thread-alive-p helm-dabbrev--current-thread))
           (thread-join helm-dabbrev--current-thread))
         ;; If the length of candidates is only one when computed
         ;; that's mean the unique matched item have already been
