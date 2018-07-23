@@ -120,6 +120,8 @@ but the initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev--cache nil)
 (defvar helm-dabbrev--data nil)
 (cl-defstruct helm-dabbrev-info dabbrev limits iterator)
+(defvar helm-dabbrev--already-tried nil)
+(defvar helm-dabbrev--current-thread nil)
 
 
 (defun helm-dabbrev--buffer-list ()
@@ -250,8 +252,6 @@ removed."
        'helm-insert-completion-at-point
        beg end candidate))))
 
-(defvar helm-dabbrev--already-tried nil)
-(defvar helm-dabbrev--current-thread nil)
 ;;;###autoload
 (defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
