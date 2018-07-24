@@ -2330,8 +2330,8 @@ purpose."
     (unless (or (string= path "Invalid tramp file name")
                 invalid-basedir)      ; Leave  helm-pattern unchanged.
       (setq helm-ff-auto-update-flag  ; [1]
-            ;; Unless auto update is disabled at startup or
-            ;; interactively, start auto updating only at third char.
+            ;; Unless auto update is disabled start auto updating only
+            ;; at third char.
             (unless (or (null helm-ff--auto-update-state)
                         ;; But don't enable auto update when
                         ;; deleting backward.
