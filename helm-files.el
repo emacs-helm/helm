@@ -1435,10 +1435,10 @@ This doesn't replace inside the files, only modify filenames."
         (message "[Auto expansion disabled]")
         (sit-for 1) (message nil)
         (setq helm-ff--auto-update-state nil))
-      (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
-      (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
-      (message "[Auto expansion %s]"
-               (if helm-ff-auto-update-flag "enabled" "disabled"))))
+    (setq helm-ff-auto-update-flag (not helm-ff-auto-update-flag))
+    (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
+    (message "[Auto expansion %s]"
+             (if helm-ff-auto-update-flag "enabled" "disabled"))))
 
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
@@ -2332,8 +2332,7 @@ purpose."
       (setq helm-ff-auto-update-flag  ; [1]
             ;; Unless auto update is disabled at startup or
             ;; interactively, start auto updating only at third char.
-            (unless (or (null helm-ff-auto-update-initial-value)
-                        (null helm-ff--auto-update-state)
+            (unless (or (null helm-ff--auto-update-state)
                         ;; But don't enable auto update when
                         ;; deleting backward.
                         helm-ff--deleting-char-backward
