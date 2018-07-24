@@ -42,7 +42,7 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :group 'helm-dabbrev
   :type 'integer)
 
-(defcustom helm-dabbrev-candidates-number-limit 600
+(defcustom helm-dabbrev-candidates-number-limit 1000
   "Maximum number of candidates to collect before stopping.
 Higher this number is slower the computation of candidates will be."
   :group 'helm-dabbrev
@@ -303,18 +303,7 @@ removed."
                                  dabbrev helm-dabbrev-cycle-threshold)
                        when (and i (string-match
                                     (concat "^" (regexp-quote dabbrev)) i))
-                       collect i into selection
-                       when (and selection
-                                 (= (length selection)
-                                    helm-dabbrev-cycle-threshold))
-                       ;; When selection len reach
-                       ;; `helm-dabbrev-cycle-threshold'
-                       ;; return selection.
-                       return selection
-                       ;; selection len never reach
-                       ;; `helm-dabbrev-cycle-threshold'
-                       ;; return selection.
-                       finally return selection)))))
+                       collect i)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)
@@ -326,11 +315,6 @@ removed."
              (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (push it helm-dabbrev--already-tried))
-        ;; Cycling is finished, ensure helm-dabbrev--cache have
-        ;; finished to complete before continuing by blocking thread.
-        (when (and (fboundp 'thread-join)
-                   (thread-alive-p helm-dabbrev--current-thread))
-          (thread-join helm-dabbrev--current-thread))
         ;; If the length of candidates is only one when computed
         ;; that's mean the unique matched item have already been
         ;; inserted by the iterator, so no need to reinsert the old dabbrev,
@@ -338,7 +322,7 @@ removed."
         (let ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
                                (helm-dabbrev-info-dabbrev helm-dabbrev--data)
                                dabbrev)))
-          (unless (cdr (all-completions old-dabbrev helm-dabbrev--cache))
+          (unless (cdr (all-completions old-dabbrev helm-dabbrev--already-tried))
             (setq cycling-disabled-p t))
           ;; Iterator is now empty, reset dabbrev to initial value
           ;; and start helm completion.
@@ -348,6 +332,11 @@ removed."
             (setq helm-dabbrev--data nil)
             (delete-region (car limits) (point))
             (insert dabbrev))
+          ;; Cycling is finished, ensure helm-dabbrev--cache have
+          ;; finished to complete before continuing by blocking thread.
+          (when (and (fboundp 'thread-join)
+                     (thread-alive-p helm-dabbrev--current-thread))
+            (thread-join helm-dabbrev--current-thread))
           (with-helm-show-completion (car limits) (cdr limits)
             (unwind-protect
                  (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
