@@ -43,8 +43,11 @@ Have no effect when `helm-dabbrev-always-search-all' is non--nil."
   :type 'integer)
 
 (defcustom helm-dabbrev-candidates-number-limit 1000
-  "Maximum number of candidates to collect before stopping.
-Higher this number is slower the computation of candidates will be."
+  "Maximum number of candidates to collect.
+
+Higher this number is, slower the computation of candidates will be.
+You can use safely a higher value with emacs-26+.
+Note that this have nothing to do with `helm-candidate-number-limit'."
   :group 'helm-dabbrev
   :type 'integer)
 
