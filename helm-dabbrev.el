@@ -301,8 +301,8 @@ removed."
              (helm-iter-list
               (cl-loop for i in (helm-dabbrev--get-candidates
                                  dabbrev helm-dabbrev-cycle-threshold)
-                       when (and i (string-match
-                                    (concat "^" (regexp-quote dabbrev)) i))
+                       when (string-match-p
+                             (concat "^" (regexp-quote dabbrev)) i)
                        collect i)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
@@ -315,25 +315,25 @@ removed."
              (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (push it helm-dabbrev--already-tried))
-        ;; If the length of candidates is only one when computed
-        ;; that's mean the unique matched item have already been
-        ;; inserted by the iterator, so no need to reinsert the old dabbrev,
-        ;; just let helm exiting with "No expansion found".
         (let ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
                                (helm-dabbrev-info-dabbrev helm-dabbrev--data)
-                               dabbrev)))
-          (unless (cdr (all-completions old-dabbrev helm-dabbrev--already-tried))
-            (setq cycling-disabled-p t))
+                             dabbrev))
+              (only-one (null (cdr (all-completions
+                                    old-dabbrev helm-dabbrev--already-tried)))))
           ;; Iterator is now empty, reset dabbrev to initial value
           ;; and start helm completion.
-          (unless cycling-disabled-p
+          ;; If the length of candidates is only one when computed
+          ;; that's mean the unique matched item have already been
+          ;; inserted by the iterator, so no need to reinsert the old dabbrev,
+          ;; just let helm exiting with "No expansion found".
+          (unless (or only-one cycling-disabled-p)
             (setq dabbrev old-dabbrev
                   limits  (helm-dabbrev-info-limits helm-dabbrev--data))
             (setq helm-dabbrev--data nil)
             (delete-region (car limits) (point))
             (insert dabbrev))
-          ;; Cycling is finished, ensure helm-dabbrev--cache have
-          ;; finished to complete before continuing by blocking thread.
+          ;; Cycling is finished, block until helm-dabbrev--cache have
+          ;; finished to complete.
           (when (and (fboundp 'thread-join)
                      (thread-alive-p helm-dabbrev--current-thread))
             (thread-join helm-dabbrev--current-thread))
