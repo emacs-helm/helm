@@ -253,7 +253,7 @@ removed."
        beg end candidate))))
 
 ;;;###autoload
-(defun helm-dabbrev ()
+(cl-defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
   (interactive)
   (let ((dabbrev (helm-thing-before-point nil helm-dabbrev-separator-regexp))
@@ -337,6 +337,9 @@ removed."
           (when (and (fboundp 'thread-join)
                      (thread-alive-p helm-dabbrev--current-thread))
             (thread-join helm-dabbrev--current-thread))
+          (when (and (null cycling-disabled-p) only-one)
+            (cl-return-from helm-dabbrev 
+              (message "[Helm-dabbrev: No expansion found]")))
           (with-helm-show-completion (car limits) (cdr limits)
             (unwind-protect
                  (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
