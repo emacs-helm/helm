@@ -267,7 +267,7 @@ removed."
         (helm-execute-action-at-once-if-one t)
         (helm-quit-if-no-candidate
          (lambda ()
-             (message "[Helm-dabbrev: No expansion found]"))))
+           (message "[Helm-dabbrev: No expansion found]"))))
     (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
                nil "[Helm-dabbrev: Nothing found before point]")
     (when (and
@@ -295,7 +295,7 @@ removed."
                    (setq helm-dabbrev--cache
                          (helm-dabbrev--get-candidates dabbrev)))))
         (setq helm-dabbrev--cache
-                   (helm-dabbrev--get-candidates dabbrev)))
+              (helm-dabbrev--get-candidates dabbrev)))
       (setq helm-dabbrev--data
             (make-helm-dabbrev-info
              :dabbrev dabbrev
@@ -315,6 +315,8 @@ removed."
           (progn
             (helm-insert-completion-at-point
              (car (helm-dabbrev-info-limits helm-dabbrev--data))
+             ;; END is the end of the previous inserted string, not
+             ;; the end (apart for first insertion) of the initial string.
              (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (push it helm-dabbrev--already-tried))
