@@ -315,11 +315,11 @@ removed."
              (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (push it helm-dabbrev--already-tried))
-        (let ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
-                               (helm-dabbrev-info-dabbrev helm-dabbrev--data)
-                             dabbrev))
-              (only-one (null (cdr (all-completions
-                                    old-dabbrev helm-dabbrev--already-tried)))))
+        (let* ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
+                                (helm-dabbrev-info-dabbrev helm-dabbrev--data)
+                              dabbrev))
+               (only-one (null (cdr (all-completions
+                                     old-dabbrev helm-dabbrev--already-tried)))))
           ;; Iterator is now empty, reset dabbrev to initial value
           ;; and start helm completion.
           ;; If the length of candidates is only one when computed
