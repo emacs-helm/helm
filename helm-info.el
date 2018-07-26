@@ -223,25 +223,25 @@ Info files are made available."
   (helm-build-sync-source "Info Pages"
     :init #'helm-info-pages-init
     :candidates (lambda () helm-info--pages-cache)
-    :action '(("Show with Info" .(lambda (node-str)
-                                  (info (replace-regexp-in-string
-                                         "^[^:]+: " "" node-str)))))
+    :action '(("Show with Info" .
+               (lambda (node-str)
+                 (info (replace-regexp-in-string
+                        "^[^:]+: " "" node-str)))))
     :requires-pattern 2)
   "Helm source for Info pages.")
 
 (defun helm-info-pages-init ()
   "Collect candidates for initial Info node Top."
-  (if helm-info--pages-cache
-      helm-info--pages-cache
-    (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\.")
-          topics)
-      (with-temp-buffer
-        (Info-find-node "dir" "top")
-        (goto-char (point-min))
-        (while (re-search-forward info-topic-regexp nil t)
-          (push (match-string-no-properties 1) topics))
-        (kill-buffer))
-      (setq helm-info--pages-cache topics))))
+  (or helm-info--pages-cache
+      (let ((info-topic-regexp "\\* +\\([^:]+: ([^)]+)[^.]*\\)\\."))
+        (save-selected-window
+          (info "dir" " *helm info temp buffer*")
+          (Info-find-node "dir" "top")
+          (goto-char (point-min))
+          (while (re-search-forward info-topic-regexp nil t)
+            (push (match-string-no-properties 1)
+                  helm-info--pages-cache))
+          (kill-buffer)))))
 
 ;;;###autoload
 (defun helm-info-at-point ()
