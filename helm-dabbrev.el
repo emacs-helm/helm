@@ -228,21 +228,20 @@ removed."
 
 (defun helm-dabbrev--get-candidates (abbrev &optional limit)
   (cl-assert abbrev nil "[No Match]")
-  (with-current-buffer (current-buffer)
-    (let* ((dabbrev-get (lambda (str all-bufs)
-                            (helm-dabbrev--collect
-                             str (or limit helm-dabbrev-candidates-number-limit)
-                             (cl-case helm-dabbrev-case-fold-search
-                               (smart (helm-set-case-fold-search-1 abbrev))
-                               (t helm-dabbrev-case-fold-search))
-                             all-bufs)))
-           (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
-      (if (and (not helm-dabbrev-always-search-all)
-               (<= (length lst) helm-dabbrev-max-length-result))
-          ;; Search all but don't recompute current-buffer.
-          (let ((helm-dabbrev--exclude-current-buffer-flag t))
-            (append lst (funcall dabbrev-get abbrev 'all-bufs)))
-        lst))))
+  (let* ((dabbrev-get (lambda (str all-bufs)
+                        (helm-dabbrev--collect
+                         str (or limit helm-dabbrev-candidates-number-limit)
+                         (cl-case helm-dabbrev-case-fold-search
+                           (smart (helm-set-case-fold-search-1 abbrev))
+                           (t helm-dabbrev-case-fold-search))
+                         all-bufs)))
+         (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
+    (if (and (not helm-dabbrev-always-search-all)
+             (<= (length lst) helm-dabbrev-max-length-result))
+        ;; Search all but don't recompute current-buffer.
+        (let ((helm-dabbrev--exclude-current-buffer-flag t))
+          (append lst (funcall dabbrev-get abbrev 'all-bufs)))
+      lst)))
 
 (defun helm-dabbrev-default-action (candidate)
   (with-helm-current-buffer
