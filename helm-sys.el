@@ -408,7 +408,9 @@ Show actions only on line starting by a PID."
 ;;
 (defvar helm-source-emacs-process
   (helm-build-sync-source "Emacs Process"
-    :init (lambda () (list-processes--refresh))
+    :init (lambda ()
+            (let (tabulated-list-use-header-line)
+              (list-processes--refresh)))
     :candidates (lambda () (mapcar #'process-name (process-list)))
     :persistent-action (lambda (elm)
                          (delete-process (get-process elm))
