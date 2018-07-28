@@ -226,21 +226,24 @@ removed."
          sep-regexp ""
          (match-string-no-properties 99))))))
 
+(defun helm-dabbrev--get-candidates-1 (str all-bufs limit)
+  (helm-dabbrev--collect
+   str (or limit helm-dabbrev-candidates-number-limit)
+   (cl-case helm-dabbrev-case-fold-search
+     (smart (helm-set-case-fold-search-1 str))
+     (t helm-dabbrev-case-fold-search))
+   all-bufs))
+
 (defun helm-dabbrev--get-candidates (abbrev &optional limit)
   (cl-assert abbrev nil "[No Match]")
-  (let* ((dabbrev-get (lambda (str all-bufs)
-                        (helm-dabbrev--collect
-                         str (or limit helm-dabbrev-candidates-number-limit)
-                         (cl-case helm-dabbrev-case-fold-search
-                           (smart (helm-set-case-fold-search-1 abbrev))
-                           (t helm-dabbrev-case-fold-search))
-                         all-bufs)))
-         (lst (funcall dabbrev-get abbrev helm-dabbrev-always-search-all)))
+  (let ((lst (helm-dabbrev--get-candidates-1
+              abbrev helm-dabbrev-always-search-all limit)))
     (if (and (not helm-dabbrev-always-search-all)
              (<= (length lst) helm-dabbrev-max-length-result))
         ;; Search all but don't recompute current-buffer.
         (let ((helm-dabbrev--exclude-current-buffer-flag t))
-          (append lst (funcall dabbrev-get abbrev 'all-bufs)))
+          (append lst (helm-dabbrev--get-candidates-1
+                       abbrev 'all-bufs limit)))
       lst)))
 
 (defun helm-dabbrev-default-action (candidate)
@@ -287,6 +290,11 @@ removed."
     ;; at startup.
     (unless (or cycling-disabled-p
                 (helm-dabbrev-info-p helm-dabbrev--data))
+      ;; FIXME: For some reason the thread is blocking after the first
+      ;; insertion and we have to wait the function building cache
+      ;; finish before insertion of second candidate, why? Is is an
+      ;; emacs bug? This is reproductible when the limit is high and
+      ;; helm is collecting a huge list of candidates.
       (if (fboundp 'make-thread)
           (setq helm-dabbrev--current-thread
                 (make-thread
@@ -319,13 +327,13 @@ removed."
              (cdr limits) it)
             ;; Move already tried candidates to end of list.
             (push it helm-dabbrev--already-tried))
+        ;; Iterator is now empty, reset dabbrev to initial value
+        ;; and start helm completion.
         (let* ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
                                 (helm-dabbrev-info-dabbrev helm-dabbrev--data)
                               dabbrev))
                (only-one (null (cdr (all-completions
                                      old-dabbrev helm-dabbrev--already-tried)))))
-          ;; Iterator is now empty, reset dabbrev to initial value
-          ;; and start helm completion.
           ;; If the length of candidates is only one when computed
           ;; that's mean the unique matched item have already been
           ;; inserted by the iterator, so no need to reinsert the old dabbrev,
