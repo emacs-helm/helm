@@ -34,14 +34,6 @@ will occur if the length of candidates is <= than
   :group 'helm-dabbrev
   :type 'boolean)
 
-(defcustom helm-dabbrev-max-length-result 20
-  "Max length of candidates before searching in all buffers.
-If number of candidates found in current-buffer is <= to this,
-search in all buffers.
-Have no effect when `helm-dabbrev-always-search-all' is non--nil."
-  :group 'helm-dabbrev
-  :type 'integer)
-
 (defcustom helm-dabbrev-candidates-number-limit 1000
   "Maximum number of candidates to collect.
 
@@ -119,7 +111,6 @@ but the initial search for all candidates in buffer(s)."
     map))
 
 ;; Internal
-(defvar helm-dabbrev--exclude-current-buffer-flag nil)
 (defvar helm-dabbrev--cache nil)
 (defvar helm-dabbrev--data nil)
 (cl-defstruct helm-dabbrev-info dabbrev limits iterator)
@@ -128,12 +119,10 @@ but the initial search for all candidates in buffer(s)."
 
 
 (defun helm-dabbrev--buffer-list ()
-  (cl-loop with lst = (buffer-list)
-        for buf in (if helm-dabbrev--exclude-current-buffer-flag
-                       (cdr lst) lst)
-        unless (cl-loop for r in helm-dabbrev-ignored-buffers-regexps
-                     thereis (string-match r (buffer-name buf)))
-        collect buf))
+  (cl-loop for buf in (buffer-list)
+           unless (cl-loop for r in helm-dabbrev-ignored-buffers-regexps
+                           thereis (string-match r (buffer-name buf)))
+           collect buf))
 
 (defun helm-dabbrev--same-major-mode-p (start-buffer)
   "Decide if current-buffer is related to START-BUFFER."
@@ -226,25 +215,14 @@ removed."
          sep-regexp ""
          (match-string-no-properties 99))))))
 
-(defun helm-dabbrev--get-candidates-1 (str all-bufs limit)
+(defun helm-dabbrev--get-candidates (dabbrev &optional limit)
+  (cl-assert dabbrev nil "[No Match]")
   (helm-dabbrev--collect
-   str (or limit helm-dabbrev-candidates-number-limit)
+   dabbrev (or limit helm-dabbrev-candidates-number-limit)
    (cl-case helm-dabbrev-case-fold-search
-     (smart (helm-set-case-fold-search-1 str))
+     (smart (helm-set-case-fold-search-1 dabbrev))
      (t helm-dabbrev-case-fold-search))
-   all-bufs))
-
-(defun helm-dabbrev--get-candidates (abbrev &optional limit)
-  (cl-assert abbrev nil "[No Match]")
-  (let ((lst (helm-dabbrev--get-candidates-1
-              abbrev helm-dabbrev-always-search-all limit)))
-    (if (and (not helm-dabbrev-always-search-all)
-             (<= (length lst) helm-dabbrev-max-length-result))
-        ;; Search all but don't recompute current-buffer.
-        (let ((helm-dabbrev--exclude-current-buffer-flag t))
-          (append lst (helm-dabbrev--get-candidates-1
-                       abbrev 'all-bufs limit)))
-      lst)))
+   helm-dabbrev-always-search-all))
 
 (defun helm-dabbrev-default-action (candidate)
   (with-helm-current-buffer
