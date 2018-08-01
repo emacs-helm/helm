@@ -269,19 +269,6 @@ removed."
     ;; at startup.
     (unless (or cycling-disabled-p
                 (helm-dabbrev-info-p helm-dabbrev--data))
-      ;; FIXME: For some reason the thread is blocking after the first
-      ;; insertion and we have to wait the function building cache
-      ;; finish before insertion of second candidate, why? Is is an
-      ;; emacs bug? This is reproductible when the limit is high and
-      ;; helm is collecting a huge list of candidates.
-      (if (fboundp 'make-thread)
-          (setq helm-dabbrev--current-thread
-                (make-thread
-                 (lambda ()
-                   (setq helm-dabbrev--cache
-                         (helm-dabbrev--get-candidates dabbrev)))))
-        (setq helm-dabbrev--cache
-              (helm-dabbrev--get-candidates dabbrev)))
       (setq helm-dabbrev--data
             (make-helm-dabbrev-info
              :dabbrev dabbrev
@@ -292,7 +279,20 @@ removed."
                                  dabbrev helm-dabbrev-cycle-threshold)
                        when (string-match-p
                              (concat "^" (regexp-quote dabbrev)) i)
-                       collect i)))))
+                       collect i))))
+      ;; FIXME: For some reason the thread is blocking after the first
+      ;; insertion and we have to wait the function building cache
+      ;; finish before insertion of second candidate, why? Is it an
+      ;; emacs bug? This is reproductible when the limit is high and
+      ;; helm is collecting a huge list of candidates.
+      (if (fboundp 'make-thread)
+          (setq helm-dabbrev--current-thread
+                (make-thread
+                 (lambda ()
+                   (setq helm-dabbrev--cache
+                         (helm-dabbrev--get-candidates dabbrev)))))
+        (setq helm-dabbrev--cache
+              (helm-dabbrev--get-candidates dabbrev))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)
