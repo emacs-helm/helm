@@ -318,7 +318,7 @@ removed."
                               dabbrev))
                (only-one (null (cdr (all-completions
                                      old-dabbrev helm-dabbrev--already-tried)))))
-          (unless helm-dabbrev--current-thread
+          (unless helm-dabbrev-use-thread
             (message "Computing helm-dabbrev candidates...")
             (setq helm-dabbrev--cache
                   (helm-dabbrev--get-candidates old-dabbrev))
