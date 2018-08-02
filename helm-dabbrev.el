@@ -99,7 +99,9 @@ but the initial search for all candidates in buffer(s)."
 (defcustom helm-dabbrev-use-thread nil
   "[EXPERIMENTAL] Compute candidates asynchronously when non nil.
 
-This is not fully working at the moment."
+This is not fully working at the moment due to thread implementation
+in emacs which is a joke for now, working only for small
+demonstrations but not for real life code."
   :group 'helm-dabbrev
   :type 'boolean)
 
@@ -270,10 +272,6 @@ removed."
     ;; thread here.
     (when cycling-disabled-p
       (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
-    ;; The idea here is to compute only the candidates needed to cycle
-    ;; and while cycling, compute the whole list in background with a
-    ;; thread so that user doesn't have to wait candidates are ready
-    ;; at startup.
     (unless (or cycling-disabled-p
                 (helm-dabbrev-info-p helm-dabbrev--data))
       (setq helm-dabbrev--data
@@ -287,11 +285,12 @@ removed."
                        when (string-match-p
                              (concat "^" (regexp-quote dabbrev)) i)
                        collect i))))
-      ;; FIXME: For some reason the thread is blocking after the first
-      ;; insertion and we have to wait the function building cache
-      ;; finish before insertion of second candidate, why? Is it an
-      ;; emacs bug? This is reproductible when the limit is high and
-      ;; helm is collecting a huge list of candidates.
+      ;; Thread is released as soon as helm-dabbrev exits after first
+      ;; insertion so this is unusable for now, keep it like this for
+      ;; now hooping the situation with threads will be improved in
+      ;; emacs. The idea is to compute whole list of candidates in
+      ;; background while cycling with the first
+      ;; helm-dabbrev-cycle-threshold ones.
       (when (and (fboundp 'make-thread) helm-dabbrev-use-thread)
         (setq helm-dabbrev--current-thread
               (make-thread
@@ -319,10 +318,9 @@ removed."
                (only-one (null (cdr (all-completions
                                      old-dabbrev helm-dabbrev--already-tried)))))
           (unless helm-dabbrev-use-thread
-            (message "Computing helm-dabbrev candidates...")
+            (message "Waiting for helm-dabbrev candidates...")
             (setq helm-dabbrev--cache
-                  (helm-dabbrev--get-candidates old-dabbrev))
-            (message "Computing helm-dabbrev candidates done"))
+                  (helm-dabbrev--get-candidates old-dabbrev)))
           ;; If the length of candidates is only one when computed
           ;; that's mean the unique matched item have already been
           ;; inserted by the iterator, so no need to reinsert the old dabbrev,
