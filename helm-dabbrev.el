@@ -97,11 +97,21 @@ but the initial search for all candidates in buffer(s)."
           (other :tag "Smart" 'smart)))
 
 (defcustom helm-dabbrev-use-thread nil
-  "[EXPERIMENTAL] Compute candidates asynchronously when non nil.
+  "[EXPERIMENTAL] Compute candidates asynchronously (partially) when non nil.
 
-This is not fully working at the moment due to thread implementation
-in emacs which is a joke for now, working only for small
-demonstrations but not for real life code."
+The idea is to compute candidates while cycling the first ones, so
+this is available only if `helm-dabbrev-cycle-threshold' is not 0 or
+nil, also it is available only on emacs-26+ (needs threads).
+
+This is reasonably working when you don't have to complete a huge list
+of candidates, otherwise you will have a small delay after the first cycle
+because thread is released unexpectedly when helm-dabbrev exit after
+first insertion.
+
+IOW keep `helm-dabbrev-candidates-number-limit' to a reasonable
+value (I don't!) and give enough prefix before completing e.g. for
+completing \"helm-dabbrev\" use \"helm-d\" and not \"he\" if you want
+to use this."
   :group 'helm-dabbrev
   :type 'boolean)
 
