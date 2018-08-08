@@ -221,7 +221,7 @@ nothing to CANDIDATES."
           (search-fn (lambda ()
                        (re-search-forward
                         org-complex-heading-regexp nil t)))
-          (file (unless nofname
+          (file (unless (or (bufferp filename) nofname)
                   (concat (helm-basename filename) ":"))))
       (when parents
         (add-function :around (var search-fn)
