@@ -116,9 +116,11 @@ to use this."
   :type 'boolean)
 
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
-(make-obsolete-variable 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp "2.8.3")
+(make-obsolete-variable 'helm-dabbrev--regexp
+                        'helm-dabbrev-separator-regexp "2.8.3")
 ;; Check for beginning of line should happen last (^\n\\|^). 
-(defvar helm-dabbrev-separator-regexp "\\s-\\|\t\\|[(\\[\\{\"'`=<$;,@.#+]\\|\\s\\\\|^\n\\|^"
+(defvar helm-dabbrev-separator-regexp
+  "\\s-\\|\t\\|[(\\[\\{\"'`=<$;,@.#+]\\|\\s\\\\|^\n\\|^"
   "Regexp matching the start of a dabbrev candidate.")
 
 
@@ -259,8 +261,10 @@ removed."
 (cl-defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
   (interactive)
-  (let ((dabbrev (helm-thing-before-point nil helm-dabbrev-separator-regexp))
-        (limits (helm-bounds-of-thing-before-point helm-dabbrev-separator-regexp))
+  (let ((dabbrev (helm-thing-before-point
+                  nil helm-dabbrev-separator-regexp))
+        (limits (helm-bounds-of-thing-before-point
+                 helm-dabbrev-separator-regexp))
         (enable-recursive-minibuffers t)
         (cycling-disabled-p (or (null helm-dabbrev-cycle-threshold)
                                 (zerop helm-dabbrev-cycle-threshold)))
@@ -326,7 +330,8 @@ removed."
                                 (helm-dabbrev-info-dabbrev helm-dabbrev--data)
                               dabbrev))
                (only-one (null (cdr (all-completions
-                                     old-dabbrev helm-dabbrev--already-tried)))))
+                                     old-dabbrev
+                                     helm-dabbrev--already-tried)))))
           (unless helm-dabbrev-use-thread
             (message "Waiting for helm-dabbrev candidates...")
             (setq helm-dabbrev--cache
@@ -352,16 +357,20 @@ removed."
               (message "[Helm-dabbrev: No expansion found]")))
           (with-helm-show-completion (car limits) (cdr limits)
             (unwind-protect
-                 (helm :sources (helm-build-in-buffer-source "Dabbrev Expand"
-                                  :data (cl-loop for cand in helm-dabbrev--cache
-                                                 unless (member cand helm-dabbrev--already-tried)
-                                                 collect cand into lst
-                                                 finally return (append lst helm-dabbrev--already-tried))
-                                  :persistent-action 'ignore
-                                  :persistent-help "DoNothing"
-                                  :keymap helm-dabbrev-map
-                                  :action 'helm-dabbrev-default-action
-                                  :group 'helm-dabbrev)
+                 (helm :sources
+                       (helm-build-in-buffer-source "Dabbrev Expand"
+                         :data
+                         (cl-loop for cand in helm-dabbrev--cache
+                                  unless
+                                  (member cand helm-dabbrev--already-tried)
+                                  collect cand into lst
+                                  finally return
+                                  (append lst helm-dabbrev--already-tried))
+                         :persistent-action 'ignore
+                         :persistent-help "DoNothing"
+                         :keymap helm-dabbrev-map
+                         :action 'helm-dabbrev-default-action
+                         :group 'helm-dabbrev)
                        :buffer "*helm dabbrev*"
                        :input (concat "^" dabbrev " ")
                        :resume 'noresume
