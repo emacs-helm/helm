@@ -247,6 +247,12 @@ Info files are made available."
 (defun helm-info-at-point ()
   "Preconfigured `helm' for searching info at point."
   (interactive)
+  (cl-loop for src in helm-info-default-sources
+           for name = (if (symbolp src)
+                          (assoc 'name (symbol-value src))
+                        (assoc 'name src))
+           unless name
+           do (warn "Couldn't build source `%S' without its info file" src))
   (helm :sources helm-info-default-sources
         :buffer "*helm info*"))
 
