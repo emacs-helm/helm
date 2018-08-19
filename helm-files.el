@@ -2449,7 +2449,7 @@ transformer."
                   ;; that we need an extra step to remove the quotes
                   ;; at the end which impact performances.
                   "ls -A -1 -F -b -Q | awk -v dir=%s '{print dir $1}'"
-                  default-directory)
+                  (shell-quote-argument default-directory))
                  nil t nil)
                 0)
         (goto-char (point-min))
