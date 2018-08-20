@@ -1377,7 +1377,7 @@ See `helm-exit-minibuffer' and `helm-keyboard-quit'.")
 (defvar helm--mode-line-string-real nil) ; The string to display in mode-line.
 (defvar helm-persistent-action-display-window nil)
 (defvar helm-marked-candidates nil
-  "Marked candadates.  List of \(source . real\) pair.")
+  "Marked candidates.  List of \(source . real\) pair.")
 (defvar helm--mode-line-display-prefarg nil)
 (defvar helm--temp-follow-flag nil
   "[INTERNAL] A simple flag to notify persistent action we are following.")
