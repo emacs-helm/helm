@@ -2330,16 +2330,14 @@ example, :candidate-number-limit is bound to
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
-  ;; Activate the advice for `tramp-read-passwd' and cua.
+  ;; Activate the advices.
   ;; Advices will be available only in >=emacs-24.4, but
   ;; allow compiling without errors on lower emacs.
   (when (fboundp 'advice-add)
     (advice-add 'tramp-read-passwd :around #'helm--suspend-read-passwd)
     (advice-add 'ange-ftp-get-passwd :around #'helm--suspend-read-passwd)
     (advice-add 'epa-passphrase-callback-function
-                :around #'helm--suspend-read-passwd)
-    (advice-add 'cua-delete-region :around #'cua-delete-region--advice)
-    (advice-add 'copy-region-as-kill :around #'copy-region-as-kill--advice))
+                :around #'helm--suspend-read-passwd))
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "any-prompt = %S" any-prompt)
   (helm-log "any-preselect = %S" any-preselect)
@@ -2355,15 +2353,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
         focus-follows-mouse
         mode-line-in-non-selected-windows
         (input-method-verbose-flag helm-input-method-verbose-flag)
-        (old--cua cua-mode)
         (helm--maybe-use-default-as-input
          (and (null any-input)
               (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
                   (cl-loop for s in (helm-normalize-sources any-sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
-    ;; cua-mode override local helm bindings.
-    ;; disable this stupid thing if enabled.
-    (and cua-mode (cua-mode -1))
     (unwind-protect
          (condition-case-unless-debug _v
              (let ( ;; `helm--source-name' is non-`nil'
@@ -2409,9 +2403,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       (when (fboundp 'advice-remove)
         (advice-remove 'tramp-read-passwd #'helm--suspend-read-passwd)
         (advice-remove 'ange-ftp-get-passwd #'helm--suspend-read-passwd)
-        (advice-remove 'epa-passphrase-callback-function #'helm--suspend-read-passwd)
-        (advice-remove 'cua-delete-region #'cua-delete-region--advice)
-        (advice-remove 'copy-region-as-kill #'copy-region-as-kill--advice))
+        (advice-remove 'epa-passphrase-callback-function #'helm--suspend-read-passwd))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
@@ -2420,7 +2412,6 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       ;; before running helm will not start with its old value.
       (setq helm-pattern "")
       (setq helm--ignore-errors nil)
-      (and old--cua (cua-mode 1))
       (helm-log-save-maybe))))
 
 
@@ -3289,16 +3280,6 @@ This is used to advice `tramp-read-passwd', `ange-ftp-get-passwd' and
        (apply old--fn args)
     (setq helm--reading-passwd-or-string nil)
     (setq helm-suspend-update-flag nil)))
-
-;; CUA workaround
-(defun cua-delete-region--advice (old--fn &rest args)
-  (ignore-errors
-    (apply old--fn args)))
-
-(defun copy-region-as-kill--advice (old--fn &rest args)
-  (if cua-mode
-      (ignore-errors (apply old--fn args))
-      (apply old--fn args)))
 
 (defun helm--maybe-update-keymap (&optional map)
   "Handle different keymaps in multiples sources.
