@@ -540,7 +540,7 @@ NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
-    (define-key map (kbd "<M-RET>")       'helm-cr-empty-string)
+    (define-key map (kbd "M-RET")         'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)

@@ -203,7 +203,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "M-a")       'helm-mark-all)
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
-    (define-key map (kbd "<C-M-SPC>") 'helm-buffers-mark-similar-buffers)
+    (define-key map (kbd "C-M-SPC")   'helm-buffers-mark-similar-buffers)
     map)
   "Keymap for buffer sources in helm.")
 
