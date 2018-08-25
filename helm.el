@@ -866,6 +866,11 @@ This option have no effect with emacs versions lower than 26."
   "Face used to highlight helm-header sign in left-margin."
   :group 'helm-faces)
 
+(defface helm-minibuffer-prompt
+  '((t (:inherit minibuffer-prompt)))
+  "Face used for the minibuffer/headline prompt (such as Pattern:) in helm."
+  :group 'helm-faces)
+
 
 ;;; Variables.
 ;;
@@ -3244,7 +3249,8 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                       (helm-print-error-messages))))))
                          ;; minibuffer has already been filled here.
                          (helm--update-header-line))
-                     (read-from-minibuffer (or any-prompt "pattern: ")
+                     (read-from-minibuffer (propertize (or any-prompt "pattern: ")
+                                                       'face 'helm-minibuffer-prompt)
                                            any-input helm-map
                                            nil hist tap
                                            helm-inherit-input-method))
