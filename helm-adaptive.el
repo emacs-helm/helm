@@ -179,8 +179,9 @@ Returns nil if `helm-adaptive-history-file' doesn't exist."
       (insert
        ";; -*- mode: emacs-lisp -*-\n"
        ";; History entries used for helm adaptive display.\n")
-      (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
-             (current-buffer))
+      (let (print-length print-level)
+        (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
+               (current-buffer)))
       (insert ?\n)
       (write-region (point-min) (point-max) helm-adaptive-history-file nil
                     (unless arg 'quiet)))))
