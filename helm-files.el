@@ -4389,7 +4389,8 @@ This is the starting point for nearly all actions you can do on files."
   (let* ((hist            (and arg helm-ff-history (helm-find-files-history nil)))
          (smart-input     (or hist (helm-find-files-initial-input)))
          (default-input   (expand-file-name (helm-current-directory)))
-         (input           (cond (helm-find-files-ignore-thing-at-point
+         (input           (cond ((and (null hist)
+                                      helm-find-files-ignore-thing-at-point)
                                  default-input)
                                 ((and (eq major-mode 'org-agenda-mode)
                                       org-directory
