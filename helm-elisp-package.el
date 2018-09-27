@@ -120,10 +120,9 @@
   (cl-loop with mkd = pkg-list
            for p in mkd
            for id = (get-text-property 0 'tabulated-list-id p)
-           do (package-install
-               (if (fboundp 'package-desc-name) id (car id)))
-           collect (if (fboundp 'package-desc-full-name) id (car id))
-           into installed-list
+           for pkg = (if (fboundp 'package-desc-name) id (car id))
+           do (package-install pkg)
+           collect pkg into installed-list
            finally do (if (fboundp 'package-desc-full-name)
                           (message (format "%d packages installed:\n(%s)"
                                            (length installed-list)
