@@ -1455,7 +1455,8 @@ This doesn't replace inside the files, only modify filenames."
     (setq helm-ff--deleting-char-backward t)
     (call-interactively
      (lookup-key (current-global-map)
-                 (read-kbd-macro "DEL")))))
+                 (read-kbd-macro "DEL")))
+    (helm--update-header-line)))
 (put 'helm-ff-delete-char-backward 'helm-only t)
 
 (defun helm-ff-delete-char-backward--exit-fn ()
