@@ -107,6 +107,18 @@ this source is accessible and properly loaded."
   "Separator for columns in buffer listing."
   :type 'string
   :group 'helm-buffers)
+
+(defcustom helm-buffer--pretty-names '((dired-mode . "Dired")
+                                       (lisp-interaction-mode . "Lisp Inter"))
+  "An alist specifying pretty names for modes.
+Most of the time buffer's `mode-name' is a string so no need to add it
+here as there is no need to compute it, but sometimes it may be a
+mode-line specification which may be costly to compute, in this case
+add here the pretty name as a string to avoid this costly computation.
+Also if some pretty names are too long you can add your own
+abbreviation here."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'helm-buffers)
 
 ;;; Faces
 ;;
@@ -242,10 +254,7 @@ Note that this variable is buffer-local.")
                                      (helm-attr 'candidates)
                                      helm-source-buffers-list))
                          maximize (length b) into len-buf
-                         maximize (length (with-current-buffer b
-                                            (if (stringp mode-name)
-                                                mode-name
-                                              (format-mode-line mode-name))))
+                         maximize (length (helm-buffer--format-mode-name b))
                          into len-mode
                          finally return (cons len-buf len-mode))))
     (unless (default-value 'helm-buffer-max-length)
@@ -361,9 +370,17 @@ See `ido-make-buffer-list' for more infos."
                  (format "(in `%s')" dir))
                'face face2)))))
 
+(defun helm-buffer--format-mode-name (buf)
+  "Prevent using `format-mode-line' as much as possible."
+  (with-current-buffer buf
+    (helm-acond ((assq major-mode helm-buffer--pretty-names)
+                 (cdr it))
+                ((stringp mode-name) mode-name)
+                (t (format-mode-line mode-name)))))
+
 (defun helm-buffer--details (buffer &optional details)
   (require 'dired)
-  (let* ((mode (with-current-buffer buffer (format-mode-line mode-name)))
+  (let* ((mode (helm-buffer--format-mode-name buffer))
          (buf (get-buffer buffer))
          (size (propertize (helm-buffer-size buf)
                            'face 'helm-buffer-size))
