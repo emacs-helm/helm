@@ -52,7 +52,10 @@
     (dired-do-copy . helm-read-file-name-handler-1)
     (dired-do-symlink . helm-read-file-name-handler-1)
     (dired-do-relsymlink . helm-read-file-name-handler-1)
-    (dired-do-hardlink . helm-read-file-name-handler-1))
+    (dired-do-hardlink . helm-read-file-name-handler-1)
+    (basic-save-buffer . helm-read-file-name-handler-1)
+    (write-file . helm-read-file-name-handler-1)
+    (write-region . helm-read-file-name-handler-1))
   "Completing read functions for specific Emacs commands.
 
 By default `helm-mode' use `helm-completing-read-default-handler' to
