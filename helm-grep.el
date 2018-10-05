@@ -28,6 +28,7 @@
 (declare-function helm-buffer-list "helm-buffers")
 (declare-function View-quit "view")
 (declare-function doc-view-goto-page "doc-view" (page))
+(declare-function pdf-view-goto-page "pdf-view" (page &optional window))
 (declare-function helm-mm-split-pattern "helm-multi-match")
 (declare-function helm--ansi-color-apply "helm-lib")
 (defvar helm--ansi-color-regexp)
