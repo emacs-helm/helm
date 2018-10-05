@@ -145,7 +145,8 @@ e.g In Ubuntu you can set it to:
 
     \"evince --page-label=%p '%f'\"
 
-If set to nil `doc-view-mode' will be used instead of an external command."
+If set to nil either `doc-view-mode' or `pdf-view-mode' will be used
+instead of an external command."
   :group 'helm-grep
   :type  'string)
 
@@ -614,7 +615,9 @@ WHERE can be one of other-window, other-frame."
       (grep         (helm-grep-save-results-1))
       (pdf          (if helm-pdfgrep-default-read-command
                         (helm-pdfgrep-action-1 split lineno (car split))
-                      (find-file (car split)) (doc-view-goto-page lineno)))
+                      (find-file (car split)) (if (derived-mode-p 'pdf-view-mode)
+                                                  (pdf-view-goto-page lineno)
+                                                (doc-view-goto-page lineno))))
       (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
       (helm-goto-line lineno))
