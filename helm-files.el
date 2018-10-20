@@ -3472,6 +3472,8 @@ Use it for non--interactive calls of `helm-find-files'."
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
+    (when (helm-attr 'follow helm-source-find-files)
+      (helm-attrset 'follow -1 helm-source-find-files))
     (helm-ff-setup-update-hook)
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
