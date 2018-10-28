@@ -447,7 +447,9 @@ The usage is the same as `cond'."
              (helm-acond ,@(cdr clauses))))))))
 
 (defmacro helm-aand (&rest conditions)
-  "Anaphoric version of `and'."
+  "Anaphoric version of `and'.
+Each condition is bound to a temporary variable called `it' which is
+usable in next condition."
   (declare (debug (&rest form)))
   (cond ((null conditions) t)
         ((null (cdr conditions)) (car conditions))
@@ -456,6 +458,8 @@ The usage is the same as `cond'."
 
 (defmacro helm-acase (expr &rest clauses)
   "A simple anaphoric `cl-case' implementation handling strings.
+EXPR is bound to a temporary variable called `it' which is usable in
+CLAUSES to refer to EXPR.
 NOTE: Duplicate keys in CLAUSES are deliberately not handled."
   (declare (indent 1) (debug t))
   (unless (null clauses)
