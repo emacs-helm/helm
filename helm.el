@@ -2342,7 +2342,10 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
     (advice-add 'tramp-read-passwd :around #'helm--suspend-read-passwd)
     (advice-add 'ange-ftp-get-passwd :around #'helm--suspend-read-passwd)
     (advice-add 'epa-passphrase-callback-function
-                :around #'helm--suspend-read-passwd))
+                :around #'helm--suspend-read-passwd)
+    ;; Ensure linum-mode is disabled in Helm buffers to preserve
+    ;; performances (Issue #1894).
+    (advice-add 'linum-on :override #'helm--advice-linum-on))
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "any-prompt = %S" any-prompt)
   (helm-log "any-preselect = %S" any-preselect)
@@ -2408,7 +2411,8 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       (when (fboundp 'advice-remove)
         (advice-remove 'tramp-read-passwd #'helm--suspend-read-passwd)
         (advice-remove 'ange-ftp-get-passwd #'helm--suspend-read-passwd)
-        (advice-remove 'epa-passphrase-callback-function #'helm--suspend-read-passwd))
+        (advice-remove 'epa-passphrase-callback-function #'helm--suspend-read-passwd)
+        (advice-remove 'linum-on #'helm--advice-linum-on))
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
@@ -2419,6 +2423,11 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
       (setq helm--ignore-errors nil)
       (helm-log-save-maybe))))
 
+(defun helm--advice-linum-on ()
+  (unless (or (minibufferp)
+              (string-match "\\`\\*helm" (buffer-name))
+              (and (daemonp) (null (frame-parameter nil 'client))))
+    (linum-mode 1)))
 
 ;;; Helm resume
 ;;
