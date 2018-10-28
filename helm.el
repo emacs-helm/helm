@@ -1129,6 +1129,8 @@ C-c <n>: Execute default action on the n-th candidate after current selected can
 not display line numbers by default: enable them with the
 \[[https://github.com/coldnew/linum-relative][linum-relative]] package and
 `helm-linum-relative-mode'.
+If you are using Emacs-26+ version you can use `global-display-line-numbers-mode'
+which seems even better (don't forget to customize `display-line-numbers-type' to relative).
 
 ** Mouse control in Helm
 
