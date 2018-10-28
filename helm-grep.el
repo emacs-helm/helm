@@ -1438,10 +1438,10 @@ When TYPE is specified it is one of what returns `helm-grep-ag-get-types'
 if available with current AG version."
   (let* ((patterns (helm-mm-split-pattern pattern t))
          (pipe-switches (mapconcat 'identity helm-grep-ag-pipe-cmd-switches " "))
-         (pipe-cmd (pcase (helm-grep--ag-command)
-                     ((and com (or "ag" "pt"))
-                      (format "%s -S --color%s" com (concat " " pipe-switches)))
-                     (`"rg" (format "rg -N -S --color=always%s"
+         (pipe-cmd (helm-acase (helm-grep--ag-command)
+                     (("ag" "pt")
+                      (format "%s -S --color%s" it (concat " " pipe-switches)))
+                     ("rg" (format "rg -N -S --color=always%s"
                                     (concat " " pipe-switches)))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
