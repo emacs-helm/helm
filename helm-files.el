@@ -2458,7 +2458,7 @@ transformer."
         (save-excursion
           (while (re-search-forward "[*=@|/>]$" nil t)
             ;; A line looks like /home/you/"foo"@
-            (helm-case (match-string 0)
+            (helm-acase (match-string 0)
               ("*" (replace-match "")
                    (put-text-property
                     (point-at-bol) (point-at-eol) 'helm-ff-exe t))
@@ -3885,7 +3885,7 @@ is nil."
                ;; is a bug).
                (if (or helm-ff-allow-recursive-deletes trash)
                    (delete-directory file 'recursive trash)
-                 (helm-case (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
+                 (helm-acase (helm-read-answer (format "Recursive delete of `%s'? [y,n,!,q]"
                                                       (abbreviate-file-name file))
                                               '("y" "n" "!" "q"))
                    ("y" (delete-directory file 'recursive trash))

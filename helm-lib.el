@@ -453,21 +453,20 @@ The usage is the same as `cond'."
         ((null (cdr conditions)) (car conditions))
         (t `(helm-aif ,(car conditions)
                 (helm-aand ,@(cdr conditions))))))
-
-;;; Improved existing functions or macros
-;;
-(defmacro helm-case (expr &rest clauses)
-  "A simpler `cl-case' implementation handling strings.
+
+(defmacro helm-acase (expr &rest clauses)
+  "A simple anaphoric `cl-case' implementation handling strings.
 NOTE: Duplicate keys in CLAUSES are deliberately not handled."
   (declare (indent 1) (debug t))
   (unless (null clauses)
     (let ((clause1 (car clauses)))
-      `(let ((key ',(car clause1)))
-         (if (or (equal ,expr key)
+      `(let ((key ',(car clause1))
+             (it ,expr))
+         (if (or (equal it key)
                  (eq key t)
-                 (and (listp key) (member ,expr key)))
+                 (and (listp key) (member it key)))
              (progn ,@(cdr clause1))
-           (helm-case ,expr ,@(cdr clauses)))))))
+           (helm-acase it ,@(cdr clauses)))))))
 
 ;;; Fuzzy matching routines
 ;;
