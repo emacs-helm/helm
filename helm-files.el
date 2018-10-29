@@ -2522,8 +2522,9 @@ If PATTERN is an url returns it unmodified.
 When PATTERN contain a space fallback to multi-match.
 If basename contain one or more space fallback to multi-match.
 If PATTERN is a valid directory name,return PATTERN unchanged."
-  ;; handle bad filenames containing a backslash.
-  (setq pattern (helm-ff-handle-backslash pattern))
+  ;; handle bad filenames containing a backslash (no more needed in
+  ;; emacs-26, also prevent regexp matching with e.g. "\|").
+  ;; (setq pattern (helm-ff-handle-backslash pattern))
   (let ((bn      (helm-basename pattern))
         (bd      (or (helm-basedir pattern) ""))
         ;; Trigger tramp connection with file-directory-p.
