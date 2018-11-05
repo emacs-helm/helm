@@ -4772,6 +4772,10 @@ mode and header lines."
 
 (defun helm--set-header-line (&optional update)
   (with-selected-window (minibuffer-window)
+    (when helm-display-header-line
+      ;; Prevent cursor movement over the overlay displaying
+      ;; persistent-help in minibuffer (issue #2108).
+      (setq-local disable-point-adjustment t))
     (let* ((beg  (save-excursion (vertical-motion 0 (helm-window)) (point)))
            (end  (save-excursion (end-of-visual-line) (point)))
            ;; The visual line where the cursor is.
@@ -4839,8 +4843,19 @@ It has no effect if `helm-echo-input-in-header-line' is nil."
   (when (with-helm-buffer helm-echo-input-in-header-line)
     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
       (overlay-put ov 'window (selected-window))
-      (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
-                              `(:background ,bg-color :foreground ,bg-color)))
+      (helm-aif (and helm-display-header-line
+                     (helm-attr 'persistent-help))
+          (progn
+            (overlay-put ov 'display
+                         (truncate-string-to-width
+                          (substitute-command-keys
+                           (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
+                                   (format "%s (keeping session)" it)))
+                          (- (window-width) 1)))
+            (overlay-put ov 'face 'helm-header))
+        (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
+                                `(:background ,bg-color :foreground ,bg-color))))
+
       (setq cursor-type nil))))
 
 (defun helm-show-candidate-number (&optional name)
