@@ -285,7 +285,6 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
     :candidates (lambda () helm-ucs-recent)
     :help-message helm-ucs-help-message
     :keymap helm-ucs-map
-    :match-part (lambda (candidate) (cadr (split-string candidate ":")))
     :volatile t))
 
 (defvar helm-source-ucs
@@ -293,7 +292,6 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
     :data #'helm-ucs-init
     :get-line #'buffer-substring
     :help-message 'helm-ucs-help-message
-    :match-part (lambda (candidate) (cadr (split-string candidate ":")))
     :filtered-candidate-transformer
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
     :action helm-ucs-actions
