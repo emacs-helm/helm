@@ -99,10 +99,11 @@
 (defvar helm-bookmark-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o") 'helm-bookmark-run-jump-other-window)
-    (define-key map (kbd "C-d")   'helm-bookmark-run-delete)
-    (define-key map (kbd "C-]")   'helm-bookmark-toggle-filename)
-    (define-key map (kbd "M-e")   'helm-bookmark-run-edit)
+    (define-key map (kbd "C-c o")   'helm-bookmark-run-jump-other-window)
+    (define-key map (kbd "C-c C-o") 'helm-bookmark-run-jump-other-frame)
+    (define-key map (kbd "C-d")     'helm-bookmark-run-delete)
+    (define-key map (kbd "C-]")     'helm-bookmark-toggle-filename)
+    (define-key map (kbd "M-e")     'helm-bookmark-run-edit)
     map)
   "Generic Keymap for emacs bookmark sources.")
 
@@ -156,12 +157,19 @@
 (put 'helm-bookmark-toggle-filename 'helm-only t)
 
 (defun helm-bookmark-jump (candidate)
-  "Jump to bookmark from keyboard."
+  "Jump to bookmark action."
   (let ((current-prefix-arg helm-current-prefix-arg)
         non-essential)
     (bookmark-jump candidate)))
 
+(defun helm-bookmark-jump-other-frame (candidate)
+  "Jump to bookmark in other frame action."
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        non-essential)
+    (bookmark-jump candidate 'switch-to-buffer-other-frame)))
+
 (defun helm-bookmark-jump-other-window (candidate)
+  "Jump to bookmark in other window action."
   (let (non-essential)
     (bookmark-jump-other-window candidate)))
 
@@ -454,8 +462,10 @@ than `w3m-browse-url' use it."
   (call-next-method)
   (setf (slot-value source 'action)
         (helm-append-at-nth
-         (remove '("Jump to BM other window" . helm-bookmark-jump-other-window)
-                 helm-type-bookmark-actions)
+         (cl-loop for (name . action) in helm-type-bookmark-actions
+                  unless (memq action '(helm-bookmark-jump-other-frame
+                                        helm-bookmark-jump-other-window))
+                  collect (cons name action))
          '(("Browse project" . helm-bookmark-browse-project)) 1))
   (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
 
@@ -661,6 +671,12 @@ words from the buffer into the new bookmark name."
 (put 'helm-bookmark-run-edit 'helm-only t)
 
 
+(defun helm-bookmark-run-jump-other-frame ()
+  "Jump to bookmark other frame from keyboard."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-bookmark-jump-other-frame)))
+
 (defun helm-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."
   (interactive)
