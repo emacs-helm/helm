@@ -451,7 +451,6 @@ than `w3m-browse-url' use it."
 (defvar helm-bookmark-find-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-bookmark-map)
-    (define-key map (kbd "C-c o")   'ignore)
     (define-key map (kbd "C-x C-d") 'helm-bookmark-run-browse-project)
     map))
 
@@ -676,6 +675,7 @@ words from the buffer into the new bookmark name."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-bookmark-jump-other-frame)))
+(put 'helm-bookmark-run-jump-other-frame 'helm-only t)
 
 (defun helm-bookmark-run-jump-other-window ()
   "Jump to bookmark from keyboard."

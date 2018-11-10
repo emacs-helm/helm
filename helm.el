@@ -1899,6 +1899,12 @@ and part of the actions of current source.
 Use this on commands invoked from key-bindings, but not
 on action functions invoked as action from the action menu,
 i.e functions called with RET."
+  ;; If ACTION is not an action available in source action attribute,
+  ;; return an error.
+  (let ((actions (helm-attr 'action nil t)))
+    (when actions
+      (cl-assert (or (eq action actions) (rassq action actions))
+                 nil "No such action `%s' for this source" action)))
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
   (setq helm--executing-helm-action t)
