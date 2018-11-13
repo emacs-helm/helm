@@ -3287,7 +3287,7 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
 
 (defvar helm--suspend-update-interactive-flag nil)
 (defun helm-toggle-suspend-update ()
-  "Enable or disable update of display in helm.
+  "Enable or disable display update in helm.
 This can be useful for example for quietly writing a complex regexp
 without helm constantly updating."
   (interactive)
@@ -3298,6 +3298,9 @@ without helm constantly updating."
 (put 'helm-toggle-suspend-update 'helm-only t)
 
 (defun helm-suspend-update (arg &optional verbose)
+  "Enable or disable display update in helm.
+If ARG is 1 or non nil suspend update, if it is -1 or nil reenable
+updating.  When VERBOSE is specified display a message."
   (with-helm-buffer
     (when (setq helm-suspend-update-flag
                 (helm-acase arg
@@ -3313,12 +3316,14 @@ without helm constantly updating."
     (helm-aif (helm-get-current-source)
         (helm-display-mode-line it t))))
 
-(defun helm-delete-backward-no-update ()
-  (interactive)
+(defun helm-delete-backward-no-update (arg)
+  "Disable update and delete ARG chars backward.
+Update is reenabled when idle 1s."
+  (interactive "p")
   (with-helm-alive-p
     (unless helm--suspend-update-interactive-flag
       (helm-suspend-update 1))
-    (delete-char -1)
+    (backward-delete-char arg)
     (run-with-idle-timer
      1 nil
      (lambda ()
