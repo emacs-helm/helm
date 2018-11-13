@@ -31,6 +31,12 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'boolean)
 
+(defvar helm-find-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-generic-files-map)
+    (define-key map (kbd "DEL") 'helm-delete-backward-no-update)
+    map))
+
 (defvar helm-source-findutils
   (helm-build-async-source "Find"
     :header-name (lambda (name)
@@ -40,7 +46,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     :action-transformer 'helm-transform-file-load-el
     :persistent-action 'helm-ff-kill-or-find-buffer-fname
     :action 'helm-type-file-actions
-    :keymap helm-generic-files-map
+    :keymap helm-find-map
     :candidate-number-limit 9999
     :requires-pattern 3))
 
