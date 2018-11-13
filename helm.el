@@ -3289,16 +3289,33 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
 This can be useful for example for quietly writing a complex regexp
 without helm constantly updating."
   (interactive)
-  (with-helm-alive-p
-    (when (setq helm-suspend-update-flag (not helm-suspend-update-flag))
+  (helm-suspend-update (not helm-suspend-update-flag) t))
+(put 'helm-toggle-suspend-update 'helm-only t)
+
+(defun helm-suspend-update (arg &optional verbose)
+  (with-helm-buffer
+    (when (setq helm-suspend-update-flag
+                (helm-acase arg
+                  (1 t)
+                  (-1 nil)
+                  (t it)))
       (helm-kill-async-processes)
       (setq helm-pattern ""))
-    (message (if helm-suspend-update-flag
-                 "Helm update suspended!"
-               "Helm update re-enabled!"))
+    (when verbose
+      (message (if helm-suspend-update-flag
+                   "Helm update suspended!"
+                 "Helm update re-enabled!")))
     (helm-aif (helm-get-current-source)
-        (with-helm-buffer (helm-display-mode-line it t)))))
-(put 'helm-toggle-suspend-update 'helm-only t)
+        (helm-display-mode-line it t))))
+
+(defun helm-delete-backward-no-update ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-suspend-update 1)
+    (delete-char -1)
+    (run-with-idle-timer 1 nil (lambda ()
+                                 (helm-suspend-update -1)
+                                 (helm-force-update)))))
 
 (defun helm--suspend-read-passwd (old--fn &rest args)
   "Suspend helm while reading password.
