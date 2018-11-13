@@ -46,6 +46,7 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
     :action-transformer 'helm-transform-file-load-el
     :persistent-action 'helm-ff-kill-or-find-buffer-fname
     :action 'helm-type-file-actions
+    :help-message 'helm-generic-file-help-message
     :keymap helm-find-map
     :candidate-number-limit 9999
     :requires-pattern 3))
