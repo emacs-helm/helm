@@ -3085,7 +3085,8 @@ See :after-init-hook and :before-init-hook in `helm-source'."
         helm-current-buffer (helm--current-buffer)
         helm-buffer-file-name buffer-file-name
         helm-issued-errors nil
-        helm-saved-current-source nil)
+        helm-saved-current-source nil
+        helm--suspend-update-interactive-flag nil)
   (when (and (with-helm-current-buffer
                (and (buffer-narrowed-p)
                     (use-region-p)))
@@ -3284,12 +3285,16 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                            helm-inherit-input-method))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
+(defvar helm--suspend-update-interactive-flag nil)
 (defun helm-toggle-suspend-update ()
   "Enable or disable update of display in helm.
 This can be useful for example for quietly writing a complex regexp
 without helm constantly updating."
   (interactive)
-  (helm-suspend-update (not helm-suspend-update-flag) t))
+  (helm-suspend-update (not helm-suspend-update-flag) t)
+  (setq helm--suspend-update-interactive-flag
+        (not helm--suspend-update-interactive-flag)))
+
 (put 'helm-toggle-suspend-update 'helm-only t)
 
 (defun helm-suspend-update (arg &optional verbose)
@@ -3311,11 +3316,16 @@ without helm constantly updating."
 (defun helm-delete-backward-no-update ()
   (interactive)
   (with-helm-alive-p
-    (helm-suspend-update 1)
+    (unless helm--suspend-update-interactive-flag
+      (helm-suspend-update 1))
     (delete-char -1)
-    (run-with-idle-timer 1 nil (lambda ()
-                                 (helm-suspend-update -1)
-                                 (helm-force-update)))))
+    (run-with-idle-timer
+     1 nil
+     (lambda ()
+       (unless helm--suspend-update-interactive-flag
+         (helm-suspend-update -1)
+         (helm-check-minibuffer-input)
+         (helm-force-update))))))
 
 (defun helm--suspend-read-passwd (old--fn &rest args)
   "Suspend helm while reading password.
