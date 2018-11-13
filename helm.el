@@ -1446,6 +1446,7 @@ This may be let bounded in other places to notify the display function
 to reuse the same frame parameters as the previous helm session just
 like resume would do.")
 (defvar helm--current-buffer-narrowed nil)
+(defvar helm--suspend-update-interactive-flag nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -3285,7 +3286,6 @@ For ANY-PRESELECT ANY-RESUME ANY-KEYMAP ANY-DEFAULT ANY-HISTORY, See `helm'."
                                            helm-inherit-input-method))
                  (when timer (cancel-timer timer) (setq timer nil)))))))))
 
-(defvar helm--suspend-update-interactive-flag nil)
 (defun helm-toggle-suspend-update ()
   "Enable or disable display update in helm.
 This can be useful for example for quietly writing a complex regexp
@@ -3294,7 +3294,6 @@ without helm constantly updating."
   (helm-suspend-update (not helm-suspend-update-flag) t)
   (setq helm--suspend-update-interactive-flag
         (not helm--suspend-update-interactive-flag)))
-
 (put 'helm-toggle-suspend-update 'helm-only t)
 
 (defun helm-suspend-update (arg &optional verbose)
@@ -3331,6 +3330,7 @@ Update is reenabled when idle 1s."
          (helm-suspend-update -1)
          (helm-check-minibuffer-input)
          (helm-force-update))))))
+(put 'helm-delete-backward-no-update 'helm-only t)
 
 (defun helm--suspend-read-passwd (old--fn &rest args)
   "Suspend helm while reading password.
