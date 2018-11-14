@@ -3484,9 +3484,9 @@ WARNING: Do not use this mode yourself, it is internal to helm."
 
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
-  (let* (inhibit-quit
-         (candidate-fn (assoc-default 'candidates source))
+  (let* ((candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
+         (inhibit-quit candidate-proc)
          cfn-error
          (notify-error
           (lambda (&optional e)
@@ -3547,7 +3547,8 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is no cached value yet."
   (let* ((name (assoc-default 'name source))
-         (candidate-cache (gethash name helm-candidate-cache)))
+         (candidate-cache (gethash name helm-candidate-cache))
+         (inhibit-quit (assoc-default 'candidates-process source)))
     (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
       (helm-log "No cached candidates, calculate candidates")
