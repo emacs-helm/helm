@@ -6734,23 +6734,35 @@ See `fit-window-to-buffer' for more infos."
 (defun helm-help ()
   "Generate helm's help according to `help-message' attribute.
 
-If source is not available yet or doesn't have any `help-message'
-attribute, a generic message explaining this is added instead.  The
-global `helm-help-message' is always added after this local help."
+If `helm-buffer' is empty, provide completions on `helm-sources' to
+choose its local documentation.
+If source doesn't have any `help-message' attribute, a generic message
+explaining this is added instead.
+The global `helm-help-message' is always added after this local help."
   (interactive)
   (with-helm-alive-p
-    (save-selected-window
-      (helm-help-internal
-       "*Helm Help*"
-       (lambda ()
-         (helm-aif (assoc-default 'help-message (helm-get-current-source))
-             (insert (substitute-command-keys
-                      (helm-interpret-value it)))
-           (insert "* No specific help for this source at this time.\n
-It may appear after first results popup in helm buffer."))
-         (insert "\n\n"
-                 (substitute-command-keys
-                  (helm-interpret-value helm-help-message))))))))
+    (let ((source (or (helm-get-current-source)
+                      (helm-comp-read
+                       "Help for: "
+                       (cl-loop for src in (with-helm-buffer helm-sources)
+                                for src-val =  (if (symbolp src)
+                                                   (symbol-value src)
+                                                 src)
+                                collect `(,(assoc-default 'name src-val) .
+                                           ,src))
+                       :allow-nest t
+                       :exec-when-only-one t))))
+      (save-selected-window
+        (helm-help-internal
+         "*Helm Help*"
+         (lambda ()
+           (helm-aif (assoc-default 'help-message source)
+               (insert (substitute-command-keys
+                        (helm-interpret-value it)))
+             (insert "* No specific help for this source available."))
+           (insert "\n\n"
+                   (substitute-command-keys
+                    (helm-interpret-value helm-help-message)))))))))
 (put 'helm-help 'helm-only t)
 
 (defun helm-toggle-truncate-line ()
