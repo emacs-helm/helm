@@ -1468,8 +1468,8 @@ This doesn't replace inside the files, only modify filenames."
 See `helm-ff-RET' for details.
 If MUST-MATCH is specified exit with
 `helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
-  (let* ((cands (helm-marked-candidates))
-         (sel   (car cands)))
+  (let ((cands (helm-marked-candidates))
+        (sel   (helm-get-selection)))
     (cl-assert sel nil "Trying to exit with no candidates")
     (if (and (not (cdr cands))
              (file-directory-p sel)
