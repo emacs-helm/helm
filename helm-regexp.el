@@ -55,7 +55,8 @@ Any other non--nil value update after confirmation."
 (defcustom helm-source-multi-occur-actions
   '(("Go to Line" . helm-moccur-goto-line)
     ("Goto line other window (C-u vertically)" . helm-moccur-goto-line-ow)
-    ("Goto line new frame" . helm-moccur-goto-line-of))
+    ("Goto line new frame" . helm-moccur-goto-line-of)
+    ("Save buffer" . helm-moccur-save-results))
   "Actions for helm-occur and helm-moccur."
   :group 'helm-regexp
   :type '(alist :key-type string :value-type function))
