@@ -243,10 +243,17 @@ The tree is reinitialized each time you browse a new tree with
 
 It behaves differently depending on `helm-selection' (current candidate in helm-buffer):
 
-- candidate basename is \".\"   => Open it in dired.
+- candidate basename is \".\" => Open it in dired.
 - candidate is a directory    => Expand it.
 - candidate is a file         => Open it.
-- marked candidates (1+)      => Open them with default action.
+
+If you have marked candidates and you press RET on a directory,
+helm will navigate to this directory, if you want to exit with
+RET with default action with these marked candidates, press RET
+on a second time while you are on the root of this directory
+e.g. \"/home/you/dir/.\" or press RET on any file which is not a
+directory.  You can also exit with default action at any moment
+with `f1'.
 
 Note that when copying, renaming, etc. from `helm-find-files' the
 destination file is selected with `helm-read-file-name'.
