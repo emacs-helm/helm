@@ -763,7 +763,7 @@ you don't want to use this anymore."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-use-undecorated-frame-option nil
+(defcustom helm-use-undecorated-frame-option t
   "Display helm frame undecorated when non nil.
 
 This option have no effect with emacs versions lower than 26."
