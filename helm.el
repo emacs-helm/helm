@@ -1335,7 +1335,9 @@ to modify it.")
 (defvar helm-saved-selection nil
   "Value of the currently selected object when the action list is shown.")
 (defvar helm-sources nil
-  "[INTERNAL] Value of current sources in use, a list.")
+  "[INTERNAL] Value of current sources in use, a list of alists.
+The list of sources (symbols or alists) is normalized to alists in
+`helm-initialize'.")
 (defvar helm-buffer-file-name nil
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
@@ -6746,10 +6748,7 @@ The global `helm-help-message' is always added after this local help."
                       (helm-comp-read
                        "Help for: "
                        (cl-loop for src in (with-helm-buffer helm-sources)
-                                for src-val =  (if (symbolp src)
-                                                   (symbol-value src)
-                                                 src)
-                                collect `(,(assoc-default 'name src-val) .
+                                collect `(,(assoc-default 'name src) .
                                            ,src))
                        :allow-nest t
                        :exec-when-only-one t))))
