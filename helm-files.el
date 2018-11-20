@@ -3407,11 +3407,11 @@ prefix arg, one prefix arg or two prefix arg."
                  (abbreviate-file-name candidate))
                 (t (file-relative-name candidate)))
         (delete-region beg end))
-    (cond ((equal helm-current-prefix-arg '(4))
-           (abbreviate-file-name candidate))
-          ((equal helm-current-prefix-arg '(16))
-           (file-relative-name candidate))
-          (t candidate))))
+    (helm-acase helm-current-prefix-arg
+      ('(4)  (abbreviate-file-name candidate))
+      ('(16) (file-relative-name candidate))
+      ('(64) (helm-basename candidate))
+      (t candidate))))
 
 (cl-defun helm-find-files-history (arg &key (comp-read t))
   "The `helm-find-files' history.

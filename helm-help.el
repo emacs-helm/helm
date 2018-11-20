@@ -429,6 +429,7 @@ On insertion (not on completion, i.e. there is nothing at point):
 - `\\[helm-ff-run-complete-fn-at-point]': insert absolute file name.
 - `\\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert abbreviated file name.
 - `\\[universal-argument] \\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert relative file name.
+- `\\[universal-argument] \\[universal-argument] \\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert basename.
 
 On completion:
 
