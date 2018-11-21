@@ -1907,7 +1907,7 @@ i.e functions called with RET."
   ;; source that inherit actions from type, note that ACTION have to
   ;; be bound to a symbol and not to be an anonymous action
   ;; i.e. lambda or byte-code.
-  (let ((actions (helm-attr 'action nil t)))
+  (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)
                      (rassq action actions)
