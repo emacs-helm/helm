@@ -514,6 +514,8 @@ from its directory."
             (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
             (buf       (helm-aif (and (bufferp sel) (get-buffer sel))
                            (buffer-name it)))
+            (pkg       (and (stringp sel)
+                            (get-text-property 0 'tabulated-list-id sel)))
             (default-preselection (or (buffer-file-name helm-current-buffer)
                                       default-directory)))
        (cond
@@ -546,6 +548,9 @@ from its directory."
          (grep-line
           (with-current-buffer (get-buffer (car grep-line))
             (expand-file-name (or (buffer-file-name) default-directory))))
+         ;; Package (installed).
+         ((and pkg (package-installed-p pkg))
+          (expand-file-name (package-desc-dir pkg)))
          ;; Url.
          ((and (stringp sel) helm--url-regexp (string-match helm--url-regexp sel)) sel)
          ;; Exit brutally from a `with-helm-show-completion'
