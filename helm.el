@@ -1910,11 +1910,12 @@ i.e functions called with RET."
   (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)
-                     (rassq action actions)
                      ;; Compiled lambda
                      (byte-code-function-p action)
                      ;; Lambdas
-                     (and (listp action) (functionp action)))
+                     (and (listp action) (functionp action))
+                     ;; One of current actions.
+                     (rassq action actions))
                  nil "No such action `%s' for this source" action)))
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
