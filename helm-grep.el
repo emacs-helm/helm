@@ -237,6 +237,12 @@ You probably don't need to use this unless you know what you are doing."
   :group 'helm-grep
   :type 'string)
 
+(defcustom helm-grep-input-idle-delay 0.6
+  "Same as `helm-input-idle-delay' but for grep commands.
+It have a higher value than `helm-input-idle-delay' to avoid
+flickering when updating."
+  :group 'helm-grep
+  :type 'integer)
 
 ;;; Faces
 ;;
@@ -1107,6 +1113,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
      'helm-grep-in-recurse recurse
      'helm-grep-use-zgrep (eq backend 'zgrep)
      'helm-grep-default-command com
+     'helm-input-idle-delay helm-grep-input-idle-delay
      'default-directory helm-ff-default-directory) ;; [1]
     ;; Setup the source.
     (set source (helm-make-source src-name 'helm-grep-class
@@ -1553,6 +1560,7 @@ if available with current AG version."
                                  name (abbreviate-file-name directory)))
           :candidates-process
           (lambda () (helm-grep-ag-init directory type))))
+  (helm-set-local-variable 'helm-input-idle-delay helm-grep-input-idle-delay)
   (helm :sources 'helm-source-grep-ag
         :keymap helm-grep-map
         :history 'helm-grep-ag-history
