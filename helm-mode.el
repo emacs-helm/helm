@@ -1395,7 +1395,7 @@ Can be used as value for `completion-in-region-function'."
       (user-error "Helm-mode enabled (Ido-everywhere is incompatible with Helm-mode, disabling it)"))))
 
 (defun helm-mode--ido-everywhere-hook ()
-  ;; Called only when user calls directly ido-everywhere or ido-mode
+  ;; Called only when user calls directly ido-everywhere
   ;; and helm-mode is enabled.
   (when helm-mode
     (helm-mode--disable-ido-maybe t)))
