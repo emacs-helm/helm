@@ -1386,15 +1386,13 @@ Can be used as value for `completion-in-region-function'."
   (defconst helm--old-completion-in-region-function completion-in-region-function))
 
 (defun helm-mode--disable-ido-maybe (&optional from-hook)
-  (when (or (and (fboundp 'ido-mode) ido-mode)
-            (and (boundp 'ido-everywhere) ido-everywhere))
+  (when (and (boundp 'ido-everywhere) ido-everywhere)
     (remove-function read-file-name-function #'ido-read-file-name)
     (remove-function read-buffer-function #'ido-read-buffer)
     (setq ido-everywhere nil)
-    (ido-mode -1)
     (if from-hook
-        (user-error "Unable to turn on Ido-mode while helm-mode is enabled")
-      (user-error "Helm-mode enabled (Ido is incompatible with Helm-mode, disabling it)"))))
+        (user-error "Unable to turn on Ido-everywhere while Helm-mode is enabled")
+      (user-error "Helm-mode enabled (Ido-everywhere is incompatible with Helm-mode, disabling it)"))))
 
 (defun helm-mode--ido-everywhere-hook ()
   ;; Called only when user calls directly ido-everywhere or ido-mode
