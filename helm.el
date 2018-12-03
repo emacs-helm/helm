@@ -35,6 +35,8 @@
 (require 'helm-multi-match)
 (require 'helm-source)
 
+(declare-function 'helm-comp-read "helm-mode.el")
+
 
 ;;; Multi keys
 ;;
