@@ -1487,6 +1487,7 @@ Behave differently depending of `helm-selection':
 - candidate is a file         => open it."
   (interactive)
   (helm-ff-RET-1))
+(put 'helm-ff-RET 'helm-only t)
 
 (defun helm-ff-RET-must-match ()
   "Same as `helm-ff-RET' but used in must-match map."
