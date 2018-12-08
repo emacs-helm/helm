@@ -445,7 +445,7 @@ To use this add it to `helm-goto-line-before-hook'."
       (set-marker (mark-marker) (point))
       (push-mark (point) 'nomsg))))
 
-(defun helm-show-all-in-this-source-only (arg)
+(defun helm-show-all-candidates-in-source (arg)
   "Toggle all or only candidate-number-limit cands in current source.
 With a numeric prefix arg show only the ARG number of candidates.
 The prefix arg have no effect when toggling to only
@@ -462,7 +462,7 @@ candidate-number-limit."
           (setq-local helm-candidate-number-limit (and (> arg 1) arg))
           (helm-set-source-filter
            (list (helm-get-current-source))))))))
-(put 'helm-show-all-in-this-source-only 'helm-only t)
+(put 'helm-show-all-candidates-in-source 'helm-only t)
 
 (defun helm-display-all-sources ()
   "Display all sources previously hidden by `helm-set-source-filter'."

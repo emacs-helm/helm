@@ -219,7 +219,7 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "M-m")        'helm-toggle-all-marks)
     (define-key map (kbd "M-a")        'helm-mark-all)
     (define-key map (kbd "M-U")        'helm-unmark-all)
-    (define-key map (kbd "C-M-a")      'helm-show-all-in-this-source-only)
+    (define-key map (kbd "C-M-a")      'helm-show-all-candidates-in-source)
     (define-key map (kbd "C-M-e")      'helm-display-all-sources)
     (define-key map (kbd "C-s")        'undefined)
     (define-key map (kbd "M-s")        'undefined)
