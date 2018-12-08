@@ -452,13 +452,16 @@ The prefix arg have no effect when toggling to only
 candidate-number-limit."
   (interactive "p")
   (with-helm-alive-p
-    (with-helm-window
+    (with-helm-buffer
       (if helm-source-filter
-          (helm-set-source-filter nil)
+          (progn
+            (setq-local helm-candidate-number-limit
+                        (default-value 'helm-candidate-number-limit))
+            (helm-set-source-filter nil))
         (with-helm-default-directory (helm-default-directory)
-            (let ((helm-candidate-number-limit (and (> arg 1) arg)))
-              (helm-set-source-filter
-               (list (helm-get-current-source)))))))))
+          (setq-local helm-candidate-number-limit (and (> arg 1) arg))
+          (helm-set-source-filter
+           (list (helm-get-current-source))))))))
 (put 'helm-show-all-in-this-source-only 'helm-only t)
 
 (defun helm-display-all-sources ()
