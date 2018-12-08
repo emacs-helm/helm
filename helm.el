@@ -3718,6 +3718,7 @@ Default function to match candidates according to `helm-pattern'."
 ;;; Fuzzy matching
 ;;
 ;;
+(defconst helm--fuzzy-word-separators '("-" "_" "." ":" "/"))
 (defvar helm--fuzzy-regexp-cache (make-hash-table :test 'eq))
 (defun helm--fuzzy-match-maybe-set-pattern ()
   ;; Computing helm-pattern with helm--mapconcat-pattern
@@ -3800,23 +3801,45 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                    candidate (helm-stringify candidate)))
          (pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string cand))
-         (bonus (cond ((equal (car pat-lookup) (car str-lookup))
-                       1)
+         ;; Prefix
+         (bonus (cond ((or (equal (car pat-lookup) (car str-lookup))
+                           (equal (caar pat-lookup) (caar str-lookup)))
+                       2)
                       ((and (null pat-lookup) ; length = 1
                             (string= pattern (substring cand 0 1)))
                        150)
                       (t 0)))
-         (bonus1 (and (string-match (concat "\\<" (regexp-quote pattern) "\\>")
-                                    cand)
-                      100)))
-    (+ bonus (or bonus1
-                 ;; Give a coefficient of 2 for contiguous matches.
-                 ;; That's mean that "wiaaaki" will not take precedence
-                 ;; on "aaawiki" when matching on "wiki" even if "wiaaaki"
-                 ;; starts by "wi".
-                 (* (length (cl-nintersection
-                             pat-lookup str-lookup :test 'equal))
-                    2)))))
+         ;; Exact match e.g. foo > foo == 200
+         (bonus1 (and (string= cand pattern) 200))
+         ;; Partial match e.g. foo > aafooaa == 100
+         (bonus2 (and (string-match
+                       (concat "\\<" (regexp-quote pattern) "\\>")
+                       cand)
+                      100))
+         ;; Prefix at word boundary e.g fb > foo-bar coeff 2
+         (bonus3 (if (or bonus1 bonus2 (null pat-lookup))
+                     0
+                   (cl-loop with seq = (copy-sequence str-lookup)
+                            with count = 0
+                            for c across (substring pattern 1)
+                            for assoc = (rassoc (list (string c)) (cdr seq))
+                            when (helm-aand
+                                  assoc
+                                  (car it)
+                                  (member it helm--fuzzy-word-separators))
+                            do (cl-incf count 2)
+                            and do (setq seq (cdr (member assoc seq)))
+                            finally return count))))
+    (+ bonus
+       bonus3
+       (or bonus1 bonus2
+           ;; Give a coefficient of 2 for contiguous matches.
+           ;; That's mean that "wiaaaki" will not take precedence
+           ;; on "aaawiki" when matching on "wiki" even if "wiaaaki"
+           ;; starts by "wi".
+           (* (length (cl-nintersection
+                       pat-lookup str-lookup :test 'equal))
+              2)))))
 
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real basename preserve-tie-order)
   "The transformer for sorting candidates in fuzzy matching.
