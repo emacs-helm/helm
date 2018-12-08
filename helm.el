@@ -1578,7 +1578,7 @@ Messages are logged to a file named with todays date and time in this directory.
 
 ;; Helm API
 (defmacro with-helm-default-directory (directory &rest body)
-  (declare (indent 2) (debug t))
+  (declare (indent 1) (debug t))
   `(let ((default-directory (or (and ,directory
                                      (file-name-as-directory ,directory))
                                 default-directory)))
