@@ -1778,7 +1778,7 @@ existing Helm function names."
            (helm--normalize-filter-sources sources))
       (helm-log "helm-source-filter = %S" helm-source-filter)
       ;; Use force-update to run init/update functions.
-      (helm-force-update (and (stringp cur-disp-sel)
+      (helm-update (and (stringp cur-disp-sel)
                               (regexp-quote cur-disp-sel))))))
 
 (defun helm--normalize-filter-sources (sources)
