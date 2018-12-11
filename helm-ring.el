@@ -95,10 +95,13 @@ will not have anymore separators between candidates."
   "Source for browse and insert contents of kill-ring.")
 
 (defun helm-kill-ring-candidates ()
-  (cl-loop for kill in (helm-fast-remove-dups kill-ring :test 'equal)
-        unless (or (< (length kill) helm-kill-ring-threshold)
-                   (string-match "\\`[\n[:blank:]]+\\'" kill))
-        collect kill))
+  (cl-loop with cands = (helm-fast-remove-dups kill-ring :test 'equal)
+           for kill in (if (eq (helm-attr 'last-command) 'yank)
+                            (cdr cands)
+                          cands)
+           unless (or (< (length kill) helm-kill-ring-threshold)
+                      (string-match "\\`[\n[:blank:]]+\\'" kill))
+           collect kill))
 
 (defun helm-kill-ring-transformer (candidates _source)
   "Ensure CANDIDATES are not read-only."
