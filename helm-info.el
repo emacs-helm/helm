@@ -149,6 +149,7 @@ Elements of the list are strings of Info file names without
 extensions (e.g. \"emacs\" for file \"emacs.info.gz\"). Info
 files are found by searching directories in
 `Info-directory-list'."
+  (info-initialize) ; Build Info-directory-list from INFOPATH (Issue #2118)
   (let ((files (cl-loop for d in (or Info-directory-list
                                      Info-default-directory-list)
                         when (file-directory-p d)
