@@ -175,7 +175,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defun helm-net--url-retrieve-sync (request parser)
   (if helm-net-prefer-curl
       (with-temp-buffer
-        (call-process "curl" nil t nil request)
+        (call-process "curl" nil t nil request "-L")
         (funcall parser))
       (with-current-buffer (url-retrieve-synchronously request)
         (funcall parser))))
