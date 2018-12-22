@@ -1153,22 +1153,25 @@ other candidate transformers."
   (char-equal (aref str (1- (length str))) ?/))
 
 (cl-defun helm-walk-directory (directory &key (path 'basename)
-                                         directories
-                                         match skip-subdirs)
+                                           directories
+                                           match skip-subdirs
+                                           noerror)
   "Walk through DIRECTORY tree.
 
 Argument PATH can be one of basename, relative, full, or a function
 called on file name, default to basename.
 
-Argument DIRECTORIES when non--nil (default) return also directories names,
-otherwise skip directories names, with a value of 'only returns
+Argument DIRECTORIES when `t' return also directories names,
+otherwise skip directories names, with a value of `only' returns
 only subdirectories, i.e files are skipped.
 
 Argument MATCH is a regexp matching files or directories.
 
 Argument SKIP-SUBDIRS when `t' will skip `helm-walk-ignore-directories'
 otherwise if it is given as a list of directories, this list will be used
-instead of `helm-walk-ignore-directories'."
+instead of `helm-walk-ignore-directories'.
+
+Argument NOERROR when `t' will skip directories which are not accessible."
   (let ((fn (cl-case path
                (basename 'file-name-nondirectory)
                (relative 'file-relative-name)
@@ -1188,7 +1191,9 @@ instead of `helm-walk-ignore-directories'."
                              if (and (helm--dir-name-p f)
                                      (helm--dir-file-name f dir))
                              nconc
-                             (unless (member f skip-subdirs)
+                             (unless (or (member f skip-subdirs)
+                                         (and noerror
+                                              (not (file-accessible-directory-p it))))
                                (if (and directories
                                         (or (null match)
                                             (string-match match f)))
