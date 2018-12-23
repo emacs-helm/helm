@@ -5290,7 +5290,8 @@ don't exit and send message 'no match'."
     (if (and (helm--updating-p)
              (null helm--reading-passwd-or-string))
         (progn (message "[Display not ready]")
-               (sit-for 0.5) (message nil))
+               (sit-for 0.5) (message nil)
+               (helm-update))
       (let* ((src (helm-get-current-source))
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
