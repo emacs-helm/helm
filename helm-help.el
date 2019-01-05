@@ -384,7 +384,7 @@ Same but the cache is refreshed.
 
 **** You can start a recursive search with \"locate\" or \"find\"
 
-See \"Note\" in the [[Recusive completion on subdirectories][section on subdirectories]].
+See \"Note\" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
 Using \"locate\", you can enable the local database with a prefix argument. If the
 local database doesn't already exists, you will be prompted for its creation.
@@ -512,7 +512,7 @@ are available as`%u', `%d' and `%c' respectively.
 
 ***** Recursively rename all files with \".JPG\" extension to \".jpg\"
 
-Use the `helm-file-globstar' feature described in [[Using wildcard to select multiple files][recursive globbing]]
+Use the `helm-file-globstar' feature described in [[Use the wildcard to select multiple files][recursive globbing]]
 by entering \"**.JPG\" at the end of the Helm-find-files pattern, then hit
 \\<helm-map>\\[helm-ff-query-replace-on-filenames]: First \"JPG\", then \"jpg\"
 and hit `RET'.
@@ -611,7 +611,7 @@ the current directory.  As such, using \"\\#\" to serial-rename files only makes
 sense for files inside the same directory.  It even keeps renaming files
 with an incremental number in the next directories.
 
-*** Serial-rename
+*** Serial renaming
 
 You can use the serial-rename actions to rename, copy or symlink marked files to
 a specific directory or in the current directory with all the files numbered
@@ -963,7 +963,7 @@ with trash-list until you log in as root.
 This is `%s' read file name completion that have been \"helmized\"
 because you have enabled [[Helm mode][helm-mode]]'.
 Don't confuse this with `helm-find-files' which is a native helm command,
-see [[Helm functions vs helmized emacs functions]].
+see Helm functions vs helmized emacs functions.
 
 ** Tips
 
