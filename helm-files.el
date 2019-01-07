@@ -3223,13 +3223,14 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
           ;; A symlink file, expand to it's true name. (first hit)
           ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
            (cons (lambda (_candidate)
-                   (funcall insert-in-minibuffer (file-truename candidate)))
+                   (funcall insert-in-minibuffer (file-truename candidate))
+                   (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
           ;; A regular file, expand it, (first hit)
           ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
            (cons (lambda (_candidate)
-                   (setq helm-pattern "")       ; Force update.
-                   (funcall insert-in-minibuffer new-pattern))
+                   (funcall insert-in-minibuffer new-pattern)
+                   (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
