@@ -6209,7 +6209,7 @@ window to maintain visibility."
   "Return the window that will be used for persistent action.
 If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
   (with-helm-window
-    (let (next-win cur-win)
+    (let (prev-win cur-win)
       (setq helm-persistent-action-display-window
             (cond ((and (window-live-p helm-persistent-action-display-window)
                         (not (member helm-persistent-action-display-window
@@ -6220,7 +6220,7 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                   (split-onewindow (split-window))
                   ;; Fix Issue #2050 with dedicated window.
                   ((window-dedicated-p
-                    (setq next-win (next-window (selected-window) 1)))
+                    (setq prev-win (previous-window (selected-window) 1)))
                    (with-helm-after-update-hook
                      (and (window-live-p helm-persistent-action-display-window)
                           (delete-window helm-persistent-action-display-window)))
@@ -6229,7 +6229,7 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                     (setq cur-win (get-buffer-window helm-current-buffer)))
                    (split-window))
                   (cur-win)
-                  (t next-win))))))
+                  (t prev-win))))))
 
 (defun helm-select-persistent-action-window (&optional split-onewindow)
   "Select the window that will be used for persistent action.
