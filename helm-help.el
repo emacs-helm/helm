@@ -963,7 +963,7 @@ with trash-list until you log in as root.
 This is `%s' read file name completion that have been \"helmized\"
 because you have enabled [[Helm mode][helm-mode]]'.
 Don't confuse this with `helm-find-files' which is a native helm command,
-see Helm functions vs helmized emacs functions.
+see [[Helm functions vs helmized Emacs functions]].
 
 ** Tips
 
