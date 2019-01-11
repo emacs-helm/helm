@@ -6420,7 +6420,9 @@ is not needed."
                    (while (< (point) maxpoint)
                      (helm-mark-current-line)
                      (let* ((prefix (get-text-property (point-at-bol) 'display))
-                            (cand   (helm-get-selection nil nil src))
+                            (cand   (helm-get-selection
+                                     nil (helm-attr 'marked-with-props src)
+                                     src))
                             (bn     (and filecomp-p (helm-basename cand))))
                        ;; Don't mark possibles directories ending with . or ..
                        ;; autosave files/links and non--existent files.
