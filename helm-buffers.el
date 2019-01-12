@@ -711,7 +711,11 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-aif (get-buffer-window "*Diff*" 'visible)
       (progn (kill-buffer "*Diff*")
              (set-window-buffer it helm-current-buffer))
-    (diff-buffer-with-file (get-buffer candidate))))
+    (let ((buf (get-buffer candidate)))
+      (if (buffer-file-name buf)
+          (diff-buffer-with-file buf)
+        (user-error "Buffer `%s' is not associated to a file"
+                    (buffer-name buf))))))
 
 (defun helm-buffer-diff-persistent ()
   "Toggle diff buffer without quitting helm."
