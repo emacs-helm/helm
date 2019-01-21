@@ -61,7 +61,7 @@ MacPorts to install id-utils, it should be `gid32'."
                         '(" " mode-line-buffer-identification " "
                           (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                           (:eval (propertize
-                                  (format "[Helm Gid process finished - (%s results)]" 
+                                  (format "[Helm Gid process finished - (%s results)]"
                                           (max (1- (count-lines
                                                     (point-min) (point-max)))
                                                0))

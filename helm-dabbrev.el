@@ -60,7 +60,7 @@ When nil all buffers are considered related to `current-buffer'."
   :group 'helm-dabbrev
   :type 'function)
 
-(defcustom helm-dabbrev-major-mode-assoc nil 
+(defcustom helm-dabbrev-major-mode-assoc nil
   "Major mode association alist.
 This allow helm-dabbrev searching in buffers with the associated `major-mode'.
 e.g \(emacs-lisp-mode . lisp-interaction-mode\)
@@ -118,7 +118,7 @@ to use this."
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp
                         'helm-dabbrev-separator-regexp "2.8.3")
-;; Check for beginning of line should happen last (^\n\\|^). 
+;; Check for beginning of line should happen last (^\n\\|^).
 (defvar helm-dabbrev-separator-regexp
   "\\s-\\|\t\\|[(\\[\\{\"'`=<$;,@.#+]\\|\\s\\\\|^\n\\|^"
   "Regexp matching the start of a dabbrev candidate.")
@@ -222,7 +222,7 @@ The search starts at (1- BEG) with a regexp starting with
 regexp matching syntactically any word or symbol.
 The possible false positives matching SEP-REGEXP at end are finally
 removed."
-  (let ((eol (point-at-eol))) 
+  (let ((eol (point-at-eol)))
     (save-excursion
       (goto-char (1- beg))
       (when (re-search-forward
@@ -353,7 +353,7 @@ removed."
                      (thread-alive-p helm-dabbrev--current-thread))
             (thread-join helm-dabbrev--current-thread))
           (when (and (null cycling-disabled-p) only-one)
-            (cl-return-from helm-dabbrev 
+            (cl-return-from helm-dabbrev
               (message "[Helm-dabbrev: No expansion found]")))
           (with-helm-show-completion (car limits) (cdr limits)
             (unwind-protect

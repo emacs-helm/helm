@@ -69,7 +69,7 @@
                  ;; properly (empty buffer) when called from lisp
                  ;; with 'no-fetch (emacs-25 WA).
                  (package-show-package-list)
-               (when helm--force-updating-p (message "Refreshing packages list..."))  
+               (when helm--force-updating-p (message "Refreshing packages list..."))
                (list-packages helm-el-package--initialized-p))
              (setq helm-el-package--initialized-p t)
              (message nil))
@@ -404,7 +404,7 @@
 (defun helm-el-package-recompile (_pkg)
   (cl-loop for p in (helm-marked-candidates)
            for pkg-desc = (get-text-property 0 'tabulated-list-id p)
-           for name = (package-desc-name pkg-desc) 
+           for name = (package-desc-name pkg-desc)
            for dir = (package-desc-dir pkg-desc)
            do (if (fboundp 'async-byte-recompile-directory)
                   (async-byte-recompile-directory dir)

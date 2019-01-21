@@ -136,7 +136,7 @@
   (cl-loop for i in candidates
            for (z . p) in display-time-world-list
            collect
-           (cons 
+           (cons
             (cond ((string-match (format-time-string "%H:%M" (current-time)) i)
                    (propertize i 'face 'helm-time-zone-current))
                   ((string-match helm-time-zone-home-location i)

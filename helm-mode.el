@@ -64,7 +64,7 @@ provide helm completion in each `completing-read' or `read-file-name'
 found, but other functions can be specified here for specific
 commands. This also allow disabling helm completion for some commands
 when needed.
- 
+
 Each entry is a cons cell like (EMACS_COMMAND . COMPLETING-READ_HANDLER)
 where key and value are symbols.
 
@@ -106,7 +106,7 @@ Example:
 
 We want here to make the regular `completing-read' in `foo/test'
 returns a list of candidate(s) instead of a single candidate.
- 
+
 Note that this function will be reused for ALL the `completing-read'
 of this command, so it should handle all cases, e.g
 If first `completing-read' complete against symbols and
@@ -903,7 +903,7 @@ See documentation of `completing-read' and `all-completions' for details."
                 def-com
                 (apply def-com def-args))
                (;; Use by default a in-buffer handler unless
-                ;; COLLECTION is a function. 
+                ;; COLLECTION is a function.
                 t
                 (funcall default-handler
                          prompt collection predicate require-match

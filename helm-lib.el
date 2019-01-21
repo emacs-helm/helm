@@ -1032,7 +1032,7 @@ Argument ALIST is an alist of associated major modes."
   ;; to determine if its `major-mode' is:
   ;; - same as the `cur-maj-mode'
   ;; - derived from `cur-maj-mode' and from
-  ;;   START-BUFFER if its mode is derived from the one in START-BUFFER. 
+  ;;   START-BUFFER if its mode is derived from the one in START-BUFFER.
   ;; - have an assoc entry (major-mode . cur-maj-mode)
   ;; - have an rassoc entry (cur-maj-mode . major-mode)
   ;; - check if one of these entries inherit from another one in

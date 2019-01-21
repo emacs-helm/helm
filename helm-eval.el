@@ -48,9 +48,9 @@ Should take one arg: the string to display."
     (cl-loop for (f . a) in '((eldoc-current-symbol .
                                elisp--current-symbol)
                               (eldoc-fnsym-in-current-sexp .
-                               elisp--fnsym-in-current-sexp) 
+                               elisp--fnsym-in-current-sexp)
                               (eldoc-get-fnsym-args-string .
-                               elisp-get-fnsym-args-string) 
+                               elisp-get-fnsym-args-string)
                               (eldoc-get-var-docstring .
                                elisp-get-var-docstring))
              unless (fboundp f)
@@ -173,7 +173,7 @@ Should take one arg: the string to display."
 (defvar eldoc-idle-delay)
 ;;;###autoload
 (defun helm-eval-expression-with-eldoc ()
-  "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support. "
+  "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support."
   (interactive)
   (let ((timer (run-with-idle-timer
                 eldoc-idle-delay 'repeat
