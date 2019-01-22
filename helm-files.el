@@ -3599,7 +3599,7 @@ is helm-source-find-files."
         ;; "/", e.g. at a beginning of a patch (first bug) and make
         ;; `file-remote-p' returning an error (second bug), so in such
         ;; case returns the region itself instead of the region
-        ;; corrupted by ffap. 
+        ;; corrupted by ffap.
         (if (and str ffap) str ffap)))))
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)

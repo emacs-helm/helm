@@ -403,7 +403,7 @@ If no local value found and current command is not one of
 `helm-commands-using-frame' use this default value.
 Function in charge of deciding which value use is
 `helm-resolve-display-function'.
- 
+
 To set it locally to `helm-buffer' in helm sources use
 `helm-set-local-variable' in init function or use
 :display-function slot in `helm' call."
@@ -1960,7 +1960,7 @@ i.e functions called with RET."
     ;; If no helm based action run within 0.5 seconds, the next helm
     ;; session will have to resolve again those variable values.
     (run-with-idle-timer 0.5 nil
-      (lambda () (helm-set-local-variable 'helm-display-function nil 
+      (lambda () (helm-set-local-variable 'helm-display-function nil
                                           'helm--last-frame-parameters nil))))
   (helm-exit-minibuffer))
 
@@ -2024,7 +2024,7 @@ IOW Don't use VALUE of previous VAR to set the VALUE of next VAR.
            ;; the first on stack e.g.
            ;; (helm-set-local-variable 'helm-foo 1)
            ;; (helm-set-local-variable 'helm-foo 2)
-           ;; helm--local-variables => 
+           ;; helm--local-variables =>
            ;; '((helm-foo . 2) (helm-foo. 1))
            ;; (helm-foo . 2) is retained and (helm-foo . 1)
            ;; ignored.
@@ -2068,7 +2068,7 @@ candidates only.
 This function is used also to process functions called with no args,
 e.g. init functions, in this case it is called without ARGS.
 See `helm-process-filtered-candidate-transformer'
-\`helm-compute-attr-in-sources' and 
+\`helm-compute-attr-in-sources' and
 \`helm-process-candidate-transformer'.
 
 Arg FUNCTIONS is either a symbol or a list of functions, each function being
@@ -2637,7 +2637,7 @@ Don't use this directly, use instead `helm' with the keyword
           (orig-one-window-p helm-onewindow-p)
           (helm--nested t))
       ;; FIXME Using helm-full-frame here allow showing the new
-      ;; helm-buffer in the same window as old helm-buffer, why? 
+      ;; helm-buffer in the same window as old helm-buffer, why?
       (helm-set-local-variable 'helm-full-frame t)
       (unwind-protect
           (let (helm-current-position
@@ -4059,7 +4059,7 @@ It is used for narrowing list of candidates to the
       ;; candidates.
       ;; NOTE that this next block of code is returning nil on async sources,
       ;; the candidates being processed directly in `helm-output-filter'
-      ;; process-filter. 
+      ;; process-filter.
       (helm-process-filtered-candidate-transformer
        ;; Using in-buffer method or helm-pattern is empty
        ;; in this case compute all candidates.
@@ -5836,7 +5836,7 @@ Acceptable values of BUFFER-SPEC:
 
 - nil (omit)
   Only return the candidates buffer of current source if found.
-  
+
 - A buffer
   Register a buffer as a candidates buffer.
   The buffer needs to exists, it is not created.
@@ -5848,7 +5848,7 @@ Acceptable values of BUFFER-SPEC:
   The buffer is not erased nor deleted.
   Generally it is safer to use a copy of buffer inserted
   in a global or local buffer.
-  
+
 If for some reasons a global buffer and a local buffer exist and are
 belonging to the same source, the local buffer takes precedence on the
 global one and is used instead.

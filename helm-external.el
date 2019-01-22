@@ -24,7 +24,7 @@
 
 
 (defgroup helm-external nil
-  "External related Applications and libraries for Helm." 
+  "External related Applications and libraries for Helm."
   :group 'helm)
 
 (defcustom helm-raise-command nil

@@ -245,7 +245,7 @@ BOOKMARK is a bookmark name or a bookmark record."
 BOOKMARK is a bookmark name or a bookmark record.
 This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
   (let* ((filename   (bookmark-get-filename bookmark))
-         (isnonfile  (equal filename helm-bookmark--non-file-filename))) 
+         (isnonfile  (equal filename helm-bookmark--non-file-filename)))
     (and filename (not isnonfile) (not (bookmark-get-handler bookmark)))))
 
 (defun helm-bookmark-org-file-p (bookmark)

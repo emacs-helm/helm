@@ -203,7 +203,7 @@ Each car is a regexp match pattern of the imenu type string."
           helm-cached-imenu-candidates
         (setq imenu--index-alist nil)
         (prog1 (setq helm-cached-imenu-candidates
-                     (let ((index (imenu--make-index-alist t))) 
+                     (let ((index (imenu--make-index-alist t)))
                        (helm-imenu--candidates-1
                         (delete (assoc "*Rescan*" index) index))))
           (setq helm-cached-imenu-tick tick))))))

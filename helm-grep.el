@@ -1237,7 +1237,7 @@ in recurse, and ignore EXTS, search being made recursively on files matching
                                (> (- (setq end (match-end 0))
                                      (setq beg (match-beginning 0))) 0))
                      (helm-add-face-text-properties beg end 'helm-grep-match))
-                   do (goto-char (point-min))) 
+                   do (goto-char (point-min)))
           (buffer-string))
       (error nil))))
 

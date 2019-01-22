@@ -25,7 +25,7 @@
 # Emacs invocation
 EMACS_COMMAND   := emacs
 
-# Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path 
+# Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path
 EMACS		:= $(EMACS_COMMAND) -q -batch
 
 EVAL := $(EMACS) --eval
