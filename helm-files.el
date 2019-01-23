@@ -1805,9 +1805,19 @@ The checksum is copied to kill-ring."
       (helm-ff-toggle-basename nil))))
 (put 'helm-ff-run-toggle-basename 'helm-only t)
 
-(defun helm-reduce-file-name (fname level)
-  "Reduce FNAME by number LEVEL from end."
-  ;; This version comes from issue #2004 (UNC paths) and should fix it.
+(defun helm-reduce-file-name-1 (fname level)
+  ;; This is the old version of helm-reduce-file-name, we still use it
+  ;; with ftp fnames as expand-file-name is not working as expected
+  ;; with ftp fnames (emacs bug).
+  (cl-loop with result
+           with iter = (helm-iter-reduce-fname (expand-file-name fname))
+           repeat level do (setq result (helm-iter-next iter))
+           finally return (or result (expand-file-name "/"))))
+
+(defun helm-reduce-file-name-2 (fname level)
+  ;; This version comes from issue #2004 (UNC paths) and should fix
+  ;; it. It works with local files and remote files as well but not
+  ;; with ftp, see helm-reduce-file-name-1.
   (while (> level 0)
     (unless (or (string= fname "/")
                 (string= (file-remote-p fname 'localname) "/"))
@@ -1815,6 +1825,24 @@ The checksum is copied to kill-ring."
                    (concat (expand-file-name fname) "/../"))))
     (setq level (1- level)))
   fname)
+
+(defun helm-reduce-file-name (fname level)
+  "Reduce FNAME by number LEVEL from end."
+  (if (helm-aand (file-remote-p fname 'method)
+                 (string= it "ftp"))
+      (helm-reduce-file-name-1 fname level)
+    (helm-reduce-file-name-2 fname level)))
+
+(defun helm-iter-reduce-fname (fname)
+  "Yield FNAME reduced by one level at each call."
+  (let ((split (split-string fname "/" t)))
+    (unless (or (null split)
+                (string-match "\\`\\(~\\|[[:alpha:]]:\\)" (car split)))
+      (setq split (cons "/" split)))
+    (lambda ()
+      (when (and split (cdr split))
+        (cl-loop for i in (setq split (butlast split))
+                 concat (if (string= i "/") i (concat i "/")))))))
 
 (defvar helm-find-files--level-tree nil)
 (defvar helm-find-files--level-tree-iterator nil)
@@ -2420,9 +2448,14 @@ purpose."
 
 If DIRECTORY is remote use `helm-list-directory-function' otherwise use
 `directory-files'."
-  (if (file-remote-p directory)
-      (funcall helm-list-directory-function directory)
-    (directory-files directory t directory-files-no-dot-files-regexp)))
+  (let* ((remote (file-remote-p directory 'method))
+         (helm-list-directory-function
+          (if (and remote (not (string= remote "ftp")))
+              helm-list-directory-function
+            #'helm-list-dir-lisp)))
+    (if remote
+        (funcall helm-list-directory-function directory)
+      (directory-files directory t directory-files-no-dot-files-regexp))))
 
 (defun helm-list-dir-lisp (directory)
   "List DIRECTORY with `file-name-all-completions' as backend.
