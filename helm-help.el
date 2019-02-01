@@ -939,7 +939,7 @@ with trash-list until you log in as root.
 \\[helm-mark-all]\t\tMark all visible candidates.
 \\[helm-ff-run-toggle-auto-update]\t\tToggle auto-expansion of directories.
 \\[helm-unmark-all]\t\tUnmark all candidates, visible and invisible ones.
-\\[helm-ff-run-gnus-attach-files]\t\tGnus' attach files to message buffer.
+\\[helm-ff-run-mail-attach-files]\t\tAttach files to message buffer.
 \\[helm-ff-run-print-file]\t\tPrint file, (`\\[universal-argument]' to refresh printer list).
 \\[helm-enlarge-window]\t\tEnlarge Helm window.
 \\[helm-narrow-window]\t\tNarrow Helm window.
