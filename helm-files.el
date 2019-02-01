@@ -368,6 +368,16 @@ directories but is more portable.
 NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
   :type 'function
   :group 'helm-files)
+
+(defcustom helm-ff-initial-sort-method nil
+  "Sort method to use when initially listing a directory.
+Note that this doesn't affect the listing when matching inside the
+directory (i.e. filenames)."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "alphabetically" nil)
+          (const :tag "newest" newest)
+          (const :tag "size" size)))
 
 ;;; Faces
 ;;
@@ -526,6 +536,9 @@ NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
     (define-key map (kbd "C-c @")         'helm-ff-run-insert-org-link)
+    (define-key map (kbd "S-<f1>")        'helm-ff-sort-alpha)
+    (define-key map (kbd "S-<f2>")        'helm-ff-sort-by-newest)
+    (define-key map (kbd "S-<f3>")        'helm-ff-sort-by-size)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
@@ -1133,6 +1146,24 @@ prefix arg eshell buffer doesn't exists, create it and switch to it."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-touch-files)))
 (put 'helm-ff-run-touch-files 'helm-only t)
+
+(defun helm-ff-sort-by-size ()
+  (interactive)
+  (setq helm-ff-initial-sort-method 'size)
+  (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+(put 'helm-ff-sort-by-size 'helm-only t)
+
+(defun helm-ff-sort-by-newest ()
+  (interactive)
+  (setq helm-ff-initial-sort-method 'newest)
+  (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+(put 'helm-ff-sort-by-newest 'helm-only t)
+
+(defun helm-ff-sort-alpha ()
+  (interactive)
+  (setq helm-ff-initial-sort-method nil)
+  (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+(put 'helm-ff-sort-alpha 'helm-only t)
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
@@ -2452,12 +2483,28 @@ If DIRECTORY is remote use `helm-list-directory-function' otherwise use
          (helm-list-directory-function
           (if (and remote (not (string= remote "ftp")))
               helm-list-directory-function
-            #'helm-list-dir-lisp)))
+            #'helm-list-dir-lisp))
+         (remote-fn-p (eq helm-list-directory-function
+                          'helm-list-dir-external))
+         (sort-method (cl-case helm-ff-initial-sort-method
+                        (newest (if (and remote remote-fn-p)
+                                    "-t" #'file-newer-than-file-p))
+                        (size (if (and remote remote-fn-p)
+                                  "-S" #'helm-ff-file-larger-that-file-p))
+                        (t nil))))
     (if remote
-        (funcall helm-list-directory-function directory)
-      (directory-files directory t directory-files-no-dot-files-regexp))))
+        (funcall helm-list-directory-function directory sort-method)
+      (if sort-method
+          (sort (directory-files directory t directory-files-no-dot-files-regexp)
+                sort-method)
+        (directory-files directory t directory-files-no-dot-files-regexp)))))
 
-(defun helm-list-dir-lisp (directory)
+(defsubst helm-ff-file-larger-that-file-p (f1 f2)
+  (let ((attr1 (file-attributes f1))
+        (attr2 (file-attributes f2)))
+    (> (nth 7 attr1) (nth 7 attr2))))
+
+(defun helm-list-dir-lisp (directory &optional sort-method)
   "List DIRECTORY with `file-name-all-completions' as backend.
 
 Add a `helm-ff-dir' property on each fname ending with \"/\"."
@@ -2466,7 +2513,7 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
   ;; the displayed files will be plain wrong in this case, even worst
   ;; the filenames will be splitted in two or more filenames.
   (cl-loop for f in (sort (file-name-all-completions "" directory)
-                          'string-lessp)
+                          (or sort-method 'string-lessp))
            unless (or (string= f "")
                       (member f '("./" "../"))
                       ;; Ignore the tramp names from /
@@ -2478,7 +2525,7 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
            else collect (propertize (expand-file-name f directory)
                                     'helm-ff-file t)))
 
-(defun helm-list-dir-external (dir)
+(defun helm-list-dir-external (dir &optional sort-method)
   "List directory DIR with external shell command as backend.
 
 This function is fast enough to be used for remote files and save the
@@ -2497,7 +2544,8 @@ transformer."
                   ;; "foo*" for the real file foo. The downside is
                   ;; that we need an extra step to remove the quotes
                   ;; at the end which impact performances.
-                  "ls -A -1 -F -b -Q | awk -v dir=%s '{print dir $1}'"
+                  "ls -A -1 -F -b -Q %s | awk -v dir=%s '{print dir $1}'"
+                  (or sort-method "")
                   (shell-quote-argument default-directory))
                  nil t nil)
                 0)
