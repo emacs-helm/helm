@@ -467,8 +467,8 @@ NOTE: Duplicate keys in CLAUSES are deliberately not handled."
       `(let ((key ',(car clause1))
              (it ,expr))
          (if (or (equal it key)
-                 (eq key t)
-                 (and (listp key) (member it key)))
+                 (and (listp key) (member it key))
+                 (eq key t))
              (progn ,@(cdr clause1))
            (helm-acase it ,@(cdr clauses)))))))
 
