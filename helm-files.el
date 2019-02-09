@@ -336,16 +336,17 @@ from `helm-find-files'."
 (defcustom helm-trash-remote-files nil
   "Allow trashing remote files when non-nil.
 
-Deleting remote files with tramp doesn't work out of the box, it is
-why it is disabled by default.
+Trashing remote files with tramp doesn't work out of the box unless
+'trash-cli' package is installed, it is why trashing remote files from
+helm is disabled by default.
 
-Following is NOT documented in tramp AFAIK but tramp is using
-external trash command in its `delete-file' and `delete-directory'
-handlers.
+Tramp is using external 'trash' command in its `delete-file' and
+`delete-directory' handlers when using `delete-by-moving-to-trash',
+which is documented nowhere in Emacs.
 
 If you want to enable this you will have to install the 'trash' command
-on remote (or locally if you want to trash as root), the package on
-Ubuntu based distribution is 'trash-cli'."
+on remote (and/or locally if you want to trash as root), on Ubuntu
+based distribution it is 'trash-cli'."
   :group 'helm-files
   :type 'boolean)
 
