@@ -2718,19 +2718,22 @@ Note that only existing directories are saved here."
   "Show file properties of CANDIDATE in a tooltip or message."
   (require 'helm-external) ; For `helm-get-default-program-for-file'.
   (helm-aif (helm-file-attributes candidate)
-      (let* ((all                it)
-             (dired-line         (helm-file-attributes
+      (let* ((dired-line         (helm-file-attributes
                                   candidate :dired t :human-size t))
-             (type               (cl-getf all :type))
-             (mode-type          (cl-getf all :mode-type))
-             (owner              (cl-getf all :uid))
-             (owner-right        (cl-getf all :user t))
-             (group              (cl-getf all :gid))
-             (group-right        (cl-getf all :group))
-             (other-right        (cl-getf all :other))
-             (size               (helm-file-human-size (cl-getf all :size)))
-             (modif              (cl-getf all :modif-time))
-             (access             (cl-getf all :access-time))
+             (type               (cl-getf it :type))
+             (mode-type          (cl-getf it :mode-type))
+             (owner              (cl-getf it :uid))
+             (owner-right        (cl-getf it :user t))
+             (group              (cl-getf it :gid))
+             (group-right        (cl-getf it :group))
+             (other-right        (cl-getf it :other))
+             (trash              (and (helm-ff-trash-file-p candidate)
+                                      (helm-ff--get-dest-file-from-trash
+                                       (helm-ff-trash-list)
+                                       candidate)))
+             (size               (helm-file-human-size (cl-getf it :size)))
+             (modif              (cl-getf it :modif-time))
+             (access             (cl-getf it :access-time))
              (ext                (helm-get-default-program-for-file candidate))
              (tooltip-hide-delay (or helm-tooltip-hide-delay tooltip-hide-delay)))
         (if (and (display-graphic-p) tooltip-mode)
@@ -2755,7 +2758,10 @@ Note that only existing directories are saved here."
               (format "Others: %s\n" other-right)
               (format "Size: %s\n" size)
               (format "Modified: %s\n" modif)
-              (format "Accessed: %s\n" access)))
+              (format "Accessed: %s\n" access)
+              (and (stringp trash)
+                   (format "Trash: %s\n" 
+                           (abbreviate-file-name trash)))))
           (message dired-line) (sit-for 5)))
     (message "Permission denied, file not readable")))
 
@@ -3112,9 +3118,7 @@ should have its '*.trashinfo' correspondent file in Trash/info
 directory."
   (let* ((default-directory (file-name-as-directory
                              helm-ff-default-directory))
-         (trashed-files (with-temp-buffer
-                          (process-file "trash-list" nil t nil)
-                          (split-string (buffer-string) "\n"))))
+         (trashed-files     (helm-ff-trash-list)))
     (helm-ff-trash-action 'helm-restore-file-from-trash-1
                           '("restore" "restoring")
                           trashed-files)))
@@ -3158,6 +3162,21 @@ with 'trash-list' command."
            (replace-regexp-in-string
             "\\`\\([0-9]\\{2,4\\}[-:][0-9]\\{2\\}[:-][0-9]\\{2\\} \\)\\{2\\}"
             "" f)))
+
+(defun helm-ff-trash-file-p (file)
+  "Return `t' when file is a trashed file.
+If trash command line is not installed, return nil."
+  (and (string-match "Trash/files/?\\'" (helm-basedir file))
+       (not (member (helm-basename file) '("." "..")))
+       (file-exists-p file)
+       (executable-find "trash")))
+
+(defun helm-ff-trash-list ()
+  "Return list of trashed files.
+Need the trash command line installed."
+  (with-temp-buffer
+    (process-file "trash-list" nil t nil)
+    (split-string (buffer-string) "\n")))
 
 (defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
