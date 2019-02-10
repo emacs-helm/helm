@@ -3068,29 +3068,31 @@ e.g. '(\"delete\" \"deleting\"), ARGS are other args to be passed to FN."
     (with-helm-display-marked-candidates
         helm-marked-buffer-name
         (helm-ff--count-and-collect-dups (mapcar 'helm-basename mkd))
-        (when (y-or-n-p (format "%s %s files from trash? "
-                                (capitalize (car names))
-                                (length mkd)))
-          (message "%s files from trash..." (capitalize (cadr names)))
-          (cl-loop for f in mkd do
-                   (condition-case err
-                       (apply fn f args)
-                     (error (push (format "%s" (cadr err)) errors)
-                            nil)))))
-    (if errors
-        (display-warning 'helm
-                         (with-temp-buffer
-                           (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
-                                                       (current-time)))
-                           (insert (format
-                                    "Failed to %s %s/%s files from trash\n"
-                                    (car names) (length errors) (length mkd)))
-                           (insert (mapconcat 'identity errors "\n") "\n")
-                           (buffer-string))
-                         :error
-                         "*helm restore warnings*")
-      (message "%s %s files from trash done"
-               (capitalize (cadr names)) (length mkd)))))
+        (if (y-or-n-p (format "%s %s files from trash? "
+                              (capitalize (car names))
+                              (length mkd)))
+            (progn
+              (message "%s files from trash..." (capitalize (cadr names)))
+              (cl-loop for f in mkd do
+                       (condition-case err
+                           (apply fn f args)
+                         (error (push (format "%s" (cadr err)) errors)
+                                nil)))
+              (if errors
+                  (display-warning 'helm
+                                   (with-temp-buffer
+                                     (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
+                                                                 (current-time)))
+                                     (insert (format
+                                              "Failed to %s %s/%s files from trash\n"
+                                              (car names) (length errors) (length mkd)))
+                                     (insert (mapconcat 'identity errors "\n") "\n")
+                                     (buffer-string))
+                                   :error
+                                   "*helm restore warnings*")
+                (message "%s %s files from trash done"
+                         (capitalize (cadr names)) (length mkd))))
+          (message "Restoring files from trash aborted")))))
 
 (defun helm-ff-trash-rm (_candidate)
   "Delete marked-files from a Trash directory.
