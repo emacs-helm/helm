@@ -953,6 +953,22 @@ with trash-list until you log in as root.
 \\[helm-ff-sort-by-newest]\t\tSort by newest
 \\[helm-ff-sort-by-size]\t\tSort by size")
 
+;;; Help for file-name-history
+;;
+;;
+(defvar helm-file-name-history-help-message
+  "* Helm file name history
+
+** Tips
+You can open directly the selected file and exit helm or preselect the file in helm-find-files,
+see actions in action menu.
+
+You can toggle the view of deleted files, see commands below.
+
+** Commands
+\\<helm-file-name-history-map>
+\\[helm-file-name-history-show-or-hide-deleted]\t\tToggle deleted files view.")
+
 ;;; Help for `helm-read-file-name'
 ;;
 ;;

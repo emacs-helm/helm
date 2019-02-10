@@ -4262,15 +4262,34 @@ This function is checking `helm-mounted-network-directories' list."
   "[Internal] This source is build to be used with `helm-find-files'.
 Don't use it in your own code unless you know what you are doing.")
 
+(defvar helm--file-name-history-hide-deleted nil)
+
+(defun helm-file-name-history-show-or-hide-deleted ()
+  (interactive)
+  (setq helm--file-name-history-hide-deleted
+        (not helm--file-name-history-hide-deleted))
+  (helm-update))
+(put 'helm-file-name-history-show-or-hide-deleted 'helm-only t)
+
+(defvar helm-file-name-history-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c d") 'helm-file-name-history-show-or-hide-deleted)
+    map))
+
 (defun helm-file-name-history-transformer (candidates _source)
-  (cl-loop for c in candidates collect
-        (cond ((or (file-remote-p c)
-                   (and (fboundp 'tramp-archive-file-name-p)
-                        (tramp-archive-file-name-p c)))
-               (cons (propertize c 'face 'helm-history-remote) c))
-              ((file-exists-p c)
-               (cons (propertize c 'face 'helm-ff-file) c))
-              (t (cons (propertize c 'face 'helm-history-deleted) c)))))
+  (cl-loop for c in candidates
+           if (or (file-remote-p c)
+                  (and (fboundp 'tramp-archive-file-name-p)
+                       (tramp-archive-file-name-p c)))
+           collect
+           (cons (propertize c 'face 'helm-history-remote) c)
+           if (file-exists-p c)
+           collect
+           (cons (propertize c 'face 'helm-ff-file) c)
+           unless helm--file-name-history-hide-deleted
+           collect
+           (cons (propertize c 'face 'helm-history-deleted) c)))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
@@ -4288,6 +4307,7 @@ Don't use it in your own code unless you know what you are doing.")
                           (if helm-ff-file-name-history-use-recentf
                               recentf-list
                               file-name-history))
+            :help-message 'helm-file-name-history-help-message
             :fuzzy-match t
             :persistent-action 'ignore
             :migemo t
@@ -4299,7 +4319,8 @@ Don't use it in your own code unless you know what you are doing.")
                                    (with-helm-after-update-hook (helm-exit-minibuffer)))
                      "Find file in helm" (lambda (candidate)
                                            (helm-set-pattern
-                                            (expand-file-name candidate)))))))
+                                            (expand-file-name candidate))))
+            :keymap helm-file-name-history-map)))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
           :buffer "*helm-file-name-history*"
