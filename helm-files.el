@@ -2730,7 +2730,8 @@ Note that only existing directories are saved here."
              (trash              (and (helm-ff-trash-file-p candidate)
                                       (helm-ff--get-dest-file-from-trash
                                        (helm-ff-trash-list)
-                                       candidate)))
+                                       (replace-regexp-in-string
+                                        "\\.trashinfo\\'" "" candidate))))
              (size               (helm-file-human-size (cl-getf it :size)))
              (modif              (cl-getf it :modif-time))
              (access             (cl-getf it :access-time))
