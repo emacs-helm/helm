@@ -3175,7 +3175,7 @@ If trash command line is not installed, return nil."
                       ;; trash directory.
                       "info" (helm-basedir (directory-file-name helm-ff-default-directory)))
                      t directory-files-no-dot-files-regexp)
-           collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo" "" f))
+           collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo\\'" "" f))
                          (with-temp-buffer
                            (save-excursion
                              (insert-file-contents f))
