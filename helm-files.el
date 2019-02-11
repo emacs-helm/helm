@@ -3140,28 +3140,21 @@ directory."
   "Restore FILE from a trash directory.
 Arg TRASHED-FILES is the list of files in the trash directory obtained
 with 'trash-list' command."
-  (let ((info-file (concat (helm-reduce-file-name file 2)
-                           "info/"
-                           (helm-basename file)
-                           ".trashinfo"))
-        (dest-file (helm-ff--get-dest-file-from-trash
-                    trashed-files file)))
+  ;; Emacs trash duplicate files with a unique name + .trashinfo in
+  ;; the filename which is wrong, only files in info directory should
+  ;; end with .trashinfo, so fix the filename before looking for dest name.
+  (let* ((fname (replace-regexp-in-string "\\.trashinfo\\'" "" file)) 
+         (info-file (concat (helm-reduce-file-name fname 2)
+                            "info/"
+                            (helm-basename fname)
+                            ".trashinfo"))
+         (dest-file (helm-ff--get-dest-file-from-trash
+                     trashed-files fname)))
     (cl-assert (not (file-exists-p dest-file)) nil
                (format "File `%s' already exists" dest-file))
     (cl-assert dest-file nil "No such file in trash")
     (rename-file file dest-file)
     (delete-file info-file)))
-
-(defun helm-ff--get-dest-file-from-trash (trashed-files file)
-  (cl-loop for f in trashed-files
-           when (string-match
-                 (concat (regexp-quote (helm-basename file))
-                         "\\'")
-                 f)
-           return
-           (replace-regexp-in-string
-            "\\`\\([0-9]\\{2,4\\}[-:][0-9]\\{2\\}[:-][0-9]\\{2\\} \\)\\{2\\}"
-            "" f)))
 
 (defun helm-ff-trash-file-p (file)
   "Return `t' when file is a trashed file.
@@ -3171,12 +3164,25 @@ If trash command line is not installed, return nil."
        (file-exists-p file)
        (executable-find "trash")))
 
+(defun helm-ff--get-dest-file-from-trash (trashed-files file)
+  (assoc-default (helm-basename file) trashed-files))
+
 (defun helm-ff-trash-list ()
-  "Return list of trashed files.
-Need the trash command line installed."
-  (with-temp-buffer
-    (process-file "trash-list" nil t nil)
-    (split-string (buffer-string) "\n")))
+  "Return an alist of trashed files basename and dest name."
+  (cl-loop for f in (directory-files
+                     (expand-file-name
+                      ;; helm-ff-default-directory is actually the
+                      ;; trash directory.
+                      "info" (helm-basedir (directory-file-name helm-ff-default-directory)))
+                     t directory-files-no-dot-files-regexp)
+           collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo" "" f))
+                         (with-temp-buffer
+                           (save-excursion
+                             (insert-file-contents f))
+                           (when (re-search-forward "path=" nil t)
+                             (helm-url-unhex-string
+                              (buffer-substring-no-properties
+                               (point) (point-at-eol))))))))
 
 (defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
