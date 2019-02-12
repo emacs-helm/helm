@@ -3110,6 +3110,19 @@ should have its '*.trashinfo' correspondent file in Trash/info
 directory."
   (helm-ff-trash-action 'helm-ff-trash-rm-1 '("delete" "deleting")))
 
+(defun helm-ff-trash-rm-1 (file)
+  (let ((info-file (concat (helm-reduce-file-name file 2)
+                           "info/" (helm-basename file "trashinfo")
+                           ".trashinfo")))
+    (cl-assert (file-exists-p file)
+               nil (format "No such file or directory `%s'"
+                           file))
+    (cl-assert (file-exists-p info-file)
+               nil (format "No such file or directory `%s'"
+                           info-file))
+    (delete-file file)
+    (delete-file info-file)))
+
 (defun helm-restore-file-from-trash (_candidate)
   "Restore marked-files from a Trash directory.
 
@@ -3123,19 +3136,6 @@ directory."
     (helm-ff-trash-action 'helm-restore-file-from-trash-1
                           '("restore" "restoring")
                           trashed-files)))
-
-(defun helm-ff-trash-rm-1 (file)
-  (let ((info-file (concat (helm-reduce-file-name file 2)
-                           "info/" (helm-basename file "trashinfo")
-                           ".trashinfo")))
-    (cl-assert (file-exists-p file)
-               nil (format "No such file or directory `%s'"
-                           file))
-    (cl-assert (file-exists-p info-file)
-               nil (format "No such file or directory `%s'"
-                           info-file))
-    (delete-file file)
-    (delete-file info-file)))
 
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a trash directory.
