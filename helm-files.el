@@ -3126,7 +3126,7 @@ directory."
 
 (defun helm-ff-trash-rm-1 (file)
   (let ((info-file (concat (helm-reduce-file-name file 2)
-                           "info/" (helm-basename file)
+                           "info/" (helm-basename file "trashinfo")
                            ".trashinfo")))
     (cl-assert (file-exists-p file)
                nil (format "No such file or directory `%s'"
