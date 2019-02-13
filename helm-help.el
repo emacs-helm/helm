@@ -872,6 +872,7 @@ from trash' action you will find in action menu (needs the
 trash-cli package installed).
 You can as well delete files from Trash directories with the 'delete files from trash'
 action.
+If you want to know where a file will be restored, hit `M-i', you will find a trash info.
 
 Tip: Navigate to your Trash/files directories with `helm-find-files' and set a bookmark
 there with \\<helm-find-files-map>\\[helm-ff-bookmark-set] for fast access to Trash.
