@@ -3139,8 +3139,8 @@ directory."
 
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a trash directory.
-Arg TRASHED-FILES is the list of files in the trash directory obtained
-with 'trash-list' command."
+Arg TRASHED-FILES is an alist of (fname_in_trash . dest) obtained with
+`helm-ff-trash-list'."
   ;; Emacs trash duplicate files with a unique name + .trashinfo in
   ;; the filename which is wrong, only files in info directory should
   ;; end with .trashinfo, so fix the filename before looking for dest name.
