@@ -20,6 +20,7 @@
 (require 'helm)
 (require 'helm-help)
 (require 'helm-types)
+(require 'helm-ring)
 
 (declare-function display-time-world-display "time.el")
 (defvar display-time-world-list)
@@ -216,8 +217,11 @@ It is added to `extended-command-history'.
     :candidates (lambda ()
                   (with-helm-current-buffer
                     (ring-elements comint-input-ring)))
-    :action 'helm-comint-input-ring-action)
-  "Source that provide helm completion against `comint-input-ring'.")
+    :action 'helm-comint-input-ring-action
+    ;; Multiline does not work for `shell' because of an Emacs bug.
+    ;; It works in other REPLs like Geiser.
+    :multiline 'helm-kill-ring-max-offset)
+  "Source that provides Helm completion against `comint-input-ring'.")
 
 
 ;;; Helm ratpoison UI
