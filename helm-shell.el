@@ -17,10 +17,7 @@
 
 ;;; Commentary:
 ;;
-;; Enable like this in .emacs:
-;; (add-hook 'shell-mode-hook
-;;           (lambda ()
-;;               (define-key shell-mode-map (kbd "M-s f") 'helm-shell-prompts-all)))
+;; This is superseded by helm-comint.el.
 
 ;;; Code:
 (require 'cl-lib)
@@ -28,140 +25,13 @@
 (require 'helm-lib)
 (require 'helm-help)
 (require 'helm-elisp)
-
-;;; Shell prompts
-;;
-(defface helm-shell-prompts-promptidx
-  '((t (:foreground "cyan")))
-  "Face used to highlight Shell prompt index."
-  :group 'helm-shell-faces)
-
-(defface helm-shell-prompts-buffer-name
-  '((t (:foreground "green")))
-  "Face used to highlight Shell buffer name."
-  :group 'helm-shell-faces)
-
-(defcustom helm-shell-prompts-promptidx-p t
-  "Show prompt number."
-  :group 'helm-shell
-  :type 'boolean)
-
-(defcustom helm-shell-comint-mode-list '(comint-mode slime-repl-mode)
-  "Supported modes for prompt navigation.
-Derived modes (e.g. Geiser's REPL) are automatically supported."
-  :group 'helm-shell
-  :type '(repeat (choice symbol)))
-
-(defvar helm-shell-prompts-keymap
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o")   'helm-shell-prompts-other-window)
-    (define-key map (kbd "C-c C-o") 'helm-shell-prompts-other-frame)
-    map)
-  "Keymap for `helm-shell-prompt-all'.")
-
-(defun helm-shell-prompts-list (mode &optional buffer)
-  "List the prompts in BUFFER in mode MODE.
-
-Return a list of (\"prompt\" (point) (buffer-name) prompt-index))
-e.g. (\"ls\" 162 \"*shell*\" 3).
-If BUFFER is nil, use current buffer."
-  (with-current-buffer (or buffer (current-buffer))
-    (when (derived-mode-p mode)
-      (save-excursion
-        (goto-char (point-min))
-        (let (result (count 1))
-          (save-mark-and-excursion
-            (helm-awhile (and (not (eobp)) (comint-next-prompt 1))
-              (push (list (buffer-substring-no-properties
-                           it (point-at-eol))
-                          it (buffer-name) count)
-                    result)
-              (setq count (1+ count))))
-          (nreverse result))))))
-
-(defun helm-shell-prompts-list-all (mode)
-  "List the prompts of all buffers in mode MODE.
-See `helm-shell-prompts-list'."
-  (cl-loop for b in (buffer-list)
-           append (helm-shell-prompts-list mode b)))
-
-(defun helm-shell-prompts-transformer (candidates &optional all)
-  ;; ("ls" 162 "*shell*" 3) => ("*shell*:3:ls" . ("ls" 162 "*shell*" 3))
-  (cl-loop for (prt pos buf id) in candidates
-           collect `(,(concat
-                       (when all
-                         (concat (propertize
-                                  buf
-                                  'face 'helm-shell-prompts-buffer-name)
-                                 ":"))
-                       (when helm-shell-prompts-promptidx-p
-                         (concat (propertize
-                                  (number-to-string id)
-                                  'face 'helm-shell-prompts-promptidx)
-                                 ":"))
-                       prt)
-                      . ,(list prt pos buf id))))
-
-(defun helm-shell-prompts-all-transformer (candidates)
-  (helm-shell-prompts-transformer candidates t))
-
-(cl-defun helm-shell-prompts-goto (candidate &optional (action 'switch-to-buffer))
-  ;; Candidate format: ("ls" 162 "*shell*" 3)
-  (let ((buf (nth 2 candidate)))
-    (unless (and (string= (buffer-name) buf)
-                 (eq action 'switch-to-buffer))
-      (funcall action buf))
-    (goto-char (nth 1 candidate))
-    (recenter)))
-
-(defun helm-shell-prompts-goto-other-window (candidate)
-  (helm-shell-prompts-goto candidate 'switch-to-buffer-other-window))
-
-(defun helm-shell-prompts-goto-other-frame (candidate)
-  (helm-shell-prompts-goto candidate 'switch-to-buffer-other-frame))
-
-(defun helm-shell-prompts-other-window ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-shell-prompts-goto-other-window)))
-(put 'helm-shell-prompts-other-window 'helm-only t)
-
-(defun helm-shell-prompts-other-frame ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-shell-prompts-goto-other-frame)))
-(put 'helm-shell-prompts-other-frame 'helm-only t)
+(require 'helm-comint)
 
 ;;;###autoload
-(defun helm-shell-prompts ()
-  "Pre-configured `helm' to browse the prompts of the current Shell."
-  (interactive)
-  (if (cl-member-if 'derived-mode-p helm-shell-comint-mode-list)
-      (helm :sources
-            (helm-build-sync-source "Shell prompts"
-              :candidates (helm-shell-prompts-list major-mode)
-              :candidate-transformer 'helm-shell-prompts-transformer
-              :action '(("Go to prompt" . helm-shell-prompts-goto)))
-            :buffer "*helm Shell prompts*")
-    (message "Current buffer is not an Shell buffer")))
+(defalias 'helm-shell-prompts 'helm-comint-prompts)
 
 ;;;###autoload
-(defun helm-shell-prompts-all ()
-  "Pre-configured `helm' to browse the prompts of all Shell sessions."
-  (interactive)
-  (when (cl-member-if 'derived-mode-p helm-shell-comint-mode-list)
-    (helm :sources
-          (helm-build-sync-source "All Shell prompts"
-            :candidates (helm-shell-prompts-list-all major-mode)
-            :candidate-transformer 'helm-shell-prompts-all-transformer
-            :action '(("Go to prompt" . helm-shell-prompts-goto)
-                      ("Go to prompt in other window `C-c o`" .
-                       helm-shell-prompts-goto-other-window)
-                      ("Go to prompt in other frame `C-c C-o`" .
-                       helm-shell-prompts-goto-other-frame))
-            :keymap helm-shell-prompts-keymap)
-          :buffer "*helm Shell all prompts*")))
+(defalias 'helm-shell-prompts-all 'helm-comint-prompts-all)
 
 (provide 'helm-shell)
 
