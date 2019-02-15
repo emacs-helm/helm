@@ -202,23 +202,6 @@ It is added to `extended-command-history'.
           (const :tag "Confirm" 'confirm)
           (const :tag "Always allow" nil)))
 
-;;; Shell history
-;;
-;;
-(defun helm-comint-input-ring-action (candidate)
-  "Default action for comint history."
-  (with-helm-current-buffer
-    (delete-region (comint-line-beginning-position) (point-max))
-    (insert candidate)))
-
-(defvar helm-source-comint-input-ring
-  (helm-build-sync-source "Comint history"
-    :candidates (lambda ()
-                  (with-helm-current-buffer
-                    (ring-elements comint-input-ring)))
-    :action 'helm-comint-input-ring-action)
-  "Source that provide helm completion against `comint-input-ring'.")
-
 
 ;;; Helm ratpoison UI
 ;;
@@ -338,17 +321,6 @@ Default action change TZ environment variable locally to emacs."
               elm))))
     (delete-minibuffer-contents)
     (insert elm)))
-
-;;;###autoload
-(defun helm-comint-input-ring ()
-  "Preconfigured `helm' that provide completion of `comint' history."
-  (interactive)
-  (when (derived-mode-p 'comint-mode)
-    (helm :sources 'helm-source-comint-input-ring
-          :input (buffer-substring-no-properties (comint-line-beginning-position)
-                                                 (point-at-eol))
-          :buffer "*helm comint history*")))
-
 
 (provide 'helm-misc)
 

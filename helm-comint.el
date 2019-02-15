@@ -165,6 +165,33 @@ See `helm-comint-prompts-list'."
             :buffer "*helm comint all prompts*")
     (message "Current buffer is not a comint buffer")))
 
+;;; Comint history
+;;
+;;
+(defun helm-comint-input-ring-action (candidate)
+  "Default action for comint history."
+  (with-helm-current-buffer
+    (delete-region (comint-line-beginning-position) (point-max))
+    (insert candidate)))
+
+(defvar helm-source-comint-input-ring
+  (helm-build-sync-source "Comint history"
+    :candidates (lambda ()
+                  (with-helm-current-buffer
+                    (ring-elements comint-input-ring)))
+    :action 'helm-comint-input-ring-action)
+  "Source that provide helm completion against `comint-input-ring'.")
+
+;;;###autoload
+(defun helm-comint-input-ring ()
+  "Preconfigured `helm' that provide completion of `comint' history."
+  (interactive)
+  (when (derived-mode-p 'comint-mode)
+    (helm :sources 'helm-source-comint-input-ring
+          :input (buffer-substring-no-properties (comint-line-beginning-position)
+                                                 (point-at-eol))
+          :buffer "*helm comint history*")))
+
 (provide 'helm-comint)
 
 ;; Local Variables:
