@@ -335,7 +335,8 @@ The function that call this should set `helm-ec-target' to thing at point."
     (unwind-protect
          (with-helm-show-completion beg end
            (helm :sources (helm-make-source "Eshell history"
-                              'helm-eshell-history-source)
+                              'helm-eshell-history-source
+                            :fuzzy-match helm-eshell-fuzzy-match)
                  :buffer "*helm eshell history*"
                  :resume 'noresume
                  :input input))
