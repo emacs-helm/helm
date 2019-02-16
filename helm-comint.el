@@ -189,7 +189,9 @@ See `helm-comint-prompts-list'."
   (helm-build-sync-source "Comint history"
     :candidates (lambda ()
                   (with-helm-current-buffer
-                    (ring-elements comint-input-ring)))
+                    (cl-loop for elm in (ring-elements comint-input-ring)
+                             unless (string= elm "")
+                             collect elm)))
     :action 'helm-comint-input-ring-action
     ;; Multiline does not work for `shell' because of an Emacs bug.
     ;; It works in other REPLs like Geiser.
