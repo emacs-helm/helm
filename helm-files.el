@@ -3178,7 +3178,7 @@ Arg TRASHED-FILES is an alist of (fname_in_trash . dest) obtained with
                          (with-temp-buffer
                            (save-excursion
                              (insert-file-contents f))
-                           (when (re-search-forward "path=" nil t)
+                           (when (re-search-forward "^path=" nil t)
                              (helm-url-unhex-string
                               (buffer-substring-no-properties
                                (point) (point-at-eol))))))))
