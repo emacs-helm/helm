@@ -138,7 +138,7 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-prompts ()
   "Pre-configured `helm' to browse the prompts of the current comint buffer."
   (interactive)
-  (if (cl-member-if 'derived-mode-p helm-comint-mode-list)
+  (if (apply 'derived-mode-p helm-comint-mode-list)
       (helm :sources
             (helm-build-sync-source "Comint prompts"
               :candidates (helm-comint-prompts-list major-mode)
@@ -151,7 +151,7 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-prompts-all ()
   "Pre-configured `helm' to browse the prompts of all comint sessions."
   (interactive)
-  (if (cl-member-if 'derived-mode-p helm-comint-mode-list)
+  (if (apply 'derived-mode-p helm-comint-mode-list)
       (helm :sources
             (helm-build-sync-source "All comint prompts"
               :candidates (helm-comint-prompts-list-all major-mode)
