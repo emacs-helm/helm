@@ -4305,17 +4305,15 @@ Don't use it in your own code unless you know what you are doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop for c in candidates
-           if (or (file-remote-p c)
-                  (and (fboundp 'tramp-archive-file-name-p)
-                       (tramp-archive-file-name-p c)))
-           collect
-           (cons (propertize c 'face 'helm-history-remote) c)
-           if (file-exists-p c)
-           collect
-           (cons (propertize c 'face 'helm-ff-file) c)
-           unless helm--file-name-history-hide-deleted
-           collect
-           (cons (propertize c 'face 'helm-history-deleted) c)))
+           when (cond ((or (file-remote-p c)
+                           (and (fboundp 'tramp-archive-file-name-p)
+                                (tramp-archive-file-name-p c)))
+                       (cons (propertize c 'face 'helm-history-remote) c))
+                      ((file-exists-p c)
+                       (cons (propertize c 'face 'helm-ff-file) c))
+                      (t (unless helm--file-name-history-hide-deleted
+                           (cons (propertize c 'face 'helm-history-deleted) c))))
+           collect it))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
