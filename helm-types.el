@@ -167,18 +167,18 @@
    'helm-buffer-switch-buffers-other-window
    "Switch to buffer other frame `C-c C-o'"
    'switch-to-buffer-other-frame
-   "Browse project from buffer"
+   "Browse project `C-x C-d'"
    'helm-buffers-browse-project
    "Query replace regexp `C-M-%'"
    'helm-buffer-query-replace-regexp
    "Query replace `M-%'" 'helm-buffer-query-replace
    "View buffer" 'view-buffer
    "Display buffer" 'display-buffer
-   "Rename buffer" 'helm-buffers-rename-buffer
-   "Grep buffers `M-g s' (C-u grep all buffers)"
+   "Rename buffer `M-R'" 'helm-buffers-rename-buffer
+   "Grep buffer(s) `M-g s' (C-u grep all buffers)"
    'helm-zgrep-buffers
    "Multi occur buffer(s) `C-s'" 'helm-multi-occur-as-action
-   "Revert buffer(s) `M-U'" 'helm-revert-marked-buffers
+   "Revert buffer(s) `M-G'" 'helm-revert-marked-buffers
    "Insert buffer" 'insert-buffer
    "Kill buffer(s) `M-D'" 'helm-kill-marked-buffers
    "Diff with file `C-='" 'diff-buffer-with-file
