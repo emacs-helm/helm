@@ -280,24 +280,62 @@ Note that this variable is buffer-local.")
    (resume :initform (lambda () (setq helm-buffers-in-project-p nil)))
    (help-message :initform 'helm-buffer-help-message)))
 
+(cl-defun helm-buffers-create-new-buffer-1 (candidate &optional (display-func 'switch-to-buffer))
+  (let ((mjm (or (and helm-current-prefix-arg
+                      (intern-soft (helm-comp-read
+                                    "Major-mode: "
+                                    helm-buffers-favorite-modes)))
+                 (cl-loop for (r . m) in auto-mode-alist
+                          when (string-match r candidate)
+                          return m)))
+        (buffer (get-buffer-create candidate)))
+    (if mjm
+        (with-current-buffer buffer (funcall mjm))
+      (set-buffer-major-mode buffer))
+    (funcall display-func buffer)))
+
+(defun helm-buffers-create-new-buffer (candidate)
+  (helm-buffers-create-new-buffer-1 candidate))
+
+(defun helm-buffers-create-new-buffer-ow (candidate)
+  (helm-buffers-create-new-buffer-1 candidate 'switch-to-buffer-other-window))
+
+(defun helm-buffers-not-found-run-switch-ow ()
+  "Run create new buffer other window action from keymap."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-buffers-create-new-buffer-ow)))
+(put 'helm-buffers-not-found-run-switch-ow 'helm-only t)
+
+(defun helm-buffers-create-new-buffer-of (candidate)
+  (helm-buffers-create-new-buffer-1 candidate 'switch-to-buffer-other-frame))
+
+(defun helm-buffers-not-found-run-switch-of ()
+  "Run create new buffer other frame action from keymap."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-buffers-create-new-buffer-of)))
+(put 'helm-buffers-not-found-run-switch-of 'helm-only t)
+
+(defvar helm-buffer-not-found-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c o")   'helm-buffers-not-found-run-switch-ow)
+    (define-key map (kbd "C-c C-o") 'helm-buffers-not-found-run-switch-of)
+    map)
+  "Keymap for `helm-source-buffer-not-found' source.")
+
 (defvar helm-source-buffer-not-found
   (helm-build-dummy-source
    "Create buffer"
    :action (helm-make-actions
             "Create buffer (C-u choose mode)"
-            (lambda (candidate)
-             (let ((mjm (or (and helm-current-prefix-arg
-                                 (intern-soft (helm-comp-read
-                                               "Major-mode: "
-                                               helm-buffers-favorite-modes)))
-                            (cl-loop for (r . m) in auto-mode-alist
-                                     when (string-match r candidate)
-                                     return m)))
-                   (buffer (get-buffer-create candidate)))
-               (if mjm
-                   (with-current-buffer buffer (funcall mjm))
-                   (set-buffer-major-mode buffer))
-               (switch-to-buffer buffer))))))
+            #'helm-buffers-create-new-buffer
+            "Create buffer other window (C-u choose mode)"
+            #'helm-buffers-create-new-buffer-ow
+            "Create buffer other frame (C-u choose mode)"
+            #'helm-buffers-create-new-buffer-of)
+   :keymap helm-buffer-not-found-map))
 
 (defvar ido-temp-list)
 (defvar ido-ignored-list)
