@@ -565,12 +565,12 @@ that use `helm-comp-read' See `helm-M-x' for example."
            (get-candidates
             (lambda ()
               (let ((cands (helm-comp-read-get-candidates
-                            collection test sort alistp
-                            ;; This should not be needed as
-                            ;; `helm-pattern' is not yet computed when
-                            ;; calling this from :init when
-                            ;; candidates-in-buffer is in use.
-                            (if candidates-in-buffer "" helm-pattern))))
+                            ;; If `helm-pattern' is passed as INPUT
+                            ;; and :alistp is nil INPUT is passed to
+                            ;; `all-completions' which defeat helm
+                            ;; matching functions (multi match, fuzzy
+                            ;; etc...) issue #2134.
+                            collection test sort alistp "")))
                 (helm-cr-default default cands))))
            (history-get-candidates
             (lambda ()
