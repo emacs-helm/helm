@@ -3120,7 +3120,9 @@ directory."
     (cl-assert (file-exists-p info-file)
                nil (format "No such file or directory `%s'"
                            info-file))
-    (delete-file file)
+    (if (file-directory-p file)
+        (delete-directory file t)
+      (delete-file file))
     (delete-file info-file)))
 
 (defun helm-restore-file-from-trash (_candidate)
