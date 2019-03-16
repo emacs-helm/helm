@@ -148,6 +148,10 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
           (const :tag "New tab" "-new-tab")
           (const :tag "New window" "-new-window")))
 
+(defcustom helm-net-curl-switches '("-s" "-L")
+  "Arguments list passed to curl when using `helm-net-prefer-curl'."
+  :group 'helm-net
+  :type '(repeat string))
 
 ;;; Additional actions for search suggestions
 ;;
@@ -161,7 +165,8 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defun helm-net--url-retrieve-sync (request parser)
   (if helm-net-prefer-curl
       (with-temp-buffer
-        (call-process "curl" nil t nil request "-L")
+        (apply #'call-process "curl"
+               nil t nil request helm-net-curl-switches)
         (funcall parser))
       (with-current-buffer (url-retrieve-synchronously request)
         (funcall parser))))
