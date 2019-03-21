@@ -52,7 +52,7 @@
 
 
 <div align="center">
-     <a href="https://www.paypal.me/thierryvolpiatto/10">
+     <a href="https://www.paypal.me/tvolpiatto">
        <img title="Donate with Paypal"
             alt="Donate with Paypal"
             style="height: 50px; width: auto;"
