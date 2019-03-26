@@ -104,7 +104,11 @@
 
   Note that if the (DISPLAY . REAL) form is used then pattern
   matching is done on the displayed string, not on the real
-  value.")
+  value.
+
+  This function, generally should not compute candidates according to
+  `helm-pattern' which defeat all the Helm's matching mechanism
+  i.e. multiple pattern matching and/or fuzzy matching.")
 
    (update
     :initarg :update
