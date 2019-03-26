@@ -800,6 +800,12 @@ Fallback to 100 when nil."
   "The function to use to set face of fake cursor in header-line."
   :group 'helm
   :type 'function)
+
+(defcustom helm-truncate-lines nil
+  "The value of `truncate-lines' when helm startup.
+You can toggle later `truncate-lines' with \\<helm-map>\\[helm-toggle-truncate-line]."
+  :group 'helm
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -1421,8 +1427,6 @@ Note that if also :input is specified as `helm' arg, it will take
 precedence on :default.")
 (defvar helm--temp-hooks nil
   "Store temporary hooks added by `with-helm-temp-hook'.")
-(defvar helm-truncate-lines nil
-  "[Internal] Don't set this globally, it is used as a local var.")
 (defvar helm--prompt nil)
 (defvar helm--file-completion-sources
   '("Find Files" "Read File Name")
