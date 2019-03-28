@@ -1,0 +1,553 @@
+;;; helm-occur.el --- Incremental Occur for Helm. -*- lexical-binding: t -*-
+
+;; Copyright (C) 2012 ~ 2019 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;; TODO
+;; [X] Save results for further editing with wgrep
+;; [X] Add the mode for editing
+;; [X] Add switch OF and OW actions
+;; [X] Add keymap
+;; [X] Add history
+;; [X] Prevent marking
+;; [X] Migemo
+;; [X] Add group attr
+;; [X] Write revert buffer action for saved buffer
+;; [X] Autoupdate on resume
+;; [X] Prefix all with helm-occur instead of helm-occur
+;; [X] Remove old code from helm-regexp when all done
+;; [] Add the from isearch functions
+;; [] Provide patch to emacs-wgrep for this
+
+;;; Code:
+
+(require 'cl-lib)
+(require 'helm)
+(require 'helm-help)
+(require 'helm-utils)
+
+;;; Internals
+;;
+(defvar helm-source-occur nil)
+(defvar helm-source-moccur nil
+  "This is just a flag to add to `helm-sources-using-default-as-input'.
+Don't set it to any value, it will have no effect.")
+(defvar helm-occur--buffer-list nil)
+(defvar helm-occur--buffer-tick nil)
+(defvar helm-occur-history nil)
+
+(defgroup helm-occur nil
+  "Regexp related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-occur-actions
+  '(("Go to Line" . helm-occur-goto-line)
+    ("Goto line other window (C-u vertically)" . helm-occur-goto-line-ow)
+    ("Goto line new frame" . helm-occur-goto-line-of)
+    ("Save buffer" . helm-occur-save-results)
+    )
+  "Actions for helm-occur."
+  :group 'helm-occur
+  :type '(alist :key-type string :value-type function))
+
+(defcustom helm-occur-use-ioccur-style-keys t
+  "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur."
+  :group 'helm-occur
+  :type 'boolean)
+
+(defcustom helm-occur-always-search-in-current nil
+  "Helm multi occur always search in current buffer when non--nil."
+  :group 'helm-occur
+  :type 'boolean)
+
+(defcustom helm-occur-truncate-lines t
+  "Truncate lines in occur buffer when non nil."
+  :group 'helm-occur
+  :type 'boolean)
+
+(defcustom helm-occur-auto-update-on-resume nil
+  "Allow auto updating helm-occur buffer when outdated.
+noask => Always update without asking
+nil   => Don't update but signal buffer needs update
+never => Never update and do not signal buffer needs update
+Any other non--nil value update after confirmation."
+  :group 'helm-regexp
+  :type '(radio :tag "Allow auto updating helm-occur buffer when outdated."
+          (const :tag "Always update without asking" noask)
+          (const :tag "Never update and do not signal buffer needs update" never)
+          (const :tag "Don't update but signal buffer needs update" nil)
+          (const :tag "Update after confirmation" t)))
+
+(defcustom helm-occur-candidate-number-limit 99999
+  "Value of `helm-candidate-number-limit' for helm-occur."
+  :group 'helm-occur
+  :type 'integer)
+
+(defvar helm-occur-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c o")    'helm-occur-run-goto-line-ow)
+    (define-key map (kbd "C-c C-o")  'helm-occur-run-goto-line-of)
+    (define-key map (kbd "C-x C-s")  'helm-occur-run-save-buffer)
+    (when helm-occur-use-ioccur-style-keys
+      (define-key map (kbd "<right>")  'helm-execute-persistent-action)
+      (define-key map (kbd "<left>")   'helm-occur-run-default-action))
+    (delq nil map))
+  "Keymap used in Moccur source.")
+
+(defface helm-moccur-buffer
+    '((t (:foreground "DarkTurquoise" :underline t)))
+  "Face used to highlight moccur buffer names."
+  :group 'helm-regexp)
+
+(defface helm-resume-need-update
+    '((t (:background "red")))
+  "Face used to flash moccur buffer when it needs update."
+  :group 'helm-regexp)
+
+
+;;;###autoload
+(defun helm-occur ()
+  (interactive)
+  (setq helm-source-occur
+        (helm-make-source "Helm occur" 'helm-moccur-class
+          :buffer-name (buffer-name)
+          :candidates
+          (lambda ()
+            (with-helm-current-buffer
+              ;; Don't use OMMIT-NULLS arg of split-string to
+              ;; collect empty lines as well to have right line
+              ;; numbers.
+              (split-string (buffer-substring-no-properties
+                             (point-min) (point-max)) "\n")))
+          :candidate-transformer 'helm-occur-transformer
+          :nomark t
+          :migemo t
+          :history 'helm-occur-history
+          :candidate-number-limit helm-occur-candidate-number-limit
+          :action 'helm-occur-actions
+          :requires-pattern 2
+          :group 'helm-occur
+          :keymap helm-occur-map
+          :resume 'helm-occur-resume-fn
+          :moccur-buffers (list (current-buffer))))
+  (helm-set-local-variable 'helm-occur--buffer-list (list (current-buffer))
+                           'helm-occur--buffer-tick
+                           (list (buffer-chars-modified-tick (current-buffer))))
+  (save-restriction
+    (let (def pos)
+      (when (use-region-p)
+        ;; When user mark defun with `mark-defun' with intention of
+        ;; using helm-occur on this region, it is relevant to use the
+        ;; thing-at-point located at previous position which have been
+        ;; pushed to `mark-ring'.
+        (setq def (save-excursion
+                    (goto-char (setq pos (car mark-ring)))
+                    (helm-aif (thing-at-point 'symbol) (regexp-quote it))))
+        (narrow-to-region (region-beginning) (region-end)))
+      (unwind-protect
+           (helm :sources 'helm-source-occur
+                 :buffer "*helm occur*"
+                 :default (or def (helm-aif (thing-at-point 'symbol) (regexp-quote it)))
+                 :preselect (and (memq 'helm-source-occur
+                                       helm-sources-using-default-as-input)
+                                 (format "^%d:" (line-number-at-pos (or pos (point)))))
+                 :truncate-lines helm-occur-truncate-lines)
+        (deactivate-mark t)))))
+
+(defun helm-occur-transformer (candidates)
+  "Returns CANDIDATES prefixed with line number."
+  (cl-loop for i in candidates
+           for n from 1
+           collect (cons (format "%s:%s"
+                                 (propertize
+                                  (number-to-string n)
+                                  'face 'helm-grep-lineno)
+                                 i)
+                         n)))
+
+(defclass helm-moccur-class (helm-source-sync)
+  ((buffer-name :initarg :buffer-name
+                :initform nil)
+   (moccur-buffers :initarg :moccur-buffers
+                   :initform nil)))
+
+(defun helm-occur-build-sources (buffers)
+  (cl-loop for buf in buffers
+           collect (helm-make-source (format "Helm moccur in `%s'" (buffer-name buf))
+                       'helm-moccur-class
+                     :buffer-name (buffer-name buf)
+                     ;; By using :candidates+:candidate-transformer we
+                     ;; ensure candidates are cached and no more computed.
+                     :candidates
+                     `(lambda ()
+                        (with-current-buffer ,buf
+                          ;; Don't use OMMIT-NULLS arg of split-string to
+                          ;; collect empty lines to ensure right line numbers.
+                          (split-string (buffer-substring-no-properties
+                                         (point-min) (point-max)) "\n")))
+                     :candidate-transformer 'helm-occur-transformer
+                     :nomark t
+                     :migemo t
+                     :history 'helm-occur-history
+                     :candidate-number-limit helm-occur-candidate-number-limit
+                     :action 'helm-occur-actions
+                     :requires-pattern 2
+                     :follow 1
+                     :group 'helm-occur
+                     :keymap helm-occur-map
+                     :resume 'helm-occur-resume-fn
+                     :moccur-buffers buffers)))
+
+(defun helm-multi-occur-1 (buffers &optional input)
+  (let* ((curbuf (current-buffer))
+         (bufs (if helm-occur-always-search-in-current
+                   (cons curbuf (remove curbuf buffers))
+                 buffers))
+         (sources (helm-occur-build-sources bufs))
+         (helm--maybe-use-default-as-input
+          (not (null (memq 'helm-source-moccur
+                           helm-sources-using-default-as-input)))))
+    (helm-set-local-variable 'helm-occur--buffer-list bufs
+                             'helm-occur--buffer-tick
+                             (cl-loop for b in bufs collect
+                                      (buffer-chars-modified-tick
+                                       (get-buffer b))))
+    (helm :sources sources
+          :buffer "*helm moccur*"
+          :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
+          :input input
+          :truncate-lines helm-occur-truncate-lines)))
+
+;;; Actions
+;;
+(cl-defun helm-occur-action (lineno
+                                  &optional (method (quote buffer)))
+  "Jump to line number LINENO with METHOD.
+arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
+  (require 'helm-grep)
+  (let ((buf (if (eq major-mode 'helm-occur-mode)
+                 (get-text-property (point) 'buffer-name)
+               (helm-attr 'buffer-name)))
+        (split-pat (helm-mm-split-pattern helm-input)))
+    (cl-case method
+      (buffer              (switch-to-buffer buf))
+      (buffer-other-window (helm-window-show-buffers (list buf) t))
+      (buffer-other-frame  (switch-to-buffer-other-frame buf)))
+    (with-current-buffer buf
+      (helm-goto-line lineno)
+      ;; Move point to the nearest matching regexp from bol.
+      (cl-loop for reg in split-pat
+               when (save-excursion
+                      (condition-case _err
+                          (if helm-migemo-mode
+                              (helm-mm-migemo-forward reg (point-at-eol) t)
+                            (re-search-forward reg (point-at-eol) t))
+                        (invalid-regexp nil)))
+               collect (match-beginning 0) into pos-ls
+               finally (when pos-ls (goto-char (apply #'min pos-ls)))))))
+
+(defun helm-occur-goto-line (candidate)
+  "From multi occur, switch to buffer and CANDIDATE line."
+  (helm-occur-action
+   candidate 'buffer))
+
+(defun helm-occur-goto-line-ow (candidate)
+  "Go to CANDIDATE line in other window.
+Same as `helm-occur-goto-line' but go in other window."
+  (helm-occur-action
+   candidate 'buffer-other-window))
+
+(defun helm-occur-goto-line-of (candidate)
+  "Go to CANDIDATE line in new frame.
+Same as `helm-occur-goto-line' but go in new frame."
+  (helm-occur-action
+   candidate 'buffer-other-frame))
+
+(defun helm-occur-run-goto-line-ow ()
+  "Run goto line other window action from `helm-occur'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-occur-goto-line-ow)))
+(put 'helm-occur-run-goto-line-ow 'helm-only t)
+
+(defun helm-occur-run-goto-line-of ()
+  "Run goto line new frame action from `helm-occur'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-occur-goto-line-of)))
+(put 'helm-occur-run-goto-line-of 'helm-only t)
+
+(defun helm-occur-run-default-action ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-occur-goto-line)))
+(put 'helm-occur-run-default-action 'helm-only t)
+
+(defun helm-occur-run-save-buffer ()
+  "Run moccur save results action from `helm-moccur'."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-occur-save-results)))
+(put 'helm-moccur-run-save-buffer 'helm-only t)
+
+
+;;; helm-occur-mode
+;;
+;;
+(defvar helm-occur-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET")      'helm-occur-mode-goto-line)
+    (define-key map (kbd "C-o")      'helm-occur-mode-goto-line-ow)
+    (define-key map (kbd "<C-down>") 'helm-occur-mode-goto-line-ow-forward)
+    (define-key map (kbd "<C-up>")   'helm-occur-mode-goto-line-ow-backward)
+    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
+    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
+    (define-key map (kbd "M-n")      'helm-occur-mode-goto-line-ow-forward)
+    (define-key map (kbd "M-p")      'helm-occur-mode-goto-line-ow-backward)
+    (define-key map (kbd "M-N")      'helm-gm-next-file)
+    (define-key map (kbd "M-P")      'helm-gm-precedent-file)
+    map))
+
+(defun helm-occur-mode-goto-line ()
+  (interactive)
+  (helm-aif (get-text-property (point) 'helm-realvalue)
+    (progn (helm-occur-goto-line it) (helm-match-line-cleanup-pulse))))
+
+(defun helm-occur-mode-goto-line-ow ()
+  (interactive)
+  (helm-aif (get-text-property (point) 'helm-realvalue)
+    (progn (helm-occur-goto-line-ow it) (helm-match-line-cleanup-pulse))))
+
+(defun helm-occur-mode-goto-line-ow-forward-1 (arg)
+  (condition-case nil
+      (progn
+        (save-selected-window
+          (helm-occur-mode-goto-line-ow)
+          (recenter))
+        (forward-line arg))
+    (error nil)))
+
+(defun helm-occur-mode-goto-line-ow-forward ()
+  (interactive)
+  (helm-occur-mode-goto-line-ow-forward-1 1))
+
+(defun helm-occur-mode-goto-line-ow-backward ()
+  (interactive)
+  (helm-occur-mode-goto-line-ow-forward-1 -1))
+
+(defun helm-occur-save-results (_candidate)
+  "Save helm moccur results in a `helm-moccur-mode' buffer."
+  (let ((buf "*hmoccur*")
+        new-buf)
+    (when (get-buffer buf)
+      (setq new-buf (helm-read-string "OccurBufferName: " buf))
+      (cl-loop for b in (helm-buffer-list)
+               when (and (string= new-buf b)
+                         (not (y-or-n-p
+                               (format "Buffer `%s' already exists overwrite? "
+                                       new-buf))))
+               do (setq new-buf (helm-read-string "OccurBufferName: " "*hmoccur ")))
+      (setq buf new-buf))
+    (with-current-buffer (get-buffer-create buf)
+      (setq buffer-read-only t)
+      (let ((inhibit-read-only t)
+            (map (make-sparse-keymap)))
+        (erase-buffer)
+        (insert "-*- mode: helm-moccur -*-\n\n"
+                (format "Moccur Results for `%s':\n\n" helm-input))
+        (save-excursion
+          (insert (with-current-buffer helm-buffer
+                    (goto-char (point-min))
+                    (cl-loop with buf
+                             while (re-search-forward "^[0-9]*:" nil t)
+                             for line = (buffer-substring (point-at-bol) (point-at-eol))
+                             for lineno = (get-text-property (point) 'helm-realvalue)
+                             do (setq buf (helm-attr 'buffer-name))
+                             concat (propertize
+                                     (concat (propertize buf 'face 'helm-moccur-buffer)
+                                             ":" line "\n")
+                                     'buffer-name buf
+                                     'helm-realvalue lineno)))))
+        (save-excursion
+          (while (not (eobp))
+            (add-text-properties
+             (point-at-bol) (point-at-eol)
+             `(keymap ,map
+               help-echo ,(concat
+                           (buffer-file-name
+                            (get-buffer (get-text-property
+                                         (point) 'buffer-name)))
+                           "\nmouse-1: set point\nmouse-2: jump to selection")
+               mouse-face highlight
+               invisible nil))
+            (define-key map [mouse-1] 'mouse-set-point)
+            (define-key map [mouse-2] 'helm-occur-mode-mouse-goto-line)
+            (define-key map [mouse-3] 'ignore)
+            (forward-line 1))))
+      (helm-occur-mode))
+    (pop-to-buffer buf)
+    (message "Helm Moccur Results saved in `%s' buffer" buf)))
+
+(defun helm-occur-mode-mouse-goto-line (event)
+  (interactive "e")
+  (let* ((window (posn-window (event-end event)))
+         (pos    (posn-point (event-end event))))
+    (with-selected-window window
+      (when (eq major-mode 'helm-occur-mode)
+        (goto-char pos)
+        (helm-occur-mode-goto-line)))))
+(put 'helm-moccur-mode-mouse-goto-line 'helm-only t)
+
+(defun helm-occur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  (goto-char (point-min))
+  (let (pattern)
+    (when (re-search-forward "^Moccur Results for `\\(.*\\)'" nil t)
+      (setq pattern (match-string 1))
+      (forward-line 0)
+      (when (re-search-forward "^$" nil t)
+        (forward-line 1))
+      (let ((inhibit-read-only t)
+            (buffer (current-buffer))
+            (buflst helm-occur--buffer-list)
+            (bsubstring #'buffer-substring-no-properties))
+        (delete-region (point) (point-max))
+        (message "Reverting buffer...")
+        (save-excursion
+          (with-temp-buffer
+            (insert
+             "\n"
+             (cl-loop for buf in buflst
+                      for bufstr = (or (and (buffer-live-p (get-buffer buf))
+                                            (with-current-buffer buf
+                                              (funcall bsubstring
+                                                       (point-min) (point-max))))
+                                       "")
+                      unless (string= bufstr "")
+                      do (add-text-properties
+                          0 (length bufstr)
+                          `(buffer-name ,(buffer-name (get-buffer buf)))
+                          bufstr)
+                      concat bufstr)
+             "\n")
+            (goto-char (point-min))
+            (cl-loop with helm-pattern = pattern
+                     while (helm-mm-search pattern)
+                     for linum = (line-number-at-pos)
+                     for line = (format "%s:%d:%s"
+                                        (get-text-property (point) 'buffer-name)
+                                        linum
+                                        (buffer-substring-no-properties
+                                         (point-at-bol) (point-at-eol)))
+                     when line
+                     do (with-current-buffer buffer
+                          (insert
+                           (propertize
+                            (car (helm-occur-filter-one-by-one line))
+                            'helm-realvalue linum)
+                           "\n"))))
+          (message "Reverting buffer done"))))))
+
+(defun helm-occur-filter-one-by-one (candidate)
+  "`filter-one-by-one' function for `helm-source-moccur'."
+  (require 'helm-grep)
+  (let* ((split  (helm-grep-split-line candidate))
+         (buf    (car split))
+         (lineno (nth 1 split))
+         (str    (nth 2 split)))
+    (cons (concat (propertize
+                   buf
+                   'face 'helm-moccur-buffer
+                   'help-echo (buffer-file-name
+                               (get-buffer buf))
+                   'buffer-name buf)
+                  ":"
+                  (propertize lineno 'face 'helm-grep-lineno)
+                  ":"
+                  (helm-grep-highlight-match str t))
+          candidate)))
+
+;;;###autoload
+(define-derived-mode helm-occur-mode
+    special-mode "helm-moccur"
+    "Major mode to provide actions in helm moccur saved buffer.
+
+Special commands:
+\\{helm-occur-mode-map}"
+    (set (make-local-variable 'helm-occur--buffer-list)
+         (with-helm-buffer helm-occur--buffer-list))
+    (set (make-local-variable 'revert-buffer-function)
+         #'helm-occur-mode--revert-buffer-function))
+(put 'helm-moccur-mode 'helm-only t)
+
+
+;;; Resume
+;;
+(defun helm-occur-resume-fn ()
+  (with-helm-buffer
+    (let (new-tick-ls buffer-is-modified)
+      (set (make-local-variable 'helm-occur--buffer-list)
+           (cl-loop for b in helm-occur--buffer-list
+                    when (buffer-live-p (get-buffer b))
+                    collect b))
+      (setq buffer-is-modified (/= (length helm-occur--buffer-list)
+                                   (length (helm-attr 'moccur-buffers))))
+      (helm-attrset 'moccur-buffers helm-occur--buffer-list)
+      (setq new-tick-ls (cl-loop for b in helm-occur--buffer-list
+                                 collect (buffer-chars-modified-tick (get-buffer b))))
+      (when buffer-is-modified
+        (setq helm-occur--buffer-tick new-tick-ls))
+      (cl-assert (> (length helm-occur--buffer-list) 0) nil
+                 "helm-resume error: helm-(m)occur buffer list is empty")
+      (unless (eq helm-occur-auto-update-on-resume 'never)
+        (when (or buffer-is-modified
+                  (cl-loop for b in helm-occur--buffer-list
+                           for new-tick = (buffer-chars-modified-tick (get-buffer b))
+                           for tick in helm-occur--buffer-tick
+                           thereis (/= tick new-tick)))
+          (helm-aif helm-occur-auto-update-on-resume
+              (when (or (eq it 'noask)
+                        (y-or-n-p "Helm (m)occur Buffer outdated, update? "))
+                (run-with-idle-timer 0.1 nil (lambda ()
+                                               (with-helm-buffer
+                                                 (helm-force-update)
+                                                 (message "Helm (m)occur Buffer have been udated")
+                                                 (sit-for 1) (message nil))))
+                (unless buffer-is-modified (setq helm-occur--buffer-tick new-tick-ls)))
+            (run-with-idle-timer 0.1 nil (lambda ()
+                                           (with-helm-buffer
+                                             (let ((ov (make-overlay (save-excursion
+                                                                       (goto-char (point-min))
+                                                                       (forward-line 1)
+                                                                       (point))
+                                                                     (point-max))))
+                                               (overlay-put ov 'face 'helm-resume-need-update)
+                                               (sit-for 0.3) (delete-overlay ov)
+                                               (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
+            (unless buffer-is-modified
+              (with-helm-after-update-hook
+                (setq helm-occur--buffer-tick new-tick-ls)
+                (message "Helm (m)occur Buffer have been udated")))))))))
+
+
+(provide 'helm-occur)
+
+;; Local Variables:
+;; byte-compile-warnings: (not obsolete)
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; End:
+
+;;; helm-occur.el ends here

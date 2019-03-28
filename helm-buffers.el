@@ -24,6 +24,7 @@
 (require 'helm-grep)
 (require 'helm-regexp)
 (require 'helm-help)
+(require 'helm-occur)
 
 (declare-function ido-make-buffer-list "ido" (default))
 (declare-function ido-add-virtual-buffers-to-list "ido")
@@ -197,7 +198,7 @@ Note that this variable is buffer-local.")
     ;; as we don't use recursivity for buffers.
     ;; So use zgrep for both as it is capable to handle non--compressed files.
     (define-key map (kbd "M-g s")     'helm-buffer-run-zgrep)
-    (define-key map (kbd "C-s")       'helm-buffers-run-multi-occur)
+    (define-key map (kbd "C-s")       'helm-buffers-run-occur)
     (define-key map (kbd "C-x C-d")   'helm-buffers-run-browse-project)
     (define-key map (kbd "C-c o")     'helm-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'helm-buffer-switch-other-frame)
@@ -1000,22 +1001,26 @@ See `helm-ediff-marked-buffers'."
 (defun helm-multi-occur-as-action (_candidate)
   "Multi occur action for `helm-source-buffers-list'.
 Can be used by any source that list buffers."
-  (let ((helm-moccur-always-search-in-current
+  (let ((helm-occur-always-search-in-current
          (if helm-current-prefix-arg
-             (not helm-moccur-always-search-in-current)
-           helm-moccur-always-search-in-current))
+             (not helm-occur-always-search-in-current)
+           helm-occur-always-search-in-current))
         (buffers (helm-marked-candidates))
-        (input (cl-loop for i in (split-string helm-pattern " " t)
-                     thereis (and (string-match "\\`@\\(.*\\)" i)
-                                  (match-string 1 i)))))
+        (input (cl-loop for i in (split-string (or (buffer-local-value
+                                                    'helm-input-local
+                                                    (get-buffer helm-buffer))
+                                                   helm-pattern)
+                                               " " t)
+                        thereis (and (string-match "\\`@\\(.*\\)" i)
+                                     (match-string 1 i)))))
     (helm-multi-occur-1 buffers input)))
 
-(defun helm-buffers-run-multi-occur ()
+(defun helm-buffers-run-occur ()
   "Run `helm-multi-occur-as-action' by key."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-multi-occur-as-action)))
-(put 'helm-buffers-run-multi-occur 'helm-only t)
+(put 'helm-buffers-run-occur 'helm-only t)
 
 (defun helm-buffers-toggle-show-hidden-buffers ()
   (interactive)
