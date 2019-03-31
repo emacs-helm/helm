@@ -105,21 +105,36 @@ Any other non--nil value update after confirmation."
       (define-key map (kbd "<right>")  'helm-execute-persistent-action)
       (define-key map (kbd "<left>")   'helm-occur-run-default-action))
     (delq nil map))
-  "Keymap used in Moccur source.")
+  "Keymap used in occur source.")
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
-  "Face used to highlight moccur buffer names."
+  "Face used to highlight occur buffer names."
   :group 'helm-regexp)
 
 (defface helm-resume-need-update
     '((t (:background "red")))
-  "Face used to flash moccur buffer when it needs update."
+  "Face used to flash occur buffer when it needs update."
   :group 'helm-regexp)
 
 
 ;;;###autoload
 (defun helm-occur ()
+    "Preconfigured helm for searching lines matching pattern in `current-buffer'.
+
+When `helm-source-occur' is member of
+`helm-sources-using-default-as-input' which is the default,
+symbol at point is searched at startup.
+
+When a region is marked search only in this region by narrowing.
+
+To search in multiples buffers start from one of the commands listing
+buffers (i.e. a helm command using `helm-source-buffers-list' like
+`helm-mini') and use the multi occur buffers action.
+
+This is the helm implementation that collect lines matching pattern
+like vanilla emacs `occur' but have nothing to do with it, the search
+engine beeing completely different and also much faster."
   (interactive)
   (setq helm-source-occur
         (helm-make-source "Helm occur" 'helm-moccur-class
@@ -545,7 +560,9 @@ Special commands:
 ;;
 ;;;###autoload
 (defun helm-occur-from-isearch ()
-  "Invoke `helm-occur' from isearch."
+  "Invoke `helm-occur' from isearch.
+
+To use this bind it to a key in `isearch-mode-map'."
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
@@ -561,7 +578,9 @@ Special commands:
 With a prefix arg, reverse the behavior of
 `helm-moccur-always-search-in-current'.
 The prefix arg can be set before calling
-`helm-multi-occur-from-isearch' or during the buffer selection."
+`helm-multi-occur-from-isearch' or during the buffer selection.
+
+To use this bind it to a key in `isearch-mode-map'."
   (interactive)
   (let (buf-list
         helm-moccur-always-search-in-current
