@@ -15,21 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;; TODO
-;; [X] Save results for further editing with wgrep
-;; [X] Add the mode for editing
-;; [X] Add switch OF and OW actions
-;; [X] Add keymap
-;; [X] Add history
-;; [X] Prevent marking
-;; [X] Migemo
-;; [X] Add group attr
-;; [X] Write revert buffer action for saved buffer
-;; [X] Autoupdate on resume
-;; [X] Prefix all with helm-occur instead of helm-occur
-;; [X] Remove old code from helm-regexp when all done
-;; [] Add the from isearch functions
-;; [] Provide patch to emacs-wgrep for this
 
 ;;; Code:
 
@@ -155,6 +140,7 @@ engine beeing completely different and also much faster."
           :action 'helm-occur-actions
           :requires-pattern 2
           :group 'helm-occur
+          :follow 1
           :keymap helm-occur-map
           :resume 'helm-occur-resume-fn
           :moccur-buffers (list (current-buffer))))
