@@ -170,12 +170,15 @@ engine beeing completely different and also much faster."
 
 (defun helm-occur-transformer (candidates)
   "Returns CANDIDATES prefixed with line number."
-  (cl-loop for i in candidates
+  (cl-loop with buf = (helm-attr 'buffer-name)
+           for i in candidates
            for n from 1
            collect (cons (format "%s:%s"
                                  (propertize
                                   (number-to-string n)
-                                  'face 'helm-grep-lineno)
+                                  'face 'helm-grep-lineno
+                                  'help-echo (buffer-file-name
+                                              (get-buffer buf)))
                                  i)
                          n)))
 
