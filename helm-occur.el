@@ -418,7 +418,7 @@ Same as `helm-occur-goto-line' but go in new frame."
 (defun helm-occur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
   (goto-char (point-min))
   (let (pattern)
-    (when (re-search-forward "^Moccur Results for `\\(.*\\)'" nil t)
+    (when (re-search-forward "^Occur Results for `\\(.*\\)'" nil t)
       (setq pattern (match-string 1))
       (forward-line 0)
       (when (re-search-forward "^$" nil t)
