@@ -151,7 +151,7 @@ engine beeing completely different and also much faster."
   "Returns CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-attr 'buffer-name)
            for c in candidates
-           collect (when (string-match "\\`\\([0-9]*\\)\\(.*\\)\\'" c)
+           collect (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'" c)
                      (let ((linum (match-string 1 c))
                            (disp (match-string 2 c)))
                        (cons (format "%s:%s"
