@@ -122,28 +122,7 @@ like vanilla emacs `occur' but have nothing to do with it, the search
 engine beeing completely different and also much faster."
   (interactive)
   (setq helm-source-occur
-        (helm-make-source "Helm occur" 'helm-moccur-class
-          :buffer-name (buffer-name)
-          :candidates
-          (lambda ()
-            (with-helm-current-buffer
-              ;; Don't use OMMIT-NULLS arg of split-string to
-              ;; collect empty lines as well to have right line
-              ;; numbers.
-              (split-string (buffer-substring-no-properties
-                             (point-min) (point-max)) "\n")))
-          :candidate-transformer 'helm-occur-transformer
-          :nomark t
-          :migemo t
-          :history 'helm-occur-history
-          :candidate-number-limit helm-occur-candidate-number-limit
-          :action 'helm-occur-actions
-          :requires-pattern 2
-          :group 'helm-occur
-          :follow 1
-          :keymap helm-occur-map
-          :resume 'helm-occur-resume-fn
-          :moccur-buffers (list (current-buffer))))
+        (car (helm-occur-build-sources (list (current-buffer)) "Helm occur")))
   (helm-set-local-variable 'helm-occur--buffer-list (list (current-buffer))
                            'helm-occur--buffer-tick
                            (list (buffer-chars-modified-tick (current-buffer))))
@@ -188,9 +167,11 @@ engine beeing completely different and also much faster."
    (moccur-buffers :initarg :moccur-buffers
                    :initform nil)))
 
-(defun helm-occur-build-sources (buffers)
+(defun helm-occur-build-sources (buffers &optional source-name)
   (cl-loop for buf in buffers
-           collect (helm-make-source (format "Helm moccur in `%s'" (buffer-name buf))
+           collect (helm-make-source
+                       (or source-name
+                           (format "Helm moccur in `%s'" (buffer-name buf)))
                        'helm-moccur-class
                      :buffer-name (buffer-name buf)
                      ;; By using :candidates+:candidate-transformer we
