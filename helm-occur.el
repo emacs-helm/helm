@@ -147,21 +147,22 @@ engine beeing completely different and also much faster."
                  :truncate-lines helm-occur-truncate-lines)
         (deactivate-mark t)))))
 
-(defun helm-occur-transformer (candidates)
+(defun helm-occur-transformer (candidates _source)
   "Returns CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-attr 'buffer-name)
-           for i in candidates
-           for n from 1
-           collect (cons (format "%s:%s"
-                                 (propertize
-                                  (number-to-string n)
-                                  'face 'helm-grep-lineno
-                                  'help-echo (buffer-file-name
-                                              (get-buffer buf)))
-                                 i)
-                         n)))
+           for c in candidates
+           collect (when (string-match "\\`\\([0-9]*\\)\\(.*\\)\\'" c)
+                     (let ((linum (match-string 1 c))
+                           (disp (match-string 2 c)))
+                       (cons (format "%s:%s"
+                                     (propertize
+                                      linum 'face 'helm-grep-lineno
+                                      'help-echo (buffer-file-name
+                                                  (get-buffer buf)))
+                                     disp)
+                             (string-to-number linum))))))
 
-(defclass helm-moccur-class (helm-source-sync)
+(defclass helm-moccur-class (helm-source-in-buffer)
   ((buffer-name :initarg :buffer-name
                 :initform nil)
    (moccur-buffers :initarg :moccur-buffers
@@ -169,32 +170,34 @@ engine beeing completely different and also much faster."
 
 (defun helm-occur-build-sources (buffers &optional source-name)
   (cl-loop for buf in buffers
-           collect (helm-make-source
-                       (or source-name
-                           (format "Helm moccur in `%s'" (buffer-name buf)))
-                       'helm-moccur-class
-                     :buffer-name (buffer-name buf)
-                     ;; By using :candidates+:candidate-transformer we
-                     ;; ensure candidates are cached and no more computed.
-                     :candidates
-                     `(lambda ()
-                        (with-current-buffer ,buf
-                          ;; Don't use OMMIT-NULLS arg of split-string to
-                          ;; collect empty lines to ensure right line numbers.
-                          (split-string (buffer-substring-no-properties
-                                         (point-min) (point-max)) "\n")))
-                     :candidate-transformer 'helm-occur-transformer
-                     :nomark t
-                     :migemo t
-                     :history 'helm-occur-history
-                     :candidate-number-limit helm-occur-candidate-number-limit
-                     :action 'helm-occur-actions
-                     :requires-pattern 2
-                     :follow 1
-                     :group 'helm-occur
-                     :keymap helm-occur-map
-                     :resume 'helm-occur-resume-fn
-                     :moccur-buffers buffers)))
+           collect
+           (helm-make-source (or source-name
+                                 (format "Helm moccur in `%s'" (buffer-name buf)))
+               'helm-moccur-class
+             :buffer-name (buffer-name buf)
+             :init `(lambda ()
+                      (with-current-buffer ,buf
+                        (let ((contents (buffer-substring-no-properties (point-min) (point-max))))
+                          (with-current-buffer (helm-candidate-buffer 'local)
+                            (insert contents)
+                            (goto-char (point-min))
+                            (let ((linum 1))
+                              (insert (format "%s " linum))
+                              (while (re-search-forward "\n" nil t)
+                                (cl-incf linum)
+                                (insert (format "%s " linum))))))))
+             :filtered-candidate-transformer 'helm-occur-transformer
+             :nomark t
+             :migemo t
+             :history 'helm-occur-history
+             :candidate-number-limit helm-occur-candidate-number-limit
+             :action 'helm-occur-actions
+             :requires-pattern 2
+             :follow 1
+             :group 'helm-occur
+             :keymap helm-occur-map
+             :resume 'helm-occur-resume-fn
+             :moccur-buffers buffers)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
   (let* ((curbuf (current-buffer))
