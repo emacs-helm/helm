@@ -485,7 +485,7 @@ directory (i.e. filenames)."
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
     (define-key map (kbd "C-x r m")       'helm-ff-bookmark-set)
-    (define-key map (kbd "C-x r b")       'helm-find-files-toggle-to-bookmark)
+    (define-key map (kbd "C-x r b")       'helm-find-files-switch-to-bookmark)
     (define-key map (kbd "C-x C-q")       'helm-ff-run-marked-files-in-dired)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
@@ -3653,22 +3653,17 @@ is helm-source-find-files."
           helm-ff-move-to-first-real-candidate
           helm-ff-clean-initial-input)))
 
-(defun helm-find-files-toggle-to-bookmark ()
-  "Toggle helm-bookmark for `helm-find-files' and `helm-find-files.'"
+(defun helm-ff-bookmark ()
+  (helm :sources 'helm-source-bookmark-helm-find-files
+        :buffer "*helm ff bookmarks*"))
+
+(defun helm-find-files-switch-to-bookmark ()
+  "Switch to helm-bookmark for `helm-find-files' from `helm-find-files.'"
   (interactive)
   (require 'helm-bookmark)
   (with-helm-alive-p
-    (with-helm-buffer
-      (if (setq helm-find-files--toggle-bookmark
-                (not helm-find-files--toggle-bookmark))
-          (progn
-            (helm-set-pattern "" t)
-            (helm-set-sources '(helm-source-bookmark-helm-find-files)))
-          ;; Switch back to helm-find-files.
-          (helm-set-pattern "./" t) ; Back to initial directory of hff session.
-          (helm-set-sources '(helm-source-find-files))
-          (helm--maybe-update-keymap)))))
-(put 'helm-find-files-toggle-to-bookmark 'helm-only t)
+    (helm-run-after-exit 'helm-ff-bookmark)))
+(put 'helm-find-files-switch-to-bookmark 'helm-only t)
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
