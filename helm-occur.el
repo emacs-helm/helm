@@ -175,6 +175,11 @@ engine beeing completely different and also much faster."
                                  (format "Helm moccur in `%s'" (buffer-name buf)))
                'helm-moccur-class
              :buffer-name (buffer-name buf)
+             :match-part
+             (lambda (candidate)
+               (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
+                                   candidate)
+                 (match-string 2 candidate)))
              :init `(lambda ()
                       (with-current-buffer ,buf
                         (let ((contents (buffer-substring-no-properties (point-min) (point-max))))
