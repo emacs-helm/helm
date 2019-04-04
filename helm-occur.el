@@ -177,6 +177,9 @@ engine beeing completely different and also much faster."
              :buffer-name (buffer-name buf)
              :match-part
              (lambda (candidate)
+               ;; The regexp should match what is in candidate buffer,
+               ;; not what is displayed in helm-buffer e.g. "12 foo"
+               ;; and not "12:foo".
                (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
                                    candidate)
                  (match-string 2 candidate)))
