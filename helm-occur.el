@@ -95,12 +95,12 @@ Any other non--nil value update after confirmation."
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
   "Face used to highlight occur buffer names."
-  :group 'helm-regexp)
+  :group 'helm-occur)
 
 (defface helm-resume-need-update
     '((t (:background "red")))
   "Face used to flash occur buffer when it needs update."
-  :group 'helm-regexp)
+  :group 'helm-occur)
 
 
 ;;;###autoload
