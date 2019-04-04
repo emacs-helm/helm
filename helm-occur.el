@@ -140,27 +140,29 @@ engine beeing completely different and also much faster."
       (unwind-protect
            (helm :sources 'helm-source-occur
                  :buffer "*helm occur*"
-                 :default (or def (helm-aif (thing-at-point 'symbol) (regexp-quote it)))
+                 :default (or def (helm-aif (thing-at-point 'symbol)
+                                      (regexp-quote it)))
                  :preselect (and (memq 'helm-source-occur
                                        helm-sources-using-default-as-input)
-                                 (format "^%d:" (line-number-at-pos (or pos (point)))))
+                                 (format "^%d:" (line-number-at-pos
+                                                 (or pos (point)))))
                  :truncate-lines helm-occur-truncate-lines)
         (deactivate-mark t)))))
 
 (defun helm-occur-transformer (candidates source)
   "Returns CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-attr 'buffer-name source)
-           for c in candidates
-           collect (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'" c)
-                     (let ((linum (match-string 1 c))
-                           (disp (match-string 2 c)))
-                       (cons (format "%s:%s"
-                                     (propertize
-                                      linum 'face 'helm-grep-lineno
-                                      'help-echo (buffer-file-name
-                                                  (get-buffer buf)))
-                                     disp)
-                             (string-to-number linum))))))
+           for c in candidates collect
+           (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'" c)
+             (let ((linum (match-string 1 c))
+                   (disp (match-string 2 c)))
+               (cons (format "%s:%s"
+                             (propertize
+                              linum 'face 'helm-grep-lineno
+                              'help-echo (buffer-file-name
+                                          (get-buffer buf)))
+                             disp)
+                     (string-to-number linum))))))
 
 (defclass helm-moccur-class (helm-source-in-buffer)
   ((buffer-name :initarg :buffer-name
@@ -172,7 +174,8 @@ engine beeing completely different and also much faster."
   (cl-loop for buf in buffers
            collect
            (helm-make-source (or source-name
-                                 (format "Helm moccur in `%s'" (buffer-name buf)))
+                                 (format "Helm moccur in `%s'"
+                                         (buffer-name buf)))
                'helm-moccur-class
              :buffer-name (buffer-name buf)
              :match-part
@@ -185,7 +188,8 @@ engine beeing completely different and also much faster."
                  (match-string 2 candidate)))
              :init `(lambda ()
                       (with-current-buffer ,buf
-                        (let ((contents (buffer-substring-no-properties (point-min) (point-max))))
+                        (let ((contents (buffer-substring-no-properties
+                                         (point-min) (point-max))))
                           (with-current-buffer (helm-candidate-buffer 'local)
                             (insert contents)
                             (goto-char (point-min))
@@ -355,7 +359,8 @@ Same as `helm-occur-goto-line' but go in new frame."
                          (not (y-or-n-p
                                (format "Buffer `%s' already exists overwrite? "
                                        new-buf))))
-               do (setq new-buf (helm-read-string "OccurBufferName: " "*hmoccur ")))
+               do (setq new-buf (helm-read-string
+                                 "OccurBufferName: " "*hmoccur ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
@@ -369,11 +374,14 @@ Same as `helm-occur-goto-line' but go in new frame."
                     (goto-char (point-min))
                     (cl-loop with buf
                              while (re-search-forward "^[0-9]*:" nil t)
-                             for line = (buffer-substring (point-at-bol) (point-at-eol))
-                             for lineno = (get-text-property (point) 'helm-realvalue)
+                             for line = (buffer-substring
+                                         (point-at-bol) (point-at-eol))
+                             for lineno = (get-text-property (point)
+                                                             'helm-realvalue)
                              do (setq buf (helm-attr 'buffer-name))
                              concat (propertize
-                                     (concat (propertize buf 'face 'helm-moccur-buffer)
+                                     (concat (propertize
+                                              buf 'face 'helm-moccur-buffer)
                                              ":" line "\n")
                                      'buffer-name buf
                                      'helm-realvalue lineno)))))
@@ -502,7 +510,8 @@ Special commands:
                                    (length (helm-attr 'moccur-buffers))))
       (helm-attrset 'moccur-buffers helm-occur--buffer-list)
       (setq new-tick-ls (cl-loop for b in helm-occur--buffer-list
-                                 collect (buffer-chars-modified-tick (get-buffer b))))
+                                 collect (buffer-chars-modified-tick
+                                          (get-buffer b))))
       (when buffer-is-modified
         (setq helm-occur--buffer-tick new-tick-ls))
       (cl-assert (> (length helm-occur--buffer-list) 0) nil
@@ -510,28 +519,33 @@ Special commands:
       (unless (eq helm-occur-auto-update-on-resume 'never)
         (when (or buffer-is-modified
                   (cl-loop for b in helm-occur--buffer-list
-                           for new-tick = (buffer-chars-modified-tick (get-buffer b))
+                           for new-tick = (buffer-chars-modified-tick
+                                           (get-buffer b))
                            for tick in helm-occur--buffer-tick
                            thereis (/= tick new-tick)))
           (helm-aif helm-occur-auto-update-on-resume
               (when (or (eq it 'noask)
                         (y-or-n-p "Helm (m)occur Buffer outdated, update? "))
-                (run-with-idle-timer 0.1 nil (lambda ()
-                                               (with-helm-buffer
-                                                 (helm-force-update)
-                                                 (message "Helm (m)occur Buffer have been udated")
-                                                 (sit-for 1) (message nil))))
-                (unless buffer-is-modified (setq helm-occur--buffer-tick new-tick-ls)))
-            (run-with-idle-timer 0.1 nil (lambda ()
-                                           (with-helm-buffer
-                                             (let ((ov (make-overlay (save-excursion
-                                                                       (goto-char (point-min))
-                                                                       (forward-line 1)
-                                                                       (point))
-                                                                     (point-max))))
-                                               (overlay-put ov 'face 'helm-resume-need-update)
-                                               (sit-for 0.3) (delete-overlay ov)
-                                               (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
+                (run-with-idle-timer
+                 0.1 nil (lambda ()
+                           (with-helm-buffer
+                             (helm-force-update)
+                             (message "Helm (m)occur Buffer have been udated")
+                             (sit-for 1) (message nil))))
+                (unless buffer-is-modified (setq helm-occur--buffer-tick
+                                                 new-tick-ls)))
+            (run-with-idle-timer
+             0.1 nil
+             (lambda ()
+               (with-helm-buffer
+                 (let ((ov (make-overlay (save-excursion
+                                           (goto-char (point-min))
+                                           (forward-line 1)
+                                           (point))
+                                         (point-max))))
+                   (overlay-put ov 'face 'helm-resume-need-update)
+                   (sit-for 0.3) (delete-overlay ov)
+                   (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
             (unless buffer-is-modified
               (with-helm-after-update-hook
                 (setq helm-occur--buffer-tick new-tick-ls)
