@@ -147,9 +147,9 @@ engine beeing completely different and also much faster."
                  :truncate-lines helm-occur-truncate-lines)
         (deactivate-mark t)))))
 
-(defun helm-occur-transformer (candidates _source)
+(defun helm-occur-transformer (candidates source)
   "Returns CANDIDATES prefixed with line number."
-  (cl-loop with buf = (helm-attr 'buffer-name)
+  (cl-loop with buf = (helm-attr 'buffer-name source)
            for c in candidates
            collect (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'" c)
                      (let ((linum (match-string 1 c))
