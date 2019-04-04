@@ -47,7 +47,7 @@ Don't set it to any value, it will have no effect.")
   :group 'helm-occur
   :type '(alist :key-type string :value-type function))
 
-(defcustom helm-occur-use-ioccur-style-keys t
+(defcustom helm-occur-use-ioccur-style-keys nil
   "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur."
   :group 'helm-occur
   :type 'boolean)
