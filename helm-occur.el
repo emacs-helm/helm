@@ -32,6 +32,8 @@ Don't set it to any value, it will have no effect.")
 (defvar helm-occur--buffer-list nil)
 (defvar helm-occur--buffer-tick nil)
 (defvar helm-occur-history nil)
+(defvar helm-occur--search-buffer-regexp "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
+  "The regexp matching candidates in helm-occur candidate buffer.")
 
 (defgroup helm-occur nil
   "Regexp related Applications and libraries for Helm."
@@ -153,7 +155,7 @@ engine beeing completely different and also much faster."
   "Returns CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-attr 'buffer-name source)
            for c in candidates collect
-           (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'" c)
+           (when (string-match helm-occur--search-buffer-regexp c)
              (let ((linum (match-string 1 c))
                    (disp (match-string 2 c)))
                (cons (format "%s:%s"
@@ -183,7 +185,7 @@ engine beeing completely different and also much faster."
                ;; The regexp should match what is in candidate buffer,
                ;; not what is displayed in helm-buffer e.g. "12 foo"
                ;; and not "12:foo".
-               (when (string-match "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
+               (when (string-match helm-occur--search-buffer-regexp
                                    candidate)
                  (match-string 2 candidate)))
              :init `(lambda ()
