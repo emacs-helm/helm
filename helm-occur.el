@@ -176,7 +176,7 @@ engine beeing completely different and also much faster."
   (cl-loop for buf in buffers
            collect
            (helm-make-source (or source-name
-                                 (format "Helm moccur in `%s'"
+                                 (format "HO [%s]"
                                          (buffer-name buf)))
                'helm-moccur-class
              :buffer-name (buffer-name buf)
