@@ -5722,6 +5722,14 @@ use `search', `get-line' and `match-part' attributes."
                           (forward-line 1)))
                 nconc
                 (cl-loop with pos-lst
+                         ;; POS-LST is used as a flag to decide if we
+                         ;; run `helm-search-match-part' even if
+                         ;; MATCH-PART isn't specified on source. This
+                         ;; happen when fuzzy matching or using a
+                         ;; negation (!) in one of the patterns, in
+                         ;; these case the searcher returns a list
+                         ;; '(BEG END) instead of an integer like
+                         ;; `re-search-forward'.
                          while (and (setq pos-lst (funcall searcher pattern))
                                     (not (eobp))
                                     (< count limit))
