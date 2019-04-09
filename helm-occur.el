@@ -367,41 +367,46 @@ Same as `helm-occur-goto-line' but go in new frame."
     (with-current-buffer (get-buffer-create buf)
       (setq buffer-read-only t)
       (let ((inhibit-read-only t)
-            (map (make-sparse-keymap)))
+            (map (make-sparse-keymap))
+            buf-name)
         (erase-buffer)
         (insert "-*- mode: helm-occur -*-\n\n"
                 (format "Occur Results for `%s':\n\n" helm-input))
         (save-excursion
           (insert (with-current-buffer helm-buffer
                     (goto-char (point-min))
-                    (cl-loop with buf
-                             while (re-search-forward "^[0-9]*:" nil t)
-                             for line = (buffer-substring
-                                         (point-at-bol) (point-at-eol))
-                             for lineno = (get-text-property (point)
-                                                             'helm-realvalue)
-                             do (setq buf (helm-attr 'buffer-name))
-                             concat (propertize
-                                     (concat (propertize
-                                              buf 'face 'helm-moccur-buffer)
-                                             ":" line "\n")
-                                     'buffer-name buf
-                                     'helm-realvalue lineno)))))
+                    (forward-line 1)
+                    (buffer-substring (point) (point-max)))))
         (save-excursion
+          (forward-line -2)
           (while (not (eobp))
-            (add-text-properties
-             (point-at-bol) (point-at-eol)
-             `(keymap ,map
-               help-echo ,(concat
-                           (buffer-file-name
-                            (get-buffer (get-text-property
-                                         (point) 'buffer-name)))
-                           "\nmouse-1: set point\nmouse-2: jump to selection")
-               mouse-face highlight
-               invisible nil))
-            (define-key map [mouse-1] 'mouse-set-point)
-            (define-key map [mouse-2] 'helm-occur-mode-mouse-goto-line)
-            (define-key map [mouse-3] 'ignore)
+            (if (helm-pos-header-line-p)
+                (let ((beg (point-at-bol))
+                      (end (point-at-eol)))
+                  (set-text-properties beg (1+ end) nil)
+                  (delete-region (1- beg) end))
+              (helm-aif (setq buf-name (assoc-default
+                                        'buffer-name
+                                        (get-text-property (point) 'helm-cur-source)))
+                  (progn
+                    (insert (propertize (concat it ":")
+                                        'face 'helm-moccur-buffer
+                                        'helm-realvalue (get-text-property (point) 'helm-realvalue)))
+                    (add-text-properties
+                     (point-at-bol) (point-at-eol)
+                     `(buffer-name ,buf-name))
+                    (add-text-properties
+                     (point-at-bol) (point-at-eol)
+                     `(keymap ,map
+                              help-echo ,(concat
+                                          (buffer-file-name
+                                           (get-buffer buf-name))
+                                          "\nmouse-1: set point\nmouse-2: jump to selection")
+                              mouse-face highlight
+                              invisible nil))
+                    (define-key map [mouse-1] 'mouse-set-point)
+                    (define-key map [mouse-2] 'helm-occur-mode-mouse-goto-line)
+                    (define-key map [mouse-3] 'ignore))))
             (forward-line 1))))
       (helm-occur-mode))
     (pop-to-buffer buf)
