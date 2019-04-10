@@ -173,6 +173,7 @@ engine beeing completely different and also much faster."
                    :initform nil)))
 
 (defun helm-occur-build-sources (buffers &optional source-name)
+  "Build sources for helm-occur for each buffer in BUFFERS list."
   (cl-loop for buf in buffers
            collect
            (helm-make-source (or source-name
@@ -201,6 +202,7 @@ engine beeing completely different and also much faster."
                                 (cl-incf linum)
                                 (insert (format "%s " linum))))))))
              :filtered-candidate-transformer 'helm-occur-transformer
+             :help-message 'helm-moccur-help-message
              :nomark t
              :migemo t
              :history 'helm-occur-history
@@ -214,6 +216,8 @@ engine beeing completely different and also much faster."
              :moccur-buffers buffers)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
+  "Runs helm-occur on a list of buffers.
+Each buffer's result is displayed in a separated source."
   (let* ((curbuf (current-buffer))
          (bufs (if helm-occur-always-search-in-current
                    (cons curbuf (remove curbuf buffers))

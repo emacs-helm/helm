@@ -1389,6 +1389,7 @@ enable this you need to add `helm-source-occur' and `helm-source-moccur' to
 
 You can do this with `\\<helm-map>\\[helm-execute-persistent-action]' (persistent-action), to do it repeatedly
 you can use `\\<helm-map>\\[helm-follow-action-forward]' and `\\<helm-map>\\[helm-follow-action-backward]' or enable `helm-follow-mode' with `\\<helm-map>\\[helm-follow-mode]'.
+Follow mode is enabled by default in helm-occur.
 
 *** Switch to buffer in other window
 
@@ -1397,7 +1398,7 @@ in other window horizontally or vertically if a prefix arg is supplied.
 
 *** Save the results
 
-Similarly to Helm-grep, you can save the results with `\\<helm-map>\\[helm-moccur-run-save-buffer]'.
+Similarly to Helm-grep, you can save the results with `\\<helm-occur-map>\\[helm-occur-run-save-buffer]'.
 Once in the saved buffer, you can edit it, see [[Edit a saved buffer][below]].
 
 Of course if you don't save the results, you can resume the Helm session with
@@ -1431,13 +1432,14 @@ this region with `mark-defun' the symbol that was at point before
 marking defun will be used when `helm-source-occur' is member of
 `helm-sources-using-default-as-input'.
 
+*** Switch to next or previous source
+
+See [[Moving in `helm-buffer'][Moving in `helm-buffer']].
+
 ** Commands
 \\<helm-moccur-map>
-\\[helm-goto-next-file]\t\tNext buffer.
-\\[helm-goto-precedent-file]\t\tPrevious buffer.
-\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.
-\\[helm-moccur-run-goto-line-ow]\t\tGo to line in other window.
-\\[helm-moccur-run-goto-line-of]\t\tGo to line in new frame.")
+\\[helm-occur-run-goto-line-ow]\t\tGo to line in other window.
+\\[helm-occur-run-goto-line-of]\t\tGo to line in new frame.")
 
 ;;; Helm Top
 ;;

@@ -1017,7 +1017,7 @@ value of this var.")
   "* Helm Generic Help
 ** Basics
 
-Helm narrows down the list of candidates as you type a filter pattern.
+Helm narrows down the list of candidates as you type a filter pattern see [[Matching in Helm][Matching in Helm]].
 
 Helm accepts multiple space-separated patterns, each pattern can be negated with \"!\".
 
@@ -1042,6 +1042,19 @@ See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completio
 Note: In addition to the default actions list, additional actions appear
 depending of the type of the selected candidate(s).  They are called filtered
 actions.
+
+** Matching in Helm
+
+All what you write in minibuffer is interpreted as a regexp or
+multiple regexps if separated by a space.  This is true for most
+sources unless developer of source have disabled it or have choosen to
+use fuzzy matching.  Even if a source have fuzzy matching enabled,
+helm will switch to multi match as soon as it detect a space in
+pattern, it may also switch to multi match as well if pattern starts
+with a \"^\" beginning of line sign, in those cases each pattern
+separated with space should be a regexp and not a fuzzy pattern.  When
+using multi match patterns, each pattern starting with \"!\" is
+interpreted as a negation i.e. match everything but this.
 
 ** Helm mode
 
@@ -1238,10 +1251,11 @@ e.g. file deletion, file copy etc...
 
 You can move in `helm-buffer' with the usual commands used in Emacs:
 \(\\<helm-map>\\[helm-next-line], \\<helm-map>\\[helm-previous-line], etc.  See above basic commands.
-When `helm-buffer' contains more than one source, change source with \\<helm-map>\\[helm-next-source].
+When `helm-buffer' contains more than one source, change source with \\<helm-map>\\[helm-next-source] and \\[helm-previous-source].
 
 Note: When reaching the end of a source, \\<helm-map>\\[helm-next-line] will *not* go to the next source unless
-variable `helm-move-to-line-cycle-in-source' is non-nil, so you will have to use \\<helm-map>\\[helm-next-source].
+variable `helm-move-to-line-cycle-in-source' is non-nil, so you will have to use \\<helm-map>\\[helm-next-source]
+and \\[helm-previous-source].
 
 ** Resume previous session from current Helm session
 
