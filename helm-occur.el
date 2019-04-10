@@ -424,6 +424,20 @@ Same as `helm-occur-goto-line' but go in new frame."
         (helm-occur-mode-goto-line)))))
 (put 'helm-moccur-mode-mouse-goto-line 'helm-only t)
 
+(defun helm-occur-buffer-substring-with-linums (beg end)
+  (let ((bufstr (buffer-substring-no-properties beg end))
+        (bufname (buffer-name)))
+    (with-temp-buffer
+      (save-excursion
+        (insert bufstr))
+      (let ((linum 1))
+        (insert (format "%s " linum))
+        (while (re-search-forward "\n" nil t)
+          (cl-incf linum)
+          (insert (format "%s " linum)))
+        (add-text-properties (point-min) (point-max) `(buffer-name ,bufname)))
+      (buffer-string))))
+
 (defun helm-occur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
   (goto-char (point-min))
   (let (pattern)
@@ -435,7 +449,7 @@ Same as `helm-occur-goto-line' but go in new frame."
       (let ((inhibit-read-only t)
             (buffer (current-buffer))
             (buflst helm-occur--buffer-list)
-            (bsubstring #'buffer-substring-no-properties))
+            (bsubstring #'helm-occur-buffer-substring-with-linums))
         (delete-region (point) (point-max))
         (message "Reverting buffer...")
         (save-excursion
@@ -448,22 +462,24 @@ Same as `helm-occur-goto-line' but go in new frame."
                                               (funcall bsubstring
                                                        (point-min) (point-max))))
                                        "")
-                      unless (string= bufstr "")
-                      do (add-text-properties
-                          0 (length bufstr)
-                          `(buffer-name ,(buffer-name (get-buffer buf)))
-                          bufstr)
                       concat bufstr)
              "\n")
             (goto-char (point-min))
-            (cl-loop with helm-pattern = pattern
+            (cl-loop with linum
+                     with mpart
+                     with helm-pattern = pattern
                      while (helm-mm-search pattern)
-                     for linum = (line-number-at-pos)
+                     do (when (save-excursion
+                                (forward-line 0)
+                                (re-search-forward "^\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)$"
+                                                   (point-at-eol) t))
+                          (setq linum (string-to-number (match-string 1))
+                                mpart (match-string 2)))
+                     when (and mpart (string-match pattern mpart))
                      for line = (format "%s:%d:%s"
                                         (get-text-property (point) 'buffer-name)
                                         linum
-                                        (buffer-substring-no-properties
-                                         (point-at-bol) (point-at-eol)))
+                                        mpart)
                      when line
                      do (with-current-buffer buffer
                           (insert
