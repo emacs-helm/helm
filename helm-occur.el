@@ -474,10 +474,11 @@ numbered.  The property 'buffer-name is added to the whole string."
                      with mpart
                      ;; Bind helm-pattern used by `helm-grep-split-line'.
                      with helm-pattern = pattern
-                     while (helm-mm-search pattern)
+                     while (helm-mm-search pattern) ; point is at eol.
                      ;; Calculate line number (linum) and extract real
                      ;; part of line (mpart).
                      do (when (save-excursion
+                                ;; `helm-mm-search' puts point at eol.
                                 (forward-line 0)
                                 (re-search-forward "^\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)$"
                                                    (point-at-eol) t))
