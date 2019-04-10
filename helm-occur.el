@@ -424,8 +424,10 @@ Same as `helm-occur-goto-line' but go in new frame."
         (helm-occur-mode-goto-line)))))
 (put 'helm-moccur-mode-mouse-goto-line 'helm-only t)
 
-(defun helm-occur-buffer-substring-with-linums (beg end)
-  (let ((bufstr (buffer-substring-no-properties beg end))
+(defun helm-occur-buffer-substring-with-linums ()
+  "Returns current-buffer contents as a string with all lines
+numbered.  The property 'buffer-name is added to the whole string."
+  (let ((bufstr (buffer-substring-no-properties (point-min) (point-max)))
         (bufname (buffer-name)))
     (with-temp-buffer
       (save-excursion
@@ -439,6 +441,7 @@ Same as `helm-occur-goto-line' but go in new frame."
       (buffer-string))))
 
 (defun helm-occur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
+  "The `revert-buffer-function' for `helm-occur-mode'."
   (goto-char (point-min))
   (let (pattern)
     (when (re-search-forward "^Occur Results for `\\(.*\\)'" nil t)
@@ -448,8 +451,7 @@ Same as `helm-occur-goto-line' but go in new frame."
         (forward-line 1))
       (let ((inhibit-read-only t)
             (buffer (current-buffer))
-            (buflst helm-occur--buffer-list)
-            (bsubstring #'helm-occur-buffer-substring-with-linums))
+            (buflst helm-occur--buffer-list))
         (delete-region (point) (point-max))
         (message "Reverting buffer...")
         (save-excursion
@@ -459,22 +461,25 @@ Same as `helm-occur-goto-line' but go in new frame."
              (cl-loop for buf in buflst
                       for bufstr = (or (and (buffer-live-p (get-buffer buf))
                                             (with-current-buffer buf
-                                              (funcall bsubstring
-                                                       (point-min) (point-max))))
+                                              (helm-occur-buffer-substring-with-linums)))
                                        "")
                       concat bufstr)
              "\n")
             (goto-char (point-min))
             (cl-loop with linum
                      with mpart
+                     ;; Bind helm-pattern used by `helm-grep-split-line'.
                      with helm-pattern = pattern
                      while (helm-mm-search pattern)
+                     ;; Calculate line number (linum) and extract real
+                     ;; part of line (mpart).
                      do (when (save-excursion
                                 (forward-line 0)
                                 (re-search-forward "^\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)$"
                                                    (point-at-eol) t))
                           (setq linum (string-to-number (match-string 1))
                                 mpart (match-string 2)))
+                     ;; Match part after line number.
                      when (and mpart (string-match pattern mpart))
                      for line = (format "%s:%d:%s"
                                         (get-text-property (point) 'buffer-name)
