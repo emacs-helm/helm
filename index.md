@@ -232,7 +232,6 @@ visually. Here is a demo of `helm-buffers-list` used with
 With more pattern matching, candidates are narrowed down from the
 initial 253 buffers to 12 as shown in the modeline. 
 
-Helm [guide](http://tuhdo.github.io/helm-intro.html) and
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) provide
 additional details.
 
@@ -289,7 +288,7 @@ through the Emacs package manager. This list is not exhaustive.
 - `helm-dabbrev`: enhanced dabbrev implementation with helm
   completion; does not use emacs code.
   
-- `helm-moccur`: enhanced occur for one or more buffers; launch from
+- `helm-occur`: enhanced occur for one or more buffers; launch from
   `helm-buffers-list` or `current-buffer`.
   
 - `helm-M-x`: enhanced `execute-extended-command` (bind it to `M-x`).
@@ -320,10 +319,19 @@ through the Emacs package manager. This list is not exhaustive.
 
 # Recommended Helm extensions
 
+Normally all Helm modules coming from [Emacs-helm](https://github.com/emacs-helm) organisation 
+are safe to use otherwise it is mentioned in their README if they are broken or unmaintained.
+Here some of them I am using:
+
 - [helm-ls-git](https://github.com/emacs-helm/helm-ls-git)
-- [helm-ls-hg](https://github.com/emacs-helm/helm-ls-hg)
+- [helm-addressbook](https://github.com/emacs-helm/helm-addressbook)
+- [helm-dictionary](https://github.com/emacs-helm/helm-dictionary)
+- [helm-mu](https://github.com/emacs-helm/helm-mu)
+- [helm-slime](https://github.com/emacs-helm/helm-slime)
+- [helm-system-packages](https://github.com/emacs-helm/helm-system-packages)
 - [helm-descbinds](https://github.com/emacs-helm/helm-descbinds)
 - [helm-firefox](https://github.com/emacs-helm/helm-firefox)
+- [helm-w3m](https://github.com/emacs-helm/helm-w3m)
 - [helm-emms](https://github.com/emacs-helm/helm-emms)
 
 **Warning** Helm development has sparked quite a few extensions, many
@@ -346,6 +354,10 @@ The Helm project has a current unresolved
 [issue list](https://github.com/emacs-helm/helm/issues?sort=created&direction=desc&state=open).
 Please feel free to fix any of them; send a pull request.
 
+Most issues come from a wrong configuration or a use of Helm modified externally by third party package e.g. Spacemacs.
+Some other Helm packages that are no more maintained (or badly maintained) and use deprecated Helm code will clash also with recent Helm
+be aware.
+
 # Contributors
 
 The Helm project maintains a
@@ -366,7 +378,7 @@ script `./emacs-helm.sh` located in the helm directory.
 Helm comes now with a template for filling bugs, when reporting issues,
 be sure to fill all sections and to run helm from a minimal install as
 described above to reproduce your bug.
- 
+
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
