@@ -116,13 +116,25 @@
     (helm-exit-and-execute-action 'helm-el-package-visit-homepage)))
 (put 'helm-el-run-visit-homepage 'helm-only t)
 
+(defun helm-elisp-package--pkg-name (pkg)
+  (if (package-desc-p pkg)
+      (package-desc-name pkg)
+    pkg))
+
 (defun helm-el-package-install-1 (pkg-list)
   (cl-loop with mkd = pkg-list
            for p in mkd
            for id = (get-text-property 0 'tabulated-list-id p)
            for pkg = (if (fboundp 'package-desc-name) id (car id))
-           do (package-install pkg)
-           collect pkg into installed-list
+           for name = (helm-elisp-package--pkg-name pkg)
+           do (package-install pkg t)
+           when (helm-aand (assq name package-alist)
+                           (package-desc-dir (cadr it))
+                           (file-exists-p it))
+           collect pkg into installed-list and
+           do (unless (package--user-selected-p name)
+                (package--save-selected-packages
+                 (cons name package-selected-packages)))
            finally do (if (fboundp 'package-desc-full-name)
                           (message (format "%d packages installed:\n(%s)"
                                            (length installed-list)
