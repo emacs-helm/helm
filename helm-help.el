@@ -687,7 +687,9 @@ On remote files grep is not well supported by TRAMP unless you suspend updates b
 entering the pattern and re-enable it once your pattern is ready.
 To toggle suspend-update, use `\\<helm-map>\\[helm-toggle-suspend-update]'.
 
-*** Setting up aliases in Eshell allows you to set up powerful customized commands
+*** Execute Eshell commands on files
+
+Setting up aliases in Eshell allows you to set up powerful customized commands.
 
 Adding Eshell aliases to your `eshell-aliases-file' or using the
 `alias' command from Eshell allows you to create personalized
