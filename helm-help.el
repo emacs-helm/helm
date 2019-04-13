@@ -717,6 +717,10 @@ $ example foo bar baz
 
 Of course the alias command should support this.
 
+If you add %s to the command line %s will be replaced with the candidate, this mean you can
+add extra argument to your command e.g. command -extra-arg %s or command %s -extra-arg.
+If you want to pass many files inside %s, don't forget to use a prefix arg.
+
 *** Using TRAMP with `helm-find-files' to read remote directories
 
 `helm-find-files' works fine with TRAMP despite some limitations.
