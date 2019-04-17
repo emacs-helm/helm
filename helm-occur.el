@@ -369,6 +369,7 @@ Same as `helm-occur-goto-line' but go in new frame."
                                  "OccurBufferName: " "*hmoccur ")))
       (setq buf new-buf))
     (with-current-buffer (get-buffer-create buf)
+      (kill-all-local-variables)
       (setq buffer-read-only t)
       (buffer-disable-undo)
       (let ((inhibit-read-only t)
