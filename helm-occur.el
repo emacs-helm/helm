@@ -498,6 +498,8 @@ numbered.  The property 'buffer-name is added to the whole string."
                             (car (helm-occur-filter-one-by-one line))
                             'helm-realvalue linum)
                            "\n"))))
+          (when (fboundp 'wgrep-cleanup-overlays)
+            (wgrep-cleanup-overlays (point-min) (point-max)))
           (message "Reverting buffer done"))))))
 
 (defun helm-occur-filter-one-by-one (candidate)

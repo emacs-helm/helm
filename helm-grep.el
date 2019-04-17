@@ -862,6 +862,8 @@ Special commands:
                                ;; needed for wgrep.
                                'helm-realvalue line)
                               "\n"))))
+      (when (fboundp 'wgrep-cleanup-overlays)
+        (wgrep-cleanup-overlays (point-min) (point-max)))
       (message "Reverting buffer done"))))
 
 (defun helm-gm-next-file ()
