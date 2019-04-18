@@ -1146,7 +1146,7 @@ Note: Some sources may not have their group set and default to the `helm' group.
 | C-M-S-v | M-prior, C-M-y   | Previous page (other-window)                                         |
 | C-M-v   | M-next           | Next page (other-window)                                             |
 | Tab     | C-i              | Show action list                                                     |
-| Left    |                  | Previous source                                                      |
+| Left    | M-o              | Previous source                                                      |
 | Right   | C-o              | Next source                                                          |
 | C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [1]) |
 | C-j     | C-z              | Persistent action (Execute and keep Helm session)                    |
@@ -1224,6 +1224,7 @@ go to previous/next line without executing the persistent action.
 ** Frequently Used Commands
 
 \\[helm-toggle-resplit-and-swap-windows]\t\tToggle vertical/horizontal split on first hit and swap Helm window on second hit.
+\\[helm-exchange-minibuffer-and-header-line]\t\tExchange minibuffer and header-line.
 \\[helm-quit-and-find-file]\t\tDrop into `helm-find-files'.
 \\[helm-kill-selection-and-quit]\t\tKill display value of candidate and quit (with prefix arg, kill the real value).
 \\[helm-yank-selection]\t\tYank current selection into pattern.
