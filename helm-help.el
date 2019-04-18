@@ -958,7 +958,7 @@ with trash-list until you log in as root.
 \\[helm-ff-run-find-alternate-file]\t\tFind alternate file.
 \\[helm-ff-run-insert-org-link]\t\tInsert org link.
 \\[helm-ff-bookmark-set]\t\tSet bookmark to current directory.
-\\[helm-find-files-toggle-to-bookmark]\t\tJump to bookmark list.
+\\[helm-find-files-switch-to-bookmark]\t\tJump to bookmark list.
 \\[helm-ff-sort-alpha]\t\tSort alphabetically
 \\[helm-ff-sort-by-newest]\t\tSort by newest
 \\[helm-ff-sort-by-size]\t\tSort by size")
