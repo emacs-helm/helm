@@ -1443,10 +1443,10 @@ marking defun will be used when `helm-source-occur' is member of
 See [[Moving in `helm-buffer'][Moving in `helm-buffer']].
 
 ** Commands
-\\<helm-moccur-map>
+\\<helm-occur-map>
 \\[helm-occur-run-goto-line-ow]\t\tGo to line in other window.
-\\[helm-occur-run-goto-line-of]\t\tGo to line in new frame.")
-
+\\[helm-occur-run-goto-line-of]\t\tGo to line in new frame.
+\\[helm-occur-run-save-buffer]\t\tSave results in new buffer.")
 ;;; Helm Top
 ;;
 ;;
