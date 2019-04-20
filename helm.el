@@ -1017,6 +1017,8 @@ value of this var.")
   "* Helm Generic Help
 ** Basics
 
+To navigate in this Help buffer see [[Helm help][here]].
+
 Helm narrows down the list of candidates as you type a filter pattern see [[Matching in Helm][Matching in Helm]].
 
 Helm accepts multiple space-separated patterns, each pattern can be negated with \"!\".
@@ -1124,10 +1126,11 @@ than the helmized Emacs equivalent.
 From a Helm session, just hit \\<helm-map>\\[helm-help] to have the
 documentation for the current source followed by the global Helm documentation.
 
-While in the help buffer, most of the regular keybindings are available in an
-Emacs buffers; the most important ones are shown in minibuffer.  However due to
-the implementation restrictions, no regular Emacs keymap is used (it runs in a
-loop when reading the help buffer) they are hardcoded and not modifiable.
+While in the help buffer, most of the Emacs regular keybindings
+are available; the most important ones are shown in minibuffer.
+However due to the implementation restrictions, no regular Emacs
+keymap is used (it runs in a loop when reading the help buffer)
+they are hardcoded and not modifiable.
 
 The hard-coded documentation bindings are:
 
