@@ -353,7 +353,7 @@ based distribution it is 'trash-cli'."
 (defcustom helm-list-directory-function
   (cl-case system-type
     (gnu/linux #'helm-list-dir-external)
-    (berkeley-unix #'helm-list-dir-external)
+    (berkeley-unix #'helm-list-dir-lisp)
     (windows-nt #'helm-list-dir-lisp)
     (t #'helm-list-dir-lisp))
   "The function used in `helm-find-files' to list remote directories.
@@ -366,7 +366,14 @@ provided with local files i.e. colorized symlinks, executables files
 etc... whereas using `helm-list-dir-lisp' will allow colorizing only
 directories but is more portable.
 
-NOTE that `helm-list-dir-external' needs ls and awk as dependencies."
+NOTE:  `helm-list-dir-external' needs ls and awk as dependencies.
+Also the ls version installed on the remote side should support the
+same arguments as the GNU/ls version that are -A -1 -F -b and -Q.
+So even if you are using a GNU/ls version locally and you want to
+connect e.g. on a Freebsd server you may have failures due to the
+incompatible ls version installed on remote server.
+In such case use `helm-list-dir-lisp' which work everywhere but is
+slower and less featured (only directories colorized)."
   :type 'function
   :group 'helm-files)
 
