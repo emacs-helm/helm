@@ -1022,7 +1022,7 @@ Helm narrows down the list of candidates as you type a filter pattern see [[Matc
 Helm accepts multiple space-separated patterns, each pattern can be negated with \"!\".
 
 Helm also supports fuzzy matching in some places when specified, you will find
-several variables to enable fuzzy matching in diverse sources,
+several variables to enable fuzzy matching in diverse [[Helm sources][sources]],
 see [[https://github.com/emacs-helm/helm/wiki/Fuzzy-matching][fuzzy-matching]] in helm-wiki for more infos.
 
 Helm generally uses familiar Emacs keys to navigate the list.
@@ -1042,6 +1042,40 @@ See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completio
 Note: In addition to the default actions list, additional actions appear
 depending of the type of the selected candidate(s).  They are called filtered
 actions.
+
+** Helm sources
+
+Helm uses what's called sources to provide different kinds of completions, each helm session
+can handle one or more source.
+A source is an alist object which is build from various classes, see [[Writing your own Helm sources][here]]
+and [[https://github.com/emacs-helm/helm/wiki/Developing#creating-a-source][Helm wiki]] for more infos.
+
+*** Configure sources
+
+You will find in helm sources already built and bound to a
+variable called generally `helm-source-<something>', in this case
+it is an alist and you can change the attributes (keys) values
+using `helm-attrset' function in your config, of course you have
+to ensure before calling `helm-attrset' that the file containing
+source is loaded with e.g. `with-eval-after-load'.  Of course you
+can also completely redefine the source but this is generally not
+elegant as it duplicate for its most part code already defined in
+Helm.
+
+You will find also sources that are not built and even not bound
+to any variables because they are rebuilded at each start of helm
+session.  In this case you can add a defmethod called
+`helm-setup-user-source' to your config:
+
+#+begin_src elisp
+
+    (defmethod helm-setup-user-source ((source helm-moccur-class))
+      (setf (slot-value source 'follow) -1))
+
+#+end_src
+
+See [[https://github.com/emacs-helm/helm/wiki/FAQ#why-is-a-customizable-helm-source-nil][here]] for more infos,
+and for more complex examples of configuration [[https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm.el#L340][here]].
 
 ** Matching in Helm
 
@@ -1316,7 +1350,7 @@ what you want to do.  To simplify this, several `helm-build-*' macros are
 provided.  Below, simple examples to start with.
 
 We will not go further here, see [[https://github.com/emacs-helm/helm/wiki/Developing][Helm wiki]] and the source
-code for more information and more complex exapmles.
+code for more information and more complex examples.
 
 #+begin_src elisp
 
