@@ -89,7 +89,7 @@ Any other non--nil value update after confirmation."
     (define-key map (kbd "C-c C-o")  'helm-occur-run-goto-line-of)
     (define-key map (kbd "C-x C-s")  'helm-occur-run-save-buffer)
     (when helm-occur-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'helm-execute-persistent-action)
+      (define-key map (kbd "<right>")  'helm-occur-right)
       (define-key map (kbd "<left>")   'helm-occur-run-default-action))
     (delq nil map))
   "Keymap used in occur source.")
@@ -308,6 +308,17 @@ Same as `helm-occur-goto-line' but go in new frame."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-occur-save-results)))
 (put 'helm-moccur-run-save-buffer 'helm-only t)
+
+(defun helm-occur-right ()
+  "helm-occur action for right arrow.
+This is used when `helm-occur-use-ioccur-style-keys' is enabled.
+If follow is enabled (default) go to next source, otherwise execute
+persistent action."
+  (interactive)
+  (if (helm-aand (helm-attr 'follow) (> it 0))
+      (helm-next-source)
+    (helm-execute-persistent-action)))
+(put 'helm-occur-right 'helm-only t)
 
 
 ;;; helm-occur-mode
