@@ -99,7 +99,8 @@ Note this have no effect in `helm-org-in-buffer-headings'."
   (goto-char (marker-position marker))
   (org-show-context)
   (re-search-backward "^\\*+ " nil t)
-  (org-show-entry))
+  (org-show-entry)
+  (org-show-children))
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   (helm-org-goto-marker marker)
