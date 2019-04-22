@@ -3774,7 +3774,7 @@ Default function to match candidates according to `helm-pattern'."
 ;;; Fuzzy matching
 ;;
 ;;
-(defconst helm--fuzzy-word-separators '("-" "_" "." ":" "/"))
+(defconst helm--fuzzy-word-separators '("-" "_" ":" "/"))
 (defvar helm--fuzzy-regexp-cache (make-hash-table :test 'eq))
 (defun helm--fuzzy-match-maybe-set-pattern ()
   ;; Computing helm-pattern with helm--mapconcat-pattern
@@ -3877,15 +3877,12 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                      0
                    (cl-loop with seq = (copy-sequence str-lookup)
                             with count = 0
-                            for i from 1
                             for c across (substring pattern 1)
                             for assoc = (rassoc (list (string c)) (cdr seq))
-                            for pos = (and assoc (cl-position assoc seq))
                             when (helm-aand
                                   assoc
                                   (car it)
-                                  (member it helm--fuzzy-word-separators)
-                                  (= pos i))
+                                  (member it helm--fuzzy-word-separators))
                             do (cl-incf count 2)
                             and do (setq seq (cdr (member assoc seq)))
                             finally return count))))
