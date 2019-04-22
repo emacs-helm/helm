@@ -3877,12 +3877,15 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                      0
                    (cl-loop with seq = (copy-sequence str-lookup)
                             with count = 0
+                            for i from 1
                             for c across (substring pattern 1)
                             for assoc = (rassoc (list (string c)) (cdr seq))
+                            for pos = (and assoc (cl-position assoc seq))
                             when (helm-aand
                                   assoc
                                   (car it)
-                                  (member it helm--fuzzy-word-separators))
+                                  (member it helm--fuzzy-word-separators)
+                                  (= pos i))
                             do (cl-incf count 2)
                             and do (setq seq (cdr (member assoc seq)))
                             finally return count))))
