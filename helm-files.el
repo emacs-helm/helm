@@ -3684,7 +3684,7 @@ is helm-source-find-files."
                        (expand-file-name input)))
         (helm-find-files-input
          (if helm-ff-allow-non-existing-file-at-point
-             (thing-at-point 'filename)
+             (and (helm-ffap-guesser) (thing-at-point 'filename))
            (helm-ffap-guesser))
          (thing-at-point 'filename)))))
 
