@@ -240,6 +240,11 @@ See also `ffap-url-unwrap-remote' that may override this variable."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-ff-allow-non-existing-file-at-point nil
+  "Use file-at-point as initial input in `helm-find-files' even if it doesn't exists."
+  :group 'helm-files
+  :type 'boolean)
+
 (defcustom helm-find-files-ignore-thing-at-point nil
   "Use only `default-directory' as default input in `helm-find-files'.
 I.e text under cursor in `current-buffer' is ignored.
@@ -3678,7 +3683,9 @@ is helm-source-find-files."
     (or (and input (or (and (file-remote-p input) input)
                        (expand-file-name input)))
         (helm-find-files-input
-         (helm-ffap-guesser)
+         (if helm-ff-allow-non-existing-file-at-point
+             (thing-at-point 'filename)
+           (helm-ffap-guesser))
          (thing-at-point 'filename)))))
 
 (defun helm-ffap-guesser ()
@@ -3734,7 +3741,8 @@ is helm-source-find-files."
          (file-p  (and file-at-pt
                        (not (string= file-at-pt ""))
                        (not remp)
-                       (file-exists-p file-at-pt)
+                       (or helm-ff-allow-non-existing-file-at-point
+                           (file-exists-p file-at-pt))
                        thing-at-pt
                        (not (string= thing-at-pt ""))
                        (file-exists-p
@@ -3750,7 +3758,8 @@ is helm-source-find-files."
           (urlp (helm-html-decode-entities-string file-at-pt)) ; possibly an url or email.
           ((and file-at-pt
                 (not remp)
-                (file-exists-p file-at-pt))
+                (or helm-ff-allow-non-existing-file-at-point
+                    (file-exists-p file-at-pt)))
            (expand-file-name file-at-pt)))))
 
 (defun helm-ff-find-url-at-point ()
