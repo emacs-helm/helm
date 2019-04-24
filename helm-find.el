@@ -31,6 +31,11 @@ I.e use the -path/ipath arguments of find instead of -name/iname."
   :group 'helm-files
   :type 'boolean)
 
+(defcustom helm-find-noerrors nil
+  "Prevent showing error messages in helm buffer when non nil."
+  :group 'helm-files
+  :type 'boolean)
+
 (defvar helm-find-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
@@ -107,7 +112,8 @@ Additional find options can be specified after a \"*\"
 separator."
   (let* (process-connection-type
          non-essential
-         (cmd (helm-find--build-cmd-line))
+         (cmd (concat (helm-find--build-cmd-line)
+                      (if helm-find-noerrors "2> /dev/null" "")))
          (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
     (helm-log "Find command:\n%s" cmd)
     (prog1 proc
