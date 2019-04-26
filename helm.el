@@ -1291,7 +1291,7 @@ You can move in `helm-buffer' with the usual commands used in Emacs:
 \(\\<helm-map>\\[helm-next-line], \\<helm-map>\\[helm-previous-line], etc.  See above basic commands.
 When `helm-buffer' contains more than one source, change source with \\<helm-map>\\[helm-next-source] and \\[helm-previous-source].
 
-Note: When reaching the end of a source, \\<helm-map>\\[helm-next-line] will *not* go to the next source unless
+Note: When reaching the end of a source, \\<helm-map>\\[helm-next-line] will *not* go to the next source when
 variable `helm-move-to-line-cycle-in-source' is non-nil, so you will have to use \\<helm-map>\\[helm-next-source]
 and \\[helm-previous-source].
 
