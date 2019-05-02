@@ -3059,13 +3059,19 @@ Return candidates prefixed with basename of `helm-input' first."
             '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
               ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
             3))
-          ((string-match "\\.el$" (helm-aif (helm-marked-candidates)
-                                     (car it) candidate))
+          ((string-match "\\.el\\'" (helm-aif (helm-marked-candidates)
+                                        (car it) candidate))
            (helm-append-at-nth
             actions
             '(("Byte compile lisp file(s) `M-B, C-u to load'"
                . helm-find-files-byte-compile)
               ("Load File(s) `M-L'" . helm-find-files-load-files))
+            2))
+          ((string-match "\\.elc?\\'" (helm-aif (helm-marked-candidates)
+                                          (car it) candidate))
+           (helm-append-at-nth
+            actions
+            '(("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
           ((and (string-match "\\.html?$" candidate)
                 (file-exists-p candidate))
