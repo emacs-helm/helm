@@ -70,8 +70,8 @@ clean:
 
 # Make autoloads file
 autoloads:
-	$(EVAL) "(let ((generated-autoload-file (expand-file-name \"helm-autoloads.el\" \"$(PKGDIR)\")) \
-(backup-inhibited t)) (update-directory-autoloads \"$(PKGDIR)\"))"
+	$(EVAL) "(progn (setq generated-autoload-file (expand-file-name \"helm-autoloads.el\" \"$(PKGDIR)\")) \
+(setq backup-inhibited t) (update-directory-autoloads \"$(PKGDIR)\"))"
 
 PREFIX=/usr/local/
 BIN=${PREFIX}bin/
