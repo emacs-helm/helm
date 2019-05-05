@@ -384,16 +384,17 @@ This is a command for `helm-kill-ring-map'."
              (list (format "%s: %s\n" lines
                            (truncate-string-to-width
                             (mapconcat 'identity (list (car val))
-                                       "^J") (- (window-width) 15)))
+                                       "^J")
+                            (- (window-width) 15)))
                    'insert-register)))
           ((stringp val)
            (list
-            ;; without properties
             (concat (substring-no-properties
                      val 0 (min (length val) helm-register-max-offset))
                     (if (> (length val) helm-register-max-offset)
                         "[...]" ""))
             'insert-register
+            'kill-new
             'append-to-register
             'prepend-to-register)))
         unless (null string-actions) ; Fix Issue #1107.
@@ -406,6 +407,11 @@ This is a command for `helm-kill-ring-map'."
            '((insert-register
               "Insert Register" .
               (lambda (c) (insert-register (car c))))
+             (kill-new
+              "Kill Register" .
+              (lambda (c) (with-temp-buffer
+                            (insert-register (car c))
+                            (kill-new (buffer-string)))))
              (jump-to-register
               "Jump to Register" .
               (lambda (c) (jump-to-register (car c))))
