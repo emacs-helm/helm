@@ -271,6 +271,9 @@ Helm uses `ffap' partially or completely to find file at point depending on the
 value of `helm-ff-guess-ffap-filenames': if non-nil, support is complete
 \(annoying), if nil, support is partial.
 
+Note that when the variable `helm-ff-allow-non-existing-file-at-point' is non nil
+Helm will insert the filename at point even if file with this name doesn't exists.
+
 **** Find file at line number
 
 When text at point is in the form of
@@ -278,6 +281,9 @@ When text at point is in the form of
     ~/elisp/helm/helm.el:1234
 
 Helm finds this file at the indicated line number, here 1234.
+
+Note that for this feature to work you have to disable
+`helm-ff-allow-non-existing-file-at-point'.
 
 **** Find URL at point
 
