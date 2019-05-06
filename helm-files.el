@@ -3690,7 +3690,10 @@ is helm-source-find-files."
                        (expand-file-name input)))
         (helm-find-files-input
          (if helm-ff-allow-non-existing-file-at-point
-             (and (helm-ffap-guesser) (thing-at-point 'filename))
+             (and (or (helm-ffap-guesser)
+                      (looking-back ":[0-9]+" (point-at-bol)))
+                  (replace-regexp-in-string
+                   ":[0-9]+\\'" "" (thing-at-point 'filename)))
            (helm-ffap-guesser))
          (thing-at-point 'filename)))))
 
@@ -3792,10 +3795,10 @@ Find inside `require' and `declare-function' sexp."
                         (buffer-substring-no-properties
                          (1+ beg-sexp) (1- end-sexp)))))
     (ignore-errors
-      (cond ((and sexp (string-match "require \'.+[^)]" sexp))
+      (cond ((and sexp (string-match "require ['].+[^)]" sexp))
              (find-library-name
               (replace-regexp-in-string
-               "'\\|\)\\|\(" ""
+               "'\\|)\\|(" ""
                ;; If require use third arg, ignore it,
                ;; always use library path found in `load-path'.
                (cl-second (split-string (match-string 0 sexp))))))
