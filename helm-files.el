@@ -3685,17 +3685,19 @@ is helm-source-find-files."
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (unless (eq major-mode 'image-mode)
-    (or (and input (or (and (file-remote-p input) input)
-                       (expand-file-name input)))
-        (helm-find-files-input
-         (if helm-ff-allow-non-existing-file-at-point
-             (and (or (helm-ffap-guesser)
-                      (looking-back ":[0-9]+" (point-at-bol)))
-                  (replace-regexp-in-string
-                   ":[0-9]+\\'" "" (thing-at-point 'filename)))
-           (helm-ffap-guesser))
-         (thing-at-point 'filename)))))
+  (let ((guesser (helm-ffap-guesser)))
+    (unless (eq major-mode 'image-mode)
+      (or (and input (or (and (file-remote-p input) input)
+                         (expand-file-name input)))
+          (helm-find-files-input
+           (if (and helm-ff-allow-non-existing-file-at-point
+                    (and guesser (not (string-match ffap-url-regexp guesser))))
+               (and (or guesser
+                        (looking-back ":[0-9]+" (point-at-bol)))
+                    (replace-regexp-in-string
+                     ":[0-9]+\\'" "" (thing-at-point 'filename)))
+             guesser)
+           (thing-at-point 'filename))))))
 
 (defun helm-ffap-guesser ()
   "Same as `ffap-guesser' but without gopher and machine support."
@@ -3750,8 +3752,9 @@ is helm-source-find-files."
          (file-p  (and file-at-pt
                        (not (string= file-at-pt ""))
                        (not remp)
-                       (or helm-ff-allow-non-existing-file-at-point
-                           (file-exists-p file-at-pt))
+                       (or (file-exists-p file-at-pt)
+                           helm-ff-allow-non-existing-file-at-point)
+                       (not urlp)
                        thing-at-pt
                        (not (string= thing-at-pt ""))
                        (file-exists-p
