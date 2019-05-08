@@ -3691,11 +3691,14 @@ is helm-source-find-files."
                          (expand-file-name input)))
           (helm-find-files-input
            (if (and helm-ff-allow-non-existing-file-at-point
-                    (and guesser (not (string-match ffap-url-regexp guesser))))
-               (and (or guesser
-                        (looking-back ":[0-9]+" (point-at-bol)))
-                    (replace-regexp-in-string
-                     ":[0-9]+\\'" "" (thing-at-point 'filename)))
+                    guesser
+                    (not (string-match ffap-url-regexp guesser)))
+               ;; Keep the ability of jumping to numbered lines even
+               ;; when allowing non existing filenames at point.
+               (helm-aand guesser
+                          (thing-at-point 'filename)
+                          (replace-regexp-in-string
+                           ":[0-9]+\\'" "" it))
              guesser)
            (thing-at-point 'filename))))))
 
