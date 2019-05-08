@@ -3990,9 +3990,10 @@ inversed."
               helm-visible-mark-overlays nil)
         (helm-force-update
          (let ((presel (helm-get-selection)))
-           (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                              (not (helm-ff-dot-file-p presel)))
-                                         (helm-basename presel) presel)))))))))
+           (when presel
+             (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                                (not (helm-ff-dot-file-p presel)))
+                                           (helm-basename presel) presel))))))))))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
