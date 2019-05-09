@@ -1825,19 +1825,38 @@ Same as `dired-do-print' but for helm."
 
 (defun helm-ff-checksum (file)
   "Calculate the checksum of FILE.
-The checksum is copied to kill-ring."
+The checksum is copied to kill-ring.
+Checksum is calculated with the md5sum, sha1sum, sha224sum, sha256sum,
+sha384sum and sha512sum when available, otherwise the emacs function
+`secure-hash' is used but it is slow and may crash Emacs and even the
+whole system as it eats all memory."
   (cl-assert (file-regular-p file)
              nil "`%s' is not a regular file" file)
-  (let ((algo (intern (helm-comp-read
-                       "Algorithm: "
-                       '(md5 sha1 sha224 sha256 sha384 sha512))))
-        (bn (helm-basename file)))
+  (let* ((algo (intern (helm-comp-read
+                        "Algorithm: "
+                        '(md5 sha1 sha224 sha256 sha384 sha512))))
+         (cmd  (concat (symbol-name algo) "sum"))
+         (bn (helm-basename file))
+         proc)
     (message "Calculating %s checksum for %s..." algo bn)
-    (async-let ((sum (with-temp-buffer
-                       (insert-file-contents-literally file)
-                       (secure-hash algo (current-buffer)))))
-      (kill-new sum)
-      (message "Calculating %s checksum for `%s' done and copied to kill-ring" algo bn))))
+    (if (executable-find cmd)
+        (progn
+          (set-process-filter
+           (setq proc (start-file-process cmd nil cmd "-b" file))
+           (lambda (_process output)
+             (when output (kill-new output))))
+          (set-process-sentinel
+           proc
+           `(lambda (_process event)
+              (when (string= event "finished\n")
+                (message "Calculating %s checksum for `%s' done and copied to kill-ring"
+                         ,(symbol-name algo) ,bn)))))
+      (async-let ((sum (with-temp-buffer
+                         (insert-file-contents-literally file)
+                         (secure-hash algo (current-buffer)))))
+        (kill-new sum)
+        (message "Calculating %s checksum for `%s' done and copied to kill-ring"
+                 algo bn)))))
 
 (defun helm-ff-toggle-basename (_candidate)
   (with-helm-buffer

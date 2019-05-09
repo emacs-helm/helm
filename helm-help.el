@@ -912,6 +912,15 @@ NOTE:
 When deleting your files with sudo method, your trashed files will not be listed
 with trash-list until you log in as root.
 
+*** Checksum file
+
+Checksum is calculated with the md5sum, sha1sum, sha224sum,
+sha256sum, sha384sum and sha512sum when available, otherwise the
+Emacs function `secure-hash' is used but it is slow and may crash
+Emacs and even the whole system as it eats all memory.  So if
+your system doesn't have the md5 and sha command line tools be
+careful when checking sum of larges files e.g. isos.
+
 ** Commands
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\tRun `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
