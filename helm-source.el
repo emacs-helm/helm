@@ -1026,6 +1026,10 @@ an eieio class."
                       '(helm-mm-3-migemo-match))))))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
+  (cl-assert (eq (slot-value source 'candidates) 'helm-candidates-in-buffer)
+             nil
+             (format "Wrong usage of `candidates' attr in `%s' use `data' or `init' instead"
+                     (slot-value source 'name)))
   (let ((cur-init (slot-value source 'init)))
     (helm-aif (slot-value source 'data)
         (setf (slot-value source 'init)
