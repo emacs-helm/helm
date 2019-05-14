@@ -74,6 +74,7 @@ will not have anymore separators between candidates."
     (define-key map (kbd "M-D")     'helm-kill-ring-delete)
     (define-key map (kbd "C-]")     'helm-kill-ring-toggle-truncated)
     (define-key map (kbd "C-c C-k") 'helm-kill-ring-kill-selection)
+    (define-key map (kbd "C-c d")   'helm-kill-ring-run-persistent-delete)
     map)
   "Keymap for `helm-show-kill-ring'.")
 
@@ -218,6 +219,26 @@ replace with STR as yanked string."
   (cl-loop for c in (helm-marked-candidates)
            do (setq kill-ring
                     (delete c kill-ring))))
+
+(defun helm-kill-ring-persistent-delete (_candidate)
+  (unwind-protect
+       (cl-loop for c in (helm-marked-candidates)
+                do (progn
+                     (helm-preselect (format "^%s" (regexp-quote c)))
+                     (setq kill-ring (delete c kill-ring))
+                     (helm-delete-current-selection)
+                     (helm--remove-marked-and-update-mode-line c)))
+    (with-helm-buffer
+      (setq helm-marked-candidates nil
+            helm-visible-mark-overlays nil))
+    (helm-force-update (helm-aif (helm-get-selection) (regexp-quote it)))))
+
+(defun helm-kill-ring-run-persistent-delete ()
+  "Delete current candidate without quitting."
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'quick-delete '(helm-kill-ring-persistent-delete . never-split))
+    (helm-execute-persistent-action 'quick-delete)))
 
 (defun helm-kill-ring-delete ()
   "Delete marked candidates from `kill-ring'.
