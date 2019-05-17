@@ -927,6 +927,7 @@ See documentation of `completing-read' and `all-completions' for details."
        (initial-input default-directory)
        (buffer "*Helm file completions*")
        test
+       noret
        (case-fold helm-file-name-case-fold-search)
        preselect
        history
@@ -954,6 +955,9 @@ Keys description:
 - BUFFER: `helm-buffer' name default to \"*Helm Completions*\".
 
 - TEST: A predicate called with one arg 'candidate'.
+
+- NORET: Allow disabling helm-ff-RET (have no effect if helm-ff-RET
+                                      isn't bound to RET).
 
 - CASE-FOLD: Same as `helm-case-fold-search'.
 
@@ -1004,11 +1008,13 @@ Keys description:
          (hist (and history (helm-comp-read-get-candidates
                              history nil nil alistp)))
          (minibuffer-completion-confirm must-match)
+         (helm-ff--RET-disabled noret)
          (must-match-map (when must-match
                            (let ((map (make-sparse-keymap)))
                              (define-key map (kbd "RET")
                                (let ((fn (lookup-key helm-read-file-map (kbd "RET"))))
-                                 (if (eq fn 'helm-ff-RET)
+                                 (if (and (eq fn 'helm-ff-RET)
+                                          (null helm-ff--RET-disabled))
                                      #'helm-ff-RET-must-match
                                    #'helm-confirm-and-exit-minibuffer)))
                              map)))
@@ -1136,6 +1142,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
          (any-args (append def-args (list str-command buf-name)))
+         (reading-directory (eq predicate 'file-directory-p))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
          fname)
@@ -1199,14 +1206,15 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        :initial-input (expand-file-name init dir)
                        :alistp nil
                        :must-match mustmatch
-                       :test predicate))))
+                       :test predicate
+                       :noret reading-directory))))
       (and ido-mode (ido-mode -1))
       (helm-mode 1)
       ;; Same comment as in `helm--completing-read-default'.
       (setq this-command current-command))
     (if (and
          ;; Using `read-directory-name'.
-         (eq predicate 'file-directory-p)
+         reading-directory
          ;; `file-name-as-directory' return "./" when FNAME is
          ;; empty string.
          (not (string= fname "")))

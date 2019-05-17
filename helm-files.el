@@ -1513,6 +1513,7 @@ This doesn't replace inside the files, only modify filenames."
   (setq helm-ff-auto-update-flag helm-ff--auto-update-state)
   (setq helm-ff--deleting-char-backward nil))
 
+(defvar helm-ff--RET-disabled nil)
 (defun helm-ff-RET-1 (&optional must-match)
   "Used for RET action in `helm-find-files'.
 See `helm-ff-RET' for details.
@@ -1521,6 +1522,7 @@ If MUST-MATCH is specified exit with
   (let ((sel   (helm-get-selection)))
     (cl-assert sel nil "Trying to exit with no candidates")
     (if (and (file-directory-p sel)
+             (null helm-ff--RET-disabled)
              (not (string= "." (helm-basename sel))))
         (helm-execute-persistent-action)
       (if must-match
