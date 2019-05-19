@@ -80,13 +80,6 @@ and use C-<backspace> to toggle it."
   :group 'helm-files
   :type  'boolean)
 
-(defcustom helm-ff-lynx-style-map t
-  "Use arrow keys to navigate with `helm-find-files'.
-You will have to restart Emacs or reeval `helm-find-files-map'
-and `helm-read-file-map' for this take effect."
-  :group 'helm-files
-  :type 'boolean)
-
 (defcustom helm-ff-history-max-length 100
   "Number of elements shown in `helm-find-files' history."
   :group 'helm-files
@@ -489,6 +482,7 @@ directory (i.e. filenames)."
 ;;; Helm-find-files - The helm file browser.
 ;;
 ;; Keymaps
+
 (defvar helm-find-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
@@ -556,9 +550,6 @@ directory (i.e. filenames)."
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
-    (when helm-ff-lynx-style-map
-      (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
-      (define-key map (kbd "<right>")     'helm-execute-persistent-action))
     (delq nil map))
   "Keymap for `helm-find-files'.")
 
@@ -578,14 +569,27 @@ directory (i.e. filenames)."
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
-    (when helm-ff-lynx-style-map
-      (define-key map (kbd "<left>")      'helm-find-files-up-one-level)
-      (define-key map (kbd "<right>")     'helm-execute-persistent-action)
-      (define-key map (kbd "<M-left>")    'helm-previous-source)
-      (define-key map (kbd "<M-right>")   'helm-next-source))
     (delq nil map))
   "Keymap for `helm-read-file-name'.")
 
+(defcustom helm-ff-lynx-style-map t
+  "Use arrow keys to navigate with `helm-find-files'.
+Note that if you define this variable with `setq' your change will
+have no effect, use customize instead."
+  :group 'helm-files
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-find-files-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-find-files-map (kbd "<left>")   'helm-find-files-up-one-level)
+               (define-key helm-read-file-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-read-file-map (kbd "<left>")   'helm-find-files-up-one-level))
+           (define-key helm-find-files-map (kbd "<right>") nil)
+           (define-key helm-find-files-map (kbd "<left>")  nil)
+           (define-key helm-read-file-map (kbd "<right>") nil)
+           (define-key helm-read-file-map (kbd "<left>")  nil))))
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"

@@ -134,11 +134,6 @@ when used matchs will be highlighted according to GREP_COLORS env var."
   :group 'helm-grep
   :type  'string)
 
-(defcustom helm-grep-use-ioccur-style-keys t
-  "Use Arrow keys to jump to occurences."
-  :group 'helm-grep
-  :type  'boolean)
-
 (defcustom helm-pdfgrep-default-read-command nil
   "Default command to read pdf files from pdfgrep.
 Where '%f' format spec is filename and '%p' is page number.
@@ -294,11 +289,23 @@ Have no effect when grep backend use \"--color=\"."
     (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
     (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
-    (when helm-grep-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'helm-execute-persistent-action)
-      (define-key map (kbd "<left>")  'helm-grep-run-default-action))
     (delq nil map))
   "Keymap used in Grep sources.")
+
+(defcustom helm-grep-use-ioccur-style-keys t
+  "Use Arrow keys to jump to occurences.
+Note that if you define this variable with `setq' your change will
+have no effect, use customize instead."
+  :group 'helm-grep
+  :type  'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-grep-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-grep-map (kbd "<left>")   'helm-grep-run-default-action))
+           (define-key helm-grep-map (kbd "<right>") nil)
+           (define-key helm-grep-map (kbd "<left>")  nil))))
 
 (defvar helm-pdfgrep-map
   (let ((map (make-sparse-keymap)))

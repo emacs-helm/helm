@@ -35,6 +35,15 @@ Don't set it to any value, it will have no effect.")
 (defvar helm-occur--search-buffer-regexp "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
   "The regexp matching candidates in helm-occur candidate buffer.")
 
+(defvar helm-occur-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c o")    'helm-occur-run-goto-line-ow)
+    (define-key map (kbd "C-c C-o")  'helm-occur-run-goto-line-of)
+    (define-key map (kbd "C-x C-s")  'helm-occur-run-save-buffer)
+    (delq nil map))
+  "Keymap used in occur source.")
+
 (defgroup helm-occur nil
   "Regexp related Applications and libraries for Helm."
   :group 'helm)
@@ -50,9 +59,20 @@ Don't set it to any value, it will have no effect.")
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-occur-use-ioccur-style-keys nil
-  "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur."
+  "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur.
+
+Note that if you define this variable with `setq' your change will
+have no effect, use customize instead."
   :group 'helm-occur
-  :type 'boolean)
+  :type 'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-occur-map (kbd "<right>")  'helm-occur-right)
+               (define-key helm-occur-map (kbd "<left>")   'helm-occur-run-default-action))
+           (define-key helm-occur-map (kbd "<right>") nil)
+           (define-key helm-occur-map (kbd "<left>")  nil))))
 
 (defcustom helm-occur-always-search-in-current nil
   "Helm multi occur always search in current buffer when non--nil."
@@ -82,18 +102,6 @@ Any other non--nil value update after confirmation."
   :group 'helm-occur
   :type 'integer)
 
-(defvar helm-occur-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o")    'helm-occur-run-goto-line-ow)
-    (define-key map (kbd "C-c C-o")  'helm-occur-run-goto-line-of)
-    (define-key map (kbd "C-x C-s")  'helm-occur-run-save-buffer)
-    (when helm-occur-use-ioccur-style-keys
-      (define-key map (kbd "<right>")  'helm-occur-right)
-      (define-key map (kbd "<left>")   'helm-occur-run-default-action))
-    (delq nil map))
-  "Keymap used in occur source.")
-
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
   "Face used to highlight occur buffer names."
