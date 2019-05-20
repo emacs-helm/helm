@@ -384,6 +384,22 @@ directory (i.e. filenames)."
           (const :tag "alphabetically" nil)
           (const :tag "newest" newest)
           (const :tag "size" size)))
+
+(defcustom helm-ff-rotate-image-program "exiftran"
+  "External program used to rotate images."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Mogrify" "mogrify")
+          (const :tag "Exiftran" "exiftran")
+          (const :tag "Jpegtran" "jpegtran")))
+
+(defcustom helm-ff-rotate-image-switch '("-i")
+  "Options used with `helm-ff-rotate-image-program'.
+If you are using Mogrify or Jpegtran mandatory option is \"-rotate\",
+with Exiftran mandatory option is \"-i\"."
+  :group 'helm-files
+  :type '(repeat string))
+
 
 ;;; Faces
 ;;
@@ -3270,33 +3286,37 @@ e.g \"foo:12\"."
                                            "application/octet-stream")))))))
 
 (defvar image-dired-display-image-buffer)
-(defun helm-ff-rotate-current-image-1 (file &optional num-arg)
-  "Rotate current image at NUM-ARG degrees.
-This is a destructive operation on FILE made by external tool mogrify."
-  (setq file (file-truename file)) ; For symlinked images.
+(defun helm-ff-rotate-current-image-1 (file num-arg)
+  "Rotate current image at NUM-ARG degrees."
+  (setq file (file-truename file))      ; For symlinked images.
   ;; When FILE is not an image-file, do nothing.
   (when (string-match (image-file-name-regexp) file)
-    (if (executable-find "mogrify")
+    (setq num-arg (if (string= helm-ff-rotate-image-program "exiftran")
+                      (cl-case num-arg
+                        (90  "-9")  ; 90 clockwise
+                        (270 "-2")) ; 270 clockwise == -90
+                    (number-to-string num-arg)))
+    (if (executable-find helm-ff-rotate-image-program)
         (progn
-          (shell-command (format "mogrify -rotate %s %s"
-                                 (or num-arg 90)
-                                 (shell-quote-argument file)))
+          (apply #'call-process helm-ff-rotate-image-program nil nil nil
+                 (append helm-ff-rotate-image-switch
+                         (list num-arg (shell-quote-argument file))))
           (when (buffer-live-p image-dired-display-image-buffer)
             (kill-buffer image-dired-display-image-buffer))
           (image-dired-display-image file)
           (message nil)
           (display-buffer (get-buffer image-dired-display-image-buffer)))
-      (error "mogrify not found"))))
+      (error "%s not found" helm-ff-rotate-image-program))))
 
 (defun helm-ff-rotate-image-left (candidate)
   "Rotate image file CANDIDATE left.
 This affect directly file CANDIDATE."
-  (helm-ff-rotate-current-image-1 candidate -90))
+  (helm-ff-rotate-current-image-1 candidate 270))
 
 (defun helm-ff-rotate-image-right (candidate)
   "Rotate image file CANDIDATE right.
 This affect directly file CANDIDATE."
-  (helm-ff-rotate-current-image-1 candidate))
+  (helm-ff-rotate-current-image-1 candidate 90))
 
 (defun helm-ff-rotate-left-persistent ()
   "Rotate image left without quitting helm."
