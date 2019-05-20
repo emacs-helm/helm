@@ -460,8 +460,10 @@ usable in next condition."
   "A simple anaphoric `cl-case' implementation handling strings.
 EXPR is bound to a temporary variable called `it' which is usable in
 CLAUSES to refer to EXPR.
-NOTE: Duplicate keys in CLAUSES are deliberately not handled."
-  (declare (indent 1) (debug t))
+NOTE: Duplicate keys in CLAUSES are deliberately not handled.
+
+\(fn EXPR (KEYLIST BODY...)...)"
+  (declare (indent 1) (debug (form &rest (sexp body))))
   (unless (null clauses)
     (let ((clause1 (car clauses)))
       `(let ((key ',(car clause1))
