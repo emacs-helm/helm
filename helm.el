@@ -1556,15 +1556,22 @@ Use optional arguments ARGS like in `format'."
   (run-hooks hook)
   (helm-log "executed %s" hook))
 
+(defvar helm--log-exclude-functions '(helm-interpret-value
+                                      helm-log
+                                      helm-log-get-current-function
+                                      helm-log-error
+                                      helm-log-save-maybe
+                                      helm-log-run-hook
+                                      helm-apply-functions-from-source
+                                      helm-funcall-with-source helm-funcall-foreach
+                                      helm-compute-attr-in-sources))
 (defun helm-log-get-current-function ()
-  "Get name of function that is calling `helm-log'.
-The original idea is from `tramp-debug-message'."
-  (cl-loop with exclude-func-re = "^helm-\\(?:interpret\\|log\\|.*funcall\\)"
-           for btn from 1 to 40
+  "Get name of function calling `helm-log'."
+  (cl-loop for btn from 1 to 40
            for btf = (cl-second (backtrace-frame btn))
            for fn  = (if (symbolp btf) (symbol-name btf) "")
-           if (and (string-match "^helm" fn)
-                   (not (string-match exclude-func-re fn)))
+           if (and (string-match "\\`helm" fn)
+                   (not (memq btf helm--log-exclude-functions)))
            return fn))
 
 (defun helm-log-error (&rest args)
@@ -2133,9 +2140,6 @@ Return the result of last function call."
   (let ((helm--source-name (assoc-default 'name source))
         (helm-current-source source)
         (funs (if (functionp functions) (list functions) functions)))
-    (helm-log "helm--source-name = %S" helm--source-name)
-    (helm-log "functions = %S" functions)
-    (helm-log "args = %S" args)
     (cl-loop with result
              for fn in funs
              do (setq result (apply fn args))
