@@ -503,6 +503,7 @@ with Exiftran mandatory option is \"-i\"."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "RET")           'helm-ff-RET)
+    (define-key map (kbd "C-i")           'helm-ff-TAB)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
@@ -572,6 +573,7 @@ with Exiftran mandatory option is \"-i\"."
 (defvar helm-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-i")           'helm-ff-TAB)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "M-RET")         'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
@@ -1560,6 +1562,28 @@ Behave differently depending of `helm-selection':
   (interactive)
   (helm-ff-RET-1))
 (put 'helm-ff-RET 'helm-only t)
+
+(defun helm-ff-TAB-1 (&optional force-menu)
+  "Used for TAB action in `helm-find-files'."
+  (let ((sel (helm-get-selection)))
+    (if (and (null force-menu)
+             (file-directory-p sel)
+             (not (string= "." (helm-basename sel))))
+        (helm-execute-persistent-action)
+      (helm-select-action))))
+
+(defun helm-ff-TAB (arg)
+  "Default action for TAB in `helm-find-files'.
+
+Behave differently depending of `helm-selection':
+
+- candidate basename is \".\" => open the action menu.
+- candidate is a directory    => expand it.
+- candidate is a file         => open action menu.
+
+Called with a prefix arg open menu unconditionally."
+  (interactive "P")
+  (helm-ff-TAB-1 arg))
 
 (defun helm-ff-RET-must-match ()
   "Same as `helm-ff-RET' but used in must-match map."
