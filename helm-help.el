@@ -1751,6 +1751,18 @@ It is useful when some commands are prompting continuously until you enter an em
 ;;; Mode line strings
 ;;
 ;;
+(defvar helm-ff-mode-line-string "\
+\\<helm-map>\
+\\[helm-help]:Help \
+\\[helm-select-action]:Exp or Act \
+\\[helm-maybe-exit-minibuffer]/\
+f1/f2/f-n:NthAct \
+\\[helm-toggle-suspend-update]:Tog.suspend"
+  "Help string displayed by `helm-find-files' in the mode-line.
+It is either a string or a list of two string arguments where the
+first string is the name and the second string is displayed in
+the mode-line. When `nil', uses default `mode-line-format'.")
+
 ;;;###autoload
 (defvar helm-comp-read-mode-line "\
 \\<helm-comp-read-map>\
