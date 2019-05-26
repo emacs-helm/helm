@@ -279,6 +279,24 @@ you press `RET'.  If you want the same behavior as in `helm-find-files', bind
 
     (define-key helm-read-file-map (kbd \"RET\") 'helm-ff-RET)
 
+**** `TAB' behavior
+
+Normally `TAB' is bound to `helm-select-action' in helm-map which
+display the action menu.  In `helm-find-files' and
+`helm-read-file-name' it behave now slighly differently depending
+of `helm-selection':
+
+- candidate basename is \".\"  => open the action menu.
+- candidate is a directory     => expand it (behave as \\<helm-map>\\[helm-execute-persistent-action]).
+- candidate is a file          => open action menu.
+
+Called with a prefix arg open menu unconditionally.
+
+You can disable this special behavior and fallback to always open
+the action menu when pressing `TAB' by adding to your config:
+
+    (define-key helm-find-files-map (kbd \"C-i\") nil)
+
 *** Find file at point
 
 Helm uses `ffap' partially or completely to find file at point depending on the
