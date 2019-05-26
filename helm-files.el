@@ -1584,6 +1584,7 @@ Behave differently depending of `helm-selection':
 Called with a prefix arg open menu unconditionally."
   (interactive "P")
   (helm-ff-TAB-1 arg))
+(put 'helm-ff-TAB 'helm-only t)
 
 (defun helm-ff-RET-must-match ()
   "Same as `helm-ff-RET' but used in must-match map."
