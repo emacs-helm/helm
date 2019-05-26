@@ -72,9 +72,8 @@ If you want to have the default tramp messages set it to 3."
 
 (defcustom helm-ff-auto-update-initial-value nil
   "Auto update when only one candidate directory is matched.
-Default value when starting `helm-find-files' is nil because
-it prevent using <backspace> to delete char backward and by the way
-confuse beginners.
+Default value when starting `helm-find-files' is nil to not confuse
+new users.
 For a better experience with `helm-find-files' set this to non--nil
 and use C-<backspace> to toggle it."
   :group 'helm-files
@@ -1520,15 +1519,24 @@ This doesn't replace inside the files, only modify filenames."
 (put 'helm-ff-run-toggle-auto-update 'helm-only t)
 
 (defun helm-ff-delete-char-backward ()
-  "Disable helm find files auto update and delete char backward."
+  "Go up one level or disable HFF auto update and delete char backward.
+
+Going up one level works only when pattern is a directory endings with
+\"/\", otherwise this command delete char backward.
+
+Going up one level can be disabled if necessary by deleting \"/\" at
+end of pattern using \\<helm-map>\\[backward-char] and \\[helm-delete-minibuffer-contents]."
   (interactive)
   (with-helm-alive-p
-    (setq helm-ff-auto-update-flag nil)
-    (setq helm-ff--deleting-char-backward t)
-    (call-interactively
-     (lookup-key (current-global-map)
-                 (read-kbd-macro "DEL")))
-    (helm--update-header-line)))
+    (if (and (string-match "/\\'" helm-pattern)
+             (file-directory-p helm-pattern))
+        (call-interactively 'helm-find-files-up-one-level)
+      (setq helm-ff-auto-update-flag nil)
+      (setq helm-ff--deleting-char-backward t)
+      (call-interactively
+       (lookup-key (current-global-map)
+                   (read-kbd-macro "DEL")))
+      (helm--update-header-line))))
 (put 'helm-ff-delete-char-backward 'helm-only t)
 
 (defun helm-ff-delete-char-backward--exit-fn ()

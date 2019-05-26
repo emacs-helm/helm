@@ -232,9 +232,23 @@ enabled by default to not confuse new users.
 
 On a symlinked directory a prefix argument expands to its true name.
 
-**** Use `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' on a directory to go up one level
+**** Use `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' or `DEL' on a directory to go up one level
 
-**** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-map>\\[helm-execute-persistent-action]' you did
+***** `DEL' behavior
+
+`DEL' behave differently depending of helm-pattern contents, it
+go up one level if pattern is a directory endings with \"/\" or
+disable HFF auto update and delete char backward if pattern is a
+filename or refer to a non existing path.  Going up one level can
+be disabled if necessary by deleting \"/\" at end of pattern
+using \\<helm-map>\\[backward-char] and
+\\[helm-delete-minibuffer-contents].
+
+Note that when deleting char backward, helm takes care of
+disabling update letting you the time to edit your pattern for
+e.g. renaming a file or creating a new file or directory.
+
+**** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' or DEL you did
 
 The tree is reinitialized each time you browse a new tree with
 `\\<helm-map>\\[helm-execute-persistent-action]' or by entering some pattern in the prompt.
