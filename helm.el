@@ -34,7 +34,7 @@
 (require 'helm-lib)
 (require 'helm-multi-match)
 (require 'helm-source)
-
+(eval-when-compile (require 'cus-edit))
 (declare-function 'helm-comp-read "helm-mode.el")
 
 
@@ -269,6 +269,7 @@ vectors, so don't use strings to define them."
   "Keymap for helm.")
 
 (defun helm-customize-group-1 (group)
+  (require 'cus-edit)
   (let ((name (format "*Customize Group: %s*"
                       (custom-unlispify-tag-name group))))
     (if (buffer-live-p (get-buffer name))

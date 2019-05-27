@@ -633,6 +633,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
                     :keymap loc-map
+                    :group group
                     :persistent-help persistent-help
                     :mode-line mode-line
                     :help-message help-message

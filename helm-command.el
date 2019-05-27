@@ -273,27 +273,28 @@ You can get help on each command by persistent action."
    (progn
      (setq helm-M-x-prefix-argument current-prefix-arg)
      (list current-prefix-arg (helm-M-x-read-extended-command))))
-  (unless (string= command-name "")
-    (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
-      (when sym-com
-        ;; Avoid having `this-command' set to *exit-minibuffer.
-        (setq this-command sym-com
-              ;; Handle C-x z (repeat) Issue #322
-              real-this-command sym-com)
-        ;; If helm-M-x is called with regular emacs completion (kmacro)
-        ;; use the value of arg otherwise use helm-current-prefix-arg.
-        (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
-          (cl-flet ((save-hist (command)
-                      (setq extended-command-history
-                            (cons command (delete command extended-command-history)))))
-            (condition-case-unless-debug err
-                (progn
-                  (command-execute sym-com 'record)
-                  (save-hist command-name))
-              (error
-               (when helm-M-x-always-save-history
-                 (save-hist command-name))
-               (signal (car err) (cdr err))))))))))
+  (when (stringp command-name)
+    (unless (string= command-name "")
+      (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
+        (when sym-com
+          ;; Avoid having `this-command' set to *exit-minibuffer.
+          (setq this-command sym-com
+                ;; Handle C-x z (repeat) Issue #322
+                real-this-command sym-com)
+          ;; If helm-M-x is called with regular emacs completion (kmacro)
+          ;; use the value of arg otherwise use helm-current-prefix-arg.
+          (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
+            (cl-flet ((save-hist (command)
+                        (setq extended-command-history
+                              (cons command (delete command extended-command-history)))))
+              (condition-case-unless-debug err
+                  (progn
+                    (command-execute sym-com 'record)
+                    (save-hist command-name))
+                (error
+                 (when helm-M-x-always-save-history
+                   (save-hist command-name))
+                 (signal (car err) (cdr err)))))))))))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
