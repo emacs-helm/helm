@@ -246,6 +246,7 @@ than the default which is OBARRAY."
                 :input-history 'helm-M-x-input-history
                 :del-input nil
                 :help-message 'helm-M-x-help-message
+                :group 'helm-command
                 :keymap helm-M-x-map
                 :must-match t
                 :match-part (lambda (c) (car (split-string c)))

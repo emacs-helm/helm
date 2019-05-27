@@ -434,7 +434,8 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (alistp t)
                             (candidate-number-limit helm-candidate-number-limit)
                             multiline
-                            allow-nest)
+                            allow-nest
+                            group)
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
@@ -515,7 +516,7 @@ Keys description:
 
 - NOMARK: When non--nil don't allow marking candidates.
 
-- ALISTP: \(default is non--nil\) See `helm-comp-read-get-candidates'.
+- ALISTP: (default is non--nil) See `helm-comp-read-get-candidates'.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
   `helm-source-in-buffer' which is much faster.
@@ -528,6 +529,8 @@ Keys description:
   See `helm'.
 
 - MULTILINE: See multiline in `helm-source'.
+
+- GROUP: See group in `helm-source'.
 
 Any prefix args passed during `helm-comp-read' invocation will be recorded
 in `helm-current-prefix-arg', otherwise if prefix args were given before
@@ -596,6 +599,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        :persistent-action persistent-action
                        :persistent-help persistent-help
                        :keymap loc-map
+                       :group group
                        :mode-line mode-line
                        :help-message help-message
                        :action action-fn))
@@ -612,6 +616,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
                   :keymap loc-map
+                  :group group
                   :mode-line mode-line
                   :help-message help-message
                   :action action-fn
