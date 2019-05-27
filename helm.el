@@ -1031,13 +1031,13 @@ see [[https://github.com/emacs-helm/helm/wiki/Fuzzy-matching][fuzzy-matching]] i
 Helm generally uses familiar Emacs keys to navigate the list.
 Here follow some of the less obvious bindings:
 
-- `\\[helm-maybe-exit-minibuffer]' selects the candidate from the list, executes the default action
+- `\\<helm-map>\\[helm-maybe-exit-minibuffer]' selects the candidate from the list, executes the default action
 upon exiting the Helm session.
 
-- `\\[helm-execute-persistent-action]' executes the default action but without exiting the Helm session.
+- `\\<helm-map>\\[helm-execute-persistent-action]' executes the default action but without exiting the Helm session.
 Not all sources support this.
 
-- `\\[helm-select-action]' displays a list of actions available on current candidate or all marked candidates.
+- `\\<helm-map>\\[helm-select-action]' displays a list of actions available on current candidate or all marked candidates.
 The default binding <tab> is ordinarily used for completion, but that would be
 redundant since Helm completes upon every character entered in the prompt.
 See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]].
@@ -1169,6 +1169,16 @@ From any Helm session, type \\<helm-map>\\[helm-customize-group] to jump to the 
 Helm also has a special group for faces you can access via `M-x customize-group RET helm-faces'.
 
 Note: Some sources may not have their group set and default to the `helm' group.
+
+** Display Helm in windows and frames
+
+You can display the helm completion buffer in many differents
+window configurations, see the custom interface to discover the
+different windows configurations available (See [[Customize Helm][Customize Helm]] to jump to custom interface).
+When using Emacs in a graphic display (i.e. not in a terminal) you can as
+well display your helm buffers in separated frames globally for
+all helm commands or separately for specific helm commands.
+See [[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for more infos.
 
 ** Helm's basic operations and default key bindings
 
