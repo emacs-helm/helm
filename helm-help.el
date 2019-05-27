@@ -236,17 +236,21 @@ On a symlinked directory a prefix argument expands to its true name.
 
 ***** `DEL' behavior
 
-`DEL' behave differently depending of helm-pattern contents, it
-go up one level if pattern is a directory endings with \"/\" or
-disable HFF auto update and delete char backward if pattern is a
-filename or refer to a non existing path.  Going up one level can
-be disabled if necessary by deleting \"/\" at end of pattern
-using \\<helm-map>\\[backward-char] and
-\\[helm-delete-minibuffer-contents].
+`DEL' by default is deleting char backward.
+
+But when `helm-ff-DEL-up-one-level-maybe' is non nil `DEL' behave
+differently depending of helm-pattern contents, it go up one
+level if pattern is a directory endings with \"/\" or disable HFF
+auto update and delete char backward if pattern is a filename or
+refer to a non existing path.  Going up one level can be disabled
+if necessary by deleting \"/\" at end of pattern using
+\\<helm-map>\\[backward-char] and \\[helm-delete-minibuffer-contents].
 
 Note that when deleting char backward, helm takes care of
 disabling update letting you the time to edit your pattern for
 e.g. renaming a file or creating a new file or directory.
+When `helm-ff-auto-update-initial-value' is non nil you may want to
+disable it temporarily, see [[Toggle auto-completion with `C-c DEL'][Toggle auto-completion with `C-c DEL']] for this.
 
 **** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' or DEL you did
 
@@ -282,20 +286,21 @@ you press `RET'.  If you want the same behavior as in `helm-find-files', bind
 **** `TAB' behavior
 
 Normally `TAB' is bound to `helm-select-action' in helm-map which
-display the action menu.  In `helm-find-files' and
-`helm-read-file-name' it behave now slighly differently depending
-of `helm-selection':
+display the action menu.
+
+You can change this behavior by setting in `helm-find-files-map'
+a new command for `TAB':
+
+    (define-key helm-find-files-map (kbd \"C-i\") 'helm-ff-TAB)
+
+It will then behave slighly differently
+depending of `helm-selection':
 
 - candidate basename is \".\"  => open the action menu.
 - candidate is a directory     => expand it (behave as \\<helm-map>\\[helm-execute-persistent-action]).
 - candidate is a file          => open action menu.
 
 Called with a prefix arg open menu unconditionally.
-
-You can disable this special behavior and fallback to always open
-the action menu when pressing `TAB' by adding to your config:
-
-    (define-key helm-find-files-map (kbd \"C-i\") nil)
 
 *** Find file at point
 

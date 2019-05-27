@@ -502,7 +502,6 @@ with Exiftran mandatory option is \"-i\"."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "RET")           'helm-ff-RET)
-    (define-key map (kbd "C-i")           'helm-ff-TAB)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-x C-f")       'helm-ff-run-locate)
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
@@ -572,7 +571,6 @@ with Exiftran mandatory option is \"-i\"."
 (defvar helm-read-file-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-i")           'helm-ff-TAB)
     (define-key map (kbd "<C-return>")    'helm-cr-empty-string)
     (define-key map (kbd "M-RET")         'helm-cr-empty-string)
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
