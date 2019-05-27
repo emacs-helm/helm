@@ -978,6 +978,8 @@ an eieio class."
 (defmethod helm--setup-source :primary ((_source helm-source)))
 
 (defmethod helm--setup-source :before ((source helm-source))
+  (unless (slot-value source 'group)
+    (setf (slot-value source 'group) 'helm))
   (when (slot-value source 'delayed)
     (warn "Deprecated usage of helm `delayed' slot in `%s'"
           (slot-value source 'name)))

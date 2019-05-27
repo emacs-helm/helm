@@ -268,12 +268,23 @@ vectors, so don't use strings to define them."
     map)
   "Keymap for helm.")
 
+(defun helm-customize-group-1 (group)
+  (let ((name (format "*Customize Group: %s*"
+                      (custom-unlispify-tag-name group))))
+    (if (buffer-live-p (get-buffer name))
+        (switch-to-buffer name)
+      (custom-buffer-create
+       (list (list group 'custom-group))
+       name
+       (concat " for group "
+               (custom-unlispify-tag-name group))))))
+
 (defun helm-customize-group ()
   "Jump to customization group of current source.
 
 Default to `helm' when group is not defined in source."
   (interactive)
-  (helm-run-after-exit 'customize-group (helm-attr 'group)))
+  (helm-run-after-exit 'helm-customize-group-1 (helm-attr 'group)))
 (put 'helm-customize-group 'helm-only t)
 
 (defun helm--action-at-nth-set-fn-1 (value &optional negative)

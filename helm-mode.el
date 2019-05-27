@@ -435,7 +435,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (candidate-number-limit helm-candidate-number-limit)
                             multiline
                             allow-nest
-                            group)
+                            (group 'helm))
   "Read a string in the minibuffer, with helm completion.
 
 It is helm `completing-read' equivalent.
