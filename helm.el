@@ -994,7 +994,8 @@ size of `helm-debug-buffer' grows quickly.")
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
 f1/f2/f-n:NthAct \
-\\[helm-toggle-suspend-update]:Tog.suspend"
+\\[helm-toggle-suspend-update]:Tog.suspend \
+\\[helm-customize-group]:Conf"
   "Help string displayed by helm in the mode-line.
 It is either a string or a list of two string arguments where the
 first string is the name and the second string is displayed in
