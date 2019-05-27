@@ -607,6 +607,16 @@ have no effect, use customize instead."
            (define-key helm-find-files-map (kbd "<left>")  nil)
            (define-key helm-read-file-map (kbd "<right>") nil)
            (define-key helm-read-file-map (kbd "<left>")  nil))))
+
+(defcustom helm-ff-DEL-up-one-level-maybe nil
+  "Use DEL to maybe go up one level when non nil.
+
+Going up one level works only when pattern is a directory endings with
+\"/\", otherwise this command delete char backward.
+
+When nil always delete char backward."
+  :group 'helm-files
+  :type 'boolean)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -1528,7 +1538,8 @@ Going up one level can be disabled if necessary by deleting \"/\" at
 end of pattern using \\<helm-map>\\[backward-char] and \\[helm-delete-minibuffer-contents]."
   (interactive)
   (with-helm-alive-p
-    (if (and (string-match "/\\'" helm-pattern)
+    (if (and helm-ff-DEL-up-one-level-maybe
+             (string-match "/\\'" helm-pattern)
              (file-directory-p helm-pattern))
         (call-interactively 'helm-find-files-up-one-level)
       (setq helm-ff-auto-update-flag nil)
