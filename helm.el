@@ -4592,8 +4592,9 @@ this additional info after the source name by overlay."
 This is intended to be added to `helm-after-initialize-hook'.
 This will work only in Emacs-26+, i.e. Emacs
 versions that have `display-line-numbers-mode'."
-  (with-helm-buffer
-    (setq display-line-numbers 'relative)))
+  (when (boundp 'display-line-numbers)
+    (with-helm-buffer
+      (setq display-line-numbers 'relative))))
 
 
 ;;; Async process
