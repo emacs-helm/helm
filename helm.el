@@ -234,6 +234,7 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-refresh)
     (define-key map (kbd "C-c >")      'helm-toggle-truncate-line)
+    (define-key map (kbd "C-c l")      'helm-display-line-numbers-mode)
     (define-key map (kbd "M-p")        'previous-history-element)
     (define-key map (kbd "M-n")        'next-history-element)
     (define-key map (kbd "C-!")        'helm-toggle-suspend-update)
@@ -1220,24 +1221,30 @@ f1-f12: Execute n-th action where n is 1 to 12.
 
 ** Shortcuts for executing the default action on the n-th candidate
 
-Helm does not display line numbers by default, you can enable it with
+Helm does not display line numbers by default, with Emacs-26+
+you can enable it permanently in all helm buffers with:
 
     (add-hook 'helm-after-initialize-hook 'helm-init-relative-display-line-numbers)
 
-in your config or by enabling `global-display-line-numbers-mode'
+You can also toggle line numbers with \\<helm-map>\\[helm-display-line-numbers-mode] in current helm buffer.
+
+Of course when enabling `global-display-line-numbers-mode' helm buffers will have line numbers as well.
 \(don't forget to customize `display-line-numbers-type' to relative).
 
 In Emacs versions < to 26 you will have to use [[https://github.com/coldnew/linum-relative][linum-relative]] package
 and `helm-linum-relative-mode'.
 
 Then when line numbers are enabled with one of the methods above
-the following keys are available:
+the following keys are available([1]):
 
 C-x <n>: Execute default action on the n-th candidate before currently selected candidate.
 
 C-c <n>: Execute default action on the n-th candidate after current selected candidate.
 
 \"n\" is limited to 1-9.  For larger jumps use other navigation keys.
+
+\[1] Note that the keybindings are always available even if line numbers are not displayed,
+they are just useless in this case.
 
 ** Mouse control in Helm
 
@@ -4595,6 +4602,18 @@ versions that have `display-line-numbers-mode'."
   (when (boundp 'display-line-numbers)
     (with-helm-buffer
       (setq display-line-numbers 'relative))))
+
+(define-minor-mode helm-display-line-numbers-mode
+    "Toggle display of line numbers in current helm buffer."
+  :group 'helm
+  (with-helm-alive-p
+    (if helm-display-line-numbers-mode
+        (with-helm-buffer
+          (setq display-line-numbers 'relative))
+      (with-helm-buffer
+        (setq display-line-numbers nil)))))
+(put 'helm-display-line-numbers-mode 'helm-only t)
+
 
 
 ;;; Async process
