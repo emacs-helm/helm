@@ -4607,6 +4607,8 @@ versions that have `display-line-numbers-mode'."
     "Toggle display of line numbers in current helm buffer."
   :group 'helm
   (with-helm-alive-p
+    (cl-assert (boundp 'display-line-numbers) nil
+               "`display-line-numbers' not available")
     (if helm-display-line-numbers-mode
         (with-helm-buffer
           (setq display-line-numbers 'relative))
