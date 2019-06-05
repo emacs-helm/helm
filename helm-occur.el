@@ -34,6 +34,8 @@ Don't set it to any value, it will have no effect.")
 (defvar helm-occur-history nil)
 (defvar helm-occur--search-buffer-regexp "\\`\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)\\'"
   "The regexp matching candidates in helm-occur candidate buffer.")
+(defvar helm-occur-mode--last-pattern nil)
+
 
 (defvar helm-occur-map
   (let ((map (make-sparse-keymap)))
@@ -344,6 +346,7 @@ persistent action."
     (define-key map (kbd "M-p")      'helm-occur-mode-goto-line-ow-backward)
     (define-key map (kbd "M-N")      'helm-gm-next-file)
     (define-key map (kbd "M-P")      'helm-gm-precedent-file)
+    (define-key map (kbd "C-c b")    'helm-occur-mode-resume-session)
     map))
 
 (defun helm-occur-mode-goto-line ()
@@ -450,6 +453,11 @@ persistent action."
         (helm-occur-mode-goto-line)))))
 (put 'helm-moccur-mode-mouse-goto-line 'helm-only t)
 
+(defun helm-occur-mode-resume-session ()
+  (interactive)
+  (cl-assert (eq major-mode 'helm-occur-mode) nil "Helm command called in wrong context")
+  (helm-multi-occur-1 helm-occur--buffer-list helm-occur-mode--last-pattern))
+
 (defun helm-occur-buffer-substring-with-linums ()
   "Returns current-buffer contents as a string with all lines
 numbered.  The property 'buffer-name is added to the whole string."
@@ -552,7 +560,9 @@ Special commands:
     (set (make-local-variable 'helm-occur--buffer-list)
          (with-helm-buffer helm-occur--buffer-list))
     (set (make-local-variable 'revert-buffer-function)
-         #'helm-occur-mode--revert-buffer-function))
+         #'helm-occur-mode--revert-buffer-function)
+    (set (make-local-variable 'helm-occur-mode--last-pattern)
+         helm-input))
 (put 'helm-moccur-mode 'helm-only t)
 
 
