@@ -888,23 +888,25 @@ Special commands:
   (helm-match-line-cleanup-pulse))
 
 (defun helm-grep-mode-jump-other-window-1 (arg)
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
-    (condition-case nil
-        (progn
-          (save-selected-window
-            (helm-grep-action candidate 'other-window)
-            (helm-match-line-cleanup-pulse)
-            (recenter))
+  (condition-case nil
+      (progn
+        (when (or (eq last-command 'helm-grep-mode-jump-other-window-forward)
+                  (eq last-command 'helm-grep-mode-jump-other-window-backward))
           (forward-line arg))
-      (error nil))))
+        (save-selected-window
+          (helm-grep-action (buffer-substring (point-at-bol) (point-at-eol))
+                            'other-window)
+          (helm-match-line-cleanup-pulse)
+          (recenter)))
+    (error nil)))
 
-(defun helm-grep-mode-jump-other-window-forward ()
-  (interactive)
-  (helm-grep-mode-jump-other-window-1 1))
+(defun helm-grep-mode-jump-other-window-forward (arg)
+  (interactive "p")
+  (helm-grep-mode-jump-other-window-1 arg))
 
-(defun helm-grep-mode-jump-other-window-backward ()
-  (interactive)
-  (helm-grep-mode-jump-other-window-1 -1))
+(defun helm-grep-mode-jump-other-window-backward (arg)
+  (interactive "p")
+  (helm-grep-mode-jump-other-window-1 (- arg)))
 
 (defun helm-grep-mode-jump-other-window ()
   (interactive)

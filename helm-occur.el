@@ -359,19 +359,21 @@ persistent action."
 (defun helm-occur-mode-goto-line-ow-forward-1 (arg)
   (condition-case nil
       (progn
+        (when (or (eq last-command 'helm-occur-mode-goto-line-ow-forward)
+                  (eq last-command 'helm-occur-mode-goto-line-ow-backward))
+          (forward-line arg))
         (save-selected-window
           (helm-occur-mode-goto-line-ow)
-          (recenter))
-        (forward-line arg))
+          (recenter)))
     (error nil)))
 
-(defun helm-occur-mode-goto-line-ow-forward ()
-  (interactive)
-  (helm-occur-mode-goto-line-ow-forward-1 1))
+(defun helm-occur-mode-goto-line-ow-forward (arg)
+  (interactive "p")
+  (helm-occur-mode-goto-line-ow-forward-1 arg))
 
-(defun helm-occur-mode-goto-line-ow-backward ()
-  (interactive)
-  (helm-occur-mode-goto-line-ow-forward-1 -1))
+(defun helm-occur-mode-goto-line-ow-backward (arg)
+  (interactive "p")
+  (helm-occur-mode-goto-line-ow-forward-1 (- arg)))
 
 (defun helm-occur-save-results (_candidate)
   "Save helm moccur results in a `helm-moccur-mode' buffer."
