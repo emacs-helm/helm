@@ -3262,9 +3262,9 @@ Arg TRASHED-FILES is an alist of (fname_in_trash . dest) obtained with
 
 (defun helm-ff-trash-file-p (file)
   "Return `t' when file is a trashed file."
-  (and (string-match "Trash/files/?\\'" (helm-basedir file))
-       (not (member (helm-basename file) '("." "..")))
-       (file-exists-p file)))
+  (and (file-exists-p file)
+       (string-match "Trash/files/?\\'" (helm-basedir file))
+       (not (member (helm-basename file) '("." "..")))))
 
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
   (assoc-default (helm-basename file) trashed-files))
