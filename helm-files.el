@@ -3121,7 +3121,8 @@ Return candidates prefixed with basename of `helm-input' first."
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
-    (cond ((and (string-match "Trash/files/?\\'" (helm-basedir candidate))
+    (cond ((and (ignore-errors
+                  (string-match "Trash/files/?\\'" (helm-basedir candidate)))
                 (not (member (helm-basename candidate) '("." "..")))
                 (file-exists-p candidate)
                 (executable-find "trash"))
