@@ -237,7 +237,7 @@ You probably don't need to use this unless you know what you are doing."
 It have a higher value than `helm-input-idle-delay' to avoid
 flickering when updating."
   :group 'helm-grep
-  :type 'integer)
+  :type 'float)
 
 ;;; Faces
 ;;
