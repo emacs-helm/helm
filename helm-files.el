@@ -3332,20 +3332,22 @@ e.g \"foo:12\"."
   "Rotate current image at NUM-ARG degrees."
   (setq file (file-truename file))      ; For symlinked images.
   ;; When FILE is not an image-file, do nothing.
-  (when (string-match (image-file-name-regexp) file)
+  (when (and (file-exists-p file)
+             (string-match (image-file-name-regexp) file))
     (setq num-arg (if (string= helm-ff-rotate-image-program "exiftran")
                       (cl-case num-arg
-                        (90  "-9")  ; 90 clockwise
-                        (270 "-2")) ; 270 clockwise == -90
+                        (90  "-9")      ; 90 clockwise
+                        (270 "-2"))     ; 270 clockwise == -90
                     (number-to-string num-arg)))
     (if (executable-find helm-ff-rotate-image-program)
-        (progn
+        (let ((default-directory (file-name-directory file))
+              (basename (helm-basename file)))
           (apply #'process-file helm-ff-rotate-image-program nil nil nil
                  (append helm-ff-rotate-image-switch
-                         (list num-arg file)))
+                         (list num-arg basename)))
           (when (buffer-live-p image-dired-display-image-buffer)
             (kill-buffer image-dired-display-image-buffer))
-          (image-dired-display-image file)
+          (image-dired-display-image basename)
           (message nil)
           (display-buffer (get-buffer image-dired-display-image-buffer)))
       (error "%s not found" helm-ff-rotate-image-program))))
