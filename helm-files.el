@@ -3340,9 +3340,9 @@ e.g \"foo:12\"."
                     (number-to-string num-arg)))
     (if (executable-find helm-ff-rotate-image-program)
         (progn
-          (apply #'call-process helm-ff-rotate-image-program nil nil nil
+          (apply #'process-file helm-ff-rotate-image-program nil nil nil
                  (append helm-ff-rotate-image-switch
-                         (list num-arg (shell-quote-argument file))))
+                         (list num-arg file)))
           (when (buffer-live-p image-dired-display-image-buffer)
             (kill-buffer image-dired-display-image-buffer))
           (image-dired-display-image file)
