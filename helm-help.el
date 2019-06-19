@@ -1661,14 +1661,14 @@ toggled; see the command list below.
 
 As opposed to `yank', numeric prefix arguments are ignored with
 `helm-show-kill-ring': there is no need for them since selection happens within
-Helm.  Moreover Helm has [[Shortcuts for executing Default Action on the nth
-candidate][Shortcuts for executing Default Action on the nth candidate]].
+Helm.  Moreover Helm has [[Shortcuts for executing the default action on the n-th candidate][Shortcuts for executing the default action on the n-th candidate]].
 
 It is recommended to globally bind `M-y' to `helm-show-kill-ring'.  Once in the
 Helm-kill-ring session you can navigate to next/previous line with `M-y' and
 `M-u' for convenience.  Of course `\\[helm-next-line]' and `\\[helm-previous-line]' are still available.
 
-It is possible to delete candidates from the kill ring.
+It is possible to delete candidates from the kill ring with `\\<helm-kill-ring-map>\\[helm-kill-ring-delete]'
+but also persistently with `\\<helm-kill-ring-map>\\[helm-kill-ring-run-persistent-delete]'.
 
 You can concatenate marked candidates and yank them in the current
 buffer, thus creating a new entry in the kill ring.  Candidates are
