@@ -96,6 +96,15 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 ;;; Org headings
 ;;
 ;;
+
+(defun helm-org-in-buffer-preselect ()
+  "Preselect the heading at point."
+  (if (org-at-heading-p)
+      (buffer-substring-no-properties (point-at-bol) (point-at-eol))
+    (save-excursion
+      (outline-previous-visible-heading 1)
+      (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
+
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
   (switch-to-buffer (marker-buffer marker))
@@ -301,13 +310,6 @@ will be refiled."
       (cl-loop for victim in victims
                do (org-with-point-at victim
                     (org-refile nil nil rfloc))))))
-
-(defun helm-org-in-buffer-preselect ()
-  (if (org-on-heading-p)
-      (buffer-substring-no-properties (point-at-bol) (point-at-eol))
-      (save-excursion
-        (outline-previous-visible-heading 1)
-        (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
 
 (defun helm-org-run-refile-heading-to ()
   "Refile one or more entries to the selected heading."
