@@ -25,8 +25,7 @@
 (eval-when-compile
   (require 'org-macs))
 
-(declare-function org-agenda-switch-to "org-agenda.el")
-
+
 (defgroup helm-org nil
   "Org related functions for Helm."
   :group 'helm)
@@ -85,7 +84,11 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 ;;; Org capture templates
 ;;
 ;;
+
 (defvar org-capture-templates)
+(defvar org-capture-templates-contexts)
+(declare-function org-capture-upgrade-templates "org-capture" (templates))
+
 (defun helm-source-org-capture-templates ()
   (helm-build-sync-source "Org Capture Templates:"
     :candidates (cl-loop for template in org-capture-templates
