@@ -1,4 +1,4 @@
-;;; helm-org.el --- Helm for org headlines and keywords completion -*- lexical-binding: t -*-
+;;; helm-org.el --- Helm for Org headline and keyword completion -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2019 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -20,7 +20,7 @@
 (require 'helm)
 (require 'helm-utils)
 (require 'org)
-
+
 ;; Load org-with-point-at macro when compiling
 (eval-when-compile
   (require 'org-macs))
@@ -28,25 +28,21 @@
 (declare-function org-agenda-switch-to "org-agenda.el")
 
 (defgroup helm-org nil
-  "Org related functions for helm."
+  "Org related functions for Helm."
   :group 'helm)
 
 (defcustom helm-org-headings-fontify nil
-  "Fontify org buffers before parsing them.
-This reflect fontification in helm-buffer when non--nil.
-NOTE: This will be slow on large org buffers."
-  :group 'helm-org
+  "Whether to fontify buffers before parsing them.
+NOTE: This will be slow on large buffers."
   :type 'boolean)
 
 (defcustom helm-org-format-outline-path nil
-  "Show all org level as path."
-  :group 'helm-org
+  "Whether to show the headline's ancestors as path."
   :type 'boolean)
 
 (defcustom helm-org-show-filename nil
-  "Show org filenames in `helm-org-agenda-files-headings' when non--nil.
-Note this have no effect in `helm-org-in-buffer-headings'."
-  :group 'helm-org
+  "Whether to show filenames in `helm-org-agenda-files-headings'.
+NOTE: This has no effect in `helm-org-in-buffer-headings'."
   :type 'boolean)
 
 (defcustom helm-org-headings-min-depth 1
@@ -62,22 +58,28 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
     ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
-    ("Refile heading(s) (marked-to-selected|current-to-selected) `C-c w`" . helm-org--refile-heading-to)
-    ("Insert link to this heading `C-c l`" . helm-org-insert-link-to-heading-at-marker))
-  "Default actions alist for
-  `helm-source-org-headings-for-files'."
-  :group 'helm-org
+    ("Refile heading(s) (marked-to-selected|current-to-selected) `C-c w'" . helm-org--refile-heading-to)
+    ("Insert link to this heading `C-c l'" . helm-org-insert-link-to-heading-at-marker))
+  "Default actions alist for `helm-source-org-headings-for-files'."
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-org-truncate-lines t
-  "Truncate org-header-lines when non-nil"
-  :type 'boolean
-  :group 'helm-org)
+  "Truncate lines when non-nil."
+  :type 'boolean)
 
 (defcustom helm-org-ignore-autosaves nil
-  "Ignore autosave files when starting `helm-org-agenda-files-headings'."
-  :type 'boolean
-  :group 'helm-org)
+  "Whether to ignore auto-save files when starting
+`helm-org-agenda-files-headings'."
+  :type 'boolean)
+
+(defvar helm-org-headings-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-c w") 'helm-org-run-refile-heading-to)
+    (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
+    map)
+  "Keymap for `helm-source-org-headings-for-files'.")
 
 
 ;;; Org capture templates
@@ -95,6 +97,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 ;;
 ;;
 (defun helm-org-goto-marker (marker)
+  "Go to MARKER showing the entry's context, body and subheadings."
   (switch-to-buffer (marker-buffer marker))
   (goto-char (marker-position marker))
   (org-show-context)
@@ -104,6 +107,7 @@ Note this have no effect in `helm-org-in-buffer-headings'."
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   (helm-org-goto-marker marker)
+  "Go to MARKER and create an indirect buffer of the current subtree."
   (org-tree-to-indirect-buffer)
 
   ;; Put the non-indirect buffer at the bottom of the prev-buffers
@@ -112,20 +116,11 @@ Note this have no effect in `helm-org-in-buffer-headings'."
                                        (car (window-prev-buffers)))))
 
 (defun helm-org-run-open-heading-in-indirect-buffer ()
-  "Open selected Org heading in an indirect buffer."
+  "Open selected subtree in an indirect buffer."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
 (put 'helm-org-run-open-heading-in-indirect-buffer 'helm-only t)
-
-(defvar helm-org-headings-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
-    (define-key map (kbd "C-c w") 'helm-org-run-refile-heading-to)
-    (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
-    map)
-  "Keymap for `helm-source-org-headings-for-files'.")
 
 (defclass helm-org-headings-class (helm-source-sync)
   ((parents
@@ -281,6 +276,7 @@ nothing to CANDIDATES."
          file-name (concat "file:" file-name "::*" heading-name))))))
 
 (defun helm-org-run-insert-link-to-heading-at-marker ()
+  "Insert link with the selected heading as its target."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action
@@ -314,6 +310,7 @@ will be refiled."
         (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
 
 (defun helm-org-run-refile-heading-to ()
+  "Refile one or more entries to the selected heading."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
@@ -321,7 +318,7 @@ will be refiled."
 
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
-  "Preconfigured helm for org files headings."
+  "Preconfigured Helm for agenda files."
   (interactive)
   (let ((autosaves (cl-loop for f in (org-agenda-files)
                             when (file-exists-p
@@ -340,7 +337,7 @@ will be refiled."
 
 ;;;###autoload
 (defun helm-org-in-buffer-headings ()
-  "Preconfigured helm for org buffer headings."
+  "Preconfigured Helm for buffer headings."
   (interactive)
   (let (helm-org-show-filename)
     (helm :sources (helm-source-org-headings-for-files
@@ -352,8 +349,7 @@ will be refiled."
 
 ;;;###autoload
 (defun helm-org-parent-headings ()
-  "Preconfigured helm for org headings that are parents of the
-current heading."
+  "Preconfigured Helm for parent headings of the current heading."
   (interactive)
   ;; Use a large max-depth to ensure all parents are displayed.
   (let ((helm-org-headings-min-depth 1)
@@ -366,15 +362,16 @@ current heading."
 
 ;;;###autoload
 (defun helm-org-capture-templates ()
-  "Preconfigured helm for org templates."
+  "Preconfigured Helm for capture templates."
   (interactive)
   (helm :sources (helm-source-org-capture-templates)
         :candidate-number-limit 99999
         :truncate-lines helm-org-truncate-lines
         :buffer "*helm org capture templates*"))
+
 
 ;;; Org tag completion
-
+;;
 ;; Based on code from Anders Johansson posted on 3 Mar 2016 at
 ;; <https://groups.google.com/d/msg/emacs-helm/tA6cn6TUdRY/G1S3TIdzBwAJ>
 
@@ -389,8 +386,8 @@ This function is used as a `completing-read' function in
 `helm-completing-read-handlers-alist' by `org-set-tags' and
 `org-capture'.
 
-NOTE: Org tag completion will work only if you disable org fast tag
-selection, see (info \"(org) setting tags\")."
+NOTE: Org tag completion will work only if Org's fast tag selection is
+disabled. See (info \"(org) setting tags\")."
   (if (not (string= "Tags: " prompt))
       ;; Not a tags prompt.  Use normal completion by calling
       ;; `org-icompleting-read' again without this function in
