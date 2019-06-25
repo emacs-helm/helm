@@ -44,16 +44,6 @@ NOTE: This will be slow on large buffers."
 NOTE: This has no effect in `helm-org-in-buffer-headings'."
   :type 'boolean)
 
-(defcustom helm-org-headings-min-depth 1
-  "Minimum depth of org headings to start with."
-  :group 'helm-org
-  :type 'integer)
-
-(defcustom helm-org-headings-max-depth 8
-  "Go down to this maximum depth of org headings."
-  :group 'helm-org
-  :type 'integer)
-
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
     ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
