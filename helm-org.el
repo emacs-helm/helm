@@ -167,6 +167,14 @@ when called from the `helm-org-agenda-files-headings' command."
       (outline-previous-visible-heading 1)
       (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
 
+(defun helm-source-org-headings-for-files (filenames &optional parents)
+  (helm-make-source "Org Headings" 'helm-org-headings-class
+    :candidates (lambda ()
+                  (if parents
+                      (with-helm-current-buffer
+                        (helm-org-get-parent-headings))
+                    (helm-org-get-candidates filenames)))))
+
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
   (switch-to-buffer (marker-buffer marker))
@@ -217,12 +225,6 @@ when called from the `helm-org-agenda-files-headings' command."
           (lambda (candidates)
             (let ((cands (helm-org-get-candidates candidates parents)))
               (if parents (nreverse cands) cands))))))
-
-(defun helm-source-org-headings-for-files (filenames &optional parents)
-  (helm-make-source "Org Headings" 'helm-org-headings-class
-    :filtered-candidate-transformer 'helm-org-startup-visibility
-    :parents parents
-    :candidates filenames))
 (defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
@@ -324,7 +326,12 @@ will be refiled."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
 (put 'helm-org-run-refile-heading-to 'helm-only t)
+
 
+;;; Commands
+;;
+;;
+
 ;;;###autoload
 (defun helm-org-agenda-files-headings ()
   "Preconfigured Helm for agenda files."
@@ -337,9 +344,10 @@ will be refiled."
                             collect (helm-basename f))))
     (when (or (null autosaves)
               helm-org-ignore-autosaves
-              (y-or-n-p (format "%s have auto save data, continue?"
-                                (mapconcat 'identity autosaves ", "))))
-      (helm :sources (helm-source-org-headings-for-files (org-agenda-files))
+              (y-or-n-p (format "%s have auto save data, continue? "
+                                (mapconcat #'identity autosaves ", "))))
+      (helm :sources (helm-source-org-headings-for-files
+                      (org-agenda-files))
             :candidate-number-limit 99999
             :truncate-lines helm-org-truncate-lines
             :buffer "*helm org headings*"))))
@@ -348,26 +356,22 @@ will be refiled."
 (defun helm-org-in-buffer-headings ()
   "Preconfigured Helm for buffer headings."
   (interactive)
-  (let (helm-org-show-filename)
-    (helm :sources (helm-source-org-headings-for-files
-                    (list (current-buffer)))
-          :candidate-number-limit 99999
-          :preselect (helm-org-in-buffer-preselect)
-          :truncate-lines helm-org-truncate-lines
-          :buffer "*helm org inbuffer*")))
+  (helm :sources (helm-source-org-headings-for-files
+                  (list (current-buffer)))
+        :candidate-number-limit 99999
+        :preselect (helm-org-in-buffer-preselect)
+        :truncate-lines helm-org-truncate-lines
+        :buffer "*helm org inbuffer*"))
 
 ;;;###autoload
 (defun helm-org-parent-headings ()
   "Preconfigured Helm for parent headings of the current heading."
   (interactive)
-  ;; Use a large max-depth to ensure all parents are displayed.
-  (let ((helm-org-headings-min-depth 1)
-        (helm-org-headings-max-depth  50))
-    (helm :sources (helm-source-org-headings-for-files
-                    (list (current-buffer)) t)
-          :candidate-number-limit 99999
-          :truncate-lines helm-org-truncate-lines
-          :buffer "*helm org parent headings*")))
+  (helm :sources (helm-source-org-headings-for-files
+                  (list (current-buffer)) t)
+	:candidate-number-limit 99999
+	:truncate-lines helm-org-truncate-lines
+	:buffer "*helm org parent headings*"))
 
 ;;;###autoload
 (defun helm-org-capture-templates ()
