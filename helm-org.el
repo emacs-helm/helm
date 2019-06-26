@@ -106,6 +106,18 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
         (t
          (match-string-no-properties 0))))
 
+(defun helm-org-get-parent-headings ()
+  "Return all parent headings of the current heading.
+Also return their position in the buffer as marker objects."
+  (let (candidates)
+    (save-excursion
+      (while (org-up-heading-safe)
+        (push (cons (when (looking-at org-complex-heading-regexp)
+                      (helm-org-format-heading))
+                    (point-marker))
+              candidates)))
+    candidates))
+
 (defun helm-org-in-buffer-preselect ()
   "Preselect the heading at point."
   (if (org-at-heading-p)
