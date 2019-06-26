@@ -80,11 +80,14 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 (declare-function org-capture-upgrade-templates "org-capture" (templates))
 
 (defun helm-source-org-capture-templates ()
-  (helm-build-sync-source "Org Capture Templates:"
-    :candidates (cl-loop for template in org-capture-templates
+  (helm-build-sync-source "Org Capture Templates"
+    :candidates (cl-loop for template in (org-contextualize-keys
+                                          (org-capture-upgrade-templates org-capture-templates)
+                                          org-capture-templates-contexts)
                          collect (cons (nth 1 template) (nth 0 template)))
-    :action '(("Do capture" . (lambda (template-shortcut)
-                                (org-capture nil template-shortcut))))))
+    :action '(("Select template" . (lambda (template-shortcut)
+                                     (org-capture nil template-shortcut))))))
+
 
 ;;; Org headings
 ;;
