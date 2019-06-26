@@ -276,12 +276,12 @@ when called from the `helm-org-agenda-files-headings' command."
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
   (with-current-buffer (marker-buffer marker)
-    (let ((heading-name (save-excursion (goto-char (marker-position marker))
-                                        (nth 4 (org-heading-components))))
-          (file-name (buffer-file-name)))
-      (with-helm-current-buffer
-        (org-insert-link
-         file-name (concat "file:" file-name "::*" heading-name))))))
+    (let ((heading-name (save-excursion
+			  (goto-char (marker-position marker))
+                          (org-entry-get nil "ITEM")))
+	  (file-name (buffer-file-name)))
+      (org-insert-link file-name
+		       (concat "file:" file-name "::*" heading-name)))))
 
 (defun helm-org-run-insert-link-to-heading-at-marker ()
   "Insert link with the selected heading as its target."
