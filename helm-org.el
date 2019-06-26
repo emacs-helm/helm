@@ -175,6 +175,19 @@ when called from the `helm-org-agenda-files-headings' command."
                         (helm-org-get-parent-headings))
                     (helm-org-get-candidates filenames)))))
 
+(defclass helm-org-headings-class (helm-source-sync)
+  ((match :initform (lambda (candidate)
+                      (string-match
+                       helm-pattern
+                       (helm-aif (get-text-property 0 'helm-real-display candidate)
+                           it
+                         candidate))))
+   (candidate-transformer :initform 'helm-org-candidate-transformer)
+   (help-message :initform 'helm-org-headings-help-message)
+   (action :initform 'helm-org-headings-actions)
+   (keymap :initform 'helm-org-headings-map)
+   (group :initform 'helm-org)))
+
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
   (switch-to-buffer (marker-buffer marker))
@@ -202,29 +215,6 @@ when called from the `helm-org-agenda-files-headings' command."
     (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
 (put 'helm-org-run-open-heading-in-indirect-buffer 'helm-only t)
 
-(defclass helm-org-headings-class (helm-source-sync)
-  ((parents
-    :initarg :parents
-    :initform nil
-    :custom boolean)
-   (match :initform
-          (lambda (candidate)
-            (string-match
-             helm-pattern
-             (helm-aif (get-text-property 0 'helm-real-display candidate)
-                 it
-               candidate))))
-   (help-message :initform 'helm-org-headings-help-message)
-   (action :initform 'helm-org-headings-actions)
-   (keymap :initform 'helm-org-headings-map)
-   (group :initform 'helm-org)))
-
-(defmethod helm--setup-source :after ((source helm-org-headings-class))
-  (let ((parents (slot-value source 'parents)))
-    (setf (slot-value source 'candidate-transformer)
-          (lambda (candidates)
-            (let ((cands (helm-org-get-candidates candidates parents)))
-              (if parents (nreverse cands) cands))))))
 (defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
