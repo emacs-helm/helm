@@ -314,6 +314,7 @@ will be refiled."
 (defun helm-org-capture-templates ()
   "Preconfigured Helm for capture templates."
   (interactive)
+  (require 'org-capture)
   (helm :sources (helm-source-org-capture-templates)
         :candidate-number-limit 99999
         :truncate-lines helm-org-truncate-lines
