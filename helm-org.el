@@ -108,10 +108,11 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
   (org-show-children))
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
-  (helm-org-goto-marker marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
+  (switch-to-buffer (marker-buffer marker))
+  (goto-char (marker-position marker))
+  (org-show-context)
   (org-tree-to-indirect-buffer)
-
   ;; Put the non-indirect buffer at the bottom of the prev-buffers
   ;; list so it won't be selected when the indirect buffer is killed
   (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
