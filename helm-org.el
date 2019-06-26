@@ -145,6 +145,20 @@ Also return their position in the buffer as marker objects."
 		     (helm-org--get-candidates-in-file)))
                  filenames)))
 
+(defun helm-org-candidate-transformer (candidates)
+  "Get the CANDIDATES' filenames and display them conditionally.
+That is, display them only if `helm-org-show-filename' is non-nil and
+when called from the `helm-org-agenda-files-headings' command."
+  (cl-loop for i in candidates
+           for heading = (car i)
+           for marker  = (cdr i)
+           when (and helm-org-show-filename
+                     (eq this-command 'helm-org-agenda-files-headings))
+           for filename = (helm-basename
+                           (buffer-file-name (marker-buffer marker)))
+           for display = (concat filename heading)
+           collect (cons display marker)))
+
 (defun helm-org-in-buffer-preselect ()
   "Preselect the heading at point."
   (if (org-at-heading-p)
