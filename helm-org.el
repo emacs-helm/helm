@@ -154,52 +154,6 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
     :filtered-candidate-transformer 'helm-org-startup-visibility
     :parents parents
     :candidates filenames))
-
-(defun helm-org-startup-visibility (candidates _source)
-  "Indent headings and hide leading stars displayed in the helm buffer.
-If `org-startup-indented' and `org-hide-leading-stars' are nil, do
-nothing to CANDIDATES."
-  (cl-loop for i in candidates
-	   collect
-           ;; Transformation is not needed if these variables are t.
-	   (if (or helm-org-show-filename helm-org-format-outline-path)
-	       (cons
-		(car i) (cdr i))
-             (cons
-              (if helm-org-headings-fontify
-                  (when (string-match "^\\(\\**\\)\\(\\* \\)\\(.*\n?\\)" (car i))
-                    (replace-match "\\1\\2\\3" t nil (car i)))
-                (when (string-match "^\\(\\**\\)\\(\\* \\)\\(.*\n?\\)" (car i))
-                  (let ((foreground (org-find-invisible-foreground)))
-                    (with-helm-current-buffer
-                      (cond
-                       ;; org-startup-indented is t, and org-hide-leading-stars is t
-                       ;; Or: #+STARTUP: indent hidestars
-                       ((and org-startup-indented org-hide-leading-stars)
-                        (with-helm-buffer
-                          (require 'org-indent)
-                          (org-indent-mode 1)
-                          (replace-match
-                           (format "%s\\2\\3"
-                                   (propertize (replace-match "\\1" t nil (car i))
-                                               'face `(:foreground ,foreground)))
-                           t nil (car i))))
-                       ;; org-startup-indented is nil, org-hide-leading-stars is t
-                       ;; Or: #+STARTUP: noindent hidestars
-                       ((and (not org-startup-indented) org-hide-leading-stars)
-                        (with-helm-buffer
-                          (replace-match
-                           (format "%s\\2\\3"
-                                   (propertize (replace-match "\\1" t nil (car i))
-                                               'face `(:foreground ,foreground)))
-                           t nil (car i))))
-                       ;; org-startup-indented is nil, and org-hide-leading-stars is nil
-                       ;; Or: #+STARTUP: noindent showstars
-                       (t
-                        (with-helm-buffer
-                          (replace-match "\\1\\2\\3" t nil (car i)))))))))
-              (cdr i)))))
-
 (defun helm-org-get-candidates (filenames &optional parents)
   (apply #'append
          (mapcar (lambda (filename)
