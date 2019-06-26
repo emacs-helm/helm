@@ -134,6 +134,17 @@ Also return their position in the buffer as marker objects."
 	      candidates))
       (nreverse candidates))))
 
+(defun helm-org-get-candidates (filenames)
+  "Return a list of candidates in FILENAMES."
+  (apply #'append
+         (mapcar (lambda (filename)
+		   (with-current-buffer
+		       (pcase filename
+                         ((pred bufferp) filename)
+                         ((pred stringp) (find-file-noselect filename t)))
+		     (helm-org--get-candidates-in-file)))
+                 filenames)))
+
 (defun helm-org-in-buffer-preselect ()
   "Preselect the heading at point."
   (if (org-at-heading-p)
@@ -198,16 +209,6 @@ Also return their position in the buffer as marker objects."
     :filtered-candidate-transformer 'helm-org-startup-visibility
     :parents parents
     :candidates filenames))
-(defun helm-org-get-candidates (filenames &optional parents)
-  (apply #'append
-         (mapcar (lambda (filename)
-                   (helm-org--get-candidates-in-file
-                    filename
-                    helm-org-headings-fontify
-                    (or parents (null helm-org-show-filename))
-                    parents))
-                 filenames)))
-
 (defun helm-org--get-candidates-in-file (filename &optional fontify nofname parents)
   (with-current-buffer (pcase filename
                          ((pred bufferp) filename)
