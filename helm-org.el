@@ -118,6 +118,22 @@ Also return their position in the buffer as marker objects."
               candidates)))
     candidates))
 
+(defun helm-org--get-candidates-in-file ()
+  "Return a list of candidates and their position in the buffer."
+  (let (candidates)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward org-complex-heading-regexp nil t)
+	(when helm-org-headings-fontify
+          (jit-lock-fontify-now (line-beginning-position)
+                                (line-end-position)))
+	(push (cons (helm-org-format-heading)
+		    (save-excursion
+		      (forward-line 0)
+		      (point-marker)))
+	      candidates))
+      (nreverse candidates))))
+
 (defun helm-org-in-buffer-preselect ()
   "Preselect the heading at point."
   (if (org-at-heading-p)
