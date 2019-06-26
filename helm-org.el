@@ -93,6 +93,19 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 ;;
 ;;
 
+(defun helm-org-format-heading ()
+  "Format the candidate's display conditionally."
+  (cond ((and helm-org-headings-fontify
+              helm-org-format-outline-path)
+         (org-format-outline-path (org-get-outline-path t t)))
+        (helm-org-format-outline-path
+         (mapconcat #'identity
+                    (org-get-outline-path t t) "/"))
+        (helm-org-headings-fontify
+         (match-string 0))
+        (t
+         (match-string-no-properties 0))))
+
 (defun helm-org-in-buffer-preselect ()
   "Preselect the heading at point."
   (if (org-at-heading-p)
