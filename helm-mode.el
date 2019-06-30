@@ -212,12 +212,17 @@ know what you are doing."
   :group 'helm-mode
   :type 'boolean)
 
+(defface helm-mode-prefix
+    '((t (:background "red" :foreground "black")))
+  "Face used for prefix completion."
+  :group 'helm-mode)
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     (define-key map (kbd "M-RET")      'helm-cr-empty-string)
+    (define-key map (kbd "DEL")        'helm-mode-delete-char-backward-maybe)
     map)
   "Keymap for `helm-comp-read'.")
 
@@ -1264,6 +1269,40 @@ The `helm-find-files' history `helm-ff-history' is used here."
   "Default sort function for completion-in-region."
   (sort candidates 'helm-generic-sort-fn))
 
+(defun helm-mode--completion-in-region-initial-input (str)
+  (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t))
+
+(defun helm-mode-delete-char-backward-1 ()
+  (interactive)
+  (condition-case err
+      (call-interactively 'delete-backward-char)
+    (text-read-only
+     (if (with-selected-window (minibuffer-window)
+           (not (string= (minibuffer-contents) "")))
+         (message "Trying to delete prefix completion, next hit will quit")
+       (user-error "%s" (car err))))))
+(put 'helm-mode-delete-char-backward-1 'helm-only t)
+
+(defun helm-mode-delete-char-backward-2 ()
+  (interactive)
+  (condition-case _err
+      (call-interactively 'delete-backward-char)
+    (text-read-only
+     (unless (with-selected-window (minibuffer-window)
+               (string= (minibuffer-contents) ""))
+       (with-helm-current-buffer
+         (run-with-timer 0.1 nil (lambda ()
+                                   (call-interactively 'delete-backward-char))))
+       (helm-keyboard-quit)))))
+(put 'helm-mode-delete-char-backward-2 'helm-only t)
+
+(helm-multi-key-defun helm-mode-delete-char-backward-maybe
+    "Delete char backward when text is not the prefix helm is completing against.
+First call warn user about deleting prefix completion.
+Second call delete backward char in current-buffer and quit helm completion,
+letting user starting a new completion with a new prefix."
+  '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1351,13 +1390,15 @@ Can be used as value for `completion-in-region-function'."
                           :initial-input
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
-                                 (concat (helm-basename input)
+                                 (concat (helm-mode--completion-in-region-initial-input
+                                          (helm-basename input))
                                          init-space-suffix))
                                 ((string-match "/\\'" input) nil)
                                 ((or (null require-match)
                                      (stringp require-match))
-                                 input)
-                                (t (concat input init-space-suffix)))
+                                 (helm-mode--completion-in-region-initial-input input))
+                                (t (concat (helm-mode--completion-in-region-initial-input input)
+                                           init-space-suffix)))
                           :buffer buf-name
                           :fc-transformer (append '(helm-cr-default-transformer)
                                                   (unless (or helm-completion-in-region-fuzzy-match
