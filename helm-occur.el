@@ -199,6 +199,12 @@ engine beeing completely different and also much faster."
                (when (string-match helm-occur--search-buffer-regexp
                                    candidate)
                  (match-string 2 candidate)))
+             :search (lambda (pattern)
+                       (when (string-match "\\`\\^\\(.*\\)" pattern)
+                         (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
+                       (condition-case _err
+                           (re-search-forward pattern nil t)
+                         (invalid-regexp nil)))
              :init `(lambda ()
                       (with-current-buffer ,buf
                         (let ((contents (buffer-substring-no-properties
