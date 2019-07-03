@@ -200,7 +200,7 @@ engine beeing completely different and also much faster."
                                    candidate)
                  (match-string 2 candidate)))
              :search (lambda (pattern)
-                       (when (string-match "\\`\\^\\(.*\\)" pattern)
+                       (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
                          (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
                        (condition-case _err
                            (re-search-forward pattern nil t)
