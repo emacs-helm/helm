@@ -286,6 +286,18 @@ when called from the `helm-org-agenda-files-headings' command."
     (helm-exit-and-execute-action 'helm-org-set-tags)))
 (put 'helm-org-run-set-tags 'helm-only t)
 
+(defun helm-org-archive-subtree (_marker)
+  "Archive marked candidates with the default command.
+This command is set with the variable `org-archive-default-command'."
+  (let ((markers (helm-marked-candidates)))
+    (helm-org-execute markers
+      (org-archive-subtree-default))))
+
+(defun helm-org-run-archive-subtree ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-archive-subtree)))
+(put 'helm-org-run-archive-subtree 'helm-only t)
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
