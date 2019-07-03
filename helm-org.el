@@ -21,10 +21,6 @@
 (require 'helm-utils)
 (require 'org)
 
-;; Load org-with-point-at macro when compiling
-(eval-when-compile
-  (require 'org-macs))
-
 
 (defgroup helm-org nil
   "Org related functions for Helm."
@@ -46,9 +42,14 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
-    ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
-    ("Refile heading(s) (marked-to-selected|current-to-selected) `C-c w'" . helm-org--refile-heading-to)
-    ("Insert link to this heading `C-c l'" . helm-org-insert-link-to-heading-at-marker))
+    ("Change state `C-c C-t'" . helm-org-change-state)
+    ("Set tags `C-c C-c'" . helm-org-set-tags)
+    ("Archive subtree `C-c C-x C-a'" . helm-org-archive-subtree)
+    ("Open in indirect buffer `C-c C-i'" . helm-org--open-heading-in-indirect-buffer)
+    ("Refile heading(s) `C-c C-w'" . helm-org--refile-heading-to)
+    ("Insert link to this heading `C-c C-l'" . helm-org-insert-link-to-heading-at-marker)
+    ("Schedule item `C-c C-s, C-u to remove'" . helm-org-schedule)
+    ("Set deadline `C-c C-d, C-u to remove'" . helm-org-deadline))
   "Default actions alist for `helm-source-org-headings-for-files'."
   :type '(alist :key-type string :value-type function))
 
@@ -64,9 +65,14 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 (defvar helm-org-headings-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
-    (define-key map (kbd "C-c w") 'helm-org-run-refile-heading-to)
-    (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
+    (define-key map (kbd "C-c C-t") 'helm-org-run-change-state)
+    (define-key map (kbd "C-c C-c") 'helm-org-run-set-tags)
+    (define-key map (kbd "C-c C-x C-a") 'helm-org-run-archive-subtree)
+    (define-key map (kbd "C-c C-i") 'helm-org-run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-c C-w") 'helm-org-run-refile-heading-to)
+    (define-key map (kbd "C-c C-l") 'helm-org-run-insert-link-to-heading-at-marker)
+    (define-key map (kbd "C-c C-s") 'helm-org-run-org-schedule)
+    (define-key map (kbd "C-c C-d") 'helm-org-run-org-deadline)
     map)
   "Keymap for `helm-source-org-headings-for-files'.")
 
@@ -193,40 +199,128 @@ when called from the `helm-org-agenda-files-headings' command."
 ;;
 ;;
 
+(defvar helm-org-switch-to-buffer-p nil
+  "Whether to show the editing buffer.")
+
+(defmacro helm-org-execute (markers &rest body)
+  "Jump to MARKERS and execute BODY."
+  (declare (indent 1))
+  `(dolist (marker (if (listp ,markers)
+                       ,markers
+                     (list ,markers)))
+     (if helm-org-switch-to-buffer-p
+         (switch-to-buffer (marker-buffer marker))
+       (set-buffer (marker-buffer marker)))
+     (goto-char (marker-position marker))
+     (org-show-context)
+     ,@body))
+
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
-  (switch-to-buffer (marker-buffer marker))
-  (goto-char (marker-position marker))
-  (org-show-context)
-  (org-show-entry)
-  (org-show-children))
+  (let ((helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (org-show-entry)
+      (org-show-children))))
+
+(defun helm-org-change-state (marker)
+  "Change the TODO state of marked candidates."
+  (let* ((markers (helm-marked-candidates))
+         (helm-org-switch-to-buffer-p t)
+         (keywords (with-current-buffer (marker-buffer marker)
+                     (mapcar (lambda (kwd)
+                               (let ((face (org-get-todo-face kwd)))
+                                 (list (org-add-props kwd nil 'face face))))
+                             org-todo-keywords-1))))
+    (helm :sources `(,(helm-build-sync-source "Change State"
+                        :candidates keywords
+                        :fuzzy-match t
+                        :action (lambda (state)
+                                  (helm-org-execute markers
+                                    (org-todo state))))
+                     ,(helm-build-sync-source "Remove State"
+                        :candidates (list "clear")
+                        :fuzzy-match t
+                        :action (lambda (_candidate)
+                                  (helm-org-execute markers
+                                    (org-todo 'none))))))))
+
+(defun helm-org-run-change-state ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-change-state)))
+(put 'helm-org-run-change-state 'helm-only t)
+
+(defun helm-org-set-tags (_marker)
+  "Add or remove tags of marked candidates, replacing current tags."
+  (let ((markers (helm-marked-candidates))
+        (helm-org-switch-to-buffer-p t)
+        tags
+        local-tags)
+    (helm-org-execute markers
+      (setq tags (apply #'append (org-get-buffer-tags))
+            local-tags (append local-tags (org-get-tags nil t))))
+    (helm :sources `(,(helm-build-sync-source "Add Tags"
+			:candidates tags
+			:action (lambda (_candidate)
+				  (helm-org-execute markers
+				    (org-set-tags (helm-marked-candidates)))))
+		     ,(helm-build-sync-source "Remove Tags"
+			:candidates local-tags
+			:action (lambda (_candidate)
+                                  (let ((marked-tags (helm-marked-candidates)))
+                                    (helm-org-execute markers
+                                      ;; Remove marked tags but keep
+                                      ;; the rest
+                                      (org-set-tags
+                                       (cl-remove-if (lambda (tag)
+                                                       (member tag marked-tags))
+                                                     (org-get-tags nil t)))))))))))
+
+(defun helm-org-run-set-tags ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-set-tags)))
+(put 'helm-org-run-set-tags 'helm-only t)
+
+(defun helm-org-archive-subtree (_marker)
+  "Archive marked candidates with the default command.
+This command is set with the variable `org-archive-default-command'."
+  (let ((markers (helm-marked-candidates)))
+    (helm-org-execute markers
+      (org-archive-subtree-default))))
+
+(defun helm-org-run-archive-subtree ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-archive-subtree)))
+(put 'helm-org-run-archive-subtree 'helm-only t)
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
-  (switch-to-buffer (marker-buffer marker))
-  (goto-char (marker-position marker))
-  (org-show-context)
-  (org-tree-to-indirect-buffer)
-  ;; Put the non-indirect buffer at the bottom of the prev-buffers
-  ;; list so it won't be selected when the indirect buffer is killed
-  (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
-                                       (car (window-prev-buffers)))))
+  (save-excursion
+    (helm-org-execute marker
+      (org-tree-to-indirect-buffer)
+      ;; Put the non-indirect buffer at the bottom of the prev-buffers
+      ;; list so it won't be selected when the indirect buffer is killed
+      (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
+                                           (car (window-prev-buffers)))))))
 
 (defun helm-org-run-open-heading-in-indirect-buffer ()
   "Open selected subtree in an indirect buffer."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
+    (helm-exit-and-execute-action 'helm-org--open-heading-in-indirect-buffer)))
 (put 'helm-org-run-open-heading-in-indirect-buffer 'helm-only t)
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
-  (with-current-buffer (marker-buffer marker)
-    (let ((heading-name (save-excursion
-			  (goto-char (marker-position marker))
-                          (org-entry-get nil "ITEM")))
-	  (file-name (buffer-file-name)))
-      (org-insert-link file-name
-		       (concat "file:" file-name "::*" heading-name)))))
+  "Get the heading at MARKER and insert a link that points to it."
+  (let (file-name heading-name)
+    (save-excursion
+      (helm-org-execute marker
+	(setq file-name (buffer-file-name (marker-buffer marker))
+	      heading-name (org-entry-get nil "ITEM"))))
+    (org-insert-link file-name
+		     (concat "file:" file-name "::*" heading-name))))
 
 (defun helm-org-run-insert-link-to-heading-at-marker ()
   "Insert link with the selected heading as its target."
@@ -236,24 +330,12 @@ when called from the `helm-org-agenda-files-headings' command."
      'helm-org-insert-link-to-heading-at-marker)))
 
 (defun helm-org--refile-heading-to (marker)
-  "Refile headings to heading at MARKER.
-If multiple candidates are marked in the Helm session, they will
-all be refiled.  If no headings are marked, the selected heading
-will be refiled."
-  (let* ((victims (with-helm-buffer (helm-marked-candidates)))
-         (buffer (marker-buffer marker))
-         (filename (buffer-file-name buffer))
-         (rfloc (list nil filename nil marker)))
-    (when (and (= 1 (length victims))
-               (equal (helm-get-selection) (car victims)))
-      ;; No candidates are marked; we are refiling the entry at point
-      ;; to the selected heading
-      (setq victims (list (point))))
-    ;; Probably best to check that everything returned a value
-    (when (and victims buffer filename rfloc)
-      (cl-loop for victim in victims
-               do (org-with-point-at victim
-                    (org-refile nil nil rfloc))))))
+  "Refile headings to heading at MARKER."
+  (let* ((markers (helm-marked-candidates))
+         (default (marker-buffer marker))
+         (rfloc (org-refile-get-location "Refile to" default)))
+    (helm-org-execute markers
+      (org-refile nil nil rfloc))))
 
 (defun helm-org-run-refile-heading-to ()
   "Refile one or more entries to the selected heading."
@@ -261,6 +343,36 @@ will be refiled."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
 (put 'helm-org-run-refile-heading-to 'helm-only t)
+
+(defun helm-org-schedule (marker)
+  "Insert the SCHEDULED: string with a timestamp to schedule a TODO item.
+With one universal prefix argument, remove any scheduling date from the item."
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        (helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (call-interactively 'org-schedule)
+      (org-show-entry))))
+
+(defun helm-org-run-org-schedule ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-schedule)))
+(put 'helm-org-run-org-schedule 'helm-only t)
+
+(defun helm-org-deadline (marker)
+  "Insert the DEADLINE: string with a timestamp to make a deadline.
+With one universal prefix argument, remove any deadline from the item."
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        (helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (org-show-entry)
+      (call-interactively 'org-deadline))))
+
+(defun helm-org-run-org-deadline ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-deadline)))
+(put 'helm-org-run-org-deadline 'helm-only t)
 
 
 ;;; Commands
