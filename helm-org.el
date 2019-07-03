@@ -21,10 +21,6 @@
 (require 'helm-utils)
 (require 'org)
 
-;; Load org-with-point-at macro when compiling
-(eval-when-compile
-  (require 'org-macs))
-
 
 (defgroup helm-org nil
   "Org related functions for Helm."
@@ -334,24 +330,12 @@ This command is set with the variable `org-archive-default-command'."
      'helm-org-insert-link-to-heading-at-marker)))
 
 (defun helm-org--refile-heading-to (marker)
-  "Refile headings to heading at MARKER.
-If multiple candidates are marked in the Helm session, they will
-all be refiled.  If no headings are marked, the selected heading
-will be refiled."
-  (let* ((victims (with-helm-buffer (helm-marked-candidates)))
-         (buffer (marker-buffer marker))
-         (filename (buffer-file-name buffer))
-         (rfloc (list nil filename nil marker)))
-    (when (and (= 1 (length victims))
-               (equal (helm-get-selection) (car victims)))
-      ;; No candidates are marked; we are refiling the entry at point
-      ;; to the selected heading
-      (setq victims (list (point))))
-    ;; Probably best to check that everything returned a value
-    (when (and victims buffer filename rfloc)
-      (cl-loop for victim in victims
-               do (org-with-point-at victim
-                    (org-refile nil nil rfloc))))))
+  "Refile headings to heading at MARKER."
+  (let* ((markers (helm-marked-candidates))
+         (default (marker-buffer marker))
+         (rfloc (org-refile-get-location "Refile to" default)))
+    (helm-org-execute markers
+      (org-refile nil nil rfloc))))
 
 (defun helm-org-run-refile-heading-to ()
   "Refile one or more entries to the selected heading."
