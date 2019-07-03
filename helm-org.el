@@ -46,9 +46,14 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 
 (defcustom helm-org-headings-actions
   '(("Go to heading" . helm-org-goto-marker)
-    ("Open in indirect buffer `C-c i'" . helm-org--open-heading-in-indirect-buffer)
-    ("Refile heading(s) (marked-to-selected|current-to-selected) `C-c w'" . helm-org--refile-heading-to)
-    ("Insert link to this heading `C-c l'" . helm-org-insert-link-to-heading-at-marker))
+    ("Change state `C-c C-t'" . helm-org-change-state)
+    ("Set tags `C-c C-c'" . helm-org-set-tags)
+    ("Archive subtree `C-c C-x C-a'" . helm-org-archive-subtree)
+    ("Open in indirect buffer `C-c C-i'" . helm-org--open-heading-in-indirect-buffer)
+    ("Refile heading(s) `C-c C-w'" . helm-org--refile-heading-to)
+    ("Insert link to this heading `C-c C-l'" . helm-org-insert-link-to-heading-at-marker)
+    ("Schedule item `C-c C-s, C-u to remove'" . helm-org-schedule)
+    ("Set deadline `C-c C-d, C-u to remove'" . helm-org-deadline))
   "Default actions alist for `helm-source-org-headings-for-files'."
   :type '(alist :key-type string :value-type function))
 
@@ -64,9 +69,14 @@ NOTE: This has no effect in `helm-org-in-buffer-headings'."
 (defvar helm-org-headings-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c i") 'helm-org-run-open-heading-in-indirect-buffer)
-    (define-key map (kbd "C-c w") 'helm-org-run-refile-heading-to)
-    (define-key map (kbd "C-c l") 'helm-org-run-insert-link-to-heading-at-marker)
+    (define-key map (kbd "C-c C-t") 'helm-org-run-change-state)
+    (define-key map (kbd "C-c C-c") 'helm-org-run-set-tags)
+    (define-key map (kbd "C-c C-x C-a") 'helm-org-run-archive-subtree)
+    (define-key map (kbd "C-c C-i") 'helm-org-run-open-heading-in-indirect-buffer)
+    (define-key map (kbd "C-c C-w") 'helm-org-run-refile-heading-to)
+    (define-key map (kbd "C-c C-l") 'helm-org-run-insert-link-to-heading-at-marker)
+    (define-key map (kbd "C-c C-s") 'helm-org-run-org-schedule)
+    (define-key map (kbd "C-c C-d") 'helm-org-run-org-deadline)
     map)
   "Keymap for `helm-source-org-headings-for-files'.")
 
