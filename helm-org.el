@@ -221,11 +221,39 @@ when called from the `helm-org-agenda-files-headings' command."
 
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
-  (switch-to-buffer (marker-buffer marker))
-  (goto-char (marker-position marker))
-  (org-show-context)
-  (org-show-entry)
-  (org-show-children))
+  (let ((helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (org-show-entry)
+      (org-show-children))))
+
+(defun helm-org-change-state (marker)
+  "Change the TODO state of marked candidates."
+  (let* ((markers (helm-marked-candidates))
+         (helm-org-switch-to-buffer-p t)
+         (keywords (with-current-buffer (marker-buffer marker)
+                     (mapcar (lambda (kwd)
+                               (let ((face (org-get-todo-face kwd)))
+                                 (list (org-add-props kwd nil 'face face))))
+                             org-todo-keywords-1))))
+    (helm :sources `(,(helm-build-sync-source "Change State"
+                        :candidates keywords
+                        :fuzzy-match t
+                        :action (lambda (state)
+                                  (helm-org-execute markers
+                                    (org-todo state))))
+                     ,(helm-build-sync-source "Remove State"
+                        :candidates (list "clear")
+                        :fuzzy-match t
+                        :action (lambda (_candidate)
+                                  (helm-org-execute markers
+                                    (org-todo 'none))))))))
+
+(defun helm-org-run-change-state ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-change-state)))
+(put 'helm-org-run-change-state 'helm-only t)
+
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
