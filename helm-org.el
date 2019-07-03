@@ -193,6 +193,22 @@ when called from the `helm-org-agenda-files-headings' command."
 ;;
 ;;
 
+(defvar helm-org-switch-to-buffer-p nil
+  "Whether to show the editing buffer.")
+
+(defmacro helm-org-execute (markers &rest body)
+  "Jump to MARKERS and execute BODY."
+  (declare (indent 1))
+  `(dolist (marker (if (listp ,markers)
+                       ,markers
+                     (list ,markers)))
+     (if helm-org-switch-to-buffer-p
+         (switch-to-buffer (marker-buffer marker))
+       (set-buffer (marker-buffer marker)))
+     (goto-char (marker-position marker))
+     (org-show-context)
+     ,@body))
+
 (defun helm-org-goto-marker (marker)
   "Go to MARKER showing the entry's context, body and subheadings."
   (switch-to-buffer (marker-buffer marker))
