@@ -344,6 +344,21 @@ This command is set with the variable `org-archive-default-command'."
     (helm-exit-and-execute-action 'helm-org--refile-heading-to)))
 (put 'helm-org-run-refile-heading-to 'helm-only t)
 
+(defun helm-org-schedule (marker)
+  "Insert the SCHEDULED: string with a timestamp to schedule a TODO item.
+With one universal prefix argument, remove any scheduling date from the item."
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        (helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (call-interactively 'org-schedule)
+      (org-show-entry))))
+
+(defun helm-org-run-org-schedule ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-schedule)))
+(put 'helm-org-run-org-schedule 'helm-only t)
+
 
 ;;; Commands
 ;;
