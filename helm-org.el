@@ -317,13 +317,14 @@ This command is set with the variable `org-archive-default-command'."
 (put 'helm-org-run-open-heading-in-indirect-buffer 'helm-only t)
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
-  (with-current-buffer (marker-buffer marker)
-    (let ((heading-name (save-excursion
-			  (goto-char (marker-position marker))
-                          (org-entry-get nil "ITEM")))
-	  (file-name (buffer-file-name)))
-      (org-insert-link file-name
-		       (concat "file:" file-name "::*" heading-name)))))
+  "Get the heading at MARKER and insert a link that points to it."
+  (let (file-name heading-name)
+    (save-excursion
+      (helm-org-execute marker
+	(setq file-name (buffer-file-name (marker-buffer marker))
+	      heading-name (org-entry-get nil "ITEM"))))
+    (org-insert-link file-name
+		     (concat "file:" file-name "::*" heading-name))))
 
 (defun helm-org-run-insert-link-to-heading-at-marker ()
   "Insert link with the selected heading as its target."
