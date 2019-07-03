@@ -359,6 +359,21 @@ With one universal prefix argument, remove any scheduling date from the item."
     (helm-exit-and-execute-action 'helm-org-schedule)))
 (put 'helm-org-run-org-schedule 'helm-only t)
 
+(defun helm-org-deadline (marker)
+  "Insert the DEADLINE: string with a timestamp to make a deadline.
+With one universal prefix argument, remove any deadline from the item."
+  (let ((current-prefix-arg helm-current-prefix-arg)
+        (helm-org-switch-to-buffer-p t))
+    (helm-org-execute marker
+      (org-show-entry)
+      (call-interactively 'org-deadline))))
+
+(defun helm-org-run-org-deadline ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-deadline)))
+(put 'helm-org-run-org-deadline 'helm-only t)
+
 
 ;;; Commands
 ;;
