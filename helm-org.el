@@ -254,6 +254,38 @@ when called from the `helm-org-agenda-files-headings' command."
     (helm-exit-and-execute-action 'helm-org-change-state)))
 (put 'helm-org-run-change-state 'helm-only t)
 
+(defun helm-org-set-tags (_marker)
+  "Add or remove tags of marked candidates, replacing current tags."
+  (let ((markers (helm-marked-candidates))
+        (helm-org-switch-to-buffer-p t)
+        tags
+        local-tags)
+    (helm-org-execute markers
+      (setq tags (apply #'append (org-get-buffer-tags))
+            local-tags (append local-tags (org-get-tags nil t))))
+    (helm :sources `(,(helm-build-sync-source "Add Tags"
+			:candidates tags
+			:action (lambda (_candidate)
+				  (helm-org-execute markers
+				    (org-set-tags (helm-marked-candidates)))))
+		     ,(helm-build-sync-source "Remove Tags"
+			:candidates local-tags
+			:action (lambda (_candidate)
+                                  (let ((marked-tags (helm-marked-candidates)))
+                                    (helm-org-execute markers
+                                      ;; Remove marked tags but keep
+                                      ;; the rest
+                                      (org-set-tags
+                                       (cl-remove-if (lambda (tag)
+                                                       (member tag marked-tags))
+                                                     (org-get-tags nil t)))))))))))
+
+(defun helm-org-run-set-tags ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-org-set-tags)))
+(put 'helm-org-run-set-tags 'helm-only t)
+
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
