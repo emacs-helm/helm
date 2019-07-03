@@ -258,7 +258,7 @@ when called from the `helm-org-agenda-files-headings' command."
         local-tags)
     (helm-org-execute markers
       (setq tags (apply #'append (org-get-buffer-tags))
-            local-tags (append local-tags (org-get-tags nil t))))
+            local-tags (append local-tags (org-get-tags))))
     (helm :sources `(,(helm-build-sync-source "Add Tags"
 			:candidates tags
 			:action (lambda (_candidate)
@@ -274,7 +274,7 @@ when called from the `helm-org-agenda-files-headings' command."
                                       (org-set-tags
                                        (cl-remove-if (lambda (tag)
                                                        (member tag marked-tags))
-                                                     (org-get-tags nil t)))))))))))
+                                                     (org-get-tags)))))))))))
 
 (defun helm-org-run-set-tags ()
   (interactive)
@@ -350,8 +350,8 @@ With one universal prefix argument, remove any scheduling date from the item."
   (let ((current-prefix-arg helm-current-prefix-arg)
         (helm-org-switch-to-buffer-p t))
     (helm-org-execute marker
-      (call-interactively 'org-schedule)
-      (org-show-entry))))
+      (org-show-entry)
+      (call-interactively 'org-schedule))))
 
 (defun helm-org-run-org-schedule ()
   (interactive)
