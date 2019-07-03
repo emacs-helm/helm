@@ -301,20 +301,19 @@ This command is set with the variable `org-archive-default-command'."
 
 (defun helm-org--open-heading-in-indirect-buffer (marker)
   "Go to MARKER and create an indirect buffer of the current subtree."
-  (switch-to-buffer (marker-buffer marker))
-  (goto-char (marker-position marker))
-  (org-show-context)
-  (org-tree-to-indirect-buffer)
-  ;; Put the non-indirect buffer at the bottom of the prev-buffers
-  ;; list so it won't be selected when the indirect buffer is killed
-  (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
-                                       (car (window-prev-buffers)))))
+  (save-excursion
+    (helm-org-execute marker
+      (org-tree-to-indirect-buffer)
+      ;; Put the non-indirect buffer at the bottom of the prev-buffers
+      ;; list so it won't be selected when the indirect buffer is killed
+      (set-window-prev-buffers nil (append (cdr (window-prev-buffers))
+                                           (car (window-prev-buffers)))))))
 
 (defun helm-org-run-open-heading-in-indirect-buffer ()
   "Open selected subtree in an indirect buffer."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action #'helm-org--open-heading-in-indirect-buffer)))
+    (helm-exit-and-execute-action 'helm-org--open-heading-in-indirect-buffer)))
 (put 'helm-org-run-open-heading-in-indirect-buffer 'helm-only t)
 
 (defun helm-org-insert-link-to-heading-at-marker (marker)
