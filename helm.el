@@ -1133,6 +1133,27 @@ provide for this function.  This is the intended behavior.
 Generally you are better off using the native Helm command
 than the helmized Emacs equivalent.
 
+*** Completion behavior with Helm and completion-at-point
+
+Helm is NOT completing dynamically, that's mean that when you are
+completing some text at point, completion is done against this
+text and subsequent characters you add AFTER this text, this
+allow you to use matching methods provided by Helm, that is multi
+matching or fuzzy matching (see [[Matching in Helm][Matching in Helm]]).
+
+Completion is not done dynamically (against `helm-pattern')
+because backend functions (i.e. `competion-at-point-functions')
+are not aware of the Helm matching methods.
+
+By behaving like this, the benefit is that you can fully use Helm
+matching methods but you can't start a full completion against a
+prefix different than the initial text you have at point, Helm
+warn you against this by colorizing the initial input and send an
+user-error message when trying to delete backward text beyond
+this limit at first hit on DEL and on second hit on DEL within a
+short delay (1s) quit Helm and delete-backward char in
+current-buffer.
+
 ** Helm help
 
 \\[helm-documentation]: Show all helm documentations concatenated in one org file.
