@@ -193,7 +193,6 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-g")        'helm-keyboard-quit)
     (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
-    (define-key map (kbd "C-z")        'helm-execute-persistent-action)
     (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        'helm-next-source)
     (define-key map (kbd "M-o")        'helm-previous-source)
@@ -1220,19 +1219,27 @@ See [[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for more infos.
 | C-n     | Down             | Next line                                                            |
 | M-v     | prior            | Previous page                                                        |
 | C-v     | next             | Next page                                                            |
-| Enter   |                  | Execute first (default) action / Select                              |
+| Enter   |                  | Execute first (default) action / Select [1]                          |
 | M-<     |                  | First line                                                           |
 | M->     |                  | Last line                                                            |
 | C-M-S-v | M-prior, C-M-y   | Previous page (other-window)                                         |
 | C-M-v   | M-next           | Next page (other-window)                                             |
 | Tab     | C-i              | Show action list                                                     |
-| Left    | M-o              | Previous source                                                      |
-| Right   | C-o              | Next source                                                          |
-| C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [1]) |
-| C-j     | C-z              | Persistent action (Execute and keep Helm session)                    |
+| M-o     |                  | Previous source                                                      |
+| C-o     |                  | Next source                                                          |
+| C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
+| C-j     |                  | Persistent action (Execute and keep Helm session)                    |
 
-\[1] Delete from point to end or all depending on the value of
+\[1] Behavior may change depending context in some source e.g. `helm-find-files'.
+
+\[2] Delete from point to end or all depending on the value of
 `helm-delete-minibuffer-contents-from-point'.
+
+** Action transformers
+
+You may be surprized to see you actions list changing depending of context, this
+happen when a source have an action transformer function which check the current
+candidate selectioned and add specific actions for this candidate.
 
 ** Shortcuts for n-th first actions
 
