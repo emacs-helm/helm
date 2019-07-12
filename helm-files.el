@@ -722,11 +722,11 @@ Should not be used among other sources.")
                 (require 'helm-external)))
    (candidates :initform 'helm-find-files-get-candidates)
    (filtered-candidate-transformer
-    :initform '(helm-ff-sort-candidates
-                (lambda (candidates _source)
+    :initform '((lambda (candidates _source)
                   (cl-loop for f in candidates
                            for ff = (helm-ff-filter-candidate-one-by-one f)
-                           when ff collect ff))))
+                           when ff collect ff))
+                helm-ff-sort-candidates))
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
@@ -2956,10 +2956,15 @@ return FNAME prefixed with [?]."
            (concat prefix-url " " fname))
           (new-file (concat prefix-new " " fname)))))
 
-(defun helm-ff-score-candidate-for-pattern (str pattern)
-  (if (member str '("." ".."))
-      200
-      (helm-score-candidate-for-pattern str pattern)))
+(defun helm-ff-score-candidate-for-pattern (real disp pattern)
+  (if (or (member real '("." ".."))
+          ;; Incomplete filenames are prefixed with two spaces, the
+          ;; first one beeing propertized with a 'display prop
+          ;; i.e. "[?] foo".
+          (and (string-match-p "\\`\\s-\\{2\\}" disp)
+               (string= real (substring-no-properties disp 2))))
+      900000
+      (helm-score-candidate-for-pattern real pattern)))
 
 (defun helm-ff-sort-candidates-1 (candidates input)
   "Sort function for `helm-source-find-files'.
@@ -2972,18 +2977,22 @@ Return candidates prefixed with basename of INPUT first."
     (let* ((memo-src  (make-hash-table :test 'equal))
            (all (sort candidates
                       (lambda (s1 s2)
-                        (let* ((score (lambda (str)
+                        (let* ((score (lambda (disp real)
                                         (helm-ff-score-candidate-for-pattern
-                                         str (helm-basename input))))
-                               (bn1 (helm-basename (if (consp s1) (cdr s1) s1)))
-                               (bn2 (helm-basename (if (consp s2) (cdr s2) s2)))
-                               (sc1 (or (gethash bn1 memo-src)
-                                        (puthash bn1 (funcall score bn1) memo-src)))
-                               (sc2 (or (gethash bn2 memo-src)
-                                        (puthash bn2 (funcall score bn2) memo-src))))
+                                         disp real (helm-basename input))))
+                               ;; Reals
+                               (r1 (helm-basename (if (consp s1) (cdr s1) s1)))
+                               (r2 (helm-basename (if (consp s2) (cdr s2) s2)))
+                               ;; Displays
+                               (d1 (helm-basename (if (consp s1) (car s1) s1)))
+                               (d2 (helm-basename (if (consp s2) (car s2) s2)))
+                               (sc1 (or (gethash r1 memo-src)
+                                        (puthash r1 (funcall score r1 d1) memo-src)))
+                               (sc2 (or (gethash r2 memo-src)
+                                        (puthash r2 (funcall score r2 d2) memo-src))))
                           (cond ((= sc1 sc2)
-                                 (< (string-width bn1)
-                                    (string-width bn2)))
+                                 (< (string-width r1)
+                                    (string-width r2)))
                                 ((> sc1 sc2))))))))
       all)))
 
