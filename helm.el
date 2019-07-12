@@ -191,8 +191,6 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "M-<")        'helm-beginning-of-buffer)
     (define-key map (kbd "M->")        'helm-end-of-buffer)
     (define-key map (kbd "C-g")        'helm-keyboard-quit)
-    (define-key map (kbd "<right>")    'helm-next-source)
-    (define-key map (kbd "<left>")     'helm-previous-source)
     (define-key map (kbd "<RET>")      'helm-maybe-exit-minibuffer)
     (define-key map (kbd "C-i")        'helm-select-action)
     (define-key map (kbd "C-z")        'helm-execute-persistent-action)

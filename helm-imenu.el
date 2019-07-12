@@ -40,11 +40,6 @@
   :group 'helm-imenu
   :type 'function)
 
-(defcustom helm-imenu-lynx-style-map t
-  "Use Arrow keys to jump to occurences."
-  :group 'helm-imenu
-  :type  'boolean)
-
 (defcustom helm-imenu-all-buffer-assoc nil
   "Major mode association alist for `helm-imenu-in-all-buffers'.
 Allow `helm-imenu-in-all-buffers' searching in these associated buffers
@@ -92,12 +87,20 @@ Each car is a regexp match pattern of the imenu type string."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-imenu-next-section)
     (define-key map (kbd "M-<up>")   'helm-imenu-previous-section)
-    (when helm-imenu-lynx-style-map
-      (define-key map (kbd "<left>")    'helm-maybe-exit-minibuffer)
-      (define-key map (kbd "<right>")   'helm-execute-persistent-action)
-      (define-key map (kbd "M-<left>")  'helm-previous-source)
-      (define-key map (kbd "M-<right>") 'helm-next-source))
-    (delq nil map)))
+    map))
+
+(defcustom helm-imenu-lynx-style-map nil
+  "Use Arrow keys to jump to occurences."
+  :group 'helm-imenu
+  :type  'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-imenu-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-imenu-map (kbd "<left>")   'helm-maybe-exit-minibuffer))
+           (define-key helm-imenu-map (kbd "<right>") nil)
+           (define-key helm-imenu-map (kbd "<left>")  nil))))
 
 (defun helm-imenu-next-or-previous-section (n)
   (with-helm-buffer

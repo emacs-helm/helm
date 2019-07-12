@@ -35,11 +35,6 @@
   "Semantic tags related libraries and applications for helm."
   :group 'helm)
 
-(defcustom helm-semantic-lynx-style-map t
-  "Use Arrow keys to jump to occurences."
-  :group 'helm-semantic
-  :type  'boolean)
-
 (defcustom helm-semantic-display-style
   '((python-mode . semantic-format-tag-summarize)
     (c-mode . semantic-format-tag-concise-prototype-c-mode)
@@ -64,10 +59,20 @@ you have completion on these functions with `C-M i' in the customize interface."
 (defvar helm-semantic-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (when helm-semantic-lynx-style-map
-      (define-key map (kbd "<left>")  'helm-maybe-exit-minibuffer)
-      (define-key map (kbd "<right>") 'helm-execute-persistent-action))
-    (delq nil map)))
+    map))
+
+(defcustom helm-semantic-lynx-style-map nil
+  "Use Arrow keys to jump to occurences."
+  :group 'helm-semantic
+  :type  'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-semantic-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-semantic-map (kbd "<left>")   'helm-maybe-exit-minibuffer))
+           (define-key helm-semantic-map (kbd "<right>") nil)
+           (define-key helm-semantic-map (kbd "<left>")  nil))))
 
 ;; Internals vars
 (defvar helm-semantic--tags-cache nil)

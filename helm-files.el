@@ -587,7 +587,7 @@ with Exiftran mandatory option is \"-i\"."
     (delq nil map))
   "Keymap for `helm-read-file-name'.")
 
-(defcustom helm-ff-lynx-style-map t
+(defcustom helm-ff-lynx-style-map nil
   "Use arrow keys to navigate with `helm-find-files'.
 Note that if you define this variable with `setq' your change will
 have no effect, use customize instead."
