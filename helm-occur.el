@@ -43,7 +43,7 @@ Don't set it to any value, it will have no effect.")
     (define-key map (kbd "C-c o")    'helm-occur-run-goto-line-ow)
     (define-key map (kbd "C-c C-o")  'helm-occur-run-goto-line-of)
     (define-key map (kbd "C-x C-s")  'helm-occur-run-save-buffer)
-    (delq nil map))
+    map)
   "Keymap used in occur source.")
 
 (defgroup helm-occur nil

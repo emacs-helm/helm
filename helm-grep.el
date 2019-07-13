@@ -289,7 +289,7 @@ Have no effect when grep backend use \"--color=\"."
     (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
     (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
     (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
-    (delq nil map))
+    map)
   "Keymap used in Grep sources.")
 
 (defcustom helm-grep-use-ioccur-style-keys t

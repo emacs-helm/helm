@@ -565,7 +565,7 @@ with Exiftran mandatory option is \"-i\"."
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
-    (delq nil map))
+    map)
   "Keymap for `helm-find-files'.")
 
 (defvar helm-read-file-map
@@ -584,7 +584,7 @@ with Exiftran mandatory option is \"-i\"."
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
-    (delq nil map))
+    map)
   "Keymap for `helm-read-file-name'.")
 
 (defcustom helm-ff-lynx-style-map nil
