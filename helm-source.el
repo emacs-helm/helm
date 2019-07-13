@@ -693,6 +693,12 @@ Matching is done basically with `string-match' against each candidate.")
    (multimatch :initform nil))
 
   "Use this class to define a helm source calling an external process.
+The external process is called typically in a `start-process' call to be
+asynchronous.
+
+Note that using multiples asynchronous sources is not fully working,
+expect weird behavior if you try this.
+
 The :candidates slot is not allowed even if described because this class
 inherit from `helm-source'.")
 

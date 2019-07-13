@@ -1498,7 +1498,8 @@ The list of sources (symbols or alists) is normalized to alists in
 (defvar helm--local-variables nil)
 (defvar helm-split-window-state nil)
 (defvar helm--window-side-state nil)
-(defvar helm-selection-point nil)
+(defvar helm-selection-point nil
+  "The value of point at selection.")
 (defvar helm-alive-p nil)
 (defvar helm-visible-mark-overlays nil)
 (defvar helm-update-blacklist-regexps '("^" "^ *" "$" "!" " " "\\b"
