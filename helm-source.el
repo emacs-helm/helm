@@ -668,7 +668,18 @@ With a value of 1 enable, a value of -1 or nil disable the mode.
   functions will be used. You can specify those functions as a
   list of functions or a single symbol function.
 
-  NOTE: This have the same effect as using :MULTIMATCH nil."))
+  NOTE: This have the same effect as using :MULTIMATCH nil.")
+
+   (match-dynamic
+    :initarg :match-dynamic
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Disable all helm matching functions when non nil.
+  The :candidates function in this case is in charge of fetching
+  candidates dynamically according to `helm-pattern'.
+  Note that :volatile is automatically enabled when using this, so no
+  need to specify it."))
 
   "Use this class to make helm sources using a list of candidates.
 This list should be given as a normal list, a variable handling a list
@@ -1031,7 +1042,12 @@ an eieio class."
       (unless (eq it 'nomultimatch) ; Use own migemo fn.
         (setf (slot-value source 'match)
               (append (helm-mklist (slot-value source 'match))
-                      '(helm-mm-3-migemo-match))))))
+                      '(helm-mm-3-migemo-match)))))
+  (when (slot-value source 'match-dynamic)
+    (setf (slot-value source 'match) 'identity)
+    (setf (slot-value source 'multimatch) nil)
+    (setf (slot-value source 'fuzzy-match) nil)
+    (setf (slot-value source 'volatile) t)))
 
 (defmethod helm--setup-source ((source helm-source-in-buffer))
   (cl-assert (eq (slot-value source 'candidates) 'helm-candidates-in-buffer)
