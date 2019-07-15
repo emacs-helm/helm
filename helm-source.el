@@ -108,7 +108,10 @@
 
   This function, generally should not compute candidates according to
   `helm-pattern' which defeat all the Helm's matching mechanism
-  i.e. multiple pattern matching and/or fuzzy matching.")
+  i.e. multiple pattern matching and/or fuzzy matching.
+  If you want to do so, use :match-dynamic slot to be sure matching
+  occur only in :candidates function and there is no conflict with
+  other match functions.")
 
    (update
     :initarg :update
