@@ -405,12 +405,17 @@ Default is `helm-current-buffer'."
 
 (defun helm-goto-char (loc)
   "Go to char, revealing if necessary."
-  (require 'org) ; On some old Emacs versions org may not be loaded.
   (goto-char loc)
-  (let ((fn (cond ((eq major-mode 'org-mode) #'org-reveal)
+  (let ((fn (cond ((eq major-mode 'org-mode)
+                   ;; On some old Emacs versions org may not be loaded.
+                   (require 'org)
+                   #'org-reveal)
                   ((and (boundp 'outline-minor-mode)
                         outline-minor-mode)
-                   (lambda () (outline-flag-subtree nil))))))
+                   #'outline-show-subtree)
+                  ((and (boundp 'markdown-mode-map)
+                        (derived-mode-p 'markdown-mode))
+                   #'markdown-show-subtree))))
     ;; outline may fail in some conditions e.g. with markdown enabled
     ;; (issue #1919).
     (condition-case nil
