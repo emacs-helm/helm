@@ -228,6 +228,13 @@ For a better experience you can enable auto completion by setting
 `helm-ff-auto-update-initial-value' to non-nil in your init file.  It is not
 enabled by default to not confuse new users.
 
+**** Navigate with arrow keys
+
+You can use <right> and <left> arrows to go down or up one level, to enable
+this customize `helm-ff-lynx-style-map'.
+This is disabled by default.
+Note that using `setq' will NOT work.
+
 **** Use `\\<helm-find-files-map>\\[helm-execute-persistent-action]' (persistent action) on a directory to go down one level
 
 On a symlinked directory a prefix argument expands to its true name.
