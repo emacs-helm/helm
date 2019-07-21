@@ -357,7 +357,7 @@ in other window according to the value of `helm-elisp-help-function'."
   (let ((sym (intern-soft candidate)))
     (cl-typecase sym
       ((and fboundp boundp)
-       (if (member name '("describe-function" "describe-variable"))
+       (if (member name `(,helm-describe-function-function ,helm-describe-variable-function))
            (funcall (intern (format "helm-%s" name)) sym)
            ;; When there is no way to know what to describe
            ;; prefer describe-function.

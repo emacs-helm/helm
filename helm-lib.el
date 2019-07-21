@@ -117,6 +117,16 @@ customize functions e.g. `customize-set-variable' and NOT `setq'."
   :type  '(repeat (choice regexp))
   :set 'helm-ff--setup-boring-regex)
 
+(defcustom helm-describe-function-function 'describe-function
+  "Function used to describe functions in Helm."
+  :group 'helm-elisp
+  :type 'function)
+
+(defcustom helm-describe-variable-function 'describe-variable
+  "Function used to describe variables in Helm."
+  :group 'helm-elisp
+  :type 'function)
+
 
 ;;; Internal vars
 ;;
@@ -963,12 +973,12 @@ Example:
 (defun helm-describe-function (func)
   "FUNC is symbol or string."
   (cl-letf (((symbol-function 'message) #'ignore))
-    (describe-function (helm-symbolify func))))
+    (funcall helm-describe-function-function (helm-symbolify func))))
 
 (defun helm-describe-variable (var)
   "VAR is symbol or string."
   (cl-letf (((symbol-function 'message) #'ignore))
-    (describe-variable (helm-symbolify var))))
+    (funcall helm-describe-variable-function (helm-symbolify var))))
 
 (defun helm-describe-face (face)
   "FACE is symbol or string."
