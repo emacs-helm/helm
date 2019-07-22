@@ -24,6 +24,7 @@
 
 (declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
 (declare-function popup-tip "ext:popup")
+(declare-function markdown-show-subtree "outline.el")
 (defvar winner-boring-buffers)
 (defvar helm-show-completion-overlay)
 
