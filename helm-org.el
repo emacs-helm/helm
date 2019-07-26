@@ -307,11 +307,14 @@ will be refiled."
                     (org-refile nil nil rfloc))))))
 
 (defun helm-org-in-buffer-preselect ()
-  (if (org-on-heading-p)
-      (buffer-substring-no-properties (point-at-bol) (point-at-eol))
-      (save-excursion
-        (outline-previous-visible-heading 1)
-        (buffer-substring-no-properties (point-at-bol) (point-at-eol)))))
+  "Return the current or closest visible heading as a regexp string."
+  (save-excursion
+    (cond ((org-at-heading-p) (forward-line 0))
+	  ((org-before-first-heading-p)
+	   (outline-next-visible-heading 1))
+	  (t (outline-previous-visible-heading 1)))
+    (regexp-quote (buffer-substring-no-properties (point-at-bol)
+						  (point-at-eol)))))
 
 (defun helm-org-run-refile-heading-to ()
   (interactive)
