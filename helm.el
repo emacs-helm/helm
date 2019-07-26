@@ -34,9 +34,9 @@
 (require 'helm-lib)
 (require 'helm-multi-match)
 (require 'helm-source)
-(eval-when-compile (require 'cus-edit))
-(declare-function 'helm-comp-read "helm-mode.el")
 
+(declare-function helm-comp-read "helm-mode.el")
+(declare-function custom-unlispify-tag-name "cus-edit.el")
 
 ;;; Multi keys
 ;;
@@ -6947,6 +6947,7 @@ If source doesn't have any `help-message' attribute, a generic message
 explaining this is added instead.
 The global `helm-help-message' is always added after this local help."
   (interactive)
+  (require 'helm-mode) ; for helm-comp-read.
   (with-helm-alive-p
     (let ((source (or (helm-get-current-source)
                       (helm-comp-read

@@ -24,8 +24,19 @@
 ;;; Code:
 
 (require 'cl-lib)
-(eval-when-compile (require 'wdired))
 
+(declare-function wdired-change-to-dired-mode "wdired.el")
+(declare-function wdired-do-symlink-changes "wdired.el")
+(declare-function wdired-do-perm-changes "wdired.el")
+(declare-function wdired-get-filename "wdired.el")
+(declare-function wdired-do-renames "wdired.el")
+(declare-function wdired-flag-for-deletion "wdired.el")
+(declare-function wdired-normalize-filename "wdired.el")
+(declare-function dired-mark-remembered "dired.el")
+(declare-function dired-log-summary "dired.el")
+(declare-function dired-current-directory "dired.el")
+(declare-function ansi-color--find-face "ansi-color.el")
+(declare-function ansi-color-apply-sequence "ansi-color.el")
 (declare-function helm-get-sources "helm.el")
 (declare-function helm-marked-candidates "helm.el")
 (declare-function helm-follow-mode-p "helm.el")
@@ -41,6 +52,9 @@
 (defvar helm-initial-frame)
 (defvar helm-current-position)
 (defvar wdired-old-marks)
+(defvar wdired-keep-marker-rename)
+(defvar wdired-allow-to-change-permissions)
+(defvar wdired-allow-to-redirect-links)
 (defvar helm-persistent-action-display-window)
 
 ;;; User vars.
