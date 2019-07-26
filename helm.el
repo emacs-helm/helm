@@ -935,6 +935,9 @@ This hook runs after `helm-buffer' is created but not from
 (defvar helm-after-update-hook nil
   "Runs after updating the helm buffer with the new input pattern.")
 
+(defvar helm-before-update-hook nil
+  "Runs before updating the helm buffer with the new input pattern.")
+
 (defvar helm-cleanup-hook nil
   "Runs after exiting the minibuffer and before performing an
 action.
@@ -3623,6 +3626,7 @@ WARNING: Do not use this mode yourself, it is internal to helm."
       (setq helm-input helm-pattern))
     (helm-log "helm-pattern = %S" helm-pattern)
     (helm-log "helm-input = %S" helm-input)
+    (helm-log-run-hook 'helm-before-update-hook)
     (setq helm--in-update t)
     (helm-update)))
 
@@ -4323,8 +4327,7 @@ without recomputing them, it should be a list of lists."
                       do (helm-render-source src mtc))
              ;; Move to first line only when there is matches
              ;; to avoid cursor moving upside down (issue #1703).
-             (helm--update-move-first-line)
-             (helm--reset-update-flag)))
+             (helm--update-move-first-line)))
       ;; When there is only one async source, update mode-line and run
       ;; `helm-after-update-hook' in `helm-output-filter--post-process',
       ;; when there is more than one source, update mode-line and run
@@ -4332,14 +4335,15 @@ without recomputing them, it should be a list of lists."
       ;; present and running in BG.
       (let ((src (or source (helm-get-current-source))))
         (unless (assq 'candidates-process src)
-          (and src (helm-display-mode-line src 'force))
+          (helm-display-mode-line src 'force)
           (helm-log-run-hook 'helm-after-update-hook)))
       (when preselect
         (helm-log "Update preselect candidate %s" preselect)
         (if (helm-window)
             (with-helm-window (helm-preselect preselect source))
           (helm-preselect preselect source)))
-      (setq helm--force-updating-p nil))
+      (setq helm--force-updating-p nil)
+      (helm--reset-update-flag))
     (helm-log "end update")))
 
 (defun helm-update-source-p (source)
