@@ -3785,7 +3785,9 @@ is helm-source-find-files."
 
 (defun helm-find-files-initial-input (&optional input)
   "Return INPUT if present, otherwise try to guess it."
-  (let ((guesser (helm-ffap-guesser)))
+  (let ((guesser (helm-acase (helm-ffap-guesser)
+                   ("" nil)
+                   (t it))))
     (unless (eq major-mode 'image-mode)
       (or (and input (or (and (file-remote-p input) input)
                          (expand-file-name input)))
