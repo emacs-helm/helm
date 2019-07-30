@@ -112,11 +112,11 @@ Each car is a regexp match pattern of the imenu type string."
            (stop-fn (if (> n 0)
                         #'helm-end-of-source-p
                         #'helm-beginning-of-source-p)))
-      (catch 'break
-        (while (not (funcall stop-fn))
-          (funcall move-fn)
-          (unless (string= curtype (funcall fn))
-            (throw 'break nil)))))))
+      (helm-without-follow
+       (while (and (not (funcall stop-fn))
+                   (string= curtype (funcall fn)))
+         (funcall move-fn)))
+      (helm-follow-execute-persistent-action-maybe 0.1))))
 
 (defun helm-imenu-next-section ()
   (interactive)
@@ -301,7 +301,7 @@ Each car is a regexp match pattern of the imenu type string."
                                     when (string-match p x) return f
                                     finally return 'default)))
                         types helm-imenu-delimiter)
-           for disp = (propertize disp1 'help-echo bufname)
+           for disp = (propertize disp1 'help-echo bufname 'types types)
            collect
            (cons disp (cons k v))))
 

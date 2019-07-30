@@ -1303,6 +1303,14 @@ That is what completion commands operate on."
   `(with-selected-window (helm-window)
      ,@body))
 
+(defmacro helm-without-follow (&rest body)
+  "Ensure BODY runs without following.
+I.e. when using `helm-next-line' and friends in BODY."
+  (declare (indent 0) (debug t))
+  `(cl-letf (((symbol-function 'helm-follow-mode-p)
+             (lambda (&optional _) nil)))
+    (let (helm-follow-mode-persistent)
+      (progn ,@body))))
 
 ;; Yank text at point.
 ;;
