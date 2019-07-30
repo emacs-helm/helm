@@ -111,11 +111,11 @@ Each car is a regexp match pattern of the imenu type string."
            (move-fn (if (> n 0) #'helm-next-line #'helm-previous-line))
            (stop-fn (if (> n 0)
                         #'helm-end-of-source-p
-                        #'helm-beginning-of-source-p)))
+                      #'helm-beginning-of-source-p)))
       (helm-without-follow
-       (while (and (not (funcall stop-fn))
-                   (string= curtype (funcall fn)))
-         (funcall move-fn)))
+        (while (and (not (funcall stop-fn))
+                    (string= curtype (funcall fn)))
+          (funcall move-fn)))
       (helm-follow-execute-persistent-action-maybe 0.1))))
 
 (defun helm-imenu-next-section ()
