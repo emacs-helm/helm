@@ -984,6 +984,12 @@ Example:
       "Anonymous"
       (symbol-name obj)))
 
+(defun helm-describe-class (class)
+  (advice-add 'cl--print-table :override #'helm-source--cl--print-table)
+  (unwind-protect
+       (helm-describe-function class)
+    (advice-remove 'cl--print-table #'helm-source--cl--print-table)))
+
 (defun helm-describe-function (func)
   "FUNC is symbol or string."
   (cl-letf (((symbol-function 'message) #'ignore))

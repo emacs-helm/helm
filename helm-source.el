@@ -39,6 +39,17 @@
 (declare-function helm-init-candidates-in-buffer "helm.el")
 (declare-function helm-interpret-value "helm.el")
 (declare-function helm-fuzzy-highlight-matches "helm.el")
+
+;;; Advice Emacs fn
+;;  Make Classes's docstrings more readable by removing al the
+;;  unnecessary crap.
+
+(defun helm-source--cl--print-table (_header rows)
+  (let ((format "%s\n %s"))
+    (dolist (row rows)
+      (setcar row (propertize (car row) 'face 'italic))
+      (setcdr row (nthcdr 2 (cdr row)))
+      (insert "\n* " (apply #'format format row) "\n"))))
 
 
 (defgeneric helm--setup-source (source)

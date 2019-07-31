@@ -663,8 +663,8 @@ Filename completion happen if string start after or between a double quote."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe class"
-    :action '(("Describe function" . helm-describe-function)
-              ("Find function" . helm-find-function)
+    :action '(("Describe Class" . helm-describe-class)
+              ("Find Class" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
 
 (defun helm-def-source--eieio-generic (&optional default)
