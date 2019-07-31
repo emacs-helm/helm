@@ -985,23 +985,24 @@ Example:
       (symbol-name obj)))
 
 (defun helm-describe-class (class)
+  "Display documentation of Eieio CLASS, a symbol or a string."
   (advice-add 'cl--print-table :override #'helm-source--cl--print-table)
   (unwind-protect
        (helm-describe-function class)
     (advice-remove 'cl--print-table #'helm-source--cl--print-table)))
 
 (defun helm-describe-function (func)
-  "FUNC is symbol or string."
+  "Display documentation of FUNC, a symbol or string."
   (cl-letf (((symbol-function 'message) #'ignore))
     (funcall helm-describe-function-function (helm-symbolify func))))
 
 (defun helm-describe-variable (var)
-  "VAR is symbol or string."
+  "Display documentation of VAR, a symbol or a string."
   (cl-letf (((symbol-function 'message) #'ignore))
     (funcall helm-describe-variable-function (helm-symbolify var))))
 
 (defun helm-describe-face (face)
-  "FACE is symbol or string."
+  "Display documentation of FACE, a symbol or a string."
   (let ((faces (helm-marked-candidates)))
     (cl-letf (((symbol-function 'message) #'ignore))
       (describe-face (if (cdr faces)
