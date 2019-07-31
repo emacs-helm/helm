@@ -562,7 +562,7 @@
     :custom integer
     :documentation
     "  Enable `helm-follow-mode' for this source only.
-With a value of 1 enable, a value of -1 or nil disable the mode.
+  With a value of 1 enable, a value of -1 or nil disable the mode.
   See `helm-follow-mode' for more infos.")
 
    (follow-delay
