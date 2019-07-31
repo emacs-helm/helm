@@ -342,6 +342,11 @@ id is non-`nil'."
   :group 'helm
   :type  'integer)
 
+(defcustom helm-left-margin-width 0
+  "`left-margin-width' value for the `helm-buffer'."
+  :group 'helm
+  :type 'integer)
+
 (defcustom helm-display-source-at-screen-top t
   "Display candidates at the top of screen.
 This happens with `helm-next-source' and `helm-previous-source'.
@@ -3314,6 +3319,7 @@ Unuseful when used outside helm, don't use it.")
       (helm-log "helm--local-variables = %S" helm--local-variables)
       (helm--set-local-variables-internal)
       (setq truncate-lines helm-truncate-lines) ; already local.
+      (setq left-margin-width helm-left-margin-width)
       (setq cursor-type nil))
     (helm-initialize-overlays helm-buffer)
     (get-buffer helm-buffer)))

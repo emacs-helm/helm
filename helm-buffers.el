@@ -89,6 +89,11 @@ Only buffer names are fuzzy matched when this is enabled,
   :group 'helm-buffers
   :type 'boolean)
 
+(defcustom helm-buffers-left-margin-width helm-left-margin-width
+  "`left-margin-width' value for `helm-mini' and `helm-buffers-list'."
+  :group 'helm-buffers
+  :type 'integer)
+
 (defcustom helm-mini-default-sources '(helm-source-buffers-list
                                        helm-source-recentf
                                        helm-source-buffer-not-found)
@@ -1080,11 +1085,12 @@ displayed with the `file-name-shadow' face if available."
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
         :keymap helm-buffer-map
-        :truncate-lines helm-buffers-truncate-lines))
+        :truncate-lines helm-buffers-truncate-lines
+        :left-margin-width helm-buffers-left-margin-width))
 
 ;;;###autoload
 (defun helm-mini ()
-  "Preconfigured `helm' lightweight version \(buffer -> recentf\)."
+  "Preconfigured `helm' displaying `helm-mini-default-sources'."
   (interactive)
   (require 'helm-x-files)
   (unless helm-source-buffers-list
@@ -1093,7 +1099,8 @@ displayed with the `file-name-shadow' face if available."
   (helm :sources helm-mini-default-sources
         :buffer "*helm mini*"
         :ff-transformer-show-only-basename nil
-        :truncate-lines helm-buffers-truncate-lines))
+        :truncate-lines helm-buffers-truncate-lines
+        :left-margin-width helm-buffers-left-margin-width))
 
 (defun helm-quit-and-helm-mini ()
   "Drop into `helm-mini' from `helm'."
