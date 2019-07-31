@@ -839,13 +839,16 @@ i.e the `symbol-name' of any existing symbol."
         :buffer "*helm locate library*"))
 
 (defun helm-set-variable (var)
-  "Set value to VAR interactively."
+  "Set VAR value interactively."
   (let* ((sym (helm-symbolify var))
          (val (default-value sym)))
-    (set-default sym (eval-minibuffer (format "Set `%s': " var)
-                                      (if (or (stringp val) (memq val '(nil t)))
-                                          (prin1-to-string val)
-                                          (format "'%s" (prin1-to-string val)))))))
+    (set-default sym (eval-minibuffer
+                      (format "Set `%s': " var)
+                      (if (or (stringp val)
+                              (memq val '(nil t))
+                              (numberp val))
+                          (prin1-to-string val)
+                        (format "'%s" (prin1-to-string val)))))))
 
 
 ;;; Elisp Timers.
