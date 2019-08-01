@@ -912,6 +912,11 @@ You can toggle later `truncate-lines' with \\<helm-map>\\[helm-toggle-truncate-l
   "Face used for the minibuffer/headline prompt (such as Pattern:) in helm."
   :group 'helm-faces)
 
+(defface helm-eob-line
+  '((t (:inherit default)))
+  "Face for empty line at end of sources in the helm buffer.
+Allow specifying the height of this line."
+  :group 'helm-faces)
 
 ;;; Variables.
 ;;
@@ -4597,7 +4602,7 @@ If DISPLAY-STRING is non-`nil' and a string value then display
 this additional info after the source name by overlay."
   (unless (bobp)
     (let ((start (point)))
-      (insert "\n")
+      (insert (propertize "\n" 'face 'helm-eob-line))
       (put-text-property start (point) 'helm-header-separator t)))
   (let ((start (point)))
     (insert name)
