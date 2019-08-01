@@ -212,20 +212,33 @@
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
            for status = (package-desc-status pkg-desc)
-           when (member status '("installed" "unsigned" "dependency"))
-           collect pkg-desc
-           into installed
+           when (member status '("installed" "unsigned"))
+           collect pkg-desc into installed
+           when (string= status "dependency")
+           collect pkg-desc into dependencies
            when (member status '("available" "new"))
-           collect (cons (package-desc-name pkg-desc) pkg-desc)
-           into available
+           collect (cons (package-desc-name pkg-desc) pkg-desc) into available
            finally return
-           (cl-loop for pkg in installed
-                    for avail-pkg = (assq (package-desc-name pkg) available)
+           ;; Always try to upgrade dependencies before installed.
+           (cl-loop with all = (append dependencies installed)
+                    with extra-upgrades
+                    for pkg in all
+                    for name = (package-desc-name pkg)
+                    for avail-pkg = (assq name available)
+                    for avail-is-dep = (and avail-pkg (member pkg dependencies))
+                    when avail-is-dep
+                    do (cl-loop for p in installed
+                                for pkg = (package-desc-name p)
+                                for deps = (and (package--user-installed-p pkg)
+                                                (package--get-deps pkg))
+                                when (memq name deps)
+                                do (push (cons pkg p) extra-upgrades))
                     when (and avail-pkg
                               (version-list-< (package-desc-version pkg)
                                               (package-desc-version
                                                (cdr avail-pkg))))
-                    collect avail-pkg)))
+                    collect avail-pkg into upgrades
+                    finally return (append upgrades extra-upgrades))))
 
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
@@ -233,20 +246,16 @@
            for upgrade = (cdr (assq (package-desc-name pkg-desc)
                                     helm-el-package--upgrades))
            do
-           (cond ((null upgrade)
-                  (ignore))
-                 ((equal pkg-desc upgrade)
-                  ;;Install.
-                  (with-no-warnings
-                    (if (boundp 'package-selected-packages)
-                        (package-install pkg-desc t)
-                        (package-install pkg-desc))))
-                 (t
-                  ;; Delete.
-                  (if (boundp 'package-selected-packages)
-                      (with-no-warnings
-                        (package-delete pkg-desc t t))
-                      (package-delete pkg-desc))))))
+           (cond ((null upgrade) (ignore))
+                 (;; Reinstall.
+                  (and (equal pkg-desc upgrade)
+                       (package-installed-p pkg-desc))
+                  (helm-el-package-reinstall-1 pkg-desc))
+                 (;; Install.
+                  (equal pkg-desc upgrade)
+                  (package-install pkg-desc t))
+                 (;; Delete. (when is this happening?)
+                  t (package-delete pkg-desc t t)))))
 
 (defun helm-el-package-upgrade (_candidate)
   (helm-el-package-upgrade-1
@@ -426,23 +435,22 @@
 (defun helm-el-package-reinstall (_pkg)
   (cl-loop for p in (helm-marked-candidates)
            for pkg-desc = (get-text-property 0 'tabulated-list-id p)
-           for name = (package-desc-name pkg-desc)
-           do (if (boundp 'package-selected-packages)
-                  (with-no-warnings
-                    (package-delete pkg-desc 'force 'nosave)
-                    ;; pkg-desc contain the description
-                    ;; of the installed package just removed
-                    ;; and is BTW no more valid.
-                    ;; Use the entry in package-archive-content
-                    ;; which is the non--installed package entry.
-                    ;; For some reason `package-install'
-                    ;; need a pkg-desc (package-desc-p) for the build-in
-                    ;; packages already installed, the name (as symbol)
-                    ;; fails with such packages.
-                    (package-install
-                     (cadr (assq name package-archive-contents)) t))
-                  (package-delete pkg-desc)
-                  (package-install name))))
+           do (helm-el-package-reinstall-1 pkg-desc)))
+
+(defun helm-el-package-reinstall-1 (pkg-desc)
+  (let ((name (package-desc-name pkg-desc)))
+    (package-delete pkg-desc 'force 'nosave)
+    ;; pkg-desc contain the description
+    ;; of the installed package just removed
+    ;; and is BTW no more valid.
+    ;; Use the entry in package-archive-content
+    ;; which is the non--installed package entry.
+    ;; For some reason `package-install'
+    ;; need a pkg-desc (package-desc-p) for the build-in
+    ;; packages already installed, the name (as symbol)
+    ;; fails with such packages.
+    (package-install
+     (cadr (assq name package-archive-contents)) t)))
 
 (defun helm-el-run-package-reinstall ()
   (interactive)
