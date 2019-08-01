@@ -208,18 +208,30 @@
     (helm-exit-and-execute-action 'helm-el-package-uninstall)))
 (put 'helm-el-run-package-uninstall 'helm-only t)
 
+;; FIXME: Attempt to fix melpa issue #6336, see url below.
+;; (defun helm-el-package--find-more-upgrades (pkg)
+;;   "Find more upgrade from PKG which is a dependency package."
+;;   (cl-loop for p in package-selected-packages
+;;            for deps = (package--get-deps p)
+;;            ;; PKG is a dependency of P a selected package.
+;;            when (member (package-desc-name pkg) deps) collect p))
+
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
            for status = (package-desc-status pkg-desc)
-           when (member status '("installed" "unsigned" "dependency"))
-           collect pkg-desc
-           into installed
+           when (member status '("installed" "unsigned"))
+           collect pkg-desc into installed
+           when (string= status "dependency")
+           collect pkg-desc into dependencies
+           ;; and append (helm-el-package--find-more-upgrades pkg-desc) into installed
            when (member status '("available" "new"))
-           collect (cons (package-desc-name pkg-desc) pkg-desc)
-           into available
+           collect (cons (package-desc-name pkg-desc) pkg-desc) into available
            finally return
-           (cl-loop for pkg in installed
+           ;; Always try to upgrade dependencies before installed.
+           ;; See https://github.com/melpa/melpa/issues/6336#issuecomment-517073353
+           (cl-loop with all = (append dependencies installed)
+                    for pkg in all
                     for avail-pkg = (assq (package-desc-name pkg) available)
                     when (and avail-pkg
                               (version-list-< (package-desc-version pkg)
