@@ -661,7 +661,7 @@ Filename completion happen if string start after or between a double quote."
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
-                          candidate 'helm-describe-function))
+                          candidate 'helm-describe-class))
     :persistent-help "Toggle describe class"
     :action '(("Describe Class" . helm-describe-class)
               ("Find Class" . helm-find-function)
