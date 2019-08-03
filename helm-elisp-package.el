@@ -208,6 +208,7 @@
     (helm-exit-and-execute-action 'helm-el-package-uninstall)))
 (put 'helm-el-run-package-uninstall 'helm-only t)
 
+(defvar helm-el-package--extra-upgrades nil)
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
@@ -227,6 +228,8 @@
                     for avail-pkg = (assq name available)
                     for avail-is-dep = (and avail-pkg (member pkg dependencies))
                     when avail-is-dep
+                    ;; Store the installed packages that don't need
+                    ;; upgrade but that have `name' as dependency.
                     do (cl-loop for p in installed
                                 for pkg = (package-desc-name p)
                                 for deps = (and (package--user-installed-p pkg)
@@ -239,15 +242,26 @@
                                               (package-desc-version
                                                (cdr avail-pkg))))
                     collect avail-pkg into upgrades
-                    finally return (append upgrades extra-upgrades))))
+                    finally return
+                    ;; Extra-upgrades are packages that need to be
+                    ;; recompiled because their dependencies have been upgraded. 
+                    (append upgrades
+                            (setq helm-el-package--extra-upgrades
+                                  extra-upgrades)))))
 
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
            for pkg-desc = (car p)
            for upgrade = (cdr (assq (package-desc-name pkg-desc)
                                     helm-el-package--upgrades))
+           for extra-upgrade = (cdr (assq (package-desc-name pkg-desc)
+                                          helm-el-package--extra-upgrades))
            do
-           (cond ((null upgrade) (ignore))
+           (cond (;; Recompile.
+                  (and (null upgrade)
+                       (equal pkg-desc extra-upgrade))
+                  (helm-el-package-recompile-1 pkg-desc))
+                 ((null upgrade) (ignore))
                  (;; Reinstall.
                   (and (equal pkg-desc upgrade)
                        (package-installed-p pkg-desc))
@@ -255,7 +269,7 @@
                  (;; Install.
                   (equal pkg-desc upgrade)
                   (package-install pkg-desc t))
-                 (;; Delete. (when is this happening?)
+                 (;; Delete.
                   t (package-delete pkg-desc t t)))))
 
 (defun helm-el-package-upgrade (_candidate)
@@ -425,13 +439,13 @@
 
 (defun helm-el-package-recompile (_pkg)
   (cl-loop for p in (helm-marked-candidates)
-           for pkg-desc = (get-text-property 0 'tabulated-list-id p)
-           for name = (package-desc-name pkg-desc)
-           for dir = (package-desc-dir pkg-desc)
-           do (if (fboundp 'async-byte-recompile-directory)
-                  (async-byte-recompile-directory dir)
-                  (when (y-or-n-p (format "Really recompile `%s' while already loaded ?" name))
-                    (byte-recompile-directory dir 0 t)))))
+           do (helm-el-package-recompile-1 p)))
+
+(defun helm-el-package-recompile-1 (pkg)
+  (let* ((pkg-desc (get-text-property 0 'tabulated-list-id pkg))
+         (dir (package-desc-dir pkg-desc)))
+    (async-byte-recompile-directory dir)
+    (setq helm-el-package--extra-upgrades nil)))
 
 (defun helm-el-package-reinstall (_pkg)
   (cl-loop for p in (helm-marked-candidates)
