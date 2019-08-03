@@ -231,7 +231,8 @@
                                 for pkg = (package-desc-name p)
                                 for deps = (and (package--user-installed-p pkg)
                                                 (package--get-deps pkg))
-                                when (memq name deps)
+                                when (and (memq name deps)
+                                          (not (eq name pkg)))
                                 do (push (cons pkg p) extra-upgrades))
                     when (and avail-pkg
                               (version-list-< (package-desc-version pkg)
