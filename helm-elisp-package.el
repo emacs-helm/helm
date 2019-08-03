@@ -208,14 +208,6 @@
     (helm-exit-and-execute-action 'helm-el-package-uninstall)))
 (put 'helm-el-run-package-uninstall 'helm-only t)
 
-;; FIXME: Attempt to fix melpa issue #6336, see url below.
-;; (defun helm-el-package--find-more-upgrades (pkg)
-;;   "Find more upgrade from PKG which is a dependency package."
-;;   (cl-loop for p in package-selected-packages
-;;            for deps = (package--get-deps p)
-;;            ;; PKG is a dependency of P a selected package.
-;;            when (member (package-desc-name pkg) deps) collect p))
-
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
@@ -224,7 +216,6 @@
            collect pkg-desc into installed
            when (string= status "dependency")
            collect pkg-desc into dependencies
-           ;; and append (helm-el-package--find-more-upgrades pkg-desc) into installed
            when (member status '("available" "new"))
            collect (cons (package-desc-name pkg-desc) pkg-desc) into available
            finally return
