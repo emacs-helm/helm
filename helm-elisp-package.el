@@ -262,11 +262,8 @@
                   (and (null upgrade)
                        (equal pkg-desc extra-upgrade))
                   (helm-el-package-recompile-1 pkg-desc))
-                 ((null upgrade) (ignore))
-                 (;; Reinstall.
-                  (and (equal pkg-desc upgrade)
-                       (package-installed-p pkg-desc))
-                  (helm-el-package-reinstall-1 pkg-desc))
+                 (;; Do nothing.
+                  (null upgrade) (ignore))
                  (;; Install.
                   (equal pkg-desc upgrade)
                   (package-install pkg-desc t))
