@@ -80,6 +80,7 @@
                (remove-text-properties (point-min) (point-max)
                                        '(read-only button follow-link category))
                (buffer-string)))
+           (setq helm-el-package--extra-upgrades nil)
            (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
            (if helm--force-updating-p
                (if helm-el-package--upgrades
@@ -444,8 +445,7 @@
 (defun helm-el-package-recompile-1 (pkg)
   (let* ((pkg-desc (get-text-property 0 'tabulated-list-id pkg))
          (dir (package-desc-dir pkg-desc)))
-    (async-byte-recompile-directory dir)
-    (setq helm-el-package--extra-upgrades nil)))
+    (async-byte-recompile-directory dir)))
 
 (defun helm-el-package-reinstall (_pkg)
   (cl-loop for p in (helm-marked-candidates)
