@@ -45,6 +45,7 @@
 (defvar helm-el-package--tabulated-list nil)
 (defvar helm-el-package--upgrades nil)
 (defvar helm-el-package--removable-packages nil)
+(defvar helm-el-package--extra-upgrades nil)
 
 ;; Shutup bytecompiler for emacs-24*
 (defvar package-menu-async) ; Only available on emacs-25.
@@ -209,7 +210,6 @@
     (helm-exit-and-execute-action 'helm-el-package-uninstall)))
 (put 'helm-el-run-package-uninstall 'helm-only t)
 
-(defvar helm-el-package--extra-upgrades nil)
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
