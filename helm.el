@@ -4214,7 +4214,7 @@ It is used for narrowing list of candidates to the
 
 (defun helm-render-source (source matches)
   "Display MATCHES from SOURCE according to its settings."
-  (helm-log "Source name = %S" (assoc-default 'name source))
+  (helm-log "Source = %S" (remove (assq 'keymap source) source))
   (when matches
     (helm-insert-header-from-source source)
     (cl-loop with separate = nil
