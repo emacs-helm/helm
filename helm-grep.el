@@ -585,7 +585,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                        (helm-get-candidate-number))
                                       'face 'helm-grep-finish))))
                       (force-mode-line-update)
-                      (when helm-allow-mouse
+                      (when (and helm-allow-mouse helm-selection-point)
                         (helm--bind-mouse-for-selection helm-selection-point))))
                    ;; Catch error output in log.
                    (t (helm-log
