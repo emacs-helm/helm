@@ -221,7 +221,7 @@ Here are the commands where you may want to add switches:
 
 You probably don't need to use this unless you know what you are doing."
   :group 'helm-grep
-  :type 'string)
+  :type '(repeat string))
 
 (defcustom helm-grep-ag-pipe-cmd-switches nil
   "A list of additional parameters to pass to grep-ag pipe command.
@@ -230,7 +230,7 @@ Use parameters compatibles with the backend you are using
 
 You probably don't need to use this unless you know what you are doing."
   :group 'helm-grep
-  :type 'string)
+  :type '(repeat string))
 
 (defcustom helm-grep-input-idle-delay 0.6
   "Same as `helm-input-idle-delay' but for grep commands.
