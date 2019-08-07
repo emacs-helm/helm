@@ -4126,50 +4126,51 @@ It is used for narrowing list of candidates to the
   (if (> (length seq) n) (cl-subseq seq 0 n) seq))
 
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
-  (condition-case-unless-debug err
-      (cl-loop with hash = (make-hash-table :test 'equal)
-               with allow-dups = (assq 'allow-dups source)
-               with case-fold-search = (helm-set-case-fold-search)
-               with count = 0
-               for iter from 1
-               for fn in matchfns
-               when (< count limit) nconc
-               (cl-loop for c in cands
-                        for dup = (gethash c hash)
-                        while (< count limit)
-                        for target = (helm-candidate-get-display c)
-                        for prop-part = (get-text-property 0 'match-part target)
-                        for part = (and match-part-fn
-                                        (or prop-part
-                                            (funcall match-part-fn target)))
-                        ;; When allowing dups check if DUP
-                        ;; have been already found in previous loop
-                        ;; by comparing its value with ITER.
-                        when (and (or (and allow-dups dup (= dup iter))
-                                      (null dup))
-                                  (condition-case nil
-                                      (funcall fn (or part target))
-                                    (invalid-regexp nil)))
-                        do
-                        (progn
-                          ;; Give as value the iteration number of
-                          ;; inner loop to be able to check if
-                          ;; the duplicate have not been found in previous loop.
-                          (puthash c iter hash)
-                          (helm--maybe-process-filter-one-by-one-candidate c source)
-                          (cl-incf count))
-                        ;; Filter out nil candidates maybe returned by
-                        ;; `helm--maybe-process-filter-one-by-one-candidate'.
-                        and when c collect
-                        (if (and part (not prop-part))
-                            (if (consp c)
-                                (cons (propertize target 'match-part part) (cdr c))
-                              (propertize c 'match-part part))
-                          c)))
-    (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
-             (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
-                             (assoc-default 'name source) (car err) (cdr err)))
-           nil)))
+  (when cands ; nil in async sources.
+    (condition-case-unless-debug err
+        (cl-loop with hash = (make-hash-table :test 'equal)
+                 with allow-dups = (assq 'allow-dups source)
+                 with case-fold-search = (helm-set-case-fold-search)
+                 with count = 0
+                 for iter from 1
+                 for fn in matchfns
+                 when (< count limit) nconc
+                 (cl-loop for c in cands
+                          for dup = (gethash c hash)
+                          while (< count limit)
+                          for target = (helm-candidate-get-display c)
+                          for prop-part = (get-text-property 0 'match-part target)
+                          for part = (and match-part-fn
+                                          (or prop-part
+                                              (funcall match-part-fn target)))
+                          ;; When allowing dups check if DUP
+                          ;; have been already found in previous loop
+                          ;; by comparing its value with ITER.
+                          when (and (or (and allow-dups dup (= dup iter))
+                                        (null dup))
+                                    (condition-case nil
+                                        (funcall fn (or part target))
+                                      (invalid-regexp nil)))
+                          do
+                          (progn
+                            ;; Give as value the iteration number of
+                            ;; inner loop to be able to check if
+                            ;; the duplicate have not been found in previous loop.
+                            (puthash c iter hash)
+                            (helm--maybe-process-filter-one-by-one-candidate c source)
+                            (cl-incf count))
+                          ;; Filter out nil candidates maybe returned by
+                          ;; `helm--maybe-process-filter-one-by-one-candidate'.
+                          and when c collect
+                          (if (and part (not prop-part))
+                              (if (consp c)
+                                  (cons (propertize target 'match-part part) (cdr c))
+                                (propertize c 'match-part part))
+                            c)))
+      (error (unless (eq (car err) 'invalid-regexp) ; Always ignore regexps errors.
+               (helm-log-error "helm-match-from-candidates in source `%s': %s %s"
+                               (assoc-default 'name source) (car err) (cdr err)))
+             nil))))
 
 (defun helm-compute-matches (source)
   "Start computing candidates in SOURCE."

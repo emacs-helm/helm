@@ -103,6 +103,19 @@ Any other non--nil value update after confirmation."
   "Value of `helm-candidate-number-limit' for helm-occur."
   :group 'helm-occur
   :type 'integer)
+
+(defcustom helm-occur-buffer-substring-fn-for-modes
+  '((mu4e-headers-mode . buffer-substring))
+  "Function to use to display buffer contents for major-mode.
+
+Can be one of `buffer-substring' or `buffer-substring-no-properties'.
+
+Note that when using `buffer-substring' initialization will be slower."
+  :group 'helm-regexp
+  :type '(alist :key-type (symbol :tag "Mode")
+                :value-type (radio (const :tag "With text properties" buffer-substring)
+                                   (const :tag "Without text properties" buffer-substring-no-properties))))
+
 
 (defface helm-moccur-buffer
     '((t (:foreground "DarkTurquoise" :underline t)))
@@ -205,10 +218,14 @@ engine beeing completely different and also much faster."
                        (condition-case _err
                            (re-search-forward pattern nil t)
                          (invalid-regexp nil)))
+             :get-line 'buffer-substring
              :init `(lambda ()
                       (with-current-buffer ,buf
-                        (let ((contents (buffer-substring-no-properties
-                                         (point-min) (point-max))))
+                        (let* ((bsfn (or (cdr (assq
+                                               major-mode
+                                               helm-occur-buffer-substring-fn-for-modes))
+                                         #'buffer-substring-no-properties))
+                               (contents (funcall bsfn (point-min) (point-max))))
                           (with-current-buffer (helm-candidate-buffer 'local)
                             (insert contents)
                             (goto-char (point-min))
