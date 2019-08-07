@@ -70,36 +70,33 @@
 
 (defcustom helm-type-file-actions
   (helm-make-actions
-    "Find file"                                               'helm-find-many-files
-    "Find file as root"                                       'helm-find-file-as-root
-    "Find file other window"                                  'helm-find-files-other-window
-    "Find file other frame"                                   'find-file-other-frame
-    "Open dired in file's directory"                          'helm-open-dired
-    "Attach file(s) to mail buffer `C-c C-a'"                 'helm-ff-mail-attach-files
-    "Marked files in dired"                                   'helm-marked-files-in-dired
-    "Grep File(s) `C-s, C-u Recurse'"                         'helm-find-files-grep
-    "Grep current directory with AG `M-g a, C-u select type'" 'helm-find-files-ag
-    "Git grep `M-g g, C-u from root'"                         'helm-ff-git-grep
-    "Zgrep File(s) `M-g z, C-u Recurse'"                      'helm-ff-zgrep
-    "Gid `M-g i'"                                             'helm-ff-gid
-    "Pdfgrep File(s)"                                         'helm-ff-pdfgrep
-    "Insert as org link"                                      'helm-files-insert-as-org-link
-    "Checksum File"                                           'helm-ff-checksum
-    "Ediff File"                                              'helm-find-files-ediff-files
-    "Ediff Merge File"                                        'helm-find-files-ediff-merge-files
-    "Etags `M-., C-u reload tag file'"                        'helm-ff-etags-select
-    "View file"                                               'view-file
-    "Insert file"                                             'insert-file
-    "Add marked files to file-cache"                          'helm-ff-cache-add-file
-    "Delete file(s)"                                          'helm-ff-delete-files
-    "Copy file(s) `M-C, C-u to follow'"                       'helm-find-files-copy
-    "Rename file(s) `M-R, C-u to follow'"                     'helm-find-files-rename
-    "Symlink files(s) `M-S, C-u to follow'"                   'helm-find-files-symlink
-    "Relsymlink file(s) `C-u to follow'"                      'helm-find-files-relsymlink
-    "Hardlink file(s) `M-H, C-u to follow'"                   'helm-find-files-hardlink
-    "Open file externally (C-u to choose)"                    'helm-open-file-externally
-    "Open file with default tool"                             'helm-open-file-with-default-tool
-    "Find file in hex dump"                                   'hexl-find-file)
+    "Find file"                               'helm-find-many-files
+    "Find file as root"                       'helm-find-file-as-root
+    "Find file other window"                  'helm-find-files-other-window
+    "Find file other frame"                   'find-file-other-frame
+    "Open dired in file's directory"          'helm-open-dired
+    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
+    "Marked files in dired"                   'helm-marked-files-in-dired
+    "Grep File(s) `C-u recurse'"              'helm-find-files-grep
+    "Zgrep File(s) `C-u Recurse'"             'helm-ff-zgrep
+    "Pdfgrep File(s)"                         'helm-ff-pdfgrep
+    "Insert as org link"                      'helm-files-insert-as-org-link
+    "Checksum File"                           'helm-ff-checksum
+    "Ediff File"                              'helm-find-files-ediff-files
+    "Ediff Merge File"                        'helm-find-files-ediff-merge-files
+    "Etags `M-., C-u reload tag file'"        'helm-ff-etags-select
+    "View file"                               'view-file
+    "Insert file"                             'insert-file
+    "Add marked files to file-cache"          'helm-ff-cache-add-file
+    "Delete file(s)"                          'helm-ff-delete-files
+    "Copy file(s) `M-C, C-u to follow'"       'helm-find-files-copy
+    "Rename file(s) `M-R, C-u to follow'"     'helm-find-files-rename
+    "Symlink files(s) `M-S, C-u to follow'"   'helm-find-files-symlink
+    "Relsymlink file(s) `C-u to follow'"      'helm-find-files-relsymlink
+    "Hardlink file(s) `M-H, C-u to follow'"   'helm-find-files-hardlink
+    "Open file externally (C-u to choose)"    'helm-open-file-externally
+    "Open file with default tool"             'helm-open-file-with-default-tool
+    "Find file in hex dump"                   'hexl-find-file)
   "Default actions for type files."
   :group 'helm-files
   :type '(alist :key-type string :value-type function))
