@@ -615,6 +615,14 @@ Going up one level works only when pattern is a directory endings with
 When nil always delete char backward."
   :group 'helm-files
   :type 'boolean)
+
+(defcustom helm-browse-project-ag-find-files-cmd
+  "ag --hidden -g '.*' %s"
+  "The command to list directories in `helm-browse-project-ag-find-files-cmd'.
+
+Use \"rg --files --hidden -g '.*' %s\" with ripgrep."
+  :type 'string
+  :group 'helm-files)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -4523,7 +4531,7 @@ Don't use it in your own code unless you know what you are doing.")
 Needs AG as backend."
   (with-temp-buffer
     (call-process-shell-command
-     (format "ag --hidden -g '.*' %s" directory)
+     (format helm-browse-project-ag-find-files-cmd directory)
      nil t nil)
     (mapcar (lambda (f) (expand-file-name f directory))
             (split-string (buffer-string) "\n"))))
