@@ -3627,7 +3627,7 @@ prefix arg, one prefix arg or two prefix arg."
       (let* ((mkds        (helm-marked-candidates :with-wildcard t))
              (candidate   (car mkds))
              (end         (point))
-             (tap         (helm-ff--fname-at-point))
+             (tap         (helm-ffap-guesser))
              (guess       (and (stringp tap)
                                (substring-no-properties tap)))
              (beg         (if guess (- (point) (length guess)) (point)))
