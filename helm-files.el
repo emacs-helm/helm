@@ -4639,6 +4639,7 @@ Needed dependencies for VCS:
 and
 <https://github.com/emacs-helm/helm-ls-hg>."
   (interactive "P")
+  (require 'helm-x-files)
   (let ((helm-type-buffer-actions
          (remove (assoc "Browse project from buffer"
                         helm-type-buffer-actions)
