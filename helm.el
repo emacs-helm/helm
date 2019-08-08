@@ -387,7 +387,9 @@ If t, then Helm does not pop-up new window."
   :type 'boolean)
 
 (defcustom helm-candidate-separator
-  "--------------------"
+  (if (fontp (char-displayable-p (read "#x2013")))
+      "––––––––––––––––––––"
+    "--------------------")
   "Candidates separator of `multiline' source."
   :group 'helm
   :type 'string)
