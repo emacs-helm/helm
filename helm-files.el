@@ -4501,6 +4501,12 @@ Don't use it in your own code unless you know what you are doing.")
 (defvar helm--browse-project-cache (make-hash-table :test 'equal))
 (defvar helm-buffers-in-project-p)
 
+(defvar helm-browse-project-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-generic-files-map)
+    (define-key map (kbd "M-g a") 'helm-browse-project-run-ag)
+    map))
+  
 (defun helm-browse-project-get-buffers (root-directory)
   (cl-loop for b in (helm-buffer-list)
            ;; FIXME: Why default-directory is root-directory
@@ -4538,33 +4544,67 @@ Needs AG as backend."
     (mapcar (lambda (f) (expand-file-name f directory))
             (split-string (buffer-string) "\n"))))
 
+(defun helm-browse-project-ag (_candidate)
+  "helm-grep AG action for helm-browse-project."
+  (let ((dir (with-helm-buffer (helm-attr 'root-dir))))
+    (helm-grep-ag dir helm-current-prefix-arg)))
+
+(defun helm-browse-project-run-ag ()
+  "Runs helm-grep AG from helm-browse-project."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-browse-project-ag)))
+(put 'helm-browse-project-run-ag 'helm-only t)
+
+(defclass helm-browse-project-override-inheritor (helm-type-file) ())
+
+(defclass helm-browse-project-source (helm-source-in-buffer
+                                      helm-browse-project-override-inheritor)
+  ((root-dir :initarg :root-dir
+             :initform nil
+             :custom 'file)
+   (match-part :initform
+               (lambda (c)
+                 (if (with-helm-buffer
+                       helm-ff-transformer-show-only-basename)
+                     (helm-basename c) c)))
+   (filter-one-by-one :initform
+                      (lambda (c)
+                        (if (with-helm-buffer
+                              helm-ff-transformer-show-only-basename)
+                            (cons (propertize (helm-basename c)
+                                              'face 'helm-ff-file)
+                                  c)
+                          (propertize c 'face 'helm-ff-file)))))
+  "Class to define a source in helm-browse-project handling non VC
+handled directories.")
+
+(defmethod helm--setup-source :after ((source helm-browse-project-override-inheritor))
+  (let ((actions (slot-value source 'action)))
+    (setf (slot-value source 'action)
+          (helm-append-at-nth
+           (symbol-value actions)
+           '(("Grep project with AG `M-g a, C-u select type'" . helm-browse-project-ag))
+           7))
+    (setf (slot-value source 'keymap) helm-browse-project-map)))
+
 (defun helm-browse-project-find-files (directory &optional refresh)
+  "Browse non VC handled directory DIRECTORY."
   (when refresh (remhash directory helm--browse-project-cache))
   (unless (gethash directory helm--browse-project-cache)
     (puthash directory (funcall helm-browse-project-default-find-files-fn
                                 directory)
              helm--browse-project-cache))
   (helm :sources `(,(helm-browse-project-build-buffers-source directory)
-                   ,(helm-build-in-buffer-source "Browse project"
-                     :data (gethash directory helm--browse-project-cache)
-                     :header-name (lambda (name)
-                                    (format
-                                     "%s (%s)"
-                                     name (abbreviate-file-name directory)))
-                     :match-part (lambda (c)
-                                   (if (with-helm-buffer
-                                         helm-ff-transformer-show-only-basename)
-                                       (helm-basename c) c))
-                     :filter-one-by-one
-                     (lambda (c)
-                       (if (with-helm-buffer
-                             helm-ff-transformer-show-only-basename)
-                           (cons (propertize (helm-basename c)
-                                             'face 'helm-ff-file)
-                                 c)
-                           (propertize c 'face 'helm-ff-file)))
-                     :keymap helm-generic-files-map
-                     :action 'helm-type-file-actions))
+                   ,(helm-make-source "Browse project"
+                        'helm-browse-project-source
+                        :root-dir directory
+                        :data (gethash directory helm--browse-project-cache)
+                        :header-name
+                        (lambda (name)
+                          (format
+                           "%s (%s)"
+                           name (abbreviate-file-name directory)))))
         :ff-transformer-show-only-basename nil
         :buffer "*helm browse project*"))
 
