@@ -218,7 +218,6 @@ engine beeing completely different and also much faster."
                        (condition-case _err
                            (re-search-forward pattern nil t)
                          (invalid-regexp nil)))
-             :get-line 'buffer-substring
              :init `(lambda ()
                       (with-current-buffer ,buf
                         (let* ((bsfn (or (cdr (assq
@@ -226,6 +225,7 @@ engine beeing completely different and also much faster."
                                                helm-occur-buffer-substring-fn-for-modes))
                                          #'buffer-substring-no-properties))
                                (contents (funcall bsfn (point-min) (point-max))))
+                          (helm-attrset 'get-line bsfn)
                           (with-current-buffer (helm-candidate-buffer 'local)
                             (insert contents)
                             (goto-char (point-min))
