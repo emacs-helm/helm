@@ -620,7 +620,9 @@ When nil always delete char backward."
   "ag --hidden -g '.*' %s"
   "The command to list directories in `helm-browse-project-ag-find-files-cmd'.
 
-Use \"rg --files --hidden -g '.*' %s\" with ripgrep."
+Use \"rg --files --hidden -g '*' %s\" with ripgrep.
+Note that last rg versions expect a glob for -g i.e. \"*\" whereas ag
+expect a regexp i.e. \".*\""
   :type 'string
   :group 'helm-files)
 
