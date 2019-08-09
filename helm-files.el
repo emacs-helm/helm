@@ -266,7 +266,11 @@ Remote filesystem are generally mounted with sshfs."
   :type '(repeat string))
 
 (defcustom helm-browse-project-default-find-files-fn
-  #'helm-browse-project-walk-directory
+  (cond ((executable-find "rg")
+         #'helm-browse-project-rg-find-files)
+        ((executable-find "ag")
+         #'helm-browse-project-ag-find-files)
+        (t #'helm-browse-project-walk-directory))
   "The default function to retrieve files in a non-vc directory.
 
 A function that takes a directory name as only arg."
@@ -615,16 +619,6 @@ Going up one level works only when pattern is a directory endings with
 When nil always delete char backward."
   :group 'helm-files
   :type 'boolean)
-
-(defcustom helm-browse-project-ag-find-files-cmd
-  "ag --hidden -g '.*' %s"
-  "The command to list directories in `helm-browse-project-ag-find-files-cmd'.
-
-Use \"rg --files --hidden -g '*' %s\" with ripgrep.
-Note that last rg versions expect a glob for -g i.e. \"*\" whereas ag
-expect a regexp i.e. \".*\""
-  :type 'string
-  :group 'helm-files)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -4533,16 +4527,27 @@ Don't use it in your own code unless you know what you are doing.")
    directory
    :directories nil :path 'full :skip-subdirs t))
 
+(defun helm-browse-project-find-files-1 (directory program)
+  "List files in DIRECTORY recursively with external PROGRAM."
+  (let ((cmd (cl-ecase program
+               (ag "ag --hidden -g '.*' %s")
+               (rg "rg --files --hidden -g '*' %s"))))
+    (with-temp-buffer
+      (call-process-shell-command
+       (format cmd directory)
+       nil t nil)
+      (mapcar (lambda (f) (expand-file-name f directory))
+              (split-string (buffer-string) "\n")))))
+
 (defun helm-browse-project-ag-find-files (directory)
   "A suitable function for `helm-browse-project-default-find-files-fn'.
+Use AG as backend."
+  (helm-browse-project-find-files-1 directory 'ag))
 
-Needs AG as backend."
-  (with-temp-buffer
-    (call-process-shell-command
-     (format helm-browse-project-ag-find-files-cmd directory)
-     nil t nil)
-    (mapcar (lambda (f) (expand-file-name f directory))
-            (split-string (buffer-string) "\n"))))
+(defun helm-browse-project-rg-find-files (directory)
+  "A suitable function for `helm-browse-project-default-find-files-fn'.
+Use RG as backend."
+  (helm-browse-project-find-files-1 directory 'rg))
 
 (defun helm-browse-project-ag (_candidate)
   "helm-grep AG action for helm-browse-project."
