@@ -4623,7 +4623,8 @@ handled directories.")
           :candidates helm-browse-project-history
           :action (lambda (candidate)
                     (with-helm-default-directory candidate
-                        (helm-browse-project arg))))
+                        (helm-browse-project
+                         (or arg helm-current-prefix-arg)))))
         :buffer "*helm browse project history*"))
 
 ;;;###autoload
