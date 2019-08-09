@@ -214,6 +214,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-c d")     'helm-buffer-run-kill-persistent)
     (define-key map (kbd "M-D")       'helm-buffer-run-kill-buffers)
     (define-key map (kbd "C-x C-s")   'helm-buffer-save-persistent)
+    (define-key map (kbd "C-x s")     'helm-buffer-run-save-some-buffers)
     (define-key map (kbd "C-M-%")     'helm-buffer-run-query-replace-regexp)
     (define-key map (kbd "M-%")       'helm-buffer-run-query-replace)
     (define-key map (kbd "M-R")       'helm-buffer-run-rename-buffer)
@@ -582,11 +583,12 @@ Should be called after others transformers i.e (boring buffers)."
                 (lambda (s1 s2)
                   (< (string-width s1) (string-width s2)))))))
 
-(defun helm-buffers-mark-similar-buffers-1 ()
+(defun helm-buffers-mark-similar-buffers-1 (&optional type)
   (with-helm-window
     (let* ((src (helm-get-current-source))
-           (type (get-text-property
-                  0 'type (helm-get-selection nil 'withprop src))))
+           (type (or type
+                     (get-text-property
+                      0 'type (helm-get-selection nil 'withprop src)))))
       (save-excursion
         (goto-char (helm-get-previous-header-pos))
         (helm-next-line)
@@ -804,6 +806,18 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                  (when (buffer-file-name) (save-buffer))))
       (when helm-marked-candidates (helm-unmark-all))
       (helm-update (regexp-quote preselect)))))
+
+(defun helm-buffer-save-some-buffers (_candidate)
+  (helm-buffers-mark-similar-buffers-1 'mod)
+  (helm-buffer-save-and-update nil))
+
+(defun helm-buffer-run-save-some-buffers ()
+  "Save unsaved file buffers without quitting helm."
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'save-some-action '(helm-buffer-save-some-buffers . never-split))
+    (helm-execute-persistent-action 'save-some-action)))
+(put 'helm-buffer-run-save-some-buffers 'helm-only t)
 
 (defun helm-buffer-save-persistent ()
   "Save buffer without quitting helm."

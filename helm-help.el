@@ -182,6 +182,15 @@ and press \\<helm-buffer-map>\\[helm-buffer-switch-other-window], when called wi
 the buffer will be displayed vertically in other window.
 If you mark more than one buffer, the marked buffers will be displayed in different windows.
 
+*** Saving buffers
+
+If buffer is associated to a file and is modified, it is by default colorized in orange,
+see [[Meaning of colors and prefixes for buffers][Meaning of colors and prefixes for buffers]].
+You can save these buffers with \\<helm-buffer-map>\\[helm-buffer-save-persistent].
+If you want to save all these buffers, you can mark them with \\[helm-buffers-mark-similar-buffers]
+and save them with \\[helm-buffer-save-persistent], you can also do this in one step with
+\\[helm-buffer-run-save-some-buffers], note that you will not be asked for confirmation.
+  
 *** Meaning of colors and prefixes for buffers
 
 Remote buffers are prefixed with '@'.
@@ -205,6 +214,7 @@ Yellow     => Tramp archive buffer.
 \\[helm-buffer-diff-persistent]\t\tToggle Diff-buffer with saved file without leaving Helm.
 \\[helm-buffer-revert-persistent]\t\tRevert buffer without leaving Helm.
 \\[helm-buffer-save-persistent]\t\tSave buffer without leaving Helm.
+\\[helm-buffer-run-save-some-buffers]\t\tSave all unsaved buffers.
 \\[helm-buffer-run-kill-buffers]\t\tDelete marked buffers and leave Helm.
 \\[helm-buffer-run-kill-persistent]\t\tDelete buffer without leaving Helm.
 \\[helm-buffer-run-rename-buffer]\t\tRename buffer.
