@@ -4616,14 +4616,14 @@ handled directories.")
 (defvar helm-browse-project-history nil)
 
 ;;;###autoload
-(defun helm-projects-history ()
-  (interactive)
+(defun helm-projects-history (arg)
+  (interactive "P")
   (helm :sources
         (helm-build-sync-source "Project history"
           :candidates helm-browse-project-history
           :action (lambda (candidate)
                     (with-helm-default-directory candidate
-                        (helm-browse-project nil))))
+                        (helm-browse-project arg))))
         :buffer "*helm browse project history*"))
 
 ;;;###autoload
