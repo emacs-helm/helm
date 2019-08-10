@@ -608,7 +608,8 @@ Should be called after others transformers i.e (boring buffers)."
             (forward-line 1) (end-of-line))))
       (helm-mark-current-line)
       (helm-display-mode-line src t)
-      (message "%s candidates marked" (length helm-marked-candidates)))))
+      (when helm-marked-candidates
+        (message "%s candidates marked" (length helm-marked-candidates))))))
 
 (defun helm-buffers-mark-similar-buffers ()
     "Mark All buffers that have same property `type' than current.
@@ -798,9 +799,11 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffer-save-and-update (_candidate)
   (with-helm-buffer
-    (let ((marked (helm-marked-candidates))
+    (let ((marked (and helm-marked-candidates
+                       (helm-marked-candidates)))
           (preselect (helm-get-selection nil t))
           (enable-recursive-minibuffers t))
+      (cl-assert marked nil "No buffers need to be saved")
       (cl-loop for buf in marked do
                (with-current-buffer (get-buffer buf)
                  (when (buffer-file-name) (save-buffer))))
