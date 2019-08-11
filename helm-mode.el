@@ -41,8 +41,6 @@
     (trace-function-foreground . helm-completing-read-symbols)
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-default-find-tag)
-    (org-capture . helm-org-completing-read-tags)
-    (org-set-tags . helm-org-completing-read-tags)
     (ffap-alternate-file . nil)
     (tmm-menubar . nil)
     (find-file . nil)

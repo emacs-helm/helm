@@ -44,9 +44,6 @@
     ["Emacs Manual index" helm-info-emacs t]
     ["Gnus Manual index" helm-info-gnus t]
     ["Helm documentation" helm-documentation t])
-   ("Org"
-    ["Org headlines in org agenda files" helm-org-agenda-files-headings t]
-    ["Org headlines in buffer" helm-org-in-buffer-headings t])
    ("Elpa"
     ["Elisp packages" helm-list-elisp-packages t]
     ["Elisp packages no fetch" helm-list-elisp-packages-no-fetch t])
