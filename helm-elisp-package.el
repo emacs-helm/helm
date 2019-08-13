@@ -77,6 +77,9 @@
                (setq helm-el-package--tabulated-list tabulated-list-entries)
                (remove-text-properties (point-min) (point-max)
                                        '(read-only button follow-link category))
+               (goto-char (point-min))
+               (while (re-search-forward "^[ \t]+" nil t)
+                 (replace-match ""))
                (buffer-string)))
            (setq helm-el-package--extra-upgrades nil)
            (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
@@ -267,6 +270,7 @@
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
+           for disp = (concat "  " c)
            for id = (get-text-property 0 'tabulated-list-id c)
            for name = (and id (package-desc-name id))
            for desc = (package-desc-status id)
@@ -276,13 +280,13 @@
            for installed-p = (member desc '("installed" "dependency"))
            for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (memq name package-selected-packages)
-           do (when user-installed-p (put-text-property 0 2 'display "S " c))
+           do (when user-installed-p (put-text-property 0 2 'display "S " disp))
            do (when (memq name helm-el-package--removable-packages)
-                (put-text-property 0 2 'display "U " c)
+                (put-text-property 0 2 'display "U " disp)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
-                 'face 'font-lock-variable-name-face c))
-           for cand = (cons c (car (split-string c)))
+                 'face 'font-lock-variable-name-face disp))
+           for cand = (cons disp (car (split-string disp)))
            when (or (and built-in-p
                          (eq helm-el-package--show-only 'built-in))
                     (and upgrade-p
