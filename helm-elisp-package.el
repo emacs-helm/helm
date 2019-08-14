@@ -194,9 +194,12 @@
                     for name = (package-desc-name pkg)
                     for avail-pkg = (assq name available)
                     for avail-is-dep = (and avail-pkg (member pkg dependencies))
+                    ;; A new version of PKG is available and is a
+                    ;; dependency. Find the installed packages that
+                    ;; have PKG as dependency and add them to
+                    ;; extra-upgrades, they will be recompiled later
+                    ;; after new PKG installation.
                     when avail-is-dep
-                    ;; Store the installed packages that don't need
-                    ;; upgrade but that have `name' as dependency.
                     do (cl-loop for p in installed
                                 for pkg = (package-desc-name p)
                                 for deps = (and (package--user-installed-p pkg)
