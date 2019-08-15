@@ -199,29 +199,18 @@
                     ;; have PKG as dependency and add them to
                     ;; extra-upgrades, they will be recompiled later
                     ;; after new PKG installation.
-                    ;;
-                    ;; FIXME: Package A have package B as
-                    ;; dependency. User have installed package B
-                    ;; explicitely before installing package A so
-                    ;; package B is considered installed package. When
-                    ;; upgrading A and B, B should be installed before
-                    ;; A and when B is upgraded, A should be recompiled.
                     when avail-is-dep
                     do (cl-loop for p in installed
                                 for pkg = (package-desc-name p)
                                 for deps = (and (package--user-installed-p pkg)
                                                 (package--get-deps pkg))
                                 when (and (memq name deps)
-                                          ;; If this installed PKG is
-                                          ;; available for upgrade,
-                                          ;; don't add it here.
-                                          (not (assq pkg available))
                                           (not (eq name pkg)))
                                 do (push (cons pkg p) extra-upgrades))
                     when (and avail-pkg
-                              (version-list-< (package-desc-version pkg)
-                                              (package-desc-version
-                                               (cdr avail-pkg))))
+                              (version-list-<
+                               (package-desc-version pkg)
+                               (package-desc-version (cdr avail-pkg))))
                     collect avail-pkg into upgrades
                     finally return
                     ;; Extra-upgrades are packages that need to be
