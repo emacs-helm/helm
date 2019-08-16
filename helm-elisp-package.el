@@ -193,20 +193,15 @@
                     for pkg in all
                     for name = (package-desc-name pkg)
                     for avail-pkg = (assq name available)
-                    for avail-is-dep = (and avail-pkg (member pkg dependencies))
                     ;; A new version of PKG is available and is a
                     ;; dependency. Find the installed packages that
                     ;; have PKG as dependency and add them to
                     ;; extra-upgrades, they will be recompiled later
                     ;; after new PKG installation.
-                    when avail-is-dep
-                    do (cl-loop for p in installed
-                                for pkg = (package-desc-name p)
-                                for deps = (and (package--user-installed-p pkg)
-                                                (package--get-deps pkg))
-                                when (and (memq name deps)
-                                          (not (eq name pkg)))
-                                do (push (cons pkg p) extra-upgrades))
+                    when (and avail-pkg (member pkg dependencies))
+                    do (setq extra-upgrades
+                             (helm-el-package--get-installed-to-recompile
+                              installed name))
                     when (and avail-pkg
                               (version-list-<
                                (package-desc-version pkg)
@@ -218,6 +213,16 @@
                     (append upgrades
                             (setq helm-el-package--extra-upgrades
                                   extra-upgrades)))))
+
+(defun helm-el-package--get-installed-to-recompile (seq pkg-name)
+  "Find the installed packages that have PKG as dependency."
+  (cl-loop for p in seq
+           for pkg = (package-desc-name p)
+           for deps = (and (package--user-installed-p pkg)
+                           (package--get-deps pkg))
+           when (and (memq pkg-name deps)
+                     (not (eq pkg-name pkg)))
+           collect (cons pkg p)))
 
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
