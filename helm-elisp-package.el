@@ -200,8 +200,9 @@
                     ;; after new PKG installation.
                     when (and avail-pkg (member pkg dependencies))
                     do (setq extra-upgrades
-                             (helm-el-package--get-installed-to-recompile
-                              installed name))
+                             (append (helm-el-package--get-installed-to-recompile
+                                      installed name)
+                                     extra-upgrades))
                     when (and avail-pkg
                               (version-list-<
                                (package-desc-version pkg)
@@ -212,7 +213,7 @@
                     ;; recompiled because their dependencies have been upgraded. 
                     (append upgrades
                             (setq helm-el-package--extra-upgrades
-                                  extra-upgrades)))))
+                                  (helm-fast-remove-dups extra-upgrades :test 'equal))))))
 
 (defun helm-el-package--get-installed-to-recompile (seq pkg-name)
   "Find the installed packages that have PKG as dependency."
