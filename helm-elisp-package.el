@@ -180,15 +180,17 @@
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
            for status = (package-desc-status pkg-desc)
-           when (member status '("installed" "unsigned"))
-           collect pkg-desc into installed
            when (string= status "dependency")
            collect pkg-desc into dependencies
+           when (package--used-elsewhere-p pkg-desc)
+           collect pkg-desc into installed-as-dep
+           when (member status '("installed" "unsigned"))
+           collect pkg-desc into installed
            when (member status '("available" "new"))
            collect (cons (package-desc-name pkg-desc) pkg-desc) into available
            finally return
            ;; Always try to upgrade dependencies before installed.
-           (cl-loop with all = (append dependencies installed)
+           (cl-loop with all = (append dependencies installed-as-dep installed)
                     with extra-upgrades
                     for pkg in all
                     for name = (package-desc-name pkg)
@@ -201,7 +203,7 @@
                     when (and avail-pkg (member pkg dependencies))
                     do (setq extra-upgrades
                              (append (helm-el-package--get-installed-to-recompile
-                                      installed name)
+                                      (append installed-as-dep installed) name)
                                      extra-upgrades))
                     when (and avail-pkg
                               (version-list-<
