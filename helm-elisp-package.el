@@ -216,7 +216,7 @@
                                   (helm-fast-remove-dups extra-upgrades :test 'equal))))))
 
 (defun helm-el-package--get-installed-to-recompile (seq pkg-name)
-  "Find the installed packages that have PKG as dependency."
+  "Find the installed packages in SEQ that have PKG-NAME as dependency."
   (cl-loop for p in seq
            for pkg = (package-desc-name p)
            for deps = (and (package--user-installed-p pkg)
