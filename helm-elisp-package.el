@@ -180,10 +180,14 @@
   (cl-loop for entry in helm-el-package--tabulated-list
            for pkg-desc = (car entry)
            for status = (package-desc-status pkg-desc)
+           ;; A dependency.
            when (string= status "dependency")
            collect pkg-desc into dependencies
+           ;; An installed package used as dependency (user have
+           ;; installed this package explicitely).
            when (package--used-elsewhere-p pkg-desc)
            collect pkg-desc into installed-as-dep
+           ;; An installed package.
            when (member status '("installed" "unsigned"))
            collect pkg-desc into installed
            when (member status '("available" "new"))
@@ -230,9 +234,10 @@
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
            for pkg-desc = (car p)
-           for upgrade = (cdr (assq (package-desc-name pkg-desc)
+           for pkg-name = (package-desc-name pkg-desc)
+           for upgrade = (cdr (assq pkg-name
                                     helm-el-package--upgrades))
-           for extra-upgrade = (cdr (assq (package-desc-name pkg-desc)
+           for extra-upgrade = (cdr (assq pkg-name
                                           helm-el-package--extra-upgrades))
            do
            (cond (;; Recompile.
@@ -240,7 +245,12 @@
                        (equal pkg-desc extra-upgrade))
                   (helm-el-package-recompile-1 pkg-desc))
                  (;; Do nothing.
-                  (null upgrade) (ignore))
+                  (or (null upgrade)
+                      ;; This may happen when a Elpa version of pkg
+                      ;; is installed and need upgrade and pkg is as
+                      ;; well a builtin package.
+                      (package-built-in-p pkg-name))
+                  (ignore))
                  (;; Install.
                   (equal pkg-desc upgrade)
                   (package-install pkg-desc t))
