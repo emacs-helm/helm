@@ -48,6 +48,8 @@
 (declare-function org-mark-ring-push "org.el")
 (declare-function helm-interpret-value "helm.el")
 (declare-function helm-get-current-source "helm.el")
+(declare-function helm-source--cl--print-table "helm-source.el")
+
 (defvar helm-sources)
 (defvar helm-initial-frame)
 (defvar helm-current-position)
