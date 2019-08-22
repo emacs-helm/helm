@@ -42,6 +42,7 @@
     (trace-function-background . helm-completing-read-symbols)
     (find-tag . helm-completing-read-default-find-tag)
     (xref-find-definitions . helm-completing-read-default-find-tag)
+    (xref-find-references . helm-completing-read-default-find-tag)
     (ffap-alternate-file . nil)
     (tmm-menubar . nil)
     (find-file . nil)
