@@ -799,8 +799,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 
 (defun helm-buffer-save-and-update (_candidate)
   (with-helm-buffer
-    (let ((marked (and helm-marked-candidates
-                       (helm-marked-candidates)))
+    (let ((marked (helm-marked-candidates))
           (preselect (helm-get-selection nil t))
           (enable-recursive-minibuffers t))
       (cl-assert marked nil "No buffers need to be saved")
