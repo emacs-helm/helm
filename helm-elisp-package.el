@@ -225,11 +225,19 @@
   "Find the installed packages in SEQ that have PKG-NAME as dependency."
   (cl-loop for p in seq
            for pkg = (package-desc-name p)
-           for deps = (and (package--user-installed-p pkg)
+           for deps = (and (helm-el-package--user-installed-p pkg)
                            (package--get-deps pkg))
            when (and (memq pkg-name deps)
                      (not (eq pkg-name pkg)))
            collect (cons pkg p)))
+
+(defun helm-el-package--user-installed-p (package)
+  "Return non-nil if PACKAGE is a user-installed package."
+  (let* ((assoc (assq package package-alist))
+         (pkg-desc (and assoc (cadr assoc)))
+         (dir (and pkg-desc (package-desc-dir pkg-desc))))
+    (when dir
+      (file-in-directory-p dir package-user-dir))))
 
 (defun helm-el-package-upgrade-1 (pkg-list)
   (cl-loop for p in pkg-list
