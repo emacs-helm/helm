@@ -3876,13 +3876,13 @@ Default function to match candidates according to `helm-pattern'."
       (if (string-match "\\`!" helm-pattern)
           (puthash 'helm-pattern
                    (if (> (length helm-pattern) 1)
-                       (list (funcall fun (substring helm-pattern 1 2))
+                       (list (regexp-quote (substring helm-pattern 1 2))
                              (funcall fun (substring helm-pattern 1)))
                        '("" ""))
                    helm--fuzzy-regexp-cache)
           (puthash 'helm-pattern
                    (if (> (length helm-pattern) 0)
-                       (list (funcall fun (substring helm-pattern 0 1))
+                       (list (regexp-quote (substring helm-pattern 0 1))
                              (funcall fun helm-pattern))
                        '("" ""))
                    helm--fuzzy-regexp-cache)))))
