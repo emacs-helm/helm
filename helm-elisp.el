@@ -829,11 +829,13 @@ i.e the `symbol-name' of any existing symbol."
                                     regexp)
                                 nil t)))
                    :match-part (lambda (candidate)
-                                 (if helm-ff-transformer-show-only-basename
-                                     (helm-basename candidate) candidate))
+                                 (with-helm-buffer
+                                   (if helm-ff-transformer-show-only-basename
+                                       (helm-basename candidate) candidate)))
                    :filter-one-by-one (lambda (c)
-                                        (if helm-ff-transformer-show-only-basename
-                                            (cons (helm-basename c) c) c))
+                                        (with-helm-buffer
+                                          (if helm-ff-transformer-show-only-basename
+                                              (cons (helm-basename c) c) c)))
                    :action (helm-actions-from-type-file))
         :ff-transformer-show-only-basename nil
         :buffer "*helm locate library*"))
