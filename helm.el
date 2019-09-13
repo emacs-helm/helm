@@ -7005,6 +7005,7 @@ The global `helm-help-message' is always added after this local help."
         (helm-update (regexp-quote (helm-get-selection nil t)))))))
 (put 'helm-toggle-truncate-line 'helm-only t)
 
+
 (provide 'helm)
 
 ;; Local Variables:
