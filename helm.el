@@ -1676,6 +1676,13 @@ Messages are logged to a file named with todays date and time in this directory.
                                     helm-debug-root-directory)))
       (make-directory logdir t)
       (with-current-buffer (get-buffer-create helm-debug-buffer)
+        (goto-char (point-max))
+        (insert "\
+
+
+Local Variables:
+mode: outline
+End:")
         (write-region (point-min) (point-max)
                       (setq helm--last-log-file
                             (expand-file-name
@@ -6998,6 +7005,7 @@ The global `helm-help-message' is always added after this local help."
         (helm-update (regexp-quote (helm-get-selection nil t)))))))
 (put 'helm-toggle-truncate-line 'helm-only t)
 
+
 (provide 'helm)
 
 ;; Local Variables:
