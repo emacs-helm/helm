@@ -6399,7 +6399,7 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                    (split-window))
                   ((window-dedicated-p
                     (setq cur-win (get-buffer-window helm-current-buffer)))
-                   (split-window))
+                   (previous-window (selected-window) 1))
                   (cur-win)
                   (t prev-win))))))
 
