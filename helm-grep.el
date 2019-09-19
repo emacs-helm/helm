@@ -1443,7 +1443,7 @@ Ripgrep (rg) types are also supported if this backend is used."
     (let* ((com (helm-grep--ag-command))
            (ripgrep (string= com "rg"))
            (regex (if ripgrep "^\\(.*\\):" "^ *\\(--[a-z]*\\)"))
-           (prefix (if ripgrep "-t" "")))
+           (prefix (if ripgrep "-t " "")))
       (when (equal (call-process com
                                  nil t nil
                                  (if ripgrep
