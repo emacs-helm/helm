@@ -969,6 +969,13 @@ Emacs and even the whole system as it eats all memory.  So if
 your system doesn't have the md5 and sha command line tools be
 careful when checking sum of larges files e.g. isos.
 
+*** Ignored or boring files
+
+Helm-find-files can ignore files matching
+`helm-boring-file-regexp-list' or files that are git ignored, you
+can set this with `helm-ff-skip-boring-files' or
+`helm-ff-skip-git-ignored-files'.
+
 ** Commands
 \\<helm-find-files-map>
 \\[helm-ff-run-locate]\t\tRun `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
