@@ -195,7 +195,6 @@
            finally return
            ;; Always try to upgrade dependencies before installed.
            (cl-loop with all = (append dependencies installed-as-dep installed)
-                    with extra-upgrades
                     for pkg in all
                     for name = (package-desc-name pkg)
                     for avail-pkg = (assq name available)
@@ -205,10 +204,9 @@
                     ;; extra-upgrades, they will be recompiled later
                     ;; after new PKG installation.
                     when (and avail-pkg (member pkg dependencies))
-                    do (setq extra-upgrades
-                             (append (helm-el-package--get-installed-to-recompile
-                                      (append installed-as-dep installed) name)
-                                     extra-upgrades))
+                    append (helm-el-package--get-installed-to-recompile
+                            (append installed-as-dep installed) name)
+                    into extra-upgrades
                     when (and avail-pkg
                               (version-list-<
                                (package-desc-version pkg)
