@@ -158,14 +158,23 @@ WARNING: Setting this to nil is unsafe and can cause deletion of a whole tree."
   :type 'boolean)
 
 (defcustom helm-ff-skip-boring-files nil
-  "Non--nil to skip files matching regexps in
-`helm-boring-file-regexp-list'.
+  "Non--nil to skip boring files.
 
+I.e. the files matching regexps in `helm-boring-file-regexp-list'.
 This take effect in `helm-find-files' and file completion used by `helm-mode'
 i.e `helm-read-file-name'.
 Note that when non-nil this will slow down slightly `helm-find-files'."
   :group 'helm-files
   :type  'boolean)
+
+(defcustom helm-ff-skip-git-ignored-files nil
+  "Non--nil to skip git ignored files.
+
+This take effect only in `helm-find-files'.
+Check is not done on remote files.
+Note that when non-nil this will slow down slightly `helm-find-files'."
+  :group 'helm-files
+  :type 'boolean)
 
 (defcustom helm-ff-candidate-number-limit 5000
   "The `helm-candidate-number-limit' for `helm-find-files' and friends.
@@ -3010,16 +3019,25 @@ Return candidates prefixed with basename of `helm-input' first."
 (defun helm-ff-boring-file-p (file)
   ;; Prevent user doing silly thing like
   ;; adding the dotted files to boring regexps (#924).
-  (and (not (string-match "\\.$" file))
+  (and helm-ff-skip-boring-files
+       (not (string-match "\\.$" file))
        (string-match  helm-ff--boring-regexp file)))
+
+(defvar helm-ff--git-found-p nil)
+(defun helm-ff-git-ignored-p (file)
+  (and helm-ff-skip-git-ignored-files
+       (not (file-remote-p file))
+       (or helm-ff--git-found-p
+           (setq helm-ff--git-found-p (executable-find "git")))
+       (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
   (let ((basename (helm-basename file))
         dot)
-    (unless (and helm-ff-skip-boring-files
-                 (helm-ff-boring-file-p basename))
+    (unless (or (helm-ff-boring-file-p basename)
+                (helm-ff-git-ignored-p file))
 
       ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
