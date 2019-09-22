@@ -8,7 +8,9 @@
 
 ## Describe versions of Helm, Emacs, operating system, etc.
 
-## Are you using `emacs-helm.sh` to reproduce this bug (yes/no):
+## Are you using `emacs-helm.sh` to reproduce this bug? (yes/no):
+
+## Are you using Spacemacs? (yes/no):
 
 ## IMPORTANT NOTE
 
