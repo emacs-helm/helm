@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 
 ## Copyright (C) 2012 ~ 2019 Thierry Volpiatto <thierry.volpiatto@gmail.com>
@@ -26,18 +26,106 @@ test -z "$TEMP" && TEMP="/tmp"
 
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
+TOOLBARS=-1
 
-case $1 in
-    -P)
-        shift 1
-        EMACS=$1
-        shift 1
-        ;;
-    -h)
-        echo "Usage: ${0##*/} [-P} Emacs path [-h} help [--] EMACS ARGS"
-        exit 1
-        ;;
-esac
+usage () {
+    cat >&1 <<EOF
+Usage: ${0##*/} [-P PATH] [--toolbars] [-h] [EMACS-OPTIONS-OR-FILENAME]
+
+-P --path:  Specify path to emacs.
+--toolbars: Display Menu bar, scroll bar etc...
+-h:         Display this help and exit.
+
+Any other Emacs options or filename must come after.
+
+Emacs options:
+
+Initialization options:
+
+--chdir DIR                 change to directory DIR
+--daemon, --bg-daemon[=NAME] start a (named) server in the background
+--fg-daemon[=NAME]          start a (named) server in the foreground
+--debug-init                enable Emacs Lisp debugger for init file
+--display, -d DISPLAY       use X server DISPLAY
+--no-build-details          do not add build details such as time stamps
+--no-loadup, -nl            do not load loadup.el into bare Emacs
+--no-site-file              do not load site-start.el
+--no-x-resources            do not load X resources
+--no-window-system, -nw     do not communicate with X, ignoring $DISPLAY
+--script FILE               run FILE as an Emacs Lisp script
+--terminal, -t DEVICE       use DEVICE for terminal I/O
+
+Action options:
+
+FILE                    visit FILE
++LINE                   go to line LINE in next FILE
++LINE:COLUMN            go to line LINE, column COLUMN, in next FILE
+--directory, -L DIR     prepend DIR to load-path (with :DIR, append DIR)
+--file FILE             visit FILE
+--find-file FILE        visit FILE
+--funcall, -f FUNC      call Emacs Lisp function FUNC with no arguments
+--insert FILE           insert contents of FILE into current buffer
+--load, -l FILE         load Emacs Lisp FILE using the load function
+--visit FILE            visit FILE
+
+Display options:
+
+--background-color, -bg COLOR   window background color
+--basic-display, -D             disable many display features;
+                                  used for debugging Emacs
+--border-color, -bd COLOR       main border color
+--border-width, -bw WIDTH       width of main border
+--color, --color=MODE           override color mode for character terminals;
+                                  MODE defaults to \`auto', and
+                                  can also be \`never', \`always',
+                                  or a mode name like \`ansi8'
+--cursor-color, -cr COLOR       color of the Emacs cursor indicating point
+--font, -fn FONT                default font; must be fixed-width
+--foreground-color, -fg COLOR   window foreground color
+--fullheight, -fh               make the first frame high as the screen
+--fullscreen, -fs               make the first frame fullscreen
+--fullwidth, -fw                make the first frame wide as the screen
+--maximized, -mm                make the first frame maximized
+--geometry, -g GEOMETRY         window geometry
+--iconic                        start Emacs in iconified state
+--internal-border, -ib WIDTH    width between text and main border
+--line-spacing, -lsp PIXELS     additional space to put between lines
+--mouse-color, -ms COLOR        mouse cursor color in Emacs window
+--name NAME                     title for initial Emacs frame
+--reverse-video, -r, -rv        switch foreground and background
+--title, -T TITLE               title for initial Emacs frame
+--vertical-scroll-bars, -vb     enable vertical scroll bars
+--xrm XRESOURCES                set additional X resources
+--parent-id XID                 set parent window
+--help                          display this help and exit
+--version                       output version information and exit
+
+You can generally also specify long option names with a single -; for
+example, -batch as well as --batch.  You can use any unambiguous
+abbreviation for a --option.
+
+Various environment variables and window system resources also affect
+the operation of Emacs.  See the main documentation.
+EOF
+         }
+
+for a in "$@"; do
+    case $a in
+        --path | -P)
+            shift 1
+            EMACS=$1
+            shift 1
+            ;;
+        --toolbars | -B)
+            shift 1
+            TOOLBARS=1
+            ;;
+        -h)
+            usage
+            exit 1
+            ;;
+    esac
+done
 
 LOAD_PATH=$($EMACS -q -batch --eval "(prin1 load-path)")
 
@@ -64,15 +152,18 @@ cat > $CONF_FILE <<EOF
 ;; emacs program \"$EMACS\".\\n\
 ;; This is a minimal \`helm' configuration to discover \`helm' or debug it.\\n\
 ;; You can retrieve this minimal configuration in \"$CONF_FILE\".\\n\
+;;
 ;; Some original Emacs commands are replaced by their \`helm' counterparts:\\n\\n\
 ;; - \`find-file'(C-x C-f)            =>\`helm-find-files'\\n\
 ;; - \`occur'(M-s o)                  =>\`helm-occur'\\n\
 ;; - \`list-buffers'(C-x C-b)         =>\`helm-buffers-list'\\n\
 ;; - \`completion-at-point'(M-tab)    =>\`helm-lisp-completion-at-point'[1]\\n\
+;; - \`apropos-command'(C-h a)        =>\`helm-apropos'\\n\
 ;; - \`dabbrev-expand'(M-/)           =>\`helm-dabbrev'\\n\
 ;; - \`execute-extended-command'(M-x) =>\`helm-M-x'\\n\\n
 ;; Some other Emacs commands are \"helmized\" by \`helm-mode'.\\n\
 ;; [1] Coming with emacs-24.4, \`completion-at-point' is \"helmized\" by \`helm-mode'\\n\
+
 ;; which provides Helm completion in many places like \`shell-mode'.\\n\
 ;; Find context help for most Helm commands with \`C-h m'.\\n\
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n"))
@@ -90,10 +181,11 @@ cat > $CONF_FILE <<EOF
 (setq package-load-list '((helm-core t) (helm t) (async t) (popup t)))
 (package-initialize)
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
-(setq default-frame-alist '((vertical-scroll-bars . nil)
-                            (tool-bar-lines . 0)
-                            (menu-bar-lines . 0)
-                            (fullscreen . nil)))
+(unless (> $TOOLBARS 0)
+   (setq default-frame-alist '((vertical-scroll-bars . nil)
+                               (tool-bar-lines . 0)
+                               (menu-bar-lines . 0)
+                               (fullscreen . nil))))
 (blink-cursor-mode -1)
 (require 'helm-config)
 (helm-mode 1)
@@ -102,6 +194,7 @@ cat > $CONF_FILE <<EOF
 (define-key global-map [remap list-buffers] 'helm-buffers-list)
 (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 (define-key global-map [remap execute-extended-command] 'helm-M-x)
+(define-key global-map [remap apropos-command] 'helm-apropos)
 (unless (boundp 'completion-in-region-function)
   (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
   (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
