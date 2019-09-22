@@ -32,9 +32,9 @@ usage () {
     cat >&1 <<EOF
 Usage: ${0##*/} [-P PATH] [--toolbars] [-h] [EMACS-OPTIONS-OR-FILENAME]
 
--P --path:  Specify path to emacs.
---toolbars: Display Menu bar, scroll bar etc...
--h:         Display this help and exit.
+-P --path:     Specify path to emacs.
+-B --toolbars: Display Menu bar, scroll bar etc...
+-h:            Display this help and exit.
 
 Any other Emacs options or filename must come after.
 
