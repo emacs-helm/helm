@@ -45,7 +45,7 @@
 (defvar helm-el-package--tabulated-list nil)
 (defvar helm-el-package--upgrades nil)
 (defvar helm-el-package--removable-packages nil)
-(defvar helm-el-package--extra-upgrades nil)
+(defvar helm-el-package--to-recompile nil)
 
 ;; Shutup bytecompiler for emacs-24*
 (defvar package-menu-async) ; Only available on emacs-25.
@@ -81,7 +81,7 @@
                (while (re-search-forward "^[ \t]+" nil t)
                  (replace-match ""))
                (buffer-string)))
-           (setq helm-el-package--extra-upgrades nil)
+           (setq helm-el-package--to-recompile nil)
            (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
            (if helm--force-updating-p
                (if helm-el-package--upgrades
@@ -218,7 +218,7 @@
                     ;; upgraded.
                     (cl-loop for p in
                              (append upgrades
-                                     (setq helm-el-package--extra-upgrades extra-upgrades))
+                                     (setq helm-el-package--to-recompile extra-upgrades))
                              unless (assoc (car p) lst)
                              collect p into lst
                              finally return lst))))
@@ -248,11 +248,12 @@
            for upgrade = (cdr (assq pkg-name
                                     helm-el-package--upgrades))
            for extra-upgrade = (cdr (assq pkg-name
-                                          helm-el-package--extra-upgrades))
+                                          helm-el-package--to-recompile))
            do
            (cond (;; Recompile.
                   (and (null upgrade)
                        (equal pkg-desc extra-upgrade))
+                  (message "Recompiling package `%s'" pkg-name)
                   (helm-el-package-recompile-1 pkg-desc))
                  (;; Do nothing.
                   (or (null upgrade)
@@ -260,12 +261,16 @@
                       ;; is installed and need upgrade and pkg is as
                       ;; well a builtin package.
                       (package-built-in-p pkg-name))
+                  (message "Do nothing, `%s' is a built-in package" pkg-name)
                   (ignore))
                  (;; Install.
                   (equal pkg-desc upgrade)
+                  (message "Installing package `%s'" pkg-name)
                   (package-install pkg-desc t))
                  (;; Delete.
-                  t (package-delete pkg-desc t t)))))
+                  t
+                  (message "Deleting package `%s'" pkg-name)
+                  (package-delete pkg-desc t t)))))
 
 (defun helm-el-package-upgrade (_candidate)
   (helm-el-package-upgrade-1
@@ -317,6 +322,8 @@
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
                  'face 'font-lock-variable-name-face disp))
+           do (when (and upgrade-p (assq name helm-el-package--to-recompile))
+                (put-text-property 0 2 'display "R " disp))
            for cand = (cons disp (car (split-string disp)))
            when (or (and built-in-p
                          (eq helm-el-package--show-only 'built-in))
