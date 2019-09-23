@@ -27,14 +27,16 @@ test -z "$TEMP" && TEMP="/tmp"
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
 TOOLBARS=-1
+LOAD_PACKAGES=
 
 usage () {
     cat >&1 <<EOF
 Usage: ${0##*/} [-P PATH] [--toolbars] [-h] [EMACS-OPTIONS-OR-FILENAME]
 
--P --path:     Specify path to emacs.
--B --toolbars: Display Menu bar, scroll bar etc...
--h:            Display this help and exit.
+-P --path:       Specify path to emacs.
+-B --toolbars:   Display Menu bar, scroll bar etc...
+--load-packages: Load specified packages (separate with ",").
+-h:              Display this help and exit.
 
 Any other Emacs options or filename must come after.
 
@@ -113,12 +115,17 @@ for a in "$@"; do
     case $a in
         --path | -P)
             shift 1
-            EMACS=$1
+            EMACS="$1"
             shift 1
             ;;
         --toolbars | -B)
             shift 1
             TOOLBARS=1
+            ;;
+        --load-packages)
+            shift 1
+            LOAD_PACKAGES="$1"
+            shift 1
             ;;
         -h)
             usage
@@ -178,7 +185,16 @@ cat > $CONF_FILE <<EOF
                                         (file-name-directory
                                          (directory-file-name default-directory)))))
 
-(setq package-load-list '((helm-core t) (helm t) (async t) (popup t)))
+(let* ((str-lst "$LOAD_PACKAGES")
+       (load-packages (and str-lst
+                           (not (string= str-lst ""))
+                           (split-string str-lst ","))))
+  (setq package-load-list
+        (if (equal load-packages '("all"))
+            '(all)
+          (append '((helm-core t) (helm t) (async t) (popup t))
+                  (mapcar (lambda (p) (list (intern p) t)) load-packages)))))
+
 (package-initialize)
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
 (unless (> $TOOLBARS 0)
