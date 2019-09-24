@@ -261,7 +261,6 @@
                       ;; is installed and need upgrade and pkg is as
                       ;; well a builtin package.
                       (package-built-in-p pkg-name))
-                  (message "Do nothing, `%s' is a built-in package" pkg-name)
                   (ignore))
                  (;; Install.
                   (equal pkg-desc upgrade)
