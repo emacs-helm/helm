@@ -315,13 +315,16 @@
            for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (memq name package-selected-packages)
            do (when user-installed-p (put-text-property 0 2 'display "S " disp))
-           do (when (memq name helm-el-package--removable-packages)
+           do (when (or (memq name helm-el-package--removable-packages)
+                        (and upgrade-p installed-p))
                 (put-text-property 0 2 'display "U " disp)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
                  'face 'font-lock-variable-name-face disp))
            do (when (and upgrade-p (assq name helm-el-package--to-recompile))
                 (put-text-property 0 2 'display "R " disp))
+           do (when (and upgrade-p (not installed-p))
+                (put-text-property 0 2 'display "I " disp))
            for cand = (cons disp (car (split-string disp)))
            when (or (and built-in-p
                          (eq helm-el-package--show-only 'built-in))
