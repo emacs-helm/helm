@@ -247,12 +247,11 @@
            for pkg-name = (package-desc-name pkg-desc)
            for upgrade = (cdr (assq pkg-name
                                     helm-el-package--upgrades))
-           for extra-upgrade = (cdr (assq pkg-name
-                                          helm-el-package--to-recompile))
+           for to-recompile = (assq pkg-name
+                                     helm-el-package--to-recompile)
            do
            (cond (;; Recompile.
-                  (and (null upgrade)
-                       (equal pkg-desc extra-upgrade))
+                  (and (null upgrade) to-recompile)
                   (message "Recompiling package `%s'" pkg-name)
                   (helm-el-package-recompile-1 pkg-desc))
                  (;; Do nothing.
