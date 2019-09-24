@@ -78,6 +78,7 @@ BIN=${PREFIX}bin/
 DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
 install:
 	test -d ${DESTDIR} || mkdir ${DESTDIR}
+	rm -vf ${DESTDIR}*.el
 	rm -vf ${DESTDIR}*.elc
 	cp -vf *.el $(DESTDIR)
 	cp -vf *.elc $(DESTDIR)
