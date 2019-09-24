@@ -1576,6 +1576,9 @@ If MUST-MATCH is specified exit with
   (let ((sel   (helm-get-selection)))
     (cl-assert sel nil "Trying to exit with no candidates")
     (if (and (file-directory-p sel)
+             ;; Allows exiting with default action when a prefix arg
+             ;; is specified.
+             (null current-prefix-arg)
              (null helm-ff--RET-disabled)
              (not (string= "." (helm-basename sel))))
         (helm-execute-persistent-action)
