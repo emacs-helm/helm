@@ -990,7 +990,8 @@ Example:
   "Display documentation of Eieio CLASS, a symbol or a string."
   (advice-add 'cl--print-table :override #'helm-source--cl--print-table)
   (unwind-protect
-       (helm-describe-function class)
+       (let ((helm-describe-function-function 'describe-function))
+         (helm-describe-function class))
     (advice-remove 'cl--print-table #'helm-source--cl--print-table)))
 
 (defun helm-describe-function (func)
