@@ -17,9 +17,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Commentary:
-
 # Preconfigured `emacs -Q' with a basic Helm configuration.
-# Run it from this directory or symlink it somewhere in your PATH.
+
 
 # If TEMP env var exists, use it, otherwise declare it.
 test -z "$TEMP" && TEMP="/tmp"
