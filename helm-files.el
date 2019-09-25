@@ -1107,16 +1107,23 @@ working."
           ;; COMMAND on basename of each file, using
           ;; its basedir as `default-directory'.
           (cl-loop for f in cand-list
+                   for n from 1
                    for dir = (and (not (string-match helm--url-regexp f))
                                   (helm-basedir f))
                    for file = (eshell-quote-argument
                                (format "%s" (if (and dir (file-remote-p dir))
                                                 (helm-basename f) f)))
-                   for com = (if (string-match "'%s'\\|\"%s\"\\|%s" command)
+                   ;; \@ => placeholder for file without extension.
+                   ;; \# => placeholder for incremental number.
+                   for fcmd = (replace-regexp-in-string
+                              "\\\\@" (file-name-sans-extension file)
+                              (replace-regexp-in-string
+                               "\\\\#" (format "%03d" n) command))
+                   for com = (if (string-match "'%s'\\|\"%s\"\\|%s" fcmd)
                                  ;; [1] This allow to enter other args AFTER filename
                                  ;; i.e <command %s some_more_args>
-                                 (format command file)
-                                 (format "%s %s" command file))
+                                 (format fcmd file)
+                               (format "%s %s" fcmd file))
                    do (let ((default-directory (or dir default-directory)))
                         (eshell-command com)))))))
 
