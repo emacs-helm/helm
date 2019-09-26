@@ -1399,6 +1399,35 @@ But you can also pass an argument or more after \"candidate_file\" like this:
 
     <command> candidate_file [extra_args]
 
+**** Use placeholders in extra arguments
+
+placeholder for file without extension: \\@ 
+placeholder for incremental number:     \\#
+
+\"candidate_file\" will be added at \"%s\" and \\@ but without extension.
+
+    <command %s \\@>
+
+\"candidate_file\" will be added at \"%s\" and \\# will be replaced by an incremental number.
+
+    <command> %s \\#
+
+Here examples:
+
+Say you want to use the =convert= command to convert all your .png files in a directory to .jpg.
+
+This will convert all your files to jpg keeping the same basename.
+
+    convert %s \\@.jpg
+
+This will convert all your files to foo-001.jpg, foo-002.jpg etc...
+
+    convert %s foo-\\#.jpg
+
+You can of course combine both placeholders if needed.
+
+    convert %s \\@-\\#.jpg
+
 *** Specify marked files as arguments
 
 Example:
