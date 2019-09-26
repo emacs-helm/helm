@@ -777,6 +777,9 @@ If you add %s to the command line %s will be replaced with the candidate, this m
 add extra argument to your command e.g. command -extra-arg %s or command %s -extra-arg.
 If you want to pass many files inside %s, don't forget to use a prefix arg.
 
+You can also use special placeholders in extra-args,
+see the specific info page once you hit `\\<helm-find-files-map>\\[helm-ff-run-eshell-command-on-file]'.
+
 *** Using TRAMP with `helm-find-files' to read remote directories
 
 `helm-find-files' works fine with TRAMP despite some limitations.
