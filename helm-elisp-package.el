@@ -322,7 +322,7 @@
                  'face 'font-lock-variable-name-face disp))
            do (when recompile-p
                 (put-text-property 0 2 'display "R " disp))
-           do (when (and upgrade-p (not installed-p))
+           do (when (and upgrade-p (not installed-p) (not built-in-p))
                 (put-text-property 0 2 'display "I " disp))
            for cand = (cons disp (car (split-string disp)))
            when (or (and built-in-p
