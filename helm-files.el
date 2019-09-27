@@ -1099,7 +1099,6 @@ working."
             (if (string-match "'%s'\\|\"%s\"\\|%s" command)
                 (setq cmd-line (format command mapfiles)) ; See [1]
                 (setq cmd-line (format "%s %s" command mapfiles)))
-            (helm-log "%S" cmd-line)
             (eshell-command cmd-line))
 
           ;; Run eshell-command on EACH marked files.
@@ -1110,9 +1109,11 @@ working."
                    for n from 1
                    for dir = (and (not (string-match helm--url-regexp f))
                                   (helm-basedir f))
-                   for file = (eshell-quote-argument
-                               (format "%s" (if (and dir (file-remote-p dir))
-                                                (helm-basename f) f)))
+                   ;; We can use basename here as the command will run
+                   ;; under default-directory.
+                   ;; This allow running e.g. "tar czvf test.tar.gz
+                   ;; %s/*" without creating an archive expanding from /home.
+                   for file = (eshell-quote-argument (helm-basename f))
                    ;; \@ => placeholder for file without extension.
                    ;; \# => placeholder for incremental number.
                    for fcmd = (replace-regexp-in-string
