@@ -216,12 +216,8 @@
                     ;; Extra-upgrades are packages that need to be
                     ;; recompiled because their dependencies have been
                     ;; upgraded.
-                    (cl-loop for p in
-                             (append upgrades
-                                     (setq helm-el-package--to-recompile extra-upgrades))
-                             unless (assoc (car p) lst)
-                             collect p into lst
-                             finally return lst))))
+                    (prog1 upgrades
+                      (setq helm-el-package--to-recompile extra-upgrades)))))
 
 (defun helm-el-package--get-installed-to-recompile (seq pkg-name)
   "Find the installed packages in SEQ that have PKG-NAME as dependency."
@@ -312,7 +308,9 @@
                                  (not (member desc '("available" "new"
                                                      "installed" "dependency"))))
            for installed-p = (member desc '("installed" "dependency"))
-           for upgrade-p = (assq name helm-el-package--upgrades)
+           for recompile-p = (assq name helm-el-package--to-recompile)
+           for upgrade-p = (or (assq name helm-el-package--upgrades)
+                               recompile-p)
            for user-installed-p = (memq name package-selected-packages)
            do (when (and user-installed-p (not upgrade-p))
                 (put-text-property 0 2 'display "S " disp))
@@ -322,7 +320,7 @@
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
                  'face 'font-lock-variable-name-face disp))
-           do (when (and upgrade-p (assq name helm-el-package--to-recompile))
+           do (when recompile-p
                 (put-text-property 0 2 'display "R " disp))
            do (when (and upgrade-p (not installed-p))
                 (put-text-property 0 2 'display "I " disp))
