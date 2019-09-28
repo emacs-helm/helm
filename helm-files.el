@@ -1052,26 +1052,30 @@ working."
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
                                   default-directory))
+           helm-display-source-at-screen-top
+           (helm-actions-inherit-frame-settings t)
+           helm-use-frame-when-more-than-two-windows
            (command (with-helm-display-marked-candidates
                       helm-marked-buffer-name
                       (helm-ff--count-and-collect-dups
                        (mapcar 'helm-basename cand-list))
-                      (helm-comp-read
-                       "Command: "
-                       (cl-loop for (a c) in (eshell-read-aliases-list)
-                                ;; Positional arguments may be double
-                                ;; quoted (Issue #1881).
-                                when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
-                                collect (propertize a 'help-echo c) into ls
-                                finally return (sort ls 'string<))
-                       :buffer "*helm eshell on file*"
-                       :name "Eshell command"
-                       :mode-line
-                       '("Eshell alias"
-                         "C-h m: Help, \\[universal-argument]: Insert output at point")
-                       :help-message 'helm-esh-help-message
-                       :input-history
-                       'helm-eshell-command-on-file-input-history)))
+                      (with-helm-current-buffer
+                        (helm-comp-read
+                         "Command: "
+                         (cl-loop for (a c) in (eshell-read-aliases-list)
+                                  ;; Positional arguments may be double
+                                  ;; quoted (Issue #1881).
+                                  when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
+                                  collect (propertize a 'help-echo c) into ls
+                                  finally return (sort ls 'string<))
+                         :buffer "*helm eshell on file*"
+                         :name "Eshell command"
+                         :mode-line
+                         '("Eshell alias"
+                           "C-h m: Help, \\[universal-argument]: Insert output at point")
+                         :help-message 'helm-esh-help-message
+                         :input-history
+                         'helm-eshell-command-on-file-input-history))))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
            cmd-line)
       (if (or (equal helm-current-prefix-arg '(16))
