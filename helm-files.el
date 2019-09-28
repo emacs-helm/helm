@@ -1047,27 +1047,30 @@ working."
   (require 'em-alias) (eshell-read-aliases-list)
   (when (or eshell-command-aliases-list
             (y-or-n-p "No eshell aliases found, run eshell-command without alias anyway? "))
-    (let* ((cand-list (helm-marked-candidates))
+    (let* ((cand-list (helm-marked-candidates :with-wildcard t))
            (default-directory (or helm-ff-default-directory
                                   ;; If candidate is an url *-ff-default-directory is nil
                                   ;; so keep value of default-directory.
                                   default-directory))
-           (command (helm-comp-read
-                     "Command: "
-                     (cl-loop for (a c) in (eshell-read-aliases-list)
-                              ;; Positional arguments may be double
-                              ;; quoted (Issue #1881).
-                              when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
-                              collect (propertize a 'help-echo c) into ls
-                              finally return (sort ls 'string<))
-                     :buffer "*helm eshell on file*"
-                     :name "Eshell command"
-                     :mode-line
-                     '("Eshell alias"
-                       "C-h m: Help, \\[universal-argument]: Insert output at point")
-                     :help-message 'helm-esh-help-message
-                     :input-history
-                     'helm-eshell-command-on-file-input-history))
+           (command (with-helm-display-marked-candidates
+                      helm-marked-buffer-name
+                      cand-list
+                      (helm-comp-read
+                       "Command: "
+                       (cl-loop for (a c) in (eshell-read-aliases-list)
+                                ;; Positional arguments may be double
+                                ;; quoted (Issue #1881).
+                                when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
+                                collect (propertize a 'help-echo c) into ls
+                                finally return (sort ls 'string<))
+                       :buffer "*helm eshell on file*"
+                       :name "Eshell command"
+                       :mode-line
+                       '("Eshell alias"
+                         "C-h m: Help, \\[universal-argument]: Insert output at point")
+                       :help-message 'helm-esh-help-message
+                       :input-history
+                       'helm-eshell-command-on-file-input-history)))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
            cmd-line)
       (if (or (equal helm-current-prefix-arg '(16))
