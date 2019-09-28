@@ -1012,7 +1012,7 @@ layout."
 
 (defvar eshell-command-aliases-list nil)
 (defvar helm-eshell-command-on-file-input-history nil)
-(defun helm-find-files-eshell-command-on-file-1 (&optional map)
+(cl-defun helm-find-files-eshell-command-on-file-1 (&optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates.
 This is done possibly with an eshell alias, if no alias found, you can type in
 an eshell command.
@@ -1100,9 +1100,9 @@ working."
           ;; This wont work on remote files, because tramp handlers depends
           ;; on `default-directory' (limitation).
           (let ((mapfiles (mapconcat 'eshell-quote-argument cand-list " ")))
-            (if (string-match "'%s'\\|\"%s\"\\|%s" command)
+            (if (string-match "%s" command)
                 (setq cmd-line (format command mapfiles)) ; See [1]
-                (setq cmd-line (format "%s %s" command mapfiles)))
+              (setq cmd-line (format "%s %s" command mapfiles)))
             (eshell-command cmd-line))
 
           ;; Run eshell-command on EACH marked files.
@@ -1124,7 +1124,7 @@ working."
                               "\\\\@" (file-name-sans-extension file)
                               (replace-regexp-in-string
                                "\\\\#" (format "%03d" n) command))
-                   for com = (if (string-match "'%s'\\|\"%s\"\\|%s" fcmd)
+                   for com = (if (string-match "%s" fcmd)
                                  ;; [1] This allow to enter other args AFTER filename
                                  ;; i.e <command %s some_more_args>
                                  (format fcmd file)
