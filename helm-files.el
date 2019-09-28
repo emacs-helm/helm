@@ -1054,7 +1054,7 @@ working."
                                   default-directory))
            (command (with-helm-display-marked-candidates
                       helm-marked-buffer-name
-                      cand-list
+                      (mapcar 'helm-basename cand-list)
                       (helm-comp-read
                        "Command: "
                        (cl-loop for (a c) in (eshell-read-aliases-list)
