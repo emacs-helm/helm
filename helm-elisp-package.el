@@ -315,7 +315,7 @@
            do (when (and user-installed-p (not upgrade-p))
                 (put-text-property 0 2 'display "S " disp))
            do (when (or (memq name helm-el-package--removable-packages)
-                        (and upgrade-p installed-p))
+                        (and upgrade-p installed-p (not recompile-p)))
                 (put-text-property 0 2 'display "U " disp)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
