@@ -249,7 +249,7 @@
            (cond (;; Recompile.
                   (and (null upgrade) to-recompile)
                   (message "Recompiling package `%s'" pkg-name)
-                  (helm-el-package-recompile-1 pkg-name))
+                  (helm-el-package-recompile-1 p))
                  (;; Do nothing.
                   (or (null upgrade)
                       ;; This may happen when a Elpa version of pkg
