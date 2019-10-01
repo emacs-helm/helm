@@ -776,8 +776,8 @@ Should not be used among other sources.")
     ;; directory.
     (when (file-directory-p fname)
       (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
-                                   (helm-basename presel)
-                                 presel)))))
+                                   (concat "^" (regexp-quote (helm-basename presel)))
+                                 (regexp-quote presel))))))
 
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
