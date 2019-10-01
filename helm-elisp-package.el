@@ -217,17 +217,17 @@
            for upgrade = (cdr (assq pkg-name
                                     helm-el-package--upgrades))
            do
-           (cond (;; Do nothing.
+           (cond (;; Install.
+                  (equal pkg-desc upgrade)
+                  (message "Installing package `%s'" pkg-name)
+                  (package-install pkg-desc t))
+                 (;; Do nothing.
                   (or (null upgrade)
                       ;; This may happen when a Elpa version of pkg
                       ;; is installed and need upgrade and pkg is as
                       ;; well a builtin package.
                       (package-built-in-p pkg-name))
                   (ignore))
-                 (;; Install.
-                  (equal pkg-desc upgrade)
-                  (message "Installing package `%s'" pkg-name)
-                  (package-install pkg-desc t))
                  (;; Delete.
                   t
                   (message "Deleting package `%s'" pkg-name)
