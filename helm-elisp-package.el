@@ -45,7 +45,6 @@
 (defvar helm-el-package--tabulated-list nil)
 (defvar helm-el-package--upgrades nil)
 (defvar helm-el-package--removable-packages nil)
-(defvar helm-el-package--to-recompile nil)
 
 ;; Shutup bytecompiler for emacs-24*
 (defvar package-menu-async) ; Only available on emacs-25.
@@ -81,7 +80,6 @@
                (while (re-search-forward "^[ \t]+" nil t)
                  (replace-match ""))
                (buffer-string)))
-           (setq helm-el-package--to-recompile nil)
            (setq helm-el-package--upgrades (helm-el-package-menu--find-upgrades))
            (if helm--force-updating-p
                (if helm-el-package--upgrades
@@ -198,36 +196,11 @@
                     for pkg in all
                     for name = (package-desc-name pkg)
                     for avail-pkg = (assq name available)
-                    ;; A new version of PKG is available and is a
-                    ;; dependency. Find the installed packages that
-                    ;; have PKG as dependency and add them to
-                    ;; extra-upgrades, they will be recompiled later
-                    ;; after new PKG installation.
-                    when (and avail-pkg (member pkg dependencies))
-                    append (helm-el-package--get-installed-to-recompile
-                            (append installed-as-dep installed) name)
-                    into extra-upgrades
                     when (and avail-pkg
                               (version-list-<
                                (package-desc-version pkg)
                                (package-desc-version (cdr avail-pkg))))
-                    collect avail-pkg into upgrades
-                    finally return
-                    ;; Extra-upgrades are packages that need to be
-                    ;; recompiled because their dependencies have been
-                    ;; upgraded.
-                    (prog1 upgrades
-                      (setq helm-el-package--to-recompile extra-upgrades)))))
-
-(defun helm-el-package--get-installed-to-recompile (seq pkg-name)
-  "Find the installed packages in SEQ that have PKG-NAME as dependency."
-  (cl-loop for p in seq
-           for pkg = (package-desc-name p)
-           for deps = (and (helm-el-package--user-installed-p pkg)
-                           (package--get-deps pkg))
-           when (and (memq pkg-name deps)
-                     (not (eq pkg-name pkg)))
-           collect (cons pkg p)))
+                    collect avail-pkg)))
 
 (defun helm-el-package--user-installed-p (package)
   "Return non-nil if PACKAGE is a user-installed package."
@@ -243,14 +216,8 @@
            for pkg-name = (package-desc-name pkg-desc)
            for upgrade = (cdr (assq pkg-name
                                     helm-el-package--upgrades))
-           for to-recompile = (assq pkg-name
-                                     helm-el-package--to-recompile)
            do
-           (cond (;; Recompile.
-                  (and (null upgrade) to-recompile)
-                  (message "Recompiling package `%s'" pkg-name)
-                  (helm-el-package-recompile-1 p))
-                 (;; Do nothing.
+           (cond (;; Do nothing.
                   (or (null upgrade)
                       ;; This may happen when a Elpa version of pkg
                       ;; is installed and need upgrade and pkg is as
@@ -308,20 +275,16 @@
                                  (not (member desc '("available" "new"
                                                      "installed" "dependency"))))
            for installed-p = (member desc '("installed" "dependency"))
-           for recompile-p = (assq name helm-el-package--to-recompile)
-           for upgrade-p = (or (assq name helm-el-package--upgrades)
-                               recompile-p)
+           for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (memq name package-selected-packages)
            do (when (and user-installed-p (not upgrade-p))
                 (put-text-property 0 2 'display "S " disp))
            do (when (or (memq name helm-el-package--removable-packages)
-                        (and upgrade-p installed-p (not recompile-p)))
+                        (and upgrade-p installed-p))
                 (put-text-property 0 2 'display "U " disp)
                 (put-text-property
                  2 (+ (length (symbol-name name)) 2)
                  'face 'font-lock-variable-name-face disp))
-           do (when recompile-p
-                (put-text-property 0 2 'display "R " disp))
            do (when (and upgrade-p (not installed-p) (not built-in-p))
                 (put-text-property 0 2 'display "I " disp))
            for cand = (cons disp (car (split-string disp)))
