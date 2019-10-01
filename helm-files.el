@@ -1125,9 +1125,9 @@ working."
                    ;; \@ => placeholder for file without extension.
                    ;; \# => placeholder for incremental number.
                    for fcmd = (replace-regexp-in-string
-                              "\\\\@" (file-name-sans-extension file)
-                              (replace-regexp-in-string
-                               "\\\\#" (format "%03d" n) command))
+                               "\\\\@" (regexp-quote (file-name-sans-extension file))
+                               (replace-regexp-in-string
+                                "\\\\#" (format "%03d" n) command))
                    for com = (if (string-match "%s" fcmd)
                                  ;; [1] This allow to enter other args AFTER filename
                                  ;; i.e <command %s some_more_args>
