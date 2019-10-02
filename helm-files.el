@@ -1470,7 +1470,8 @@ This doesn't replace inside the files, only modify filenames."
                     (unless (string= query "!")
                       (setq query (helm-read-answer (format
                                                      "Replace `%s' by `%s' [!,y,n,q]"
-                                                     old new)
+                                                     (helm-basename old)
+                                                     (helm-basename new))
                                                     '("y" "n" "!" "q"))))
                     (when (string= query "q")
                       (cl-return (message "Operation aborted")))
