@@ -165,6 +165,7 @@ engine beeing completely different and also much faster."
       (unwind-protect
            (helm :sources 'helm-source-occur
                  :buffer "*helm occur*"
+                 :history 'helm-occur-history
                  :default (or def (helm-aif (thing-at-point 'symbol)
                                       (regexp-quote it)))
                  :preselect (and (memq 'helm-source-occur
@@ -238,6 +239,7 @@ engine beeing completely different and also much faster."
              :help-message 'helm-moccur-help-message
              :nomark t
              :migemo t
+             ;; Needed for resume.
              :history 'helm-occur-history
              :candidate-number-limit helm-occur-candidate-number-limit
              :action 'helm-occur-actions
@@ -266,6 +268,7 @@ Each buffer's result is displayed in a separated source."
                                        (get-buffer b))))
     (helm :sources sources
           :buffer "*helm moccur*"
+          :history 'helm-occur-history
           :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
           :input input
           :truncate-lines helm-occur-truncate-lines)))
