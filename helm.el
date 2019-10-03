@@ -2678,13 +2678,14 @@ as a string with ARG."
                 :buffer any-buffer)
             (run-hook-with-args 'helm-resume-after-hook sources))))))
 
-(defun helm-resume-previous-session-after-quit (arg)
+(defun helm-resume-previous-session-after-quit ()
   "Resume previous helm session within a running helm."
-  (interactive "p")
+  (interactive)
   (with-helm-alive-p
-    (if (>= (length helm-buffers) arg)
-        (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
-      (message "No previous helm sessions available for resuming!"))))
+    (let ((arg (if (null (member helm-buffer helm-buffers)) 0 1))) 
+      (if (> (length helm-buffers) arg)
+          (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
+        (message "No previous helm sessions available for resuming!")))))
 (put 'helm-resume-previous-session-after-quit 'helm-only t)
 
 (defun helm-resume-list-buffers-after-quit ()
