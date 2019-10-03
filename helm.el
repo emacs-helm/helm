@@ -2661,6 +2661,9 @@ as a string with ARG."
           (progn
             (set-buffer (car it))
             (setq narrow-pos (cdr it))))
+    ;; This happen when calling C-x b within helm.
+    (helm-aif (get-buffer-window helm-marked-buffer-name 'visible)
+        (progn (delete-window it) (kill-buffer helm-marked-buffer-name)))
     (save-restriction
       (when narrow-pos (apply #'narrow-to-region narrow-pos))
       ;; Restart with same `default-directory' value this session
@@ -2679,7 +2682,7 @@ as a string with ARG."
   "Resume previous helm session within a running helm."
   (interactive "p")
   (with-helm-alive-p
-    (if (> (length helm-buffers) arg)
+    (if (>= (length helm-buffers) arg)
         (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
       (message "No previous helm sessions available for resuming!"))))
 (put 'helm-resume-previous-session-after-quit 'helm-only t)
