@@ -4770,7 +4770,8 @@ This is the starting point for nearly all actions you can do on files."
                                 ((and (eq major-mode 'org-agenda-mode)
                                       org-directory
                                       (not smart-input))
-                                 (expand-file-name org-directory))
+                                 (file-name-as-directory
+                                  (expand-file-name org-directory)))
                                 ((and (eq major-mode 'dired-mode) smart-input)
                                  (file-name-directory smart-input))
                                 ((and (not (string= smart-input ""))
