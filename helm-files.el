@@ -578,6 +578,8 @@ with Exiftran mandatory option is \"-i\"."
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
                                   nil 'helm-ff-delete-char-backward--exit-fn)
+    (when (fboundp 'tab-bar-mode)
+      (define-key map (kbd "C-c C-t")       'helm-ff-find-file-other-tab))
     map)
   "Keymap for `helm-find-files'.")
 
@@ -709,6 +711,9 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
+   (lambda () (and (fboundp 'tab-bar-mode)
+                   "Find file other tab `C-c C-t'"))
+   'find-file-other-tab
    "Print File `C-c p, C-u to refresh'" 'helm-ff-print
    "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)
   "Actions for `helm-find-files'."
@@ -4376,6 +4381,14 @@ Called with two prefix arg open files in background without selecting them."
               ;; Find file at `default-directory' when basedir is
               ;; unspecified e.g user hit C-k foo RET.
               (t (find-file candidate)))))))
+
+(defun helm-ff-find-file-other-tab ()
+  "Run switch to buffer in other tab action from `helm-source-buffers-list'."
+  (interactive)
+  (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'find-file-other-tab)))
+(put 'helm-ff-find-file-other-tab 'helm-only t)
 
 (defun helm-ff--mkdir (dir &optional helm-ff)
   (when (or (not confirm-nonexistent-file-or-buffer)
