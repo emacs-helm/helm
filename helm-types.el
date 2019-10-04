@@ -167,6 +167,9 @@
    'helm-buffer-switch-buffers-other-window
    "Switch to buffer other frame `C-c C-o'"
    'switch-to-buffer-other-frame
+   (lambda () (and (fboundp 'tab-bar-mode)
+                   "Switch to buffer other tab `C-c C-t'"))
+   'switch-to-buffer-other-tab
    "Browse project `C-x C-d'"
    'helm-buffers-browse-project
    "Query replace regexp `C-M-%'"

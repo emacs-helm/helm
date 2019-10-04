@@ -223,6 +223,8 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
     (define-key map (kbd "C-M-SPC")   'helm-buffers-mark-similar-buffers)
+    (when (fboundp 'tab-bar-mode)
+      (define-key map (kbd "C-c C-t") 'helm-buffers-switch-to-buffer-new-tab))
     map)
   "Keymap for buffer sources in helm.")
 
@@ -905,6 +907,14 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
 (put 'helm-buffer-switch-other-frame 'helm-only t)
+
+(defun helm-buffers-switch-to-buffer-new-tab ()
+  "Run switch to buffer in other tab action from `helm-source-buffers-list'."
+  (interactive)
+  (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'switch-to-buffer-other-tab)))
+(put 'helm-buffers-switch-to-buffer-new-tab 'helm-only t)
 
 (defun helm-buffer-switch-buffers (_candidate)
   "Switch to buffer candidates and replace current buffer.
