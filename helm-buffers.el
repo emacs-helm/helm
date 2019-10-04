@@ -126,7 +126,7 @@ abbreviation here."
   :type '(alist :key-type symbol :value-type string)
   :group 'helm-buffers)
 
-(defcustom helm-buffers-maybe-switch-to-tab t
+(defcustom helm-buffers-maybe-switch-to-tab nil
   "Switch to buffer in its tab when non nil.
 This have no effect when `tab-bar-mode' is not available."
   :group 'helm-buffers
