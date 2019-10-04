@@ -4383,7 +4383,7 @@ Called with two prefix arg open files in background without selecting them."
               (t (find-file candidate)))))))
 
 (defun helm-ff-find-file-other-tab ()
-  "Run switch to buffer in other tab action from `helm-source-buffers-list'."
+  "Run find file in other tab action from `helm-source-buffers-list'."
   (interactive)
   (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
   (with-helm-alive-p
