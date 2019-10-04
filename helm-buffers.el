@@ -125,6 +125,13 @@ Also if some pretty names are too long you can add your own
 abbreviation here."
   :type '(alist :key-type symbol :value-type string)
   :group 'helm-buffers)
+
+(defcustom helm-buffers-maybe-switch-to-tab t
+  "Switch to buffer in its tab when non nil.
+This have no effect when `tab-bar-mode' is not available."
+  :group 'helm-buffers
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
