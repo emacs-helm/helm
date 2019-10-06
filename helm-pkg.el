@@ -5,7 +5,8 @@
   '((emacs "24.4")
     (async "1.9.3")
     (popup "0.5.3")
-    (helm-core "3.0"))
+    (helm-core "3.0")
+    (helm-org "1.0"))
   :url "https://emacs-helm.github.io/helm/")
 
 ;; Local Variables:
