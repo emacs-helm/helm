@@ -3025,7 +3025,9 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
       (when (and (or helm-always-two-windows helm-autoresize-mode)
                  (not (eq helm-split-window-default-side 'same))
                  (not (minibufferp helm-current-buffer))
-                 (not helm-split-window-inside-p))
+                 (not helm-split-window-inside-p)
+                 (not (window-dedicated-p
+                       (get-buffer-window helm-current-buffer))))
         (delete-other-windows))
       (display-buffer
        buffer `(,helm-default-display-buffer-functions
@@ -6120,7 +6122,9 @@ when initializing a source with `helm-source-in-buffer' class."
   "Toggle resplit helm window, vertically or horizontally."
   (interactive)
   (with-helm-alive-p
-    (if (= (length (window-list nil 1)) 2)
+    (if (and (= (length (window-list nil 1)) 2)
+             (not (window-dedicated-p
+                   (get-buffer-window helm-current-buffer))))
         (progn
           (when helm-prevent-escaping-from-minibuffer
             (helm-prevent-switching-other-window :enabled nil))
