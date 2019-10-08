@@ -262,6 +262,21 @@ See also `helm-locate'."
           :default default
           :history 'helm-file-name-history)))
 
+(defun helm-locate-update-mode-line (process-name)
+  "Update mode-line with PROCESS-NAME status information."
+  (with-helm-window
+    (setq mode-line-format
+          '(" " mode-line-buffer-identification " "
+            (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+            (:eval (propertize
+                    (format "[%s process finished - (%s results)]"
+                            (max (1- (count-lines
+                                      (point-min) (point-max)))
+                                 0)
+                            process-name)
+                    'face 'helm-locate-finish))))
+    (force-mode-line-update)))
+
 (defun helm-locate-init ()
   "Initialize async locate process for `helm-source-locate'."
   (let* ((locate-is-es (string-match "\\`es" helm-locate-command))
@@ -309,17 +324,7 @@ See also `helm-locate'."
                   (when (and helm-locate-fuzzy-match
                              (not (string-match-p "\\s-" helm-pattern)))
                     (helm-redisplay-buffer))
-                  (with-helm-window
-                    (setq mode-line-format
-                          '(" " mode-line-buffer-identification " "
-                            (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                            (:eval (propertize
-                                    (format "[Locate process finished - (%s results)]"
-                                            (max (1- (count-lines
-                                                      (point-min) (point-max)))
-                                                 0))
-                                    'face 'helm-locate-finish))))
-                    (force-mode-line-update)))
+                  (helm-locate-update-mode-line "Locate"))
                  (t
                   (helm-log "Error: Locate %s"
                             (replace-regexp-in-string "\n" "" event))))))))))
