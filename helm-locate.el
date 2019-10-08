@@ -266,14 +266,14 @@ See also `helm-locate'."
   "Update mode-line with PROCESS-NAME status information."
   (with-helm-window
     (setq mode-line-format
-          '(" " mode-line-buffer-identification " "
+          `(" " mode-line-buffer-identification " "
             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
             (:eval (propertize
                     (format "[%s process finished - (%s results)]"
                             (max (1- (count-lines
                                       (point-min) (point-max)))
                                  0)
-                            process-name)
+                            ,process-name)
                     'face 'helm-locate-finish))))
     (force-mode-line-update)))
 
