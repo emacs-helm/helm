@@ -1028,9 +1028,14 @@ See `helm-elisp-show-help'."
               ;; When started from a help buffer,
               ;; Don't kill this buffer as it is helm-current-buffer.
               (unless (equal hbuf helm-current-buffer)
+                (kill-buffer hbuf)
                 (set-window-buffer (get-buffer-window hbuf)
-                                   helm-current-buffer)
-                (kill-buffer hbuf))
+                                   ;; It is generally
+                                   ;; helm-current-buffer but it may
+                                   ;; be another buffer when helm have
+                                   ;; been started from a dedicated window.
+                                   (window-buffer
+                                    helm-persistent-action-display-window)))
               (helm-attrset 'help-running-p nil)))
            (t
             (if name
