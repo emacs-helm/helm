@@ -813,6 +813,11 @@ Fallback to 100 when nil."
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-use-frame-when-dedicated-window nil
+  "Display helm buffer in frame when helm is started from a dedicated window."
+  :group 'helm
+  :type 'boolean)
+
 (defcustom helm-default-prompt-display-function
   #'helm-set-default-prompt-display
   "The function to use to set face of fake cursor in header-line."
@@ -2962,6 +2967,8 @@ Fallback to global value of `helm-display-function' when no local
 value found and current command is not in `helm-commands-using-frame'."
   (or (with-helm-buffer helm-display-function)
       (and (or (memq com helm-commands-using-frame)
+               (and helm-use-frame-when-dedicated-window
+                    (window-dedicated-p (get-buffer-window helm-current-buffer)))
                (and helm-use-frame-when-more-than-two-windows
                     (null helm--nested)
                     (> (length (window-list)) 2))
