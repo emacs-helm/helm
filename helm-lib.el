@@ -1034,7 +1034,9 @@ See `helm-elisp-show-help'."
                                    ;; helm-current-buffer but it may
                                    ;; be another buffer when helm have
                                    ;; been started from a dedicated window.
-                                   helm-persistent-action-window-buffer))
+                                   (if helm-use-frame-when-dedicated-window
+                                       helm-current-buffer
+                                     helm-persistent-action-window-buffer)))
               (helm-attrset 'help-running-p nil)))
            (t
             (if name
