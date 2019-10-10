@@ -2909,6 +2909,12 @@ frame configuration as per `helm-save-configuration-functions'."
                          ((symbol-function 'x-focus-frame) #'ignore))
                  (select-frame-set-input-focus frame))))))
 
+(defvar helm-persistent-action-window-buffer nil
+  "[INTERNAL] Store the buffer where helm is started.
+It is generally `helm-current-buffer', but when this one is displayed
+in a dedicated buffer, helm can't start in this window and use another
+window handling a buffer, it is this one we store.")
+
 (defun helm-split-window-default-fn (window)
   "Default function to split windows before displaying `helm-buffer'.
 
@@ -2918,34 +2924,36 @@ value of `split-window-preferred-function' in `helm-display-buffer'.
 When `helm-display-function' which default to
 `helm-default-display-buffer' is called from `helm-display-buffer' the
 value of `split-window-preferred-function' will be used by `display-buffer'."
-  (let (split-width-threshold)
-    (if (and (fboundp 'window-in-direction)
-             ;; Don't try to split when starting in a minibuffer
-             ;; e.g M-: and try to use helm-show-kill-ring.
-             (not (minibufferp helm-current-buffer)))
-        (if (or (one-window-p t)
-                helm-split-window-inside-p)
-            (split-window
-             (selected-window) nil (if (eq helm-split-window-default-side 'other)
-                                       'below helm-split-window-default-side))
-          ;; If more than one window reuse one of them.
-          (cl-case helm-split-window-default-side
-            (left  (or (helm-window-in-direction 'left)
-                       (helm-window-in-direction 'above)
-                       (selected-window)))
-            (above (or (helm-window-in-direction 'above)
-                       (helm-window-in-direction 'left)
-                       (selected-window)))
-            (right (or (helm-window-in-direction 'right)
-                       (helm-window-in-direction 'below)
-                       (selected-window)))
-            (below (or (helm-window-in-direction 'below)
-                       (helm-window-in-direction 'right)
-                       (selected-window)))
-            (same  (selected-window))
-            (other (other-window-for-scrolling))
-            (t     (or (window-next-sibling) (selected-window)))))
-      (split-window-sensibly window))))
+  (let* (split-width-threshold
+         (win (if (and (fboundp 'window-in-direction)
+                       ;; Don't try to split when starting in a minibuffer
+                       ;; e.g M-: and try to use helm-show-kill-ring.
+                       (not (minibufferp helm-current-buffer)))
+                  (if (or (one-window-p t)
+                          helm-split-window-inside-p)
+                      (split-window
+                       (selected-window) nil (if (eq helm-split-window-default-side 'other)
+                                                 'below helm-split-window-default-side))
+                    ;; If more than one window reuse one of them.
+                    (cl-case helm-split-window-default-side
+                      (left  (or (helm-window-in-direction 'left)
+                                 (helm-window-in-direction 'above)
+                                 (selected-window)))
+                      (above (or (helm-window-in-direction 'above)
+                                 (helm-window-in-direction 'left)
+                                 (selected-window)))
+                      (right (or (helm-window-in-direction 'right)
+                                 (helm-window-in-direction 'below)
+                                 (selected-window)))
+                      (below (or (helm-window-in-direction 'below)
+                                 (helm-window-in-direction 'right)
+                                 (selected-window)))
+                      (same  (selected-window))
+                      (other (other-window-for-scrolling))
+                      (t     (or (window-next-sibling) (selected-window)))))
+                (split-window-sensibly window))))
+    (setq helm-persistent-action-window-buffer (window-buffer win))
+    win))
 
 (defun helm-window-in-direction (direction)
   "Same as `window-in-direction' but check if window is dedicated."
