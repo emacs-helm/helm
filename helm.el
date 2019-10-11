@@ -6332,7 +6332,7 @@ Possible values are 'left 'right 'below or 'above."
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
-(cl-defun helm-execute-persistent-action (&optional attr split-onewindow)
+(cl-defun helm-execute-persistent-action (&optional attr)
   "Perform the associated action ATTR without quitting helm.
 Arg ATTR default will be `persistent-action' or `persistent-action-if'
 if unspecified depending on what's found in source, but it can be
@@ -6341,7 +6341,7 @@ In this case you have to add this new attribute to your source.
 See `persistent-action' and `persistent-action-if' slot documentation
 in `helm-source'.
 
-When `helm-full-frame' or SPLIT-ONEWINDOW are non-`nil', and
+When `helm-full-frame' is non-`nil', and
 `helm-buffer' is displayed in only one window, the helm window is
 split to display `helm-select-persistent-action-window' in other
 window to maintain visibility."
@@ -6377,9 +6377,8 @@ window to maintain visibility."
             (with-helm-window
               (save-selected-window
                 (if no-split
-                    (helm-select-persistent-action-window)
-                  (helm-select-persistent-action-window
-                   (or split-onewindow helm-onewindow-p)))
+                    (helm-select-persistent-action-window :split 'never)
+                  (helm-select-persistent-action-window :split helm-onewindow-p))
                 (helm-log "current-buffer = %S" (current-buffer))
                 (let ((helm-in-persistent-action t)
                       (same-window-regexps '("."))
@@ -6403,7 +6402,7 @@ window to maintain visibility."
                   (delete-other-windows))))))))))
 (put 'helm-execute-persistent-action 'helm-only t)
 
-(defun helm-persistent-action-display-window (&optional split-onewindow)
+(cl-defun helm-persistent-action-display-window (&key split)
   "Return the window that will be used for persistent action.
 If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
   (with-helm-window
@@ -6415,10 +6414,11 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                    helm-persistent-action-display-window)
                   ((and helm--buffer-in-new-frame-p helm-initial-frame)
                    (with-selected-frame helm-initial-frame (selected-window)))
-                  (split-onewindow (split-window))
+                  ((and split (not (eq split 'never))) (split-window))
                   ;; Fix Issue #2050 with dedicated window.
-                  ((window-dedicated-p
-                    (setq prev-win (previous-window (selected-window) 1)))
+                  ((and (window-dedicated-p
+                         (setq prev-win (previous-window (selected-window) 1)))
+                        (not (eq split 'never)))
                    (with-helm-after-update-hook
                      (and (window-live-p helm-persistent-action-display-window)
                           (delete-window helm-persistent-action-display-window)))
@@ -6429,14 +6429,14 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                   (cur-win)
                   (t prev-win))))))
 
-(defun helm-select-persistent-action-window (&optional split-onewindow)
+(cl-defun helm-select-persistent-action-window (&key split)
   "Select the window that will be used for persistent action.
 See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
   (select-window (get-buffer-window (helm-buffer-get)))
   (prog1
       (select-window
        (setq minibuffer-scroll-window
-             (helm-persistent-action-display-window split-onewindow)))
+             (helm-persistent-action-display-window :split split)))
     (helm-log "Selected window is %S" minibuffer-scroll-window)))
 
 ;;; Scrolling - recentering
