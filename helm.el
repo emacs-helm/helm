@@ -6422,7 +6422,10 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
                    (with-helm-after-update-hook
                      (and (window-live-p helm-persistent-action-display-window)
                           (delete-window helm-persistent-action-display-window)))
-                   (split-window))
+                   ;; If next-window is usable use it, otherwise split
+                   ;; the helm window.
+                   (let ((nw (next-window (selected-window) 1)))
+                     (if (eql nw prev-win) (split-window) nw)))
                   ((window-dedicated-p
                     (setq cur-win (get-buffer-window helm-current-buffer)))
                    (previous-window (selected-window) 1))
