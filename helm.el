@@ -526,7 +526,8 @@ handle this."
 
 (defcustom helm-always-two-windows nil
   "When non-`nil' helm uses two windows in this frame.
-To display `helm-buffer' in one window and `helm-current-buffer'
+
+I.e. `helm-buffer' in one window and `helm-current-buffer'
 in the other.
 
 Note: this has no effect when `helm-split-window-inside-p' is non-`nil',
