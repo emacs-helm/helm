@@ -6332,8 +6332,9 @@ Possible values are 'left 'right 'below or 'above."
 (defun helm-initialize-persistent-action ()
   (set (make-local-variable 'helm-persistent-action-display-window) nil))
 
-(cl-defun helm-execute-persistent-action (&optional attr)
+(cl-defun helm-execute-persistent-action (&optional attr split)
   "Perform the associated action ATTR without quitting helm.
+
 Arg ATTR default will be `persistent-action' or `persistent-action-if'
 if unspecified depending on what's found in source, but it can be
 anything else.
@@ -6344,7 +6345,8 @@ in `helm-source'.
 When `helm-full-frame' is non-`nil', and
 `helm-buffer' is displayed in only one window, the helm window is
 split to display `helm-select-persistent-action-window' in other
-window to maintain visibility."
+window to maintain visibility.  The argument SPLIT can be used to
+force splitting inconditionally, it is unused actually."
   (interactive)
   (with-helm-alive-p
     (let ((source (helm-get-current-source)))
@@ -6378,7 +6380,8 @@ window to maintain visibility."
               (save-selected-window
                 (if no-split
                     (helm-select-persistent-action-window :split 'never)
-                  (helm-select-persistent-action-window :split helm-onewindow-p))
+                  (helm-select-persistent-action-window
+                   :split (or split helm-onewindow-p)))
                 (helm-log "current-buffer = %S" (current-buffer))
                 (let ((helm-in-persistent-action t)
                       (same-window-regexps '("."))
@@ -6404,7 +6407,10 @@ window to maintain visibility."
 
 (cl-defun helm-persistent-action-display-window (&key split)
   "Return the window that will be used for persistent action.
-If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
+If SPLIT is `t' window is split in persistent action, if it has the
+special symbol `never' don't split, if it is `nil' normally don't
+split but this may happen in case of dedicated-windows or unsuitable
+window to display persistent action buffer."
   (with-helm-window
     (let (prev-win cur-win)
       (setq helm-persistent-action-display-window
@@ -6434,7 +6440,7 @@ If SPLIT-ONEWINDOW is non-`nil' window is split in persistent action."
 
 (cl-defun helm-select-persistent-action-window (&key split)
   "Select the window that will be used for persistent action.
-See `helm-persistent-action-display-window' for how to use SPLIT-ONEWINDOW."
+See `helm-persistent-action-display-window' for how to use SPLIT."
   (select-window (get-buffer-window (helm-buffer-get)))
   (prog1
       (select-window
