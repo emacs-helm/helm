@@ -1034,14 +1034,15 @@ See `helm-elisp-show-help'."
                                    ;; helm-current-buffer but it may
                                    ;; be another buffer when helm have
                                    ;; been started from a dedicated window.
-                                   (if helm-use-frame-when-dedicated-window
+                                   (if helm--buffer-in-new-frame-p
                                        helm-current-buffer
                                      helm-persistent-action-window-buffer)))
               (helm-attrset 'help-running-p nil))
             ;; Force running update hook to may be delete
             ;; helm-persistent-action-display-window, this is done in
             ;; helm-persistent-action-display-window (the function). 
-            (helm-update (regexp-quote (helm-get-selection))))
+            (unless helm--buffer-in-new-frame-p
+              (helm-update (regexp-quote (helm-get-selection)))))
            (t
             (if name
                 (funcall fun candidate name)
