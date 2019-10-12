@@ -1037,7 +1037,11 @@ See `helm-elisp-show-help'."
                                    (if helm-use-frame-when-dedicated-window
                                        helm-current-buffer
                                      helm-persistent-action-window-buffer)))
-              (helm-attrset 'help-running-p nil)))
+              (helm-attrset 'help-running-p nil))
+            ;; Force running update hook to may be delete
+            ;; helm-persistent-action-display-window, this is done in
+            ;; helm-persistent-action-display-window (the function). 
+            (helm-update (regexp-quote (helm-get-selection))))
            (t
             (if name
                 (funcall fun candidate name)
