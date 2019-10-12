@@ -1612,6 +1612,11 @@ to reuse the same frame parameters as the previous helm session just
 like resume would do.")
 (defvar helm--current-buffer-narrowed nil)
 (defvar helm--suspend-update-interactive-flag nil)
+(defvar helm-persistent-action-window-buffer nil
+  "[INTERNAL] Store the buffer where helm is started.
+It is generally `helm-current-buffer', but when this one is displayed
+in a dedicated buffer, helm can't start in this window and use another
+window handling a buffer, it is this one we store.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2908,12 +2913,6 @@ frame configuration as per `helm-save-configuration-functions'."
                          ;; side-effects, not for x-focus-frame.
                          ((symbol-function 'x-focus-frame) #'ignore))
                  (select-frame-set-input-focus frame))))))
-
-(defvar helm-persistent-action-window-buffer nil
-  "[INTERNAL] Store the buffer where helm is started.
-It is generally `helm-current-buffer', but when this one is displayed
-in a dedicated buffer, helm can't start in this window and use another
-window handling a buffer, it is this one we store.")
 
 (defun helm-split-window-default-fn (window)
   "Default function to split windows before displaying `helm-buffer'.
