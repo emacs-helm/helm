@@ -3045,8 +3045,8 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                  (not (minibufferp helm-current-buffer))
                  (not helm-split-window-inside-p)
                  ;; Prevent deleting OW only when helm-current-buffer
-                 ;; is strongly dedicated.
-                 (or (null dedicated-p) (eq dedicated-p 'soft)))
+                 ;; is "strongly" dedicated.
+                 (null (eq dedicated-p t)))
         (delete-other-windows))
       (display-buffer
        buffer `(,helm-default-display-buffer-functions
