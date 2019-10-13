@@ -78,12 +78,12 @@ BIN=${PREFIX}bin/
 DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
 install:
 	test -d ${DESTDIR} || mkdir ${DESTDIR}
-	rm -vf ${DESTDIR}*.el
-	rm -vf ${DESTDIR}*.elc
-	cp -vf *.el $(DESTDIR)
-	cp -vf *.elc $(DESTDIR)
-	cp -vf helm-autoloads.el $(DESTDIR)
-	cp -vf emacs-helm.sh $(DESTDIR)
+	rm -f ${DESTDIR}*.el
+	rm -f ${DESTDIR}*.elc
+	cp -f *.el $(DESTDIR)
+	cp -f *.elc $(DESTDIR)
+	cp -f helm-autoloads.el $(DESTDIR)
+	cp -f emacs-helm.sh $(DESTDIR)
 	ln -fs ${DESTDIR}emacs-helm.sh ${BIN}helm
 uninstall:
 	rm -vf ${DESTDIR}*.elc
