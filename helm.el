@@ -3033,7 +3033,7 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
   (let (pop-up-frames
         (dedicated-p (window-dedicated-p
                       (get-buffer-window helm-current-buffer))))
-    (if (and (not dedicated-p)
+    (if (and (null (eq dedicated-p t))
              (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
                  (and (eq helm-split-window-default-side 'same)
                       (one-window-p t))))
