@@ -553,7 +553,7 @@ set to `other'."
 
 (defcustom helm-default-display-buffer-functions nil
   "Action functions to pass to `display-buffer'.
-See (info \"(elisp) Display Action Functions\").
+See (info \"(elisp) Action Functions for Buffer Display\").
 
 Have no effect when `helm-always-two-windows' is non-nil and may
 override other settings like `helm-split-window-inside-p'."
@@ -562,7 +562,7 @@ override other settings like `helm-split-window-inside-p'."
 
 (defcustom helm-default-display-buffer-alist nil
   "Additional alist to pass to `display-buffer' action.
-See (info \"(elisp) Display Action Functions\").
+See (info \"(elisp) Action Alists for Buffer Display\").
 
 Have no effect when `helm-always-two-windows' is non-nil and may
 override other settings like `helm-split-window-inside-p'.
