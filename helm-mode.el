@@ -428,6 +428,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             header-name
                             candidates-in-buffer
                             match-part
+                            match-dynamic
                             exec-when-only-one
                             quit-when-no-cand
                             (volatile t)
@@ -530,6 +531,9 @@ Keys description:
 - MATCH-PART: Allow matching only one part of candidate.
   See match-part documentation in `helm-source'.
 
+- MATCH-DYNAMIC: See match-dynamic in `helm-source-sync'
+  It have no effect when used with CANDIDATES-IN-BUFFER.
+
 - ALLOW-NEST: Allow nesting this `helm-comp-read' in a helm session.
   See `helm'.
 
@@ -578,7 +582,9 @@ that use `helm-comp-read' See `helm-M-x' for example."
                             ;; `all-completions' which defeat helm
                             ;; matching functions (multi match, fuzzy
                             ;; etc...) issue #2134.
-                            collection test sort alistp "")))
+                            collection test sort alistp
+                            (if (and match-dynamic (null candidates-in-buffer))
+                                helm-pattern ""))))
                 (helm-cr-default default cands))))
            (history-get-candidates
             (lambda ()
@@ -623,6 +629,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :keymap loc-map
                   :group group
                   :mode-line mode-line
+                  :match-dynamic match-dynamic
                   :help-message help-message
                   :action action-fn
                   :volatile volatile))
