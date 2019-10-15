@@ -1366,24 +1366,17 @@ Can be used as value for `completion-in-region-function'."
                           (or (and (boundp 'prompt) prompt) "Pattern: ")
                           data
                           :name str-command
-                          :fuzzy helm-completion-in-region-fuzzy-match
                           :nomark (null crm)
                           :marked-candidates crm
                           :initial-input
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
-                                 ;; (concat (helm-mode--completion-in-region-initial-input
-                                 ;;          (helm-basename input))
-                                 ;;         init-space-suffix)
                                  (concat (helm-basename input) init-space-suffix))
                                 ((string-match "/\\'" input) nil)
                                 ((or (null require-match)
                                      (stringp require-match))
-                                 ;; (helm-mode--completion-in-region-initial-input input)
                                  input)
-                                (t ;; (concat (helm-mode--completion-in-region-initial-input input)
-                                   ;;         init-space-suffix)
-                                   (concat input init-space-suffix)))
+                                (t (concat input init-space-suffix)))
                           :buffer buf-name
                           :fc-transformer (append '(helm-cr-default-transformer)
                                                   (unless (or helm-completion-in-region-fuzzy-match
