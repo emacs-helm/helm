@@ -222,7 +222,6 @@ know what you are doing."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     (define-key map (kbd "M-RET")      'helm-cr-empty-string)
-    (define-key map (kbd "DEL")        'helm-mode-delete-char-backward-maybe)
     map)
   "Keymap for `helm-comp-read'.")
 
@@ -1276,40 +1275,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
   "Default sort function for completion-in-region."
   (sort candidates 'helm-generic-sort-fn))
 
-(defun helm-mode--completion-in-region-initial-input (str)
-  (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t))
-
-(defun helm-mode-delete-char-backward-1 ()
-  (interactive)
-  (condition-case err
-      (call-interactively 'delete-backward-char)
-    (text-read-only
-     (if (with-selected-window (minibuffer-window)
-           (not (string= (minibuffer-contents) "")))
-         (message "Trying to delete prefix completion, next hit will quit")
-       (user-error "%s" (car err))))))
-(put 'helm-mode-delete-char-backward-1 'helm-only t)
-
-(defun helm-mode-delete-char-backward-2 ()
-  (interactive)
-  (condition-case _err
-      (call-interactively 'delete-backward-char)
-    (text-read-only
-     (unless (with-selected-window (minibuffer-window)
-               (string= (minibuffer-contents) ""))
-       (with-helm-current-buffer
-         (run-with-timer 0.1 nil (lambda ()
-                                   (call-interactively 'delete-backward-char))))
-       (helm-keyboard-quit)))))
-(put 'helm-mode-delete-char-backward-2 'helm-only t)
-
-(helm-multi-key-defun helm-mode-delete-char-backward-maybe
-    "Delete char backward when text is not the prefix helm is completing against.
-First call warn user about deleting prefix completion.
-Second call delete backward char in current-buffer and quit helm completion,
-letting user starting a new completion with a new prefix."
-  '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
-
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1343,53 +1308,63 @@ Can be used as value for `completion-in-region-function'."
                (metadata (completion-metadata
                           (buffer-substring-no-properties start (point))
                           collection predicate))
-               (data (completion-all-completions
-                      (buffer-substring start end)
-                      collection
-                      predicate
-                      (- (point) start)
-                      metadata))
-               ;; `completion-all-completions' store the base-size in the last `cdr',
-               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
-               (last-data (last data))
-               (base-size (helm-aif (cdr (last data))
-                              (prog1 it
-                                (setcdr last-data nil))
-                            0))
-               (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
-                                              (string-suffix-p " " input)
-                                              (string= input ""))
-                                    " "))
                (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
                                 (helm-mode--in-file-completion-p)
                                 ;; Assume that when `afun' and `predicate' are null
                                 ;; we are in filename completion.
                                 (and (null afun) (null predicate))))
+               (pos (- (point) start))
+               (data (if (stringp collection)
+                         collection
+                       (completion-table-dynamic
+                        (lambda (_str)
+                          (let ((comps (completion-all-completions
+                                        helm-pattern
+                                        collection
+                                        predicate
+                                        pos
+                                        metadata)))
+                            (if file-comp-p
+                                (cl-loop for f in comps unless
+                                         (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                                         collect f)
+                              (if afun
+                                  (mapcar (lambda (s)
+                                            (let ((ann (funcall afun s)))
+                                              (if ann
+                                                  (cons
+                                                   (concat
+                                                    s
+                                                    (propertize
+                                                     " " 'display
+                                                     (propertize
+                                                      ann
+                                                      'face 'completions-annotations)))
+                                                   s)
+                                                s)))
+                                          comps)
+                                comps)))))))
+               ;; `completion-all-completions' store the base-size in the last `cdr',
+               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
+               ;; (last-data (last data))
+               ;; FIXME: As we don't have data we can find base-size
+               ;; anymore, find a way to catch base-size when
+               ;; computation of dynamic table happen.
+               (base-size ;; (helm-aif (cdr (last data))
+                          ;;     (prog1 it
+                          ;;       (setcdr last-data nil))
+                          ;;   0)
+                          0)
+               (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
+                                              (string-suffix-p " " input)
+                                              (string= input ""))
+                                    " "))
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
                          (helm-comp-read
                           (or (and (boundp 'prompt) prompt) "Pattern: ")
-                          (if file-comp-p
-                              (cl-loop for f in data unless
-                                       (string-match "\\`\\.\\{1,2\\}/\\'" f)
-                                       collect f)
-                            (if afun
-                                (mapcar (lambda (s)
-                                          (let ((ann (funcall afun s)))
-                                            (if ann
-                                                (cons
-                                                 (concat
-                                                  s
-                                                  (propertize
-                                                   " " 'display
-                                                   (propertize
-                                                    ann
-                                                    'face 'completions-annotations)))
-                                                 s)
-                                              s)))
-                                        data)
-                              data))
+                          data
                           :name str-command
                           :fuzzy helm-completion-in-region-fuzzy-match
                           :nomark (null crm)
@@ -1397,20 +1372,24 @@ Can be used as value for `completion-in-region-function'."
                           :initial-input
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
-                                 (concat (helm-mode--completion-in-region-initial-input
-                                          (helm-basename input))
-                                         init-space-suffix))
+                                 ;; (concat (helm-mode--completion-in-region-initial-input
+                                 ;;          (helm-basename input))
+                                 ;;         init-space-suffix)
+                                 (concat (helm-basename input) init-space-suffix))
                                 ((string-match "/\\'" input) nil)
                                 ((or (null require-match)
                                      (stringp require-match))
-                                 (helm-mode--completion-in-region-initial-input input))
-                                (t (concat (helm-mode--completion-in-region-initial-input input)
-                                           init-space-suffix)))
+                                 ;; (helm-mode--completion-in-region-initial-input input)
+                                 input)
+                                (t ;; (concat (helm-mode--completion-in-region-initial-input input)
+                                   ;;         init-space-suffix)
+                                   (concat input init-space-suffix)))
                           :buffer buf-name
                           :fc-transformer (append '(helm-cr-default-transformer)
                                                   (unless (or helm-completion-in-region-fuzzy-match
                                                               (null helm-completion-in-region-default-sort-fn))
                                                     (list helm-completion-in-region-default-sort-fn)))
+                          :match-dynamic t
                           :exec-when-only-one t
                           :quit-when-no-cand
                           (lambda ()
