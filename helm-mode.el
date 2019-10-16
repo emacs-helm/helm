@@ -1313,7 +1313,6 @@ Can be used as value for `completion-in-region-function'."
                                 ;; Assume that when `afun' and `predicate' are null
                                 ;; we are in filename completion.
                                 (and (null afun) (null predicate))))
-               (pos (- (point) start))
                (data (if (stringp collection)
                          collection
                        (completion-table-dynamic
@@ -1322,7 +1321,7 @@ Can be used as value for `completion-in-region-function'."
                                         helm-pattern
                                         collection
                                         predicate
-                                        pos
+                                        (length helm-pattern)
                                         metadata)))
                             (if file-comp-p
                                 (cl-loop for f in comps unless
@@ -1355,10 +1354,6 @@ Can be used as value for `completion-in-region-function'."
                           ;;       (setcdr last-data nil))
                           ;;   0)
                           0)
-               (init-space-suffix (unless (or helm-completion-in-region-fuzzy-match
-                                              (string-suffix-p " " input)
-                                              (string= input ""))
-                                    " "))
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
@@ -1371,17 +1366,18 @@ Can be used as value for `completion-in-region-function'."
                           :initial-input
                           (cond ((and file-comp-p
                                       (not (string-match "/\\'" input)))
-                                 (concat (helm-basename input) init-space-suffix))
+                                 (helm-basename input))
                                 ((string-match "/\\'" input) nil)
                                 ((or (null require-match)
                                      (stringp require-match))
                                  input)
-                                (t (concat input init-space-suffix)))
+                                (t input))
                           :buffer buf-name
                           :fc-transformer (append '(helm-cr-default-transformer)
-                                                  (unless (or helm-completion-in-region-fuzzy-match
-                                                              (null helm-completion-in-region-default-sort-fn))
-                                                    (list helm-completion-in-region-default-sort-fn)))
+                                                  (list helm-completion-in-region-default-sort-fn))
+                          ;; (unless (or helm-completion-in-region-fuzzy-match
+                          ;; (null helm-completion-in-region-default-sort-fn))
+                          ;; (list helm-completion-in-region-default-sort-fn)))
                           :match-dynamic t
                           :exec-when-only-one t
                           :quit-when-no-cand
