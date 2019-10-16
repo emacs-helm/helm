@@ -1322,7 +1322,9 @@ Can be used as value for `completion-in-region-function'."
                                         collection
                                         predicate
                                         (length helm-pattern)
-                                        metadata)))
+                                        (completion-metadata
+                                         helm-pattern
+                                         collection predicate))))
                             (if file-comp-p
                                 (cl-loop for f in comps unless
                                          (string-match "\\`\\.\\{1,2\\}/\\'" f)
