@@ -1377,9 +1377,6 @@ Can be used as value for `completion-in-region-function'."
                           :buffer buf-name
                           :fc-transformer (append '(helm-cr-default-transformer)
                                                   (list helm-completion-in-region-default-sort-fn))
-                          ;; (unless (or helm-completion-in-region-fuzzy-match
-                          ;; (null helm-completion-in-region-default-sort-fn))
-                          ;; (list helm-completion-in-region-default-sort-fn)))
                           :match-dynamic t
                           :exec-when-only-one t
                           :quit-when-no-cand
