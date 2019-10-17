@@ -323,7 +323,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
                        minibuffer-completing-file-name)
-                  (cl-loop for f in (funcall collection input test t)
+                  (cl-loop for f in (all-completions input collection test)
                            unless (member f '("./" "../"))
                            if (string-match helm--url-regexp input)
                            collect f
@@ -332,7 +332,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                             (helm-basedir input))
                                            f)))
                  ((functionp collection)
-                  (funcall collection input test t))
+                  (all-completions input collection test))
                  ((and alistp (null test)) collection)
                  ;; Next test ensure circular objects are removed
                  ;; with `all-completions' (Issue #1530).
