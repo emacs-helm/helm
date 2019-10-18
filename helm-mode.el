@@ -1330,10 +1330,13 @@ Can be used as value for `completion-in-region-function'."
                                         (length str)
                                         metadata)))
                             (if file-comp-p
+                                ;; Filter out dot files in file completion.
                                 (cl-loop for f in comps unless
                                          (string-match "\\`\\.\\{1,2\\}/\\'" f)
                                          collect f)
                               (if afun
+                                  ;; Add annotation at end of
+                                  ;; candidate if needed.
                                   (mapcar (lambda (s)
                                             (let ((ann (funcall afun s)))
                                               (if ann
