@@ -619,8 +619,10 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :multiline multiline
                   :header-name header-name
                   :filtered-candidate-transformer
-                  (append (helm-mklist fc-transformer)
-                          '(helm-cr-default-transformer))
+                  (let ((transformers (helm-mklist fc-transformer)))
+                    (append transformers
+                            (unless (member 'helm-cr-default-transformer transformers)
+                              '(helm-cr-default-transformer))))
                   :requires-pattern requires-pattern
                   :persistent-action persistent-action
                   :persistent-help persistent-help
@@ -1380,8 +1382,10 @@ Can be used as value for `completion-in-region-function'."
                                  input)
                                 (t input))
                           :buffer buf-name
-                          :fc-transformer (append '(helm-cr-default-transformer)
-                                                  (list helm-completion-in-region-default-sort-fn))
+                          :fc-transformer
+                          ;; Ensure sort fn is at the end.
+                          (append '(helm-cr-default-transformer)
+                                  (list helm-completion-in-region-default-sort-fn))
                           :match-dynamic t
                           :exec-when-only-one t
                           :quit-when-no-cand
