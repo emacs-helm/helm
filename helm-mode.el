@@ -1287,7 +1287,9 @@ Can be used as value for `completion-in-region-function'."
      :around #'helm-mode--advice-lisp--local-variables)
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
-               (input (buffer-substring-no-properties start end))
+               (minibuffer-completion-table collection)
+               (minibuffer-completion-predicate predicate)
+               (input (buffer-substring start end))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
                (str-command (helm-symbol-name current-command))
@@ -1306,7 +1308,7 @@ Can be used as value for `completion-in-region-function'."
                ;; See Issue #407.
                (afun (plist-get completion-extra-properties :annotation-function))
                (metadata (completion-metadata
-                          (buffer-substring-no-properties start (point))
+                          (buffer-substring start (point))
                           collection predicate))
                (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
                                 (helm-mode--in-file-completion-p)
@@ -1316,15 +1318,17 @@ Can be used as value for `completion-in-region-function'."
                (data (if (stringp collection)
                          collection
                        (completion-table-dynamic
-                        (lambda (_str)
+                        (lambda (str)
                           (let ((comps (completion-all-completions
-                                        helm-pattern
+                                        ;; `helm-comp-read-get-candidates'
+                                        ;; set input to `helm-pattern'
+                                        ;; so no need to pass
+                                        ;; `helm-pattern' directly here.
+                                        str
                                         collection
                                         predicate
-                                        (length helm-pattern)
-                                        (completion-metadata
-                                         helm-pattern
-                                         collection predicate))))
+                                        (length str)
+                                        metadata)))
                             (if file-comp-p
                                 (cl-loop for f in comps unless
                                          (string-match "\\`\\.\\{1,2\\}/\\'" f)
