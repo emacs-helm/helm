@@ -323,7 +323,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
                        minibuffer-completing-file-name)
-                  (cl-loop for f in (all-completions input collection test)
+                  (cl-loop for f in (funcall input collection test)
                            unless (member f '("./" "../"))
                            if (string-match helm--url-regexp input)
                            collect f
@@ -332,7 +332,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                             (helm-basedir input))
                                            f)))
                  ((functionp collection)
-                  (all-completions input collection test))
+                  (funcall collection input test t))
                  ((and alistp (null test)) collection)
                  ;; Next test ensure circular objects are removed
                  ;; with `all-completions' (Issue #1530).
@@ -1324,45 +1324,48 @@ Can be used as value for `completion-in-region-function'."
                          collection
                        (completion-table-dynamic
                         (lambda (str)
-                          (let* ((comps (completion-all-completions
-                                         ;; `helm-comp-read-get-candidates'
-                                         ;; set input to `helm-pattern'
-                                         ;; so no need to pass
-                                         ;; `helm-pattern' directly here.
-                                         str
-                                         collection
-                                         predicate
-                                         (length str)
-                                         metadata))
-                                 (last-data (last comps)))
-                            (setq base-size
-                                  (helm-aif (cdr last-data)
-                                      (prog1 (or base-size it)
-                                        (setcdr last-data nil))
-                                    0))
-                            (if file-comp-p
-                                ;; Filter out dot files in file completion.
-                                (cl-loop for f in comps unless
-                                         (string-match "\\`\\.\\{1,2\\}/\\'" f)
-                                         collect f)
-                              (if afun
-                                  ;; Add annotation at end of
-                                  ;; candidate if needed.
-                                  (mapcar (lambda (s)
-                                            (let ((ann (funcall afun s)))
-                                              (if ann
-                                                  (cons
-                                                   (concat
-                                                    s
-                                                    (propertize
-                                                     " " 'display
-                                                     (propertize
-                                                      ann
-                                                      'face 'completions-annotations)))
-                                                   s)
-                                                s)))
-                                          comps)
-                                comps)))))))
+                          ;; Force `completion-table-dynamic' to NOT
+                          ;; use `all-completions'.
+                          (lambda (_string _predicate _action)
+                            (let* ((comps (completion-all-completions
+                                           ;; `helm-comp-read-get-candidates'
+                                           ;; set input to `helm-pattern'
+                                           ;; so no need to pass
+                                           ;; `helm-pattern' directly here.
+                                           str
+                                           collection
+                                           predicate
+                                           (length str)
+                                           metadata))
+                                   (last-data (last comps)))
+                              (setq base-size
+                                    (helm-aif (cdr last-data)
+                                        (prog1 (or base-size it)
+                                          (setcdr last-data nil))
+                                      0))
+                              (if file-comp-p
+                                  ;; Filter out dot files in file completion.
+                                  (cl-loop for f in comps unless
+                                           (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                                           collect f)
+                                (if afun
+                                    ;; Add annotation at end of
+                                    ;; candidate if needed.
+                                    (mapcar (lambda (s)
+                                              (let ((ann (funcall afun s)))
+                                                (if ann
+                                                    (cons
+                                                     (concat
+                                                      s
+                                                      (propertize
+                                                       " " 'display
+                                                       (propertize
+                                                        ann
+                                                        'face 'completions-annotations)))
+                                                     s)
+                                                  s)))
+                                            comps)
+                                  comps))))))))
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
