@@ -1315,20 +1315,29 @@ Can be used as value for `completion-in-region-function'."
                                 ;; Assume that when `afun' and `predicate' are null
                                 ;; we are in filename completion.
                                 (and (null afun) (null predicate))))
+               ;; `completion-all-completions' store the base-size in the last `cdr',
+               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
+               base-size
                (data (if (stringp collection)
                          collection
                        (completion-table-dynamic
                         (lambda (str)
-                          (let ((comps (completion-all-completions
-                                        ;; `helm-comp-read-get-candidates'
-                                        ;; set input to `helm-pattern'
-                                        ;; so no need to pass
-                                        ;; `helm-pattern' directly here.
-                                        str
-                                        collection
-                                        predicate
-                                        (length str)
-                                        metadata)))
+                          (let* ((comps (completion-all-completions
+                                         ;; `helm-comp-read-get-candidates'
+                                         ;; set input to `helm-pattern'
+                                         ;; so no need to pass
+                                         ;; `helm-pattern' directly here.
+                                         str
+                                         collection
+                                         predicate
+                                         (length str)
+                                         metadata))
+                                 (last-data (last comps)))
+                            (setq base-size
+                                  (helm-aif (cdr last-data)
+                                      (prog1 (or base-size it)
+                                        (setcdr last-data nil))
+                                    0))
                             (if file-comp-p
                                 ;; Filter out dot files in file completion.
                                 (cl-loop for f in comps unless
@@ -1352,17 +1361,6 @@ Can be used as value for `completion-in-region-function'."
                                                 s)))
                                           comps)
                                 comps)))))))
-               ;; `completion-all-completions' store the base-size in the last `cdr',
-               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
-               ;; (last-data (last data))
-               ;; FIXME: As we don't have data we can find base-size
-               ;; anymore, find a way to catch base-size when
-               ;; computation of dynamic table happen.
-               (base-size ;; (helm-aif (cdr (last data))
-                          ;;     (prog1 it
-                          ;;       (setcdr last-data nil))
-                          ;;   0)
-                          0)
                ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
