@@ -1441,29 +1441,25 @@ Can be used as value for `completion-in-region-function'."
                                    0))
                            (helm-completion-in-region--comps
                             comps afun file-comp-p))
-                       (completion-table-dynamic
-                        (lambda (str)
-                          ;; Force `completion-table-dynamic' to NOT
-                          ;; use `all-completions'.
-                          (lambda (_string _predicate _action)
-                            (let* ((comps (completion-all-completions
-                                           ;; `helm-comp-read-get-candidates'
-                                           ;; set input to `helm-pattern'
-                                           ;; so no need to pass
-                                           ;; `helm-pattern' directly here.
-                                           str
-                                           collection
-                                           predicate
-                                           (length str)
-                                           metadata))
-                                   (last-data (last comps)))
-                              (setq base-size
-                                    (helm-aif (cdr last-data)
-                                        (prog1 (or base-size it)
-                                          (setcdr last-data nil))
-                                      0))
-                              (helm-completion-in-region--comps
-                               comps afun file-comp-p)))))))
+                       (lambda (str _predicate _action)
+                         (let* ((comps (completion-all-completions
+                                        ;; `helm-comp-read-get-candidates'
+                                        ;; set input to `helm-pattern'
+                                        ;; so no need to pass
+                                        ;; `helm-pattern' directly here.
+                                        str
+                                        collection
+                                        predicate
+                                        (length str)
+                                        metadata))
+                                (last-data (last comps)))
+                           (setq base-size
+                                 (helm-aif (cdr last-data)
+                                     (prog1 (or base-size it)
+                                       (setcdr last-data nil))
+                                   0))
+                           (helm-completion-in-region--comps
+                            comps afun file-comp-p)))))
                (result (if (stringp data)
                            data
                          (helm-comp-read
