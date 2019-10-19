@@ -1360,6 +1360,15 @@ letting user starting a new completion with a new prefix."
                        (if (and scr1 scr2)
                            (> scr1 scr2)
                          (helm-generic-sort-fn s1 s2))))))
+(defun helm-completion-in-region--fix-completion-styles ()
+  "Use a simple settings for `completion-styles' when using helm styles.
+Returns a suitable value for `completion-styles'."
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      '(basic partial-completion emacs22)
+    (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
+             for style in completion-styles
+             when (member style all-styles)
+             collect style)))
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
@@ -1382,6 +1391,7 @@ Can be used as value for `completion-in-region-function'."
                       ((eq helm-completion-style 'helm-fuzzy)
                        nil)
                       (t helm-completion-in-region-default-sort-fn)))
+               (completion-styles (helm-completion-in-region--fix-completion-styles))
                (input (buffer-substring start end))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
