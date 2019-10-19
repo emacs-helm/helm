@@ -1360,6 +1360,7 @@ letting user starting a new completion with a new prefix."
                        (if (and scr1 scr2)
                            (> scr1 scr2)
                          (helm-generic-sort-fn s1 s2))))))
+
 (defun helm-completion-in-region--fix-completion-styles ()
   "Use a simple setting for `completion-styles' when using helm styles.
 Returns a suitable value for `completion-styles'."
