@@ -1426,22 +1426,7 @@ Can be used as value for `completion-in-region-function'."
                ;; `completion-all-completions' store the base-size in the last `cdr',
                ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                base-size
-               (data (if (memq helm-completion-style '(helm helm-fuzzy))
-                         (let* ((comps (completion-all-completions
-                                        (buffer-substring start end)
-                                        collection
-                                        predicate
-                                        (- (point) start)
-                                        metadata))
-                                (last-data (last comps)))
-                           (setq base-size
-                                 (helm-aif (cdr last-data)
-                                     (prog1 it
-                                       (setcdr last-data nil))
-                                   0))
-                           (helm-completion-in-region--comps
-                            comps afun file-comp-p))
-                       (lambda (str _predicate _action)
+               (compfn (lambda (str _predicate _action)
                          (let* ((comps (completion-all-completions
                                         ;; `helm-comp-read-get-candidates'
                                         ;; set input to `helm-pattern'
@@ -1459,7 +1444,10 @@ Can be used as value for `completion-in-region-function'."
                                        (setcdr last-data nil))
                                    0))
                            (helm-completion-in-region--comps
-                            comps afun file-comp-p)))))
+                            comps afun file-comp-p))))
+               (data (if (memq helm-completion-style '(helm helm-fuzzy))
+                         (funcall compfn (buffer-substring start end) nil nil)
+                       compfn))
                (result (if (stringp data)
                            data
                          (helm-comp-read
