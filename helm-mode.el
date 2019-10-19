@@ -1464,10 +1464,10 @@ Can be used as value for `completion-in-region-function'."
                                       0))
                               (helm-completion-in-region--comps
                                comps afun file-comp-p)))))))
-               ;; Completion-at-point and friends have no prompt.
                (result (if (stringp data)
                            data
                          (helm-comp-read
+                          ;; Completion-at-point and friends have no prompt.
                           (or (and (boundp 'prompt) prompt) "Pattern: ")
                           data
                           :name str-command
