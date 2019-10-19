@@ -1352,6 +1352,15 @@ Second call delete backward char in current-buffer and quit helm completion,
 letting user starting a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
+(defun helm-completion-in-region-sort-flex-candidates (candidates _source)
+  "Sort CANDIDATES computed with flex completion-style."
+  (sort candidates (lambda (s1 s2)
+                     (let ((scr1 (get-text-property 0 'completion-score s1))
+                           (scr2 (get-text-property 0 'completion-score s2)))
+                       (if (and scr1 scr2)
+                           (> scr1 scr2)
+                         (helm-generic-sort-fn s1 s2))))))
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1366,6 +1375,13 @@ Can be used as value for `completion-in-region-function'."
         (let* ((enable-recursive-minibuffers t)
                (minibuffer-completion-table collection)
                (minibuffer-completion-predicate predicate)
+               (helm-completion-in-region-default-sort-fn
+                (cond ((and (eq helm-completion-style 'emacs)
+                            (memq 'flex completion-styles))
+                       #'helm-completion-in-region-sort-flex-candidates)
+                      ((eq helm-completion-style 'helm-fuzzy)
+                       nil)
+                      (t helm-completion-in-region-default-sort-fn)))
                (input (buffer-substring start end))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
@@ -1462,9 +1478,7 @@ Can be used as value for `completion-in-region-function'."
                           :fc-transformer
                           ;; Ensure sort fn is at the end.
                           (append '(helm-cr-default-transformer)
-                                  (unless (or (eq helm-completion-style 'helm-fuzzy)
-                                              (null helm-completion-in-region-default-sort-fn))
-                                    (list helm-completion-in-region-default-sort-fn)))
+                                  (list helm-completion-in-region-default-sort-fn))
                           :match-dynamic (eq helm-completion-style 'emacs)
                           :fuzzy (eq helm-completion-style 'helm-fuzzy)
                           :exec-when-only-one t
