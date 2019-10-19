@@ -1371,6 +1371,7 @@ Returns a suitable value for `completion-styles'."
              when (member style all-styles)
              collect style)))
 
+;; FIXME: Figure out how to get a convenient sort function from table?
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
