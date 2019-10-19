@@ -1478,7 +1478,8 @@ Can be used as value for `completion-in-region-function'."
                           :fc-transformer
                           ;; Ensure sort fn is at the end.
                           (append '(helm-cr-default-transformer)
-                                  (list helm-completion-in-region-default-sort-fn))
+                                  (and helm-completion-in-region-default-sort-fn
+                                       (list helm-completion-in-region-default-sort-fn)))
                           :match-dynamic (eq helm-completion-style 'emacs)
                           :fuzzy (eq helm-completion-style 'helm-fuzzy)
                           :exec-when-only-one t
