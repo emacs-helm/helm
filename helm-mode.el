@@ -222,13 +222,20 @@ know what you are doing."
 
 (defcustom helm-completion-style 'helm
   "Style of completion to use in `completion-in-region'.
-This affect `completion-at-point' and friends, NOT `completing-read'.
-There is three possible value to use:  helm, helm-fuzzy and emacs.
-When set to helm, use multi match regular helm completion.
-When set to helm-fuzzy, use fuzzy matching, note that as usual when
-entering a space helm switch to multi matching mode.
-When set to emacs use regular emacs completion according to
-`completion-styles'."
+
+This affect only `completion-at-point' and friends, NOT
+`completing-read' nor other helm commands.
+
+There is three possible value to use:
+- helm, use multi match regular helm completion.
+- helm-fuzzy, use fuzzy matching, note that as usual when
+  entering a space helm switch to multi matching mode.
+- emacs, use regular emacs completion according to
+  `completion-styles', note that in this case you loose helm matching
+  capabilities.
+
+Please use custom interface or `customize-set-variable' to set this,
+NOT `setq'."
   :group 'helm-mode
   :type '(choice (const :tag "Emacs" emacs)
                  (const :tag "Helm" helm)
