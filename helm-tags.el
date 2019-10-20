@@ -329,9 +329,11 @@ Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.
                 (helm-etags-build-source)))
         (helm :sources 'helm-source-etags-select
               :keymap helm-etags-map
-              :default (if helm-etags-fuzzy-match
+              :default (if (or helm-etags-fuzzy-match
+                               (and (eq major-mode 'haskell-mode)
+                                    (string-match "[']\\'" str)))
                            str
-                           (list (concat "\\_<" str "\\_>") str))
+                         (list (concat "\\_<" str "\\_>") str))
               :buffer "*helm etags*"))))
 
 (provide 'helm-tags)
