@@ -1371,7 +1371,6 @@ Returns a suitable value for `completion-styles'."
              when (member style all-styles)
              collect style)))
 
-;; FIXME: Figure out how to get a convenient sort function from table?
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1388,9 +1387,11 @@ Can be used as value for `completion-in-region-function'."
                (minibuffer-completion-predicate predicate)
                (helm-completion-in-region-default-sort-fn
                 (cond ((and (eq helm-completion-style 'emacs)
+                            ;; Emacs-27 only.
                             (memq 'flex completion-styles))
                        #'helm-completion-in-region-sort-flex-candidates)
                       ((or (eq helm-completion-style 'helm-fuzzy)
+                           ;; Sly only.
                            (memq 'backend completion-styles))
                        nil)
                       (t helm-completion-in-region-default-sort-fn)))
