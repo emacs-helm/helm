@@ -344,7 +344,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
                        minibuffer-completing-file-name)
-                  (cl-loop for f in (funcall input collection test)
+                  (cl-loop for f in (funcall collection input test)
                            unless (member f '("./" "../"))
                            if (string-match helm--url-regexp input)
                            collect f
