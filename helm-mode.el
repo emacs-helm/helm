@@ -1502,26 +1502,29 @@ Can be used as value for `completion-in-region-function'."
                              0.01 nil
                              (lambda ()
                                (message "[No matches]")))
-                            t) ; exit minibuffer immediately.
+                            t)          ; exit minibuffer immediately.
                           :must-match require-match))))
-          (cond ((stringp result)
-                 (choose-completion-string
-                  result (current-buffer)
-                  (list (+ start base-size) end)
-                  completion-list-insert-choice-function))
-                ((consp result) ; crm.
-                 (let ((beg (+ start base-size))
-                       (sep ","))
-                   ;; Try to find a default separator.
-                   (save-excursion
-                     (goto-char beg)
-                     (when (looking-back crm-separator (1- (point)))
-                       (setq sep (match-string 0))))
-                   (funcall completion-list-insert-choice-function
-                            beg end (mapconcat 'identity result sep))))
-                (t nil)))
+          (helm-completion-in-region--insert-result result start end base-size))
       (advice-remove 'lisp--local-variables
                      #'helm-mode--advice-lisp--local-variables))))
+
+(defun helm-completion-in-region--insert-result (result start end base-size)
+  (cond ((stringp result)
+         (choose-completion-string
+          result (current-buffer)
+          (list (+ start base-size) end)
+          completion-list-insert-choice-function))
+        ((consp result)                 ; crm.
+         (let ((beg (+ start base-size))
+               (sep ","))
+           ;; Try to find a default separator.
+           (save-excursion
+             (goto-char beg)
+             (when (looking-back crm-separator (1- (point)))
+               (setq sep (match-string 0))))
+           (funcall completion-list-insert-choice-function
+                    beg end (mapconcat 'identity result sep))))
+        (t nil)))
 
 (defun helm-mode--in-file-completion-p ()
   (with-helm-current-buffer
