@@ -1390,8 +1390,6 @@ Can be used as value for `completion-in-region-function'."
      :around #'helm-mode--advice-lisp--local-variables)
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
-               (minibuffer-completion-table collection)
-               (minibuffer-completion-predicate predicate)
                (helm-completion-in-region-default-sort-fn
                 (cond ((and (eq helm-completion-style 'emacs)
                             ;; Emacs-27 only.
