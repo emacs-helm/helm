@@ -3878,8 +3878,9 @@ is helm-source-find-files."
       (let* ((beg (and (use-region-p) (region-beginning)))
              (end (and (use-region-p) (region-end)))
              (str (and beg end (buffer-substring-no-properties beg end)))
-             (ffap (or (and helm-ff-guess-ffap-urls ffap-url-regexp
-                            (ffap-fixup-url (ffap-url-at-point)))
+             (ffap (or (helm-aand helm-ff-guess-ffap-urls ffap-url-regexp
+                                  (ffap-fixup-url (ffap-url-at-point))
+                                  (and (string-match ffap-url-regexp it) it))
                        (ffap-file-at-point))))
         ;; Workaround emacs bugs:
         ;; When the region is active and a file is detected
