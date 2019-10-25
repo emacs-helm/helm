@@ -226,13 +226,17 @@ know what you are doing."
 This affect only `completion-at-point' and friends, NOT
 `completing-read' nor other helm commands.
 
+NB: This have nothing to do with `completion-styles', it is independent to
+helm.
+
 There is three possible value to use:
 - helm, use multi match regular helm completion.
 - helm-fuzzy, use fuzzy matching, note that as usual when
   entering a space helm switch to multi matching mode.
 - emacs, use regular emacs completion according to
-  `completion-styles', note that in this case you loose helm matching
-  capabilities.
+  `completion-styles', note that even in this style, helm allow using
+  multi match.  Emacs-27 provide a style called flex that can be used
+  along this helm style (see `completion-styles-alist').
 
 Please use custom interface or `customize-set-variable' to set this,
 NOT `setq'."
