@@ -1375,8 +1375,10 @@ letting user starting a new completion with a new prefix."
 (defun helm-completion-in-region-sort-flex-candidates (candidates _source)
   "Sort CANDIDATES computed with flex completion-style."
   (sort candidates (lambda (s1 s2)
-                     (let ((scr1 (get-text-property 0 'completion-score s1))
-                           (scr2 (get-text-property 0 'completion-score s2)))
+                     (let* ((str1 (if (consp s1) (car s1) s1))
+                            (str2 (if (consp s2) (car s2) s2))
+                            (scr1 (get-text-property 0 'completion-score str1))
+                            (scr2 (get-text-property 0 'completion-score str2)))
                        (if (and scr1 scr2)
                            (> scr1 scr2)
                          (helm-generic-sort-fn s1 s2))))))
