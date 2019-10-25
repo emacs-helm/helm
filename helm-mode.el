@@ -1387,6 +1387,37 @@ Returns a suitable value for `completion-styles'."
              when (member style all-styles)
              collect style)))
 
+;; Helm style
+(defun helm-completion-try-completion (string table pred point)
+  "The try completion function for `completing-styles-alist'.
+Actually do nothing."
+  (ignore string table pred point))
+
+(defun helm-completion-all-completions (string table pred point)
+  "The all completions function for `completing-styles-alist'."
+  (pcase-let ((`(,all ,_pattern ,prefix ,_suffix ,_carbounds)
+               (helm-completion--substring-all-completions
+                string table pred point)))
+    (when all
+      (nconc all (length prefix)))))
+
+(defun helm-completion--substring-all-completions (string table pred point)
+  "Collect completions from TABLE for helm completion style."
+  (let* ((init-str (if (string-match-p " " string)
+                       (car (helm-mm-split-pattern string))
+                     string))
+         (all (cl-loop for c in (all-completions init-str table pred)
+                       when (helm-mm-match c string)
+                       collect c)))
+    (list all string "" "" point)))
+
+(add-to-list 'completion-styles-alist
+             '(helm helm-completion-try-completion
+                    helm-completion-all-completions
+                    "helm completion style."))
+(add-to-list 'completion-category-defaults
+             '(helm-completion (styles . (helm))))
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1464,7 +1495,11 @@ Can be used as value for `completion-in-region-function'."
                                                      collection
                                                      predicate
                                                      (length str)
-                                                     metadata)
+                                                     (if (assq 'category metadata)
+                                                         metadata
+                                                       (append
+                                                        metadata
+                                                        '((category . helm-completion)))))
                                                 hash)))
                                   (last-data (last comps)))
                              (setq base-size
