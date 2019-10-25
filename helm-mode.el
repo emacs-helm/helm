@@ -1399,20 +1399,24 @@ Actually do nothing."
 
 (defun helm-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
-  (pcase-let ((`(,all ,_pattern ,prefix ,_suffix ,_carbounds)
-               (helm-completion--substring-all-completions
-                string table pred point)))
-    (when all
-      (nconc all (length prefix)))))
+  ;; FIXME: No need to bind all these value.
+  (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
+      (helm-completion--substring-all-completions string table pred point)
+    ;; For now (length prefix) is always == to 0.
+    (when all (nconc all (length prefix)))))
+
+(defun helm-completion--all-completions-multi (string collection predicate)
+  (all-completions "" collection (lambda (x)
+                                   (and (funcall predicate x)
+                                        (helm-mm-match (helm-stringify x) string)))))
 
 (defun helm-completion--substring-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
-  (let* ((init-str (if (string-match-p " " string)
-                       (car (helm-mm-split-pattern string))
-                     string))
-         (all (cl-loop for c in (all-completions init-str table pred)
-                       when (helm-mm-match c string)
-                       collect c)))
+  (let ((all (helm-completion--all-completions-multi string table pred)))
+    ;; FIXME: No need to return all these value (see above).
+    ;; We return prefix as an empty string, so its length value will
+    ;; be always 0, let see if there is other use cases where
+    ;; base-size needs to be something else than 0. 
     (list all string "" "" point)))
 
 (defun helm-completion--merge-metadata (metadata)
