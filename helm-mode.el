@@ -1407,11 +1407,13 @@ Actually do nothing."
     ;; For now (length prefix) is always == to 0.
     (when all (nconc all (length prefix)))))
 
-(defun helm-completion--all-completions-multi (string collection predicate)
+(defun helm-completion--all-completions-multi (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
   (all-completions "" collection (lambda (x)
-                                   (and (funcall predicate x)
-                                        (helm-mm-match (helm-stringify x) string)))))
+                                   (if predicate
+                                       (and (funcall predicate x)
+                                            (helm-mm-match (helm-stringify x) string))
+                                     (helm-mm-match (helm-stringify x) string)))))
 
 (defun helm-completion--substring-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
