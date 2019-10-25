@@ -1411,12 +1411,34 @@ Actually do nothing."
                        collect c)))
     (list all string "" "" point)))
 
-(add-to-list 'completion-styles-alist
-             '(helm helm-completion-try-completion
-                    helm-completion-all-completions
-                    "helm completion style."))
-(add-to-list 'completion-category-defaults
-             '(helm-completion (styles . (helm))))
+(defun helm-completion--merge-metadata (metadata)
+  (if (and (eq helm-completion-style 'emacs)
+           (assq 'helm-completion completion-category-defaults)
+           (assq 'helm completion-styles-alist)
+           (not (assq 'category metadata)))
+      (append
+       metadata
+       '((category . helm-completion)))
+    metadata))
+
+;; Setup completion styles for helm
+(defun helm-mode--setup-completion-styles ()
+  (cl-pushnew '(helm helm-completion-try-completion
+                     helm-completion-all-completions
+                     "helm completion style.")
+              completion-styles-alist
+              :test 'equal)
+  (cl-pushnew '(helm-completion (styles . (helm)))
+              completion-category-defaults
+              :test 'equal))
+
+(defun helm-mode--disable-completion-styles ()
+  (setq completion-styles-alist
+        (delete (assq 'helm completion-styles-alist)
+                completion-styles-alist)
+        completion-category-defaults
+        (delete (assq 'helm-completion completion-category-defaults)
+                completion-category-defaults)))
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
@@ -1462,9 +1484,10 @@ Can be used as value for `completion-in-region-function'."
                  ;; e.g "foo" => "foo <f>" where foo is a function.
                  ;; See Issue #407.
                  (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (completion-metadata
-                            (buffer-substring start (point))
-                            collection predicate))
+                 (metadata (helm-completion--merge-metadata
+                            (completion-metadata
+                             (buffer-substring start (point))
+                             collection predicate)))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
@@ -1495,11 +1518,7 @@ Can be used as value for `completion-in-region-function'."
                                                      collection
                                                      predicate
                                                      (length str)
-                                                     (if (assq 'category metadata)
-                                                         metadata
-                                                       (append
-                                                        metadata
-                                                        '((category . helm-completion)))))
+                                                     metadata)
                                                 hash)))
                                   (last-data (last comps)))
                              (setq base-size
@@ -1642,7 +1661,8 @@ Note: This mode is incompatible with Emacs23."
                           #'helm--generic-read-buffer)
             (when helm-mode-handle-completion-in-region
               (add-function :override completion-in-region-function
-                            #'helm--completion-in-region))
+                            #'helm--completion-in-region)
+              (helm-mode--setup-completion-styles))
             ;; If user have enabled ido-everywhere BEFORE enabling
             ;; helm-mode disable it and warn user about its
             ;; incompatibility with helm-mode (issue #2085).
@@ -1656,7 +1676,8 @@ Note: This mode is incompatible with Emacs23."
                 read-buffer-function     'helm--generic-read-buffer)
           (when (and (boundp 'completion-in-region-function)
                      helm-mode-handle-completion-in-region)
-            (setq completion-in-region-function #'helm--completion-in-region))
+            (setq completion-in-region-function #'helm--completion-in-region)
+            (helm-mode--setup-completion-styles))
           (message helm-completion-mode-start-message))
       (if (fboundp 'remove-function)
           (progn
@@ -1664,6 +1685,7 @@ Note: This mode is incompatible with Emacs23."
             (remove-function read-file-name-function #'helm--generic-read-file-name)
             (remove-function read-buffer-function #'helm--generic-read-buffer)
             (remove-function completion-in-region-function #'helm--completion-in-region)
+            (helm-mode--disable-completion-styles)
             (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))
           (setq completing-read-function (and (fboundp 'completing-read-default)
                                         'completing-read-default)
@@ -1672,7 +1694,8 @@ Note: This mode is incompatible with Emacs23."
                 read-buffer-function     (and (fboundp 'read-buffer) 'read-buffer))
           (when (and (boundp 'completion-in-region-function)
                      (boundp 'helm--old-completion-in-region-function))
-            (setq completion-in-region-function helm--old-completion-in-region-function))
+            (setq completion-in-region-function helm--old-completion-in-region-function)
+            (helm-mode--disable-completion-styles))
           (message helm-completion-mode-quit-message))))
 
 (provide 'helm-mode)
