@@ -1413,7 +1413,13 @@ Actually do nothing."
 
 (defun helm-completion--substring-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
-  (let ((all (helm-completion--all-completions-multi string table pred)))
+  (let* ((multi-pats (string-match-p " " string))
+         (init-str (if multi-pats
+                       (car (helm-mm-split-pattern string))
+                     string))
+         (all (if (or multi-pats (string-match-p "\\`!" init-str))
+                  (helm-completion--all-completions-multi string table pred)
+                (all-completions init-str table pred))))
     ;; FIXME: No need to return all these value (see above).
     ;; We return prefix as an empty string, so its length value will
     ;; be always 0, let see if there is other use cases where
