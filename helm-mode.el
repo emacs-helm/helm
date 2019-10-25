@@ -220,7 +220,7 @@ know what you are doing."
     map)
   "Keymap for `helm-comp-read'.")
 
-(defcustom helm-completion-style 'helm
+(defcustom helm-completion-style 'emacs
   "Style of completion to use in `completion-in-region'.
 
 This affect only `completion-at-point' and friends, NOT
