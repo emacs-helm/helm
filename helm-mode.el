@@ -1406,6 +1406,7 @@ Actually do nothing."
     (when all (nconc all (length prefix)))))
 
 (defun helm-completion--all-completions-multi (string collection predicate)
+  "Allow `all-completions' multi matching on its candidates."
   (all-completions "" collection (lambda (x)
                                    (and (funcall predicate x)
                                         (helm-mm-match (helm-stringify x) string)))))
