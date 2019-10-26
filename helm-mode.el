@@ -1417,18 +1417,19 @@ Actually do nothing."
 
 (defun helm-completion--substring-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
-  (let* ((multi-pats (string-match-p " " string))
+  (let* ((beforepoint (substring string 0 point))
+         (afterpoint (substring string point))
+         (bounds (completion-boundaries beforepoint table pred afterpoint))
+         (prefix (substring beforepoint 0 (car bounds)))
+         (suffix (substring afterpoint (cdr bounds)))
+         (multi-pats (string-match-p " " string))
          (init-str (if multi-pats
                        (car (helm-mm-split-pattern string))
                      string))
          (all (if (or multi-pats (string-match-p "\\`!" init-str))
                   (helm-completion--all-completions-multi string table pred)
                 (all-completions init-str table pred))))
-    ;; FIXME: No need to return all these value (see above).
-    ;; We return prefix as an empty string, so its length value will
-    ;; be always 0, let see if there is other use cases where
-    ;; base-size needs to be something else than 0. 
-    (list all string "" "" point)))
+    (list all string prefix suffix point)))
 
 (defun helm-completion--merge-metadata (metadata)
   (if (and (eq helm-completion-style 'emacs)
