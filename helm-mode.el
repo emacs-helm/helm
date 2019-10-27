@@ -1397,6 +1397,12 @@ Returns a suitable value for `completion-styles'."
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
+  ;; AFAIU the try completion function is here to handle single
+  ;; element completion, in this case it throw this element without
+  ;; popping up *completions* buffer. If that's the case we don't need
+  ;; this because helm already handle this with
+  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
+  ;; nil should be fine.
   (ignore string table pred point))
 
 (defun helm-completion-all-completions (string table pred point)
