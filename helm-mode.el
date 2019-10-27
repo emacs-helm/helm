@@ -1431,14 +1431,44 @@ Actually do nothing."
                 (all-completions init-str table pred))))
     (list all string prefix suffix point)))
 
+;; FIXME: Should I merge categories or use existent category if one?
+;; This version append the helm category to the category found in
+;; metadata.
+;; (helm-completion--merge-metadata
+;;  '(metadata (display-sort-function . identity)
+;;             (category . sly-completion)))
+;; => (metadata (display-sort-function . identity) (category helm-completion sly-completion))
+;; This is not working in sly, no helm completion is provided in
+;; addition of sly one, only the sly completion is working.
+
+;; (defun helm-completion--merge-metadata (metadata)
+;;   "Merge helm category with existent category in METADATA."
+;;   (if (and (eq helm-completion-style 'emacs)
+;;            (assq 'helm-completion completion-category-defaults)
+;;            (assq 'helm completion-styles-alist))
+;;       (let ((cat (assq 'category metadata)))
+;;         `(,(or (car metadata) 'metadata)
+;;           ,@(append (if cat
+;;                         (remove cat (cdr metadata))
+;;                       (cdr metadata))
+;;                     `((category . ,(if cat
+;;                                        (list 'helm-completion (cdr cat))
+;;                                      'helm-completion))))))
+;;     metadata))
+
+;; This version add the helm category only if no category found in metadata:
+;; (helm-completion--merge-metadata
+;;  '(metadata (display-sort-function . identity)
+;;             (category . sly-completion)))
+;; => (metadata (display-sort-function . identity) (category . sly-completion))
 (defun helm-completion--merge-metadata (metadata)
+  "Add helm category to METADATA if no category found in METADATA."
   (if (and (eq helm-completion-style 'emacs)
            (assq 'helm-completion completion-category-defaults)
            (assq 'helm completion-styles-alist)
            (not (assq 'category metadata)))
-      (append
-       metadata
-       '((category . helm-completion)))
+      `(,(or (car metadata) 'metadata)
+        ,@(append (cdr metadata) `((category . helm-completion))))
     metadata))
 
 ;; Setup completion styles for helm
