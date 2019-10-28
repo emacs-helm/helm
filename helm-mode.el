@@ -1389,9 +1389,11 @@ Returns a suitable value for `completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       '(basic partial-completion emacs22)
     (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
-             for style in completion-styles
-             when (member style all-styles)
-             collect style)))
+             for style in (cons 'helm completion-styles)
+             when (and (memq style all-styles)
+                       (not (memq style styles)))
+             collect style into styles
+             finally return styles)))
 
 ;; Helm style
 (defun helm-completion-try-completion (string table pred point)
@@ -1410,7 +1412,6 @@ Actually do nothing."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
       (helm-completion--substring-all-completions string table pred point)
-    ;; For now (length prefix) is always == to 0.
     (when all (nconc all (length prefix)))))
 
 (defun helm-completion--all-completions-multi (string collection &optional predicate)
@@ -1437,34 +1438,18 @@ Actually do nothing."
                 (all-completions init-str table pred))))
     (list all string prefix suffix point)))
 
-(defun helm-completion--merge-metadata (metadata)
-  "Add helm category to METADATA if no category found in METADATA."
-  (if (and (eq helm-completion-style 'emacs)
-           (assq 'helm-completion completion-category-defaults)
-           (assq 'helm completion-styles-alist)
-           (not (assq 'category metadata)))
-      `(,(or (car metadata) 'metadata)
-        ,@(append (cdr metadata) `((category . helm-completion))))
-    metadata))
-
 ;; Setup completion styles for helm
 (defun helm-mode--setup-completion-styles ()
   (cl-pushnew '(helm helm-completion-try-completion
                      helm-completion-all-completions
                      "helm completion style.")
               completion-styles-alist
-              :test 'equal)
-  (cl-pushnew '(helm-completion (styles . (helm)))
-              completion-category-defaults
               :test 'equal))
 
 (defun helm-mode--disable-completion-styles ()
   (setq completion-styles-alist
         (delete (assq 'helm completion-styles-alist)
-                completion-styles-alist)
-        completion-category-defaults
-        (delete (assq 'helm-completion completion-category-defaults)
-                completion-category-defaults)))
+                completion-styles-alist)))
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
@@ -1510,10 +1495,9 @@ Can be used as value for `completion-in-region-function'."
                  ;; e.g "foo" => "foo <f>" where foo is a function.
                  ;; See Issue #407.
                  (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (helm-completion--merge-metadata
-                            (completion-metadata
-                             (buffer-substring start (point))
-                             collection predicate)))
+                 (metadata (completion-metadata
+                            (buffer-substring start (point))
+                            collection predicate))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
