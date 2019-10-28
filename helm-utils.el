@@ -619,7 +619,8 @@ that is sorting is done against real value of candidate."
          (reg1  (concat "\\_<" qpattern "\\_>"))
          (reg2  (concat "\\_<" qpattern))
          (reg3  helm-pattern)
-         (split (helm-mm-split-pattern helm-pattern))
+         (split (helm-remove-if-match
+                 "\\`!" (helm-mm-split-pattern helm-pattern)))
          (str1  (if (consp s1) (cdr s1) s1))
          (str2  (if (consp s2) (cdr s2) s2))
          (score (lambda (str r1 r2 r3 lst)
@@ -629,10 +630,12 @@ that is sorting is done against real value of candidate."
                                    (string-match
                                     (concat "\\_<" (regexp-quote (car lst))) str)
                                    (cl-loop for r in (cdr lst)
-                                            always (string-match r str))) 4)
+                                            always (string-match r str)))
+                              4)
                              ((and (string-match " " qpattern)
                                    (cl-loop for r in lst
-                                            always (string-match r str))) 3)
+                                            always (string-match r str)))
+                              3)
                              ((string-match r2 str) 2)
                              ((string-match r3 str) 1)
                              (t 0)))))
