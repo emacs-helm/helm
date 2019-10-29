@@ -1306,12 +1306,9 @@ The `helm-find-files' history `helm-ff-history' is used here."
   (ignore-errors
     (apply old--fn args)))
 
-(defvar helm-completion--sorting-done nil)
 (defun helm-completion-in-region-sort-fn (candidates _source)
   "Default sort function for completion-in-region."
-  (if helm-completion--sorting-done
-      candidates
-    (sort candidates 'helm-generic-sort-fn)))
+  (sort candidates 'helm-generic-sort-fn))
 
 (defun helm-completion-in-region--comps (comps afun file-comp-p)
   (if file-comp-p
@@ -1374,6 +1371,17 @@ Second call delete backward char in current-buffer and quit helm completion,
 letting user starting a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
+(defun helm-completion-in-region-sort-flex-candidates (candidates _source)
+  "Sort CANDIDATES computed with flex completion-style."
+  (sort candidates (lambda (s1 s2)
+                     (let* ((str1 (if (consp s1) (car s1) s1))
+                            (str2 (if (consp s2) (car s2) s2))
+                            (scr1 (get-text-property 0 'completion-score str1))
+                            (scr2 (get-text-property 0 'completion-score str2)))
+                       (if (and scr1 scr2)
+                           (> scr1 scr2)
+                         (helm-generic-sort-fn s1 s2))))))
+
 (defun helm-completion-in-region--fix-completion-styles ()
   "Use a simple setting for `completion-styles' when using helm styles.
 Returns a suitable value for `completion-styles'."
@@ -1385,16 +1393,6 @@ Returns a suitable value for `completion-styles'."
                        (not (memq style styles)))
              collect style into styles
              finally return styles)))
-
-(defun helm-completion--merge-metadata (metadata)
-  "Add helm category to METADATA if no category found in METADATA."
-  (if (and (eq helm-completion-style 'emacs)
-           ;(assq 'helm-completion completion-category-defaults)
-           (assq 'helm completion-styles-alist)
-           (not (assq 'category metadata)))
-      `(,(or (car metadata) 'metadata)
-        ,@(append (cdr metadata) `((category . helm-completion))))
-    metadata))
 
 ;; Helm style
 (defun helm-completion-try-completion (string table pred point)
@@ -1464,6 +1462,16 @@ Can be used as value for `completion-in-region-function'."
           (customize-set-variable 'helm-completion-style it))
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
+                 (helm-completion-in-region-default-sort-fn
+                  (cond ((and (eq helm-completion-style 'emacs)
+                              ;; Emacs-27 only.
+                              (memq 'flex completion-styles))
+                         #'helm-completion-in-region-sort-flex-candidates)
+                        ((or (eq helm-completion-style 'helm-fuzzy)
+                             ;; Sly only.
+                             (memq 'backend completion-styles))
+                         nil)
+                        (t helm-completion-in-region-default-sort-fn)))
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
                  (input (buffer-substring start end))
                  (current-command (or (helm-this-command) this-command))
@@ -1483,10 +1491,9 @@ Can be used as value for `completion-in-region-function'."
                  ;; e.g "foo" => "foo <f>" where foo is a function.
                  ;; See Issue #407.
                  (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (helm-completion--merge-metadata
-                            (completion-metadata
-                             (buffer-substring start (point))
-                             collection predicate)))
+                 (metadata (completion-metadata
+                            (buffer-substring start (point))
+                            collection predicate))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
@@ -1519,23 +1526,14 @@ Can be used as value for `completion-in-region-function'."
                                                      (length str)
                                                      metadata)
                                                 hash)))
-                                  (last-data (last comps))
-                                  (sort-fn (helm-aif (and (not (eq (alist-get 'category metadata)
-                                                                   'helm-completion))
-                                                          (completion-metadata-get
-                                                           metadata 'display-sort-function))
-                                               it))
-                                  all)
+                                  (last-data (last comps)))
                              (setq base-size
                                    (helm-aif (cdr last-data)
                                        (prog1 (or base-size it)
                                          (setcdr last-data nil))
                                      0))
-                             (setq helm-completion--sorting-done (and sort-fn t))
-                             (setq all (copy-sequence comps))
                              (helm-completion-in-region--comps
-                              (if sort-fn (funcall sort-fn all) all)
-                              afun file-comp-p))))
+                              comps afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn (buffer-substring start end) nil nil)
                          compfn))
@@ -1580,7 +1578,6 @@ Can be used as value for `completion-in-region-function'."
                             :must-match require-match))))
             (helm-completion-in-region--insert-result result start end base-size))
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
-        (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables)))))
 
