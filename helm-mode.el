@@ -1306,12 +1306,11 @@ The `helm-find-files' history `helm-ff-history' is used here."
   (ignore-errors
     (apply old--fn args)))
 
-(defvar helm-completion--sorting-done nil)
 (defun helm-completion-in-region-sort-fn (candidates _source)
   "Default sort function for completion-in-region."
-  (if helm-completion--sorting-done
-      candidates
-    (sort candidates 'helm-generic-sort-fn)))
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      (sort candidates 'helm-generic-sort-fn)
+    candidates))
 
 (defun helm-completion-in-region--comps (comps afun file-comp-p)
   (if file-comp-p
@@ -1386,16 +1385,6 @@ Returns a suitable value for `completion-styles'."
              collect style into styles
              finally return styles)))
 
-(defun helm-completion--merge-metadata (metadata)
-  "Add helm category to METADATA if no category found in METADATA."
-  (if (and (eq helm-completion-style 'emacs)
-           ;(assq 'helm-completion completion-category-defaults)
-           (assq 'helm completion-styles-alist)
-           (not (assq 'category metadata)))
-      `(,(or (car metadata) 'metadata)
-        ,@(append (cdr metadata) `((category . helm-completion))))
-    metadata))
-
 ;; Helm style
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
@@ -1449,6 +1438,26 @@ Actually do nothing."
         (delete (assq 'helm completion-styles-alist)
                 completion-styles-alist)))
 
+(defun helm-completion--adjust-metadata (metadata)
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      metadata
+    (cl-flet ((compose-helm-sort-fn
+               (_existing-sort-fn)
+               (lambda (candidates)
+                 (let ((res candidates))
+                   (sort res #'helm-generic-sort-fn)))))
+      (let ((alist (cdr metadata)))
+        (if (alist-get 'display-sort-function alist)
+            (setf (alist-get 'display-sort-function alist)
+                  (compose-helm-sort-fn (alist-get 'display-sort-function alist)))
+          (setq alist (cons
+                       (cons 'display-sort-function
+                             (compose-helm-sort-fn
+                              (alist-get 'display-sort-function alist)))
+                       alist)))
+        `(metadata . ,alist)))))
+(put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1483,10 +1492,9 @@ Can be used as value for `completion-in-region-function'."
                  ;; e.g "foo" => "foo <f>" where foo is a function.
                  ;; See Issue #407.
                  (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (helm-completion--merge-metadata
-                            (completion-metadata
+                 (metadata (completion-metadata
                              (buffer-substring start (point))
-                             collection predicate)))
+                             collection predicate))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
@@ -1520,8 +1528,7 @@ Can be used as value for `completion-in-region-function'."
                                                      metadata)
                                                 hash)))
                                   (last-data (last comps))
-                                  (sort-fn (helm-aif (and (not (eq (alist-get 'category metadata)
-                                                                   'helm-completion))
+                                  (sort-fn (helm-aif (and (eq helm-completion-style 'emacs)
                                                           (completion-metadata-get
                                                            metadata 'display-sort-function))
                                                it))
@@ -1531,10 +1538,13 @@ Can be used as value for `completion-in-region-function'."
                                        (prog1 (or base-size it)
                                          (setcdr last-data nil))
                                      0))
-                             (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
                              (helm-completion-in-region--comps
-                              (if sort-fn (funcall sort-fn all) all)
+                              (if sort-fn
+                                  (funcall sort-fn
+                                           (helm-take-first-elements
+                                            all helm-candidate-number-limit))
+                                all)
                               afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn (buffer-substring start end) nil nil)
@@ -1580,7 +1590,6 @@ Can be used as value for `completion-in-region-function'."
                             :must-match require-match))))
             (helm-completion-in-region--insert-result result start end base-size))
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
-        (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables)))))
 
