@@ -250,7 +250,7 @@ NOT `setq'."
              (define-key helm-comp-read-map (kbd "DEL") 'helm-mode-delete-char-backward-maybe)
            (define-key helm-comp-read-map (kbd "DEL") 'delete-backward-char))))
 
-(defcustom helm-completion-styles-alist nil
+(defcustom helm-completion-styles-alist '((eshell-mode . helm))
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
