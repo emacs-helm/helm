@@ -1431,13 +1431,10 @@ Actually do nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
-         (multi-pats (string-match-p " " string))
-         (init-str (if multi-pats
-                       (car (helm-mm-split-pattern string))
-                     string))
-         (all (if (or multi-pats (string-match-p "\\`!" init-str))
+         (all (if (or (string-match-p " " string)
+                      (string-match-p "\\`!" string))
                   (helm-completion--all-completions-multi string table pred)
-                (all-completions init-str table pred))))
+                (all-completions string table pred))))
     (list all string prefix suffix point)))
 
 ;; Setup completion styles for helm
