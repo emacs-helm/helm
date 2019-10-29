@@ -794,8 +794,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                                    ((pred (stringp)) init)
                                    ;; INIT is a cons cell.
                                    (`(,l . ,_ll) l))
-                           (if minibuffer-completing-file-name it
-                               (regexp-quote it)))))
+                           it)))
     (helm-comp-read
      prompt collection
      :test test
