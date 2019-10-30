@@ -1445,15 +1445,13 @@ Actually do nothing."
                  (let ((res candidates))
                    (sort res #'helm-generic-sort-fn)))))
       (let ((alist (cdr metadata)))
-        (if (alist-get 'display-sort-function alist)
-            (setf (alist-get 'display-sort-function alist)
-                  (compose-helm-sort-fn (alist-get 'display-sort-function alist)))
-          (setq alist (cons
+        (helm-aif (assq 'display-sort-function alist)
+            (setq alist (remove it alist)))
+        `(metadata . ,(cons
                        (cons 'display-sort-function
                              (compose-helm-sort-fn
                               (alist-get 'display-sort-function alist)))
-                       alist)))
-        `(metadata . ,alist)))))
+                       alist))))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
