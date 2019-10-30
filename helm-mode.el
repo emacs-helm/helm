@@ -1504,7 +1504,6 @@ Can be used as value for `completion-in-region-function'."
                                   ;; Assume that when `afun' and `predicate' are null
                                   ;; we are in filename completion.
                                   (and (null afun) (null predicate))))
-                 (hash (make-hash-table :test 'equal))
                  ;; `completion-all-completions' store the base-size in the last `cdr',
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
@@ -1515,18 +1514,16 @@ Can be used as value for `completion-in-region-function'."
                            ;; needed but it doesn't harm to set hash, it
                            ;; will not be used.
                            (let* ((comps
-                                   (or (gethash str hash)
-                                       (puthash str (completion-all-completions
-                                                     ;; `helm-comp-read-get-candidates'
-                                                     ;; set input to `helm-pattern'
-                                                     ;; so no need to pass
-                                                     ;; `helm-pattern' directly here.
-                                                     str
-                                                     collection
-                                                     predicate
-                                                     (length str)
-                                                     metadata)
-                                                hash)))
+                                   (completion-all-completions
+                                    ;; `helm-comp-read-get-candidates'
+                                    ;; set input to `helm-pattern'
+                                    ;; so no need to pass
+                                    ;; `helm-pattern' directly here.
+                                    str
+                                    collection
+                                    predicate
+                                    (length str)
+                                    metadata))
                                   (last-data (last comps))
                                   (sort-fn (helm-aif (and (eq helm-completion-style 'emacs)
                                                           (completion-metadata-get
