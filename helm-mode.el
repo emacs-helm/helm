@@ -1523,16 +1523,16 @@ Can be used as value for `completion-in-region-function'."
                                     (length str)
                                     metadata))
                                   (last-data (last comps))
-                                  (sort-fn (helm-aif (and (eq helm-completion-style 'emacs)
-                                                          (completion-metadata-get
-                                                           metadata 'display-sort-function))
-                                               it))
+                                  (sort-fn (and (eq helm-completion-style 'emacs)
+                                                (completion-metadata-get
+                                                 metadata 'display-sort-function)))
                                   all)
                              (setq base-size
                                    (helm-aif (cdr last-data)
                                        (prog1 (or base-size it)
                                          (setcdr last-data nil))
                                      0))
+                             (setq all (copy-sequence comps))
                              (helm-completion-in-region--comps
                               (if sort-fn
                                   (funcall sort-fn
