@@ -1306,9 +1306,12 @@ The `helm-find-files' history `helm-ff-history' is used here."
   (ignore-errors
     (apply old--fn args)))
 
+(defvar helm-completion--sorting-done nil)
 (defun helm-completion-in-region-sort-fn (candidates _source)
   "Default sort function for completion-in-region."
-  (sort candidates 'helm-generic-sort-fn))
+  (if helm-completion--sorting-done
+      candidates
+    (sort candidates 'helm-generic-sort-fn)))
 
 (defun helm-completion-in-region--comps (comps afun file-comp-p)
   (if file-comp-p
@@ -1530,6 +1533,7 @@ Can be used as value for `completion-in-region-function'."
                                        (prog1 (or base-size it)
                                          (setcdr last-data nil))
                                      0))
+                             (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
                              (helm-completion-in-region--comps
                               (if sort-fn
@@ -1582,6 +1586,7 @@ Can be used as value for `completion-in-region-function'."
                             :must-match require-match))))
             (helm-completion-in-region--insert-result result start end base-size))
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
+        (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables)))))
 
