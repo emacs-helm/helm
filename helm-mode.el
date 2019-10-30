@@ -1371,17 +1371,6 @@ Second call delete backward char in current-buffer and quit helm completion,
 letting user starting a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
-(defun helm-completion-in-region-sort-flex-candidates (candidates _source)
-  "Sort CANDIDATES computed with flex completion-style."
-  (sort candidates (lambda (s1 s2)
-                     (let* ((str1 (if (consp s1) (car s1) s1))
-                            (str2 (if (consp s2) (car s2) s2))
-                            (scr1 (get-text-property 0 'completion-score str1))
-                            (scr2 (get-text-property 0 'completion-score str2)))
-                       (if (and scr1 scr2)
-                           (> scr1 scr2)
-                         (helm-generic-sort-fn s1 s2))))))
-
 (defun helm-completion-in-region--fix-completion-styles ()
   "Use a simple setting for `completion-styles' when using helm styles.
 Returns a suitable value for `completion-styles'."
@@ -1447,6 +1436,26 @@ Actually do nothing."
         (delete (assq 'helm completion-styles-alist)
                 completion-styles-alist)))
 
+(defun helm-completion--adjust-metadata (metadata)
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      metadata
+    (cl-flet ((compose-helm-sort-fn
+               (_existing-sort-fn)
+               (lambda (candidates)
+                 (let ((res candidates))
+                   (sort res #'helm-generic-sort-fn)))))
+      (let ((alist (cdr metadata)))
+        (if (alist-get 'display-sort-function alist)
+            (setf (alist-get 'display-sort-function alist)
+                  (compose-helm-sort-fn (alist-get 'display-sort-function alist)))
+          (setq alist (cons
+                       (cons 'display-sort-function
+                             (compose-helm-sort-fn
+                              (alist-get 'display-sort-function alist)))
+                       alist)))
+        `(metadata . ,alist)))))
+(put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
+
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
@@ -1462,16 +1471,6 @@ Can be used as value for `completion-in-region-function'."
           (customize-set-variable 'helm-completion-style it))
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
-                 (helm-completion-in-region-default-sort-fn
-                  (cond ((and (eq helm-completion-style 'emacs)
-                              ;; Emacs-27 only.
-                              (memq 'flex completion-styles))
-                         #'helm-completion-in-region-sort-flex-candidates)
-                        ((or (eq helm-completion-style 'helm-fuzzy)
-                             ;; Sly only.
-                             (memq 'backend completion-styles))
-                         nil)
-                        (t helm-completion-in-region-default-sort-fn)))
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
                  (input (buffer-substring start end))
                  (current-command (or (helm-this-command) this-command))
@@ -1503,7 +1502,6 @@ Can be used as value for `completion-in-region-function'."
                                   ;; Assume that when `afun' and `predicate' are null
                                   ;; we are in filename completion.
                                   (and (null afun) (null predicate))))
-                 (hash (make-hash-table :test 'equal))
                  ;; `completion-all-completions' store the base-size in the last `cdr',
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
@@ -1514,26 +1512,34 @@ Can be used as value for `completion-in-region-function'."
                            ;; needed but it doesn't harm to set hash, it
                            ;; will not be used.
                            (let* ((comps
-                                   (or (gethash str hash)
-                                       (puthash str (completion-all-completions
-                                                     ;; `helm-comp-read-get-candidates'
-                                                     ;; set input to `helm-pattern'
-                                                     ;; so no need to pass
-                                                     ;; `helm-pattern' directly here.
-                                                     str
-                                                     collection
-                                                     predicate
-                                                     (length str)
-                                                     metadata)
-                                                hash)))
-                                  (last-data (last comps)))
+                                   (completion-all-completions
+                                    ;; `helm-comp-read-get-candidates'
+                                    ;; set input to `helm-pattern'
+                                    ;; so no need to pass
+                                    ;; `helm-pattern' directly here.
+                                    str
+                                    collection
+                                    predicate
+                                    (length str)
+                                    metadata))
+                                  (last-data (last comps))
+                                  (sort-fn (helm-aif (and (eq helm-completion-style 'emacs)
+                                                          (completion-metadata-get
+                                                           metadata 'display-sort-function))
+                                               it))
+                                  all)
                              (setq base-size
                                    (helm-aif (cdr last-data)
                                        (prog1 (or base-size it)
                                          (setcdr last-data nil))
                                      0))
                              (helm-completion-in-region--comps
-                              comps afun file-comp-p))))
+                              (if sort-fn
+                                  (funcall sort-fn
+                                           (helm-take-first-elements
+                                            all helm-candidate-number-limit))
+                                all)
+                              afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn (buffer-substring start end) nil nil)
                          compfn))
