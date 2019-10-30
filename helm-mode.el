@@ -220,6 +220,37 @@ know what you are doing."
     map)
   "Keymap for `helm-comp-read'.")
 
+(defun helm-mode-delete-char-backward-1 ()
+  (interactive)
+  (condition-case err
+      (call-interactively 'delete-backward-char)
+    (text-read-only
+     (if (with-selected-window (minibuffer-window)
+           (not (string= (minibuffer-contents) "")))
+         (message "Trying to delete prefix completion, next hit will quit")
+       (user-error "%s" (car err))))))
+(put 'helm-mode-delete-char-backward-1 'helm-only t)
+
+(defun helm-mode-delete-char-backward-2 ()
+  (interactive)
+  (condition-case _err
+      (call-interactively 'delete-backward-char)
+    (text-read-only
+     (unless (with-selected-window (minibuffer-window)
+               (string= (minibuffer-contents) ""))
+       (with-helm-current-buffer
+         (run-with-timer 0.1 nil (lambda ()
+                                   (call-interactively 'delete-backward-char))))
+       (helm-keyboard-quit)))))
+(put 'helm-mode-delete-char-backward-2 'helm-only t)
+
+(helm-multi-key-defun helm-mode-delete-char-backward-maybe
+    "Delete char backward when text is not the prefix helm is completing against.
+First call warn user about deleting prefix completion.
+Second call delete backward char in current-buffer and quit helm completion,
+letting user starting a new completion with a new prefix."
+  '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
+
 (defcustom helm-completion-style 'emacs
   "Style of completion to use in `completion-in-region'.
 
@@ -1300,93 +1331,26 @@ The `helm-find-files' history `helm-ff-history' is used here."
      :test predicate)))
 
 
-;;; Completion in region
+;;; Completion in region and Helm style
 ;;
 (defun helm-mode--advice-lisp--local-variables (old--fn &rest args)
   (ignore-errors
     (apply old--fn args)))
 
-(defvar helm-completion--sorting-done nil)
+(defvar helm-completion--sorting-done nil
+  "Flag that notify the FCT if sorting have been done in completion function.")
 (defun helm-completion-in-region-sort-fn (candidates _source)
   "Default sort function for completion-in-region."
   (if helm-completion--sorting-done
       candidates
     (sort candidates 'helm-generic-sort-fn)))
 
-(defun helm-completion-in-region--comps (comps afun file-comp-p)
-  (if file-comp-p
-      ;; Filter out dot files in file completion.
-      (cl-loop for f in comps unless
-               (string-match "\\`\\.\\{1,2\\}/\\'" f)
-               collect f)
-    (if afun
-        ;; Add annotation at end of
-        ;; candidate if needed.
-        (mapcar (lambda (s)
-                  (let ((ann (funcall afun s)))
-                    (if ann
-                        (cons
-                         (concat
-                          s
-                          (propertize
-                           " " 'display
-                           (propertize
-                            ann
-                            'face 'completions-annotations)))
-                         s)
-                      s)))
-                comps)
-      comps)))
-
 (defun helm-mode--completion-in-region-initial-input (str)
+  "Highlight prefix in helm and helm-fuzzy `helm-completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm-mode-delete-char-backward-1 ()
-  (interactive)
-  (condition-case err
-      (call-interactively 'delete-backward-char)
-    (text-read-only
-     (if (with-selected-window (minibuffer-window)
-           (not (string= (minibuffer-contents) "")))
-         (message "Trying to delete prefix completion, next hit will quit")
-       (user-error "%s" (car err))))))
-(put 'helm-mode-delete-char-backward-1 'helm-only t)
-
-(defun helm-mode-delete-char-backward-2 ()
-  (interactive)
-  (condition-case _err
-      (call-interactively 'delete-backward-char)
-    (text-read-only
-     (unless (with-selected-window (minibuffer-window)
-               (string= (minibuffer-contents) ""))
-       (with-helm-current-buffer
-         (run-with-timer 0.1 nil (lambda ()
-                                   (call-interactively 'delete-backward-char))))
-       (helm-keyboard-quit)))))
-(put 'helm-mode-delete-char-backward-2 'helm-only t)
-
-(helm-multi-key-defun helm-mode-delete-char-backward-maybe
-    "Delete char backward when text is not the prefix helm is completing against.
-First call warn user about deleting prefix completion.
-Second call delete backward char in current-buffer and quit helm completion,
-letting user starting a new completion with a new prefix."
-  '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
-
-(defun helm-completion-in-region--fix-completion-styles ()
-  "Use a simple setting for `completion-styles' when using helm styles.
-Returns a suitable value for `completion-styles'."
-  (if (memq helm-completion-style '(helm helm-fuzzy))
-      '(basic partial-completion emacs22)
-    (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
-             for style in (cons 'helm completion-styles)
-             when (and (memq style all-styles)
-                       (not (memq style styles)))
-             collect style into styles
-             finally return styles)))
-
-;; Helm style
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
@@ -1426,7 +1390,34 @@ Actually do nothing."
                 (all-completions string table pred))))
     (list all string prefix suffix point)))
 
-;; Setup completion styles for helm
+(defun helm-completion-in-region--initial-filter (comps afun file-comp-p)
+  "Add annotations at end of candidates and filter out dot files."
+  (if file-comp-p
+      ;; Filter out dot files in file completion.
+      (cl-loop for f in comps unless
+               (string-match "\\`\\.\\{1,2\\}/\\'" f)
+               collect f)
+    (if afun
+        ;; Add annotation at end of
+        ;; candidate if needed, e.g. foo<f>, this happen when
+        ;; completing against a quoted symbol.
+        (mapcar (lambda (s)
+                  (let ((ann (funcall afun s)))
+                    (if ann
+                        (cons
+                         (concat
+                          s
+                          (propertize
+                           " " 'display
+                           (propertize
+                            ann
+                            'face 'completions-annotations)))
+                         s)
+                      s)))
+                comps)
+      comps)))
+
+;; Setup completion styles for helm-mode
 (defun helm-mode--setup-completion-styles ()
   (cl-pushnew '(helm helm-completion-try-completion
                      helm-completion-all-completions
@@ -1438,6 +1429,17 @@ Actually do nothing."
   (setq completion-styles-alist
         (delete (assq 'helm completion-styles-alist)
                 completion-styles-alist)))
+
+(defun helm-completion-in-region--fix-completion-styles ()
+  "Add helm style to `completion-styles' and filter out invalid styles."
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      '(basic partial-completion emacs22)
+    (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
+             for style in (cons 'helm completion-styles)
+             when (and (memq style all-styles)
+                       (not (memq style styles)))
+             collect style into styles
+             finally return styles)))
 
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
@@ -1535,7 +1537,7 @@ Can be used as value for `completion-in-region-function'."
                                      0))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
-                             (helm-completion-in-region--comps
+                             (helm-completion-in-region--initial-filter
                               (if sort-fn
                                   (funcall sort-fn
                                            (helm-take-first-elements
