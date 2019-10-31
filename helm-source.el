@@ -1160,7 +1160,7 @@ Args ARGS are keywords provided by `helm-source-dummy'."
 Arg FILE is a filename, the contents of this file will be
 used as candidates in buffer.
 Args ARGS are keywords provided by `helm-source-in-file'."
-  (declare (indent 1))
+  (declare (indent 2))
   `(helm-make-source ,name 'helm-source-in-file
      :candidates-file ,file ,@args))
 
