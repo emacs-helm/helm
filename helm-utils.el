@@ -553,9 +553,12 @@ from its directory."
                                       (helm-basename f) f))))
              (helm-find-files-1 f))))
      (let* ((sel       (helm-get-selection))
-            (marker    (if (consp sel) (markerp (cdr sel))))
+            (marker    (and (consp sel) (markerp (cdr sel))))
             (grep-line (and (stringp sel)
                             (helm-grep-split-line sel)))
+            (occur-fname (helm-aand (numberp sel)
+                                    (helm-attr 'buffer-name)
+                                    (buffer-file-name (get-buffer it))))
             (bmk-name  (and (stringp sel)
                             (not grep-line)
                             (replace-regexp-in-string "\\`\\*" "" sel)))
@@ -593,9 +596,8 @@ from its directory."
          ((and grep-line (file-exists-p (car grep-line)))
           (expand-file-name (car grep-line)))
          ;; Occur.
-         (grep-line
-          (with-current-buffer (get-buffer (car grep-line))
-            (expand-file-name (or (buffer-file-name) default-directory))))
+         ((and occur-fname (file-exists-p occur-fname))
+          (expand-file-name occur-fname))
          ;; Package (installed).
          ((and pkg (package-installed-p pkg))
           (expand-file-name (package-desc-dir pkg)))
