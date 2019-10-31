@@ -1538,11 +1538,9 @@ Can be used as value for `completion-in-region-function'."
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
                              (helm-completion-in-region--initial-filter
-                              (if sort-fn
-                                  (funcall sort-fn
-                                           (helm-take-first-elements
-                                            all helm-candidate-number-limit))
-                                all)
+                              (helm-take-first-elements
+                               (if sort-fn (funcall sort-fn all) all)
+                               helm-candidate-number-limit)
                               afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn (buffer-substring start end) nil nil)
