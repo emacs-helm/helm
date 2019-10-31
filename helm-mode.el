@@ -1543,10 +1543,7 @@ Can be used as value for `completion-in-region-function'."
                              (when (and sort-fn (<= (length str) 1))
                                (setq sort-fn (lambda (all) (sort all #'string-lessp))))
                              (helm-completion-in-region--initial-filter
-                              (helm-take-first-elements
-                               (if sort-fn
-                                   (funcall sort-fn all) all)
-                               helm-candidate-number-limit)
+                              (if sort-fn (funcall sort-fn all) all)
                               afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn (buffer-substring start end) nil nil)
