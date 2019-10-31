@@ -1537,9 +1537,15 @@ Can be used as value for `completion-in-region-function'."
                                      0))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
+                             ;; Fall back to string-lessp sorting when
+                             ;; str is too small as specialized
+                             ;; sorting may be too slow (flex).
+                             (when (and sort-fn (<= (length str) 1))
+                               (setq sort-fn (lambda (all) (sort all #'string-lessp))))
                              (helm-completion-in-region--initial-filter
                               (helm-take-first-elements
-                               (if sort-fn (funcall sort-fn all) all)
+                               (if sort-fn
+                                   (funcall sort-fn all) all)
                                helm-candidate-number-limit)
                               afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
