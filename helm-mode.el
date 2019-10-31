@@ -1509,11 +1509,6 @@ Can be used as value for `completion-in-region-function'."
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
                  (compfn (lambda (str _predicate _action)
-                           ;; Cache data for subsequent calls when emacs
-                           ;; style is in use, with helm style function
-                           ;; is called only once and cache is not
-                           ;; needed but it doesn't harm to set hash, it
-                           ;; will not be used.
                            (let* ((comps
                                    (completion-all-completions
                                     ;; `helm-comp-read-get-candidates'
