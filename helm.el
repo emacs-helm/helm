@@ -244,7 +244,6 @@ vectors, so don't use strings to define them."
     ;; Multi keys
     (define-key map (kbd "C-t")        'helm-toggle-resplit-and-swap-windows)
     ;; Debugging command
-    (define-key map (kbd "C-h C-d")    'undefined)
     (define-key map (kbd "C-h C-d")    'helm-enable-or-switch-to-debug)
     (define-key map (kbd "C-h c")      'helm-customize-group)
     ;; Allow to eval keymap without errors.
