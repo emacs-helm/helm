@@ -1521,6 +1521,11 @@ Can be used as value for `completion-in-region-function'."
                                     (length str)
                                     metadata))
                                   (last-data (last comps))
+                                  ;; Helm syle sort fn is added to
+                                  ;; metadata only in emacs-27, so in
+                                  ;; emacs-26 sort-fn is always nil
+                                  ;; and  sorting will be done
+                                  ;; later in FCT.
                                   (sort-fn (and (eq helm-completion-style 'emacs)
                                                 (completion-metadata-get
                                                  metadata 'display-sort-function)))
@@ -1528,6 +1533,8 @@ Can be used as value for `completion-in-region-function'."
                              (setq base-size
                                    (helm-aif (cdr last-data)
                                        (prog1 (or base-size it)
+                                         ;; Remove the last element of
+                                         ;; comps by side-effect.
                                          (setcdr last-data nil))
                                      0))
                              (setq helm-completion--sorting-done (and sort-fn t))
