@@ -281,7 +281,7 @@ NOT `setq'."
              (define-key helm-comp-read-map (kbd "DEL") 'helm-mode-delete-char-backward-maybe)
            (define-key helm-comp-read-map (kbd "DEL") 'delete-backward-char))))
 
-(defcustom helm-completion-styles-alist '((eshell-mode . helm))
+(defcustom helm-completion-styles-alist nil
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
@@ -1530,13 +1530,16 @@ Can be used as value for `completion-in-region-function'."
                                                 (completion-metadata-get
                                                  metadata 'display-sort-function)))
                                   all)
-                             (setq base-size
+                             ;; base-size needs to be set only once at
+                             ;; first call.
+                             (unless base-size
+                               (setq base-size
                                    (helm-aif (cdr last-data)
-                                       (prog1 (or base-size it)
+                                       (prog1 it
                                          ;; Remove the last element of
                                          ;; comps by side-effect.
                                          (setcdr last-data nil))
-                                     0))
+                                     0)))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
                              ;; Fall back to string-lessp sorting when
@@ -1548,7 +1551,7 @@ Can be used as value for `completion-in-region-function'."
                               (if sort-fn (funcall sort-fn all) all)
                               afun file-comp-p))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
-                           (funcall compfn (buffer-substring start end) nil nil)
+                           (funcall compfn input nil nil)
                          compfn))
                  (result (if (stringp data)
                              data
@@ -1563,9 +1566,11 @@ Can be used as value for `completion-in-region-function'."
                             (cond ((and file-comp-p
                                         (not (string-match "/\\'" input)))
                                    (concat (helm-mode--completion-in-region-initial-input
-                                            (helm-basename input))
+                                            (if (memq helm-completion-style '(helm helm-fuzzy))
+                                                (helm-basename input)
+                                              input))
                                            init-space-suffix))
-                                  ((string-match "/\\'" input) nil)
+                                  ((string-match "/\\'" input))
                                   ((or (null require-match)
                                        (stringp require-match))
                                    (helm-mode--completion-in-region-initial-input input))
