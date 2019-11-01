@@ -1521,6 +1521,12 @@ Can be used as value for `completion-in-region-function'."
                                     (length str)
                                     metadata))
                                   (last-data (last comps))
+                                  (bs (helm-aif (cdr last-data)
+                                          (prog1 it
+                                            ;; Remove the last element of
+                                            ;; comps by side-effect.
+                                            (setcdr last-data nil))
+                                        0))
                                   ;; Helm syle sort fn is added to
                                   ;; metadata only in emacs-27, so in
                                   ;; emacs-26 sort-fn is always nil
@@ -1532,14 +1538,7 @@ Can be used as value for `completion-in-region-function'."
                                   all)
                              ;; base-size needs to be set only once at
                              ;; first call.
-                             (unless base-size
-                               (setq base-size
-                                   (helm-aif (cdr last-data)
-                                       (prog1 it
-                                         ;; Remove the last element of
-                                         ;; comps by side-effect.
-                                         (setcdr last-data nil))
-                                     0)))
+                             (unless base-size (setq base-size bs))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
                              ;; Fall back to string-lessp sorting when
