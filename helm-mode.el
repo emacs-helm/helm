@@ -1366,10 +1366,10 @@ Actually do nothing."
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
-      (helm-completion--substring-all-completions string table pred point)
+      (helm-completion--multi-all-completions string table pred point)
     (when all (nconc all (length prefix)))))
 
-(defun helm-completion--all-completions-multi (string collection &optional predicate)
+(defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
   (all-completions "" collection (lambda (x)
                                    (if predicate
@@ -1377,7 +1377,7 @@ Actually do nothing."
                                             (helm-mm-match (helm-stringify x) string))
                                      (helm-mm-match (helm-stringify x) string)))))
 
-(defun helm-completion--substring-all-completions (string table pred point)
+(defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
   (let* ((beforepoint (substring string 0 point))
          (afterpoint (substring string point))
@@ -1386,7 +1386,7 @@ Actually do nothing."
          (suffix (substring afterpoint (cdr bounds)))
          (all (if (or (string-match-p " " string)
                       (string-match-p "\\`!" string))
-                  (helm-completion--all-completions-multi string table pred)
+                  (helm-completion--multi-all-completions-1 string table pred)
                 (all-completions string table pred))))
     (list all string prefix suffix point)))
 
