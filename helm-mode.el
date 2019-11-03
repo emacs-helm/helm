@@ -1571,7 +1571,7 @@ Can be used as value for `completion-in-region-function'."
                                                 (helm-basename input)
                                               input))
                                            init-space-suffix))
-                                  ((string-match "/\\'" input))
+                                  ((string-match "/\\'" input) input)
                                   ((or (null require-match)
                                        (stringp require-match))
                                    (helm-mode--completion-in-region-initial-input input))
