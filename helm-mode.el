@@ -1475,8 +1475,8 @@ Can be used as value for `completion-in-region-function'."
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
-                 ;; Use prefix as input i.e. use (point) instead of end.
-                 (input (buffer-substring start (point)))
+                 (input (buffer-substring start end))
+                 (prefix (buffer-substring start (point)))
                  (current-command (or (helm-this-command) this-command))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
@@ -1510,14 +1510,12 @@ Can be used as value for `completion-in-region-function'."
                  (compfn (lambda (str _predicate _action)
                            (let* ((comps
                                    (completion-all-completions
-                                    ;; `helm-comp-read-get-candidates'
-                                    ;; set input to `helm-pattern'
-                                    ;; so no need to pass
-                                    ;; `helm-pattern' directly here.
-                                    str
+                                    str ; This is helm-pattern
                                     collection
                                     predicate
-                                    (length str)
+                                    ;; Use prefix at first call to
+                                    ;; allow other styles to kick in.
+                                    (length (or prefix str))
                                     metadata))
                                   (last-data (last comps))
                                   (bs (helm-aif (cdr last-data)
@@ -1535,6 +1533,10 @@ Can be used as value for `completion-in-region-function'."
                                                 (completion-metadata-get
                                                  metadata 'display-sort-function)))
                                   all)
+                             ;; Reset prefix to allow using length of
+                             ;; helm-pattern on next calls (this avoid
+                             ;; args-out-of-range error).
+                             (and prefix (setq prefix nil))
                              ;; base-size needs to be set only once at
                              ;; first call.
                              (unless base-size (setq base-size bs))
