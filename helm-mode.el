@@ -1475,7 +1475,8 @@ Can be used as value for `completion-in-region-function'."
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
-                 (input (buffer-substring start end))
+                 ;; Use prefix as input i.e. use (point) instead of end.
+                 (input (buffer-substring start (point)))
                  (current-command (or (helm-this-command) this-command))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
@@ -1493,9 +1494,7 @@ Can be used as value for `completion-in-region-function'."
                  ;; e.g "foo" => "foo <f>" where foo is a function.
                  ;; See Issue #407.
                  (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (completion-metadata
-                            (buffer-substring start (point))
-                            collection predicate))
+                 (metadata (completion-metadata input collection predicate))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
