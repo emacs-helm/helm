@@ -1513,8 +1513,9 @@ Can be used as value for `completion-in-region-function'."
                                     str ; This is helm-pattern
                                     collection
                                     predicate
-                                    ;; Use prefix at first call to
-                                    ;; allow other styles to kick in.
+                                    ;; Use prefix length at first call to
+                                    ;; allow styles matching
+                                    ;; "prefix*suffix" to kick in.
                                     (length (or prefix str))
                                     metadata))
                                   (last-data (last comps))
