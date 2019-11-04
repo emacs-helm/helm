@@ -2398,7 +2398,10 @@ purpose."
            (comps (cl-loop for (f . h) in (tramp-get-completion-function method)
                            append (cl-loop for e in (funcall f (car h))
                                            for host = (and (consp e) (cadr e))
-                                           when (and host (not (member host all-methods)))
+                                           ;; On emacs-27 host may be
+                                           ;; ("root" t) in sudo method.
+                                           when (and (stringp host)
+                                                     (not (member host all-methods)))
                                            collect (concat (or (car mh-method) "/")
                                                            method ":" host)))))
       (helm-fast-remove-dups
