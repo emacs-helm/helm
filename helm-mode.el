@@ -1476,7 +1476,7 @@ Can be used as value for `completion-in-region-function'."
           (let* ((enable-recursive-minibuffers t)
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
                  (input (buffer-substring-no-properties start end))
-                 (prefix (buffer-substring start (point)))
+                 (prefix (buffer-substring-no-properties start (point)))
                  (current-command (or (helm-this-command) this-command))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
