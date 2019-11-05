@@ -160,7 +160,7 @@ For minimal helm configuration, run the start-up script `./emacs-helm.sh`
 and then see the file `/tmp/helm-cfg.el`.
 
 The full configuration I (the helm maintainer) use is
-[here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el).
+[here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm.el).
 
 Also see helm customizable variables with the customize interface.
 
