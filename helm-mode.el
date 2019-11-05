@@ -31,16 +31,7 @@
   :group 'helm)
 
 (defcustom helm-completing-read-handlers-alist
-  '((describe-function . helm-completing-read-symbols)
-    (describe-variable . helm-completing-read-symbols)
-    (describe-symbol . helm-completing-read-symbols)
-    (debug-on-entry . helm-completing-read-symbols)
-    (find-function . helm-completing-read-symbols)
-    (disassemble . helm-completing-read-symbols)
-    (trace-function . helm-completing-read-symbols)
-    (trace-function-foreground . helm-completing-read-symbols)
-    (trace-function-background . helm-completing-read-symbols)
-    (find-tag . helm-completing-read-default-find-tag)
+  '((find-tag . helm-completing-read-default-find-tag)
     (xref-find-definitions . helm-completing-read-default-find-tag)
     (xref-find-references . helm-completing-read-default-find-tag)
     (ffap-alternate-file . nil)
@@ -190,22 +181,6 @@ Helm-mode is rejecting all lambda's, byte-code fns
 and all functions belonging in this list from `minibuffer-setup-hook'."
   :group 'helm-mode
   :type '(repeat (choice symbol)))
-
-(defcustom helm-completing-read-dynamic-complete nil
-  "Use dynamic completion in `completing-read' when non-nil.
-
-The default is to not use this because it is most of the time unneeded
-in `completing-read' and thus it is much more slower.
-If you feel one emacs function need this you have better time to tell
-`helm-mode' to use a dynamic completion for this function only by using
-`helm-completing-read-handlers-alist' with an entry like this:
-
-    (my-function . helm-completing-read-sync-default-handler)
-
-So you should not change the default setting of this variable unless you
-know what you are doing."
-  :group 'helm-mode
-  :type 'boolean)
 
 (defface helm-mode-prefix
     '((t (:background "red" :foreground "black")))
@@ -456,9 +431,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default (default cands)
   (delq nil
-        (cond ((and (stringp default) (not (string= default "")))
+        (cond ((and (stringp default)
+                    (not (string= default ""))
+                    (string= helm-pattern ""))
                (cons default (delete default cands)))
-              ((consp default)
+              ((and (consp default) (string= helm-pattern ""))
                (append (cl-loop for d in default
                                 ;; Don't convert
                                 ;; nil to "nil" (i.e the string)
@@ -855,6 +832,77 @@ It should be used when candidate list don't need to rebuild dynamically."
      ;; helm-comp-read.
      :initial-input initial-input)))
 
+(defun helm-completing-read-default-2
+    (prompt collection predicate require-match
+     init hist default _inherit-input-method
+     name buffer &optional exec-when-only-one)
+  "Call `helm-comp-read' with same args as `completing-read'.
+
+This handler use dynamic matching which allow honouring `completion-styles'."
+  (let* ((history (or (car-safe hist) hist))
+         (input (pcase init
+                  ((pred (stringp)) init)
+                  ;; INIT is a cons cell.
+                  (`(,l . ,_ll) l)))
+         (completion-styles (helm-completion-in-region--fix-completion-styles))
+         (metadata (or (and input predicate
+                            (completion-metadata input collection predicate))
+                       '(metadata)))
+         (compfn (lambda (str _predicate _action)
+                   (let* ((comps
+                           (completion-all-completions
+                            str         ; This is helm-pattern
+                            collection
+                            predicate
+                            (length str)
+                            metadata))
+                          (last-data (last comps))
+                          ;; Helm syle sort fn is added to
+                          ;; metadata only in emacs-27, so in
+                          ;; emacs-26 sort-fn is always nil
+                          ;; and  sorting will be done
+                          ;; later in FCT.
+                          (sort-fn (and (eq helm-completion-style 'emacs)
+                                        (completion-metadata-get
+                                         metadata 'display-sort-function)))
+                          all)
+                     (when (cdr last-data)
+                       ;; Remove the last element of
+                       ;; comps by side-effect.
+                       (setcdr last-data nil))
+                     (setq default nil)
+                     (setq helm-completion--sorting-done (and sort-fn t))
+                     (setq all (copy-sequence comps))
+                     ;; Fall back to string-lessp sorting when
+                     ;; str is too small as specialized
+                     ;; sorting may be too slow (flex).
+                     (when (and sort-fn (<= (length str) 1))
+                       (setq sort-fn (lambda (all) (sort all #'string-lessp))))
+                     (if sort-fn (funcall sort-fn all) all))))
+         (data (if (memq helm-completion-style '(helm helm-fuzzy))
+                   (funcall compfn (or input "") nil nil)
+                 compfn)))
+    (unwind-protect
+        (helm-comp-read
+         ;; Completion-at-point and friends have no prompt.
+         prompt
+         data
+         :name name
+         :initial-input input
+         :buffer buffer
+         :history history
+         :default default
+         :fc-transformer
+         ;; Ensure sort fn is at the end.
+         (append '(helm-cr-default-transformer)
+                 (and helm-completion-in-region-default-sort-fn
+                      (list helm-completion-in-region-default-sort-fn)))
+         :match-dynamic (eq helm-completion-style 'emacs)
+         :fuzzy (eq helm-completion-style 'helm-fuzzy)
+         :exec-when-only-one exec-when-only-one
+         :must-match require-match)
+      (setq helm-completion--sorting-done nil))))
+
 (defun helm-completing-read-default-find-tag
     (prompt collection test require-match
      init hist default inherit-input-method
@@ -884,10 +932,9 @@ It should be used when candidate list don't need to rebuild dynamically."
      init hist default inherit-input-method
      name buffer)
   "Default `helm-mode' handler for all `completing-read'."
-  (helm-completing-read-default-1 prompt collection test require-match
+  (helm-completing-read-default-2 prompt collection test require-match
                                   init hist default inherit-input-method
-                                  name buffer
-                                  (null helm-completing-read-dynamic-complete)))
+                                  name buffer))
 
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
   "The `read-buffer-function' for `helm-mode'.
@@ -943,14 +990,10 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; i.e (push ?\t unread-command-events).
          unread-command-events
          (default-handler
-          ;; Typically when COLLECTION is a function, we can assume
-          ;; the intention is completing dynamically according to
-          ;; input; If one want to use in-buffer handler for specific
-          ;; usage with a function as collection he can specify it in
-          ;; helm-completing-read-handlers-alist.
-          (if (functionp collection)
-              #'helm-completing-read-sync-default-handler
-            #'helm-completing-read-default-handler)))
+           ;; If nothing is found in
+           ;; helm-completing-read-handlers-alist use default
+           ;; handler.
+           #'helm-completing-read-default-handler))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
       ;; An entry in *read-handlers-alist exists but have
