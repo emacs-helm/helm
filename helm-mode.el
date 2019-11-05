@@ -1475,7 +1475,7 @@ Can be used as value for `completion-in-region-function'."
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-styles (helm-completion-in-region--fix-completion-styles))
-                 (input (buffer-substring start end))
+                 (input (buffer-substring-no-properties start end))
                  (prefix (buffer-substring start (point)))
                  (current-command (or (helm-this-command) this-command))
                  (crm (eq current-command 'crm-complete))
