@@ -870,7 +870,6 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                        ;; Remove the last element of
                        ;; comps by side-effect.
                        (setcdr last-data nil))
-                     (setq default nil)
                      (setq helm-completion--sorting-done (and sort-fn t))
                      (setq all (copy-sequence comps))
                      ;; Fall back to string-lessp sorting when
