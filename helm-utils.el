@@ -272,6 +272,10 @@ If a prefix arg is given split windows vertically."
           (funcall initial-ow-fn (car buffers))
         (helm-buffers-switch-to-buffer-or-tab (car buffers))))))
 
+(defvar tab-bar-tab-name-function)
+(declare-function tab-bar-switch-to-tab "tab-bar.el")
+(declare-function tab-bar-tab-name-all "tab-bar.el")
+
 (defun helm-buffers-switch-to-buffer-or-tab (buffer)
   "Switch to BUFFER in its tab if some."
   (if (and (fboundp 'tab-bar-mode)
