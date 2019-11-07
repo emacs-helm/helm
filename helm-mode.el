@@ -166,13 +166,13 @@ will be used."
 
 (defcustom helm-mode-fuzzy-match nil
   "Enable fuzzy matching in `helm-mode' globally.
-Note that this will slow down completion and modify sorting
-which is unwanted in many places.
-This affect only the functions with completing-read helmized by helm-mode.
-To fuzzy match `completion-at-point' and friends see
-`helm-completion-style'."
+
+This is deprecated, use instead helm-fuzzy `helm-completion-style' or
+even better if you are using emacs-27 add flex style to
+`completion-styles' and use emacs `helm-completion-style'."
   :group 'helm-mode
   :type 'boolean)
+(make-obsolete-variable 'helm-mode-fuzzy-match 'helm-completion-style "3.6.0")
 
 (defcustom helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
   "Incompatible `minibuffer-setup-hook' functions go here.
