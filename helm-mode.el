@@ -234,16 +234,17 @@ the `completing-read' using the default handler
 i.e. `helm-completing-read-default-handler'.
 
 NB: This have nothing to do with `completion-styles', it is independent to
-helm.
+helm, but when using emacs as helm-completion-style helm
+will use the `completion-styles' for its completions.
 
 There is three possible value to use:
 - helm, use multi match regular helm completion.
 - helm-fuzzy, use fuzzy matching, note that as usual when
   entering a space helm switch to multi matching mode.
 - emacs, use regular emacs completion according to
-  `completion-styles', note that even in this style, helm allow using
+  `completion-styles', note that even in this style, helm allows using
   multi match.  Emacs-27 provide a style called flex that can be used
-  along this helm style (see `completion-styles-alist').
+  aside helm style (see `completion-styles-alist').
 
 Please use custom interface or `customize-set-variable' to set this,
 NOT `setq'."
