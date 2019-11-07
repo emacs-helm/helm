@@ -229,8 +229,9 @@ letting user starting a new completion with a new prefix."
 (defcustom helm-completion-style 'emacs
   "Style of completion to use in `completion-in-region'.
 
-This affect only `completion-at-point' and friends, NOT
-`completing-read' nor other helm commands.
+This affect only `completion-at-point' and friends, and
+the `completing-read' using the default handler
+i.e. `helm-completing-read-default-handler'.
 
 NB: This have nothing to do with `completion-styles', it is independent to
 helm.
