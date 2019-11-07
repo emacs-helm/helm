@@ -877,10 +877,23 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                      ;; sorting may be too slow (flex).
                      (when (and sort-fn (<= (length str) 1))
                        (setq sort-fn (lambda (all) (sort all #'string-lessp))))
-                     (if sort-fn (funcall sort-fn all) all))))
+                     ;; Default is passed here only with helm
+                     ;; h-c-styles, otherwise with emacs style it is
+                     ;; passed with the :default arg of helm-comp-read
+                     ;; and computed in its get-candidates function.
+                     (append (and default
+                                  (memq helm-completion-style '(helm helm-fuzzy))
+                                  (list default))
+                             (if sort-fn (funcall sort-fn all) all)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
-                 compfn)))
+                 compfn))
+         (helm-completion-in-region-default-sort-fn
+          (lambda (candidates _source)
+            (if (or helm-completion--sorting-done
+                    (string= helm-pattern ""))
+                candidates
+              (sort candidates 'helm-generic-sort-fn)))))
     (unwind-protect
         (helm-comp-read
          ;; Completion-at-point and friends have no prompt.
@@ -890,7 +903,9 @@ This handler use dynamic matching which allow honouring `completion-styles'."
          :initial-input input
          :buffer buffer
          :history history
-         :default default
+         ;; In helm h-c-styles default is passed directly in
+         ;; candidates.
+         :default (and (eq helm-completion-style 'emacs) default)
          :fc-transformer
          ;; Ensure sort fn is at the end.
          (append '(helm-cr-default-transformer)
