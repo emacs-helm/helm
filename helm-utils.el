@@ -276,10 +276,11 @@ If a prefix arg is given split windows vertically."
   "Switch to BUFFER in its tab if some."
   (if (and (fboundp 'tab-bar-mode)
            helm-buffers-maybe-switch-to-tab)
-      (let* ((tabs (tab-bar-tabs))
+      (let* ((tab-bar-tab-name-function #'tab-bar-tab-name-all)
+             (tabs (tab-bar-tabs))
              (tab-names (mapcar (lambda (tab)
                                   (cdr (assq 'name tab)))
-                                (tab-bar-tabs)))
+                                tabs))
              (bname (buffer-name (get-buffer buffer)))
              (tab (helm-buffers--get-tab-from-name bname tabs)))
         (if (helm-buffers--buffer-in-tab-p bname tab-names)
