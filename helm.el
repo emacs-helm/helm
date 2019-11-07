@@ -3054,6 +3054,9 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
                              (window-width  . ,helm-display-buffer-default-width)))))
       (helm-log-run-hook 'helm-window-configuration-hook))))
 
+;; Shut up byte-compiler in emacs-26
+(defvar tab-bar-mode)
+
 (defun helm-display-buffer-in-own-frame (buffer &optional resume)
   "Display helm buffer BUFFER in a separate frame.
 
@@ -3077,6 +3080,7 @@ Note that this feature is available only with emacs-25+."
            (frame-info (frame-geometry))
            (prmt-size (length helm--prompt))
            (line-height (frame-char-height))
+           tab-bar-mode
            (default-frame-alist
             (if resume
                 (buffer-local-value 'helm--last-frame-parameters
