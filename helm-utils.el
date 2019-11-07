@@ -284,7 +284,7 @@ If a prefix arg is given split windows vertically."
              (tab (helm-buffers--get-tab-from-name bname tabs)))
         (if (helm-buffers--buffer-in-tab-p bname tab-names)
             (progn
-              (tab-bar-select-tab tab)
+              (tab-bar-switch-to-tab (alist-get 'name tab))
               (select-window (get-buffer-window bname)))
           (switch-to-buffer buffer)))
     (switch-to-buffer buffer)))
