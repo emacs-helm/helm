@@ -1518,13 +1518,12 @@ Actually do nothing."
                        alist))))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
-(defun helm--completion-in-region (start end collection &optional predicate)
+(defun helm--completion-in-region (origfun start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 Can be used as value for `completion-in-region-function'."
   (cl-declare (special require-match prompt))
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
-      (funcall helm--old-completion-in-region-function
-               start end collection predicate)
+      (funcall origfun start end collection predicate)
     (advice-add
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
@@ -1683,9 +1682,6 @@ Can be used as value for `completion-in-region-function'."
   (with-helm-current-buffer
     (run-hook-with-args-until-success 'file-name-at-point-functions)))
 
-(when (boundp 'completion-in-region-function)
-  (defconst helm--old-completion-in-region-function completion-in-region-function))
-
 (defun helm-mode--disable-ido-maybe (&optional from-hook)
   (when (and (boundp 'ido-everywhere) ido-everywhere)
     (remove-function read-file-name-function #'ido-read-file-name)
@@ -1737,52 +1733,32 @@ Note: This mode is incompatible with Emacs23."
   (cl-assert (boundp 'completing-read-function) nil
              "`helm-mode' not available, upgrade to Emacs-24")
   (if helm-mode
-      (if (fboundp 'add-function)
-          (progn
-            (add-function :override completing-read-function
-                          #'helm--completing-read-default)
-            (add-function :override read-file-name-function
-                          #'helm--generic-read-file-name)
-            (add-function :override read-buffer-function
-                          #'helm--generic-read-buffer)
-            (when helm-mode-handle-completion-in-region
-              (add-function :override completion-in-region-function
-                            #'helm--completion-in-region)
-              (helm-mode--setup-completion-styles))
-            ;; If user have enabled ido-everywhere BEFORE enabling
-            ;; helm-mode disable it and warn user about its
-            ;; incompatibility with helm-mode (issue #2085).
-            (helm-mode--disable-ido-maybe)
-            ;; If ido-everywhere is not enabled yet anticipate and
-            ;; disable it if user attempt to enable it while helm-mode
-            ;; is running (issue #2085).
-            (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))
-          (setq completing-read-function 'helm--completing-read-default
-                read-file-name-function  'helm--generic-read-file-name
-                read-buffer-function     'helm--generic-read-buffer)
-          (when (and (boundp 'completion-in-region-function)
-                     helm-mode-handle-completion-in-region)
-            (setq completion-in-region-function #'helm--completion-in-region)
-            (helm-mode--setup-completion-styles))
-          (message helm-completion-mode-start-message))
-      (if (fboundp 'remove-function)
-          (progn
-            (remove-function completing-read-function #'helm--completing-read-default)
-            (remove-function read-file-name-function #'helm--generic-read-file-name)
-            (remove-function read-buffer-function #'helm--generic-read-buffer)
-            (remove-function completion-in-region-function #'helm--completion-in-region)
-            (helm-mode--disable-completion-styles)
-            (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))
-          (setq completing-read-function (and (fboundp 'completing-read-default)
-                                        'completing-read-default)
-                read-file-name-function  (and (fboundp 'read-file-name-default)
-                                              'read-file-name-default)
-                read-buffer-function     (and (fboundp 'read-buffer) 'read-buffer))
-          (when (and (boundp 'completion-in-region-function)
-                     (boundp 'helm--old-completion-in-region-function))
-            (setq completion-in-region-function helm--old-completion-in-region-function)
-            (helm-mode--disable-completion-styles))
-          (message helm-completion-mode-quit-message))))
+      (progn
+        (add-function :override completing-read-function
+                      #'helm--completing-read-default)
+        (add-function :override read-file-name-function
+                      #'helm--generic-read-file-name)
+        (add-function :override read-buffer-function
+                      #'helm--generic-read-buffer)
+        (when helm-mode-handle-completion-in-region
+          (add-function :around completion-in-region-function
+                        #'helm--completion-in-region)
+          (helm-mode--setup-completion-styles))
+        ;; If user have enabled ido-everywhere BEFORE enabling
+        ;; helm-mode disable it and warn user about its
+        ;; incompatibility with helm-mode (issue #2085).
+        (helm-mode--disable-ido-maybe)
+        ;; If ido-everywhere is not enabled yet anticipate and
+        ;; disable it if user attempt to enable it while helm-mode
+        ;; is running (issue #2085).
+        (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))
+    (progn
+      (remove-function completing-read-function #'helm--completing-read-default)
+      (remove-function read-file-name-function #'helm--generic-read-file-name)
+      (remove-function read-buffer-function #'helm--generic-read-buffer)
+      (remove-function completion-in-region-function #'helm--completion-in-region)
+      (helm-mode--disable-completion-styles)
+      (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))))
 
 (provide 'helm-mode)
 
