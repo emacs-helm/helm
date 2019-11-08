@@ -1491,7 +1491,7 @@ Actually do nothing."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       '(basic partial-completion emacs22)
     (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
-             for style in (cons 'helm completion-styles)
+             for style in (append completion-styles '(helm))
              when (and (memq style all-styles)
                        (not (memq style styles)))
              collect style into styles
