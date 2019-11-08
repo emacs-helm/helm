@@ -375,6 +375,20 @@ When only `add-text-properties' is available APPEND is ignored."
         (setq file-name-handler-alist (delq fnh-elem file-name-handler-alist))))
     (or (ffap-url-p guess)
 	(substitute-in-file-name guess))))
+
+(unless (fboundp 'ffap-read-url-internal)
+  (defun ffap-read-url-internal (string pred action)
+    "Complete URLs from history, treating given string as valid."
+    (let ((hist (ffap-symbol-value 'url-global-history-hash-table)))
+      (cond
+       ((not action)
+        (or (try-completion string hist pred) string))
+       ((eq action t)
+        (or (all-completions string hist pred) (list string)))
+       ;; action == lambda, documented where?  Tests whether string is a
+       ;; valid "match".  Let us always say yes.
+       (t t)))))
+
 
 ;;; Macros helper.
 ;;
