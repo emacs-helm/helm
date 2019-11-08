@@ -339,6 +339,41 @@ When only `add-text-properties' is available APPEND is ignored."
          (if val
              (advice-add 'push-mark :override #'helm--advice-push-mark)
            (advice-remove 'push-mark #'helm--advice-push-mark))))
+
+(defun helm-advice--ffap-read-file-or-url (prompt guess)
+  "Read file or URL from minibuffer, with PROMPT and initial GUESS."
+  (or guess (setq guess default-directory))
+  (let (dir)
+    ;; Tricky: guess may have or be a local directory, like "w3/w3.elc"
+    ;; or "w3/" or "../el/ffap.el" or "../../../"
+    (unless (ffap-url-p guess)
+      (unless (ffap-file-remote-p guess)
+	(setq guess
+	      (abbreviate-file-name (expand-file-name guess))))
+      (setq dir (file-name-directory guess)))
+    (let ((minibuffer-completing-file-name t)
+	  (completion-ignore-case read-file-name-completion-ignore-case)
+          (fnh-elem (cons ffap-url-regexp 'url-file-handler)))
+      ;; Explain to `rfn-eshadow' that we can use URLs here.
+      (push fnh-elem file-name-handler-alist)
+      (unwind-protect
+          (setq guess
+                (let ((default-directory (if dir (expand-file-name dir)
+                                           default-directory))
+                      (url (ffap-url-p guess)))
+                  (if url
+                      (car (ffap-read-url-internal url nil t))
+                    (read-file-name prompt default-directory
+                                    (and buffer-file-name
+                                         (abbreviate-file-name buffer-file-name))
+                                    nil))))
+        ;; Remove the special handler manually.  We used to just let-bind
+        ;; file-name-handler-alist to preserve its value, but that caused
+        ;; other modifications to be lost (e.g. when Tramp gets loaded
+        ;; during the completing-read call).
+        (setq file-name-handler-alist (delq fnh-elem file-name-handler-alist))))
+    (or (ffap-url-p guess)
+	(substitute-in-file-name guess))))
 
 ;;; Macros helper.
 ;;

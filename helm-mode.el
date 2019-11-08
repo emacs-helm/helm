@@ -34,11 +34,8 @@
   '((find-tag . helm-completing-read-default-find-tag)
     (xref-find-definitions . helm-completing-read-default-find-tag)
     (xref-find-references . helm-completing-read-default-find-tag)
-    (ffap-alternate-file . nil)
     (tmm-menubar . nil)
     (find-file . nil)
-    (find-file-at-point . nil)
-    (ffap . nil)
     (execute-extended-command . nil)
     (dired-do-rename . helm-read-file-name-handler-1)
     (dired-do-copy . helm-read-file-name-handler-1)
@@ -1751,14 +1748,16 @@ Note: This mode is incompatible with Emacs23."
         ;; If ido-everywhere is not enabled yet anticipate and
         ;; disable it if user attempt to enable it while helm-mode
         ;; is running (issue #2085).
-        (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))
+        (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
+        (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
       (remove-function read-file-name-function #'helm--generic-read-file-name)
       (remove-function read-buffer-function #'helm--generic-read-buffer)
       (remove-function completion-in-region-function #'helm--completion-in-region)
       (helm-mode--disable-completion-styles)
-      (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook))))
+      (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
+      (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))))
 
 (provide 'helm-mode)
 
