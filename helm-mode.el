@@ -1428,10 +1428,14 @@ Actually do nothing."
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
   (all-completions "" collection (lambda (x)
-                                   (if predicate
-                                       (and (funcall predicate x)
-                                            (helm-mm-match (helm-stringify x) string))
-                                     (helm-mm-match (helm-stringify x) string)))))
+                                   ;; Elements of collection may be
+                                   ;; lists, in this case consider the
+                                   ;; car of element #2219.
+                                   (let ((elm (if (listp x) (car x) x)))
+                                     (if predicate
+                                         (and (funcall predicate elm)
+                                              (helm-mm-match (helm-stringify elm) string))
+                                       (helm-mm-match (helm-stringify elm) string))))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
