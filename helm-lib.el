@@ -364,8 +364,9 @@ When only `add-text-properties' is available APPEND is ignored."
                   (if url
                       (car (ffap-read-url-internal url nil t))
                     (read-file-name prompt default-directory
-                                    (and buffer-file-name
-                                         (abbreviate-file-name buffer-file-name))
+                                    (or guess
+                                        (and buffer-file-name
+                                             (abbreviate-file-name buffer-file-name)))
                                     nil))))
         ;; Remove the special handler manually.  We used to just let-bind
         ;; file-name-handler-alist to preserve its value, but that caused
