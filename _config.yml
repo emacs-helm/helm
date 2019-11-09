@@ -2,7 +2,7 @@ title: Helm
 description: Emacs incremental completion and selection narrowing framework
 google_analytics: UA-54420623-1
 show_downloads: true
-theme: jekyll-theme-cayman
+theme: jekyll-theme-slate
 
 gems:
   - jekyll-mentions
