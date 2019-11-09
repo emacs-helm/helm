@@ -352,42 +352,21 @@ When only `add-text-properties' is available APPEND is ignored."
 	      (abbreviate-file-name (expand-file-name guess))))
       (setq dir (file-name-directory guess)))
     (let ((minibuffer-completing-file-name t)
-	  (completion-ignore-case read-file-name-completion-ignore-case)
-          (fnh-elem (cons ffap-url-regexp 'url-file-handler)))
-      ;; Explain to `rfn-eshadow' that we can use URLs here.
-      (push fnh-elem file-name-handler-alist)
+	  (completion-ignore-case read-file-name-completion-ignore-case))
       (unwind-protect
           (setq guess
                 (let ((default-directory (if dir (expand-file-name dir)
                                            default-directory))
                       (url (ffap-url-p guess)))
-                  (if url
-                      (car (ffap-read-url-internal url nil t))
-                    (read-file-name prompt default-directory
-                                    (or guess
-                                        (and buffer-file-name
-                                             (abbreviate-file-name buffer-file-name)))
-                                    nil))))
-        ;; Remove the special handler manually.  We used to just let-bind
-        ;; file-name-handler-alist to preserve its value, but that caused
-        ;; other modifications to be lost (e.g. when Tramp gets loaded
-        ;; during the completing-read call).
-        (setq file-name-handler-alist (delq fnh-elem file-name-handler-alist))))
+                  (or (and url (read-string prompt url))
+                      (read-file-name prompt default-directory
+                                      (or guess
+                                          (and buffer-file-name
+                                               (abbreviate-file-name
+                                                buffer-file-name)))
+                                      nil))))))
     (or (ffap-url-p guess)
 	(substitute-in-file-name guess))))
-
-(unless (fboundp 'ffap-read-url-internal)
-  (defun ffap-read-url-internal (string pred action)
-    "Complete URLs from history, treating given string as valid."
-    (let ((hist (ffap-symbol-value 'url-global-history-hash-table)))
-      (cond
-       ((not action)
-        (or (try-completion string hist pred) string))
-       ((eq action t)
-        (or (all-completions string hist pred) (list string)))
-       ;; action == lambda, documented where?  Tests whether string is a
-       ;; valid "match".  Let us always say yes.
-       (t t)))))
 
 
 ;;; Macros helper.
