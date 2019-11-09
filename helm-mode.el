@@ -1521,7 +1521,10 @@ Actually do nothing."
 
 (defun helm--completion-in-region (origfun start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
-Can be used as value for `completion-in-region-function'."
+
+Can be used for `completion-in-region-function' by advicing it with an
+:around advice to allow passing the old
+`completion-in-region-function' value in ORIGFUN."
   (cl-declare (special require-match prompt))
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
       (funcall origfun start end collection predicate)
