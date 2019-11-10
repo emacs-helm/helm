@@ -340,34 +340,15 @@ When only `add-text-properties' is available APPEND is ignored."
              (advice-add 'push-mark :override #'helm--advice-push-mark)
            (advice-remove 'push-mark #'helm--advice-push-mark))))
 
+;; This the version of Emacs-27 written by Stefan
 (defun helm-advice--ffap-read-file-or-url (prompt guess)
-  "Read file or URL from minibuffer, with PROMPT and initial GUESS."
   (or guess (setq guess default-directory))
-  (let (dir)
-    ;; Tricky: guess may have or be a local directory, like "w3/w3.elc"
-    ;; or "w3/" or "../el/ffap.el" or "../../../"
-    (unless (ffap-url-p guess)
-      (unless (ffap-file-remote-p guess)
-	(setq guess
-	      (abbreviate-file-name (expand-file-name guess))))
-      (setq dir (file-name-directory guess)))
-    (let ((minibuffer-completing-file-name t)
-	  (completion-ignore-case read-file-name-completion-ignore-case))
-      (unwind-protect
-          (setq guess
-                (let ((default-directory (if dir (expand-file-name dir)
-                                           default-directory))
-                      (url (ffap-url-p guess)))
-                  (or (and url (read-string prompt url))
-                      (read-file-name prompt default-directory
-                                      (or guess
-                                          (and buffer-file-name
-                                               (abbreviate-file-name
-                                                buffer-file-name)))
-                                      nil))))))
-    (or (ffap-url-p guess)
-	(substitute-in-file-name guess))))
-
+  (if (ffap-url-p guess)
+      (read-string prompt guess nil nil t)
+    (unless (ffap-file-remote-p guess)
+      (setq guess (abbreviate-file-name (expand-file-name guess))))
+    (read-file-name prompt (file-name-directory guess) nil nil
+                    (file-name-nondirectory guess))))
 
 ;;; Macros helper.
 ;;

@@ -1756,7 +1756,11 @@ Note: This mode is incompatible with Emacs23."
         ;; disable it if user attempt to enable it while helm-mode
         ;; is running (issue #2085).
         (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
-        (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
+        (when (fboundp 'ffap-read-file-or-url-internal)
+          ;; `ffap-read-file-or-url-internal' have been removed in
+          ;; emacs-27 and `ffap-read-file-or-url' is fixed, so no need
+          ;; to advice it. 
+          (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url)))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
       (remove-function read-file-name-function #'helm--generic-read-file-name)
@@ -1764,7 +1768,8 @@ Note: This mode is incompatible with Emacs23."
       (remove-function completion-in-region-function #'helm--completion-in-region)
       (helm-mode--disable-completion-styles)
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
-      (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))))
+      (when (fboundp 'ffap-read-file-or-url-internal)
+        (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url)))))
 
 (provide 'helm-mode)
 
