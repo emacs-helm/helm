@@ -250,8 +250,10 @@
 (defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
       (with-helm-display-marked-candidates
-        helm-marked-buffer-name (mapcar (lambda (x) (symbol-name (car x)))
-                                        helm-el-package--upgrades)
+        helm-marked-buffer-name (helm-fast-remove-dups
+                                 (mapcar (lambda (x) (symbol-name (car x)))
+                                         helm-el-package--upgrades)
+                                 :test 'equal)
         (when (y-or-n-p "Upgrade all packages? ")
           (helm-el-package-upgrade-1 helm-el-package--tabulated-list)))
       (message "No packages to upgrade actually!")))
