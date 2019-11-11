@@ -1425,8 +1425,7 @@ Actually do nothing."
       (helm-completion--multi-all-completions string table pred point)
     (when all (nconc all (length prefix)))))
 
-(when (and (fboundp 'completion-styles-try-completion)
-           (fboundp 'completion-styles-all-completion))
+(when (fboundp 'completion-styles-all-completions)
   (cl-defmethod completion-styles-try-completion ((_style (eql helm))
                                                   string table pred point &rest _)
     "The try completion function for `completing-styles-alist'.
