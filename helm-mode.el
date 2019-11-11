@@ -1407,8 +1407,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(cl-defmethod completion-styles-try-completion ((_style (eql helm))
-                                                string table pred point &rest _)
+(defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
   ;; AFAIU the try completion function is here to handle single
@@ -1419,14 +1418,35 @@ Actually do nothing."
   ;; nil should be fine.
   (ignore string table pred point))
 
-(cl-defmethod completion-styles-all-completions ((_style (eql helm))
-                                                 string table pred point &rest _)
+(defun helm-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
       (helm-completion--multi-all-completions string table pred point)
-    (when all (cons (nconc all (length prefix))
-                    (helm-completion--adjust-metadata nil)))))
+    (when all (nconc all (length prefix)))))
+
+(when (and (fboundp 'completion-styles-try-completion)
+           (fboundp 'completion-styles-all-completion))
+  (cl-defmethod completion-styles-try-completion ((_style (eql helm))
+                                                  string table pred point &rest _)
+    "The try completion function for `completing-styles-alist'.
+Actually do nothing."
+    ;; AFAIU the try completion function is here to handle single
+    ;; element completion, in this case it throw this element without
+    ;; popping up *completions* buffer. If that's the case we don't need
+    ;; this because helm already handle this with
+    ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
+    ;; nil should be fine.
+    (ignore string table pred point))
+
+  (cl-defmethod completion-styles-all-completions ((_style (eql helm))
+                                                   string table pred point &rest _)
+    "The all completions function for `completing-styles-alist'."
+    ;; FIXME: No need to bind all these value.
+    (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
+        (helm-completion--multi-all-completions string table pred point)
+      (when all (cons (nconc all (length prefix))
+                      (helm-completion--adjust-metadata nil))))))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1679,6 +1699,20 @@ Can be used for `completion-in-region-function' by advicing it with an
   (when helm-mode
     (helm-mode--disable-ido-maybe t)))
 
+;; Setup completion styles for helm-mode
+(defun helm-mode--maybe-setup-completion-styles ()
+  (unless (fboundp 'completion-styles-all-completions)
+    (cl-pushnew '(helm helm-completion-try-completion
+                       helm-completion-all-completions
+                       "helm completion style.")
+                completion-styles-alist
+                :test 'equal)))
+
+(defun helm-mode--maybe-disable-completion-styles ()
+  (helm-aif (assq 'helm completion-styles-alist)
+      (setq completion-styles-alist
+            (delete it completion-styles-alist))))
+
 ;;;###autoload
 (define-minor-mode helm-mode
     "Toggle generic helm completion.
@@ -1725,8 +1759,7 @@ Note: This mode is incompatible with Emacs23."
         (when helm-mode-handle-completion-in-region
           (add-function :around completion-in-region-function
                         #'helm--completion-in-region)
-          ;; (helm-mode--setup-completion-styles)
-          )
+          (helm-mode--maybe-setup-completion-styles))
         ;; If user have enabled ido-everywhere BEFORE enabling
         ;; helm-mode disable it and warn user about its
         ;; incompatibility with helm-mode (issue #2085).
@@ -1745,7 +1778,7 @@ Note: This mode is incompatible with Emacs23."
       (remove-function read-file-name-function #'helm--generic-read-file-name)
       (remove-function read-buffer-function #'helm--generic-read-buffer)
       (remove-function completion-in-region-function #'helm--completion-in-region)
-      ;; (helm-mode--disable-completion-styles)
+      (helm-mode--maybe-disable-completion-styles)
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url)))))
