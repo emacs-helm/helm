@@ -843,7 +843,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ((pred (stringp)) init)
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
-         (completion-styles (helm-completion-in-region--fix-completion-styles))
+         (completion-styles (append (remove 'helm completion-styles) '(helm)))
          (metadata (or (and input predicate
                             (completion-metadata input collection predicate))
                        '(metadata)))
@@ -1407,7 +1407,8 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm-completion-try-completion (string table pred point)
+(cl-defmethod completion-styles-try-completion ((_style (eql helm))
+                                                string table pred point &rest _)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
   ;; AFAIU the try completion function is here to handle single
@@ -1418,12 +1419,14 @@ Actually do nothing."
   ;; nil should be fine.
   (ignore string table pred point))
 
-(defun helm-completion-all-completions (string table pred point)
+(cl-defmethod completion-styles-all-completions ((_style (eql helm))
+                                                 string table pred point &rest _)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
       (helm-completion--multi-all-completions string table pred point)
-    (when all (nconc all (length prefix)))))
+    (when all (cons (nconc all (length prefix))
+                    (helm-completion--adjust-metadata nil)))))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1477,30 +1480,6 @@ Actually do nothing."
                 comps)
       comps)))
 
-;; Setup completion styles for helm-mode
-(defun helm-mode--setup-completion-styles ()
-  (cl-pushnew '(helm helm-completion-try-completion
-                     helm-completion-all-completions
-                     "helm completion style.")
-              completion-styles-alist
-              :test 'equal))
-
-(defun helm-mode--disable-completion-styles ()
-  (setq completion-styles-alist
-        (delete (assq 'helm completion-styles-alist)
-                completion-styles-alist)))
-
-(defun helm-completion-in-region--fix-completion-styles ()
-  "Add helm style to `completion-styles' and filter out invalid styles."
-  (if (memq helm-completion-style '(helm helm-fuzzy))
-      '(basic partial-completion emacs22)
-    (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
-             for style in (append completion-styles '(helm))
-             when (and (memq style all-styles)
-                       (not (memq style styles)))
-             collect style into styles
-             finally return styles)))
-
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata
@@ -1517,7 +1496,6 @@ Actually do nothing."
                              (compose-helm-sort-fn
                               (alist-get 'display-sort-function alist)))
                        alist))))))
-(put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 (defun helm--completion-in-region (origfun start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
@@ -1536,7 +1514,7 @@ Can be used for `completion-in-region-function' by advicing it with an
           (customize-set-variable 'helm-completion-style it))
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
-                 (completion-styles (helm-completion-in-region--fix-completion-styles))
+                 (completion-styles (append (remove 'helm completion-styles) '(helm)))
                  (input (buffer-substring-no-properties start end))
                  (prefix (and (eq helm-completion-style 'emacs)
                               (buffer-substring-no-properties start (point))))
@@ -1747,7 +1725,8 @@ Note: This mode is incompatible with Emacs23."
         (when helm-mode-handle-completion-in-region
           (add-function :around completion-in-region-function
                         #'helm--completion-in-region)
-          (helm-mode--setup-completion-styles))
+          ;; (helm-mode--setup-completion-styles)
+          )
         ;; If user have enabled ido-everywhere BEFORE enabling
         ;; helm-mode disable it and warn user about its
         ;; incompatibility with helm-mode (issue #2085).
@@ -1766,7 +1745,7 @@ Note: This mode is incompatible with Emacs23."
       (remove-function read-file-name-function #'helm--generic-read-file-name)
       (remove-function read-buffer-function #'helm--generic-read-buffer)
       (remove-function completion-in-region-function #'helm--completion-in-region)
-      (helm-mode--disable-completion-styles)
+      ;; (helm-mode--disable-completion-styles)
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url)))))
