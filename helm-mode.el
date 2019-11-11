@@ -913,6 +913,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
          :match-dynamic (eq helm-completion-style 'emacs)
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
          :exec-when-only-one exec-when-only-one
+         :requires-pattern 1
          :must-match require-match)
       (setq helm-completion--sorting-done nil))))
 
@@ -1649,6 +1650,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :match-dynamic (eq helm-completion-style 'emacs)
                             :fuzzy (eq helm-completion-style 'helm-fuzzy)
                             :exec-when-only-one t
+                            :requires-pattern 1
                             :quit-when-no-cand
                             (lambda ()
                               ;; Delay message to overwrite "Quit".
