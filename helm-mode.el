@@ -902,6 +902,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
          :initial-input input
          :buffer buffer
          :history history
+         :reverse-history helm-mode-reverse-history
          ;; In helm h-c-styles default is passed directly in
          ;; candidates.
          :default (and (eq helm-completion-style 'emacs) default)
@@ -913,7 +914,6 @@ This handler use dynamic matching which allow honouring `completion-styles'."
          :match-dynamic (eq helm-completion-style 'emacs)
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
          :exec-when-only-one exec-when-only-one
-         :requires-pattern 1
          :must-match require-match)
       (setq helm-completion--sorting-done nil))))
 
