@@ -1506,7 +1506,7 @@ Actually do nothing."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata
     (cl-flet ((compose-helm-sort-fn
-               (_existing-sort-fn)
+               ()
                (lambda (candidates)
                  (let ((res candidates))
                    (sort res #'helm-generic-sort-fn)))))
@@ -1515,8 +1515,7 @@ Actually do nothing."
             (setq alist (remove it alist)))
         `(metadata . ,(cons
                        (cons 'display-sort-function
-                             (compose-helm-sort-fn
-                              (alist-get 'display-sort-function alist)))
+                             (compose-helm-sort-fn))
                        alist))))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
