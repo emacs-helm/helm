@@ -45,16 +45,21 @@ Show all candidates on startup when 0 (default)."
   :type 'boolean)
 
 (defcustom helm-M-x-fuzzy-match nil
-  "Enable fuzzy matching in `helm-M-x' when non--nil."
+  "Enable fuzzy matching in `helm-M-x' when non--nil.
+
+This have no effect when `helm-M-x-use-completion-styles' is non nil"
+  :group 'helm-command
+  :type 'boolean)
+
+(defcustom helm-M-x-use-completion-styles nil
+  "Use `completion-styles' in helm-M-x."
   :group 'helm-command
   :type 'boolean)
 
 (defcustom helm-M-x-default-sort-fn #'helm-M-x-fuzzy-sort-candidates
-  "Default sort function for `helm-M-x'.
+  "Default sort function for `helm-M-x' with fuzzy matching.
 
-It should sort against REAL value of candidates.
-
-It is used only when `helm-M-x-fuzzy-match' is enabled."
+It should sort against REAL value of candidates."
   :group 'helm-command
   :type 'function)
 
@@ -213,7 +218,7 @@ than the default which is OBARRAY."
              (helm-move-selection-after-hook
               (cons (lambda () (setq current-prefix-arg nil))
                     helm-move-selection-after-hook))
-             (sources (and (eq helm-completion-style 'emacs)
+             (sources (and helm-M-x-use-completion-styles
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (lambda () (or history extended-command-history))
                                 :filtered-candidate-transformer 'helm-M-x-transformer-hist)
@@ -229,7 +234,17 @@ than the default which is OBARRAY."
                                                       candidate 'helm-describe-function))
                                 :persistent-help "Describe this command"
                                 :group 'helm-command
-                                :keymap helm-M-x-map)))))
+                                :keymap helm-M-x-map))))
+             (prompt (concat (cond
+                              ((eq helm-M-x-prefix-argument '-) "- ")
+                              ((and (consp helm-M-x-prefix-argument)
+                                    (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                              ((and (consp helm-M-x-prefix-argument)
+                                    (integerp (car helm-M-x-prefix-argument)))
+                               (format "%d " (car helm-M-x-prefix-argument)))
+                              ((integerp helm-M-x-prefix-argument)
+                               (format "%d " helm-M-x-prefix-argument)))
+                             "M-x ")))
         (setq extended-command-history
               (cl-loop for c in extended-command-history
                        when (and c (commandp (intern c)))
@@ -243,30 +258,12 @@ than the default which is OBARRAY."
                (if sources
                    ;; Use dynamic-matching and `completion-styles'.
                    (helm :sources sources
-                         :prompt (concat (cond
-                                          ((eq helm-M-x-prefix-argument '-) "- ")
-                                          ((and (consp helm-M-x-prefix-argument)
-                                                (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                                          ((and (consp helm-M-x-prefix-argument)
-                                                (integerp (car helm-M-x-prefix-argument)))
-                                           (format "%d " (car helm-M-x-prefix-argument)))
-                                          ((integerp helm-M-x-prefix-argument)
-                                           (format "%d " helm-M-x-prefix-argument)))
-                                         "M-x ")
+                         :prompt prompt
                          :buffer "*helm M-x*"
                          :history 'helm-M-x-input-history)
                  ;; Use helm matching through `helm-comp-read'.
                  (helm-comp-read
-                  (concat (cond
-                           ((eq helm-M-x-prefix-argument '-) "- ")
-                           ((and (consp helm-M-x-prefix-argument)
-                                 (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                           ((and (consp helm-M-x-prefix-argument)
-                                 (integerp (car helm-M-x-prefix-argument)))
-                            (format "%d " (car helm-M-x-prefix-argument)))
-                           ((integerp helm-M-x-prefix-argument)
-                            (format "%d " helm-M-x-prefix-argument)))
-                          "M-x ")
+                  prompt
                   (or collection obarray)
                   :test 'commandp
                   :requires-pattern helm-M-x-requires-pattern
