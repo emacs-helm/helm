@@ -220,7 +220,10 @@ than the default which is OBARRAY."
                     helm-move-selection-after-hook))
              (sources (and helm-M-x-use-completion-styles
                            `(,(helm-build-sync-source "Emacs Commands history"
-                                :candidates (lambda () (or history extended-command-history))
+                                :candidates (helm-dynamic-completion
+                                             (or history extended-command-history)
+                                             #'commandp)
+                                :match-dynamic t
                                 :filtered-candidate-transformer 'helm-M-x-transformer-hist)
                              ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
