@@ -1342,6 +1342,24 @@ I.e. when using `helm-next-line' and friends in BODY."
              (lambda (&optional _) nil)))
     (let (helm-follow-mode-persistent)
       (progn ,@body))))
+
+(defun helm-dynamic-completion (collection predicate &optional point metadata)
+  (lambda ()
+    (let* ((completion-styles (append completion-styles '(helm)))
+           (comps (completion-all-completions
+                   helm-pattern
+                   collection
+                   predicate
+                   (or point 0)
+                   (or metadata '(metadata))))
+           (last-data (last comps))
+           (sort-fn (completion-metadata-get
+                     metadata 'display-sort-function))
+           all)
+      (helm-aif (cdr last-data)
+          (setcdr last-data nil))
+      (setq all (copy-sequence comps))
+      (if sort-fn (funcall sort-fn all) all))))
 
 ;; Yank text at point.
 ;;
