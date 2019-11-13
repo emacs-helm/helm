@@ -214,7 +214,10 @@ than the default which is OBARRAY."
               (cons (lambda () (setq current-prefix-arg nil))
                     helm-move-selection-after-hook))
              (sources (and (eq helm-completion-style 'emacs)
-                           `(,(helm-build-sync-source "Emacs Commands"
+                           `(,(helm-build-sync-source "Emacs Commands history"
+                                :candidates (lambda () (or history extended-command-history))
+                                :filtered-candidate-transformer 'helm-M-x-transformer-hist)
+                             ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
                                              (or collection obarray)
                                              #'commandp)
@@ -226,19 +229,19 @@ than the default which is OBARRAY."
                                                       candidate 'helm-describe-function))
                                 :persistent-help "Describe this command"
                                 :group 'helm-command
-                                :keymap helm-M-x-map)
-                             ,(helm-build-sync-source "Emacs Commands history"
-                                :candidates (lambda () (or history extended-command-history))
-                                :filtered-candidate-transformer 'helm-M-x-transformer-hist)))))
+                                :keymap helm-M-x-map)))))
         (setq extended-command-history
               (cl-loop for c in extended-command-history
                        when (and c (commandp (intern c)))
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
+        (when (and sources helm-M-x-reverse-history)
+          (setq sources (nreverse sources)))
         (unwind-protect
              (progn
                (setq current-prefix-arg nil)
                (if sources
+                   ;; Use dynamic-matching and `completion-styles'.
                    (helm :sources sources
                          :prompt (concat (cond
                                           ((eq helm-M-x-prefix-argument '-) "- ")
@@ -252,7 +255,7 @@ than the default which is OBARRAY."
                                          "M-x ")
                          :buffer "*helm M-x*"
                          :history 'helm-M-x-input-history)
-                                
+                 ;; Use helm matching through `helm-comp-read'.
                  (helm-comp-read
                   (concat (cond
                            ((eq helm-M-x-prefix-argument '-) "- ")
