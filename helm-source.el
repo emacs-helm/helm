@@ -1061,6 +1061,7 @@ an eieio class."
                       '(helm-mm-3-migemo-match)))))
   (when (slot-value source 'match-dynamic)
     (setf (slot-value source 'match) 'identity)
+    (setf (slot-value source 'match-part) nil)
     (setf (slot-value source 'multimatch) nil)
     (setf (slot-value source 'fuzzy-match) nil)
     (setf (slot-value source 'volatile) t)))
