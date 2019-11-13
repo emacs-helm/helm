@@ -1344,6 +1344,23 @@ I.e. when using `helm-next-line' and friends in BODY."
       (progn ,@body))))
 
 (defun helm-dynamic-completion (collection predicate &optional point metadata)
+  "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
+Only the elements of COLLECTION that satisfy PREDICATE are considered.
+POINT and METADATA are unused for now.
+The return value is a list of completions that may be sorted by the
+sort function provided by the completion-style in use (emacs-27 only),
+otherwise (emacs-26) the sort function have to be provided if needed.
+
+Example:
+
+    (helm :sources (helm-build-sync-source \"test\"
+                     :candidates (helm-dynamic-completion
+                                  '(foo bar baz foab)
+                                  'symbolp)
+                     :match-dynamic t)
+          :buffer \"*helm test*\")
+
+"
   (lambda ()
     (let* ((completion-styles (append completion-styles '(helm)))
            (comps (completion-all-completions
