@@ -222,6 +222,11 @@ than the default which is OBARRAY."
              (helm-move-selection-after-hook
               (cons (lambda () (setq current-prefix-arg nil))
                     helm-move-selection-after-hook))
+             (extended-command-history
+              (cl-loop for c in extended-command-history
+                       when (and c (commandp (intern c)))
+                       do (set-text-properties 0 (length c) nil c)
+                       and collect c))
              (sources (and helm-M-x-use-completion-styles
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (helm-dynamic-completion
@@ -261,11 +266,6 @@ than the default which is OBARRAY."
                               ((integerp helm-M-x-prefix-argument)
                                (format "%d " helm-M-x-prefix-argument)))
                              "M-x ")))
-        (setq extended-command-history
-              (cl-loop for c in extended-command-history
-                       when (and c (commandp (intern c)))
-                       do (set-text-properties 0 (length c) nil c)
-                       and collect c))
         (when (and sources helm-M-x-reverse-history)
           (setq sources (nreverse sources)))
         (unwind-protect
