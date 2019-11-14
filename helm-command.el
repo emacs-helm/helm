@@ -227,10 +227,14 @@ than the default which is OBARRAY."
                                 :candidates (helm-dynamic-completion
                                              (or history extended-command-history)
                                              #'commandp)
+                                :match-dynamic t
+                                :requires-pattern helm-M-x-requires-pattern
                                 :persistent-action
                                 'helm-M-x-persistent-action
                                 :persistent-help "Describe this command"
-                                :match-dynamic t
+                                :help-message 'helm-M-x-help-message
+                                :nomark t
+                                :keymap helm-M-x-map
                                 :filtered-candidate-transformer
                                 'helm-M-x-transformer-hist)
                              ,(helm-build-sync-source "Emacs Commands"
@@ -243,6 +247,8 @@ than the default which is OBARRAY."
                                 :persistent-action
                                 'helm-M-x-persistent-action
                                 :persistent-help "Describe this command"
+                                :help-message 'helm-M-x-help-message
+                                :nomark t
                                 :group 'helm-command
                                 :keymap helm-M-x-map))))
              (prompt (concat (cond
