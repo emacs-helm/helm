@@ -1445,10 +1445,7 @@ Actually do nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
-         (all (if (or (string-match-p " " string)
-                      (string-match-p "\\`!" string))
-                  (helm-completion--multi-all-completions-1 string table pred)
-                (all-completions string table pred))))
+         (all (helm-completion--multi-all-completions-1 string table pred)))
     (list all string prefix suffix point)))
 
 (defun helm-completion-in-region--initial-filter (comps afun file-comp-p)
