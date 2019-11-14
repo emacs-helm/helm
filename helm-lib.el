@@ -1363,22 +1363,23 @@ Example:
 "
   (lambda ()
     (let* ((completion-styles (append completion-styles '(helm)))
-           ;; Ensure circular objects are removed.
-           (data (complete-with-action t collection "" predicate))
-           (comps (completion-all-completions
-                   helm-pattern
-                   data
-                   predicate
-                   (or point 0)
-                   (or metadata '(metadata))))
-           (last-data (last comps))
-           (sort-fn (completion-metadata-get
-                     metadata 'display-sort-function))
-           all)
-      (helm-aif (cdr last-data)
-          (setcdr last-data nil))
-      (setq all (copy-sequence comps))
-      (if sort-fn (funcall sort-fn all) all))))
+           (compsfn (lambda (str pred _action)
+                      (let* ((comps (completion-all-completions
+                                     str
+                                     collection
+                                     pred
+                                     (or point 0)
+                                     (or metadata '(metadata))))
+                             (last-data (last comps))
+                             (sort-fn (completion-metadata-get
+                                       metadata 'display-sort-function))
+                             all)
+                        (helm-aif (cdr last-data)
+                            (setcdr last-data nil))
+                        (setq all (copy-sequence comps))
+                        (if sort-fn (funcall sort-fn all) all)))))
+      ;; Ensure circular objects are removed.
+      (complete-with-action t compsfn helm-pattern predicate))))
 
 ;; Yank text at point.
 ;;
