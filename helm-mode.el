@@ -131,20 +131,10 @@ See `helm-case-fold-search' for more info."
   :group 'helm-mode
   :type 'symbol)
 
-(defcustom helm-mode-handle-completion-in-region t
-  "Whether to replace or not `completion-in-region-function'.
-This enable support for `completing-read-multiple' and `completion-at-point'
-when non--nil."
-  :group 'helm-mode
-  :type 'boolean)
+(defcustom helm-mode-reverse-history nil
+  "Display history source after current source when non nil.
 
-(defcustom helm-mode-reverse-history t
-  "Display history source after current source in `helm-mode' handled commands."
-  :group 'helm-mode
-  :type 'boolean)
-
-(defcustom helm-mode-no-completion-in-region-in-modes nil
-  "A list of modes that do not want helm for `completion-in-region'."
+Apply only in `helm-mode' handled commands."
   :group 'helm-mode
   :type 'boolean)
 
@@ -1528,150 +1518,148 @@ Actually do nothing."
                        alist))))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
-(defun helm--completion-in-region (origfun start end collection &optional predicate)
+(defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 
 Can be used for `completion-in-region-function' by advicing it with an
 :around advice to allow passing the old
 `completion-in-region-function' value in ORIGFUN."
   (cl-declare (special require-match prompt))
-  (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
-      (funcall origfun start end collection predicate)
-    (advice-add
-     'lisp--local-variables
-     :around #'helm-mode--advice-lisp--local-variables)
-    (let ((old--helm-completion-style helm-completion-style))
-      (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
-          (customize-set-variable 'helm-completion-style it))
-      (unwind-protect
-          (let* ((enable-recursive-minibuffers t)
-                 (completion-styles (helm-completion-in-region--fix-completion-styles))
-                 (input (buffer-substring-no-properties start end))
-                 (prefix (and (eq helm-completion-style 'emacs)
-                              (buffer-substring-no-properties start (point))))
-                 (current-command (or (helm-this-command) this-command))
-                 (crm (eq current-command 'crm-complete))
-                 (str-command (helm-symbol-name current-command))
-                 (buf-name (format "*helm-mode-%s*" str-command))
-                 (require-match (or (and (boundp 'require-match) require-match)
-                                    minibuffer-completion-confirm
-                                    ;; If prompt have not been propagated here, that's
-                                    ;; probably mean we have no prompt and we are in
-                                    ;; completion-at-point or friend, so use a non--nil
-                                    ;; value for require-match.
-                                    (not (boundp 'prompt))))
-                 ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
-                 ;; `afun' is a closure to call against each string in `data'.
-                 ;; it provide the annotation info for each string.
-                 ;; e.g "foo" => "foo <f>" where foo is a function.
-                 ;; See Issue #407.
-                 (afun (plist-get completion-extra-properties :annotation-function))
-                 (metadata (completion-metadata input collection predicate))
-                 (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
-                                                (string-suffix-p " " input)
-                                                (string= input ""))
-                                      " "))
-                 (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
-                                  (helm-mode--in-file-completion-p)
-                                  ;; Assume that when `afun' and `predicate' are null
-                                  ;; we are in filename completion.
-                                  (and (null afun) (null predicate))))
-                 ;; `completion-all-completions' store the base-size in the last `cdr',
-                 ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
-                 base-size
-                 (compfn (lambda (str _predicate _action)
-                           (let* ((comps
-                                   (completion-all-completions
-                                    str ; This is helm-pattern
-                                    collection
-                                    predicate
-                                    ;; Use prefix length at first call to
-                                    ;; allow styles matching
-                                    ;; "prefix*suffix" to kick in.
-                                    (length (or prefix str))
-                                    metadata))
-                                  (last-data (last comps))
-                                  (bs (helm-aif (cdr last-data)
-                                          (prog1 it
-                                            ;; Remove the last element of
-                                            ;; comps by side-effect.
-                                            (setcdr last-data nil))
-                                        0))
-                                  ;; Helm syle sort fn is added to
-                                  ;; metadata only in emacs-27, so in
-                                  ;; emacs-26 sort-fn is always nil
-                                  ;; and  sorting will be done
-                                  ;; later in FCT.
-                                  (sort-fn (and (eq helm-completion-style 'emacs)
-                                                (completion-metadata-get
-                                                 metadata 'display-sort-function)))
-                                  all)
-                             ;; Reset prefix to allow using length of
-                             ;; helm-pattern on next calls (this avoid
-                             ;; args-out-of-range error).
-                             (and prefix (setq prefix nil))
-                             ;; base-size needs to be set only once at
-                             ;; first call.
-                             (unless base-size (setq base-size bs))
-                             (setq helm-completion--sorting-done (and sort-fn t))
-                             (setq all (copy-sequence comps))
-                             ;; Fall back to string-lessp sorting when
-                             ;; str is too small as specialized
-                             ;; sorting may be too slow (flex).
-                             (when (and sort-fn (<= (length str) 1))
-                               (setq sort-fn (lambda (all) (sort all #'string-lessp))))
-                             (helm-completion-in-region--initial-filter
-                              (if sort-fn (funcall sort-fn all) all)
-                              afun file-comp-p))))
-                 (data (if (memq helm-completion-style '(helm helm-fuzzy))
-                           (funcall compfn input nil nil)
-                         compfn))
-                 (result (if (stringp data)
-                             data
-                           (helm-comp-read
-                            ;; Completion-at-point and friends have no prompt.
-                            (or (and (boundp 'prompt) prompt) "Pattern: ")
-                            data
-                            :name str-command
-                            :nomark (null crm)
-                            :marked-candidates crm
-                            :initial-input
-                            (cond ((and file-comp-p
-                                        (not (string-match "/\\'" input)))
-                                   (concat (helm-mode--completion-in-region-initial-input
-                                            (if (memq helm-completion-style '(helm helm-fuzzy))
-                                                (helm-basename input)
-                                              input))
-                                           init-space-suffix))
-                                  ((string-match "/\\'" input) input)
-                                  ((or (null require-match)
-                                       (stringp require-match))
-                                   (helm-mode--completion-in-region-initial-input input))
-                                  (t (concat (helm-mode--completion-in-region-initial-input input)
-                                             init-space-suffix)))
-                            :buffer buf-name
-                            :fc-transformer
-                            ;; Ensure sort fn is at the end.
-                            (append '(helm-cr-default-transformer)
-                                    (and helm-completion-in-region-default-sort-fn
-                                         (list helm-completion-in-region-default-sort-fn)))
-                            :match-dynamic (eq helm-completion-style 'emacs)
-                            :fuzzy (eq helm-completion-style 'helm-fuzzy)
-                            :exec-when-only-one t
-                            :quit-when-no-cand
-                            (lambda ()
-                              ;; Delay message to overwrite "Quit".
-                              (run-with-timer
-                               0.01 nil
-                               (lambda ()
-                                 (message "[No matches]")))
-                              t)        ; exit minibuffer immediately.
-                            :must-match require-match))))
-            (helm-completion-in-region--insert-result result start end base-size))
-        (customize-set-variable 'helm-completion-style old--helm-completion-style)
-        (setq helm-completion--sorting-done nil)
-        (advice-remove 'lisp--local-variables
-                       #'helm-mode--advice-lisp--local-variables)))))
+  (advice-add
+   'lisp--local-variables
+   :around #'helm-mode--advice-lisp--local-variables)
+  (let ((old--helm-completion-style helm-completion-style))
+    (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
+        (customize-set-variable 'helm-completion-style it))
+    (unwind-protect
+        (let* ((enable-recursive-minibuffers t)
+               (completion-styles (helm-completion-in-region--fix-completion-styles))
+               (input (buffer-substring-no-properties start end))
+               (prefix (and (eq helm-completion-style 'emacs)
+                            (buffer-substring-no-properties start (point))))
+               (current-command (or (helm-this-command) this-command))
+               (crm (eq current-command 'crm-complete))
+               (str-command (helm-symbol-name current-command))
+               (buf-name (format "*helm-mode-%s*" str-command))
+               (require-match (or (and (boundp 'require-match) require-match)
+                                  minibuffer-completion-confirm
+                                  ;; If prompt have not been propagated here, that's
+                                  ;; probably mean we have no prompt and we are in
+                                  ;; completion-at-point or friend, so use a non--nil
+                                  ;; value for require-match.
+                                  (not (boundp 'prompt))))
+               ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
+               ;; `afun' is a closure to call against each string in `data'.
+               ;; it provide the annotation info for each string.
+               ;; e.g "foo" => "foo <f>" where foo is a function.
+               ;; See Issue #407.
+               (afun (plist-get completion-extra-properties :annotation-function))
+               (metadata (completion-metadata input collection predicate))
+               (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
+                                              (string-suffix-p " " input)
+                                              (string= input ""))
+                                    " "))
+               (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
+                                (helm-mode--in-file-completion-p)
+                                ;; Assume that when `afun' and `predicate' are null
+                                ;; we are in filename completion.
+                                (and (null afun) (null predicate))))
+               ;; `completion-all-completions' store the base-size in the last `cdr',
+               ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
+               base-size
+               (compfn (lambda (str _predicate _action)
+                         (let* ((comps
+                                 (completion-all-completions
+                                  str   ; This is helm-pattern
+                                  collection
+                                  predicate
+                                  ;; Use prefix length at first call to
+                                  ;; allow styles matching
+                                  ;; "prefix*suffix" to kick in.
+                                  (length (or prefix str))
+                                  metadata))
+                                (last-data (last comps))
+                                (bs (helm-aif (cdr last-data)
+                                        (prog1 it
+                                          ;; Remove the last element of
+                                          ;; comps by side-effect.
+                                          (setcdr last-data nil))
+                                      0))
+                                ;; Helm syle sort fn is added to
+                                ;; metadata only in emacs-27, so in
+                                ;; emacs-26 sort-fn is always nil
+                                ;; and  sorting will be done
+                                ;; later in FCT.
+                                (sort-fn (and (eq helm-completion-style 'emacs)
+                                              (completion-metadata-get
+                                               metadata 'display-sort-function)))
+                                all)
+                           ;; Reset prefix to allow using length of
+                           ;; helm-pattern on next calls (this avoid
+                           ;; args-out-of-range error).
+                           (and prefix (setq prefix nil))
+                           ;; base-size needs to be set only once at
+                           ;; first call.
+                           (unless base-size (setq base-size bs))
+                           (setq helm-completion--sorting-done (and sort-fn t))
+                           (setq all (copy-sequence comps))
+                           ;; Fall back to string-lessp sorting when
+                           ;; str is too small as specialized
+                           ;; sorting may be too slow (flex).
+                           (when (and sort-fn (<= (length str) 1))
+                             (setq sort-fn (lambda (all) (sort all #'string-lessp))))
+                           (helm-completion-in-region--initial-filter
+                            (if sort-fn (funcall sort-fn all) all)
+                            afun file-comp-p))))
+               (data (if (memq helm-completion-style '(helm helm-fuzzy))
+                         (funcall compfn input nil nil)
+                       compfn))
+               (result (if (stringp data)
+                           data
+                         (helm-comp-read
+                          ;; Completion-at-point and friends have no prompt.
+                          (or (and (boundp 'prompt) prompt) "Pattern: ")
+                          data
+                          :name str-command
+                          :nomark (null crm)
+                          :marked-candidates crm
+                          :initial-input
+                          (cond ((and file-comp-p
+                                      (not (string-match "/\\'" input)))
+                                 (concat (helm-mode--completion-in-region-initial-input
+                                          (if (memq helm-completion-style '(helm helm-fuzzy))
+                                              (helm-basename input)
+                                            input))
+                                         init-space-suffix))
+                                ((string-match "/\\'" input) input)
+                                ((or (null require-match)
+                                     (stringp require-match))
+                                 (helm-mode--completion-in-region-initial-input input))
+                                (t (concat (helm-mode--completion-in-region-initial-input input)
+                                           init-space-suffix)))
+                          :buffer buf-name
+                          :fc-transformer
+                          ;; Ensure sort fn is at the end.
+                          (append '(helm-cr-default-transformer)
+                                  (and helm-completion-in-region-default-sort-fn
+                                       (list helm-completion-in-region-default-sort-fn)))
+                          :match-dynamic (eq helm-completion-style 'emacs)
+                          :fuzzy (eq helm-completion-style 'helm-fuzzy)
+                          :exec-when-only-one t
+                          :quit-when-no-cand
+                          (lambda ()
+                            ;; Delay message to overwrite "Quit".
+                            (run-with-timer
+                             0.01 nil
+                             (lambda ()
+                               (message "[No matches]")))
+                            t)          ; exit minibuffer immediately.
+                          :must-match require-match))))
+          (helm-completion-in-region--insert-result result start end base-size))
+      (customize-set-variable 'helm-completion-style old--helm-completion-style)
+      (setq helm-completion--sorting-done nil)
+      (advice-remove 'lisp--local-variables
+                     #'helm-mode--advice-lisp--local-variables))))
 
 (defun helm-completion-in-region--insert-result (result start end base-size)
   (cond ((stringp result)
@@ -1714,29 +1702,20 @@ Can be used for `completion-in-region-function' by advicing it with an
 (define-minor-mode helm-mode
     "Toggle generic helm completion.
 
-All functions in Emacs that use `completing-read'
-or `read-file-name' and friends will use helm interface
-when this mode is turned on.
+All functions in Emacs that use `completing-read',
+`read-file-name', `completion-in-region' and friends will use helm
+interface when this mode is turned on.
 
 However you can modify this behavior for functions of your choice
 with `helm-completing-read-handlers-alist'.
 
-Also commands using `completion-in-region' will be helmized when
-`helm-mode-handle-completion-in-region' is non nil, you can modify
-this behavior with `helm-mode-no-completion-in-region-in-modes'.
-
 Called with a positive arg, turn on unconditionally, with a
 negative arg turn off.
-You can turn it on with `helm-mode'.
-
-Some crap emacs functions may not be supported,
-e.g `ffap-alternate-file' and maybe others
-You can add such functions to `helm-completing-read-handlers-alist'
-with a nil value.
+You can toggle it with M-x `helm-mode'.
 
 About `ido-mode':
-When you are using `helm-mode', DO NOT use `ido-mode', instead if you
-want some commands use `ido', add these commands to
+DO NOT enable `ido-everywhere' when using `helm-mode' and instead of
+using `ido-mode', add the commands where you want to use ido to
 `helm-completing-read-handlers-alist' with `ido' as value.
 
 Note: This mode is incompatible with Emacs23."
@@ -1753,10 +1732,9 @@ Note: This mode is incompatible with Emacs23."
                       #'helm--generic-read-file-name)
         (add-function :override read-buffer-function
                       #'helm--generic-read-buffer)
-        (when helm-mode-handle-completion-in-region
-          (add-function :around completion-in-region-function
-                        #'helm--completion-in-region)
-          (helm-mode--setup-completion-styles))
+        (add-function :override completion-in-region-function
+                      #'helm--completion-in-region)
+        (helm-mode--setup-completion-styles)
         ;; If user have enabled ido-everywhere BEFORE enabling
         ;; helm-mode disable it and warn user about its
         ;; incompatibility with helm-mode (issue #2085).
