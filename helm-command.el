@@ -198,7 +198,11 @@ fuzzy matching is running its own sort function with a different algorithm."
 (defun helm-M-x-fuzzy-sort-candidates (candidates _source)
   (helm-fuzzy-matching-default-sort-fn-1 candidates t))
 
-(defun helm-M-x-read-extended-command (&optional collection history)
+(defun helm-M-x-persistent-action (candidate)
+  (helm-elisp--persistent-help
+   candidate 'helm-describe-function))
+
+(defun helm-M-x-read-extended-command (collection &optional history)
   "Read command name to invoke in `helm-M-x'.
 Helm completion is not provided when executing or defining
 kbd macros.
@@ -223,18 +227,21 @@ than the default which is OBARRAY."
                                 :candidates (helm-dynamic-completion
                                              (or history extended-command-history)
                                              #'commandp)
+                                :persistent-action
+                                'helm-M-x-persistent-action
+                                :persistent-help "Describe this command"
                                 :match-dynamic t
-                                :filtered-candidate-transformer 'helm-M-x-transformer-hist)
+                                :filtered-candidate-transformer
+                                'helm-M-x-transformer-hist)
                              ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
-                                             (or collection obarray)
-                                             #'commandp)
+                                             collection #'commandp)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
-                                :filtered-candidate-transformer 'helm-M-x-transformer
-                                :persistent-action (lambda (candidate)
-                                                     (helm-elisp--persistent-help
-                                                      candidate 'helm-describe-function))
+                                :filtered-candidate-transformer
+                                'helm-M-x-transformer
+                                :persistent-action
+                                'helm-M-x-persistent-action
                                 :persistent-help "Describe this command"
                                 :group 'helm-command
                                 :keymap helm-M-x-map))))
@@ -307,7 +314,7 @@ You can get help on each command by persistent action."
   (interactive
    (progn
      (setq helm-M-x-prefix-argument current-prefix-arg)
-     (list current-prefix-arg (helm-M-x-read-extended-command))))
+     (list current-prefix-arg (helm-M-x-read-extended-command obarray))))
   (when (stringp command-name)
     (unless (string= command-name "")
       (let ((sym-com (and (stringp command-name) (intern-soft command-name))))
