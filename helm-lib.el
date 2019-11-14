@@ -1362,6 +1362,8 @@ Example:
 
 "
   (lambda ()
+    ;; FIXME: not working with other old syles, see comment in
+    ;; helm-completion-in-region--fix-completion-styles.
     (let* ((completion-styles (if (memq 'flex completion-styles)
                                   '(flex helm)
                                 '(helm)))

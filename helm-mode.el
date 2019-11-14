@@ -1482,7 +1482,16 @@ Actually do nothing."
   "Add helm style to `completion-styles' and filter out incompatibles styles."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       '(basic partial-completion emacs22)
+    ;; FIXME: When merging helm with other old styles (basic
+    ;; partial-completion emacs22) helm is matching fine but if it
+    ;; doesn't match, the other styles match all, this happen with
+    ;; helm-completion-dynamic but not here (at least I couldn't reproduce).
     (if (memq 'flex completion-styles)
+        ;; We need to have flex always behind helm, otherwise
+        ;; when matching against e.g. '(foo foobar foao frogo bar
+        ;; baz) with pattern "foo" helm style if before flex will
+        ;; return foo and foobar only defeating flex that would
+        ;; return foo foobar foao and frogo.
         '(flex helm)
       '(helm))))
 
