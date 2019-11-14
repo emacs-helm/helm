@@ -1363,9 +1363,11 @@ Example:
 "
   (lambda ()
     (let* ((completion-styles (append completion-styles '(helm)))
+           ;; Ensure circular objects are removed.
+           (data (complete-with-action t collection "" predicate))
            (comps (completion-all-completions
                    helm-pattern
-                   collection
+                   data
                    predicate
                    (or point 0)
                    (or metadata '(metadata))))
