@@ -1479,27 +1479,12 @@ Actually do nothing."
                 completion-styles-alist)))
 
 (defun helm-completion-in-region--fix-completion-styles ()
-  "Add helm style to `completion-styles' and filter out invalid styles."
+  "Add helm style to `completion-styles' and filter out incompatibles styles."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       '(basic partial-completion emacs22)
-    (cl-loop with all-styles = (mapcar 'car completion-styles-alist)
-             ;; We need to have flex always behind helm, otherwise
-             ;; when matching against e.g. '(foo foobar foao frogo bar
-             ;; baz) with pattern "foo" helm style if before flex will
-             ;; return foo and foobar only defeating flex that would
-             ;; return foo foobar foao and frogo.
-             for styles = (if (memq 'flex completion-styles)
-                              ;; Emacs27
-                              (helm-append-at-nth
-                               completion-styles 'helm
-                               (1+ (helm-position 'flex completion-styles)))
-                            ;; Emacs26
-                            (append '(helm) completion-styles))
-             for style in styles
-             when (and (memq style all-styles)
-                       (not (memq style styles)))
-             collect style into styles
-             finally return styles)))
+    (if (memq 'flex completion-styles)
+        '(flex helm)
+      '(helm))))
 
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))

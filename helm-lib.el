@@ -1362,7 +1362,9 @@ Example:
 
 "
   (lambda ()
-    (let* ((completion-styles (append '(helm) (remove 'helm completion-styles)))
+    (let* ((completion-styles (if (memq 'flex completion-styles)
+                                  '(flex helm)
+                                '(helm)))
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
                                      str
