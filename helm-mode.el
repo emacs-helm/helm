@@ -1529,6 +1529,8 @@ Can be used for `completion-in-region-function' by advicing it with an
         (let* ((enable-recursive-minibuffers t)
                (completion-styles (helm-completion-in-region--fix-completion-styles))
                (input (buffer-substring-no-properties start end))
+               ;; FIXME: Should I use prefix instead of input for
+               ;; initial completion? And use input for final insertion?
                (prefix (and (eq helm-completion-style 'emacs)
                             (buffer-substring-no-properties start (point))))
                (current-command (or (helm-this-command) this-command))
