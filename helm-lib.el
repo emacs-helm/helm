@@ -1374,8 +1374,8 @@ Example:
                              (sort-fn (completion-metadata-get
                                        metadata 'display-sort-function))
                              all)
-                        (helm-aif (cdr last-data)
-                            (setcdr last-data nil))
+                        (when (cdr last-data)
+                          (setcdr last-data nil))
                         (setq all (copy-sequence comps))
                         (if sort-fn (funcall sort-fn all) all)))))
       ;; Ensure circular objects are removed.
