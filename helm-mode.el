@@ -1503,13 +1503,12 @@ Actually do nothing."
                (lambda (candidates)
                  (let ((res candidates))
                    (sort res #'helm-generic-sort-fn)))))
-      (let ((alist (cdr metadata)))
-        (helm-aif (assq 'display-sort-function alist)
-            (setq alist (remove it alist)))
-        `(metadata . ,(cons
-                       (cons 'display-sort-function
-                             (compose-helm-sort-fn))
-                       alist))))))
+      `(metadata
+        (display-sort-function
+         . ,(compose-helm-sort-fn))
+        (cycle-sort-function
+         . ,(compose-helm-sort-fn))
+        ,@(cdr metadata)))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
