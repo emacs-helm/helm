@@ -1,0 +1,51 @@
+# from https://github.com/abo-abo/swiper/blob/master/.travis.yml
+dist: bionic
+language: emacs-lisp
+addons:
+  apt:
+    update: true
+
+cache:
+  directories:
+  - $HOME/.evm
+
+jobs:
+  include:
+    - stage: setup
+      name: "Install EVM and Emacs"
+      env: EVM_EMACS=emacs-24.5-travis
+      script: &setup
+        - rm -rf .evm
+        - git clone https://github.com/rejeep/evm.git $HOME/.evm
+        - export PATH=$HOME/.evm/bin:$PATH
+        - evm config path /tmp
+        - evm install $EVM_EMACS --use --skip
+    - stage: setup
+      env: EVM_EMACS=emacs-25.3-travis
+      script: *setup
+    - stage: setup
+      env: EVM_EMACS=emacs-26.3-travis
+      script: *setup
+    - stage: setup
+      env: EVM_EMACS=emacs-git-snapshot-travis
+      script: *setup
+    - stage: load
+      name: "Load"
+      env: EVM_EMACS=emacs-24.5-travis
+      script: &load
+      - export PATH=$HOME/.evm/bin:$PATH
+      - evm use $EVM_EMACS
+      - emacs --version
+      - emacs --load helm.el
+    - stage: load
+      name: "Load"
+      env: EVM_EMACS=emacs-25.3-travis
+      script: &load
+    - stage: load
+      name: "Load"
+      env: EVM_EMACS=emacs-26.3-travis
+      script: &load
+    - stage: load
+      name: "Load"
+      env: EVM_EMACS=emacs-git-snapshot-travis
+      script: &load
