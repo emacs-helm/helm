@@ -51,6 +51,11 @@
 (declare-function async-byte-recompile-directory "ext:async-bytecomp.el")
 
 (defun helm-el-package--init ()
+  ;; In emacs-27 package-show-package-list returns an empty buffer
+  ;; until package-initialize have been called.
+  (unless (or package--initialized
+              (null (boundp 'package-quickstart)))
+    (package-initialize))
   (let (package-menu-async
         (inhibit-read-only t))
     (when (null package-alist)
