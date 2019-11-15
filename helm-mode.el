@@ -131,7 +131,7 @@ See `helm-case-fold-search' for more info."
   :group 'helm-mode
   :type 'symbol)
 
-(defcustom helm-mode-reverse-history nil
+(defcustom helm-mode-reverse-history t
   "Display history source after current source when non nil.
 
 Apply only in `helm-mode' handled commands."
