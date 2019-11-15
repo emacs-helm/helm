@@ -71,6 +71,18 @@
 (defvar helm-eshell--quit-flag nil)
 
 
+(defun helm-esh-transformer (candidates _sources)
+  (cl-loop
+   for i in candidates
+   collect
+   (cond ((string-match "\\`~/?" helm-ec-target)
+          (abbreviate-file-name i))
+         ((string-match "\\`/" helm-ec-target) i)
+         (t
+          (file-relative-name i)))
+   into lst
+   finally return (sort lst 'helm-generic-sort-fn)))
+
 (defclass helm-esh-source (helm-source-sync)
   ((init :initform (lambda ()
                      (setq pcomplete-current-completions nil
@@ -82,19 +94,7 @@
    ;(nomark :initform t)
    (persistent-action :initform 'ignore)
    (nohighlight :initform t)
-   (filtered-candidate-transformer
-    :initform
-    (lambda (candidates _sources)
-      (cl-loop
-       for i in candidates
-       collect
-       (cond ((string-match "\\`~/?" helm-ec-target)
-              (abbreviate-file-name i))
-             ((string-match "\\`/" helm-ec-target) i)
-             (t
-              (file-relative-name i)))
-       into lst
-       finally return (sort lst 'helm-generic-sort-fn))))
+   (filtered-candidate-transformer :initform #'helm-esh-transformer)
    (action :initform 'helm-ec-insert))
   "Helm class to define source for Eshell completion.")
 
