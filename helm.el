@@ -3934,6 +3934,41 @@ This function is used with sources built with `helm-source-sync'."
           (not (string-match regexp candidate))
         (string-match regexp candidate)))))
 
+(defvar helm--fuzzy-style-str nil)
+(defvar helm--fuzzy-style-cache-pat nil)
+(defun helm-fuzzy-style-get-pattern (pattern)
+  (unless (equal pattern helm--fuzzy-style-str)
+    (setq helm--fuzzy-style-str pattern
+          helm--fuzzy-style-cache-pat
+          (helm--fuzzy-style-set-pattern pattern)))
+  helm--fuzzy-style-cache-pat)
+
+(defun helm--fuzzy-style-set-pattern (pattern)
+  (let ((fun (if (string-match "\\`\\^" pattern)
+                 #'identity
+               #'helm--mapconcat-pattern)))
+    ;; FIXME: Splitted part are not handled here,
+    ;; I must compute them in `helm-search-match-part'
+    ;; when negation and in-buffer are used.
+    (if (string-match "\\`!" pattern)
+        (if (> (length pattern) 1)
+            (funcall fun (substring pattern 1))
+          "")
+      (if (> (length pattern) 0)
+          (funcall fun pattern)
+        ""))))
+
+(defun helm-fuzzy-style-match (candidate)
+  "Check if `helm-pattern' fuzzy matches CANDIDATE.
+This function is used with sources built with `helm-source-sync'."
+  (unless (string-match " " helm-pattern)
+    ;; When pattern have one or more spaces, let
+    ;; multi-match doing the job with no fuzzy matching.[1]
+    (let ((regexp (helm-fuzzy-style-get-pattern helm-pattern)))
+      (if (string-match "\\`!" helm-pattern)
+          (not (string-match regexp candidate))
+        (string-match regexp candidate)))))
+
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources built with
 `helm-source-in-buffer'."
