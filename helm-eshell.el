@@ -218,24 +218,20 @@ The function that call this should set `helm-ec-target' to thing at point."
   (if (and (stringp last)
            (not (string= last ""))
            (not users-comp)
-           ;; Fix completion on
-           ;; "../" see #1832.
+           ;; Fix completion on "../" see #1832.
            (or (file-exists-p last)
                (helm-aand
                 (file-name-directory last)
                 (file-directory-p it))))
       (if (and (file-directory-p last)
                (string-match "\\`[~.]*.*/[.]\\'" target))
-          ;; Fix completion on
-          ;; "~/.", "~/[...]/.", and "../."
+          ;; Fix completion on "~/.", "~/[...]/.", and "../."
           (expand-file-name
            (concat (helm-basedir (file-name-as-directory last))
                    (regexp-quote (helm-basename target))))
         (expand-file-name last))
-    ;; Don't add "~" to input to
-    ;; provide completion on all
-    ;; users instead of only on
-    ;; current $HOME (#1832).
+    ;; Don't add "~" to input to provide completion on all users instead of only
+    ;; on current $HOME (#1832).
     (unless users-comp last)))
 
 (defun helm-esh-pcomplete-source ()
