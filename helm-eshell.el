@@ -234,12 +234,16 @@ The function that call this should set `helm-ec-target' to thing at point."
     ;; on current $HOME (#1832).
     (unless users-comp last)))
 
-(defun helm-esh-pcomplete-source ()
+(defun helm-esh-pcomplete-default-source ()
+  "Make and return the default source for Eshell completion."
   (helm-make-source "Eshell completions" 'helm-esh-source
     :fuzzy-match helm-eshell-fuzzy-match))
 
+(defvar helm-esh-pcomplete-build-source-fn #'helm-esh-pcomplete-default-source
+  "Function that builds a source or a list of sources.")
+
 (defun helm-esh-pcomplete--make-helm (&optional input)
-  (helm :sources (helm-esh-pcomplete-source)
+  (helm :sources (funcall helm-esh-pcomplete-build-source-fn)
         :buffer "*helm pcomplete*"
         :keymap helm-esh-completion-map
         :resume 'noresume
