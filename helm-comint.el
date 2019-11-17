@@ -61,7 +61,8 @@ Derived modes (e.g. Geiser's REPL) are automatically supported."
  used to navigate the prompts.
  The function must return the point after the prompt.
  Otherwise (comint-next-prompt 1) will be used."
-  :group 'helm-comint)
+  :group 'helm-comint
+  :type '(alist :key-type symbol :value-type function))
 
 (defcustom helm-comint-max-offset 400
   "Max number of chars displayed per candidate in comint-input-ring browser.
