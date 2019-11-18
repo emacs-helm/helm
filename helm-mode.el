@@ -584,10 +584,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
                           (if ,marked-candidates
                               (helm-marked-candidates)
                               (identity candidate)))))))
-    ;; Assume completion have been already required,
-    ;; so always use 'confirm.
-    (when (eq must-match 'confirm-after-completion)
-      (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm must-match)
            (minibuffer-completion-predicate test)
            (minibuffer-completion-table collection)
@@ -1107,10 +1103,6 @@ Keys description:
   (require 'tramp)
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
-  ;; Assume completion have been already required,
-  ;; so always use 'confirm.
-  (when (eq must-match 'confirm-after-completion)
-    (setq must-match 'confirm))
   (mapc (lambda (hook)
           (add-hook 'helm-after-update-hook hook))
         '(helm-ff-move-to-first-real-candidate

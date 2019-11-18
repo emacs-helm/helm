@@ -1027,9 +1027,6 @@ an eieio class."
   (when (slot-value source 'delayed)
     (warn "Deprecated usage of helm `delayed' slot in `%s'"
           (slot-value source 'name)))
-  (helm-aif (slot-value source 'must-match)
-    (and (eq it 'confirm-after-completion)
-         (setf (slot-value source 'must-match) 'confirm)))
   (helm-aif (slot-value source 'keymap)
       (let* ((map (if (symbolp it)
                       (symbol-value it)
