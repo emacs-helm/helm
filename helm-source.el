@@ -644,6 +644,17 @@
     "  This slot have no more effect and is just kept for backward compatibility.
   Please don't use it.")
 
+   (must-match
+    :initarg :must-match
+    :initform nil
+    :custom symbol
+    :documentation
+    "  Prevent exiting with empty helm buffer.
+  For this to work `minibuffer-completion-confirm' must be let-bounded
+  around the helm call.
+  Same as `completing-read' require-match arg, possible values are `t'
+  or `confirm'.")
+
    (group
     :initarg :group
     :initform helm
@@ -1016,8 +1027,23 @@ an eieio class."
   (when (slot-value source 'delayed)
     (warn "Deprecated usage of helm `delayed' slot in `%s'"
           (slot-value source 'name)))
+  (helm-aif (slot-value source 'must-match)
+    (and (eq it 'confirm-after-completion)
+         (setf (slot-value source 'must-match) 'confirm)))
   (helm-aif (slot-value source 'keymap)
-      (and (symbolp it) (setf (slot-value source 'keymap) (symbol-value it))))
+      (let* ((map (if (symbolp it)
+                      (symbol-value it)
+                    it))
+             (must-match-map (when (slot-value source 'must-match)
+                               (let ((map (make-sparse-keymap)))
+                                 (define-key map (kbd "RET")
+                                   'helm-confirm-and-exit-minibuffer)
+                                 map)))
+             (loc-map (if must-match-map
+                          (make-composed-keymap
+                           must-match-map map)
+                        map)))
+        (setf (slot-value source 'keymap) loc-map)))
   (helm-aif (slot-value source 'persistent-help)
       (setf (slot-value source 'header-line)
             (helm-source--persistent-help-string it source))

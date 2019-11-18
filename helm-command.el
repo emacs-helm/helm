@@ -227,6 +227,7 @@ than the default which is OBARRAY."
                        when (and c (commandp (intern c)))
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
+             (minibuffer-completion-confirm t)
              (sources (and helm-M-x-use-completion-styles
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (helm-dynamic-completion
@@ -234,6 +235,7 @@ than the default which is OBARRAY."
                                              #'commandp)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
+                                :must-match t
                                 :persistent-action
                                 'helm-M-x-persistent-action
                                 :persistent-help "Describe this command"
@@ -247,6 +249,7 @@ than the default which is OBARRAY."
                                              collection #'commandp)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
+                                :must-match t
                                 :filtered-candidate-transformer
                                 'helm-M-x-transformer
                                 :persistent-action

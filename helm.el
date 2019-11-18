@@ -5513,6 +5513,17 @@ don't exit and send message 'no match'."
                           unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
+              (empty-buffer-p
+               ;; This is used when helm-buffer is totally empty,
+               ;; i.e. the [?] have not been added because must-match
+               ;; is used from outside helm-comp-read.
+               (setq helm-saved-selection helm-pattern
+                     helm-saved-action (helm-get-default-action
+                                        (assoc-default
+                                         'action
+                                         (car (with-helm-buffer helm-sources))))
+                     helm-minibuffer-confirm-state nil)
+               (helm-exit-minibuffer))
               (t
                (setq helm-minibuffer-confirm-state nil)
                (helm-exit-minibuffer)))))))

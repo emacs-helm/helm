@@ -589,15 +589,6 @@ that use `helm-comp-read' See `helm-M-x' for example."
     (when (eq must-match 'confirm-after-completion)
       (setq must-match 'confirm))
     (let* ((minibuffer-completion-confirm must-match)
-           (must-match-map (when must-match
-                             (let ((map (make-sparse-keymap)))
-                               (define-key map (kbd "RET")
-                                 'helm-confirm-and-exit-minibuffer)
-                               map)))
-           (loc-map (if must-match-map
-                        (make-composed-keymap
-                         must-match-map (or keymap helm-map))
-                      (or keymap helm-map)))
            (minibuffer-completion-predicate test)
            (minibuffer-completion-table collection)
            (helm-read-file-name-mode-line-string
@@ -639,7 +630,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                                (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                        :persistent-action persistent-action
                        :persistent-help persistent-help
-                       :keymap loc-map
+                       :keymap keymap
+                       :must-match must-match
                        :group group
                        :mode-line mode-line
                        :help-message help-message
@@ -658,7 +650,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :persistent-action persistent-action
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
-                  :keymap loc-map
+                  :keymap keymap
+                  :must-match must-match
                   :group group
                   :mode-line mode-line
                   :match-dynamic match-dynamic
@@ -676,7 +669,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
-                    :keymap loc-map
+                    :keymap keymap
+                    :must-match must-match
                     :group group
                     :persistent-help persistent-help
                     :mode-line mode-line
@@ -702,7 +696,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                          :preselect preselect
                          :prompt prompt
                          :resume 'noresume
-                         :keymap loc-map ;; Needed with empty collection.
+                         :keymap keymap ;; Needed with empty collection.
                          :allow-nest allow-nest
                          :candidate-number-limit candidate-number-limit
                          :case-fold-search case-fold
@@ -1139,19 +1133,6 @@ Keys description:
                              history nil nil alistp)))
          (minibuffer-completion-confirm must-match)
          (helm-ff--RET-disabled noret)
-         (must-match-map (when must-match
-                           (let ((map (make-sparse-keymap)))
-                             (define-key map (kbd "RET")
-                               (let ((fn (lookup-key helm-read-file-map (kbd "RET"))))
-                                 (if (and (eq fn 'helm-ff-RET)
-                                          (null helm-ff--RET-disabled))
-                                     #'helm-ff-RET-must-match
-                                   #'helm-confirm-and-exit-minibuffer)))
-                             map)))
-         (cmap (if must-match-map
-                   (make-composed-keymap
-                    must-match-map helm-read-file-map)
-                 helm-read-file-map))
          (minibuffer-completion-predicate test)
          (minibuffer-completing-file-name t)
          (helm--completing-file-name t)
@@ -1172,7 +1153,8 @@ Keys description:
              :fuzzy-match fuzzy
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
-             :keymap cmap
+             :keymap helm-read-file-map
+             :must-match must-match
              :nomark nomark
              :action action-fn)
            ;; Other source.
@@ -1206,7 +1188,8 @@ Keys description:
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
-             :keymap cmap
+             :keymap helm-read-file-map
+             :must-match must-match
              :cleanup 'helm-find-files-cleanup
              :nomark nomark
              :action action-fn)))
