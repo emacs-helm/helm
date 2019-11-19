@@ -4013,6 +4013,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                    candidate (helm-stringify candidate)))
          (pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string cand))
+         (inter (cl-nintersection pat-lookup str-lookup :test 'equal))
          ;; Prefix
          (bonus (cond ((or (equal (car pat-lookup) (car str-lookup))
                            (equal (caar pat-lookup) (caar str-lookup)))
@@ -4038,9 +4039,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
            ;; That's mean that "wiaaaki" will not take precedence
            ;; on "aaawiki" when matching on "wiki" even if "wiaaaki"
            ;; starts by "wi".
-           (* (length (cl-nintersection
-                       pat-lookup str-lookup :test 'equal))
-              2)))))
+           (* (length inter) 2)))))
 
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real basename preserve-tie-order)
   "The transformer for sorting candidates in fuzzy matching.
@@ -4086,7 +4085,11 @@ the candidates."
                      (len2 (cadr data2))
                      (scr1 (car data1))
                      (scr2 (car data2)))
-                (cond ((= scr1 scr2)
+                (cond ((or (= scr1 scr2)
+                           ;; Be more lax about the score.
+                           (<= (- scr1 scr2) 2)
+                           (string-match cand1 cand2)
+                           (string-match cand2 cand1))
                        (unless preserve-tie-order
                          (< len1 len2)))
                       ((> scr1 scr2)))))))))
