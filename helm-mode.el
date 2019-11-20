@@ -824,9 +824,11 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
          (completion-styles (helm-completion-in-region--fix-completion-styles))
-         (metadata (or (and input predicate
-                            (completion-metadata input collection predicate))
+         (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
+         (afun (or (plist-get completion-extra-properties :annotation-function)
+                   (completion-metadata-get metadata 'annotation-function)))
+         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
          (compfn (lambda (str _predicate _action)
                    (let* ((comps
                            (completion-all-completions
@@ -863,7 +865,9 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                      (append (and default
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
-                             (if sort-fn (funcall sort-fn all) all)))))
+                             (helm-completion-in-region--initial-filter
+                              (if sort-fn (funcall sort-fn all) all)
+                              afun file-comp-p)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
                  compfn))
