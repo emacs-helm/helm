@@ -244,6 +244,7 @@ than the default which is OBARRAY."
                                 :persistent-help "Describe this command"
                                 :help-message 'helm-M-x-help-message
                                 :nomark t
+                                :group 'helm-command
                                 :keymap helm-M-x-map
                                 :filtered-candidate-transformer
                                 'helm-M-x-transformer-hist)
