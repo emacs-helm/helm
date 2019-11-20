@@ -1393,10 +1393,13 @@ Actually do nothing."
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x)
+  (all-completions "" collection (lambda (x &optional _y)
+                                   ;; Second arg _y is needed when
+                                   ;; COLLECTION is a hash-table issue
+                                   ;; #2231 (C-x 8 RET).
                                    ;; Elements of collection may be
-                                   ;; lists, in this case consider the
-                                   ;; car of element #2219.
+                                   ;; lists or alists, in this case consider the
+                                   ;; car of element issue #2219 (org-refile).
                                    (let ((elm (if (listp x) (car x) x)))
                                      (if predicate
                                          (and (funcall predicate elm)
