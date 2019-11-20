@@ -215,7 +215,7 @@
 
 (defcustom helm-type-function-actions
   (helm-make-actions
-   "Describe command" 'describe-function
+   "Describe command" 'helm-describe-function
    "Add command to kill ring" 'helm-kill-new
    "Go to command's definition" 'find-function
    "Debug on entry" 'debug-on-entry
@@ -258,7 +258,8 @@
 (defcustom helm-type-command-actions
   (append (helm-make-actions
            "Call interactively" 'helm-call-interactively)
-          (helm-actions-from-type-function))
+          (symbol-value
+           (helm-actions-from-type-function)))
   "Default actions for type command."
   :group 'helm-command
   :type '(alist :key-type string :value-type function))
