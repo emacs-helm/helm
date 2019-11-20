@@ -1490,11 +1490,7 @@ Actually do nothing."
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
-  "Helm replacement of `completion--in-region'.
-
-Can be used for `completion-in-region-function' by advicing it with an
-:around advice to allow passing the old
-`completion-in-region-function' value in ORIGFUN."
+  "Helm replacement of `completion--in-region'."
   (cl-declare (special require-match prompt))
   (advice-add
    'lisp--local-variables
