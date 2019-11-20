@@ -103,6 +103,9 @@
   It can either be a variable name, a function called with no parameters
   or the actual list of candidates.
 
+  Do NOT use this for asynchronous sources, use `candidates-process'
+  instead.
+
   The list must be a list whose members are strings, symbols
   or (DISPLAY . REAL) pairs.
 
@@ -450,8 +453,8 @@
   functions, respectively.
 
   This attribute has no effect for asynchronous sources (see
-  attribute `candidates'), since they perform pattern matching
-  themselves.
+  attribute `candidates'), and sources using `match-dynamic'
+  since they perform pattern matching themselves.
 
   Note that FUZZY-MATCH slot will overhide value of this slot.")
 
@@ -719,7 +722,10 @@ Matching is done basically with `string-match' against each candidate.")
     :custom function
     :documentation
     "  This attribute is used to define a process as candidate.
-  The value must be a process.
+  The function called with no arguments must return a process
+  i.e. `processp', it use typically `start-process' or `make-process',
+  see (info \"(elisp) Asynchronous Processes\").
+  
 
   NOTE:
   When building the source at runtime you can give directly a process
