@@ -1521,13 +1521,14 @@ Can be used for `completion-in-region-function' by advicing it with an
                                   ;; completion-at-point or friend, so use a non--nil
                                   ;; value for require-match.
                                   (not (boundp 'prompt))))
+               (metadata (completion-metadata input collection predicate))
                ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
                ;; `afun' is a closure to call against each string in `data'.
                ;; it provide the annotation info for each string.
                ;; e.g "foo" => "foo <f>" where foo is a function.
                ;; See Issue #407.
-               (afun (plist-get completion-extra-properties :annotation-function))
-               (metadata (completion-metadata input collection predicate))
+               (afun (or (plist-get completion-extra-properties :annotation-function)
+                         (completion-metadata-get metadata 'annotation-function)))
                (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                               (string-suffix-p " " input)
                                               (string= input ""))
