@@ -1483,8 +1483,7 @@ Actually do nothing."
     (cl-flet ((compose-helm-sort-fn
                ()
                (lambda (candidates)
-                 (let ((res candidates))
-                   (sort res #'helm-generic-sort-fn)))))
+                 (sort candidates #'helm-generic-sort-fn))))
       `(metadata
         (display-sort-function
          . ,(compose-helm-sort-fn))
