@@ -1480,15 +1480,14 @@ Actually do nothing."
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata
-    (cl-flet ((compose-helm-sort-fn
-               ()
-               (lambda (candidates)
-                 (sort candidates #'helm-generic-sort-fn))))
+    (let ((compose-helm-sort-fn
+           (lambda (candidates)
+             (sort candidates #'helm-generic-sort-fn))))
       `(metadata
         (display-sort-function
-         . ,(compose-helm-sort-fn))
+         . ,compose-helm-sort-fn)
         (cycle-sort-function
-         . ,(compose-helm-sort-fn))
+         . ,compose-helm-sort-fn)
         ,@(cdr metadata)))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
