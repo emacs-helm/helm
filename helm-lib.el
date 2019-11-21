@@ -58,6 +58,7 @@
 (defvar wdired-allow-to-change-permissions)
 (defvar wdired-allow-to-redirect-links)
 (defvar helm-persistent-action-display-window)
+(defvar completion-flex-nospace)
 
 ;;; User vars.
 ;;
@@ -1367,6 +1368,7 @@ Example:
     (let* ((completion-styles (if (memq 'flex completion-styles)
                                   '(flex helm)
                                 '(helm)))
+           (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
                                      str

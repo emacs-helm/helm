@@ -24,6 +24,8 @@
 
 (defvar crm-separator)
 (defvar ido-everywhere)
+(defvar completion-flex-nospace)
+
 (declare-function ido-mode "ido.el")
 
 (defgroup helm-mode nil
@@ -823,6 +825,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ((pred (stringp)) init)
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
+         (completion-flex-nospace t)
          (completion-styles (helm-completion-in-region--fix-completion-styles))
          (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
@@ -1502,6 +1505,7 @@ Actually do nothing."
         (customize-set-variable 'helm-completion-style it))
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
+               (completion-flex-nospace t)
                (completion-styles (helm-completion-in-region--fix-completion-styles))
                (input (buffer-substring-no-properties start end))
                ;; FIXME: Should I use prefix instead of input for
