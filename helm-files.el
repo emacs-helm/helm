@@ -2262,9 +2262,9 @@ or when `helm-pattern' is equal to \"~/\"."
          (expand-fn (if directory
                         #'expand-file-name
                       #'helm-ff--expand-file-name-no-dot)))
+    ;; Fix issue #2223 with tilde in directory names e.g. "~/tmp/~test/".
     (funcall expand-fn (if (string-match-p "\\`~[^/]" subst)
-                           pattern
-                         (helm-substitute-in-filename pattern))
+                           pattern subst)
              ;; directory is nil on Nix.
              directory)))
 
