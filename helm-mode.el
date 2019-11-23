@@ -1423,7 +1423,7 @@ Actually do nothing."
 
 (defun helm-completion--fuzzy-all-completions-1 (_string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x)
+  (all-completions "" collection (lambda (x &optional _y)
                                    ;; Elements of collection may be
                                    ;; lists, in this case consider the
                                    ;; car of element #2219.
