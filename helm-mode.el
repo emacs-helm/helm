@@ -1412,9 +1412,14 @@ Actually do nothing."
 (defun helm-fuzzy-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
-  (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
+  (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
       (helm-completion--fuzzy-all-completions string table pred point)
-    (when all (nconc all (length prefix)))))
+    (when all (nconc (helm-fuzzy-add-score-as-prop all pattern)
+                     (length prefix)))))
+
+(defun helm-fuzzy-add-score-as-prop (candidates pattern)
+  (cl-loop for cand in candidates
+           collect (helm-fuzzy-style-score cand pattern)))
 
 (defun helm-completion--fuzzy-all-completions-1 (_string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1435,8 +1440,11 @@ Actually do nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
+         (pattern (cl-loop for str across string
+                           nconc (list (string str) 'any) into lst
+                           finally return (cons 'point lst)))
          (all (helm-completion--fuzzy-all-completions-1 string table pred)))
-    (list all string prefix suffix point)))
+    (list all pattern prefix suffix point)))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1550,8 +1558,12 @@ Actually do nothing."
     (cl-flet ((compose-helm-sort-fn
                ()
                (lambda (candidates)
-                 (let ((res candidates))
-                   (helm-fuzzy-matching-default-sort-fn-1 res)))))
+                 (sort
+                  candidates
+                  (lambda (c1 c2)
+                    (let ((s1 (get-text-property 0 'completion-score c1))
+                          (s2 (get-text-property 0 'completion-score c2)))
+                      (> (or s1 0) (or s2 0))))))))
       `(metadata
         (display-sort-function
          . ,(compose-helm-sort-fn))

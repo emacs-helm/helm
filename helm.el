@@ -3969,6 +3969,43 @@ This function is used with sources built with `helm-source-sync'."
           (not (string-match regexp candidate))
         (string-match regexp candidate)))))
 
+(defun helm-fuzzy-style-score (str pattern)
+  ;; Don't modify the string itself.
+  (setq str (copy-sequence str))
+  (let ((re (completion-pcm--pattern->regex pattern 'group)))
+    (unless (string-match re str)
+      (error "Internal error: %s does not match %s" re str))
+    (let* ((md (match-data))
+           (start (pop md))
+           (len (length str))
+           (score-numerator 0)
+           (score-denominator 0)
+           (last-b 0)
+           (update-score
+            (lambda (a b)
+              "Update score variables given match range (A B)."
+              (setq score-numerator (+ score-numerator (- b a)))
+              (unless (or (= a last-b)
+                          (zerop last-b)
+                          (= a (length str)))
+                (setq score-denominator (+ score-denominator
+                                           1
+                                           (expt (- a last-b 1)
+                                                 (/ 1.0 3)))))
+              (setq last-b b))))
+      (funcall update-score start start)
+      (pop md)
+      (while md
+        (funcall update-score start (car md))
+        (pop md)
+        (setq start (pop md)))
+      (funcall update-score len len)
+      (unless (zerop (length str))
+        (put-text-property
+         0 1 'completion-score
+         (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
+    str))
+
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources built with
 `helm-source-in-buffer'."
