@@ -4122,11 +4122,7 @@ the candidates."
                      (len2 (cadr data2))
                      (scr1 (car data1))
                      (scr2 (car data2)))
-                (cond ((or (= scr1 scr2)
-                           ;; Be more lax about the score.
-                           (<= (- scr1 scr2) 2)
-                           (string-match cand1 cand2)
-                           (string-match cand2 cand1))
+                (cond ((= scr1 scr2)
                        (unless preserve-tie-order
                          (< len1 len2)))
                       ((> scr1 scr2)))))))))
