@@ -1553,6 +1553,8 @@ Actually do nothing."
            '(helm-flex helm))
           (t '(helm)))))
 
+;; The adjust-metadata functions run only in emacs-27, they are NOT
+;; used otherwise.
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata

@@ -650,7 +650,7 @@ that is sorting is done against real value of candidate."
          (sc2 (get-text-property 0 'completion-score str2))
          (sc3 (unless sc1 (funcall score str1 reg1 reg2 reg3 split)))
          (sc4 (unless sc2 (funcall score str2 reg1 reg2 reg3 split))))
-    (cond ((and sc1 sc2)
+    (cond ((and sc1 sc2) ; helm-flex style.
            (> sc1 sc2))
           ((or (zerop (string-width qpattern))
                (and (zerop sc3) (zerop sc4)))

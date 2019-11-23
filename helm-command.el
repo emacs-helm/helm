@@ -146,6 +146,7 @@ fuzzy matching is running its own sort function with a different algorithm."
 
 (defun helm-M-x-transformer (candidates _source)
   "Transformer function for `helm-M-x' candidates."
+  ;; Generic sort function is handling helm-flex.
   (helm-M-x-transformer-1 candidates (null helm--in-fuzzy)))
 
 (defun helm-M-x-transformer-hist (candidates _source)
