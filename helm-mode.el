@@ -838,7 +838,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
          (completion-flex-nospace t)
-         (completion-styles (helm-completion-in-region--fix-completion-styles))
+         (completion-styles (helm-completion-in-region--set-completion-styles))
          (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
          (afun (or (plist-get completion-extra-properties :annotation-function)
@@ -1534,7 +1534,7 @@ Actually do nothing."
           (delete (assq 'helm-flex completion-styles-alist)
                   completion-styles-alist))))
 
-(defun helm-completion-in-region--fix-completion-styles ()
+(defun helm-completion-in-region--set-completion-styles ()
   "Add helm style to `completion-styles' and filter out incompatibles styles."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       '(basic partial-completion emacs22)
@@ -1599,7 +1599,7 @@ Actually do nothing."
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
                (completion-flex-nospace t)
-               (completion-styles (helm-completion-in-region--fix-completion-styles))
+               (completion-styles (helm-completion-in-region--set-completion-styles))
                (input (buffer-substring-no-properties start end))
                ;; FIXME: Should I use prefix instead of input for
                ;; initial completion? And use input for final insertion?
