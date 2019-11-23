@@ -52,7 +52,9 @@ This have no effect when `helm-M-x-use-completion-styles' is non nil"
   :type 'boolean)
 
 (defcustom helm-M-x-use-completion-styles nil
-  "Use `completion-styles' in helm-M-x."
+  "Use `completion-styles' in helm-M-x.
+
+Note that this have no effect if `helm-mode' is disabled."
   :group 'helm-command
   :type 'boolean)
 
@@ -229,6 +231,7 @@ than the default which is OBARRAY."
                        and collect c))
              (minibuffer-completion-confirm t)
              (sources (and helm-M-x-use-completion-styles
+                           helm-mode
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (helm-dynamic-completion
                                              (or history extended-command-history)
@@ -241,6 +244,7 @@ than the default which is OBARRAY."
                                 :persistent-help "Describe this command"
                                 :help-message 'helm-M-x-help-message
                                 :nomark t
+                                :group 'helm-command
                                 :keymap helm-M-x-map
                                 :filtered-candidate-transformer
                                 'helm-M-x-transformer-hist)

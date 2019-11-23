@@ -24,6 +24,8 @@
 
 (defvar crm-separator)
 (defvar ido-everywhere)
+(defvar completion-flex-nospace)
+
 (declare-function ido-mode "ido.el")
 
 (defgroup helm-mode nil
@@ -823,10 +825,13 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ((pred (stringp)) init)
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
+         (completion-flex-nospace t)
          (completion-styles (helm-completion-in-region--fix-completion-styles))
-         (metadata (or (and input predicate
-                            (completion-metadata input collection predicate))
+         (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
+         (afun (or (plist-get completion-extra-properties :annotation-function)
+                   (completion-metadata-get metadata 'annotation-function)))
+         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
          (compfn (lambda (str _predicate _action)
                    (let* ((comps
                            (completion-all-completions
@@ -863,7 +868,9 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                      (append (and default
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
-                             (if sort-fn (funcall sort-fn all) all)))))
+                             (helm-completion-in-region--initial-filter
+                              (if sort-fn (funcall sort-fn all) all)
+                              afun file-comp-p)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
                  compfn))
@@ -1433,10 +1440,13 @@ Actually do nothing."
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x)
+  (all-completions "" collection (lambda (x &optional _y)
+                                   ;; Second arg _y is needed when
+                                   ;; COLLECTION is a hash-table issue
+                                   ;; #2231 (C-x 8 RET).
                                    ;; Elements of collection may be
-                                   ;; lists, in this case consider the
-                                   ;; car of element #2219.
+                                   ;; lists or alists, in this case consider the
+                                   ;; car of element issue #2219 (org-refile).
                                    (let ((elm (if (listp x) (car x) x)))
                                      (if predicate
                                          (and (funcall predicate elm)
@@ -1523,16 +1533,14 @@ Actually do nothing."
 (defun helm-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata
-    (cl-flet ((compose-helm-sort-fn
-               ()
-               (lambda (candidates)
-                 (let ((res candidates))
-                   (sort res #'helm-generic-sort-fn)))))
+    (let ((compose-helm-sort-fn
+           (lambda (candidates)
+             (sort candidates #'helm-generic-sort-fn))))
       `(metadata
         (display-sort-function
-         . ,(compose-helm-sort-fn))
+         . ,compose-helm-sort-fn)
         (cycle-sort-function
-         . ,(compose-helm-sort-fn))
+         . ,compose-helm-sort-fn)
         ,@(cdr metadata)))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
@@ -1553,11 +1561,7 @@ Actually do nothing."
 (put 'helm-fuzzy 'completion--adjust-metadata 'helm-fuzzy-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
-  "Helm replacement of `completion--in-region'.
-
-Can be used for `completion-in-region-function' by advicing it with an
-:around advice to allow passing the old
-`completion-in-region-function' value in ORIGFUN."
+  "Helm replacement of `completion--in-region'."
   (cl-declare (special require-match prompt))
   (advice-add
    'lisp--local-variables
@@ -1567,6 +1571,7 @@ Can be used for `completion-in-region-function' by advicing it with an
         (customize-set-variable 'helm-completion-style it))
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
+               (completion-flex-nospace t)
                (completion-styles (helm-completion-in-region--fix-completion-styles))
                (input (buffer-substring-no-properties start end))
                ;; FIXME: Should I use prefix instead of input for
@@ -1584,13 +1589,14 @@ Can be used for `completion-in-region-function' by advicing it with an
                                   ;; completion-at-point or friend, so use a non--nil
                                   ;; value for require-match.
                                   (not (boundp 'prompt))))
+               (metadata (completion-metadata input collection predicate))
                ;; `completion-extra-properties' is let-bounded in `completion-at-point'.
                ;; `afun' is a closure to call against each string in `data'.
                ;; it provide the annotation info for each string.
                ;; e.g "foo" => "foo <f>" where foo is a function.
                ;; See Issue #407.
-               (afun (plist-get completion-extra-properties :annotation-function))
-               (metadata (completion-metadata input collection predicate))
+               (afun (or (plist-get completion-extra-properties :annotation-function)
+                         (completion-metadata-get metadata 'annotation-function)))
                (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
                                               (string-suffix-p " " input)
                                               (string= input ""))
