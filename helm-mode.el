@@ -1431,7 +1431,7 @@ Actually do nothing."
 
 (defun helm-flex-add-score-as-prop (candidates pattern)
   (cl-loop for cand in candidates
-           collect (helm-flex-style-score cand pattern)))
+           collect (helm-flex--style-score cand pattern)))
 
 (defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1445,6 +1445,11 @@ Actually do nothing."
                                               (helm-flex-style-match (helm-stringify elm)))
                                        (helm-flex-style-match (helm-stringify elm)))))))
 
+(defun helm-completion--flex-transform-pattern (string)
+  (cl-loop for str across string
+           nconc (list (string str) 'any) into lst
+           finally return (cons 'point lst)))
+
 (defun helm-completion--flex-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
   (let* ((beforepoint (substring string 0 point))
@@ -1452,9 +1457,7 @@ Actually do nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
-         (pattern (cl-loop for str across string
-                           nconc (list (string str) 'any) into lst
-                           finally return (cons 'point lst)))
+         (pattern (helm-completion--flex-transform-pattern string))
          (all (helm-completion--flex-all-completions-1 string table pred)))
     (list all pattern prefix suffix point)))
 

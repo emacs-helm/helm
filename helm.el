@@ -4180,7 +4180,15 @@ This function is used with sources built with `helm-source-sync'."
           (not (string-match regexp candidate))
         (string-match regexp candidate)))))
 
-(defun helm-flex-style-score (str pattern)
+(defun helm-flex--style-score (str pattern)
+  "Score STR candidate according to PATTERN.
+
+PATTERN is a list like '(point \"f\" any \"o\" any \"b\" any)
+for \"foo\" as PATTERN.  Such pattern is build with
+`helm-completion--flex-transform-pattern' function.
+
+Function extracted from `completion-pcm--hilit-commonality' in
+emacs-27 to provide such scoring in emacs<27."
   ;; Don't modify the string itself.
   (setq str (copy-sequence str))
   (let ((re (completion-pcm--pattern->regex pattern 'group)))
