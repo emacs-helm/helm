@@ -3934,78 +3934,6 @@ This function is used with sources built with `helm-source-sync'."
           (not (string-match regexp candidate))
         (string-match regexp candidate)))))
 
-(defvar helm--fuzzy-style-str nil)
-(defvar helm--fuzzy-style-cache-pat nil)
-(defun helm-fuzzy-style-get-pattern (pattern)
-  (unless (equal pattern helm--fuzzy-style-str)
-    (setq helm--fuzzy-style-str pattern
-          helm--fuzzy-style-cache-pat
-          (helm--fuzzy-style-set-pattern pattern)))
-  helm--fuzzy-style-cache-pat)
-
-(defun helm--fuzzy-style-set-pattern (pattern)
-  (let ((fun (if (string-match "\\`\\^" pattern)
-                 #'identity
-               #'helm--mapconcat-pattern)))
-    ;; FIXME: Splitted part are not handled here,
-    ;; I must compute them in `helm-search-match-part'
-    ;; when negation and in-buffer are used.
-    (if (string-match "\\`!" pattern)
-        (if (> (length pattern) 1)
-            (funcall fun (substring pattern 1))
-          "")
-      (if (> (length pattern) 0)
-          (funcall fun pattern)
-        ""))))
-
-(defun helm-fuzzy-style-match (candidate)
-  "Check if `helm-pattern' fuzzy matches CANDIDATE.
-This function is used with sources built with `helm-source-sync'."
-  (unless (string-match " " helm-pattern)
-    ;; When pattern have one or more spaces, let
-    ;; multi-match doing the job with no fuzzy matching.[1]
-    (let ((regexp (helm-fuzzy-style-get-pattern helm-pattern)))
-      (if (string-match "\\`!" helm-pattern)
-          (not (string-match regexp candidate))
-        (string-match regexp candidate)))))
-
-(defun helm-fuzzy-style-score (str pattern)
-  ;; Don't modify the string itself.
-  (setq str (copy-sequence str))
-  (let ((re (completion-pcm--pattern->regex pattern 'group)))
-    (unless (string-match re str)
-      (error "Internal error: %s does not match %s" re str))
-    (let* ((md (match-data))
-           (start (pop md))
-           (len (length str))
-           (score-numerator 0)
-           (score-denominator 0)
-           (last-b 0)
-           (update-score
-            (lambda (a b)
-              "Update score variables given match range (A B)."
-              (setq score-numerator (+ score-numerator (- b a)))
-              (unless (or (= a last-b)
-                          (zerop last-b)
-                          (= a (length str)))
-                (setq score-denominator (+ score-denominator
-                                           1
-                                           (expt (- a last-b 1)
-                                                 (/ 1.0 3)))))
-              (setq last-b b))))
-      (funcall update-score start start)
-      (pop md)
-      (while md
-        (funcall update-score start (car md))
-        (pop md)
-        (setq start (pop md)))
-      (funcall update-score len len)
-      (unless (zerop (length str))
-        (put-text-property
-         0 1 'completion-score
-         (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
-    str))
-
 (defun helm-fuzzy-search (pattern)
   "Same as `helm-fuzzy-match' but for sources built with
 `helm-source-in-buffer'."
@@ -4211,6 +4139,83 @@ to the matching method in use."
 See `helm-fuzzy-default-highlight-match'."
   (cl-loop for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c)))
+
+
+;;; helm-flex style
+;;
+;; Provide the emacs-27 flex style for emacs<27.
+;; Reuse the flex scoring algorithm of flex style in emacs-27.
+(defvar helm--flex-style-str nil)
+(defvar helm--flex-style-cache-pat nil)
+(defun helm-fuzzy-style-get-pattern (pattern)
+  (unless (equal pattern helm--flex-style-str)
+    (setq helm--flex-style-str pattern
+          helm--flex-style-cache-pat
+          (helm--flex-style-set-pattern pattern)))
+  helm--flex-style-cache-pat)
+
+(defun helm--flex-style-set-pattern (pattern)
+  (let ((fun (if (string-match "\\`\\^" pattern)
+                 #'identity
+               #'helm--mapconcat-pattern)))
+    ;; FIXME: Splitted part are not handled here,
+    ;; I must compute them in `helm-search-match-part'
+    ;; when negation and in-buffer are used.
+    (if (string-match "\\`!" pattern)
+        (if (> (length pattern) 1)
+            (funcall fun (substring pattern 1))
+          "")
+      (if (> (length pattern) 0)
+          (funcall fun pattern)
+        ""))))
+
+(defun helm-flex-style-match (candidate)
+  "Check if `helm-pattern' fuzzy matches CANDIDATE.
+This function is used with sources built with `helm-source-sync'."
+  (unless (string-match " " helm-pattern)
+    ;; When pattern have one or more spaces, let
+    ;; multi-match doing the job with no fuzzy matching.[1]
+    (let ((regexp (helm-fuzzy-style-get-pattern helm-pattern)))
+      (if (string-match "\\`!" helm-pattern)
+          (not (string-match regexp candidate))
+        (string-match regexp candidate)))))
+
+(defun helm-flex-style-score (str pattern)
+  ;; Don't modify the string itself.
+  (setq str (copy-sequence str))
+  (let ((re (completion-pcm--pattern->regex pattern 'group)))
+    (unless (string-match re str)
+      (error "Internal error: %s does not match %s" re str))
+    (let* ((md (match-data))
+           (start (pop md))
+           (len (length str))
+           (score-numerator 0)
+           (score-denominator 0)
+           (last-b 0)
+           (update-score
+            (lambda (a b)
+              "Update score variables given match range (A B)."
+              (setq score-numerator (+ score-numerator (- b a)))
+              (unless (or (= a last-b)
+                          (zerop last-b)
+                          (= a (length str)))
+                (setq score-denominator (+ score-denominator
+                                           1
+                                           (expt (- a last-b 1)
+                                                 (/ 1.0 3)))))
+              (setq last-b b))))
+      (funcall update-score start start)
+      (pop md)
+      (while md
+        (funcall update-score start (car md))
+        (pop md)
+        (setq start (pop md)))
+      (funcall update-score len len)
+      (unless (zerop (length str))
+        (put-text-property
+         0 1 'completion-score
+         (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
+    str))
 
 
 ;;; Matching candidates

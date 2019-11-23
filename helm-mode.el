@@ -1398,7 +1398,7 @@ Actually do nothing."
       (helm-completion--multi-all-completions string table pred point)
     (when all (nconc all (length prefix)))))
 
-(defun helm-fuzzy-completion-try-completion (string table pred point)
+(defun helm-flex-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
   ;; AFAIU the try completion function is here to handle single
@@ -1409,19 +1409,19 @@ Actually do nothing."
   ;; nil should be fine.
   (ignore string table pred point))
 
-(defun helm-fuzzy-completion-all-completions (string table pred point)
+(defun helm-flex-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
-      (helm-completion--fuzzy-all-completions string table pred point)
-    (when all (nconc (helm-fuzzy-add-score-as-prop all pattern)
+      (helm-completion--flex-all-completions string table pred point)
+    (when all (nconc (helm-flex-add-score-as-prop all pattern)
                      (length prefix)))))
 
-(defun helm-fuzzy-add-score-as-prop (candidates pattern)
+(defun helm-flex-add-score-as-prop (candidates pattern)
   (cl-loop for cand in candidates
-           collect (helm-fuzzy-style-score cand pattern)))
+           collect (helm-flex-style-score cand pattern)))
 
-(defun helm-completion--fuzzy-all-completions-1 (_string collection &optional predicate)
+(defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
   (all-completions "" collection (lambda (x &optional _y)
                                    ;; Elements of collection may be
@@ -1430,10 +1430,10 @@ Actually do nothing."
                                    (let ((elm (if (listp x) (car x) x)))
                                      (if predicate
                                          (and (funcall predicate elm)
-                                              (helm-fuzzy-style-match (helm-stringify elm)))
-                                       (helm-fuzzy-style-match (helm-stringify elm)))))))
+                                              (helm-flex-style-match (helm-stringify elm)))
+                                       (helm-flex-style-match (helm-stringify elm)))))))
 
-(defun helm-completion--fuzzy-all-completions (string table pred point)
+(defun helm-completion--flex-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
   (let* ((beforepoint (substring string 0 point))
          (afterpoint (substring string point))
@@ -1443,7 +1443,7 @@ Actually do nothing."
          (pattern (cl-loop for str across string
                            nconc (list (string str) 'any) into lst
                            finally return (cons 'point lst)))
-         (all (helm-completion--fuzzy-all-completions-1 string table pred)))
+         (all (helm-completion--flex-all-completions-1 string table pred)))
     (list all pattern prefix suffix point)))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
@@ -1505,19 +1505,22 @@ Actually do nothing."
                      "helm multi completion style.")
               completion-styles-alist
               :test 'equal)
-  (cl-pushnew '(helm-fuzzy helm-fuzzy-completion-try-completion
-                           helm-fuzzy-completion-all-completions
-                           "helm fuzzy completion style.")
-              completion-styles-alist
-              :test 'equal))
+  (unless (assq 'flex completion-styles-alist)
+    ;; Add helm-fuzzy style only if flex is not available.
+    (cl-pushnew '(helm-flex helm-flex-completion-try-completion
+                            helm-flex-completion-all-completions
+                            "helm flex completion style.\nProvide flex matching for emacs-26.")
+                completion-styles-alist
+                :test 'equal)))
 
 (defun helm-mode--disable-completion-styles ()
   (setq completion-styles-alist
         (delete (assq 'helm completion-styles-alist)
                 completion-styles-alist))
-  (setq completion-styles-alist
-        (delete (assq 'helm-fuzzy completion-styles-alist)
-                completion-styles-alist)))
+  (when (assq 'helm-flex completion-styles-alist)
+    (setq completion-styles-alist
+          (delete (assq 'helm-flex completion-styles-alist)
+                  completion-styles-alist))))
 
 (defun helm-completion-in-region--fix-completion-styles ()
   "Add helm style to `completion-styles' and filter out incompatibles styles."
@@ -1534,8 +1537,8 @@ Actually do nothing."
            ;; return foo and foobar only defeating flex that would
            ;; return foo foobar foao and frogo.
            '(flex helm))
-          ((memq 'helm-fuzzy completion-styles)
-           '(helm-fuzzy helm))
+          ((memq 'helm-flex completion-styles)
+           '(helm-flex helm))
           (t '(helm)))))
 
 (defun helm-completion--adjust-metadata (metadata)
@@ -1552,7 +1555,7 @@ Actually do nothing."
         ,@(cdr metadata)))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
-(defun helm-fuzzy-completion--adjust-metadata (metadata)
+(defun helm-flex-completion--adjust-metadata (metadata)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       metadata
     (cl-flet ((compose-helm-sort-fn
@@ -1570,7 +1573,7 @@ Actually do nothing."
         (cycle-sort-function
          . ,(compose-helm-sort-fn))
         ,@(cdr metadata)))))
-(put 'helm-fuzzy 'completion--adjust-metadata 'helm-fuzzy-completion--adjust-metadata)
+(put 'helm-flex 'completion--adjust-metadata 'helm-flex-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'."

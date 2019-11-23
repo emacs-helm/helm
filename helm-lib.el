@@ -1367,8 +1367,8 @@ Example:
     ;; helm-completion-in-region--fix-completion-styles.
     (let* ((completion-styles (cond ((memq 'flex completion-styles)
                                      '(flex helm))
-                                    ((memq 'helm-fuzzy completion-styles)
-                                     '(helm-fuzzy helm))
+                                    ((memq 'helm-flex completion-styles)
+                                     '(helm-flex helm))
                                     (t '(helm))))
            (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
