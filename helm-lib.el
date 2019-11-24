@@ -1374,7 +1374,9 @@ Example:
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
                                      str
-                                     collection
+                                     (if (functionp collection)
+                                         (funcall collection str predicate t)
+                                       collection)
                                      pred
                                      (or point 0)
                                      (or metadata '(metadata))))
