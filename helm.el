@@ -4213,10 +4213,9 @@ emacs-27 to provide such scoring in emacs<27."
                                                (/ 1.0 3)))))
             (setq last-b b))))
     (funcall update-score start start)
-    (pop md)
+    (setq md (cdr md))
     (while md
-      (funcall update-score start (car md))
-      (pop md)
+      (funcall update-score start (pop md))
       (setq start (pop md)))
     (funcall update-score len len)
     (unless (zerop (length str))
