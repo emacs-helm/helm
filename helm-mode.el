@@ -1426,12 +1426,13 @@ Actually do nothing."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
       (helm-completion--flex-all-completions string table pred point)
-    (when all (nconc (helm-flex-add-score-as-prop all pattern)
-                     (length prefix)))))
+    (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
+      (when all (nconc (helm-flex-add-score-as-prop all regexp)
+                       (length prefix))))))
 
-(defun helm-flex-add-score-as-prop (candidates pattern)
+(defun helm-flex-add-score-as-prop (candidates regexp)
   (cl-loop for cand in candidates
-           collect (helm-flex--style-score cand pattern)))
+           collect (helm-flex--style-score cand regexp)))
 
 (defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
@@ -1445,11 +1446,18 @@ Actually do nothing."
                                               (helm-flex-style-match (helm-stringify elm)))
                                        (helm-flex-style-match (helm-stringify elm)))))))
 
-(defun helm-completion--flex-transform-pattern (string)
-  (cl-loop for str across string
-           nconc (list (string str) 'any) into lst
-           finally return (cons 'point lst)))
+(defun helm-completion--flex-transform-pattern (pattern)
+  ;; "fob" => '(prefix "f" any "o" any "b" any point)
+  (cl-loop for p in pattern
+           if (stringp p) append
+           (cl-loop for str across p
+                    nconc (list (string str) 'any))
+           else nconc (list p)))
 
+;; FIXME: POINT is still wrong in some cases e.g. completing against
+;; "def" should return "defun" on top, it returns actually "defun*"
+;; the helm style though return "defun" on top as expected.  Flex with
+;; emacs-27 also is correct, it returns "defun" as well.
 (defun helm-completion--flex-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
   (let* ((beforepoint (substring string 0 point))
@@ -1457,7 +1465,12 @@ Actually do nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
-         (pattern (helm-completion--flex-transform-pattern string))
+         (basic-pattern (completion-basic--pattern
+                         beforepoint afterpoint bounds))
+         (pattern (if (not (stringp (car basic-pattern)))
+                      basic-pattern
+                    (cons 'prefix basic-pattern)))
+         (pattern (helm-completion--flex-transform-pattern pattern))
          (all (helm-completion--flex-all-completions-1 string table pred)))
     (list all pattern prefix suffix point)))
 

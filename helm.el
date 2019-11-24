@@ -4180,50 +4180,50 @@ This function is used with sources built with `helm-source-sync'."
           (not (string-match regexp candidate))
         (string-match regexp candidate)))))
 
-(defun helm-flex--style-score (str pattern)
+(defun helm-flex--style-score (str regexp)
   "Score STR candidate according to PATTERN.
 
-PATTERN is a list like '(point \"f\" any \"o\" any \"b\" any)
-for \"foo\" as PATTERN.  Such pattern is build with
+REGEXP should be generated from a pattern which is a list like
+\'(point \"f\" any \"o\" any \"b\" any) for \"fob\" as pattern.
+Such pattern is build with 
 `helm-completion--flex-transform-pattern' function.
 
 Function extracted from `completion-pcm--hilit-commonality' in
 emacs-27 to provide such scoring in emacs<27."
   ;; Don't modify the string itself.
   (setq str (copy-sequence str))
-  (let ((re (completion-pcm--pattern->regex pattern 'group)))
-    (unless (string-match re str)
-      (error "Internal error: %s does not match %s" re str))
-    (let* ((md (match-data))
-           (start (pop md))
-           (len (length str))
-           (score-numerator 0)
-           (score-denominator 0)
-           (last-b 0)
-           (update-score
-            (lambda (a b)
-              "Update score variables given match range (A B)."
-              (setq score-numerator (+ score-numerator (- b a)))
-              (unless (or (= a last-b)
-                          (zerop last-b)
-                          (= a (length str)))
-                (setq score-denominator (+ score-denominator
-                                           1
-                                           (expt (- a last-b 1)
-                                                 (/ 1.0 3)))))
-              (setq last-b b))))
-      (funcall update-score start start)
+  (unless (string-match regexp str)
+    (error "Internal error: %s does not match %s" regexp str))
+  (let* ((md (match-data))
+         (start (pop md))
+         (len (length str))
+         (score-numerator 0)
+         (score-denominator 0)
+         (last-b 0)
+         (update-score
+          (lambda (a b)
+            "Update score variables given match range (A B)."
+            (setq score-numerator (+ score-numerator (- b a)))
+            (unless (or (= a last-b)
+                        (zerop last-b)
+                        (= a (length str)))
+              (setq score-denominator (+ score-denominator
+                                         1
+                                         (expt (- a last-b 1)
+                                               (/ 1.0 3)))))
+            (setq last-b b))))
+    (funcall update-score start start)
+    (pop md)
+    (while md
+      (funcall update-score start (car md))
       (pop md)
-      (while md
-        (funcall update-score start (car md))
-        (pop md)
-        (setq start (pop md)))
-      (funcall update-score len len)
-      (unless (zerop (length str))
-        (put-text-property
-         0 1 'completion-score
-         (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
-    str))
+      (setq start (pop md)))
+    (funcall update-score len len)
+    (unless (zerop (length str))
+      (put-text-property
+       0 1 'completion-score
+       (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
+    str)
 
 
 ;;; Matching candidates
