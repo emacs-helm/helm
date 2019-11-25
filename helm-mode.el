@@ -1392,113 +1392,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm-completion-try-completion (string table pred point)
-  "The try completion function for `completing-styles-alist'.
-Actually do nothing."
-  ;; AFAIU the try completion function is here to handle single
-  ;; element completion, in this case it throw this element without
-  ;; popping up *completions* buffer. If that's the case we don't need
-  ;; this because helm already handle this with
-  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
-  ;; nil should be fine.
-  (ignore string table pred point))
-
-(defun helm-completion-all-completions (string table pred point)
-  "The all completions function for `completing-styles-alist'."
-  ;; FIXME: No need to bind all these value.
-  (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
-      (helm-completion--multi-all-completions string table pred point)
-    (when all (nconc all (length prefix)))))
-
-(defun helm-flex-completion-try-completion (string table pred point)
-  "The try completion function for `completing-styles-alist'.
-Actually do nothing."
-  ;; AFAIU the try completion function is here to handle single
-  ;; element completion, in this case it throw this element without
-  ;; popping up *completions* buffer. If that's the case we don't need
-  ;; this because helm already handle this with
-  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
-  ;; nil should be fine.
-  (ignore string table pred point))
-
-(defun helm-flex-completion-all-completions (string table pred point)
-  "The all completions function for `completing-styles-alist'."
-  ;; FIXME: No need to bind all these value.
-  (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
-      (helm-completion--flex-all-completions string table pred point)
-    (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
-      (when all (nconc (helm-flex-add-score-as-prop all regexp)
-                       (length prefix))))))
-
-(defun helm-flex-add-score-as-prop (candidates regexp)
-  (cl-loop for cand in candidates
-           collect (helm-flex--style-score cand regexp)))
-
-(defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
-  "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x &optional _y)
-                                   ;; Elements of collection may be
-                                   ;; lists, in this case consider the
-                                   ;; car of element #2219.
-                                   (let ((elm (if (listp x) (car x) x)))
-                                     (if predicate
-                                         (and (funcall predicate elm)
-                                              (helm-flex-style-match (helm-stringify elm)))
-                                       (helm-flex-style-match (helm-stringify elm)))))))
-
-(defun helm-completion--flex-transform-pattern (pattern)
-  ;; "fob" => '(prefix "f" any "o" any "b" any point)
-  (cl-loop for p in pattern
-           if (stringp p) append
-           (cl-loop for str across p
-                    nconc (list (string str) 'any))
-           else nconc (list p)))
-
-;; FIXME: POINT is still wrong in some cases e.g. completing against
-;; "def" should return "defun" on top, it returns actually "defun*"
-;; the helm style though return "defun" on top as expected.  Flex with
-;; emacs-27 also is correct, it returns "defun" as well.
-(defun helm-completion--flex-all-completions (string table pred point)
-  "Collect completions from TABLE for helm completion style."
-  (let* ((beforepoint (substring string 0 point))
-         (afterpoint (substring string point))
-         (bounds (completion-boundaries beforepoint table pred afterpoint))
-         (prefix (substring beforepoint 0 (car bounds)))
-         (suffix (substring afterpoint (cdr bounds)))
-         (basic-pattern (completion-basic--pattern
-                         beforepoint afterpoint bounds))
-         (pattern (if (not (stringp (car basic-pattern)))
-                      basic-pattern
-                    (cons 'prefix basic-pattern)))
-         (pattern (helm-completion--flex-transform-pattern pattern))
-         (all (helm-completion--flex-all-completions-1 string table pred)))
-    (list all pattern prefix suffix point)))
-
-(defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
-  "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x &optional _y)
-                                   ;; Second arg _y is needed when
-                                   ;; COLLECTION is a hash-table issue
-                                   ;; #2231 (C-x 8 RET).
-                                   ;; Elements of collection may be
-                                   ;; lists or alists, in this case consider the
-                                   ;; car of element issue #2219 (org-refile).
-                                   (let ((elm (if (listp x) (car x) x)))
-                                     (if predicate
-                                         (and (funcall predicate elm)
-                                              (helm-mm-match (helm-stringify elm) string))
-                                       (helm-mm-match (helm-stringify elm) string))))))
-
-(defun helm-completion--multi-all-completions (string table pred point)
-  "Collect completions from TABLE for helm completion style."
-  (let* ((beforepoint (substring string 0 point))
-         (afterpoint (substring string point))
-         (bounds (completion-boundaries beforepoint table pred afterpoint))
-         (prefix (substring beforepoint 0 (car bounds)))
-         (suffix (substring afterpoint (cdr bounds)))
-         (all (helm-completion--multi-all-completions-1 string table pred)))
-    (list all string prefix suffix point)))
-
 (defun helm-completion-in-region--initial-filter (comps afun file-comp-p)
   "Add annotations at end of candidates and filter out dot files."
   (if file-comp-p
@@ -1569,6 +1462,51 @@ Actually do nothing."
            '(helm-flex helm))
           (t '(helm)))))
 
+;; Helm multi matching style
+
+(defun helm-completion-try-completion (string table pred point)
+  "The try completion function for `completing-styles-alist'.
+Actually do nothing."
+  ;; AFAIU the try completion function is here to handle single
+  ;; element completion, in this case it throw this element without
+  ;; popping up *completions* buffer. If that's the case we don't need
+  ;; this because helm already handle this with
+  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
+  ;; nil should be fine.
+  (ignore string table pred point))
+
+(defun helm-completion-all-completions (string table pred point)
+  "The all completions function for `completing-styles-alist'."
+  ;; FIXME: No need to bind all these value.
+  (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
+      (helm-completion--multi-all-completions string table pred point)
+    (when all (nconc all (length prefix)))))
+
+(defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
+  "Allow `all-completions' multi matching on its candidates."
+  (all-completions "" collection (lambda (x &optional _y)
+                                   ;; Second arg _y is needed when
+                                   ;; COLLECTION is a hash-table issue
+                                   ;; #2231 (C-x 8 RET).
+                                   ;; Elements of collection may be
+                                   ;; lists or alists, in this case consider the
+                                   ;; car of element issue #2219 (org-refile).
+                                   (let ((elm (if (listp x) (car x) x)))
+                                     (if predicate
+                                         (and (funcall predicate elm)
+                                              (helm-mm-match (helm-stringify elm) string))
+                                       (helm-mm-match (helm-stringify elm) string))))))
+
+(defun helm-completion--multi-all-completions (string table pred point)
+  "Collect completions from TABLE for helm completion style."
+  (let* ((beforepoint (substring string 0 point))
+         (afterpoint (substring string point))
+         (bounds (completion-boundaries beforepoint table pred afterpoint))
+         (prefix (substring beforepoint 0 (car bounds)))
+         (suffix (substring afterpoint (cdr bounds)))
+         (all (helm-completion--multi-all-completions-1 string table pred)))
+    (list all string prefix suffix point)))
+
 ;; The adjust-metadata functions run only in emacs-27, they are NOT
 ;; used otherwise.
 (defun helm-completion--adjust-metadata (metadata)
@@ -1585,25 +1523,94 @@ Actually do nothing."
         ,@(cdr metadata)))))
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
-(defun helm-flex-completion--adjust-metadata (metadata)
-  (if (memq helm-completion-style '(helm helm-fuzzy))
-      metadata
-    (cl-flet ((compose-helm-sort-fn
-               ()
-               (lambda (candidates)
-                 (sort
-                  candidates
-                  (lambda (c1 c2)
-                    (let ((s1 (get-text-property 0 'completion-score c1))
-                          (s2 (get-text-property 0 'completion-score c2)))
-                      (> (or s1 0) (or s2 0))))))))
-      `(metadata
-        (display-sort-function
-         . ,(compose-helm-sort-fn))
-        (cycle-sort-function
-         . ,(compose-helm-sort-fn))
-        ,@(cdr metadata)))))
-(put 'helm-flex 'completion--adjust-metadata 'helm-flex-completion--adjust-metadata)
+;; Helm-flex style.
+
+(defun helm-flex-completion-try-completion (string table pred point)
+  "The try completion function for `completing-styles-alist'.
+Actually do nothing."
+  ;; AFAIU the try completion function is here to handle single
+  ;; element completion, in this case it throw this element without
+  ;; popping up *completions* buffer. If that's the case we don't need
+  ;; this because helm already handle this with
+  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
+  ;; nil should be fine.
+  (ignore string table pred point))
+
+(defun helm-flex-completion-all-completions (string table pred point)
+  "The all completions function for `completing-styles-alist'."
+  ;; FIXME: No need to bind all these value.
+  (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
+      (helm-completion--flex-all-completions string table pred point)
+    (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
+      (when all (nconc (helm-flex-add-score-as-prop all regexp)
+                       (length prefix))))))
+
+(defun helm-flex-add-score-as-prop (candidates regexp)
+  (cl-loop for cand in candidates
+           collect (helm-flex--style-score cand regexp)))
+
+(defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
+  "Allow `all-completions' multi matching on its candidates."
+  (all-completions "" collection (lambda (x &optional _y)
+                                   ;; Elements of collection may be
+                                   ;; lists, in this case consider the
+                                   ;; car of element #2219.
+                                   (let ((elm (if (listp x) (car x) x)))
+                                     (if predicate
+                                         (and (funcall predicate elm)
+                                              (helm-flex-style-match (helm-stringify elm)))
+                                       (helm-flex-style-match (helm-stringify elm)))))))
+
+(defun helm-completion--flex-transform-pattern (pattern)
+  ;; "fob" => '(prefix "f" any "o" any "b" any point)
+  (cl-loop for p in pattern
+           if (stringp p) append
+           (cl-loop for str across p
+                    nconc (list (string str) 'any))
+           else nconc (list p)))
+
+;; FIXME: POINT is still wrong in some cases e.g. completing against
+;; "def" should return "defun" on top, it returns actually "defun*"
+;; the helm style though return "defun" on top as expected.  Flex with
+;; emacs-27 also is correct, it returns "defun" as well.
+(defun helm-completion--flex-all-completions (string table pred point)
+  "Collect completions from TABLE for helm completion style."
+  (let* ((beforepoint (substring string 0 point))
+         (afterpoint (substring string point))
+         (bounds (completion-boundaries beforepoint table pred afterpoint))
+         (prefix (substring beforepoint 0 (car bounds)))
+         (suffix (substring afterpoint (cdr bounds)))
+         (basic-pattern (completion-basic--pattern
+                         beforepoint afterpoint bounds))
+         (pattern (if (not (stringp (car basic-pattern)))
+                      basic-pattern
+                    (cons 'prefix basic-pattern)))
+         (pattern (helm-completion--flex-transform-pattern pattern))
+         (all (helm-completion--flex-all-completions-1 string table pred)))
+    (list all pattern prefix suffix point)))
+
+;; This is usable only in emacs-27, but in emacs-27 we prefer
+;; using flex so this code is unused in both emacs-26 and 27.
+
+;; (defun helm-flex-completion--adjust-metadata (metadata)
+;; (if (memq helm-completion-style '(helm helm-fuzzy))
+;; metadata
+;; (cl-flet ((compose-helm-sort-fn
+;; ()
+;; (lambda (candidates)
+;; (sort
+;; candidates
+;; (lambda (c1 c2)
+;; (let ((s1 (get-text-property 0 'completion-score c1))
+;; (s2 (get-text-property 0 'completion-score c2)))
+;; (> (or s1 0) (or s2 0))))))))
+;; `(metadata
+;; (display-sort-function
+;; . ,(compose-helm-sort-fn))
+;; (cycle-sort-function
+;; . ,(compose-helm-sort-fn))
+;; ,@(cdr metadata)))))
+;; (put 'helm-flex 'completion--adjust-metadata 'helm-flex-completion--adjust-metadata)
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'."
