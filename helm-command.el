@@ -149,7 +149,7 @@ fuzzy matching is running its own sort function with a different algorithm."
   ;; Generic sort function is handling helm-flex.
   (helm-M-x-transformer-1 candidates (null helm--in-fuzzy)))
 
-(defun helm-M-x-transformer-hist (candidates _source)
+(defun helm-M-x-transformer-no-sort (candidates _source)
   "Transformer function for `helm-M-x' candidates."
   (helm-M-x-transformer-1 candidates))
 
@@ -248,7 +248,7 @@ than the default which is OBARRAY."
                                 :group 'helm-command
                                 :keymap helm-M-x-map
                                 :filtered-candidate-transformer
-                                'helm-M-x-transformer-hist)
+                                'helm-M-x-transformer-no-sort)
                              ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
                                              collection #'commandp)
@@ -310,7 +310,7 @@ than the default which is OBARRAY."
                   :nomark t
                   :candidates-in-buffer t
                   :fc-transformer 'helm-M-x-transformer
-                  :hist-fc-transformer 'helm-M-x-transformer-hist)))
+                  :hist-fc-transformer 'helm-M-x-transformer-no-sort)))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 
