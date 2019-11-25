@@ -1346,11 +1346,15 @@ I.e. when using `helm-next-line' and friends in BODY."
 
 (defun helm-dynamic-completion (collection predicate &optional point metadata)
   "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
+
 Only the elements of COLLECTION that satisfy PREDICATE are considered.
-POINT and METADATA are unused for now.
+Argument POINT is same as in `completion-all-completions' and is
+meaningful only when using some kind of `completion-at-point'.
 The return value is a list of completions that may be sorted by the
 sort function provided by the completion-style in use (emacs-27 only),
-otherwise (emacs-26) the sort function have to be provided if needed.
+otherwise (emacs-26) the sort function have to be provided if needed
+either with a FCT function in source or by passing the sort function
+with METADATA e.g. (metadata (display-sort-function . foo)).
 
 Example:
 
