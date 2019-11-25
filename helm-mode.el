@@ -855,12 +855,21 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                           (last-data (last comps))
                           ;; Helm syle sort fn is added to
                           ;; metadata only in emacs-27, so in
-                          ;; emacs-26 sort-fn is always nil
-                          ;; and  sorting will be done
+                          ;; emacs-26 use helm-generic-sort-fn
+                          ;; which handle both helm and
+                          ;; helm-flex styles. When
+                          ;; helm-completion-style is helm or
+                          ;; helm-fuzzy, sorting will be done
                           ;; later in FCT.
-                          (sort-fn (and (eq helm-completion-style 'emacs)
-                                        (completion-metadata-get
-                                         metadata 'display-sort-function)))
+                          (sort-fn
+                           (and (eq helm-completion-style 'emacs)
+                                (or
+                                 ;; Emacs-27
+                                 (completion-metadata-get
+                                  metadata 'display-sort-function)
+                                 ;; Emacs-26
+                                 (lambda (candidates)
+                                   (sort candidates #'helm-generic-sort-fn)))))
                           all)
                      (when (cdr last-data)
                        ;; Remove the last element of
@@ -1681,12 +1690,21 @@ Actually do nothing."
                                       0))
                                 ;; Helm syle sort fn is added to
                                 ;; metadata only in emacs-27, so in
-                                ;; emacs-26 sort-fn is always nil
-                                ;; and  sorting will be done
+                                ;; emacs-26 use helm-generic-sort-fn
+                                ;; which handle both helm and
+                                ;; helm-flex styles. When
+                                ;; helm-completion-style is helm or
+                                ;; helm-fuzzy, sorting will be done
                                 ;; later in FCT.
-                                (sort-fn (and (eq helm-completion-style 'emacs)
-                                              (completion-metadata-get
-                                               metadata 'display-sort-function)))
+                                (sort-fn
+                                 (and (eq helm-completion-style 'emacs)
+                                      (or
+                                       ;; Emacs-27
+                                       (completion-metadata-get
+                                           metadata 'display-sort-function)
+                                       ;; Emacs-26
+                                       (lambda (candidates)
+                                         (sort candidates #'helm-generic-sort-fn)))))
                                 all)
                            ;; Reset prefix to allow using length of
                            ;; helm-pattern on next calls (this avoid
