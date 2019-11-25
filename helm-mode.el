@@ -163,13 +163,16 @@ even better if you are using emacs-27 add flex style to
   :type 'boolean)
 (make-obsolete-variable 'helm-mode-fuzzy-match 'helm-completion-style "3.6.0")
 
-(defcustom helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
-  "Incompatible `minibuffer-setup-hook' functions go here.
-A list of symbols.
-Helm-mode is rejecting all lambda's, byte-code fns
-and all functions belonging in this list from `minibuffer-setup-hook'."
+(defcustom helm-completion-mark-suffix nil
+  "Push mark at end of suffix when non nil."
   :group 'helm-mode
-  :type '(repeat (choice symbol)))
+  :type 'boolean)
+
+(defvar helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
+  "Incompatible `minibuffer-setup-hook' functions go here.
+A list of symbols.  Helm-mode is rejecting all lambda's, byte-code fns
+and all functions belonging in this list from `minibuffer-setup-hook'.
+This is mainly needed to prevent \"*Completions*\" buffers to popup.")
 
 (defface helm-mode-prefix
     '((t (:background "red" :foreground "black")))
@@ -1466,10 +1469,14 @@ The `helm-find-files' history `helm-ff-history' is used here."
            ;; baz) with pattern "foo" helm style if before flex will
            ;; return foo and foobar only defeating flex that would
            ;; return foo foobar foao and frogo.
-           '(flex helm))
+           (helm-append-at-nth
+            completion-styles
+            '(helm) (1+ (cl-position 'flex completion-styles))))
           ((memq 'helm-flex completion-styles)
-           '(helm-flex helm))
-          (t '(helm)))))
+           (helm-append-at-nth
+            completion-styles
+            '(helm) (1+ (cl-position 'helm-flex completion-styles))))
+          (t (append '(helm) completion-styles)))))
 
 ;; Helm multi matching style
 
@@ -1639,6 +1646,7 @@ Actually do nothing."
                ;; initial completion? And use input for final insertion?
                (prefix (and (eq helm-completion-style 'emacs)
                             (buffer-substring-no-properties start (point))))
+               (point (point))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
                (str-command (helm-symbol-name current-command))
@@ -1768,18 +1776,25 @@ Actually do nothing."
                                (message "[No matches]")))
                             t)          ; exit minibuffer immediately.
                           :must-match require-match))))
-          (helm-completion-in-region--insert-result result start end base-size))
+          (helm-completion-in-region--insert-result result start point end base-size))
       (customize-set-variable 'helm-completion-style old--helm-completion-style)
       (setq helm-completion--sorting-done nil)
       (advice-remove 'lisp--local-variables
                      #'helm-mode--advice-lisp--local-variables))))
 
-(defun helm-completion-in-region--insert-result (result start end base-size)
+(defun helm-completion-in-region--insert-result (result start point end base-size)
   (cond ((stringp result)
          (choose-completion-string
           result (current-buffer)
-          (list (+ start base-size) end)
-          completion-list-insert-choice-function))
+          (list (+ start base-size) point)
+          completion-list-insert-choice-function)
+         (when helm-completion-mark-suffix
+           (run-with-idle-timer 0.01 nil
+                                (lambda ()
+                                  (helm-aand 
+                                   (+ (- (point) point) end)
+                                   (and (> it (point)) it)
+                                   (push-mark  it t t))))))
         ((consp result)                 ; crm.
          (let ((beg (+ start base-size))
                (sep ","))

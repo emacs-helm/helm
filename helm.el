@@ -5592,8 +5592,9 @@ don't exit and send message 'no match'."
                                        ;; SEL may be a cons cell when helm-comp-read
                                        ;; is called directly with a collection composed
                                        ;; of (display . real) and real is a cons cell.
-                                       (try-completion sel minibuffer-completion-table
-                                                       minibuffer-completion-predicate)))
+                                       (let (completion-styles)
+                                         (try-completion sel minibuffer-completion-table
+                                                         minibuffer-completion-predicate))))
                           unknown))
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
