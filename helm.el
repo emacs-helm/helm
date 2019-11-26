@@ -5571,7 +5571,6 @@ don't exit and send message 'no match'."
       (let* ((src (helm-get-current-source))
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
-             (sel (helm-get-selection nil nil src))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
                                      0 'display
@@ -5584,24 +5583,18 @@ don't exit and send message 'no match'."
                      'confirm)
                (setq minibuffer-completion-confirm nil)
                (minibuffer-message " [confirm]"))
-              ((and (or empty-buffer-p
-                        (unless (if minibuffer-completing-file-name
-                                    (and minibuffer-completion-predicate
-                                         (funcall minibuffer-completion-predicate sel))
-                                  (and (stringp sel)
-                                       ;; SEL may be a cons cell when helm-comp-read
-                                       ;; is called directly with a collection composed
-                                       ;; of (display . real) and real is a cons cell.
-                                       (let (completion-styles)
-                                         (try-completion sel minibuffer-completion-table
-                                                         minibuffer-completion-predicate))))
-                          unknown))
+              ;; When require-match is strict (i.e. `t'), buffer
+              ;; should be either empty or in read-file-name have an
+              ;; unknown candidate ([?] prefix), if it's not the case
+              ;; fix it in helm-mode but not here. 
+              ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
               (empty-buffer-p
                ;; This is used when helm-buffer is totally empty,
                ;; i.e. the [?] have not been added because must-match
-               ;; is used from outside helm-comp-read.
+               ;; is used from outside helm-comp-read i.e. from a helm
+               ;; source built with :must-match.
                (setq helm-saved-selection helm-pattern
                      helm-saved-action (helm-get-default-action
                                         (assoc-default
