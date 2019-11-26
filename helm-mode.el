@@ -163,7 +163,7 @@ even better if you are using emacs-27 add flex style to
   :type 'boolean)
 (make-obsolete-variable 'helm-mode-fuzzy-match 'helm-completion-style "3.6.0")
 
-(defcustom helm-completion-mark-suffix nil
+(defcustom helm-completion-mark-suffix t
   "Push mark at end of suffix when non nil."
   :group 'helm-mode
   :type 'boolean)
