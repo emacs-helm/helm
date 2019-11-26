@@ -1642,10 +1642,12 @@ Actually do nothing."
                (completion-flex-nospace t)
                (completion-styles (helm-completion-in-region--set-completion-styles))
                (input (buffer-substring-no-properties start end))
-               ;; FIXME: Should I use prefix instead of input for
-               ;; initial completion? And use input for final insertion?
-               (prefix (and (eq helm-completion-style 'emacs)
-                            (buffer-substring-no-properties start (point))))
+               ;; Always start with prefix to allow completing without
+               ;; the need of inserting a space after cursor or
+               ;; relaying on crap old completion-styles emacs22 which
+               ;; add suffix after prefix. e.g. def|else.
+               (initial-input (buffer-substring-no-properties start (point)))
+               (prefix (and (eq helm-completion-style 'emacs) initial-input))
                (point (point))
                (current-command (or (helm-this-command) this-command))
                (crm (eq current-command 'crm-complete))
@@ -1745,18 +1747,18 @@ Actually do nothing."
                           :marked-candidates crm
                           :initial-input
                           (cond ((and file-comp-p
-                                      (not (string-match "/\\'" input)))
+                                      (not (string-match "/\\'" initial-input)))
                                  (concat (helm-mode--completion-in-region-initial-input
                                           (if (memq helm-completion-style '(helm helm-fuzzy))
-                                              (helm-basename input)
-                                            input))
+                                              (helm-basename initial-input)
+                                            initial-input))
                                          init-space-suffix))
-                                ((string-match "/\\'" input)
-                                 (and (eq helm-completion-style 'emacs) input))
+                                ((string-match "/\\'" initial-input)
+                                 (and (eq helm-completion-style 'emacs) initial-input))
                                 ((or (null require-match)
                                      (stringp require-match))
-                                 (helm-mode--completion-in-region-initial-input input))
-                                (t (concat (helm-mode--completion-in-region-initial-input input)
+                                 (helm-mode--completion-in-region-initial-input initial-input))
+                                (t (concat (helm-mode--completion-in-region-initial-input initial-input)
                                            init-space-suffix)))
                           :buffer buf-name
                           :fc-transformer
