@@ -156,9 +156,10 @@ will be used."
 (defcustom helm-mode-fuzzy-match nil
   "Enable fuzzy matching in `helm-mode' globally.
 
-This is deprecated, use instead helm-fuzzy `helm-completion-style' or
-even better if you are using emacs-27 add flex style to
-`completion-styles' and use emacs `helm-completion-style'."
+This is deprecated, use instead helm-fuzzy as `helm-completion-style' or
+even better 'emacs as `helm-completion-style' and add 'flex to
+`completion-styles' (emacs-27) or 'helm-flex if 'flex is not available
+in `completion-styles-alist' (emacs-26)."
   :group 'helm-mode
   :type 'boolean)
 (make-obsolete-variable 'helm-mode-fuzzy-match 'helm-completion-style "3.6.0")
@@ -266,10 +267,13 @@ NOT `setq'."
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
-suitable value for `helm-completion-style'."
+suitable value for `helm-completion-style'.
+When specifying emacs as style for a mode, `completion-styles' can be
+specified, e.g. (foo-mode . (emacs helm flex)), this will set
+`completion-styles' to '(helm flex) for foo-mode."
   :group 'helm-mode
   :type '(alist :key-type (symbol :tag "Mode")
-                :value-type (symbol :tag "Style")))
+                :value-type (sexp :tag "Style")))
 
 ;;; helm-comp-read
 ;;
@@ -1456,27 +1460,22 @@ The `helm-find-files' history `helm-ff-history' is used here."
                   completion-styles-alist))))
 
 (defun helm-completion-in-region--set-completion-styles ()
-  "Add helm style to `completion-styles' and filter out incompatibles styles."
+  "Return a suitable list of styles for `completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
+      ;; Keep default settings, but probably nil is fine as well.
       '(basic partial-completion emacs22)
-    ;; FIXME: When merging helm with other old styles (basic
-    ;; partial-completion emacs22) helm is matching fine but if it
-    ;; doesn't match, the other styles match all, this happen with
-    ;; helm-completion-dynamic but not here (at least I couldn't reproduce).
-    (cond ((memq 'flex completion-styles)
-           ;; We need to have flex always behind helm, otherwise
-           ;; when matching against e.g. '(foo foobar foao frogo bar
-           ;; baz) with pattern "foo" helm style if before flex will
-           ;; return foo and foobar only defeating flex that would
-           ;; return foo foobar foao and frogo.
-           (helm-append-at-nth
-            completion-styles
-            '(helm) (1+ (cl-position 'flex completion-styles))))
-          ((memq 'helm-flex completion-styles)
-           (helm-append-at-nth
-            completion-styles
-            '(helm) (1+ (cl-position 'helm-flex completion-styles))))
-          (t (append '(helm) completion-styles)))))
+    (or
+     (pcase (cdr (assq major-mode helm-completion-styles-alist))
+       (`(,_l . ,ll) ll))
+     ;; We need to have flex always behind helm, otherwise
+     ;; when matching against e.g. '(foo foobar foao frogo bar
+     ;; baz) with pattern "foo" helm style if before flex will
+     ;; return foo and foobar only defeating flex that would
+     ;; return foo foobar foao and frogo.
+     (let* ((wflex (car (or (assq 'flex completion-styles-alist)
+                            (assq 'helm-flex completion-styles-alist))))
+            (styles (append (list wflex) (remove wflex completion-styles))))
+       (helm-append-at-nth styles '(helm) (if wflex 1 0))))))
 
 ;; Helm multi matching style
 

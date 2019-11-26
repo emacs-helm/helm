@@ -231,6 +231,8 @@ than the default which is OBARRAY."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
              (minibuffer-completion-confirm t)
+             ;; Disable specific modes settings for completion-styles.
+             helm-completion-styles-alist
              (sources (and helm-M-x-use-completion-styles
                            helm-mode
                            `(,(helm-build-sync-source "Emacs Commands history"

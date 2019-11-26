@@ -49,7 +49,7 @@
 (declare-function helm-interpret-value "helm.el")
 (declare-function helm-get-current-source "helm.el")
 (declare-function helm-source--cl--print-table "helm-source.el")
-
+(declare-function helm-completion-in-region--set-completion-styles "helm-mode.el")
 (defvar helm-sources)
 (defvar helm-initial-frame)
 (defvar helm-current-position)
@@ -1367,13 +1367,8 @@ Example:
 
 "
   (lambda ()
-    ;; FIXME: not working with other old syles, see comment in
-    ;; helm-completion-in-region--set-completion-styles.
-    (let* ((completion-styles (cond ((memq 'flex completion-styles)
-                                     '(flex helm))
-                                    ((memq 'helm-flex completion-styles)
-                                     '(helm-flex helm))
-                                    (t '(helm))))
+    (let* ((completion-styles
+            (helm-completion-in-region--set-completion-styles))
            (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
