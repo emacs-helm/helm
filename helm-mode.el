@@ -1583,7 +1583,7 @@ Actually do nothing."
 (defun helm-completion--flex-transform-pattern (pattern)
   ;; "fob" => '(prefix "f" any "o" any "b" any point)
   (cl-loop for p in pattern
-           if (stringp p) append
+           if (stringp p) nconc
            (cl-loop for str across p
                     nconc (list (string str) 'any))
            else nconc (list p)))
