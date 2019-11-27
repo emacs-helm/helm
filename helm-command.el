@@ -231,14 +231,13 @@ than the default which is OBARRAY."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
              (minibuffer-completion-confirm t)
-             ;; Disable specific modes settings for completion-styles.
-             helm-completion-styles-alist
              (sources (and helm-M-x-use-completion-styles
                            helm-mode
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (helm-dynamic-completion
                                              (or history extended-command-history)
-                                             #'commandp)
+                                             #'commandp
+                                             nil nil t)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
                                 :must-match t
@@ -253,7 +252,8 @@ than the default which is OBARRAY."
                                 'helm-M-x-transformer-no-sort)
                              ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
-                                             collection #'commandp)
+                                             collection #'commandp
+                                             nil nil t)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
                                 :must-match t

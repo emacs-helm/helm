@@ -270,7 +270,9 @@ Each entry is a cons cell like (mode . style) where style must be a
 suitable value for `helm-completion-style'.
 When specifying emacs as style for a mode, `completion-styles' can be
 specified, e.g. (foo-mode . (emacs helm flex)), this will set
-`completion-styles' to '(helm flex) for foo-mode."
+`completion-styles' to '(helm flex) for foo-mode, this affect only
+completions happening in buffers and not minibuffer completions,
+i.e. completing-read's."
   :group 'helm-mode
   :type '(alist :key-type (symbol :tag "Mode")
                 :value-type (sexp :tag "Style")))
@@ -845,7 +847,8 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
          (completion-flex-nospace t)
-         (completion-styles (helm-completion-in-region--set-completion-styles))
+         (completion-styles
+          (helm-completion-in-region--set-completion-styles 'nomode))
          (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
          (afun (or (plist-get completion-extra-properties :annotation-function)
@@ -1459,13 +1462,14 @@ The `helm-find-files' history `helm-ff-history' is used here."
           (delete (assq 'helm-flex completion-styles-alist)
                   completion-styles-alist))))
 
-(defun helm-completion-in-region--set-completion-styles ()
+(defun helm-completion-in-region--set-completion-styles (&optional nomode)
   "Return a suitable list of styles for `completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       ;; Keep default settings, but probably nil is fine as well.
       '(basic partial-completion emacs22)
     (or
-     (pcase (cdr (assq major-mode helm-completion-styles-alist))
+     (pcase (and (null nomode)
+                 (cdr (assq major-mode helm-completion-styles-alist)))
        (`(,_l . ,ll) ll))
      ;; We need to have flex always behind helm, otherwise
      ;; when matching against e.g. '(foo foobar foao frogo bar
@@ -1635,7 +1639,8 @@ Actually do nothing."
    :around #'helm-mode--advice-lisp--local-variables)
   (let ((old--helm-completion-style helm-completion-style))
     (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
-        (customize-set-variable 'helm-completion-style it))
+        (customize-set-variable 'helm-completion-style
+                                (if (cdr it) (car it) it)))
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
                (completion-flex-nospace t)

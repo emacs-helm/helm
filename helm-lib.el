@@ -1344,7 +1344,7 @@ I.e. when using `helm-next-line' and friends in BODY."
     (let (helm-follow-mode-persistent)
       (progn ,@body))))
 
-(defun helm-dynamic-completion (collection predicate &optional point metadata)
+(defun helm-dynamic-completion (collection predicate &optional point metadata nomode)
   "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
 
 Only the elements of COLLECTION that satisfy PREDICATE are considered.
@@ -1365,10 +1365,11 @@ Example:
                      :match-dynamic t)
           :buffer \"*helm test*\")
 
-"
+When argument NOMODE is non nil don't use `completion-styles' as
+specified in `helm-completion-styles-alist'."
   (lambda ()
     (let* ((completion-styles
-            (helm-completion-in-region--set-completion-styles))
+            (helm-completion-in-region--set-completion-styles nomode))
            (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
