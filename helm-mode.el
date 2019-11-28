@@ -1653,7 +1653,7 @@ Actually do nothing."
   (let ((old--helm-completion-style helm-completion-style))
     (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
         (customize-set-variable 'helm-completion-style
-                                (if (cdr it) (car it) it)))
+                                (if (cdr-safe it) (car it) it)))
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
                (completion-flex-nospace t)
