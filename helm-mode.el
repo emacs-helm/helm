@@ -1460,40 +1460,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
                 comps)
       comps)))
 
-;; Setup completion styles for helm-mode
-(defun helm-mode--setup-completion-styles ()
-  (cl-pushnew '(helm helm-completion-try-completion
-                     helm-completion-all-completions
-                     "helm multi completion style.")
-              completion-styles-alist
-              :test 'equal)
-  (unless (assq 'flex completion-styles-alist)
-    ;; Add helm-fuzzy style only if flex is not available.
-    (cl-pushnew '(helm-flex helm-flex-completion-try-completion
-                            helm-flex-completion-all-completions
-                            "helm flex completion style.\nProvide flex matching for emacs-26.")
-                completion-styles-alist
-                :test 'equal)))
-
-(defun helm-completion-in-region--set-completion-styles (&optional nomode)
-  "Return a suitable list of styles for `completion-styles'."
-  (if (memq helm-completion-style '(helm helm-fuzzy))
-      ;; Keep default settings, but probably nil is fine as well.
-      '(basic partial-completion emacs22)
-    (or
-     (pcase (and (null nomode)
-                 (cdr (assq major-mode helm-completion-styles-alist)))
-       (`(,_l . ,ll) ll))
-     ;; We need to have flex always behind helm, otherwise
-     ;; when matching against e.g. '(foo foobar foao frogo bar
-     ;; baz) with pattern "foo" helm style if before flex will
-     ;; return foo and foobar only defeating flex that would
-     ;; return foo foobar foao and frogo.
-     (let* ((wflex (car (or (assq 'flex completion-styles-alist)
-                            (assq 'helm-flex completion-styles-alist))))
-            (styles (append (list wflex) (remove wflex completion-styles))))
-       (helm-append-at-nth styles '(helm) (if wflex 1 0))))))
-
 ;; Helm multi matching style
 
 (defun helm-completion-try-completion (string table pred point)
@@ -1881,7 +1847,6 @@ Note: This mode is incompatible with Emacs23."
                       #'helm--generic-read-buffer)
         (add-function :override completion-in-region-function
                       #'helm--completion-in-region)
-        (helm-mode--setup-completion-styles)
         ;; If user have enabled ido-everywhere BEFORE enabling
         ;; helm-mode disable it and warn user about its
         ;; incompatibility with helm-mode (issue #2085).

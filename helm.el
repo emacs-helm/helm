@@ -35,6 +35,9 @@
 (require 'helm-multi-match)
 (require 'helm-source)
 
+;; Setup completion styles for helm-mode
+(helm-mode--setup-completion-styles)
+
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 

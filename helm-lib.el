@@ -49,7 +49,6 @@
 (declare-function helm-interpret-value "helm.el")
 (declare-function helm-get-current-source "helm.el")
 (declare-function helm-source--cl--print-table "helm-source.el")
-(declare-function helm-completion-in-region--set-completion-styles "helm-mode.el")
 (defvar helm-sources)
 (defvar helm-initial-frame)
 (defvar helm-current-position)
@@ -1344,6 +1343,41 @@ I.e. when using `helm-next-line' and friends in BODY."
     (let (helm-follow-mode-persistent)
       (progn ,@body))))
 
+;; Completion styles related functions
+;;
+(defun helm-mode--setup-completion-styles ()
+  (cl-pushnew '(helm helm-completion-try-completion
+                     helm-completion-all-completions
+                     "helm multi completion style.")
+              completion-styles-alist
+              :test 'equal)
+  (unless (assq 'flex completion-styles-alist)
+    ;; Add helm-fuzzy style only if flex is not available.
+    (cl-pushnew '(helm-flex helm-flex-completion-try-completion
+                            helm-flex-completion-all-completions
+                            "helm flex completion style.\nProvide flex matching for emacs-26.")
+                completion-styles-alist
+                :test 'equal)))
+
+(defun helm-completion-in-region--set-completion-styles (&optional nomode)
+  "Return a suitable list of styles for `completion-styles'."
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      ;; Keep default settings, but probably nil is fine as well.
+      '(basic partial-completion emacs22)
+    (or
+     (pcase (and (null nomode)
+                 (cdr (assq major-mode helm-completion-styles-alist)))
+       (`(,_l . ,ll) ll))
+     ;; We need to have flex always behind helm, otherwise
+     ;; when matching against e.g. '(foo foobar foao frogo bar
+     ;; baz) with pattern "foo" helm style if before flex will
+     ;; return foo and foobar only defeating flex that would
+     ;; return foo foobar foao and frogo.
+     (let* ((wflex (car (or (assq 'flex completion-styles-alist)
+                            (assq 'helm-flex completion-styles-alist))))
+            (styles (append (list wflex) (remove wflex completion-styles))))
+       (helm-append-at-nth styles '(helm) (if wflex 1 0))))))
+
 (defun helm-dynamic-completion (collection predicate &optional point metadata nomode)
   "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
 
@@ -1367,9 +1401,6 @@ Example:
 
 When argument NOMODE is non nil don't use `completion-styles' as
 specified in `helm-completion-styles-alist'."
-  (require 'helm-mode)
-  (unless (assq 'helm completion-styles-alist)
-    (helm-mode--setup-completion-styles))
   (lambda ()
     (let* ((completion-styles
             (helm-completion-in-region--set-completion-styles nomode))
