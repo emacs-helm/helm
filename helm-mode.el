@@ -263,19 +263,41 @@ NOT `setq'."
              (define-key helm-comp-read-map (kbd "DEL") 'helm-mode-delete-char-backward-maybe)
            (define-key helm-comp-read-map (kbd "DEL") 'delete-backward-char))))
 
+(defconst helm-completion--all-styles
+  (let ((flex (if (assq 'flex completion-styles-alist)
+                  'flex 'helm-flex)))
+    (helm-fast-remove-dups
+     (append (list 'helm flex)
+             (mapcar 'car completion-styles-alist)))))
+
+(defconst helm-completion--styles-type
+  `(repeat :tag "with other completion styles"
+           (choice ,@(mapcar (lambda (x) (list 'const x))
+                             helm-completion--all-styles))))
+
 (defcustom helm-completion-styles-alist '((gud-mode . helm))
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
 suitable value for `helm-completion-style'.
 When specifying emacs as style for a mode, `completion-styles' can be
-specified, e.g. (foo-mode . (emacs helm flex)), this will set
+specified by using a cons cell specifying completion-styles to use
+with helm emacs style, e.g. (foo-mode . (emacs helm flex)) will set
 `completion-styles' to '(helm flex) for foo-mode, this affect only
 completions happening in buffers and not minibuffer completions,
 i.e. completing-read's."
   :group 'helm-mode
-  :type '(alist :key-type (symbol :tag "Mode")
-                :value-type (sexp :tag "Style")))
+  :type
+  `(alist :key-type (symbol :tag "Major Mode")
+          :value-type
+          (choice :tag "Use helm style or completion styles"
+                  (radio :tag "Helm Style"
+                         (const helm)
+                         (const helm-fuzzy)
+                         (const emacs))
+                  (cons :tag "Completion Styles"
+                        (const :tag "Using Helm `emacs' style" emacs)
+                        ,helm-completion--styles-type))))
 
 ;;; helm-comp-read
 ;;
