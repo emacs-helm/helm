@@ -1361,6 +1361,8 @@ I.e. when using `helm-next-line' and friends in BODY."
 
 (defun helm--prepare-completion-styles (&optional nomode)
   "Return a suitable list of styles for `completion-styles'."
+  ;; For `helm-completion-style' and `helm-completion-styles-alist'.
+  (require 'helm-mode)
   (if (memq helm-completion-style '(helm helm-fuzzy))
       ;; Keep default settings, but probably nil is fine as well.
       '(basic partial-completion emacs22)
