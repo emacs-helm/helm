@@ -1475,15 +1475,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
                 completion-styles-alist
                 :test 'equal)))
 
-(defun helm-mode--disable-completion-styles ()
-  (setq completion-styles-alist
-        (delete (assq 'helm completion-styles-alist)
-                completion-styles-alist))
-  (when (assq 'helm-flex completion-styles-alist)
-    (setq completion-styles-alist
-          (delete (assq 'helm-flex completion-styles-alist)
-                  completion-styles-alist))))
-
 (defun helm-completion-in-region--set-completion-styles (&optional nomode)
   "Return a suitable list of styles for `completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
@@ -1909,7 +1900,6 @@ Note: This mode is incompatible with Emacs23."
       (remove-function read-file-name-function #'helm--generic-read-file-name)
       (remove-function read-buffer-function #'helm--generic-read-buffer)
       (remove-function completion-in-region-function #'helm--completion-in-region)
-      (helm-mode--disable-completion-styles)
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url)))))

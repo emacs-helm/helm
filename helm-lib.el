@@ -1367,6 +1367,9 @@ Example:
 
 When argument NOMODE is non nil don't use `completion-styles' as
 specified in `helm-completion-styles-alist'."
+  (require 'helm-mode)
+  (unless helm-mode
+    (helm-mode--setup-completion-styles))
   (lambda ()
     (let* ((completion-styles
             (helm-completion-in-region--set-completion-styles nomode))
