@@ -51,7 +51,7 @@ This have no effect when `helm-M-x-use-completion-styles' is non nil"
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-use-completion-styles nil
+(defcustom helm-M-x-use-completion-styles t
   "Use `completion-styles' in helm-M-x."
   :group 'helm-command
   :type 'boolean)
