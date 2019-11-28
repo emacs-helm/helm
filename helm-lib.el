@@ -1345,7 +1345,7 @@ I.e. when using `helm-next-line' and friends in BODY."
 
 ;; Completion styles related functions
 ;;
-(defun helm-mode--setup-completion-styles ()
+(defun helm--setup-completion-styles-alist ()
   (cl-pushnew '(helm helm-completion-try-completion
                      helm-completion-all-completions
                      "helm multi completion style.")
@@ -1359,7 +1359,7 @@ I.e. when using `helm-next-line' and friends in BODY."
                 completion-styles-alist
                 :test 'equal)))
 
-(defun helm-completion-in-region--set-completion-styles (&optional nomode)
+(defun helm--prepare-completion-styles (&optional nomode)
   "Return a suitable list of styles for `completion-styles'."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       ;; Keep default settings, but probably nil is fine as well.
@@ -1403,7 +1403,7 @@ When argument NOMODE is non nil don't use `completion-styles' as
 specified in `helm-completion-styles-alist'."
   (lambda ()
     (let* ((completion-styles
-            (helm-completion-in-region--set-completion-styles nomode))
+            (helm--prepare-completion-styles nomode))
            (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions

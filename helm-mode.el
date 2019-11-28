@@ -870,7 +870,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                   (`(,l . ,_ll) l)))
          (completion-flex-nospace t)
          (completion-styles
-          (helm-completion-in-region--set-completion-styles 'nomode))
+          (helm--prepare-completion-styles 'nomode))
          (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
          (afun (or (plist-get completion-extra-properties :annotation-function)
@@ -1623,7 +1623,7 @@ Actually do nothing."
     (unwind-protect
         (let* ((enable-recursive-minibuffers t)
                (completion-flex-nospace t)
-               (completion-styles (helm-completion-in-region--set-completion-styles))
+               (completion-styles (helm--prepare-completion-styles))
                (input (buffer-substring-no-properties start end))
                ;; Always start with prefix to allow completing without
                ;; the need of inserting a space after cursor or

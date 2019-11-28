@@ -36,7 +36,7 @@
 (require 'helm-source)
 
 ;; Setup completion styles for helm-mode
-(helm-mode--setup-completion-styles)
+(helm--setup-completion-styles-alist)
 
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
