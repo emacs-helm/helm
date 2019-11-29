@@ -3,11 +3,6 @@ language: emacs-lisp
 addons:
   apt:
     update: true
-    packages:
-      - gnutls-bin
-      - gnutls-dev
-      - libgnutls-dev
-      - gnupg
 
 jobs:
   allow_failures:
