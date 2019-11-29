@@ -47,11 +47,22 @@
   :group 'helm-comint
   :type 'boolean)
 
-(defcustom helm-comint-mode-list '(comint-mode slime-repl-mode)
+(defcustom helm-comint-mode-list '(comint-mode slime-repl-mode sly-mrepl-mode)
   "Supported modes for prompt navigation.
 Derived modes (e.g. Geiser's REPL) are automatically supported."
   :group 'helm-comint
   :type '(repeat (choice symbol)))
+
+(defcustom helm-comint-next-prompt-function '((sly-mrepl-mode . (lambda ()
+                                                                  (sly-mrepl-next-prompt)
+                                                                  (point))))
+  "Alist of (MODE . NEXT-PROMPT-FUNCTION) to use.
+ If the current major mode is a key in this list, the associated function will be
+ used to navigate the prompts.
+ The function must return the point after the prompt.
+ Otherwise (comint-next-prompt 1) will be used."
+  :group 'helm-comint
+  :type '(alist :key-type symbol :value-type function))
 
 (defcustom helm-comint-max-offset 400
   "Max number of chars displayed per candidate in comint-input-ring browser.
@@ -84,7 +95,10 @@ If BUFFER is nil, use current buffer."
         (goto-char (point-min))
         (let (result (count 1))
           (save-mark-and-excursion
-            (helm-awhile (and (not (eobp)) (comint-next-prompt 1))
+            (helm-awhile (and (not (eobp))
+                              (helm-aif (alist-get major-mode helm-comint-next-prompt-function)
+                                  (funcall it)
+                                (comint-next-prompt 1)))
               (push (list (buffer-substring-no-properties
                            it (point-at-eol))
                           it (buffer-name) count)

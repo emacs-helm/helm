@@ -38,6 +38,9 @@
 (require 'helm-multi-match)
 (require 'helm-source)
 
+;; Setup completion styles for helm-mode
+(helm--setup-completion-styles-alist)
+
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 
@@ -3981,6 +3984,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
                    candidate (helm-stringify candidate)))
          (pat-lookup (helm--collect-pairs-in-string pattern))
          (str-lookup (helm--collect-pairs-in-string cand))
+         (inter (cl-nintersection pat-lookup str-lookup :test 'equal))
          ;; Prefix
          (bonus (cond ((or (equal (car pat-lookup) (car str-lookup))
                            (equal (caar pat-lookup) (caar str-lookup)))
@@ -4006,9 +4010,7 @@ CANDIDATE. Contiguous matches get a coefficient of 2."
            ;; That's mean that "wiaaaki" will not take precedence
            ;; on "aaawiki" when matching on "wiki" even if "wiaaaki"
            ;; starts by "wi".
-           (* (length (cl-nintersection
-                       pat-lookup str-lookup :test 'equal))
-              2)))))
+           (* (length inter) 2)))))
 
 (defun helm-fuzzy-matching-default-sort-fn-1 (candidates &optional use-real basename preserve-tie-order)
   "The transformer for sorting candidates in fuzzy matching.
@@ -4143,6 +4145,90 @@ to the matching method in use."
 See `helm-fuzzy-default-highlight-match'."
   (cl-loop for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c)))
+
+
+;;; helm-flex style
+;;
+;; Provide the emacs-27 flex style for emacs<27.
+;; Reuse the flex scoring algorithm of flex style in emacs-27.
+(defvar helm--flex-style-str nil)
+(defvar helm--flex-style-cache-pat nil)
+(defun helm-fuzzy-style-get-pattern (pattern)
+  (unless (equal pattern helm--flex-style-str)
+    (setq helm--flex-style-str pattern
+          helm--flex-style-cache-pat
+          (helm--flex-style-set-pattern pattern)))
+  helm--flex-style-cache-pat)
+
+(defun helm--flex-style-set-pattern (pattern)
+  (let ((fun (if (string-match "\\`\\^" pattern)
+                 #'identity
+               #'helm--mapconcat-pattern)))
+    ;; FIXME: Splitted part are not handled here,
+    ;; I must compute them in `helm-search-match-part'
+    ;; when negation and in-buffer are used.
+    (if (string-match "\\`!" pattern)
+        (if (> (length pattern) 1)
+            (funcall fun (substring pattern 1))
+          "")
+      (if (> (length pattern) 0)
+          (funcall fun pattern)
+        ""))))
+
+(defun helm-flex-style-match (candidate)
+  "Check if `helm-pattern' fuzzy matches CANDIDATE.
+This function is used with sources built with `helm-source-sync'."
+  (unless (string-match " " helm-pattern)
+    ;; When pattern have one or more spaces, let
+    ;; multi-match doing the job with no fuzzy matching.[1]
+    (let ((regexp (helm-fuzzy-style-get-pattern helm-pattern)))
+      (if (string-match "\\`!" helm-pattern)
+          (not (string-match regexp candidate))
+        (string-match regexp candidate)))))
+
+(defun helm-flex--style-score (str regexp)
+  "Score STR candidate according to PATTERN.
+
+REGEXP should be generated from a pattern which is a list like
+\'(point \"f\" any \"o\" any \"b\" any) for \"fob\" as pattern.
+Such pattern is build with 
+`helm-completion--flex-transform-pattern' function.
+
+Function extracted from `completion-pcm--hilit-commonality' in
+emacs-27 to provide such scoring in emacs<27."
+  ;; Don't modify the string itself.
+  (setq str (copy-sequence str))
+  (unless (string-match regexp str)
+    (error "Internal error: %s does not match %s" regexp str))
+  (let* ((md (match-data))
+         (start (pop md))
+         (len (length str))
+         (score-numerator 0)
+         (score-denominator 0)
+         (last-b 0)
+         (update-score
+          (lambda (a b)
+            "Update score variables given match range (A B)."
+            (setq score-numerator (+ score-numerator (- b a)))
+            (unless (or (= a last-b)
+                        (zerop last-b)
+                        (= a (length str)))
+              (setq score-denominator (+ score-denominator
+                                         1
+                                         (expt (- a last-b 1)
+                                               (/ 1.0 3)))))
+            (setq last-b b))))
+    (funcall update-score start start)
+    (setq md (cdr md))
+    (while md
+      (funcall update-score start (pop md))
+      (setq start (pop md)))
+    (funcall update-score len len)
+    (unless (zerop (length str))
+      (put-text-property
+       0 1 'completion-score
+       (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
+    str)
 
 
 ;;; Matching candidates
@@ -5491,31 +5577,37 @@ don't exit and send message 'no match'."
       (let* ((src (helm-get-current-source))
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
-             (sel (helm-get-selection nil nil src))
              (unknown (and (not empty-buffer-p)
                            (string= (get-text-property
                                      0 'display
                                      (helm-get-selection nil 'withprop src))
                                     "[?]"))))
         (cond ((and (or empty-buffer-p unknown)
-                    (eq minibuffer-completion-confirm 'confirm))
+                    (memq minibuffer-completion-confirm
+                          '(confirm confirm-after-completion)))
                (setq helm-minibuffer-confirm-state
                      'confirm)
                (setq minibuffer-completion-confirm nil)
                (minibuffer-message " [confirm]"))
-              ((and (or empty-buffer-p
-                        (unless (if minibuffer-completing-file-name
-                                    (and minibuffer-completion-predicate
-                                         (funcall minibuffer-completion-predicate sel))
-                                  (and (stringp sel)
-                                       ;; SEL may be a cons cell when helm-comp-read
-                                       ;; is called directly with a collection composed
-                                       ;; of (display . real) and real is a cons cell.
-                                       (try-completion sel minibuffer-completion-table
-                                                       minibuffer-completion-predicate)))
-                          unknown))
+              ;; When require-match is strict (i.e. `t'), buffer
+              ;; should be either empty or in read-file-name have an
+              ;; unknown candidate ([?] prefix), if it's not the case
+              ;; fix it in helm-mode but not here. 
+              ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
+              (empty-buffer-p
+               ;; This is used when helm-buffer is totally empty,
+               ;; i.e. the [?] have not been added because must-match
+               ;; is used from outside helm-comp-read i.e. from a helm
+               ;; source built with :must-match.
+               (setq helm-saved-selection helm-pattern
+                     helm-saved-action (helm-get-default-action
+                                        (assoc-default
+                                         'action
+                                         (car (with-helm-buffer helm-sources))))
+                     helm-minibuffer-confirm-state nil)
+               (helm-exit-minibuffer))
               (t
                (setq helm-minibuffer-confirm-state nil)
                (helm-exit-minibuffer)))))))

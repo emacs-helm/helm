@@ -49,7 +49,6 @@
 (declare-function helm-interpret-value "helm.el")
 (declare-function helm-get-current-source "helm.el")
 (declare-function helm-source--cl--print-table "helm-source.el")
-
 (defvar helm-sources)
 (defvar helm-initial-frame)
 (defvar helm-current-position)
@@ -58,6 +57,7 @@
 (defvar wdired-allow-to-change-permissions)
 (defvar wdired-allow-to-redirect-links)
 (defvar helm-persistent-action-display-window)
+(defvar completion-flex-nospace)
 
 ;;; User vars.
 ;;
@@ -1343,13 +1343,54 @@ I.e. when using `helm-next-line' and friends in BODY."
     (let (helm-follow-mode-persistent)
       (progn ,@body))))
 
-(defun helm-dynamic-completion (collection predicate &optional point metadata)
+;; Completion styles related functions
+;;
+(defun helm--setup-completion-styles-alist ()
+  (cl-pushnew '(helm helm-completion-try-completion
+                     helm-completion-all-completions
+                     "helm multi completion style.")
+              completion-styles-alist
+              :test 'equal)
+  (unless (assq 'flex completion-styles-alist)
+    ;; Add helm-fuzzy style only if flex is not available.
+    (cl-pushnew '(helm-flex helm-flex-completion-try-completion
+                            helm-flex-completion-all-completions
+                            "helm flex completion style.\nProvide flex matching for emacs-26.")
+                completion-styles-alist
+                :test 'equal)))
+
+(defun helm--prepare-completion-styles (&optional nomode)
+  "Return a suitable list of styles for `completion-styles'."
+  ;; For `helm-completion-style' and `helm-completion-styles-alist'.
+  (require 'helm-mode)
+  (if (memq helm-completion-style '(helm helm-fuzzy))
+      ;; Keep default settings, but probably nil is fine as well.
+      '(basic partial-completion emacs22)
+    (or
+     (pcase (and (null nomode)
+                 (cdr (assq major-mode helm-completion-styles-alist)))
+       (`(,_l . ,ll) ll))
+     ;; We need to have flex always behind helm, otherwise
+     ;; when matching against e.g. '(foo foobar foao frogo bar
+     ;; baz) with pattern "foo" helm style if before flex will
+     ;; return foo and foobar only defeating flex that would
+     ;; return foo foobar foao and frogo.
+     (let* ((wflex (car (or (assq 'flex completion-styles-alist)
+                            (assq 'helm-flex completion-styles-alist))))
+            (styles (append (list wflex) (remove wflex completion-styles))))
+       (helm-append-at-nth styles '(helm) (if wflex 1 0))))))
+
+(defun helm-dynamic-completion (collection predicate &optional point metadata nomode)
   "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
+
 Only the elements of COLLECTION that satisfy PREDICATE are considered.
-POINT and METADATA are unused for now.
+Argument POINT is same as in `completion-all-completions' and is
+meaningful only when using some kind of `completion-at-point'.
 The return value is a list of completions that may be sorted by the
 sort function provided by the completion-style in use (emacs-27 only),
-otherwise (emacs-26) the sort function have to be provided if needed.
+otherwise (emacs-26) the sort function have to be provided if needed
+either with a FCT function in source or by passing the sort function
+with METADATA e.g. (metadata (display-sort-function . foo)).
 
 Example:
 
@@ -1360,17 +1401,18 @@ Example:
                      :match-dynamic t)
           :buffer \"*helm test*\")
 
-"
+When argument NOMODE is non nil don't use `completion-styles' as
+specified in `helm-completion-styles-alist'."
   (lambda ()
-    ;; FIXME: not working with other old syles, see comment in
-    ;; helm-completion-in-region--fix-completion-styles.
-    (let* ((completion-styles (if (memq 'flex completion-styles)
-                                  '(flex helm)
-                                '(helm)))
+    (let* ((completion-styles
+            (helm--prepare-completion-styles nomode))
+           (completion-flex-nospace t)
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
                                      str
-                                     collection
+                                     (if (functionp collection)
+                                         (funcall collection str predicate t)
+                                       collection)
                                      pred
                                      (or point 0)
                                      (or metadata '(metadata))))

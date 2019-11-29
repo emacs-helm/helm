@@ -51,7 +51,7 @@ This have no effect when `helm-M-x-use-completion-styles' is non nil"
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-use-completion-styles nil
+(defcustom helm-M-x-use-completion-styles t
   "Use `completion-styles' in helm-M-x."
   :group 'helm-command
   :type 'boolean)
@@ -144,9 +144,10 @@ fuzzy matching is running its own sort function with a different algorithm."
 
 (defun helm-M-x-transformer (candidates _source)
   "Transformer function for `helm-M-x' candidates."
+  ;; Generic sort function is handling helm-flex.
   (helm-M-x-transformer-1 candidates (null helm--in-fuzzy)))
 
-(defun helm-M-x-transformer-hist (candidates _source)
+(defun helm-M-x-transformer-no-sort (candidates _source)
   "Transformer function for `helm-M-x' candidates."
   (helm-M-x-transformer-1 candidates))
 
@@ -227,26 +228,32 @@ than the default which is OBARRAY."
                        when (and c (commandp (intern c)))
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
+             (minibuffer-completion-confirm t)
              (sources (and helm-M-x-use-completion-styles
                            `(,(helm-build-sync-source "Emacs Commands history"
                                 :candidates (helm-dynamic-completion
                                              (or history extended-command-history)
-                                             #'commandp)
+                                             #'commandp
+                                             nil nil t)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
+                                :must-match t
                                 :persistent-action
                                 'helm-M-x-persistent-action
                                 :persistent-help "Describe this command"
                                 :help-message 'helm-M-x-help-message
                                 :nomark t
+                                :group 'helm-command
                                 :keymap helm-M-x-map
                                 :filtered-candidate-transformer
-                                'helm-M-x-transformer-hist)
+                                'helm-M-x-transformer-no-sort)
                              ,(helm-build-sync-source "Emacs Commands"
                                 :candidates (helm-dynamic-completion
-                                             collection #'commandp)
+                                             collection #'commandp
+                                             nil nil t)
                                 :match-dynamic t
                                 :requires-pattern helm-M-x-requires-pattern
+                                :must-match t
                                 :filtered-candidate-transformer
                                 'helm-M-x-transformer
                                 :persistent-action
@@ -302,7 +309,7 @@ than the default which is OBARRAY."
                   :nomark t
                   :candidates-in-buffer t
                   :fc-transformer 'helm-M-x-transformer
-                  :hist-fc-transformer 'helm-M-x-transformer-hist)))
+                  :hist-fc-transformer 'helm-M-x-transformer-no-sort)))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 

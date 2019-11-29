@@ -103,6 +103,9 @@
   It can either be a variable name, a function called with no parameters
   or the actual list of candidates.
 
+  Do NOT use this for asynchronous sources, use `candidates-process'
+  instead.
+
   The list must be a list whose members are strings, symbols
   or (DISPLAY . REAL) pairs.
 
@@ -450,8 +453,8 @@
   functions, respectively.
 
   This attribute has no effect for asynchronous sources (see
-  attribute `candidates'), since they perform pattern matching
-  themselves.
+  attribute `candidates'), and sources using `match-dynamic'
+  since they perform pattern matching themselves.
 
   Note that FUZZY-MATCH slot will overhide value of this slot.")
 
@@ -644,6 +647,17 @@
     "  This slot have no more effect and is just kept for backward compatibility.
   Please don't use it.")
 
+   (must-match
+    :initarg :must-match
+    :initform nil
+    :custom symbol
+    :documentation
+    "  Prevent exiting with empty helm buffer.
+  For this to work `minibuffer-completion-confirm' must be let-bounded
+  around the helm call.
+  Same as `completing-read' require-match arg, possible values are `t'
+  or `confirm'.")
+
    (group
     :initarg :group
     :initform helm
@@ -708,7 +722,10 @@ Matching is done basically with `string-match' against each candidate.")
     :custom function
     :documentation
     "  This attribute is used to define a process as candidate.
-  The value must be a process.
+  The function called with no arguments must return a process
+  i.e. `processp', it use typically `start-process' or `make-process',
+  see (info \"(elisp) Asynchronous Processes\").
+  
 
   NOTE:
   When building the source at runtime you can give directly a process
@@ -1017,7 +1034,19 @@ an eieio class."
     (warn "Deprecated usage of helm `delayed' slot in `%s'"
           (slot-value source 'name)))
   (helm-aif (slot-value source 'keymap)
-      (and (symbolp it) (setf (slot-value source 'keymap) (symbol-value it))))
+      (let* ((map (if (symbolp it)
+                      (symbol-value it)
+                    it))
+             (must-match-map (when (slot-value source 'must-match)
+                               (let ((map (make-sparse-keymap)))
+                                 (define-key map (kbd "RET")
+                                   'helm-confirm-and-exit-minibuffer)
+                                 map)))
+             (loc-map (if must-match-map
+                          (make-composed-keymap
+                           must-match-map map)
+                        map)))
+        (setf (slot-value source 'keymap) loc-map)))
   (helm-aif (slot-value source 'persistent-help)
       (setf (slot-value source 'header-line)
             (helm-source--persistent-help-string it source))

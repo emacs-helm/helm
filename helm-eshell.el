@@ -71,33 +71,6 @@
 (defvar helm-eshell--quit-flag nil)
 
 
-(defclass helm-esh-source (helm-source-sync)
-  ((init :initform (lambda ()
-                     (setq pcomplete-current-completions nil
-                           pcomplete-last-completion-raw nil)
-                     ;; Eshell-command add this hook in all minibuffers
-                     ;; Remove it for the helm one. (Fixed in Emacs24)
-                     (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
-   (candidates :initform 'helm-esh-get-candidates)
-   ;(nomark :initform t)
-   (persistent-action :initform 'ignore)
-   (nohighlight :initform t)
-   (filtered-candidate-transformer
-    :initform
-    (lambda (candidates _sources)
-      (cl-loop
-       for i in candidates
-       collect
-       (cond ((string-match "\\`~/?" helm-ec-target)
-              (abbreviate-file-name i))
-             ((string-match "\\`/" helm-ec-target) i)
-             (t
-              (file-relative-name i)))
-       into lst
-       finally return (sort lst 'helm-generic-sort-fn))))
-   (action :initform 'helm-ec-insert))
-  "Helm class to define source for Eshell completion.")
-
 ;; Internal.
 (defvar helm-ec-target "")
 (defun helm-ec-insert (_candidate)
@@ -131,6 +104,33 @@ The function that call this should set `helm-ec-target' to thing at point."
                       (string-match-p "/\\'" it)
                       "")
            " ")))))
+
+(defun helm-esh-transformer (candidates _sources)
+  (cl-loop
+   for i in candidates
+   collect
+   (cond ((string-match "\\`~/?" helm-ec-target)
+          (abbreviate-file-name i))
+         ((string-match "\\`/" helm-ec-target) i)
+         (t
+          (file-relative-name i)))
+   into lst
+   finally return (sort lst 'helm-generic-sort-fn)))
+
+(defclass helm-esh-source (helm-source-sync)
+  ((init :initform (lambda ()
+                     (setq pcomplete-current-completions nil
+                           pcomplete-last-completion-raw nil)
+                     ;; Eshell-command add this hook in all minibuffers
+                     ;; Remove it for the helm one. (Fixed in Emacs24)
+                     (remove-hook 'minibuffer-setup-hook 'eshell-mode)))
+   (candidates :initform 'helm-esh-get-candidates)
+   ;(nomark :initform t)
+   (persistent-action :initform 'ignore)
+   (nohighlight :initform t)
+   (filtered-candidate-transformer :initform #'helm-esh-transformer)
+   (action :initform 'helm-ec-insert))
+  "Helm class to define source for Eshell completion.")
 
 (defun helm-esh-get-candidates ()
   "Get candidates for eshell completion using `pcomplete'."
@@ -214,6 +214,41 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Helm class to define source for Eshell history.")
 
 
+(defun helm-esh-pcomplete-input (target users-comp last)
+  (if (and (stringp last)
+           (not (string= last ""))
+           (not users-comp)
+           ;; Fix completion on "../" see #1832.
+           (or (file-exists-p last)
+               (helm-aand
+                (file-name-directory last)
+                (file-directory-p it))))
+      (if (and (file-directory-p last)
+               (string-match "\\`[~.]*.*/[.]\\'" target))
+          ;; Fix completion on "~/.", "~/[...]/.", and "../."
+          (expand-file-name
+           (concat (helm-basedir (file-name-as-directory last))
+                   (regexp-quote (helm-basename target))))
+        (expand-file-name last))
+    ;; Don't add "~" to input to provide completion on all users instead of only
+    ;; on current $HOME (#1832).
+    (unless users-comp last)))
+
+(defun helm-esh-pcomplete-default-source ()
+  "Make and return the default source for Eshell completion."
+  (helm-make-source "Eshell completions" 'helm-esh-source
+    :fuzzy-match helm-eshell-fuzzy-match))
+
+(defvar helm-esh-pcomplete-build-source-fn #'helm-esh-pcomplete-default-source
+  "Function that builds a source or a list of sources.")
+
+(defun helm-esh-pcomplete--make-helm (&optional input)
+  (helm :sources (funcall helm-esh-pcomplete-build-source-fn)
+        :buffer "*helm pcomplete*"
+        :keymap helm-esh-completion-map
+        :resume 'noresume
+        :input input))
+
 ;;;###autoload
 (defun helm-esh-pcomplete ()
   "Preconfigured helm to provide helm completion in eshell."
@@ -265,33 +300,8 @@ The function that call this should set `helm-ec-target' to thing at point."
              (add-hook 'helm-quit-hook 'helm-eshell--quit-hook-fn)
              (with-helm-show-completion beg end
                (unwind-protect
-                   (or (helm :sources (helm-make-source "Eshell completions" 'helm-esh-source
-                                        :fuzzy-match helm-eshell-fuzzy-match)
-                             :buffer "*helm pcomplete*"
-                             :keymap helm-esh-completion-map
-                             :resume 'noresume
-                             :input (if (and (stringp last)
-                                             (not (string= last ""))
-                                             (not users-comp)
-                                             ;; Fix completion on
-                                             ;; "../" see #1832.
-                                             (or (file-exists-p last)
-                                                 (helm-aand
-                                                  (file-name-directory last)
-                                                  (file-directory-p it))))
-                                        (if (and (file-directory-p last)
-                                                 (string-match "\\`[~.]*.*/[.]\\'" target))
-                                            ;; Fix completion on
-                                            ;; "~/.", "~/[...]/.", and "../."
-                                            (expand-file-name
-                                             (concat (helm-basedir (file-name-as-directory last))
-                                                     (regexp-quote (helm-basename target))))
-                                          (expand-file-name last))
-                                      ;; Don't add "~" to input to
-                                      ;; provide completion on all
-                                      ;; users instead of only on
-                                      ;; current $HOME (#1832).
-                                      (unless users-comp last)))
+                   (or (helm-esh-pcomplete--make-helm
+                        (helm-esh-pcomplete-input target users-comp last))
                        ;; Delete removed dot on quit
                        (and del-dot (prog1 t (insert ".")))
                        ;; A space is needed to have completion, remove

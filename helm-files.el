@@ -2256,12 +2256,15 @@ or when `helm-pattern' is equal to \"~/\"."
   ;; so use the root of current Drive. (i.e "C:/")
   (let* ((directory (and (memq system-type '(windows-nt ms-dos))
                          (getenv "SystemDrive")))
+         (subst (helm-substitute-in-filename pattern))
          ;; On Windows use a simple call to `expand-file-name' to
          ;; avoid Issue #2004.
          (expand-fn (if directory
                         #'expand-file-name
                       #'helm-ff--expand-file-name-no-dot)))
-    (funcall expand-fn (helm-substitute-in-filename pattern)
+    ;; Fix issue #2223 with tilde in directory names e.g. "~/tmp/~test/".
+    (funcall expand-fn (if (string-match-p "\\`~[^/]" subst)
+                           pattern subst)
              ;; directory is nil on Nix.
              directory)))
 
@@ -3211,8 +3214,9 @@ Return candidates prefixed with basename of `helm-input' first."
                . helm-find-files-byte-compile)
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
-          ((string-match "\\.elc?\\'" (helm-aif (helm-marked-candidates)
-                                          (car it) candidate))
+          ((string-match (concat (regexp-opt load-suffixes) "\\'")
+                         (helm-aif (helm-marked-candidates)
+                             (car it) candidate))
            (helm-append-at-nth
             actions
             '(("Load File(s) `M-L'" . helm-find-files-load-files))
