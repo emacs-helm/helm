@@ -1368,7 +1368,8 @@ I.e. when using `helm-next-line' and friends in BODY."
       '(basic partial-completion emacs22)
     (or
      (pcase (and (null nomode)
-                 (cdr (assq major-mode helm-completion-styles-alist)))
+                 (with-helm-current-buffer
+                   (cdr (assq major-mode helm-completion-styles-alist))))
        (`(,_l . ,ll) ll))
      ;; We need to have flex always behind helm, otherwise
      ;; when matching against e.g. '(foo foobar foao frogo bar
