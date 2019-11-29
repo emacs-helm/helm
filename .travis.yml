@@ -1,4 +1,3 @@
-# from https://github.com/abo-abo/swiper/blob/master/.travis.yml
 dist: xenial
 language: emacs-lisp
 addons:
@@ -10,32 +9,28 @@ addons:
       - libgnutls-dev
       - gnupg
 
-cache:
-  directories:
-  - $HOME/.evm
-
 jobs:
+  allow_failures:
+    - env: EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
   include:
-    - stage: setup
+    - stage: build
       env: EVM_EMACS=emacs-24.5-travis
-      script: &setup
+      script: &build
         - rm -rf $HOME/.evm
         - git clone https://github.com/rejeep/evm.git $HOME/.evm
         - export PATH=$HOME/.evm/bin:$HOME/.cask/bin:$PATH
         - evm config path /tmp
         - evm install $EVM_EMACS --use --skip
-        - evm use $EVM_EMACS
         - emacs --version
         - curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
-        # - emacs --load helm.el
         - travis_retry cask install
         - cask build
-    - stage: setup
+    - stage: build
       env: EVM_EMACS=emacs-25.3-travis
-      script: *setup
-    - stage: setup
+      script: *build
+    - stage: build
       env: EVM_EMACS=emacs-26.3-travis-linux-xenial
-      script: *setup
-    - stage: setup
+      script: *build
+    - stage: build
       env: EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
-      script: *setup
+      script: *build
