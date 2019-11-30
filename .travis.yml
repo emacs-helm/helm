@@ -1,0 +1,31 @@
+dist: xenial
+language: emacs-lisp
+addons:
+  apt:
+    update: true
+
+jobs:
+  allow_failures:
+    - env: EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
+  include:
+    - stage: build
+      env: EVM_EMACS=emacs-24.5-travis
+      script: &build
+        - rm -rf $HOME/.evm
+        - git clone https://github.com/rejeep/evm.git $HOME/.evm
+        - export PATH=$HOME/.evm/bin:$HOME/.cask/bin:$PATH
+        - evm config path /tmp
+        - evm install $EVM_EMACS --use --skip
+        - emacs --version
+        - curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+        - travis_retry cask install
+        - cask build
+    - stage: build
+      env: EVM_EMACS=emacs-25.3-travis
+      script: *build
+    - stage: build
+      env: EVM_EMACS=emacs-26.3-travis-linux-xenial
+      script: *build
+    - stage: build
+      env: EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
+      script: *build
