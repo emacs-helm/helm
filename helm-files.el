@@ -3214,8 +3214,9 @@ Return candidates prefixed with basename of `helm-input' first."
                . helm-find-files-byte-compile)
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
-          ((string-match "\\.elc?\\'" (helm-aif (helm-marked-candidates)
-                                          (car it) candidate))
+          ((string-match (concat (regexp-opt load-suffixes) "\\'")
+                         (helm-aif (helm-marked-candidates)
+                             (car it) candidate))
            (helm-append-at-nth
             actions
             '(("Load File(s) `M-L'" . helm-find-files-load-files))
