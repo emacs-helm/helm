@@ -1359,6 +1359,7 @@ I.e. when using `helm-next-line' and friends in BODY."
                 completion-styles-alist
                 :test 'equal)))
 
+(defvar helm-blacklist-completion-styles '(emacs21 emacs22))
 (defun helm--prepare-completion-styles (&optional nomode)
   "Return a suitable list of styles for `completion-styles'."
   ;; For `helm-completion-style' and `helm-completion-styles-alist'.
@@ -1378,8 +1379,16 @@ I.e. when using `helm-next-line' and friends in BODY."
      ;; return foo foobar foao and frogo.
      (let* ((wflex (car (or (assq 'flex completion-styles-alist)
                             (assq 'helm-flex completion-styles-alist))))
-            (styles (append (list wflex) (remove wflex completion-styles))))
-       (helm-append-at-nth styles '(helm) (if wflex 1 0))))))
+            (styles (append (and (memq wflex completion-styles)
+                                 (list wflex))
+                            (cl-loop for s in completion-styles
+                                     unless (or (memq s helm-blacklist-completion-styles)
+                                                (memq wflex completion-styles))
+                                     collect s))))
+       (helm-append-at-nth
+        styles '(helm)
+        (if (memq wflex completion-styles)
+            1 0))))))
 
 (defun helm-dynamic-completion (collection predicate &optional point metadata nomode)
   "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
