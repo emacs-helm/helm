@@ -1635,7 +1635,12 @@ You must pass prefix arguments \*after* starting `helm-M-x'.  A mode-line
 counter will display the number of given prefix arguments.
 
 If you pass prefix arguments before running `helm-M-x', it will be displayed in the prompt.
-The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.")
+The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.
+
+*** Completion styles in helm-M-x
+
+By default helm-M-x use 'helm completion style, if you want to enable fuzzy matching aka flex,
+see [[Completion-styles][Completion-styles]].")
 
 ;;; Helm imenu
 ;;
