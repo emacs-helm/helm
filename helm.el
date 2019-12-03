@@ -1130,6 +1130,54 @@ separated with space should be a regexp and not a fuzzy pattern.  When
 using multi match patterns, each pattern starting with \"!\" is
 interpreted as a negation i.e. match everything but this.
 
+*** Completion-styles
+
+Helm generally fetch its candidates with the :candidates function
+up to `helm-candidate-number-limit' and then apply match functions
+to these candidates according to `helm-pattern'.
+But Helm allows matching candidates directly from the :candidates
+function using its own `completion-styles'.
+Helm provides 'helm completion style but also 'helm-flex completion style
+for Emacs<27 that don't have 'flex completion style, otherwise (emacs-27)
+'flex completion style is used to provide fuzzy aka flex completion.
+By default, like in Emacs vanilla, all completion commands
+\(e.g. `completion-at-point') using `completion-in-region' or
+`completing-read' use `completion-styles'.
+Some Helm native commands like `helm-M-x' do use `completion-styles'.
+Any helm sources can use `completion-styles' by using :match-dynamic slot
+and building their :candidates function with `helm-dynamic-completion'.
+Example:
+
+#+begin_src elisp
+
+    (helm :sources (helm-build-sync-source \"test\"
+                     :candidates (helm-dynamic-completion
+                                  '(foo bar baz foab)
+                                  'symbolp)
+                     :match-dynamic t)
+          :buffer \"*helm test*\")
+
+#+end_src
+
+By default Helm setup `completion-styles' and always add 'helm to it, however
+the flex completion styles are not added, this is up to the user if she want to
+have such completion to enable this.
+As specified above use 'flex for emacs-27 and 'helm-flex for emacs-26.
+Anyway, 'helm-flex is not provided in `completion-styles-alist' if 'flex is present.
+
+Finally Helm provide two user variables to control `completion-styles' usage:
+`helm-completion-style' and `helm-completion-syles-alist'.
+Both variables are customizable.
+The former allows retrieving previous Helm behavior if needed, by setting it to
+`helm' or `helm-fuzzy', default being `emacs' which allows dynamic completion
+and usage of `completion-styles', the second allows setting `helm-completion-style'
+per mode and also specify `completion-styles' per mode (see its docstring).
+
+NOTE: Some old completion styles are not working fine with helm
+and are disabled by default in
+`helm-blacklist-completion-styles', they are anyway not useful in
+helm because 'helm style supersed these styles.
+
 ** Helm mode
 
 `helm-mode' toggles Helm completion in native Emacs functions,
