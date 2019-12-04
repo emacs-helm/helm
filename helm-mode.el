@@ -1567,10 +1567,6 @@ Actually do nothing."
                     nconc (list (string str) 'any))
            else nconc (list p)))
 
-;; FIXME: POINT is still wrong in some cases e.g. completing against
-;; "def" should return "defun" on top, it returns actually "defun*"
-;; the helm style though return "defun" on top as expected.  Flex with
-;; emacs-27 also is correct, it returns "defun" as well.
 (defun helm-completion--flex-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
   (let* ((beforepoint (substring string 0 point))
@@ -1587,28 +1583,7 @@ Actually do nothing."
          (all (helm-completion--flex-all-completions-1 string table pred)))
     (list all pattern prefix suffix point)))
 
-;; This is usable only in emacs-27, but in emacs-27 we prefer
-;; using flex so this code is unused in both emacs-26 and 27.
-
-;; (defun helm-flex-completion--adjust-metadata (metadata)
-;; (if (memq helm-completion-style '(helm helm-fuzzy))
-;; metadata
-;; (cl-flet ((compose-helm-sort-fn
-;; ()
-;; (lambda (candidates)
-;; (sort
-;; candidates
-;; (lambda (c1 c2)
-;; (let ((s1 (get-text-property 0 'completion-score c1))
-;; (s2 (get-text-property 0 'completion-score c2)))
-;; (> (or s1 0) (or s2 0))))))))
-;; `(metadata
-;; (display-sort-function
-;; . ,(compose-helm-sort-fn))
-;; (cycle-sort-function
-;; . ,(compose-helm-sort-fn))
-;; ,@(cdr metadata)))))
-;; (put 'helm-flex 'completion--adjust-metadata 'helm-flex-completion--adjust-metadata)
+;; Completion-in-region-function
 
 (defun helm--completion-in-region (start end collection &optional predicate)
   "Helm replacement of `completion--in-region'."
