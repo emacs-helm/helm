@@ -295,7 +295,7 @@ Default action change TZ environment variable locally to emacs."
   (let* ((enable-recursive-minibuffers t)
          (query-replace-p (or (eq last-command 'query-replace)
                               (eq last-command 'query-replace-regexp)))
-         (elm (helm-comp-read "pattern: "
+         (elm (helm-comp-read "Next element matching (regexp): "
                               (cl-loop for i in
                                        (symbol-value minibuffer-history-variable)
                                        unless (string= "" i) collect i into history
