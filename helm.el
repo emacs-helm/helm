@@ -5048,15 +5048,17 @@ If action buffer is selected, back to the helm buffer."
 (defun helm-menu-select-action (_event)
   "Popup action menu from mouse-3."
   (interactive "e")
-  (let* ((actions (helm-get-actions-from-current-source
-                  (helm-get-current-source)))
-         (action (x-popup-menu
-                  t (list "Available Actions"
-                          (cons "" (if (consp actions)
-                                       actions
-                                     `(,(cons "Sole action" actions))))))))
-    (setq helm-saved-action action)
-    (helm-maybe-exit-minibuffer)))
+  (if (get-buffer-window helm-action-buffer 'visible)
+      (helm-select-action)
+    (let* ((actions (helm-get-actions-from-current-source
+                     (helm-get-current-source)))
+           (action (x-popup-menu
+                    t (list "Available Actions"
+                            (cons "" (if (consp actions)
+                                         actions
+                                       `(,(cons "Sole action" actions))))))))
+      (setq helm-saved-action action)
+      (helm-maybe-exit-minibuffer))))
 (put 'helm-menu-select-action 'helm-only t)
 
 (defun helm--set-action-prompt (&optional restore)
