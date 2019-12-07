@@ -4699,7 +4699,7 @@ respectively `helm-cand-num' and `helm-cur-source'."
       (when map
         (define-key map [mouse-1] 'helm-mouse-select-candidate)
         (define-key map [mouse-2] 'ignore)
-        (define-key map [mouse-3] 'helm-select-action)
+        (define-key map [mouse-3] 'helm-menu-select-action)
         (add-text-properties
          start end
          `(mouse-face highlight
@@ -5044,6 +5044,17 @@ If action buffer is selected, back to the helm buffer."
           (helm-display-mode-line (helm-get-current-source))
           (run-hooks 'helm-window-configuration-hook))))))
 (put 'helm-select-action 'helm-only t)
+
+(defun helm-menu-select-action (_event)
+  "Popup action menu from mouse-3."
+  (interactive "e")
+  (let* ((actions (helm-get-actions-from-current-source
+                  (helm-get-current-source)))
+         (action (x-popup-menu
+                  t (list "Available Actions" (cons "" actions)))))
+    (setq helm-saved-action action)
+    (helm-maybe-exit-minibuffer)))
+(put 'helm-menu-select-action 'helm-only t)
 
 (defun helm--set-action-prompt (&optional restore)
   (with-selected-window (minibuffer-window)
