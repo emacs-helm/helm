@@ -5051,7 +5051,10 @@ If action buffer is selected, back to the helm buffer."
   (let* ((actions (helm-get-actions-from-current-source
                   (helm-get-current-source)))
          (action (x-popup-menu
-                  t (list "Available Actions" (cons "" actions)))))
+                  t (list "Available Actions"
+                          (cons "" (if (consp actions)
+                                       actions
+                                     `(,(cons "Sole action" actions))))))))
     (setq helm-saved-action action)
     (helm-maybe-exit-minibuffer)))
 (put 'helm-menu-select-action 'helm-only t)
