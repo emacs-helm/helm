@@ -5050,15 +5050,21 @@ If action buffer is selected, back to the helm buffer."
   (interactive "e")
   (if (get-buffer-window helm-action-buffer 'visible)
       (helm-select-action)
-    (let* ((actions (helm-get-actions-from-current-source
-                     (helm-get-current-source)))
-           (action (x-popup-menu
-                    t (list "Available Actions"
-                            (cons "" (if (consp actions)
-                                         actions
-                                       `(,(cons "Sole action" actions))))))))
-      (setq helm-saved-action action)
-      (helm-maybe-exit-minibuffer))))
+    (let ((src (helm-get-current-source)))
+      (helm-aif (helm-get-actions-from-current-source src)
+          (progn
+            (setq helm-saved-current-source src)
+            (if (functionp it)
+                (message "Sole action: %s"
+                         (if (or (consp it)
+                                 (byte-code-function-p it))
+                             "Anonymous" it))
+              (setq helm-saved-action
+                    (x-popup-menu
+                     t (list "Available Actions"
+                             (cons "" it))))
+              (helm-maybe-exit-minibuffer))
+            (message "No Actions available"))))))
 (put 'helm-menu-select-action 'helm-only t)
 
 (defun helm--set-action-prompt (&optional restore)
