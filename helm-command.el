@@ -230,7 +230,9 @@ Arg HISTORY default is `extended-command-history'."
                            :candidates (helm-dynamic-completion
                                         (or history extended-command-history)
                                         #'commandp
-                                        nil nil t))
+                                        nil nil t)
+                           :filtered-candidate-transformer
+                           #'helm-M-x-transformer-no-sort)
                         ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                            :candidates (helm-dynamic-completion
                                         (or collection obarray) #'commandp
@@ -265,18 +267,20 @@ Arg HISTORY default is `extended-command-history'."
           real-this-command command)
     ;; If helm-M-x is called with regular emacs completion (kmacro)
     ;; use the value of arg otherwise use helm-current-prefix-arg.
-    (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument)))
+    (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument))
+          (command-name (symbol-name command)))
       (cl-flet ((save-hist
-                 (sym)
-                 (setq extended-command-history
-                       (cons sym (delete sym extended-command-history)))))
+                 (name)
+                 (set-default-toplevel-value
+                  'extended-command-history
+                  (cons name (delete name extended-command-history)))))
         (condition-case-unless-debug err
             (progn
               (command-execute command 'record)
-              (save-hist command))
+              (save-hist command-name))
           (error
            (when helm-M-x-always-save-history
-             (save-hist command))
+             (save-hist command-name))
            (signal (car err) (cdr err))))))))
 
 ;;;###autoload
