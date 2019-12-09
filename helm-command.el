@@ -28,12 +28,6 @@
   "Emacs command related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-M-x-requires-pattern 0
-  "Value of requires-pattern for `helm-M-x'.
-Show all candidates on startup when 0 (default)."
-  :group 'helm-command
-  :type 'boolean)
-
 (defcustom helm-M-x-always-save-history nil
   "`helm-M-x' Save command in `extended-command-history' even when it fail."
   :group 'helm-command
@@ -41,18 +35,6 @@ Show all candidates on startup when 0 (default)."
 
 (defcustom helm-M-x-reverse-history nil
   "The history source of `helm-M-x' appear in second position when non--nil."
-  :group 'helm-command
-  :type 'boolean)
-
-(defcustom helm-M-x-fuzzy-match nil
-  "Enable fuzzy matching in `helm-M-x' when non--nil.
-
-This have no effect when `helm-M-x-use-completion-styles' is non nil"
-  :group 'helm-command
-  :type 'boolean)
-
-(defcustom helm-M-x-use-completion-styles t
-  "Use `completion-styles' in helm-M-x."
   :group 'helm-command
   :type 'boolean)
 
@@ -205,7 +187,7 @@ fuzzy matching is running its own sort function with a different algorithm."
 
 (defclass helm-M-x-class (helm-source-sync helm-type-command)
   ((match-dynamic :initform t)
-   (requires-pattern :initform helm-M-x-requires-pattern)
+   (requires-pattern :initform 0)
    (must-match :initform t)
    (filtered-candidate-transformer :initform 'helm-M-x-transformer)
    (persistent-help :initform "Describe this command")
@@ -244,16 +226,15 @@ Arg HISTORY default is `extended-command-history'."
                        do (set-text-properties 0 (length c) nil c)
                        and collect c))
              (minibuffer-completion-confirm t)
-             (sources (and helm-M-x-use-completion-styles
-                           `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
-                                :candidates (helm-dynamic-completion
-                                             (or history extended-command-history)
-                                             #'commandp
-                                             nil nil t))
-                             ,(helm-make-source "Emacs Commands" 'helm-M-x-class
-                                :candidates (helm-dynamic-completion
-                                             (or collection obarray) #'commandp
-                                             nil nil t)))))
+             (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
+                           :candidates (helm-dynamic-completion
+                                        (or history extended-command-history)
+                                        #'commandp
+                                        nil nil t))
+                        ,(helm-make-source "Emacs Commands" 'helm-M-x-class
+                           :candidates (helm-dynamic-completion
+                                        (or collection obarray) #'commandp
+                                        nil nil t))))
              (prompt (concat (cond
                               ((eq helm-M-x-prefix-argument '-) "- ")
                               ((and (consp helm-M-x-prefix-argument)
@@ -269,39 +250,10 @@ Arg HISTORY default is `extended-command-history'."
         (unwind-protect
              (progn
                (setq current-prefix-arg nil)
-               (if sources
-                   ;; Use dynamic-matching and `completion-styles'.
-                   (helm :sources sources
-                         :prompt prompt
-                         :buffer "*helm M-x*"
-                         :history 'helm-M-x-input-history)
-                 ;; Use helm matching through `helm-comp-read'.
-                 (helm-comp-read
-                  prompt
-                  (or collection obarray)
-                  :test 'commandp
-                  :requires-pattern helm-M-x-requires-pattern
-                  :name "Emacs Commands"
-                  :buffer "*helm M-x*"
-                  :persistent-action (lambda (candidate)
-                                       (helm-elisp--persistent-help
-                                        candidate 'helm-describe-function))
-                  :persistent-help "Describe this command"
-                  :history (or history extended-command-history)
-                  :reverse-history helm-M-x-reverse-history
-                  :input-history 'helm-M-x-input-history
-                  :del-input nil
-                  :help-message 'helm-M-x-help-message
-                  :group 'helm-command
-                  :keymap helm-M-x-map
-                  :must-match t
-                  :coerce 'helm-symbolify
-                  :match-part (lambda (c) (car (split-string c)))
-                  :fuzzy helm-M-x-fuzzy-match
-                  :nomark t
-                  :candidates-in-buffer t
-                  :fc-transformer 'helm-M-x-transformer
-                  :hist-fc-transformer 'helm-M-x-transformer-no-sort)))
+               (helm :sources sources
+                     :prompt prompt
+                     :buffer "*helm M-x*"
+                     :history 'helm-M-x-input-history))
           (cancel-timer tm)
           (setq helm--mode-line-display-prefarg nil)))))
 
@@ -342,10 +294,7 @@ You can get help on each command by persistent action."
    (progn
      (setq helm-M-x-prefix-argument current-prefix-arg)
      (list current-prefix-arg)))
-  (if helm-M-x-use-completion-styles
-      (helm-M-x-read-extended-command obarray)
-    (let ((command-name (helm-M-x-read-extended-command obarray)))
-      (helm-M-x-execute-command command-name))))
+  (helm-M-x-read-extended-command obarray))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)

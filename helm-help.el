@@ -1631,11 +1631,19 @@ marking it (`C-c u' or `RET') .
 
 *** Prefix arguments
 
-You must pass prefix arguments \*after* starting `helm-M-x'.  A mode-line
+You can pass prefix arguments *after* starting `helm-M-x'.  A mode-line
 counter will display the number of given prefix arguments.
 
 If you pass prefix arguments before running `helm-M-x', it will be displayed in the prompt.
 The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.
+
+NOTE: When you specify prefix arguments once `helm-M-x' is
+started, the prefix argument apply on the next command, so if you
+hit RET, it will apply on the selected command, but if you type a
+new character at prompt to narrow down further candidates, the
+prefix arg will apply to `self-insert-command' (e.g. if you type
+`C-u e' \"eeee\" will be inserted in prompt) so select the
+command you want to execute before specifying prefix arg.
 
 *** Completion styles in helm-M-x
 
