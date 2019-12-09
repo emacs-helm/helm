@@ -270,7 +270,7 @@
    (requires-pattern
     :initarg :requires-pattern
     :initform 0
-    :type integer
+    :custom integer
     :documentation
     "  If present matches from the source are shown only if the
   pattern is not empty. Optionally, it can have an integer
