@@ -986,9 +986,10 @@ Example:
 ;;
 (defun helm-symbolify (str-or-sym)
   "Get symbol of STR-OR-SYM."
-  (if (symbolp str-or-sym)
-      str-or-sym
-    (intern str-or-sym)))
+  (cond ((symbolp str-or-sym)
+         str-or-sym)
+        ((equal str-or-sym "") nil)
+        (t (intern str-or-sym))))
 
 (defun helm-symbol-name (obj)
   (if (or (and (consp obj) (functionp obj))
