@@ -633,7 +633,7 @@ source name in this variable."
 
 Note that this also allow moving out of minibuffer when clicking
 outside of `helm-buffer', up to you to get back to helm by clicking
-back in `helm-buffer' of minibuffer."
+back in `helm-buffer' or minibuffer."
   :group 'helm
   :type 'boolean)
 
