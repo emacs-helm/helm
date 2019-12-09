@@ -225,7 +225,9 @@
    "Untrace function" 'untrace-function)
     "Default actions for type functions."
   :group 'helm-elisp
-  :type '(alist :key-type string :value-type function))
+  ;; Use symbol as value type because some functions may not be
+  ;; autoloaded (like untrace-function).
+  :type '(alist :key-type string :value-type symbol))
 
 (defmethod helm-source-get-action-from-type ((object helm-type-function))
   (slot-value object 'action))
@@ -262,7 +264,7 @@
            (helm-actions-from-type-function)))
   "Default actions for type command."
   :group 'helm-command
-  :type '(alist :key-type string :value-type function))
+  :type '(alist :key-type string :value-type symbol))
 
 (defmethod helm--setup-source :primary ((_source helm-type-command)))
 
