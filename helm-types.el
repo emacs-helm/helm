@@ -271,8 +271,7 @@
   (setf (slot-value source 'coerce) 'helm-symbolify)
   (setf (slot-value source 'persistent-action) 'helm-M-x-persistent-action)
   (setf (slot-value source 'persistent-help) "Describe this command")
-  (setf (slot-value source 'group) 'helm-command)
-  (setf (slot-value source 'keymap) helm-M-x-map))
+  (setf (slot-value source 'group) 'helm-command))
 
 ;; Timers
 (defclass helm-type-timers (helm-source) ()
