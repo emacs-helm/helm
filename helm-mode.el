@@ -516,6 +516,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (candidate-number-limit helm-candidate-number-limit)
                             multiline
                             allow-nest
+                            coerce
                             (group 'helm))
   "Read a string in the minibuffer, with helm completion.
 
@@ -614,6 +615,8 @@ Keys description:
 
 - MULTILINE: See multiline in `helm-source'.
 
+- COERCE: See coerce in `helm-source'.
+
 - GROUP: See group in `helm-source'.
 
 Any prefix args passed during `helm-comp-read' invocation will be recorded
@@ -674,6 +677,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                        :keymap keymap
                        :must-match must-match
                        :group group
+                       :coerce coerce
                        :mode-line mode-line
                        :help-message help-message
                        :action action-fn))
@@ -694,6 +698,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                   :keymap keymap
                   :must-match must-match
                   :group group
+                  :coerce coerce
                   :mode-line mode-line
                   :match-dynamic match-dynamic
                   :help-message help-message
@@ -713,6 +718,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :keymap keymap
                     :must-match must-match
                     :group group
+                    :coerce coerce
                     :persistent-help persistent-help
                     :mode-line mode-line
                     :help-message help-message
