@@ -208,6 +208,8 @@ fuzzy matching is running its own sort function with a different algorithm."
    (requires-pattern :initform helm-M-x-requires-pattern)
    (must-match :initform t)
    (filtered-candidate-transformer :initform 'helm-M-x-transformer)
+   (persistent-help :initform "Describe this command")
+   (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
    (keymap :initform helm-M-x-map)))
 
