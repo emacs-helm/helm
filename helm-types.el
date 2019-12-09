@@ -257,7 +257,7 @@
 
 (defcustom helm-type-command-actions
   (append (helm-make-actions
-           "Call interactively" 'helm-call-interactively)
+           "Execute command" 'helm-M-x-execute-command)
           (symbol-value
            (helm-actions-from-type-function)))
   "Default actions for type command."
@@ -269,8 +269,10 @@
 (defmethod helm--setup-source :before ((source helm-type-command))
   (setf (slot-value source 'action) 'helm-type-command-actions)
   (setf (slot-value source 'coerce) 'helm-symbolify)
-  (setf (slot-value source 'persistent-action) 'describe-function)
-  (setf (slot-value source 'group) 'helm-command))
+  (setf (slot-value source 'persistent-action) 'helm-M-x-persistent-action)
+  (setf (slot-value source 'persistent-help) "Describe this command")
+  (setf (slot-value source 'group) 'helm-command)
+  (setf (slot-value source 'keymap) helm-M-x-map))
 
 ;; Timers
 (defclass helm-type-timers (helm-source) ()
