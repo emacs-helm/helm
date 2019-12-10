@@ -915,11 +915,6 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                        (setcdr last-data nil))
                      (setq helm-completion--sorting-done (and sort-fn t))
                      (setq all (copy-sequence comps))
-                     ;; Fall back to string-lessp sorting when
-                     ;; str is too small as specialized
-                     ;; sorting may be too slow (flex).
-                     (when (and sort-fn (<= (length str) 1))
-                       (setq sort-fn (lambda (all) (sort all #'string-lessp))))
                      ;; Default is passed here only with helm
                      ;; h-c-styles, otherwise with emacs style it is
                      ;; passed with the :default arg of helm-comp-read
@@ -1689,11 +1684,6 @@ Actually do nothing."
                            (unless base-size (setq base-size bs))
                            (setq helm-completion--sorting-done (and sort-fn t))
                            (setq all (copy-sequence comps))
-                           ;; Fall back to string-lessp sorting when
-                           ;; str is too small as specialized
-                           ;; sorting may be too slow (flex).
-                           (when (and sort-fn (<= (length str) 1))
-                             (setq sort-fn (lambda (all) (sort all #'string-lessp))))
                            (helm-completion-in-region--initial-filter
                             (if sort-fn (funcall sort-fn all) all)
                             afun file-comp-p))))
