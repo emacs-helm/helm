@@ -208,56 +208,52 @@ Arg COLLECTION should be an `obarray' but can be any object suitable
 for `try-completion'.  Arg PREDICATE is a function that default to
 `commandp' see also `try-completion'.
 Arg HISTORY default to `extended-command-history'."
-  (if (or defining-kbd-macro executing-kbd-macro)
-      (if helm-mode
-          (unwind-protect
-               (progn
-                 (helm-mode -1)
-                 (read-extended-command))
-            (helm-mode 1))
-          (read-extended-command))
-      (let* ((helm-fuzzy-sort-fn helm-M-x-default-sort-fn)
-             (helm--mode-line-display-prefarg t)
-             (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
-             (helm-move-selection-after-hook
-              (cons (lambda () (setq current-prefix-arg nil))
-                    helm-move-selection-after-hook))
-             (minibuffer-completion-confirm t)
-             (pred (or predicate #'commandp))
-             (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
-                           :candidates (helm-dynamic-completion
-                                        (or history extended-command-history)
-                                        pred nil nil t)
-                           :filtered-candidate-transformer
-                           #'helm-M-x-transformer-no-sort)
-                        ,(helm-make-source "Emacs Commands" 'helm-M-x-class
-                           :candidates (helm-dynamic-completion
-                                        collection pred
-                                        nil nil t))))
-             (prompt (concat (cond
-                              ((eq helm-M-x-prefix-argument '-) "- ")
-                              ((and (consp helm-M-x-prefix-argument)
-                                    (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
-                              ((and (consp helm-M-x-prefix-argument)
-                                    (integerp (car helm-M-x-prefix-argument)))
-                               (format "%d " (car helm-M-x-prefix-argument)))
-                              ((integerp helm-M-x-prefix-argument)
-                               (format "%d " helm-M-x-prefix-argument)))
-                             "M-x ")))
-        (when (and sources helm-M-x-reverse-history)
-          (setq sources (nreverse sources)))
-        (unwind-protect
-             (progn
-               (setq current-prefix-arg nil)
-               (helm :sources sources
-                     :prompt prompt
-                     :buffer "*helm M-x*"
-                     :history 'helm-M-x-input-history))
-          (cancel-timer tm)
-          (setq helm--mode-line-display-prefarg nil)))))
+  (let* ((helm-fuzzy-sort-fn helm-M-x-default-sort-fn)
+         (helm--mode-line-display-prefarg t)
+         (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
+         (helm-move-selection-after-hook
+          (cons (lambda () (setq current-prefix-arg nil))
+                helm-move-selection-after-hook))
+         (minibuffer-completion-confirm t)
+         (pred (or predicate #'commandp))
+         (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
+                       :candidates (helm-dynamic-completion
+                                    (or history extended-command-history)
+                                    pred nil nil t)
+                       :filtered-candidate-transformer
+                       #'helm-M-x-transformer-no-sort)
+                    ,(helm-make-source "Emacs Commands" 'helm-M-x-class
+                       :candidates (helm-dynamic-completion
+                                    collection pred
+                                    nil nil t))))
+         (prompt (concat (cond
+                          ((eq helm-M-x-prefix-argument '-) "- ")
+                          ((and (consp helm-M-x-prefix-argument)
+                                (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                          ((and (consp helm-M-x-prefix-argument)
+                                (integerp (car helm-M-x-prefix-argument)))
+                           (format "%d " (car helm-M-x-prefix-argument)))
+                          ((integerp helm-M-x-prefix-argument)
+                           (format "%d " helm-M-x-prefix-argument)))
+                         "M-x ")))
+    (when (and sources helm-M-x-reverse-history)
+      (setq sources (nreverse sources)))
+    (unwind-protect
+        (progn
+          (setq current-prefix-arg nil)
+          (helm :sources sources
+                :prompt prompt
+                :buffer "*helm M-x*"
+                :history 'helm-M-x-input-history))
+      (cancel-timer tm)
+      (setq helm--mode-line-display-prefarg nil))))
 
 (defun helm-M-x-execute-command (command)
+  "Execute COMMAND as an editor command.
+COMMAND must be a symbol that satisfies the `commandp' predicate.
+Save COMMAND to `extended-command-history'."
   (when command
+    (set--this-command-keys (concat "\M-x" (symbol-name command) "\r"))
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command command
           ;; Handle C-x z (repeat) Issue #322
@@ -279,6 +275,17 @@ Arg HISTORY default to `extended-command-history'."
              (save-hist command-name))
            (signal (car err) (cdr err))))))))
 
+(defun helm-M-x--vanilla-M-x ()
+  (helm-M-x-execute-command
+   (intern-soft
+    (if helm-mode
+        (unwind-protect
+            (progn
+              (helm-mode -1)
+              (read-extended-command))
+          (helm-mode 1))
+      (read-extended-command)))))
+
 ;;;###autoload
 (defun helm-M-x (_arg)
   "Preconfigured `helm' for Emacs commands.
@@ -294,7 +301,9 @@ You can get help on each command by persistent action."
    (progn
      (setq helm-M-x-prefix-argument current-prefix-arg)
      (list current-prefix-arg)))
-  (helm-M-x-read-extended-command obarray))
+  (if (or defining-kbd-macro executing-kbd-macro)
+      (helm-M-x--vanilla-M-x)
+  (helm-M-x-read-extended-command obarray)))
 (put 'helm-M-x 'interactive-only 'command-execute)
 
 (provide 'helm-command)
