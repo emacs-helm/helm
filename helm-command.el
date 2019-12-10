@@ -195,7 +195,7 @@ fuzzy matching is running its own sort function with a different algorithm."
    (nomark :initform t)
    (keymap :initform helm-M-x-map)))
 
-(defun helm-M-x-read-extended-command (collection &optional history)
+(defun helm-M-x-read-extended-command (collection &optional predicate history)
   "Read or execute action on command name in COLLECTION or HISTORY.
 
 When `helm-M-x-use-completion-styles' is used, several actions as of
@@ -204,8 +204,10 @@ function returns the command as a symbol.
 
 Helm completion is not provided when executing or defining kbd macros.
 
-Arg COLLECTION default is `obarray'.
-Arg HISTORY default is `extended-command-history'."
+Arg COLLECTION should be an `obarray' but can be any object suitable
+for `try-completion'.  Arg PREDICATE is a function that default to
+`commandp' see also `try-completion'.
+Arg HISTORY default to `extended-command-history'."
   (if (or defining-kbd-macro executing-kbd-macro)
       (if helm-mode
           (unwind-protect
@@ -220,22 +222,17 @@ Arg HISTORY default is `extended-command-history'."
              (helm-move-selection-after-hook
               (cons (lambda () (setq current-prefix-arg nil))
                     helm-move-selection-after-hook))
-             (extended-command-history
-              (cl-loop for c in extended-command-history
-                       when (and c (commandp (intern c)))
-                       do (set-text-properties 0 (length c) nil c)
-                       and collect c))
              (minibuffer-completion-confirm t)
+             (pred (or predicate #'commandp))
              (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
                            :candidates (helm-dynamic-completion
                                         (or history extended-command-history)
-                                        #'commandp
-                                        nil nil t)
+                                        pred nil nil t)
                            :filtered-candidate-transformer
                            #'helm-M-x-transformer-no-sort)
                         ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                            :candidates (helm-dynamic-completion
-                                        (or collection obarray) #'commandp
+                                        collection pred
                                         nil nil t))))
              (prompt (concat (cond
                               ((eq helm-M-x-prefix-argument '-) "- ")
@@ -271,9 +268,8 @@ Arg HISTORY default is `extended-command-history'."
           (command-name (symbol-name command)))
       (cl-flet ((save-hist
                  (name)
-                 (set-default-toplevel-value
-                  'extended-command-history
-                  (cons name (delete name extended-command-history)))))
+                 (setq extended-command-history
+                       (cons name (delete name extended-command-history)))))
         (condition-case-unless-debug err
             (progn
               (command-execute command 'record)
