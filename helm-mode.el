@@ -1523,23 +1523,24 @@ Actually do nothing."
 (put 'helm 'completion--adjust-metadata 'helm-completion--adjust-metadata)
 
 ;; Helm-flex style.
-
+;; This is more or less the same as emacs-27 flex style.
 (defun helm-flex-completion-try-completion (string table pred point)
-  "The try completion function for `completing-styles-alist'.
-Actually do nothing."
-  ;; AFAIU the try completion function is here to handle single
-  ;; element completion, in this case it throw this element without
-  ;; popping up *completions* buffer. If that's the case we don't need
-  ;; this because helm already handle this with
-  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
-  ;; nil should be fine.
-  (ignore string table pred point))
+  "The try completion function for `completing-styles-alist'."
+  ;; It is needed here to make minibuffer-complete work in emacs-26,
+  ;; e.g. with regular M-x.
+  (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
+      (helm-completion--flex-all-completions string table pred point)
+    (when minibuffer-completing-file-name
+      (setq all (completion-pcm--filename-try-filter all)))
+    (completion-pcm--merge-try pattern all prefix suffix)))
 
 (defun helm-flex-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
   (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
-      (helm-completion--flex-all-completions string table pred point)
+      (helm-completion--flex-all-completions
+       string table pred point
+       #'helm-completion--flex-transform-pattern)
     (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
       (when all (nconc (helm-flex-add-score-as-prop all regexp)
                        (length prefix))))))
@@ -1547,18 +1548,6 @@ Actually do nothing."
 (defun helm-flex-add-score-as-prop (candidates regexp)
   (cl-loop for cand in candidates
            collect (helm-flex--style-score cand regexp)))
-
-(defun helm-completion--flex-all-completions-1 (_string collection &optional predicate)
-  "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x &optional _y)
-                                   ;; Elements of collection may be
-                                   ;; lists, in this case consider the
-                                   ;; car of element #2219.
-                                   (let ((elm (if (listp x) (car x) x)))
-                                     (if predicate
-                                         (and (funcall predicate elm)
-                                              (helm-flex-style-match (helm-stringify elm)))
-                                       (helm-flex-style-match (helm-stringify elm)))))))
 
 (defun helm-completion--flex-transform-pattern (pattern)
   ;; "fob" => '(prefix "f" any "o" any "b" any point)
@@ -1568,21 +1557,28 @@ Actually do nothing."
                     nconc (list (string str) 'any))
            else nconc (list p)))
 
-(defun helm-completion--flex-all-completions (string table pred point)
-  "Collect completions from TABLE for helm completion style."
+;; Same as emacs-27 completion-substring--all-completions.
+(defun helm-completion--flex-all-completions
+    (string table pred point &optional transform-pattern-fn)
+  "Match the presumed substring STRING to the entries in TABLE.
+Respect PRED and POINT.  The pattern used is a PCM-style
+substring pattern, but it be massaged by TRANSFORM-PATTERN-FN, if
+that is non-nil."
   (let* ((beforepoint (substring string 0 point))
          (afterpoint (substring string point))
          (bounds (completion-boundaries beforepoint table pred afterpoint))
-         (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
+         (prefix (substring beforepoint 0 (car bounds)))
          (basic-pattern (completion-basic--pattern
                          beforepoint afterpoint bounds))
          (pattern (if (not (stringp (car basic-pattern)))
                       basic-pattern
                     (cons 'prefix basic-pattern)))
-         (pattern (helm-completion--flex-transform-pattern pattern))
-         (all (helm-completion--flex-all-completions-1 string table pred)))
-    (list all pattern prefix suffix point)))
+         (pattern (if transform-pattern-fn
+                       (funcall transform-pattern-fn pattern)
+                     pattern))
+         (all (completion-pcm--all-completions prefix pattern table pred)))
+    (list all pattern prefix suffix (car bounds))))
 
 ;; Completion-in-region-function
 
