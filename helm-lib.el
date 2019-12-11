@@ -1402,6 +1402,8 @@ sort function provided by the completion-style in use (emacs-27 only),
 otherwise (emacs-26) the sort function have to be provided if needed
 either with a FCT function in source or by passing the sort function
 with METADATA e.g. (metadata (display-sort-function . foo)).
+If you don't want the sort fn provided by style to kick in (emacs-27)
+you can use as metadata value the symbol `nosort'.
 
 Example:
 
@@ -1418,6 +1420,7 @@ specified in `helm-completion-styles-alist'."
     (let* ((completion-styles
             (helm--prepare-completion-styles nomode))
            (completion-flex-nospace t)
+           (nosort (eq metadata 'nosort))
            (compsfn (lambda (str pred _action)
                       (let* ((comps (completion-all-completions
                                      str
@@ -1426,10 +1429,12 @@ specified in `helm-completion-styles-alist'."
                                        collection)
                                      pred
                                      (or point 0)
-                                     (or metadata '(metadata))))
+                                     (or (and (listp metadata) metadata)
+                                         (setq metadata '(metadata)))))
                              (last-data (last comps))
-                             (sort-fn (completion-metadata-get
-                                       metadata 'display-sort-function))
+                             (sort-fn (unless nosort
+                                        (completion-metadata-get
+                                         metadata 'display-sort-function)))
                              all)
                         (when (cdr last-data)
                           (setcdr last-data nil))

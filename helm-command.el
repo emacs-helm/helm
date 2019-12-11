@@ -189,7 +189,7 @@ fuzzy matching is running its own sort function with a different algorithm."
   ((match-dynamic :initform t)
    (requires-pattern :initform 0)
    (must-match :initform t)
-   (filtered-candidate-transformer :initform 'helm-M-x-transformer)
+   (filtered-candidate-transformer :initform 'helm-M-x-transformer-no-sort)
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
@@ -216,16 +216,19 @@ Arg HISTORY default to `extended-command-history'."
                 helm-move-selection-after-hook))
          (minibuffer-completion-confirm t)
          (pred (or predicate #'commandp))
+         (metadata (unless (assq 'flex completion-styles-alist)
+                     '(metadata (display-sort-function
+                                 .
+                                 (lambda (candidates)
+                                   (sort candidates #'helm-generic-sort-fn))))))
          (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
                        :candidates (helm-dynamic-completion
                                     (or history extended-command-history)
-                                    pred nil nil t)
-                       :filtered-candidate-transformer
-                       #'helm-M-x-transformer-no-sort)
+                                    pred nil 'nosort t))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :candidates (helm-dynamic-completion
                                     collection pred
-                                    nil nil t))))
+                                    nil metadata t))))
          (prompt (concat (cond
                           ((eq helm-M-x-prefix-argument '-) "- ")
                           ((and (consp helm-M-x-prefix-argument)
