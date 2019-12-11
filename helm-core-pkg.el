@@ -3,7 +3,7 @@
 (define-package "helm-core" "3.0"
   "Development files for Helm"
   '((emacs "24.4")
-    (async "1.9.3"))
+    (async "1.9.4"))
   :url "https://emacs-helm.github.io/helm/")
 
 ;; Local Variables:
