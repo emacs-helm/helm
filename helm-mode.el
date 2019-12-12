@@ -1466,12 +1466,13 @@ The `helm-find-files' history `helm-ff-history' is used here."
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
-  ;; AFAIU the try completion function is here to handle single
-  ;; element completion, in this case it throw this element without
-  ;; popping up *completions* buffer. If that's the case we don't need
-  ;; this because helm already handle this with
-  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
-  ;; nil should be fine.
+  ;; AFAIU the try-completions style functions
+  ;; are here to check if what is at point is suitable for TABLE but
+  ;; there is no way to pass a multiple pattern from what is at point
+  ;; apart sending STRING in a minibuffer like helm does.  Perhaps
+  ;; minibuffer-complete should benefit of this but for now just do
+  ;; nothing as this is used nowhere.  It is anyway not clear what the
+  ;; try-completions functions do in emacs so just do nothing for now.
   (ignore string table pred point))
 
 (defun helm-completion-all-completions (string table pred point)
@@ -1483,18 +1484,44 @@ Actually do nothing."
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
   "Allow `all-completions' multi matching on its candidates."
-  (all-completions "" collection (lambda (x &optional _y)
-                                   ;; Second arg _y is needed when
-                                   ;; COLLECTION is a hash-table issue
-                                   ;; #2231 (C-x 8 RET).
-                                   ;; Elements of collection may be
-                                   ;; lists or alists, in this case consider the
-                                   ;; car of element issue #2219 (org-refile).
-                                   (let ((elm (if (listp x) (car x) x)))
-                                     (if predicate
-                                         (and (funcall predicate elm)
-                                              (helm-mm-match (helm-stringify elm) string))
-                                       (helm-mm-match (helm-stringify elm) string))))))
+  ;; Doing an initial call of all-completions on the first element of
+  ;; STRING speedup completion and fix file completion when CAPF
+  ;; returns relative paths to initial pattern (eshell).
+  (let* ((split (helm-mm-split-pattern string))
+         (fpat (car split))
+         (all (and (or (cdr split) (string-match " \\'" string))
+                   (not (string-match "\\`!" fpat))
+                   ;; all-completions should return nil if FPAT is a
+                   ;; regexp, it is what we expect.
+                   (all-completions fpat collection
+                                    (lambda (x &optional _y)
+                                      (let ((elm (if (listp x) (car x) x)))
+                                        (funcall (or predicate #'identity) elm))))))
+         (pattern (if all
+                      ;; Returns the part of STRING after space
+                      ;; e.g. "foo bar baz" => "bar baz".
+                      (substring string (1+ (string-match " " string)))
+                    string)))
+    (if (string= pattern "") ; e.g. STRING == "foo ".
+        all
+      (all-completions "" (or all collection)
+                       (lambda (x &optional _y)
+                         ;; Second arg _y is needed when
+                         ;; COLLECTION is a hash-table issue
+                         ;; #2231 (C-x 8 RET).
+                         ;; Elements of COLLECTION may be
+                         ;; lists or alists, in this case consider the
+                         ;; car of element (issue #2219 org-refile).
+                         (let ((elm (if (listp x) (car x) x)))
+                           ;; PREDICATE have been already called in
+                           ;; initial all-completions, no need to call
+                           ;; it a second time, thus ALL is now a list
+                           ;; of strings maybe not supported by
+                           ;; PREDICATE (e.g. symbols vs strings).
+                           (if (and predicate (null all))
+                               (and (funcall predicate elm)
+                                    (helm-mm-match (helm-stringify elm) pattern))
+                             (helm-mm-match (helm-stringify elm) pattern))))))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
