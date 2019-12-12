@@ -1466,12 +1466,13 @@ The `helm-find-files' history `helm-ff-history' is used here."
 (defun helm-completion-try-completion (string table pred point)
   "The try completion function for `completing-styles-alist'.
 Actually do nothing."
-  ;; AFAIU the try completion function is here to handle single
-  ;; element completion, in this case it throws this element without
-  ;; popping up *completions* buffer. If that's the case we don't need
-  ;; this because helm already handle this with
-  ;; `helm-execute-action-at-once-if-one', so returning unconditionaly
-  ;; nil should be fine.
+  ;; AFAIU the try-completions style functions
+  ;; are here to check if what is at point is suitable for TABLE but
+  ;; there is no way to pass a multiple pattern from what is at point
+  ;; apart sending STRING in a minibuffer like helm does.  Perhaps
+  ;; minibuffer-complete should benefit of this but for now just do
+  ;; nothing as this is used nowhere.  It is anyway not clear what the
+  ;; try-completions functions do in emacs so just do nothing for now.
   (ignore string table pred point))
 
 (defun helm-completion-all-completions (string table pred point)
@@ -1490,6 +1491,8 @@ Actually do nothing."
          (fpat (car split))
          (all (and (or (cdr split) (string-match " \\'" string))
                    (not (string-match "\\`!" fpat))
+                   ;; all-completions should return nil if FPAT is a
+                   ;; regexp, it is what we expect.
                    (all-completions fpat collection
                                     (lambda (x &optional _y)
                                       (let ((elm (if (listp x) (car x) x)))
