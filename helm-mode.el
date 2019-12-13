@@ -1513,10 +1513,10 @@ Actually do nothing."
                                     (lambda (x &optional _y)
                                       (let ((elm (if (listp x) (car x) x)))
                                         (funcall (or predicate #'identity) elm))))))
-         (pattern (helm-aif (and all (string-match " " string))
-                      ;; Returns the part of STRING after space
-                      ;; e.g. "foo bar baz" => "bar baz".
-                      (substring string (1+ it)))))
+         (pattern (helm-aand all (string-match " " string)
+                             ;; Returns the part of STRING after space
+                             ;; e.g. "foo bar baz" => "bar baz".
+                             (substring string (1+ it)))))
     (if (equal pattern "") ; e.g. STRING == "foo ".
         all
       (all-completions "" (or all collection)
