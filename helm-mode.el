@@ -1488,8 +1488,9 @@ Actually do nothing."
   ;; STRING speedup completion and fix file completion when CAPF
   ;; returns relative paths to initial pattern (eshell).
   (let* ((split (helm-mm-split-pattern string))
-         (fpat (car split))
-         (all (and (or (cdr split) (string-match " \\'" string))
+         (fpat (or (car split) ""))
+         (all (and (or (cdr split) (string-match " \\'" string)
+                       (string= string ""))
                    (not (string-match "\\`!" fpat))
                    ;; all-completions should return nil if FPAT is a
                    ;; regexp, it is what we expect.
@@ -1497,10 +1498,10 @@ Actually do nothing."
                                     (lambda (x &optional _y)
                                       (let ((elm (if (listp x) (car x) x)))
                                         (funcall (or predicate #'identity) elm))))))
-         (pattern (if all
+         (pattern (helm-aif (and all (string-match " " string))
                       ;; Returns the part of STRING after space
                       ;; e.g. "foo bar baz" => "bar baz".
-                      (substring string (1+ (string-match " " string)))
+                      (substring string (1+ it))
                     string)))
     (if (string= pattern "") ; e.g. STRING == "foo ".
         all
