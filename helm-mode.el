@@ -865,7 +865,7 @@ It should be used when candidate list don't need to rebuild dynamically."
 (defun helm-completing-read-default-2
     (prompt collection predicate require-match
      init hist default _inherit-input-method
-     name buffer &optional exec-when-only-one)
+     name buffer &optional _cands-in-buffer exec-when-only-one)
   "Call `helm-comp-read' with same args as `completing-read'.
 
 This handler use dynamic matching which allow honouring `completion-styles'."
@@ -982,14 +982,29 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                                   init hist default inherit-input-method
                                   name buffer))
 
+(defun helm-completing-read-inbuffer-default-handler
+    (prompt collection test require-match
+     init hist default inherit-input-method
+     name buffer)
+  "`helm-mode' handler using inbuffer source as backend."
+  (helm-completing-read-default-1 prompt collection test require-match
+                                  init hist default inherit-input-method
+                                  name buffer t))
+
 (defun helm-completing-read-default-handler
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
   "Default `helm-mode' handler for all `completing-read'."
-  (helm-completing-read-default-2 prompt collection test require-match
-                                  init hist default inherit-input-method
-                                  name buffer))
+  (let* ((standard (memq helm-completion-style '(helm helm-fuzzy)))
+         (fn (if standard
+                 #'helm-completing-read-default-1
+               #'helm-completing-read-default-2))
+         (helm-mode-fuzzy-match (eq helm-completion-style 'helm-fuzzy)))
+    (apply fn
+           prompt collection test require-match
+           init hist default inherit-input-method
+           name buffer standard)))
 
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
   "The `read-buffer-function' for `helm-mode'.
