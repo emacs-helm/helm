@@ -271,7 +271,6 @@ Arg HISTORY default to `extended-command-history'."
 COMMAND must be a symbol that satisfies the `commandp' predicate.
 Save COMMAND to `extended-command-history'."
   (when command
-    (set--this-command-keys (concat "\M-x" (symbol-name command) "\r"))
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command command
           ;; Handle C-x z (repeat) Issue #322
