@@ -1501,9 +1501,8 @@ Actually do nothing."
          (pattern (helm-aif (and all (string-match " " string))
                       ;; Returns the part of STRING after space
                       ;; e.g. "foo bar baz" => "bar baz".
-                      (substring string (1+ it))
-                    string)))
-    (if (string= pattern "") ; e.g. STRING == "foo ".
+                      (substring string (1+ it)))))
+    (if (equal pattern "") ; e.g. STRING == "foo ".
         all
       (all-completions "" (or all collection)
                        (lambda (x &optional _y)
@@ -1521,8 +1520,8 @@ Actually do nothing."
                            ;; PREDICATE (e.g. symbols vs strings).
                            (if (and predicate (null all))
                                (and (funcall predicate elm)
-                                    (helm-mm-match (helm-stringify elm) pattern))
-                             (helm-mm-match (helm-stringify elm) pattern))))))))
+                                    (helm-mm-match (helm-stringify elm) (or pattern string)))
+                             (helm-mm-match (helm-stringify elm) (or pattern string)))))))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
