@@ -185,6 +185,13 @@ fuzzy matching is running its own sort function with a different algorithm."
   (helm-elisp--persistent-help
    candidate 'helm-describe-function))
 
+(defun helm-M-x--move-selection-after-hook ()
+  (setq current-prefix-arg nil))
+
+(defun helm-M-x--before-action-hook ()
+  (remove-hook 'helm-move-selection-after-hook
+               'helm-M-x--move-selection-after-hook))
+
 (defclass helm-M-x-class (helm-source-sync helm-type-command)
   ((match-dynamic :initform t)
    (requires-pattern :initform 0)
@@ -211,9 +218,6 @@ Arg HISTORY default to `extended-command-history'."
   (let* ((helm-fuzzy-sort-fn helm-M-x-default-sort-fn)
          (helm--mode-line-display-prefarg t)
          (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
-         (helm-move-selection-after-hook
-          (cons (lambda () (setq current-prefix-arg nil))
-                helm-move-selection-after-hook))
          (minibuffer-completion-confirm t)
          (pred (or predicate #'commandp))
          (metadata (unless (assq 'flex completion-styles-alist)
@@ -239,6 +243,12 @@ Arg HISTORY default to `extended-command-history'."
                           ((integerp helm-M-x-prefix-argument)
                            (format "%d " helm-M-x-prefix-argument)))
                          "M-x ")))
+    ;; Fix Issue #2250, add `helm-move-selection-after-hook' which
+    ;; reset prefix arg to nil only for this helm session.
+    (add-hook 'helm-move-selection-after-hook
+              'helm-M-x--move-selection-after-hook)
+    (add-hook 'helm-before-action-hook
+              'helm-M-x--before-action-hook)
     (when (and sources helm-M-x-reverse-history)
       (setq sources (nreverse sources)))
     (unwind-protect
@@ -249,14 +259,18 @@ Arg HISTORY default to `extended-command-history'."
                 :buffer "*helm M-x*"
                 :history 'helm-M-x-input-history))
       (cancel-timer tm)
-      (setq helm--mode-line-display-prefarg nil))))
+      (setq helm--mode-line-display-prefarg nil)
+      ;; Be sure to remove it here as well in case of quit.
+      (remove-hook 'helm-move-selection-after-hook
+                   'helm-M-x--move-selection-after-hook)
+      (remove-hook 'helm-before-action-hook
+                   'helm-M-x--before-action-hook))))
 
 (defun helm-M-x-execute-command (command)
   "Execute COMMAND as an editor command.
 COMMAND must be a symbol that satisfies the `commandp' predicate.
 Save COMMAND to `extended-command-history'."
   (when command
-    (set--this-command-keys (concat "\M-x" (symbol-name command) "\r"))
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command command
           ;; Handle C-x z (repeat) Issue #322
