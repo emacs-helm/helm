@@ -865,7 +865,7 @@ It should be used when candidate list don't need to rebuild dynamically."
 (defun helm-completing-read-default-2
     (prompt collection predicate require-match
      init hist default _inherit-input-method
-     name buffer &optional exec-when-only-one)
+     name buffer &optional _cands-in-buffer exec-when-only-one)
   "Call `helm-comp-read' with same args as `completing-read'.
 
 This handler use dynamic matching which allow honouring `completion-styles'."
@@ -923,7 +923,9 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
                              (helm-completion-in-region--initial-filter
-                              (if sort-fn (funcall sort-fn all) all)
+                              (if (and sort-fn (> (length str) 0))
+                                  (funcall sort-fn all)
+                                all)
                               afun file-comp-p)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
@@ -982,14 +984,29 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                                   init hist default inherit-input-method
                                   name buffer))
 
+(defun helm-completing-read-inbuffer-default-handler
+    (prompt collection test require-match
+     init hist default inherit-input-method
+     name buffer)
+  "`helm-mode' handler using inbuffer source as backend."
+  (helm-completing-read-default-1 prompt collection test require-match
+                                  init hist default inherit-input-method
+                                  name buffer t))
+
 (defun helm-completing-read-default-handler
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
   "Default `helm-mode' handler for all `completing-read'."
-  (helm-completing-read-default-2 prompt collection test require-match
-                                  init hist default inherit-input-method
-                                  name buffer))
+  (let* ((standard (memq helm-completion-style '(helm helm-fuzzy)))
+         (fn (if standard
+                 #'helm-completing-read-default-1
+               #'helm-completing-read-default-2))
+         (helm-mode-fuzzy-match (eq helm-completion-style 'helm-fuzzy)))
+    (apply fn
+           prompt collection test require-match
+           init hist default inherit-input-method
+           name buffer standard)))
 
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
   "The `read-buffer-function' for `helm-mode'.
@@ -1488,8 +1505,9 @@ Actually do nothing."
   ;; STRING speedup completion and fix file completion when CAPF
   ;; returns relative paths to initial pattern (eshell).
   (let* ((split (helm-mm-split-pattern string))
-         (fpat (car split))
-         (all (and (or (cdr split) (string-match " \\'" string))
+         (fpat (or (car split) ""))
+         (all (and (or (cdr split) (string-match " \\'" string)
+                       (string= string ""))
                    (not (string-match "\\`!" fpat))
                    ;; all-completions should return nil if FPAT is a
                    ;; regexp, it is what we expect.
@@ -1497,12 +1515,11 @@ Actually do nothing."
                                     (lambda (x &optional _y)
                                       (let ((elm (if (listp x) (car x) x)))
                                         (funcall (or predicate #'identity) elm))))))
-         (pattern (if all
-                      ;; Returns the part of STRING after space
-                      ;; e.g. "foo bar baz" => "bar baz".
-                      (substring string (1+ (string-match " " string)))
-                    string)))
-    (if (string= pattern "") ; e.g. STRING == "foo ".
+         (pattern (helm-aand all (string-match " " string)
+                             ;; Returns the part of STRING after space
+                             ;; e.g. "foo bar baz" => "bar baz".
+                             (substring string (1+ it)))))
+    (if (equal pattern "") ; e.g. STRING == "foo ".
         all
       (all-completions "" (or all collection)
                        (lambda (x &optional _y)
@@ -1520,8 +1537,8 @@ Actually do nothing."
                            ;; PREDICATE (e.g. symbols vs strings).
                            (if (and predicate (null all))
                                (and (funcall predicate elm)
-                                    (helm-mm-match (helm-stringify elm) pattern))
-                             (helm-mm-match (helm-stringify elm) pattern))))))))
+                                    (helm-mm-match (helm-stringify elm) (or pattern string)))
+                             (helm-mm-match (helm-stringify elm) (or pattern string)))))))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
@@ -1555,22 +1572,24 @@ Actually do nothing."
   "The try completion function for `completing-styles-alist'."
   ;; It is needed here to make minibuffer-complete work in emacs-26,
   ;; e.g. with regular M-x.
-  (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
-      (helm-completion--flex-all-completions string table pred point)
-    (when minibuffer-completing-file-name
-      (setq all (completion-pcm--filename-try-filter all)))
-    (completion-pcm--merge-try pattern all prefix suffix)))
+  (unless (string-match-p " " string)
+    (cl-multiple-value-bind (all pattern prefix suffix _carbounds)
+        (helm-completion--flex-all-completions string table pred point)
+      (when minibuffer-completing-file-name
+        (setq all (completion-pcm--filename-try-filter all)))
+      (completion-pcm--merge-try pattern all prefix suffix))))
 
 (defun helm-flex-completion-all-completions (string table pred point)
   "The all completions function for `completing-styles-alist'."
   ;; FIXME: No need to bind all these value.
-  (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
-      (helm-completion--flex-all-completions
-       string table pred point
-       #'helm-completion--flex-transform-pattern)
-    (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
-      (when all (nconc (helm-flex-add-score-as-prop all regexp)
-                       (length prefix))))))
+  (unless (string-match-p " " string)
+    (cl-multiple-value-bind (all pattern prefix _suffix _carbounds)
+        (helm-completion--flex-all-completions
+         string table pred point
+         #'helm-completion--flex-transform-pattern)
+      (let ((regexp (completion-pcm--pattern->regex pattern 'group)))
+        (when all (nconc (helm-flex-add-score-as-prop all regexp)
+                         (length prefix)))))))
 
 (defun helm-flex-add-score-as-prop (candidates regexp)
   (cl-loop for cand in candidates
@@ -1708,7 +1727,9 @@ that is non-nil."
                            (setq helm-completion--sorting-done (and sort-fn t))
                            (setq all (copy-sequence comps))
                            (helm-completion-in-region--initial-filter
-                            (if sort-fn (funcall sort-fn all) all)
+                            (if (and sort-fn (> (length str) 0))
+                                (funcall sort-fn all)
+                              all)
                             afun file-comp-p))))
                (data (if (memq helm-completion-style '(helm helm-fuzzy))
                          (funcall compfn input nil nil)
