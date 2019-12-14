@@ -227,8 +227,10 @@ Arg HISTORY default to `extended-command-history'."
                                    (sort candidates #'helm-generic-sort-fn))))))
          (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
                        :candidates (helm-dynamic-completion
+                                    ;; A list of strings.
                                     (or history extended-command-history)
-                                    pred nil 'nosort t))
+                                    (lambda (str) (funcall pred (intern-soft str)))
+                                    nil 'nosort t))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :candidates (helm-dynamic-completion
                                     collection pred
