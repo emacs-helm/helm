@@ -1425,7 +1425,7 @@ specified in `helm-completion-styles-alist'."
                       (let* ((comps (completion-all-completions
                                      str
                                      (if (functionp collection)
-                                         (funcall collection str predicate t)
+                                         (funcall collection str pred t)
                                        collection)
                                      pred
                                      (or point 0)
