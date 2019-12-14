@@ -1439,7 +1439,9 @@ specified in `helm-completion-styles-alist'."
                         (when (cdr last-data)
                           (setcdr last-data nil))
                         (setq all (copy-sequence comps))
-                        (if sort-fn (funcall sort-fn all) all)))))
+                        (if (and sort-fn (> (length str) 0))
+                            (funcall sort-fn all)
+                          all)))))
       ;; Ensure circular objects are removed.
       (complete-with-action t compsfn helm-pattern predicate))))
 

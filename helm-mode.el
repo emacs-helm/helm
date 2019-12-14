@@ -923,7 +923,9 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
                              (helm-completion-in-region--initial-filter
-                              (if sort-fn (funcall sort-fn all) all)
+                              (if (and sort-fn (> (length str) 0))
+                                  (funcall sort-fn all)
+                                all)
                               afun file-comp-p)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
@@ -1725,7 +1727,9 @@ that is non-nil."
                            (setq helm-completion--sorting-done (and sort-fn t))
                            (setq all (copy-sequence comps))
                            (helm-completion-in-region--initial-filter
-                            (if sort-fn (funcall sort-fn all) all)
+                            (if (and sort-fn (> (length str) 0))
+                                (funcall sort-fn all)
+                              all)
                             afun file-comp-p))))
                (data (if (memq helm-completion-style '(helm helm-fuzzy))
                          (funcall compfn input nil nil)
