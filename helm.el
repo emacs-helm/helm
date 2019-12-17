@@ -1173,6 +1173,10 @@ The former allows retrieving previous Helm behavior if needed, by setting it to
 and usage of `completion-styles', the second allows setting `helm-completion-style'
 per mode and also specify `completion-styles' per mode (see its docstring).
 
+Also for a better control of styles in native helm sources (not helmized by helm-mode)
+using :match-dynamic, `helm-dynamic-completion' provides a STYLES argument that allows
+specifying explicitely styles for this source.
+
 NOTE: Some old completion styles are not working fine with helm
 and are disabled by default in
 `helm-blacklist-completion-styles', they are anyway not useful in
