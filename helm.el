@@ -1172,6 +1172,12 @@ The former allows retrieving previous Helm behavior if needed, by setting it to
 `helm' or `helm-fuzzy', default being `emacs' which allows dynamic completion
 and usage of `completion-styles', the second allows setting `helm-completion-style'
 per mode and also specify `completion-styles' per mode (see its docstring).
+Note that these two variables take effect only in helm-mode i.e. in all what use
+`completion-read' or `completion-in-region', IOW all helmized commands.
+File completion in `read-file-name' family doesn't obey completion-styles and have their
+own file completion implementation.
+Native helm commands using `completion-styles' doesn't obey `helm-completion-style' and
+`helm-completion-syles-alist' (e.g. helm-M-x).
 
 Also for a better control of styles in native helm sources (not helmized by helm-mode)
 using :match-dynamic, `helm-dynamic-completion' provides a STYLES argument that allows
