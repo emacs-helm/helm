@@ -903,8 +903,7 @@ See `helm-candidates-in-buffer' for more infos.")
 (defun helm--create-source (object)
   "[INTERNAL] Build a helm source from OBJECT.
 Where OBJECT is an instance of an eieio class."
-  (cl-loop for sd in (eieio-class-slots (eieio-object-class object))
-           for s = (eieio-slot-descriptor-name sd)
+  (cl-loop for s in (object-slots object)
            for slot-val = (slot-value object s)
            when slot-val
            collect (cons s (unless (eq t slot-val) slot-val))))
