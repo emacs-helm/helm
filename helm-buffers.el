@@ -1014,17 +1014,18 @@ If a prefix arg is given split windows vertically."
 (defun helm-ediff-marked-buffers (_candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
 With optional arg MERGE call `ediff-merge-buffers'."
-  (let ((lg-lst (length (helm-marked-candidates)))
-        buf1 buf2)
+  (let* ((mkd (helm-marked-candidates))
+         (lg-lst (length mkd))
+         buf1 buf2)
     (cl-case lg-lst
       (0
        (error "Error:You have to mark at least 1 buffer"))
       (1
        (setq buf1 helm-current-buffer
-             buf2 (cl-first (helm-marked-candidates))))
+             buf2 (cl-first mkd)))
       (2
-       (setq buf1 (cl-first (helm-marked-candidates))
-             buf2 (cl-second (helm-marked-candidates))))
+       (setq buf1 (cl-first mkd)
+             buf2 (cl-second mkd)))
       (t
        (error "Error:Too many buffers marked!")))
     (if merge
