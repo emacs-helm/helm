@@ -576,7 +576,6 @@ numbered.  The property 'buffer-name is added to the whole string."
                   (helm-grep-highlight-match str t))
           candidate)))
 
-;;;###autoload
 (define-derived-mode helm-occur-mode
     special-mode "helm-moccur"
     "Major mode to provide actions in helm moccur saved buffer.
