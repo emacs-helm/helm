@@ -540,12 +540,17 @@ e.g helm.el$
 
 ;;; Help routines.
 ;;
+(defvar helm-help-mode-before-hook nil
+  "A hook that run before helm-help starts.")
+(defvar helm-help-mode-after-hook nil
+  "A hook that run when helm-help exits.")
 (defun helm-help-internal (bufname insert-content-fn)
   "Show long message during `helm' session in BUFNAME.
 INSERT-CONTENT-FN is the function that insert
 text to be displayed in BUFNAME."
   (let ((winconf (current-frame-configuration))
         (hframe (selected-frame)))
+    (helm-log-run-hook 'helm-help-mode-before-hook)
     (with-selected-frame helm-initial-frame
       (select-frame-set-input-focus helm-initial-frame)
       (unwind-protect
@@ -562,6 +567,7 @@ text to be displayed in BUFNAME."
              (buffer-disable-undo)
              (helm-help-event-loop))
         (raise-frame hframe)
+        (helm-log-run-hook 'helm-help-mode-after-hook)
         (setq helm-suspend-update-flag nil)
         (set-frame-configuration winconf)))))
 
