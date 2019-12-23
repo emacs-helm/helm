@@ -216,8 +216,8 @@
 (defcustom helm-type-function-actions
   (helm-make-actions
    "Describe command" 'helm-describe-function
-   "Add command to kill ring" 'helm-kill-new
    "Go to command's definition" 'find-function
+   "Info lookup" 'helm-info-lookup-symbol
    "Debug on entry" 'debug-on-entry
    "Cancel debug on entry" 'cancel-debug-on-entry
    "Trace function" 'trace-function
