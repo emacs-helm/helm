@@ -2597,6 +2597,10 @@ example, :candidate-number-limit is bound to
   "The internal helm function called by `helm'.
 For ANY-SOURCES ANY-INPUT ANY-PROMPT ANY-RESUME ANY-PRESELECT ANY-BUFFER and
 ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
+  (cl-assert (or (stringp any-input)
+                 (null any-input))
+             nil "Error in %S buffer: Initial input should be a string or nil"
+             any-buffer)
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
   ;; Activate the advices.
   ;; Advices will be available only in >=emacs-24.4, but
