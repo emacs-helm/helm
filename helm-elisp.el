@@ -718,7 +718,7 @@ Filename completion happen if string start after or between a double quote."
                            (list (helm-info-lookup-fallback-source c)))
           :resume 'noresume
           :buffer "*helm lookup*"
-          :input c)))
+          :input (helm-stringify c))))
 
 (defun helm-info-lookup-symbol (candidate)
   ;; ???:Running an idle-timer allows not catching RET when exiting
