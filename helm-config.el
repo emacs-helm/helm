@@ -61,10 +61,11 @@
                       minibuffer-local-ns-map))
       (let ((vmap (symbol-value map)))
         (when (and (boundp map) (keymapp vmap))
-          (helm-aif (and (boundp var) (symbol-value var))
-            (define-key vmap
-              (if (stringp it) (read-kbd-macro it) it)
-              nil))
+          (let ((val (and (boundp var) (symbol-value var))))
+            (when val
+              (define-key vmap
+                (if (stringp val) (read-kbd-macro val) val)
+                nil)))
           (when key
             (define-key (symbol-value map)
               (if (stringp key) (read-kbd-macro key) key)
