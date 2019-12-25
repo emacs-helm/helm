@@ -96,25 +96,6 @@ but the initial search for all candidates in buffer(s)."
           (const :tag "Respect case" nil)
           (other :tag "Smart" 'smart)))
 
-(defcustom helm-dabbrev-use-thread nil
-  "[EXPERIMENTAL] Compute candidates asynchronously (partially) when non nil.
-
-The idea is to compute candidates while cycling the first ones, so
-this is available only if `helm-dabbrev-cycle-threshold' is not 0 or
-nil, also it is available only on emacs-26+ (needs threads).
-
-This is reasonably working when you don't have to complete a huge list
-of candidates, otherwise you will have a small delay after the first cycle
-because thread is released unexpectedly when helm-dabbrev exit after
-first insertion.
-
-IOW keep `helm-dabbrev-candidates-number-limit' to a reasonable
-value (I don't!) and give enough prefix before completing e.g. for
-completing \"helm-dabbrev\" use \"helm-d\" and not \"he\" if you want
-to use this."
-  :group 'helm-dabbrev
-  :type 'boolean)
-
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp
                         'helm-dabbrev-separator-regexp "2.8.3")
@@ -136,7 +117,6 @@ to use this."
 (defvar helm-dabbrev--data nil)
 (cl-defstruct helm-dabbrev-info dabbrev limits iterator)
 (defvar helm-dabbrev--already-tried nil)
-(defvar helm-dabbrev--current-thread nil)
 
 
 (defun helm-dabbrev--buffer-list ()
@@ -298,19 +278,7 @@ removed."
                                  dabbrev helm-dabbrev-cycle-threshold)
                        when (string-match-p
                              (concat "^" (regexp-quote dabbrev)) i)
-                       collect i))))
-      ;; Thread is released as soon as helm-dabbrev exits after first
-      ;; insertion so this is unusable for now, keep it like this for
-      ;; now hooping the situation with threads will be improved in
-      ;; emacs. The idea is to compute whole list of candidates in
-      ;; background while cycling with the first
-      ;; helm-dabbrev-cycle-threshold ones.
-      (when (and (fboundp 'make-thread) helm-dabbrev-use-thread)
-        (setq helm-dabbrev--current-thread
-              (make-thread
-               (lambda ()
-                 (setq helm-dabbrev--cache
-                       (helm-dabbrev--get-candidates dabbrev)))))))
+                       collect i)))))
     (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
                      (helm-dabbrev-info-iterator helm-dabbrev--data)))
           deactivate-mark)
@@ -332,10 +300,9 @@ removed."
                (only-one (null (cdr (all-completions
                                      old-dabbrev
                                      helm-dabbrev--already-tried)))))
-          (unless helm-dabbrev-use-thread
-            (message "Waiting for helm-dabbrev candidates...")
-            (setq helm-dabbrev--cache
-                  (helm-dabbrev--get-candidates old-dabbrev)))
+          (message "Waiting for helm-dabbrev candidates...")
+          (setq helm-dabbrev--cache
+                (helm-dabbrev--get-candidates old-dabbrev))
           ;; If the length of candidates is only one when computed
           ;; that's mean the unique matched item have already been
           ;; inserted by the iterator, so no need to reinsert the old dabbrev,
@@ -346,12 +313,6 @@ removed."
             (setq helm-dabbrev--data nil)
             (delete-region (car limits) (point))
             (insert dabbrev))
-          ;; Cycling is finished, block until helm-dabbrev--cache have
-          ;; finished to complete.
-          (when (and (fboundp 'thread-join)
-                     helm-dabbrev-use-thread
-                     (thread-alive-p helm-dabbrev--current-thread))
-            (thread-join helm-dabbrev--current-thread))
           (when (and (null cycling-disabled-p) only-one)
             (cl-return-from helm-dabbrev
               (message "[Helm-dabbrev: No expansion found]")))
