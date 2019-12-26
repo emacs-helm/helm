@@ -129,38 +129,41 @@ but the initial search for all candidates in buffer(s)."
   "Decide if current-buffer is related to START-BUFFER."
   (helm-same-major-mode-p start-buffer helm-dabbrev-major-mode-assoc))
 
+(defun helm-dabbrev--search-and-store (pattern direction limit results)
+  (let ((res results)
+         after before)
+    (while (and (<= (length res) limit)
+                (cl-case direction
+                  (1   (search-forward pattern nil t))
+                  (-1  (search-backward pattern nil t))
+                  (2   (let ((pos
+                              (save-excursion
+                                (forward-line
+                                 helm-dabbrev-lineno-around)
+                                (point))))
+                         (setq after pos)
+                         (search-forward pattern pos t)))
+                  (-2  (let ((pos
+                              (save-excursion
+                                (forward-line
+                                 (- helm-dabbrev-lineno-around))
+                                (point))))
+                         (setq before pos)
+                         (search-backward pattern pos t)))))
+      (let* ((mb (match-beginning 0))
+             (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
+                                     "\\)\\'"))
+             (match-word (helm-dabbrev--search
+                          pattern mb replace-regexp)))
+        (when (and match-word (not (member match-word res)))
+          (push match-word res))))
+    (list res after before)))
+
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let* ((case-fold-search ignore-case)
          (buffer1 (current-buffer))     ; start buffer.
          (minibuf (minibufferp buffer1))
-         result pos-before pos-after
-         (search-and-store
-          (lambda (pattern direction)
-            (while (and (<= (length result) limit)
-                        (cl-case direction
-                          (1   (search-forward pattern nil t))
-                          (-1  (search-backward pattern nil t))
-                          (2   (let ((pos
-                                      (save-excursion
-                                        (forward-line
-                                         helm-dabbrev-lineno-around)
-                                        (point))))
-                                 (setq pos-after pos)
-                                 (search-forward pattern pos t)))
-                          (-2  (let ((pos
-                                      (save-excursion
-                                        (forward-line
-                                         (- helm-dabbrev-lineno-around))
-                                        (point))))
-                                 (setq pos-before pos)
-                                 (search-backward pattern pos t)))))
-              (let* ((pbeg (match-beginning 0))
-                     (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
-                                             "\\)\\'"))
-                     (match-word (helm-dabbrev--search
-                                  pattern pbeg replace-regexp)))
-                (when (and match-word (not (member match-word result)))
-                  (push match-word result)))))))
+         results pos-before pos-after)
     (catch 'break
       (dolist (buf (if all (helm-dabbrev--buffer-list)
                      (list (current-buffer))))
@@ -173,26 +176,42 @@ but the initial search for all candidates in buffer(s)."
               ;; Start searching before thing before point.
               (goto-char (- (point) (length str)))
               ;; Search the last 30 lines before point.
-              (funcall search-and-store str -2)) ; store pos [1]
+              (cl-multiple-value-bind (res pa pb)
+                  (helm-dabbrev--search-and-store str -2 limit results)
+                (setq results    res
+                      pos-before pb
+                      pos-after  pa)))
             (save-excursion
               ;; Search the next 30 lines after point.
-              (funcall search-and-store str 2)) ; store pos [2]
+              (cl-multiple-value-bind (res pa pb)
+                  (helm-dabbrev--search-and-store str 2 limit results)
+                (setq results    res
+                      pos-before pb
+                      pos-after  pa)))
             (save-excursion
               ;; Search all before point.
               ;; If limit is reached in previous call of
               ;; search-and-store pos-before is never set and
               ;; goto-char will fail, so check it.
               (when pos-before
-                (goto-char pos-before)  ; start from [1]
-                (funcall search-and-store str -1)))
+                (goto-char pos-before)
+                (cl-multiple-value-bind (res pa pb)
+                  (helm-dabbrev--search-and-store str -1 limit results)
+                (setq results    res
+                      pos-before pb
+                      pos-after  pa))))
             (save-excursion
               ;; Search all after point.
               ;; Same comment as above for pos-after.
               (when pos-after
-                (goto-char pos-after)   ; start from [2]
-                (funcall search-and-store str 1)))))
-        (when (>= (length result) limit) (throw 'break nil))))
-    (nreverse result)))
+                (goto-char pos-after)
+                (cl-multiple-value-bind (res pa pb)
+                    (helm-dabbrev--search-and-store str 1 limit results)
+                  (setq results    res
+                        pos-before pb
+                        pos-after  pa))))))
+        (when (>= (length results) limit) (throw 'break nil))))
+    (nreverse results)))
 
 (defun helm-dabbrev--search (pattern beg sep-regexp)
   "Search word or symbol at point matching PATTERN.
