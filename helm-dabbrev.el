@@ -76,7 +76,7 @@ bound to a function that doesn't handle this var."
   :group 'helm-dabbrev)
 
 (defcustom helm-dabbrev-lineno-around 30
-  "Search first in this number of lines before an after point."
+  "Search first in this number of lines before and after point."
   :group 'helm-dabbrev
   :type 'integer)
 
