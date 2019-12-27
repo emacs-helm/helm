@@ -129,36 +129,6 @@ but the initial search for all candidates in buffer(s)."
   "Decide if current-buffer is related to START-BUFFER."
   (helm-same-major-mode-p start-buffer helm-dabbrev-major-mode-assoc))
 
-(defun helm-dabbrev--search-and-store (pattern direction limit results)
-  (let ((res results)
-         after before)
-    (while (and (<= (length res) limit)
-                (cl-case direction
-                  (1   (search-forward pattern nil t))
-                  (-1  (search-backward pattern nil t))
-                  (2   (let ((pos
-                              (save-excursion
-                                (forward-line
-                                 helm-dabbrev-lineno-around)
-                                (point))))
-                         (setq after pos)
-                         (search-forward pattern pos t)))
-                  (-2  (let ((pos
-                              (save-excursion
-                                (forward-line
-                                 (- helm-dabbrev-lineno-around))
-                                (point))))
-                         (setq before pos)
-                         (search-backward pattern pos t)))))
-      (let* ((mb (match-beginning 0))
-             (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
-                                     "\\)\\'"))
-             (match-word (helm-dabbrev--search
-                          pattern mb replace-regexp)))
-        (when (and match-word (not (member match-word res)))
-          (push match-word res))))
-    (list res after before)))
-
 (defun helm-dabbrev--collect (str limit ignore-case all)
   (let* ((case-fold-search ignore-case)
          (buffer1 (current-buffer))     ; start buffer.
@@ -212,6 +182,36 @@ but the initial search for all candidates in buffer(s)."
                         pos-after  pa))))))
         (when (>= (length results) limit) (throw 'break nil))))
     (nreverse results)))
+
+(defun helm-dabbrev--search-and-store (pattern direction limit results)
+  (let ((res results)
+         after before)
+    (while (and (<= (length res) limit)
+                (cl-case direction
+                  (1   (search-forward pattern nil t))
+                  (-1  (search-backward pattern nil t))
+                  (2   (let ((pos
+                              (save-excursion
+                                (forward-line
+                                 helm-dabbrev-lineno-around)
+                                (point))))
+                         (setq after pos)
+                         (search-forward pattern pos t)))
+                  (-2  (let ((pos
+                              (save-excursion
+                                (forward-line
+                                 (- helm-dabbrev-lineno-around))
+                                (point))))
+                         (setq before pos)
+                         (search-backward pattern pos t)))))
+      (let* ((mb (match-beginning 0))
+             (replace-regexp (concat "\\(" helm-dabbrev-separator-regexp
+                                     "\\)\\'"))
+             (match-word (helm-dabbrev--search
+                          pattern mb replace-regexp)))
+        (when (and match-word (not (member match-word res)))
+          (push match-word res))))
+    (list res after before)))
 
 (defun helm-dabbrev--search (pattern beg sep-regexp)
   "Search word or symbol at point matching PATTERN.
