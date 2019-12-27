@@ -699,18 +699,25 @@ i.e same color."
 (defun helm-buffers--match-from-inside (candidate)
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
          (buf  (get-buffer cand))
-         (regexp (cl-loop with pattern = helm-pattern
-                          for p in (helm-mm-split-pattern pattern)
-                          when (string-match "\\`@\\(.*\\)" p)
-                          return (match-string 1 p))))
-    (if (and buf regexp)
+         (pattern (cl-loop with pat = helm-pattern
+                           for p in (helm-mm-split-pattern pat)
+                           when (string-match "\\`@\\(.*\\)" p)
+                           collect (match-string 1 p) into lst
+                           finally return (mapconcat 'identity lst " ")))
+         (patterns (helm-mm-3-get-patterns pattern)))
+    (if (and buf patterns)
         (with-current-buffer buf
           (save-excursion
             (goto-char (point-min))
-            (if helm-migemo-mode
-                (helm-mm-migemo-forward regexp nil t)
-             (re-search-forward regexp nil t))))
-        t)))
+            (cl-loop for (pred . regexp) in patterns
+                     always
+                     (save-excursion
+                       (funcall
+                        pred
+                        (if helm-migemo-mode
+                            (helm-mm-migemo-forward regexp nil t)
+                          (re-search-forward regexp nil t)))))))
+      t)))
 
 (defun helm-buffers--match-from-directory (candidate)
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))

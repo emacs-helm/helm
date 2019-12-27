@@ -101,7 +101,16 @@ pattern.
 **** Search inside buffers
 
 If you enter a space and a pattern prefixed by \"@\", Helm searches for text
-matching this pattern \*inside* the buffer (i.e. not in the name of the buffer).
+matching this pattern *inside* the buffer (i.e. not in the name of the buffer).
+
+Negation are supported i.e. \"!\".
+
+When you specify more than one of such patterns, it will match
+buffers with contents matching each of these patterns i.e. AND,
+not OR.  That's mean that if you specify \"@foo @bar\" the
+contents of buffer will have to be matched by foo AND bar.  If
+you specify \"@foo @!bar\" it means the contents of buffer have
+to be matched by foo but NOT bar.
 
 If you enter a pattern prefixed with an escaped \"@\", Helm searches for a
 buffer matching \"@pattern\" but does not search inside.
