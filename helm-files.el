@@ -4494,7 +4494,8 @@ Don't use it in your own code unless you know what you are doing.")
 (defvar helm-file-name-history-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c d") 'helm-file-name-history-show-or-hide-deleted)
+    (define-key map (kbd "C-c d")   'helm-file-name-history-show-or-hide-deleted)
+    (define-key map (kbd "C-x C-f") 'helm-ff-file-name-history-run-ff)
     map))
 
 (defun helm-file-name-history-transformer (candidates _source)
@@ -4508,6 +4509,16 @@ Don't use it in your own code unless you know what you are doing.")
                       (t (unless helm--file-name-history-hide-deleted
                            (cons (propertize c 'face 'helm-history-deleted) c))))
            collect it))
+
+(defun helm-ff-file-name-history-ff (candidate)
+  (helm-set-pattern
+   (expand-file-name candidate)))
+
+(defun helm-ff-file-name-history-run-ff ()
+  "Switch back to current HFF session with selection as preselect."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-ff-file-name-history-ff)))
 
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
@@ -4535,9 +4546,7 @@ Don't use it in your own code unless you know what you are doing.")
                                    (helm-set-pattern
                                     (expand-file-name candidate))
                                    (with-helm-after-update-hook (helm-exit-minibuffer)))
-                     "Find file in helm" (lambda (candidate)
-                                           (helm-set-pattern
-                                            (expand-file-name candidate))))
+                     "Find file in helm" 'helm-ff-file-name-history-ff)
             :keymap helm-file-name-history-map)))
   (with-helm-alive-p
     (helm :sources 'helm-source--ff-file-name-history
