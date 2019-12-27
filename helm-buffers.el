@@ -1057,7 +1057,7 @@ Can be used by any source that list buffers."
                                                     (get-buffer helm-buffer))
                                                    helm-pattern)
                                                " " t)
-                        thereis (and (string-match "\\`@\\(.*\\)" i)
+                        thereis (and (string-match "\\`@\\([^!]*\\)" i)
                                      (match-string 1 i)))))
     (helm-multi-occur-1 buffers input)))
 
