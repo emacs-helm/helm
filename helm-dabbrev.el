@@ -281,8 +281,7 @@ removed."
            (not (eq last-command 'helm-dabbrev)))
       (setq helm-dabbrev--data nil))
     ;; When candidates are requested in helm directly without cycling,
-    ;; we need them right now before running helm, so no need to use a
-    ;; thread here.
+    ;; we need them right now before running helm.
     (when cycling-disabled-p
       (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
     (unless (or cycling-disabled-p
