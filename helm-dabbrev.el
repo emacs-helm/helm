@@ -321,6 +321,9 @@ removed."
           (message "Waiting for helm-dabbrev candidates...")
           (setq helm-dabbrev--cache
                 (helm-dabbrev--get-candidates old-dabbrev))
+          ;; If user continues typing M-/ while display is blocked by
+          ;; helm-dabbrev--get-candidates delete these events.
+          (setq unread-command-events nil)
           ;; If the length of candidates is only one when computed
           ;; that's mean the unique matched item have already been
           ;; inserted by the iterator, so no need to reinsert the old dabbrev,
