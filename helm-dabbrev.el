@@ -342,12 +342,12 @@ removed."
                  (helm :sources
                        (helm-build-in-buffer-source "Dabbrev Expand"
                          :data
-                         (cl-loop for cand in helm-dabbrev--cache
-                                  unless
-                                  (member cand helm-dabbrev--already-tried)
-                                  collect cand into lst
-                                  finally return
-                                  (append lst helm-dabbrev--already-tried))
+                         (append
+                          (cl-loop with lst = helm-dabbrev--cache
+                                   for cand in helm-dabbrev--already-tried
+                                   do (setq lst (delete cand lst))
+                                   finally return lst)
+                          helm-dabbrev--already-tried)
                          :persistent-action 'ignore
                          :persistent-help "DoNothing"
                          :keymap helm-dabbrev-map
