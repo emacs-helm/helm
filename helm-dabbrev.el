@@ -117,7 +117,9 @@ but the initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev--data nil)
 (cl-defstruct helm-dabbrev-info dabbrev limits iterator)
 (defvar helm-dabbrev--already-tried nil)
-
+(defvar helm-dabbrev--computing-cache nil
+  "[INTERNAL] Flag to notify helm-dabbrev is blocked.
+Do nothing when non nil.")
 
 (defun helm-dabbrev--buffer-list ()
   (cl-loop for buf in (buffer-list)
@@ -260,104 +262,112 @@ removed."
 (cl-defun helm-dabbrev ()
   "Preconfigured helm for dynamic abbreviations."
   (interactive)
-  (let ((dabbrev (helm-thing-before-point
-                  nil helm-dabbrev-separator-regexp))
-        (limits (helm-bounds-of-thing-before-point
-                 helm-dabbrev-separator-regexp))
-        (enable-recursive-minibuffers t)
-        (cycling-disabled-p (or (null helm-dabbrev-cycle-threshold)
-                                (zerop helm-dabbrev-cycle-threshold)))
-        (helm-execute-action-at-once-if-one t)
-        (helm-quit-if-no-candidate
-         (lambda ()
-           (message "[Helm-dabbrev: No expansion found]"))))
-    (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
-               nil "[Helm-dabbrev: Nothing found before point]")
-    (when (and
-           ;; have been called at least once.
-           (helm-dabbrev-info-p helm-dabbrev--data)
-           ;; But user have moved with some other command
-           ;; in the meaning time.
-           (not (eq last-command 'helm-dabbrev)))
-      (setq helm-dabbrev--data nil))
-    ;; When candidates are requested in helm directly without cycling,
-    ;; we need them right now before running helm.
-    (when cycling-disabled-p
-      (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
-    (unless (or cycling-disabled-p
-                (helm-dabbrev-info-p helm-dabbrev--data))
-      (setq helm-dabbrev--data
-            (make-helm-dabbrev-info
-             :dabbrev dabbrev
-             :limits limits
-             :iterator
-             (helm-iter-list
-              (cl-loop for i in (helm-dabbrev--get-candidates
-                                 dabbrev helm-dabbrev-cycle-threshold)
-                       when (string-match-p
-                             (concat "^" (regexp-quote dabbrev)) i)
-                       collect i)))))
-    (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
-                     (helm-dabbrev-info-iterator helm-dabbrev--data)))
-          deactivate-mark)
-      ;; Cycle until iterator is consumed.
-      (helm-aif (and iter (helm-iter-next iter))
-          (progn
-            (helm-insert-completion-at-point
-             (car (helm-dabbrev-info-limits helm-dabbrev--data))
-             ;; END is the end of the previous inserted string, not
-             ;; the end (apart for first insertion) of the initial string.
-             (cdr limits) it)
-            ;; Move already tried candidates to end of list.
-            (push it helm-dabbrev--already-tried))
-        ;; Iterator is now empty, reset dabbrev to initial value
-        ;; and start helm completion.
-        (let* ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
-                                (helm-dabbrev-info-dabbrev helm-dabbrev--data)
-                              dabbrev))
-               (only-one (null (cdr (all-completions
-                                     old-dabbrev
-                                     helm-dabbrev--already-tried)))))
-          (message "Waiting for helm-dabbrev candidates...")
-          (setq helm-dabbrev--cache
-                (helm-dabbrev--get-candidates old-dabbrev))
-          ;; If user continues typing M-/ while display is blocked by
-          ;; helm-dabbrev--get-candidates delete these events.
-          (setq unread-command-events nil)
-          ;; If the length of candidates is only one when computed
-          ;; that's mean the unique matched item have already been
-          ;; inserted by the iterator, so no need to reinsert the old dabbrev,
-          ;; just let helm exiting with "No expansion found".
-          (unless (or only-one cycling-disabled-p)
-            (setq dabbrev old-dabbrev
-                  limits  (helm-dabbrev-info-limits helm-dabbrev--data))
-            (setq helm-dabbrev--data nil)
-            (delete-region (car limits) (point))
-            (insert dabbrev))
-          (when (and (null cycling-disabled-p) only-one)
-            (cl-return-from helm-dabbrev
-              (message "[Helm-dabbrev: No expansion found]")))
-          (with-helm-show-completion (car limits) (cdr limits)
-            (unwind-protect
-                 (helm :sources
-                       (helm-build-in-buffer-source "Dabbrev Expand"
-                         :data
-                         (append
-                          (cl-loop with lst = helm-dabbrev--cache
-                                   for cand in helm-dabbrev--already-tried
-                                   do (setq lst (delete cand lst))
-                                   finally return lst)
-                          helm-dabbrev--already-tried)
-                         :persistent-action 'ignore
-                         :persistent-help "DoNothing"
-                         :keymap helm-dabbrev-map
-                         :action 'helm-dabbrev-default-action
-                         :group 'helm-dabbrev)
-                       :buffer "*helm dabbrev*"
-                       :input (concat "^" dabbrev " ")
-                       :resume 'noresume
-                       :allow-nest t)
-              (setq helm-dabbrev--already-tried nil))))))))
+  (unless helm-dabbrev--computing-cache
+    (let ((dabbrev (helm-thing-before-point
+                    nil helm-dabbrev-separator-regexp))
+          (limits (helm-bounds-of-thing-before-point
+                   helm-dabbrev-separator-regexp))
+          (enable-recursive-minibuffers t)
+          (cycling-disabled-p (or (null helm-dabbrev-cycle-threshold)
+                                  (zerop helm-dabbrev-cycle-threshold)))
+          (helm-execute-action-at-once-if-one t)
+          (helm-quit-if-no-candidate
+           (lambda ()
+             (message "[Helm-dabbrev: No expansion found]"))))
+      (cl-assert (and (stringp dabbrev) (not (string= dabbrev "")))
+                 nil "[Helm-dabbrev: Nothing found before point]")
+      (when (and
+             ;; have been called at least once.
+             (helm-dabbrev-info-p helm-dabbrev--data)
+             ;; But user have moved with some other command
+             ;; in the meaning time.
+             (not (eq last-command 'helm-dabbrev)))
+        (setq helm-dabbrev--data nil))
+      ;; When candidates are requested in helm directly without cycling,
+      ;; we need them right now before running helm.
+      (when cycling-disabled-p
+        (message "Waiting for helm-dabbrev candidates...")
+        (setq helm-dabbrev--cache (helm-dabbrev--get-candidates dabbrev)))
+      (unless (or cycling-disabled-p
+                  (helm-dabbrev-info-p helm-dabbrev--data))
+        (setq helm-dabbrev--data
+              (make-helm-dabbrev-info
+               :dabbrev dabbrev
+               :limits limits
+               :iterator
+               (helm-iter-list
+                (cl-loop for i in (helm-dabbrev--get-candidates
+                                   dabbrev helm-dabbrev-cycle-threshold)
+                         when (string-match-p
+                               (concat "^" (regexp-quote dabbrev)) i)
+                         collect i)))))
+      (let ((iter (and (helm-dabbrev-info-p helm-dabbrev--data)
+                       (helm-dabbrev-info-iterator helm-dabbrev--data)))
+            deactivate-mark)
+        ;; Cycle until iterator is consumed.
+        (helm-aif (and iter (helm-iter-next iter))
+            (progn
+              (helm-insert-completion-at-point
+               (car (helm-dabbrev-info-limits helm-dabbrev--data))
+               ;; END is the end of the previous inserted string, not
+               ;; the end (apart for first insertion) of the initial string.
+               (cdr limits) it)
+              ;; Move already tried candidates to end of list.
+              (push it helm-dabbrev--already-tried))
+          ;; Iterator is now empty, or cycling was disabled, maybe
+          ;; reset dabbrev to initial value and start helm completion.
+          (let* ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
+                                  (helm-dabbrev-info-dabbrev helm-dabbrev--data)
+                                dabbrev))
+                 (only-one (and helm-dabbrev--already-tried
+                                (null (cdr (all-completions
+                                            old-dabbrev
+                                            helm-dabbrev--already-tried))))))
+            (unless helm-dabbrev--cache ; Already computed when
+                                        ; cycling is disabled.
+              (message "Waiting for helm-dabbrev candidates...")
+              (setq helm-dabbrev--computing-cache t)
+              (setq helm-dabbrev--cache
+                    (helm-dabbrev--get-candidates old-dabbrev))
+              ;; If user continues typing M-/ while display is blocked by
+              ;; helm-dabbrev--get-candidates delete these events.
+              (setq unread-command-events nil))
+            ;; If the length of candidates is only one when computed
+            ;; that's mean the unique matched item have already been
+            ;; inserted by the iterator, so no need to reinsert the old dabbrev,
+            ;; just let helm exiting with "No expansion found".
+            (unless (or only-one cycling-disabled-p)
+              (setq dabbrev old-dabbrev
+                    limits  (helm-dabbrev-info-limits helm-dabbrev--data))
+              (setq helm-dabbrev--data nil)
+              (delete-region (car limits) (point))
+              (insert dabbrev))
+            (when (and (null cycling-disabled-p) only-one)
+              (cl-return-from helm-dabbrev
+                (message "[Helm-dabbrev: No expansion found]")))
+            (with-helm-show-completion (car limits) (cdr limits)
+              (unwind-protect
+                  (helm :sources
+                        (helm-build-in-buffer-source "Dabbrev Expand"
+                          :data
+                          (append
+                           (cl-loop with lst = helm-dabbrev--cache
+                                    for cand in helm-dabbrev--already-tried
+                                    do (setq lst (delete cand lst))
+                                    finally return lst)
+                           helm-dabbrev--already-tried)
+                          :persistent-action 'ignore
+                          :persistent-help "DoNothing"
+                          :keymap helm-dabbrev-map
+                          :action 'helm-dabbrev-default-action
+                          :group 'helm-dabbrev)
+                        :buffer "*helm dabbrev*"
+                        :input (concat "^" dabbrev " ")
+                        :resume 'noresume
+                        :allow-nest t)
+                (setq helm-dabbrev--computing-cache nil
+                      helm-dabbrev--already-tried   nil
+                      helm-dabbrev--cache           nil)))))))))
 
 (provide 'helm-dabbrev)
 
