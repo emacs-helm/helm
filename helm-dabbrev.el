@@ -319,10 +319,7 @@ removed."
           (let* ((old-dabbrev (if (helm-dabbrev-info-p helm-dabbrev--data)
                                   (helm-dabbrev-info-dabbrev helm-dabbrev--data)
                                 dabbrev))
-                 (only-one (and helm-dabbrev--already-tried
-                                (null (cdr (all-completions
-                                            old-dabbrev
-                                            helm-dabbrev--already-tried))))))
+                 (only-one (eq (length helm-dabbrev--already-tried) 1)))
             (unless helm-dabbrev--cache ; Already computed when
                                         ; cycling is disabled.
               (message "Waiting for helm-dabbrev candidates...")
@@ -343,6 +340,9 @@ removed."
               (delete-region (car limits) (point))
               (insert dabbrev))
             (when (and (null cycling-disabled-p) only-one)
+              (setq helm-dabbrev--cache nil
+                    helm-dabbrev--already-tried nil
+                    helm-dabbrev--computing-cache nil)
               (cl-return-from helm-dabbrev
                 (message "[Helm-dabbrev: No expansion found]")))
             (with-helm-show-completion (car limits) (cdr limits)
