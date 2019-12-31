@@ -1072,7 +1072,7 @@ You can toggle the view of deleted files, see commands below.
      "* Helm `%s' read file name completion
 
 This is `%s' read file name completion that have been \"helmized\"
-because you have enabled [[Helm mode][helm-mode]]'.
+because you have enabled [[Helm mode][helm-mode]].
 Don't confuse this with `helm-find-files' which is a native helm command,
 see [[Helm functions vs helmized Emacs functions]].
 
