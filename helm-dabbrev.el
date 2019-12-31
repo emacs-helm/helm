@@ -186,6 +186,17 @@ Do nothing when non nil.")
     (nreverse results)))
 
 (defun helm-dabbrev--search-and-store (pattern direction limit results)
+  "Search words or symbols matching PATTERN in DIRECTION up to LIMIT.
+Finally returns all matched candidates appended to RESULTS.
+Argument DIRECTION can be:
+    -  (1):  Search forward from point.
+    - (-1):  Search backward from point.
+    -  (2):  Search forward from the
+             `helm-dabbrev-lineno-around'
+             lines after point.
+    -  (2):  Search backward from the
+             `helm-dabbrev-lineno-around'
+             lines before point."
   (let ((res results)
          after before)
     (while (and (<= (length res) limit)
