@@ -3674,7 +3674,13 @@ prefix arg, one prefix arg or two prefix arg."
              (tap         (helm-ffap-guesser))
              (guess       (and (stringp tap)
                                (substring-no-properties tap)))
-             (beg         (if guess (- (point) (length guess)) (point)))
+             (beg         (helm-aif (and guess
+                                         (save-excursion
+                                           (when (re-search-backward
+                                                  (regexp-quote guess)
+                                                  (point-at-bol) t)
+                                             (point))))
+                              it (point)))
              (full-path-p (and (stringp guess)
                                (or (string-match-p
                                     (concat "^" (getenv "HOME"))
@@ -3682,34 +3688,40 @@ prefix arg, one prefix arg or two prefix arg."
                                    (string-match-p
                                     "\\`\\(/\\|[[:lower:][:upper:]]:/\\)"
                                     guess))))
-             (escape-fn (with-helm-current-buffer
-                          (if (memq major-mode
-                                    helm-modes-using-escaped-strings)
-                              #'shell-quote-argument #'identity))))
+             (escape-fn (if (memq major-mode
+                                  helm-modes-using-escaped-strings)
+                            #'shell-quote-argument #'identity)))
+        (when (and beg end)
+          (delete-region beg end))
         (insert
-         (funcall escape-fn (helm-ff--insert-fname
-                             candidate beg end full-path-p guess))
+         (funcall
+          escape-fn
+          (helm-ff--format-fname-to-insert
+           candidate beg end full-path-p guess
+           helm-current-prefix-arg))
          (if (cdr mkds) " " "")
          (mapconcat escape-fn
                     (cl-loop for f in (cdr mkds)
-                             collect (helm-ff--insert-fname f))
+                             collect (helm-ff--format-fname-to-insert
+                                      f nil nil nil nil
+                                      helm-current-prefix-arg))
                     " "))))))
 
-(defun helm-ff--insert-fname (candidate &optional beg end full-path guess)
+(defun helm-ff--format-fname-to-insert (candidate
+                                        &optional beg end full-path guess prefarg)
   (set-text-properties 0 (length candidate) nil candidate)
   (if (and beg end guess (not (string= guess ""))
+           (null prefarg)
            (or (string-match
                 "^\\(~/\\|/\\|[[:lower:][:upper:]]:/\\)"
                 guess)
                (file-exists-p candidate)))
-      (prog1
-          (cond (full-path
-                 (expand-file-name candidate))
-                ((string= (match-string 1 guess) "~/")
-                 (abbreviate-file-name candidate))
-                (t (file-relative-name candidate)))
-        (delete-region beg end))
-    (helm-acase helm-current-prefix-arg
+      (cond (full-path
+             (expand-file-name candidate))
+            ((string= (match-string 1 guess) "~/")
+             (abbreviate-file-name candidate))
+            (t (file-relative-name candidate)))
+    (helm-acase prefarg
       ('(4)  (abbreviate-file-name candidate))
       ('(16) (file-relative-name candidate))
       ('(64) (helm-basename candidate))
