@@ -287,7 +287,9 @@ NOT `setq'."
            (choice ,@(mapcar (lambda (x) (list 'const x))
                              helm-completion--all-styles))))
 
-(defcustom helm-completion-styles-alist '((gud-mode . helm))
+(defcustom helm-completion-styles-alist '((gud-mode . helm)
+                                          (shell-mode . helm)
+                                          (eshell-mode . helm))
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
