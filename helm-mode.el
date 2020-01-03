@@ -1549,8 +1549,11 @@ Actually do nothing."
                            ;; PREDICATE (e.g. symbols vs strings).
                            (if (and predicate (null all))
                                (and (funcall predicate elm)
-                                    (helm-mm-match (helm-stringify elm) (or pattern string)))
-                             (helm-mm-match (helm-stringify elm) (or pattern string)))))))))
+                                    ;; ALL is nil so use whole STRING
+                                    ;; against COLLECTION.
+                                    (helm-mm-match (helm-stringify elm) string))
+                             (helm-mm-match (helm-stringify elm)
+                                            (or (and all pattern) string)))))))))
 
 (defun helm-completion--multi-all-completions (string table pred point)
   "Collect completions from TABLE for helm completion style."
