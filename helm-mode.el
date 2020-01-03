@@ -1520,7 +1520,11 @@ Actually do nothing."
   ;; returns relative paths to initial pattern (eshell).
   (let* ((split (helm-mm-split-pattern string))
          (fpat (or (car split) ""))
-         (all (and (or (cdr split) (string-match " \\'" string)
+         (all (and (or (cdr split)
+                       (and (not (cdr split))
+                            ;; Kickin when STRING is a simple string.
+                            (not (string= fpat "")))
+                       (string-match " \\'" string)
                        (string= string ""))
                    (not (string-match "\\`!" fpat))
                    ;; all-completions should return nil if FPAT is a
@@ -1533,7 +1537,8 @@ Actually do nothing."
                              ;; Returns the part of STRING after space
                              ;; e.g. "foo bar baz" => "bar baz".
                              (substring string (1+ it)))))
-    (if (equal pattern "") ; e.g. STRING == "foo ".
+    (if (or (and all (not (cdr split)))
+            (equal pattern "")) ; e.g. STRING == "foo ".
         all
       (all-completions "" (or all collection)
                        (lambda (x &optional _y)
