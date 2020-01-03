@@ -1523,8 +1523,8 @@ Actually do nothing."
          (all (and (or (cdr split)
                        (and (not (cdr split))
                             ;; Kickin when STRING is a simple string.
+                            ;; Handle as well "foo " (space at end).
                             (not (string= fpat "")))
-                       (string-match " \\'" string)
                        (string= string ""))
                    (not (string-match "\\`!" fpat))
                    ;; all-completions should return nil if FPAT is a
