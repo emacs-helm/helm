@@ -411,7 +411,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ((and (functionp collection) (not (string= input ""))
                        (or minibuffer-completing-file-name
                            (eq (completion-metadata-get
-                                (completion-metadata input collection predicate)
+                                (completion-metadata input collection test)
                                 'category)
                                'file)))
                   (cl-loop for f in (funcall collection input test t)
