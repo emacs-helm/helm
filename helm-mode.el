@@ -409,8 +409,12 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  ;; but special cases like `find-file-at-point' do it.
                  ;; Handle here specially such cases.
                  ((and (functionp collection) (not (string= input ""))
-                       minibuffer-completing-file-name)
-                  (cl-loop for f in (funcall collection input test)
+                       (or minibuffer-completing-file-name
+                           (eq (completion-metadata-get
+                                (completion-metadata input collection predicate)
+                                'category)
+                               'file)))
+                  (cl-loop for f in (funcall collection input test t)
                            unless (member f '("./" "../"))
                            if (string-match helm--url-regexp input)
                            collect f
