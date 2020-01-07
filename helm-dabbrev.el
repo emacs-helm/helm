@@ -39,7 +39,10 @@ will occur if the length of candidates is <= than
 
 Higher this number is, slower the computation of candidates will be.
 You can use safely a higher value with emacs-26+.
-Note that this have nothing to do with `helm-candidate-number-limit'."
+Note that this have nothing to do with `helm-candidate-number-limit',
+this mean that computation of candidates stop when this value is
+reached but only `helm-candidate-number-limit' candidates are
+displayed in helm buffer."
   :group 'helm-dabbrev
   :type 'integer)
 
