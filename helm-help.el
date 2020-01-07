@@ -1636,7 +1636,7 @@ marking it (`C-c u' or `RET') .
 
 ** Tips
 
-*** You can get help on any command with persistent action (\\[helm-execute-persistent-action])
+*** You can get help on any command with persistent action (\\<helm-map>\\[helm-execute-persistent-action])
 
 *** Prefix arguments
 
