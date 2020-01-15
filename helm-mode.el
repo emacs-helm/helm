@@ -1520,10 +1520,17 @@ Actually do nothing."
   "Allow `all-completions' multi matching on its candidates."
   ;; Doing an initial call of all-completions on the first element of
   ;; STRING speedup completion and fix file completion when CAPF
-  ;; returns relative paths to initial pattern (eshell).
+  ;; returns relative paths to initial pattern (eshell and shell).
   (let* ((split (helm-mm-split-pattern string))
          (fpat (or (car split) ""))
-         (all (and (or (cdr split)
+         (file-comp-p (or minibuffer-completing-file-name
+                          (eq
+                           (completion-metadata-get
+                            (completion-metadata string collection predicate)
+                            'category)
+                           'file)))
+         (all (and file-comp-p
+                   (or (cdr split)
                        (and (not (cdr split))
                             ;; Kickin when STRING is a simple string.
                             ;; Handle as well "foo " (space at end).
