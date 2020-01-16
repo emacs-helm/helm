@@ -4158,7 +4158,9 @@ to the matching method in use."
            (count   0)
            beg-str end-str)
       ;; Extract all parts of display keeping original properties.
-      (when (and mp (string-match (regexp-quote mp) display))
+      (when (and mp (ignore-errors
+                      ;; Avoid error when candidate is a huge line.
+                      (string-match (regexp-quote mp) display)))
         (setq beg-str (substring display 0 (match-beginning 0))
               end-str (substring display (match-end 0) (length display))
               mp (substring display (match-beginning 0) (match-end 0))))
