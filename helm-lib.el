@@ -1445,7 +1445,8 @@ being used inconditionally as value."
            (completion-flex-nospace t)
            (nosort (eq metadata 'nosort))
            (compsfn (lambda (str pred _action)
-                      (let* ((comps (completion-all-completions
+                      (let* ((completion-ignore-case (helm-set-case-fold-search))
+                             (comps (completion-all-completions
                                      str
                                      (if (functionp collection)
                                          (funcall collection str pred t)

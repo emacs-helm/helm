@@ -900,7 +900,8 @@ This handler use dynamic matching which allow honouring `completion-styles'."
                    (completion-metadata-get metadata 'annotation-function)))
          (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
          (compfn (lambda (str _predicate _action)
-                   (let* ((comps
+                   (let* ((completion-ignore-case (helm-set-case-fold-search))
+                          (comps
                            (completion-all-completions
                             str         ; This is helm-pattern
                             collection
@@ -1624,7 +1625,8 @@ Actually do nothing."
                          (length prefix)))))))
 
 (defun helm-flex-add-score-as-prop (candidates regexp)
-  (cl-loop for cand in candidates
+  (cl-loop with case-fold-search = (helm-set-case-fold-search) 
+           for cand in candidates
            collect (helm-flex--style-score cand regexp)))
 
 (defun helm-completion--flex-transform-pattern (pattern)
@@ -1720,7 +1722,8 @@ Can be used for `completion-in-region-function' by advicing it with an
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
                  (compfn (lambda (str _predicate _action)
-                           (let* ((comps
+                           (let* ((completion-ignore-case (helm-set-case-fold-search))
+                                  (comps
                                    (completion-all-completions
                                     str ; This is helm-pattern
                                     collection
