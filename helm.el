@@ -213,8 +213,8 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "<C-M-down>") 'helm-scroll-other-window)
     (define-key map (kbd "<C-M-up>")   'helm-scroll-other-window-down)
     (define-key map (kbd "C-@")        'helm-toggle-visible-mark)
-    (define-key map (kbd "C-SPC")      'helm-toggle-visible-mark)
-    (define-key map (kbd "M-SPC")      'helm-toggle-visible-mark)
+    (define-key map (kbd "C-SPC")      'helm-toggle-visible-mark-forward)
+    (define-key map (kbd "M-SPC")      'helm-toggle-visible-mark-backward)
     (define-key map (kbd "M-[")        nil)
     (define-key map (kbd "M-(")        'helm-prev-visible-mark)
     (define-key map (kbd "M-)")        'helm-next-visible-mark)
@@ -6713,6 +6713,14 @@ If ARG is negative toggle backward."
                            (cl-return nil))
                        (funcall (cdr next-fns))))))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
+
+(defun helm-toggle-visible-mark-forward ()
+  (interactive)
+  (helm-toggle-visible-mark 1))
+
+(defun helm-toggle-visible-mark-backward ()
+  (interactive)
+  (helm-toggle-visible-mark -1))
 
 (defun helm-file-completion-source-p (&optional source)
   "Return non-`nil' if current source is a file completion source."
