@@ -1370,6 +1370,10 @@ I.e. when using `helm-next-line' and friends in BODY."
 (defun helm--prepare-completion-styles (&optional nomode styles)
   "Return a suitable list of styles for `completion-styles'.
 
+When `helm-completion-style' is not `emacs' the Emacs vanilla default
+`completion-styles' is used except for `helm-dynamic-completion' which
+use inconditionally `emacs' as value for `helm-completion-style'.
+ 
 If styles are specified in `helm-completion-styles-alist' for a
 particular mode, use these styles unless NOMODE is non nil.
 If STYLES is specified as a list of styles suitable for
