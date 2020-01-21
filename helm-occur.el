@@ -227,7 +227,7 @@ engine beeing completely different and also much faster."
                                          #'buffer-substring-no-properties))
                                (contents (funcall bsfn (point-min) (point-max))))
                           (helm-attrset 'get-line bsfn)
-                          (with-current-buffer (helm-candidate-buffer 'local)
+                          (with-current-buffer (helm-candidate-buffer 'global)
                             (insert contents)
                             (goto-char (point-min))
                             (let ((linum 1))
