@@ -1674,7 +1674,8 @@ Can be used for `completion-in-region-function' by advicing it with an
     (advice-add
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
-    (let ((old--helm-completion-style helm-completion-style))
+    (let ((old--helm-completion-style helm-completion-style)
+          string)
       (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
           (customize-set-variable 'helm-completion-style
                                   (if (cdr-safe it) (car it) it)))
@@ -1817,7 +1818,9 @@ Can be used for `completion-in-region-function' by advicing it with an
                                  (message "[No matches]")))
                               t)        ; exit minibuffer immediately.
                             :must-match require-match))))
+            (setq string result)
             (helm-completion-in-region--insert-result result start point end base-size))
+        (completion--done string 'finished)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
