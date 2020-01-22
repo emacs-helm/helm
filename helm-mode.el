@@ -1660,6 +1660,10 @@ that is non-nil."
          (all (completion-pcm--all-completions prefix pattern table pred)))
     (list all pattern prefix suffix (car bounds))))
 
+(defun helm-completion-in-region-selection ()
+  (with-helm-buffer
+    (setq helm-saved-selection (helm-get-selection nil 'withprop))))
+
 ;; Completion-in-region-function
 
 (defun helm--completion-in-region (origfun start end collection &optional predicate)
@@ -1674,10 +1678,12 @@ Can be used for `completion-in-region-function' by advicing it with an
     (advice-add
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
-    (let ((old--helm-completion-style helm-completion-style))
+    (let ((old--helm-completion-style helm-completion-style)
+          string)
       (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
           (customize-set-variable 'helm-completion-style
                                   (if (cdr-safe it) (car it) it)))
+      (add-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-flex-nospace t)
@@ -1817,7 +1823,14 @@ Can be used for `completion-in-region-function' by advicing it with an
                                  (message "[No matches]")))
                               t)        ; exit minibuffer immediately.
                             :must-match require-match))))
+            ;; `helm-completion-in-region--insert-result' is stripping
+            ;; out properties on RESULT and by side-effect (perhaps
+            ;; `choose-completion-string'?) modify STRING so make a copy.
+            (setq string (copy-sequence result))
+            (remove-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
             (helm-completion-in-region--insert-result result start point end base-size))
+        ;; Allow running extra property :exit-function (Issue #2265)
+        (completion--done string 'finished)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
