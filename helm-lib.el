@@ -723,7 +723,7 @@ end a printable representation of hashtable itself."
   "Return a regexp which matches any of the regexps in REGEXP-LIST."
   (if regexp-list
       (concat "\\(?:" (helm--string-join regexp-list "\\)\\|\\(?:") "\\)")
-    "\\<\\>"))                          ; Match nothing
+    "\\`\\'"))                          ; Match nothing
 
 (defun helm-skip-entries (seq black-regexp-list &optional white-regexp-list)
   "Remove entries which matches one of REGEXP-LIST from SEQ."
