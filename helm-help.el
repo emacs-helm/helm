@@ -502,7 +502,7 @@ On completion:
 
 *** Use the wildcard to select multiple files
 
-Use of wilcard is supported to run an action over a set of files.
+Use of wildcard is supported to run an action over a set of files.
 
 Example: You can copy all the files with \".el\" extension by using \"*.el\" and
 then run copy action.
@@ -525,7 +525,7 @@ When using an action that involves an external backend (e.g. grep), using \"**\"
 is not recommended (even thought it works fine) because it will be slower to
 select all the files.  You are better off leaving the backend to do it, it will
 be faster.  However, if you know you have not many files it is reasonable to use
-this, also using not recursive wilcard (e.g. \"*.el\") is perfectly fine for
+this, also using not recursive wildcard (e.g. \"*.el\") is perfectly fine for
 this.
 
 The \"**\" feature is active by default in the option `helm-file-globstar'.  It

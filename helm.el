@@ -6853,7 +6853,7 @@ With a prefix argument mark all candidates in all sources."
                            (helm-file-expand-wildcards
                             coerced t)
                          (error nil)))))
-    ;; Avoid returning a not expanded wilcard fname.
+    ;; Avoid returning a not expanded wildcard fname.
     ;; e.g assuming "/tmp" doesn't contain "*.el"
     ;; return nil when coerced is "/tmp/*.el".
     (unless (or wilds (null wildcard)

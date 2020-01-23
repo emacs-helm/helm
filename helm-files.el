@@ -2793,7 +2793,7 @@ If PATTERN is a valid directory name,return PATTERN unchanged."
       ((or (not (helm-ff-fuzzy-matching-p))
            (string-match "\\s-" bn))    ; Fall back to multi-match.
        (concat (regexp-quote bd) bn))
-      ((or (string-match "[*][.]?.*" bn) ; Allow entering wilcard.
+      ((or (string-match "[*][.]?.*" bn) ; Allow entering wildcard.
            (string-match "/$" pattern)     ; Allow mkdir.
            (string-match helm-ff-url-regexp pattern)
            (and (string= helm-ff-default-directory "/") tramp-p))
