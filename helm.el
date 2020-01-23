@@ -4423,18 +4423,20 @@ the source, keeping previous candidates in display."
   "Used to set the value of `case-fold-search' in helm.
 Return t or nil depending on the value of `helm-case-fold-search'
 and `helm-pattern'."
-  (let ((helm-case-fold-search
-         (helm-aif (assq 'case-fold-search (helm-get-current-source))
-             (cdr it)
-           helm-case-fold-search))
-        ;; Only parse basename for filenames
-        ;; to avoid setting case sensitivity
-        ;; when expanded directories contains upcase
-        ;; characters.
-        (bn-or-pattern (if (string-match "[~/]*" pattern)
-                           (helm-basename pattern)
-                         pattern)))
-    (helm-set-case-fold-search-1 bn-or-pattern)))
+  (if helm-alive-p
+      (let ((helm-case-fold-search
+             (helm-aif (assq 'case-fold-search (helm-get-current-source))
+                 (cdr it)
+               helm-case-fold-search))
+            ;; Only parse basename for filenames
+            ;; to avoid setting case sensitivity
+            ;; when expanded directories contains upcase
+            ;; characters.
+            (bn-or-pattern (if (string-match "[~/]*" pattern)
+                               (helm-basename pattern)
+                             pattern)))
+        (helm-set-case-fold-search-1 bn-or-pattern))
+    case-fold-search))
 
 (defun helm-set-case-fold-search-1 (pattern)
   (cl-case helm-case-fold-search
