@@ -1538,6 +1538,7 @@ that match whole STRING.
 
 This is needed to provide compatibility for both emacs-25 and emacs-24.5
 as emacs-25 version of `ansi-color-apply' is partially broken."
+  (require 'ansi-color)
   (let ((start 0)
         codes end escape-sequence
         result colorized-substring)
