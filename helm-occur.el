@@ -262,7 +262,7 @@ Each buffer's result is displayed in a separated source."
                  buffers))
          (helm-sources-using-default-as-input
            (unless (cl-loop for b in bufs
-                            thereis (> (buffer-size) 2000000))
+                            thereis (> (buffer-size b) 2000000))
              helm-sources-using-default-as-input))
          (sources (helm-occur-build-sources bufs))
          (helm--maybe-use-default-as-input
