@@ -261,8 +261,10 @@ Each buffer's result is displayed in a separated source."
                    (cons curbuf (remove curbuf buffers))
                  buffers))
          (helm-sources-using-default-as-input
-           (unless (cl-loop for b in bufs
-                            thereis (> (buffer-size b) 2000000))
+           (unless (cl-loop with total_size = 0
+                            for b in bufs
+                            do (setq total_size (buffer-size b))
+                            finally return (> total_size 2000000))
              helm-sources-using-default-as-input))
          (sources (helm-occur-build-sources bufs))
          (helm--maybe-use-default-as-input
