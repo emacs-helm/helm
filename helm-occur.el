@@ -152,7 +152,10 @@ engine beeing completely different and also much faster."
                            'helm-occur--buffer-tick
                            (list (buffer-chars-modified-tick (current-buffer))))
   (save-restriction
-    (let (def pos)
+    (let ((helm-sources-using-default-as-input
+           (unless (> (buffer-size) 2000000)
+             helm-sources-using-default-as-input))
+          def pos)
       (when (use-region-p)
         ;; When user mark defun with `mark-defun' with intention of
         ;; using helm-occur on this region, it is relevant to use the
@@ -257,6 +260,10 @@ Each buffer's result is displayed in a separated source."
          (bufs (if helm-occur-always-search-in-current
                    (cons curbuf (remove curbuf buffers))
                  buffers))
+         (helm-sources-using-default-as-input
+           (unless (cl-loop for b in bufs
+                            thereis (> (buffer-size) 2000000))
+             helm-sources-using-default-as-input))
          (sources (helm-occur-build-sources bufs))
          (helm--maybe-use-default-as-input
           (not (null (memq 'helm-source-moccur
