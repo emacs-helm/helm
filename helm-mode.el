@@ -1830,7 +1830,8 @@ Can be used for `completion-in-region-function' by advicing it with an
             (remove-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
             (helm-completion-in-region--insert-result result start point end base-size))
         ;; Allow running extra property :exit-function (Issue #2265)
-        (completion--done string 'finished)
+        (when (stringp string)
+          (completion--done string 'finished))
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
