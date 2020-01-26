@@ -1660,7 +1660,7 @@ that is non-nil."
          (all (completion-pcm--all-completions prefix pattern table pred)))
     (list all pattern prefix suffix (car bounds))))
 
-(defun helm-completion-in-region-selection ()
+(defun helm-completion-in-region--selection ()
   (with-helm-buffer
     (setq helm-saved-selection (helm-get-selection nil 'withprop))))
 
@@ -1683,7 +1683,10 @@ Can be used for `completion-in-region-function' by advicing it with an
       (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
           (customize-set-variable 'helm-completion-style
                                   (if (cdr-safe it) (car it) it)))
-      (add-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
+      ;; This hook force usage of the display part of candidate with
+      ;; its properties, this is needed for lsp-mode in its
+      ;; :exit-function see issue #2265.
+      (add-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-flex-nospace t)
@@ -1831,7 +1834,7 @@ Can be used for `completion-in-region-function' by advicing it with an
         ;; Allow running extra property :exit-function (Issue #2265)
         (when (stringp string)
           (completion--done string 'finished))
-        (remove-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
+        (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
