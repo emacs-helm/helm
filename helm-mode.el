@@ -1827,11 +1827,11 @@ Can be used for `completion-in-region-function' by advicing it with an
             ;; out properties on RESULT and by side-effect (perhaps
             ;; `choose-completion-string'?) modify STRING so make a copy.
             (setq string (copy-sequence result))
-            (remove-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
             (helm-completion-in-region--insert-result result start point end base-size))
         ;; Allow running extra property :exit-function (Issue #2265)
         (when (stringp string)
           (completion--done string 'finished))
+        (remove-hook 'helm-before-action-hook 'helm-completion-in-region-selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
         (advice-remove 'lisp--local-variables
