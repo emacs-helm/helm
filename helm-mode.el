@@ -1833,7 +1833,7 @@ Can be used for `completion-in-region-function' by advicing it with an
             (helm-completion-in-region--insert-result result start point end base-size))
         ;; Allow running extra property :exit-function (Issue #2265)
         (when (stringp string)
-          (completion--done string 'finished))
+          (completion--done string 'exact))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
