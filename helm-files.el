@@ -2137,10 +2137,7 @@ or when `helm-pattern' is equal to \"~/\"."
       (with-helm-buffer
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
-               (pat         (if (string-match helm-tramp-file-name-regexp
-                                              helm-pattern)
-                                (helm-ff--create-tramp-name helm-pattern)
-                                helm-pattern))
+               (pat         (helm-ff-set-pattern helm-pattern))
                (completed-p (string= (file-name-as-directory
                                       (expand-file-name
                                        (substitute-in-file-name pat)))
@@ -2240,7 +2237,12 @@ or when `helm-pattern' is equal to \"~/\"."
                                                   (file-name-directory input))))
              (with-helm-window
                (helm-set-pattern input)
-               (helm-check-minibuffer-input)))))))
+               (helm-check-minibuffer-input))))
+          ((string-match "\\`/\\(-\\):.*" helm-pattern)
+           (with-helm-window
+             (helm-set-pattern
+              (replace-match tramp-default-method t t helm-pattern 1))
+             (helm-check-minibuffer-input))))))
 
 (defun helm-ff--expand-file-name-no-dot (name &optional directory)
   "Prevent expanding \"/home/user/.\" to \"/home/user\"."
@@ -2449,6 +2451,8 @@ purpose."
          (postfixed (helm-ff--tramp-postfixed-p pattern))
          (reg "\\`/\\([^[/:]+\\|[^/]+]\\):.*:")
          cur-method tramp-name)
+    (when (string-match "\\`/\\(-\\):" pattern)
+      (setq pattern (replace-match tramp-default-method t t pattern 1)))
     ;; In some rare cases tramp can return a nil input,
     ;; so be sure pattern is a string for safety (Issue #476).
     (unless pattern (setq pattern ""))
