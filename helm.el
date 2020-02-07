@@ -3016,8 +3016,10 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
                   (if (or (one-window-p t)
                           helm-split-window-inside-p)
                       (split-window
-                       (selected-window) nil (if (eq helm-split-window-default-side 'other)
-                                                 helm-split-window-other-side-when-one-window helm-split-window-default-side))
+                       (selected-window) nil
+                       (if (eq helm-split-window-default-side 'other)
+                           helm-split-window-other-side-when-one-window
+                         helm-split-window-default-side))
                     ;; If more than one window reuse one of them.
                     (cl-case helm-split-window-default-side
                       (left  (or (helm-window-in-direction 'left)
