@@ -491,7 +491,24 @@ If `helm-full-frame' is non-`nil', it take precedence over this setting.
 See also `helm-split-window-inside-p' and `helm-always-two-windows' that
 take precedence over this.
 
-NOTE: this have no effect if `helm-split-window-preferred-function' is not
+NOTE: this has no effect if `helm-split-window-preferred-function' is not
+`helm-split-window-default-fn' unless this new function can handle this."
+  :group 'helm
+  :type 'symbol)
+
+(defcustom helm-split-window-other-side-when-one-window 'below
+  "The default side to display `helm-buffer' when (1)
+`helm-split-window-default-side' is 'other and (2) 
+the current frame only has one window. Possible values 
+are acceptable args for `split-window' SIDE, that is `below', 
+`above', `left' or `right'.
+
+If `helm-full-frame' is non-`nil', it take precedence over this setting.
+
+See also `helm-split-window-inside-p' and `helm-always-two-windows' that
+take precedence over this.
+
+NOTE: this has no effect if `helm-split-window-preferred-function' is not
 `helm-split-window-default-fn' unless this new function can handle this."
   :group 'helm
   :type 'symbol)
@@ -3000,7 +3017,7 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
                           helm-split-window-inside-p)
                       (split-window
                        (selected-window) nil (if (eq helm-split-window-default-side 'other)
-                                                 'below helm-split-window-default-side))
+                                                 helm-split-window-other-side-when-one-window helm-split-window-default-side))
                     ;; If more than one window reuse one of them.
                     (cl-case helm-split-window-default-side
                       (left  (or (helm-window-in-direction 'left)
