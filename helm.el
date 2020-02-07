@@ -3016,15 +3016,23 @@ value of `split-window-preferred-function' will be used by `display-buffer'."
                                  (helm-window-in-direction 'right)
                                  (selected-window)))
                       (same  (selected-window))
-                      (other (other-window-for-scrolling))
+                      (other (or (helm-other-window-for-scrolling)
+                                 (selected-window)))
                       (t     (or (window-next-sibling) (selected-window)))))
                 (split-window-sensibly window))))
     (setq helm-persistent-action-window-buffer (window-buffer win))
     win))
 
 (defun helm-window-in-direction (direction)
-  "Same as `window-in-direction' but check if window is dedicated."
+  "Same as `window-in-direction' but check if window is dedicated.
+Returns nil when window is dedicated."
   (helm-aif (window-in-direction direction)
+      (and (not (window-dedicated-p it)) it)))
+
+(defun helm-other-window-for-scrolling ()
+  "Same as `other-window-for-scrolling' but check if window is dedicated.
+Returns nil when window is dedicated."
+  (helm-aif (other-window-for-scrolling)
       (and (not (window-dedicated-p it)) it)))
 
 
