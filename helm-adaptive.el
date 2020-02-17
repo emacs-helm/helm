@@ -29,7 +29,7 @@
   :group 'helm)
 
 (defcustom helm-adaptive-history-file
-  "~/.emacs.d/helm-adaptive-history"
+  (locate-user-emacs-file "helm-adaptive-history")
   "Path of file where history information is stored.
 When nil history is not saved nor restored after emacs restart unless
 you save/restore `helm-adaptive-history' with something else like

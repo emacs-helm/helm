@@ -179,7 +179,7 @@ cat > $CONF_FILE <<EOF
 ;; User may be using a non standard \`package-user-dir'.
 ;; Modify \`package-directory-list' instead of \`package-user-dir'
 ;; in case the user starts Helm from a non-ELPA installation.
-(unless (file-equal-p package-user-dir "~/.emacs.d/elpa")
+(unless (file-equal-p package-user-dir (locate-user-emacs-file "elpa"))
   (add-to-list 'package-directory-list (directory-file-name
                                         (file-name-directory
                                          (directory-file-name default-directory)))))

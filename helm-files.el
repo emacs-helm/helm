@@ -4263,7 +4263,7 @@ inversed."
 ;;
 ;;
 (defvar helm-ff-delete-log-file
-  (expand-file-name "helm-delete-file.log" user-emacs-directory)
+  (locate-user-emacs-file "helm-delete-file.log")
   "The file use to communicate with emacs child when deleting files async.")
 
 (defvar helm-ff--trash-flag nil)

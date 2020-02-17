@@ -34,7 +34,11 @@ PKGDIR := .
 
 # Additional emacs loadpath
 LOADPATH	:= -L $(PKGDIR)
-ELPA_DIR        =  $(HOME)/.emacs.d/elpa
+
+# Prefer emacs config folder in XDG_CONFIG_HOME to ~/.emacs.d
+XDG_ELPA_DIR	:= $(if $(XDG_CONFIG_HOME), $(XDG_CONFIG_HOME)/emacs/elpa, $(HOME)/.config/emacs/elpa)
+ELPA_DIR := $(if $(shell test -d $(XDG_ELPA_DIR)), $(HOME)/.emacs.d/elpa, $(XDG_ELPA_DIR))
+
 ASYNC_ELPA_DIR  =  $(shell \
 	test -d $(ELPA_DIR) && \
 	find -L $(ELPA_DIR) -maxdepth 1 -regex '.*/async-[.0-9]*' 2> /dev/null | \
