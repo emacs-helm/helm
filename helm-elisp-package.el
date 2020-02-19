@@ -39,6 +39,12 @@
   :group 'helm-el-package
   :type 'boolean)
 
+(defcustom helm-el-package-autoremove-on-start nil
+  "Try to autoremove no more needed packages on startup.
+See `package-autoremove'."
+  :group 'helm-el-package
+  :type 'boolean)
+
 ;; internals vars
 (defvar helm-el-package--show-only 'all)
 (defvar helm-el-package--initialized-p nil)
@@ -60,8 +66,12 @@
         (inhibit-read-only t))
     (when (null package-alist)
       (setq helm-el-package--show-only 'all))
-    (when (setq helm-el-package--removable-packages
-                (package--removable-packages))
+    (unless (consp package-selected-packages)
+      (helm-aif (package--find-non-dependencies)
+          (setq package-selected-packages it)))
+    (when (and (setq helm-el-package--removable-packages
+                     (package--removable-packages))
+               helm-el-package-autoremove-on-start)
       (package-autoremove))
     (unwind-protect
          (progn
