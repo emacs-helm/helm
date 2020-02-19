@@ -39,6 +39,12 @@
   :group 'helm-el-package
   :type 'boolean)
 
+
+(defcustom helm-el-package-upgrade-on-start nil
+  "Show package upgrades on startup when non nil."
+  :group 'helm-el-package
+  :type 'boolean)
+
 (defcustom helm-el-package-autoremove-on-start nil
   "Try to autoremove no more needed packages on startup.
 See `package-autoremove'."
@@ -101,7 +107,8 @@ See `package-autoremove'."
                    (message "Refreshing packages list done, [%d] package(s) to upgrade"
                             (length helm-el-package--upgrades))
                  (message "Refreshing packages list done, no upgrades available"))
-             (setq helm-el-package--show-only (if helm-el-package--upgrades
+             (setq helm-el-package--show-only (if (and helm-el-package-upgrade-on-start
+                                                       helm-el-package--upgrades)
                                                   'upgrade
                                                 helm-el-package-initial-filter))))
       (kill-buffer "*Packages*"))))
