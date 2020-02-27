@@ -866,6 +866,7 @@ It should be used when candidate list don't need to rebuild dynamically."
                                     (eq require-match
                                         'confirm-after-completion)))
                            1 0)
+     :nomark t
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
      :fuzzy helm-mode-fuzzy-match
@@ -963,6 +964,7 @@ This handler use dynamic matching which allow honouring `completion-styles'."
          :initial-input input
          :buffer buffer
          :history history
+         :nomark t
          :reverse-history helm-mode-reverse-history
          ;; In helm h-c-styles default is passed directly in
          ;; candidates.
