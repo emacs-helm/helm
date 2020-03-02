@@ -798,8 +798,7 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (let ((len (length seq)))
-    (cond ((> index len) (setq index len))
-          ((< index 0) (setq index 0)))
+    (setq index (min (max index 0) len))
     (if (zerop index)
         (append elm seq)
       (cl-loop for i in seq
@@ -807,6 +806,22 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
                when (= count index)
                if (listp elm) append elm
                else collect elm))))
+
+(cl-defgeneric helm-take-first-elements (seq n)
+  "Return the first N elements of SEQ if SEQ is longer than N.
+It is used for narrowing list of candidates to the
+`helm-candidate-number-limit'."
+  (if (> (length seq) n) (cl-subseq seq 0 n) seq))
+
+(cl-defmethod helm-take-first-elements ((seq list) n)
+  "Optimized for lists, same as `seq-take'."
+  (if (> (length seq) n)
+      (let ((result '()))
+        (while (and seq (> n 0))
+          (setq n (1- n))
+          (push (pop seq) result))
+        (nreverse result))
+    seq))
 
 (defun helm-source-by-name (name &optional sources)
   "Get a Helm source in SOURCES by NAME.

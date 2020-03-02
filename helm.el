@@ -4302,12 +4302,6 @@ emacs-27 to provide such scoring in emacs<27."
     (if (and (listp searchfns) (not (functionp searchfns)))
         searchfns (list searchfns))))
 
-(defun helm-take-first-elements (seq n)
-  "Return the first N elements of SEQ if SEQ is longer than N.
-It is used for narrowing list of candidates to the
-`helm-candidate-number-limit'."
-  (if (> (length seq) n) (cl-subseq seq 0 n) seq))
-
 (defun helm-match-from-candidates (cands matchfns match-part-fn limit source)
   (when cands ; nil in async sources.
     (condition-case-unless-debug err
