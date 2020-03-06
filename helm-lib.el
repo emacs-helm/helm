@@ -807,21 +807,11 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
                if (listp elm) append elm
                else collect elm))))
 
-(cl-defgeneric helm-take-first-elements (seq n)
+(defun helm-take-first-elements (seq n)
   "Return the first N elements of SEQ if SEQ is longer than N.
 It is used for narrowing list of candidates to the
 `helm-candidate-number-limit'."
   (if (> (length seq) n) (cl-subseq seq 0 n) seq))
-
-(cl-defmethod helm-take-first-elements ((seq list) n)
-  "Optimized for lists, same as `seq-take'."
-  (if (> (length seq) n)
-      (let ((result '()))
-        (while (and seq (> n 0))
-          (setq n (1- n))
-          (push (pop seq) result))
-        (nreverse result))
-    seq))
 
 (defun helm-source-by-name (name &optional sources)
   "Get a Helm source in SOURCES by NAME.
