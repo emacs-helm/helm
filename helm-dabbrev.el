@@ -150,41 +150,39 @@ Do nothing when non nil.")
             (save-excursion
               ;; Start searching before thing before point.
               (goto-char (- (point) (length str)))
-              ;; Search the last 30 lines before point.
-              (cl-multiple-value-bind (res pa pb)
+              ;; Search the last 30 lines BEFORE point and set POS-BEFORE.
+              (cl-multiple-value-bind (res _pa pb)
                   (helm-dabbrev--search-and-store str -2 limit results)
                 (setq results    res
-                      pos-before pb
-                      pos-after  pa)))
+                      ;; No need to set POS-AFTER here.
+                      pos-before pb)))
             (save-excursion
-              ;; Search the next 30 lines after point.
-              (cl-multiple-value-bind (res pa pb)
+              ;; Search the next 30 lines AFTER point and set POS-AFTER.
+              (cl-multiple-value-bind (res pa _pb)
                   (helm-dabbrev--search-and-store str 2 limit results)
                 (setq results    res
-                      pos-before pb
+                      ;; No need to set POS-BEFORE, we keep the last
+                      ;; value found.
                       pos-after  pa)))
             (save-excursion
-              ;; Search all before point.
+              ;; Search all BEFORE point maybe starting from
+              ;; POS-BEFORE to not search again what previously found.
               ;; If limit is reached in previous call of
-              ;; search-and-store pos-before is never set and
+              ;; `helm-dabbrev--search-and-store' POS-BEFORE is nil and
               ;; goto-char will fail, so check it.
-              (when pos-before
-                (goto-char pos-before)
-                (cl-multiple-value-bind (res pa pb)
+              (when pos-before (goto-char pos-before))
+              (cl-multiple-value-bind (res _pa _pb)
                   (helm-dabbrev--search-and-store str -1 limit results)
-                (setq results    res
-                      pos-before pb
-                      pos-after  pa))))
+                ;; No need to set POS-BEFORE and POS-AFTER here.
+                (setq results res)))
             (save-excursion
-              ;; Search all after point.
-              ;; Same comment as above for pos-after.
-              (when pos-after
-                (goto-char pos-after)
-                (cl-multiple-value-bind (res pa pb)
-                    (helm-dabbrev--search-and-store str 1 limit results)
-                  (setq results    res
-                        pos-before pb
-                        pos-after  pa))))))
+              ;; Search all AFTER point maybe starting from POS-AFTER.
+              ;; Same comment as above for POS-AFTER.
+              (when pos-after (goto-char pos-after))
+              (cl-multiple-value-bind (res _pa _pb)
+                  (helm-dabbrev--search-and-store str 1 limit results)
+                ;; No need to set POS-BEFORE and POS-AFTER here.
+                (setq results res)))))
         (when (>= (length results) limit) (throw 'break nil))))
     (nreverse results)))
 
@@ -197,7 +195,7 @@ Argument DIRECTION can be:
     -  (2):  Search forward from the
              `helm-dabbrev-lineno-around'
              lines after point.
-    -  (2):  Search backward from the
+    - (-2):  Search backward from the
              `helm-dabbrev-lineno-around'
              lines before point."
   (let ((res results)
