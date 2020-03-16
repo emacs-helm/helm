@@ -322,6 +322,15 @@ depending of `helm-selection':
 
 Called with a prefix arg open menu unconditionally.
 
+*** Sort directory contents
+
+When listing a directory without narrowing its contents, i.e. when pattern ends with \"/\",
+you can sort alphabetically, by newest or by size by using respectively
+\\<helm-find-files-map>\\[helm-ff-sort-alpha], \\[helm-ff-sort-by-newest] or \\[helm-ff-sort-by-size].
+NOTE:
+When starting back narrowing i.e. entering something in minibuffer after \"/\" sorting is done
+again with fuzzy sorting and no more with sorting methods previously selected.
+
 *** Find file at point
 
 Helm uses `ffap' partially or completely to find file at point depending on the
