@@ -2430,7 +2430,8 @@ purpose."
            "Invalid tramp file name"))
 
 (defun helm-ff--tramp-postfixed-p (str)
-  (let (result)
+  (let ((methods (helm-ff--get-tramp-methods))
+        result)
     (save-match-data
       (with-temp-buffer
         (save-excursion (insert str))
@@ -2438,10 +2439,10 @@ purpose."
           (if (save-excursion
                 (forward-char -1)
                 (looking-back
-                 (mapconcat 'identity (helm-ff--get-tramp-methods) "\\|")
+                 (mapconcat (lambda (m) (format "[/|]%s" m)) methods "\\|")
                  (point-at-bol)))
               (setq result nil)
-              (setq result it)))))
+            (setq result it)))))
     result))
 
 (defun helm-ff-set-pattern (pattern)
