@@ -730,7 +730,7 @@ See [[Use the wildcard to select multiple files]] for details.
 
 You can bookmark the `helm-find-files' session with `\\[helm-ff-bookmark-set]'.
 You can later retrieve these bookmarks by calling `helm-filtered-bookmarks'
-or, from the current `helm-find-files' session, by hitting `\\[helm-find-files-toggle-to-bookmark]'.
+or, from the current `helm-find-files' session, by hitting `\\[helm-find-files-switch-to-bookmark]'.
 
 *** Grep files from `helm-find-files'
 
