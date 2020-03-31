@@ -47,7 +47,9 @@
                                  helm-imenu-help-message
                                  helm-colors-help-message
                                  helm-semantic-help-message
-                                 helm-kmacro-help-message))
+                                 helm-kmacro-help-message
+                                 helm-kill-ring-help-message)
+  "A list of help messages (strings) used by `helm-documentation'.")
 
 (defvar helm-documentation-buffer-name "*helm documentation*")
 
