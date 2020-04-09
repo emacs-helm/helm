@@ -2629,7 +2629,7 @@ ANY-KEYMAP ANY-DEFAULT ANY-HISTORY See `helm'."
                 :around #'helm--suspend-read-passwd)
     ;; Ensure linum-mode is disabled in Helm buffers to preserve
     ;; performances (Issue #1894).
-    (advice-add 'linum-on :override #'helm--advice-linum-on))
+    (advice-add 'linum-on :override #'helm--advice-linum-on '((depth . 100))))
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "any-prompt = %S" any-prompt)
   (helm-log "any-preselect = %S" any-preselect)

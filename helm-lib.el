@@ -337,7 +337,7 @@ When only `add-text-properties' is available APPEND is ignored."
   :set (lambda (var val)
          (set var val)
          (if val
-             (advice-add 'push-mark :override #'helm--advice-push-mark)
+             (advice-add 'push-mark :override #'helm--advice-push-mark '((depth . 100)))
            (advice-remove 'push-mark #'helm--advice-push-mark))))
 
 ;; This the version of Emacs-27 written by Stefan
@@ -1010,7 +1010,7 @@ Example:
 
 (defun helm-describe-class (class)
   "Display documentation of Eieio CLASS, a symbol or a string."
-  (advice-add 'cl--print-table :override #'helm-source--cl--print-table)
+  (advice-add 'cl--print-table :override #'helm-source--cl--print-table '((depth . 100)))
   (unwind-protect
        (let ((helm-describe-function-function 'describe-function))
          (helm-describe-function class))
