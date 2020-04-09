@@ -2912,16 +2912,12 @@ Don't use this directly, use instead `helm' with the keyword
           (setq helm-current-buffer orig-helm-current-buffer)
           (setq helm-onewindow-p orig-one-window-p)
           ;; Be sure advices, hooks, and local modes keep running.
-          (if (fboundp 'advice-add)
-              (progn
-                (advice-add 'tramp-read-passwd
-                            :around #'helm--suspend-read-passwd)
-                (advice-add 'ange-ftp-get-passwd
-                            :around #'helm--suspend-read-passwd)
-                (advice-add 'epa-passphrase-callback-function
-                            :around #'helm--suspend-read-passwd))
-            (ad-activate 'tramp-read-passwd)
-            (ad-activate 'ange-ftp-get-passwd))
+          (advice-add 'tramp-read-passwd
+                      :around #'helm--suspend-read-passwd)
+          (advice-add 'ange-ftp-get-passwd
+                      :around #'helm--suspend-read-passwd)
+          (advice-add 'epa-passphrase-callback-function
+                      :around #'helm--suspend-read-passwd)
           (unless helm-allow-mouse
             (helm--remap-mouse-mode 1))
           (unless (cl-loop for h in post-command-hook
