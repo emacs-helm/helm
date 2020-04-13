@@ -1133,6 +1133,14 @@ session.  In this case you can add a defmethod called
 See [[https://github.com/emacs-helm/helm/wiki/FAQ#why-is-a-customizable-helm-source-nil][here]] for more infos,
 and for more complex examples of configuration [[https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm.el#L340][here]].
 
+** Modify keybindings in Helm
+
+Helm main keymap is `helm-map', all keys bound in this map apply
+to all helm sources.  However, most sources have their own
+keymap, with each binding overriding its counterpart in
+`helm-map', you can see all bindings in effect in the [[Commands][Commands]]
+section (available only if the source have its own keymap and documentation of course).
+
 ** Matching in Helm
 
 All what you write in minibuffer is interpreted as a regexp or
