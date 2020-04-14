@@ -917,6 +917,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 (defvar helm-rsync--progress-str nil)
 (defvar helm-rsync--timer nil)
 
+(defface helm-ff-rsync-progress
+  '((t (:inherit font-lock-warning-face)))
+  "Face used for rsync mode-line indicator."
+  :group 'helm-files-faces)
+
 (defun helm-rsync-remote2rsync (file)
   (if (file-remote-p file)
       (let ((localname (expand-file-name (file-remote-p file 'localname)))
@@ -971,7 +976,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                             "%" "%%"
                                             (replace-regexp-in-string "[[:cntrl:]]" "" output))
                                           "]")
-                                          'face 'font-lock-warning-face))))))))
+                                          'face 'helm-ff-rsync-progress))))))))
 
 (defun helm-find-files-rsync (_candidate)
   "Rsync files from `helm-find-files'."
