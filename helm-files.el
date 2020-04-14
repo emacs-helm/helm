@@ -956,6 +956,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                (let ((inhibit-read-only t))
                                  (with-current-buffer (process-buffer proc)
                                    (when (string-match comint-password-prompt-regexp output)
+                                     ;; FIXME: Fully not tested and
+                                     ;; use and agent or auth-source
+                                     ;; or whatever to get password if
+                                     ;; available.
                                      (process-send-string
                                       proc (concat (read-passwd (match-string 0 output)) "\n")))
                                    (erase-buffer)
