@@ -936,8 +936,6 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
     (sit-for 0.01)))
 
 (defun helm-rsync-copy-files (files dest)
-  (interactive (list (helm-read-file-name "Ifiles: " :marked-candidates t)
-                     (helm-read-file-name "Dest: ")))
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
