@@ -531,7 +531,8 @@ with Exiftran mandatory option is \"-i\"."
     (define-key map (kbd "M-.")           'helm-ff-run-etags)
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
-    (define-key map (kbd "M-:")           'helm-ff-run-rsync-file)
+    (when (executable-find "rsync")
+      (define-key map (kbd "M-:")         'helm-ff-run-rsync-file))
     (define-key map (kbd "M-B")           'helm-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'helm-ff-run-load-file)
     (define-key map (kbd "M-S")           'helm-ff-run-symlink-file)
@@ -705,7 +706,10 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    'helm-ff-delete-files
    "Touch File(s) `M-T'" 'helm-ff-touch-files
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
-   "Rsync file(s) `M-:'" 'helm-find-files-rsync
+   (lambda ()
+     (and (executable-find "rsync")
+          "Rsync file(s) `M-:'"))
+   'helm-find-files-rsync
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
@@ -858,6 +862,8 @@ belonging to each window."
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION can be `rsync' or any action supported by `helm-dired-action'."
   (require 'dired-async)
+  (when (eq action 'rsync)
+    (cl-assert (executable-find "rsync") nil "No command named rsync"))
   (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
