@@ -728,6 +728,17 @@ When `dired-async-mode' is enabled, an additional action named \"Backup files\"
 will be available. (Such command is not natively available in Emacs).
 See [[Use the wildcard to select multiple files]] for details.
 
+**** Use Rsync to copy files
+
+If Rsync is available, you can use it to copy/sync files or directories
+with some restrictions though:
+
+- Copying from tramp sudo method is not supported.
+- Copying from remote to remote is not supported.
+
+This command is mostly useful when copying large files as it is fast,
+asynchronous and provide a progress bar in mode-line.
+
 *** Bookmark the `helm-find-files' session
 
 You can bookmark the `helm-find-files' session with `\\[helm-ff-bookmark-set]'.
