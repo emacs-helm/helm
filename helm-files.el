@@ -957,6 +957,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
     (set-process-filter proc (lambda (proc output)
                                (let ((inhibit-read-only t))
                                  (with-current-buffer (process-buffer proc)
+                                   (when (string-match comint-password-prompt-regexp output)
+                                     (process-send-string
+                                      proc (concat (read-passwd (match-string 0 output)) "\n")))
                                    (erase-buffer)
                                    (setq helm-rsync--progress-str
                                          (propertize
