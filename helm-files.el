@@ -953,8 +953,12 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                (lambda ()
                                  (helm-rsync-mode-line helm-rsync--progress-str))))
     (set-process-sentinel proc `(lambda (process event)
-                                  (when (string= event "finished\n")
-                                    (message "rsync copied %s files" ,(length files)))
+                                  (cond ((string= event "finished\n")
+                                         (message "Rsync copied %s files" ,(length files)))
+                                        (t (error "Process %s %s with code %s"
+                                                  (process-name process)
+                                                  (process-status process)
+                                                  (process-exit-status process))))
                                   (cancel-timer helm-rsync--timer)
                                   (force-mode-line-update t)))
     (set-process-filter proc (lambda (proc output)
@@ -962,7 +966,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                  (with-current-buffer (process-buffer proc)
                                    (when (string-match comint-password-prompt-regexp output)
                                      ;; FIXME: Fully not tested and
-                                     ;; use and agent or auth-source
+                                     ;; use an agent or auth-source
                                      ;; or whatever to get password if
                                      ;; available.
                                      (process-send-string
