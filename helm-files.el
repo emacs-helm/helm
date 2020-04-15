@@ -871,6 +871,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          (prompt (format "%s %s file(s) %s: "
                          (if (and (and (fboundp 'dired-async-mode)
                                        dired-async-mode)
+                                  (not (eq action 'rsync))
                                   (null prefarg))
                              (concat "Async " (symbol-name action))
                            (capitalize (symbol-name action)))
