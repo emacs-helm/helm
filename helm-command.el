@@ -271,18 +271,14 @@ Save COMMAND to `extended-command-history'."
     ;; use the value of arg otherwise use helm-current-prefix-arg.
     (let ((prefix-arg (or helm-current-prefix-arg helm-M-x-prefix-argument))
           (command-name (symbol-name command)))
-      (cl-flet ((save-hist
-                 (name)
-                 (setq extended-command-history
-                       (cons name (delete name extended-command-history)))))
-        (condition-case-unless-debug err
-            (progn
-              (command-execute command 'record)
-              (save-hist command-name))
-          (error
-           (when helm-M-x-always-save-history
-             (save-hist command-name))
-           (signal (car err) (cdr err))))))))
+      (condition-case-unless-debug err
+          (progn
+            (command-execute command 'record)
+            (add-to-history 'extended-command-history command-name))
+        (error
+         (when helm-M-x-always-save-history
+           (add-to-history 'extended-command-history command-name))
+         (signal (car err) (cdr err)))))))
 
 (defun helm-M-x--vanilla-M-x ()
   (helm-M-x-execute-command
