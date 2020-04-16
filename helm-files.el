@@ -925,13 +925,15 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 (defun helm-rsync-remote2rsync (file)
   (if (file-remote-p file)
-      (let ((localname (expand-file-name (file-remote-p file 'localname)))
+      (let ((localname (directory-file-name
+                        (expand-file-name (file-remote-p file 'localname))))
             (user      (file-remote-p file 'user))
             (host      (file-remote-p file 'host)))
         (if user
             (format "%s@%s:'%s'" user host (helm-rsync-quote-argument localname))
           (format "%s:'%s'" host (helm-rsync-quote-argument localname))))
-    (expand-file-name file)))
+    (directory-file-name
+     (expand-file-name file))))
 
 (defun helm-rsync-quote-argument (fname)
   (mapconcat 'identity (split-string fname) "\\ "))
@@ -951,8 +953,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                              (append files (list dest))))))
     (setq helm-rsync--timer
           (run-with-timer 0.1 0.1
-                               (lambda ()
-                                 (helm-rsync-mode-line helm-rsync--progress-str))))
+                          (lambda ()
+                            (helm-rsync-mode-line helm-rsync--progress-str))))
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
                                          (message "Rsync copied %s files" ,(length files)))
