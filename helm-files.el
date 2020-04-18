@@ -918,8 +918,18 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   :type '(repeat string)
   :group 'helm-files)
 
+(defcustom helm-rsync-percent-sign "％"
+  "Percentage unicode sign to use in Rsync reporter."
+  :type 'string
+  :group 'helm-files)
+
 (defvar helm-rsync-process-buffer "*helm-rsync*")
 (defvar helm-rsync-progress-str nil)
+
+(defface helm-ff-rsync-progress
+  '((t (:inherit font-lock-warning-face)))
+  "Face used for rsync mode-line indicator."
+  :group 'helm-files-faces)
 
 (defun helm-rsync-remote2rsync (file)
   (if (file-remote-p file)
@@ -940,6 +950,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   ;; shell-quote-argument is not working with Rsync.
   (mapconcat 'identity (split-string fname) "\\ "))
 
+(defun helm-rsync-format-mode-line-str ()
+  (format " Rsync: [%s]"
+          (propertize helm-rsync-progress-str
+                      'face 'helm-ff-rsync-progress)))
+
 (defun helm-rsync-mode-line ()
   "Add Rsync progress to the mode line."
   (or global-mode-string (setq global-mode-string '("")))
@@ -947,12 +962,13 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 		  global-mode-string)
     (setq global-mode-string
 	  (append global-mode-string
-		  '(helm-rsync-progress-str)))))
+		  '((:eval (helm-rsync-format-mode-line-str)))))))
 
 (defun helm-rsync-restore-mode-line ()
   "Restore the mode line when Rsync finishes."
   (setq global-mode-string
-	(remove 'helm-rsync-progress-str global-mode-string))
+	(remove '(:eval (helm-rsync-format-mode-line-str))
+                global-mode-string))
   (force-mode-line-update))
 
 (defun helm-rsync-copy-files (files dest)
@@ -985,17 +1001,14 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                       proc (concat (read-passwd (match-string 0 output)) "\n")))
                                    (erase-buffer)
                                    (setq helm-rsync-progress-str
-                                          (concat
-                                           " Rsync: ["
-                                           (mapconcat 'identity
-                                                      (split-string
-                                                       (replace-regexp-in-string
-                                                        "%" "%%"
-                                                        (replace-regexp-in-string
-                                                         "[[:cntrl:]] *" "" output))
-                                                       " " t)
-                                                      " ")
-                                           "]"))
+                                         (mapconcat 'identity
+                                                    (split-string
+                                                     (replace-regexp-in-string
+                                                      "%" helm-rsync-percent-sign
+                                                      (replace-regexp-in-string
+                                                       "[[:cntrl:]] *" "" output))
+                                                     " " t)
+                                                    " "))
                                    (force-mode-line-update t)))))))
 
 (defun helm-find-files-rsync (_candidate)
