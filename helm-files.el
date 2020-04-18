@@ -913,15 +913,13 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 ;; Rsync
 ;;
-(defvar helm-rsync-switches '("-a" "-z" "-r" "-h" "--info=progress2"))
-(defvar helm-rsync--buffer "*helm-rsync*")
-(defvar helm-rsync--progress-str nil)
-(defvar helm-rsync--timer nil)
+(defcustom helm-rsync-switches '("-a" "-z" "-r" "-h" "--info=progress2")
+  "Rsync options to use with HFF Rsync action."
+  :type '(repeat string)
+  :group 'helm-files)
 
-(defface helm-ff-rsync-progress
-  '((t (:inherit font-lock-warning-face)))
-  "Face used for rsync mode-line indicator."
-  :group 'helm-files-faces)
+(defvar helm-rsync-process-buffer "*helm-rsync*")
+(defvar helm-rsync-progress-str nil)
 
 (defun helm-rsync-remote2rsync (file)
   (if (file-remote-p file)
@@ -936,25 +934,36 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
      (expand-file-name file))))
 
 (defun helm-rsync-quote-argument (fname)
+  ;; Seems rsync already quote things like accentued chars and failed
+  ;; when passing such chars already quoted, so quote only spaces and
+  ;; only for remote path as specified in its documentation. IOW
+  ;; shell-quote-argument is not working with Rsync.
   (mapconcat 'identity (split-string fname) "\\ "))
 
-(defun helm-rsync-mode-line (str)
-  (let ((mode-line-format (concat " " str)))
-    (force-mode-line-update t)
-    (sit-for 0.01)))
+(defun helm-rsync-mode-line ()
+  "Add Rsync progress to the mode line."
+  (or global-mode-string (setq global-mode-string '("")))
+  (unless (member 'helm-rsync-progress-str
+		  global-mode-string)
+    (setq global-mode-string
+	  (append global-mode-string
+		  '(helm-rsync-progress-str)))))
+
+(defun helm-rsync-restore-mode-line ()
+  "Restore the mode line when Rsync finishes."
+  (setq global-mode-string
+	(remove 'helm-rsync-progress-str global-mode-string))
+  (force-mode-line-update))
 
 (defun helm-rsync-copy-files (files dest)
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let ((proc (apply #'start-process
-                     "*helm-rsync*" helm-rsync--buffer "rsync"
+                     "*helm-rsync*" helm-rsync-process-buffer "rsync"
                      (append helm-rsync-switches
                              (append files (list dest))))))
-    (setq helm-rsync--timer
-          (run-with-timer 0.1 0.1
-                          (lambda ()
-                            (helm-rsync-mode-line helm-rsync--progress-str))))
+    (helm-rsync-mode-line)
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
                                          (message "Rsync copied %s files" ,(length files)))
@@ -962,8 +971,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                   (process-name process)
                                                   (process-status process)
                                                   (process-exit-status process))))
-                                  (cancel-timer helm-rsync--timer)
-                                  (force-mode-line-update t)))
+                                  (helm-rsync-restore-mode-line)
+                                  (force-mode-line-update)))
     (set-process-filter proc (lambda (proc output)
                                (let ((inhibit-read-only t))
                                  (with-current-buffer (process-buffer proc)
@@ -975,15 +984,19 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                      (process-send-string
                                       proc (concat (read-passwd (match-string 0 output)) "\n")))
                                    (erase-buffer)
-                                   (setq helm-rsync--progress-str
-                                         (propertize
+                                   (setq helm-rsync-progress-str
                                           (concat
-                                           "  Rsync: ["
-                                           (replace-regexp-in-string
-                                            "%" "%%"
-                                            (replace-regexp-in-string "[[:cntrl:]]" "" output))
-                                          "]")
-                                          'face 'helm-ff-rsync-progress))))))))
+                                           " Rsync: ["
+                                           (mapconcat 'identity
+                                                      (split-string
+                                                       (replace-regexp-in-string
+                                                        "%" "%%"
+                                                        (replace-regexp-in-string
+                                                         "[[:cntrl:]] *" "" output))
+                                                       " " t)
+                                                      " ")
+                                           "]"))
+                                   (force-mode-line-update t)))))))
 
 (defun helm-find-files-rsync (_candidate)
   "Rsync files from `helm-find-files'."
