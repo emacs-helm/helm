@@ -983,7 +983,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
     (helm-rsync-mode-line proc)
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
-                                         (message "Rsync copied %s files" ,(length files)))
+                                         (message "%s copied %s files"
+                                                  (capitalize (process-name process))
+                                                  ,(length files)))
                                         (t (error "Process %s %s with code %s"
                                                   (process-name process)
                                                   (process-status process)
@@ -991,8 +993,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                   (setq helm-rsync-progress-str-alist
                                         (delete (assoc process helm-rsync-progress-str-alist)
                                                 helm-rsync-progress-str-alist))
-                                  (unless helm-rsync-progress-str-alist
-                                    (helm-rsync-restore-mode-line process))
+                                  (helm-rsync-restore-mode-line process)
                                   (force-mode-line-update)))
     (set-process-filter proc (lambda (proc output)
                                (let ((inhibit-read-only t))
@@ -1004,6 +1005,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                      ;; available.
                                      (process-send-string
                                       proc (concat (read-passwd (match-string 0 output)) "\n")))
+                                   ;; FIXME: Extract the fname
+                                   ;; currently copied and pass it as
+                                   ;; a help-echo prop.
                                    (erase-buffer)
                                    (let ((ml-str (mapconcat 'identity
                                                             (split-string
