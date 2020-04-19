@@ -1013,8 +1013,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                                "[[:cntrl:]] *" "" output))
                                                              " " t)
                                                             " ")))
-                                     (if (assoc proc helm-rsync-progress-str-alist)
-                                         (setcdr (assoc proc helm-rsync-progress-str-alist) ml-str)
+                                     (helm-aif (assoc proc helm-rsync-progress-str-alist)
+                                         (setcdr it ml-str)
                                        (setq helm-rsync-progress-str-alist
                                              (push (cons proc ml-str) helm-rsync-progress-str-alist))))
                                    (force-mode-line-update t)))))))
