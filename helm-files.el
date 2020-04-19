@@ -924,7 +924,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   :group 'helm-files)
 
 (defvar helm-rsync-process-buffer "*helm-rsync*")
-(defvar helm-rsync-progress-str nil)
+(defvar helm-rsync-progress-str-alist nil)
 
 (defface helm-ff-rsync-progress
   '((t (:inherit font-lock-warning-face)))
@@ -950,24 +950,25 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   ;; shell-quote-argument is not working with Rsync.
   (mapconcat 'identity (split-string fname) "\\ "))
 
-(defun helm-rsync-format-mode-line-str ()
-  (format " Rsync: [%s]"
-          (propertize helm-rsync-progress-str
-                      'face 'helm-ff-rsync-progress)))
+(defun helm-rsync-format-mode-line-str (proc)
+  (format " [%s]"
+          (propertize (assoc-default proc helm-rsync-progress-str-alist)
+                      'face 'helm-ff-rsync-progress
+                      'help-echo (format "%s" (process-name proc)))))
 
-(defun helm-rsync-mode-line ()
+(defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
   (or global-mode-string (setq global-mode-string '("")))
-  (unless (member 'helm-rsync-progress-str
+  (unless (member `(:eval (helm-rsync-format-mode-line-str ,proc))
 		  global-mode-string)
     (setq global-mode-string
 	  (append global-mode-string
-		  '((:eval (helm-rsync-format-mode-line-str)))))))
+		  `((:eval (helm-rsync-format-mode-line-str ,proc)))))))
 
-(defun helm-rsync-restore-mode-line ()
+(defun helm-rsync-restore-mode-line (proc)
   "Restore the mode line when Rsync finishes."
   (setq global-mode-string
-	(remove '(:eval (helm-rsync-format-mode-line-str))
+	(remove `(:eval (helm-rsync-format-mode-line-str ,proc))
                 global-mode-string))
   (force-mode-line-update))
 
@@ -976,10 +977,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let ((proc (apply #'start-process
-                     "*helm-rsync*" helm-rsync-process-buffer "rsync"
+                     "rsync" helm-rsync-process-buffer "rsync"
                      (append helm-rsync-switches
                              (append files (list dest))))))
-    (helm-rsync-mode-line)
+    (helm-rsync-mode-line proc)
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
                                          (message "Rsync copied %s files" ,(length files)))
@@ -987,7 +988,11 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                   (process-name process)
                                                   (process-status process)
                                                   (process-exit-status process))))
-                                  (helm-rsync-restore-mode-line)
+                                  (setq helm-rsync-progress-str-alist
+                                        (delete (assoc process helm-rsync-progress-str-alist)
+                                                helm-rsync-progress-str-alist))
+                                  (unless helm-rsync-progress-str-alist
+                                    (helm-rsync-restore-mode-line process))
                                   (force-mode-line-update)))
     (set-process-filter proc (lambda (proc output)
                                (let ((inhibit-read-only t))
@@ -1000,15 +1005,18 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                      (process-send-string
                                       proc (concat (read-passwd (match-string 0 output)) "\n")))
                                    (erase-buffer)
-                                   (setq helm-rsync-progress-str
-                                         (mapconcat 'identity
-                                                    (split-string
-                                                     (replace-regexp-in-string
-                                                      "%" helm-rsync-percent-sign
-                                                      (replace-regexp-in-string
-                                                       "[[:cntrl:]] *" "" output))
-                                                     " " t)
-                                                    " "))
+                                   (let ((ml-str (mapconcat 'identity
+                                                            (split-string
+                                                             (replace-regexp-in-string
+                                                              "%" helm-rsync-percent-sign
+                                                              (replace-regexp-in-string
+                                                               "[[:cntrl:]] *" "" output))
+                                                             " " t)
+                                                            " ")))
+                                     (if (assoc proc helm-rsync-progress-str-alist)
+                                         (setcdr (assoc proc helm-rsync-progress-str-alist) ml-str)
+                                       (setq helm-rsync-progress-str-alist
+                                             (push (cons proc ml-str) helm-rsync-progress-str-alist))))
                                    (force-mode-line-update t)))))))
 
 (defun helm-find-files-rsync (_candidate)
