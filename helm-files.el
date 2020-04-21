@@ -913,7 +913,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 ;; Rsync
 ;;
-(defcustom helm-rsync-switches '("-a" "-z" "-r" "-h" "--info=progress2")
+(defcustom helm-rsync-switches '("-a" "-z" "-r" "-h" "--info=all2")
   "Rsync options to use with HFF Rsync action."
   :type '(repeat string)
   :group 'helm-files)
@@ -953,8 +953,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 (defun helm-rsync-format-mode-line-str (proc)
   (format " [%s]"
           (propertize (assoc-default proc helm-rsync-progress-str-alist)
-                      'face 'helm-ff-rsync-progress
-                      'help-echo (format "%s" (process-name proc)))))
+                      'face 'helm-ff-rsync-progress)))
 
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
@@ -995,33 +994,56 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                                 helm-rsync-progress-str-alist))
                                   (helm-rsync-restore-mode-line process)
                                   (force-mode-line-update)))
-    (set-process-filter proc (lambda (proc output)
-                               (let ((inhibit-read-only t))
-                                 (with-current-buffer (process-buffer proc)
-                                   (when (string-match comint-password-prompt-regexp output)
-                                     ;; FIXME: Fully not tested and
-                                     ;; use an agent or auth-source
-                                     ;; or whatever to get password if
-                                     ;; available.
-                                     (process-send-string
-                                      proc (concat (read-passwd (match-string 0 output)) "\n")))
-                                   ;; FIXME: Extract the fname
-                                   ;; currently copied and pass it as
-                                   ;; a help-echo prop.
-                                   (erase-buffer)
-                                   (let ((ml-str (mapconcat 'identity
-                                                            (split-string
-                                                             (replace-regexp-in-string
-                                                              "%" helm-rsync-percent-sign
-                                                              (replace-regexp-in-string
-                                                               "[[:cntrl:]] *" "" output))
-                                                             " " t)
-                                                            " ")))
-                                     (helm-aif (assoc proc helm-rsync-progress-str-alist)
-                                         (setcdr it ml-str)
-                                       (setq helm-rsync-progress-str-alist
-                                             (push (cons proc ml-str) helm-rsync-progress-str-alist))))
-                                   (force-mode-line-update t)))))))
+    (set-process-filter proc #'helm-rsync-process-filter)))
+
+(defun helm-rsync-process-filter (proc output)
+  (let ((inhibit-read-only t)
+        fname progbar)
+    (with-current-buffer (process-buffer proc)
+      (when (string-match comint-password-prompt-regexp output)
+        ;; FIXME: Fully not tested and
+        ;; use an agent or auth-source
+        ;; or whatever to get password if
+        ;; available.
+        (process-send-string
+         proc (concat (read-passwd (match-string 0 output)) "\n")))
+      ;; Extract the progress bar.
+      (with-temp-buffer
+        (insert output)
+        (when (re-search-backward "[[:cntrl:]]" nil t)
+          (setq progbar (buffer-substring-no-properties
+                         (match-end 0) (point-max)))))
+      ;; Insert the text, advancing the process marker.
+      (save-excursion
+        (goto-char (process-mark proc))
+        (insert output)
+        (set-marker (process-mark proc) (point)))
+      (goto-char (process-mark proc))
+      ;; Extract the file name currently
+      ;; copied (Imply --info=all2 or all1).
+      (save-excursion
+        (when (re-search-backward "^[^[:cntrl:]]" nil t)
+          (setq fname (helm-basename
+                       (buffer-substring-no-properties
+                        (point) (point-at-eol))))))
+      ;; Now format the string for the mode-line.
+      (let ((ml-str (mapconcat 'identity
+                               (split-string
+                                (replace-regexp-in-string
+                                 "%" helm-rsync-percent-sign
+                                 progbar)
+                                " " t)
+                               " ")))
+        (setq ml-str (propertize ml-str 'help-echo
+                                 (format "%s->%s" (process-name proc) fname)))
+        ;; Now associate the formatted
+        ;; progress-bar string with process.
+        (helm-aif (assoc proc helm-rsync-progress-str-alist)
+            (setcdr it ml-str)
+          (setq helm-rsync-progress-str-alist
+                (push (cons proc ml-str) helm-rsync-progress-str-alist))))
+      ;; Finally update mode-line.
+      (force-mode-line-update t))))
 
 (defun helm-find-files-rsync (_candidate)
   "Rsync files from `helm-find-files'."
