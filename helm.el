@@ -6821,7 +6821,8 @@ is not needed."
                     ;; autosave files/links and non--existent files.
                     (unless
                         (or (helm-this-visible-mark)
-                            (string= prefix "[?]") ; doesn't match
+                            (and (stringp prefix)
+                                 (string= prefix "[?]")) ; doesn't match
                             (and filecomp-p
                                  (or
                                   ;; autosave files
