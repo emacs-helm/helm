@@ -6822,11 +6822,16 @@ is not needed."
                     (unless
                         (or (helm-this-visible-mark)
                             (and (stringp prefix)
-                                 (string= prefix "[?]")) ; doesn't match
+                                 ;; Non existing files in HFF and RFN.
+                                 (string= prefix "[?]"))
+                            ;; Same here but maybe PREFIX is displayed
+                            ;; with e.g. an image with no string. See
+                            ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5.
+                            (and prefix (not (stringp prefix)))
                             (and filecomp-p
                                  (or
                                   ;; autosave files
-                                  (string-match-p "^[.]?#.*#?$" bn)
+                                  (string-match-p "\\`[.]?#.*#?\\'" bn)
                                   ;; dot files
                                   (member bn '("." ".."))
                                   ;; We need to test here when not using
