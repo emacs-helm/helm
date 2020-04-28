@@ -5656,10 +5656,10 @@ don't exit and send message 'no match'."
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
              (unknown (and (not empty-buffer-p)
-                           (string= (get-text-property
-                                     0 'display
-                                     (helm-get-selection nil 'withprop src))
-                                    "[?]"))))
+                           (equal (get-text-property
+                                   0 'display
+                                   (helm-get-selection nil 'withprop src))
+                                  "[?]"))))
         (cond ((and (or empty-buffer-p unknown)
                     (memq minibuffer-completion-confirm
                           '(confirm confirm-after-completion)))
@@ -6821,12 +6821,12 @@ is not needed."
                     ;; autosave files/links and non--existent files.
                     (unless
                         (or (helm-this-visible-mark)
-                            (and (stringp prefix)
-                                 ;; Non existing files in HFF and RFN.
-                                 (string= prefix "[?]"))
-                            ;; Same here but maybe PREFIX is displayed
-                            ;; with e.g. an image with no string. See
-                            ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5.
+                            ;; Non existing files in HFF and
+                            ;; RFN. Display may be an image. See
+                            ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
+                            ;; and also issue #2296. 
+                            (equal prefix "[?]")
+                            ;; Prefix is non-nil (an image?) and not a string.
                             (and prefix (not (stringp prefix)))
                             (and filecomp-p
                                  (or
