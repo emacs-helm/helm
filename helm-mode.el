@@ -1858,8 +1858,16 @@ Can be used for `completion-in-region-function' by advicing it with an
                                    (push-mark  it t t))))))
         ((consp result)                 ; crm.
          (let ((beg (+ start base-size))
-               (sep ","))
-           ;; Try to find a default separator.
+               (sep (or (and
+                         ;; If `crm-separator' is a string of length 1
+                         ;; assume it can be used as separator (#2298),
+                         ;; otherwise it is a regexp and use the value
+                         ;; it matches or default to "," if no match.
+                         (eq (length crm-separator) 1)
+                         crm-separator)
+                        ",")))
+           ;; Try to find a default separator. If `crm-separator' is a
+           ;; regexp use the string the regexp is matching.
            (save-excursion
              (goto-char beg)
              (when (looking-back crm-separator (1- (point)))
