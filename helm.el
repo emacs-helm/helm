@@ -6798,7 +6798,7 @@ is not needed."
       (helm-follow-mode -1)
       (unwind-protect
           (if nomark
-              (message "Marking not allowed in this source")
+              (user-error "Marking not allowed in this source")
             (save-excursion
               (when ensure-beg-of-source
                 (goto-char (helm-get-previous-header-pos))
