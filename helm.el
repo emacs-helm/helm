@@ -6825,8 +6825,6 @@ is not needed."
                             ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
                             ;; and also issue #2296. 
                             (equal prefix "[?]")
-                            ;; Prefix is non-nil (an image?) and not a string.
-                            (and prefix (not (stringp prefix)))
                             (and filecomp-p
                                  (or
                                   ;; autosave files
