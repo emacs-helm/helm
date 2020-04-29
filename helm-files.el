@@ -690,6 +690,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Grep current directory with AG `M-g a, C-u select type'" 'helm-find-files-ag
    "Git grep `M-g g, C-u from root'" 'helm-ff-git-grep
    "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
+   "Pdf Grep File(s)" 'helm-ff-pdfgrep
    "Gid `M-g i'" 'helm-ff-gid
    "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
    "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
@@ -3386,10 +3387,6 @@ Return candidates prefixed with basename of `helm-input' first."
                 (file-exists-p candidate))
            (helm-append-at-nth
             actions '(("Browse url file" . browse-url-of-file)) 2))
-          ((or (string= (file-name-extension candidate) "pdf")
-               (string= (file-name-extension candidate) "PDF"))
-           (helm-append-at-nth
-            actions '(("Pdfgrep File(s)" . helm-ff-pdfgrep)) 4))
           (t actions))))
 
 (defun helm-ff-trash-action (fn names &rest args)
