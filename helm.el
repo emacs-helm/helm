@@ -6791,8 +6791,7 @@ is not needed."
          (nomark     (assq 'nomark src))
          (src-name   (assoc-default 'name src))
          (filecomp-p (or (helm-file-completion-source-p src)
-                         (string= src-name "Files from Current Directory")))
-         (remote-p (and filecomp-p (file-remote-p helm-pattern))))
+                         (string= src-name "Files from Current Directory"))))
     ;; Note that `cl-letf' prevents edebug working properly.
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-follow-mode -1)
@@ -6833,12 +6832,7 @@ is not needed."
                                   ;; autosave files
                                   (string-match-p "\\`[.]?#.*#?\\'" bn)
                                   ;; dot files
-                                  (member bn '("." ".."))
-                                  ;; We need to test here when not using
-                                  ;; a transformer that put a prefix tag
-                                  ;; before candidate.
-                                  ;; (i.e no [?] prefix on tramp).
-                                  (and remote-p (not (file-exists-p cand))))))
+                                  (member bn '("." "..")))))
                       (helm-make-visible-mark src cand)))
                   (when (helm-pos-multiline-p)
                     (goto-char
