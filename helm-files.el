@@ -2372,7 +2372,7 @@ or when `helm-pattern' is equal to \"~/\"."
                  (helm-basename helm-pattern))
                 (string-match-p "/\\'" helm-pattern))
            (helm-ff-recursive-dirs helm-pattern)
-           (with-helm-window (helm-check-minibuffer-input)))
+           (helm-ff--maybe-set-pattern-and-update))
           ((string-match
             "\\(?:\\`~/\\)\\|/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
             helm-pattern)
@@ -2392,14 +2392,15 @@ or when `helm-pattern' is equal to \"~/\"."
                        (setq input (file-name-as-directory input)))
                  (setq helm-ff-default-directory (file-name-as-directory
                                                   (file-name-directory input))))
-             (with-helm-window
-               (helm-set-pattern input)
-               (helm-check-minibuffer-input))))
+             (helm-ff--maybe-set-pattern-and-update input)))
           ((string-match "\\`/\\(-\\):.*" helm-pattern)
-           (with-helm-window
-             (helm-set-pattern
-              (replace-match tramp-default-method t t helm-pattern 1))
-             (helm-check-minibuffer-input))))))
+           (helm-ff--maybe-set-pattern-and-update
+            (replace-match tramp-default-method t t helm-pattern 1))))))
+
+(defun helm-ff--maybe-set-pattern-and-update (&optional str)
+  (with-helm-window
+    (when str (helm-set-pattern str))
+    (helm-check-minibuffer-input)))
 
 (defun helm-ff--expand-file-name-no-dot (name &optional directory)
   "Prevent expanding \"/home/user/.\" to \"/home/user\"."
