@@ -1873,7 +1873,7 @@ Can be used for `completion-in-region-function' by advicing it with an
              (when (looking-back crm-separator (1- (point)))
                (setq sep (match-string 0))))
            (funcall completion-list-insert-choice-function
-                    beg end (mapconcat 'identity result sep))))
+                    beg end (mapconcat 'identity (append result '("")) sep))))
         (t nil)))
 
 (defun helm-mode--in-file-completion-p ()
