@@ -3665,7 +3665,8 @@ If a prefix arg is given or `helm-follow-mode' is on open file."
                    (when (string= (helm-basename candidate) "..")
                      (setq helm-ff-last-expanded helm-ff-default-directory))
                    (funcall insert-in-minibuffer (file-name-as-directory
-                                                  (expand-file-name candidate))))
+                                                  (expand-file-name candidate)))
+                   (with-helm-after-update-hook (helm-ff-retrieve-last-expanded)))
                  'never-split))
           ;; A symlink file, expand to it's true name. (first hit)
           ((and (file-symlink-p candidate) (not current-prefix-arg) (not follow))
