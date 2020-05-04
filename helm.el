@@ -3245,12 +3245,16 @@ Note that this feature is available only with emacs-25+."
 (defun helm-display-buffer-popup-frame (buffer frame-alist)
   (if helm-display-buffer-reuse-frame
       (let* ((x (cdr (assoc 'left frame-alist)))
-             (y (cdr (assoc 'top frame-alist))))
+             (y (cdr (assoc 'top frame-alist)))
+             (width (cdr (assoc 'width frame-alist)))
+             (height (cdr (assoc 'height frame-alist))))
         (unless (and helm-popup-frame
                      (frame-live-p helm-popup-frame))
           (setq helm-popup-frame (make-frame frame-alist)))
         (select-frame helm-popup-frame)
         (set-frame-position helm-popup-frame x y)
+        (set-frame-width helm-popup-frame width)
+        (set-frame-height helm-popup-frame height)
         (switch-to-buffer buffer)
         (select-frame-set-input-focus helm-popup-frame t))
     ;; If user have changed `helm-display-buffer-reuse-frame' to nil
