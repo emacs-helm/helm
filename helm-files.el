@@ -532,7 +532,7 @@ with Exiftran mandatory option is \"-i\"."
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
     (when (executable-find "rsync")
-      (define-key map (kbd "M-:")         'helm-ff-run-rsync-file))
+      (define-key map (kbd "M-V")         'helm-ff-run-rsync-file))
     (define-key map (kbd "M-B")           'helm-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'helm-ff-run-load-file)
     (define-key map (kbd "M-S")           'helm-ff-run-symlink-file)
@@ -709,7 +709,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    (lambda ()
      (and (executable-find "rsync")
-          "Rsync file(s) `M-:'"))
+          "Rsync file(s) `M-V'"))
    'helm-find-files-rsync
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
