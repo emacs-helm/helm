@@ -790,8 +790,10 @@ so it have only effect when `helm-always-two-windows' is non-nil."
   "When non nil helm frame is not deleted and reused in next sessions.
 
 This was used to workaround a bug in emacs where frames where
-popping up slowly, now that the bug have been fixed upstream probably
-you don't want to use this anymore."
+popping up slowly, now that the bug have been fixed upstream
+\(emacs-27) probably you don't want to use this anymore.
+On emacs-26 set `x-wait-for-event-timeout' to nil to have your frames
+popping up fast."
   :group 'helm
   :type 'boolean)
 
