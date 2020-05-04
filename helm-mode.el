@@ -1058,7 +1058,7 @@ See documentation of `completing-read' and `all-completions' for details."
                                 initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
-         (any-args        (append def-args (list str-command buf-name)))
+         (others-args        (append def-args (list str-command buf-name)))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message
          ;; Be sure this pesty *completion* buffer doesn't popup.
@@ -1109,7 +1109,7 @@ See documentation of `completing-read' and `all-completions' for details."
     (unwind-protect
          (cond (;; An helm specialized function exists, run it.
                 (and def-com helm-mode)
-                (apply def-com any-args))
+                (apply def-com others-args))
                (;; Try to handle `ido-completing-read' everywhere.
                 (and def-com (eq def-com 'ido-completing-read))
                 (setcar (memq collection def-args)
@@ -1345,7 +1345,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          (def-args (list prompt dir default-filename mustmatch initial predicate))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
-         (any-args (append def-args (list str-command buf-name)))
+         (others-args (append def-args (list str-command buf-name)))
          (reading-directory (eq predicate 'file-directory-p))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
@@ -1390,7 +1390,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                       (and def-com helm-mode
                            (not (eq def-com 'ido-read-file-name))
                            (not (eq def-com 'incompatible)))
-                      (apply def-com any-args))
+                      (apply def-com others-args))
                      (;; Def-com value is `ido-read-file-name'
                       ;; run it with default args.
                       (and def-com (eq def-com 'ido-read-file-name))
