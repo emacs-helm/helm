@@ -2358,6 +2358,16 @@ or when `helm-pattern' is equal to \"~/\"."
                   (helm-set-pattern
                    ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
                    (expand-file-name (file-name-as-directory helm-pattern)))))
+            ;; When typing pattern in minibuffer, helm
+            ;; expand very fast to a directory matching pattern and
+            ;; don't let undo the time to set a boundary, the result
+            ;; is when e.g. going to root with "//" and undoing, undo
+            ;; doesn't undo to previous input.  One fix for this is to
+            ;; advice `undo-auto--boundary-ensure-timer' so that it is
+            ;; possible to modify its delay (use a value of 1s for
+            ;; helm), a second fix is to run directly here `undo-boundary'
+            ;; inside a timer.
+            (run-at-time helm-input-idle-delay nil #'undo-boundary)
             (helm-check-minibuffer-input)))))))
 
 (defun helm-ff-auto-expand-to-home-or-root ()
