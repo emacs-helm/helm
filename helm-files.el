@@ -569,6 +569,7 @@ with Exiftran mandatory option is \"-i\"."
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
     (define-key map (kbd "C-x C-v")       'helm-ff-run-find-alternate-file)
@@ -593,6 +594,7 @@ with Exiftran mandatory option is \"-i\"."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
@@ -2275,6 +2277,20 @@ or hitting C-j on \"..\"."
                          (not (file-remote-p it nil t)))
                     (file-exists-p it))
           (helm-next-line)))))
+
+(defun helm-ff-undo ()
+  "Undo minibuffer in `helm-find-files'.
+Ensure disabling `helm-ff-auto-update-flag' before undoing."
+  (interactive)
+  (let ((old--flag helm-ff-auto-update-flag))
+    (setq helm-ff-auto-update-flag nil)
+    (setq helm-ff--auto-update-state nil)
+    (unwind-protect
+        (progn
+          (undo)
+          (helm-check-minibuffer-input))
+      (setq helm-ff-auto-update-flag old--flag)
+      (setq helm-ff--auto-update-state helm-ff-auto-update-flag))))
 
 ;;; Auto-update - helm-find-files auto expansion of directories.
 ;;
