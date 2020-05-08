@@ -916,7 +916,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 ;; Rsync
 ;;
-(defcustom helm-rsync-switches '("-a" "-z" "-r" "-h" "--info=all2")
+(defcustom helm-rsync-switches '("-a" "-z" "-h" "--info=all2")
   "Rsync options to use with HFF Rsync action."
   :type '(repeat string)
   :group 'helm-files)
