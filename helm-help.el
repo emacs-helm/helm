@@ -260,16 +260,16 @@ On a symlinked directory a prefix argument expands to its true name.
 
 `DEL' by default is deleting char backward.
 
-But when `helm-ff-DEL-up-one-level-maybe' is non nil `DEL' behave
-differently depending of helm-pattern contents, it go up one
-level if pattern is a directory endings with \"/\" or disable HFF
-auto update and delete char backward if pattern is a filename or
-refer to a non existing path.  Going up one level can be disabled
-if necessary by deleting \"/\" at end of pattern using
+But when `helm-ff-DEL-up-one-level-maybe' is non nil `DEL' behaves
+differently depending on the contents of helm-pattern. It goes up one
+level if the pattern is a directory ending with \"/\" or disables HFF
+auto update and delete char backward if the pattern is a filename or
+refers to a non existing path.  Going up one level can be disabled
+if necessary by deleting \"/\" at the end of the pattern using
 \\<helm-map>\\[backward-char] and \\[helm-delete-minibuffer-contents].
 
 Note that when deleting char backward, helm takes care of
-disabling update letting you the time to edit your pattern for
+disabling update giving you the opportunity to edit your pattern for
 e.g. renaming a file or creating a new file or directory.
 When `helm-ff-auto-update-initial-value' is non nil you may want to
 disable it temporarily, see [[Toggle auto-completion with `C-c DEL'][Toggle auto-completion with `C-c DEL']] for this.
