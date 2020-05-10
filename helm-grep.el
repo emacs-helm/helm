@@ -615,15 +615,15 @@ WHERE can be one of other-window, other-frame."
                                    (if (eq major-mode 'helm-grep-mode)
                                        (current-buffer)
                                        helm-buffer)
-                                 (get-text-property (point-at-bol) 'helm-grep-fname))
+                                 (get-text-property (point-at-bol)
+                                                    'helm-grep-fname))
                                (car split)))
-         (tramp-method (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'method))
-         (tramp-host   (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'host))
-         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host
-                           (concat tramp-prefix loc-fname) loc-fname)))
+         (tramp-fname  (file-remote-p (or helm-ff-default-directory
+                                          default-directory)))
+         (fname        (if tramp-fname
+                           (concat tramp-fname loc-fname)
+                         loc-fname)))
+    (helm-log "helm-grep-action fname: %s" fname )
     (cl-case where
       (other-window (helm-window-show-buffers
                      (list (find-file-noselect fname)) t))
