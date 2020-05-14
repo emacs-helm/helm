@@ -740,7 +740,10 @@ end a printable representation of hashtable itself."
   "Check if one regexp in BLACK-LIST match DIRECTORY."
   (helm-awhile (helm-basedir (directory-file-name
                               (expand-file-name directory)))
-    (when (string= it "/") (cl-return nil))
+    ;; Break at root to avoid infloop, root is / or on Windows
+    ;; C:/ i.e. <volume>:/ (issue #2308).
+    (when (string-match-p "\\`[A-Za-z]?:?/\\'" it)
+      (cl-return nil))
     (when (cl-loop for r in black-list
                    thereis (string-match-p
                             r (directory-file-name directory)))
