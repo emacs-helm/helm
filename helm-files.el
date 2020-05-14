@@ -3507,7 +3507,9 @@ Arg TRASHED-FILES is an alist of (fname_in_trash . dest) obtained with
     (cl-assert (not (file-exists-p dest-file)) nil
                (format "File `%s' already exists" dest-file))
     (cl-assert dest-file nil "No such file in trash")
+    (message "Restoring %s to %s..." (helm-basename file) (helm-basedir dest-file))
     (rename-file file dest-file)
+    (message "Restoring %s to %s done" (helm-basename file) (helm-basedir dest-file))
     (delete-file info-file)))
 
 (defun helm-ff-trash-file-p (file)
