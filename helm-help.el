@@ -470,6 +470,9 @@ session by default.  Hitting `\\[next-history-element]' should just kick in the
 locate search with this pattern.  If you want Helm to automatically do this, add
 `helm-source-locate' to `helm-sources-using-default-as-input'.
 
+NOTE: On Windows use Everything with its command line ~es~ as a replacement of locate.
+See [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
+
 **** Recursive completion on subdirectories
 
 Starting from the directory you are currently browsing, it is possible to have
@@ -1201,8 +1204,11 @@ search will be performed on basename only for efficiency (so don't add \"-b\" at
 prompt).  As soon as you separate the patterns with spaces, fuzzy matching will
 be disabled and search will be done on the full filename.  Note that in
 multi-match, fuzzy is completely disabled, which means that each pattern is a
-match regexp (i.e. \"helm\" will match \"helm\" but \"hlm\" will \*not* match
+match regexp (i.e. \"helm\" will match \"helm\" but \"hlm\" will *not* match
 \"helm\").
+
+NOTE: On Windows use Everything with its command line ~es~ as a replacement of locate.
+See [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
 
 *** Browse project
 
