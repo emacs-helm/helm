@@ -65,11 +65,11 @@
 **Table of Contents**
 
 - [Introduction](#introduction)
+- [Features](#features)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
     - [Quick install from git](#quick-install-from-git)
     - [Install from Emacs packaging system](#install-from-emacs-packaging-system)
-    - [Debian and Ubuntu](#debian-and-ubuntu)
     - [Installing just the helm-core package](#installing-just-the-helm-core-package)
     - [Warning about alternate installation methods](#warning-about-alternate-installation-methods)
     - [Configuration](#configuration)
@@ -80,6 +80,7 @@
 - [Helm Applications](#helm-applications)
 - [Recommended Helm extensions](#recommended-helm-extensions)
 - [Other emacs extensions recommended with helm](#other-emacs-extensions-recommended-with-helm)
+- [External programs recommended with helm](#external-programs-recommended-with-helm)
 - [Known issues](#known-issues)
 - [Contributors](#contributors)
 - [Bugs & Improvements](#bugs--improvements)
@@ -112,7 +113,7 @@ no need to install 3rd party packages for this.
 
 # Requirements
 
-Helm requires Emacs-24.4 or later versions.
+Helm requires Emacs-25.1 or later versions.
 
 Helm installs [async](https://github.com/jwiegley/emacs-async) and [popup-el](https://github.com/auto-complete/popup-el) package as dependencies
 when Helm is installed using [MELPA](https://melpa.org/). 
@@ -201,6 +202,8 @@ options. `emacs-helm.sh -h` opens an Info screen with more details.
 _Note:_ When helm is installed with "make install" 
 you will have a shell command named helm that you can run from any
 places i.e. not only the helm directory
+
+See https://github.com/emacs-helm/helm/wiki#quick-try-with-emacs-helmsh
 
 ## Advanced usage
 
@@ -340,6 +343,10 @@ extensions.
 # Other emacs extensions recommended with helm
 
 - [Emacs-wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
+
+# External programs recommended with helm
+
+- [Ripgrep](https://github.com/BurntSushi/ripgrep)
 
 # Known issues
 
