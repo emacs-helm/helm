@@ -245,9 +245,8 @@ enabled by default to not confuse new users.
 
 **** Navigate with arrow keys
 
-You can use <right> and <left> arrows to go down or up one level, to enable
+You can use <right> and <left> arrows to go down or up one level, to disable
 this customize `helm-ff-lynx-style-map'.
-This is disabled by default.
 Note that using `setq' will NOT work.
 
 **** Use `\\<helm-find-files-map>\\[helm-execute-persistent-action]' (persistent action) on a directory to go down one level
@@ -297,13 +296,6 @@ with `f1'.
 
 Note that when copying, renaming, etc. from `helm-find-files' the
 destination file is selected with `helm-read-file-name'.
-
-To avoid confusion when using `read-file-name' or `read-directory-name', `RET'
-follows its standard Emacs behaviour, i.e. it exits the minibuffer as soon as
-you press `RET'.  If you want the same behavior as in `helm-find-files', bind
-`helm-ff-RET' to the `helm-read-file-map':
-
-    (define-key helm-read-file-map (kbd \"RET\") 'helm-ff-RET)
 
 **** `TAB' behavior
 

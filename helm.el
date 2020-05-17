@@ -202,6 +202,8 @@ vectors, so don't use strings to define them."
     (define-key map (kbd "C-j")        'helm-execute-persistent-action)
     (define-key map (kbd "C-o")        'helm-next-source)
     (define-key map (kbd "M-o")        'helm-previous-source)
+    (define-key map (kbd "<right>")    'helm-next-source)
+    (define-key map (kbd "<left>")     'helm-previous-source)
     (define-key map (kbd "C-l")        'helm-recenter-top-bottom-other-window)
     (define-key map (kbd "M-C-l")      'helm-reposition-window-other-window)
     (define-key map (kbd "C-M-v")      'helm-scroll-other-window)
@@ -1336,8 +1338,8 @@ See [[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for more infos.
 | C-M-S-v | M-prior, C-M-y   | Previous page (other-window)                                         |
 | C-M-v   | M-next           | Next page (other-window)                                             |
 | Tab     | C-i              | Show action list                                                     |
-| M-o     |                  | Previous source                                                      |
-| C-o     |                  | Next source                                                          |
+| M-o     | left             | Previous source                                                      |
+| C-o     | right            | Next source                                                          |
 | C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
 | C-j     |                  | Persistent action (Execute and keep Helm session)                    |
 
@@ -1345,6 +1347,10 @@ See [[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for more infos.
 
 \[2] Delete from point to end or all depending on the value of
 `helm-delete-minibuffer-contents-from-point'.
+
+NOTE: Any of these bindings are from `helm-map' and may be
+overriten by the map specific to the current source in use (each
+source can have its own keymap).
 
 ** Action transformers
 

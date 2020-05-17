@@ -599,6 +599,7 @@ with Exiftran mandatory option is \"-i\"."
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
     (define-key map (kbd "C-<backspace>") 'helm-ff-run-toggle-auto-update)
     (define-key map (kbd "C-c <DEL>")     'helm-ff-run-toggle-auto-update)
+    (define-key map (kbd "RET")           'helm-ff-RET)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
@@ -606,7 +607,7 @@ with Exiftran mandatory option is \"-i\"."
     map)
   "Keymap for `helm-read-file-name'.")
 
-(defcustom helm-ff-lynx-style-map nil
+(defcustom helm-ff-lynx-style-map t
   "Use arrow keys to navigate with `helm-find-files'.
 Note that if you define this variable with `setq' your change will
 have no effect, use customize instead."
