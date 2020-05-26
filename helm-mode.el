@@ -443,6 +443,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
         unknown-pattern)
     (unless (or (eq must-match t)
                 (string= helm-pattern "")
+                ;; Check if pattern is already member of candidates.
                 (helm-cr--pattern-in-candidates-p candidates))
       (setq candidates (append (list
                                 ;; Unquote helm-pattern
@@ -650,8 +651,7 @@ that use `helm-comp-read' See `helm-M-x' for example."
                           (if ,marked-candidates
                               (helm-marked-candidates)
                               (identity candidate)))))))
-    (let* ((minibuffer-completion-confirm must-match)
-           (minibuffer-completion-predicate test)
+    (let* ((minibuffer-completion-predicate test)
            (minibuffer-completion-table collection)
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-maybe-exit-minibuffer"
@@ -742,9 +742,8 @@ that use `helm-comp-read' See `helm-M-x' for example."
                     :help-message help-message
                     :action action-fn))
            (src-list (list src-hist
-                           (cons (cons 'must-match must-match)
-                                 (if candidates-in-buffer
-                                     src-1 src))))
+                           (if candidates-in-buffer
+                               src-1 src)))
            (helm-execute-action-at-once-if-one exec-when-only-one)
            (helm-quit-if-no-candidate quit-when-no-cand)
            result)
@@ -1222,7 +1221,6 @@ Keys description:
                (not (memq helm-mm-matching-method '(multi1 multi3p)))))
          (hist (and history (helm-comp-read-get-candidates
                              history nil nil alistp)))
-         (minibuffer-completion-confirm must-match)
          (helm-ff--RET-disabled noret)
          (minibuffer-completion-predicate test)
          (minibuffer-completing-file-name t)

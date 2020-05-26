@@ -1913,6 +1913,16 @@ You can also use `helm-attrset' to modify ATTRIBUTE-NAME."
             (helm-interpret-value (cdr it) src compute)
           (cdr it)))))
 
+;; (helm-aif (assq attribute-name src)
+;; (let* ((val     (cdr it))
+;; When attr exists but have no cdr it is equal to `t'.
+;; (attrval (or val t)))
+;; Attributes with a boolean value have no cdr, so no need
+;; to compute a value == to t.
+;; (if (and compute val)
+;; (helm-interpret-value val src compute)
+;; attrval)))))
+
 (cl-defun helm-attrset (attribute-name value
                                        &optional
                                        (src (helm-get-current-source)))
@@ -2659,6 +2669,7 @@ HISTORY args See `helm'."
         mouse-autoselect-window
         focus-follows-mouse
         mode-line-in-non-selected-windows
+        (minibuffer-completion-confirm minibuffer-completion-confirm)
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (helm--maybe-use-default-as-input
          (and (null input)
@@ -5377,7 +5388,8 @@ Key arg DIRECTION can be one of:
                                (previous 'helm-move--previous-source-fn)
                                (next 'helm-move--next-source-fn)
                                (t (lambda () ; A source is passed as DIRECTION arg.
-                                    (helm-move--goto-source-fn direction))))))))
+                                    (helm-move--goto-source-fn direction)))))))
+        source)
     (unless (or (helm-empty-buffer-p (helm-buffer-get))
                 (not (helm-window)))
       (with-helm-window
@@ -5393,8 +5405,9 @@ Key arg DIRECTION can be one of:
         (helm-mark-current-line)
         (when follow
           (helm-follow-execute-persistent-action-maybe))
-        (helm-display-mode-line (helm-get-current-source))
-        (helm-log-run-hook 'helm-move-selection-after-hook)))))
+        (helm-display-mode-line (setq source (helm-get-current-source)))
+        (helm-log-run-hook 'helm-move-selection-after-hook)
+        (helm--set-minibuffer-completion-confirm source)))))
 
 (defun helm-move--beginning-of-multiline-candidate ()
   (let ((header-pos (helm-get-previous-header-pos))
@@ -5703,14 +5716,18 @@ don't exit and send message 'no match'."
                (helm-exit-minibuffer)))))))
 (put 'helm-confirm-and-exit-minibuffer 'helm-only t)
 
-(add-hook 'helm-after-update-hook 'helm-confirm-and-exit-hook)
-
 (defun helm-confirm-and-exit-hook ()
   "Restore `minibuffer-completion-confirm' when helm update."
   (unless (or (eq minibuffer-completion-confirm t)
               (not helm-minibuffer-confirm-state))
     (setq minibuffer-completion-confirm
           helm-minibuffer-confirm-state)))
+(add-hook 'helm-after-update-hook 'helm-confirm-and-exit-hook)
+
+(defun helm--set-minibuffer-completion-confirm (src)
+  (with-helm-buffer
+    (helm-aif (helm-attr 'must-match src)
+        (setq minibuffer-completion-confirm it))))
 
 (defun helm-read-string (prompt &optional initial-input history
                                 default-value inherit-input-method)

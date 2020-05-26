@@ -652,11 +652,16 @@
     :initform nil
     :custom symbol
     :documentation
-    "  Prevent exiting with empty helm buffer.
-  For this to work `minibuffer-completion-confirm' must be let-bounded
-  around the helm call.
-  Same as `completing-read' require-match arg, possible values are `t'
-  or `confirm'.")
+    "  Same as `completing-read' require-match arg.
+  Possible values are:
+  - `t' which prevent exiting with an empty helm-buffer i.e. no matches.
+  - `confirm' which ask for confirmation i.e. need to press a second
+     time RET.
+  - `nil' is the default and is doing nothing i.e. returns nil when
+    pressing RET with an empty helm-buffer.
+  - Any other non nil values e.g. `ignore' allow exiting with
+    minibuffer contents as candidate value (in this case helm-buffer
+    is empty).")
 
    (group
     :initarg :group
@@ -906,7 +911,7 @@ Where OBJECT is an instance of an eieio class."
   (cl-loop for s in (object-slots object)
            for slot-val = (slot-value object s)
            when slot-val
-           collect (cons s (unless (eq t slot-val) slot-val))))
+           collect (cons s slot-val)))
 
 (defun helm-make-source (name class &rest args)
   "Build a `helm' source named NAME with ARGS for CLASS.
