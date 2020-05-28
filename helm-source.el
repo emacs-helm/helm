@@ -48,7 +48,7 @@
   "Advice for `cl--print-table' to make readable class slots docstrings."
   (let ((format "%s\n\n  Initform=%s\n\n%s"))
     (dolist (row rows)
-      (setcar row (propertize (car row) 'face 'italic))
+      (setcar row (propertize (car row) 'face 'bold))
       (setcdr row (nthcdr 1 (cdr row)))
       (insert "\n* " (apply #'format format row) "\n"))))
 
