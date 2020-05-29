@@ -2669,7 +2669,7 @@ HISTORY args See `helm'."
         mouse-autoselect-window
         focus-follows-mouse
         mode-line-in-non-selected-windows
-        (minibuffer-completion-confirm minibuffer-completion-confirm)
+        minibuffer-completion-confirm
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (helm--maybe-use-default-as-input
          (and (null input)
