@@ -351,12 +351,10 @@ Note that this variable is buffer-local.")
     result))
 
 (defun helm-buffer-list-1 (&optional visibles)
-  (delq nil
-        (mapcar (lambda (b)
-                  (let ((bn (buffer-name b)))
-                    (unless (member bn visibles)
-                      bn)))
-                (buffer-list))))
+  (cl-loop for b in (buffer-list)
+           for bn = (buffer-name b)
+           unless (member bn visibles)
+           collect bn))
 
 (defun helm-buffer-list ()
   "Return the current list of buffers.
