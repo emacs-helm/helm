@@ -26,7 +26,6 @@
 (require 'helm-help)
 (require 'helm-occur)
 
-(declare-function ido-make-buffer-list "ido" (default))
 (declare-function ido-add-virtual-buffers-to-list "ido")
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
@@ -383,18 +382,29 @@ Note that this variable is buffer-local.")
                . helm-open-file-externally))))
 
 
-(defvar ido-use-virtual-buffers)
-(defvar ido-ignore-buffers)
+(defun helm-buffers-get-visible-buffers ()
+  "Returns buffers visibles on current frame."
+  (let (result)
+    (walk-windows
+     (lambda (x)
+       (push (buffer-name (window-buffer x)) result))
+     nil 'visible)
+    result))
+
+(defun helm-buffer-list-1 (&optional visibles)
+  (delq nil
+        (mapcar (lambda (b)
+                  (let ((bn (buffer-name b)))
+                    (unless (member bn visibles)
+                      bn)))
+                (buffer-list))))
+
 (defun helm-buffer-list ()
   "Return the current list of buffers.
-Currently visible buffers are put at the end of the list.
-See `ido-make-buffer-list' for more infos."
-  (require 'ido)
-  (let ((ido-process-ignore-lists t)
-        ido-ignored-list
-        ido-ignore-buffers
-        ido-use-virtual-buffers)
-    (ido-make-buffer-list nil)))
+Currently visible buffers are put at the end of the list."
+  (let* ((visibles (helm-buffers-get-visible-buffers))
+         (others   (helm-buffer-list-1 visibles)))
+    (nconc others visibles)))
 
 (defun helm-buffer-size (buffer)
   "Return size of BUFFER."
