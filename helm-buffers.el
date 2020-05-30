@@ -26,7 +26,6 @@
 (require 'helm-help)
 (require 'helm-occur)
 
-(declare-function ido-add-virtual-buffers-to-list "ido")
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
 
@@ -234,17 +233,6 @@ Note that this variable is buffer-local.")
     map)
   "Keymap for buffer sources in helm.")
 
-(defvar helm-buffers-ido-virtual-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o")   'helm-ff-run-switch-other-window)
-    (define-key map (kbd "C-c C-o") 'helm-ff-run-switch-other-frame)
-    (define-key map (kbd "M-g s")   'helm-ff-run-grep)
-    (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
-    (define-key map (kbd "M-D")     'helm-ff-run-delete-file)
-    (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
-    map))
-
 
 (defvar helm-buffer-max-len-mode nil)
 (defvar helm-buffers-in-project-p nil)
@@ -351,35 +339,6 @@ Note that this variable is buffer-local.")
             "Create buffer other frame (C-u choose mode)"
             #'helm-buffers-create-new-buffer-of)
    :keymap helm-buffer-not-found-map))
-
-(defvar ido-temp-list)
-(defvar ido-ignored-list)
-(defvar ido-process-ignore-lists)
-(defvar ido-use-virtual-buffers)
-(defvar ido-virtual-buffers)
-
-(defvar helm-source-ido-virtual-buffers
-  (helm-build-sync-source "Ido virtual buffers"
-    :candidates (lambda ()
-                  (let (ido-temp-list
-                        ido-ignored-list
-                        (ido-process-ignore-lists t))
-                    (when ido-use-virtual-buffers
-                      (ido-add-virtual-buffers-to-list)
-                      ido-virtual-buffers)))
-    :fuzzy-match helm-buffers-fuzzy-matching
-    :keymap helm-buffers-ido-virtual-map
-    :help-message 'helm-buffers-ido-virtual-help-message
-    :action '(("Find file" . helm-find-many-files)
-              ("Find file other window" . find-file-other-window)
-              ("Find file other frame" . find-file-other-frame)
-              ("Find file as root" . helm-find-file-as-root)
-              ("Grep File(s) `C-u recurse'" . helm-find-files-grep)
-              ("Zgrep File(s) `C-u Recurse'" . helm-ff-zgrep)
-              ("View file" . view-file)
-              ("Delete file(s)" . helm-delete-marked-files)
-              ("Open file externally (C-u to choose)"
-               . helm-open-file-externally))))
 
 
 (defun helm-buffers-get-visible-buffers ()
@@ -1128,7 +1087,6 @@ displayed with the `file-name-shadow' face if available."
     (setq helm-source-buffers-list
           (helm-make-source "Buffers" 'helm-source-buffers)))
   (helm :sources '(helm-source-buffers-list
-                   helm-source-ido-virtual-buffers
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
         :keymap helm-buffer-map
