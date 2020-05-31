@@ -1413,10 +1413,15 @@ For ripgrep here is the command line to use:
 
     rg --color=always --smart-case --no-heading --line-number %s %s %s
 
-NOTE: Old versions of ripgrep was not supporting colors in emacs and a
-workaround had to be used (i.e prefixing command line with
-\"TERM=eterm-color\"), this is no more needed.
-See issue <https://github.com/BurntSushi/ripgrep/issues/182> for more infos.
+And to customize colors (always for ripgrep) use something like this:
+
+    rg --color=always --colors 'match:bg:yellow' --colors 'match:fg:black'
+\--smart-case --no-heading --line-number %s %s %s
+
+This will change color for matched items from foreground red (the
+default) to a yellow background with a black foreground. For more
+enhanced settings of ansi colors see
+https://github.com/emacs-helm/helm/issues/2313.
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1426,9 +1431,11 @@ The option \"--nogroup\" allow this.
 The option \"--line-numbers\" is also mandatory except with PT (not supported).
 For RG the options \"--no-heading\" and \"--line-number\" are the ones to use.
 
-When modifying the default colors of matches with e.g \"--color-match\" option of AG
-you may want to modify as well `helm-grep-ag-pipe-cmd-switches' to have all matches
-colorized with same color in multi match."
+When modifying the default colors of matches with
+e.g. \"--color-match\" option of AG or \"--colors\" option of
+ripgrep you may want to modify as well
+`helm-grep-ag-pipe-cmd-switches' to have all matches colorized
+with same color in multi match,."
   :group 'helm-grep
   :type 'string)
 

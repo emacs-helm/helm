@@ -1317,11 +1317,15 @@ highlighted since there is no ~--color~-like option in GID itself.
 
 ** Tips
 
-Helm-AG is different from grep or ack-grep in that it works on a directory and
-not on a list of files.
+Helm-AG is different from grep or ack-grep in that it works on a
+directory recursively and not on a list of files.  It is called
+helm-AG but it support several backend, namely AG, RG and PT.
+Nowaday the best backend is Ripgrep aka RG, it is the fastest and
+is actively maintained, see `helm-grep-ag-command' and
+`helm-grep-ag-pipe-cmd-switches' to configure it.
 
 You can ignore files and directories with a \".agignore\" file, local to a
-directory or global when placed in the home directory. \(See the AG man page for
+directory or global when placed in the home directory. (See the AG man page for
 more details.)  That file follows the same syntax as `helm-grep-ignored-files'
 and `helm-grep-ignored-directories'.
 
@@ -1330,7 +1334,8 @@ As always you can access Helm AG from `helm-find-files'.
 Starting with version 0.30, AG accepts one or more TYPE arguments on its command
 line.  Helm provides completion on these TYPE arguments when available with your
 AG version.  Use a prefix argument when starting a Helm-AG session to enable this
-completion.
+completion.  See RG and AG man pages on how to add new types.
+
 
 Note: You can mark several types to match in the AG query.  The first AG
 versions providing this feature allowed only one type, so in this case only the
