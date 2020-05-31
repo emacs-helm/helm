@@ -130,6 +130,17 @@ This have no effect when `tab-bar-mode' is not available."
   :group 'helm-buffers
   :type 'boolean)
 
+(defcustom helm-buffer-list-reorder-fn #'helm-buffers-reorder-buffer-list
+  "A function in charge of ordering the initial buffer list.
+It takes two arguments VISIBLES buffers and OTHERS buffers.
+Arg VISIBLES handles the buffers visibles in this frame.
+Arg OTHERS handles all the other buffers.
+You can write a function that reorder VISIBLES and OTHERS as you want.
+Default function returns OTHERS buffers on top and VISIBLES buffer at the
+end.  See `helm-buffers-reorder-buffer-list'."
+  :group 'helm-buffers
+  :type 'function)
+
 
 ;;; Faces
 ;;
@@ -356,12 +367,20 @@ Note that this variable is buffer-local.")
            unless (member bn visibles)
            collect bn))
 
+(defun helm-buffers-reorder-buffer-list (visibles others)
+  "Default function to reorder buffer-list.
+Arg VISIBLES handles the buffers visibles in this frame.
+Arg OTHERS handles all the other buffers.
+This function returns OTHERS buffers on top and VISIBLES buffer at the
+end."
+  (nconc others visibles))
+
 (defun helm-buffer-list ()
   "Return the current list of buffers.
-Currently visible buffers are put at the end of the list."
+The list is reordered with `helm-buffer-list-reorder-fn'."
   (let* ((visibles (helm-buffers-get-visible-buffers))
          (others   (helm-buffer-list-1 visibles)))
-    (nconc others visibles)))
+    (funcall helm-buffer-list-reorder-fn visibles others)))
 
 (defun helm-buffer-size (buffer)
   "Return size of BUFFER."
