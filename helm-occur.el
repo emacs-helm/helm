@@ -582,7 +582,7 @@ numbered.  The property 'buffer-name is added to the whole string."
                   ":"
                   (propertize lineno 'face 'helm-grep-lineno)
                   ":"
-                  (helm-grep-highlight-match str t))
+                  (helm-grep-highlight-match str))
           candidate)))
 
 (define-derived-mode helm-occur-mode
