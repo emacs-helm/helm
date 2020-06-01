@@ -47,7 +47,7 @@
   :group 'helm-comint
   :type 'boolean)
 
-(defcustom helm-comint-mode-list '(comint-mode slime-repl-mode sly-mrepl-mode)
+(defcustom helm-comint-mode-list '(comint-mode slime-repl-mode sly-mrepl-mode sql-interactive-mode)
   "Supported modes for prompt navigation.
 Derived modes (e.g. Geiser's REPL) are automatically supported."
   :group 'helm-comint
@@ -216,7 +216,8 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-input-ring ()
   "Preconfigured `helm' that provide completion of `comint' history."
   (interactive)
-  (when (derived-mode-p 'comint-mode)
+  (when (or (derived-mode-p 'comint-mode)
+            (member major-mode helm-comint-mode-list))
     (helm :sources 'helm-source-comint-input-ring
           :input (buffer-substring-no-properties (comint-line-beginning-position)
                                                  (point-at-eol))
