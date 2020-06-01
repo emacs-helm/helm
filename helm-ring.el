@@ -39,9 +39,9 @@
   "Max number of chars displayed per candidate in kill-ring browser.
 When `t', don't truncate candidate, show all.
 By default it is approximatively the number of bits contained in five lines
-of 80 chars each i.e 80*5.
-Note that if you set this to nil multiline will be disabled, i.e you
-will not have anymore separators between candidates."
+of 80 chars each, i.e. 80*5.
+Note that if you set this to nil multiline will be disabled, i.e. you
+will not have separators between candidates any more."
   :type '(choice (const :tag "Disabled" t)
           (integer :tag "Max candidate offset"))
   :group 'helm-ring)
@@ -163,10 +163,10 @@ use `helm-kill-ring-separator' as default."
 (defun helm-kill-ring-action-yank-1 (str)
   "Insert STR in `kill-ring' and set STR to the head.
 
-When called with a prefix arg, point and mark are exchanged without
-activating region.
-If this action is executed just after `yank',
-replace with STR as yanked string."
+When called with a prefix arg, point and mark are exchanged
+without activating region.
+If this action is executed just after `yank', replace with STR as
+yanked string."
   (let ((yank-fn (lambda (&optional before yank-pop)
                    (insert-for-yank str)
                    ;; Set the window start back where it was in

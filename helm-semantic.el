@@ -165,7 +165,7 @@ you have completion on these functions with `C-M i' in the customize interface."
 ;;;###autoload
 (defun helm-semantic (arg)
   "Preconfigured `helm' for `semantic'.
-If ARG is supplied, pre-select symbol at point instead of current"
+If ARG is supplied, pre-select symbol at point instead of current."
   (interactive "P")
   (let ((tag (helm-aif (car (semantic-current-tag-parent))
                  (let ((curtag (car (semantic-current-tag))))

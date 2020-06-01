@@ -107,8 +107,8 @@ one match."
   "Cache content of etags files used here for faster access.")
 
 (defun helm-etags-get-tag-file (&optional directory)
-  "Return the path of etags file if found.
-Lookes recursively in parents directorys for a
+  "Return the path of etags file if found in DIRECTORY.
+Look recursively in parents directorys for a
 `helm-etags-tag-file-name' file."
   ;; Get tag file from `default-directory' or upper directory.
   (let ((current-dir (helm-etags-find-tag-file-directory
@@ -118,7 +118,7 @@ Lookes recursively in parents directorys for a
       (expand-file-name helm-etags-tag-file-name current-dir))))
 
 (defun helm-etags-all-tag-files ()
-  "Return files from the following sources;
+  "Return files from the following sources:
   1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
   2) `tags-file-name', which is commonly set by `find-tag' command.
   3) `tags-table-list' which is commonly set by `visit-tags-table' command."
@@ -186,7 +186,7 @@ If not found in CURRENT-DIR search in upper directory."
 
 (defun helm-etags-init ()
   "Feed `helm-buffer' using `helm-etags-cache' or tag file.
-If no entry in cache, create one."
+If there is no entry in cache, create one."
   (let ((tagfiles (helm-etags-all-tag-files)))
     (when tagfiles
       (with-current-buffer (helm-candidate-buffer 'global)

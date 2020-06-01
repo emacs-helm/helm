@@ -31,9 +31,9 @@
 (defcustom helm-adaptive-history-file
   (locate-user-emacs-file "helm-adaptive-history")
   "Path of file where history information is stored.
-When nil history is not saved nor restored after emacs restart unless
-you save/restore `helm-adaptive-history' with something else like
-psession or desktop."
+When nil history is not saved nor restored after Emacs restart
+unless you save/restore `helm-adaptive-history' with something
+else like psession or desktop."
   :type 'string
   :group 'helm-adapt)
 
@@ -48,8 +48,8 @@ psession or desktop."
 When nil sort on frequency usage only.
 
 Only frequency:
-When candidate have low frequency, you have to hit on it many times to
-make it going up on top.
+When candidate have low frequency, you have to hit on it many
+times to make it going up on top.
 
 Frequency+recent:
 Even with a low frequency, candidate go up on top. If a candidate
@@ -172,7 +172,7 @@ Returns nil if `helm-adaptive-history-file' doesn't exist."
     (load-file helm-adaptive-history-file)))
 
 (defun helm-adaptive-save-history (&optional arg)
-  "Save history information to file given by `helm-adaptive-history-file'."
+  "Save history information to the file given by `helm-adaptive-history-file'."
   (interactive "p")
   (when helm-adaptive-history-file
     (with-temp-buffer
@@ -253,7 +253,8 @@ you should reinitialize it with `helm-reset-adaptive-history'"
 ;;;###autoload
 (defun helm-reset-adaptive-history ()
   "Delete all `helm-adaptive-history' and his file.
-Useful when you have a old or corrupted `helm-adaptive-history-file'."
+Useful when you have a old or corrupted
+`helm-adaptive-history-file'."
   (interactive)
   (when (y-or-n-p "Really delete all your `helm-adaptive-history'? ")
     (setq helm-adaptive-history nil)
@@ -262,7 +263,8 @@ Useful when you have a old or corrupted `helm-adaptive-history-file'."
 (defun helm-adaptive-compare (x y)
   "Compare display parts if some of candidates X and Y.
 
-Arguments X and Y are cons cell in (DISPLAY . REAL) format or atoms."
+Arguments X and Y are cons cell in (DISPLAY . REAL) format or
+atoms."
   (equal (if (listp x) (car x) x)
          (if (listp y) (car y) y)))
 

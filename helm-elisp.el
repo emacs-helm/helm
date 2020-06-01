@@ -53,14 +53,14 @@ This is used in macro `with-helm-show-completion'."
     callf callf2 cl-callf cl-callf2 fset
     fboundp fmakunbound symbol-function)
   "List of function where quoted function completion happen.
-e.g give only function names after \(funcall '."
+E.g. give only function names after \(funcall '."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
 (defcustom helm-lisp-unquoted-function-list
   '(function defadvice)
   "List of function where unquoted function completion happen.
-e.g give only function names after \(function ."
+E.g. give only function names after \(function ."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
@@ -71,9 +71,9 @@ e.g give only function names after \(function ."
 
 (defcustom helm-lisp-fuzzy-completion nil
   "Enable fuzzy matching in emacs-lisp completion when non-nil.
-NOTE: This enable fuzzy matching in helm native implementation of
-elisp completion, but not on helmized elisp completion, i.e
-fuzzy completion is not available in `completion-at-point'."
+NOTE: This enables fuzzy matching in Helm native implementation of
+elisp completion, but not on helmized elisp completion, i.e. fuzzy
+completion is not available in `completion-at-point'."
   :group 'helm-elisp
   :type 'boolean)
 
@@ -162,7 +162,7 @@ display."
                'face 'helm-lisp-show-completion))
 
 (defun helm-show-completion-default-display-function (buffer &rest _args)
-  "A special resized helm window is used depending on position in BUFFER."
+  "A special resized Helm window is used depending on position in BUFFER."
   (with-selected-window (selected-window)
     (if (window-dedicated-p)
         (helm-default-display-buffer buffer)
@@ -181,10 +181,10 @@ display."
                            buffer)))))
 
 (defmacro with-helm-show-completion (beg end &rest body)
-  "Show helm candidate in an overlay at point.
-BEG and END are the beginning and end position of the current completion
-in `helm-current-buffer'.
-BODY is an helm call where we want to enable show completion.
+  "Show Helm candidate in an overlay at point.
+BEG and END are the beginning and end position of the current
+completion in `helm-current-buffer'.
+BODY is an Helm call where we want to enable show completion.
 If `helm-turn-on-show-completion' is nil do nothing."
   (declare (indent 2) (debug t))
   `(unwind-protect
@@ -291,7 +291,7 @@ Return a cons \(beg . end\)."
 (defvar helm-lgst-len nil)
 ;;;###autoload
 (defun helm-lisp-completion-at-point ()
-  "Preconfigured helm for lisp symbol completion at point."
+  "Preconfigured Helm for Lisp symbol completion at point."
   (interactive)
   (setq helm-lgst-len 0)
   (let* ((target     (helm-thing-before-point))
@@ -343,8 +343,9 @@ Return a cons \(beg . end\)."
 
 (defun helm-lisp-completion-persistent-action (candidate &optional name)
   "Show documentation for the function.
-Documentation is shown briefly in mode-line or completely
-in other window according to the value of `helm-elisp-help-function'."
+Documentation is shown briefly in mode-line or completely in
+other window according to the value of
+`helm-elisp-help-function'."
   (funcall helm-elisp-help-function candidate name))
 
 (defun helm-lisp-completion-persistent-help ()
@@ -368,15 +369,15 @@ in other window according to the value of `helm-elisp-help-function'."
 
 (defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
-Arg NAME specify the name of the top level function
-calling helm generic completion (e.g \"describe-function\")
-which allow calling the right function when CANDIDATE symbol
-refers at the same time to variable and a function."
+Arg NAME specifies the name of the top level function calling
+Helm generic completion (e.g., \"describe-function\") which
+allows calling the right function when CANDIDATE symbol refers at
+the same time to variable and a function."
   (helm-elisp--persistent-help
    candidate 'helm-elisp--show-help-1 name))
 
 (defun helm-elisp-show-doc-modeline (candidate &optional name)
-  "Show brief documentation for the function in modeline."
+  "Show brief documentation for the function in the mode-line."
   (let ((cursor-in-echo-area t)
         mode-line-in-non-selected-windows)
     (helm-show-info-in-mode-line
@@ -386,7 +387,7 @@ refers at the same time to variable and a function."
       'face 'helm-lisp-completion-info))))
 
 (defun helm-lisp-completion-transformer (candidates _source)
-  "Helm candidates transformer for lisp completion."
+  "Helm candidates transformer for Lisp completion."
   (cl-loop for c in candidates
         for sym = (intern c)
         for annot = (cl-typecase sym
@@ -426,7 +427,7 @@ If SYM is not documented, return \"Not documented\"."
 
 ;;;###autoload
 (defun helm-complete-file-name-at-point (&optional force)
-  "Preconfigured helm to complete file name at point."
+  "Preconfigured Helm to complete file name at point."
   (interactive)
   (require 'helm-mode)
   (let* ((tap (thing-at-point 'filename))
@@ -464,8 +465,9 @@ If SYM is not documented, return \"Not documented\"."
 
 ;;;###autoload
 (defun helm-lisp-completion-or-file-name-at-point ()
-  "Preconfigured helm to complete lisp symbol or filename at point.
-Filename completion happen if string start after or between a double quote."
+  "Preconfigured Helm to complete Lisp symbol or filename at point.
+Filename completion happens if string start after or between a
+double quote."
   (interactive)
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
@@ -728,9 +730,9 @@ Filename completion happen if string start after or between a double quote."
 
 ;;;###autoload
 (defun helm-apropos (default)
-  "Preconfigured helm to describe commands, functions, variables and faces.
-In non interactives calls DEFAULT argument should be provided as a string,
-i.e the `symbol-name' of any existing symbol."
+  "Preconfigured Helm to describe commands, functions, variables and faces.
+In non interactives calls DEFAULT argument should be provided as
+a string, i.e. the `symbol-name' of any existing symbol."
   (interactive (list (thing-at-point 'symbol)))
     (helm :sources
           (mapcar (lambda (func)
@@ -951,7 +953,7 @@ i.e the `symbol-name' of any existing symbol."
 
 ;;;###autoload
 (defun helm-complex-command-history ()
-  "Preconfigured helm for complex command history."
+  "Preconfigured `helm' for complex command history."
   (interactive)
   (helm :sources 'helm-source-complex-command-history
         :buffer "*helm complex commands*"))

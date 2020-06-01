@@ -162,7 +162,7 @@ Should take one arg: the string to display."
 
 ;;;###autoload
 (defun helm-eval-expression (arg)
-  "Preconfigured helm for `helm-source-evaluation-result'."
+  "Preconfigured `helm' for `helm-source-evaluation-result'."
   (interactive "P")
   (helm :sources (helm-build-evaluation-result-source)
         :input (when arg (thing-at-point 'sexp))
@@ -173,7 +173,7 @@ Should take one arg: the string to display."
 (defvar eldoc-idle-delay)
 ;;;###autoload
 (defun helm-eval-expression-with-eldoc ()
-  "Preconfigured helm for `helm-source-evaluation-result' with `eldoc' support."
+  "Preconfigured `helm' for `helm-source-evaluation-result' with `eldoc' support."
   (interactive)
   (let ((timer (run-with-idle-timer
                 eldoc-idle-delay 'repeat
@@ -188,7 +188,7 @@ Should take one arg: the string to display."
 
 ;;;###autoload
 (defun helm-calcul-expression ()
-  "Preconfigured helm for `helm-source-calculation-result'."
+  "Preconfigured `helm' for `helm-source-calculation-result'."
   (interactive)
   (helm :sources 'helm-source-calculation-result
         :buffer "*helm calcul*"))

@@ -131,7 +131,7 @@
 
 ;;;###autoload
 (defun helm-configuration ()
-  "Customize `helm'."
+  "Customize Helm."
   (interactive)
   (customize-group "helm"))
 

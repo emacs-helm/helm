@@ -106,7 +106,7 @@ files with `helm-info-at-point'."
      :info-file ,fname ,@args))
 
 (defun helm-build-info-index-command (name doc source buffer)
-  "Define a helm command NAME with documentation DOC.
+  "Define a Helm command NAME with documentation DOC.
 Arg SOURCE will be an existing helm source named
 `helm-source-info-<NAME>' and BUFFER a string buffer name."
   (defalias (intern (concat "helm-info-" name))
@@ -118,9 +118,11 @@ Arg SOURCE will be an existing helm source named
     doc))
 
 (defun helm-define-info-index-sources (var-value &optional commands)
-  "Define helm sources named helm-source-info-<NAME>.
-Sources are generated for all entries of `helm-default-info-index-list'.
-If COMMANDS arg is non-nil, also build commands named `helm-info-<NAME>'.
+  "Define Helm sources named helm-source-info-<NAME>.
+Sources are generated for all entries of
+`helm-default-info-index-list'.
+If COMMANDS arg is non-nil, also build commands named
+`helm-info-<NAME>'.
 Where NAME is an element of `helm-default-info-index-list'."
   (cl-loop for str in var-value
            for sym = (intern (concat "helm-source-info-" str))
@@ -146,7 +148,7 @@ Where NAME is an element of `helm-default-info-index-list'."
   "Return list of Info files to use for `helm-info'.
 
 Elements of the list are strings of Info file names without
-extensions (e.g. \"emacs\" for file \"emacs.info.gz\"). Info
+extensions (e.g., \"emacs\" for file \"emacs.info.gz\").  Info
 files are found by searching directories in
 `Info-directory-list'."
   (info-initialize) ; Build Info-directory-list from INFOPATH (Issue #2118)
@@ -176,7 +178,7 @@ helm-info-<CANDIDATE>."
       (ring-insert helm-info-searched candidate))))
 
 (defun helm-def-source--info-files ()
-  "Return a `helm' source for Info files."
+  "Return a Helm source for Info files."
   (helm-build-sync-source "Helm Info"
     :candidates
     (lambda () (copy-sequence helm-default-info-index-list))
@@ -191,12 +193,13 @@ helm-info-<CANDIDATE>."
 (defun helm-info (&optional refresh)
   "Preconfigured `helm' for searching Info files' indices.
 
-With a prefix argument \\[universal-argument], set REFRESH to non-nil.
+With a prefix argument \\[universal-argument], set REFRESH to
+non-nil.
 
-Optional parameter REFRESH, when non-nil, reevaluates
+Optional parameter REFRESH, when non-nil, re-evaluates
 `helm-default-info-index-list'.  If the variable has been
 customized, set it to its saved value.  If not, set it to its
-standard value.  See `custom-reevaluate-setting' for more.
+standard value. See `custom-reevaluate-setting' for more.
 
 REFRESH is useful when new Info files are installed.  If
 `helm-default-info-index-list' has not been customized, the new

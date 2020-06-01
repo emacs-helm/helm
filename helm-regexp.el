@@ -37,7 +37,7 @@
 (defun helm-query-replace-regexp (_candidate)
   "Query replace regexp from `helm-regexp'.
 With a prefix arg replace only matches surrounded by word boundaries,
-i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
+i.e. don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((regexp helm-input))
     (apply 'query-replace-regexp
            (helm-query-replace-args regexp))))
@@ -52,7 +52,7 @@ i.e Don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (helm-regexp-kill-new helm-input))
 
 (defun helm-query-replace-args (regexp)
-  "create arguments of `query-replace-regexp' action in `helm-regexp'."
+  "Create arguments of `query-replace-regexp' action in `helm-regexp'."
   (let ((region-only (helm-region-active-p)))
     (list
      regexp

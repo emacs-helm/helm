@@ -29,12 +29,12 @@
   :group 'helm)
 
 (defcustom helm-M-x-always-save-history nil
-  "`helm-M-x' Save command in `extended-command-history' even when it fail."
+  "`helm-M-x' save command in `extended-command-history' even when it fails."
   :group 'helm-command
   :type  'boolean)
 
 (defcustom helm-M-x-reverse-history nil
-  "The history source of `helm-M-x' appear in second position when non--nil."
+  "The history source of `helm-M-x' appear in second position when non-nil."
   :group 'helm-command
   :type 'boolean)
 
@@ -68,8 +68,8 @@
 
 (defun helm-get-mode-map-from-mode (mode)
   "Guess the mode-map name according to MODE.
-Some modes don't use conventional mode-map name
-so we need to guess mode-map name. e.g python-mode ==> py-mode-map.
+Some modes don't use conventional mode-map name so we need to
+guess mode-map name. E.g. `python-mode' ==> py-mode-map.
 Return nil if no mode-map found."
   (cl-loop ;; Start with a conventional mode-map name.
         with mode-map    = (intern-soft (format "%s-map" mode))
@@ -92,10 +92,12 @@ Return nil if no mode-map found."
 
 (defun helm-M-x-transformer-1 (candidates &optional sort)
   "Transformer function to show bindings in emacs commands.
-Show global bindings and local bindings according to current `major-mode'.
+Show global bindings and local bindings according to current
+`major-mode'.
 If SORT is non nil sort list with `helm-generic-sort-fn'.
 Note that SORT should not be used when fuzzy matching because
-fuzzy matching is running its own sort function with a different algorithm."
+fuzzy matching is running its own sort function with a different
+algorithm."
   (with-helm-current-buffer
     (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
@@ -196,16 +198,17 @@ fuzzy matching is running its own sort function with a different algorithm."
 (defun helm-M-x-read-extended-command (collection &optional predicate history)
   "Read or execute action on command name in COLLECTION or HISTORY.
 
-When `helm-M-x-use-completion-styles' is used, several actions as of
-`helm-type-command' are used and executed from here, otherwise this
-function returns the command as a symbol.
+When `helm-M-x-use-completion-styles' is used, several actions as
+of `helm-type-command' are used and executed from here, otherwise
+this function returns the command as a symbol.
 
-Helm completion is not provided when executing or defining kbd macros.
+Helm completion is not provided when executing or defining kbd
+macros.
 
-Arg COLLECTION should be an `obarray' but can be any object suitable
-for `try-completion'.  Arg PREDICATE is a function that default to
-`commandp' see also `try-completion'.
-Arg HISTORY default to `extended-command-history'."
+Arg COLLECTION should be an `obarray' but can be any object
+suitable for `try-completion'.  Arg PREDICATE is a function that
+default to `commandp' see also `try-completion'.  Arg HISTORY
+default to `extended-command-history'."
   (let* ((helm--mode-line-display-prefarg t)
          (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
          (minibuffer-completion-confirm t)
@@ -294,12 +297,14 @@ Save COMMAND to `extended-command-history'."
 ;;;###autoload
 (defun helm-M-x (_arg)
   "Preconfigured `helm' for Emacs commands.
-It is `helm' replacement of regular `M-x' `execute-extended-command'.
+It is `helm' replacement of regular `M-x'
+`execute-extended-command'.
 
-Unlike regular `M-x' emacs vanilla `execute-extended-command' command,
-the prefix args if needed, can be passed AFTER starting `helm-M-x'.
-When a prefix arg is passed BEFORE starting `helm-M-x', the first `C-u'
-while in `helm-M-x' session will disable it.
+Unlike regular `M-x' Emacs vanilla `execute-extended-command'
+command, the prefix args if needed, can be passed AFTER starting
+`helm-M-x'.  When a prefix arg is passed BEFORE starting
+`helm-M-x', the first `C-u' while in `helm-M-x' session will
+disable it.
 
 You can get help on each command by persistent action."
   (interactive

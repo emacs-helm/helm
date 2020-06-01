@@ -35,7 +35,7 @@
           (const :tag "Show upgradable packages" upgrade)))
 
 (defcustom helm-el-truncate-lines t
-  "Truncate lines in helm-buffer when non--nil."
+  "Truncate lines in `helm-buffer' when non-nil."
   :group 'helm-el-package
   :type 'boolean)
 
@@ -461,7 +461,7 @@ See `package-autoremove'."
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)
-  "Preconfigured helm for listing and handling emacs packages."
+  "Preconfigured `helm' for listing and handling Emacs packages."
   (interactive "P")
   (when arg (setq helm-el-package--initialized-p nil))
   (unless helm-source-list-el-package
@@ -474,10 +474,11 @@ See `package-autoremove'."
 
 ;;;###autoload
 (defun helm-list-elisp-packages-no-fetch (arg)
-  "Preconfigured helm for emacs packages.
+  "Preconfigured Helm for Emacs packages.
 
-Same as `helm-list-elisp-packages' but don't fetch packages on remote.
-Called with a prefix ARG always fetch packages on remote."
+Same as `helm-list-elisp-packages' but don't fetch packages on
+remote.  Called with a prefix ARG always fetch packages on
+remote."
   (interactive "P")
   (let ((helm-el-package--initialized-p (null arg)))
     (helm-list-elisp-packages nil)))

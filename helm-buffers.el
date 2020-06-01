@@ -60,18 +60,18 @@ These buffers will be displayed even if they match one of
 
 (defcustom helm-buffer-max-length 20
   "Max length of buffer names before truncate.
-When disabled (nil) use the longest buffer-name length found."
+When disabled (nil) use the longest `buffer-name' length found."
   :group 'helm-buffers
   :type  '(choice (const :tag "Disabled" nil)
            (integer :tag "Length before truncate")))
 
 (defcustom helm-buffer-details-flag t
-  "Always show details in buffer list when non--nil."
+  "Always show details in buffer list when non-nil."
   :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-fuzzy-matching nil
-  "Fuzzy matching buffer names when non--nil.
+  "Fuzzy matching buffer names when non-nil.
 Only buffer names are fuzzy matched when this is enabled,
 `major-mode' matching is not affected by this."
   :group 'helm-buffers
@@ -83,7 +83,7 @@ Only buffer names are fuzzy matched when this is enabled,
   :type 'boolean)
 
 (defcustom helm-buffers-truncate-lines t
-  "Truncate lines in `helm-buffers-list' when non--nil."
+  "Truncate lines in `helm-buffers-list' when non-nil."
   :group 'helm-buffers
   :type 'boolean)
 
@@ -97,8 +97,8 @@ Only buffer names are fuzzy matched when this is enabled,
                                        helm-source-buffer-not-found)
   "Default sources list used in `helm-mini'.
 
-When adding a source here it is up to you to ensure the library of
-this source is accessible and properly loaded."
+When adding a source here it is up to you to ensure the library
+of this source is accessible and properly loaded."
   :group 'helm-buffers
   :type '(repeat (choice symbol)))
 
@@ -115,18 +115,18 @@ this source is accessible and properly loaded."
 (defcustom helm-buffer--pretty-names '((dired-mode . "Dired")
                                        (lisp-interaction-mode . "Lisp Inter"))
   "An alist specifying pretty names for modes.
-Most of the time buffer's `mode-name' is a string so no need to add it
-here as there is no need to compute it, but sometimes it may be a
-mode-line specification which may be costly to compute, in this case
-add here the pretty name as a string to avoid this costly computation.
-Also if some pretty names are too long you can add your own
-abbreviation here."
+Most of the time buffer's `mode-name' is a string so no need to
+add it here as there is no need to compute it, but sometimes it
+may be a mode-line specification which may be costly to compute,
+in this case add here the pretty name as a string to avoid this
+costly computation.  Also if some pretty names are too long you
+can add your own abbreviation here."
   :type '(alist :key-type symbol :value-type string)
   :group 'helm-buffers)
 
 (defcustom helm-buffers-maybe-switch-to-tab nil
   "Switch to buffer in its tab when non nil.
-This have no effect when `tab-bar-mode' is not available."
+This has no effect when `tab-bar-mode' is not available."
   :group 'helm-buffers
   :type 'boolean)
 
@@ -135,9 +135,10 @@ This have no effect when `tab-bar-mode' is not available."
 It takes two arguments VISIBLES buffers and OTHERS buffers.
 Arg VISIBLES handles the buffers visibles in this frame.
 Arg OTHERS handles all the other buffers.
-You can write a function that reorder VISIBLES and OTHERS as you want.
-Default function returns OTHERS buffers on top and VISIBLES buffer at the
-end.  See `helm-buffers-reorder-buffer-list'."
+You can write a function that reorder VISIBLES and OTHERS as you
+want.
+Default function returns OTHERS buffers on top and VISIBLES
+buffer at the end.  See `helm-buffers-reorder-buffer-list'."
   :group 'helm-buffers
   :type 'function)
 
@@ -199,10 +200,10 @@ end.  See `helm-buffers-reorder-buffer-list'."
 
 (defvar helm-buffers-tick-counter nil
   "Allows recording local changes to a non-file buffer.
-Typical usage of this var is for modes that want to see if
-their buffers have changed since last visit.
-Such programs may want to record tick counter after visiting their
-buffers like this:
+Typical usage of this var is for modes that want to see if their
+buffers have changed since last visit.
+Such programs may want to record tick counter after visiting
+their buffers like this:
 
     (setq helm-buffers-tick-counter (buffer-modified-tick))
 
@@ -371,8 +372,8 @@ Note that this variable is buffer-local.")
   "Default function to reorder buffer-list.
 Arg VISIBLES handles the buffers visibles in this frame.
 Arg OTHERS handles all the other buffers.
-This function returns OTHERS buffers on top and VISIBLES buffer at the
-end."
+This function returns OTHERS buffers on top and VISIBLES buffer
+at the end."
   (nconc others visibles))
 
 (defun helm-buffer-list ()
@@ -490,7 +491,8 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
 
 (defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
-Should be called after others transformers i.e (boring buffers)."
+Should be called after others transformers i.e. (boring
+buffers)."
   (cl-loop for i in buffers
            for (name size mode meta) = (if helm-buffer-details-flag
                                            (helm-buffer--details i 'details)
@@ -604,7 +606,7 @@ Should be called after others transformers i.e (boring buffers)."
 
 (defun helm-buffers-mark-similar-buffers ()
     "Mark All buffers that have same property `type' than current.
-i.e same color."
+I.e. same color."
   (interactive)
   (with-helm-alive-p
     (let ((marked (helm-marked-candidates)))
@@ -812,7 +814,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-buffer-save-and-update nil))
 
 (defun helm-buffer-run-save-some-buffers ()
-  "Save unsaved file buffers without quitting helm."
+  "Save unsaved file buffers without quitting Helm."
   (interactive)
   (with-helm-alive-p
     (helm-attrset 'save-some-action '(helm-buffer-save-some-buffers . never-split))
@@ -820,7 +822,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (put 'helm-buffer-run-save-some-buffers 'helm-only t)
 
 (defun helm-buffer-save-persistent ()
-  "Save buffer without quitting helm."
+  "Save buffer without quitting Helm."
   (interactive)
   (with-helm-alive-p
     (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
@@ -839,7 +841,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (put 'helm-buffer-run-rename-buffer 'helm-only t)
 
 (defun helm-buffer-run-kill-persistent ()
-  "Kill buffer without quitting helm."
+  "Kill buffer without quitting Helm."
   (interactive)
   (with-helm-alive-p
     (helm-attrset 'kill-action '(helm-buffers-persistent-kill . never-split))
@@ -915,8 +917,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffer-switch-buffers (_candidate)
   "Switch to buffer candidates and replace current buffer.
 
-If more than one buffer marked switch to these buffers in separate windows.
-If a prefix arg is given split windows vertically."
+If more than one buffer marked switch to these buffers in
+separate windows.  If a prefix arg is given split windows
+vertically."
   (let ((buffers (helm-marked-candidates)))
     (helm-window-show-buffers buffers)))
 
@@ -1070,7 +1073,7 @@ Can be used by any source that list buffers."
 (put 'helm-buffers-toggle-show-hidden-buffers 'helm-only t)
 
 (defun helm-buffers-browse-project (buf)
-  "Browse project from buffer."
+  "Browse project from buffer BUF."
   (with-current-buffer buf
     (helm-browse-project helm-current-prefix-arg)))
 

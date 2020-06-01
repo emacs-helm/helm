@@ -26,8 +26,9 @@
   :type  'boolean)
 
 (defcustom helm-findutils-search-full-path nil
-  "Search in full path with shell command find when non--nil.
-I.e use the -path/ipath arguments of find instead of -name/iname."
+  "Search in full path with shell command find when non-nil.
+I.e. use the -path/ipath arguments of find instead of
+-name/iname."
   :group 'helm-files
   :type 'boolean)
 

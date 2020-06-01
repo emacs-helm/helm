@@ -33,7 +33,7 @@
   :group 'helm)
 
 (defcustom helm-time-zone-home-location "Paris"
-  "The time zone of your home"
+  "The time zone of your home."
   :group 'helm-misc
   :type 'string)
 

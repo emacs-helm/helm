@@ -30,7 +30,7 @@
   :group 'helm)
 
 (defcustom helm-google-suggest-default-browser-function nil
-  "The browse url function you prefer to use with google suggest.
+  "The browse url function you prefer to use with Google suggest.
 When nil, use the first browser function available
 See `helm-browse-url-default-browser-alist'."
   :group 'helm-net
@@ -72,7 +72,7 @@ Otherwise `url-retrieve-synchronously' is used."
 
 (defcustom helm-surfraw-duckduckgo-url
   "https://duckduckgo.com/lite/?q=%s&kp=1"
-  "The duckduckgo url.
+  "The Duckduckgo url.
 This is a format string, don't forget the `%s'.
 If you have personal settings saved on duckduckgo you should have
 a personal url, see your settings on duckduckgo."
@@ -192,7 +192,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
      request #'helm-google-suggest-parser)))
 
 (defun helm-google-suggest-set-candidates (&optional request-prefix)
-  "Set candidates with result and number of google results found."
+  "Set candidates with result and number of Google results found."
   (let ((suggestions (helm-google-suggest-fetch
                       (or (and request-prefix
                                (concat request-prefix
@@ -223,7 +223,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
     "?"))
 
 (defun helm-google-suggest-action (candidate)
-  "Default action to jump to a google suggested candidate."
+  "Default action to jump to a Google suggested candidate."
   (let ((arg (format helm-google-suggest-search-url
                      (url-hexify-string candidate))))
     (helm-aif helm-google-suggest-default-browser-function
@@ -232,7 +232,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 
 (defvar helm-google-suggest-default-function
   'helm-google-suggest-set-candidates
-  "Default function to use in helm google suggest.")
+  "Default function to use in `helm-google-suggest'.")
 
 (defvar helm-source-google-suggest
   (helm-build-sync-source "Google Suggest"
@@ -244,7 +244,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
     :requires-pattern 3))
 
 (defun helm-google-suggest-emacs-lisp ()
-  "Try to emacs lisp complete with google suggestions."
+  "Try to emacs lisp complete with Google suggestions."
   (helm-google-suggest-set-candidates "emacs lisp"))
 
 
@@ -291,12 +291,12 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 
 ;;;###autoload
 (defun helm-browse-url-firefox (url &optional _ignore)
-  "Same as `browse-url-firefox' but detach from emacs.
+  "Same as `browse-url-firefox' but detach from Emacs.
 
-So when you quit emacs you can keep your firefox session open
-and not be prompted to kill firefox process.
+So when you quit Emacs you can keep your Firefox session open and
+not be prompted to kill the Firefox process.
 
-NOTE: Probably not supported on some systems (e.g Windows)."
+NOTE: Probably not supported on some systems (e.g., Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
   (setq url (browse-url-encode-url url))
@@ -309,12 +309,12 @@ NOTE: Probably not supported on some systems (e.g Windows)."
 
 ;;;###autoload
 (defun helm-browse-url-opera (url &optional _ignore)
-  "Browse URL with opera browser and detach from emacs.
+  "Browse URL with Opera browser and detach from Emacs.
 
-So when you quit emacs you can keep your opera session open
-and not be prompted to kill opera process.
+So when you quit Emacs you can keep your Opera session open and
+not be prompted to kill the Opera process.
 
-NOTE: Probably not supported on some systems (e.g Windows)."
+NOTE: Probably not supported on some systems (e.g., Windows)."
   (interactive (list (read-string "URL: " (browse-url-url-at-point))
                      nil))
   (setq url (browse-url-encode-url url))
@@ -325,7 +325,7 @@ NOTE: Probably not supported on some systems (e.g Windows)."
 
 ;;;###autoload
 (defun helm-browse-url-chromium (url &optional _ignore)
-  "Browse URL with google chrome browser."
+  "Browse URL with Google Chrome browser."
   (interactive "sURL: ")
   (helm-generic-browser
    url helm-browse-url-chromium-program))
@@ -416,7 +416,7 @@ NOTE: Probably not supported on some systems (e.g Windows)."
 
 ;;;###autoload
 (defun helm-google-suggest ()
-  "Preconfigured `helm' for google search with google suggest."
+  "Preconfigured `helm' for Google search with Google suggest."
   (interactive)
   (helm-other-buffer 'helm-source-google-suggest "*helm google*"))
 

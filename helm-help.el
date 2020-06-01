@@ -55,7 +55,7 @@
 
 ;;;###autoload
 (defun helm-documentation ()
-  "Preconfigured Helm for Helm documentation.
+  "Preconfigured `helm' for Helm documentation.
 With a prefix arg refresh the documentation.
 
 Find here the documentation of all documented sources."
