@@ -23,6 +23,8 @@
 (require 'helm-help)
 (require 'helm-utils)
 
+(declare-function 'helm-buffers-get-visible-buffers "helm-buffers.el")
+
 ;;; Internals
 ;;
 (defvar helm-source-occur nil)
@@ -177,6 +179,16 @@ engine beeing completely different and also much faster."
                                                  (or pos (point)))))
                  :truncate-lines helm-occur-truncate-lines)
         (deactivate-mark t)))))
+
+;;;###autoload
+(defun helm-occur-visible-buffers ()
+  "Run helm-occur on all visible buffers in frame."
+  (interactive)
+  (require 'helm-buffers)
+  (if (or (one-window-p) (region-active-p))
+      (call-interactively #'helm-occur)
+    (let ((buffers (helm-buffers-get-visible-buffers)))
+      (helm-multi-occur-1 (mapcar 'get-buffer buffers)))))
 
 (defun helm-occur-transformer (candidates source)
   "Returns CANDIDATES prefixed with line number."
