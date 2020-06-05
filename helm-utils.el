@@ -543,6 +543,7 @@ from its directory."
   (with-helm-alive-p
     (require 'helm-grep)
     (require 'helm-elisp)
+    (require 'bookmark) ; For bookmark-alist
     (helm-run-after-exit
      (lambda (f)
        ;; Ensure specifics `helm-execute-action-at-once-if-one'
