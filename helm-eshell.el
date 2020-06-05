@@ -44,12 +44,12 @@
 
 
 (defgroup helm-eshell nil
-  "Helm eshell completion and history."
+  "Helm completion and history for Eshell."
   :group 'helm)
 
 
 (defcustom helm-eshell-fuzzy-match nil
-  "Enable fuzzy matching in `helm-esh-pcomplete' when non--nil."
+  "Enable fuzzy matching in `helm-esh-pcomplete' when non-nil."
   :group 'helm-eshell
   :type 'boolean)
 
@@ -75,7 +75,8 @@
 (defvar helm-ec-target "")
 (defun helm-ec-insert (_candidate)
   "Replace text at point with CANDIDATE.
-The function that call this should set `helm-ec-target' to thing at point."
+The function that call this should set `helm-ec-target' to thing
+at point."
   (set (make-local-variable 'comint-file-name-quote-list)
        eshell-special-chars-outside-quoting)
   (let ((pt (point)))
@@ -133,7 +134,7 @@ The function that call this should set `helm-ec-target' to thing at point."
   "Helm class to define source for Eshell completion.")
 
 (defun helm-esh-get-candidates ()
-  "Get candidates for eshell completion using `pcomplete'."
+  "Get candidates for Eshell completion using `pcomplete'."
   (catch 'pcompleted
     (with-helm-current-buffer
       (let* ((pcomplete-stub)
@@ -251,7 +252,7 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 ;;;###autoload
 (defun helm-esh-pcomplete ()
-  "Preconfigured helm to provide helm completion in eshell."
+  "Preconfigured `helm' to provide Helm completion in Eshell."
   (interactive)
   (let* ((helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
@@ -332,7 +333,7 @@ The function that call this should set `helm-ec-target' to thing at point."
 
 ;;;###autoload
 (defun helm-eshell-history ()
-  "Preconfigured helm for eshell history."
+  "Preconfigured Helm for Eshell history."
   (interactive)
   (let* ((end   (point))
          (beg   (save-excursion (eshell-bol) (point)))
@@ -387,7 +388,7 @@ The function that call this should set `helm-ec-target' to thing at point."
   "List the prompts in Eshell BUFFER.
 
 Return a list of (\"prompt\" (point) (buffer-name) prompt-index))
-e.g. (\"ls\" 162 \"*eshell*\" 3).
+E.g. (\"ls\" 162 \"*eshell*\" 3).
 If BUFFER is nil, use current buffer."
   (with-current-buffer (or buffer (current-buffer))
     (when (eq major-mode 'eshell-mode)

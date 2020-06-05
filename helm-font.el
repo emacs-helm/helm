@@ -23,7 +23,7 @@
 
 
 (defgroup helm-font nil
-  "Related applications to display fonts in helm."
+  "Related applications to display fonts in Helm."
   :group 'helm)
 
 (defcustom helm-ucs-recent-size 10
@@ -111,7 +111,7 @@
            finally return (cons code char)))
 
 (defun helm-calculate-ucs-max-len ()
-  "Calculate the length of longest `ucs-names' candidate."
+  "Calculate the length of the longest `ucs-names' candidate."
   (let ((ucs-struct (ucs-names)))
     (if (hash-table-p ucs-struct)
         (helm-calculate-ucs-hash-table-max-len ucs-struct)
@@ -172,7 +172,7 @@ either be an alist or a hash-table."
     (helm-ucs-collect-symbols-alist ucs-struct)))
 
 (defun helm-ucs-init ()
-  "Initialize an helm buffer with ucs symbols.
+  "Initialize a Helm buffer with ucs symbols.
 Only math* symbols are collected."
   (unless helm-ucs--max-len
     (setq helm-ucs--max-len
@@ -185,7 +185,8 @@ Only math* symbols are collected."
 
 (defun helm-ucs-match (candidate n)
   "Return the N part of an ucs CANDIDATE.
-Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
+Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs
+name."
   (when (string-match
          "^(\\(#x[a-f0-9]+\\)): *\\(.\\) *\\([^:]+\\)+"
          candidate)
@@ -310,7 +311,7 @@ Where N=1 is the ucs code, N=2 the ucs char and N=3 the ucs name."
 
 ;;;###autoload
 (defun helm-ucs (arg)
-  "Preconfigured helm for `ucs-names'.
+  "Preconfigured `helm' for `ucs-names'.
 
 Called with a prefix arg force reloading cache."
   (interactive "P")

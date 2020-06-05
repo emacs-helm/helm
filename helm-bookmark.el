@@ -105,7 +105,7 @@
     (define-key map (kbd "C-]")     'helm-bookmark-toggle-filename)
     (define-key map (kbd "M-e")     'helm-bookmark-run-edit)
     map)
-  "Generic Keymap for emacs bookmark sources.")
+  "Generic Keymap for Emacs bookmark sources.")
 
 (defclass helm-source-basic-bookmarks (helm-source-in-buffer helm-type-bookmark)
    ((init :initform (lambda ()
@@ -292,8 +292,8 @@ BOOKMARK is a bookmark name or a bookmark record."
 (defvar w3m-async-exec)
 (defun helm-bookmark-jump-w3m (bookmark)
   "Jump to W3m bookmark BOOKMARK, setting a new tab.
-If `browse-url-browser-function' is set to something else
-than `w3m-browse-url' use it."
+If `browse-url-browser-function' is set to something else than
+`w3m-browse-url' use it."
   (require 'helm-net)
   (let* ((file  (or (bookmark-prop-get bookmark 'filename)
                     (bookmark-prop-get bookmark 'url)))
@@ -596,7 +596,8 @@ than `w3m-browse-url' use it."
 ;;
 (defun helm-bookmark-edit-bookmark (bookmark-name)
   "Edit bookmark's name and file name, and maybe save them.
-BOOKMARK-NAME is the current (old) name of the bookmark to be renamed."
+BOOKMARK-NAME is the current (old) name of the bookmark to be
+renamed."
   (let ((bmk (helm-bookmark-get-bookmark-from-name bookmark-name))
         (handler (bookmark-prop-get bookmark-name 'handler)))
     (if (eq handler 'addressbook-bookmark-jump)
@@ -644,8 +645,8 @@ If NEW is nil, then prompt for its string value.
 
 If BATCH is non-nil, then do not rebuild the menu list.
 
-While the user enters the new name, repeated `C-w' inserts consecutive
-words from the buffer into the new bookmark name."
+While the user enters the new name, repeated `C-w' inserts
+consecutive words from the buffer into the new bookmark name."
   (interactive (list (bookmark-completing-read "Old bookmark name")))
   (bookmark-maybe-historicize-string old)
   (bookmark-maybe-load-default-file)
@@ -694,7 +695,7 @@ words from the buffer into the new bookmark name."
 
 (defun helm-bookmark-get-bookmark-from-name (bmk)
   "Return bookmark name even if it is a bookmark with annotation.
-e.g prepended with *."
+E.g. prepended with *."
   (let ((bookmark (replace-regexp-in-string "\\`\\*" "" bmk)))
     (if (assoc bookmark bookmark-alist) bookmark bmk)))
 
@@ -716,9 +717,9 @@ e.g prepended with *."
 
 ;;;###autoload
 (defun helm-filtered-bookmarks ()
-  "Preconfigured helm for bookmarks (filtered by category).
-Optional source `helm-source-bookmark-addressbook' is loaded
-only if external addressbook-bookmark package is installed."
+  "Preconfigured `helm' for bookmarks (filtered by category).
+Optional source `helm-source-bookmark-addressbook' is loaded only
+if external addressbook-bookmark package is installed."
   (interactive)
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "

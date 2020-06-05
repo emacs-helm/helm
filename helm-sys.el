@@ -40,20 +40,22 @@
   "Top command used to display output of top.
 A format string where %s will be replaced with `frame-width'.
 
-To use 'top' command, a version supporting batch mode (-b option) is needed.
-On Mac OSX 'top' command doesn't support this, so ps command
-is used instead by default.
-Normally 'top' command output have 12 columns, but in some versions you may
-have less than this, so you can either customize top to use 12 columns with the
-interactives 'f' and 'W' commands of top, or modify
-`helm-top-sort-columns-alist' to fit with the number of columns
-your 'top' command is using.
+To use 'top' command, a version supporting batch mode (-b option)
+is needed. On Mac OSX 'top' command doesn't support this, so the
+'ps' command is used instead by default.
 
-If you modify 'ps' command be sure that 'pid' comes in first
-and \"env COLUMNS=%s\" is specified at beginning of command.
-Ensure also that no elements contain spaces (e.g use start_time and not start).
-Same as for 'top' you can customize `helm-top-sort-columns-alist' to make sort commands
-working properly according to your settings."
+Normally 'top' command output have 12 columns, but in some
+versions you may have less than this, so you can either customize
+top to use 12 columns with the interactives 'f' and 'W' commands
+of top, or modify `helm-top-sort-columns-alist' to fit with the
+number of columns your 'top' command is using.
+
+If you modify 'ps' command be sure that 'pid' comes in first and
+\"env COLUMNS=%s\" is specified at beginning of command. Ensure
+also that no elements contain spaces (e.g., use start_time and
+not start). Same as for 'top': you can customize
+`helm-top-sort-columns-alist' to make sort commands working
+properly according to your settings."
   :group 'helm-sys
   :type 'string)
 
@@ -64,7 +66,7 @@ working properly according to your settings."
   "Allow defining which column to use when sorting output of top/ps command.
 Only com, mem, cpu and user are sorted, so no need to put something else there,
 it will have no effect.
-Note that column numbers are counted from zero, i.e column 1 is the nth 0 column."
+Note that column numbers are counted from zero, i.e. column 1 is the nth 0 column."
   :group 'helm-sys
   :type '(alist :key-type symbol :value-type (integer :tag "Column number")))
 
@@ -76,15 +78,15 @@ The minimal delay allowed is 1.5, if less than this helm-top will use 1.5."
 
 (defcustom helm-top-poll-delay-post-command 1.0
   "Helm top stop polling during this delay.
-This delay is additioned to `helm-top-poll-delay' after emacs stop
+This delay is added to `helm-top-poll-delay' after Emacs stops
 being idle."
   :group 'helm-sys
   :type 'float)
 
 (defcustom helm-top-poll-preselection 'linum
-  "Stay on same line or follow candidate when `helm-top-poll' update display.
+  "Stay on same line or follow candidate when `helm-top-poll' updates display.
 Possible values are 'candidate or 'linum.
-This affect also sorting functions in the same way."
+This affects also sorting functions in the same way."
   :group'helm-sys
   :type '(radio :tag "Preferred preselection action for helm-top"
           (const :tag "Follow candidate" candidate)
@@ -143,9 +145,9 @@ This affect also sorting functions in the same way."
                       helm-top-poll-delay-post-command)))
 
 (defun helm-top-initialize-poll-hooks ()
-  ;; When emacs is idle during say 20s
+  ;; When Emacs is idle during say 20s
   ;; the idle timer will run in 20+1.5 s.
-  ;; This is fine when emacs stays idle, because the next timer
+  ;; This is fine when Emacs stays idle, because the next timer
   ;; will run at 21.5+1.5 etc... so the display will be updated
   ;; at every 1.5 seconds.
   ;; But as soon as emacs looses its idleness, the next update
@@ -437,7 +439,7 @@ Show actions only on line starting by a PID."
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
-  "Preconfigured `helm' for emacs process."
+  "Preconfigured `helm' for Emacs process."
   (interactive)
   (helm-other-buffer 'helm-source-emacs-process "*helm process*"))
 

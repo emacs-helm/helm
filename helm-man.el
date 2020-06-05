@@ -33,7 +33,7 @@
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
 
 (defgroup helm-man nil
-  "Man and Woman applications for helm."
+  "Man and Woman applications for Helm."
   :group 'helm)
 
 (defcustom helm-man-or-woman-function 'Man-getpage-in-background
@@ -54,11 +54,11 @@ Arguments are passed to `manual-entry' with `format.'"
 ;; Internal
 (defvar helm-man--pages nil
   "All man pages on system.
-Will be calculated the first time you invoke helm with this
+Will be calculated the first time you invoke Helm with this
 source.")
 
 (defun helm-man-default-action (candidate)
-  "Default action for jumping to a woman or man page from helm."
+  "Default action for jumping to a woman or man page from Helm."
   (let ((wfiles (mapcar #'car (woman-file-name-all-completions candidate))))
     (condition-case nil
         (let ((file (if (cdr wfiles)

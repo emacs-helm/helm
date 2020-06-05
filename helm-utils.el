@@ -76,11 +76,11 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   :type '(repeat (choice string)))
 
 (defcustom helm-html-decode-entities-function #'helm-html-decode-entities-string
-  "Function used to decode html entities in html bookmarks.
+  "Function used to decode HTML entities in HTML bookmarks.
 Helm comes by default with `helm-html-decode-entities-string', if you need something
 more sophisticated you can use `w3m-decode-entities-string' if available.
 
-In emacs itself org-entities seems broken and `xml-substitute-numeric-entities'
+In Emacs itself org-entities seem broken and `xml-substitute-numeric-entities'
 supports only numeric entities."
   :group 'helm-utils
   :type 'function)
@@ -88,17 +88,17 @@ supports only numeric entities."
 
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
-This hook run when jumping from `helm-goto-line', `helm-etags-default-action',
+This hook runs when jumping from `helm-goto-line', `helm-etags-default-action',
 and `helm-imenu-default-action'.
-This allow you to retrieve a previous position after using the different helm
+This allows you to retrieve a previous position after using the different helm
 tools for searching (etags, grep, gid, (m)occur etc...).
-By default positions are added to `mark-ring' you can also add to register
-by using instead (or adding) `helm-save-pos-to-register-before-jump'.
-In this case last position is added to the register
-`helm-save-pos-before-jump-register'.")
+By default positions are added to `mark-ring'.
+You can also add to register by using (or adding)
+`helm-save-pos-to-register-before-jump' instead. In this case
+last position is added to the register `helm-save-pos-before-jump-register'.")
 
 (defvar helm-save-pos-before-jump-register ?_
-  "The register where `helm-save-pos-to-register-before-jump' save position.")
+  "The register where `helm-save-pos-to-register-before-jump' saves position.")
 
 (defconst helm-html-entities-alist
   '(("&quot;"   . 34)   ;; "
@@ -206,18 +206,18 @@ In this case last position is added to the register
   "Table of html character entities and values.")
 
 (defvar helm-find-many-files-after-hook nil
-  "Hook that run at end of `helm-find-many-files'.")
+  "Hook that runs at end of `helm-find-many-files'.")
 
 ;;; Faces.
 ;;
 (defface helm-selection-line
     '((t (:inherit highlight :distant-foreground "black")))
-  "Face used in the `helm-current-buffer' when jumping to candidate."
+  "Face used in the `helm-current-buffer' when jumping to a candidate."
   :group 'helm-faces)
 
 (defface helm-match-item
     '((t (:inherit isearch)))
-  "Face used to highlight item matched in a selected line."
+  "Face used to highlight the item matched in a selected line."
   :group 'helm-faces)
 
 
@@ -236,7 +236,7 @@ according to the setting of `split-width-threshold' and the size of
 the window from where splitting is done.
 
 Note that when using `decide' and `split-width-threshold' is nil, the
-behavior is the same that with a nil value."
+behavior is the same as with a nil value."
   :group 'helm-utils
   :type '(choice
            (const :tag "Split window vertically" t)
@@ -258,8 +258,8 @@ It is typically used to rearrange windows."
 (defun helm-window-show-buffers (buffers &optional other-window)
   "Show BUFFERS.
 
-If more than one buffer marked switch to these buffers in separate windows.
-If OTHER-WINDOW is non-nil, keep current buffer and switch to others buffers
+With more than one buffer marked switch to these buffers in separate windows.
+If OTHER-WINDOW is non-nil, keep current buffer and switch to other buffers
 in separate windows.
 If a prefix arg is given split windows vertically."
   (let ((initial-ow-fn (if (cdr (window-list))
@@ -494,7 +494,7 @@ To use this add it to `helm-goto-line-before-hook'."
 (defun helm-show-all-candidates-in-source (arg)
   "Toggle all or only candidate-number-limit cands in current source.
 With a numeric prefix arg show only the ARG number of candidates.
-The prefix arg have no effect when toggling to only
+The prefix arg has no effect when toggling to only
 candidate-number-limit."
   (interactive "p")
   (with-helm-alive-p
@@ -661,7 +661,7 @@ that is sorting is done against real value of candidate."
 
 (cl-defun helm-file-human-size (size &optional (kbsize helm-default-kbsize))
   "Return a string showing SIZE of a file in human readable form.
-SIZE can be an integer or a float depending it's value.
+SIZE can be an integer or a float depending on it's value.
 `file-attributes' will take care of that to avoid overflow error.
 KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
   (cl-loop with result = (cons "B" size)
@@ -983,8 +983,8 @@ Assume regexp is a pcre based regexp."
                      file))))
 
 (defun helm-open-dired (file)
-  "Opens a dired buffer in FILE's directory.  If FILE is a
-directory, open this directory."
+  "Open a dired buffer in FILE's directory.
+If FILE is a directory, open this directory."
   (if (file-directory-p file)
       (dired file)
     (dired (file-name-directory file))
@@ -1013,7 +1013,7 @@ directory, open this directory."
 
 (defun helm-find-many-files (_ignore)
   "Simple action that run `find-file' on marked candidates.
-Run `helm-find-many-files-after-hook' at end"
+Run `helm-find-many-files-after-hook' at end."
   (let ((helm--reading-passwd-or-string t))
     (mapc 'find-file (helm-marked-candidates))
     (helm-log-run-hook 'helm-find-many-files-after-hook)))
@@ -1030,7 +1030,7 @@ If COUNT is non--nil add a number after each prompt."
         finally return (remove "" lis)))
 
 (defun helm-html-bookmarks-to-alist (file url-regexp bmk-regexp)
-  "Parse html bookmark FILE and return an alist with (title . url) as elements."
+  "Parse HTML bookmark FILE and return an alist with (title . url) as elements."
   (let (bookmarks-alist url title)
     (with-temp-buffer
       (insert-file-contents file)
@@ -1048,7 +1048,7 @@ If COUNT is non--nil add a number after each prompt."
     (nreverse bookmarks-alist)))
 
 (defun helm-html-entity-to-string (entity)
-  "Replace an html ENTITY by its string value.
+  "Replace an HTML ENTITY with its string value.
 When unable to decode ENTITY returns nil."
   (helm-aif (assoc entity helm-html-entities-alist)
       (string (cdr it))

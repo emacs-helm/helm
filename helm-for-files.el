@@ -35,8 +35,8 @@
     helm-source-locate)
   "Your preferred sources for `helm-for-files' and `helm-multi-files'.
 
-When adding a source here it is up to you to ensure the library of
-this source is accessible and properly loaded."
+When adding a source here it is up to you to ensure the library
+of this source is accessible and properly loaded."
   :type '(repeat (choice symbol))
   :group 'helm-files)
 
@@ -138,10 +138,11 @@ Be aware that a nil value will make tramp display very slow."
 
 (defvar helm-source-recentf nil
   "See (info \"(emacs)File Conveniences\").
-Set `recentf-max-saved-items' to a bigger value if default is too small.")
+Set `recentf-max-saved-items' to a bigger value if default is too
+small.")
 
 (defcustom helm-recentf-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-recentf' when non--nil."
+  "Enable fuzzy matching in `helm-source-recentf' when non-nil."
   :group 'helm-files
   :type 'boolean
   :set (lambda (var val)
@@ -253,8 +254,8 @@ Run all sources defined in `helm-for-files-preferred-list'."
 
 Allow toggling back and forth from locate to others sources with
 `helm-multi-files-toggle-locate-binding' key.
-This avoid launching needlessly locate when what you search is already
-found."
+This avoids launching locate needlessly when what you are
+searching for is already found."
   (interactive)
   (require 'helm-x-files)
   (unless helm-source-buffers-list

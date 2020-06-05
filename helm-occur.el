@@ -145,7 +145,7 @@ buffers (i.e. a helm command using `helm-source-buffers-list' like
 `helm-mini') and use the multi occur buffers action.
 
 This is the helm implementation that collect lines matching pattern
-like vanilla emacs `occur' but have nothing to do with it, the search
+like vanilla Emacs `occur' but have nothing to do with it, the search
 engine beeing completely different and also much faster."
   (interactive)
   (setq helm-source-occur
@@ -191,7 +191,7 @@ engine beeing completely different and also much faster."
       (helm-multi-occur-1 (mapcar 'get-buffer buffers)))))
 
 (defun helm-occur-transformer (candidates source)
-  "Returns CANDIDATES prefixed with line number."
+  "Return CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-attr 'buffer-name source)
            for c in candidates collect
            (when (string-match helm-occur--search-buffer-regexp c)
@@ -212,7 +212,7 @@ engine beeing completely different and also much faster."
                    :initform nil)))
 
 (defun helm-occur-build-sources (buffers &optional source-name)
-  "Build sources for helm-occur for each buffer in BUFFERS list."
+  "Build sources for `helm-occur' for each buffer in BUFFERS list."
   (cl-loop for buf in buffers
            collect
            (helm-make-source (or source-name
@@ -266,7 +266,7 @@ engine beeing completely different and also much faster."
              :moccur-buffers buffers)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
-  "Runs helm-occur on a list of buffers.
+  "Run `helm-occur' on a list of buffers.
 Each buffer's result is displayed in a separated source."
   (let* ((curbuf (current-buffer))
          (bufs (if helm-occur-always-search-in-current
@@ -299,7 +299,7 @@ Each buffer's result is displayed in a separated source."
 (cl-defun helm-occur-action (lineno
                                   &optional (method (quote buffer)))
   "Jump to line number LINENO with METHOD.
-arg METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
+METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
   (let ((buf (if (eq major-mode 'helm-occur-mode)
                  (get-text-property (point) 'buffer-name)
@@ -367,7 +367,7 @@ Same as `helm-occur-goto-line' but go in new frame."
 (put 'helm-moccur-run-save-buffer 'helm-only t)
 
 (defun helm-occur-right ()
-  "helm-occur action for right arrow.
+  "`helm-occur' action for right arrow.
 This is used when `helm-occur-use-ioccur-style-keys' is enabled.
 If follow is enabled (default) go to next source, otherwise execute
 persistent action."
@@ -506,7 +506,7 @@ persistent action."
   (helm-multi-occur-1 helm-occur--buffer-list helm-occur-mode--last-pattern))
 
 (defun helm-occur-buffer-substring-with-linums ()
-  "Returns current-buffer contents as a string with all lines
+  "Return current-buffer contents as a string with all lines
 numbered.  The property 'buffer-name is added to the whole string."
   (let ((bufstr (buffer-substring-no-properties (point-min) (point-max)))
         (bufname (buffer-name)))

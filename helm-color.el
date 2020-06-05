@@ -84,25 +84,25 @@
   (kill-new (helm-colors-get-rgb candidate)))
 
 (defun helm-color-run-insert-name ()
-  "Insert name of color from `helm-source-colors'"
+  "Insert name of color from `helm-source-colors'."
   (interactive)
   (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-name)))
 (put 'helm-color-run-insert-name 'helm-only t)
 
 (defun helm-color-run-kill-name ()
-  "Kill name of color from `helm-source-colors'"
+  "Kill name of color from `helm-source-colors'."
   (interactive)
   (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-name)))
 (put 'helm-color-run-kill-name 'helm-only t)
 
 (defun helm-color-run-insert-rgb ()
-  "Insert RGB of color from `helm-source-colors'"
+  "Insert RGB of color from `helm-source-colors'."
   (interactive)
   (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-rgb)))
 (put 'helm-color-run-insert-rgb 'helm-only t)
 
 (defun helm-color-run-kill-rgb ()
-  "Kill RGB of color from `helm-source-colors'"
+  "Kill RGB of color from `helm-source-colors'."
   (interactive)
   (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-rgb)))
 (put 'helm-color-run-kill-rgb 'helm-only t)
