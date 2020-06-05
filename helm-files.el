@@ -925,7 +925,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 ;; Rsync
 ;;
 (defcustom helm-rsync-switches '("-a" "-z" "-h" "--info=all2")
-  "Rsync options to use with HFF Rsync action."
+  "Rsync options to use with HFF Rsync action.
+Note: Using \"--info=all2\" allows having the name of the file
+currently transfered in an help-echo in mode-line, if you use
+\"--info=progress2\" you will not have this information."
   :type '(repeat string)
   :group 'helm-files)
 
