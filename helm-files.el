@@ -3272,12 +3272,13 @@ Return candidates prefixed with basename of INPUT first."
 Return candidates prefixed with basename of `helm-input' first."
   (helm-ff-sort-candidates-1 candidates helm-input))
 
-(defvar helm-ff-dir-locals nil)
+(defvar helm-ff--dir-locals nil)
+(make-local-variable 'helm-ff--dir-locals)
 
 (defun helm-ff--reset-dir-locals ()
   "Reset directory local variables to their default-value."
   (with-helm-buffer
-    (cl-loop for (k . _v) in helm-ff-dir-locals
+    (cl-loop for (k . _v) in helm-ff--dir-locals
              do (set (make-local-variable k) (default-value k)))))
 
 (defun helm-ff--apply-dir-locals (locals)
@@ -3287,11 +3288,9 @@ Return candidates prefixed with basename of `helm-input' first."
     ;; `hack-local-variables-apply' to their default value.
     (helm-ff--reset-dir-locals)
     ;; Store possible dir local vars for further reset.
-    (set (make-local-variable 'helm-ff-dir-locals)
-         (cl-loop for (k . v) in locals
-                  unless (assq k helm-ff-dir-locals)
-                  do (push (cons k v) helm-ff-dir-locals)
-                  finally return helm-ff-dir-locals))
+    (cl-loop for (k . v) in locals
+             unless (assq k helm-ff--dir-locals)
+             do (push (cons k v) helm-ff--dir-locals))
     ;; Now apply dir locals.
     (hack-local-variables-apply)))
 
