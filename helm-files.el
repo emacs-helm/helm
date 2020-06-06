@@ -3275,11 +3275,13 @@ Return candidates prefixed with basename of `helm-input' first."
 (defvar helm-ff-dir-locals nil)
 
 (defun helm-ff--reset-dir-locals ()
+  "Reset directory local variables to their default-value."
   (with-helm-buffer
     (cl-loop for (k . _v) in helm-ff-dir-locals
              do (set (make-local-variable k) (default-value k)))))
 
 (defun helm-ff--apply-dir-locals (locals)
+  "Apply directory variables LOCALS (an alist) in helm-buffer."
   (with-helm-buffer
     ;; Reset all local vars that have been added by
     ;; `hack-local-variables-apply' to their default value.
@@ -3294,6 +3296,7 @@ Return candidates prefixed with basename of `helm-input' first."
     (hack-local-variables-apply)))
 
 (defun helm-ff--hack-dir-locals ()
+  "Maybe apply directory local variables in helm-buffer."
   (with-helm-default-directory helm-ff-default-directory
     ;; Reset previous dir local vars in helm-buffer.
     (with-helm-buffer (setq dir-local-variables-alist nil))
@@ -3303,6 +3306,7 @@ Return candidates prefixed with basename of `helm-input' first."
       (helm-ff--reset-dir-locals))))
 
 (defun helm-ff-boring-file-p (file)
+  "Returns non nil when FILE is matching boring regexps."
   ;; Prevent user doing silly thing like
   ;; adding the dotted files to boring regexps (#924).
   (and helm-ff-skip-boring-files
@@ -3311,6 +3315,7 @@ Return candidates prefixed with basename of `helm-input' first."
 
 (defvar helm-ff--git-found-p nil)
 (defun helm-ff-git-ignored-p (file)
+  "Returns non nil when FILE is matched in \".gitignore\" file."
   (and helm-ff-skip-git-ignored-files
        (not (file-remote-p file))
        (or helm-ff--git-found-p
