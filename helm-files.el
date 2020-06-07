@@ -3279,6 +3279,7 @@ Return candidates prefixed with basename of `helm-input' first."
   "Reset directory local variables to their default-value."
   (with-helm-buffer
     (cl-loop for (k . _v) in helm-ff--dir-locals
+             when (default-boundp k)
              do (set (make-local-variable k) (default-value k)))))
 
 (defun helm-ff--apply-dir-locals (locals)
