@@ -972,7 +972,7 @@ currently transfered in an help-echo in mode-line, if you use
   ;; shell-quote-argument is not working with Rsync.
   (mapconcat 'identity (split-string fname) "\\ "))
 
-(defvar helm-rsync--last-progress-bar ""
+(defvar helm-rsync--last-progress-bar-alist nil
   "Used to store last valid rsync progress bar.")
 (defun helm-rsync-format-mode-line-str (proc)
   (helm-aif (and (process-live-p proc)
@@ -983,12 +983,12 @@ currently transfered in an help-echo in mode-line, if you use
         ;; coming from filter process, as a result the progress bar
         ;; disapear for a while giving no information to user while
         ;; the rsync process continues, so keep printing the last valid
-        ;; progress bar (stored in `helm-rsync--last-progress-bar')
+        ;; progress bar (stored in `helm-rsync--last-progress-bar-alist')
         ;; instead of sending empty string.
         (unless (equal it "")
-          (setq helm-rsync--last-progress-bar it))
+          (push (cons proc it) helm-rsync--last-progress-bar-alist))
         (format " [%s]" (propertize
-                         helm-rsync--last-progress-bar
+                         (assoc-default proc helm-rsync--last-progress-bar-alist)
                          'face 'helm-ff-rsync-progress)))))
 
 (defun helm-rsync-mode-line (proc)
@@ -1005,7 +1005,7 @@ currently transfered in an help-echo in mode-line, if you use
   (setq global-mode-string
 	(remove `(:eval (helm-rsync-format-mode-line-str ,proc))
                 global-mode-string))
-  (setq helm-rsync--last-progress-bar "")
+  (setq helm-rsync--last-progress-bar-alist nil)
   (force-mode-line-update))
 
 (defun helm-rsync-copy-files (files dest)
