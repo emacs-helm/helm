@@ -46,7 +46,6 @@
 (declare-function eshell-reset "esh-mode.el")
 (declare-function eshell/cd "em-dirs.el")
 (declare-function eshell-next-prompt "em-prompt.el")
-(declare-function eshell-quote-argument "esh-arg.el")
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 (declare-function helm-gid "helm-id-utils.el")
@@ -1294,7 +1293,7 @@ this working."
           ;; Run eshell-command with ALL marked files as arguments.
           ;; This wont work on remote files, because tramp handlers depends
           ;; on `default-directory' (limitation).
-          (let ((mapfiles (mapconcat 'eshell-quote-argument cand-list " ")))
+          (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "%s" command)
                 (setq cmd-line (format command mapfiles)) ; See [1]
               (setq cmd-line (format "%s %s" command mapfiles)))
@@ -1312,7 +1311,7 @@ this working."
                    ;; under default-directory.
                    ;; This allow running e.g. "tar czvf test.tar.gz
                    ;; %s/*" without creating an archive expanding from /home.
-                   for file = (eshell-quote-argument (helm-basename f))
+                   for file = (shell-quote-argument (helm-basename f))
                    ;; \@ => placeholder for file without extension.
                    ;; \# => placeholder for incremental number.
                    for fcmd = (replace-regexp-in-string
