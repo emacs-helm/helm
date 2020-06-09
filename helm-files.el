@@ -1376,10 +1376,11 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
                        when (helm-ff--shell-interactive-buffer-p
                              b helm-ff-preferred-shell-mode)
                        collect b)))
-    (helm-aif (if (cdr bufs)
-                  (helm-comp-read "Switch to shell buffer: " bufs
-                                  :must-match t)
-                (car bufs))
+    (helm-aif (and (not helm-current-prefix-arg)
+                   (if (cdr bufs)
+                       (helm-comp-read "Switch to shell buffer: " bufs
+                                       :must-match t)
+                     (car bufs)))
         (switch-to-buffer it)
       (if (eq helm-ff-preferred-shell-mode 'eshell-mode)
           (eshell helm-current-prefix-arg)
@@ -1388,7 +1389,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
                    (format "*shell<%s>" it)))))
     (helm-aif (and (eq helm-ff-preferred-shell-mode 'shell-mode)
                    (get-buffer-process (current-buffer)))
-      (accept-process-output it 0.1))
+        (accept-process-output it 0.1))
     (if (eq major-mode 'eshell-mode)
         (unless (get-buffer-process (current-buffer))
           (funcall cd-eshell))
