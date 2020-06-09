@@ -425,7 +425,7 @@ in different directories."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-ff-prefered-shell-mode 'eshell-mode
+(defcustom helm-ff-preferred-shell-mode 'eshell-mode
   "Shell to use to switch to a shell buffer from `helm-find-files'.
 This affect \\<helm-find-files-map>\\[helm-ff-run-switch-to-shell] keybinding."
   :group 'helm-files
@@ -1374,19 +1374,19 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
            (comint-send-input)))
         (bufs (cl-loop for b in (mapcar 'buffer-name (buffer-list))
                        when (helm-ff--shell-interactive-buffer-p
-                             b helm-ff-prefered-shell-mode)
+                             b helm-ff-preferred-shell-mode)
                        collect b)))
     (helm-aif (if (cdr bufs)
                   (helm-comp-read "Switch to shell buffer: " bufs
                                   :must-match t)
                 (car bufs))
         (switch-to-buffer it)
-      (if (eq helm-ff-prefered-shell-mode 'eshell-mode)
+      (if (eq helm-ff-preferred-shell-mode 'eshell-mode)
           (eshell helm-current-prefix-arg)
         (shell (helm-aif (and helm-current-prefix-arg
                               (prefix-numeric-value helm-current-prefix-arg))
                    (format "*shell<%s>" it)))))
-    (helm-aif (and (eq helm-ff-prefered-shell-mode 'shell-mode)
+    (helm-aif (and (eq helm-ff-preferred-shell-mode 'shell-mode)
                    (get-buffer-process (current-buffer)))
       (accept-process-output it 0.1))
     (if (eq major-mode 'eshell-mode)
