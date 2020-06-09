@@ -424,6 +424,14 @@ This allows using for example different values for boring files/dirs
 in different directories."
   :group 'helm-files
   :type 'boolean)
+
+(defcustom helm-ff-prefered-shell-mode 'eshell-mode
+  "Shell to use to switch to a shell buffer from `helm-find-files'.
+This affect \\<helm-find-files-map>\\[helm-ff-run-switch-to-shell] keybinding."
+  :group 'helm-files
+  :type '(choice
+          (const :tag "Use Eshell" eshell-mode)
+          (const :tag "Use Shell" shell-mode)))
 
 ;;; Faces
 ;;
@@ -554,7 +562,7 @@ in different directories."
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
     (define-key map (kbd "C-c d")         'helm-ff-persistent-delete)
-    (define-key map (kbd "M-e")           'helm-ff-run-switch-to-eshell)
+    (define-key map (kbd "M-e")           'helm-ff-run-switch-to-shell)
     (define-key map (kbd "C-c i")         'helm-ff-run-complete-fn-at-point)
     (define-key map (kbd "C-c o")         'helm-ff-run-switch-other-window)
     (define-key map (kbd "C-c C-o")       'helm-ff-run-switch-other-frame)
@@ -707,7 +715,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Zgrep File(s) `M-g z, C-u Recurse'" 'helm-ff-zgrep
    "Pdf Grep File(s)" 'helm-ff-pdfgrep
    "Gid `M-g i'" 'helm-ff-gid
-   "Switch to Eshell `M-e'" 'helm-ff-switch-to-eshell
+   "Switch to Eshell `M-e'" 'helm-ff-switch-to-shell
    "Etags `M-., C-u reload tag file'" 'helm-ff-etags-select
    "Eshell command on file(s) `M-!, C-u take all marked as arguments.'"
    'helm-find-files-eshell-command-on-file
@@ -1331,38 +1339,69 @@ this working."
 See `helm-find-files-eshell-command-on-file-1' for more info."
   (helm-find-files-eshell-command-on-file-1 helm-current-prefix-arg))
 
-(defun helm-ff-switch-to-eshell (_candidate)
-  "Switch to eshell and cd to `helm-ff-default-directory'.
+(defun helm-ff--shell-interactive-buffer-p (buffer &optional mode)
+  (with-current-buffer buffer
+    (when (eq major-mode (or mode 'eshell-mode))
+      (let ((next-prompt-fn (cl-case major-mode
+                              (shell-mode #'comint-next-prompt)
+                              (eshell-mode #'eshell-next-prompt))))
+        (save-excursion
+          (goto-char (point-min))
+          (funcall next-prompt-fn 1)
+          (null (eql (point) (point-min))))))))
 
-With a numeric prefix arg switch to numbered eshell buffer.  If no
-prefix arg is provided and more than one Eshell buffer exist,
-provide completions on those buffers.  If only one Eshell buffer
-exists, switch to this one.  If no Eshell buffer exists or if the
-Eshell buffer the numeric prefix arg points to doesn't exist,
-create it and switch to it."
+(defun helm-ff-switch-to-shell (_candidate)
+  "Switch to Eshell or M-x shell and cd to `helm-ff-default-directory'.
+Set your prefered shell mode in `helm-ff-prefered-shell'.
+
+With a numeric prefix arg switch to numbered shell buffer, if no
+prefix arg provided and more than one shell buffer exists, provide
+completions on those buffers. If only one shell buffer exists,
+switch to this one, if no shell buffer exists or if the numeric
+prefix arg shell buffer doesn't exists, create it and switch to it."
   (let ((cd-eshell (lambda ()
                      (eshell/cd helm-ff-default-directory)
                      (eshell-reset)))
+        (cd-shell
+         (lambda ()
+           (goto-char (point-max))
+           (comint-delete-input)
+           (insert (format "cd %s"
+                           (shell-quote-argument
+                            (or (file-remote-p
+                                 helm-ff-default-directory 'localname)
+                                helm-ff-default-directory))))
+           (comint-send-input)))
         (bufs (cl-loop for b in (mapcar 'buffer-name (buffer-list))
-                       when (helm-ff--eshell-interactive-buffer-p b)
+                       when (helm-ff--shell-interactive-buffer-p
+                             b helm-ff-prefered-shell-mode)
                        collect b)))
-    (helm-aif (and (null helm-current-prefix-arg)
-                   (if (cdr bufs)
-                       (helm-comp-read "Switch to eshell buffer: " bufs
-                                       :must-match t)
-                     (car bufs)))
+    (helm-aif (if (cdr bufs)
+                  (helm-comp-read "Switch to shell buffer: " bufs
+                                  :must-match t)
+                (car bufs))
         (switch-to-buffer it)
-      (eshell helm-current-prefix-arg))
-    (unless (get-buffer-process (current-buffer))
-      (funcall cd-eshell))))
+      (if (eq helm-ff-prefered-shell-mode 'eshell-mode)
+          (eshell helm-current-prefix-arg)
+        (shell (helm-aif (and helm-current-prefix-arg
+                              (prefix-numeric-value helm-current-prefix-arg))
+                   (format "*shell<%s>" it)))))
+    (helm-aif (and (eq helm-ff-prefered-shell-mode 'shell-mode)
+                   (get-buffer-process (current-buffer)))
+      (accept-process-output it 0.1))
+    (if (eq major-mode 'eshell-mode)
+        (unless (get-buffer-process (current-buffer))
+          (funcall cd-eshell))
+      (unless (helm-ff-shell-alive-p)
+        (funcall cd-shell)))))
 
-(defun helm-ff--eshell-interactive-buffer-p (buffer)
-  (with-current-buffer buffer
-    (and (eq major-mode 'eshell-mode)
-         (save-excursion
-           (goto-char (point-min))
-           (eshell-next-prompt 1)
-           (null (eql (point) (point-min)))))))
+(defun helm-ff-shell-alive-p ()
+  "Returns non nil when a process is running inside `shell-mode' buffer."
+  (save-excursion
+    (comint-goto-process-mark)
+    (or (null comint-last-prompt)
+        (not (eql (point)
+                  (marker-position (cdr comint-last-prompt)))))))
 
 (defun helm-ff-touch-files (_candidate)
   "The touch files action for helm-find-files."
@@ -1967,12 +2006,12 @@ Called with a prefix arg open menu unconditionally."
      'helm-insert-file-name-completion-at-point)))
 (put 'helm-ff-run-complete-fn-at-point 'helm-only t)
 
-(defun helm-ff-run-switch-to-eshell ()
+(defun helm-ff-run-switch-to-shell ()
   "Run switch to eshell action from `helm-source-find-files'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-ff-switch-to-eshell)))
-(put 'helm-ff-run-switch-to-eshell 'helm-only t)
+    (helm-exit-and-execute-action 'helm-ff-switch-to-shell)))
+(put 'helm-ff-run-switch-to-shell 'helm-only t)
 
 (defun helm-ff-run-switch-other-window ()
   "Run switch to other window action from `helm-source-find-files'.
