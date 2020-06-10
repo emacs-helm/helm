@@ -1386,7 +1386,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
           (eshell helm-current-prefix-arg)
         (shell (helm-aif (and helm-current-prefix-arg
                               (prefix-numeric-value helm-current-prefix-arg))
-                   (format "*shell<%s>" it)))))
+                   (format "*shell<%s>*" it)))))
     (helm-aif (and (eq helm-ff-preferred-shell-mode 'shell-mode)
                    (get-buffer-process (current-buffer)))
         (accept-process-output it 0.1))
