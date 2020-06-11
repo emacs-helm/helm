@@ -963,6 +963,14 @@ names."
   :type 'string
   :group 'helm-files)
 
+(defcustom helm-rsync-no-mode-line-update nil
+  "When non nil don't update mode-line when rsync is running.
+This is useful if you display the progress bar somewhere else,
+e.g. with minibuffer-line in minibuffer, in this case updating
+mode-line may create flickering in other frame's mode-line."
+  :type 'boolean
+  :group 'helm-files)
+
 (defvar helm-rsync-process-buffer "*helm-rsync*")
 (defvar helm-rsync-progress-str-alist nil)
 
@@ -1099,7 +1107,8 @@ names."
           (setq helm-rsync-progress-str-alist
                 (push (cons proc ml-str) helm-rsync-progress-str-alist))))
       ;; Finally update mode-line.
-      (force-mode-line-update t))))
+      (unless helm-rsync-no-mode-line-update
+        (force-mode-line-update t)))))
 
 (defun helm-find-files-rsync (_candidate)
   "Rsync files from `helm-find-files'."
