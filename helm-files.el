@@ -1369,6 +1369,8 @@ prefix arg provided and more than one shell buffer exists, provide
 completions on those buffers. If only one shell buffer exists,
 switch to this one, if no shell buffer exists or if the numeric
 prefix arg shell buffer doesn't exists, create it and switch to it."
+  ;; Reproduce the Emacs-25 behavior to be able to edit and send
+  ;; command in term buffer.
   (let (term-char-mode-buffer-read-only      ; Emacs-25 behavior.
         term-char-mode-point-at-process-mark ; Emacs-25 behavior.
         (cd-eshell (lambda ()
