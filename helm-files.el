@@ -952,7 +952,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   "Rsync options to use with HFF Rsync action.
 Note: Using \"--info=all2\" allows having the name of the file
 currently transfered in an help-echo in mode-line, if you use
-\"--info=progress2\" you will not have this information."
+\"--info=progress2\" you will not have this information.  Using
+\"--protect-args\" option may clash as we are already quoting
+names."
   :type '(repeat string)
   :group 'helm-files)
 
@@ -976,10 +978,11 @@ currently transfered in an help-echo in mode-line, if you use
             (user      (file-remote-p file 'user))
             (host      (file-remote-p file 'host)))
         (if user
-            (format "%s@%s:'%s'" user host (helm-rsync-quote-argument localname))
-          (format "%s:'%s'" host (helm-rsync-quote-argument localname))))
-    (directory-file-name
-     (expand-file-name file))))
+            (format "%s@%s:%s" user host (helm-rsync-quote-argument localname))
+          (format "%s:%s" host (helm-rsync-quote-argument localname))))
+    (helm-rsync-quote-argument
+     (directory-file-name
+      (expand-file-name file)))))
 
 (defun helm-rsync-quote-argument (fname)
   ;; Seems rsync already quote things like accentued chars and failed
