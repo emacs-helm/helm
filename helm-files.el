@@ -1405,13 +1405,15 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
          (eshell helm-current-prefix-arg))
         (shell-mode
          (shell (helm-aif (and helm-current-prefix-arg
-                               (prefix-numeric-value helm-current-prefix-arg))
+                               (prefix-numeric-value
+                                helm-current-prefix-arg))
                     (format "*shell<%s>*" it))))
         (term-mode
          (progn
            (ansi-term (getenv "SHELL")
                       (helm-aif (and helm-current-prefix-arg
-                                     (prefix-numeric-value helm-current-prefix-arg))
+                                     (prefix-numeric-value
+                                      helm-current-prefix-arg))
                           (format "*ansi-term<%s>*" it)))
            (term-line-mode)))))
     ;; Now cd into directory.
