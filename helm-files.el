@@ -1869,7 +1869,9 @@ at end of pattern using \\<helm-map>\\[backward-char] and
 See `helm-ff-RET' for details.
 If MUST-MATCH is specified exit with
 `helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
-  (let ((sel   (helm-get-selection)))
+  (let ((sel   (helm-get-selection))
+        ;; Ensure `file-directory-p' works on remote files.
+        non-essential)
     (cl-assert sel nil "Trying to exit with no candidates")
     (if (and (file-directory-p sel)
              ;; Allows exiting with default action when a prefix arg
