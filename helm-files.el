@@ -52,7 +52,14 @@
 (declare-function helm-find-1 "helm-find")
 (declare-function helm-get-default-program-for-file "helm-external")
 (declare-function helm-open-file-externally "helm-external")
+(declare-function term-line-mode "term")
+(declare-function term-char-mode "term")
+(declare-function term-send-input "term")
+(declare-function term-next-prompt "term")
+(declare-function term-process-mark "term")
 
+(defvar term-char-mode-point-at-process-mark)
+(defvar term-char-mode-buffer-read-only)
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
 (defvar dired-async-mode)
@@ -427,11 +434,13 @@ in different directories."
 
 (defcustom helm-ff-preferred-shell-mode 'eshell-mode
   "Shell to use to switch to a shell buffer from `helm-find-files'.
-This affect \\<helm-find-files-map>\\[helm-ff-run-switch-to-shell] keybinding."
+Possible values are `shell-mode', `eshell-mode' and `term-mode'.
+This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding."
   :group 'helm-files
   :type '(choice
           (const :tag "Use Eshell" eshell-mode)
-          (const :tag "Use Shell" shell-mode)))
+          (const :tag "Use Shell" shell-mode)
+          (const :tag "Use Shell" term-mode)))
 
 ;;; Faces
 ;;
@@ -1344,7 +1353,8 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
     (when (eq major-mode (or mode 'eshell-mode))
       (let ((next-prompt-fn (cl-case major-mode
                               (shell-mode #'comint-next-prompt)
-                              (eshell-mode #'eshell-next-prompt))))
+                              (eshell-mode #'eshell-next-prompt)
+                              (term-mode #'term-next-prompt))))
         (save-excursion
           (goto-char (point-min))
           (funcall next-prompt-fn 1)
@@ -1352,57 +1362,79 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
 
 (defun helm-ff-switch-to-shell (_candidate)
   "Switch to Eshell or M-x shell and cd to `helm-ff-default-directory'.
-Set your prefered shell mode in `helm-ff-prefered-shell'.
+Set your preferred shell mode in `helm-ff-preferred-shell-mode'.
 
 With a numeric prefix arg switch to numbered shell buffer, if no
 prefix arg provided and more than one shell buffer exists, provide
 completions on those buffers. If only one shell buffer exists,
 switch to this one, if no shell buffer exists or if the numeric
 prefix arg shell buffer doesn't exists, create it and switch to it."
-  (let ((cd-eshell (lambda ()
+  (let (term-char-mode-buffer-read-only      ; Emacs-25 behavior.
+        term-char-mode-point-at-process-mark ; Emacs-25 behavior.
+        (cd-eshell (lambda ()
                      (eshell/cd helm-ff-default-directory)
                      (eshell-reset)))
         (cd-shell
          (lambda ()
            (goto-char (point-max))
-           (comint-delete-input)
+           (when (eq helm-ff-preferred-shell-mode 'shell-mode)
+             (comint-delete-input))
            (insert (format "cd %s"
                            (shell-quote-argument
                             (or (file-remote-p
                                  helm-ff-default-directory 'localname)
                                 helm-ff-default-directory))))
-           (comint-send-input)))
+           (cl-case helm-ff-preferred-shell-mode
+             (shell-mode (comint-send-input))
+             (term-mode (progn (term-char-mode) (term-send-input))))))
         (bufs (cl-loop for b in (mapcar 'buffer-name (buffer-list))
                        when (helm-ff--shell-interactive-buffer-p
                              b helm-ff-preferred-shell-mode)
                        collect b)))
+    ;; Jump to a shell buffer or open a new session.
     (helm-aif (and (not helm-current-prefix-arg)
                    (if (cdr bufs)
                        (helm-comp-read "Switch to shell buffer: " bufs
                                        :must-match t)
                      (car bufs)))
         (switch-to-buffer it)
-      (if (eq helm-ff-preferred-shell-mode 'eshell-mode)
-          (eshell helm-current-prefix-arg)
-        (shell (helm-aif (and helm-current-prefix-arg
-                              (prefix-numeric-value helm-current-prefix-arg))
-                   (format "*shell<%s>*" it)))))
-    (helm-aif (and (eq helm-ff-preferred-shell-mode 'shell-mode)
+      (cl-case helm-ff-preferred-shell-mode
+        (eshell-mode
+         (eshell helm-current-prefix-arg))
+        (shell-mode
+         (shell (helm-aif (and helm-current-prefix-arg
+                               (prefix-numeric-value helm-current-prefix-arg))
+                    (format "*shell<%s>*" it))))
+        (term-mode
+         (progn
+           (ansi-term (getenv "SHELL")
+                      (helm-aif (and helm-current-prefix-arg
+                                     (prefix-numeric-value helm-current-prefix-arg))
+                          (format "*ansi-term<%s>*" it)))
+           (term-line-mode)))))
+    ;; Now cd into directory.
+    (helm-aif (and (memq major-mode '(shell-mode term-mode))
                    (get-buffer-process (current-buffer)))
         (accept-process-output it 0.1))
-    (if (eq major-mode 'eshell-mode)
-        (unless (get-buffer-process (current-buffer))
-          (funcall cd-eshell))
-      (unless (helm-ff-shell-alive-p)
-        (funcall cd-shell)))))
+    (unless (helm-ff-shell-alive-p major-mode)
+      (funcall
+       (if (eq major-mode 'eshell-mode) cd-eshell cd-shell)))))
 
-(defun helm-ff-shell-alive-p ()
+(defun helm-ff-shell-alive-p (mode)
   "Returns non nil when a process is running inside `shell-mode' buffer."
-  (save-excursion
-    (comint-goto-process-mark)
-    (or (null comint-last-prompt)
-        (not (eql (point)
-                  (marker-position (cdr comint-last-prompt)))))))
+  (cl-ecase mode
+    (shell-mode
+     (save-excursion
+       (comint-goto-process-mark)
+       (or (null comint-last-prompt)
+           (not (eql (point)
+                     (marker-position (cdr comint-last-prompt)))))))
+    (eshell-mode
+     (get-buffer-process (current-buffer)))
+    (term-mode
+     (save-excursion
+       (goto-char (term-process-mark))
+       (not (looking-back "\\$ " (- (point) 2)))))))
 
 (defun helm-ff-touch-files (_candidate)
   "The touch files action for helm-find-files."
