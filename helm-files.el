@@ -988,9 +988,8 @@ mode-line may create flickering in other frame's mode-line."
         (if user
             (format "%s@%s:%s" user host (helm-rsync-quote-argument localname))
           (format "%s:%s" host (helm-rsync-quote-argument localname))))
-    (helm-rsync-quote-argument
-     (directory-file-name
-      (expand-file-name file)))))
+    (directory-file-name
+     (expand-file-name file))))
 
 (defun helm-rsync-quote-argument (fname)
   ;; Seems rsync already quote things like accentued chars and failed
