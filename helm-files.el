@@ -988,6 +988,7 @@ mode-line may create flickering in other frame's mode-line."
         (if user
             (format "%s@%s:%s" user host (helm-rsync-quote-argument localname))
           (format "%s:%s" host (helm-rsync-quote-argument localname))))
+    ;; FIXME: For some reasons quoting local paths fails, why?
     (directory-file-name
      (expand-file-name file))))
 
