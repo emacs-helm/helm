@@ -1038,7 +1038,7 @@ mode-line may create flickering in other frame's mode-line."
                 (format "rsync %s"
                         (mapconcat 'identity
                                    (append helm-rsync-switches
-                                           (append files (list dest)))
+                                           files (list dest))
                                    " ")))))
     (helm-rsync-mode-line proc)
     (set-process-sentinel
