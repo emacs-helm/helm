@@ -583,8 +583,7 @@ are available as`%u', `%d' and `%c' respectively.
 
 Use the `helm-file-globstar' feature described in [[Use the wildcard to select multiple files][recursive globbing]]
 by entering \"**.JPG\" at the end of the Helm-find-files pattern, then hit
-\\<helm-map>\\[helm-ff-query-replace-on-filenames]: First \"JPG\", then \"jpg\"
-and hit `RET'.
+\\<helm-find-files-map>\\[helm-ff-run-query-replace-fnames-on-marked] and enter \"JPG\" on first prompt, then \"jpg\" on second prompt and hit `RET'.
 
 Alternatively you can enter \".%\" at the first prompt, then \"jpg\" and hit
 `RET'.  Note that when using this instead of using \"JPG\" at the first prompt,
