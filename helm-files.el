@@ -1374,7 +1374,7 @@ See `helm-find-files-eshell-command-on-file-1' for more info."
           (null (eql (point) (point-min))))))))
 
 (defun helm-ff-switch-to-shell (_candidate)
-  "Switch to Eshell or M-x shell and cd to `helm-ff-default-directory'.
+  "Switch to a shell buffer and cd to `helm-ff-default-directory'.
 Set your preferred shell mode in `helm-ff-preferred-shell-mode'.
 
 With a numeric prefix arg switch to numbered shell buffer, if no
