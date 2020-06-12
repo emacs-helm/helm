@@ -1041,20 +1041,21 @@ mode-line may create flickering in other frame's mode-line."
                                            (append files (list dest)))
                                    " ")))))
     (helm-rsync-mode-line proc)
-    (set-process-sentinel proc `(lambda (process event)
-                                  (cond ((string= event "finished\n")
-                                         (message "%s copied %s files"
-                                                  (capitalize (process-name process))
-                                                  ,(length files)))
-                                        (t (error "Process %s %s with code %s"
-                                                  (process-name process)
-                                                  (process-status process)
-                                                  (process-exit-status process))))
-                                  (setq helm-rsync-progress-str-alist
-                                        (delete (assoc process helm-rsync-progress-str-alist)
-                                                helm-rsync-progress-str-alist))
-                                  (helm-rsync-restore-mode-line process)
-                                  (force-mode-line-update)))
+    (set-process-sentinel
+     proc `(lambda (process event)
+             (cond ((string= event "finished\n")
+                    (message "%s copied %s files"
+                             (capitalize (process-name process))
+                             ,(length files)))
+                   (t (error "Process %s %s with code %s"
+                             (process-name process)
+                             (process-status process)
+                             (process-exit-status process))))
+             (setq helm-rsync-progress-str-alist
+                   (delete (assoc process helm-rsync-progress-str-alist)
+                           helm-rsync-progress-str-alist))
+             (helm-rsync-restore-mode-line process)
+             (force-mode-line-update)))
     (set-process-filter proc #'helm-rsync-process-filter)))
 
 (defun helm-rsync-process-filter (proc output)
