@@ -986,18 +986,11 @@ mode-line may create flickering in other frame's mode-line."
             (user      (file-remote-p file 'user))
             (host      (file-remote-p file 'host)))
         (if user
-            (format "%s@%s:%s" user host (helm-rsync-quote-argument localname))
-          (format "%s:%s" host (helm-rsync-quote-argument localname))))
-    ;; FIXME: For some reasons quoting local paths fails, why?
-    (directory-file-name
-     (expand-file-name file))))
-
-(defun helm-rsync-quote-argument (fname)
-  ;; Seems rsync already quote things like accentued chars and failed
-  ;; when passing such chars already quoted, so quote only spaces and
-  ;; only for remote path as specified in its documentation. IOW
-  ;; shell-quote-argument is not working with Rsync.
-  (mapconcat 'identity (split-string fname) "\\ "))
+            (format "%s@%s:%s" user host (shell-quote-argument localname))
+          (format "%s:%s" host (shell-quote-argument localname))))
+    (shell-quote-argument
+     (directory-file-name
+      (expand-file-name file)))))
 
 (defvar helm-rsync--last-progress-bar-alist nil
   "Used to store last valid rsync progress bar.")
@@ -1040,10 +1033,13 @@ mode-line may create flickering in other frame's mode-line."
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let* ((buf (generate-new-buffer-name helm-rsync-process-buffer))
-         (proc (apply #'start-process
-                      "rsync" buf "rsync"
-                      (append helm-rsync-switches
-                              (append files (list dest))))))
+         (proc (start-process-shell-command 
+                "rsync" buf
+                (format "rsync %s"
+                        (mapconcat 'identity
+                                   (append helm-rsync-switches
+                                           (append files (list dest)))
+                                   " ")))))
     (helm-rsync-mode-line proc)
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
