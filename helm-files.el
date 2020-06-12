@@ -1038,10 +1038,11 @@ mode-line may create flickering in other frame's mode-line."
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
-  (let ((proc (apply #'start-process
-                     "rsync" helm-rsync-process-buffer "rsync"
-                     (append helm-rsync-switches
-                             (append files (list dest))))))
+  (let* ((buf (generate-new-buffer-name helm-rsync-process-buffer))
+         (proc (apply #'start-process
+                      "rsync" buf "rsync"
+                      (append helm-rsync-switches
+                              (append files (list dest))))))
     (helm-rsync-mode-line proc)
     (set-process-sentinel proc `(lambda (process event)
                                   (cond ((string= event "finished\n")
