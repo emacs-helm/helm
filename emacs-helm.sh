@@ -196,6 +196,11 @@ cat > $CONF_FILE <<EOF
 
 (package-initialize)
 (add-to-list 'load-path (file-name-directory (file-truename "$0")))
+
+(let ((async-path (expand-file-name "straight/repos/async" user-emacs-directory)))
+  (when (file-directory-p async-path)
+    (add-to-list 'load-path async-path)))
+
 (unless (> $TOOLBARS 0)
    (setq default-frame-alist '((vertical-scroll-bars . nil)
                                (tool-bar-lines . 0)
