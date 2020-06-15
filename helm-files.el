@@ -899,7 +899,16 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
   (require 'dired-async)
   (when (eq action 'rsync)
     (cl-assert (executable-find "rsync") nil "No command named rsync"))
-  (let* ((ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
+  (let* ((rsync-switches
+          (when (and (eq action 'rsync)
+                     helm-current-prefix-arg
+                     (y-or-n-p "Edit rsync command? "))
+            (cdr (split-string
+                  (read-string "Run rsync like this: "
+                               (mapconcat
+                                'identity
+                                (cons "rsync" helm-rsync-switches) " "))))))
+         (ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
          (prefarg helm-current-prefix-arg)
@@ -942,7 +951,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
       (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
         (make-directory dest-dir t)))
     (if (eq action 'rsync)
-        (helm-rsync-copy-files ifiles dest)
+        (helm-rsync-copy-files ifiles dest rsync-switches)
       (helm-dired-action
        dest :files ifiles :action action :follow prefarg))))
 
@@ -1028,7 +1037,7 @@ mode-line may create flickering in other frame's mode-line."
   (setq helm-rsync--last-progress-bar-alist nil)
   (force-mode-line-update))
 
-(defun helm-rsync-copy-files (files dest)
+(defun helm-rsync-copy-files (files dest &optional switches)
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
@@ -1037,7 +1046,7 @@ mode-line may create flickering in other frame's mode-line."
                 "rsync" buf
                 (format "rsync %s"
                         (mapconcat 'identity
-                                   (append helm-rsync-switches
+                                   (append (or switches helm-rsync-switches)
                                            files (list dest))
                                    " ")))))
     (helm-rsync-mode-line proc)
