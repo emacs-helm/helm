@@ -1111,10 +1111,10 @@ mode-line may create flickering in other frame's mode-line."
         (helm-aif (assoc proc helm-rsync-progress-str-alist)
             (setcdr it ml-str)
           (setq helm-rsync-progress-str-alist
-                (push (cons proc ml-str) helm-rsync-progress-str-alist))))
-      ;; Finally update mode-line.
-      (unless helm-rsync-no-mode-line-update
-        (force-mode-line-update t)))))
+                (push (cons proc ml-str) helm-rsync-progress-str-alist)))))
+    ;; Finally update mode-line.
+    (unless helm-rsync-no-mode-line-update
+      (force-mode-line-update))))
 
 (defun helm-ff-kill-rsync-process (process)
   "Kill rsync process PROCESS.
