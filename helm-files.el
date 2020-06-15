@@ -1024,15 +1024,15 @@ mode-line may create flickering in other frame's mode-line."
   "Add Rsync progress to the mode line."
   (or global-mode-string (setq global-mode-string '("")))
   (unless (member `(:eval (helm-rsync-format-mode-line-str ,proc))
-		  global-mode-string)
+                  global-mode-string)
     (setq global-mode-string
-	  (append global-mode-string
-		  `((:eval (helm-rsync-format-mode-line-str ,proc)))))))
+          (append global-mode-string
+                  `((:eval (helm-rsync-format-mode-line-str ,proc)))))))
 
 (defun helm-rsync-restore-mode-line (proc)
   "Restore the mode line when Rsync finishes."
   (setq global-mode-string
-	(remove `(:eval (helm-rsync-format-mode-line-str ,proc))
+        (remove `(:eval (helm-rsync-format-mode-line-str ,proc))
                 global-mode-string))
   (setq helm-rsync--last-progress-bar-alist nil)
   (force-mode-line-update))
@@ -1042,7 +1042,7 @@ mode-line may create flickering in other frame's mode-line."
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let* ((buf (generate-new-buffer-name helm-rsync-process-buffer))
-         (proc (start-process-shell-command 
+         (proc (start-process-shell-command
                 "rsync" buf
                 (format "rsync %s"
                         (mapconcat 'identity
@@ -2184,10 +2184,10 @@ Same as `dired-do-print' but for Helm."
                             "Printer: " helm-ff-printer-list)
                          printer-name))
          (lpr-switches
-	  (if (and (stringp printer-name)
-		   (string< "" printer-name))
-	      (cons (concat lpr-printer-switch printer-name)
-		    lpr-switches)
+          (if (and (stringp printer-name)
+                   (string< "" printer-name))
+              (cons (concat lpr-printer-switch printer-name)
+                    lpr-switches)
               lpr-switches))
          (command (helm-read-string
                    (format "Print *%s File(s):\n%s with: "
@@ -3222,7 +3222,7 @@ Note that only existing directories are saved here."
               (format "Modified: %s\n" modif)
               (format "Accessed: %s\n" access)
               (and (stringp trash)
-                   (format "Trash: %s\n" 
+                   (format "Trash: %s\n"
                            (abbreviate-file-name trash)))))
           (message dired-line) (sit-for 5)))
     (message "Permission denied, file not readable")))
@@ -3666,7 +3666,7 @@ with `helm-ff-trash-list'."
   ;; Emacs trash duplicate files with a unique name + .trashinfo in
   ;; the filename which is wrong, only files in info directory should
   ;; end with .trashinfo, so fix the filename before looking for dest name.
-  (let* ((fname (replace-regexp-in-string "\\.trashinfo\\'" "" file)) 
+  (let* ((fname (replace-regexp-in-string "\\.trashinfo\\'" "" file))
          (info-file (concat (helm-reduce-file-name fname 2)
                             "info/"
                             (helm-basename fname)
@@ -4942,7 +4942,7 @@ doing.")
     (set-keymap-parent map helm-generic-files-map)
     (define-key map (kbd "M-g a") 'helm-browse-project-run-ag)
     map))
-  
+
 (defun helm-browse-project-get-buffers (root-directory)
   (cl-loop for b in (helm-buffer-list)
            ;; FIXME: Why default-directory is root-directory
