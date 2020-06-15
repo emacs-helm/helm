@@ -1116,6 +1116,25 @@ mode-line may create flickering in other frame's mode-line."
       (unless helm-rsync-no-mode-line-update
         (force-mode-line-update t)))))
 
+(defun helm-ff-kill-rsync-process (process)
+  "Kill rsync process PROCESS.
+
+When called interactively prompt user with completion when more than
+one process."
+  (interactive (list (get-process
+                      (helm-comp-read
+                       "Kill rsync process: "
+                       (mapcar (lambda (x)
+                                 (process-name (car x)))
+                               helm-rsync-progress-str-alist)
+                       :exec-when-only-one t))))
+  (with-current-buffer (process-buffer process)
+    (delete-process process)
+    (kill-buffer))
+  (setq helm-rsync-progress-str-alist
+        (delete (assoc process helm-rsync-progress-str-alist)
+                helm-rsync-progress-str-alist)))
+
 (defun helm-find-files-rsync (_candidate)
   "Rsync files from `helm-find-files'."
   (helm-find-files-do-action 'rsync))
