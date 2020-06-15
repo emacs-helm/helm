@@ -727,11 +727,25 @@ See [[Use the wildcard to select multiple files]] for details.
 If Rsync is available, you can use it to copy/sync files or directories
 with some restrictions though:
 
-- Copying from tramp sudo method is not supported.
-- Copying from remote to remote is not supported.
+- Copying from/to tramp sudo method may not work (permissions).
+- Copying from remote to remote is not supported (rsync restriction).
 
-This command is mostly useful when copying large files as it is fast,
-asynchronous and provide a progress bar in mode-line.
+This command is mostly useful when copying large files as it is
+fast, asynchronous and provide a progress bar in mode-line.  Each
+rsync process have its own progress bar, so you can run several
+rsync jobs, they are independents.  If rsync fails you can
+consult the \"*helm-rsync<n>*\" buffer to see rsync errors.  An
+help-echo (move mouse over progress bar) is provided to see which
+file is in transfer.  Note that when copying directories, no
+trailing slashes are added to directory names, which mean that
+directory is created on destination if it doesn't already exists,
+see rsync documentation for more infos on rsync behavior.  To
+synchronize a directory, mark all in the directory and rsync all
+marked to the destination directory.
+
+The options are configurable through `helm-rsync-switches', but
+you can modify them on the fly when needed by using a prefix arg,
+in this case you will be prompted for modifications.
 
 *** Bookmark the `helm-find-files' session
 
