@@ -901,8 +901,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
     (cl-assert (executable-find "rsync") nil "No command named rsync"))
   (let* ((rsync-switches
           (when (and (eq action 'rsync)
-                     helm-current-prefix-arg
-                     (y-or-n-p "Edit rsync command? "))
+                     helm-current-prefix-arg)
             (cdr (split-string
                   (read-string "Run rsync like this: "
                                (mapconcat
