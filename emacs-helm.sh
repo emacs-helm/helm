@@ -177,6 +177,7 @@ cat > $CONF_FILE <<EOF
 (setq load-path (quote $LOAD_PATH))
 
 (defvar default-package-manager nil)
+(defvar bootstrap-version)
 (let* ((packages "$LOAD_PACKAGES")
        (pkg-list (and packages
                       (not (equal packages ""))
