@@ -189,10 +189,17 @@ cat > $CONF_FILE <<EOF
   (when (file-exists-p bootstrap-file)
     (setq default-package-manager 'straight)
     (load bootstrap-file nil 'nomessage)
-    (straight-use-package 'async)
+    (add-to-list 'load-path async-path)
     (when pkg-list
       (dolist (pkg pkg-list)
-        (straight-use-package (intern pkg))))))
+        (let* ((pkg-path (expand-file-name pkg straight-path))
+               (autoload-file (expand-file-name
+                               (format "%s-autoloads.el" pkg)
+                               pkg-path)))
+          (add-to-list 'load-path pkg-path)
+          (if (file-exists-p autoload-file)
+              (load autoload-file nil 'nomessage)
+            (straight-use-package (intern pkg))))))))
 
 (unless (eq default-package-manager 'straight)
   (require 'package)
