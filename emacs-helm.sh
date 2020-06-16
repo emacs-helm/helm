@@ -175,11 +175,24 @@ cat > $CONF_FILE <<EOF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n"))
 
 (setq load-path (quote $LOAD_PATH))
+
 (defvar default-package-manager nil)
-(let ((async-path (expand-file-name "straight/build/async" user-emacs-directory)))
-  (when (file-directory-p async-path)
+(let* ((packages "$LOAD_PACKAGES")
+       (pkg-list (and packages
+                      (not (equal packages ""))
+                      (split-string packages ",")))
+       (straight-path (expand-file-name "straight/build/" user-emacs-directory))
+       (async-path (expand-file-name "straight/build/async" user-emacs-directory))
+       (bootstrap-file
+        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (bootstrap-version 5))
+  (when (file-exists-p bootstrap-file)
     (setq default-package-manager 'straight)
-    (add-to-list 'load-path async-path)))
+    (load bootstrap-file nil 'nomessage)
+    (straight-use-package 'async)
+    (when pkg-list
+      (dolist (pkg pkg-list)
+        (straight-use-package (intern pkg))))))
 
 (unless (eq default-package-manager 'straight)
   (require 'package)
