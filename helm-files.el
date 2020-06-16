@@ -741,7 +741,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
    "Copy file(s) `M-C, C-u to follow'" 'helm-find-files-copy
    (lambda ()
      (and (executable-find "rsync")
-          "Rsync file(s) `M-V'"))
+          "Rsync file(s) `M-V' (C-u edit command)"))
    'helm-find-files-rsync
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
