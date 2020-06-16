@@ -1695,7 +1695,12 @@ command you want to execute before specifying prefix arg.
 *** Completion styles in helm-M-x
 
 By default helm-M-x use 'helm completion style, if you want to enable fuzzy matching aka flex,
-see [[Completion-styles][Completion-styles]].")
+see [[Completion-styles][Completion-styles]].
+
+*** Duplicate entries in helm-M-x history
+
+helm-M-x history obey to history variables, if you have
+duplicates in your helm-M-x history set `history-delete-duplicates' to non nil.")
 
 ;;; Helm imenu
 ;;
