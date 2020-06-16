@@ -1451,9 +1451,11 @@ And to customize colors (always for ripgrep) use something like this:
 \--smart-case --no-heading --line-number %s %s %s
 
 This will change color for matched items from foreground red (the
-default) to a yellow background with a black foreground.  For more
-enhanced settings of ansi colors see
-https://github.com/emacs-helm/helm/issues/2313.
+default) to a yellow background with a black foreground.  Note
+that your color settings for RG will not work properly with
+multiples pattern if you have configured colors in rg config file
+instead of command line. For more enhanced settings of ansi
+colors see https://github.com/emacs-helm/helm/issues/2313
 
 You must use an output format that fit with helm grep, that is:
 
@@ -1504,8 +1506,11 @@ returns if available with current AG version."
          (pipe-cmd (helm-acase (helm-grep--ag-command)
                      (("ag" "pt")
                       (format "%s -S --color%s" it (concat " " pipe-switches)))
-                     ("rg" (format "rg -N -S --color=always%s"
-                                    (concat " " pipe-switches)))))
+                     ("rg" (format "rg -N -S --color=%s%s"
+                                   (when (string-match "--color=\\([a-z]+\\) "
+                                                       helm-grep-ag-command)
+                                     (match-string 1 helm-grep-ag-command))
+                                   (concat " " pipe-switches)))))
          (cmd (format helm-grep-ag-command
                       (mapconcat 'identity type " ")
                       (shell-quote-argument (car patterns))
