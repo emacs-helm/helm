@@ -175,31 +175,35 @@ cat > $CONF_FILE <<EOF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\n\\n"))
 
 (setq load-path (quote $LOAD_PATH))
-(require 'package)
-;; User may be using a non standard \`package-user-dir'.
-;; Modify \`package-directory-list' instead of \`package-user-dir'
-;; in case the user starts Helm from a non-ELPA installation.
-(unless (file-equal-p package-user-dir (locate-user-emacs-file "elpa"))
-  (add-to-list 'package-directory-list (directory-file-name
-                                        (file-name-directory
-                                         (directory-file-name default-directory)))))
-
-(let* ((str-lst "$LOAD_PACKAGES")
-       (load-packages (and str-lst
-                           (not (string= str-lst ""))
-                           (split-string str-lst ","))))
-  (setq package-load-list
-        (if (equal load-packages '("all"))
-            '(all)
-          (append '((helm-core t) (helm t) (async t) (popup t))
-                  (mapcar (lambda (p) (list (intern p) t)) load-packages)))))
-
-(package-initialize)
-(add-to-list 'load-path (file-name-directory (file-truename "$0")))
-
-(let ((async-path (expand-file-name "straight/repos/async" user-emacs-directory)))
+(defvar default-package-manager nil)
+(let ((async-path (expand-file-name "straight/build/async" user-emacs-directory)))
   (when (file-directory-p async-path)
+    (setq default-package-manager 'straight)
     (add-to-list 'load-path async-path)))
+
+(unless (eq default-package-manager 'straight)
+  (require 'package)
+  ;; User may be using a non standard \`package-user-dir'.
+  ;; Modify \`package-directory-list' instead of \`package-user-dir'
+  ;; in case the user starts Helm from a non-ELPA installation.
+  (unless (file-equal-p package-user-dir (locate-user-emacs-file "elpa"))
+    (add-to-list 'package-directory-list (directory-file-name
+                                          (file-name-directory
+                                           (directory-file-name default-directory)))))
+
+  (let* ((str-lst "$LOAD_PACKAGES")
+         (load-packages (and str-lst
+                             (not (string= str-lst ""))
+                             (split-string str-lst ","))))
+    (setq package-load-list
+          (if (equal load-packages '("all"))
+              '(all)
+            (append '((helm-core t) (helm t) (async t) (popup t))
+                    (mapcar (lambda (p) (list (intern p) t)) load-packages)))))
+
+  (package-initialize))
+
+(add-to-list 'load-path (file-name-directory (file-truename "$0")))
 
 (unless (> $TOOLBARS 0)
    (setq default-frame-alist '((vertical-scroll-bars . nil)
