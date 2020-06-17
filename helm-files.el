@@ -1037,6 +1037,10 @@ mode-line may create flickering in other frame's mode-line."
   (force-mode-line-update))
 
 (defun helm-rsync-copy-files (files dest &optional switches)
+  "Send FILES to DEST using Rsync with SWITCHES as arguments.
+
+DEST must be a directory.  SWITCHES when unspecified default to
+`helm-rsync-switches'."
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
@@ -1067,6 +1071,7 @@ mode-line may create flickering in other frame's mode-line."
     (set-process-filter proc #'helm-rsync-process-filter)))
 
 (defun helm-rsync-process-filter (proc output)
+  "Filter process function used by `helm-rsync-copy-files'."
   (let ((inhibit-read-only t)
         fname progbar)
     (with-current-buffer (process-buffer proc)
