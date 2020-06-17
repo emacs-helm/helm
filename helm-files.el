@@ -893,6 +893,7 @@ belonging to each window."
                                    else
                                    collect k)))
 
+(defvar helm-rsync-command-history nil)
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION can be `rsync' or any action supported by `helm-dired-action'."
@@ -906,7 +907,8 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                   (read-string "Run rsync like this: "
                                (mapconcat
                                 'identity
-                                (cons "rsync" helm-rsync-switches) " "))))))
+                                (cons "rsync" helm-rsync-switches) " ")
+                               'helm-rsync-command-history)))))
          (ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
          (cand   (helm-get-selection)) ; Target
