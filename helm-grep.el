@@ -239,7 +239,7 @@ doing."
   :group 'helm-grep
   :type '(repeat string))
 
-(defcustom helm-grep-input-idle-delay 0.6
+(defcustom helm-grep-input-idle-delay 0.1
   "Same as `helm-input-idle-delay' but for grep commands.
 It have a higher value than `helm-input-idle-delay' to avoid
 flickering when updating."
