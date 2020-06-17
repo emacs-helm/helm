@@ -241,7 +241,7 @@ doing."
 
 (defcustom helm-grep-input-idle-delay 0.1
   "Same as `helm-input-idle-delay' but for grep commands.
-It have a higher value than `helm-input-idle-delay' to avoid
+It has a higher value than `helm-input-idle-delay' to avoid
 flickering when updating."
   :group 'helm-grep
   :type 'float)
