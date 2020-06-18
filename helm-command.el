@@ -56,7 +56,8 @@
 (defvar helm-M-x-input-history nil)
 (defvar helm-M-x-prefix-argument nil
   "Prefix argument before calling `helm-M-x'.")
-
+(defvar helm-M-x--timer nil)
+(defvar helm-M-x--unwind-forms-done nil)
 
 (defun helm-M-x-get-major-mode-command-alist (mode-map)
   "Return alist of MODE-MAP."
@@ -210,7 +211,6 @@ suitable for `try-completion'.  Arg PREDICATE is a function that
 default to `commandp' see also `try-completion'.  Arg HISTORY
 default to `extended-command-history'."
   (let* ((helm--mode-line-display-prefarg t)
-         (tm (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
          (minibuffer-completion-confirm t)
          (pred (or predicate #'commandp))
          (metadata (unless (assq 'flex completion-styles-alist)
@@ -238,6 +238,7 @@ default to `extended-command-history'."
                           ((integerp helm-M-x-prefix-argument)
                            (format "%d " helm-M-x-prefix-argument)))
                          "M-x ")))
+    (setq helm-M-x--timer (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
     ;; Fix Issue #2250, add `helm-move-selection-after-hook' which
     ;; reset prefix arg to nil only for this helm session.
     (add-hook 'helm-move-selection-after-hook
@@ -253,18 +254,36 @@ default to `extended-command-history'."
                 :prompt prompt
                 :buffer "*helm M-x*"
                 :history 'helm-M-x-input-history))
-      (cancel-timer tm)
-      (setq helm--mode-line-display-prefarg nil)
-      ;; Be sure to remove it here as well in case of quit.
-      (remove-hook 'helm-move-selection-after-hook
-                   'helm-M-x--move-selection-after-hook)
-      (remove-hook 'helm-before-action-hook
-                   'helm-M-x--before-action-hook))))
+      (helm-M-x--unwind-forms))))
+
+;; When running a command involving again helm from helm-M-x, the
+;; unwind-protect UNWINDS forms are executed only once this helm
+;; command exit leaving the helm-M-x timer running and other variables
+;; and hooks not unset, so the timer is now in a global var and all
+;; the forms that should normally run in unwind-protect are running as
+;; well as soon as helm-M-x-execute-command is called.
+(defun helm-M-x--unwind-forms (&optional done)
+  ;; helm-M-x--unwind-forms-done is non nil when it have been called
+  ;; once from helm-M-x-execute-command.
+  (unless helm-M-x--unwind-forms-done
+    (when (timerp helm-M-x--timer)
+      (cancel-timer helm-M-x--timer)
+      (setq helm-M-x--timer nil))
+    (setq helm--mode-line-display-prefarg nil)
+    ;; Be sure to remove it here as well in case of quit.
+    (remove-hook 'helm-move-selection-after-hook
+                 'helm-M-x--move-selection-after-hook)
+    (remove-hook 'helm-before-action-hook
+                 'helm-M-x--before-action-hook))
+  ;; Reset helm-M-x--unwind-forms-done to nil when DONE is
+  ;; unspecified.
+  (setq helm-M-x--unwind-forms-done done))
 
 (defun helm-M-x-execute-command (command)
   "Execute COMMAND as an editor command.
 COMMAND must be a symbol that satisfies the `commandp' predicate.
 Save COMMAND to `extended-command-history'."
+  (helm-M-x--unwind-forms t)
   (when command
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command command
