@@ -441,6 +441,29 @@ This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding
           (const :tag "Use Eshell" eshell-mode)
           (const :tag "Use Shell" shell-mode)
           (const :tag "Use Shell" term-mode)))
+
+(defcustom helm-rsync-no-mode-line-update nil
+  "When non nil don't update mode-line when rsync is running.
+This is useful if you display the progress bar somewhere else,
+e.g. with minibuffer-line in minibuffer, in this case updating
+mode-line may create flickering in other frame's mode-line."
+  :type 'boolean
+  :group 'helm-files)
+
+(defcustom helm-rsync-switches '("-a" "-z" "-h" "--info=all2")
+  "Rsync options to use with HFF Rsync action.
+Note: Using \"--info=all2\" allows having the name of the file
+currently transfered in an help-echo in mode-line, if you use
+\"--info=progress2\" you will not have this information.  Using
+\"--protect-args\" option may clash as we are already quoting
+names."
+  :type '(repeat string)
+  :group 'helm-files)
+
+(defcustom helm-rsync-percent-sign "％"
+  "Percentage unicode sign to use in Rsync reporter."
+  :type 'string
+  :group 'helm-files)
 
 ;;; Faces
 ;;
@@ -534,6 +557,11 @@ This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding
 (defface helm-delete-async-message
     '((t (:foreground "yellow")))
   "Face used for mode-line message."
+  :group 'helm-files-faces)
+
+(defface helm-ff-rsync-progress
+  '((t (:inherit font-lock-warning-face)))
+  "Face used for rsync mode-line indicator."
   :group 'helm-files-faces)
 
 ;;; Helm-find-files - The helm file browser.
@@ -693,6 +721,11 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff--tramp-methods nil)
 (defvar helm-ff--directory-files-hash (make-hash-table :test 'equal))
 (defvar helm-ff-history-buffer-name "*helm-find-files history*")
+(defvar helm-rsync-command-history nil)
+(defvar helm-rsync--last-progress-bar-alist nil
+  "Used to store last valid rsync progress bar.")
+(defvar helm-rsync-process-buffer "*helm-rsync*")
+(defvar helm-rsync-progress-str-alist nil)
 
 ;;; Helm-find-files
 ;;
@@ -893,7 +926,6 @@ belonging to each window."
                                    else
                                    collect k)))
 
-(defvar helm-rsync-command-history nil)
 (defun helm-find-files-do-action (action)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION can be `rsync' or any action supported by `helm-dired-action'."
@@ -958,37 +990,6 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 ;; Rsync
 ;;
-(defcustom helm-rsync-switches '("-a" "-z" "-h" "--info=all2")
-  "Rsync options to use with HFF Rsync action.
-Note: Using \"--info=all2\" allows having the name of the file
-currently transfered in an help-echo in mode-line, if you use
-\"--info=progress2\" you will not have this information.  Using
-\"--protect-args\" option may clash as we are already quoting
-names."
-  :type '(repeat string)
-  :group 'helm-files)
-
-(defcustom helm-rsync-percent-sign "％"
-  "Percentage unicode sign to use in Rsync reporter."
-  :type 'string
-  :group 'helm-files)
-
-(defcustom helm-rsync-no-mode-line-update nil
-  "When non nil don't update mode-line when rsync is running.
-This is useful if you display the progress bar somewhere else,
-e.g. with minibuffer-line in minibuffer, in this case updating
-mode-line may create flickering in other frame's mode-line."
-  :type 'boolean
-  :group 'helm-files)
-
-(defvar helm-rsync-process-buffer "*helm-rsync*")
-(defvar helm-rsync-progress-str-alist nil)
-
-(defface helm-ff-rsync-progress
-  '((t (:inherit font-lock-warning-face)))
-  "Face used for rsync mode-line indicator."
-  :group 'helm-files-faces)
-
 (defun helm-rsync-remote2rsync (file)
   (if (file-remote-p file)
       (let ((localname (directory-file-name
@@ -1002,8 +1003,6 @@ mode-line may create flickering in other frame's mode-line."
      (directory-file-name
       (expand-file-name file)))))
 
-(defvar helm-rsync--last-progress-bar-alist nil
-  "Used to store last valid rsync progress bar.")
 (defun helm-rsync-format-mode-line-str (proc)
   (helm-aif (and (process-live-p proc)
                  (assoc-default proc helm-rsync-progress-str-alist))
