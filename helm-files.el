@@ -1042,6 +1042,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
 
 DEST must be a directory.  SWITCHES when unspecified default to
 `helm-rsync-switches'."
+  (cl-assert (file-directory-p dest) t)
   (setq files (cl-loop for f in files
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
