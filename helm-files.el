@@ -811,6 +811,9 @@ Should not be used among other sources.")
                                          #'helm-ff-make-bookmark-record)
                 (require 'helm-external)))
    (candidates :initform 'helm-find-files-get-candidates)
+   (update :initform (lambda ()
+                       (remhash helm-ff-default-directory
+                                helm-ff--list-directory-cache)))
    (filtered-candidate-transformer
     :initform '((lambda (candidates _source)
                   (when helm-ff-use-dir-locals
@@ -2967,30 +2970,34 @@ debugging purpose."
                        (list path))
                      (helm-ff-directory-files basedir))))))
 
+(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
 (defun helm-list-directory (directory)
   "List directory DIRECTORY.
 
 If DIRECTORY is remote use `helm-list-directory-function',
 otherwise use `directory-files'."
-  (let* ((remote (file-remote-p directory 'method))
-         (helm-list-directory-function
-          (if (and remote (not (string= remote "ftp")))
-              helm-list-directory-function
-            #'helm-list-dir-lisp))
-         (remote-fn-p (eq helm-list-directory-function
-                          'helm-list-dir-external))
-         (sort-method (cl-case helm-ff-initial-sort-method
-                        (newest (if (and remote remote-fn-p)
-                                    "-t" #'file-newer-than-file-p))
-                        (size (if (and remote remote-fn-p)
-                                  "-S" #'helm-ff-file-larger-that-file-p))
-                        (t nil))))
-    (if remote
-        (funcall helm-list-directory-function directory sort-method)
-      (if sort-method
-          (sort (directory-files directory t directory-files-no-dot-files-regexp)
-                sort-method)
-        (directory-files directory t directory-files-no-dot-files-regexp)))))
+  (or (gethash directory helm-ff--list-directory-cache)
+      (let* ((remote (file-remote-p directory 'method))
+             (helm-list-directory-function
+              (if (and remote (not (string= remote "ftp")))
+                  helm-list-directory-function
+                #'helm-list-dir-lisp))
+             (remote-fn-p (eq helm-list-directory-function
+                              'helm-list-dir-external))
+             (sort-method (cl-case helm-ff-initial-sort-method
+                            (newest (if (and remote remote-fn-p)
+                                        "-t" #'file-newer-than-file-p))
+                            (size (if (and remote remote-fn-p)
+                                      "-S" #'helm-ff-file-larger-that-file-p))
+                            (t nil))))
+        (puthash (file-name-as-directory directory)
+                 (if remote
+                     (funcall helm-list-directory-function directory sort-method)
+                   (if sort-method
+                       (sort (directory-files directory t directory-files-no-dot-files-regexp)
+                             sort-method)
+                     (directory-files directory t directory-files-no-dot-files-regexp)))
+                 helm-ff--list-directory-cache))))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
@@ -4214,6 +4221,7 @@ source is `helm-source-find-files'."
     (add-hook 'helm-after-update-hook hook)))
 
 (defun helm-find-files-cleanup ()
+  (clrhash helm-ff--list-directory-cache)
   (mapc (lambda (hook)
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
