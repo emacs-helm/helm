@@ -2970,34 +2970,30 @@ debugging purpose."
                        (list path))
                      (helm-ff-directory-files basedir))))))
 
-(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
 (defun helm-list-directory (directory)
   "List directory DIRECTORY.
 
 If DIRECTORY is remote use `helm-list-directory-function',
 otherwise use `directory-files'."
-  (or (gethash directory helm-ff--list-directory-cache)
-      (let* ((remote (file-remote-p directory 'method))
-             (helm-list-directory-function
-              (if (and remote (not (string= remote "ftp")))
-                  helm-list-directory-function
-                #'helm-list-dir-lisp))
-             (remote-fn-p (eq helm-list-directory-function
-                              'helm-list-dir-external))
-             (sort-method (cl-case helm-ff-initial-sort-method
-                            (newest (if (and remote remote-fn-p)
-                                        "-t" #'file-newer-than-file-p))
-                            (size (if (and remote remote-fn-p)
-                                      "-S" #'helm-ff-file-larger-that-file-p))
-                            (t nil))))
-        (puthash (file-name-as-directory directory)
-                 (if remote
-                     (funcall helm-list-directory-function directory sort-method)
-                   (if sort-method
-                       (sort (directory-files directory t directory-files-no-dot-files-regexp)
-                             sort-method)
-                     (directory-files directory t directory-files-no-dot-files-regexp)))
-                 helm-ff--list-directory-cache))))
+  (let* ((remote (file-remote-p directory 'method))
+         (helm-list-directory-function
+          (if (and remote (not (string= remote "ftp")))
+              helm-list-directory-function
+            #'helm-list-dir-lisp))
+         (remote-fn-p (eq helm-list-directory-function
+                          'helm-list-dir-external))
+         (sort-method (cl-case helm-ff-initial-sort-method
+                        (newest (if (and remote remote-fn-p)
+                                    "-t" #'file-newer-than-file-p))
+                        (size (if (and remote remote-fn-p)
+                                  "-S" #'helm-ff-file-larger-that-file-p))
+                        (t nil))))
+    (if remote
+        (funcall helm-list-directory-function directory sort-method)
+      (if sort-method
+          (sort (directory-files directory t directory-files-no-dot-files-regexp)
+                sort-method)
+        (directory-files directory t directory-files-no-dot-files-regexp)))))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
@@ -3069,6 +3065,7 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
+(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
 (defun helm-ff-directory-files (directory)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3077,25 +3074,28 @@ filename '.' and '..' even on root directories in Windows
 systems."
   (setq directory (file-name-as-directory
                    (expand-file-name directory)))
-  (let* (file-error
-         (ls   (condition-case err
-                   (helm-list-directory directory)
-                 ;; Handle file-error from here for Windows
-                 ;; because predicates like `file-readable-p' and friends
-                 ;; seem broken on emacs for Windows systems (always returns t).
-                 ;; This should never be called on GNU/Linux/Unix
-                 ;; as the error is properly intercepted in
-                 ;; `helm-find-files-get-candidates' by `file-readable-p'.
-                 (file-error
-                  (prog1
-                      (list (format "%s:%s"
-                                    (car err)
-                                    (mapconcat 'identity (cdr err) " ")))
-                    (setq file-error t)))))
-        (dot  (concat directory "."))
-        (dot2 (concat directory "..")))
-    (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
-    (append (and (not file-error) (list dot dot2)) ls)))
+  (or (gethash directory helm-ff--list-directory-cache) 
+      (let* (file-error
+             (ls   (condition-case err
+                       (helm-list-directory directory)
+                     ;; Handle file-error from here for Windows
+                     ;; because predicates like `file-readable-p' and friends
+                     ;; seem broken on emacs for Windows systems (always returns t).
+                     ;; This should never be called on GNU/Linux/Unix
+                     ;; as the error is properly intercepted in
+                     ;; `helm-find-files-get-candidates' by `file-readable-p'.
+                     (file-error
+                      (prog1
+                          (list (format "%s:%s"
+                                        (car err)
+                                        (mapconcat 'identity (cdr err) " ")))
+                        (setq file-error t)))))
+             (dot  (concat directory "."))
+             (dot2 (concat directory "..")))
+        (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
+        (puthash directory
+                 (append (and (not file-error) (list dot dot2)) ls)
+                 helm-ff--list-directory-cache))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
