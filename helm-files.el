@@ -815,7 +815,7 @@ Should not be used among other sources.")
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache)))
    (filtered-candidate-transformer
-    :initform '(helm-ff-fct-show-maybe-only-basename ;helm-ff-fct
+    :initform '(helm-ff-fct-show-maybe-only-basename
                 helm-ff-sort-candidates))
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")

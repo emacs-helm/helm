@@ -1261,9 +1261,6 @@ Keys description:
              :nohighlight t
              :candidates
              (lambda ()
-               ;; (append (and (not (file-exists-p helm-pattern))
-               ;;              (not (helm-ff--invalid-tramp-name-p helm-pattern))
-               ;;              (list helm-pattern))
                (if test
                    (cl-loop with hn = (helm-ff--tramp-hostnames)
                             for i in (helm-find-files-get-candidates
