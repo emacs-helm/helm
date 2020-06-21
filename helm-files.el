@@ -3457,7 +3457,8 @@ Return candidates prefixed with basename of `helm-input' first."
            when ff collect ff))
 
 (defun helm-ff-fct-show-maybe-only-basename (candidates _source)
-  (cl-loop for file in candidates
+  (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
+           for file in candidates
            for props = (append `(helm-realvalue ,file)
                                (text-properties-at 1 file))
            collect
@@ -3465,8 +3466,11 @@ Return candidates prefixed with basename of `helm-input' first."
                     (not (helm-dir-is-dot file))
                     (not (and helm--url-regexp
                               (string-match helm--url-regexp file))))
-               (let ((str (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                              (helm-basename file))))
+               (let ((str
+                      (or (and invalid-remote
+                               (helm-ff--get-host-from-tramp-invalid-fname
+                                file))
+                          (helm-basename file))))
                  (add-text-properties 0 (length str) props str)
                  str)
              file)))
