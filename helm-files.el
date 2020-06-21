@@ -3347,8 +3347,8 @@ it.
 NEW-FILE when non-nil means FNAME is a non existing file and
 return FNAME with display property prefixed with [?]."
   (cond (file-or-symlinkp fname)
-        ((or (string-match helm-ff-url-regexp fname)
-             (and helm--url-regexp (string-match helm--url-regexp fname)))
+        ((and helm--url-regexp
+              (string-match helm--url-regexp fname))
          (propertize
           fname 'display
           (format "%s %s"
@@ -3361,7 +3361,8 @@ return FNAME with display property prefixed with [?]."
                            (propertize
                             "[?]" 'face 'helm-ff-prefix)
                            (if helm-ff-transformer-show-only-basename
-                               (helm-basename fname) fname))))))
+                               (helm-basename fname) fname))))
+        (t fname)))
 
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
   (if (or (member real '("." ".."))
