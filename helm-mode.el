@@ -1261,19 +1261,22 @@ Keys description:
              :nohighlight t
              :candidates
              (lambda ()
-               (append (and (not (file-exists-p helm-pattern))
-                            (not (helm-ff--invalid-tramp-name-p helm-pattern))
-                            (list helm-pattern))
-                       (if test
-                           (cl-loop with hn = (helm-ff--tramp-hostnames)
-                                    for i in (helm-find-files-get-candidates
-                                              must-match)
-                                    when (or (member i hn) ; A tramp host
-                                             (funcall test i)) ; Test ok
-                                    collect i)
-                           (helm-find-files-get-candidates must-match))))
-             :filtered-candidate-transformer 'helm-ff-sort-candidates
-             :filter-one-by-one 'helm-ff-filter-candidate-one-by-one
+               ;; (append (and (not (file-exists-p helm-pattern))
+               ;;              (not (helm-ff--invalid-tramp-name-p helm-pattern))
+               ;;              (list helm-pattern))
+               (if test
+                   (cl-loop with hn = (helm-ff--tramp-hostnames)
+                            for i in (helm-find-files-get-candidates
+                                      must-match)
+                            when (or (member i hn)     ; A tramp host
+                                     (funcall test i)) ; Test ok
+                            collect i)
+                 (helm-find-files-get-candidates must-match)))
+             :update (lambda ()
+                       (remhash helm-ff-default-directory
+                                helm-ff--list-directory-cache))
+             :filtered-candidate-transformer '(helm-ff-fct-show-maybe-only-basename
+                                               helm-ff-sort-candidates)
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
