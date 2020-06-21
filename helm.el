@@ -5784,10 +5784,10 @@ message 'no match'."
              (empty-buffer-p (with-current-buffer helm-buffer
                                (eq (point-min) (point-max))))
              (unknown (and (not empty-buffer-p)
-                           (equal (get-text-property
-                                   0 'display
-                                   (helm-get-selection nil 'withprop src))
-                                  "[?]"))))
+                           (helm-aif (get-text-property
+                                      0 'display
+                                      (helm-get-selection nil 'withprop src))
+                               (string-match-p "\\`\\[\\?\\]" it)))))
         (cond ((and (or empty-buffer-p unknown)
                     (memq minibuffer-completion-confirm
                           '(confirm confirm-after-completion)))
