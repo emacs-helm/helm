@@ -3463,24 +3463,24 @@ Return candidates prefixed with basename of `helm-input' first."
   "FCT function for `helm-find-files'.
 
 Allow toggling from basename to full path display."
-  (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
-           for file in candidates
-           for props = (append `(helm-realvalue ,file)
-                               (text-properties-at 1 file))
-           collect
-           (if (and helm-ff-transformer-show-only-basename
-                    (not (helm-ff-dot-file-p file))
-                    (not (and helm--url-regexp
-                              (string-match helm--url-regexp file))))
-               (let ((str
-                      (or (and invalid-remote
-                               (helm-ff--get-host-from-tramp-invalid-fname
-                                file))
-                          (helm-basename file))))
-                 ;; Add the lost properties of FILE to BASENAME.
-                 (add-text-properties 0 (length str) props str)
-                 str)
-             file)))
+  (if (and helm-ff-transformer-show-only-basename
+           (cdr candidates))
+      (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
+               for file in candidates
+               for props = (append `(helm-realvalue ,file)
+                                   (text-properties-at 1 file))
+               collect
+               (if (not (helm-ff-dot-file-p file))
+                   (let ((str
+                          (or (and invalid-remote
+                                   (helm-ff--get-host-from-tramp-invalid-fname
+                                    file))
+                              (helm-basename file))))
+                     ;; Add the lost properties of FILE to BASENAME.
+                     (add-text-properties 0 (length str) props str)
+                     str)
+                 file))
+    candidates))
 
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
