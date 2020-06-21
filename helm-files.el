@@ -3339,12 +3339,13 @@ in `helm-find-files-persistent-action-if'."
 (put 'helm-ff-run-preview-file-externally 'helm-only t)
 
 (defun helm-ff-prefix-filename (fname &optional file-or-symlinkp new-file)
-  "Return filename FNAME maybe prefixed with [?] or [@].
+  "Add display property to FNAME.
+Display property presents a string maybe prefixed with [?] or [@].
 If FILE-OR-SYMLINKP is non-nil this means we assume FNAME is an
 existing filename or valid symlink and there is no need to test
 it.
 NEW-FILE when non-nil means FNAME is a non existing file and
-return FNAME prefixed with [?]."
+return FNAME with display property prefixed with [?]."
   (cond (file-or-symlinkp fname)
         ((or (string-match helm-ff-url-regexp fname)
              (and helm--url-regexp (string-match helm--url-regexp fname)))
@@ -3458,6 +3459,9 @@ Return candidates prefixed with basename of `helm-input' first."
        (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
 
 (defun helm-ff-fct-show-maybe-only-basename (candidates _source)
+  "FCT function for `helm-find-files'.
+
+Allow toggling from basename to full path display."
   (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
            for file in candidates
            for props = (append `(helm-realvalue ,file)
@@ -3472,6 +3476,7 @@ Return candidates prefixed with basename of `helm-input' first."
                                (helm-ff--get-host-from-tramp-invalid-fname
                                 file))
                           (helm-basename file))))
+                 ;; Add the lost properties of FILE to BASENAME.
                  (add-text-properties 0 (length str) props str)
                  str)
              file)))
