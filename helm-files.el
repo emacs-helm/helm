@@ -2934,7 +2934,7 @@ debugging purpose."
                invalid-basedir
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
-           (list path))
+           (list (helm-ff-filter-candidate-one-by-one path)))
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
