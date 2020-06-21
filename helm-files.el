@@ -3090,6 +3090,8 @@ systems."
              (dot  (concat directory "."))
              (dot2 (concat directory ".."))
              (candidates (append (and (not file-error) (list dot dot2)) ls)))
+        (when helm-ff-use-dir-locals
+          (helm-ff--hack-dir-locals))
         (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
         (puthash directory
                  (cl-loop for f in candidates
@@ -3454,13 +3456,6 @@ Return candidates prefixed with basename of `helm-input' first."
        (or helm-ff--git-found-p
            (setq helm-ff--git-found-p (executable-find "git")))
        (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
-
-(defun helm-ff-fct (candidates _source)
-  (when helm-ff-use-dir-locals
-    (helm-ff--hack-dir-locals))
-  (cl-loop for f in candidates
-           for ff = (helm-ff-filter-candidate-one-by-one f)
-           when ff collect ff))
 
 (defun helm-ff-fct-show-maybe-only-basename (candidates _source)
   (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
