@@ -3468,7 +3468,7 @@ Allow toggling from basename to full path display."
                                (text-properties-at 1 file))
            collect
            (if (and helm-ff-transformer-show-only-basename
-                    (not (helm-dir-is-dot file))
+                    (not (helm-ff-dot-file-p file))
                     (not (and helm--url-regexp
                               (string-match helm--url-regexp file))))
                (let ((str
@@ -3485,7 +3485,7 @@ Allow toggling from basename to full path display."
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
   ;; Handle boring files
   (let ((basename (helm-basename file))
-        (dot (helm-dir-is-dot file))
+        (dot (helm-ff-dot-file-p file))
         ;; Filename with cntrl chars e.g. foo^J
         (disp (replace-regexp-in-string "[[:cntrl:]]" "?" file)))
     (unless (or (helm-ff-boring-file-p basename)
@@ -3529,7 +3529,7 @@ Allow toggling from basename to full path display."
                 ((and dot (stringp type))
                  (propertize disp 'face 'helm-ff-dotted-symlink-directory))
                 ;; A dotted directory.
-                ((helm-ff-dot-file-p file)
+                (dot
                  (propertize disp 'face 'helm-ff-dotted-directory))
                 ;; A symlink.
                 ((stringp type)
