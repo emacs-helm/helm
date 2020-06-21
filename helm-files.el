@@ -2943,7 +2943,7 @@ debugging purpose."
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
            (helm-ff-directory-files path))
-          (t (append (unless (or require-match
+          (t (append (unless (or (eq require-match t)
                                  ;; Check here if path is an existing
                                  ;; file before adding it to
                                  ;; candidates, it was previously done
