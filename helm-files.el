@@ -816,7 +816,8 @@ Should not be used among other sources.")
                                 helm-ff--list-directory-cache)))
    (match-on-real :initform t)
    (filtered-candidate-transformer
-    :initform 'helm-ff-sort-candidates)
+    :initform '(helm-ff-fct
+                helm-ff-sort-candidates))
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
@@ -3459,13 +3460,28 @@ Return candidates prefixed with basename of `helm-input' first."
            (setq helm-ff--git-found-p (executable-find "git")))
        (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
 
-(defun helm-ff-filter-candidate-one-by-one (file)
-  "`filter-one-by-one' Transformer function for `helm-source-find-files'."
+(defun helm-ff-fct (candidates _source)
+  "Filter in charge of displaying basename of full path in HFF.
+Because CANDIDATES are directly stored as (basename . full_path), when
+`helm-ff-transformer-show-only-basename' is non nil do nothing and
+return directly CANDIDATES."
+  (if (null helm-ff-transformer-show-only-basename)
+      (cl-loop for (_disp . real) in candidates
+               for fc = (helm-ff-filter-candidate-one-by-one real 'reverse)
+               when fc collect fc)
+    candidates))
+
+(defun helm-ff-filter-candidate-one-by-one (file &optional reverse)
+  "Transform file in a cons cell like (DISPLAY . REAL).
+DISPLAY is shown as basename of FILE and REAL as full path of FILE.
+If REVERSE is non nil DISPLAY is shown as full path."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
          ;; Filename with cntrl chars e.g. foo^J
          (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
-                   (replace-regexp-in-string "[[:cntrl:]]" "?" basename))))
+                   (replace-regexp-in-string
+                    "[[:cntrl:]]" "?"
+                    (if reverse file basename)))))
     (unless (or (helm-ff-boring-file-p basename)
                 (helm-ff-git-ignored-p file))
 
