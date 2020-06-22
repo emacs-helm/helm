@@ -4439,8 +4439,12 @@ emacs-27 to provide such scoring in emacs<27."
                  when (< count limit) nconc
                  (cl-loop for c in cands
                           for dup = (gethash c hash)
+                          for disp = (helm-candidate-get-display c)
                           while (< count limit)
-                          for target = (helm-candidate-get-display c)
+                          for target = (if (helm-attr 'match-on-real source)
+                                           (or (cdr-safe c)
+                                               (get-text-property 0 'helm-realvalue disp))
+                                         disp)
                           for prop-part = (get-text-property 0 'match-part target)
                           for part = (and match-part-fn
                                           (or prop-part
