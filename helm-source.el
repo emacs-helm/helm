@@ -461,7 +461,9 @@
    (match-on-real
     :initarg :match-on-real
     :initform nil
-    :custom boolean)
+    :custom boolean
+    :documentation
+    "  Match the real value of candidates when non nil.")
 
    (fuzzy-match
     :initarg :fuzzy-match
