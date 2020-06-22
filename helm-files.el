@@ -3069,7 +3069,7 @@ later in the transformer."
         (split-string (buffer-string) "\n" t)))))
 
 (defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
-(defun helm-ff-directory-files (directory)
+(defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the dotted
@@ -3077,7 +3077,8 @@ filename '.' and '..' even on root directories in Windows
 systems."
   (setq directory (file-name-as-directory
                    (expand-file-name directory)))
-  (or (gethash directory helm-ff--list-directory-cache) 
+  (or (and (not force-update)
+           (gethash directory helm-ff--list-directory-cache))
       (let* (file-error
              (ls   (condition-case err
                        (helm-list-directory directory)
@@ -3104,6 +3105,64 @@ systems."
                           for ff = (helm-ff-filter-candidate-one-by-one f)
                           when ff collect ff)
                  helm-ff--list-directory-cache))))
+
+;;; [EXPERIMENTAL] helm-ff-cache-mode
+;;
+;;
+(defvar helm-ff--refresh-cache-timer nil)
+(defvar helm-ff-refresh-cache-delay 1.5)
+
+;;;###autoload
+(define-minor-mode helm-ff-cache-mode
+  "Refresh `helm-ff--list-directory-cache' when emacs is idle."
+  :group 'helm-files
+  :global t
+  (cl-assert helm-ff-keep-cached-candidates
+             nil "Please set first `helm-ff-keep-cached-candidates' to `t'")
+  (if helm-ff-cache-mode
+      (helm-ff-cache-mode-add-hooks)
+    (helm-ff-cache-mode-remove-hooks)
+    (cancel-timer helm-ff--refresh-cache-timer)
+    (setq helm-ff--refresh-cache-timer nil)))
+
+(defun helm-ff--cache-mode-refresh (&optional no-update delay)
+  (when helm-ff--refresh-cache-timer
+    (cancel-timer helm-ff--refresh-cache-timer))
+  ;(message "Helm find files refreshing...")
+  (unless (or helm-alive-p (input-pending-p) no-update)
+    (helm-ff--cache-mode-refresh-1))
+  ;(message "Helm find files refreshing done")
+  (setq helm-ff--refresh-cache-timer
+        (run-with-idle-timer
+         (helm-aif (current-idle-time)
+             (time-add
+              it (seconds-to-time helm-ff-refresh-cache-delay))
+           (or delay (helm-ff--cache-mode-delay)))
+         nil
+         #'helm-ff--cache-mode-refresh)))
+
+(defun helm-ff--cache-mode-refresh-1 ()
+  (when (and helm-ff-keep-cached-candidates
+             (> (hash-table-count helm-ff--list-directory-cache) 0))
+    (with-local-quit
+      (maphash (lambda (k _v)
+                 (helm-ff-directory-files k t))
+               helm-ff--list-directory-cache))))
+
+(defun helm-ff--cache-mode-delay ()
+  (max 1.5 helm-ff-refresh-cache-delay))
+
+(defun helm-ff--cache-mode-reset-timer ()
+  (helm-ff--cache-mode-refresh
+   'no-update (+ (helm-ff--cache-mode-delay) 1.0)))
+
+(defun helm-ff-cache-mode-add-hooks ()
+  (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
+  (add-hook 'focus-in-hook 'helm-ff--cache-mode-reset-timer))
+
+(defun helm-ff-cache-mode-remove-hooks ()
+  (remove-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
+  (remove-hook 'focus-in-hook 'helm-ff--cache-mode-reset-timer))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
