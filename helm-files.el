@@ -3148,7 +3148,8 @@ systems."
                           (seconds-to-time helm-ff-cache-mode-max-idle-time)))
     (with-local-quit
       (maphash (lambda (k _v)
-                 (helm-ff-directory-files k t))
+                 (unless (file-remote-p k)
+                   (helm-ff-directory-files k t)))
                helm-ff--list-directory-cache))))
 
 (defun helm-ff--cache-mode-delay ()
