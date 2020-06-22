@@ -1272,7 +1272,8 @@ Keys description:
              :update (lambda ()
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache))
-             :filtered-candidate-transformer '(helm-ff-fct-show-maybe-only-basename
+             :match-on-real t
+             :filtered-candidate-transformer '(helm-ff-fct
                                                helm-ff-sort-candidates)
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
