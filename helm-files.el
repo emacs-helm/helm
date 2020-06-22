@@ -1534,7 +1534,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (interactive)
   (unless (eq helm-ff-initial-sort-method 'size)
     (setq helm-ff-initial-sort-method 'size)
-    (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
   (message "Sorting by size"))
 (put 'helm-ff-sort-by-size 'helm-only t)
 
@@ -1542,7 +1542,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (interactive)
   (unless (eq helm-ff-initial-sort-method 'newest)
     (setq helm-ff-initial-sort-method 'newest)
-    (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
   (message "Sorting by newest"))
 (put 'helm-ff-sort-by-newest 'helm-only t)
 
@@ -1550,7 +1550,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (interactive)
   (unless (eq helm-ff-initial-sort-method nil)
     (setq helm-ff-initial-sort-method nil)
-    (helm-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
   (message "Sorting alphabetically"))
 (put 'helm-ff-sort-alpha 'helm-only t)
 
