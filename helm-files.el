@@ -3111,7 +3111,7 @@ systems."
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
 (defvar helm-ff-refresh-cache-delay 1.5)
-
+(defvar helm-ff-cache-mode-max-idle-time 120) ; Seconds.
 ;;;###autoload
 (define-minor-mode helm-ff-cache-mode
   "Refresh `helm-ff--list-directory-cache' when emacs is idle."
@@ -3128,10 +3128,8 @@ systems."
 (defun helm-ff--cache-mode-refresh (&optional no-update delay)
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
-  ;(message "Helm find files refreshing...")
   (unless (or helm-alive-p (input-pending-p) no-update)
     (helm-ff--cache-mode-refresh-1))
-  ;(message "Helm find files refreshing done")
   (setq helm-ff--refresh-cache-timer
         (run-with-idle-timer
          (helm-aif (current-idle-time)
@@ -3143,14 +3141,18 @@ systems."
 
 (defun helm-ff--cache-mode-refresh-1 ()
   (when (and helm-ff-keep-cached-candidates
-             (> (hash-table-count helm-ff--list-directory-cache) 0))
+             (> (hash-table-count helm-ff--list-directory-cache) 0)
+             ;; Stop updating when Emacs is idle more than
+             ;; helm-ff-cache-mode-max-idle-time.
+             (time-less-p (current-idle-time)
+                          (seconds-to-time helm-ff-cache-mode-max-idle-time)))
     (with-local-quit
       (maphash (lambda (k _v)
                  (helm-ff-directory-files k t))
                helm-ff--list-directory-cache))))
 
 (defun helm-ff--cache-mode-delay ()
-  (max 1.5 helm-ff-refresh-cache-delay))
+  (max 3 helm-ff-refresh-cache-delay))
 
 (defun helm-ff--cache-mode-reset-timer ()
   (helm-ff--cache-mode-refresh
