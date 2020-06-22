@@ -458,6 +458,11 @@
 
   Note that FUZZY-MATCH slot will overhide value of this slot.")
 
+   (match-on-real
+    :initarg :match-on-real
+    :initform nil
+    :custom boolean)
+
    (fuzzy-match
     :initarg :fuzzy-match
     :initform nil
