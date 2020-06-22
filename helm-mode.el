@@ -1263,11 +1263,13 @@ Keys description:
              (lambda ()
                (if test
                    (cl-loop with hn = (helm-ff--tramp-hostnames)
-                            for i in (helm-find-files-get-candidates
-                                      must-match)
-                            when (or (member i hn)     ; A tramp host
-                                     (funcall test i)) ; Test ok
-                            collect i)
+                            ;; helm-find-files-get-candidates is
+                            ;; returning a list of cons cells.
+                            for (d . r) in (helm-find-files-get-candidates
+                                            must-match)
+                            when (or (member r hn)     ; A tramp host
+                                     (funcall test r)) ; Test ok
+                            collect (cons d r))
                  (helm-find-files-get-candidates must-match)))
              :update (lambda ()
                        (remhash helm-ff-default-directory
