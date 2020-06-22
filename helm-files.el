@@ -814,9 +814,9 @@ Should not be used among other sources.")
    (update :initform (lambda ()
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache)))
+   (match-on-real :initform t)
    (filtered-candidate-transformer
-    :initform '(helm-ff-fct-show-maybe-only-basename
-                helm-ff-sort-candidates))
+    :initform 'helm-ff-sort-candidates)
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
    (help-message :initform 'helm-ff-help-message)
@@ -3459,36 +3459,13 @@ Return candidates prefixed with basename of `helm-input' first."
            (setq helm-ff--git-found-p (executable-find "git")))
        (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
 
-(defun helm-ff-fct-show-maybe-only-basename (candidates _source)
-  "FCT function for `helm-find-files'.
-
-Allow toggling from basename to full path display."
-  (if (and helm-ff-transformer-show-only-basename
-           (cdr candidates))
-      (cl-loop with invalid-remote = (helm-ff--invalid-tramp-name-p) 
-               for file in candidates
-               for props = (append `(helm-realvalue ,file)
-                                   (text-properties-at 1 file))
-               collect
-               (if (not (helm-ff-dot-file-p file))
-                   (let ((str
-                          (or (and invalid-remote
-                                   (helm-ff--get-host-from-tramp-invalid-fname
-                                    file))
-                              (helm-basename file))))
-                     ;; Add the lost properties of FILE to BASENAME.
-                     (add-text-properties 0 (length str) props str)
-                     str)
-                 file))
-    candidates))
-
 (defun helm-ff-filter-candidate-one-by-one (file)
   "`filter-one-by-one' Transformer function for `helm-source-find-files'."
-  ;; Handle boring files
-  (let ((basename (helm-basename file))
-        (dot (helm-ff-dot-file-p file))
-        ;; Filename with cntrl chars e.g. foo^J
-        (disp (replace-regexp-in-string "[[:cntrl:]]" "?" file)))
+  (let* ((basename (helm-basename file))
+         (dot (helm-ff-dot-file-p file))
+         ;; Filename with cntrl chars e.g. foo^J
+         (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
+                   (replace-regexp-in-string "[[:cntrl:]]" "?" basename))))
     (unless (or (helm-ff-boring-file-p basename)
                 (helm-ff-git-ignored-p file))
 
@@ -3497,23 +3474,24 @@ Allow toggling from basename to full path display."
                    (helm-file-on-mounted-network-p helm-pattern)))
           (let* ((hostp (helm-ff--get-host-from-tramp-invalid-fname file)))
             (cond (;; Dot directories . and ..
-                   dot (propertize file 'face 'helm-ff-dotted-directory))
+                   dot (cons (propertize file 'face 'helm-ff-dotted-directory) file))
                   ;; Directories.
                   ((get-text-property 1 'helm-ff-dir file)
-                   (propertize disp 'face 'helm-ff-directory))
+                   (cons (propertize disp 'face 'helm-ff-directory) file))
                   ;; Executable files.
                   ((get-text-property 1 'helm-ff-exe file)
-                   (propertize disp 'face 'helm-ff-executable))
+                   (cons (propertize disp 'face 'helm-ff-executable) file))
                   ;; Symlinks.
                   ((get-text-property 1 'helm-ff-sym file)
-                   (propertize disp 'face 'helm-ff-symlink))
+                   (cons (propertize disp 'face 'helm-ff-symlink) file))
                   ;; Regular files.
                   ((get-text-property 1 'helm-ff-file file)
-                   (propertize disp 'face 'helm-ff-file))
+                   (cons (propertize disp 'face 'helm-ff-file) file))
                   ;; non existing files.
-                  (t (helm-ff-prefix-filename
-                      (propertize disp 'face 'helm-ff-file)
-                      hostp (unless hostp 'new-file)))))
+                  (t (cons (helm-ff-prefix-filename
+                            (propertize disp 'face 'helm-ff-file)
+                            hostp (unless hostp 'new-file))
+                           file))))
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
@@ -3525,44 +3503,46 @@ Allow toggling from basename to full path display."
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
-                 (propertize disp 'face 'helm-ff-invalid-symlink))
+                 (cons (propertize disp 'face 'helm-ff-invalid-symlink) file))
                 ;; A dotted directory symlinked.
                 ((and dot (stringp type))
-                 (propertize disp 'face 'helm-ff-dotted-symlink-directory))
+                 (cons (propertize file 'face 'helm-ff-dotted-symlink-directory) file))
                 ;; A dotted directory.
                 (dot
-                 (propertize disp 'face 'helm-ff-dotted-directory))
+                 (cons (propertize file 'face 'helm-ff-dotted-directory) file))
                 ;; A symlink.
                 ((stringp type)
-                 (propertize disp 'display
-                             (concat (propertize disp 'face 'helm-ff-symlink)
-                                     " -> "
-                                     (propertize (abbreviate-file-name type)
-                                                 'face 'helm-ff-truename))))
+                 (cons (propertize disp 'display
+                                   (concat (propertize disp 'face 'helm-ff-symlink)
+                                           " -> "
+                                           (propertize (abbreviate-file-name type)
+                                                       'face 'helm-ff-truename)))
+                       file))
                 ;; A directory.
                 ((eq t type)
-                 (propertize disp 'face 'helm-ff-directory))
+                 (cons (propertize disp 'face 'helm-ff-directory) file))
                 ;; A character device file.
                 ((and attr (string-match
                             "\\`[cp]" (setq x-bit (substring (nth 8 attr) 0 4))))
-                 (propertize disp 'face 'helm-ff-pipe))
+                 (cons (propertize disp 'face 'helm-ff-pipe) file))
                 ;; A socket file.
                 ((and attr (string-match "\\`[s]" x-bit))
-                 (propertize disp 'face 'helm-ff-socket))
+                 (cons (propertize disp 'face 'helm-ff-socket) file))
                 ;; An executable file.
                 ((and attr
                       (string-match
                        "x\\'" x-bit))
-                 (propertize disp 'face 'helm-ff-executable))
+                 (cons (propertize disp 'face 'helm-ff-executable) file))
                 ;; An executable file with suid
                 ((and attr (string-match "s\\'" x-bit))
-                 (propertize disp 'face 'helm-ff-suid))
+                 (cons (propertize disp 'face 'helm-ff-suid) file))
                 ;; A file.
                 ((and attr (null type))
-                 (propertize disp 'face 'helm-ff-file))
+                 (cons (propertize disp 'face 'helm-ff-file) file))
                 ;; A non--existing file.
-                (t (helm-ff-prefix-filename
-                    (propertize disp 'face 'helm-ff-file) nil 'new-file))))))))
+                (t (cons (helm-ff-prefix-filename
+                          (propertize disp 'face 'helm-ff-file) nil 'new-file)
+                         file))))))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
