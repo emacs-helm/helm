@@ -3461,7 +3461,7 @@ Return candidates prefixed with basename of `helm-input' first."
        (zerop (call-process "git" nil nil nil "check-ignore" "-q" file))))
 
 (defun helm-ff-fct (candidates _source)
-  "Filter in charge of displaying basename of full path in HFF.
+  "Filter in charge of displaying basename or full path in HFF.
 Because CANDIDATES are directly stored as (basename . full_path), when
 `helm-ff-transformer-show-only-basename' is non nil do nothing and
 return directly CANDIDATES."
