@@ -464,6 +464,11 @@ names."
   "Percentage unicode sign to use in Rsync reporter."
   :type 'string
   :group 'helm-files)
+
+(defcustom helm-ff-keep-cached-candidates nil
+  "When non nil do not delete the HFF cache after each session."
+  :type 'boolean
+  :group 'helm-files)
 
 ;;; Faces
 ;;
@@ -4216,7 +4221,8 @@ source is `helm-source-find-files'."
     (add-hook 'helm-after-update-hook hook)))
 
 (defun helm-find-files-cleanup ()
-  (clrhash helm-ff--list-directory-cache)
+  (unless helm-ff-keep-cached-candidates
+    (clrhash helm-ff--list-directory-cache))
   (mapc (lambda (hook)
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
