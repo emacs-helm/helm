@@ -466,8 +466,17 @@ names."
   :group 'helm-files)
 
 (defcustom helm-ff-keep-cached-candidates nil
-  "When non nil do not delete the HFF cache after each session."
-  :type 'boolean
+  "When non nil do not delete the HFF cache after each session.
+Possible values are:
+- `all' or `t' : Keep all
+- `remote': Keep only remote
+- `local': Keep only locals
+- `nil' (default) : Delete all"
+  :type '(choice
+          (const :tag "Keep all"         'all)
+          (const :tag "Keep only remote" 'remote)
+          (const :tag "Keep only locals" 'local)
+          (const :tag "Delete all"       nil))
   :group 'helm-files)
 
 ;;; Faces
@@ -4282,9 +4291,22 @@ source is `helm-source-find-files'."
                   helm-ff-auto-expand-to-home-or-root))
     (add-hook 'helm-after-update-hook hook)))
 
+(defun helm-ff--cleanup-cache ()
+  "Remove remote entries from cache or clear it."
+  (cl-ecase helm-ff-keep-cached-candidates
+    ((all t) (ignore))
+    (local (maphash (lambda (k _v)
+                      (when (file-remote-p k)
+                        (remhash k helm-ff--list-directory-cache)))
+                    helm-ff--list-directory-cache))
+    (remote (maphash (lambda (k _v)
+                       (unless (file-remote-p k)
+                         (remhash k helm-ff--list-directory-cache)))
+                     helm-ff--list-directory-cache))
+    (nil (clrhash helm-ff--list-directory-cache))))
+
 (defun helm-find-files-cleanup ()
-  (unless helm-ff-keep-cached-candidates
-    (clrhash helm-ff--list-directory-cache))
+  (helm-ff--cleanup-cache)
   (mapc (lambda (hook)
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
