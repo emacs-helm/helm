@@ -3168,10 +3168,11 @@ When Emacs is idle, refresh the cache all the
                         (seconds-to-time helm-ff-cache-mode-max-idle-time)))
       (with-local-quit
         (setq helm-ff-cache-mode-lighter-face 'font-lock-type-face)
-        (maphash (lambda (k _v)
-                   (unless (file-remote-p k)
-                     (helm-ff-directory-files k t)))
-                 helm-ff--list-directory-cache))
+        (while-no-input
+          (maphash (lambda (k _v)
+                     (unless (file-remote-p k)
+                       (helm-ff-directory-files k t)))
+                   helm-ff--list-directory-cache)))
     (setq helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face))
   (force-mode-line-update))
 
