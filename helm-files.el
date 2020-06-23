@@ -4292,7 +4292,7 @@ source is `helm-source-find-files'."
     (add-hook 'helm-after-update-hook hook)))
 
 (defun helm-ff--cleanup-cache ()
-  "Remove remote entries from cache or clear it."
+  "Remove entries from cache according to `helm-ff-keep-cached-candidates'."
   (cl-ecase helm-ff-keep-cached-candidates
     ((all t) (ignore))
     (local (maphash (lambda (k _v)
