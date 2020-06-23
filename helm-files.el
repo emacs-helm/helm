@@ -3119,14 +3119,23 @@ systems."
 ;;
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
-(defvar helm-ff-refresh-cache-delay 2)
-(defvar helm-ff-cache-mode-post-delay 1.5)
-(defvar helm-ff-cache-mode-max-idle-time 120) ; Seconds.
+(defvar helm-ff-refresh-cache-delay 1.5)
+(defvar helm-ff-cache-mode-post-delay 1.0)
+(defvar helm-ff-cache-mode-max-idle-time 30) ; Seconds.
+
+(defvar helm-ff-cache-mode-lighter " 💡")
+(defvar helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face)
+
 ;;;###autoload
 (define-minor-mode helm-ff-cache-mode
-  "Refresh `helm-ff--list-directory-cache' when emacs is idle."
+  "Refresh `helm-ff--list-directory-cache' when emacs is idle.
+
+When Emacs is idle, refresh the cache all the
+`helm-ff-refresh-cache-delay' seconds then stop after
+`helm-ff-cache-mode-max-idle-time' if emacs is still idle."
   :group 'helm-files
   :global t
+  :lighter (:eval (propertize helm-ff-cache-mode-lighter 'face helm-ff-cache-mode-lighter-face))
   (cl-assert helm-ff-keep-cached-candidates
              nil "Please set first `helm-ff-keep-cached-candidates' to `t'")
   (if helm-ff-cache-mode
@@ -3138,7 +3147,8 @@ systems."
 (defun helm-ff--cache-mode-refresh (&optional no-update delay)
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
-  (unless (or helm-alive-p (input-pending-p) no-update)
+  (if (or helm-alive-p (input-pending-p) no-update)
+      (setq helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face)
     (helm-ff--cache-mode-refresh-1))
   (setq helm-ff--refresh-cache-timer
         (run-with-idle-timer
@@ -3150,19 +3160,20 @@ systems."
          #'helm-ff--cache-mode-refresh)))
 
 (defun helm-ff--cache-mode-refresh-1 ()
-  (when (and helm-ff-keep-cached-candidates
-             (> (hash-table-count helm-ff--list-directory-cache) 0)
-             ;; Stop updating when Emacs is idle more than
-             ;; helm-ff-cache-mode-max-idle-time.
-             (time-less-p (current-idle-time)
-                          (seconds-to-time helm-ff-cache-mode-max-idle-time)))
-    (message "Updating HFF cache...")
-    (with-local-quit
-      (maphash (lambda (k _v)
-                 (unless (file-remote-p k)
-                   (helm-ff-directory-files k t)))
-               helm-ff--list-directory-cache))
-    (message "Updating HFF cache done")))
+  (if (and helm-ff-keep-cached-candidates
+           (> (hash-table-count helm-ff--list-directory-cache) 0)
+           ;; Stop updating when Emacs is idle more than
+           ;; helm-ff-cache-mode-max-idle-time.
+           (time-less-p (current-idle-time)
+                        (seconds-to-time helm-ff-cache-mode-max-idle-time)))
+      (with-local-quit
+        (setq helm-ff-cache-mode-lighter-face 'font-lock-type-face)
+        (maphash (lambda (k _v)
+                   (unless (file-remote-p k)
+                     (helm-ff-directory-files k t)))
+                 helm-ff--list-directory-cache))
+    (setq helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face))
+  (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
   (helm-ff--cache-mode-refresh
