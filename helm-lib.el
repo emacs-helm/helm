@@ -995,12 +995,12 @@ Example:
           (\"q\" \"quit\")))
 
 "
-  (helm-awhile (string
-                (read-key (propertize prompt 'face 'minibuffer-prompt)))
-    (if (member it answer-list)
-        (cl-return it)
-      (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
-      (sit-for 1))))
+  (helm-awhile (read-key (propertize prompt 'face 'minibuffer-prompt))
+    (let ((str (and (characterp it) (string it))))
+      (if (and str (member str answer-list))
+          (cl-return str)
+        (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
+        (sit-for 1)))))
 
 ;;; Symbols routines
 ;;
