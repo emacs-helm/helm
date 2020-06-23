@@ -3119,7 +3119,8 @@ systems."
 ;;
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
-(defvar helm-ff-refresh-cache-delay 1.5)
+(defvar helm-ff-refresh-cache-delay 2)
+(defvar helm-ff-cache-mode-post-delay 1.5)
 (defvar helm-ff-cache-mode-max-idle-time 120) ; Seconds.
 ;;;###autoload
 (define-minor-mode helm-ff-cache-mode
@@ -3144,7 +3145,7 @@ systems."
          (helm-aif (current-idle-time)
              (time-add
               it (seconds-to-time helm-ff-refresh-cache-delay))
-           (or delay (helm-ff--cache-mode-delay)))
+           (or delay helm-ff-refresh-cache-delay))
          nil
          #'helm-ff--cache-mode-refresh)))
 
@@ -3155,18 +3156,18 @@ systems."
              ;; helm-ff-cache-mode-max-idle-time.
              (time-less-p (current-idle-time)
                           (seconds-to-time helm-ff-cache-mode-max-idle-time)))
+    (message "Updating HFF cache...")
     (with-local-quit
       (maphash (lambda (k _v)
                  (unless (file-remote-p k)
                    (helm-ff-directory-files k t)))
-               helm-ff--list-directory-cache))))
-
-(defun helm-ff--cache-mode-delay ()
-  (max 3 helm-ff-refresh-cache-delay))
+               helm-ff--list-directory-cache))
+    (message "Updating HFF cache done")))
 
 (defun helm-ff--cache-mode-reset-timer ()
   (helm-ff--cache-mode-refresh
-   'no-update (+ (helm-ff--cache-mode-delay) 1.0)))
+   'no-update (+ helm-ff-refresh-cache-delay
+                 helm-ff-cache-mode-post-delay)))
 
 (defun helm-ff-cache-mode-add-hooks ()
   (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
