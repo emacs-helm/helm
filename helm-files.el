@@ -3118,7 +3118,8 @@ systems."
 (defun helm-ff-refresh-cache ()
   "Refresh `helm-ff--list-directory-cache'."
   (maphash (lambda (k _v)
-             (helm-ff-directory-files k t))
+             (unless (file-remote-p k)
+               (helm-ff-directory-files k t)))
            helm-ff--list-directory-cache))
 
 ;;; [EXPERIMENTAL] helm-ff-cache-mode
