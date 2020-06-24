@@ -3160,13 +3160,18 @@ When Emacs is idle, refresh the cache all the
   :global t
   :lighter (:eval (propertize helm-ff-cache-mode-lighter
                               'face helm-ff--cache-mode-lighter-face))
-  (cl-assert helm-ff-keep-cached-candidates
-             nil "Please set first `helm-ff-keep-cached-candidates' to `t'")
-  (if helm-ff-cache-mode
-      (helm-ff-cache-mode-add-hooks)
-    (helm-ff-cache-mode-remove-hooks)
-    (cancel-timer helm-ff--refresh-cache-timer)
-    (setq helm-ff--refresh-cache-timer nil)))
+  (condition-case err
+      (progn
+        (cl-assert helm-ff-keep-cached-candidates
+                   nil "Please set first `helm-ff-keep-cached-candidates' to a non nil value")
+        (if helm-ff-cache-mode
+            (helm-ff-cache-mode-add-hooks)
+          (helm-ff-cache-mode-remove-hooks)
+          (cancel-timer helm-ff--refresh-cache-timer)
+          (setq helm-ff--refresh-cache-timer nil)))
+    (error (progn
+             (setq helm-ff-cache-mode nil)
+             (user-error "%s" (cadr err))))))
 
 (defun helm-ff--cache-mode-refresh (&optional no-update delay)
   (when helm-ff--refresh-cache-timer
