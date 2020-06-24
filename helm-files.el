@@ -3566,6 +3566,7 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; adding the dotted files to boring regexps (#924).
   (and helm-ff-skip-boring-files
        (not (string-match "\\.$" file))
+       (not (string= file "~"))
        (string-match  helm-ff--boring-regexp file)))
 
 (defvar helm-ff--git-found-p nil)
