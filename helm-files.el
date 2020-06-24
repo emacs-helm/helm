@@ -3115,6 +3115,12 @@ systems."
                           when ff collect ff)
                  helm-ff--list-directory-cache))))
 
+(defun helm-ff-refresh-cache ()
+  "Refresh `helm-ff--list-directory-cache'."
+  (maphash (lambda (k _v)
+             (helm-ff-directory-files k t))
+           helm-ff--list-directory-cache))
+
 ;;; [EXPERIMENTAL] helm-ff-cache-mode
 ;;
 ;;
@@ -3773,7 +3779,9 @@ Trash/info directory."
          (trashed-files     (helm-ff-trash-list)))
     (helm-ff-trash-action 'helm-restore-file-from-trash-1
                           '("restore" "restoring")
-                          trashed-files)))
+                          trashed-files)
+    (unless helm-ff-cache-mode
+      (helm-ff-refresh-cache))))
 
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a trash directory.
@@ -4743,6 +4751,8 @@ When a prefix arg is given, meaning of
                               (sleep-for 1))
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
+        (unless helm-ff-cache-mode
+          (helm-ff-refresh-cache))
         (message "%s File(s) %s" len (if trash "trashed" "deleted"))))))
 
 ;;; Delete files async
@@ -4816,6 +4826,8 @@ directories are always deleted with no warnings."
                          (let ((last-nonmenu-event t))
                            (when (y-or-n-p (format "Kill buffer %s, too? " buf))
                              (kill-buffer buf)))))
+                     (unless helm-ff-cache-mode
+                       (helm-ff-refresh-cache))
                      (run-with-timer
                       0.1 nil
                       (lambda ()
