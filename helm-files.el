@@ -3130,7 +3130,17 @@ systems."
 (defvar helm-ff-cache-mode-max-idle-time 30) ; Seconds.
 
 (defvar helm-ff-cache-mode-lighter " 💡")
-(defvar helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face)
+(defvar helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped)
+
+(defface helm-ff-cache-updating
+  '((t (:inherit font-lock-type-face)))
+  "Face used for `helm-ff-cache-mode' lighter."
+  :group 'helm-files-faces)
+
+(defface helm-ff-cache-stopped
+  '((t (:inherit font-lock-variable-name-face)))
+  "Face used for `helm-ff-cache-mode' lighter."
+  :group 'helm-files-faces)
 
 ;;;###autoload
 (define-minor-mode helm-ff-cache-mode
@@ -3141,7 +3151,8 @@ When Emacs is idle, refresh the cache all the
 `helm-ff-cache-mode-max-idle-time' if emacs is still idle."
   :group 'helm-files
   :global t
-  :lighter (:eval (propertize helm-ff-cache-mode-lighter 'face helm-ff-cache-mode-lighter-face))
+  :lighter (:eval (propertize helm-ff-cache-mode-lighter
+                              'face helm-ff-cache-mode-lighter-face))
   (cl-assert helm-ff-keep-cached-candidates
              nil "Please set first `helm-ff-keep-cached-candidates' to `t'")
   (if helm-ff-cache-mode
@@ -3154,7 +3165,7 @@ When Emacs is idle, refresh the cache all the
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
   (if (or helm-alive-p (input-pending-p) no-update)
-      (setq helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face)
+      (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped)
     (helm-ff--cache-mode-refresh-1))
   (setq helm-ff--refresh-cache-timer
         (run-with-idle-timer
@@ -3173,13 +3184,10 @@ When Emacs is idle, refresh the cache all the
            (time-less-p (current-idle-time)
                         (seconds-to-time helm-ff-cache-mode-max-idle-time)))
       (with-local-quit
-        (setq helm-ff-cache-mode-lighter-face 'font-lock-type-face)
+        (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-updating)
         (while-no-input
-          (maphash (lambda (k _v)
-                     (unless (file-remote-p k)
-                       (helm-ff-directory-files k t)))
-                   helm-ff--list-directory-cache)))
-    (setq helm-ff-cache-mode-lighter-face 'font-lock-variable-name-face))
+          (helm-ff-refresh-cache)))
+    (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped))
   (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
