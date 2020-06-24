@@ -3125,9 +3125,9 @@ systems."
 ;;
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
-(defvar helm-ff-refresh-cache-delay 1.5)
-(defvar helm-ff-cache-mode-post-delay 1.0)
-(defvar helm-ff-cache-mode-max-idle-time 30) ; Seconds.
+(defvar helm-ff-refresh-cache-delay 1.0)
+(defvar helm-ff-cache-mode-post-delay 0.5)
+(defvar helm-ff-cache-mode-max-idle-time 15) ; Seconds.
 
 (defvar helm-ff-cache-mode-lighter " 💡")
 (defvar helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped)
