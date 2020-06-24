@@ -3125,12 +3125,18 @@ systems."
 ;;
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
-(defvar helm-ff-refresh-cache-delay 1.0)
-(defvar helm-ff-cache-mode-post-delay 0.5)
-(defvar helm-ff-cache-mode-max-idle-time 15) ; Seconds.
+(defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
+(defvar helm-ff--cache-mode-post-delay 0.5)
 
-(defvar helm-ff-cache-mode-lighter " 💡")
-(defvar helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped)
+(defvar helm-ff-refresh-cache-delay 1.0
+  "`helm-ff-cache-mode' timer starts after this many seconds")
+(defvar helm-ff-cache-mode-max-idle-time 15
+  "`helm-ff-cache-mode' timer stops updating after this many seconds.")
+
+(defcustom helm-ff-cache-mode-lighter " 💡"
+  "A string for `helm-ff-cache-mode' lighter."
+  :type 'string
+  :group 'helm-files)
 
 (defface helm-ff-cache-updating
   '((t (:inherit font-lock-type-face)))
@@ -3152,7 +3158,7 @@ When Emacs is idle, refresh the cache all the
   :group 'helm-files
   :global t
   :lighter (:eval (propertize helm-ff-cache-mode-lighter
-                              'face helm-ff-cache-mode-lighter-face))
+                              'face helm-ff--cache-mode-lighter-face))
   (cl-assert helm-ff-keep-cached-candidates
              nil "Please set first `helm-ff-keep-cached-candidates' to `t'")
   (if helm-ff-cache-mode
@@ -3165,7 +3171,7 @@ When Emacs is idle, refresh the cache all the
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
   (if (or helm-alive-p (input-pending-p) no-update)
-      (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped)
+      (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
     (helm-ff--cache-mode-refresh-1))
   (setq helm-ff--refresh-cache-timer
         (run-with-idle-timer
@@ -3184,16 +3190,16 @@ When Emacs is idle, refresh the cache all the
            (time-less-p (current-idle-time)
                         (seconds-to-time helm-ff-cache-mode-max-idle-time)))
       (with-local-quit
-        (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-updating)
+        (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating)
         (while-no-input
           (helm-ff-refresh-cache)))
-    (setq helm-ff-cache-mode-lighter-face 'helm-ff-cache-stopped))
+    (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped))
   (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
   (helm-ff--cache-mode-refresh
    'no-update (+ helm-ff-refresh-cache-delay
-                 helm-ff-cache-mode-post-delay)))
+                 helm-ff--cache-mode-post-delay)))
 
 (defun helm-ff-cache-mode-add-hooks ()
   (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
