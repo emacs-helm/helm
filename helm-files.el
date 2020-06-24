@@ -1803,6 +1803,8 @@ This doesn't replace inside the files, only modify filenames."
                       (rename-file old new)
                       (cl-incf count)))
                finally (message "%d Files renamed" count))))
+  (unless helm-ff-cache-mode
+    (helm-ff-refresh-cache))
   ;; This fix the emacs bug where "Emacs-Lisp:" is sent
   ;; in minibuffer (not the echo area).
   (sit-for 0.1)
