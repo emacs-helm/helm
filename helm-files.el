@@ -3192,7 +3192,7 @@ When Emacs is idle, refresh the cache all the
            ;; helm-ff-cache-mode-max-idle-time.
            (time-less-p (current-idle-time)
                         (seconds-to-time helm-ff-cache-mode-max-idle-time)))
-      (with-local-quit
+      (progn
         (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating)
         (while-no-input
           (helm-ff-refresh-cache)))
