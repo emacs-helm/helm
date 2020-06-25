@@ -1017,6 +1017,22 @@ Helm-find-files can ignore files matching
 `helm-boring-file-regexp-list' or files that are git ignored, you
 can set this with `helm-ff-skip-boring-files' or
 `helm-ff-skip-git-ignored-files'.
+NOTE: This will slow down helm, be warned.
+
+*** Helm is using a cache
+
+Helm is caching each directory files list in a hash table for
+faster search.  By default the cache is cleared after each HFF
+session, but you can keep the cache across your HFF sessions by
+customizing `helm-ff-keep-cached-candidates' (see its docstring),
+however this may cause surprises if files have changed (renamed,
+deleted etc...) in these cases you can refresh a directory by
+hitting `\\<helm-map>\\[helm-refresh]'.  An other way is to use
+`helm-ff-cache-mode' which will lazily update HFF cache while
+Emacs is idle, it will show a red or green light depending helm
+is updating or not, to enable it add to your init file
+=(helm-ff-cache-mode 1)=
+or manually with M-x helm-ff-cache-mode.
 
 ** Commands
 \\<helm-find-files-map>
@@ -1033,6 +1049,7 @@ can set this with `helm-ff-skip-boring-files' or
 \\[helm-ff-run-rename-file]\t\tRename Files (`\\[universal-argument]' to follow).
 \\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace on marked files.
 \\[helm-ff-run-copy-file]\t\tCopy Files (`\\[universal-argument]' to follow).
+\\[helm-ff-run-rsync-file]\t\tRsync Files (`\\[universal-argument]' to edit command).
 \\[helm-ff-run-byte-compile-file]\t\tByte Compile Files (`\\[universal-argument]' to load).
 \\[helm-ff-run-load-file]\t\tLoad Files.
 \\[helm-ff-run-symlink-file]\t\tSymlink Files.
