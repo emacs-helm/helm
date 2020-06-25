@@ -425,13 +425,6 @@ If you are using Mogrify or Jpegtran mandatory option is
   :group 'helm-files
   :type '(repeat string))
 
-(defcustom helm-ff-use-dir-locals nil
-  "Whether to obey dir locals var in helm-find-files.
-This allows using for example different values for boring files/dirs
-in different directories."
-  :group 'helm-files
-  :type 'boolean)
-
 (defcustom helm-ff-preferred-shell-mode 'eshell-mode
   "Shell to use to switch to a shell buffer from `helm-find-files'.
 Possible values are `shell-mode', `eshell-mode' and `term-mode'.
@@ -3112,8 +3105,6 @@ in cache."
              (dot  (concat directory "."))
              (dot2 (concat directory ".."))
              (candidates (append (and (not file-error) (list dot dot2)) ls)))
-        (when helm-ff-use-dir-locals
-          (helm-ff--hack-dir-locals))
         (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
         (puthash directory
                  (cl-loop for f in candidates
@@ -3530,39 +3521,6 @@ Return candidates prefixed with basename of INPUT first."
   "Sort function for `helm-source-find-files'.
 Return candidates prefixed with basename of `helm-input' first."
   (helm-ff-sort-candidates-1 candidates helm-input))
-
-(defvar helm-ff--dir-locals nil)
-(make-local-variable 'helm-ff--dir-locals)
-
-(defun helm-ff--reset-dir-locals ()
-  "Reset directory local variables to their default-value."
-  (with-helm-buffer
-    (cl-loop for (k . _v) in helm-ff--dir-locals
-             when (default-boundp k)
-             do (set (make-local-variable k) (default-value k)))))
-
-(defun helm-ff--apply-dir-locals (locals)
-  "Apply directory variables LOCALS (an alist) in helm-buffer."
-  (with-helm-buffer
-    ;; Reset all local vars that have been added by
-    ;; `hack-local-variables-apply' to their default value.
-    (helm-ff--reset-dir-locals)
-    ;; Store possible dir local vars for further reset.
-    (cl-loop for (k . v) in locals
-             unless (assq k helm-ff--dir-locals)
-             do (push (cons k v) helm-ff--dir-locals))
-    ;; Now apply dir locals.
-    (hack-local-variables-apply)))
-
-(defun helm-ff--hack-dir-locals ()
-  "Maybe apply directory local variables in helm-buffer."
-  (with-helm-default-directory helm-ff-default-directory
-    ;; Reset previous dir local vars in helm-buffer.
-    (with-helm-buffer (setq dir-local-variables-alist nil))
-    (hack-dir-local-variables)
-    (helm-aif dir-local-variables-alist
-        (helm-ff--apply-dir-locals it)
-      (helm-ff--reset-dir-locals))))
 
 (defun helm-ff-boring-file-p (file)
   "Returns non nil when FILE is matching boring regexps."
