@@ -3459,23 +3459,17 @@ existing filename or valid symlink and there is no need to test
 it.
 NEW-FILE when non-nil means FNAME is a non existing file and
 return FNAME with display property prefixed with [?]."
-  (cond (file-or-symlinkp fname)
-        ((and helm--url-regexp
-              (string-match helm--url-regexp fname))
-         (propertize
-          fname 'display
-          (format "%s %s"
-                  (propertize
-                   "[@]" 'face 'helm-ff-prefix)
-                  fname)))
-        (new-file (propertize
-                   fname 'display
-                   (format "%s %s"
-                           (propertize
-                            "[?]" 'face 'helm-ff-prefix)
-                           (if helm-ff-transformer-show-only-basename
-                               (helm-basename fname) fname))))
-        (t fname)))
+  (let* ((prefix-new (propertize
+                      " " 'display
+                      (propertize "[?]" 'face 'helm-ff-prefix)))
+         (prefix-url (propertize
+                      " " 'display
+                      (propertize "[@]" 'face 'helm-ff-prefix))))
+    (cond (file-or-symlinkp fname)
+          ((or (string-match helm-ff-url-regexp fname)
+               (and helm--url-regexp (string-match helm--url-regexp fname)))
+           (concat prefix-url " " fname))
+          (new-file (concat prefix-new " " fname)))))
 
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
   (if (or (member real '("." ".."))
