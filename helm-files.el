@@ -2951,7 +2951,8 @@ debugging purpose."
                invalid-basedir
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
-           (list (helm-ff-filter-candidate-one-by-one path)))
+           ;; Do NOT filter boring files here (issue #2330).
+           (list (helm-ff-filter-candidate-one-by-one path nil t)))
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
@@ -2981,7 +2982,8 @@ debugging purpose."
                                  ;; disabled, whe don't want PATH to be added on top
                                  ;; if it is a directory.
                                  dir-p)
-                       (list (helm-ff-filter-candidate-one-by-one path)))
+                       ;; Do NOT filter boring files here (issue #2330).
+                       (list (helm-ff-filter-candidate-one-by-one path nil t)))
                      (helm-ff-directory-files basedir))))))
 
 (defun helm-list-directory (directory)
@@ -3566,7 +3568,6 @@ Return candidates prefixed with basename of `helm-input' first."
   ;; adding the dotted files to boring regexps (#924).
   (and helm-ff-skip-boring-files
        (not (string-match "\\.$" file))
-       (not (string= file "~"))
        (string-match  helm-ff--boring-regexp file)))
 
 (defvar helm-ff--git-found-p nil)
@@ -3589,10 +3590,11 @@ return directly CANDIDATES."
                when fc collect fc)
     candidates))
 
-(defun helm-ff-filter-candidate-one-by-one (file &optional reverse)
+(defun helm-ff-filter-candidate-one-by-one (file &optional reverse skip-boring-check)
   "Transform file in a cons cell like (DISPLAY . REAL).
 DISPLAY is shown as basename of FILE and REAL as full path of FILE.
-If REVERSE is non nil DISPLAY is shown as full path."
+If REVERSE is non nil DISPLAY is shown as full path.
+If SKIP-BORING-CHECK is non nil don't filter boring files."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
          ;; Filename with cntrl chars e.g. foo^J
@@ -3600,8 +3602,12 @@ If REVERSE is non nil DISPLAY is shown as full path."
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
                     (if reverse file basename)))))
-    (unless (or (helm-ff-boring-file-p basename)
-                (helm-ff-git-ignored-p file))
+    ;; We don't want to filter boring files only on the files coming
+    ;; from the output of helm-ff-directory-files not on single
+    ;; candidate (issue #2330).
+    (unless (and (not skip-boring-check)
+                 (or (helm-ff-boring-file-p basename)
+                     (helm-ff-git-ignored-p file)))
 
       ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
