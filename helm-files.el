@@ -3087,7 +3087,9 @@ later in the transformer."
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the dotted
 filename '.' and '..' even on root directories in Windows
-systems."
+systems.
+When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
+in cache."
   (setq directory (file-name-as-directory
                    (expand-file-name directory)))
   (or (and (not force-update)
