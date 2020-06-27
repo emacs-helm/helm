@@ -999,7 +999,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
       (let ((localname (directory-file-name
                         (expand-file-name (file-remote-p file 'localname))))
             (user      (file-remote-p file 'user))
-            (host      (file-remote-p file 'host)))
+            ;; Tramp name may contain port e.g. /ssh:host#2222:/foo.
+            (host      (replace-regexp-in-string
+                        "#[0-9]+" "" (file-remote-p file 'host))))
         (if user
             (format "%s@%s:%s" user host (shell-quote-argument localname))
           (format "%s:%s" host (shell-quote-argument localname))))
@@ -1051,12 +1053,28 @@ DEST must be a directory.  SWITCHES when unspecified default to
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let* ((buf (generate-new-buffer-name helm-rsync-process-buffer))
+         (port (when (helm-aand (file-remote-p dest 'host)
+                                (string-match "#\\([0-9]+\\)" it))
+                 (match-string 1)))
          (proc (start-process-shell-command
                 "rsync" buf
                 (format "rsync %s"
-                        (mapconcat 'identity
-                                   (append (or switches helm-rsync-switches)
-                                           files (list dest))
+                        (mapconcat
+                         'identity
+                         (append (or switches helm-rsync-switches)
+                                 (and port
+                                      ;; Add automatically port
+                                      ;; specified in tramp name
+                                      ;; unless user already specified
+                                      ;; it himself with the -e option
+                                      ;; by editing command.
+                                      (and switches
+                                           (cl-loop for arg in switches never
+                                                    (string-match-p
+                                                     "\\`-e" arg)))
+                                      (list (format "-e 'ssh -p %s'"
+                                                    port)))
+                                 files (list dest))
                                    " ")))))
     (helm-rsync-mode-line proc)
     (set-process-sentinel
