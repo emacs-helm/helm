@@ -447,9 +447,7 @@ mode-line may create flickering in other frame's mode-line."
   "Rsync options to use with HFF Rsync action.
 Note: Using \"--info=all2\" allows having the name of the file
 currently transfered in an help-echo in mode-line, if you use
-\"--info=progress2\" you will not have this information.  Using
-\"--protect-args\" option may clash as we are already quoting
-names."
+\"--info=progress2\" you will not have this information."
   :type '(repeat string)
   :group 'helm-files)
 
