@@ -3124,12 +3124,21 @@ in cache."
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
 (defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
-(defvar helm-ff--cache-mode-post-delay 0.5)
 
-(defvar helm-ff-refresh-cache-delay 1.0
-  "`helm-ff-cache-mode' timer starts after this many seconds")
-(defvar helm-ff-cache-mode-max-idle-time 15
-  "`helm-ff-cache-mode' timer stops updating after this many seconds.")
+(defcustom helm-ff-cache-mode-post-delay 0.5
+  "Wait this delay seconds before restarting when emacs stops beeing idle"
+  :type 'float
+  :group 'helm-files)
+
+(defcustom helm-ff-refresh-cache-delay 1.0
+  "`helm-ff-cache-mode' timer starts after this many seconds"
+  :type 'float
+  :group 'helm-files)
+
+(defcustom helm-ff-cache-mode-max-idle-time 15
+  "`helm-ff-cache-mode' timer stops updating after this many seconds."
+  :type 'integer
+  :group 'helm-files)
 
 (defcustom helm-ff-cache-mode-lighter " 💡"
   "A string for `helm-ff-cache-mode' lighter."
@@ -3215,7 +3224,7 @@ When Emacs is idle, refresh the cache all the
   ;; and an explicit delay in post-command-hook and in focus-in-hook.
   (helm-ff--cache-mode-refresh
    'no-update (+ helm-ff-refresh-cache-delay
-                 helm-ff--cache-mode-post-delay)))
+                 helm-ff-cache-mode-post-delay)))
 
 (defun helm-ff-cache-mode-add-hooks ()
   (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
