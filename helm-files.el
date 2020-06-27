@@ -443,7 +443,7 @@ mode-line may create flickering in other frame's mode-line."
   :type 'boolean
   :group 'helm-files)
 
-(defcustom helm-rsync-switches '("-a" "-z" "-h" "--info=all2")
+(defcustom helm-rsync-switches '("-a" "-z" "-h" "-s" "--info=all2")
   "Rsync options to use with HFF Rsync action.
 Note: Using \"--info=all2\" allows having the name of the file
 currently transfered in an help-echo in mode-line, if you use
