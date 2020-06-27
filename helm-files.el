@@ -3200,6 +3200,19 @@ When Emacs is idle, refresh the cache all the
   (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
+  ;; The goal is to run a timer all the x seconds when Emacs is idle.
+  ;; When Emacs is idle during say 20s (current-idle-time)
+  ;; the idle timer will run in
+  ;; 20+<helm-ff-refresh-cache-delay>+<helm-ff--cache-mode-post-delay>
+  ;; s. Say for example it is 20+1.5.
+  ;; This is fine when Emacs stays idle, because the next timer
+  ;; will run at 21.5+1.5 etc... so the display will be updated
+  ;; at every 1.5 seconds.
+  ;; But as soon as emacs looses its idleness
+  ;; i.e. (current-idle-time)==nil, the next update
+  ;; will occur at say 21+1.5 s, so we have to reinitialize
+  ;; the timer at 0+1.5. To do this we run the timer fn with 'noupdate
+  ;; and an explicit delay in post-command-hook and in focus-in-hook.
   (helm-ff--cache-mode-refresh
    'no-update (+ helm-ff-refresh-cache-delay
                  helm-ff--cache-mode-post-delay)))
