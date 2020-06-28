@@ -1444,12 +1444,12 @@ colorization of backend, however it is still supported.
 
 For ripgrep here is the command line to use:
 
-    rg --color=always --smart-case --no-heading --line-number %s %s %s
+    rg --color=always --hidden --smart-case --no-heading --line-number %s %s %s
 
 And to customize colors (always for ripgrep) use something like this:
 
     rg --color=always --colors 'match:bg:yellow' --colors 'match:fg:black'
-\--smart-case --no-heading --line-number %s %s %s
+\--hidden --smart-case --no-heading --line-number %s %s %s
 
 This will change color for matched items from foreground red (the
 default) to a yellow background with a black foreground.  Note
