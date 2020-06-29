@@ -748,6 +748,14 @@ a string, i.e. the `symbol-name' of any existing symbol."
 ;;; Advices
 ;;
 ;;
+(defvar ad-advised-functions)
+(defvar ad-advice-classes)
+(declare-function ad-make-single-advice-docstring "advice")
+(declare-function ad-get-advice-info-field "advice")
+(declare-function ad-advice-set-enabled "advice")
+(declare-function ad-advice-set-enabled "advice")
+(declare-function ad-advice-enabled "advice")
+
 (defvar helm-source-advice
   (helm-build-sync-source "Function Advice"
     :init (lambda () (require 'advice))
