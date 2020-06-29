@@ -45,12 +45,14 @@
   :type '(alist :key-type string :value-type function))
 
 (defface helm-time-zone-current
-    '((t (:foreground "green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "green"))
   "Face used to colorize current time in `helm-world-time'."
   :group 'helm-misc)
 
 (defface helm-time-zone-home
-    '((t (:foreground "red")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "red"))
   "Face used to colorize home time in `helm-world-time'."
   :group 'helm-misc)
 

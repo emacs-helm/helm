@@ -153,48 +153,60 @@ buffer at the end.  See `helm-buffers-reorder-buffer-list'."
   :group 'helm-faces)
 
 (defface helm-buffer-saved-out
-    '((t (:foreground "red" :background "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "red" :background "black"))
   "Face used for buffer files modified outside of emacs."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-not-saved
-    '((t (:foreground "Indianred2")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Indianred2"))
   "Face used for buffer files not already saved on disk."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-modified
-    '((t :inherit font-lock-comment-face))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-comment-face))
   "Face used for modified buffers."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-size
-    '((((background dark)) :foreground "RosyBrown")
-      (((background light)) :foreground "SlateGray"))
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "RosyBrown")
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "SlateGray"))
   "Face used for buffer size."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-process
-    '((t (:foreground "Sienna3")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Sienna3"))
   "Face used for process status in buffer."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-directory
-    '((t (:foreground "DarkRed" :background "LightGray")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "DarkRed" :background "LightGray"))
   "Face used for directories in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-file
-    '((t :inherit font-lock-builtin-face))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-builtin-face))
   "Face for buffer file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-archive
-    '((t (:foreground "Gold")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Gold"))
   "Face for archive file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-non-file-buffer
-    '((t (:inherit italic)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit italic))
   "Face used for non-file buffers in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 

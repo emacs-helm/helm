@@ -28,7 +28,8 @@
   :group 'helm)
 
 (defface helm-top-columns
-    '((t :inherit helm-header))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit helm-header))
   "Face for helm help string in minibuffer."
   :group 'helm-sys)
 

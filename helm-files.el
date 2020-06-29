@@ -480,92 +480,110 @@ Possible values are:
   :group 'helm-faces)
 
 (defface helm-ff-prefix
-    '((t (:background "yellow" :foreground "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "yellow" :foreground "black"))
   "Face used to prefix new file or url paths in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-executable
-    '((t (:foreground "green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "green"))
   "Face used for executable files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-suid
-    '((t (:background "red" :foreground "white")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "red" :foreground "white"))
   "Face used for suid files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-directory
-    '((t (:foreground "DarkRed" :background "LightGray")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "DarkRed" :background "LightGray"))
   "Face used for directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-dotted-directory
-    '((t (:foreground "black" :background "DimGray")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "black" :background "DimGray"))
   "Face used for dotted directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-dotted-symlink-directory
-    '((t (:foreground "DarkOrange" :background "DimGray")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "DarkOrange" :background "DimGray"))
   "Face used for dotted symlinked directories in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-symlink
-    '((t :inherit font-lock-comment-face))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-comment-face))
   "Face used for symlinks in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-invalid-symlink
-    '((t (:foreground "black" :background "red")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "black" :background "red"))
   "Face used for invalid symlinks in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-denied
-    '((t (:foreground "red" :background "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "red" :background "black"))
   "Face used for non accessible files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-file
-    '((t (:inherit font-lock-builtin-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-builtin-face))
   "Face used for file names in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-truename
-    '((t (:inherit font-lock-string-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-string-face))
   "Face used for symlink truenames in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-dirs
-    '((t (:inherit font-lock-function-name-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-function-name-face))
   "Face used for file names in recursive dirs completion in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-socket
-    '((t (:foreground "DeepPink")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "DeepPink"))
   "Face used for socket files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-ff-pipe
-    '((t (:foreground "yellow" :background "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "yellow" :background "black"))
   "Face used for named pipes and character device files in `helm-find-files'."
   :group 'helm-files-faces)
 
 (defface helm-history-deleted
-    '((t (:inherit helm-ff-invalid-symlink)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit helm-ff-invalid-symlink))
   "Face used for deleted files in `file-name-history'."
   :group 'helm-files-faces)
 
 (defface helm-history-remote
-    '((t (:foreground "Indianred1")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Indianred1"))
   "Face used for remote files in `file-name-history'."
   :group 'helm-files-faces)
 
 (defface helm-delete-async-message
-    '((t (:foreground "yellow")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "yellow"))
   "Face used for mode-line message."
   :group 'helm-files-faces)
 
 (defface helm-ff-rsync-progress
-  '((t (:inherit font-lock-warning-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-warning-face))
   "Face used for rsync mode-line indicator."
   :group 'helm-files-faces)
 
@@ -3166,12 +3184,14 @@ Minimum value accepted is 0.5s."
   :group 'helm-files)
 
 (defface helm-ff-cache-updating
-  '((t (:inherit font-lock-type-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-type-face))
   "Face used for `helm-ff-cache-mode' lighter."
   :group 'helm-files-faces)
 
 (defface helm-ff-cache-stopped
-  '((t (:inherit font-lock-variable-name-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-variable-name-face))
   "Face used for `helm-ff-cache-mode' lighter."
   :group 'helm-files-faces)
 

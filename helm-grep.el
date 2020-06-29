@@ -257,30 +257,38 @@ buffer from flickering when updating."
   :group 'helm-faces)
 
 (defface helm-grep-match
-  '((((background light)) :foreground "#b00000")
-    (((background dark))  :foreground "gold1"))
+  `((((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "#b00000")
+    (((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "gold1"))
   "Face used to highlight grep matches.
 Have no effect when grep backend use \"--color=\"."
   :group 'helm-grep-faces)
 
 (defface helm-grep-file
-    '((t (:foreground "BlueViolet"
-          :underline t)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "BlueViolet"
+       :underline t))
   "Face used to highlight grep results filenames."
   :group 'helm-grep-faces)
 
 (defface helm-grep-lineno
-    '((t (:foreground "Darkorange1")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Darkorange1"))
   "Face used to highlight grep number lines."
   :group 'helm-grep-faces)
 
 (defface helm-grep-finish
-    '((t (:foreground "Green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Green"))
   "Face used in mode line when grep is finish."
   :group 'helm-grep-faces)
 
 (defface helm-grep-cmd-line
-    '((t (:inherit font-lock-type-face)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit font-lock-type-face))
   "Face used to highlight grep command line when no results."
   :group 'helm-grep-faces)
 

@@ -189,7 +189,8 @@ and all functions belonging in this list from `minibuffer-setup-hook'.
 This is mainly needed to prevent \"*Completions*\" buffers to popup.")
 
 (defface helm-mode-prefix
-    '((t (:background "red" :foreground "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       (:background "red" :foreground "black")))
   "Face used for prefix completion."
   :group 'helm-mode)
 

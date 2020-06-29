@@ -119,12 +119,14 @@ display."
   :group 'helm-faces)
 
 (defface helm-lisp-show-completion
-    '((t (:background "DarkSlateGray")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "DarkSlateGray"))
   "Face used for showing candidates in `helm-lisp-completion'."
   :group 'helm-elisp-faces)
 
 (defface helm-lisp-completion-info
-    '((t (:foreground "red")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "red"))
   "Face used for showing info in `helm-lisp-completion'."
   :group 'helm-elisp-faces)
 

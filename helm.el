@@ -883,11 +883,13 @@ You can toggle later `truncate-lines' with
   :group 'helm)
 
 (defface helm-source-header
-  '((((background dark))
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "#22083397778B"
      :foreground "white"
      :weight bold :height 1.3 :family "Sans Serif")
     (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
      :background "#abd7f0"
      :foreground "black"
      :weight bold :height 1.3 :family "Sans Serif"))
@@ -895,76 +897,110 @@ You can toggle later `truncate-lines' with
   :group 'helm-faces)
 
 (defface helm-visible-mark
-  '((((min-colors 88) (background dark))
-     (:background "green1" :foreground "black"))
+  `((((min-colors 88) (background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "green1"
+     :foreground "black")
     (((background dark))
-     (:background "green" :foreground "black"))
-    (((background light)) :background "#d1f5ea")
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "green"
+     :foreground "black")
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "#d1f5ea")
     (((min-colors 88))
-     (:background "green1"))
-    (t (:background "green")))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "green1")
+    (t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "green"))
   "Face for visible mark."
   :group 'helm-faces)
 
 (defface helm-header
-  '((t (:inherit header-line)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit header-line))
   "Face for header lines in the Helm buffer."
   :group 'helm-faces)
 
 (defface helm-candidate-number
-  '((((background dark)) :background "Yellow" :foreground "black")
-    (((background light)) :background "#faffb5" :foreground "black"))
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "Yellow" :foreground "black")
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "#faffb5" :foreground "black"))
   "Face for candidate number in mode-line."
   :group 'helm-faces)
 
 (defface helm-candidate-number-suspended
-  '((t (:inherit helm-candidate-number :inverse-video t)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+     :inherit helm-candidate-number :inverse-video t))
   "Face for candidate number in mode-line when Helm is suspended."
   :group 'helm-faces)
 
 (defface helm-selection
-  '((((background dark)) :background "ForestGreen"
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "ForestGreen"
      :distant-foreground "black")
-    (((background light)) :background "#b5ffd1"
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :background "#b5ffd1"
      :distant-foreground "black"))
   "Face for currently selected item in the Helm buffer."
   :group 'helm-faces)
 
 (defface helm-separator
-  '((((background dark)) :foreground "red")
-    (((background light)) :foreground "#ffbfb5"))
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "red")
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "#ffbfb5"))
   "Face for multiline source separator."
   :group 'helm-faces)
 
 (defface helm-action
-  '((t (:underline t)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :underline t))
   "Face for action lines in the Helm action buffer."
   :group 'helm-faces)
 
 (defface helm-prefarg
-  '((((background dark)) :foreground "green")
-    (((background light)) :foreground "red"))
+  `((((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "green")
+    (((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "red"))
   "Face for showing prefix arg in mode-line."
   :group 'helm-faces)
 
 (defface helm-match
-  '((((background light)) :foreground "#b00000")
-    (((background dark))  :foreground "gold1"))
+  `((((background light))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "#b00000")
+    (((background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "gold1"))
   "Face used to highlight matches."
   :group 'helm-faces)
 
 (defface helm-header-line-left-margin
-  '((t (:foreground "black" :background "yellow")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "black" :background "yellow"))
   "Face used to highlight helm-header sign in left-margin."
   :group 'helm-faces)
 
 (defface helm-minibuffer-prompt
-  '((t (:inherit minibuffer-prompt)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit minibuffer-prompt))
   "Face used for the minibuffer/headline prompt (such as Pattern:) in Helm."
   :group 'helm-faces)
 
 (defface helm-eob-line
-  '((t (:inherit default)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit default))
   "Face for empty line at end of sources in the Helm buffer.
 Allow specifying the height of this line."
   :group 'helm-faces)

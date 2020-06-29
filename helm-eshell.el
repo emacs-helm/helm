@@ -359,12 +359,14 @@ at point."
 ;;; Eshell prompts
 ;;
 (defface helm-eshell-prompts-promptidx
-  '((t (:foreground "cyan")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "cyan"))
   "Face used to highlight Eshell prompt index."
   :group 'helm-eshell-faces)
 
 (defface helm-eshell-prompts-buffer-name
-  '((t (:foreground "green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "green"))
   "Face used to highlight Eshell buffer name."
   :group 'helm-eshell-faces)
 

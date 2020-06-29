@@ -24,7 +24,8 @@
   :group 'helm)
 
 (defface helm-helper
-  '((t :inherit helm-header))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit helm-header))
   "Face for Helm help string in minibuffer."
   :group 'helm-help)
 

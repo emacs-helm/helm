@@ -48,7 +48,9 @@
   :group 'helm-command
   :group 'helm-faces)
 
-(defface helm-M-x-key '((t (:foreground "orange" :underline t)))
+(defface helm-M-x-key
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "orange" :underline t))
   "Face used in helm-M-x to show keybinding."
   :group 'helm-command-faces)
 

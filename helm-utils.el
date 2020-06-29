@@ -211,12 +211,14 @@ last position is added to the register `helm-save-pos-before-jump-register'.")
 ;;; Faces.
 ;;
 (defface helm-selection-line
-    '((t (:inherit highlight :distant-foreground "black")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit highlight :distant-foreground "black"))
   "Face used in the `helm-current-buffer' when jumping to a candidate."
   :group 'helm-faces)
 
 (defface helm-match-item
-    '((t (:inherit isearch)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit isearch))
   "Face used to highlight the item matched in a selected line."
   :group 'helm-faces)
 

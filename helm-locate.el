@@ -137,7 +137,8 @@ embedded help for more infos."
     map))
 
 (defface helm-locate-finish
-    '((t (:foreground "Green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Green"))
   "Face used in mode line when locate process is finish."
   :group 'helm-locate)
 

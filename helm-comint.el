@@ -33,12 +33,14 @@
 ;;; Comint prompts
 ;;
 (defface helm-comint-prompts-promptidx
-  '((t (:foreground "cyan")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       (:foreground "cyan")))
   "Face used to highlight comint prompt index."
   :group 'helm-comint-faces)
 
 (defface helm-comint-prompts-buffer-name
-  '((t (:foreground "green")))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       (:foreground "green")))
   "Face used to highlight comint buffer name."
   :group 'helm-comint-faces)
 

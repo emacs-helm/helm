@@ -64,8 +64,9 @@ one match."
   :group 'helm-faces)
 
 (defface helm-etags-file
-    '((t (:foreground "Lightgoldenrod4"
-          :underline t)))
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "Lightgoldenrod4"
+       :underline t))
   "Face used to highlight etags filenames."
   :group 'helm-tags-faces)
 

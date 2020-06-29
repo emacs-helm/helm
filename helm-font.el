@@ -53,7 +53,9 @@
   "Keymap for `helm-ucs'.")
 
 (defface helm-ucs-char
-  '((((class color) (background dark))  (:foreground "Gold")))
+  `((((class color) (background dark))
+     ,@(and (>= emacs-major-version 27) '(:extend t))
+     :foreground "Gold"))
   "Face used to display ucs characters."
   :group 'helm-font)
 
