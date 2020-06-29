@@ -1282,21 +1282,42 @@ than 1 megabyte:
 
 ** Tips
 
-*** Use a prefix argument to grep recursively
+With Helm supporting Git-grep and AG/RG, you are better off using
+one of them for recursive searches, keeping grep or ack-grep to
+grep individual or marked files.  See [[Helm AG][Helm AG]].
 
-With Helm supporting git-grep and AG however, you are better off using one of
-them for recursive searches.
+*** Meaning of the prefix argument
+**** With grep or ack-grep
+
+Grep recursively, in this case you are
+prompted for types (ack-grep) or for wild cards (grep).
+
+**** With AG or RG
+
+the prefix arg allows you to specify a type of file to search in.
 
 *** You can use wild cards when selecting files (e.g. \"*.el\")
 
-*** You can grep in many different directories by marking files or using wild cards
+Note that a way to grep specific files recursively is to use
+e.g. \"**.el\" to select files, the variable `helm-file-globstar'
+controls this (it is non nil by default), however it is much
+slower than using grep recusively (see helm-find-files
+documentation about this feature).
+
+*** Grep hidden files
+
+You may want to customize your command line for grepping hidden
+files, for AG/RG use \"--hidden\", see man page
+of your backend for more infos.
+
+*** You can grep in different directories by marking files or using wild cards
 
 *** You can save the result in a `helm-grep-mode' buffer
 
 See [[Commands][commands]] below.
 
-Once in that buffer you can use \"emacs-wgrep\" (external package not bundled with Helm)
-to edit your changes.
+Once in that buffer you can use [[https://github.com/mhayashi1120/Emacs-wgrep][emacs-wgrep]] (external package not bundled with Helm)
+to edit your changes, for Helm the package name is `wgrep-helm', it is hightly recommended.
 
 *** Helm-grep supports multi-matching
 
@@ -1304,10 +1325,15 @@ to edit your changes.
 
 Simply add a space between each pattern as for most Helm commands.
 
+NOTE: Depending the regexp you use it may match as well the
+filename, this because we pipe the first grep command which send
+the filename in output.
+
 *** See full path of selected candidate
 
-Add (helm-popup-tip-mode 1) in your init file or enable it interactively with
-M-x helm-popup-tip-mode.
+Add (helm-popup-tip-mode 1) in your init file or enable it
+interactively with M-x helm-popup-tip-mode, however it is
+generally enough to just put your mouse cursor over candidate.
 
 *** Open file in other window
 
@@ -1329,6 +1355,9 @@ Another solution is to not use TRAMP at all and mount your remote file system vi
 SSHFS.
 
 * Helm GID
+
+Still supported, but mostly deprecated, using AG/RG or Git-grep
+is much more efficient, also `id-utils' seems no more maintained.
 
 ** Tips
 
@@ -1373,7 +1402,7 @@ last mark will be used.
 
 * Helm git-grep
 
-Helm-git-grep searches the current directory, i.e the default directory or the
+Helm-git-grep searches the current directory, i.e. the default directory or the
 directory in Helm-find-files.  If this current directory is a subdirectory of a
 project and you want to also match parent directories (i.e the whole project),
 use a prefix argument.

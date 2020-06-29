@@ -1429,7 +1429,7 @@ non-file buffers."
 ;;  https://github.com/BurntSushi/ripgrep
 
 (defcustom helm-grep-ag-command
-  "ag --line-numbers -S --hidden --color --nogroup %s %s %s"
+  "ag --line-numbers -S --color --nogroup %s %s %s"
   "The default command for AG, PT or RG.
 
 Takes three format specs, the first for type(s), the second for
@@ -1472,7 +1472,10 @@ When modifying the default colors of matches with e.g.
 \"--color-match\" option of AG or \"--colors\" option of ripgrep
 you may want to modify as well `helm-grep-ag-pipe-cmd-switches'
 to have all matches colorized with the same color in multi
-match."
+match.
+
+Of course you can use several other options, see the man page of the
+backend you are using."
   :group 'helm-grep
   :type 'string)
 
