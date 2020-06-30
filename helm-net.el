@@ -157,7 +157,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 ;;
 ;;
 ;; Internal
-
+(defvar helm-net-curl-log-file (expand-file-name "helm-curl.log" user-emacs-directory))
 (defun helm-search-suggest-perform-additional-action (url query)
   "Perform the search via URL using QUERY as input."
   (browse-url (format url (url-hexify-string query))))
@@ -166,7 +166,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
   (if helm-net-prefer-curl
       (with-temp-buffer
         (apply #'call-process "curl"
-               nil t nil request helm-net-curl-switches)
+               nil `(t ,helm-net-curl-log-file) nil request helm-net-curl-switches)
         (funcall parser))
       (with-current-buffer (url-retrieve-synchronously request)
         (funcall parser))))
