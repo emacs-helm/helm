@@ -742,11 +742,18 @@ trailing slashes are added to directory names, which mean that
 directory is created on destination if it doesn't already exists,
 see rsync documentation for more infos on rsync behavior.  To
 synchronize a directory, mark all in the directory and rsync all
-marked to the destination directory.
+marked to the destination directory or rsync the directory itself
+to its parent, e.g. remote:/home/you/music => /home/you.
 
 The options are configurable through `helm-rsync-switches', but
 you can modify them on the fly when needed by using a prefix arg,
 in this case you will be prompted for modifications.
+
+NOTE: When selecting a remote file, if you use the tramp syntax
+for specifying a port, i.e. host#2222, helm will add
+automatically \"-e 'ssh -p 2222'\" to the rsync command line
+unless you have specified yourself the \"-e\" option by editing
+rsync command line with a prefix arg (see above).
 
 *** Bookmark the `helm-find-files' session
 
