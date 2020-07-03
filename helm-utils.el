@@ -793,8 +793,9 @@ Inlined here for compatibility."
 
 (defmacro with-helm-display-marked-candidates (buffer-or-name candidates &rest body)
   (declare (indent 0) (debug t))
-  (helm-with-gensyms (buffer window)
+  (helm-with-gensyms (buffer window winconf)
     `(let* ((,buffer (temp-buffer-window-setup ,buffer-or-name))
+            (,winconf helm-last-frame-or-window-configuration)
             (helm-always-two-windows t)
             (helm-split-window-default-side
              (if (eq helm-split-window-default-side 'same)
@@ -811,7 +812,8 @@ Inlined here for compatibility."
                                '(display-buffer-below-selected
                                  (window-height . fit-window-to-buffer))))
               (progn ,@body))
-         (quit-window 'kill ,window)))))
+         (quit-window 'kill ,window)
+         (and ,winconf (set-window-configuration ,winconf))))))
 
 ;;; Persistent Action Helpers
 ;;
