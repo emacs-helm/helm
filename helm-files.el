@@ -1362,7 +1362,7 @@ this working."
                          (cl-loop for (a c) in (eshell-read-aliases-list)
                                   ;; Positional arguments may be double
                                   ;; quoted (Issue #1881).
-                                  when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\'" c)
+                                  when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'" c)
                                   collect (propertize a 'help-echo c) into ls
                                   finally return (sort ls 'string<))
                          :buffer "*helm eshell on file*"
