@@ -1694,6 +1694,9 @@ Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 (defvar helm-resume-after-hook nil
   "A hook that runs after resuming a Helm session.
 The hook should takes one arg SOURCES.")
+
+(defvar helm-help-buffer-name "*Helm Help*"
+  "The name of helm help buffer.")
 
 ;;; Internal Variables
 ;;
@@ -7388,7 +7391,7 @@ help."
                        :exec-when-only-one t))))
       (save-selected-window
         (helm-help-internal
-         "*Helm Help*"
+         helm-help-buffer-name
          (lambda ()
            (helm-aif (assoc-default 'help-message source)
                (insert (substitute-command-keys
