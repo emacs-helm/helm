@@ -1380,9 +1380,9 @@ this working."
           ;; Two time C-u from `helm-comp-read' mean print to current-buffer.
           ;; i.e `eshell-command' will use this value.
           (setq current-prefix-arg '(16))
-          ;; Else reset the value of `current-prefix-arg'
-          ;; to avoid printing in current-buffer.
-          (setq current-prefix-arg nil))
+        ;; Else reset the value of `current-prefix-arg'
+        ;; to avoid printing in current-buffer.
+        (setq current-prefix-arg nil))
       (if (and (or
                 ;; One prefix-arg have been passed before `helm-comp-read'.
                 ;; If map have been set with C-u C-u (value == '(16))
@@ -1405,38 +1405,38 @@ this working."
                 (setq cmd-line (format command mapfiles)) ; See [1]
               (setq cmd-line (format "%s %s" command mapfiles)))
             (eshell-command cmd-line))
-          (unwind-protect
-              (progn
-                ;; Run eshell-command on EACH marked files.
-                ;; To work with tramp handler we have to call
-                ;; COMMAND on basename of each file, using
-                ;; its basedir as `default-directory'.
-                (cl-loop for f in cand-list
-                         for n from 1
-                         for dir = (and (not (string-match helm--url-regexp f))
-                                        (helm-basedir f))
-                         ;; We can use basename here as the command will run
-                         ;; under default-directory.
-                         ;; This allow running e.g. "tar czvf test.tar.gz
-                         ;; %s/*" without creating an archive expanding from /home.
-                         for file = (shell-quote-argument (helm-basename f))
-                         ;; \@ => placeholder for file without extension.
-                         ;; \# => placeholder for incremental number.
-                         for fcmd = (replace-regexp-in-string
-                                     "\\\\@" (regexp-quote (file-name-sans-extension file))
-                                     (replace-regexp-in-string
-                                      "\\\\#" (format "%03d" n) command))
-                         for com = (if (string-match "%s" fcmd)
-                                       ;; [1] This allow to enter other args AFTER filename
-                                       ;; i.e <command %s some_more_args>
-                                       (format fcmd file)
-                                     (format "%s %s" fcmd file))
-                         do (let ((default-directory (or dir default-directory)))
-                              (eshell-command com))))
-            ;; Async process continue running but don't need anymore
-            ;; the advice at this point (see the `eshell-eval-command'
-            ;; call in `eshell-command'.) .
-            (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command))))))
+        (unwind-protect
+            (progn
+              ;; Run eshell-command on EACH marked files.
+              ;; To work with tramp handler we have to call
+              ;; COMMAND on basename of each file, using
+              ;; its basedir as `default-directory'.
+              (cl-loop for f in cand-list
+                       for n from 1
+                       for dir = (and (not (string-match helm--url-regexp f))
+                                      (helm-basedir f))
+                       ;; We can use basename here as the command will run
+                       ;; under default-directory.
+                       ;; This allow running e.g. "tar czvf test.tar.gz
+                       ;; %s/*" without creating an archive expanding from /home.
+                       for file = (shell-quote-argument (helm-basename f))
+                       ;; \@ => placeholder for file without extension.
+                       ;; \# => placeholder for incremental number.
+                       for fcmd = (replace-regexp-in-string
+                                   "\\\\@" (regexp-quote (file-name-sans-extension file))
+                                   (replace-regexp-in-string
+                                    "\\\\#" (format "%03d" n) command))
+                       for com = (if (string-match "%s" fcmd)
+                                     ;; [1] This allow to enter other args AFTER filename
+                                     ;; i.e <command %s some_more_args>
+                                     (format fcmd file)
+                                   (format "%s %s" fcmd file))
+                       do (let ((default-directory (or dir default-directory)))
+                            (eshell-command com))))
+          ;; Async process continue running but don't need anymore
+          ;; the advice at this point (see the `eshell-eval-command'
+          ;; call in `eshell-command'.) .
+          (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command))))))
 
 (defun helm--advice-eshell-eval-command (command &optional input)
   "Fix return value when command ends with \"&\"."
