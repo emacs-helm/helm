@@ -46,6 +46,7 @@
 (declare-function eshell-reset "esh-mode.el")
 (declare-function eshell/cd "em-dirs.el")
 (declare-function eshell-next-prompt "em-prompt.el")
+(declare-function eshell-resume-eval "esh-cmd")
 (declare-function helm-ls-git-ls "ext:helm-ls-git")
 (declare-function helm-hg-find-files-in-project "ext:helm-ls-hg")
 (declare-function helm-gid "helm-id-utils.el")
@@ -64,6 +65,10 @@
 (defvar helm-mm-matching-method)
 (defvar dired-async-mode)
 (defvar org-directory)
+(defvar eshell-current-command)
+(defvar eshell-debug-command)
+(defvar eshell-current-command)
+
 
 (defgroup helm-files nil
   "Files applications and libraries for Helm."
@@ -1336,6 +1341,7 @@ You have to setup some aliases in Eshell with the `alias' command
 or by editing yourself the file `eshell-aliases-file' to make
 this working."
   (require 'em-alias) (eshell-read-aliases-list)
+  (advice-add 'eshell-eval-command :override #'helm--advice-eshell-eval-command)
   (when (or eshell-command-aliases-list
             (y-or-n-p "No eshell aliases found, run eshell-command without alias anyway? "))
     (let* ((cand-list (helm-marked-candidates :with-wildcard t))
@@ -1399,33 +1405,66 @@ this working."
                 (setq cmd-line (format command mapfiles)) ; See [1]
               (setq cmd-line (format "%s %s" command mapfiles)))
             (eshell-command cmd-line))
+          (unwind-protect
+              (progn
+                ;; Run eshell-command on EACH marked files.
+                ;; To work with tramp handler we have to call
+                ;; COMMAND on basename of each file, using
+                ;; its basedir as `default-directory'.
+                (cl-loop for f in cand-list
+                         for n from 1
+                         for dir = (and (not (string-match helm--url-regexp f))
+                                        (helm-basedir f))
+                         ;; We can use basename here as the command will run
+                         ;; under default-directory.
+                         ;; This allow running e.g. "tar czvf test.tar.gz
+                         ;; %s/*" without creating an archive expanding from /home.
+                         for file = (shell-quote-argument (helm-basename f))
+                         ;; \@ => placeholder for file without extension.
+                         ;; \# => placeholder for incremental number.
+                         for fcmd = (replace-regexp-in-string
+                                     "\\\\@" (regexp-quote (file-name-sans-extension file))
+                                     (replace-regexp-in-string
+                                      "\\\\#" (format "%03d" n) command))
+                         for com = (if (string-match "%s" fcmd)
+                                       ;; [1] This allow to enter other args AFTER filename
+                                       ;; i.e <command %s some_more_args>
+                                       (format fcmd file)
+                                     (format "%s %s" fcmd file))
+                         do (let ((default-directory (or dir default-directory)))
+                              (eshell-command com))))
+            ;; Async process continue running but don't need anymore
+            ;; the advice at this point (see the `eshell-eval-command'
+            ;; call in `eshell-command'.) .
+            (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command))))))
 
-          ;; Run eshell-command on EACH marked files.
-          ;; To work with tramp handler we have to call
-          ;; COMMAND on basename of each file, using
-          ;; its basedir as `default-directory'.
-          (cl-loop for f in cand-list
-                   for n from 1
-                   for dir = (and (not (string-match helm--url-regexp f))
-                                  (helm-basedir f))
-                   ;; We can use basename here as the command will run
-                   ;; under default-directory.
-                   ;; This allow running e.g. "tar czvf test.tar.gz
-                   ;; %s/*" without creating an archive expanding from /home.
-                   for file = (shell-quote-argument (helm-basename f))
-                   ;; \@ => placeholder for file without extension.
-                   ;; \# => placeholder for incremental number.
-                   for fcmd = (replace-regexp-in-string
-                               "\\\\@" (regexp-quote (file-name-sans-extension file))
-                               (replace-regexp-in-string
-                                "\\\\#" (format "%03d" n) command))
-                   for com = (if (string-match "%s" fcmd)
-                                 ;; [1] This allow to enter other args AFTER filename
-                                 ;; i.e <command %s some_more_args>
-                                 (format fcmd file)
-                               (format "%s %s" fcmd file))
-                   do (let ((default-directory (or dir default-directory)))
-                        (eshell-command com)))))))
+(defun helm--advice-eshell-eval-command (command &optional input)
+  "Fix return value when command ends with \"&\"."
+  (if eshell-current-command
+      ;; we can just stick the new command at the end of the current
+      ;; one, and everything will happen as it should
+      (setcdr (last (cdr eshell-current-command))
+	      (list `(let ((here (and (eobp) (point))))
+                       ,(and input
+                             `(insert-and-inherit ,(concat input "\n")))
+                       (if here
+                           (eshell-update-markers here))
+                       (eshell-do-eval ',command))))
+    (and eshell-debug-command
+         (with-current-buffer (get-buffer-create "*eshell last cmd*")
+           (erase-buffer)
+           (insert "command: \"" input "\"\n")))
+    (setq eshell-current-command command)
+    (let* ((delim (catch 'eshell-incomplete
+		    (eshell-resume-eval)))
+           (val (car delim)))
+      (if (and val
+               (not (processp val))
+               (not (eq val t)))
+          (error "Unmatched delimiter: %S" val)
+        ;; Eshell-command expect a list like (<process>) to know if the
+        ;; command should be async or not.
+        (and (processp val) delim)))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
