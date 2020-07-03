@@ -792,6 +792,11 @@ To toggle suspend-update, use `\\<helm-map>\\[helm-toggle-suspend-update]'.
 
 Setting up aliases in Eshell allows you to set up powerful customized commands.
 
+Your aliases for using eshell command on file should allow
+specifying one or more files, use e.g. \"alias foo $1\" or
+\"alias foo $*\", if you want your command to be asynchronous add
+at end \"&\", e.g. \"alias foo $* &\".
+
 Adding Eshell aliases to your `eshell-aliases-file' or using the
 `alias' command from Eshell allows you to create personalized
 commands not available in `helm-find-files' actions and use them
@@ -1551,6 +1556,16 @@ the command is called once for each file like this:
     <command> file1
     <command> file2
     ...
+
+*** Run eshell commands asynchronously
+
+You can run your commands asynchronously by adding \"&\" at end
+of any commands, e.g. \"foo %s &\".  You can also directly setup
+your alias in the eshell alias file with e.g. \"alias foo $1 &\".
+
+NOTE: If you use \"&\" in a command with marked files and your
+command accept many files as argument don't forget to pass the
+prefix arg to ensure you run only one command on all marked async.
 
 ** Commands
 \\<helm-esh-on-file-map>")
