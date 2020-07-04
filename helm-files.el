@@ -1440,6 +1440,17 @@ this working."
 
 (defun helm--advice-eshell-eval-command (command &optional input)
   "Fix return value when command ends with \"&\"."
+  ;; Fix this emacs commit which is plain wrong as it returns
+  ;; either nil or an error (double because format spec doesn't
+  ;; always match specifier) whereas it should return either a
+  ;; single element (CAR DELIM) or DELIM itself if the car of
+  ;; DELIM is a process.
+  ;;
+  ;; 6b6f91b357f6fe2f1e0d72f046a1b8d8a2d6d8c3
+  ;; Author:     John Wiegley <johnw@newartisans.com>
+  ;; AuthorDate: Fri May 27 02:57:18 2005 +0000
+  ;; Commit:     John Wiegley <johnw@newartisans.com>
+  ;; CommitDate: Fri May 27 02:57:18 2005 +0000
   (if eshell-current-command
       ;; we can just stick the new command at the end of the current
       ;; one, and everything will happen as it should
@@ -1458,6 +1469,10 @@ this working."
     (let* ((delim (catch 'eshell-incomplete
 		    (eshell-resume-eval)))
            (val (car delim)))
+      ;; If the return value of `eshell-resume-eval' is wrapped in a
+      ;; list, it indicates that the command was run asynchronously.
+      ;; In that case, unwrap the value before checking the delimiter
+      ;; value.
       (if (and val
                (not (processp val))
                (not (eq val t)))
