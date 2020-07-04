@@ -1464,7 +1464,7 @@ this working."
           (error "Unmatched delimiter: %S" val)
         ;; Eshell-command expect a list like (<process>) to know if the
         ;; command should be async or not.
-        (and (processp val) delim)))))
+        (or (and (processp val) delim) val)))))
 
 (defun helm-find-files-eshell-command-on-file (_candidate)
   "Run `eshell-command' on CANDIDATE or marked candidates.
