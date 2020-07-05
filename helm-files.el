@@ -4669,6 +4669,10 @@ destination for the actions copy and rename."
                (setq helm-ff-cand-to-mark
                      (helm-get-dest-fnames-from-list files candidate dirflag))
                (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
+               ;; Refresh directory even if helm-ff-cache-mode is
+               ;; enabled, it will not have the time to update
+               ;; destination directory.
+               (helm-ff-directory-files candidate t)
                (if (and dirflag (eq action 'rename))
                    (helm-find-files-1 (file-name-directory target)
                                       (if helm-ff-transformer-show-only-basename
