@@ -3389,9 +3389,14 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
            (string-match helm-ff-url-regexp pattern)
            (and (string= helm-ff-default-directory "/") tramp-p))
        ;; Don't treat wildcards ("*") as regexp char.
-       ;; (e.g ./foo/*.el => ./foo/[*].el)
+       ;; (e.g ./foo/*.el => ./foo/\\*\\.el) or ./foo/*.[ch] =>
+       ;; ./foo/\\*\\.\\[ch]
        (concat (regexp-quote bd)
-               (replace-regexp-in-string "[*]" "[*]" bn)))
+               ;; We were previously using
+               ;; (replace-regexp-in-string "[*]" "[*]" bn) but this
+               ;; doesn't handle wilcards like *.[ch], so regexp-quote
+               ;; bn as well.
+               (regexp-quote bn)))
       (t (concat (regexp-quote bd)
                  (if (>= (length bn) 2) ; wait 2nd char before concating.
                      (helm--mapconcat-pattern bn)
