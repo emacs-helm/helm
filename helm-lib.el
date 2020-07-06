@@ -650,10 +650,13 @@ displayed in BUFNAME."
 (defun helm-multiline-transformer (candidates _source)
   (cl-loop with offset = (helm-interpret-value
                           (assoc-default 'multiline (helm-get-current-source)))
-           for i in candidates
+           for cand in candidates
+           for disp = (or (car-safe cand) cand)
+           for real = (or (cdr-safe cand) cand)
            if (numberp offset)
-           collect (cons (helm--multiline-get-truncated-candidate i offset) i)
-           else collect i))
+           collect (cons (helm--multiline-get-truncated-candidate disp offset)
+                         real)
+           else collect (cons disp real)))
 
 (defun helm--multiline-get-truncated-candidate (candidate offset)
   "Truncate CANDIDATE when its length is > than OFFSET."
