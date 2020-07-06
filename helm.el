@@ -5830,7 +5830,8 @@ message 'no match'."
                            (helm-aif (get-text-property
                                       0 'display
                                       (helm-get-selection nil 'withprop src))
-                               (string-match-p "\\`\\[\\?\\]" it)))))
+                               (when (stringp it)
+                                 (string-match-p "\\`\\[\\?\\]" it))))))
         (cond ((and (or empty-buffer-p unknown)
                     (memq minibuffer-completion-confirm
                           '(confirm confirm-after-completion)))
