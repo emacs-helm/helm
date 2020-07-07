@@ -713,14 +713,14 @@ directories associated to each window.
 *** Copying/Renaming from or to remote directories
 
 Never use ssh tramp method to copy/rename large files, use
-instead its scp method if you don't want to come out of memory
-and crash Emacs or the whole system.  Moreover when using scp
-method, you will hit a bug when copying more than 3 files at the
-time, see [[https://github.com/emacs-helm/helm/issues/1945][bug#1945]].
+instead its scp method if you want to avoid out of memory
+problems and crash Emacs or the whole system.  Moreover when using
+scp method, you will hit a bug when copying more than 3 files at
+the time, see [[https://github.com/emacs-helm/helm/issues/1945][bug#1945]].
 The best way actually is using Rsync to copy files from or to
 remote, see [[Use Rsync to copy files][Use Rsync to copy files]].
-Also if you often work on remote you may consider using SSHFS instead
-or relaying on tramp.
+Also if you often work on remote you may consider using SSHFS
+instead of relying on tramp.
 
 *** Copying and renaming asynchronously
 
