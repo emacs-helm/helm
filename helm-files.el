@@ -3702,7 +3702,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
     ;; Highlight extensions.
     (helm-aif (and (not backup)
                    (file-name-extension disp))
-        (when (and (zerop (string-to-number it))
+        (when (and (not (string= "0" it))
+                   (zerop (string-to-number it))
                    (string-match (format "\\.\\(%s\\)\\'" it) disp))
           (add-face-text-property
            (match-beginning 1) (match-end 1)
