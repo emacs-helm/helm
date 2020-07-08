@@ -568,6 +568,18 @@ Possible values are:
   "Face used for named pipes and character device files in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-file-extension
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "magenta"))
+  "Face used for file extensions in `helm-find-files'."
+  :group 'helm-files-faces)
+
+(defface helm-ff-backup-file
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :foreground "DimGray"))
+  "Face used for backup files in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-history-deleted
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit helm-ff-invalid-symlink))
@@ -3684,7 +3696,17 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
          (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
-                    (if reverse file basename)))))
+                    (if reverse file basename))))
+         (len (length disp))
+         (backup (backup-file-name-p disp)))
+    ;; Highlight extensions.
+    (helm-aif (and (not backup)
+                   (file-name-extension disp))
+        (when (and (zerop (string-to-number it))
+                   (string-match (format "\\.\\(%s\\)\\'" it) disp))
+          (add-face-text-property
+           (match-beginning 1) (match-end 1)
+           'helm-ff-file-extension t disp)))
     ;; We don't want to filter boring files only on the files coming
     ;; from the output of helm-ff-directory-files not on single
     ;; candidate (issue #2330).
@@ -3697,22 +3719,31 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (helm-file-on-mounted-network-p helm-pattern)))
           (let* ((hostp (helm-ff--get-host-from-tramp-invalid-fname file)))
             (cond (;; Dot directories . and ..
-                   dot (cons (propertize file 'face 'helm-ff-dotted-directory) file))
+                   dot
+                   (cons (propertize file 'face 'helm-ff-dotted-directory) file))
                   ;; Directories.
                   ((get-text-property 1 'helm-ff-dir file)
                    (cons (propertize disp 'face 'helm-ff-directory) file))
+                  ;; Backup files.
+                  (backup
+                   (cons (propertize disp 'face '((:foreground "DimGray"))) file))
                   ;; Executable files.
                   ((get-text-property 1 'helm-ff-exe file)
-                   (cons (propertize disp 'face 'helm-ff-executable) file))
+                   (add-face-text-property 0 len 'helm-ff-executable t disp)
+                   (cons disp file))
                   ;; Symlinks.
                   ((get-text-property 1 'helm-ff-sym file)
-                   (cons (propertize disp 'face 'helm-ff-symlink) file))
+                   (add-face-text-property 0 len 'helm-ff-symlink t disp)
+                   (cons disp file))
                   ;; Regular files.
                   ((get-text-property 1 'helm-ff-file file)
-                   (cons (propertize disp 'face 'helm-ff-file) file))
+                   (add-face-text-property 0 len 'helm-ff-file t disp)
+                   (cons disp file))
                   ;; non existing files.
-                  (t (cons (helm-ff-prefix-filename
-                            (propertize disp 'face 'helm-ff-file)
+                  (t
+                   (add-face-text-property 0 len 'helm-ff-file t disp)
+                   (cons (helm-ff-prefix-filename
+                            disp
                             hostp (unless hostp 'new-file))
                            file))))
 
@@ -3726,46 +3757,61 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
-                 (cons (propertize disp 'face 'helm-ff-invalid-symlink) file))
+                 (add-face-text-property 0 len 'helm-ff-invalid-symlink t disp)
+                 (cons disp file))
                 ;; A dotted directory symlinked.
                 ((and dot (stringp type))
                  (cons (propertize file 'face 'helm-ff-dotted-symlink-directory) file))
                 ;; A dotted directory.
                 (dot
                  (cons (propertize file 'face 'helm-ff-dotted-directory) file))
+                ;; Backup files.
+                (backup
+                 (cons (propertize disp 'face 'helm-ff-backup-file) file))
                 ;; A symlink.
                 ((stringp type)
-                 (cons (propertize disp 'display
-                                   (concat (propertize disp 'face 'helm-ff-symlink)
-                                           " -> "
-                                           (propertize (abbreviate-file-name type)
-                                                       'face 'helm-ff-truename)))
-                       file))
+                 (let* ((abbrev (abbreviate-file-name type))
+                        (len-abbrev (length abbrev)))
+                   (helm-aif (file-name-extension abbrev)
+                       (when (string-match (format "\\.\\(%s\\)\\'" it) abbrev)
+                         (add-face-text-property
+                          (match-beginning 1) (match-end 1)
+                          'helm-ff-file-extension t abbrev)))
+                   (add-face-text-property 0 len-abbrev 'helm-ff-truename t abbrev)
+                   ;; Colorize extension only on truename.
+                   (add-face-text-property 0 len 'helm-ff-symlink nil disp)
+                   (cons (propertize disp 'display (concat disp " -> " abbrev))
+                         file)))
                 ;; A directory.
                 ((eq t type)
                  (cons (propertize disp 'face 'helm-ff-directory) file))
                 ;; A character device file.
                 ((and attr (string-match
                             "\\`[cp]" (setq x-bit (substring (nth 8 attr) 0 4))))
-                 (cons (propertize disp 'face 'helm-ff-pipe) file))
+                 (add-face-text-property 0 len 'helm-ff-pipe t disp)
+                 (cons disp file))
                 ;; A socket file.
                 ((and attr (string-match "\\`[s]" x-bit))
-                 (cons (propertize disp 'face 'helm-ff-socket) file))
+                 (add-face-text-property 0 len 'helm-ff-socket t disp)
+                 (cons disp file))
                 ;; An executable file.
-                ((and attr
-                      (string-match
-                       "x\\'" x-bit))
-                 (cons (propertize disp 'face 'helm-ff-executable) file))
+                ((and attr (string-match "x\\'" x-bit))
+                 (add-face-text-property 0 len 'helm-ff-executable t disp)
+                 (cons disp file))
                 ;; An executable file with suid
                 ((and attr (string-match "s\\'" x-bit))
-                 (cons (propertize disp 'face 'helm-ff-suid) file))
+                 (add-face-text-property 0 len 'helm-ff-suid t disp)
+                 (cons disp file))
                 ;; A file.
                 ((and attr (null type))
-                 (cons (propertize disp 'face 'helm-ff-file) file))
+                 (add-face-text-property 0 len 'helm-ff-file t disp)
+                 (cons disp file))
                 ;; A non--existing file.
-                (t (cons (helm-ff-prefix-filename
-                          (propertize disp 'face 'helm-ff-file) nil 'new-file)
-                         file))))))))
+                (t
+                 (add-face-text-property 0 len 'helm-ff-file t disp)
+                 (cons (helm-ff-prefix-filename
+                          disp nil 'new-file)
+                       file))))))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
