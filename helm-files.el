@@ -3692,15 +3692,19 @@ If REVERSE is non nil DISPLAY is shown as full path.
 If SKIP-BORING-CHECK is non nil don't filter boring files."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
+         (urlp (and helm--url-regexp
+                    (string-match helm--url-regexp file)
+                    (string-match helm-ff-url-regexp file)))
          ;; Filename with cntrl chars e.g. foo^J
          (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
-                    (if reverse file basename))))
+                    (if (or reverse urlp) file basename))))
          (len (length disp))
          (backup (backup-file-name-p disp)))
     ;; Highlight extensions.
     (helm-aif (and (not backup)
+                   (not urlp)
                    (file-name-extension disp))
         (when (and (zerop (string-to-number it))
                    (string-match (format "\\.\\(%s\\)\\'" it) disp))
