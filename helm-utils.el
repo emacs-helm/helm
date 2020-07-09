@@ -676,6 +676,24 @@ KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
              ("B" (format "%s" size))
              (t (format "%.1f%s" (cdr result) it)))))
 
+(defun helm-directory-size (directory &optional recursive human)
+  "Return the resulting size of the sum of all files in DIRECTORY.
+
+If RECURSIVE is non nil return the size of all files in DIRECTORY and
+its subdirectories.  With arg HUMAN format the size in a human
+readable format,see `helm-file-human-size'."
+  (cl-loop with files = (if recursive
+                            (helm-walk-directory
+                             directory
+                             :path 'full
+                             :directories t)
+                          (directory-files directory t))
+           for file in files
+           sum (nth 7 (file-attributes file)) into total
+           finally return (if human
+                              (helm-file-human-size total)
+                            total)))
+
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
             status size mode gid-change inode device-num dired human-size
