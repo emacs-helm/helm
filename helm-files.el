@@ -3498,7 +3498,7 @@ Note that only existing directories are saved here."
               (format "Type: %s: %s\n" type mode-type)
               (when (string= type "symlink")
                 (format "True name: '%s'\n"
-                        (cond ((string-match "^\.#" (helm-basename candidate))
+                        (cond ((string-match "^\\.#" (helm-basename candidate))
                                "Autosave symlink")
                               ((helm-ff-valid-symlink-p candidate)
                                (file-truename candidate))
