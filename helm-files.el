@@ -3730,7 +3730,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (cons (propertize disp 'face 'helm-ff-directory) file))
                   ;; Backup files.
                   (backup
-                   (cons (propertize disp 'face '((:foreground "DimGray"))) file))
+                   (cons (propertize disp 'face 'helm-ff-backup-file) file))
                   ;; Executable files.
                   ((get-text-property 1 'helm-ff-exe file)
                    (add-face-text-property 0 len 'helm-ff-executable t disp)
