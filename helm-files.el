@@ -3695,15 +3695,19 @@ If REVERSE is non nil DISPLAY is shown as full path.
 If SKIP-BORING-CHECK is non nil don't filter boring files."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
+         (urlp (and helm--url-regexp
+                    (string-match helm--url-regexp file)
+                    (string-match helm-ff-url-regexp file)))
          ;; Filename with cntrl chars e.g. foo^J
          (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
-                    (if reverse file basename))))
+                    (if (or reverse urlp) file basename))))
          (len (length disp))
          (backup (backup-file-name-p disp)))
     ;; Highlight extensions.
     (helm-aif (and (not backup)
+                   (not urlp)
                    (file-name-extension disp))
         (when (and (not (string= "0" it))
                    (zerop (string-to-number it))
@@ -3730,7 +3734,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (cons (propertize disp 'face 'helm-ff-directory) file))
                   ;; Backup files.
                   (backup
-                   (cons (propertize disp 'face '((:foreground "DimGray"))) file))
+                   (cons (propertize disp 'face 'helm-ff-backup-file) file))
                   ;; Executable files.
                   ((get-text-property 1 'helm-ff-exe file)
                    (add-face-text-property 0 len 'helm-ff-executable t disp)
