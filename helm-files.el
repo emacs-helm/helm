@@ -3703,23 +3703,22 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                     (if (or reverse urlp) file basename))))
          (len (length disp))
          (backup (backup-file-name-p disp)))
-    ;; Highlight extensions.
-    (helm-aif (and (not backup)
-                   (not urlp)
-                   (file-name-extension disp))
-        (when (and (not (string= "0" it))
-                   (zerop (string-to-number it))
-                   (string-match (format "\\.\\(%s\\)\\'" it) disp))
-          (add-face-text-property
-           (match-beginning 1) (match-end 1)
-           'helm-ff-file-extension t disp)))
-    ;; We don't want to filter boring files only on the files coming
+    ;; We want to filter boring files only on the files coming
     ;; from the output of helm-ff-directory-files not on single
     ;; candidate (issue #2330).
     (unless (and (not skip-boring-check)
                  (or (helm-ff-boring-file-p basename)
                      (helm-ff-git-ignored-p file)))
-
+      ;; Highlight extensions.
+      (helm-aif (and (not backup)
+                     (not urlp)
+                     (file-name-extension disp))
+          (when (and (not (string= "0" it))
+                     (zerop (string-to-number it))
+                     (string-match (format "\\.\\(%s\\)\\'" it) disp))
+            (add-face-text-property
+             (match-beginning 1) (match-end 1)
+             'helm-ff-file-extension t disp)))
       ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                    (helm-file-on-mounted-network-p helm-pattern)))
