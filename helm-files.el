@@ -3695,9 +3695,7 @@ If REVERSE is non nil DISPLAY is shown as full path.
 If SKIP-BORING-CHECK is non nil don't filter boring files."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
-         (urlp (and helm--url-regexp
-                    (string-match helm--url-regexp file)
-                    (string-match helm-ff-url-regexp file)))
+         (urlp (string-match-p helm-ff-url-regexp file))
          ;; Filename with cntrl chars e.g. foo^J
          (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
                    (replace-regexp-in-string
