@@ -3049,7 +3049,8 @@ debugging purpose."
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
-           (list (format "file-error: Opening directory permission denied `%s'" path)))
+           (list (cons (format "file-error: Opening directory permission denied `%s'" path)
+                       path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
           ((and dir-p helm-ff-auto-update-flag)
