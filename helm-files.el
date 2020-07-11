@@ -2014,7 +2014,8 @@ If MUST-MATCH is specified exit with
         ;; Ensure `file-directory-p' works on remote files.
         non-essential)
     (cl-assert sel nil "Trying to exit with no candidates")
-    (if (and (file-directory-p sel)
+    (if (and (or (file-directory-p sel)
+                 (helm-ff--invalid-tramp-name-p sel))
              ;; Allows exiting with default action when a prefix arg
              ;; is specified.
              (null current-prefix-arg)
