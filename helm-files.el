@@ -2860,7 +2860,10 @@ debugging purpose."
                                                     (concat (or (car mh-method) "/")
                                                             method ":" host))))))
       (helm-fast-remove-dups
-       (delq nil (cons current-mh-host comps))
+       (append (and current-mh-host
+                    (list (helm-ff-filter-candidate-one-by-one
+                           current-mh-host)))
+               comps)
        :test 'equal))))
 
 (defun helm-ff-before-action-hook-fn ()
