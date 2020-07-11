@@ -5080,25 +5080,38 @@ selecting them."
     (helm-exit-and-execute-action 'find-file-other-tab)))
 (put 'helm-ff-find-file-other-tab 'helm-only t)
 
+(defun helm-ff--new-dirs-to-update (path)
+  "Collect directories to update when creating new directory PATH."
+  (let ((result (list path)))
+    (helm-awhile (helm-reduce-file-name path 1)
+      (if (not (file-directory-p it))
+          (progn (push it result) (setq path it))
+        (push it result)
+        (cl-return)))
+    result))
+
 (defun helm-ff--mkdir (dir &optional helm-ff)
   (when (or (not confirm-nonexistent-file-or-buffer)
             (y-or-n-p (format "Create directory `%s'? "
                               (abbreviate-file-name
                                (expand-file-name dir)))))
-    (let ((dirfname (directory-file-name dir)))
+    (let ((dirfname (directory-file-name dir))
+          (to-update (and helm-ff (helm-ff--new-dirs-to-update dir))))
       (if (file-exists-p dirfname)
           (error
            "Mkdir: Unable to create directory `%s': file exists."
            (helm-basename dirfname))
-        (make-directory dir 'parent)))
-    (when helm-ff
-      ;; Allow having this new dir in history
-      ;; to be able to retrieve it immediately
-      ;; if we want to e.g copy a file from somewhere in it.
-      (setq helm-ff-default-directory
-            (file-name-as-directory (expand-file-name dir)))
-      (push helm-ff-default-directory helm-ff-history))
-    (or (and helm-ff (helm-find-files-1 dir)) t)))
+        (make-directory dir 'parent))
+      (when helm-ff
+        ;; Refresh cache.
+        (mapc (lambda (x) (helm-ff-directory-files x t)) to-update)
+        ;; Allow having this new dir in history
+        ;; to be able to retrieve it immediately
+        ;; if we want to e.g copy a file from somewhere in it.
+        (setq helm-ff-default-directory
+              (file-name-as-directory (expand-file-name dir)))
+        (push helm-ff-default-directory helm-ff-history))
+      (or (and helm-ff (helm-find-files-1 dir)) t))))
 
 (defun helm-transform-file-load-el (actions candidate)
   "Add action to load the file CANDIDATE if it is an Emacs Lisp
