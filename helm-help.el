@@ -541,6 +541,19 @@ a named extension recursively you would write \"**.el\" whereas in Bash it would
 be \"**/*.el\".  Directory selection with \"**/\" like Bash \"shopt globstar\"
 option is not supported yet.
 
+Helm supports different styles of wildcards:
+
+- `sh' style, the ones supported by `file-expand-wildcards'.
+e.g. \"*.el\", \"*.[ch]\" which match respectively all \".el\"
+files or all \".c\" and \".h\" files.
+
+- `bash' style (partially) In addition to what allowed in `sh'
+style you can specify file extensions that have more than one
+character like this: \"*.{sh,py}\" which match \".sh\" and
+\".py\" files.
+
+Of course in both styles you can specify one or two \"*\".
+
 *** Query replace regexp on filenames
 
 Replace different parts of a file basename with something else.
