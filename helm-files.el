@@ -2880,7 +2880,7 @@ debugging purpose."
 (cl-defun helm-ff--invalid-tramp-name-p (&optional (pattern helm-pattern))
   "Return non-nil when PATTERN is an invalid tramp filename."
   (string= (helm-ff-set-pattern pattern)
-           "Invalid tramp file name"))
+           "@@TRAMP@@"))
 
 (defun helm-ff--tramp-postfixed-p (str)
   (let ((methods (helm-ff--get-tramp-methods))
@@ -2956,7 +2956,8 @@ debugging purpose."
           ((and (null postfixed)
                 (string-match helm-tramp-file-name-regexp pattern)
                 (member (match-string 1 pattern) methods))
-           "Invalid tramp file name")   ; Write in helm-buffer.
+           ;; A flag to notify tramp name is incomplete.
+           "@@TRAMP@@")
           ;; Return PATTERN unchanged.
           (t pattern))))
 
@@ -2975,7 +2976,7 @@ debugging purpose."
     ;; Issue #118 allow creation of newdir+newfile.
     (unless (or
              ;; A tramp file name not completed.
-             (string= path "Invalid tramp file name")
+             (string= path "@@TRAMP@@")
              ;; An empty pattern
              (string= path "")
              (and (string-match-p ":\\'" path)
@@ -2989,10 +2990,10 @@ debugging purpose."
       ;; to write a non--existing path in minibuffer
       ;; probably to create a 'new_dir' or a 'new_dir+new_file'.
       (setq invalid-basedir t))
-    ;; Don't set now `helm-pattern' if `path' == "Invalid tramp file name"
+    ;; Don't set now `helm-pattern' if `path' == "@@TRAMP@@"
     ;; like that the actual value (e.g /ssh:) is passed to
     ;; `helm-ff--tramp-hostnames'.
-    (unless (or (string= path "Invalid tramp file name")
+    (unless (or (string= path "@@TRAMP@@")
                 invalid-basedir)      ; Leave  helm-pattern unchanged.
       (setq helm-ff-auto-update-flag  ; [1]
             ;; Unless auto update is disabled start auto updating only
@@ -3028,18 +3029,8 @@ debugging purpose."
     (when (and (string-match ":\\'" path)
                (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
-    (cond ((string= path "Invalid tramp file name")
-           (or (helm-ff--tramp-hostnames) ; Hostnames completion.
-               (prog2
-                   ;; `helm-pattern' have not been modified yet.
-                   ;; Set it here to the value of `path' that should be now
-                   ;; "Invalid tramp file name" and set the candidates list
-                   ;; to ("Invalid tramp file name") to make `helm-pattern'
-                   ;; match single candidate "Invalid tramp file name".
-                   (setq helm-pattern path)
-                   ;; "Invalid tramp file name" is now printed
-                   ;; in `helm-buffer'.
-                   (list path))))
+    (cond ((string= path "@@TRAMP@@")
+           (helm-ff--tramp-hostnames)) ; Hostnames completion.
           ((or (and (file-regular-p path)
                     (eq last-repeatable-command 'helm-execute-persistent-action))
                ;; `ffap-url-regexp' don't match until url is complete.
