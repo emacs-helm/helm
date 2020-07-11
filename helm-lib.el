@@ -1306,9 +1306,19 @@ Directories expansion is not supported."
                                      ((basename nil) 'basename)
                                      (t 'full))
                              :directories nil
-                             :match (wildcard-to-regexp bn)
+                             :match (or (helm-wildcard-to-regexp bn)
+                                        (wildcard-to-regexp bn))
                              :skip-subdirs t)
-        (file-expand-wildcards pattern full))))
+      (helm-aif (helm-wildcard-to-regexp bn)
+          (directory-files (helm-basedir pattern) full it)
+        (file-expand-wildcards pattern full)))))
+
+(defun helm-wildcard-to-regexp (wc)
+  "Transform wilcard WC like \"**.{jpg,jpeg}\" in REGEXP."
+  (when (string-match ".*\\(\\*\\{1,2\\}\\)\\.[{]\\(.*\\)[}]\\'" wc)
+    (format ".*\\.\\(%s\\)$"
+            (replace-regexp-in-string
+             "," "\\\\|" (match-string 2 wc)))))
 
 ;;; helm internals
 ;;
