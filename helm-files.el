@@ -3220,6 +3220,7 @@ in cache."
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
 (defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
+(defvar helm-ff--refresh-cache-done nil)
 
 (defcustom helm-ff-cache-mode-post-delay 0.5
   "Wait this delay seconds before restarting when emacs stops beeing idle.
@@ -3235,7 +3236,7 @@ Minimum value accepted is 0.5s."
   :type 'float
   :group 'helm-files)
 
-(defcustom helm-ff-cache-mode-max-idle-time 15
+(defcustom helm-ff-cache-mode-max-idle-time 6
   "`helm-ff-cache-mode' timer stops updating after this many seconds."
   :type 'integer
   :group 'helm-files)
@@ -3302,11 +3303,13 @@ When Emacs is idle, refresh the cache all the
            ;; Stop updating when Emacs is idle more than
            ;; helm-ff-cache-mode-max-idle-time.
            (time-less-p (current-idle-time)
-                        (seconds-to-time helm-ff-cache-mode-max-idle-time)))
+                        (seconds-to-time helm-ff-cache-mode-max-idle-time))
+           (null helm-ff--refresh-cache-done))
       (progn
         (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating)
         (while-no-input
-          (helm-ff-refresh-cache)))
+          (helm-ff-refresh-cache)
+          (setq helm-ff--refresh-cache-done t)))
     (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped))
   (force-mode-line-update))
 
@@ -3326,7 +3329,8 @@ When Emacs is idle, refresh the cache all the
   ;; and an explicit delay in post-command-hook and in focus-in-hook.
   (helm-ff--cache-mode-refresh
    'no-update (+ (helm-ff--refresh-cache-delay)
-                 (helm-ff--cache-mode-post-delay))))
+                 (helm-ff--cache-mode-post-delay)))
+  (setq helm-ff--refresh-cache-done nil))
 
 (defun helm-ff--refresh-cache-delay ()
   "Prevent user using less than 0.5s for `helm-ff-refresh-cache-delay'."
