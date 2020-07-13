@@ -142,6 +142,14 @@ buffer at the end.  See `helm-buffers-reorder-buffer-list'."
   :group 'helm-buffers
   :type 'function)
 
+(defcustom helm-buffers-sort-fn helm-fuzzy-sort-fn
+  "The sort function to use in `helm-buffers-list'.
+
+Default to `helm-fuzzy-sort-fn' you can use
+`helm-fuzzy-matching-sort-fn-preserve-ties-order' as alternative if
+you want to keep the recentest order when narrowing candidates."
+  :type 'function
+  :group 'helm-buffers)
 
 ;;; Faces
 ;;
@@ -586,7 +594,7 @@ buffers)."
   (if (string= helm-pattern "")
       candidates
     (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
-      (funcall helm-fuzzy-sort-fn candidates source))))
+      (funcall helm-buffers-sort-fn candidates source))))
 
 (defun helm-buffers-mark-similar-buffers-1 (&optional type)
   (with-helm-window
