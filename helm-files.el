@@ -460,20 +460,6 @@ currently transfered in an help-echo in mode-line, if you use
   "Percentage unicode sign to use in Rsync reporter."
   :type 'string
   :group 'helm-files)
-
-(defcustom helm-ff-keep-cached-candidates nil
-  "When non nil do not delete the HFF cache after each session.
-Possible values are:
-- `all' or `t' : Keep all
-- `remote': Keep only remote
-- `local': Keep only locals
-- `nil' (default) : Delete all"
-  :type '(choice
-          (const :tag "Keep all"         'all)
-          (const :tag "Keep only remote" 'remote)
-          (const :tag "Keep only locals" 'local)
-          (const :tag "Delete all"       nil))
-  :group 'helm-files)
 
 ;;; Faces
 ;;
@@ -3219,8 +3205,8 @@ in cache."
                (helm-ff-directory-files k t)))
            helm-ff--list-directory-cache))
 
-;;; [EXPERIMENTAL] helm-ff-cache-mode
-;;
+;;; `helm-ff-cache-mode'
+;;  A mode to auto refresh helm-find-files cache.
 ;;
 (defvar helm-ff--refresh-cache-timer nil)
 (defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
@@ -3261,30 +3247,6 @@ Minimum value accepted is 0.5s."
        :inherit font-lock-variable-name-face))
   "Face used for `helm-ff-cache-mode' lighter."
   :group 'helm-files-faces)
-
-;;;###autoload
-(define-minor-mode helm-ff-cache-mode
-  "Refresh `helm-ff--list-directory-cache' when emacs is idle.
-
-When Emacs is idle, refresh the cache all the
-`helm-ff-refresh-cache-delay' seconds then stop after
-`helm-ff-cache-mode-max-idle-time' if emacs is still idle."
-  :group 'helm-files
-  :global t
-  :lighter (:eval (propertize helm-ff-cache-mode-lighter
-                              'face helm-ff--cache-mode-lighter-face))
-  (condition-case err
-      (progn
-        (cl-assert helm-ff-keep-cached-candidates
-                   nil "Please set first `helm-ff-keep-cached-candidates' to a non nil value")
-        (if helm-ff-cache-mode
-            (helm-ff-cache-mode-add-hooks)
-          (helm-ff-cache-mode-remove-hooks)
-          (cancel-timer helm-ff--refresh-cache-timer)
-          (setq helm-ff--refresh-cache-timer nil)))
-    (error (progn
-             (setq helm-ff-cache-mode nil)
-             (user-error "%s" (cadr err))))))
 
 (defun helm-ff--cache-mode-refresh (&optional no-update delay)
   (when helm-ff--refresh-cache-timer
@@ -3351,6 +3313,52 @@ When Emacs is idle, refresh the cache all the
 (defun helm-ff-cache-mode-remove-hooks ()
   (remove-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
   (remove-hook 'focus-in-hook 'helm-ff--cache-mode-reset-timer))
+
+;;;###autoload
+(define-minor-mode helm-ff-cache-mode
+  "Auto refresh `helm-find-files' cache when emacs is idle.
+
+When Emacs is idle, refresh the cache all the
+`helm-ff-refresh-cache-delay' seconds then stop when done or after
+`helm-ff-cache-mode-max-idle-time' if emacs is still idle."
+  :group 'helm-files
+  :global t
+  :lighter (:eval (propertize helm-ff-cache-mode-lighter
+                              'face helm-ff--cache-mode-lighter-face))
+  (unless helm-ff-keep-cached-candidates
+    (display-warning
+     '(helm-ff-cached-mode)
+     "`helm-ff-keep-cached-candidates' should be set to a non nil value"))
+  (if helm-ff-cache-mode
+      (helm-ff-cache-mode-add-hooks)
+    (helm-ff-cache-mode-remove-hooks)
+    (cancel-timer helm-ff--refresh-cache-timer)
+    (setq helm-ff--refresh-cache-timer nil)))
+
+(defcustom helm-ff-keep-cached-candidates 'all
+  "When non nil do not delete the HFF cache after each session.
+
+Possible values are:
+- `all' or `t' : Keep all.
+- `remote': Keep only remote.
+- `local': Keep only locals.
+- `nil' (default) : Delete all.
+
+Starts `helm-ff-cache-mode' when non nil.
+
+Please use customize interface or `customize-set-variable' to
+configure this i.e. NOT `setq'."
+  :type '(choice
+          (const :tag "Keep all"         'all)
+          (const :tag "Keep only remote" 'remote)
+          (const :tag "Keep only locals" 'local)
+          (const :tag "Delete all"       nil))
+  :group 'helm-files
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (helm-ff-cache-mode 1)
+           (helm-ff-cache-mode -1))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
