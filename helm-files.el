@@ -3332,7 +3332,8 @@ When Emacs is idle, refresh the cache all the
   (if helm-ff-cache-mode
       (helm-ff-cache-mode-add-hooks)
     (helm-ff-cache-mode-remove-hooks)
-    (cancel-timer helm-ff--refresh-cache-timer)
+    (and helm-ff--refresh-cache-timer
+         (cancel-timer helm-ff--refresh-cache-timer))
     (setq helm-ff--refresh-cache-timer nil)))
 
 (defcustom helm-ff-keep-cached-candidates 'all
