@@ -3322,6 +3322,12 @@ Minimum value accepted is 0.5s."
 (define-minor-mode helm-ff-cache-mode
   "Auto refresh `helm-find-files' cache when emacs is idle.
 
+You will probably don't want to start this mode directly but instead
+customize `helm-ff-keep-cached-candidates' to a non nil value to
+enable it.
+With `helm-ff-keep-cached-candidates' set to a nil value the mode will
+disable itself.
+
 When Emacs is idle, refresh the cache all the
 `helm-ff-refresh-cache-delay' seconds then stop when done or after
 `helm-ff-cache-mode-max-idle-time' if emacs is still idle."
