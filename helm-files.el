@@ -3719,7 +3719,7 @@ return directly CANDIDATES."
 (defsubst helm-ff-file-extension (file)
   "Returns FILE extension if it is not a number."
   (helm-aif (file-name-extension file)
-      (and (not (string= "0" it))
+      (and (not (string-match "\\`0+\\'" it))
            (zerop (string-to-number it))
            it)))
 
