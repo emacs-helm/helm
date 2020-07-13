@@ -3325,7 +3325,8 @@ When Emacs is idle, refresh the cache all the
   :global t
   :lighter (:eval (propertize helm-ff-cache-mode-lighter
                               'face helm-ff--cache-mode-lighter-face))
-  (unless helm-ff-keep-cached-candidates
+  (unless (or helm-ff-keep-cached-candidates
+              (null helm-ff-cache-mode))
     (display-warning
      '(helm-ff-cached-mode)
      "`helm-ff-keep-cached-candidates' should be set to a non nil value"))
