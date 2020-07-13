@@ -2020,7 +2020,11 @@ If MUST-MATCH is specified exit with
              ;; is specified.
              (null current-prefix-arg)
              (null helm-ff--RET-disabled)
-             (not (string= "." (helm-basename sel))))
+             (or (and (file-remote-p sel)
+                      (string= "." (helm-basename sel))
+                      (string-match-p "\\`[/].*:.*:\\'"
+                                      helm-pattern))
+                 (not (string= "." (helm-basename sel)))))
         (helm-execute-persistent-action)
       (if must-match
           (helm-confirm-and-exit-minibuffer)
