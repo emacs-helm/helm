@@ -3254,14 +3254,18 @@ Minimum value accepted is 0.5s."
   (if (or helm-alive-p (input-pending-p) no-update)
       (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
     (helm-ff--cache-mode-refresh-1))
-  (setq helm-ff--refresh-cache-timer
-        (run-with-idle-timer
-         (helm-aif (current-idle-time)
-             (time-add
-              it (seconds-to-time (helm-ff--refresh-cache-delay)))
-           (or delay helm-ff-refresh-cache-delay))
-         nil
-         #'helm-ff--cache-mode-refresh)))
+  ;; When `helm-ff-keep-cached-candidates' becomes nil don't restart
+  ;; timer and set mode to nil to disable it.
+  (if helm-ff-keep-cached-candidates
+      (setq helm-ff--refresh-cache-timer
+            (run-with-idle-timer
+             (helm-aif (current-idle-time)
+                 (time-add
+                  it (seconds-to-time (helm-ff--refresh-cache-delay)))
+               (or delay helm-ff-refresh-cache-delay))
+             nil
+             #'helm-ff--cache-mode-refresh))
+    (setq helm-ff-cache-mode nil)))
 
 (defun helm-ff--cache-mode-refresh-1 ()
   (if (and helm-ff-keep-cached-candidates
@@ -3327,6 +3331,10 @@ When Emacs is idle, refresh the cache all the
                               'face helm-ff--cache-mode-lighter-face))
   (unless (or helm-ff-keep-cached-candidates
               (null helm-ff-cache-mode))
+    ;; When helm-ff-keep-cached-candidates have been set to nil with
+    ;; setq, the mode will start but with no effect and die by itself
+    ;; i.e. the timer will not restart on itself and mode will be set
+    ;; to nil.
     (display-warning
      '(helm-ff-cached-mode)
      "`helm-ff-keep-cached-candidates' should be set to a non nil value"))
