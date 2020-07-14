@@ -3215,14 +3215,14 @@ in cache."
 (defcustom helm-ff-cache-mode-post-delay 0.5
   "Wait this delay seconds before restarting when emacs stops beeing idle.
 
-Minimum value accepted is 0.5s."
+Minimum value accepted is 0.3s."
   :type 'float
   :group 'helm-files)
 
-(defcustom helm-ff-refresh-cache-delay 1.0
+(defcustom helm-ff-refresh-cache-delay 0.5
   "`helm-ff-cache-mode' timer starts after this many seconds.
 
-Minimum value accepted is 0.5s."
+Minimum value accepted is 0.3s."
   :type 'float
   :group 'helm-files)
 
@@ -3304,11 +3304,11 @@ Minimum value accepted is 0.5s."
 
 (defun helm-ff--refresh-cache-delay ()
   "Prevent user using less than 0.5s for `helm-ff-refresh-cache-delay'."
-  (max 0.5 helm-ff-refresh-cache-delay))
+  (max 0.3 helm-ff-refresh-cache-delay))
 
 (defun helm-ff--cache-mode-post-delay ()
   "Prevent user using less than 0.5s for `helm-ff-cache-mode-post-delay'."
-  (max 0.5 helm-ff-cache-mode-post-delay))
+  (max 0.3 helm-ff-cache-mode-post-delay))
 
 (defun helm-ff-cache-mode-add-hooks ()
   (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
