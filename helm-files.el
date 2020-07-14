@@ -3273,7 +3273,7 @@ Minimum value accepted is 0.3s."
            ;; Stop updating when Emacs is idle more than
            ;; helm-ff-cache-mode-max-idle-time.
            (time-less-p (current-idle-time)
-                        (seconds-to-time helm-ff-cache-mode-max-idle-time))
+                        (seconds-to-time (helm-ff--cache-mode-max-idle-time)))
            (null helm-ff--refresh-cache-done))
       (progn
         (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating)
@@ -3309,6 +3309,13 @@ Minimum value accepted is 0.3s."
 (defun helm-ff--cache-mode-post-delay ()
   "Prevent user using less than 0.5s for `helm-ff-cache-mode-post-delay'."
   (max 0.3 helm-ff-cache-mode-post-delay))
+
+(defun helm-ff--cache-mode-max-idle-time ()
+  "Prevent user using too small value for `helm-ff-cache-mode-max-idle-time'."
+  (max (+ helm-ff-cache-mode-post-delay
+          helm-ff-refresh-cache-delay
+          1)
+       helm-ff-cache-mode-max-idle-time))
 
 (defun helm-ff-cache-mode-add-hooks ()
   (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
