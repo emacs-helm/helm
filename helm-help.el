@@ -1057,20 +1057,18 @@ can set this with `helm-ff-skip-boring-files' or
 `helm-ff-skip-git-ignored-files'.
 NOTE: This will slow down helm, be warned.
 
-*** Helm is using a cache
+*** Helm-find-files is using a cache
 
 Helm is caching each directory files list in a hash table for
-faster search.  By default the cache is cleared after each HFF
-session, but you can keep the cache across your HFF sessions by
-customizing `helm-ff-keep-cached-candidates' (see its docstring),
-however this may cause surprises if files have changed (renamed,
-deleted etc...) in these cases you can refresh a directory by
-hitting `\\<helm-map>\\[helm-refresh]'.  An other way is to use
-`helm-ff-cache-mode' which will lazily update HFF cache while
-Emacs is idle, it will show a red or green light depending helm
-is updating or not, to enable it add to your init file
-=(helm-ff-cache-mode 1)=
-or manually with M-x helm-ff-cache-mode.
+faster search.  What is kept in the cache is defined by
+`helm-ff-keep-cached-candidates' variable.  By default HFF keep
+all in the cache between its sessions but you can customize
+`helm-ff-keep-cached-candidates', do not use setq for this.  When
+`helm-ff-keep-cached-candidates' is non nil HFF refreshes the
+cache automatically between its sessions when Emacs is idle, you
+should see a little icon brievly changing color when the cache is
+refreshed. You can also refresh a directory at anytime during
+your HFF sessions by hitting \\<helm-map>\\[helm-refresh].
 
 ** Commands
 \\<helm-find-files-map>
