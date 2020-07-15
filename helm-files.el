@@ -2650,7 +2650,7 @@ when `helm-pattern' is equal to \"~/\"."
     (cond ((and (not (file-remote-p helm-pattern))
                 (null (file-exists-p helm-pattern))
                 (string-match-p
-                 "\\`\\([.]\\|\\s-\\)\\{2\\}[^/]+"
+                 "\\`\\([.]\\)\\{2\\}[^/]+"
                  (helm-basename helm-pattern))
                 (string-match-p "/\\'" helm-pattern))
            (helm-ff-recursive-dirs helm-pattern)
@@ -4285,7 +4285,7 @@ file."
 ;;; Recursive dirs completion
 ;;
 (defun helm-find-files-recursive-dirs (directory &optional input)
-  (when (string-match "\\(\\s-+\\|[.]\\)\\{2\\}" input)
+  (when (string-match "\\([.]\\)\\{2\\}" input)
     (setq input (replace-match "" nil t input)))
   (message "Recursively searching %s from %s ..."
            input (abbreviate-file-name directory))
