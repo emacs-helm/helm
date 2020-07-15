@@ -2656,7 +2656,7 @@ when `helm-pattern' is equal to \"~/\"."
            (helm-ff-recursive-dirs helm-pattern)
            (helm-ff--maybe-set-pattern-and-update))
           ((string-match
-            "\\(?:\\`~/\\)\\|/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\|\\s\\+\\)"
+            "\\(?:\\`~/\\)\\|/?\\$.*/\\|/\\./\\|/\\.\\./\\|/~.*/\\|//\\|\\(/[[:alpha:]]:/\\)"
             helm-pattern)
            (let* ((match (match-string 0 helm-pattern))
                   (input (cond ((string= match "/./")
