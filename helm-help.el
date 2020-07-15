@@ -475,8 +475,6 @@ you want to go to \"/home/you/foo/bar/baz/somewhere/else\", simply type
 the final \"/\".  Helm will then list all possible directories under \"foo\"
 matching \"else\".
 
-Entering two spaces before \"else\" instead of two dots also works.
-
 Note: Completion on subdirectories uses \"locate\" as backend, you can configure
 the command with `helm-locate-recursive-dirs-command'.  Because this completion
 uses an index, the directory tree displayed may be out-of-date and not reflect
