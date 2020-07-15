@@ -3755,7 +3755,9 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
       (helm-aif (and (not backup)
                      (not urlp)
                      (helm-ff-file-extension disp))
-          (when (string-match (format "\\.\\(%s\\)\\'" it) disp)
+          (when (condition-case _err
+                    (string-match (format "\\.\\(%s\\)\\'" it) disp)
+                  (invalid-regexp nil))
             (add-face-text-property
              (match-beginning 1) (match-end 1)
              'helm-ff-file-extension t disp)))
