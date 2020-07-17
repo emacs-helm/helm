@@ -3231,20 +3231,30 @@ Minimum value accepted is 0.3s."
   :type 'integer
   :group 'helm-files)
 
-(defcustom helm-ff-cache-mode-lighter " 💡"
-  "A string for `helm-ff-cache-mode' lighter."
+(defcustom helm-ff-cache-mode-lighter-sleep " ⏹"
+  "String used when `helm-ff-cache-mode' is inactive."
+  :type 'string
+  :group 'helm-files)
+
+(defcustom helm-ff-cache-mode-lighter-updating " ▼"
+  "String used when `helm-ff-cache-mode' is updating cache."
+  :type 'string
+  :group 'helm-files)
+
+(defcustom helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep
+  "Default string for `helm-ff-cache-mode' lighter."
   :type 'string
   :group 'helm-files)
 
 (defface helm-ff-cache-updating
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :inherit font-lock-type-face))
+       :inherit default))
   "Face used for `helm-ff-cache-mode' lighter."
   :group 'helm-files-faces)
 
 (defface helm-ff-cache-stopped
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :inherit font-lock-variable-name-face))
+       :inherit default))
   "Face used for `helm-ff-cache-mode' lighter."
   :group 'helm-files-faces)
 
@@ -3252,7 +3262,8 @@ Minimum value accepted is 0.3s."
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
   (if (or helm-alive-p (input-pending-p) no-update)
-      (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
+      (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped
+            helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep)
     (helm-ff--cache-mode-refresh-1))
   ;; When `helm-ff-keep-cached-candidates' becomes nil don't restart
   ;; timer and set mode to nil to disable it.
@@ -3276,11 +3287,13 @@ Minimum value accepted is 0.3s."
                         (seconds-to-time (helm-ff--cache-mode-max-idle-time)))
            (null helm-ff--refresh-cache-done))
       (progn
-        (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating)
+        (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating
+              helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-updating)
         (while-no-input
           (helm-ff-refresh-cache)
           (setq helm-ff--refresh-cache-done t)))
-    (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped))
+    (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped
+          helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep))
   (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
