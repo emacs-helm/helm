@@ -2797,7 +2797,7 @@ HISTORY args see `helm'."
   (helm-log "default = %S" default)
   (helm-log "history = %S" history)
   (setq helm--prompt (or prompt "pattern: "))
-  (let ((non-essential t)
+  (let ((helm-use-tramp-handlers t)
         ;; Prevent mouse jumping to the upper-right
         ;; hand corner of the frame (#1538).
         mouse-autoselect-window
@@ -5155,7 +5155,7 @@ If PRESERVE-SAVED-ACTION is non-nil, then save the action."
       (kill-buffer it))
   (let ((source (or helm-saved-current-source
                     (helm-get-current-source)))
-        non-essential)
+        helm-use-tramp-handlers)
     (setq selection (helm-coerce-selection
                      (or selection
                          helm-saved-selection

@@ -1027,7 +1027,7 @@ If FILE is a directory, open this directory."
                                (if host
                                    (file-remote-p candidate 'localname)
                                  candidate))))
-         non-essential)
+         helm-use-tramp-handlers)
     (if (buffer-live-p (get-buffer buf))
         (progn
           (set-buffer buf)

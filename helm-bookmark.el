@@ -167,18 +167,18 @@
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark action."
   (let ((current-prefix-arg helm-current-prefix-arg)
-        non-essential)
+        helm-use-tramp-handlers)
     (bookmark-jump candidate)))
 
 (defun helm-bookmark-jump-other-frame (candidate)
   "Jump to bookmark in other frame action."
   (let ((current-prefix-arg helm-current-prefix-arg)
-        non-essential)
+        helm-use-tramp-handlers)
     (bookmark-jump candidate 'switch-to-buffer-other-frame)))
 
 (defun helm-bookmark-jump-other-window (candidate)
   "Jump to bookmark in other window action."
-  (let (non-essential)
+  (let (helm-use-tramp-handlers)
     (bookmark-jump-other-window candidate)))
 
 
@@ -507,7 +507,7 @@ If `browse-url-browser-function' is set to something else than
 
 (defun helm-highlight-bookmark (bookmarks _source)
   "Used as `filtered-candidate-transformer' to colorize bookmarks."
-  (let ((non-essential t))
+  (let ((helm-use-tramp-handlers t))
     (cl-loop for i in bookmarks
           for isfile        = (bookmark-get-filename i)
           for hff           = (helm-bookmark-helm-find-files-p i)
