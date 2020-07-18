@@ -4540,16 +4540,29 @@ source is `helm-source-find-files'."
 (defun helm-ff--cleanup-cache ()
   "Remove entries from cache according to `helm-ff-keep-cached-candidates'."
   (cl-ecase helm-ff-keep-cached-candidates
-    ((all t) (ignore))
-    (local (maphash (lambda (k _v)
-                      (when (file-remote-p k)
-                        (remhash k helm-ff--list-directory-cache)))
-                    helm-ff--list-directory-cache))
-    (remote (maphash (lambda (k _v)
-                       (unless (file-remote-p k)
-                         (remhash k helm-ff--list-directory-cache)))
-                     helm-ff--list-directory-cache))
-    ((nil) (clrhash helm-ff--list-directory-cache))))
+    ((all t)
+     (maphash (lambda (k _v)
+                ;; Keep all but non existing files but don't call
+                ;; `file-exists-p' on remote files to avoid triggering
+                ;; a tramp connection [1].
+                (when (and (not (file-remote-p k))
+                           (not (file-exists-p k)))
+                  (remhash k helm-ff--list-directory-cache)))
+              helm-ff--list-directory-cache))
+    (local
+     (maphash (lambda (k _v)
+                ;; Same comment as [1].
+                (when (or (file-remote-p k)
+                          (not (file-exists-p k)))
+                  (remhash k helm-ff--list-directory-cache)))
+              helm-ff--list-directory-cache))
+    (remote
+     (maphash (lambda (k _v)
+                (unless (file-remote-p k)
+                  (remhash k helm-ff--list-directory-cache)))
+              helm-ff--list-directory-cache))
+    ((nil)
+     (clrhash helm-ff--list-directory-cache))))
 
 (defun helm-find-files-cleanup ()
   (helm-ff--cleanup-cache)
