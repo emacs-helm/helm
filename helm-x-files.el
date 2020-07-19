@@ -15,6 +15,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
 ;;; Code:
 
 (require 'helm-for-files)
@@ -23,7 +25,10 @@
 ;;; List of files gleaned from every dired buffer
 ;;
 ;;
+(defvar dired-buffers)
+(defvar dired-re-no-dot)
 (defun helm-files-in-all-dired-candidates ()
+  "Return a list of files from live `dired' buffers."
   (save-excursion
     (cl-loop for (f . b) in dired-buffers
           when (buffer-live-p b)
@@ -74,6 +79,7 @@
 ;; Tracker desktop search
 
 (defun helm-source-tracker-transformer (candidates _source)
+  "Return file names from tracker CANDIDATES."
   ;; loop through tracker candidates selecting out file:// lines
   ;; then select part after file:// and url decode to get straight filenames
   (cl-loop for cand in candidates
@@ -101,7 +107,7 @@
     :action-transformer '(helm-transform-file-load-el
                           helm-transform-file-browse-url)
     :requires-pattern 3)
-  "Source for retrieving files matching the current input pattern
+  "Source for retrieving files matching the current input pattern \
 with the tracker desktop search.")
 
 ;; Spotlight (MacOS X desktop search)
@@ -114,8 +120,7 @@ with the tracker desktop search.")
 
 (defvar helm-source-mac-spotlight
   (helm-make-source "mdfind" 'helm-mac-spotlight-source)
-  "Source for retrieving files via Spotlight's command line
-utility mdfind.")
+  "Source for retrieving files via Spotlight's command line utility mdfind.")
 
 (provide 'helm-x-files)
 
