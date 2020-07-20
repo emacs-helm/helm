@@ -541,15 +541,20 @@ buffers)."
                                         (and helm-buffers-fuzzy-matching ""))))
                      (cons (if helm-buffer-details-flag
                                (concat
-                                (funcall helm-fuzzy-matching-highlight-fn
-                                         truncbuf)
+                                (if helm-fuzzy-matching-highlight-fn
+                                    (funcall helm-fuzzy-matching-highlight-fn
+                                             truncbuf)
+                                  truncbuf)
                                 helm-buffers-column-separator
                                 formatted-size
                                 helm-buffers-column-separator
                                 fmode
                                 helm-buffers-column-separator
                                 meta)
-                             (funcall helm-fuzzy-matching-highlight-fn name))
+                             (if helm-fuzzy-matching-highlight-fn
+                                 (funcall helm-fuzzy-matching-highlight-fn
+                                          name)
+                               name))
                            (get-buffer i)))))
 
 (defun helm-buffer--get-preselection (buffer)
@@ -591,7 +596,8 @@ buffers)."
            finally return (mapconcat 'identity lst (or separator " "))))
 
 (defun helm-buffers-sort-transformer (candidates source)
-  (if (string= helm-pattern "")
+  (if (or (string= helm-pattern "")
+          (null helm-buffers-sort-fn))
       candidates
     (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
       (funcall helm-buffers-sort-fn candidates source))))

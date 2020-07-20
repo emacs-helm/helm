@@ -4398,8 +4398,9 @@ to the matching method in use."
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
-  (cl-loop for c in candidates
-           collect (funcall helm-fuzzy-matching-highlight-fn c)))
+  (if helm-fuzzy-matching-highlight-fn
+      (mapcar helm-fuzzy-matching-highlight-fn candidates)
+    candidates))
 
 
 ;;; helm-flex style
