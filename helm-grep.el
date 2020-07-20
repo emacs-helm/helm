@@ -543,7 +543,7 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                          (if helm-grep-in-recurse
                              (helm-grep-command t)
                              (helm-grep-command)))))
-         helm-use-tramp-handlers)
+         non-essential)
     ;; Start grep process.
     (helm-log "Starting Grep process in directory `%s'" default-directory)
     (helm-log "Command line used was:\n\n%s"
@@ -1100,7 +1100,7 @@ It is used actually to specify 'zgrep' or 'git'.
 When BACKEND 'zgrep' is used don't prompt for a choice in
 recurse, and ignore EXTS, search being made recursively on files
 matching `helm-zgrep-file-extension-regexp' only."
-  (let* (helm-use-tramp-handlers
+  (let* (non-essential
          (ack-rec-p (helm-grep-use-ack-p :where 'recursive))
          (exts (and recurse
                     ;; [FIXME] I could handle this from helm-walk-directory.

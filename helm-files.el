@@ -1998,7 +1998,7 @@ If MUST-MATCH is specified exit with
 `helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
   (let ((sel   (helm-get-selection))
         ;; Ensure `file-directory-p' works on remote files.
-        helm-use-tramp-handlers)
+        non-essential)
     (cl-assert sel nil "Trying to exit with no candidates")
     (if (and (or (file-directory-p sel)
                  (helm-ff--invalid-tramp-name-p sel))
@@ -2965,7 +2965,7 @@ debugging purpose."
          (dir-p         (file-accessible-directory-p path))
          basedir
          invalid-basedir
-         helm-use-tramp-handlers
+         non-essential
          (tramp-verbose helm-tramp-verbose)) ; No tramp message when 0.
     ;; Tramp check if path is valid without waiting a valid
     ;; connection and may send a file-error.
@@ -4632,7 +4632,7 @@ source is `helm-source-find-files'."
 
 (defun helm-find-files-input (file-at-pt thing-at-pt)
   "Try to guess a default input for `helm-find-files'."
-  (let* ((helm-use-tramp-handlers t)
+  (let* ((non-essential t)
          (remp    (or (and file-at-pt (file-remote-p file-at-pt))
                       (and thing-at-pt (file-remote-p thing-at-pt))))
          (def-dir (helm-current-directory))

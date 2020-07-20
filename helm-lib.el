@@ -162,18 +162,6 @@ the customize functions e.g. `customize-set-variable' and NOT
 
 ;;; Compatibility
 ;;
-(defvaralias 'helm-use-tramp-handlers 'non-essential
-  "Don't trigger a tramp connection when non nil.
-
-Tramp trigger connection when using functions that have a tramp
-handler like `file-exists-p' and friends and these functions are
-called on a remote filename, using a non nil value for
-this variable prevents tramp from kicking in.
-
-This alias is added to provide a comprehensive name and a clear
-docstring instead of `non-essential' which mean nothing and have an
-obscure docstring.")
-
 (defun helm-add-face-text-properties (beg end face &optional append object)
   "Add the face property to the text from START to END.
 It is a compatibility function which behaves exactly like
@@ -1174,7 +1162,7 @@ case it should match `file-name-extension'.
 It can also be non-nil (t) in this case no checking of
 `file-name-extension' is done and the extension is removed
 unconditionally."
-  (let ((helm-use-tramp-handlers t))
+  (let ((non-essential t))
     (if (and ext (or (string= (file-name-extension fname) ext)
                      (string= (file-name-extension fname t) ext)
                      (eq ext t))

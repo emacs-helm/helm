@@ -58,7 +58,7 @@ I.e. use the -path/ipath arguments of find instead of
     :requires-pattern 3))
 
 (defun helm-findutils-transformer (candidates _source)
-  (let (helm-use-tramp-handlers
+  (let (non-essential
         (default-directory (helm-default-directory)))
     (cl-loop for i in candidates
              for abs = (expand-file-name
@@ -112,7 +112,7 @@ I.e. use the -path/ipath arguments of find instead of
 Additional find options can be specified after a \"*\"
 separator."
   (let* (process-connection-type
-         helm-use-tramp-handlers
+         non-essential
          (cmd (concat (helm-find--build-cmd-line)
                       (if helm-find-noerrors "2> /dev/null" "")))
          (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
