@@ -3238,20 +3238,20 @@ Minimum value accepted is 0.3s."
   :type 'integer
   :group 'helm-files)
 
-(defcustom helm-ff-cache-mode-lighter-sleep " ⏹"
-  "String used when `helm-ff-cache-mode' is inactive."
+(defcustom helm-ff-cache-mode-lighter-sleep nil
+  "String used when `helm-ff-cache-mode' is inactive.
+When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode'."
   :type 'string
   :group 'helm-files)
 
-(defcustom helm-ff-cache-mode-lighter-updating " ▼"
-  "String used when `helm-ff-cache-mode' is updating cache."
+(defcustom helm-ff-cache-mode-lighter-updating nil
+  "String used when `helm-ff-cache-mode' is updating cache.
+When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode'."
   :type 'string
   :group 'helm-files)
 
-(defcustom helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep
-  "Default string for `helm-ff-cache-mode' lighter."
-  :type 'string
-  :group 'helm-files)
+(defvar helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep
+  "Default string for `helm-ff-cache-mode' lighter.")
 
 (defface helm-ff-cache-updating
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
