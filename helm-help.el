@@ -1064,10 +1064,10 @@ all in the cache between its sessions but you can customize
 `helm-ff-keep-cached-candidates', do not use setq for this.  When
 `helm-ff-keep-cached-candidates' is non nil HFF refreshes the
 cache automatically between its sessions when Emacs is idle, you
-should see a little icon brievly changing form and/or color when
-the cache is refreshed. You can also refresh a directory at
-anytime during your HFF sessions by hitting
-\\<helm-map>\\[helm-refresh].
+should see a little icon brievly changing form when the cache is
+refreshed if you have set `helm-ff-cache-mode-lighter-updating'
+and `helm-ff-cache-mode-lighter-sleep' . You can also refresh a
+directory at anytime during your HFF sessions by hitting \\<helm-map>\\[helm-refresh].
 
 ** Commands
 \\<helm-find-files-map>
