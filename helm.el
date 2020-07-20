@@ -680,14 +680,12 @@ This applies when using `helm-next/previous-line'."
   :type 'function)
 
 (defcustom helm-fuzzy-sort-fn 'helm-fuzzy-matching-default-sort-fn
-  "The sort transformer function used in fuzzy matching.
-When nil, sorting is not done."
+  "The sort transformer function used in fuzzy matching."
   :group 'helm
   :type 'function)
 
 (defcustom helm-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
-  "The function to highlight fuzzy matches.
-When nil, no highlighting is done."
+  "The function to highlight fuzzy matches."
   :group 'helm
   :type 'function)
 
@@ -4398,6 +4396,7 @@ to the matching method in use."
 (defun helm-fuzzy-highlight-matches (candidates _source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
+  (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c)))
 

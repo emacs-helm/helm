@@ -513,6 +513,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e. (boring
 buffers)."
+  (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop for i in buffers
            for (name size mode meta) = (if helm-buffer-details-flag
                                            (helm-buffer--details i 'details)
@@ -591,6 +592,7 @@ buffers)."
            finally return (mapconcat 'identity lst (or separator " "))))
 
 (defun helm-buffers-sort-transformer (candidates source)
+  (cl-assert helm-buffers-sort-fn nil "Wrong type argument functionp: nil")
   (if (string= helm-pattern "")
       candidates
     (let ((helm-pattern (helm-buffers--pattern-sans-filters)))
