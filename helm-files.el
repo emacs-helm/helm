@@ -3253,24 +3253,11 @@ When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode
 (defvar helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep
   "Default string for `helm-ff-cache-mode' lighter.")
 
-(defface helm-ff-cache-updating
-  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :inherit default))
-  "Face used for `helm-ff-cache-mode' lighter."
-  :group 'helm-files-faces)
-
-(defface helm-ff-cache-stopped
-  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :inherit default))
-  "Face used for `helm-ff-cache-mode' lighter."
-  :group 'helm-files-faces)
-
 (defun helm-ff--cache-mode-refresh (&optional no-update delay)
   (when helm-ff--refresh-cache-timer
     (cancel-timer helm-ff--refresh-cache-timer))
   (if (or helm-alive-p (input-pending-p) no-update)
-      (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped
-            helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep)
+      (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep)
     (helm-ff--cache-mode-refresh-1))
   ;; When `helm-ff-keep-cached-candidates' becomes nil don't restart
   ;; timer and set mode to nil to disable it.
@@ -3294,13 +3281,11 @@ When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode
                         (seconds-to-time (helm-ff--cache-mode-max-idle-time)))
            (null helm-ff--refresh-cache-done))
       (progn
-        (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-updating
-              helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-updating)
+        (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-updating)
         (while-no-input
           (helm-ff-refresh-cache)
           (setq helm-ff--refresh-cache-done t)))
-    (setq helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped
-          helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep))
+    (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep))
   (force-mode-line-update))
 
 (defun helm-ff--cache-mode-reset-timer ()
@@ -3360,8 +3345,7 @@ When Emacs is idle, refresh the cache all the
 `helm-ff-cache-mode-max-idle-time' if emacs is still idle."
   :group 'helm-files
   :global t
-  :lighter (:eval (propertize helm-ff-cache-mode-lighter
-                              'face helm-ff--cache-mode-lighter-face))
+  :lighter (:eval helm-ff-cache-mode-lighter)
   (unless (or helm-ff-keep-cached-candidates
               (null helm-ff-cache-mode))
     ;; When helm-ff-keep-cached-candidates have been set to nil with
