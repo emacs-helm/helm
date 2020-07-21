@@ -3366,10 +3366,10 @@ When Emacs is idle, refresh the cache all the
   "When non nil do not delete the HFF cache after each session.
 
 Possible values are:
-- `all' or `t' : Keep all.
+- `all' or `t' (default): Keep all.
 - `remote': Keep only remote.
 - `local': Keep only locals.
-- `nil' (default) : Delete all.
+- `nil': Delete all.
 
 Starts `helm-ff-cache-mode' when non nil.
 
