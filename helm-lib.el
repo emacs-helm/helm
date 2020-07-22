@@ -613,17 +613,23 @@ displayed in BUFNAME."
         scroll-error-top-bottom
         (iter-org-state (helm-iter-circular '(1 (16) (64)))))
     (helm-awhile (read-key prompt)
-      (cl-case it
-        ((?\C-v ? next) (helm-help-scroll-up helm-scroll-amount))
-        ((?\M-v ?b prior) (helm-help-scroll-down helm-scroll-amount))
+      (pcase it
+        ((or ?\C-v ? 'next)
+         (helm-help-scroll-up helm-scroll-amount))
+        ((or ?\M-v ?b 'prior)
+         (helm-help-scroll-down helm-scroll-amount))
         (?\C-s (isearch-forward))
         (?\C-r (isearch-backward))
         (?\C-a (call-interactively #'move-beginning-of-line))
         (?\C-e (call-interactively #'move-end-of-line))
-        ((?\C-f right) (call-interactively #'forward-char))
-        ((?\C-b left) (call-interactively #'backward-char))
-        ((?\C-n down) (helm-help-next-line))
-        ((?\C-p up) (helm-help-previous-line))
+        ((or ?\C-f 'right)
+         (call-interactively #'forward-char))
+        ((or ?\C-b 'left)
+         (call-interactively #'backward-char))
+        ((or ?\C-n 'down)
+         (helm-help-next-line))
+        ((or ?\C-p 'up)
+         (helm-help-previous-line))
         (?\M-a (call-interactively #'backward-sentence))
         (?\M-e (call-interactively #'forward-sentence))
         (?\M-f (call-interactively #'forward-word))
@@ -631,6 +637,7 @@ displayed in BUFNAME."
         (?\M-> (call-interactively #'end-of-buffer))
         (?\M-< (call-interactively #'beginning-of-buffer))
         (?\C-  (helm-help-toggle-mark))
+        ((guard (eql (aref (kbd "C-M-SPC") 0) it)) (mark-sexp))
         (?\t   (org-cycle))
         (?\C-m (ignore-errors (call-interactively #'org-open-at-point)))
         (?\C-& (ignore-errors (call-interactively #'org-mark-ring-goto)))
@@ -642,7 +649,7 @@ displayed in BUFNAME."
                 (region-beginning) (region-end))
                (deactivate-mark))
         (?q    (cl-return))
-        (t     (ignore))))))
+        (_     (ignore))))))
 
 
 ;;; Multiline transformer
