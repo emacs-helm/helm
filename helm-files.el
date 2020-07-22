@@ -26,12 +26,12 @@
 (require 'helm-locate)
 (require 'helm-tags)
 (require 'helm-buffers)
+(require 'tramp)
 (eval-when-compile
   (require 'thingatpt)
   (require 'ffap)
   (require 'dired-aux)
   (require 'dired-x)
-  (require 'tramp)
   (require 'image-dired))
 
 (declare-function find-library-name "find-func.el" (library))
