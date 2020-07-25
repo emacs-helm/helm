@@ -575,13 +575,13 @@ displayed in BUFNAME."
         (setq helm-suspend-update-flag nil)
         (set-frame-configuration winconf)))))
 
-(defun helm-help-scroll-up (amount)
+(cl-defun helm-help-scroll-up (&optional (amount helm-scroll-amount))
   (condition-case _err
       (scroll-up-command amount)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
-(defun helm-help-scroll-down (amount)
+(cl-defun helm-help-scroll-down (&optional (amount helm-scroll-amount))
   (condition-case _err
       (scroll-down-command amount)
     (beginning-of-buffer nil)
@@ -604,6 +604,74 @@ displayed in BUFNAME."
       (deactivate-mark)
       (push-mark nil nil t)))
 
+(defvar helm-help--iter-org-state nil)
+(defun helm-help-org-cycle ()
+  (pcase (helm-iter-next helm-help--iter-org-state)
+    ((pred numberp) (org-content))
+    ((and state) (org-cycle state))))
+
+(defun helm-help-copy-region-as-kill ()
+  (copy-region-as-kill
+   (region-beginning) (region-end))
+  (deactivate-mark))
+
+(defun helm-help-quit ()
+  (throw 'helm-help-quit nil))
+
+(defun helm-help-org-open-at-point ()
+  (ignore-errors
+    (org-open-at-point)))
+
+(defun helm-help-org-mark-ring-goto ()
+  (ignore-errors
+    (org-mark-ring-goto)))
+
+(defvar helm-help-hkmap
+  '(("C-v" . helm-help-scroll-up)
+    ("SPC" . helm-help-scroll-up)
+    ("<next>" . helm-help-scroll-up)
+    ("M-v" . helm-help-scroll-down)
+    ("b" . helm-help-scroll-down)
+    ("<prior>" . helm-help-scroll-down)
+    ("C-s" . isearch-forward)
+    ("C-r" . isearch-backward)
+    ("C-a" . move-beginning-of-line)
+    ("C-e" . move-end-of-line)
+    ("C-f" . forward-char)
+    ("<right>" . forward-char)
+    ("C-b" . backward-char)
+    ("<left>" . backward-char)
+    ("C-n" . helm-help-next-line)
+    ("C-p" . helm-help-previous-line)
+    ("<down>" . helm-help-next-line)
+    ("<up>" . helm-help-previous-line)
+    ("M-a" . backward-sentence)
+    ("M-e" . forward-sentence)
+    ("M-f" . forward-word)
+    ("M-b" . backward-word)
+    ("M->" . end-of-buffer)
+    ("M-<" . beginning-of-buffer)
+    ("C-SPC" . helm-help-toggle-mark)
+    ("C-M-SPC" . mark-sexp)
+    ("TAB"   . org-cycle)
+    ("C-m" . helm-help-org-open-at-point)
+    ("C-&" . helm-help-org-mark-ring-goto)
+    ("C-%" . org-mark-ring-push)
+    ("M-TAB" . helm-help-org-cycle)
+    ("M-w" . helm-help-copy-region-as-kill)
+    ("q" . helm-help-quit))
+  "Alist of (KEY . FUNCTION) for `helm-help'.
+
+This is not a standard keymap, just an alist where it is possible to
+define a simple KEY (a string with no spaces) associated with a
+FUNCTION. More complex key like \"C-x C-x\" are not supported.
+Interactive functions will be called interactively whereas other
+functions will be called with funcall except commands that are in
+`helm-help-not-interactive-command'.")
+
+(defvar helm-help-not-interactive-command '(isearch-forward isearch-backward)
+  "Commands that we don't want to call interactively in `helm-help'.")
+
 ;; For movement of cursor in help buffer we need to call interactively
 ;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
@@ -611,46 +679,17 @@ displayed in BUFNAME."
                  "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
                  'face 'helm-helper))
         scroll-error-top-bottom
-        (iter-org-state (helm-iter-circular '(1 (16) (64)))))
-    (helm-awhile (read-key prompt)
-      (pcase it
-        ((or ?\C-v ? 'next)
-         (helm-help-scroll-up helm-scroll-amount))
-        ((or ?\M-v ?b 'prior)
-         (helm-help-scroll-down helm-scroll-amount))
-        (?\C-s (isearch-forward))
-        (?\C-r (isearch-backward))
-        (?\C-a (call-interactively #'move-beginning-of-line))
-        (?\C-e (call-interactively #'move-end-of-line))
-        ((or ?\C-f 'right)
-         (call-interactively #'forward-char))
-        ((or ?\C-b 'left)
-         (call-interactively #'backward-char))
-        ((or ?\C-n 'down)
-         (helm-help-next-line))
-        ((or ?\C-p 'up)
-         (helm-help-previous-line))
-        (?\M-a (call-interactively #'backward-sentence))
-        (?\M-e (call-interactively #'forward-sentence))
-        (?\M-f (call-interactively #'forward-word))
-        (?\M-b (call-interactively #'backward-word))
-        (?\M-> (call-interactively #'end-of-buffer))
-        (?\M-< (call-interactively #'beginning-of-buffer))
-        (?\C-  (helm-help-toggle-mark))
-        ((guard (eql (aref (kbd "C-M-SPC") 0) it)) (mark-sexp))
-        (?\t   (org-cycle))
-        (?\C-m (ignore-errors (call-interactively #'org-open-at-point)))
-        (?\C-& (ignore-errors (call-interactively #'org-mark-ring-goto)))
-        (?\C-% (call-interactively #'org-mark-ring-push))
-        (?\M-\t (pcase (helm-iter-next iter-org-state)
-                  ((pred numberp) (org-content))
-                  ((and state) (org-cycle state))))
-        (?\M-w (copy-region-as-kill
-                (region-beginning) (region-end))
-               (deactivate-mark))
-        (?q    (cl-return))
-        (_     (ignore))))))
-
+        (helm-help--iter-org-state (helm-iter-circular '(1 (16) (64)))))
+    (catch 'helm-help-quit
+      (helm-awhile (read-key prompt)
+        (let ((fun (cl-loop for (k . v) in helm-help-hkmap
+                            when (eql (aref (kbd k) 0) it)
+                            return v)))
+          (when fun
+            (if (and (commandp fun)
+                     (not (memq fun helm-help-not-interactive-command)))
+                (call-interactively fun)
+              (funcall fun))))))))
 
 ;;; Multiline transformer
 ;;
