@@ -548,6 +548,9 @@ E.g.: helm.el$
   "A hook that runs before helm-help starts.")
 (defvar helm-help-mode-after-hook nil
   "A hook that runs when helm-help exits.")
+(defvar helm-help-default-prompt
+  "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
+  "The prompt used in `helm-help'.")
 (defvar helm-help--iter-org-state nil)
 
 (defun helm-help-internal (bufname insert-content-fn)
@@ -677,7 +680,7 @@ functions will be called with funcall except commands that are in
 ;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
-                 "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
+                 helm-help-default-prompt
                  'face 'helm-helper))
         scroll-error-top-bottom
         (helm-help--iter-org-state (helm-iter-circular '(1 (16) (64)))))
