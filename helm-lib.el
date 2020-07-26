@@ -552,11 +552,13 @@ E.g.: helm.el$
 (defvar helm-help-mode-after-hook nil
   "A hook that runs when helm-help exits.")
 
-(defvar helm-help-default-prompt
+(defcustom helm-help-default-prompt
   "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
-  "The prompt used in `helm-help'.")
+  "The prompt used in `helm-help'."
+  :type 'string
+  :group 'helm)
 
-(defvar helm-help-hkmap
+(defcustom helm-help-hkmap
   '(("C-v" . helm-help-scroll-up)
     ("SPC" . helm-help-scroll-up)
     ("<next>" . helm-help-scroll-up)
@@ -597,7 +599,10 @@ define a simple KEY (a string with no spaces) associated with a
 FUNCTION. More complex key like \"C-x C-x\" are not supported.
 Interactive functions will be called interactively whereas other
 functions will be called with funcall except commands that are in
-`helm-help-not-interactive-command'.")
+`helm-help-not-interactive-command'.
+For convenience you can add bindings here with `helm-help-define-key'."
+  :type '(alist :key-type string :key-value symbol)
+  :group 'helm)
 
 (defvar helm-help-not-interactive-command '(isearch-forward isearch-backward)
   "Commands that we don't want to call interactively in `helm-help'.")
