@@ -544,14 +544,63 @@ E.g.: helm.el$
 
 ;;; Help routines.
 ;;
+(defvar helm-help--iter-org-state nil)
+
 (defvar helm-help-mode-before-hook nil
   "A hook that runs before helm-help starts.")
+
 (defvar helm-help-mode-after-hook nil
   "A hook that runs when helm-help exits.")
+
 (defvar helm-help-default-prompt
   "[SPC,C-v,next:ScrollUp  b,M-v,prior:ScrollDown TAB:Cycle M-TAB:All C-s/r:Isearch q:Quit]"
   "The prompt used in `helm-help'.")
-(defvar helm-help--iter-org-state nil)
+
+(defvar helm-help-hkmap
+  '(("C-v" . helm-help-scroll-up)
+    ("SPC" . helm-help-scroll-up)
+    ("<next>" . helm-help-scroll-up)
+    ("M-v" . helm-help-scroll-down)
+    ("b" . helm-help-scroll-down)
+    ("<prior>" . helm-help-scroll-down)
+    ("C-s" . isearch-forward)
+    ("C-r" . isearch-backward)
+    ("C-a" . move-beginning-of-line)
+    ("C-e" . move-end-of-line)
+    ("C-f" . forward-char)
+    ("<right>" . forward-char)
+    ("C-b" . backward-char)
+    ("<left>" . backward-char)
+    ("C-n" . helm-help-next-line)
+    ("C-p" . helm-help-previous-line)
+    ("<down>" . helm-help-next-line)
+    ("<up>" . helm-help-previous-line)
+    ("M-a" . backward-sentence)
+    ("M-e" . forward-sentence)
+    ("M-f" . forward-word)
+    ("M-b" . backward-word)
+    ("M->" . end-of-buffer)
+    ("M-<" . beginning-of-buffer)
+    ("C-SPC" . helm-help-toggle-mark)
+    ("C-M-SPC" . mark-sexp)
+    ("TAB"   . org-cycle)
+    ("C-m" . helm-help-org-open-at-point)
+    ("C-&" . helm-help-org-mark-ring-goto)
+    ("C-%" . org-mark-ring-push)
+    ("M-TAB" . helm-help-org-cycle)
+    ("M-w" . helm-help-copy-region-as-kill)
+    ("q" . helm-help-quit))
+  "Alist of (KEY . FUNCTION) for `helm-help'.
+
+This is not a standard keymap, just an alist where it is possible to
+define a simple KEY (a string with no spaces) associated with a
+FUNCTION. More complex key like \"C-x C-x\" are not supported.
+Interactive functions will be called interactively whereas other
+functions will be called with funcall except commands that are in
+`helm-help-not-interactive-command'.")
+
+(defvar helm-help-not-interactive-command '(isearch-forward isearch-backward)
+  "Commands that we don't want to call interactively in `helm-help'.")
 
 (defun helm-help-internal (bufname insert-content-fn)
   "Show long message during Helm session in BUFNAME.
@@ -629,52 +678,6 @@ displayed in BUFNAME."
 (defun helm-help-org-mark-ring-goto ()
   (ignore-errors
     (org-mark-ring-goto)))
-
-(defvar helm-help-hkmap
-  '(("C-v" . helm-help-scroll-up)
-    ("SPC" . helm-help-scroll-up)
-    ("<next>" . helm-help-scroll-up)
-    ("M-v" . helm-help-scroll-down)
-    ("b" . helm-help-scroll-down)
-    ("<prior>" . helm-help-scroll-down)
-    ("C-s" . isearch-forward)
-    ("C-r" . isearch-backward)
-    ("C-a" . move-beginning-of-line)
-    ("C-e" . move-end-of-line)
-    ("C-f" . forward-char)
-    ("<right>" . forward-char)
-    ("C-b" . backward-char)
-    ("<left>" . backward-char)
-    ("C-n" . helm-help-next-line)
-    ("C-p" . helm-help-previous-line)
-    ("<down>" . helm-help-next-line)
-    ("<up>" . helm-help-previous-line)
-    ("M-a" . backward-sentence)
-    ("M-e" . forward-sentence)
-    ("M-f" . forward-word)
-    ("M-b" . backward-word)
-    ("M->" . end-of-buffer)
-    ("M-<" . beginning-of-buffer)
-    ("C-SPC" . helm-help-toggle-mark)
-    ("C-M-SPC" . mark-sexp)
-    ("TAB"   . org-cycle)
-    ("C-m" . helm-help-org-open-at-point)
-    ("C-&" . helm-help-org-mark-ring-goto)
-    ("C-%" . org-mark-ring-push)
-    ("M-TAB" . helm-help-org-cycle)
-    ("M-w" . helm-help-copy-region-as-kill)
-    ("q" . helm-help-quit))
-  "Alist of (KEY . FUNCTION) for `helm-help'.
-
-This is not a standard keymap, just an alist where it is possible to
-define a simple KEY (a string with no spaces) associated with a
-FUNCTION. More complex key like \"C-x C-x\" are not supported.
-Interactive functions will be called interactively whereas other
-functions will be called with funcall except commands that are in
-`helm-help-not-interactive-command'.")
-
-(defvar helm-help-not-interactive-command '(isearch-forward isearch-backward)
-  "Commands that we don't want to call interactively in `helm-help'.")
 
 ;; For movement of cursor in help buffer we need to call interactively
 ;; commands for impaired people using a synthetizer (#1347).
