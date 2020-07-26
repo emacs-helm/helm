@@ -690,6 +690,14 @@ functions will be called with funcall except commands that are in
                      (not (memq fun helm-help-not-interactive-command)))
                 (call-interactively fun)
               (funcall fun))))))))
+
+(defun helm-help-define-key (key function)
+  "Add KEY bound to fUNCTION in `helm-help-hkmap'.
+
+See `helm-help-hkmap' for supported keys and functions."
+  (cl-assert (not (cdr (split-string key))) nil
+             (format "Error: Unsuported key `%s'" key))
+  (add-to-list 'helm-help-hkmap `(,key . ,function)))
 
 ;;; Multiline transformer
 ;;
