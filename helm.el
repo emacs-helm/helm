@@ -1356,9 +1356,14 @@ While in the help buffer, most of the Emacs regular key bindings
 are available; the most important ones are shown in minibuffer.
 However, due to implementation restrictions, no regular Emacs
 keymap is used (it runs in a loop when reading the help buffer).
-They are hardcoded and not modifiable.
+Only simple bindings are available and they are defined in
+`helm-help-hkmap', which is a simple alist of (key . function).
+You can define or redefine bindings in help with
+`helm-help-define-key' or by adding/removing entries directly in
+`helm-help-hkmap'.
+See `helm-help-hkmap' for restrictions on bindings and functions.
 
-The hard-coded documentation bindings are:
+The documentation of default bindings are:
 
 | Key       | Alternative keys | Command             |
 |-----------+------------------+---------------------|
@@ -1379,6 +1384,7 @@ The hard-coded documentation bindings are:
 | M->       |                  | End of buffer       |
 | M-<       |                  | Beginning of buffer |
 | C-<SPACE> |                  | Toggle mark         |
+| C-M-SPACE |                  | Mark sexp           |
 | RET       |                  | Follow org link     |
 | C-%       |                  | Push org mark       |
 | C-&       |                  | Goto org mark-ring  |
