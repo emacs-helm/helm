@@ -684,8 +684,6 @@ displayed in BUFNAME."
   (ignore-errors
     (org-mark-ring-goto)))
 
-;; For movement of cursor in help buffer we need to call interactively
-;; commands for impaired people using a synthetizer (#1347).
 (defun helm-help-event-loop ()
   (let ((prompt (propertize
                  helm-help-default-prompt
@@ -700,6 +698,9 @@ displayed in BUFNAME."
           (when fun
             (if (and (commandp fun)
                      (not (memq fun helm-help-not-interactive-command)))
+                ;; For movement of cursor in help buffer we need to
+                ;; call interactively commands for impaired people
+                ;; using a synthetizer (#1347).
                 (call-interactively fun)
               (funcall fun))))))))
 
