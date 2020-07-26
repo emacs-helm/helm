@@ -635,56 +635,67 @@ displayed in BUFNAME."
         (set-frame-configuration winconf)))))
 
 (cl-defun helm-help-scroll-up (&optional (amount helm-scroll-amount))
+  "Scroll up in `helm-help'."
   (condition-case _err
       (scroll-up-command amount)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (cl-defun helm-help-scroll-down (&optional (amount helm-scroll-amount))
+  "Scroll down in `helm-help'."
   (condition-case _err
       (scroll-down-command amount)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (defun helm-help-next-line ()
+  "Next line function for `helm-help'."
   (condition-case _err
       (call-interactively #'next-line)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (defun helm-help-previous-line ()
+  "Previous line function for `helm-help'."
   (condition-case _err
       (call-interactively #'previous-line)
     (beginning-of-buffer nil)
     (end-of-buffer nil)))
 
 (defun helm-help-toggle-mark ()
+  "Toggle mark in `helm-help'."
   (if (region-active-p)
       (deactivate-mark)
       (push-mark nil nil t)))
 
 (defun helm-help-org-cycle ()
+  "Runs `org-cycle' in `helm-help'."
   (pcase (helm-iter-next helm-help--iter-org-state)
     ((pred numberp) (org-content))
     ((and state) (org-cycle state))))
 
 (defun helm-help-copy-region-as-kill ()
+  "Copy region function for `helm-help'"
   (copy-region-as-kill
    (region-beginning) (region-end))
   (deactivate-mark))
 
 (defun helm-help-quit ()
+  "Quit `helm-help'."
   (throw 'helm-help-quit nil))
 
 (defun helm-help-org-open-at-point ()
+  "Calls `org-open-at-point' ignoring errors."
   (ignore-errors
     (org-open-at-point)))
 
 (defun helm-help-org-mark-ring-goto ()
+  "Calls `org-mark-ring-goto' ignoring errors."
   (ignore-errors
     (org-mark-ring-goto)))
 
 (defun helm-help-event-loop ()
+  "The loop in charge of scanning keybindings in `helm-help'."
   (let ((prompt (propertize
                  helm-help-default-prompt
                  'face 'helm-helper))
