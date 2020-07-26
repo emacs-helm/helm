@@ -548,6 +548,8 @@ E.g.: helm.el$
   "A hook that runs before helm-help starts.")
 (defvar helm-help-mode-after-hook nil
   "A hook that runs when helm-help exits.")
+(defvar helm-help--iter-org-state nil)
+
 (defun helm-help-internal (bufname insert-content-fn)
   "Show long message during Helm session in BUFNAME.
 INSERT-CONTENT-FN is the function that inserts text to be
@@ -604,7 +606,6 @@ displayed in BUFNAME."
       (deactivate-mark)
       (push-mark nil nil t)))
 
-(defvar helm-help--iter-org-state nil)
 (defun helm-help-org-cycle ()
   (pcase (helm-iter-next helm-help--iter-org-state)
     ((pred numberp) (org-content))
