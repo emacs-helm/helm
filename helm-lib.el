@@ -715,12 +715,17 @@ displayed in BUFNAME."
                 (call-interactively fun)
               (funcall fun))))))))
 
-(defun helm-help-define-key (key function)
+(defun helm-help-define-key (key function &optional override)
   "Add KEY bound to fUNCTION in `helm-help-hkmap'.
 
+If OVERRIDE is non nil, all bindings associated with FUNCTION are
+removed and only (KEY . FUNCTION) is kept.
 See `helm-help-hkmap' for supported keys and functions."
   (cl-assert (not (cdr (split-string key))) nil
              (format "Error: Unsuported key `%s'" key))
+  (when override
+    (helm-awhile (rassoc function helm-help-hkmap)
+      (setq helm-help-hkmap (delete it helm-help-hkmap))))
   (add-to-list 'helm-help-hkmap `(,key . ,function)))
 
 ;;; Multiline transformer
