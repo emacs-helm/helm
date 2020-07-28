@@ -21,8 +21,6 @@
 ;;; Require
 ;;
 ;;
-(require 'cl-macs)
-
 (declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
 (when (require 'async-bytecomp nil t)
   (and (fboundp 'async-bytecomp-package-mode)
@@ -47,32 +45,6 @@
           (read-kbd-macro key) 'helm-command-prefix))
     (set var key)))
 
-(defcustom helm-minibuffer-history-key "C-r"
-  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
-  :type '(choice (string :tag "Key") (const :tag "no binding"))
-  :group 'helm-config
-  :set
-  (lambda (var key)
-    (cl-dolist (map '(minibuffer-local-completion-map
-                      minibuffer-local-filename-completion-map
-                      minibuffer-local-filename-must-match-map ; Emacs 23.1.+
-                      minibuffer-local-isearch-map
-                      minibuffer-local-map
-                      minibuffer-local-must-match-filename-map ; Older Emacsen
-                      minibuffer-local-must-match-map
-                      minibuffer-local-ns-map))
-      (let ((vmap (symbol-value map)))
-        (when (and (boundp map) (keymapp vmap))
-          (let ((val (and (boundp var) (symbol-value var))))
-            (when val
-              (define-key vmap
-                (if (stringp val) (read-kbd-macro val) val)
-                nil)))
-          (when key
-            (define-key (symbol-value map)
-              (if (stringp key) (read-kbd-macro key) key)
-              'helm-minibuffer-history)))))
-    (set var key)))
 
 ;;; Command Keymap
 ;;
