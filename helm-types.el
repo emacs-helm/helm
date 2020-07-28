@@ -36,7 +36,9 @@
 (defclass helm-type-file (helm-source) ()
   "A class to define helm type file.")
 
-(eieio-declare-slots action)
+;; Emacs-27+ only. FIXME Should be fixed in helm-source instead.
+(when (fboundp 'eieio-declare-slots)
+  (eieio-declare-slots action))
 (defmethod helm-source-get-action-from-type ((object helm-type-file))
   (slot-value object 'action))
 
