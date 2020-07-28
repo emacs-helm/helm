@@ -22,6 +22,8 @@
 (require 'helm-help)
 (require 'helm-net)
 
+(declare-function helm-comp-read "helm-mode")
+
 
 (defgroup helm-external nil
   "External related Applications and libraries for Helm."

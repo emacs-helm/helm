@@ -31,6 +31,7 @@
 (declare-function woman-expand-directory-path "woman.el" (path-dirs path-regexps))
 (declare-function woman-topic-all-completions "woman.el" (path))
 (declare-function helm-generic-sort-fn "helm-utils.el" (S1 S2))
+(declare-function helm-comp-read "helm-mode")
 
 (defgroup helm-man nil
   "Man and Woman applications for Helm."

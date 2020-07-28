@@ -42,6 +42,8 @@
 
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
+
+(defvar helm-marked-buffer-name)
 
 ;;; Multi keys
 ;;
@@ -501,9 +503,9 @@ handle this."
 
 (defcustom helm-split-window-other-side-when-one-window 'below
   "The default side to display `helm-buffer' when (1)
-`helm-split-window-default-side' is 'other and (2) 
-the current frame only has one window. Possible values 
-are acceptable args for `split-window' SIDE, that is `below', 
+`helm-split-window-default-side' is 'other and (2)
+the current frame only has one window. Possible values
+are acceptable args for `split-window' SIDE, that is `below',
 `above', `left' or `right'.
 
 If `helm-full-frame' is non-nil, it takes precedence over this
@@ -2935,7 +2937,7 @@ buffers (sessions).  When calling from Lisp, specify a
   "Resume previous Helm session within a running Helm."
   (interactive)
   (with-helm-alive-p
-    (let ((arg (if (null (member helm-buffer helm-buffers)) 0 1))) 
+    (let ((arg (if (null (member helm-buffer helm-buffers)) 0 1)))
       (if (> (length helm-buffers) arg)
           (helm-run-after-exit (lambda () (helm-resume (nth arg helm-buffers))))
         (message "No previous helm sessions available for resuming!")))))
@@ -4410,7 +4412,7 @@ See `helm-fuzzy-default-highlight-match'."
 
 REGEXP should be generated from a pattern which is a list like
 \'(point \"f\" any \"o\" any \"b\" any) for \"fob\" as pattern.
-Such pattern is build with 
+Such pattern is build with
 `helm-completion--flex-transform-pattern' function.
 
 Function extracted from `completion-pcm--hilit-commonality' in
@@ -5841,7 +5843,7 @@ message 'no match'."
               ;; When require-match is strict (i.e. `t'), buffer
               ;; should be either empty or in read-file-name have an
               ;; unknown candidate ([?] prefix), if it's not the case
-              ;; fix it in helm-mode but not here. 
+              ;; fix it in helm-mode but not here.
               ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
@@ -7003,7 +7005,7 @@ starting it is not needed."
                             ;; Non existing files in HFF and
                             ;; RFN. Display may be an image. See
                             ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
-                            ;; and also issue #2296. 
+                            ;; and also issue #2296.
                             (equal prefix "[?]")
                             (and filecomp-p
                                  (or

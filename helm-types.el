@@ -24,11 +24,19 @@
 (require 'cl-lib)
 (require 'eieio)
 
+(defvar helm-map)
+(defvar helm-mode-line-string)
+(defvar helm-bookmark-map)
+(declare-function helm-make-actions "helm-lib")
+(declare-function helm-ediff-marked-buffers "helm-buffers")
+(declare-function helm-make-type "helm-source")
+
 
 ;;  Files
 (defclass helm-type-file (helm-source) ()
   "A class to define helm type file.")
 
+(eieio-declare-slots action)
 (defmethod helm-source-get-action-from-type ((object helm-type-file))
   (slot-value object 'action))
 

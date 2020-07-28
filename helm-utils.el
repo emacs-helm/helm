@@ -22,16 +22,26 @@
 (require 'helm-help)
 (eval-when-compile (require 'dired))
 
-(declare-function helm-find-files-1 "helm-files.el" (fname &optional preselect))
+(declare-function helm-find-files-1 "helm-files" (fname &optional preselect))
+(declare-function helm-grep-split-line "helm-grep" (line))
 (declare-function popup-tip "ext:popup")
-(declare-function markdown-show-subtree "outline.el")
-(declare-function outline-show-subtree "outline.el")
-(declare-function org-reveal "org.el")
-(declare-function tab-bar-tabs "tab-bar.el")
-(declare-function tab-bar-select-tab "tab-bar.el")
+(declare-function markdown-show-subtree "outline")
+(declare-function outline-show-subtree "outline")
+(declare-function org-reveal "org")
+(declare-function tab-bar-tabs "tab-bar")
+(declare-function tab-bar-select-tab "tab-bar")
+(declare-function dired-goto-file "dired")
+(declare-function bookmark-get-filename "bookmark")
+(declare-function package-installed-p "package")
+(declare-function package-desc-dir "package")
+
 (defvar org-directory)
 (defvar winner-boring-buffers)
+(defvar bookmark-alist)
 (defvar helm-show-completion-overlay)
+(defvar helm-buffers-maybe-switch-to-tab)
+(defvar helm-ff-transformer-show-only-basename)
+(defvar helm-popup-tip-mode)
 
 
 (defgroup helm-utils nil

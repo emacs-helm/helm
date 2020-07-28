@@ -26,9 +26,11 @@
 (require 'helm-eval)
 (require 'helm-files)
 
-(declare-function 'helm-describe-function "helm-lib")
-(declare-function 'helm-describe-variable "helm-lib")
-(declare-function 'helm-describe-face "helm-lib")
+(declare-function helm-describe-function "helm-lib")
+(declare-function helm-describe-variable "helm-lib")
+(declare-function helm-describe-face "helm-lib")
+(declare-function helm-read-file-name "helm-mode")
+(declare-function helm-comp-read "helm-mode")
 
 
 ;;; Customizable values

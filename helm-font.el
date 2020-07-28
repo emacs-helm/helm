@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-help)
 
+(declare-function helm-generic-sort-fn "helm-utils")
 
 (defgroup helm-font nil
   "Related applications to display fonts in Helm."
