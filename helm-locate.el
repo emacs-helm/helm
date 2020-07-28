@@ -26,6 +26,9 @@
 (require 'helm-types)
 (require 'helm-help)
 
+(defvar helm-ff-default-directory)
+(declare-function helm-read-file-name "helm-mode")
+
 
 (defgroup helm-locate nil
   "Locate related Applications and libraries for Helm."

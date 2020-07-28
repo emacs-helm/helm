@@ -60,7 +60,10 @@ See `package-autoremove'."
 
 ;; Shutup bytecompiler for emacs-24*
 (defvar package-menu-async) ; Only available on emacs-25.
+(defvar helm-marked-buffer-name)
 (declare-function async-byte-recompile-directory "ext:async-bytecomp.el")
+(declare-function with-helm-display-marked-candidates "helm-utils.el")
+
 
 (defun helm-el-package--init ()
   ;; In emacs-27 package-show-package-list returns an empty buffer

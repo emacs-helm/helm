@@ -23,7 +23,11 @@
 (require 'helm-help)
 (require 'helm-utils)
 
-(declare-function 'helm-buffers-get-visible-buffers "helm-buffers.el")
+(declare-function helm-buffers-get-visible-buffers "helm-buffers")
+(declare-function helm-buffer-list "helm-buffers")
+(declare-function helm-grep-split-line "helm-grep")
+(declare-function helm-grep-highlight-match "helm-grep")
+(declare-function helm-comp-read "helm-mode")
 
 ;;; Internals
 ;;

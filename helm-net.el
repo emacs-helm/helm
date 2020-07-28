@@ -24,6 +24,8 @@
 (require 'xml)
 (require 'browse-url)
 
+(declare-function helm-comp-read "helm-mode")
+
 
 (defgroup helm-net nil
   "Net related applications and libraries for Helm."

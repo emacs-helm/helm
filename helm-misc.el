@@ -26,6 +26,7 @@
 (declare-function LaTeX-math-mode "ext:latex.el")
 (declare-function jabber-chat-with "ext:jabber.el")
 (declare-function jabber-read-account "ext:jabber.el")
+(declare-function helm-comp-read "helm-mode")
 
 
 (defgroup helm-misc nil

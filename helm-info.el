@@ -25,7 +25,10 @@
 
 (declare-function Info-index-nodes "info" (&optional file))
 (declare-function Info-goto-node "info" (&optional fork))
-(declare-function Info-find-node "info.el" (filename nodename &optional no-going-back))
+(declare-function Info-find-node "info" (filename nodename &optional no-going-back))
+(declare-function ring-insert "ring")
+(declare-function ring-empty-p "ring")
+(declare-function ring-ref "ring")
 (defvar Info-history)
 (defvar Info-directory-list)
 

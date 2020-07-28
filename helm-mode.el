@@ -25,8 +25,13 @@
 (defvar crm-separator)
 (defvar ido-everywhere)
 (defvar completion-flex-nospace)
+(defvar helm-completion--sorting-done)
+(defvar helm-mode)
 
 (declare-function ido-mode "ido.el")
+(declare-function helm-apropos-init "helm-elisp")
+(declare-function helm-lisp-completion-persistent-action "helm-elisp")
+(declare-function helm-lisp-completion-persistent-help "helm-elisp")
 
 (defgroup helm-mode nil
   "Enable helm completion."
@@ -1634,7 +1639,7 @@ Actually does nothing."
                          (length prefix)))))))
 
 (defun helm-flex-add-score-as-prop (candidates regexp)
-  (cl-loop with case-fold-search = (helm-set-case-fold-search) 
+  (cl-loop with case-fold-search = (helm-set-case-fold-search)
            for cand in candidates
            collect (helm-flex--style-score cand regexp)))
 
@@ -1858,7 +1863,7 @@ Can be used for `completion-in-region-function' by advicing it with an
          (when helm-completion-mark-suffix
            (run-with-idle-timer 0.01 nil
                                 (lambda ()
-                                  (helm-aand 
+                                  (helm-aand
                                    (+ (- (point) point) end)
                                    (and (> it (point)) it)
                                    (push-mark  it t t))))))
@@ -1949,7 +1954,7 @@ Note: This mode is incompatible with Emacs23."
         (when (fboundp 'ffap-read-file-or-url-internal)
           ;; `ffap-read-file-or-url-internal' have been removed in
           ;; emacs-27 and `ffap-read-file-or-url' is fixed, so no need
-          ;; to advice it. 
+          ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url)))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)

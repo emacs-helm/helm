@@ -21,6 +21,8 @@
 ;;; Require
 ;;
 ;;
+(require 'cl-macs)
+
 (declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
 (when (require 'async-bytecomp nil t)
   (and (fboundp 'async-bytecomp-package-mode)

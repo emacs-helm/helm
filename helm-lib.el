@@ -25,30 +25,37 @@
 
 (require 'cl-lib)
 
-(declare-function wdired-change-to-dired-mode "wdired.el")
-(declare-function wdired-do-symlink-changes "wdired.el")
-(declare-function wdired-do-perm-changes "wdired.el")
-(declare-function wdired-get-filename "wdired.el")
-(declare-function wdired-do-renames "wdired.el")
-(declare-function wdired-flag-for-deletion "wdired.el")
-(declare-function wdired-normalize-filename "wdired.el")
-(declare-function dired-mark-remembered "dired.el")
-(declare-function dired-log-summary "dired.el")
-(declare-function dired-current-directory "dired.el")
 (declare-function ansi-color--find-face "ansi-color.el")
 (declare-function ansi-color-apply-sequence "ansi-color.el")
-(declare-function helm-get-sources "helm.el")
-(declare-function helm-marked-candidates "helm.el")
-(declare-function helm-follow-mode-p "helm.el")
+(declare-function dired-current-directory "dired.el")
+(declare-function dired-log-summary "dired.el")
+(declare-function dired-mark-remembered "dired.el")
+(declare-function ffap-file-remote-p "ffap.el")
+(declare-function ffap-url-p "ffap.el")
 (declare-function helm-attr "helm.el")
 (declare-function helm-attrset "helm.el")
-(declare-function org-open-at-point "org.el")
+(declare-function helm-follow-mode-p "helm.el")
+(declare-function helm-get-current-source "helm.el")
+(declare-function helm-get-selection "helm.el")
+(declare-function helm-get-sources "helm.el")
+(declare-function helm-interpret-value "helm.el")
+(declare-function helm-log-run-hook "helm.el")
+(declare-function helm-marked-candidates "helm.el")
+(declare-function helm-set-case-fold-search "helm.el")
+(declare-function helm-source--cl--print-table "helm-source.el")
+(declare-function helm-update "helm.el")
 (declare-function org-content "org.el")
 (declare-function org-mark-ring-goto "org.el")
 (declare-function org-mark-ring-push "org.el")
-(declare-function helm-interpret-value "helm.el")
-(declare-function helm-get-current-source "helm.el")
-(declare-function helm-source--cl--print-table "helm-source.el")
+(declare-function org-open-at-point "org.el")
+(declare-function wdired-change-to-dired-mode "wdired.el")
+(declare-function wdired-do-perm-changes "wdired.el")
+(declare-function wdired-do-renames "wdired.el")
+(declare-function wdired-do-symlink-changes "wdired.el")
+(declare-function wdired-flag-for-deletion "wdired.el")
+(declare-function wdired-get-filename "wdired.el")
+(declare-function wdired-normalize-filename "wdired.el")
+
 (defvar helm-sources)
 (defvar helm-initial-frame)
 (defvar helm-current-position)
@@ -57,6 +64,10 @@
 (defvar wdired-allow-to-change-permissions)
 (defvar wdired-allow-to-redirect-links)
 (defvar helm-persistent-action-display-window)
+(defvar helm--buffer-in-new-frame-p)
+(defvar helm-completion-style)
+(defvar helm-completion-styles-alist)
+(defvar helm-persistent-action-window-buffer)
 (defvar completion-flex-nospace)
 
 ;;; User vars.
@@ -1158,7 +1169,7 @@ See `helm-elisp-show-help'."
               (helm-attrset 'help-running-p nil))
             ;; Force running update hook to may be delete
             ;; helm-persistent-action-display-window, this is done in
-            ;; helm-persistent-action-display-window (the function). 
+            ;; helm-persistent-action-display-window (the function).
             (unless helm--buffer-in-new-frame-p
               (helm-update (regexp-quote (helm-get-selection)))))
            (t
@@ -1487,7 +1498,7 @@ When `helm-completion-style' is not `emacs' the Emacs vanilla
 default `completion-styles' is used except for
 `helm-dynamic-completion' which uses inconditionally `emacs' as
 value for `helm-completion-style'.
- 
+
 If styles are specified in `helm-completion-styles-alist' for a
 particular mode, use these styles unless NOMODE is non nil.
 If STYLES is specified as a list of styles suitable for

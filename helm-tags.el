@@ -23,6 +23,9 @@
 (require 'helm-utils)
 (require 'helm-grep)
 
+(defvar helm-etags-fuzzy-match)
+(declare-function ring-insert "ring")
+
 
 (defgroup helm-tags nil
   "Tags related Applications and libraries for Helm."

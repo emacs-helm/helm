@@ -31,7 +31,16 @@
 (declare-function pdf-view-goto-page "pdf-view" (page &optional window))
 (declare-function helm-mm-split-pattern "helm-multi-match")
 (declare-function helm--ansi-color-apply "helm-lib")
+(declare-function helm-comp-read "helm-mode")
+(declare-function helm-occur "helm-occur")
+
 (defvar helm--ansi-color-regexp)
+(defvar helm-ff-default-directory)
+(defvar helm-tramp-verbose)
+(defvar helm-grep-ack-types-cache)
+(defvar helm-grep-git-grep-command)
+(defvar helm-source-grep-git)
+(defvar tramp-verbose)
 
 
 (defgroup helm-grep nil
