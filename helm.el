@@ -36,6 +36,14 @@
 (require 'helm-lib)
 (require 'helm-multi-match)
 (require 'helm-source)
+;; Soft require this as it is not bundled with helm-core package.
+(require 'helm-global-bindings nil t)
+
+;; Ensure async-bytecomp is used even with helm-core package.
+(declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
+(when (require 'async-bytecomp nil t)
+  (and (fboundp 'async-bytecomp-package-mode)
+       (async-bytecomp-package-mode 1)))
 
 ;; Setup completion styles for helm-mode
 (helm--setup-completion-styles-alist)
@@ -44,6 +52,13 @@
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 
 (defvar helm-marked-buffer-name)
+
+;; Easy access to customize
+;;;###autoload
+(defun helm-configuration ()
+  "Customize Helm."
+  (interactive)
+  (customize-group "helm"))
 
 ;;; Multi keys
 ;;
