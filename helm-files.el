@@ -1565,7 +1565,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
         (let ((win (display-buffer it)))
           (if win
               (select-window win)
-            (switch-to-buffer it)))
+            (pop-to-buffer it '(display-buffer-same-window))))
       (cl-case helm-ff-preferred-shell-mode
         (eshell-mode
          (eshell helm-current-prefix-arg))
