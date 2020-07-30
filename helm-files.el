@@ -1562,7 +1562,10 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
                        (helm-comp-read "Switch to shell buffer: " bufs
                                        :must-match t)
                      (car bufs)))
-        (switch-to-buffer it)
+        (let ((win (display-buffer it)))
+          (if win
+              (select-window win)
+            (switch-to-buffer it)))
       (cl-case helm-ff-preferred-shell-mode
         (eshell-mode
          (eshell helm-current-prefix-arg))
