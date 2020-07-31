@@ -1854,6 +1854,8 @@ Can be used for `completion-in-region-function' by advicing it with an
         (advice-remove 'lisp--local-variables
                        #'helm-mode--advice-lisp--local-variables)))))
 
+(defvar helm-crm-default-separator ","
+  "Default separator for `completing-read-multiple'.")
 (defun helm-completion-in-region--insert-result (result start point end base-size)
   (cond ((stringp result)
          (choose-completion-string
@@ -1876,7 +1878,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                          ;; it matches or default to "," if no match.
                          (eq (length crm-separator) 1)
                          crm-separator)
-                        ",")))
+                        helm-crm-default-separator)))
            ;; Try to find a default separator. If `crm-separator' is a
            ;; regexp use the string the regexp is matching.
            (save-excursion
