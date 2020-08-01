@@ -1856,9 +1856,14 @@ Can be used for `completion-in-region-function' by advicing it with an
 
 (defvar helm-crm-default-separator ","
   "Default separator for `completing-read-multiple'.
-If used globally, it is a string composed of a single character, if
-used locally i.e. let-bounded, it can be nil or a symbol which mean no
-separator, in this case the user will have to enter manually the separator.")
+
+`crm-separator' will take precedence on this when it is a string composed
+of a single character.
+If used globally, it is a string composed of a single character,
+if let-bounded, it can be also nil or a symbol which mean no
+separator.  Don't set this to a string composed of more than one
+character.
+Be sure to know what you are doing when modifying this.")
 (defun helm-completion-in-region--insert-result (result start point end base-size)
   (cond ((stringp result)
          (choose-completion-string
@@ -1885,7 +1890,7 @@ separator, in this case the user will have to enter manually the separator.")
            ;; Try to find a default separator. If `crm-separator' is a
            ;; regexp use the string the regexp is matching.
            ;; If SEP is not a string, it have been probably bound to a
-           ;; symbol through `helm-crm-default-separator' that serve
+           ;; symbol or nil through `helm-crm-default-separator' that serve
            ;; as a flag to say "Please no separator" (Issue #2353 with
            ;; `magit-completing-read-multiple').
            (if (stringp sep)
