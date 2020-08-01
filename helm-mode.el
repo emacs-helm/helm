@@ -1855,7 +1855,10 @@ Can be used for `completion-in-region-function' by advicing it with an
                        #'helm-mode--advice-lisp--local-variables)))))
 
 (defvar helm-crm-default-separator ","
-  "Default separator for `completing-read-multiple'.")
+  "Default separator for `completing-read-multiple'.
+If used globally, it is a string composed of a single character, if
+used locally i.e. let-bounded, it can be nil or a symbol which mean no
+separator, in this case the user will have to enter manually the separator.")
 (defun helm-completion-in-region--insert-result (result start point end base-size)
   (cond ((stringp result)
          (choose-completion-string
@@ -1881,10 +1884,16 @@ Can be used for `completion-in-region-function' by advicing it with an
                         helm-crm-default-separator)))
            ;; Try to find a default separator. If `crm-separator' is a
            ;; regexp use the string the regexp is matching.
-           (save-excursion
-             (goto-char beg)
-             (when (looking-back crm-separator (1- (point)))
-               (setq sep (match-string 0))))
+           ;; If SEP is not a string, it have been probably bound to a
+           ;; symbol through `helm-crm-default-separator' that serve
+           ;; as a flag to say "Please no separator" (Issue #2353 with
+           ;; `magit-completing-read-multiple').
+           (if (stringp sep)
+               (save-excursion
+                 (goto-char beg)
+                 (when (looking-back crm-separator (1- (point)))
+                   (setq sep (match-string 0))))
+             (setq sep nil))
            (funcall completion-list-insert-choice-function
                     beg end (mapconcat 'identity (append result '("")) sep))))
         (t nil)))
