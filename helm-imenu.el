@@ -84,6 +84,11 @@ string."
   "Extra modes where `helm-imenu-in-all-buffers' should look into."
   :group 'helm-imenu
   :type '(repeat symbol))
+
+(defcustom helm-imenu-highlight-matches-around-point-max-lines 0
+  "Same as `highlight-matches-around-point-max-lines' but for imenu."
+  :group 'helm-imenu
+  :type 'integer)
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -320,6 +325,8 @@ string."
           (helm-make-source "Imenu" 'helm-imenu-source
             :fuzzy-match helm-imenu-fuzzy-match)))
   (let* ((imenu-auto-rescan t)
+         (helm-highlight-matches-around-point-max-lines
+          helm-imenu-highlight-matches-around-point-max-lines)
          (str (thing-at-point 'symbol))
          (init-reg (and str (concat "\\_<" (regexp-quote str) "\\_>")))
          (helm-execute-action-at-once-if-one
@@ -352,6 +359,8 @@ i.e. `derived-mode-p' or it have an association in
               :candidates 'helm-imenu--in-all-buffers-cache
               :fuzzy-match helm-imenu-fuzzy-match))))
   (let* ((imenu-auto-rescan t)
+         (helm-highlight-matches-around-point-max-lines
+          helm-imenu-highlight-matches-around-point-max-lines)
          (str (thing-at-point 'symbol))
          (init-reg (and str (concat "\\_<" (regexp-quote str) "\\_>")))
          (helm-execute-action-at-once-if-one
