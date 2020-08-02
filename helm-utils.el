@@ -79,6 +79,7 @@ Possible value are:
   :group 'helm-utils
   :type '(choice (cons (integer :tag "Match before")
                        (integer :tag "Match after"))
+                 (const :tag "Match in line only" 0)
                  (integer :tag "Match after or before (+/-)")
                  (const  :tag "Never match" 'never)))
 
