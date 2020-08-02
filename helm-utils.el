@@ -940,9 +940,11 @@ Assume regexp is a pcre based regexp."
     (helm-match-line-cleanup)))
 
 (defun helm-match-line-update ()
+  (when helm--match-item-overlays
+    (mapc 'delete-overlay helm--match-item-overlays))
   (when helm-match-line-overlay
-    (delete-overlay helm-match-line-overlay)
-    (helm-highlight-current-line)))
+    (delete-overlay helm-match-line-overlay))
+  (helm-highlight-current-line))
 
 (defun helm-persistent-autoresize-hook ()
   (when (and helm-buffers-to-resize-on-pa
