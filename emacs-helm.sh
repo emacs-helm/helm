@@ -139,7 +139,7 @@ cd "${0%/*}" || exit 1
 
 # Check if autoload file exists.
 # It may be in a different directory if emacs-helm.sh is a symlink.
-TRUENAME=$(find . -samefile "$0" -printf "%l")
+TRUENAME=$(ls -l "$0" | awk '{print $11}')
 if [ ! -z "$TRUENAME" ]; then
     AUTO_FILE="${TRUENAME%/*}/helm-autoloads.el"
 else
