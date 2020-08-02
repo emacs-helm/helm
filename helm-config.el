@@ -15,11 +15,17 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;
+;; Requiring this file is not needed when using a package manager to
+;; install helm as this one will take care of loading the autoload
+;; file.
+
 ;;; Code:
 
 ;;; Load the autoload file
 ;;  It should have been generated either by
-;;  package.el or the make file.
+;;  the package manager or the make file.
 
 (load "helm-autoloads" nil t)
 
