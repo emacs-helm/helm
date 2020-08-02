@@ -64,10 +64,23 @@ It is a float, usually 1024.0 but could be 1000.0 on some systems."
   'helm-highlight-matches-around-point-max-lines
   "20160119")
 
-(defcustom helm-highlight-matches-around-point-max-lines 15
-  "Number of lines around point where matched items are highlighted."
+(defcustom helm-highlight-matches-around-point-max-lines '(15 . 15)
+  "Number of lines around point where matched items are highlighted.
+
+Possible value are:
+- A cons cell (x . y)
+  Match x lines before point and y lines after point.
+- An integer
+  Positive means this number lines after point.
+  Negative means this number lines before point.
+  A zero value means highlight only inside matched lines.
+- The symbol never
+  Means do not highlight matched items. "
   :group 'helm-utils
-  :type 'integer)
+  :type '(choice (cons (integer :tag "Match before")
+                       (integer :tag "Match after"))
+                 (integer :tag "Match after or before (+/-)")
+                 (const  :tag "Never match" 'never)))
 
 (defcustom helm-buffers-to-resize-on-pa nil
   "A list of helm buffers where the helm-window should be reduced on persistent actions."
@@ -868,20 +881,41 @@ Inlined here for compatibility."
     ;; Now highlight matches only if we are in helm session, we are
     ;; maybe coming from helm-grep-mode or helm-moccur-mode buffers.
     (when helm-alive-p
-      (if (or (null helm-highlight-matches-around-point-max-lines)
-              (zerop helm-highlight-matches-around-point-max-lines))
-          (setq start-match start
-                end-match   end)
-          (setq start-match
-                (save-excursion
-                  (forward-line
-                   (- helm-highlight-matches-around-point-max-lines))
-                  (point-at-bol))
-                  end-match
-                  (save-excursion
-                    (forward-line
-                     helm-highlight-matches-around-point-max-lines)
-                    (point-at-bol))))
+      (cond (;; These 2 clauses have to be the first otherwise
+             ;; `helm-highlight-matches-around-point-max-lines' is
+             ;; compared as a number by other clauses and return an error.
+             (eq helm-highlight-matches-around-point-max-lines 'never)
+             (setq start-match start
+                   end-match   start))
+            ((consp helm-highlight-matches-around-point-max-lines)
+             (setq start-match
+                   (save-excursion
+                     (forward-line
+                      (- (car helm-highlight-matches-around-point-max-lines)))
+                     (point-at-bol))
+                   end-match
+                   (save-excursion
+                     (forward-line
+                      (cdr helm-highlight-matches-around-point-max-lines))
+                     (point-at-bol))))
+            ((or (null helm-highlight-matches-around-point-max-lines)
+                 (zerop helm-highlight-matches-around-point-max-lines))
+             (setq start-match start
+                   end-match   end))
+            ((< helm-highlight-matches-around-point-max-lines 0)
+             (setq start-match
+                   (save-excursion
+                     (forward-line
+                      helm-highlight-matches-around-point-max-lines)
+                     (point-at-bol))
+                   end-match start))
+            ((> helm-highlight-matches-around-point-max-lines 0)
+             (setq start-match start
+                   end-match
+                   (save-excursion
+                     (forward-line
+                      helm-highlight-matches-around-point-max-lines)
+                     (point-at-bol)))))
       (catch 'empty-line
         (cl-loop with ov
                  for r in (helm-remove-if-match
@@ -894,9 +928,10 @@ Inlined here for compatibility."
                  do (save-excursion
                       (goto-char start-match)
                       (while (condition-case _err
-                                 (if helm-migemo-mode
-                                     (helm-mm-migemo-forward r end-match t)
-                                     (re-search-forward r end-match t))
+                                 (and (not (= start-match end-match))
+                                      (if helm-migemo-mode
+                                          (helm-mm-migemo-forward r end-match t)
+                                        (re-search-forward r end-match t)))
                                (invalid-regexp nil))
                         (let ((s (match-beginning 0))
                               (e (match-end 0)))

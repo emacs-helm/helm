@@ -85,7 +85,7 @@ string."
   :group 'helm-imenu
   :type '(repeat symbol))
 
-(defcustom helm-imenu-highlight-matches-around-point-max-lines 0
+(defcustom helm-imenu-highlight-matches-around-point-max-lines 'never
   "Same as `highlight-matches-around-point-max-lines' but for imenu."
   :group 'helm-imenu
   :type 'integer)
