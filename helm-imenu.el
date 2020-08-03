@@ -362,7 +362,7 @@ i.e. `derived-mode-p' or it have an association in
          (init-reg (and str (concat "\\_<" (regexp-quote str) "\\_>")))
          (helm-execute-action-at-once-if-one
           helm-imenu-execute-action-at-once-if-one)
-         (helm--maybe-use-default-as-input
+         (helm-maybe-use-default-as-input
           (not (null (memq 'helm-source-imenu-all
                            helm-sources-using-default-as-input))))
          (sources (if helm-imenu-in-all-buffers-separate-sources

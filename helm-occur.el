@@ -285,7 +285,7 @@ Each buffer's result is displayed in a separated source."
                             finally return (> total_size 2000000))
              helm-sources-using-default-as-input))
          (sources (helm-occur-build-sources bufs))
-         (helm--maybe-use-default-as-input
+         (helm-maybe-use-default-as-input
           (not (null (memq 'helm-source-moccur
                            helm-sources-using-default-as-input)))))
     (helm-set-local-variable 'helm-occur--buffer-list bufs

@@ -112,7 +112,7 @@ See <https://www.gnu.org/software/idutils/>."
               helm-gid-db-file-name))
          (helm-grep-default-directory-fn
           (lambda () default-directory))
-         (helm--maybe-use-default-as-input t))
+         (helm-maybe-use-default-as-input t))
     (cl-assert db nil "No DataBase found, create one with `mkid'")
     (helm :sources (helm-make-source "Gid" 'helm-gid-source
                      :db-dir db)

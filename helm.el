@@ -627,7 +627,7 @@ Note that window-height and window-width have to be configured in
                                                  helm-source-grep-ag
                                                  helm-source-grep-git
                                                  helm-source-grep)
-  "List of Helm sources that need to use `helm--maybe-use-default-as-input'.
+  "List of Helm sources that need to use `helm-maybe-use-default-as-input'.
 When a source is a member of this list, default `thing-at-point'
 will be used as input."
   :group 'helm
@@ -1800,7 +1800,7 @@ Helm aborts in some special circumstances.  See
 (defvar helm--reading-passwd-or-string nil)
 (defvar helm--in-update nil)
 (defvar helm--in-fuzzy nil)
-(defvar helm--maybe-use-default-as-input nil
+(defvar helm-maybe-use-default-as-input nil
   "Flag to notify the use of use-default-as-input.
 Use only in let-bindings.
 Use :default arg of `helm' as input to update display.
@@ -2681,7 +2681,7 @@ the list items, starting with the first.
 
 If nil, `thing-at-point' is used.
 
-If `helm--maybe-use-default-as-input' is non-nil, display is
+If `helm-maybe-use-default-as-input' is non-nil, display is
 updated using this value if this value matches, otherwise it is
 ignored. If :input is specified, it takes precedence on :default.
 
@@ -2826,9 +2826,9 @@ HISTORY args see `helm'."
         mode-line-in-non-selected-windows
         minibuffer-completion-confirm
         (input-method-verbose-flag helm-input-method-verbose-flag)
-        (helm--maybe-use-default-as-input
+        (helm-maybe-use-default-as-input
          (and (null input)
-              (or helm--maybe-use-default-as-input ; it is let-bounded so use it.
+              (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                   (cl-loop for s in (helm-normalize-sources sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
     (unwind-protect
@@ -3591,7 +3591,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
           (or helm-split-window-default-side 'below)))
   ;; Call the init function for sources where appropriate
   (helm-compute-attr-in-sources 'init sources)
-  (setq helm-pattern (or (and helm--maybe-use-default-as-input
+  (setq helm-pattern (or (and helm-maybe-use-default-as-input
                               (or (if (listp default)
                                       (car default) default)
                                   (with-helm-current-buffer
@@ -3659,7 +3659,7 @@ please don't use it outside of Helm.
 
 (defun helm--reset-default-pattern ()
   (setq helm-pattern "")
-  (setq helm--maybe-use-default-as-input nil))
+  (setq helm-maybe-use-default-as-input nil))
 
 (defun helm-read-pattern-maybe (prompt
                                 input preselect resume
@@ -3696,9 +3696,9 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
       ;; display if no result found with precedent value of `helm-pattern'
       ;; unless `helm-quit-if-no-candidate' is non-`nil', in this case
       ;; Don't force update with an empty pattern.
-      ;; Reset also `helm--maybe-use-default-as-input' as this checking
+      ;; Reset also `helm-maybe-use-default-as-input' as this checking
       ;; happen only on startup.
-      (when helm--maybe-use-default-as-input
+      (when helm-maybe-use-default-as-input
         ;; Store value of `default' temporarily here waiting next update
         ;; to allow actions like helm-moccur-action matching pattern
         ;; at the place it jump to.
