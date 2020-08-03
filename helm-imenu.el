@@ -179,6 +179,10 @@ string."
               (save-excursion
                 (goto-char (point-at-bol))
                  (point-marker)))))
+    ;; Happen when cursor is on the line where a definition is. This
+    ;; prevent jumping to the definition where we are already, instead
+    ;; display helm with all definitions and preselection to the place
+    ;; we already are.
     (if (equal (cdr cur) mb)
         (prog1 nil
           (helm-set-pattern "")
