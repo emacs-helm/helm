@@ -1594,7 +1594,8 @@ Actually does nothing."
          (bounds (completion-boundaries beforepoint table pred afterpoint))
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
-         (all (helm-completion--multi-all-completions-1 string table pred)))
+         (all (helm-completion--multi-all-completions-1
+               (regexp-quote string) table pred)))
     (list all string prefix suffix point)))
 
 ;; The adjust-metadata functions run only in emacs-27, they are NOT
