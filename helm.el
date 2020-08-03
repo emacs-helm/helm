@@ -2682,8 +2682,8 @@ the list items, starting with the first.
 If nil, `thing-at-point' is used.
 
 If `helm--maybe-use-default-as-input' is non-nil, display is
-updated using this value, unless :input is specified, in which
-case that value is used instead.
+updated using this value if this value matches, otherwise it is
+ignored. If :input is specified, it takes precedence on :default.
 
 *** :history
 
