@@ -3713,7 +3713,7 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
         ;; when we start with an empty pattern.
         (and (helm-empty-buffer-p)
              (null helm-quit-if-no-candidate)
-             (helm-force-update)))
+             (helm-force-update preselect)))
       ;; Handle `helm-execute-action-at-once-if-one' and
       ;; `helm-quit-if-no-candidate' now.
       (cond ((and (if (functionp helm-execute-action-at-once-if-one)
