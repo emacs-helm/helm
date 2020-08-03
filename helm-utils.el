@@ -864,7 +864,7 @@ Inlined here for compatibility."
 (defvar helm-match-line-overlay nil)
 (defvar helm--match-item-overlays nil)
 
-(defun helm-highlight-current-line (&optional start end buf face)
+(cl-defun helm-highlight-current-line (&optional start end buf face)
   "Highlight and underline current position"
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
@@ -886,8 +886,7 @@ Inlined here for compatibility."
              ;; `helm-highlight-matches-around-point-max-lines' is
              ;; compared as a number by other clauses and return an error.
              (eq helm-highlight-matches-around-point-max-lines 'never)
-             (setq start-match start
-                   end-match   start))
+             (cl-return-from helm-highlight-current-line))
             ((consp helm-highlight-matches-around-point-max-lines)
              (setq start-match
                    (save-excursion
