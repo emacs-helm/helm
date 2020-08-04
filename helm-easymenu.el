@@ -34,6 +34,9 @@
     ["Bookmarks" helm-filtered-bookmarks t])
    ("Buffers"
     ["Find buffers" helm-buffers-list t])
+   ("Projects"
+    ["Browse project" helm-browse-project]
+    ["Projects history" helm-projects-history])
    ("Commands"
     ["Emacs Commands" helm-M-x t]
     ["Externals Commands" helm-run-external-command t])

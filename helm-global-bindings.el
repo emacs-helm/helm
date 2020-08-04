@@ -71,7 +71,7 @@
     (define-key map (kbd "m")         'helm-man-woman)
     (define-key map (kbd "t")         'helm-top)
     (define-key map (kbd "/")         'helm-find)
-    (define-key map (kbd "i")         'helm-semantic-or-imenu)
+    (define-key map (kbd "i")         'helm-imenu)
     (define-key map (kbd "I")         'helm-imenu-in-all-buffers)
     (define-key map (kbd "<tab>")     'helm-lisp-completion-at-point)
     (define-key map (kbd "p")         'helm-list-emacs-process)
