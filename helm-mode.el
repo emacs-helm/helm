@@ -1843,12 +1843,18 @@ Can be used for `completion-in-region-function' by advicing it with an
                             :must-match require-match))))
             ;; `helm-completion-in-region--insert-result' is stripping
             ;; out properties on RESULT and by side-effect (perhaps
-            ;; `choose-completion-string'?) modify STRING so make a copy.
+            ;; `choose-completion-string'?) so make a copy of STRING
+            ;; to not loose props.
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result result start point end base-size))
-        ;; Allow running extra property :exit-function (Issue #2265)
+        ;; Allow running extra property :exit-function (Issues #2265,
+        ;; #2356). Passing 'finished to `completion--done' is probably
+        ;; the more logical as completion is always finished in our
+        ;; case when pressing RET, at one point 'finished was addind a
+        ;; space at insertion so we used 'exact, but it seems it is no
+        ;; more the case.
         (when (stringp string)
-          (completion--done string 'exact))
+          (completion--done string 'finished))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
