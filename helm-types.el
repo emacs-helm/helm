@@ -177,6 +177,8 @@
    (lambda () (and (fboundp 'tab-bar-mode)
                    "Switch to buffer other tab `C-c C-t'"))
    'switch-to-buffer-other-tab
+   "Switch to buffer at line number"
+   'helm-switch-to-buffer-at-linum
    "Browse project `C-x C-d'"
    'helm-buffers-browse-project
    "Query replace regexp `C-M-%'"

@@ -244,6 +244,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-x C-d")   'helm-buffers-run-browse-project)
     (define-key map (kbd "C-c o")     'helm-buffer-switch-other-window)
     (define-key map (kbd "C-c C-o")   'helm-buffer-switch-other-frame)
+    (define-key map (kbd "M-g M-g")   'helm-buffer-run-goto-line)
     (define-key map (kbd "C-c =")     'helm-buffer-run-ediff)
     (define-key map (kbd "M-=")       'helm-buffer-run-ediff-merge)
     (define-key map (kbd "C-=")       'helm-buffer-diff-persistent)
@@ -861,6 +862,22 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffers-rename-buffer)))
 (put 'helm-buffer-run-rename-buffer 'helm-only t)
+
+(defun helm-switch-to-buffer-at-linum (candidate)
+  (let ((linum (read-number
+                "Line number: "
+                (with-current-buffer candidate
+                  (line-number-at-pos)))))
+    (switch-to-buffer candidate)
+    (goto-char (point-min))
+    (forward-line (1- linum))))
+
+(defun helm-buffer-run-goto-line ()
+  "Switch to buffer at line number."
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-switch-to-buffer-at-linum)))
+(put 'helm-buffer-run-goto-line 'helm-only t)
 
 (defun helm-buffer-run-kill-persistent ()
   "Kill buffer without quitting Helm."
