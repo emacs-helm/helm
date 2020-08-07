@@ -321,6 +321,17 @@ i.e. completing-read's."
 ;;; helm-comp-read
 ;;
 ;;
+(defvar helm-comp-read-use-marked nil
+  "[INTERNAL] When non nil `helm-comp-read' will return marked candidates.
+
+Use this ONLY in `let', NOT globally, this allows third party packages
+to use a list as return value when `helm-mode' is enabled, e.g.
+
+    (let ((helm-comp-read-use-marked t))
+      (completing-read \"test: \" '(a b c d e f g)))
+
+")
+
 (defun helm-cr-empty-string ()
   "Return empty string."
   (interactive)
@@ -535,7 +546,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             sort
                             fc-transformer
                             hist-fc-transformer
-                            marked-candidates
+                            (marked-candidates helm-comp-read-use-marked)
                             nomark
                             (alistp t)
                             (candidate-number-limit helm-candidate-number-limit)
@@ -872,7 +883,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
                                     (eq require-match
                                         'confirm-after-completion)))
                            1 0)
-     :nomark t
+     :nomark (null helm-comp-read-use-marked)
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
      :fuzzy helm-mode-fuzzy-match
@@ -970,7 +981,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          :initial-input input
          :buffer buffer
          :history history
-         :nomark t
+         :nomark (null helm-comp-read-use-marked)
          :reverse-history helm-mode-reverse-history
          ;; In helm h-c-styles default is passed directly in
          ;; candidates.
