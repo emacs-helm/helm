@@ -1705,6 +1705,12 @@ Can be used for `completion-in-region-function' by advicing it with an
      'lisp--local-variables
      :around #'helm-mode--advice-lisp--local-variables)
     (let ((old--helm-completion-style helm-completion-style)
+          (exit-fun (plist-get completion-extra-properties :exit-function))
+          ;; Always start with prefix to allow completing without
+          ;; the need of inserting a space after cursor or
+          ;; relaying on crap old completion-styles emacs22 which
+          ;; add suffix after prefix. e.g. def|else.
+          (initial-input (buffer-substring-no-properties start (point)))
           string)
       (helm-aif (cdr (assq major-mode helm-completion-styles-alist))
           (customize-set-variable 'helm-completion-style
@@ -1718,11 +1724,6 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (completion-flex-nospace t)
                  (completion-styles (helm--prepare-completion-styles))
                  (input (buffer-substring-no-properties start end))
-                 ;; Always start with prefix to allow completing without
-                 ;; the need of inserting a space after cursor or
-                 ;; relaying on crap old completion-styles emacs22 which
-                 ;; add suffix after prefix. e.g. def|else.
-                 (initial-input (buffer-substring-no-properties start (point)))
                  (prefix (and (eq helm-completion-style 'emacs) initial-input))
                  (point (point))
                  (current-command (or (helm-this-command) this-command))
@@ -1859,13 +1860,13 @@ Can be used for `completion-in-region-function' by advicing it with an
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result result start point end base-size))
         ;; Allow running extra property :exit-function (Issues #2265,
-        ;; #2356). Passing 'finished to `completion--done' is probably
-        ;; the more logical as completion is always finished in our
-        ;; case when pressing RET, at one point 'finished was addind a
-        ;; space at insertion so we used 'exact, but it seems it is no
-        ;; more the case.
-        (when (stringp string)
-          (completion--done string 'finished))
+        ;; #2356). Function is called with 'exact if for a unique
+        ;; match which is exact, the return value of `try-completion'
+        ;; is t, otherwise it is called with 'finished. 
+        (when (and (stringp string) exit-fun)
+          (funcall exit-fun string
+                   (if (eq (try-completion initial-input collection) t)
+                       'exact 'finished)))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
