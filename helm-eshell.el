@@ -238,7 +238,8 @@ at point."
 (defun helm-esh-pcomplete-default-source ()
   "Make and return the default source for Eshell completion."
   (helm-make-source "Eshell completions" 'helm-esh-source
-    :fuzzy-match helm-eshell-fuzzy-match))
+    :fuzzy-match helm-eshell-fuzzy-match
+    :keymap helm-esh-completion-map))
 
 (defvar helm-esh-pcomplete-build-source-fn #'helm-esh-pcomplete-default-source
   "Function that builds a source or a list of sources.")
@@ -246,7 +247,6 @@ at point."
 (defun helm-esh-pcomplete--make-helm (&optional input)
   (helm :sources (funcall helm-esh-pcomplete-build-source-fn)
         :buffer "*helm pcomplete*"
-        :keymap helm-esh-completion-map
         :resume 'noresume
         :input input))
 
