@@ -31,8 +31,8 @@
                       minibuffer-local-must-match-filename-map ; Older Emacsen
                       minibuffer-local-must-match-map
                       minibuffer-local-ns-map))
-      (let ((vmap (symbol-value map)))
-        (when (and (boundp map) (keymapp vmap))
+      (let ((vmap (and (boundp map) (symbol-value map))))
+        (when (keymapp vmap)
           (let ((val (and (boundp var) (symbol-value var))))
             (when val
               (define-key vmap
