@@ -363,6 +363,11 @@ Default action change TZ environment variable locally to emacs."
                                   uid 'face 'font-lock-warning-face))
                          key)))
 
+(defun helm-epa-encrypt-file (candidate)
+  "Select a file to encrypt with key CANDIDATE."
+  (let ((file (helm-read-file-name "Encrypt file: ")))
+    (epa-encrypt-file file candidate)))
+
 (defun helm-list-epg-keys ()
   "List all gpg keys.
 This is the helm interface for `epa-list-keys'."
@@ -373,7 +378,8 @@ This is the helm interface for `epa-list-keys'."
                   (require 'epg)
                   (require 'epa))
           :candidates 'helm-epg-get-key-list
-          :action '(("Show key" . epa--show-key)))
+          :action '(("Show key" . epa--show-key)
+                    ("encrypt file with key" . helm-epa-encrypt-file)))
         :buffer "*helm epg list keys*"))
 
 (provide 'helm-misc)
