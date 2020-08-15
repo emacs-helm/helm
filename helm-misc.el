@@ -324,6 +324,57 @@ Default action change TZ environment variable locally to emacs."
               elm))))
     (delete-minibuffer-contents)
     (insert elm)))
+
+;;; GPG keys
+;;
+;;
+(defvar epa-protocol)
+(declare-function epg-list-keys        "epg")
+(declare-function epg-make-context     "epg")
+(declare-function epg-key-sub-key-list "epg")
+(declare-function epg-sub-key-id       "epg")
+(declare-function epg-key-user-id-list "epg")
+(declare-function epg-user-id-string   "epg")
+(declare-function epg-user-id-validity "epg")
+
+(defun helm-epg-get-key-list ()
+  "Build candidate list for `helm-list-epg-keys'."
+  (cl-loop with all-keys = (epg-list-keys (epg-make-context epa-protocol))
+           for key in all-keys
+           for sublist = (car (epg-key-sub-key-list key))
+           for subkey-id = (epg-sub-key-id sublist)
+           for uid-list = (epg-key-user-id-list key)
+           for uid = (epg-user-id-string (car uid-list))
+           for validity = (epg-user-id-validity (car uid-list))
+           collect (cons (format " %s %s %s"
+                                 (cl-case validity
+                                   (none "-")
+                                   (revoked "r")
+                                   (expired "e")
+                                   (t "u"))
+                                 (propertize
+                                  subkey-id
+                                  'face (cl-case validity
+                                          (none 'epa-validity-medium)
+                                          ((revoked expired)
+                                           'epa-validity-disabled)
+                                          (t 'epa-validity-high)))
+                                 (propertize
+                                  uid 'face 'font-lock-warning-face))
+                         key)))
+
+(defun helm-list-epg-keys ()
+  "List all gpg keys.
+This is the helm interface for `epa-list-keys'."
+  (interactive)
+  (helm :sources
+        (helm-build-sync-source "Epg list keys"
+          :init (lambda ()
+                  (require 'epg)
+                  (require 'epa))
+          :candidates 'helm-epg-get-key-list
+          :action '(("Show key" . epa--show-key)))
+        :buffer "*helm epg list keys*"))
 
 (provide 'helm-misc)
 
