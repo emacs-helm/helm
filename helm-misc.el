@@ -369,12 +369,17 @@ Default action change TZ environment variable locally to emacs."
 
 (defun helm-epa-encrypt-file (candidate)
   "Select a file to encrypt with key CANDIDATE."
-  (let ((file (helm-read-file-name "Encrypt file: ")))
-    (epa-encrypt-file file candidate)))
+  (let ((file (helm-read-file-name "Encrypt file: "))
+        (key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
+        (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
+    (epa-encrypt-file file candidate)
+    (message "File encrypted with key `%s %s'" key id)))
 
 (defun helm-epa-mail-sign (candidate)
   "Sign email with key CANDIDATE."
-  (let (start end mode)
+  (let ((key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
+        (id  (epg-user-id-string (car (epg-key-user-id-list candidate))))
+        start end mode)
     (save-excursion
       (goto-char (point-min))
       (if (search-forward mail-header-separator nil t)
@@ -391,7 +396,8 @@ Default action change TZ environment variable locally to emacs."
     ;; TODO Make non-interactive functions to replace epa-sign-region
     ;; and epa-encrypt-region and inline them.
     (with-suppressed-warnings ((interactive-only epa-sign-region))
-      (epa-sign-region start end candidate mode))))
+      (epa-sign-region start end candidate mode))
+    (message "Mail signed with key `%s %s'" key id)))
 
 (defun helm-epa-mail-encrypt (candidate)
   "Encrypt email with key CANDIDATE."
@@ -406,9 +412,12 @@ Default action change TZ environment variable locally to emacs."
 	    (or coding-system-for-write
 		(select-safe-coding-system start end))))
     ;; Don't let some read-only text stop us from encrypting.
-    (let ((inhibit-read-only t))
+    (let ((inhibit-read-only t)
+          (key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
+          (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
       (with-suppressed-warnings ((interactive-only epa-encrypt-region))
-        (epa-encrypt-region start end candidate nil nil)))))
+        (epa-encrypt-region start end candidate nil nil))
+      (message "Mail encrypted with key `%s %s'" key id))))
 
 (defun helm-list-epg-keys ()
   "List all gpg keys.
