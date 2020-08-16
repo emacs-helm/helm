@@ -1859,14 +1859,7 @@ Can be used for `completion-in-region-function' by advicing it with an
             ;; to not loose props.
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result
-             ;; When RESULT have annotation, annotation is displayed
-             ;; in it with a display property attached to a space
-             ;; added at end of string, take care of removing this
-             ;; space (issue #2360). However keep RESULT intact to
-             ;; pass it to `:exit-function' i.e. Don't store the
-             ;; modified string in STRING.
-             (replace-regexp-in-string " \\'" "" result)
-             start point end base-size))
+             result start point end base-size))
         ;; Allow running extra property `:exit-function' (Issues #2265,
         ;; #2356). Function is called with 'exact if for a unique
         ;; match which is exact, the return value of `try-completion'
@@ -1893,8 +1886,15 @@ character.
 Be sure to know what you are doing when modifying this.")
 (defun helm-completion-in-region--insert-result (result start point end base-size)
   (cond ((stringp result)
+         ;; When RESULT have annotation, annotation is displayed
+         ;; in it with a display property attached to a space
+         ;; added at end of string, take care of removing this
+         ;; space (issue #2360). However keep RESULT intact to
+         ;; pass it to `:exit-function' i.e. Don't store the
+         ;; modified string in STRING.
          (choose-completion-string
-          result (current-buffer)
+          (replace-regexp-in-string " \\'" "" result)
+          (current-buffer)
           (list (+ start base-size) point)
           completion-list-insert-choice-function)
          (when helm-completion-mark-suffix
