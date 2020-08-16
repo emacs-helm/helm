@@ -388,6 +388,8 @@ Default action change TZ environment variable locally to emacs."
               mode (if verbose
 		       (epa--read-signature-type)
 	             'clear))))
+    ;; TODO Make non-interactive functions to replace epa-sign-region
+    ;; and epa-encrypt-region and inline them.
     (with-suppressed-warnings ((interactive-only epa-sign-region))
       (epa-sign-region start end candidate mode))))
 
@@ -420,6 +422,7 @@ This is the helm interface for `epa-list-keys'."
           :candidates 'helm-epg-get-key-list
           :action '(("Show key" . epa--show-key)
                     ("encrypt file with key" . helm-epa-encrypt-file)
+                    ;; TODO filter these actions according to context.
                     ("Sign mail with key" . helm-epa-mail-sign)
                     ("Encrypt mail with key" . helm-epa-mail-encrypt)))
         :buffer "*helm epg list keys*"))
