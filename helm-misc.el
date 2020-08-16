@@ -329,13 +329,17 @@ Default action change TZ environment variable locally to emacs."
 ;;
 ;;
 (defvar epa-protocol)
-(declare-function epg-list-keys        "epg")
-(declare-function epg-make-context     "epg")
-(declare-function epg-key-sub-key-list "epg")
-(declare-function epg-sub-key-id       "epg")
-(declare-function epg-key-user-id-list "epg")
-(declare-function epg-user-id-string   "epg")
-(declare-function epg-user-id-validity "epg")
+(defvar epa-last-coding-system-specified)
+(defvar mail-header-separator)
+(declare-function epg-list-keys            "epg")
+(declare-function epg-make-context         "epg")
+(declare-function epg-key-sub-key-list     "epg")
+(declare-function epg-sub-key-id           "epg")
+(declare-function epg-key-user-id-list     "epg")
+(declare-function epg-user-id-string       "epg")
+(declare-function epg-user-id-validity     "epg")
+(declare-function epa-sign-region          "epg")
+(declare-function epa--read-signature-type "epg")
 
 (defun helm-epg-get-key-list ()
   "Build candidate list for `helm-list-epg-keys'."
@@ -368,6 +372,42 @@ Default action change TZ environment variable locally to emacs."
   (let ((file (helm-read-file-name "Encrypt file: ")))
     (epa-encrypt-file file candidate)))
 
+(defun helm-epa-mail-sign (candidate)
+  "Sign email with key CANDIDATE."
+  (let (start end mode)
+    (save-excursion
+      (goto-char (point-min))
+      (if (search-forward mail-header-separator nil t)
+	  (forward-line))
+      (setq epa-last-coding-system-specified
+	    (or coding-system-for-write
+	        (select-safe-coding-system (point) (point-max))))
+      (let ((verbose current-prefix-arg))
+        (setq start (point)
+              end (point-max)
+              mode (if verbose
+		       (epa--read-signature-type)
+	             'clear))))
+    (with-suppressed-warnings ((interactive-only epa-sign-region))
+      (epa-sign-region start end candidate mode))))
+
+(defun helm-epa-mail-encrypt (candidate)
+  "Encrypt email with key CANDIDATE."
+  (let (start end)
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward mail-header-separator nil t)
+	(forward-line))
+      (setq start (point)
+            end (point-max))
+      (setq epa-last-coding-system-specified
+	    (or coding-system-for-write
+		(select-safe-coding-system start end))))
+    ;; Don't let some read-only text stop us from encrypting.
+    (let ((inhibit-read-only t))
+      (with-suppressed-warnings ((interactive-only epa-encrypt-region))
+        (epa-encrypt-region start end candidate nil nil)))))
+
 (defun helm-list-epg-keys ()
   "List all gpg keys.
 This is the helm interface for `epa-list-keys'."
@@ -379,7 +419,9 @@ This is the helm interface for `epa-list-keys'."
                   (require 'epa))
           :candidates 'helm-epg-get-key-list
           :action '(("Show key" . epa--show-key)
-                    ("encrypt file with key" . helm-epa-encrypt-file)))
+                    ("encrypt file with key" . helm-epa-encrypt-file)
+                    ("Sign mail with key" . helm-epa-mail-sign)
+                    ("Encrypt mail with key" . helm-epa-mail-encrypt)))
         :buffer "*helm epg list keys*"))
 
 (provide 'helm-misc)
