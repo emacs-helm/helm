@@ -344,6 +344,22 @@ Default action change TZ environment variable locally to emacs."
 (declare-function epg-export-keys-to-string "epg")
 (declare-function epg-context-armor         "epg")
 
+(defcustom helm-epa-actions '(("Show key" . epa--show-key)
+                              ("encrypt file with key" . helm-epa-encrypt-file)
+                              ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
+                              ;; TODO filter these actions according to context.
+                              ("Sign mail with key" . helm-epa-mail-sign)
+                              ("Encrypt mail with key" . helm-epa-mail-encrypt))
+  "Actions for `helm-list-epg-keys'."
+  :type '(alist :key-type string :value-type symbol)
+  :group 'helm-misc)
+
+(defclass helm-epa (helm-source-sync)
+  ((init :initform (lambda ()
+                     (require 'epg)
+                     (require 'epa)))
+   (candidates :initform 'helm-epg-get-key-list)))
+
 (defun helm-epg-get-key-list ()
   "Build candidate list for `helm-list-epg-keys'."
   (cl-loop with all-keys = (epg-list-keys (epg-make-context epa-protocol))
@@ -439,17 +455,8 @@ Default action change TZ environment variable locally to emacs."
 This is the helm interface for `epa-list-keys'."
   (interactive)
   (helm :sources
-        (helm-build-sync-source "Epg list keys"
-          :init (lambda ()
-                  (require 'epg)
-                  (require 'epa))
-          :candidates 'helm-epg-get-key-list
-          :action '(("Show key" . epa--show-key)
-                    ("encrypt file with key" . helm-epa-encrypt-file)
-                    ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
-                    ;; TODO filter these actions according to context.
-                    ("Sign mail with key" . helm-epa-mail-sign)
-                    ("Encrypt mail with key" . helm-epa-mail-encrypt)))
+        (helm-make-source "Epg list keys" 'helm-epa
+          :action 'helm-epa-actions)
         :buffer "*helm epg list keys*"))
 
 (provide 'helm-misc)
