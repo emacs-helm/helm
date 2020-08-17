@@ -344,7 +344,8 @@ Default action change TZ environment variable locally to emacs."
 (declare-function epg-export-keys-to-string "epg")
 (declare-function epg-context-armor         "epg")
 
-(defvar helm-epa--list-only-secrets nil)
+(defvar helm-epa--list-only-secrets nil
+  "[INTERNAL] Used to pass MODE argument to `epg-list-keys'.")
 
 (defcustom helm-epa-actions '(("Show key" . epa--show-key)
                               ("encrypt file with key" . helm-epa-encrypt-file)
@@ -387,13 +388,21 @@ Default action change TZ environment variable locally to emacs."
                                   uid 'face 'font-lock-warning-face))
                          key)))
 
-(defun helm-epa-select-keys (context prompt &optional names secret)
+(defun helm-epa-select-keys (_context prompt &optional names secret)
   "A helm replacement for `epa-select-keys'."
   (let ((helm-epa--list-only-secrets secret))
     (helm :sources (helm-make-source "Epa select keys" 'helm-epa)
           :default (if (stringp names) names (regexp-opt names))
           :prompt prompt
           :buffer "*helm epa*")))
+
+(define-minor-mode helm-epa-mode
+  "Enable helm completion on gpg keys in epa functions."
+  :group 'helm-misc
+  :global t
+  (if helm-epa-mode
+      (advice-add 'epa-select-keys :override #'helm-epa-select-keys)
+    (advice-remove 'epa-select-keys #'helm-epa-select-keys)))
 
 (defun helm-epa-action-transformer (actions _candidate)
   "Helm epa action transformer function."
