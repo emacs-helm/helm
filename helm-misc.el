@@ -331,15 +331,18 @@ Default action change TZ environment variable locally to emacs."
 (defvar epa-protocol)
 (defvar epa-last-coding-system-specified)
 (defvar mail-header-separator)
-(declare-function epg-list-keys            "epg")
-(declare-function epg-make-context         "epg")
-(declare-function epg-key-sub-key-list     "epg")
-(declare-function epg-sub-key-id           "epg")
-(declare-function epg-key-user-id-list     "epg")
-(declare-function epg-user-id-string       "epg")
-(declare-function epg-user-id-validity     "epg")
-(declare-function epa-sign-region          "epg")
-(declare-function epa--read-signature-type "epg")
+(declare-function epg-list-keys             "epg")
+(declare-function epg-make-context          "epg")
+(declare-function epg-key-sub-key-list      "epg")
+(declare-function epg-sub-key-id            "epg")
+(declare-function epg-key-user-id-list      "epg")
+(declare-function epg-user-id-string        "epg")
+(declare-function epg-user-id-validity      "epg")
+(declare-function epa-sign-region           "epg")
+(declare-function epa--read-signature-type  "epg")
+(declare-function epa-display-error         "epg")
+(declare-function epg-export-keys-to-string "epg")
+(declare-function epg-context-armor         "epg")
 
 (defun helm-epg-get-key-list ()
   "Build candidate list for `helm-list-epg-keys'."
@@ -374,6 +377,18 @@ Default action change TZ environment variable locally to emacs."
         (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
     (epa-encrypt-file file candidate)
     (message "File encrypted with key `%s %s'" key id)))
+
+(defun helm-epa-kill-keys-armor (_candidate)
+  "Copy marked keys to kill ring."
+  (let ((keys (helm-marked-candidates))
+        (context (epg-make-context epa-protocol)))
+    (with-no-warnings
+      (setf (epg-context-armor context) t))
+    (condition-case error
+	(kill-new (epg-export-keys-to-string context keys))
+      (error
+       (epa-display-error context)
+       (signal (car error) (cdr error))))))
 
 (defun helm-epa-mail-sign (candidate)
   "Sign email with key CANDIDATE."
@@ -431,6 +446,7 @@ This is the helm interface for `epa-list-keys'."
           :candidates 'helm-epg-get-key-list
           :action '(("Show key" . epa--show-key)
                     ("encrypt file with key" . helm-epa-encrypt-file)
+                    ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
                     ;; TODO filter these actions according to context.
                     ("Sign mail with key" . helm-epa-mail-sign)
                     ("Encrypt mail with key" . helm-epa-mail-encrypt)))
