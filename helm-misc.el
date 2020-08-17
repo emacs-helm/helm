@@ -346,10 +346,7 @@ Default action change TZ environment variable locally to emacs."
 
 (defcustom helm-epa-actions '(("Show key" . epa--show-key)
                               ("encrypt file with key" . helm-epa-encrypt-file)
-                              ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
-                              ;; TODO filter these actions according to context.
-                              ("Sign mail with key" . helm-epa-mail-sign)
-                              ("Encrypt mail with key" . helm-epa-mail-encrypt))
+                              ("Copy keys to kill ring" . helm-epa-kill-keys-armor))
   "Actions for `helm-list-epg-keys'."
   :type '(alist :key-type string :value-type symbol)
   :group 'helm-misc)
@@ -358,7 +355,8 @@ Default action change TZ environment variable locally to emacs."
   ((init :initform (lambda ()
                      (require 'epg)
                      (require 'epa)))
-   (candidates :initform 'helm-epg-get-key-list)))
+   (candidates :initform 'helm-epg-get-key-list))
+  "Allow building helm sources for GPG keys.")
 
 (defun helm-epg-get-key-list ()
   "Build candidate list for `helm-list-epg-keys'."
@@ -385,6 +383,16 @@ Default action change TZ environment variable locally to emacs."
                                  (propertize
                                   uid 'face 'font-lock-warning-face))
                          key)))
+
+(defun helm-epa-action-transformer (actions _candidate)
+  "Helm epa action transformer function."
+  (cond ((with-helm-current-buffer
+           (derived-mode-p 'message-mode 'mail-mode))
+         (helm-append-at-nth
+          actions '(("Sign mail with key" . helm-epa-mail-sign)
+                    ("Encrypt mail with key" . helm-epa-mail-encrypt))
+          3))
+        (t actions)))
 
 (defun helm-epa-encrypt-file (candidate)
   "Select a file to encrypt with key CANDIDATE."
@@ -456,6 +464,7 @@ This is the helm interface for `epa-list-keys'."
   (interactive)
   (helm :sources
         (helm-make-source "Epg list keys" 'helm-epa
+          :action-transformer 'helm-epa-action-transformer
           :action 'helm-epa-actions)
         :buffer "*helm epg list keys*"))
 
