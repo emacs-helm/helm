@@ -402,13 +402,11 @@ Default action change TZ environment variable locally to emacs."
 (n - Create a normal signature)
 (c - Create a cleartext signature)
 (d - Create a detached signature)"
-                                  '("n" "c" "d")))
-        type)
+                                  '("n" "c" "d"))))
     (helm-acase answer
-      ("n" (setq type 'normal))
-      ("c" (setq type 'clear))
-      ("d" (setq type 'detached)))
-    type))
+      ("n" 'normal)
+      ("c" 'clear)
+      ("d" 'detached))))
 
 ;;;###autoload
 (define-minor-mode helm-epa-mode
