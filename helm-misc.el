@@ -396,13 +396,32 @@ Default action change TZ environment variable locally to emacs."
           :prompt prompt
           :buffer "*helm epa*")))
 
+(defun helm-epa--read-signature-type ()
+  "A helm replacement for `epa--read-signature-type'."
+  (let ((answer (helm-read-answer "Signature type:
+(n - Create a normal signature)
+(c - Create a cleartext signature)
+(d - Create a detached signature)"
+                                  '("n" "c" "d")))
+        type)
+    (helm-acase answer
+      ("n" (setq type 'normal))
+      ("c" (setq type 'clear))
+      ("d" (setq type 'detached)))
+    type))
+
+;;;###autoload
 (define-minor-mode helm-epa-mode
   "Enable helm completion on gpg keys in epa functions."
   :group 'helm-misc
   :global t
+  (require 'epa)
   (if helm-epa-mode
-      (advice-add 'epa-select-keys :override #'helm-epa-select-keys)
-    (advice-remove 'epa-select-keys #'helm-epa-select-keys)))
+      (progn
+        (advice-add 'epa-select-keys :override #'helm-epa-select-keys)
+        (advice-add 'epa--read-signature-type :override #'helm-epa--read-signature-type))
+    (advice-remove 'epa-select-keys #'helm-epa-select-keys)
+    (advice-remove 'epa--read-signature-type #'helm-epa--read-signature-type)))
 
 (defun helm-epa-action-transformer (actions _candidate)
   "Helm epa action transformer function."
