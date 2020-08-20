@@ -495,6 +495,7 @@ Default action change TZ environment variable locally to emacs."
         (epa-encrypt-region start end candidate nil nil))
       (message "Mail encrypted with key `%s %s'" key id))))
 
+;;;###autoload
 (defun helm-list-epg-keys ()
   "List all gpg keys.
 This is the helm interface for `epa-list-keys'."
