@@ -350,7 +350,7 @@ Default action change TZ environment variable locally to emacs."
 (defcustom helm-epa-actions '(("Show key" . epa--show-key)
                               ("encrypt file with key" . helm-epa-encrypt-file)
                               ("Copy keys to kill ring" . helm-epa-kill-keys-armor))
-  "Actions for `helm-list-epg-keys'."
+  "Actions for `helm-epa-list-keys'."
   :type '(alist :key-type string :value-type symbol)
   :group 'helm-misc)
 
@@ -358,11 +358,11 @@ Default action change TZ environment variable locally to emacs."
   ((init :initform (lambda ()
                      (require 'epg)
                      (require 'epa)))
-   (candidates :initform 'helm-epg-get-key-list))
+   (candidates :initform 'helm-epa-get-key-list))
   "Allow building helm sources for GPG keys.")
 
-(defun helm-epg-get-key-list ()
-  "Build candidate list for `helm-list-epg-keys'."
+(defun helm-epa-get-key-list ()
+  "Build candidate list for `helm-epa-list-keys'."
   (cl-loop with all-keys = (epg-list-keys (epg-make-context epa-protocol)
                                           nil helm-epa--list-only-secrets)
            for key in all-keys
@@ -496,7 +496,7 @@ Default action change TZ environment variable locally to emacs."
       (message "Mail encrypted with key `%s %s'" key id))))
 
 ;;;###autoload
-(defun helm-list-epg-keys ()
+(defun helm-epa-list-keys ()
   "List all gpg keys.
 This is the helm interface for `epa-list-keys'."
   (interactive)
