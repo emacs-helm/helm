@@ -265,8 +265,8 @@ There are three possible values to use:
   `flex' and helm fuzzy matching.
 
 For a better experience, if you don't know what to use, set
-`completion-styles' to '(flex) if you are using emacs-27 or to
-\'(helm-flex) if you are using emacs-26 and keep 'emacs as default
+`completion-styles' to \\='(flex) if you are using emacs-27 or to
+\\='(helm-flex) if you are using emacs-26 and keep \\='emacs as default
 value for `helm-completion-style'.  Advanced users can also have a
 look to `completion-category-overrides' to set styles according to category.
 
