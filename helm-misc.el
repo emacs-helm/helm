@@ -393,8 +393,14 @@ Default action change TZ environment variable locally to emacs."
   (let ((helm-epa--list-only-secrets secret))
     (helm :sources (helm-make-source "Epa select keys" 'helm-epa)
           :default (if (stringp names) names (regexp-opt names))
-          :prompt prompt
+          :prompt (helm-epa--format-prompt prompt)
           :buffer "*helm epa*")))
+
+(defun helm-epa--format-prompt (prompt)
+  (let ((split (split-string prompt "\n")))
+    (format "%s\n(%s): "
+            (replace-regexp-in-string "\\.[\t ]*\\'" "" (car split))
+            (replace-regexp-in-string "\\.[\t ]*\\'" "" (cadr split)))))
 
 (defun helm-epa--read-signature-type ()
   "A helm replacement for `epa--read-signature-type'."
