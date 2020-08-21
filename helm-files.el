@@ -3363,11 +3363,12 @@ When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode
 (define-minor-mode helm-ff-cache-mode
   "Auto refresh `helm-find-files' cache when emacs is idle.
 
-You will probably don't want to start this mode directly but instead
-customize `helm-ff-keep-cached-candidates' to a non nil value to
-enable it.
-With `helm-ff-keep-cached-candidates' set to a nil value the mode will
-disable itself.
+You probably don't want to start this mode directly.  Instead you
+should customize `helm-ff-keep-cached-candidates' to a non nil
+value to enable it.
+
+With `helm-ff-keep-cached-candidates' set to a nil value the mode
+will disable itself.
 
 When Emacs is idle, refresh the cache all the
 `helm-ff-refresh-cache-delay' seconds then stop when done or after
