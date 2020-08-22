@@ -330,6 +330,7 @@ Default action change TZ environment variable locally to emacs."
 ;;
 (defvar epa-protocol)
 (defvar epa-last-coding-system-specified)
+(defvar epg-key-validity-alist)
 (defvar mail-header-separator)
 (declare-function epg-list-keys             "epg")
 (declare-function epg-make-context          "epg")
@@ -372,11 +373,9 @@ Default action change TZ environment variable locally to emacs."
            for uid = (epg-user-id-string (car uid-list))
            for validity = (epg-user-id-validity (car uid-list))
            collect (cons (format " %s %s %s"
-                                 (cl-case validity
-                                   (none "-")
-                                   (revoked "r")
-                                   (expired "e")
-                                   (t "u"))
+                                 (helm-aif (rassq validity epg-key-validity-alist)
+                                     (string (car it))
+                                   "?")
                                  (propertize
                                   subkey-id
                                   'face (cl-case validity
