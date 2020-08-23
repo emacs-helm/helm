@@ -478,7 +478,7 @@ Default action change TZ environment variable locally to emacs."
 	             'clear))))
     ;; TODO Make non-interactive functions to replace epa-sign-region
     ;; and epa-encrypt-region and inline them.
-    (with-suppressed-warnings ((interactive-only epa-sign-region))
+    (with-no-warnings
       (epa-sign-region start end candidate mode))
     (message "Mail signed with key `%s %s'" key id)))
 
@@ -498,7 +498,7 @@ Default action change TZ environment variable locally to emacs."
     (let ((inhibit-read-only t)
           (key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
           (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
-      (with-suppressed-warnings ((interactive-only epa-encrypt-region))
+      (with-no-warnings
         (epa-encrypt-region start end candidate nil nil))
       (message "Mail encrypted with key `%s %s'" key id))))
 
