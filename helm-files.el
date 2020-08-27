@@ -4184,9 +4184,7 @@ file."
   (let* ((follow        (or (helm-follow-mode-p)
                             helm--temp-follow-flag))
          (image-cand    (string-match-p (image-file-name-regexp) candidate))
-         (new-pattern   (helm-get-selection))
-         (num-lines-buf (with-current-buffer helm-buffer
-                          (count-lines (point-min) (point-max))))
+         (selection   (helm-get-selection))
          (insert-in-minibuffer (lambda (fname)
                                    (with-selected-window (or (active-minibuffer-window)
                                                              (minibuffer-window))
@@ -4236,9 +4234,10 @@ file."
                    (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
           ;; A regular file, expand it, (first hit)
-          ((and (>= num-lines-buf 3) (not current-prefix-arg) (not follow))
+          ((and (not (file-equal-p selection helm-pattern))
+                (not current-prefix-arg) (not follow))
            (cons (lambda (_candidate)
-                   (funcall insert-in-minibuffer new-pattern)
+                   (funcall insert-in-minibuffer selection)
                    (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
           ;; An image file and it is the second hit on C-j,
