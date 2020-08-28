@@ -18,6 +18,12 @@ jobs:
       env: EMACS_CI=emacs-25-3
     - os: linux
       dist: bionic
+      env: EMACS_CI=emacs-26-1
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-26-2
+    - os: linux
+      dist: bionic
       env: EMACS_CI=emacs-26-3
     - os: linux
       dist: bionic
@@ -45,3 +51,8 @@ script:
   - export PATH=$HOME/.cask/bin:$PATH
   - emacs --version
   - cask build
+
+allow_failures:
+  - os: linux
+    dist: bionic
+    env: EMACS_CI=emacs-snapshot
