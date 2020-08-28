@@ -1,35 +1,44 @@
-dist: xenial
-language: emacs-lisp
-addons:
-  apt:
-    update: true
+# https://github.com/purcell/nix-emacs-ci
+language: nix
+
+cache:
+  directories:
+  - $HOME/nix.store
 
 jobs:
-  allow_failures:
-    - env: EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
   include:
-    - stage: build
-      env:
-        - EVM_EMACS=emacs-24.5-travis
-      script: &build
-        - rm -rf $HOME/.evm
-        - travis_retry eval $"git clone https://github.com/rejeep/evm.git $HOME/.evm ; sleep 10"
-        - export PATH=$HOME/.evm/bin:$HOME/.cask/bin:$PATH
-        - evm config path /tmp
-        - travis_retry eval $"evm install $EVM_EMACS --use --skip ; sleep 10"
-        - emacs --version
-        - travis_retry eval $"curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python ; sleep 10"
-        - travis_retry eval $"cask install ; sleep 10"
-        - cask build
-    - stage: build
-      env:
-        - EVM_EMACS=emacs-25.3-travis
-      script: *build
-    - stage: build
-      env:
-        - EVM_EMACS=emacs-26.3-travis-linux-xenial
-      script: *build
-    - stage: build
-      env:
-        - EVM_EMACS=emacs-git-snapshot-travis-linux-xenial
-      script: *build
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-24-5
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-25-3
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-26-3
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-27-1
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-snapshot
+
+before_install:
+  - sudo mkdir -p /etc/nix
+  - echo "substituters = https://cache.nixos.org/ file://$HOME/nix.store" | sudo tee -a /etc/nix/nix.conf > /dev/null
+  - echo 'require-sigs = false' | sudo tee -a /etc/nix/nix.conf > /dev/null
+
+before_cache:
+  - mkdir -p $HOME/nix.store
+  - nix copy --to file://$HOME/nix.store -f default.nix buildInputs
+
+install:
+  # The default "emacs" executable on the $PATH will now be the version named by $EMACS_CI
+  - bash <(curl https://raw.githubusercontent.com/purcell/nix-emacs-ci/master/travis-install)
+  - travis_retry eval $"curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python ; sleep 10"
+  - export PATH=$HOME/.cask/bin:$PATH
+  - travis_retry eval $"cask install ; sleep 10"
+script:
+  - export PATH=$HOME/.cask/bin:$PATH
+  - emacs --version
+  - cask build
