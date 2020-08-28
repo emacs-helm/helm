@@ -9,7 +9,10 @@ jobs:
   include:
     - os: linux
       dist: bionic
-      env: EMACS_CI=emacs-24-5
+      env: EMACS_CI=emacs-25-1
+    - os: linux
+      dist: bionic
+      env: EMACS_CI=emacs-25-2
     - os: linux
       dist: bionic
       env: EMACS_CI=emacs-25-3
