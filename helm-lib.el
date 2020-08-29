@@ -900,12 +900,17 @@ ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
         else
         collect (funcall function arg)))
 
+(defsubst helm-append-1 (elm seq)
+  "Append ELM to SEQ.
+If ELM is not a list transform it in list."
+  (append (if (listp elm) elm (list elm)) seq))
+
 (defun helm-append-at-nth (seq elm index)
   "Append ELM at INDEX in SEQ."
   (let ((len (length seq)))
     (setq index (min (max index 0) len))
     (if (zerop index)
-        (append elm seq)
+        (helm-append-1 elm seq)
       (cl-loop for i in seq
                for count from 1 collect i
                when (= count index)
