@@ -363,6 +363,17 @@ available APPEND is ignored."
       (setq guess (abbreviate-file-name (expand-file-name guess))))
     (read-file-name prompt (file-name-directory guess) nil nil
                     (file-name-nondirectory guess))))
+
+;; The native-comp branch of emacs "is a modified Emacs capable of compiling
+;; and running Emacs Lisp as native code in form of re-loadable elf files."
+;; (https://akrl.sdf.org/gccemacs.html). The function subr-native-elisp-p is a
+;; native function available only in this branch and evaluates to true if the
+;; argument supplied is a natively compiled lisp function. Use this function
+;; if it's available, otherwise return nil. Helm needs to distinguish compiled
+;; functions from other symbols in a various places.
+(defun helm-subr-native-elisp-p (object)
+  (when (fboundp 'subr-native-elisp-p)
+      (subr-native-elisp-p object)))
 
 ;;; Macros helper.
 ;;
@@ -1110,7 +1121,8 @@ Example:
 
 (defun helm-symbol-name (obj)
   (if (or (and (consp obj) (functionp obj))
-          (byte-code-function-p obj))
+          (byte-code-function-p obj)
+          (helm-subr-native-elisp-p obj))
       "Anonymous"
       (symbol-name obj)))
 
