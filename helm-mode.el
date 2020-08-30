@@ -1093,6 +1093,7 @@ See documentation of `completing-read' and `all-completions' for details."
           (cl-loop for h in minibuffer-setup-hook
                    unless (or (consp h) ; a lambda.
                               (byte-code-function-p h)
+                              (helm-subr-native-elisp-p h)
                               (memq h helm-mode-minibuffer-setup-hook-black-list))
                    collect h))
          ;; Disable hack that could be used before `completing-read'.
