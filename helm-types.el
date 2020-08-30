@@ -297,7 +297,8 @@
                              (describe-function (timer--function tm))))
     ("Find Function" . (lambda (tm)
                          (helm-aif (timer--function tm)
-                             (if (byte-code-function-p it)
+                             (if (or (byte-code-function-p it)
+                                     (helm-subr-native-elisp-p it))
                                  (message "Can't find anonymous function `%s'" it)
                                  (find-function it))))))
   "Default actions for type timers."

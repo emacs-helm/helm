@@ -2352,8 +2352,10 @@ i.e. functions called with RET."
   (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)
-                     ;; Compiled lambda
+                     ;; Compiled lambdas
                      (byte-code-function-p action)
+                     ;; Natively compiled (libgccjit)
+                     (helm-subr-native-elisp-p action)
                      ;; Lambdas
                      (and (listp action) (functionp action))
                      ;; One of current actions.
@@ -5231,7 +5233,8 @@ If action buffer is selected, back to the Helm buffer."
                            (if (functionp actions)
                                (message "Sole action: %s"
                                         (if (or (consp actions)
-                                                (byte-code-function-p actions))
+                                                (byte-code-function-p actions)
+                                                (helm-subr-native-elisp-p actions))
                                             "Anonymous" actions))
                              (helm-show-action-buffer actions)
                              ;; Be sure the minibuffer is entirely deleted (#907).
@@ -5255,7 +5258,8 @@ If action buffer is selected, back to the Helm buffer."
             (if (functionp it)
                 (message "Sole action: %s"
                          (if (or (consp it)
-                                 (byte-code-function-p it))
+                                 (byte-code-function-p it)
+                                 (helm-subr-native-elisp-p it))
                              "Anonymous" it))
               (setq helm-saved-action
                     (x-popup-menu
