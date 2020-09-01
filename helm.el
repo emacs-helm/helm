@@ -3391,6 +3391,7 @@ Note that this feature is available only with emacs-25+."
                  (foreground-color . ,(or helm-frame-foreground-color
                                           (face-attribute 'default :foreground)))
                  (alpha . ,(or helm-frame-alpha 100))
+                 (font . ,(assoc-default 'font (frame-parameters)))
                  (vertical-scroll-bars . nil)
                  (menu-bar-lines . 0)
                  (fullscreen . nil)
