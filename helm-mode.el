@@ -1727,7 +1727,16 @@ Can be used for `completion-in-region-function' by advicing it with an
                  (input (buffer-substring-no-properties start end))
                  (prefix (and (eq helm-completion-style 'emacs) initial-input))
                  (point (point))
-                 (current-command (or (helm-this-command) this-command))
+                 (current-command (or (helm-this-command)
+                                      this-command
+                                      ;; Some backends are async and
+                                      ;; use a callback, in those
+                                      ;; cases, we can't retrieve from
+                                      ;; frames the last interactive
+                                      ;; command, so fallback to
+                                      ;; `last-command' which may be
+                                      ;; the one that called the callback.
+                                      last-command))
                  (crm (eq current-command 'crm-complete))
                  (str-command (helm-symbol-name current-command))
                  (buf-name (format "*helm-mode-%s*" str-command))
