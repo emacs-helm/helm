@@ -3887,6 +3887,9 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   (with-current-buffer helm-buffer
     (let ((frame (selected-frame)))
       (setq cursor-type t)
+      ;; Ensure restoring default-value of mode-line to allow user
+      ;; using the mouse when helm is inactive (issues #1517,#2377).
+      (setq mode-line-format (default-value 'mode-line-format))
       (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
       (remove-hook 'post-command-hook 'helm--update-header-line)
       ;; Be sure we call cleanup functions from helm-buffer.
