@@ -211,7 +211,11 @@
 (defmethod helm--setup-source :before ((source helm-type-buffer))
   (setf (slot-value source 'action) 'helm-type-buffer-actions)
   (setf (slot-value source 'persistent-help) "Show this buffer")
-  (setf (slot-value source 'mode-line) (list "Buffer(s)" helm-mode-line-string))
+  (setf (slot-value source 'mode-line)
+        ;; Use default-value of `helm-mode-line-string' in case user
+        ;; starts with a helm buffer as current-buffer otherwise the
+        ;; local value of this helm buffer is used (issues #1517,#2377).
+        (list "Buffer(s)" (default-value 'helm-mode-line-string)))
   (setf (slot-value source 'filtered-candidate-transformer)
         '(helm-skip-boring-buffers
           helm-buffers-sort-transformer
