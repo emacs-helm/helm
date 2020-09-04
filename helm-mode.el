@@ -1048,20 +1048,16 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
            init hist default inherit-input-method
            name buffer standard)))
 
-(defun helm-mode--buffer-list ()
-  "Remove internal buffers from `buffer-list'."
-  (delq nil (mapcar (lambda (b)
-                      (let ((name (buffer-name b)))
-                        (and (not (eql (aref name 0) ? ))
-                             name)))
-                    (buffer-list))))
-
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
   "The `read-buffer-function' for `helm-mode'.
-Affects `switch-to-buffer' and related."
-  (let ((collection (helm-mode--buffer-list)))
-    (helm--completing-read-default
-     prompt collection predicate require-match nil nil default)))
+Affects `switch-to-buffer' `kill-buffer' and related."
+  ;; Use `internal-complete-buffer-except' as default collection,
+  ;; assuming `switch-to-buffer' doesn't need the current buffer and
+  ;; `kill-buffer' add it on top of completion list.  This may be
+  ;; wrong in other functions, but lets use this as there is no better
+  ;; solutions to abstract this for now.
+  (helm--completing-read-default
+   prompt (internal-complete-buffer-except) predicate require-match nil nil default))
 
 (cl-defun helm--completing-read-default
     (prompt collection &optional
