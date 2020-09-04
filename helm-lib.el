@@ -1531,8 +1531,7 @@ flex or helm-flex completion style if present."
     (or
      styles
      (pcase (and (null nomode)
-                 (with-helm-current-buffer
-                   (cdr (assq major-mode helm-completion-styles-alist))))
+                 (cdr (assq major-mode helm-completion-styles-alist)))
        (`(,_l . ,ll) ll))
      ;; We need to have flex always behind helm, otherwise
      ;; when matching against e.g. '(foo foobar foao frogo bar
@@ -1594,7 +1593,8 @@ Also `helm-completion-style' settings have no effect here,
            ;; emacs22).
            (helm-completion-style 'emacs)
            (completion-styles
-            (helm--prepare-completion-styles nomode styles))
+            (with-helm-current-buffer
+              (helm--prepare-completion-styles nomode styles)))
            (completion-flex-nospace t)
            (nosort (eq metadata 'nosort))
            (compsfn (lambda (str pred _action)
