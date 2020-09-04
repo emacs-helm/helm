@@ -165,6 +165,9 @@ Apply only in `helm-mode' handled commands."
 When nil no sorting is done.
 The function is a `filtered-candidate-transformer' function which takes
 two args CANDIDATES and SOURCE.
+The function must use the flag `helm-completion--sorting-done' and
+return CANDIDATES unchanged when the flag is nil.
+See default function `helm-completion-in-region-sort-fn' as example.
 It will be used only when `helm-completion-style' is either Emacs or
 helm, otherwise when helm-fuzzy style is used, the fuzzy sort function
 will be used."
