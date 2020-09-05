@@ -1051,7 +1051,14 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
            init hist default inherit-input-method
            name buffer standard)))
 
-(defun helm-read-buffer-to-switch (prompt)
+(defun helm-mode--read-buffer-to-switch (prompt)
+  "[INTERNAL] This is used to advice `read-buffer-to-switch'.
+Don't use it directly."
+  ;; `read-buffer-to-switch' is passing `minibuffer-completion-table'
+  ;; to `read-buffer' through `minibuffer-setup-hook' which is too
+  ;; late to be known by `read-buffer-function', in our case
+  ;; `helm--generic-read-buffer'.  It should let bind it to allow us
+  ;; using it. 
   (let ((minibuffer-completion-table (internal-complete-buffer-except)))
     (read-buffer prompt (other-buffer (current-buffer))
                  (confirm-nonexistent-file-or-buffer))))
@@ -2021,7 +2028,7 @@ Note: This mode is incompatible with Emacs23."
           ;; emacs-27 and `ffap-read-file-or-url' is fixed, so no need
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
-        (advice-add 'read-buffer-to-switch :override #'helm-read-buffer-to-switch))
+        (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
       (remove-function read-file-name-function #'helm--generic-read-file-name)
@@ -2030,7 +2037,7 @@ Note: This mode is incompatible with Emacs23."
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
-      (advice-remove 'read-buffer-to-switch #'helm-read-buffer-to-switch))))
+      (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch))))
 
 (provide 'helm-mode)
 
