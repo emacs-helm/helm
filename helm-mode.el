@@ -1389,7 +1389,10 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          ;; in helm specialized functions.
          (others-args (append def-args (list str-command buf-name)))
          (reading-directory (eq predicate 'file-directory-p))
-         (use-dialog (and (string= str-command "menu-find-file-existing")
+         (use-dialog (and (next-read-file-uses-dialog-p)
+                          ;; Graphical file dialogs can't handle
+                          ;; remote files.
+                          (not (file-remote-p init))
                           use-file-dialog))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
@@ -1416,7 +1419,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                (helm-mode -1)
                (apply read-file-name-function def-args))
           (helm-mode 1))))
-    ;; If we use now `read-file-name' we MUST turn off `helm-mode'
+    ;; If we use now `read-file-name' or dialog we MUST turn off `helm-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (memq def-com '(read-file-name ido-read-file-name))
               use-dialog
@@ -1432,7 +1435,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                         (setq add-to-history t)
                         (x-file-dialog prompt init default-filename
                                        dialog-mustmatch
-                                       (eq predicate 'file-directory-p))))
+                                       reading-directory)))
                      ;; A specialized function exists, run it
                      ;; with the two extra args specific to helm.
                      ;; Note that the helm handler should ensure
