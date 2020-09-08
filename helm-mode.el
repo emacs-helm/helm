@@ -1389,6 +1389,8 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          ;; in helm specialized functions.
          (others-args (append def-args (list str-command buf-name)))
          (reading-directory (eq predicate 'file-directory-p))
+         (use-dialog (and (string= str-command "menu-find-file-existing")
+                          use-file-dialog))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
          add-to-history fname)
@@ -1417,13 +1419,13 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
     ;; If we use now `read-file-name' we MUST turn off `helm-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
     (when (or (memq def-com '(read-file-name ido-read-file-name))
-              (string= str-command "menu-find-file-existing")
+              use-dialog
               (and (stringp str-defcom)
                    (not (string-match "^helm" str-defcom))))
       (helm-mode -1))
     (unwind-protect
          (setq fname
-               (cond ((string= str-command "menu-find-file-existing")
+               (cond (use-dialog
                       (let ((dialog-mustmatch
                              (not (memq mustmatch
                                         '(nil confirm confirm-after-completion)))))
