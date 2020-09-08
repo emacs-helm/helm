@@ -1391,7 +1391,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
          (reading-directory (eq predicate 'file-directory-p))
          helm-completion-mode-start-message ; Be quiet
          helm-completion-mode-quit-message  ; Same here
-         fname)
+         add-to-history fname)
     ;; Build `default-filename' with `dir'+`initial' when
     ;; `default-filename' is not specified.
     ;; See `read-file-name' docstring for more infos.
@@ -1416,20 +1416,28 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
           (helm-mode 1))))
     ;; If we use now `read-file-name' we MUST turn off `helm-mode'
     ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
-    (when (or (eq def-com 'read-file-name)
-              (eq def-com 'ido-read-file-name)
+    (when (or (memq def-com '(read-file-name ido-read-file-name))
+              (string= str-command "menu-find-file-existing")
               (and (stringp str-defcom)
                    (not (string-match "^helm" str-defcom))))
       (helm-mode -1))
     (unwind-protect
          (setq fname
-               (cond (;; A specialized function exists, run it
-                      ;; with the two extra args specific to helm.
-                      ;; Note that the helm handler should ensure
-                      ;; :initial-input is not nil i.e. Use init
-                      ;; which fallback to default-directory instead
-                      ;; of INITIAL.
-                      (and def-com helm-mode
+               (cond ((string= str-command "menu-find-file-existing")
+                      (let ((dialog-mustmatch
+                             (not (memq mustmatch
+                                        '(nil confirm confirm-after-completion)))))
+                        (setq add-to-history t)
+                        (x-file-dialog prompt init default-filename
+                                       dialog-mustmatch
+                                       (eq predicate 'file-directory-p))))
+                     ;; A specialized function exists, run it
+                     ;; with the two extra args specific to helm.
+                     ;; Note that the helm handler should ensure
+                     ;; :initial-input is not nil i.e. Use init
+                     ;; which fallback to default-directory instead
+                     ;; of INITIAL.
+                     ((and def-com helm-mode
                            (not (eq def-com 'ido-read-file-name))
                            (not (eq def-com 'incompatible)))
                       (apply def-com others-args))
@@ -1442,7 +1450,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                       ;; run it with default args.
                       (eq def-com 'read-file-name)
                       (apply def-com def-args))
-                     (t ; Fall back to classic `helm-read-file-name'.
+                     (t  ; Fall back to classic `helm-read-file-name'.
                       (helm-read-file-name
                        prompt
                        :name str-command
@@ -1458,13 +1466,17 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
       (helm-mode 1)
       ;; Same comment as in `helm--completing-read-default'.
       (setq this-command current-command))
+    (when add-to-history
+      (add-to-history 'file-name-history
+                      (minibuffer-maybe-quote-filename fname)))
     (if (and
          ;; Using `read-directory-name'.
          reading-directory
          ;; `file-name-as-directory' return "./" when FNAME is
          ;; empty string.
          (not (string= fname "")))
-        (file-name-as-directory fname) fname)))
+        (file-name-as-directory fname)
+      fname)))
 
 ;; Read file name handler with history (issue #1652)
 (defun helm-read-file-name-handler-1 (prompt dir default-filename
