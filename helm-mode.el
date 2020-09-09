@@ -1432,6 +1432,10 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                       (let ((dialog-mustmatch
                              (not (memq mustmatch
                                         '(nil confirm confirm-after-completion)))))
+                        ;; Dialogs don't support a list of default fnames.
+                        (when (and default-filename (consp default-filename))
+                          (setq default-filename
+                                (expand-file-name (car default-filename) init)))
                         (setq add-to-history t)
                         (x-file-dialog prompt init default-filename
                                        dialog-mustmatch
