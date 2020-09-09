@@ -55,7 +55,7 @@
   :group 'helm-command-faces)
 
 (defface helm-command-active-mode
-  '((t :inherit helm-M-x-key))
+  '((t :inherit font-lock-builtin-face))
   "Face used by `helm-M-x' for activated modes."
   :group 'helm-command-faces)
 
