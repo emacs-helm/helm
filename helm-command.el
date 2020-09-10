@@ -112,7 +112,7 @@ algorithm."
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
           for sym        = (intern cand)
-          for cand       = (if (or (eq sym major-mode)
+          for disp       = (if (or (eq sym major-mode)
                                    (and (memq sym minor-mode-list)
                                         (boundp sym)
                                         (buffer-local-value sym helm-current-buffer)))
@@ -122,12 +122,12 @@ algorithm."
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
                        (format "%s (%s)"
-                               cand (propertize
+                               disp (propertize
                                      local-key
                                      'face 'helm-M-x-key)))
-                      ((string-match "^M-x" key) cand)
+                      ((string-match "^M-x" key) disp)
                       (t (format "%s (%s)"
-                                 cand (propertize
+                                 disp (propertize
                                        key
                                        'face 'helm-M-x-key))))
                 cand)
