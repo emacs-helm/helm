@@ -54,6 +54,11 @@
   "Face used in helm-M-x to show keybinding."
   :group 'helm-command-faces)
 
+(defface helm-command-active-mode
+  '((t :inherit font-lock-builtin-face))
+  "Face used by `helm-M-x' for activated modes."
+  :group 'helm-command-faces)
+
 
 (defvar helm-M-x-input-history nil)
 (defvar helm-M-x-prefix-argument nil
@@ -106,6 +111,13 @@ algorithm."
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
+          for sym        = (intern cand)
+          for cand       = (if (or (eq sym major-mode)
+                                   (and (memq sym minor-mode-list)
+                                        (boundp sym)
+                                        (buffer-local-value sym helm-current-buffer)))
+                               (propertize cand 'face 'helm-command-active-mode)
+                             cand)
           unless (get (intern (if (consp cand) (car cand) cand)) 'helm-only)
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
