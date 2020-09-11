@@ -31,36 +31,6 @@
 
 ***
 
-<div align="center">
-  Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
-  Thanks to all the people that are helping or have helped Helm development,<br>
-  but they are actually too few.<br>
-
-  If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
-</div>
-
-<div align="center">
-  <i>Thank you! &mdash; Thierry Volpiatto</i>
-</div>
-
-
-<div align="center">
-     <a href="https://www.paypal.me/tvolpiatto">
-       <img title="Donate with Paypal"
-            alt="Donate with Paypal"
-            style="height: 50px; width: auto;"
-            src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
-     &nbsp;&nbsp;
-     <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-       <img title="Donate monthly using Patreon"
-            alt="Donate monthly using Patreon"
-            style="height: 50px; width: auto;"
-            src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
-     &nbsp;&nbsp;
-</div>
-
-***
-
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
