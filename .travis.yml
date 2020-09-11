@@ -1,4 +1,5 @@
 # https://github.com/purcell/nix-emacs-ci
+# https://nixos.wiki/wiki/Nix_on_Travis
 language: nix
 
 cache:
@@ -40,6 +41,9 @@ before_install:
 before_cache:
   - mkdir -p $HOME/nix.store
   - nix copy --to file://$HOME/nix.store -f default.nix buildInputs
+
+before_script:
+  - sudo mkdir -p /etc/nix && echo 'sandbox = true' | sudo tee /etc/nix/nix.conf
 
 install:
   # The default "emacs" executable on the $PATH will now be the version named by $EMACS_CI
