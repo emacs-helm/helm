@@ -35,36 +35,6 @@
 ***
 
 <p align="center">
-  Maintaining Helm requires a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>lot of work</b></a>,
-  Thanks to all the people that are helping or have helped Helm development,<br>
-  but they are actually too few.<br>
-  If you feel Helm is making your daily work easier,<br>
-  <b>please consider making a donation.</b><br>
-
-</p>
-
-<p align="center">
-  <i>Thank you! &mdash; Thierry Volpiatto</i>
-</p>
-
-<div align="center">
-  <a href="https://www.paypal.me/tvolpiatto">
-    <img title="Donate with Paypal"
-         alt="Donate with Paypal"
-         style="height: 50px; width: auto;"
-         src="https://github.com/emacs-helm/helm/blob/master/images/paypal.png?raw=true"></a>
-  &nbsp;&nbsp;
-  <a href="https://patreon.com/preview/30231724baf440fabe80d44d0ee77067">
-    <img title="Donate monthly using Patreon"
-         alt="Donate monthly using Patreon"
-         style="height: 50px; width: auto;"
-         src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
-  &nbsp;&nbsp;
-</div>
-
-***
-
-<p align="center">
   Helm in action searching with <a href="https://github.com/ggreer/the_silver_searcher"<b>Grep Ag</b></a>
                                    </p>
 
