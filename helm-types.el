@@ -228,8 +228,8 @@
 
 (defcustom helm-type-function-actions
   (helm-make-actions
-   "Describe command" 'helm-describe-function
-   "Go to command's definition" 'find-function
+   "Describe function" 'helm-describe-function
+   "Find function" 'find-function
    "Info lookup" 'helm-info-lookup-symbol
    "Debug on entry" 'debug-on-entry
    "Cancel debug on entry" 'cancel-debug-on-entry
