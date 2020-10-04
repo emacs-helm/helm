@@ -125,13 +125,13 @@ Note that when using `buffer-substring' initialization will be slower."
 
 (defface helm-moccur-buffer
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       (:foreground "DarkTurquoise" :underline t)))
+       :foreground "DarkTurquoise" :underline t))
   "Face used to highlight occur buffer names."
   :group 'helm-occur)
 
 (defface helm-resume-need-update
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       (:background "red")))
+       :background "red"))
   "Face used to flash occur buffer when it needs update."
   :group 'helm-occur)
 
