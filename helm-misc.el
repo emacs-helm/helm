@@ -328,6 +328,7 @@ Default action change TZ environment variable locally to emacs."
 ;;; GPG keys
 ;;
 ;;
+(eval-when-compile (require 'epg))
 (defvar epa-protocol)
 (defvar epa-last-coding-system-specified)
 (defvar epg-key-validity-alist)
@@ -339,11 +340,12 @@ Default action change TZ environment variable locally to emacs."
 (declare-function epg-key-user-id-list      "epg")
 (declare-function epg-user-id-string        "epg")
 (declare-function epg-user-id-validity      "epg")
-(declare-function epa-sign-region           "epg")
-(declare-function epa--read-signature-type  "epg")
-(declare-function epa-display-error         "epg")
+(declare-function epa-sign-region           "epa")
+(declare-function epa--read-signature-type  "epa")
+(declare-function epa-display-error         "epa")
 (declare-function epg-export-keys-to-string "epg")
 (declare-function epg-context-armor         "epg")
+(declare-function epg-context-set-armor     "epg")
 
 (defvar helm-epa--list-only-secrets nil
   "[INTERNAL] Used to pass MODE argument to `epg-list-keys'.")
