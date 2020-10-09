@@ -1154,9 +1154,7 @@ be negated with \"!\".
 
 Helm also supports fuzzy matching in some places when specified,
 you will find several variables to enable fuzzy matching in
-diverse [[Helm sources][sources]], see
-[[https://github.com/emacs-helm/helm/wiki/Fuzzy-matching][fuzzy-matching]]
-in helm-wiki for more infos.
+diverse [[Helm sources][sources]], see [[https://github.com/emacs-helm/helm/wiki/Fuzzy-matching][fuzzy-matching]] in helm-wiki for more infos.
 
 Helm generally uses familiar Emacs keys to navigate the list.
 Here follow some of the less obvious bindings:
@@ -1173,9 +1171,7 @@ sources support this.
 available on current candidate or all marked candidates.  The
 default binding <tab> is ordinarily used for completion, but that
 would be redundant since Helm completes upon every character
-entered in the prompt.  See
-[[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm
-wiki]].
+entered in the prompt.  See [[https://github.com/emacs-helm/helm/wiki#helm-completion-vs-emacs-completion][Helm wiki]].
 
 Note: In addition to the default actions list, additional actions
 appear depending on the type of the selected candidate(s).  They
@@ -1460,6 +1456,19 @@ more infos.
 NOTE: Any of these bindings are from `helm-map' and may be
 overriten by the map specific to the current source in use (each
 source can have its own keymap).
+
+** The actions menu
+
+You can display the action menu in the same window
+as helm candidates (default) or in a side window according to
+`helm-show-action-window-other-window' value.
+
+When the action menu popup, the helm prompt is used to narrow
+down this menu, no more candidates.
+
+When `helm-allow-mouse' is non nil, you can use as well
+mouse-3 (right click) in the candidate zone to select actions
+with the mouse once your candidate is selected.
 
 ** Action transformers
 
