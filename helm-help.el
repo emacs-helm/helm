@@ -449,7 +449,7 @@ List all the files under this directory and other subdirectories
 - With two prefix arguments:
 Same but the cache is refreshed.
 
-**** You can start a recursive search with \"locate\" or \"find\"
+**** You can start a recursive search with \"locate\" \"find\" or [[https://github.com/sharkdp/fd][Fd]]
 
 See \"Note\" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
@@ -489,6 +489,15 @@ the basedir as first argument of \"find\" and the subdir as the value for
 Examples:
 - \"find %s -type d -name '*%s*'\"
 - \"find %s -type d -regex .*%s.*$\"
+
+[[https://github.com/sharkdp/fd][Fd]] command is now also supported, it is regexp based and very fast, here is the
+command line to use:
+
+- \"fd --hidden --type d .*%s.*$ %s\"
+
+You can use also a glob based search, in this case use the --glob option:
+
+- \"fd --hidden --type d --glob '*%s*' %s\"
 
 *** Insert filename at point or complete filename at point
 
