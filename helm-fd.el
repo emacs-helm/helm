@@ -34,8 +34,30 @@
 (defvar helm-fd-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
-    (define-key map (kbd "DEL") 'helm-delete-backward-no-update)
+    (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
+    (define-key map (kbd "M-<down>") 'helm-fd-next-directory)
+    (define-key map (kbd "M-<up>")   'helm-fd-previous-directory)
     map))
+
+(defun helm-fd-next-directory-1 (arg)
+  (with-helm-window
+    (let ((cur-dir (helm-basedir (helm-get-selection))))
+      (while (equal cur-dir (helm-basedir (helm-get-selection)))
+        (if (> arg 0)
+            (helm-next-line)
+          (helm-previous-line))))))
+
+(defun helm-fd-next-directory ()
+  "Move to next directory in a helm-fd source."
+  (interactive)
+  (with-helm-alive-p
+    (helm-fd-next-directory-1 1)))
+
+(defun helm-fd-previous-directory ()
+  "Move to previous directory in a helm-fd source."
+  (interactive)
+  (with-helm-alive-p
+    (helm-fd-next-directory-1 -1)))
 
 (defclass helm-fd-class (helm-source-async)
   ((candidates-process :initform 'helm-fd-process)
