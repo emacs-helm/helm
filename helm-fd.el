@@ -104,7 +104,10 @@
   (cl-assert (executable-find helm-fd-executable) nil "Could not find fd executable")
   (cl-assert (not (file-remote-p directory)) nil "Fd not supported on remote directories")
   (let ((default-directory directory))
-    (helm :sources (helm-make-source "fd" 'helm-fd-class)
+    (helm :sources (helm-make-source
+                       (format "fd (%s)"
+                               (abbreviate-file-name default-directory))
+                       'helm-fd-class)
           :buffer "*helm fd*")))
 
 
