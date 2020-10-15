@@ -90,9 +90,7 @@
                                      ,(- (float-time) start-time)
                                      (helm-get-candidate-number))
                                     'face 'helm-fd-finish))))
-                    (force-mode-line-update)
-                    (when (and helm-allow-mouse helm-selection-point)
-                      (helm--bind-mouse-for-selection helm-selection-point)))
+                    (force-mode-line-update))
                 (helm-log "Error: Fd %s"
                           (replace-regexp-in-string "\n" "" event))))))))
 
