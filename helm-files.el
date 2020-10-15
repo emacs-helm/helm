@@ -318,7 +318,9 @@ Remote filesystem are generally mounted with sshfs."
   :type '(repeat string))
 
 (defcustom helm-browse-project-default-find-files-fn
-  (cond ((executable-find "rg")
+  (cond ((executable-find "fd")
+         #'helm-browse-project-fd-find-files)
+        ((executable-find "rg")
          #'helm-browse-project-rg-find-files)
         ((executable-find "ag")
          #'helm-browse-project-ag-find-files)
@@ -5387,7 +5389,8 @@ doing.")
   "List files in DIRECTORY recursively with external PROGRAM."
   (let ((cmd (cl-ecase program
                (ag "ag --hidden -g '.*' %s")
-               (rg "rg --files --hidden -g '*' %s"))))
+               (rg "rg --files --hidden -g '*' %s")
+               (fd "fd --hidden --type f --glob '*' %s"))))
     (with-temp-buffer
       (call-process-shell-command
        (format cmd directory)
@@ -5404,6 +5407,11 @@ Use AG as backend."
   "A suitable function for `helm-browse-project-default-find-files-fn'.
 Use RG as backend."
   (helm-browse-project-find-files-1 directory 'rg))
+
+(defun helm-browse-project-fd-find-files (directory)
+  "A suitable function for `helm-browse-project-default-find-files-fn'.
+Use FD as backend."
+  (helm-browse-project-find-files-1 directory 'fd))
 
 (defun helm-browse-project-ag (_candidate)
   "A `helm-grep' AG action for `helm-browse-project'."
