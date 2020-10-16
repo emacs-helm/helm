@@ -52,7 +52,6 @@
     (define-key map (kbd "M-g s")   'helm-ff-run-grep)
     (define-key map (kbd "M-g z")   'helm-ff-run-zgrep)
     (define-key map (kbd "M-g p")   'helm-ff-run-pdfgrep)
-    (define-key map (kbd "C-c g")   'helm-ff-run-gid)
     (define-key map (kbd "M-R")     'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")     'helm-ff-run-copy-file)
     (define-key map (kbd "M-B")     'helm-ff-run-byte-compile-file)
@@ -68,7 +67,6 @@
     (define-key map (kbd "M-i")     'helm-ff-properties-persistent)
     (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c X")   'helm-ff-run-open-file-with-default-tool)
-    (define-key map (kbd "M-.")     'helm-ff-run-etags)
     (define-key map (kbd "C-c @")   'helm-ff-run-insert-org-link)
     (define-key map (kbd "C-x C-q") 'helm-ff-run-marked-files-in-dired)
     (define-key map (kbd "C-c C-a") 'helm-ff-run-mail-attach-files)
@@ -91,7 +89,6 @@
     "Checksum File"                           'helm-ff-checksum
     "Ediff File"                              'helm-find-files-ediff-files
     "Ediff Merge File"                        'helm-find-files-ediff-merge-files
-    "Etags `M-., C-u reload tag file'"        'helm-ff-etags-select
     "View file"                               'view-file
     "Insert file"                             'insert-file
     "Add marked files to file-cache"          'helm-ff-cache-add-file

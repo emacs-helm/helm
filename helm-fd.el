@@ -34,6 +34,7 @@
 (defvar helm-fd-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
+    (define-key map (kbd "C-]")      'undefined)
     (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
     (define-key map (kbd "M-<down>") 'helm-fd-next-directory)
     (define-key map (kbd "M-<up>")   'helm-fd-previous-directory)
@@ -64,6 +65,7 @@
    (requires-pattern :initform 2)
    (candidate-number-limit :initform 20000)
    (nohighlight :initform t)
+   (help-message :initform 'helm-fd-help-message)
    (filtered-candidate-transformer :initform 'helm-fd-fct)
    (action :initform 'helm-type-file-actions)
    (keymap :initform helm-fd-map)))
