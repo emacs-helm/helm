@@ -1269,6 +1269,261 @@ To customize colors see [[https://github.com/sharkdp/fd#colorized-output][Fd col
 
 Search is (pcre) regexp based (see [[https://docs.rs/regex/1.0.0/regex/#syntax][Regexp syntax]]), multi patterns are _not_ supported.
 
+** Man page
+
+NAME
+       fd - find entries in the filesystem
+
+SYNOPSIS
+       fd  [-HIEsiaLp0hV]  [-d  depth] [-t filetype] [-e ext] [-E exclude] [-c
+       when] [-j num] [-x cmd] [pattern] [path...]
+
+DESCRIPTION
+       fd is a simple, fast and user-friendly alternative to find(1).
+
+OPTIONS
+       -H, --hidden
+              Include hidden files  and  directories  in  the  search  results
+              (default: hidden files and directories are skipped).
+
+       -I, --no-ignore
+              Show search results from files and directories that would other‐
+              wise be ignored by .gitignore, .ignore, .fdignore, or the global
+              ignore file.
+
+       -u, --unrestricted
+              Alias  for '--no-ignore'. Can be repeated; '-uu' is an alias for
+              '--no-ignore --hidden'.
+
+       --no-ignore-vcs
+              Show search results from files and directories that would other‐
+              wise be ignored by .gitignore files.
+
+       -s, --case-sensitive
+              Perform a case-sensitive search. By default, fd uses case-insen‐
+              sitive searches, unless the pattern contains an uppercase  char‐
+              acter (smart case).
+
+       -i, --ignore-case
+              Perform  a  case-insensitive  search.  By default, fd uses case-
+              insensitive searches, unless the pattern contains  an  uppercase
+              character (smart case).
+
+       -g, --glob
+              Perform  a  glob-based  search  instead  of a regular expression
+              search.
+
+       --regex
+              Perform a regular-expression based seach (default). This can  be
+              used to override --glob.
+
+       -F, --fixed-strings
+              Treat  the  pattern  as  a  literal  string instead of a regular
+              expression.
+
+       -a, --absolute-path
+              Shows the full path starting from the root as opposed  to  rela‐
+              tive paths.
+
+       -l, --list-details
+              Use a detailed listing format like 'ls -l'. This is basically an
+              alias  for  '--exec-batch  ls  -l'  with  some  additional  'ls'
+              options.  This can be used to see more metadata, to show symlink
+              targets and to achieve a deterministic sort order.
+
+       -L, --follow
+              By default, fd does  not  descend  into  symlinked  directories.
+              Using this flag, symbolic links are also traversed.
+
+       -p, --full-path
+              By default, the search pattern is only matched against the file‐
+              name (or directory  name).  Using  this  flag,  the  pattern  is
+              matched against the full path.
+
+       -0, --print0
+              Separate  search  results by the null character (instead of new‐
+              lines). Useful for piping results to xargs.
+
+       --max-results count
+              Limit the number of search results to 'count' and  quit  immedi‐
+              ately.
+
+       -1     Limit  the  search to a single result and quit immediately. This
+              is an alias for '--max-results=1'.
+
+       --show-errors
+              Enable the display of filesystem errors for situations  such  as
+              insufficient permissions or dead symlinks.
+
+       --one-file-system, --mount, --xdev
+              By  default,  fd  will  traverse  the file system tree as far as
+              other options dictate. With this flag, fd ensures that  it  does
+              not descend into a different file system than the one it started
+              in. Comparable to the -mount or -xdev filters of find(1).
+
+       -h, --help
+              Print help information.
+
+       -V, --version
+              Print version information.
+
+       -d, --max-depth d
+              Limit directory traversal to at  most  d  levels  of  depth.  By
+              default, there is no limit on the search depth.
+
+       --min-depth d
+              Only  show search results starting at the given depth. See also:
+              '--max-depth' and '--exact-depth'.
+
+       --exact-depth d
+              Only show search results at the exact given depth.  This  is  an
+              alias for '--min-depth <depth> --max-depth <depth>'.
+
+       -t, --type filetype
+              Filter search by type:
+
+              f, file
+                     regular files
+
+              d, directory
+                     directories
+
+              l, symlink
+                     symbolic links
+
+              x, executable
+                     executable (files)
+
+              e, empty
+                     empty files or directories
+
+              s, socket
+                     sockets
+
+              p, pipe
+                     named pipes (FIFOs)
+
+              This  option  can  be used repeatedly to allow for multiple file
+              types.
+
+       -e, --extension ext
+              Filter search results by file extension ext.  This option can be
+              used repeatedly to allow for multiple possible file extensions.
+
+       -E, --exclude pattern
+              Exclude  files/directories  that  match  the given glob pattern.
+              This overrides any other ignore logic.   Multiple  exclude  pat‐
+              terns can be specified.
+
+       --ignore-file path
+              Add  a  custom  ignore-file in '.gitignore' format.  These files
+              have a low precedence.
+
+       -c, --color when
+              Declare when to colorize search results:
+
+              auto   Colorize output when standard output is connected to terminal (default).
+
+              never  Do not colorize output.
+
+              always Always colorize output.
+
+       -j, --threads num
+              Set number of threads to use for searching & executing (default:
+              number of available CPU cores).
+
+       -S, --size size
+              Limit results based on  the  size  of  files  using  the  format
+              <+-><NUM><UNIT>
+
+              '+'    file size must be greater than or equal to this
+
+              '-'    file size must be less than or equal to this
+
+              'NUM'  The numeric size (e.g. 500)
+
+              'UNIT' The  units for NUM. They are not case-sensitive.  Allowed
+                     unit values:
+
+                     'b'    bytes
+
+                     'k'    kilobytes (base ten, 10^3 = 1000 bytes)
+
+                     'm'    megabytes
+
+                     'g'    gigabytes
+
+                     't'    terabytes
+
+                     'ki'   kibibytes (base two, 2^10 = 1024 bytes)
+
+                     'mi'   mebibytes
+
+                     'gi'   gibibytes
+
+                     'ti'   tebibytes
+
+       --changed-within date|duration
+              Filter results based on the file modification time. The argument
+              can  be  provided  as  a  specific  point  in  time  (YYYY-MM-DD
+              HH:MM:SS) or as a duration (10h,  1d,  35min).   --change-newer-
+              than can be used as an alias.
+
+              Examples:
+                --changed-within 2weeks
+                --change-newer-than \"2018-10-27 10:00:00\"
+
+       --changed-before date|duration
+              Filter results based on the file modification time. The argument
+              can  be  provided  as  a  specific  point  in  time  (YYYY-MM-DD
+              HH:MM:SS)  or  as  a duration (10h, 1d, 35min).  --change-older-
+              than can be used as an alias.
+
+              Examples:
+                --changed-before \"2018-10-27 10:00:00\"
+                --change-older-than 2weeks
+
+       -o, --owner [user][:group]
+              Filter   files   by   their   user   and/or    group.    Format:
+              [(user|uid)][:(group|gid)].  Either  side  is  optional. Precede
+              either side with a '!' to exclude files instead.
+
+              Examples:
+                --owner john
+                --owner :students
+                --owner \"!john:students\"
+
+       -x, --exec command
+              Execute command for each search result. The following placehold‐
+              ers  are  substituted  by a path derived from the current search
+              result:
+
+              {}     path
+
+              {/}    basename
+
+              {//}   parent directory
+
+              {.}    path without file extension
+
+              {/.}   basename without file extension
+
+       -X, --exec-batch command
+              Execute command with all  search  results  at  once.   A  single
+              occurence  of  the following placeholders is authorized and
+              sub stituted by the paths derived from the search results before the
+              command is executed:
+
+              {}     path
+
+              {/}    basename
+
+              {//}   parent directory
+
+              {.}    path without file extension
+
+              {/.}   basename without file extension
+
 ** Commands
 \\<helm-fd-map>
 \\[helm-ff-run-grep]\t\tRun grep (`\\[universal-argument]' to recurse).
