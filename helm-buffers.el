@@ -579,11 +579,11 @@ buffers)."
     (let* ((buf (helm-get-selection))
            (preselect (helm-buffer--get-preselection buf)))
       (setq helm-buffer-details-flag (not helm-buffer-details-flag))
-      (helm-update (lambda ()
-                     (helm-awhile (re-search-forward preselect nil t)
-                       (helm-mark-current-line)
-                       (when (equal buf (helm-get-selection))
-                         (cl-return t))))))))
+      (helm-force-update (lambda ()
+                           (helm-awhile (re-search-forward preselect nil t)
+                             (helm-mark-current-line)
+                             (when (equal buf (helm-get-selection))
+                               (cl-return t))))))))
 (put 'helm-toggle-buffers-details 'helm-only t)
 
 (defun helm-buffers--pattern-sans-filters (&optional separator)
@@ -810,7 +810,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                       (helm-get-selection))))
       (cl-loop for buf in marked do (helm-revert-buffer buf))
       (when helm-marked-candidates (helm-unmark-all))
-      (helm-update preselect))))
+      (helm-force-update preselect))))
 
 (defun helm-buffer-revert-persistent ()
   "Revert buffer without quitting helm."
@@ -830,7 +830,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
                (with-current-buffer (get-buffer buf)
                  (when (buffer-file-name) (save-buffer))))
       (when helm-marked-candidates (helm-unmark-all))
-      (helm-update (regexp-quote preselect)))))
+      (helm-force-update (regexp-quote preselect)))))
 
 (defun helm-buffer-save-some-buffers (_candidate)
   (helm-buffers-mark-similar-buffers-1 'mod)
