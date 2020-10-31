@@ -4316,7 +4316,7 @@ file."
           ;; On second hit we open file.
           ;; On Third hit we kill it's buffer maybe.
           (t
-           (lambda (_candidate)
+           (lambda (candidate)
              (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
 
 
