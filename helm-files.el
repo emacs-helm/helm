@@ -3583,7 +3583,8 @@ Note that only existing directories are saved here."
               (format "Size: %s\n" size)
               (when (string= type "directory")
                 (format "Size used in directory: %s\n"
-                        (helm-directory-size candidate nil t)))
+                        (helm-directory-size
+                         candidate current-prefix-arg t)))
               (format "Modified: %s\n" modif)
               (format "Accessed: %s\n" access)
               (and (stringp trash)
