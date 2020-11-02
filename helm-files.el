@@ -682,6 +682,8 @@ currently transfered in an help-echo in mode-line, if you use
     ;; Next 2 have no effect if candidate is not an image file.
     (define-key map (kbd "M-l")           'helm-ff-rotate-left-persistent)
     (define-key map (kbd "M-r")           'helm-ff-rotate-right-persistent)
+    (define-key map (kbd "M-+")           'helm-ff-increase-image-size-persistent)
+    (define-key map (kbd "M--")           'helm-ff-decrease-image-size-persistent)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
@@ -4120,27 +4122,30 @@ E.g. \"foo:12\"."
 (defvar image-dired-display-image-buffer)
 (defun helm-ff-rotate-current-image-1 (file num-arg)
   "Rotate current image at NUM-ARG degrees."
-  (setq file (file-truename file))      ; For symlinked images.
-  ;; When FILE is not an image-file, do nothing.
-  (when (and (file-exists-p file)
-             (string-match (image-file-name-regexp) file))
-    (setq num-arg (if (string= helm-ff-rotate-image-program "exiftran")
-                      (cl-case num-arg
-                        (90  "-9")      ; 90 clockwise
-                        (270 "-2"))     ; 270 clockwise == -90
-                    (number-to-string num-arg)))
-    (if (executable-find helm-ff-rotate-image-program)
-        (let ((default-directory (file-name-directory file))
-              (basename (helm-basename file)))
-          (apply #'process-file helm-ff-rotate-image-program nil nil nil
-                 (append helm-ff-rotate-image-switch
-                         (list num-arg basename)))
-          (when (buffer-live-p image-dired-display-image-buffer)
-            (kill-buffer image-dired-display-image-buffer))
-          (image-dired-display-image basename)
-          (message nil)
-          (display-buffer (get-buffer image-dired-display-image-buffer)))
-      (error "%s not found" helm-ff-rotate-image-program))))
+  (if helm-ff-display-image-native
+      (with-selected-window (helm-persistent-action-display-window)
+        (image-rotate num-arg))
+    (setq file (file-truename file))    ; For symlinked images.
+    ;; When FILE is not an image-file, do nothing.
+    (when (and (file-exists-p file)
+               (string-match (image-file-name-regexp) file))
+      (setq num-arg (if (string= helm-ff-rotate-image-program "exiftran")
+                        (cl-case num-arg
+                          (90  "-9")    ; 90 clockwise
+                          (270 "-2"))   ; 270 clockwise == -90
+                      (number-to-string num-arg)))
+      (if (executable-find helm-ff-rotate-image-program)
+          (let ((default-directory (file-name-directory file))
+                (basename (helm-basename file)))
+            (apply #'process-file helm-ff-rotate-image-program nil nil nil
+                   (append helm-ff-rotate-image-switch
+                           (list num-arg basename)))
+            (when (buffer-live-p image-dired-display-image-buffer)
+              (kill-buffer image-dired-display-image-buffer))
+            (image-dired-display-image basename)
+            (message nil)
+            (display-buffer (get-buffer image-dired-display-image-buffer)))
+        (error "%s not found" helm-ff-rotate-image-program)))))
 
 (defun helm-ff-rotate-image-left (candidate)
   "Rotate image file CANDIDATE left.
@@ -4168,6 +4173,47 @@ This affects directly file CANDIDATE."
     (helm-execute-persistent-action 'image-action2)))
 (put 'helm-ff-rotate-right-persistent 'helm-only t)
 
+(defun helm-ff-resize-image-1 (arg)
+  ;; `image-decrease-size' and `image-increase-size' are not usable
+  ;; because they run directly `image--change-size' in a timer without
+  ;; taking care of the selected-window.
+  (cl-assert (and (fboundp 'image--change-size)
+                  helm-ff-display-image-native)
+             nil "Resizing image not available")
+  (if (> arg 0)
+      (run-with-idle-timer
+       0.3 nil
+       (lambda ()
+         (with-selected-window (helm-persistent-action-display-window)
+           (image--change-size 1.2))))
+    (run-with-idle-timer
+     0.3 nil
+     (lambda ()
+       (with-selected-window (helm-persistent-action-display-window)
+         (image--change-size 0.8))))))
+
+(defun helm-ff-increase-image-size (_candidate)
+  (helm-ff-resize-image-1 1))
+
+(defun helm-ff-decrease-image-size (_candidate)
+  (helm-ff-resize-image-1 -1))
+
+(defun helm-ff-increase-image-size-persistent ()
+  "Increase image size without quitting helm."
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'image-action3 'helm-ff-increase-image-size)
+    (helm-execute-persistent-action 'image-action3)))
+(put 'helm-ff-increase-image-size-persistent 'helm-only t)
+
+(defun helm-ff-decrease-image-size-persistent ()
+  "Decrease image size without quitting helm."
+  (interactive)
+  (with-helm-alive-p
+    (helm-attrset 'image-action4 'helm-ff-decrease-image-size)
+    (helm-execute-persistent-action 'image-action4)))
+(put 'helm-ff-decrease-image-size-persistent 'helm-only t)
+
 (defun helm-ff-exif-data (candidate)
   "Extract exif data from file CANDIDATE using `helm-ff-exif-data-program'."
   (if (and helm-ff-exif-data-program
@@ -4178,6 +4224,13 @@ This affects directly file CANDIDATE."
                                        candidate))
     (format "No program %s found to extract exif"
             helm-ff-exif-data-program)))
+
+(defcustom helm-ff-display-image-native t
+  "Use native `image-mode' when non nil.
+
+Otherwise, `image-dired' is used, using imagemagick as backend."
+  :group 'helm-files
+  :type 'boolean)
 
 (cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
@@ -4249,39 +4302,42 @@ file."
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
-           (lambda (_candidate)
-             (require 'image-dired)
-             (let* ((win (get-buffer-window
-                          image-dired-display-image-buffer 'visible))
-                    (fname (and win
-                                (with-selected-window win
-                                  (get-text-property (point-min)
-                                                     'original-file-name))))
-                    (remove-buf-only (and win
-                                          fname
-                                          (with-helm-buffer
-                                            (file-equal-p candidate fname)))))
-               (when remove-buf-only
-                 (with-helm-window
-                   (if (and helm-persistent-action-display-window
-                            (window-dedicated-p (next-window win 1)))
-                       (delete-window helm-persistent-action-display-window)
-                     (set-window-buffer win helm-current-buffer))))
-               (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
-                 (kill-buffer image-dired-display-image-buffer))
-               (unless remove-buf-only
-                 ;; Fix emacs bug never fixed upstream.
-                 (unless (file-directory-p image-dired-dir)
-                   (make-directory image-dired-dir))
-                 (switch-to-buffer image-dired-display-image-buffer)
-                 (message "Resizing image...")
-                 (cl-letf (((symbol-function 'message) #'ignore))
-                   (image-dired-display-image candidate))
-                 (message "Resizing image done")
-                 (with-current-buffer image-dired-display-image-buffer
-                   (let ((exif-data (helm-ff-exif-data candidate)))
-                     (setq default-directory helm-ff-default-directory)
-                     (image-dired-update-property 'help-echo exif-data)))))))
+           (if helm-ff-display-image-native
+               (lambda (candidate)
+                 (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))
+             (lambda (_candidate)
+               (require 'image-dired)
+               (let* ((win (get-buffer-window
+                            image-dired-display-image-buffer 'visible))
+                      (fname (and win
+                                  (with-selected-window win
+                                    (get-text-property (point-min)
+                                                       'original-file-name))))
+                      (remove-buf-only (and win
+                                            fname
+                                            (with-helm-buffer
+                                              (file-equal-p candidate fname)))))
+                 (when remove-buf-only
+                   (with-helm-window
+                     (if (and helm-persistent-action-display-window
+                              (window-dedicated-p (next-window win 1)))
+                         (delete-window helm-persistent-action-display-window)
+                       (set-window-buffer win helm-current-buffer))))
+                 (when (buffer-live-p (get-buffer image-dired-display-image-buffer))
+                   (kill-buffer image-dired-display-image-buffer))
+                 (unless remove-buf-only
+                   ;; Fix emacs bug never fixed upstream.
+                   (unless (file-directory-p image-dired-dir)
+                     (make-directory image-dired-dir))
+                   (switch-to-buffer image-dired-display-image-buffer)
+                   (message "Resizing image...")
+                   (cl-letf (((symbol-function 'message) #'ignore))
+                     (image-dired-display-image candidate))
+                   (message "Resizing image done")
+                   (with-current-buffer image-dired-display-image-buffer
+                     (let ((exif-data (helm-ff-exif-data candidate)))
+                       (setq default-directory helm-ff-default-directory)
+                       (image-dired-update-property 'help-echo exif-data))))))))
           ;; Allow browsing archive on avfs fs.
           ;; Assume volume is already mounted with mountavfs.
           ((helm-aand helm-ff-avfs-directory
