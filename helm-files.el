@@ -4232,6 +4232,8 @@ Otherwise, `image-dired' is used, using imagemagick as backend."
   :group 'helm-files
   :type 'boolean)
 
+(defvar helm-ff-image-native-buffer "*image-native-display-image*")
+
 (cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
@@ -4257,7 +4259,9 @@ file."
       (when follow
         (helm-follow-mode -1)
         (cl-return-from helm-find-files-persistent-action-if
-          (message "Helm-follow-mode allowed only on images, disabling"))))
+          (prog1
+              #'ignore
+              (message "Helm-follow-mode allowed only on images, disabling")))))
     (cond ((and (helm-ff--invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
            (cons (lambda (_candidate)
@@ -4304,7 +4308,14 @@ file."
           (image-cand
            (if helm-ff-display-image-native
                (lambda (candidate)
-                 (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))
+                 ;; Display images in same buffer
+                 ;; `helm-ff-image-native-buffer'.
+                 (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+                   (kill-buffer helm-ff-image-native-buffer))
+                 (funcall helm-ff-kill-or-find-buffer-fname-fn candidate)
+                 (with-current-buffer (get-file-buffer candidate)
+                   (rename-buffer helm-ff-image-native-buffer)
+                   (setq buffer-file-name nil)))
              (lambda (_candidate)
                (require 'image-dired)
                (let* ((win (get-buffer-window
