@@ -751,6 +751,17 @@ with \"/\", otherwise this command deletes char backward.
 When nil always delete char backward."
   :group 'helm-files
   :type 'boolean)
+
+(defcustom helm-ff-display-image-native (>= emacs-major-version 27)
+  "Use native `image-mode' when non nil.
+
+You should use this only with Emacs>= 27 and `image-auto-resize'
+enabled to have images resized properly.  When this is enabled,
+you have new commands to zoom in/out images.  See
+`image-transform-resize' and `image-auto-resize'.  Otherwise,
+when nil `image-dired' is used, using imagemagick as backend."
+  :group 'helm-files
+  :type 'boolean)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -4224,13 +4235,6 @@ This affects directly file CANDIDATE."
                                        candidate))
     (format "No program %s found to extract exif"
             helm-ff-exif-data-program)))
-
-(defcustom helm-ff-display-image-native t
-  "Use native `image-mode' when non nil.
-
-Otherwise, `image-dired' is used, using imagemagick as backend."
-  :group 'helm-files
-  :type 'boolean)
 
 (defvar helm-ff-image-native-buffer "*image-native-display-image*")
 
