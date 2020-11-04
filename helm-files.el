@@ -796,6 +796,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "Used to store last valid rsync progress bar.")
 (defvar helm-rsync-process-buffer "*helm-rsync*")
 (defvar helm-rsync-progress-str-alist nil)
+(defvar helm-ff--trash-directory-regexp "\\.?Trash[/0-9]+files/?\\'")
 
 ;;; Helm-find-files
 ;;
@@ -3922,7 +3923,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
     (cond ((and (file-exists-p candidate)
-                (string-match "Trash/files/?\\'" (helm-basedir candidate))
+                (string-match helm-ff--trash-directory-regexp (helm-basedir candidate))
                 (not (member (helm-basename candidate) '("." "..")))
                 (executable-find "trash"))
            (helm-append-at-nth
@@ -3963,6 +3964,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
             actions '(("Browse url file" . browse-url-of-file)) 2))
           (t actions))))
 
+;;; Trashing files
+;;
 (defun helm-ff-trash-action (fn names &rest args)
   "Execute a trash action FN on marked files.
 
@@ -4066,7 +4069,7 @@ with `helm-ff-trash-list'."
 (defun helm-ff-trash-file-p (file)
   "Return t when FILE is a trashed file."
   (and (file-exists-p file)
-       (string-match "Trash/files/?\\'" (helm-basedir file))
+       (string-match helm-ff--trash-directory-regexp (helm-basedir file))
        (not (member (helm-basename file) '("." "..")))))
 
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
@@ -4074,6 +4077,11 @@ with `helm-ff-trash-list'."
 
 (defun helm-ff-trash-list ()
   "Return an alist of trashed files basename and dest name."
+  ;; Files owned by root are trashed in /root/.local/share/Trash.
+  ;; Files owned by user and trashed by root are trashed in
+  ;; /home/.Trash.
+  ;; Files owned by user and trashed by user are trashed in
+  ;; ~/.local/share/Trash.
   (cl-loop for f in (directory-files
                      (expand-file-name
                       ;; helm-ff-default-directory is actually the
@@ -4085,9 +4093,17 @@ with `helm-ff-trash-list'."
                            (save-excursion
                              (insert-file-contents f))
                            (when (re-search-forward "^path=" nil t)
-                             (helm-url-unhex-string
-                              (buffer-substring-no-properties
-                               (point) (point-at-eol))))))))
+                             (let ((path (helm-url-unhex-string
+                                          (buffer-substring-no-properties
+                                           (point) (point-at-eol)))))
+                               (if (string-match "\\`/" path)
+                                   ;; path is absolute
+                                   path
+                                 ;; When path is relative, assume the
+                                 ;; trash directory is located at
+                                 ;; /home/.Trash and path is the
+                                 ;; relative name of file from /home.
+                                 (expand-file-name path "/home"))))))))
 
 (defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
