@@ -346,6 +346,7 @@ Default action change TZ environment variable locally to emacs."
 (declare-function epg-export-keys-to-string "epg")
 (declare-function epg-context-armor         "epg")
 (declare-function epg-context-set-armor     "epg")
+(declare-function epg-delete-keys           "epg")
 
 (defvar helm-epa--list-only-secrets nil
   "[INTERNAL] Used to pass MODE argument to `epg-list-keys'.")
