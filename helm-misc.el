@@ -352,7 +352,8 @@ Default action change TZ environment variable locally to emacs."
 
 (defcustom helm-epa-actions '(("Show key" . epa--show-key)
                               ("encrypt file with key" . helm-epa-encrypt-file)
-                              ("Copy keys to kill ring" . helm-epa-kill-keys-armor))
+                              ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
+                              ("Delete keys" . helm-epa-delete-keys))
   "Actions for `helm-epa-list-keys'."
   :type '(alist :key-type string :value-type symbol)
   :group 'helm-misc)
@@ -440,6 +441,18 @@ Default action change TZ environment variable locally to emacs."
           3))
         (t actions)))
 
+(defun helm-epa-delete-keys (_candidate)
+  "Delete gpg marked keys from helm-epa."
+  (let ((context (epg-make-context epa-protocol))
+        (keys (helm-marked-candidates)))
+    (message "Deleting gpg keys..")
+    (condition-case error
+	(epg-delete-keys context keys)
+      (error
+       (epa-display-error context)
+       (signal (car error) (cdr error))))
+    (message "Deleting gpg keys done")))
+  
 (defun helm-epa-encrypt-file (candidate)
   "Select a file to encrypt with key CANDIDATE."
   (let ((file (helm-read-file-name "Encrypt file: "))
