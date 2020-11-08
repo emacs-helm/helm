@@ -395,11 +395,13 @@ Default action change TZ environment variable locally to emacs."
 
 (defun helm-epa-select-keys (_context prompt &optional names secret)
   "A helm replacement for `epa-select-keys'."
-  (let ((helm-epa--list-only-secrets secret))
-    (helm :sources (helm-make-source "Epa select keys" 'helm-epa)
-          :default (if (stringp names) names (regexp-opt names))
-          :prompt (and prompt (helm-epa--format-prompt prompt))
-          :buffer "*helm epa*")))
+  (let* ((helm-epa--list-only-secrets secret)
+         (result (helm :sources (helm-make-source "Epa select keys" 'helm-epa)
+                       :default (if (stringp names) names (regexp-opt names))
+                       :prompt (and prompt (helm-epa--format-prompt prompt))
+                       :buffer "*helm epa*")))
+    (unless (equal result "")
+      result)))
 
 (defun helm-epa--format-prompt (prompt)
   (let ((split (split-string prompt "\n")))
