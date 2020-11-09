@@ -4333,7 +4333,7 @@ file."
                  (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
                    (kill-buffer helm-ff-image-native-buffer))
                  (cl-letf (((symbol-function 'message) #'ignore))
-                   (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))
+                   (find-file candidate))
                  (with-current-buffer (get-file-buffer candidate)
                    (rename-buffer helm-ff-image-native-buffer)
                    (setq buffer-file-name nil)))
