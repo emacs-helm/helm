@@ -358,8 +358,12 @@ This is a command for `helm-kill-ring-map'."
 
 (defun helm-register-candidates ()
   "Collecting register contents and appropriate commands."
-  (cl-loop for (char . val) in register-alist
+  (cl-loop for (char . rval) in register-alist
         for key    = (single-key-description char)
+        for e27 = (registerv-p rval)
+        for val = (if e27 ; emacs-27
+                      (registerv-data rval)
+                    rval)
         for string-actions =
         (cond
           ((numberp val)
@@ -382,7 +386,7 @@ This is a command for `helm-kill-ring-map'."
                  'jump-to-register))
           ((and (vectorp val)
                 (fboundp 'undo-tree-register-data-p)
-                (undo-tree-register-data-p (elt val 1)))
+                (undo-tree-register-data-p (if e27 val (elt val 1))))
            (list
             "Undo-tree entry."
             'undo-tree-restore-state-from-register))
