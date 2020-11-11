@@ -4330,13 +4330,17 @@ file."
                (lambda (candidate)
                  ;; Display images in same buffer
                  ;; `helm-ff-image-native-buffer'.
-                 (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-                   (kill-buffer helm-ff-image-native-buffer))
-                 (cl-letf (((symbol-function 'message) #'ignore))
-                   (find-file candidate))
-                 (with-current-buffer (get-file-buffer candidate)
-                   (rename-buffer helm-ff-image-native-buffer)
-                   (setq buffer-file-name nil)))
+                 (if (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+                          (file-equal-p (buffer-file-name
+                                         (get-buffer helm-ff-image-native-buffer))
+                                        candidate))
+                     (kill-buffer helm-ff-image-native-buffer)
+                   (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+                        (kill-buffer helm-ff-image-native-buffer))
+                   (cl-letf (((symbol-function 'message) #'ignore))
+                     (find-file candidate))
+                   (with-current-buffer (get-file-buffer candidate)
+                     (rename-buffer helm-ff-image-native-buffer))))
              (lambda (_candidate)
                (require 'image-dired)
                (let* ((win (get-buffer-window
