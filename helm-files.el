@@ -4254,6 +4254,8 @@ This affects directly file CANDIDATE."
 
 (defvar helm-ff-image-native-buffer "*image-native-display-image*")
 
+(defvar helm-ff-sound-file-extensions '("wav" "au"))
+
 (cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
@@ -4265,6 +4267,8 @@ file."
   (let* ((follow        (or (helm-follow-mode-p)
                             helm--temp-follow-flag))
          (image-cand    (string-match-p (image-file-name-regexp) candidate))
+         (sound-cand (member (file-name-extension candidate)
+                             helm-ff-sound-file-extensions))
          (selection   (helm-get-selection))
          (insert-in-minibuffer (lambda (fname)
                                    (with-selected-window (or (active-minibuffer-window)
@@ -4323,6 +4327,7 @@ file."
                    (funcall insert-in-minibuffer selection)
                    (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
+          (sound-cand (lambda (candidate) (play-sound-file candidate)))
           ;; An image file and it is the second hit on C-j,
           ;; show the file in `image-dired'.
           (image-cand
