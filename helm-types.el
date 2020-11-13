@@ -226,7 +226,9 @@
 (defcustom helm-type-function-actions
   (helm-make-actions
    "Describe function" 'helm-describe-function
-   "Find function" 'find-function
+   "Find function" (if (fboundp 'xref-find-definitions)
+                       ;; Find-function is broken in emacs-27.
+                       'xref-find-definitions 'find-function)
    "Info lookup" 'helm-info-lookup-symbol
    "Debug on entry" 'debug-on-entry
    "Cancel debug on entry" 'cancel-debug-on-entry
