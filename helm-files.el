@@ -3215,7 +3215,14 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
-(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
+(defcustom helm-ff-cache-max-entries 100
+  "The maximum number of entries in HFF cache before clearing.
+The value must be an integer >= to 65."
+  :type 'integer
+  :group 'helm-files)
+
+(defvar helm-ff--list-directory-cache
+  (make-hash-table :test 'equal :size (max 65 helm-ff-cache-max-entries)))
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -4655,30 +4662,33 @@ source is `helm-source-find-files'."
 
 (defun helm-ff--cleanup-cache ()
   "Remove entries from cache according to `helm-ff-keep-cached-candidates'."
-  (cl-ecase helm-ff-keep-cached-candidates
-    ((all t)
-     (maphash (lambda (k _v)
-                ;; Keep all but non existing files but don't call
-                ;; `file-exists-p' on remote files to avoid triggering
-                ;; a tramp connection [1].
-                (when (and (not (file-remote-p k))
-                           (not (file-exists-p k)))
-                  (remhash k helm-ff--list-directory-cache)))
-              helm-ff--list-directory-cache))
-    (local
-     (maphash (lambda (k _v)
-                ;; Same comment as [1].
-                (when (or (file-remote-p k)
-                          (not (file-exists-p k)))
-                  (remhash k helm-ff--list-directory-cache)))
-              helm-ff--list-directory-cache))
-    (remote
-     (maphash (lambda (k _v)
-                (unless (file-remote-p k)
-                  (remhash k helm-ff--list-directory-cache)))
-              helm-ff--list-directory-cache))
-    ((nil)
-     (clrhash helm-ff--list-directory-cache))))
+  (if (> (hash-table-count helm-ff--list-directory-cache)
+         helm-ff-cache-max-entries)
+      (clrhash helm-ff--list-directory-cache)
+    (cl-ecase helm-ff-keep-cached-candidates
+      ((all t)
+       (maphash (lambda (k _v)
+                  ;; Keep all but non existing files but don't call
+                  ;; `file-exists-p' on remote files to avoid triggering
+                  ;; a tramp connection [1].
+                  (when (and (not (file-remote-p k))
+                             (not (file-exists-p k)))
+                    (remhash k helm-ff--list-directory-cache)))
+                helm-ff--list-directory-cache))
+      (local
+       (maphash (lambda (k _v)
+                  ;; Same comment as [1].
+                  (when (or (file-remote-p k)
+                            (not (file-exists-p k)))
+                    (remhash k helm-ff--list-directory-cache)))
+                helm-ff--list-directory-cache))
+      (remote
+       (maphash (lambda (k _v)
+                  (unless (file-remote-p k)
+                    (remhash k helm-ff--list-directory-cache)))
+                helm-ff--list-directory-cache))
+      ((nil)
+       (clrhash helm-ff--list-directory-cache)))))
 
 (defun helm-find-files-cleanup ()
   (helm-ff--cleanup-cache)
