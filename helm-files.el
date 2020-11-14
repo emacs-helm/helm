@@ -3267,17 +3267,17 @@ in cache."
 (defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
 (defvar helm-ff--refresh-cache-done nil)
 
-(defcustom helm-ff-cache-mode-post-delay 0.5
+(defcustom helm-ff-cache-mode-post-delay 0.3
   "Wait this delay seconds before restarting when emacs stops beeing idle.
 
-Minimum value accepted is 0.3s."
+Minimum value accepted is 0.1s."
   :type 'float
   :group 'helm-files)
 
-(defcustom helm-ff-refresh-cache-delay 0.5
+(defcustom helm-ff-refresh-cache-delay 0.3
   "`helm-ff-cache-mode' timer starts after this many seconds.
 
-Minimum value accepted is 0.3s."
+Minimum value accepted is 0.1s."
   :type 'float
   :group 'helm-files)
 
@@ -3357,11 +3357,11 @@ When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode
 
 (defun helm-ff--refresh-cache-delay ()
   "Prevent user using less than 0.5s for `helm-ff-refresh-cache-delay'."
-  (max 0.3 helm-ff-refresh-cache-delay))
+  (max 0.1 helm-ff-refresh-cache-delay))
 
 (defun helm-ff--cache-mode-post-delay ()
   "Prevent user using less than 0.5s for `helm-ff-cache-mode-post-delay'."
-  (max 0.3 helm-ff-cache-mode-post-delay))
+  (max 0.1 helm-ff-cache-mode-post-delay))
 
 (defun helm-ff--cache-mode-max-idle-time ()
   "Prevent user using too small value for `helm-ff-cache-mode-max-idle-time'."
