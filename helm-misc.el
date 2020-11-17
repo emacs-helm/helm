@@ -368,10 +368,10 @@ Default action change TZ environment variable locally to emacs."
    (mode-line :initform helm-comp-read-mode-line))
   "Allow building helm sources for GPG keys.")
 
-(defun helm-epa-get-key-list ()
+(defun helm-epa-get-key-list (&optional keys)
   "Build candidate list for `helm-epa-list-keys'."
-  (cl-loop with all-keys = (epg-list-keys (epg-make-context epa-protocol)
-                                          nil helm-epa--list-only-secrets)
+  (cl-loop with all-keys = (or keys (epg-list-keys (epg-make-context epa-protocol)
+                                                   nil helm-epa--list-only-secrets))
            for key in all-keys
            for sublist = (car (epg-key-sub-key-list key))
            for subkey-id = (epg-sub-key-id sublist)
@@ -393,13 +393,13 @@ Default action change TZ environment variable locally to emacs."
                                   uid 'face 'font-lock-warning-face))
                          key)))
 
-(defun helm-epa-select-keys (_context prompt &optional names secret)
-  "A helm replacement for `epa-select-keys'."
-  (let* ((helm-epa--list-only-secrets secret)
-         (result (helm :sources (helm-make-source "Epa select keys" 'helm-epa)
-                       :default (if (stringp names) names (regexp-opt names))
-                       :prompt (and prompt (helm-epa--format-prompt prompt))
-                       :buffer "*helm epa*")))
+(defun helm-epa--select-keys (prompt keys)
+  "A helm replacement for `epa--select-keys'."
+  (let ((result (helm :sources (helm-make-source "Epa select keys" 'helm-epa
+                                 :candidates (lambda ()
+                                               (helm-epa-get-key-list keys)))
+                      :prompt (and prompt (helm-epa--format-prompt prompt))
+                      :buffer "*helm epa*")))
     (unless (equal result "")
       result)))
 
@@ -431,9 +431,9 @@ Default action change TZ environment variable locally to emacs."
   (require 'epa)
   (if helm-epa-mode
       (progn
-        (advice-add 'epa-select-keys :override #'helm-epa-select-keys)
+        (advice-add 'epa--select-keys :override #'helm-epa--select-keys)
         (advice-add 'epa--read-signature-type :override #'helm-epa--read-signature-type))
-    (advice-remove 'epa-select-keys #'helm-epa-select-keys)
+    (advice-remove 'epa-select-keys #'helm-epa--select-keys)
     (advice-remove 'epa--read-signature-type #'helm-epa--read-signature-type)))
 
 (defun helm-epa-action-transformer (actions _candidate)
