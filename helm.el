@@ -1089,7 +1089,8 @@ minibuffer abnormally (e.g. via `helm-keyboard-quit').")
   "Runs after pre-selection in `helm-buffer'.")
 
 (defvar helm-window-configuration-hook nil
-  "Runs when switching to and from the action buffer.")
+  "Runs when switching to and from the action buffer.
+Should run also at end of `helm-display-function'.")
 
 (defvar helm-execute-action-at-once-if-one nil
   "When non-nil execute the default action and then exit if only one candidate.
