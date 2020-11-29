@@ -1281,7 +1281,7 @@ windows layout."
                (wrong-number-of-arguments
                 ;; Emacs-28 accepts only one arg.
                 (byte-compile-file fname)
-                (when parg (load-file (concat fname "c"))))))))
+                (when parg (load fname)))))))
 
 (defun helm-find-files-load-files (_candidate)
   "Load elisp files from `helm-find-files'."
