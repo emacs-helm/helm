@@ -1275,7 +1275,13 @@ windows layout."
   (let ((files    (helm-marked-candidates :with-wildcard t))
         (parg     helm-current-prefix-arg))
     (cl-loop for fname in files
-          do (byte-compile-file fname parg))))
+          do (condition-case _err
+                 (with-no-warnings
+                   (byte-compile-file fname parg))
+               (wrong-number-of-arguments
+                ;; Emacs-28 accepts only one arg.
+                (byte-compile-file fname)
+                (when parg (load-file (concat fname "c"))))))))
 
 (defun helm-find-files-load-files (_candidate)
   "Load elisp files from `helm-find-files'."

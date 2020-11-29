@@ -17,6 +17,9 @@
 
 ;;; Code:
 
+(require 'helm)
+(require 'helm-types)
+
 (defvar helm-fd-executable "fd"
   "The fd shell command executable.")
 

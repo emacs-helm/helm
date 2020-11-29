@@ -18,6 +18,8 @@
 
 ;;; Code:
 
+(require 'helm)
+
 (eval-when-compile (require 'epg))
 (defvar epa-protocol)
 (defvar epa-last-coding-system-specified)
@@ -37,6 +39,7 @@
 (declare-function epg-context-armor         "epg")
 (declare-function epg-context-set-armor     "epg")
 (declare-function epg-delete-keys           "epg")
+(declare-function helm-read-file-name       "helm-mode")
 
 (defvar helm-epa--list-only-secrets nil
   "[INTERNAL] Used to pass MODE argument to `epg-list-keys'.")
