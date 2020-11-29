@@ -4265,7 +4265,7 @@ This affects directly file CANDIDATE."
     (format "No program %s found to extract exif"
             helm-ff-exif-data-program)))
 
-(defvar helm-ff-image-native-buffer "*image-native-display-image*")
+(defvar helm-ff-image-native-buffer "*image-native-display*")
 
 (defvar helm-ff-sound-file-extensions '("wav" "au"))
 
