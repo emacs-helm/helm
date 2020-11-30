@@ -2859,7 +2859,7 @@ HISTORY args see `helm'."
               ;; only one candidate (this avoid having the helm frame
               ;; flashing), lets first compute candidates and if more
               ;; than one display helm-buffer (this is done later in
-              ;; helm-read-pattern-maybe).
+              ;; helm-read-from-minibuffer).
               (unless helm-execute-action-at-once-if-one
                 (helm-display-buffer helm-buffer resume)
                 (select-window (helm-window)))
@@ -2873,7 +2873,7 @@ HISTORY args see `helm'."
               (add-hook 'post-command-hook 'helm--update-header-line)
               (helm-log "show prompt")
               (unwind-protect
-                  (helm-read-pattern-maybe
+                  (helm-read-from-minibuffer
                    prompt input preselect
                    resume keymap default history)
                 (helm-cleanup))
@@ -3674,7 +3674,7 @@ please don't use it outside of Helm.
   (setq helm-pattern "")
   (setq helm-maybe-use-default-as-input nil))
 
-(defun helm-read-pattern-maybe (prompt
+(defun helm-read-from-minibuffer (prompt
                                 input preselect resume
                                 keymap default history)
   "Read pattern with prompt PROMPT and initial input INPUT.
