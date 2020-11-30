@@ -3525,47 +3525,6 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
     (overlay-put helm-selection-overlay 'face 'helm-selection)
     (overlay-put helm-selection-overlay 'priority 1)))
 
-(defun helm-restore-position-on-quit ()
-  "Restore position in `helm-current-buffer' when quitting."
-  (helm-current-position 'restore))
-
-(defun helm--push-and-remove-dups (elm sym)
-  "Move ELM of SYM value on top and set SYM to this new value."
-  (set sym (cons elm (delete elm (symbol-value sym)))))
-
-(defun helm--current-buffer ()
-  "[INTERNAL] Return `current-buffer' BEFORE `helm-buffer' is initialized.
-Note that it returns the minibuffer in use after Helm has started
-and is intended for `helm-initial-setup'.  To get the buffer where
-Helm was started, use `helm-current-buffer' instead."
-  (if (minibuffer-window-active-p (minibuffer-window))
-      ;; If minibuffer is active be sure to use it's buffer
-      ;; as `helm-current-buffer', this allow to use helm
-      ;; from an already active minibuffer (M-: etc...)
-      (window-buffer (active-minibuffer-window))
-    ;; Fix Issue #456
-    ;; Use this instead of `current-buffer' to ensure
-    ;; helm session started in helm-mode from a completing-read
-    ;; Use really the buffer where we started and not the one
-    ;; where the completing-read is wrapped. i.e
-    ;; (with-current-buffer SOME-OTHER-BUFFER (completing-read [...])
-    (window-buffer (with-selected-window (minibuffer-window)
-                     (minibuffer-selected-window)))))
-
-(defun helm--run-init-hooks (hook sources)
-  "Run after and before init hooks local to source.
-See :after-init-hook and :before-init-hook in `helm-source'."
-  (cl-loop with sname = (cl-ecase hook
-                          (before-init-hook "h-before-init-hook")
-                          (after-init-hook "h-after-init-hook"))
-           with h = (cl-gensym sname)
-           for s in sources
-           for hv = (assoc-default hook s)
-           if (and hv (not (symbolp hv)))
-           do (set h hv)
-           and do (helm-log-run-hook h)
-           else do (helm-log-run-hook hv)))
-
 (defun helm-initial-setup (default sources)
   "Initialize Helm settings and set up the Helm buffer."
   ;; Run global hook.
@@ -3618,6 +3577,47 @@ See :after-init-hook and :before-init-hook in `helm-source'."
   (helm-log-run-hook 'helm-after-initialize-hook)
   ;; Run local source hook.
   (helm--run-init-hooks 'after-init-hook sources))
+
+(defun helm--run-init-hooks (hook sources)
+  "Run after and before init hooks local to source.
+See :after-init-hook and :before-init-hook in `helm-source'."
+  (cl-loop with sname = (cl-ecase hook
+                          (before-init-hook "h-before-init-hook")
+                          (after-init-hook "h-after-init-hook"))
+           with h = (cl-gensym sname)
+           for s in sources
+           for hv = (assoc-default hook s)
+           if (and hv (not (symbolp hv)))
+           do (set h hv)
+           and do (helm-log-run-hook h)
+           else do (helm-log-run-hook hv)))
+
+(defun helm-restore-position-on-quit ()
+  "Restore position in `helm-current-buffer' when quitting."
+  (helm-current-position 'restore))
+
+(defun helm--push-and-remove-dups (elm sym)
+  "Move ELM of SYM value on top and set SYM to this new value."
+  (set sym (cons elm (delete elm (symbol-value sym)))))
+
+(defun helm--current-buffer ()
+  "[INTERNAL] Return `current-buffer' BEFORE `helm-buffer' is initialized.
+Note that it returns the minibuffer in use after Helm has started
+and is intended for `helm-initial-setup'.  To get the buffer where
+Helm was started, use `helm-current-buffer' instead."
+  (if (minibuffer-window-active-p (minibuffer-window))
+      ;; If minibuffer is active be sure to use it's buffer
+      ;; as `helm-current-buffer', this allow to use helm
+      ;; from an already active minibuffer (M-: etc...)
+      (window-buffer (active-minibuffer-window))
+    ;; Fix Issue #456
+    ;; Use this instead of `current-buffer' to ensure
+    ;; helm session started in helm-mode from a completing-read
+    ;; Use really the buffer where we started and not the one
+    ;; where the completing-read is wrapped. i.e
+    ;; (with-current-buffer SOME-OTHER-BUFFER (completing-read [...])
+    (window-buffer (with-selected-window (minibuffer-window)
+                     (minibuffer-selected-window)))))
 
 (define-derived-mode helm-major-mode
   fundamental-mode "Hmm"
