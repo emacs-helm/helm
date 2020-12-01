@@ -20,7 +20,6 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-help)
-(eval-when-compile (require 'dired))
 
 (declare-function helm-find-files-1 "helm-files" (fname &optional preselect))
 (declare-function helm-grep-split-line "helm-grep" (line))
@@ -38,10 +37,12 @@
 (defvar org-directory)
 (defvar winner-boring-buffers)
 (defvar bookmark-alist)
+(defvar dired-buffers)
 (defvar helm-show-completion-overlay)
 (defvar helm-buffers-maybe-switch-to-tab)
 (defvar helm-ff-transformer-show-only-basename)
 (defvar helm-popup-tip-mode)
+
 
 
 (defgroup helm-utils nil
@@ -1055,6 +1056,7 @@ Assume regexp is a pcre based regexp."
 (defun helm-open-dired (file)
   "Open a dired buffer in FILE's directory.
 If FILE is a directory, open this directory."
+  (require 'dired)
   (if (file-directory-p file)
       (dired file)
     (dired (file-name-directory file))

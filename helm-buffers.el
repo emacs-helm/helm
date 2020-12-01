@@ -29,6 +29,8 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
 
+(defvar dired-buffers)
+
 
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
