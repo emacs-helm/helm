@@ -32,8 +32,8 @@
 (declare-function dired-mark-remembered "dired.el")
 (declare-function ffap-file-remote-p "ffap.el")
 (declare-function ffap-url-p "ffap.el")
-(declare-function helm-attr "helm.el")
-(declare-function helm-attrset "helm.el")
+(declare-function helm-get-attr "helm.el")
+(declare-function helm-set-attr "helm.el")
 (declare-function helm-follow-mode-p "helm.el")
 (declare-function helm-get-current-source "helm.el")
 (declare-function helm-get-selection "helm.el")
@@ -1169,8 +1169,8 @@ See `helm-elisp-show-help'."
             (if name
                 (funcall fun candidate name)
                 (funcall fun candidate)))
-           ((or (and (helm-attr 'help-running-p)
-                     (string= candidate (helm-attr 'help-current-symbol))))
+           ((or (and (helm-get-attr 'help-running-p)
+                     (string= candidate (helm-get-attr 'help-current-symbol))))
             (progn
               ;; When started from a help buffer,
               ;; Don't kill this buffer as it is helm-current-buffer.
@@ -1184,7 +1184,7 @@ See `helm-elisp-show-help'."
                                    (if helm--buffer-in-new-frame-p
                                        helm-current-buffer
                                      helm-persistent-action-window-buffer)))
-              (helm-attrset 'help-running-p nil))
+              (helm-set-attr 'help-running-p nil))
             ;; Force running update hook to may be delete
             ;; helm-persistent-action-display-window, this is done in
             ;; helm-persistent-action-display-window (the function).
@@ -1194,8 +1194,8 @@ See `helm-elisp-show-help'."
             (if name
                 (funcall fun candidate name)
                 (funcall fun candidate))
-            (helm-attrset 'help-running-p t)))
-    (helm-attrset 'help-current-symbol candidate)))
+            (helm-set-attr 'help-running-p t)))
+    (helm-set-attr 'help-current-symbol candidate)))
 
 (defun helm-find-function (func)
   "FUNC is symbol or string."

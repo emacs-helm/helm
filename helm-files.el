@@ -2013,7 +2013,7 @@ This doesn't replace inside the files, only modify filenames."
 (defun helm-ff-run-toggle-auto-update ()
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
+    (helm-set-attr 'toggle-auto-update '(helm-ff-toggle-auto-update . never-split))
     (helm-execute-persistent-action 'toggle-auto-update)))
 (put 'helm-ff-run-toggle-auto-update 'helm-only t)
 
@@ -2504,7 +2504,7 @@ If prefix numeric arg is given go ARG level up."
         (let ((cur-cand (helm-get-selection nil nil src))
               (new-pattern (helm-reduce-file-name helm-pattern arg)))
           ;; Ensure visibility on all candidates for preselection.
-          (helm-attrset 'candidate-number-limit
+          (helm-set-attr 'candidate-number-limit
                         (if helm-ff-up-one-level-preselect
                             (max (gethash new-pattern
                                           helm-ff--directory-files-hash
@@ -3624,7 +3624,7 @@ Note that only existing directories are saved here."
   "Show properties without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'properties-action '(helm-ff-properties . never-split))
+    (helm-set-attr 'properties-action '(helm-ff-properties . never-split))
     (helm-execute-persistent-action 'properties-action)))
 (put 'helm-ff-properties-persistent 'helm-only t)
 
@@ -3632,7 +3632,7 @@ Note that only existing directories are saved here."
   "Delete current candidate without quitting."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
+    (helm-set-attr 'quick-delete '(helm-ff-quick-delete . never-split))
     (helm-execute-persistent-action 'quick-delete)))
 (put 'helm-ff-persistent-delete 'helm-only t)
 
@@ -3678,7 +3678,7 @@ in `helm-find-files-persistent-action-if'."
   "Execute `helm-ff-kill-buffer-fname' without quitting."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
+    (helm-set-attr 'kill-buffer-fname 'helm-ff-kill-buffer-fname)
     (helm-execute-persistent-action 'kill-buffer-fname)))
 (put 'helm-ff-run-kill-buffer-persistent 'helm-only t)
 
@@ -3693,7 +3693,7 @@ in `helm-find-files-persistent-action-if'."
 (defun helm-ff-run-preview-file-externally ()
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'open-file-externally '(helm-ff-persistent-open-file-externally . never-split))
+    (helm-set-attr 'open-file-externally '(helm-ff-persistent-open-file-externally . never-split))
     (helm-execute-persistent-action 'open-file-externally)))
 (put 'helm-ff-run-preview-file-externally 'helm-only t)
 
@@ -4201,7 +4201,7 @@ This affects directly file CANDIDATE."
   "Rotate image left without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'image-action1 'helm-ff-rotate-image-left)
+    (helm-set-attr 'image-action1 'helm-ff-rotate-image-left)
     (helm-execute-persistent-action 'image-action1)))
 (put 'helm-ff-rotate-left-persistent 'helm-only t)
 
@@ -4209,7 +4209,7 @@ This affects directly file CANDIDATE."
   "Rotate image right without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'image-action2 'helm-ff-rotate-image-right)
+    (helm-set-attr 'image-action2 'helm-ff-rotate-image-right)
     (helm-execute-persistent-action 'image-action2)))
 (put 'helm-ff-rotate-right-persistent 'helm-only t)
 
@@ -4242,7 +4242,7 @@ This affects directly file CANDIDATE."
   "Increase image size without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'image-action3 'helm-ff-increase-image-size)
+    (helm-set-attr 'image-action3 'helm-ff-increase-image-size)
     (helm-execute-persistent-action 'image-action3)))
 (put 'helm-ff-increase-image-size-persistent 'helm-only t)
 
@@ -4250,7 +4250,7 @@ This affects directly file CANDIDATE."
   "Decrease image size without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'image-action4 'helm-ff-decrease-image-size)
+    (helm-set-attr 'image-action4 'helm-ff-decrease-image-size)
     (helm-execute-persistent-action 'image-action4)))
 (put 'helm-ff-decrease-image-size-persistent 'helm-only t)
 
@@ -4291,7 +4291,7 @@ file."
                                        (set-text-properties 0 (length fname)
                                                             nil fname)
                                        (insert fname))))))
-    (helm-attrset 'candidate-number-limit helm-ff-candidate-number-limit)
+    (helm-set-attr 'candidate-number-limit helm-ff-candidate-number-limit)
     (unless image-cand
       (when follow
         (helm-follow-mode -1)
@@ -4622,8 +4622,8 @@ Use it for non-interactive calls of `helm-find-files'."
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
-    (when (helm-attr 'follow helm-source-find-files)
-      (helm-attrset 'follow -1 helm-source-find-files))
+    (when (helm-get-attr 'follow helm-source-find-files)
+      (helm-set-attr 'follow -1 helm-source-find-files))
     (helm-ff-setup-update-hook)
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
@@ -4645,7 +4645,7 @@ When NOHOOK is non-nil run inconditionally, otherwise only when
 source is `helm-source-find-files'."
   (when (or nohook (string= "Find Files"
                             (assoc-default 'name (car sources))))
-    (helm-attrset 'resume `(lambda ()
+    (helm-set-attr 'resume `(lambda ()
                              (helm-ff-setup-update-hook)
                              (setq helm-ff-default-directory
                                    ,helm-ff-default-directory
@@ -5529,7 +5529,7 @@ Use FD as backend."
 
 (defun helm-browse-project-ag (_candidate)
   "A `helm-grep' AG action for `helm-browse-project'."
-  (let ((dir (with-helm-buffer (helm-attr 'root-dir))))
+  (let ((dir (with-helm-buffer (helm-get-attr 'root-dir))))
     (helm-grep-ag dir helm-current-prefix-arg)))
 
 (defun helm-browse-project-run-ag ()

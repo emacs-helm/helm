@@ -204,7 +204,7 @@
        \"Delete current candidate without quitting.\"
        (interactive)
        (with-helm-alive-p
-         (helm-attrset 'quick-delete '(helm-ff-quick-delete . never-split))
+         (helm-set-attr 'quick-delete '(helm-ff-quick-delete . never-split))
          (helm-execute-persistent-action 'quick-delete)))
 
   This function is then bound in `helm-find-files-map'.")
@@ -877,7 +877,7 @@ See `helm-candidates-in-buffer' for more infos.")
 
 (defclass helm-source-in-file (helm-source-in-buffer)
   ((init :initform (lambda ()
-                     (let ((file (helm-attr 'candidates-file))
+                     (let ((file (helm-get-attr 'candidates-file))
                            (count 1))
                        (with-current-buffer (helm-candidate-buffer 'global)
                          (insert-file-contents file)

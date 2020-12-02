@@ -818,7 +818,7 @@ If N is positive go forward otherwise go backward."
       (setq default-directory (or helm-ff-default-directory
                                   (helm-default-directory)
                                   default-directory))
-      (setq-local helm-grep-mode-use-pcre (helm-attr 'pcre src))
+      (setq-local helm-grep-mode-use-pcre (helm-get-attr 'pcre src))
       (setq buffer-read-only t)
       (let ((inhibit-read-only t)
             (map (make-sparse-keymap)))
@@ -1265,7 +1265,7 @@ matching `helm-zgrep-file-extension-regexp' only."
                             (and (null (eq major-mode 'helm-grep-mode))
                                  (helm-default-directory))
                             default-directory))))
-        (pcre (helm-attr 'pcre source)))
+        (pcre (helm-get-attr 'pcre source)))
     (cl-loop for c in candidates
              collect (helm-grep--filter-candidate-1 c nil pcre))))
 

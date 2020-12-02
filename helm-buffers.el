@@ -281,15 +281,15 @@ Note that this variable is buffer-local.")
   ;; source with a different 'buffer-list fn as the same cache was
   ;; reused in each source (issue #1907), now 'candidates attr is set
   ;; directly so that each list of candidates is local to source.
-  (helm-attrset 'candidates (funcall (helm-attr 'buffer-list)))
+  (helm-set-attr 'candidates (funcall (helm-get-attr 'buffer-list)))
   (let ((result (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers
                                               (helm-attr
                                                'filtered-candidate-transformer
                                                helm-source-buffers-list))
                          for b in (if allbufs
-                                      (helm-attr 'candidates)
+                                      (helm-get-attr 'candidates)
                                     (helm-skip-boring-buffers
-                                     (helm-attr 'candidates)
+                                     (helm-get-attr 'candidates)
                                      helm-source-buffers-list))
                          maximize (length b) into len-buf
                          maximize (length (helm-buffer--format-mode-name b))
@@ -793,7 +793,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Toggle diff buffer without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'diff-action 'helm-buffer-toggle-diff)
+    (helm-set-attr 'diff-action 'helm-buffer-toggle-diff)
     (helm-execute-persistent-action 'diff-action)))
 (put 'helm-buffer-diff-persistent 'helm-only t)
 
@@ -818,7 +818,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Revert buffer without quitting helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'revert-action '(helm-buffer-revert-and-update . never-split))
+    (helm-set-attr 'revert-action '(helm-buffer-revert-and-update . never-split))
     (helm-execute-persistent-action 'revert-action)))
 (put 'helm-buffer-revert-persistent 'helm-only t)
 
@@ -842,7 +842,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Save unsaved file buffers without quitting Helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'save-some-action '(helm-buffer-save-some-buffers . never-split))
+    (helm-set-attr 'save-some-action '(helm-buffer-save-some-buffers . never-split))
     (helm-execute-persistent-action 'save-some-action)))
 (put 'helm-buffer-run-save-some-buffers 'helm-only t)
 
@@ -850,7 +850,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Save buffer without quitting Helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
+    (helm-set-attr 'save-action '(helm-buffer-save-and-update . never-split))
     (helm-execute-persistent-action 'save-action)))
 (put 'helm-buffer-save-persistent 'helm-only t)
 
@@ -885,7 +885,7 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   "Kill buffer without quitting Helm."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'kill-action '(helm-buffers-persistent-kill . never-split))
+    (helm-set-attr 'kill-action '(helm-buffers-persistent-kill . never-split))
     (helm-execute-persistent-action 'kill-action)))
 (put 'helm-buffer-run-kill-persistent 'helm-only t)
 
@@ -1097,15 +1097,15 @@ Can be used by any source that list buffers."
 (defun helm-buffers-toggle-show-hidden-buffers ()
   (interactive)
   (with-helm-alive-p
-    (let ((filter-attrs (helm-attr 'filtered-candidate-transformer
+    (let ((filter-attrs (helm-get-attr 'filtered-candidate-transformer
                                    helm-source-buffers-list)))
       (if (memq 'helm-shadow-boring-buffers filter-attrs)
-          (helm-attrset 'filtered-candidate-transformer
+          (helm-set-attr 'filtered-candidate-transformer
                         (cons 'helm-skip-boring-buffers
                               (remove 'helm-shadow-boring-buffers
                                       filter-attrs))
                         helm-source-buffers-list)
-        (helm-attrset 'filtered-candidate-transformer
+        (helm-set-attr 'filtered-candidate-transformer
                       (cons 'helm-shadow-boring-buffers
                             (remove 'helm-skip-boring-buffers
                                     filter-attrs))

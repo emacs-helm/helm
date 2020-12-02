@@ -79,7 +79,7 @@ MacPorts to install id-utils, it should be `gid32'."
   ((header-name
     :initform
     (lambda (name)
-      (concat name " [" (helm-attr 'db-dir) "]")))
+      (concat name " [" (helm-get-attr 'db-dir) "]")))
    (db-dir :initarg :db-dir
            :initform nil
            :custom string

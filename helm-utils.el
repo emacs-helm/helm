@@ -590,7 +590,7 @@ from its directory."
             (grep-line (and (stringp sel)
                             (helm-grep-split-line sel)))
             (occur-fname (helm-aand (numberp sel)
-                                    (helm-attr 'buffer-name)
+                                    (helm-get-attr 'buffer-name)
                                     (buffer-file-name (get-buffer it))))
             (bmk-name  (and (stringp sel)
                             (not grep-line)

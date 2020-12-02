@@ -459,7 +459,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-attr 'must-match source))
+  (let ((must-match (helm-get-attr 'must-match source))
         unknown-pattern)
     (unless (or (eq must-match t)
                 (string= helm-pattern "")

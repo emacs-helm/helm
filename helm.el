@@ -306,7 +306,7 @@ and vectors, so don't use strings to define them."
 
 Default to Helm group when group is not defined in source."
   (interactive)
-  (helm-run-after-exit 'helm-customize-group-1 (helm-attr 'group)))
+  (helm-run-after-exit 'helm-customize-group-1 (helm-get-attr 'group)))
 (put 'helm-customize-group 'helm-only t)
 
 (defun helm--action-at-nth-set-fn-1 (value &optional negative)
@@ -1192,8 +1192,8 @@ wiki]] for more infos.
 You will find in Helm sources already built and bound to a
 variable called generally `helm-source-<something>'.  In this case
 it is an alist and you can change the attributes (keys) values
-using `helm-attrset' function in your configuration.  Of course
-you have to ensure before calling `helm-attrset' that the file
+using `helm-set-attr' function in your configuration.  Of course
+you have to ensure before calling `helm-set-attr' that the file
 containing source is loaded, e.g. with `with-eval-after-load'.  Of
 course you can also completely redefine the source but this is
 generally not elegant as it duplicate for its most part code
@@ -2040,7 +2040,7 @@ End:")
 
 ;;; helm-attributes
 ;;
-(defun helm-attr (attribute-name &optional source compute)
+(defun helm-get-attr (attribute-name &optional source compute)
   "Get the value of ATTRIBUTE-NAME of SRC.
 
 If SRC is omitted, use current source.
@@ -2053,7 +2053,7 @@ value unchanged, but will eval a symbol which is bound.
 You can use `setf' to modify value of ATTRIBUTE-NAME unless
 COMPUTE is specified, if attribute ATTRIBUTE-NAME is not found in
 SOURCE `setf' will create new attribute ATTRIBUTE-NAME with
-specified value.  You can also use `helm-attrset' to modify
+specified value.  You can also use `helm-set-attr' to modify
 ATTRIBUTE-NAME."
   (declare (gv-setter
             (lambda (val)
@@ -2073,17 +2073,10 @@ ATTRIBUTE-NAME."
             (helm-interpret-value (cdr it) src compute)
           (cdr it)))))
 
-;; (helm-aif (assq attribute-name src)
-;; (let* ((val     (cdr it))
-;; When attr exists but have no cdr it is equal to `t'.
-;; (attrval (or val t)))
-;; Attributes with a boolean value have no cdr, so no need
-;; to compute a value == to t.
-;; (if (and compute val)
-;; (helm-interpret-value val src compute)
-;; attrval)))))
+(defalias 'helm-attr 'helm-get-attr)
+(make-obsolete 'helm-attr 'helm-get-attr "3.7.0")
 
-(cl-defun helm-attrset (attribute-name value
+(cl-defun helm-set-attr (attribute-name value
                                        &optional
                                        (src (helm-get-current-source)))
   "Set the value of ATTRIBUTE-NAME of source SRC to VALUE.
@@ -2092,9 +2085,11 @@ If ATTRIBUTE-NAME doesn't exists in source it is created with
 value VALUE.  If SRC is omitted, use current source.  If operation
 succeed, return value, otherwise nil.
 
-Note that `setf' on `helm-attr' can be used instead of this
-function."
-  (setf (helm-attr attribute-name src) value))
+Using this function is same as using `setf' on `helm-get-attr'."
+  (setf (helm-get-attr attribute-name src) value))
+
+(defalias 'helm-attrset 'helm-set-attr)
+(make-obsolete 'helm-attrset 'helm-set-attr "3.7.0")
 
 (defun helm-add-action-to-source (name fn source &optional index)
   "Add new action NAME linked to function FN to SOURCE.
@@ -2105,11 +2100,11 @@ If INDEX is specified, action is added to the action list at INDEX,
 otherwise added at end.
 This allows users to add specific actions to an existing source
 without modifying source code."
-  (let ((actions    (helm-attr 'action source 'ignorefn))
+  (let ((actions    (helm-get-attr 'action source 'ignorefn))
         (new-action (list (cons name fn))))
     (when (functionp actions)
       (setq actions (list (cons "Default action" actions))))
-    (helm-attrset 'action
+    (helm-set-attr 'action
                   (if index
                       (helm-append-at-nth actions new-action index)
                     (append actions new-action))
@@ -2119,11 +2114,11 @@ without modifying source code."
   "Delete ACTION-OR-NAME from SOURCE.
 ACTION-OR-NAME can either be the name of action or the symbol
 function associated to name."
-  (let* ((actions    (helm-attr 'action source 'ignorefn))
+  (let* ((actions    (helm-get-attr 'action source 'ignorefn))
          (del-action (if (symbolp action-or-name)
                          (rassoc action-or-name actions)
                        (assoc action-or-name actions))))
-    (helm-attrset 'action (delete del-action actions) source)))
+    (helm-set-attr 'action (delete del-action actions) source)))
 
 (cl-defun helm-add-action-to-source-if (name fn source predicate
                                              &optional (index 4) test-only)
@@ -2151,8 +2146,8 @@ when predicate helm-ff-candidates-lisp-p returns non-nil:
                               'async-byte-compile-file
                               helm-source-find-files
                               'helm-ff-candidates-lisp-p\)."
-  (let* ((actions     (helm-attr 'action source 'ignorefn))
-         (action-transformers (helm-attr 'action-transformer source))
+  (let* ((actions     (helm-get-attr 'action source 'ignorefn))
+         (action-transformers (helm-get-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
          (transformer (lambda (actions candidate)
                         (cond ((funcall predicate candidate)
@@ -2160,12 +2155,12 @@ when predicate helm-ff-candidates-lisp-p returns non-nil:
                                 actions new-action index))
                               (t actions)))))
     (when (functionp actions)
-      (helm-attrset 'action (list (cons "Default action" actions)) source))
+      (helm-set-attr 'action (list (cons "Default action" actions)) source))
     (when (or (symbolp action-transformers) (functionp action-transformers))
       (setq action-transformers (list action-transformers)))
     (if test-only                       ; debug
         (delq nil (append (list transformer) action-transformers))
-      (helm-attrset 'action-transformer
+      (helm-set-attr 'action-transformer
                     (helm-fast-remove-dups
                      (delq nil (append (list transformer) action-transformers))
                      :test 'equal)
@@ -2276,10 +2271,10 @@ It is a function symbol (sole action) or list
 of (action-display . function)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
     (let ((src (helm-get-current-source)))
-      (helm-aif (helm-attr 'action-transformer)
+      (helm-aif (helm-get-attr 'action-transformer)
           (helm-apply-functions-from-source
            (or source src) it
-           (helm-attr 'action nil 'ignorefn)
+           (helm-get-attr 'action nil 'ignorefn)
            ;; Check if the first given transformer
            ;; returns the same set of actions for each
            ;; candidate in marked candidates.
@@ -2292,7 +2287,7 @@ of (action-display . function)."
                         always (equal (funcall act nil c) acts))
                (car (helm-marked-candidates))
              (helm-get-selection nil nil src)))
-        (helm-attr 'action nil 'ignorefn)))))
+        (helm-get-attr 'action nil 'ignorefn)))))
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.
@@ -2317,7 +2312,7 @@ Return nil when `helm-buffer' is empty."
 (defun helm-buffer-is-modified (buffer)
   "Return non-nil when BUFFER is modified since Helm was invoked."
   (let* ((buf         (get-buffer buffer))
-         (key         (concat (buffer-name buf) "/" (helm-attr 'name)))
+         (key         (concat (buffer-name buf) "/" (helm-get-attr 'name)))
          (source-tick (or (gethash key helm-tick-hash) 0))
          (buffer-tick (buffer-chars-modified-tick buf))
          (modifiedp   (/= source-tick buffer-tick)))
@@ -4518,7 +4513,7 @@ emacs-27 to provide such scoring in emacs<27."
                           for dup = (gethash c hash)
                           for disp = (helm-candidate-get-display c)
                           while (< count limit)
-                          for target = (if (helm-attr 'match-on-real source)
+                          for target = (if (helm-get-attr 'match-on-real source)
                                            (or (cdr-safe c)
                                                (get-text-property 0 'helm-realvalue disp))
                                          disp)
@@ -4813,7 +4808,7 @@ passed as argument to `recenter'."
   "Reinit SOURCE by calling its update and init functions."
   ;; When using a specific buffer as cache, don't kill it.
   (helm-aif (and (null (bufferp (assoc-default
-                                 (helm-attr 'name source)
+                                 (helm-get-attr 'name source)
                                  helm--candidate-buffer-alist)))
                  (helm-apply-functions-from-source
                   source 'helm-candidate-buffer))
@@ -5515,7 +5510,7 @@ It has no effect if `helm-echo-input-in-header-line' is nil."
     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
       (overlay-put ov 'window (selected-window))
       (helm-aif (and helm-display-header-line
-                     (helm-attr 'persistent-help))
+                     (helm-get-attr 'persistent-help))
           (progn
             (overlay-put ov 'display
                          (truncate-string-to-width
@@ -5913,7 +5908,7 @@ message 'no match'."
 
 (defun helm--set-minibuffer-completion-confirm (src)
   (with-helm-buffer
-    (helm-aif (helm-attr 'must-match src)
+    (helm-aif (helm-get-attr 'must-match src)
         (setq minibuffer-completion-confirm it))))
 
 (defun helm-read-string (prompt &optional initial-input history
@@ -6249,7 +6244,7 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
      (or (assoc-default 'search src)
          '(helm-candidates-in-buffer-search-default-fn))
      (helm-candidate-number-limit src)
-     (helm-attr 'match-part)
+     (helm-get-attr 'match-part)
      src)))
 
 (defun helm-candidates-in-buffer-search-default-fn (pattern)
@@ -6916,7 +6911,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
 (defun helm-make-visible-mark (&optional src selection)
   (let* ((source (or src  (helm-get-current-source)))
          (sel    (or selection (helm-get-selection
-                                nil (helm-attr 'marked-with-props source)
+                                nil (helm-get-attr 'marked-with-props source)
                                 source)))
          (selection-end (if (helm-pos-multiline-p)
                             ;; Stays within source
@@ -7034,7 +7029,7 @@ starting it is not needed."
                   (helm-mark-current-line)
                   (let* ((prefix (get-text-property (point-at-bol) 'display))
                          (cand   (helm-get-selection
-                                  nil (helm-attr 'marked-with-props src)
+                                  nil (helm-get-attr 'marked-with-props src)
                                   src))
                          (bn     (and filecomp-p (helm-basename cand))))
                     ;; Don't mark possibles directories ending with . or ..
@@ -7129,7 +7124,7 @@ sources."
            sel)
       (unless candidates
         (setq sel (helm-get-selection
-                   nil (helm-attr 'marked-with-props
+                   nil (helm-get-attr 'marked-with-props
                                   current-src)
                    current-src))
         (setq candidates
@@ -7376,11 +7371,11 @@ source or `helm-follow-input-idle-delay' or
 
 (defun helm-follow-mode-p (&optional source)
   (with-helm-buffer
-    (eq (helm-attr 'follow (or source (helm-get-current-source))) 1)))
+    (eq (helm-get-attr 'follow (or source (helm-get-current-source))) 1)))
 
 (defun helm-follow-mode-set-source (value &optional source)
   (with-helm-buffer
-    (helm-attrset 'follow value (or source (helm-get-current-source)))))
+    (helm-set-attr 'follow value (or source (helm-get-current-source)))))
 
 ;;; Auto-resize mode
 ;;

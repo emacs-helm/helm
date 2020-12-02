@@ -422,14 +422,14 @@ Sort is done on basename of CANDIDATES."
      (if (string-match-p "\\`fd" helm-locate-recursive-dirs-command)
          (format helm-locate-recursive-dirs-command
                  ;; fd pass path at end.
-                 (helm-attr 'subdir) (helm-attr 'basedir))
+                 (helm-get-attr 'subdir) (helm-get-attr 'basedir))
        (format helm-locate-recursive-dirs-command
 	       (if (string-match-p "\\`es" helm-locate-recursive-dirs-command)
                    ;; Fix W32 paths.
 		   (replace-regexp-in-string
-                    "/" "\\\\\\\\" (helm-attr 'basedir))
-                 (helm-attr 'basedir))
-	       (helm-attr 'subdir)))
+                    "/" "\\\\\\\\" (helm-get-attr 'basedir))
+                 (helm-get-attr 'basedir))
+	       (helm-get-attr 'subdir)))
      nil t nil)
     (buffer-string)))
 

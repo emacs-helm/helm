@@ -159,7 +159,7 @@
   "Toggle bookmark location visibility."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'toggle-filename
+    (helm-set-attr 'toggle-filename
                   '(helm-bookmark-toggle-filename-1 . never-split))
     (helm-execute-persistent-action 'toggle-filename)))
 (put 'helm-bookmark-toggle-filename 'helm-only t)

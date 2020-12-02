@@ -81,8 +81,8 @@ will not have separators between candidates any more."
 (defvar helm-source-kill-ring
   (helm-build-sync-source "Kill Ring"
     :init (lambda ()
-            (helm-attrset 'last-command last-command)
-            (helm-attrset 'multiline helm-kill-ring-max-offset))
+            (helm-set-attr 'last-command last-command)
+            (helm-set-attr 'multiline helm-kill-ring-max-offset))
     :candidates #'helm-kill-ring-candidates
     :filtered-candidate-transformer #'helm-kill-ring-transformer
     :action 'helm-kill-ring-actions
@@ -97,7 +97,7 @@ will not have separators between candidates any more."
 
 (defun helm-kill-ring-candidates ()
   (cl-loop with cands = (helm-fast-remove-dups kill-ring :test 'equal)
-           for kill in (if (eq (helm-attr 'last-command) 'yank)
+           for kill in (if (eq (helm-get-attr 'last-command) 'yank)
                             (cdr cands)
                           cands)
            unless (or (< (length kill) helm-kill-ring-threshold)
@@ -120,7 +120,7 @@ will not have separators between candidates any more."
     (let* ((cur-cand (helm-get-selection))
            (presel-fn (lambda ()
                         (helm-kill-ring--preselect-fn cur-cand))))
-      (helm-attrset 'multiline
+      (helm-set-attr 'multiline
                     (if helm-kill-ring--truncated-flag
                         15000000
                         helm-kill-ring-max-offset))
@@ -192,7 +192,7 @@ yanked string."
              ;; so use this workaround (Issue #1520).
              (when (and (region-active-p) delete-selection-mode)
                (delete-region (region-beginning) (region-end)))
-             (if (not (eq (helm-attr 'last-command helm-source-kill-ring) 'yank))
+             (if (not (eq (helm-get-attr 'last-command helm-source-kill-ring) 'yank))
                  (progn
                    ;; Ensure mark is at beginning of inserted text.
                    (push-mark)
@@ -237,7 +237,7 @@ yanked string."
   "Delete current candidate without quitting."
   (interactive)
   (with-helm-alive-p
-    (helm-attrset 'quick-delete '(helm-kill-ring-persistent-delete . never-split))
+    (helm-set-attr 'quick-delete '(helm-kill-ring-persistent-delete . never-split))
     (helm-execute-persistent-action 'quick-delete)))
 (put 'helm-kill-ring-run-persistent-delete 'helm-only t)
 

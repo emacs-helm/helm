@@ -198,7 +198,7 @@ engine beeing completely different and also much faster."
 
 (defun helm-occur-transformer (candidates source)
   "Return CANDIDATES prefixed with line number."
-  (cl-loop with buf = (helm-attr 'buffer-name source)
+  (cl-loop with buf = (helm-get-attr 'buffer-name source)
            for c in candidates collect
            (when (string-match helm-occur--search-buffer-regexp c)
              (let ((linum (match-string 1 c))
@@ -247,7 +247,7 @@ engine beeing completely different and also much faster."
                                                helm-occur-buffer-substring-fn-for-modes))
                                          #'buffer-substring-no-properties))
                                (contents (funcall bsfn (point-min) (point-max))))
-                          (helm-attrset 'get-line bsfn)
+                          (helm-set-attr 'get-line bsfn)
                           (with-current-buffer (helm-candidate-buffer 'global)
                             (insert contents)
                             (goto-char (point-min))
@@ -309,7 +309,7 @@ METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
   (require 'helm-grep)
   (let ((buf (if (eq major-mode 'helm-occur-mode)
                  (get-text-property (point) 'buffer-name)
-               (helm-attr 'buffer-name)))
+               (helm-get-attr 'buffer-name)))
         (split-pat (helm-mm-split-pattern helm-input)))
     (cl-case method
       (buffer              (switch-to-buffer buf))
@@ -378,7 +378,7 @@ This is used when `helm-occur-use-ioccur-style-keys' is enabled.
 If follow is enabled (default) go to next source, otherwise execute
 persistent action."
   (interactive)
-  (if (helm-aand (helm-attr 'follow) (> it 0))
+  (if (helm-aand (helm-get-attr 'follow) (> it 0))
       (helm-next-source)
     (helm-execute-persistent-action)))
 (put 'helm-occur-right 'helm-only t)
@@ -628,8 +628,8 @@ Special commands:
                     when (buffer-live-p (get-buffer b))
                     collect b))
       (setq buffer-is-modified (/= (length helm-occur--buffer-list)
-                                   (length (helm-attr 'moccur-buffers))))
-      (helm-attrset 'moccur-buffers helm-occur--buffer-list)
+                                   (length (helm-get-attr 'moccur-buffers))))
+      (helm-set-attr 'moccur-buffers helm-occur--buffer-list)
       (setq new-tick-ls (cl-loop for b in helm-occur--buffer-list
                                  collect (buffer-chars-modified-tick
                                           (get-buffer b))))
