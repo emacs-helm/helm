@@ -1090,7 +1090,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         (unless (equal it "")
           (push (cons proc it) helm-rsync--last-progress-bar-alist))
         (format " [%s]" (propertize
-                         (assoc-default proc helm-rsync--last-progress-bar-alist)
+                         (or (assoc-default proc helm-rsync--last-progress-bar-alist)
+                             ;; Avoid (wrong-type-argument stringp
+                             ;; nil) when process is not ready.
+                             "")
                          'face 'helm-ff-rsync-progress)))))
 
 (defun helm-rsync-mode-line (proc)
