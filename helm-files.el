@@ -693,6 +693,9 @@ currently transfered in an help-echo in mode-line, if you use
     (define-key map (kbd "S-<f1>")        'helm-ff-sort-alpha)
     (define-key map (kbd "S-<f2>")        'helm-ff-sort-by-newest)
     (define-key map (kbd "S-<f3>")        'helm-ff-sort-by-size)
+    (define-key map (kbd "S-<f4>")        'helm-ff-toggle-dirs-only)
+    (define-key map (kbd "S-<f5>")        'helm-ff-toggle-files-only)
+    (define-key map (kbd "S-<f6>")        'helm-ff-show-all)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
@@ -797,6 +800,8 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-rsync-process-buffer "*helm-rsync*")
 (defvar helm-rsync-progress-str-alist nil)
 (defvar helm-ff--trash-directory-regexp "\\.?Trash[/0-9]+files/?\\'")
+(defvar helm-ff--show-directories-only nil)
+(defvar helm-ff--show-files-only nil)
 
 ;;; Helm-find-files
 ;;
@@ -889,6 +894,10 @@ Should not be used among other sources.")
    (match-on-real :initform t)
    (filtered-candidate-transformer
     :initform '(helm-ff-fct
+                ;; These next two have to be called after
+                ;; `helm-ff-fct' as they use only cons cell candidates.
+                helm-ff-directories-only
+                helm-ff-files-only
                 helm-ff-sort-candidates))
    (persistent-action-if :initform 'helm-find-files-persistent-action-if)
    (persistent-help :initform "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
@@ -1704,6 +1713,47 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (message "Sorting alphabetically"))
 (put 'helm-ff-sort-alpha 'helm-only t)
 
+(defun helm-ff-directories-only (candidates _source)
+  (if helm-ff--show-directories-only
+      (cl-loop for (d . r) in candidates
+               when (file-directory-p r)
+               ;; We can use this as long as this filtering function
+               ;; is called after `helm-ff-fct' otherwise candidates
+               ;; may not be cons cell at first call [1]. 
+               collect (cons d r))
+    candidates))
+
+(defun helm-ff-files-only (candidates _source)
+  (if helm-ff--show-files-only
+      (cl-loop for (d . r) in candidates
+               unless (file-directory-p r)
+               ;; Same comment as in [1] above.
+               collect (cons d r))
+    candidates))
+
+(defun helm-ff-toggle-dirs-only ()
+  (interactive)
+  (setq helm-ff--show-directories-only (not helm-ff--show-directories-only))
+  (setq helm-ff--show-files-only nil)
+  (helm-update (helm-get-selection nil t)))
+
+(defun helm-ff-toggle-files-only ()
+  (interactive)
+  (setq helm-ff--show-files-only (not helm-ff--show-files-only))
+  (setq helm-ff--show-directories-only nil)
+  (helm-update (helm-get-selection nil t)))
+
+(defun helm-ff-show-all ()
+  (interactive)
+  (setq helm-ff--show-directories-only nil
+        helm-ff--show-files-only nil)
+  (helm-update (helm-get-selection nil t)))
+
+(defun helm-ff-after-persistent-show-all ()
+  (setq helm-ff--show-directories-only nil
+        helm-ff--show-files-only nil))
+(add-hook 'helm-after-persistent-action-hook 'helm-ff-after-persistent-show-all)
+
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
 See `helm-ff-serial-rename-1'."
@@ -2495,6 +2545,8 @@ Emacs and even the whole system as it eats all memory."
 If prefix numeric arg is given go ARG level up."
   (interactive "p")
   (with-helm-alive-p
+    (setq helm-ff--show-directories-only nil
+          helm-ff--show-files-only nil)
     (let ((src (helm-get-current-source)))
       (when (and (helm-file-completion-source-p src)
                  (not (helm-ff--invalid-tramp-name-p)))
@@ -4706,7 +4758,9 @@ source is `helm-source-find-files'."
         '(helm-ff-auto-expand-to-home-or-root
           helm-ff-update-when-only-one-matched
           helm-ff-move-to-first-real-candidate
-          helm-ff-clean-initial-input)))
+          helm-ff-clean-initial-input))
+  (setq helm-ff--show-directories-only nil
+        helm-ff--show-files-only nil))
 
 (defun helm-ff-bookmark ()
   (helm :sources 'helm-source-bookmark-helm-find-files

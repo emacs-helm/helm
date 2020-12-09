@@ -318,6 +318,11 @@ depending of `helm-selection':
 
 Called with a prefix arg open menu unconditionally.
 
+*** Filter out files or directories
+
+You can show files or directories only with respectively
+\\<helm-find-files-map>\\[helm-ff-toggle-dirs-only] and \\<helm-find-files-map>\\[helm-ff-toggle-files-only].
+
 *** Sort directory contents
 
 When listing a directory without narrowing its contents, i.e. when pattern ends with \"/\",
