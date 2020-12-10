@@ -1732,16 +1732,18 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
 
 (defun helm-ff-toggle-dirs-only ()
   (interactive)
-  (setq helm-ff--show-directories-only (not helm-ff--show-directories-only))
-  (setq helm-ff--show-files-only nil)
-  (helm-update (helm-get-selection nil t)))
+  (with-helm-alive-p
+    (setq helm-ff--show-directories-only (not helm-ff--show-directories-only))
+    (setq helm-ff--show-files-only nil)
+    (helm-update (helm-get-selection nil t))))
 (put 'helm-ff-toggle-dirs-only 'helm-only t)
 
 (defun helm-ff-toggle-files-only ()
   (interactive)
-  (setq helm-ff--show-files-only (not helm-ff--show-files-only))
-  (setq helm-ff--show-directories-only nil)
-  (helm-update (helm-get-selection nil t)))
+  (with-helm-alive-p
+    (setq helm-ff--show-files-only (not helm-ff--show-files-only))
+    (setq helm-ff--show-directories-only nil)
+    (helm-update (helm-get-selection nil t))))
 (put 'helm-ff-toggle-files-only 'helm-only t)
 
 (defun helm-ff-after-persistent-show-all ()
