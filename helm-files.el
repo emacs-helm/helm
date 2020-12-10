@@ -695,7 +695,6 @@ currently transfered in an help-echo in mode-line, if you use
     (define-key map (kbd "S-<f3>")        'helm-ff-sort-by-size)
     (define-key map (kbd "S-<f4>")        'helm-ff-toggle-dirs-only)
     (define-key map (kbd "S-<f5>")        'helm-ff-toggle-files-only)
-    (define-key map (kbd "S-<f6>")        'helm-ff-show-all)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
@@ -1736,23 +1735,18 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (setq helm-ff--show-directories-only (not helm-ff--show-directories-only))
   (setq helm-ff--show-files-only nil)
   (helm-update (helm-get-selection nil t)))
+(put 'helm-ff-toggle-dirs-only 'helm-only t)
 
 (defun helm-ff-toggle-files-only ()
   (interactive)
   (setq helm-ff--show-files-only (not helm-ff--show-files-only))
   (setq helm-ff--show-directories-only nil)
   (helm-update (helm-get-selection nil t)))
-
-(defun helm-ff-show-all ()
-  (interactive)
-  (setq helm-ff--show-directories-only nil
-        helm-ff--show-files-only nil)
-  (helm-update (helm-get-selection nil t)))
+(put 'helm-ff-toggle-files-only 'helm-only t)
 
 (defun helm-ff-after-persistent-show-all ()
   (setq helm-ff--show-directories-only nil
         helm-ff--show-files-only nil))
-(add-hook 'helm-after-persistent-action-hook 'helm-ff-after-persistent-show-all)
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
@@ -4367,6 +4361,7 @@ file."
            ;; unless a prefix arg is given.
            (and (file-directory-p candidate) (file-symlink-p candidate))
            (cons (lambda (_candidate)
+                   (helm-ff-after-persistent-show-all)
                    (funcall insert-in-minibuffer
                             (file-name-as-directory
                              (if current-prefix-arg
@@ -4376,6 +4371,7 @@ file."
           ;; A directory, open it.
           ((file-directory-p candidate)
            (cons (lambda (_candidate)
+                   (helm-ff-after-persistent-show-all)
                    (when (string= (helm-basename candidate) "..")
                      (setq helm-ff-last-expanded helm-ff-default-directory))
                    (funcall insert-in-minibuffer (file-name-as-directory
