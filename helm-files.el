@@ -2665,6 +2665,11 @@ when `helm-pattern' is equal to \"~/\"."
                (not (helm-ff--invalid-tramp-name-p))
                (not (string-match-p "\\`[.]\\{2\\}[^/]+"
                                     (helm-basename helm-pattern))))
+      ;; If we are filtering do nothing to allow toggling dirs/files
+      ;; only otherwise reset flags to show all when changing dir.
+      (unless (or helm-ff--show-files-only
+                  helm-ff--show-directories-only) ; filtering.
+        (helm-ff-after-persistent-show-all))
       (with-helm-buffer
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
@@ -2780,8 +2785,11 @@ avoid errors when called outside helm for debugging purpose."
              ;; `file-directory-p' returns t on "/home/me/." (issue #1844).
              (if (and (file-directory-p input)
                       (not (string-match-p "[^.]\\.\\'" input)))
-                 (setq helm-ff-default-directory
-                       (setq input (file-name-as-directory input)))
+                 (progn
+                   (setq helm-ff-default-directory
+                         (setq input (file-name-as-directory input)))
+                   ;; When changing directory ensure to show all.
+                   (helm-ff-after-persistent-show-all))
                  (setq helm-ff-default-directory (file-name-as-directory
                                                   (file-name-directory input))))
              (if spattern input (helm-ff--maybe-set-pattern-and-update input))))
