@@ -322,6 +322,8 @@ Called with a prefix arg open menu unconditionally.
 
 You can show files or directories only with respectively
 \\<helm-find-files-map>\\[helm-ff-toggle-dirs-only] and \\<helm-find-files-map>\\[helm-ff-toggle-files-only].
+These are toggle commands i.e. filter/show_all.
+Changing directory disable filtering.
 
 *** Sort directory contents
 
