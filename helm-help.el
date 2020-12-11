@@ -403,8 +403,6 @@ It starts from the third character of the pattern.
 For instance \"fob\" or \"fbr\" will complete \"foobar\" but \"fb\" needs a
 third character in order to complete it.
 
-*** Use `\\[universal-argument] \\[helm-execute-persistent-action]' or `\\[helm-follow-action-forward]' to display an image
-
 *** `\\[helm-execute-persistent-action]' on a filename expands to that filename in the Helm buffer
 
 Second hit displays the buffer filename.
@@ -413,9 +411,23 @@ Note: `\\[universal-argument] \\[helm-execute-persistent-action]' displays the b
 
 *** Browse images directories with `helm-follow-mode' and navigate up/down
 
+Before Emacs-27 Helm was using image-dired that works with
+external ImageMagick tools.  From Emacs-27 Helm use native
+display of images with image-mode by default for Emacs-27 (see `helm-ff-display-image-native'),
+this allows automatic resize when changing window size, zooming with `\\[helm-ff-increase-image-size-persistent]' and `\\[helm-ff-decrease-image-size-persistent]'
+and rotate images as before.
+
 You can also use `helm-follow-action-forward' and `helm-follow-action-backward' with
 `\\[helm-follow-action-forward]' and `\\[helm-follow-action-backward]' respectively.
+Note that these commands have different behavior when `helm-follow-mode'
+is enabled (go to next/previous line only).
 
+Use `\\[universal-argument] \\[helm-execute-persistent-action]' to display an image or kill its buffer.
+
+TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enlarge-window]' to display helm window vertically
+and to enlarge it while viewing images.
+This may not work though with exotic helm windows settings like the one you can find is Spacemacs...
+ 
 *** Toggle auto-completion with `\\[helm-ff-run-toggle-auto-update]'
 
 It is useful when trying to create a new file or directory and you don't want
@@ -1085,6 +1097,8 @@ should see a little icon brievly changing form when the cache is
 refreshed if you have set `helm-ff-cache-mode-lighter-updating'
 and `helm-ff-cache-mode-lighter-sleep' . You can also refresh a
 directory at anytime during your HFF sessions by hitting \\<helm-map>\\[helm-refresh].
+The cache is renitialized all the `helm-ff-cache-max-entries',
+100 by default, you can customize this as needed. 
 
 ** Commands
 \\<helm-find-files-map>
@@ -1123,6 +1137,8 @@ directory at anytime during your HFF sessions by hitting \\<helm-map>\\[helm-ref
 \\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
 \\[helm-ff-rotate-left-persistent]\t\tRotate image left.
 \\[helm-ff-rotate-right-persistent]\t\tRotate image right.
+\\[helm-ff-increase-image-size-persistent]\t\tZoom in image.
+\\[helm-ff-decrease-image-size-persistent]\t\tZoom out image.
 \\[helm-find-files-up-one-level]\t\tGo to parent directory.
 \\[helm-find-files-history]\t\tSwitch to the visited-directory history.
 \\[helm-ff-file-name-history]\t\tSwitch to file name history.
