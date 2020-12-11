@@ -1731,6 +1731,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
     candidates))
 
 (defun helm-ff-toggle-dirs-only ()
+  "Show only directories in helm-find-files."
   (interactive)
   (with-helm-alive-p
     (setq helm-ff--show-directories-only (not helm-ff--show-directories-only))
@@ -1739,6 +1740,7 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
 (put 'helm-ff-toggle-dirs-only 'helm-only t)
 
 (defun helm-ff-toggle-files-only ()
+  "Show only files in helm-find-files."
   (interactive)
   (with-helm-alive-p
     (setq helm-ff--show-files-only (not helm-ff--show-files-only))
