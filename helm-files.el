@@ -2669,11 +2669,6 @@ when `helm-pattern' is equal to \"~/\"."
                (not (helm-ff--invalid-tramp-name-p))
                (not (string-match-p "\\`[.]\\{2\\}[^/]+"
                                     (helm-basename helm-pattern))))
-      ;; If we are filtering do nothing to allow toggling dirs/files
-      ;; only otherwise reset flags to show all when changing dir.
-      (unless (or helm-ff--show-files-only
-                  helm-ff--show-directories-only) ; filtering.
-        (helm-ff-after-persistent-show-all))
       (with-helm-buffer
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
@@ -2731,8 +2726,11 @@ when `helm-pattern' is equal to \"~/\"."
                 ;; is not one of "." or ".." [1]
                 ;; and only one candidate is remaining [2],
                 ;; assume candidate is a new directory to expand, and do it.
-                (helm-set-pattern (file-name-as-directory
-                                   (substring-no-properties cur-cand)))
+                (progn
+                    (helm-set-pattern (file-name-as-directory
+                                       (substring-no-properties cur-cand)))
+                    ;; Reset flags to show all when changing dir.
+                    (helm-ff-after-persistent-show-all))
                 ;; The candidate is one of "." or ".."
                 ;; that mean we have entered the last letter of the directory name
                 ;; in prompt, so expansion is already done, just add the "/" at end
