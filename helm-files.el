@@ -3330,8 +3330,8 @@ in cache."
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
     (let ((desc (cadr event)))
-      (helm-log "%s modified: %S" directory event)
       (when (memq desc '(created deleted renamed))
+        (helm-log "%s modified: %S" directory event)
         ;; When DIRECTORY is modified remove it from cache.
         (remhash directory helm-ff--list-directory-cache)
         ;; Remove watch as well in case of rename or delete.
