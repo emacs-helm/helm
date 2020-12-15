@@ -33,6 +33,7 @@
   (require 'dired-aux)
   (require 'dired-x)
   (require 'image-dired))
+(require 'filenotify)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
@@ -88,8 +89,6 @@
 (defvar term-char-mode-buffer-read-only)
 (defvar recentf-list)
 (defvar helm-mm-matching-method)
-(defvar helm-ff-cache-mode)
-(defvar helm-ff-keep-cached-candidates)
 (defvar dired-async-mode)
 (defvar org-directory)
 (defvar eshell-current-command)
@@ -1987,8 +1986,6 @@ This doesn't replace inside the files, only modify filenames."
                       (rename-file old new)
                       (cl-incf count)))
                finally (message "%d Files renamed" count))))
-  (unless helm-ff-cache-mode
-    (helm-ff-refresh-cache))
   ;; This fix the emacs bug where "Emacs-Lisp:" is sent
   ;; in minibuffer (not the echo area).
   (sit-for 0.1)
@@ -3319,194 +3316,30 @@ in cache."
              (dot2 (concat directory ".."))
              (candidates (append (and (not file-error) (list dot dot2)) ls)))
         (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
-        (puthash directory
-                 (cl-loop for f in candidates
-                          for ff = (helm-ff-filter-candidate-one-by-one f)
-                          when ff collect ff)
-                 helm-ff--list-directory-cache))))
+        (prog1
+            (puthash directory
+                     (cl-loop for f in candidates
+                              when (helm-ff-filter-candidate-one-by-one f)
+                              collect it)
+                     helm-ff--list-directory-cache)
+          (unless (gethash directory helm-ff--file-notify-watchers)
+            (puthash directory
+                     (file-notify-add-watch
+                      directory
+                      '(change)
+                      (helm-ff--inotify-make-callback directory))
+                     helm-ff--file-notify-watchers))))))
 
-(defun helm-ff-refresh-cache ()
-  "Refresh `helm-ff--list-directory-cache'."
-  (maphash (lambda (k _v)
-             (unless (file-remote-p k)
-               (helm-ff-directory-files k t)))
-           helm-ff--list-directory-cache))
-
-;;; `helm-ff-cache-mode'
-;;  A mode to auto refresh helm-find-files cache.
+;;; Inotify
 ;;
-(defvar helm-ff--refresh-cache-timer nil)
-(defvar helm-ff--cache-mode-lighter-face 'helm-ff-cache-stopped)
-(defvar helm-ff--refresh-cache-done nil)
+(defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal))
 
-(defcustom helm-ff-cache-mode-post-delay 0.3
-  "Wait this delay seconds before restarting when emacs stops beeing idle.
-
-Minimum value accepted is 0.1s."
-  :type 'float
-  :group 'helm-files)
-
-(defcustom helm-ff-refresh-cache-delay 0.3
-  "`helm-ff-cache-mode' timer starts after this many seconds.
-
-Minimum value accepted is 0.1s."
-  :type 'float
-  :group 'helm-files)
-
-(defcustom helm-ff-cache-mode-max-idle-time 6
-  "`helm-ff-cache-mode' timer stops updating after this many seconds."
-  :type 'integer
-  :group 'helm-files)
-
-(defcustom helm-ff-cache-mode-lighter-sleep nil
-  "String used when `helm-ff-cache-mode' is inactive.
-When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode'."
-  :type 'string
-  :group 'helm-files)
-
-(defcustom helm-ff-cache-mode-lighter-updating nil
-  "String used when `helm-ff-cache-mode' is updating cache.
-When this is set to a valid string, it is used as lighter in `helm-ff-cache-mode'."
-  :type 'string
-  :group 'helm-files)
-
-(defvar helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep
-  "Default string for `helm-ff-cache-mode' lighter.")
-
-(defun helm-ff--cache-mode-refresh (&optional no-update delay)
-  (when helm-ff--refresh-cache-timer
-    (cancel-timer helm-ff--refresh-cache-timer))
-  (if (or helm-alive-p (input-pending-p) no-update)
-      (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep)
-    (helm-ff--cache-mode-refresh-1))
-  ;; When `helm-ff-keep-cached-candidates' becomes nil don't restart
-  ;; timer and set mode to nil to disable it.
-  (if helm-ff-keep-cached-candidates
-      (setq helm-ff--refresh-cache-timer
-            (run-with-idle-timer
-             (helm-aif (current-idle-time)
-                 (time-add
-                  it (seconds-to-time (helm-ff--refresh-cache-delay)))
-               (or delay helm-ff-refresh-cache-delay))
-             nil
-             #'helm-ff--cache-mode-refresh))
-    (setq helm-ff-cache-mode nil)))
-
-(defun helm-ff--cache-mode-refresh-1 ()
-  (if (and helm-ff-keep-cached-candidates
-           (> (hash-table-count helm-ff--list-directory-cache) 0)
-           ;; Stop updating when Emacs is idle more than
-           ;; helm-ff-cache-mode-max-idle-time.
-           (time-less-p (current-idle-time)
-                        (seconds-to-time (helm-ff--cache-mode-max-idle-time)))
-           (null helm-ff--refresh-cache-done))
-      (progn
-        (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-updating)
-        (while-no-input
-          (helm-ff-refresh-cache)
-          (setq helm-ff--refresh-cache-done t)))
-    (setq helm-ff-cache-mode-lighter helm-ff-cache-mode-lighter-sleep))
-  (force-mode-line-update))
-
-(defun helm-ff--cache-mode-reset-timer ()
-  ;; The goal is to run a timer all the x seconds when Emacs is idle.
-  ;; When Emacs is idle during say 20s (current-idle-time)
-  ;; the idle timer will run in
-  ;; 20+<helm-ff-refresh-cache-delay>+<helm-ff--cache-mode-post-delay>
-  ;; s. Say for example it is 20+1.5.
-  ;; This is fine when Emacs stays idle, because the next timer
-  ;; will run at 21.5+1.5 etc... so the display will be updated
-  ;; at every 1.5 seconds.
-  ;; But as soon as emacs looses its idleness
-  ;; i.e. (current-idle-time)==nil, the next update
-  ;; will occur at say 21+1.5 s, so we have to reinitialize
-  ;; the timer at 0+1.5. To do this we run the timer fn with 'noupdate
-  ;; and an explicit delay in post-command-hook and in focus-in-hook.
-  (helm-ff--cache-mode-refresh
-   'no-update (+ (helm-ff--refresh-cache-delay)
-                 (helm-ff--cache-mode-post-delay)))
-  (setq helm-ff--refresh-cache-done nil))
-
-(defun helm-ff--refresh-cache-delay ()
-  "Prevent user using less than 0.5s for `helm-ff-refresh-cache-delay'."
-  (max 0.1 helm-ff-refresh-cache-delay))
-
-(defun helm-ff--cache-mode-post-delay ()
-  "Prevent user using less than 0.5s for `helm-ff-cache-mode-post-delay'."
-  (max 0.1 helm-ff-cache-mode-post-delay))
-
-(defun helm-ff--cache-mode-max-idle-time ()
-  "Prevent user using too small value for `helm-ff-cache-mode-max-idle-time'."
-  (max (+ helm-ff-cache-mode-post-delay
-          helm-ff-refresh-cache-delay
-          1)
-       helm-ff-cache-mode-max-idle-time))
-
-(defun helm-ff-cache-mode-add-hooks ()
-  (add-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
-  (add-hook 'focus-in-hook 'helm-ff--cache-mode-reset-timer))
-
-(defun helm-ff-cache-mode-remove-hooks ()
-  (remove-hook 'post-command-hook 'helm-ff--cache-mode-reset-timer)
-  (remove-hook 'focus-in-hook 'helm-ff--cache-mode-reset-timer))
-
-;;;###autoload
-(define-minor-mode helm-ff-cache-mode
-  "Auto refresh `helm-find-files' cache when emacs is idle.
-
-You probably don't want to start this mode directly.  Instead you
-should customize `helm-ff-keep-cached-candidates' to a non nil
-value to enable it.
-
-With `helm-ff-keep-cached-candidates' set to a nil value the mode
-will disable itself.
-
-When Emacs is idle, refresh the cache all the
-`helm-ff-refresh-cache-delay' seconds then stop when done or after
-`helm-ff-cache-mode-max-idle-time' if emacs is still idle."
-  :group 'helm-files
-  :global t
-  :lighter (:eval helm-ff-cache-mode-lighter)
-  (unless (or helm-ff-keep-cached-candidates
-              (null helm-ff-cache-mode))
-    ;; When helm-ff-keep-cached-candidates have been set to nil with
-    ;; setq, the mode will start but with no effect and die by itself
-    ;; i.e. the timer will not restart on itself and mode will be set
-    ;; to nil.
-    (display-warning
-     '(helm-ff-cached-mode)
-     "`helm-ff-keep-cached-candidates' should be set to a non nil value"))
-  (if helm-ff-cache-mode
-      (helm-ff-cache-mode-add-hooks)
-    (helm-ff-cache-mode-remove-hooks)
-    (and helm-ff--refresh-cache-timer
-         (cancel-timer helm-ff--refresh-cache-timer))
-    (setq helm-ff--refresh-cache-timer nil)))
-
-(defcustom helm-ff-keep-cached-candidates 'all
-  "When non nil do not delete the HFF cache after each session.
-
-Possible values are:
-- `all' or `t' (default): Keep all.
-- `remote': Keep only remote.
-- `local': Keep only locals.
-- `nil': Delete all.
-
-Starts `helm-ff-cache-mode' when non nil.
-
-Please use customize interface or `customize-set-variable' to
-configure this i.e. NOT `setq'."
-  :type '(choice
-          (const :tag "Keep all"         'all)
-          (const :tag "Keep only remote" 'remote)
-          (const :tag "Keep only locals" 'local)
-          (const :tag "Delete all"       nil))
-  :group 'helm-files
-  :set (lambda (var val)
-         (set var val)
-         (if val
-             (helm-ff-cache-mode 1)
-           (helm-ff-cache-mode -1))))
+(defun helm-ff--inotify-make-callback (directory)
+  (lambda (event)
+    (helm-log "%s modified by event: %S" directory event)
+    (remhash directory helm-ff--list-directory-cache)
+    (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
+    (remhash directory helm-ff--file-notify-watchers)))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
@@ -4112,9 +3945,7 @@ Trash/info directory."
          (trashed-files     (helm-ff-trash-list)))
     (helm-ff-trash-action 'helm-restore-file-from-trash-1
                           '("restore" "restoring")
-                          trashed-files)
-    (unless helm-ff-cache-mode
-      (helm-ff-refresh-cache))))
+                          trashed-files)))
 
 (defun helm-restore-file-from-trash-1 (file trashed-files)
   "Restore FILE from a trash directory.
@@ -4727,38 +4558,7 @@ source is `helm-source-find-files'."
                   helm-ff-auto-expand-to-home-or-root))
     (add-hook 'helm-after-update-hook hook)))
 
-(defun helm-ff--cleanup-cache ()
-  "Remove entries from cache according to `helm-ff-keep-cached-candidates'."
-  (if (> (hash-table-count helm-ff--list-directory-cache)
-         helm-ff-cache-max-entries)
-      (clrhash helm-ff--list-directory-cache)
-    (cl-ecase helm-ff-keep-cached-candidates
-      ((all t)
-       (maphash (lambda (k _v)
-                  ;; Keep all but non existing files but don't call
-                  ;; `file-exists-p' on remote files to avoid triggering
-                  ;; a tramp connection [1].
-                  (when (and (not (file-remote-p k))
-                             (not (file-exists-p k)))
-                    (remhash k helm-ff--list-directory-cache)))
-                helm-ff--list-directory-cache))
-      (local
-       (maphash (lambda (k _v)
-                  ;; Same comment as [1].
-                  (when (or (file-remote-p k)
-                            (not (file-exists-p k)))
-                    (remhash k helm-ff--list-directory-cache)))
-                helm-ff--list-directory-cache))
-      (remote
-       (maphash (lambda (k _v)
-                  (unless (file-remote-p k)
-                    (remhash k helm-ff--list-directory-cache)))
-                helm-ff--list-directory-cache))
-      ((nil)
-       (clrhash helm-ff--list-directory-cache)))))
-
 (defun helm-find-files-cleanup ()
-  (helm-ff--cleanup-cache)
   (mapc (lambda (hook)
           (remove-hook 'helm-after-update-hook hook))
         '(helm-ff-auto-expand-to-home-or-root
@@ -5188,8 +4988,6 @@ When a prefix arg is given, meaning of
                               (sleep-for 1))
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
-        (unless helm-ff-cache-mode
-          (helm-ff-refresh-cache))
         (message "%s File(s) %s" len (if trash "trashed" "deleted"))))))
 
 ;;; Delete files async
@@ -5263,8 +5061,6 @@ directories are always deleted with no warnings."
                          (let ((last-nonmenu-event t))
                            (when (y-or-n-p (format "Kill buffer %s, too? " buf))
                              (kill-buffer buf)))))
-                     (unless helm-ff-cache-mode
-                       (helm-ff-refresh-cache))
                      (run-with-timer
                       0.1 nil
                       (lambda ()
