@@ -3336,20 +3336,7 @@ in cache."
         (remhash directory helm-ff--list-directory-cache)
         ;; Remove watch as well in case of rename or delete.
         (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
-        (remhash directory helm-ff--file-notify-watchers)
-        ;; When a helm session is running and its directory is the one
-        ;; that is modified externally update it.
-        (when (and helm-alive-p
-                   ;; This prevent updating when deleting with
-                   ;; helm-ff-quick-delete. Assume user haven't
-                   ;; switched to an emacs shell while leaving the
-                   ;; helm session open.
-                   (not (frame-focus-state helm-initial-frame)))
-          (with-helm-buffer
-            (when (file-equal-p helm-ff-default-directory directory)
-              ;; No need to force-update, directory have already been
-              ;; removed from cache.
-              (helm-update))))))))
+        (remhash directory helm-ff--file-notify-watchers)))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
