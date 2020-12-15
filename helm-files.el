@@ -790,7 +790,14 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 (defvar helm-ff--move-to-first-real-candidate t)
 (defvar helm-find-files--toggle-bookmark nil)
 (defvar helm-ff--tramp-methods nil)
-(defvar helm-ff--directory-files-hash (make-hash-table :test 'equal))
+(defvar helm-ff--directory-files-length (make-hash-table :test 'equal)
+  "Used to count number of candidates in directory.
+candidate-number-limit is set to this value if this value is bigger
+than `helm-candidate-number-limit'.")
+(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal)
+  "Cache for `helm-find-files' candidates.")
+(defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal)
+  "File-notify watchers for `helm-find-files' are stored here.")
 (defvar helm-ff-history-buffer-name "*helm-find-files history*")
 (defvar helm-rsync-command-history nil)
 (defvar helm-rsync--last-progress-bar-alist nil
@@ -2557,7 +2564,7 @@ If prefix numeric arg is given go ARG level up."
           (helm-set-attr 'candidate-number-limit
                         (if helm-ff-up-one-level-preselect
                             (max (gethash new-pattern
-                                          helm-ff--directory-files-hash
+                                          helm-ff--directory-files-length
                                           helm-ff-candidate-number-limit)
                                  helm-ff-candidate-number-limit)
                           helm-ff-candidate-number-limit))
@@ -3277,9 +3284,6 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
-(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
-(defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal))
-
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3310,7 +3314,7 @@ in cache."
              (dot  (concat directory "."))
              (dot2 (concat directory ".."))
              (candidates (append (and (not file-error) (list dot dot2)) ls)))
-        (puthash directory (+ (length ls) 2) helm-ff--directory-files-hash)
+        (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
         (prog1
             (puthash directory
                      (cl-loop for f in candidates
