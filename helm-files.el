@@ -3335,6 +3335,7 @@ in cache."
 (defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal))
 
 (defun helm-ff--inotify-make-callback (directory)
+  "Return a callback for `file-notify-add-watch'."
   (lambda (event)
     (let ((desc (cadr event)))
       (helm-log "%s modified: %S" directory event)
