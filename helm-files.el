@@ -3277,14 +3277,9 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
-(defcustom helm-ff-cache-max-entries 100
-  "The maximum number of entries in HFF cache before clearing.
-The value must be an integer >= to 65."
-  :type 'integer
-  :group 'helm-files)
+(defvar helm-ff--list-directory-cache (make-hash-table :test 'equal))
+(defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal))
 
-(defvar helm-ff--list-directory-cache
-  (make-hash-table :test 'equal :size (max 65 helm-ff-cache-max-entries)))
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3329,10 +3324,6 @@ in cache."
                       '(change)
                       (helm-ff--inotify-make-callback directory))
                      helm-ff--file-notify-watchers))))))
-
-;;; Inotify
-;;
-(defvar helm-ff--file-notify-watchers (make-hash-table :test 'equal))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
