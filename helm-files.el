@@ -3336,10 +3336,12 @@ in cache."
 
 (defun helm-ff--inotify-make-callback (directory)
   (lambda (event)
-    (helm-log "%s modified by event: %S" directory event)
-    (remhash directory helm-ff--list-directory-cache)
-    (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
-    (remhash directory helm-ff--file-notify-watchers)))
+    (let ((desc (cadr event)))
+      (helm-log "%s modified: %S" directory event)
+      (when (memq desc '(created deleted renamed))
+        (remhash directory helm-ff--list-directory-cache)
+        (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
+        (remhash directory helm-ff--file-notify-watchers)))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
