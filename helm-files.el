@@ -3317,6 +3317,7 @@ in cache."
                               when (helm-ff-filter-candidate-one-by-one f)
                               collect it)
                      helm-ff--list-directory-cache)
+          ;; Put an inotify watcher to check directory modifications.
           (unless (gethash directory helm-ff--file-notify-watchers)
             (puthash directory
                      (file-notify-add-watch
@@ -3331,7 +3332,9 @@ in cache."
     (let ((desc (cadr event)))
       (helm-log "%s modified: %S" directory event)
       (when (memq desc '(created deleted renamed))
+        ;; When DIRECTORY is modified remove it from cache.
         (remhash directory helm-ff--list-directory-cache)
+        ;; Remove watch as well in case of rename or delete.
         (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
         (remhash directory helm-ff--file-notify-watchers)))))
 
