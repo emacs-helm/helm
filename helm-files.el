@@ -763,6 +763,13 @@ you have new commands to zoom in/out images.  See
 when nil `image-dired' is used, using imagemagick as backend."
   :group 'helm-files
   :type 'boolean)
+
+(defcustom helm-ff-reset-filters-on-update t
+  "Reset filter variables when changing directory.
+When filtering directories/files only, switch back to a \"show all\" view
+when moving out of directory when non nil."
+  :type 'boolean
+  :group 'helm-files)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -1755,8 +1762,9 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
 (put 'helm-ff-toggle-files-only 'helm-only t)
 
 (defun helm-ff-after-persistent-show-all ()
-  (setq helm-ff--show-directories-only nil
-        helm-ff--show-files-only nil))
+  (when helm-ff-reset-filters-on-update
+    (setq helm-ff--show-directories-only nil
+          helm-ff--show-files-only nil)))
 
 (defun helm-ff-serial-rename-action (method)
   "Rename all marked files in `helm-ff-default-directory' with METHOD.
@@ -2547,8 +2555,7 @@ Emacs and even the whole system as it eats all memory."
 If prefix numeric arg is given go ARG level up."
   (interactive "p")
   (with-helm-alive-p
-    (setq helm-ff--show-directories-only nil
-          helm-ff--show-files-only nil)
+    (helm-ff-after-persistent-show-all)
     (let ((src (helm-get-current-source)))
       (when (and (helm-file-completion-source-p src)
                  (not (helm-ff--invalid-tramp-name-p)))
