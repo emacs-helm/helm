@@ -1087,18 +1087,11 @@ NOTE: This will slow down helm, be warned.
 *** Helm-find-files is using a cache
 
 Helm is caching each directory files list in a hash table for
-faster search.  What is kept in the cache is defined by
-`helm-ff-keep-cached-candidates' variable.  By default HFF keep
-all in the cache between its sessions but you can customize
-`helm-ff-keep-cached-candidates', do not use setq for this.  When
-`helm-ff-keep-cached-candidates' is non nil HFF refreshes the
-cache automatically between its sessions when Emacs is idle, you
-should see a little icon brievly changing form when the cache is
-refreshed if you have set `helm-ff-cache-mode-lighter-updating'
-and `helm-ff-cache-mode-lighter-sleep' . You can also refresh a
-directory at anytime during your HFF sessions by hitting \\<helm-map>\\[helm-refresh].
-The cache is renitialized all the `helm-ff-cache-max-entries',
-100 by default, you can customize this as needed. 
+faster search, when a directory is modified it is removed from cache
+so that further visit in this directory refresh cache.
+You may have in some rare cases to refresh directory manually with `\\<helm-map>\\[helm-refresh]'
+for example when helm-find-files session is running and a file is modified/deleted
+in current visited directory by an external command from outside Emacs.
 
 ** Commands
 \\<helm-find-files-map>
@@ -1125,7 +1118,7 @@ The cache is renitialized all the `helm-ff-cache-max-entries',
 \\[helm-ff-run-touch-files]\t\tTouch files.
 \\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate without leaving Helm.
 \\[helm-ff-persistent-delete]\t\tDelete file without leaving Helm.
-\\[helm-ff-run-switch-to-eshell]\t\tSwitch to Eshell.
+\\[helm-ff-run-switch-to-shell]\t\tSwitch to prefered shell.
 \\[helm-ff-run-eshell-command-on-file]\t\tEshell command on file (`\\[universal-argument]' to apply on marked files, otherwise treat them sequentially).
 \\[helm-ff-run-ediff-file]\t\tEdiff file.
 \\[helm-ff-run-ediff-merge-file]\t\tEdiff merge file.
