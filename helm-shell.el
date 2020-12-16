@@ -1,6 +1,6 @@
 ;;; helm-shell.el --- Shell prompt navigation for helm. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019 Pierre Neidhardt <mail@ambrevar.xyz>
+;; Copyright (C) 2020 Pierre Neidhardt <mail@ambrevar.xyz>
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
