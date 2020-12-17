@@ -4252,7 +4252,10 @@ file."
                           (file-equal-p (buffer-file-name
                                          (get-buffer helm-ff-image-native-buffer))
                                         candidate))
-                     (kill-buffer helm-ff-image-native-buffer)
+                     (progn
+                       (set-window-buffer
+                        helm-persistent-action-display-window helm-current-buffer)
+                       (kill-buffer helm-ff-image-native-buffer))
                    (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
                         (kill-buffer helm-ff-image-native-buffer))
                    (cl-letf (((symbol-function 'message) #'ignore))
