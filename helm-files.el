@@ -4241,8 +4241,7 @@ file."
                    (helm-check-minibuffer-input)) ; Force update.
                  'never-split))
           (sound-cand (lambda (candidate) (play-sound-file candidate)))
-          ;; An image file and it is the second hit on C-j,
-          ;; show the file in `image-dired'.
+          ;; An image file and it is the second hit on C-j, display it.
           (image-cand
            (if helm-ff-display-image-native
                (lambda (candidate)
