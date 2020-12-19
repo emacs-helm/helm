@@ -427,8 +427,33 @@ Use `\\[universal-argument] \\[helm-execute-persistent-action]' to display an im
 TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enlarge-window]' to display helm window vertically
 and to enlarge it while viewing images.
 This may not work though with exotic helm windows settings like the one you can find is Spacemacs...
- 
-*** Toggle auto-completion with `\\[helm-ff-run-toggle-auto-update]'
+
+*** Open files externally
+
+- Open file with external program (`\\<helm-find-files-map>\\[helm-ff-run-open-file-externally]',`C-u' to choose).
+
+Helm is looking what is used by default to open file
+externally (mailcap files) but have its own variable
+`helm-external-programs-associations' to store external
+applications.  If you call the action or its binding without
+prefix arg helm will see if there is an application suitable in
+`helm-external-programs-associations' , otherwise it will look in
+mailcap files.  If you want to specify which external application
+to use (and its options) use a prefix arg.
+
+Note: What you configure for Helm in `helm-external-programs-associations'
+will take precedence on mailcap files.
+
+- Preview file with external program (`\\[helm-ff-run-preview-file-externally]').
+
+Same as above but doesn't quit Helm session, it is apersistent action.
+
+- Open file externally with default tool (`\\[helm-ff-run-open-file-with-default-tool]').
+
+This use xdg-open which sucks most of the time, perhaps it works
+fine on Windows, it is why it is kept in Helm.
+
+*** Toggle auto-completion
 
 It is useful when trying to create a new file or directory and you don't want
 Helm to complete what you are writing.
