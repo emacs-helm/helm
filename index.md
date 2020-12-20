@@ -74,12 +74,18 @@ backward compatibility.
 
 # Features
 
-In addition of its framework where you can build your own `Helm` applications, `Helm` provides preconfigured commands to
-browse and search incrementally in files, buffers, bookmarks etc... and much more.
+In addition of its framework where you can build your own `Helm`
+applications, `Helm` provides preconfigured commands to browse and
+search incrementally in files, buffers, bookmarks etc... and much
+more.  Helm allows displaying different sources in same session.  Helm
+displays its candidates in a window or a frame, keeping the minibuffer for
+user input.  Helm provides a full set of actions for each of its
+sources, each action apply on a single candidate or a set of marked
+candidates.
 
 _Note:_ You will find many helm extensions providing diverse features sometimes already implemented in `Helm`, 
 prefer generally the ones that are natively in `Helm`, e.g. `Helm` support natively most grep implementations as backend (ack, ag, rg),
-no need to install 3rd party packages for this.
+no need to install 3rd party packages for this, same for managing projects etc...
 
 # Requirements
 
@@ -124,7 +130,7 @@ For minimal helm configuration, run the start-up script `./emacs-helm.sh`
 and then see the file `/tmp/helm-cfg.el`.
 
 The full configuration I (the helm maintainer) use is
-[here](https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm.el).
+[here](https://github.com/thierryvolpiatto/emacs-config/blob/master/init-helm.el).
 
 Also see helm customizable variables with the customize interface.
 
