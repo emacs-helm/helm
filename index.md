@@ -38,6 +38,7 @@
 - [Alternatives](#alternatives)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
+    - [Install from [Straight](https://github.com/raxod502/straight.el)](#install-from-straighthttpsgithubcomraxod502straightel)
     - [Quick install from git](#quick-install-from-git)
     - [Install from Emacs packaging system](#install-from-emacs-packaging-system)
     - [Installing just the helm-core package](#installing-just-the-helm-core-package)
@@ -102,6 +103,10 @@ when Helm is installed using [MELPA](https://melpa.org/).
 
 # Getting Started
 
+## Install from [Straight](https://github.com/raxod502/straight.el)
+
+See [Install from straight package manager](https://github.com/emacs-helm/helm/wiki#from-straight-package-manager)
+
 ## Quick install from git
 
 See [Install Helm from Git](https://github.com/emacs-helm/helm/wiki#from-source)
@@ -111,6 +116,8 @@ _NOTE:_ Installing helm using git and make is the safest way.
 ## Install from Emacs packaging system
 
 See [Install Helm from Melpa](https://github.com/emacs-helm/helm/wiki#from-melpa)
+
+_NOTE:_ This is not the recommended way to install packages.
 
 ## Installing just the helm-core package
 
