@@ -30,12 +30,12 @@
 </p>
 
 ***
-
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Alternatives](#alternatives)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
     - [Quick install from git](#quick-install-from-git)
@@ -86,6 +86,12 @@ candidates.
 _Note:_ You will find many helm extensions providing diverse features sometimes already implemented in `Helm`, 
 prefer generally the ones that are natively in `Helm`, e.g. `Helm` support natively most grep implementations as backend (ack, ag, rg),
 no need to install 3rd party packages for this, same for managing projects etc...
+
+# Alternatives
+
+There are several alternatives to Helm nowaday, they are all providing
+incremental completion but they lack all the Helm features due to
+their wrong implementation abusing minibuffer.
 
 # Requirements
 
