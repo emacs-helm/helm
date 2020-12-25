@@ -5787,6 +5787,17 @@ If SOURCE-OR-NAME is empty string or nil go to the first
 candidate of first source."
   (helm-move-selection-common :where 'source :direction source-or-name))
 
+(defvar helm-follow-action-white-list-commands
+  '(helm-ff-decrease-image-size-persistent
+    helm-ff-increase-image-size-persistent
+    helm-ff-rotate-left-persistent
+    helm-ff-rotate-right-persistent)
+  "Allow `helm-follow-action-forward/backward' switching to next file
+when one of these commands is the `last-command'.
+
+For example when browsing files with `C-<down>` and rotate the current file,
+hitting `C-<down>` again will not switch to next file but kill its buffer.")
+
 (defun helm--follow-action (arg)
   (let ((helm--temp-follow-flag t) ; Needed in HFF.
         (in-follow-mode (helm-follow-mode-p)))
@@ -5795,6 +5806,7 @@ candidate of first source."
     (when (or (eq last-command 'helm-follow-action-forward)
               (eq last-command 'helm-follow-action-backward)
               (eq last-command 'helm-execute-persistent-action)
+              (memq last-command helm-follow-action-white-list-commands)
               in-follow-mode)
       (if (> arg 0)
           (helm-move-selection-common :where 'line
