@@ -4250,7 +4250,11 @@ file."
                  (if (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
                           (file-equal-p (buffer-file-name
                                          (get-buffer helm-ff-image-native-buffer))
-                                        candidate))
+                                        candidate)
+                          ;; Allow redisplaying
+                          ;; `helm-ff-image-native-buffer' when it
+                          ;; already exists and display same image as candidate.
+                          (get-buffer-window helm-ff-image-native-buffer 'visible))
                      (progn
                        (set-window-buffer
                         helm-persistent-action-display-window helm-current-buffer)
