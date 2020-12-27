@@ -1913,11 +1913,15 @@ Can be used for `completion-in-region-function' by advicing it with an
         ;; Allow running extra property `:exit-function' (Issues #2265,
         ;; #2356). Function is called with 'exact if for a unique
         ;; match which is exact, the return value of `try-completion'
-        ;; is t, otherwise it is called with 'finished.
+        ;; is t or a string ending with "/" i.e. possibly a directory
+        ;; (issue #2274),
+        ;; otherwise it is called with 'finished.
         (when (and (stringp string) exit-fun)
-          (funcall exit-fun string
-                   (if (eq (try-completion initial-input collection) t)
-                       'exact 'finished)))
+          (let ((tcomp (try-completion initial-input collection)))
+            (funcall exit-fun string
+                     (if (or (eq tcomp t) ; Unique.
+                             (string-match "/\\'" tcomp)) ; A directory.
+                         'exact 'finished))))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
         (setq helm-completion--sorting-done nil)
