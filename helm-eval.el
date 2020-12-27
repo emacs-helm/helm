@@ -148,9 +148,14 @@ Should take one arg: the string to display."
   (helm-build-dummy-source "Calculation Result"
     :filtered-candidate-transformer (lambda (_candidates _source)
                                       (list
-                                       (condition-case nil
-                                           (calc-eval helm-pattern)
-                                         (error "error"))))
+                                       (condition-case err
+                                           (let ((result (calc-eval helm-pattern)))
+                                             (if (listp result)
+                                                 (error "%S"
+                                                        (format "At pos %s: %s"
+                                                                (car result) (cadr result)))
+                                               result))
+                                         (error (cdr err)))))
     :nohighlight t
     :action '(("Copy result to kill-ring" . (lambda (candidate)
                                               (kill-new candidate)
