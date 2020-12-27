@@ -4066,7 +4066,6 @@ E.g. \"foo:12\"."
       (with-selected-window (helm-persistent-action-display-window)
         (image-rotate num-arg))
     (setq file (file-truename file))    ; For symlinked images.
-    ;; When FILE is not an image-file, do nothing.
     (setq num-arg (if (string= helm-ff-rotate-image-program "exiftran")
                       (cl-case num-arg
                         (90  "-9")      ; 90 clockwise
