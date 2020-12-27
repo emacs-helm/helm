@@ -4243,27 +4243,7 @@ file."
           ;; An image file and it is the second hit on C-j, display it.
           (image-cand
            (if helm-ff-display-image-native
-               (lambda (candidate)
-                 ;; Display images in same buffer
-                 ;; `helm-ff-image-native-buffer'.
-                 (if (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-                          (file-equal-p (buffer-file-name
-                                         (get-buffer helm-ff-image-native-buffer))
-                                        candidate)
-                          ;; Allow redisplaying
-                          ;; `helm-ff-image-native-buffer' when it
-                          ;; already exists and display same image as candidate.
-                          (get-buffer-window helm-ff-image-native-buffer 'visible))
-                     (progn
-                       (set-window-buffer
-                        helm-persistent-action-display-window helm-current-buffer)
-                       (kill-buffer helm-ff-image-native-buffer))
-                   (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-                        (kill-buffer helm-ff-image-native-buffer))
-                   (cl-letf (((symbol-function 'message) #'ignore))
-                     (find-file candidate))
-                   (with-current-buffer (get-file-buffer candidate)
-                     (rename-buffer helm-ff-image-native-buffer))))
+               #'helm-ff--display-or-kill-image-native
              (lambda (_candidate)
                (require 'image-dired)
                (let* ((win (get-buffer-window
@@ -4335,6 +4315,30 @@ file."
            (lambda (candidate)
              (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
 
+(defun helm-ff--display-or-kill-image-native (candidate)
+  ;; Display images in same buffer
+  ;; `helm-ff-image-native-buffer'.
+  (if (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+           (file-equal-p (buffer-file-name
+                          (get-buffer helm-ff-image-native-buffer))
+                         candidate)
+           ;; Allow redisplaying
+           ;; `helm-ff-image-native-buffer' when it
+           ;; already exists and display same image as candidate.
+           (get-buffer-window helm-ff-image-native-buffer 'visible))
+      (progn
+        (set-window-buffer
+         helm-persistent-action-display-window helm-current-buffer)
+        (kill-buffer helm-ff-image-native-buffer))
+    (helm-ff--display-image-native candidate)))
+
+(defun helm-ff--display-image-native (candidate)
+  (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+       (kill-buffer helm-ff-image-native-buffer))
+  (cl-letf (((symbol-function 'message) #'ignore))
+    (find-file candidate))
+  (with-current-buffer (get-file-buffer candidate)
+    (rename-buffer helm-ff-image-native-buffer)))
 
 ;;; Recursive dirs completion
 ;;
