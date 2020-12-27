@@ -445,7 +445,11 @@ the directory (i.e. filenames)."
           (const :tag "size" size)))
 
 (defcustom helm-ff-rotate-image-program "exiftran"
-  "External program used to rotate images."
+  "External program used to rotate images.
+When nil and `helm-ff-display-image-native' is enabled, fallback to
+`image-rotate' without modification of exif data i.e. rotation is not
+persistent otherwise an error is returned when not using
+`helm-ff-display-image-native' i.e. using image-dired."
   :group 'helm-files
   :type '(choice
           (const :tag "Mogrify" "mogrify")
@@ -4073,7 +4077,8 @@ E.g. \"foo:12\"."
                    (number-to-string angle)))
         rotation-failed)
     ;; Try to rotate image with exiftran even with helm-ff-display-image-native.
-    (if (executable-find helm-ff-rotate-image-program)
+    (if (and helm-ff-rotate-image-program
+             (executable-find helm-ff-rotate-image-program))
         (apply #'process-file helm-ff-rotate-image-program nil nil nil
                (append helm-ff-rotate-image-switch
                        (list num-arg basename)))
@@ -4088,7 +4093,8 @@ E.g. \"foo:12\"."
           (helm-ff--display-image-native file))
       ;; Use image-dired to display image.
       (when rotation-failed
-        (error "%s not found" helm-ff-rotate-image-program))
+        (error "%s not found" (or helm-ff-rotate-image-program
+                                  "`helm-ff-rotate-image-program'")))
       (when (buffer-live-p image-dired-display-image-buffer)
         (kill-buffer image-dired-display-image-buffer))
       (image-dired-display-image basename)
