@@ -151,9 +151,8 @@ Should take one arg: the string to display."
                                        (condition-case err
                                            (let ((result (calc-eval helm-pattern)))
                                              (if (listp result)
-                                                 (error "%S"
-                                                        (format "At pos %s: %s"
-                                                                (car result) (cadr result)))
+                                                 (error "At pos %s: %s"
+                                                        (car result) (cadr result))
                                                result))
                                          (error (cdr err)))))
     :nohighlight t
