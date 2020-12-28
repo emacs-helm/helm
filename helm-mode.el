@@ -1920,7 +1920,8 @@ Can be used for `completion-in-region-function' by advicing it with an
           (let ((tcomp (try-completion initial-input collection)))
             (funcall exit-fun string
                      (if (or (eq tcomp t) ; Unique.
-                             (string-match "/\\'" tcomp)) ; A directory.
+                             (and (stringp tcomp)
+                                  (string-match "/\\'" tcomp))) ; A directory.
                          'exact 'finished))))
         (remove-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
         (customize-set-variable 'helm-completion-style old--helm-completion-style)
