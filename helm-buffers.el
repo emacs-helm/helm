@@ -947,12 +947,17 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
 (put 'helm-buffer-switch-other-frame 'helm-only t)
 
+(defun helm-buffers-switch-to-buffer-other-tab (_candidate)
+  (let ((bufs (helm-marked-candidates)))
+    (cl-loop for buf in bufs
+             do (switch-to-buffer-other-tab buf))))
+
 (defun helm-buffers-switch-to-buffer-new-tab ()
   "Run switch to buffer in other tab action from `helm-source-buffers-list'."
   (interactive)
   (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'switch-to-buffer-other-tab)))
+    (helm-exit-and-execute-action 'helm-buffers-switch-to-buffer-other-tab)))
 (put 'helm-buffers-switch-to-buffer-new-tab 'helm-only t)
 
 (defun helm-buffer-switch-buffers (_candidate)
