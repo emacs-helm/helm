@@ -3364,6 +3364,10 @@ in cache."
              ;; Remove watch as well in case of rename or delete.
              (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
              (remhash directory helm-ff--file-notify-watchers))
+            ;; `attribute-changed' means permissions have changed, not
+            ;; file modifications like file changes, visit
+            ;; etc... AFAIU the desc for this is `changed' and for our
+            ;; use case we don't care of this.
             ((eq desc 'attribute-changed)
              (push directory helm-ff--directories-events))))))
 
