@@ -3312,13 +3312,16 @@ in cache."
            (helm-aif (gethash directory helm-ff--list-directory-cache)
                (prog1 it
                  (when (member directory helm-ff--directories-events)
-                   (message " %s Something changed in `%s', you may want to update (%s)"
-                            (propertize "WARNING " 'face 'font-lock-warning-face)
-                            (helm-basename directory)
-                            (propertize
-                             (substitute-command-keys
-                              "\\<helm-map>\\[helm-refresh]")
-                             'face 'font-lock-type-face))))))
+                   (run-at-time
+                    0.1 nil
+                    (lambda ()
+                      (message " %s Something changed in `%s', you may want to update (%s)"
+                               (propertize "WARNING " 'face 'font-lock-warning-face)
+                               (helm-basename directory)
+                               (propertize
+                                (substitute-command-keys
+                                 "\\<helm-map>\\[helm-refresh]")
+                                'face 'font-lock-type-face))))))))
       (let* (file-error
              (ls   (condition-case err
                        (helm-list-directory directory)
