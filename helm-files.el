@@ -3295,7 +3295,8 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
-(defvar helm-ff--directories-events nil)
+(defvar helm-ff--directories-events nil
+  "Temporarily store for directories where attributes have changed.")
 
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
