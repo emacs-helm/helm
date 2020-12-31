@@ -3295,9 +3295,6 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
-(defvar helm-ff--directories-events nil
-  "Temporarily store for directories where attributes have changed.")
-
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3309,19 +3306,7 @@ in cache."
   (setq directory (file-name-as-directory
                    (expand-file-name directory)))
   (or (and (not force-update)
-           (helm-aif (gethash directory helm-ff--list-directory-cache)
-               (prog1 it
-                 (when (member directory helm-ff--directories-events)
-                   (run-at-time
-                    0.1 nil
-                    (lambda ()
-                      (message " %s Something changed in `%s', you may want to update (%s)"
-                               (propertize "WARNING " 'face 'font-lock-warning-face)
-                               (helm-basename directory)
-                               (propertize
-                                (substitute-command-keys
-                                 "\\<helm-map>\\[helm-refresh]")
-                                'face 'font-lock-type-face))))))))
+           (gethash directory helm-ff--list-directory-cache))
       (let* (file-error
              (ls   (condition-case err
                        (helm-list-directory directory)
@@ -3341,7 +3326,6 @@ in cache."
              (dot2 (concat directory ".."))
              (candidates (append (and (not file-error) (list dot dot2)) ls)))
         (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
-        (setq helm-ff--directories-events (delete directory helm-ff--directories-events))
         (prog1
             (puthash directory
                      (cl-loop for f in candidates
@@ -3361,18 +3345,16 @@ in cache."
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
     (let ((desc (cadr event)))
-      (cond ((memq desc '(created deleted renamed))
-             ;; When DIRECTORY is modified remove it from cache.
-             (remhash directory helm-ff--list-directory-cache)
-             ;; Remove watch as well in case of rename or delete.
-             (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
-             (remhash directory helm-ff--file-notify-watchers))
-            ;; `attribute-changed' means permissions have changed, not
-            ;; file modifications like file changes, visit
-            ;; etc... AFAIU the desc for this is `changed' and for our
-            ;; use case we don't care of this.
-            ((eq desc 'attribute-changed)
-             (push directory helm-ff--directories-events))))))
+      ;; `attribute-changed' means permissions have changed, not
+      ;; file modifications like file changes, visit
+      ;; etc... AFAIU the desc for this is `changed' and for our
+      ;; use case we don't care of this.
+      (when (memq desc '(created deleted renamed attribute-changed))
+        ;; When DIRECTORY is modified remove it from cache.
+        (remhash directory helm-ff--list-directory-cache)
+        ;; Remove watch as well in case of rename or delete.
+        (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
+        (remhash directory helm-ff--file-notify-watchers)))))
 
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
