@@ -48,7 +48,8 @@ will not have separators between candidates any more."
 
 (defcustom helm-kill-ring-actions
   '(("Yank marked" . helm-kill-ring-action-yank)
-    ("Delete marked" . helm-kill-ring-action-delete))
+    ("Delete marked" . helm-kill-ring-action-delete)
+    ("Search from candidate" . helm-kill-ring-search-from-string))
   "List of actions for kill ring source."
   :group 'helm-ring
   :type '(alist :key-type string :value-type function))
@@ -72,6 +73,7 @@ will not have separators between candidates any more."
     (define-key map (kbd "M-y")     'helm-next-line)
     (define-key map (kbd "M-u")     'helm-previous-line)
     (define-key map (kbd "M-D")     'helm-kill-ring-delete)
+    (define-key map (kbd "C-s")     'helm-kill-ring-run-search-from-string)
     (define-key map (kbd "C-]")     'helm-kill-ring-toggle-truncated)
     (define-key map (kbd "C-c C-k") 'helm-kill-ring-kill-selection)
     (define-key map (kbd "C-c d")   'helm-kill-ring-run-persistent-delete)
@@ -213,6 +215,18 @@ yanked string."
                  (run-with-timer 0.01 nil yank-fn before 'pop))))
         (kill-new str)))))
 (define-obsolete-function-alias 'helm-kill-ring-action 'helm-kill-ring-action-yank "2.4.0")
+
+(defun helm-kill-ring-search-from-string (candidate)
+  (let ((str (car (split-string candidate "\n"))))
+    (helm-multi-occur-1
+     (list (current-buffer))
+     (regexp-quote (substring-no-properties str)))))
+
+(defun helm-kill-ring-run-search-from-string ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-kill-ring-search-from-string)))
+(put 'helm-kill-ring-run-search-from-string 'helm-only t)
 
 (defun helm-kill-ring-action-delete (_candidate)
   "Delete marked candidates from `kill-ring'."
