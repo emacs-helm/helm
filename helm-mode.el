@@ -1468,6 +1468,8 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        ;; Helm handlers should always have a non nil INITIAL arg.
                        :initial-input (expand-file-name init dir)
                        :alistp nil
+                       :nomark (null helm-comp-read-use-marked)
+                       :marked-candidates helm-comp-read-use-marked
                        :must-match mustmatch
                        :test predicate
                        :noret reading-directory))))
