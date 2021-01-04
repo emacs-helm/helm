@@ -961,6 +961,15 @@ If NAME returns nil the pair is skipped.
            do (setq name (funcall name))
            when name
            collect (cons name fn)))
+
+(defun helm-closest-number-in-list (num list)
+  "Return closest number to NUM found in LIST.
+LIST is a list of numbers and NUM a number."
+  (cl-loop for i in list
+           for diff = (if (> num i) (- num i) (- i num))
+           collect (cons diff i) into res
+           minimize diff into min
+           finally return (cdr (assq min res))))
 
 ;;; Strings processing.
 ;;
