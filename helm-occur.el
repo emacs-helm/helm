@@ -31,7 +31,9 @@
 
 ;;; Internals
 ;;
-(defvar helm-source-occur nil)
+(defvar helm-source-occur nil
+  "This will be the name of the source related to `current-buffer'.
+Don't use it as it value changes always.")
 (defvar helm-source-moccur nil
   "This is just a flag to add to `helm-sources-using-default-as-input'.
 Don't set it to any value, it will have no effect.")
