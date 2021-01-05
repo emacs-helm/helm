@@ -342,12 +342,14 @@ Each buffer's result is displayed in a separated source."
                      return s))
       (setq helm-occur--initial-pos (line-number-at-pos))
       (add-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))
-    (helm :sources sources
-          :buffer "*helm moccur*"
-          :history 'helm-occur-history
-          :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
-          :input input
-          :truncate-lines helm-occur-truncate-lines)))
+    (unwind-protect
+        (helm :sources sources
+              :buffer "*helm moccur*"
+              :history 'helm-occur-history
+              :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
+              :input input
+              :truncate-lines helm-occur-truncate-lines)
+      (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))
 
 ;;; Actions
 ;;
