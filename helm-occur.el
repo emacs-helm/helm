@@ -144,7 +144,7 @@ This happen only in `helm-source-occur' which is always related to `current-buff
 
 
 (defun helm-occur--select-closest-candidate ()
-  (with-helm-window
+  (with-helm-buffer
     (let ((lst '())
           (name (helm-get-attr 'name helm-source-occur))
           closest beg end)
