@@ -124,8 +124,9 @@ Note that when using `buffer-substring' initialization will be slower."
                 :value-type (radio (const :tag "With text properties" buffer-substring)
                                    (const :tag "Without text properties" buffer-substring-no-properties))))
 
-(defcustom helm-occur-keep-closest-position t
-  "When non nil select closest candidate from point after update."
+(defcustom helm-occur-keep-closest-position nil
+  "When non nil select closest candidate from point after update.
+This happen only in `helm-source-occur' which is always related to `current-buffer'."
   :group 'helm-regexp
   :type 'boolean)
 
