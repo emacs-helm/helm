@@ -164,11 +164,12 @@ This happen only in `helm-source-occur' which is always related to `current-buff
                       end (or (helm-get-next-header-pos) (point-max)))
                 (cl-return))))
           (save-excursion
-            (goto-char beg)
-            (while (re-search-forward "^[0-9]+" end t)
-              (push (string-to-number (match-string 0)) lst))
-            (setq closest (helm-closest-number-in-list
-                           helm-occur--initial-pos lst)))
+            (when (and beg end)
+              (goto-char beg)
+              (while (re-search-forward "^[0-9]+" end t)
+                (push (string-to-number (match-string 0)) lst))
+              (setq closest (helm-closest-number-in-list
+                             helm-occur--initial-pos lst))))
           (when (and closest (re-search-forward (format "^%s" closest) end t))
             (helm-mark-current-line)
             (goto-char (overlay-end
