@@ -143,16 +143,28 @@ Note that when using `buffer-substring' initialization will be slower."
 (defun helm-occur--select-closest-candidate ()
   (with-helm-window
     (let ((lst '())
-          closest)
+          (name (helm-get-attr 'name helm-source-occur))
+          closest beg end)
       (unless (string-equal helm-pattern "")
         (while-no-input
           (goto-char (point-min))
+          (if (string= name "Helm occur")
+              (setq beg (point)
+                    end (point-max))
+            (helm-awhile (helm-get-next-header-pos)
+              (when (string= name (buffer-substring-no-properties
+                                   (point-at-bol) (point-at-eol)))
+                (forward-line 1)
+                (setq beg (point)
+                      end (or (helm-get-next-header-pos) (point-max)))
+                (cl-return))))
           (save-excursion
-            (while (re-search-forward "^[0-9]+" nil t)
+            (goto-char beg)
+            (while (re-search-forward "^[0-9]+" end t)
               (push (string-to-number (match-string 0)) lst))
             (setq closest (helm-closest-number-in-list
                            helm-occur--initial-pos lst)))
-          (when (and closest (re-search-forward (format "^%s" closest) nil t))
+          (when (and closest (re-search-forward (format "^%s" closest) end t))
             (helm-mark-current-line)
             (goto-char (overlay-end
                          helm-selection-overlay))))))))
@@ -318,6 +330,15 @@ Each buffer's result is displayed in a separated source."
                              (cl-loop for b in bufs collect
                                       (buffer-chars-modified-tick
                                        (get-buffer b))))
+    (when (and helm-occur-always-search-in-current
+               helm-occur-keep-closest-position)
+      (setq helm-source-occur
+            (cl-loop for s in sources
+                     when (eql helm-current-buffer
+                               (get-buffer (helm-get-attr 'buffer-name s)))
+                     return s))
+      (setq helm-occur--initial-pos (line-number-at-pos))
+      (add-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))
     (helm :sources sources
           :buffer "*helm moccur*"
           :history 'helm-occur-history
