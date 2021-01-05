@@ -1960,6 +1960,12 @@ prefix arg to ensure you run only one command on all marked async.
 
 ** Tips
 
+*** Searching in many buffers
+
+Start from `helm-buffers-list' or `helm-mini', mark some buffers and hit \\<helm-buffer-map\\[helm-buffers-run-occur].
+A prefix arg will change the behavior of `helm-occur-always-search-in-current'
+i.e. add current buffer or not to the list of buffers to search in.
+
 *** Matching
 
 Multiple regexp matching is allowed, simply enter a space to separate the regexps.
@@ -1970,10 +1976,25 @@ save and edit these results, i.e. add text to the empty line.
 
 *** Automatically match symbol at point
 
-Helm can automatically match the symbol at point while keeping the minibuffer
-empty, ready to be written to.  This behaviour is disabled by default.  To
-enable this you need to add `helm-source-occur' and `helm-source-moccur' to
+Helm can automatically match the symbol at point while keeping
+the minibuffer empty, ready to be written to when
+`helm-source-occur' and `helm-source-moccur' are member of
 `helm-sources-using-default-as-input'.
+
+*** Yank word at point in minibuffer
+
+Use `C-w' as many time as needed, undo with =C-_=.  Note that
+=C-w= and =C-_= are not standard keybindings, but bindings
+provided with special helm feature
+`helm-define-key-with-subkeys'.
+
+*** Preselection
+
+When helm-occur search symbol at point the current line is
+preselected in the source related to current-buffer.  When
+`helm-occur-keep-closest-position' is non nil helm-occur will
+select the line which is the closest from the current line in
+current-buffer after updating.
 
 *** Jump to the corresponding line in the searched buffer
 
