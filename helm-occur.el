@@ -144,11 +144,13 @@ This happen only in `helm-source-occur' which is always related to `current-buff
 
 
 (defun helm-occur--select-closest-candidate ()
-  (with-helm-buffer
-    (let ((lst '())
-          (name (helm-get-attr 'name helm-source-occur))
-          closest beg end)
-      (unless (string-equal helm-pattern "")
+  ;; Prevent error with `with-helm-window' when switching to help.
+  (unless (or (not (get-buffer-window helm-buffer 'visible))
+              (string-equal helm-pattern ""))
+    (with-helm-window
+      (let ((lst '())
+            (name (helm-get-attr 'name helm-source-occur))
+            closest beg end)
         (while-no-input
           (goto-char (point-min))
           (if (string= name "Helm occur")
@@ -170,7 +172,7 @@ This happen only in `helm-source-occur' which is always related to `current-buff
           (when (and closest (re-search-forward (format "^%s" closest) end t))
             (helm-mark-current-line)
             (goto-char (overlay-end
-                         helm-selection-overlay))))))))
+                        helm-selection-overlay))))))))
 
 ;;;###autoload
 (defun helm-occur ()
