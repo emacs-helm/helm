@@ -172,7 +172,7 @@ This happen only in `helm-source-occur' which is always related to `current-buff
                              helm-occur--initial-pos lst))))
           (when (and closest (re-search-forward (format "^%s" closest) end t))
             (helm-mark-current-line)
-            (goto-char (overlay-end
+            (goto-char (overlay-start
                         helm-selection-overlay))))))))
 
 ;;;###autoload
