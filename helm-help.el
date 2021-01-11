@@ -494,7 +494,7 @@ List all the files under this directory and other subdirectories
 - With two prefix arguments:
 Same but the cache is refreshed.
 
-**** You can start a recursive search with \"locate\" \"find\" or [[https://github.com/sharkdp/fd][Fd]]
+**** You can start a recursive search with \"locate\", \"find\" or [[https://github.com/sharkdp/fd][Fd]]
 
 See \"Note\" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
@@ -535,8 +535,9 @@ Examples:
 - \"find %s -type d -name '*%s*'\"
 - \"find %s -type d -regex .*%s.*$\"
 
-[[https://github.com/sharkdp/fd][Fd]] command is now also supported, it is regexp based and very fast, here is the
-command line to use:
+[[https://github.com/sharkdp/fd][Fd]] command is now also
+supported, it is regexp based and very fast.  Here is the command
+line to use:
 
 - \"fd --hidden --type d .*%s.*$ %s\"
 
@@ -1983,7 +1984,7 @@ the minibuffer empty, ready to be written to when
 
 *** Yank word at point in minibuffer
 
-Use `C-w' as many time as needed, undo with =C-_=.  Note that
+Use `C-w' as many times as needed, undo with =C-_=.  Note that
 =C-w= and =C-_= are not standard keybindings, but bindings
 provided with special helm feature
 `helm-define-key-with-subkeys'.
@@ -2204,7 +2205,7 @@ duplicates in your helm-M-x history set `history-delete-duplicates' to non nil."
 - End the kmacro recording with `f4'.
 - Run `helm-execute-kmacro' to list all your kmacros.
 
-Use persistent action to run your kmacro as many time as needed.
+Use persistent action to run your kmacro as many times as needed.
 You can browse the kmacros with `helm-next-line' and `helm-previous-line'.
 
 Note: You can't record keys running Helm commands except `helm-M-x', under the
