@@ -111,13 +111,13 @@ Negation are supported i.e. \"!\".
 
 When you specify more than one of such patterns, it will match
 buffers with contents matching each of these patterns i.e. AND,
-not OR.  That's mean that if you specify \"@foo @bar\" the
-contents of buffer will have to be matched by foo AND bar.  If
-you specify \"@foo @!bar\" it means the contents of buffer have
-to be matched by foo but NOT bar.
+not OR.  That means that if you specify \"@foo @bar\" the contents
+of buffer will have to be matched by foo AND bar.  If you specify
+\"@foo @!bar\" it means the contents of the buffer have to be
+matched by foo but NOT bar.
 
 If you enter a pattern prefixed with an escaped \"@\", Helm searches for a
-buffer matching \"@pattern\" but does not search inside.
+buffer matching \"@pattern\" but does not search inside the buffer.
 
 **** Search by directory name
 
@@ -195,8 +195,8 @@ If buffer is associated to a file and is modified, it is by default colorized in
 see [[Meaning of colors and prefixes for buffers][Meaning of colors and prefixes for buffers]].
 You can save these buffers with \\<helm-buffer-map>\\[helm-buffer-save-persistent].
 If you want to save all these buffers, you can mark them with \\[helm-buffers-mark-similar-buffers]
-and save them with \\[helm-buffer-save-persistent], you can also do this in one step with
-\\[helm-buffer-run-save-some-buffers], note that you will not be asked for confirmation.
+and save them with \\[helm-buffer-save-persistent].  You can also do this in one step with
+\\[helm-buffer-run-save-some-buffers].  Note that you will not be asked for confirmation.
   
 *** Meaning of colors and prefixes for buffers
 
@@ -259,17 +259,17 @@ On a symlinked directory a prefix argument expands to its true name.
 
 ***** `DEL' behavior
 
-`DEL' by default is deleting char backward.
+`DEL' by default deletes char backward.
 
 But when `helm-ff-DEL-up-one-level-maybe' is non nil `DEL' behaves
-differently depending on the contents of helm-pattern. It goes up one
+differently depending on the contents of helm-pattern.  It goes up one
 level if the pattern is a directory ending with \"/\" or disables HFF
 auto update and delete char backward if the pattern is a filename or
 refers to a non existing path.  Going up one level can be disabled
 if necessary by deleting \"/\" at the end of the pattern using
 \\<helm-map>\\[backward-char] and \\[helm-delete-minibuffer-contents].
 
-Note that when deleting char backward, helm takes care of
+Note that when deleting char backward, Helm takes care of
 disabling update giving you the opportunity to edit your pattern for
 e.g. renaming a file or creating a new file or directory.
 When `helm-ff-auto-update-initial-value' is non nil you may want to
@@ -289,10 +289,10 @@ It behaves differently depending on `helm-selection' (current candidate in helm-
 - candidate is a file         => Open it.
 
 If you have marked candidates and you press RET on a directory,
-helm will navigate to this directory, if you want to exit with
-RET with default action with these marked candidates, press RET
-on a second time while you are on the root of this directory
-e.g. \"/home/you/dir/.\" or press RET on any file which is not a
+Helm will navigate to this directory.  If you want to exit with
+RET with default action with these marked candidates, press RET a
+second time while you are on the root of this directory e.g.
+\"/home/you/dir/.\" or press RET on any file which is not a
 directory.  You can also exit with default action at any moment
 with `f1'.
 
@@ -309,8 +309,8 @@ a new command for `TAB':
 
     (define-key helm-find-files-map (kbd \"C-i\") 'helm-ff-TAB)
 
-It will then behave slighly differently
-depending of `helm-selection':
+It will then behave slighly differently depending of
+`helm-selection':
 
 - candidate basename is \".\"  => open the action menu.
 - candidate is a directory     => expand it (behave as \\<helm-map>\\[helm-execute-persistent-action]).
@@ -424,9 +424,9 @@ is enabled (go to next/previous line only).
 
 Use `\\[universal-argument] \\[helm-execute-persistent-action]' to display an image or kill its buffer.
 
-TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enlarge-window]' to display helm window vertically
+TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enlarge-window]' to display Helm window vertically
 and to enlarge it while viewing images.
-This may not work though with exotic helm windows settings like the one you can find is Spacemacs...
+Note this may not work with exotic Helm windows settings such as the ones in Spacemacs.
 
 *** Open files externally
 
@@ -436,8 +436,8 @@ Helm is looking what is used by default to open file
 externally (mailcap files) but have its own variable
 `helm-external-programs-associations' to store external
 applications.  If you call the action or its binding without
-prefix arg helm will see if there is an application suitable in
-`helm-external-programs-associations' , otherwise it will look in
+prefix arg Helm will see if there is an application suitable in
+`helm-external-programs-associations', otherwise it will look in
 mailcap files.  If you want to specify which external application
 to use (and its options) use a prefix arg.
 
@@ -450,8 +450,8 @@ Same as above but doesn't quit Helm session, it is apersistent action.
 
 - Open file externally with default tool (`\\[helm-ff-run-open-file-with-default-tool]').
 
-This use xdg-open which sucks most of the time, perhaps it works
-fine on Windows, it is why it is kept in Helm.
+This uses xdg-open which sucks most of the time, but perhaps it
+works fine on Windows.  This is why it is kept in Helm.
 
 *** Toggle auto-completion
 
@@ -474,7 +474,7 @@ Note that when you enter a new name, this one is prefixed with
 \[?] if you are in a writable directory.  If you are in a directory
 where you have no write permission the new file name is not
 prefixed and is colored in red.  There is not such distinction
-when using tramp, new filename just appear on top of buffer.
+when using Tramp, new filename just appears on top of buffer.
 
 *** Recursive search from Helm-find-files
 
@@ -502,7 +502,7 @@ Using \"locate\", you can enable the local database with a prefix argument. If t
 local database doesn't already exists, you will be prompted for its creation.
 If it exists and you want to refresh it, give it two prefix args.
 
-When using locate the helm-buffer remains empty until you type something.
+When using locate the Helm buffer remains empty until you type something.
 Regardless Helm uses the basename of the pattern entered in the helm-find-files
 session by default.  Hitting `\\[next-history-element]' should just kick in the
 locate search with this pattern.  If you want Helm to automatically do this, add
@@ -536,7 +536,7 @@ Examples:
 - \"find %s -type d -regex .*%s.*$\"
 
 [[https://github.com/sharkdp/fd][Fd]] command is now also
-supported, it is regexp based and very fast.  Here is the command
+supported which is regexp based and very fast.  Here is the command
 line to use:
 
 - \"fd --hidden --type d .*%s.*$ %s\"
