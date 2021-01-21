@@ -745,7 +745,10 @@ To use this bind it to a key in `isearch-mode-map'."
   (let ((input (if isearch-regexp
                    isearch-string
                  (regexp-quote isearch-string)))
-        (bufs (list (current-buffer))))
+        (bufs (list (current-buffer)))
+        ;; Use `helm-occur-always-search-in-current' as a flag for
+        ;; `helm-occur--select-closest-candidate'.
+        (helm-occur-always-search-in-current t))
     (isearch-exit)
     (helm-multi-occur-1 bufs input)))
 
