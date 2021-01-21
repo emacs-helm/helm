@@ -198,6 +198,10 @@ engine beeing completely different and also much faster."
   (helm-set-local-variable 'helm-occur--buffer-list (list (current-buffer))
                            'helm-occur--buffer-tick
                            (list (buffer-chars-modified-tick (current-buffer))))
+  (helm-set-attr 'header-name (lambda (_name)
+                                (format "HO [%s]"
+                                        (buffer-name helm-current-buffer)))
+                 helm-source-occur)
   (when helm-occur-keep-closest-position
     (setq helm-occur--initial-pos (line-number-at-pos))
     (add-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))
@@ -263,12 +267,14 @@ engine beeing completely different and also much faster."
 (defun helm-occur-build-sources (buffers &optional source-name)
   "Build sources for `helm-occur' for each buffer in BUFFERS list."
   (cl-loop for buf in buffers
+           for bname = (buffer-name buf)
            collect
-           (helm-make-source (or source-name
-                                 (format "HO [%s]"
-                                         (buffer-name buf)))
+           (helm-make-source (or source-name bname)
                'helm-moccur-class
-             :buffer-name (buffer-name buf)
+             :header-name (lambda (name)
+                            (format "HO [%s]" (if (string= name "Helm occur")
+                                                  bname name)))
+             :buffer-name bname
              :match-part
              (lambda (candidate)
                ;; The regexp should match what is in candidate buffer,
@@ -327,7 +333,9 @@ Each buffer's result is displayed in a separated source."
                             do (setq total_size (buffer-size b))
                             finally return (> total_size 2000000))
              helm-sources-using-default-as-input))
-         (sources (helm-occur-build-sources bufs))
+         (sources (helm-occur-build-sources bufs (and (eql curbuf (car bufs))
+                                                      (not (cdr bufs))
+                                                      "Helm occur")))
          (helm-maybe-use-default-as-input
           (not (null (memq 'helm-source-moccur
                            helm-sources-using-default-as-input)))))
