@@ -202,7 +202,7 @@ previous value stored in `helm-mm--3-pattern-list'."
 E.g., ((identity . \"foo\") (not . \"bar\"))."
   (unless (string= pattern "")
     (cl-loop for pat in (helm-mm-split-pattern pattern)
-          collect (if (string= "!" (substring pat 0 1))
+          collect (if (char-equal ?! (aref pat 0))
                       (cons 'not (substring pat 1))
                     (cons 'identity pat)))))
 
