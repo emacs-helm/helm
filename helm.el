@@ -1422,13 +1422,26 @@ the `helm' group.
 
 You can display the Helm completion buffer in many different
 window configurations, see the custom interface to discover the
-different windows configurations available (See [[Customize
-Helm][Customize Helm]] to jump to custom interface).  When using
-Emacs in a graphic display (i.e. not in a terminal) you can as
+different windows configurations available (See [[Customize Helm][Customize Helm]] to jump to custom interface).
+When using Emacs in a graphic display (i.e. not in a terminal) you can as
 well display your Helm buffers in separated frames globally for
-all Helm commands or separately for specific Helm commands.  See
-[[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for
-more infos.
+all Helm commands or separately for specific Helm commands.
+See `helm-display-function' and `helm-commands-using-frame'.
+See also [[https://github.com/emacs-helm/helm/wiki/frame][helm wiki]] for more infos.
+
+There is a variable to allow reusing frame instead of deleting
+and creating a new one at each session, see `helm-display-buffer-reuse-frame'.
+Normally you don't have to use this, it have been made to workaround
+slow frame popup in Emacs-26, to workaround this slowness in Emacs-26 use instead
+
+#+begin_src elisp 
+    (when (= emacs-major-version 26)
+      (setq x-wait-for-event-timeout nil))
+#+end_src
+
+WARNING:
+There is a package called posframe and also one called helm-posframe,
+you DO NOT need these packages to display helm buffers in frames.
 
 ** Helm's basic operations and default key bindings
 
