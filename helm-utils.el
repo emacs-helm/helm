@@ -24,9 +24,10 @@
 (declare-function helm-find-files-1 "helm-files" (fname &optional preselect))
 (declare-function helm-grep-split-line "helm-grep" (line))
 (declare-function popup-tip "ext:popup")
-(declare-function markdown-show-subtree "outline")
+(declare-function markdown-show-entry "ext:markdown-mode.el")
 (declare-function outline-show-subtree "outline")
 (declare-function org-reveal "org")
+(declare-function hs-show-block "hideshow.el")
 (declare-function tab-bar-tabs "tab-bar")
 (declare-function tab-bar-select-tab "tab-bar")
 (declare-function dired-goto-file "dired")
@@ -34,6 +35,8 @@
 (declare-function package-installed-p "package")
 (declare-function package-desc-dir "package")
 
+(defvar hs-minor-mode)
+(defvar hs-show-hook)
 (defvar org-directory)
 (defvar winner-boring-buffers)
 (defvar bookmark-alist)
@@ -481,12 +484,16 @@ Default is `helm-current-buffer'."
                   ((and (boundp 'outline-minor-mode)
                         outline-minor-mode)
                    #'outline-show-subtree)
+                  ((and (boundp 'hs-minor-mode)
+                    hs-minor-mode)
+                   #'hs-show-block)
                   ((and (boundp 'markdown-mode-map)
                         (derived-mode-p 'markdown-mode))
-                   #'markdown-show-subtree))))
+                   #'markdown-show-entry)))
+        (hs-show-hook (list (lambda () (goto-char loc)))))
     ;; outline may fail in some conditions e.g. with markdown enabled
     ;; (issue #1919).
-    (condition-case nil
+    (condition-case-unless-debug nil
         (and fn (funcall fn))
       (error nil))))
 
