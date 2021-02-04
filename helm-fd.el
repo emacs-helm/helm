@@ -78,8 +78,12 @@
   (let* (process-connection-type
          (cmd (append helm-fd-switches (split-string helm-pattern " ")))
          (proc (apply #'start-process "fd" nil "fd" cmd))
-         (start-time (float-time)))
+         (start-time (float-time))
+         (fd-version (replace-regexp-in-string
+                      "\n" ""
+                      (shell-command-to-string "fd --version"))))
     (helm-log "Fd command:\nfd %s" (mapconcat 'identity cmd " "))
+    (helm-log "VERSION: %s" fd-version)
     (prog1
         proc
       (set-process-sentinel
@@ -91,7 +95,8 @@
                             (:eval (format "L%s" (helm-candidate-number-at-point))) " "
                             (:eval (propertize
                                     (format
-                                     "[fd process finished in %.2fs - (%s results)] "
+                                     "[%s process finished in %.2fs - (%s results)] "
+                                     ,fd-version
                                      ,(- (float-time) start-time)
                                      (helm-get-candidate-number))
                                     'face 'helm-fd-finish))))
