@@ -733,7 +733,7 @@ displayed in BUFNAME."
                      (not (memq fun helm-help-not-interactive-command)))
                 ;; For movement of cursor in help buffer we need to
                 ;; call interactively commands for impaired people
-                ;; using a synthetizer (Bug #1347).
+                ;; using a synthetizer (Bug#1347).
                 (call-interactively fun)
               (funcall fun))))))))
 

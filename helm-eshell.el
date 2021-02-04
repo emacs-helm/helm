@@ -219,7 +219,7 @@ at point."
   (if (and (stringp last)
            (not (string= last ""))
            (not users-comp)
-           ;; Fix completion on "../" see bug #1832.
+           ;; Fix completion on "../" see Bug#1832.
            (or (file-exists-p last)
                (helm-aand
                 (file-name-directory last)

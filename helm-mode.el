@@ -468,7 +468,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (setq candidates (append (list
                                 ;; Unquote helm-pattern
                                 ;; when it is added
-                                ;; as candidate: Why? (bug #2015)
+                                ;; as candidate: Why? (Bug#2015)
                                 ;; (replace-regexp-in-string
                                 ;;  "\\s\\" "" helm-pattern)
                                 helm-pattern)
@@ -498,7 +498,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
-      ;; Avoid error with candidates with an image as display (bug #2296).
+      ;; Avoid error with candidates with an image as display (Bug#2296).
       (when (equal (get-text-property 0 'display it) "[?]")
         (helm-next-line))))
 
@@ -1965,7 +1965,7 @@ Be sure to know what you are doing when modifying this.")
          (let ((beg (+ start base-size))
                (sep (or (and
                          ;; If `crm-separator' is a string of length 1
-                         ;; assume it can be used as separator (bug #2298),
+                         ;; assume it can be used as separator (Bug#2298),
                          ;; otherwise it is a regexp and use the value
                          ;; it matches or default to "," if no match.
                          (eq (length crm-separator) 1)
