@@ -258,7 +258,7 @@ string."
                                    ;; If value is an integer, convert it
                                    ;; to a marker, otherwise it is a cons cell
                                    ;; and it will be converted on next recursions.
-                                   ;; (Issue #1060) [1].
+                                   ;; (Bug#1060) [1].
                                    (if (integerp v) (copy-marker v) v)))))
                   ((listp (cdr elm))
                    (and elm (list elm)))
@@ -266,7 +266,7 @@ string."
                    ;; bug in imenu, should not be needed.
                    (and (cdr elm)
                         ;; Semantic uses overlays whereas imenu uses
-                        ;; markers (issue #1706).
+                        ;; markers (Bug#1706).
                         (setcdr elm (pcase (cdr elm) ; Same as [1].
                                       ((and ov (pred overlayp))
                                        (copy-overlay ov))
@@ -351,7 +351,7 @@ i.e. `derived-mode-p' or it have an association in
               :init (lambda ()
                       ;; Use a cache to avoid repeatedly sending
                       ;; progress-reporter message when updating
-                      ;; (Issue #1704).
+                      ;; (Bug#1704).
                       (setq helm-imenu--in-all-buffers-cache
                             (helm-imenu-candidates-in-all-buffers)))
               :candidates 'helm-imenu--in-all-buffers-cache

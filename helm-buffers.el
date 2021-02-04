@@ -275,11 +275,11 @@ Note that this variable is buffer-local.")
 
 (defun helm-buffers-list--init ()
   (require 'dired)
-  ;; Issue #51 Create the list before `helm-buffer' creation.
+  ;; Bug#51 Create the list before `helm-buffer' creation.
   ;; We were using a global cache in the past and 'candidates was
   ;; bound to this cache, this was a problem when using more than one
   ;; source with a different 'buffer-list fn as the same cache was
-  ;; reused in each source (issue #1907), now 'candidates attr is set
+  ;; reused in each source (Bug#1907), now 'candidates attr is set
   ;; directly so that each list of candidates is local to source.
   (helm-set-attr 'candidates (funcall (helm-get-attr 'buffer-list)))
   (let ((result (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers

@@ -2585,7 +2585,7 @@ of current source only."
                    while (not (if in-current-source
                                   (or (helm-pos-header-line-p) (eobp))
                                 (eobp)))
-                   ;; Don't count empty lines maybe added by popup (#1370).
+                   ;; Don't count empty lines maybe added by popup (bug#1370).
                    unless (or (eq (point-at-bol) (point-at-eol))
                               (helm-pos-header-line-p))
                    do (cl-incf ln)
@@ -2828,7 +2828,7 @@ HISTORY args see `helm'."
     (advice-add 'epa-passphrase-callback-function
                 :around #'helm--suspend-read-passwd)
     ;; Ensure linum-mode is disabled in Helm buffers to preserve
-    ;; performances (Issue #1894).
+    ;; performances (Bug#1894).
     (advice-add 'linum-on :override #'helm--advice-linum-on '((depth . 100))))
   (helm-log (concat "[Start session] " (make-string 41 ?+)))
   (helm-log "prompt = %S" prompt)
@@ -2840,7 +2840,7 @@ HISTORY args see `helm'."
   (setq helm--prompt (or prompt "pattern: "))
   (let ((non-essential t)
         ;; Prevent mouse jumping to the upper-right
-        ;; hand corner of the frame (#1538).
+        ;; hand corner of the frame (bug#1538).
         mouse-autoselect-window
         focus-follows-mouse
         mode-line-in-non-selected-windows
@@ -2876,7 +2876,7 @@ HISTORY args see `helm'."
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
               (add-hook 'post-command-hook 'helm--maybe-update-keymap)
               ;; Add also to update hook otherwise keymap is not updated
-              ;; until a key is hitted (Issue #1670).
+              ;; until a key is hitted (Bug#1670).
               (add-hook 'helm-after-update-hook 'helm--maybe-update-keymap)
               (add-hook 'post-command-hook 'helm--update-header-line)
               (helm-log "show prompt")
@@ -3186,7 +3186,7 @@ frame configuration as per `helm-save-configuration-functions'."
                          ;;
                          ;; Since they don't know about the new timestamp,
                          ;; their keyboard handling can break after a helm
-                         ;; user quits emacs, as reported in #1641.
+                         ;; user quits emacs, as reported in bug#1641.
                          ;;
                          ;; Fortunately for us, we really don't need this
                          ;; XSetInputFocus call, since we already have focus
@@ -3618,7 +3618,7 @@ Helm was started, use `helm-current-buffer' instead."
       ;; as `helm-current-buffer', this allow to use helm
       ;; from an already active minibuffer (M-: etc...)
       (window-buffer (active-minibuffer-window))
-    ;; Fix Issue #456
+    ;; Fix Bug#456
     ;; Use this instead of `current-buffer' to ensure
     ;; helm session started in helm-mode from a completing-read
     ;; Use really the buffer where we started and not the one
@@ -3867,7 +3867,7 @@ map)."
         ;; e.g C-x C-f M-y C-g
         ;; => *find-files have now the bindings of *kill-ring.
         ;; It is no more true now we are using `minor-mode-overriding-map-alist'
-        ;; and `helm--minor-mode' thus it fix issue #1076 for emacs-24.3
+        ;; and `helm--minor-mode' thus it fix Bug#1076 for emacs-24.3
         ;; where concurrent timers are not supported.
         ;; i.e update keymap+check input.
         (with-current-buffer (window-buffer (minibuffer-window))
@@ -3906,7 +3906,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
     (let ((frame (selected-frame)))
       (setq cursor-type t)
       ;; Ensure restoring default-value of mode-line to allow user
-      ;; using the mouse when helm is inactive (issues #1517,#2377).
+      ;; using the mouse when helm is inactive (Bug#1517,Bug#2377).
       (setq mode-line-format (default-value 'mode-line-format))
       (remove-hook 'post-command-hook 'helm--maybe-update-keymap)
       (remove-hook 'post-command-hook 'helm--update-header-line)
@@ -3996,7 +3996,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   "Retrieve and return the list of candidates from SOURCE."
   (let* ((candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
-         ;; See comment in helm-get-cached-candidates (Issue #2113).
+         ;; See comment in helm-get-cached-candidates (Bug#2113).
          (inhibit-quit candidate-proc)
          cfn-error
          (notify-error
@@ -4033,7 +4033,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
                ;; Can happen when the output of a process
                ;; is empty, and the candidates function call
                ;; something like (split-string (buffer-string) "\n")
-               ;; which result in a list of one empty string (Issue #938).
+               ;; which result in a list of one empty string (Bug#938).
                ;; e.g (completing-read "test: " '(""))
                (equal candidates '("")))
            nil)
@@ -4061,7 +4061,7 @@ Cache the candidates if there is no cached value yet."
          (candidate-cache (gethash name helm-candidate-cache))
          ;; Bind inhibit-quit to ensure function terminate in case of
          ;; quit from helm-while-no-input and processes are added to
-         ;; helm-async-processes for further deletion (Issue #2113).
+         ;; helm-async-processes for further deletion (Bug#2113).
          (inhibit-quit (assoc-default 'candidates-process source)))
     (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
@@ -4170,7 +4170,7 @@ If \(candidate-number-limit\) is in SOURCE, show all candidates in SOURCE.
 If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
   (helm-aif (assq 'candidate-number-limit source)
       ;; When assoc value is nil use by default 99999999 otherwise use
-      ;; the assoc value, when it is a symbol interpret its value (#1831).
+      ;; the assoc value, when it is a symbol interpret its value (bug#1831).
       (or (helm-aand (cdr it) (helm-interpret-value it)) 99999999)
     (or helm-candidate-number-limit 99999999)))
 
@@ -4403,7 +4403,7 @@ to the matching method in use."
       (with-temp-buffer
         ;; Insert the whole display part and remove non--match-part
         ;; to keep their original face properties.
-        (insert (propertize (or mp display) 'read-only nil)) ; Fix (#1176)
+        (insert (propertize (or mp display) 'read-only nil)) ; Fix (bug#1176)
         (goto-char (point-min))
         (condition-case nil
             (progn
@@ -4733,7 +4733,7 @@ without recomputing them, it should be a list of lists."
                      for mtc in matches
                      do (helm-render-source src mtc))
             ;; Move to first line only when there is matches
-            ;; to avoid cursor moving upside down (issue #1703).
+            ;; to avoid cursor moving upside down (Bug#1703).
             (helm--update-move-first-line)))
       ;; When there is only one async source, update mode-line and run
       ;; `helm-after-update-hook' in `helm-output-filter--post-process',
@@ -4767,7 +4767,7 @@ without recomputing them, it should be a list of lists."
              (helm-aif (assq 'requires-pattern source) (or (cdr it) 1) 0))
          ;; Entering repeatedly these strings (*, ?) takes 100% CPU
          ;; and hang emacs on MacOs preventing deleting backward those
-         ;; characters (issue #1802).
+         ;; characters (Bug#1802).
          (not (string-match-p "\\`[*]+\\'" helm-pattern))
          ;; These incomplete regexps hang helm forever
          ;; so defer update. Maybe replace spaces quoted when using
@@ -5116,7 +5116,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
             ;; incomplete-line-info assumed output was truncated in
             ;; only two chunks. But output could be large and
             ;; truncated in more than two chunks. Therefore store
-            ;; 'newline' to contain the previous chunks (Issue #1187).
+            ;; 'newline' to contain the previous chunks (Bug#1187).
             finally do (setcdr incomplete-line-info newline))))
 
 (defun helm-output-filter--post-process ()
@@ -5259,7 +5259,7 @@ If action buffer is selected, back to the Helm buffer."
                                                 (helm-subr-native-elisp-p actions))
                                             "Anonymous" actions))
                              (helm-show-action-buffer actions)
-                             ;; Be sure the minibuffer is entirely deleted (#907).
+                             ;; Be sure the minibuffer is entirely deleted (bug#907).
                              (helm--delete-minibuffer-contents-from "")
                              (helm--set-action-prompt)
                              (helm-check-minibuffer-input))))
@@ -5453,7 +5453,7 @@ mode and header lines."
   (with-selected-window (minibuffer-window)
     (when helm-display-header-line
       ;; Prevent cursor movement over the overlay displaying
-      ;; persistent-help in minibuffer (issue #2108).
+      ;; persistent-help in minibuffer (Bug#2108).
       (setq-local disable-point-adjustment t))
     (let* ((beg  (save-excursion (vertical-motion 0 (helm-window)) (point)))
            (end  (save-excursion (end-of-visual-line) (point)))
@@ -5469,11 +5469,11 @@ mode and header lines."
                               "->"
                               'face 'helm-header-line-left-margin))))
            (pos  (- (point) beg)))
-      ;; Increment pos each time we find a "%" up to current-pos (#1648).
+      ;; Increment pos each time we find a "%" up to current-pos (bug#1648).
       (cl-loop for c across (buffer-substring-no-properties beg (point))
                when (eql c ?%) do (cl-incf pos))
       ;; Increment pos when cursor is on a "%" to make it visible in header-line
-      ;; i.e "%%|" and not "%|%" (#1649).
+      ;; i.e "%%|" and not "%|%" (bug#1649).
       (when (eql (char-after) ?%) (setq pos (1+ pos)))
       (setq cont (replace-regexp-in-string "%" "%%" cont))
       (with-helm-buffer
@@ -5694,7 +5694,7 @@ Key arg DIRECTION can be one of:
                              (forward-line 1) (eobp)))
                       ;; Empty source at eob are just
                       ;; not displayed unless they are dummy.
-                      ;; Issue #1117.
+                      ;; Bug#1117.
                       (helm-get-next-header-pos))
                  (point-min))))
 
@@ -6095,7 +6095,7 @@ Optional argument SOURCE is a Helm source object."
                                 (re-search-forward (cdr candidate-or-regexp) nil t))
                          (re-search-forward candidate-or-regexp nil t))
             ;; If search fall on an header line continue loop
-            ;; until it match or fail (Issue #1509).
+            ;; until it match or fail (Bug#1509).
             (unless (helm-pos-header-line-p) (cl-return (setq mp it))))
           (goto-char (or mp start)))))
     (forward-line 0) ; Avoid scrolling right on long lines.
@@ -6499,7 +6499,7 @@ before running again the init function."
                                 (global global-bname)
                                 (local  local-bname)))
           ;; We need a buffer not read-only to perhaps insert later
-          ;; text coming from read-only buffers (issue #1176).
+          ;; text coming from read-only buffers (Bug#1176).
           (set (make-local-variable 'buffer-read-only) nil)
           ;; Undo is automatically disabled in buffer names starting
           ;; with a space, so no need to disable it.
@@ -6839,7 +6839,7 @@ unsuitable window to display persistent action buffer."
                   ((and helm--buffer-in-new-frame-p helm-initial-frame)
                    (with-selected-frame helm-initial-frame (selected-window)))
                   ((and split (not (eq split 'never))) (split-window))
-                  ;; Fix Issue #2050 with dedicated window.
+                  ;; Fix Bug#2050 with dedicated window.
                   ((and (window-dedicated-p
                          (setq prev-win (previous-window (selected-window) 1)))
                         (not (eq split 'never)))
@@ -7064,7 +7064,7 @@ starting it is not needed."
                             ;; Non existing files in HFF and
                             ;; RFN. Display may be an image. See
                             ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
-                            ;; and also issue #2296.
+                            ;; and also Bug#2296.
                             (equal prefix "[?]")
                             (and filecomp-p
                                  (or
@@ -7196,7 +7196,7 @@ sources."
                   ;; than the one stored in overlay.
                   ;; This is needed when some cands have same display names.
                   ;; Using equal allow testing any type of value for real cand.
-                  ;; Issue (#706).
+                  ;; bug#706.
                   (and (equal (overlay-get o 'real) real)
                        (move-overlay o beg end))
                 (and (equal o-str (buffer-substring beg end))

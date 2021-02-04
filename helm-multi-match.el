@@ -126,7 +126,7 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
 
 (defun helm-mm-prefix-match (candidate &optional pattern)
   ;; In filename completion basename and basedir may be
-  ;; quoted, unquote them for string comparison (Issue #1283).
+  ;; quoted, unquote them for string comparison (Bug#1283).
   (setq pattern (replace-regexp-in-string
                  "\\\\" "" (or pattern helm-pattern)))
   (let ((len (length pattern)))

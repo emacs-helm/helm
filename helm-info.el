@@ -67,7 +67,7 @@ files with `helm-info-at-point'."
           (while (search-forward "\n* " nil t)
             (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
               (setq start (point-at-bol)
-                    ;; Fix issue #1503 by getting the invisible
+                    ;; Fix Bug#1503 by getting the invisible
                     ;; info displayed on next line in long strings.
                     ;; e.g "* Foo.\n   (line 12)" instead of
                     ;;     "* Foo.(line 12)"
@@ -154,7 +154,7 @@ Elements of the list are strings of Info file names without
 extensions (e.g., \"emacs\" for file \"emacs.info.gz\").  Info
 files are found by searching directories in
 `Info-directory-list'."
-  (info-initialize) ; Build Info-directory-list from INFOPATH (Issue #2118)
+  (info-initialize) ; Build Info-directory-list from INFOPATH (Bug#2118)
   (let ((files (cl-loop for d in (or Info-directory-list
                                      Info-default-directory-list)
                         when (file-directory-p d)

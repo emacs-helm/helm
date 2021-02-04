@@ -211,7 +211,7 @@
   (setf (slot-value source 'mode-line)
         ;; Use default-value of `helm-mode-line-string' in case user
         ;; starts with a helm buffer as current-buffer otherwise the
-        ;; local value of this helm buffer is used (issues #1517,#2377).
+        ;; local value of this helm buffer is used (bug#1517, bug#2377).
         (list "Buffer(s)" (default-value 'helm-mode-line-string)))
   (setf (slot-value source 'filtered-candidate-transformer)
         '(helm-skip-boring-buffers

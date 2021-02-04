@@ -1439,7 +1439,7 @@ this working."
                          "Command: "
                          (cl-loop for (a c) in (eshell-read-aliases-list)
                                   ;; Positional arguments may be double
-                                  ;; quoted (Issue #1881).
+                                  ;; quoted (Bug#1881).
                                   when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'" c)
                                   collect (propertize a 'help-echo c) into ls
                                   finally return (sort ls 'string<))
@@ -2523,7 +2523,7 @@ Emacs and even the whole system as it eats all memory."
            finally return (or result (expand-file-name "/"))))
 
 (defun helm-reduce-file-name-2 (fname level)
-  ;; This version comes from issue #2004 (UNC paths) and should fix
+  ;; This version comes from Bug#2004 (UNC paths) and should fix
   ;; it. It works with local files and remote files as well but not
   ;; with ftp, see helm-reduce-file-name-1.
   (while (> level 0)
@@ -2643,7 +2643,7 @@ hitting C-j on \"..\"."
     (helm-aif (and (helm-file-completion-source-p src)
                    (not (helm-empty-source-p))
                    ;; Prevent dired commands moving to first real
-                   ;; (Issue #910).
+                   ;; (Bug#910).
                    (or (memq (intern-soft name)
                              helm-ff-goto-first-real-dired-exceptions)
                        (not (string-match "\\`[Dd]ired-" name)))
@@ -2704,12 +2704,12 @@ when `helm-pattern' is equal to \"~/\"."
                                ;; but not when renaming, copying etc...,
                                ;; so for this use
                                ;; `helm-ff-move-to-first-real-candidate'
-                               ;; instead of `helm-next-line' (Issue #910).
+                               ;; instead of `helm-next-line' (Bug#910).
                                (helm-ff-move-to-first-real-candidate))
                              (helm-get-selection nil nil src))))
           (when (and (or (and helm-ff-auto-update-flag
                               (null helm-ff--deleting-char-backward)
-                              ;; Issue #295
+                              ;; Bug#295
                               ;; File predicates are returning t
                               ;; with paths like //home/foo.
                               ;; So check it is not the case by regexp
@@ -2717,7 +2717,7 @@ when `helm-pattern' is equal to \"~/\"."
                               ;; entering a tramp method e.g /sudo::.
                               (not (string-match "\\`//" helm-pattern))
                               (not (eq last-command 'helm-yank-text-at-point)))
-                         ;; Fix issue #542.
+                         ;; Fix Bug#542.
                          (string= helm-pattern "~/")
                          ;; Only one remaining directory, expand it.
                          (and (= candnum 1)
@@ -2799,7 +2799,7 @@ avoid errors when called outside helm for debugging purpose."
                                   (if (file-directory-p sub)
                                       sub (replace-regexp-in-string "/\\'" "" sub))))
                                (t (helm-ff--expand-substitued-pattern pattern)))))
-             ;; `file-directory-p' returns t on "/home/me/." (issue #1844).
+             ;; `file-directory-p' returns t on "/home/me/." (Bug#1844).
              (if (and (file-directory-p input)
                       (not (string-match-p "[^.]\\.\\'" input)))
                  (progn
@@ -2821,7 +2821,7 @@ avoid errors when called outside helm for debugging purpose."
 
 (defun helm-ff--expand-file-name-no-dot (name &optional directory)
   "Prevent expanding \"/home/user/.\" to \"/home/user\"."
-  ;; Issue #1844 - If user enter "~/." to type an hidden filename
+  ;; Bug#1844 - If user enter "~/." to type an hidden filename
   ;; don't expand to /home/him e.g.
   ;; (expand-file-name "~/.") =>"/home/thierry"
   ;; (helm-ff--expand-substitued-pattern "~/.") =>"/home/thierry/."
@@ -2835,11 +2835,11 @@ avoid errors when called outside helm for debugging purpose."
                          (getenv "SystemDrive")))
          (subst (helm-substitute-in-filename pattern))
          ;; On Windows use a simple call to `expand-file-name' to
-         ;; avoid Issue #2004.
+         ;; avoid Bug#2004.
          (expand-fn (if directory
                         #'expand-file-name
                       #'helm-ff--expand-file-name-no-dot)))
-    ;; Fix issue #2223 with tilde in directory names e.g. "~/tmp/~test/".
+    ;; Fix Bug#2223 with tilde in directory names e.g. "~/tmp/~test/".
     (funcall expand-fn (if (string-match-p "\\`~[^/]" subst)
                            pattern subst)
              ;; directory is nil on Nix.
@@ -2864,7 +2864,7 @@ and should be used carefully elsewhere, or not at all, using
            (insert fname)
            (goto-char (point-min))
            (when (memq system-type '(windows-nt ms-dos))
-             (skip-chars-forward "/")) ;; Avoid infloop in UNC paths Issue #424
+             (skip-chars-forward "/")) ;; Avoid infloop in UNC paths Bug#424
            (if (re-search-forward "~.*/?\\|//\\|/[[:alpha:]]:/" nil t)
                (let ((match (match-string 0)))
                  (goto-char (if (or (string= match "//")
@@ -3034,7 +3034,7 @@ debugging purpose."
     (when (string-match "\\`/\\(-\\):" pattern)
       (setq pattern (replace-match tramp-default-method t t pattern 1)))
     ;; In some rare cases tramp can return a nil input,
-    ;; so be sure pattern is a string for safety (Issue #476).
+    ;; so be sure pattern is a string for safety (Bug#476).
     (unless pattern (setq pattern ""))
     (cond ((string-match helm-ff-url-regexp pattern) pattern)
           ((string-match "\\`\\$" pattern)
@@ -3042,7 +3042,7 @@ debugging purpose."
           ((string= pattern "") "")
           ((string-match "\\`[.]\\{1,2\\}/\\'" pattern)
            (expand-file-name pattern))
-          ;; Directories ending by a dot (issue #1940)
+          ;; Directories ending by a dot (Bug#1940)
           ((string-match "[^/][.]/\\'" pattern)
            (expand-file-name pattern))
           ((string-match ".*\\(~?/?[.]\\{1\\}/\\)\\'" pattern)
@@ -3099,7 +3099,7 @@ debugging purpose."
     ;; connection and may send a file-error.
     (setq helm--ignore-errors (file-remote-p path))
     (set-text-properties 0 (length path) nil path)
-    ;; Issue #118 allow creation of newdir+newfile.
+    ;; Bug#118 allow creation of newdir+newfile.
     (unless (or
              ;; A tramp file name not completed.
              (string= path "@@TRAMP@@")
@@ -3164,7 +3164,7 @@ debugging purpose."
                invalid-basedir
                (and (not (file-exists-p path)) (string-match "/$" path))
                (and helm--url-regexp (string-match helm--url-regexp path)))
-           ;; Do NOT filter boring files here (issue #2330).
+           ;; Do NOT filter boring files here (Bug#2330).
            (list (helm-ff-filter-candidate-one-by-one path nil t)))
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
@@ -3196,7 +3196,7 @@ debugging purpose."
                                  ;; disabled, whe don't want PATH to be added on top
                                  ;; if it is a directory.
                                  dir-p)
-                       ;; Do NOT filter boring files here (issue #2330).
+                       ;; Do NOT filter boring files here (Bug#2330).
                        (list (helm-ff-filter-candidate-one-by-one path nil t)))
                      (helm-ff-directory-files basedir))))))
 
@@ -3391,14 +3391,14 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
       ((or (and dir-p tramp-p (string-match ":\\'" pattern))
            (string= pattern "")
            (and dir-p (<= (length bn) 2))
-           ;; Fix Issue #541 when BD have a subdir similar
+           ;; Fix Bug#541 when BD have a subdir similar
            ;; to BN, don't switch to match plugin
            ;; which will match both.
            (and dir-p (string-match (regexp-quote bn) bd)))
        ;; Use full PATTERN on e.g "/ssh:host:".
        (regexp-quote pattern))
       ;; Prefixing BN with a space call multi-match completion.
-      ;; This allow showing all files/dirs matching BN (Issue #518).
+      ;; This allow showing all files/dirs matching BN (Bug#518).
       ;; FIXME: some multi-match methods may not work here.
       (dir-p (concat (regexp-quote bd) " " (regexp-quote bn)))
       ((or (not (helm-ff-fuzzy-matching-p))
@@ -3460,7 +3460,7 @@ Note that only existing directories are saved here."
 (defun helm-ff-valid-symlink-p (file)
   (helm-aif (condition-case-unless-debug nil
                 ;; `file-truename' send error
-                ;; on cyclic symlinks (Issue #692).
+                ;; on cyclic symlinks (Bug#692).
                 (file-truename file)
               (error nil))
       (file-exists-p it)))
@@ -3721,7 +3721,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
          (backup (backup-file-name-p disp)))
     ;; We want to filter boring files only on the files coming
     ;; from the output of helm-ff-directory-files not on single
-    ;; candidate (issue #2330).
+    ;; candidate (Bug#2330).
     (unless (and (not skip-boring-check)
                  (or (helm-ff-boring-file-p basename)
                      (helm-ff-git-ignored-p file)))
@@ -4534,7 +4534,7 @@ Use it for non-interactive calls of `helm-find-files'."
   ;; [FIXME] When `helm-find-files-1' is used directly from lisp
   ;; and FNAME is an abbreviated path, for some reasons
   ;; `helm-update' is called many times before resolving
-  ;; the abbreviated path (Issue #1939) so be sure to pass a
+  ;; the abbreviated path (Bug#1939) so be sure to pass a
   ;; full path to helm-find-files-1.
   (unless (string-match-p helm-ff-url-regexp fname)
     (setq fname (expand-file-name (substitute-in-file-name fname))))
@@ -4644,7 +4644,7 @@ source is `helm-source-find-files'."
   (require 'ffap)
   ;; Avoid "Stack overflow in regexp matcher" error
   ;; in evil `ffap-guesser' by removing crap `ffap-gopher-at-point'
-  ;; (bug fixed in emacs-26 #25391) .
+  ;; (bug fixed in emacs-26 http://debbugs.gnu.org/cgi/bugreport.cgi?bug=25391) .
   ;; `ffap-machine-at-point' have been removed too as it was anyway
   ;; disabled with `ffap-machine-p-known' bound to 'reject.
   ;; `ffap-file-at-point' can be neutralized with
@@ -5661,7 +5661,7 @@ files."
   "Allow deleting tramp connection or marked tramp connections at once.
 
 This replace `tramp-cleanup-connection' which is partially broken
-in Emacs < to 25.1.50.1 (See Emacs Bug#24432).
+in Emacs < to 25.1.50.1 (See Emacs bug http://debbugs.gnu.org/cgi/bugreport.cgi?bug=24432).
 
 It allows additionally to delete more than one connection at
 once."

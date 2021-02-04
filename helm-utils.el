@@ -491,7 +491,7 @@ Default is `helm-current-buffer'."
                    #'markdown-show-entry)))
         (hs-show-hook (list (lambda () (goto-char loc)))))
     ;; outline may fail in some conditions e.g. with markdown enabled
-    ;; (issue #1919).
+    ;; (Bug#1919).
     (condition-case-unless-debug nil
         (and fn (funcall fn))
       (error nil))))

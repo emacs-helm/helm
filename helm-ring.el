@@ -191,7 +191,7 @@ yanked string."
              ;; Adding a `delete-selection' property
              ;; to `helm-kill-ring-action' is not working
              ;; because `this-command' will be `helm-maybe-exit-minibuffer',
-             ;; so use this workaround (Issue #1520).
+             ;; so use this workaround (Bug#1520).
              (when (and (region-active-p) delete-selection-mode)
                (delete-region (region-beginning) (region-end)))
              (if (not (eq (helm-get-attr 'last-command helm-source-kill-ring) 'yank))
@@ -438,7 +438,7 @@ This is a command for `helm-kill-ring-map'."
             'kill-new
             'append-to-register
             'prepend-to-register)))
-        unless (null string-actions) ; Fix Issue #1107.
+        unless (null string-actions) ; Fix Bug#1107.
         collect (cons (format "Register %3s:\n %s" key (car string-actions))
                       (cons char (cdr string-actions)))))
 

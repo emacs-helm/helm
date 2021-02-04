@@ -1028,7 +1028,7 @@ an eieio class."
                         (if (stringp (car action))
                             (car action)
                             ;; It comes from :persistent-action
-                            ;; (function . 'nosplit) Fix Issue #788.
+                            ;; (function . 'nosplit) Fix Bug#788.
                             (if (or (symbolp action)
                                     (functionp action))
                                 (helm-symbol-name action)))))

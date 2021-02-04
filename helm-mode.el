@@ -394,13 +394,13 @@ data would not be fully collected at init time.
 If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   ;; Ensure COLLECTION is computed from `helm-current-buffer'
   ;; because some functions used as COLLECTION work
-  ;; only in the context of current-buffer (Issue #1030) .
+  ;; only in the context of current-buffer (Bug#1030) .
   (with-helm-current-buffer
     (let ((cands
            (cond ((vectorp collection)
                   (all-completions input collection test))
                  ((and (symbolp collection) (boundp collection)
-                       ;; Issue #324 history is let-bounded and given
+                       ;; Bug#324 history is let-bounded and given
                        ;; quoted as hist argument of completing-read.
                        ;; See example in `rcirc-browse-url'.
                        (symbolp (symbol-value collection)))
@@ -446,7 +446,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                   (funcall collection input test t))
                  ((and alistp (null test)) collection)
                  ;; Next test ensure circular objects are removed
-                 ;; with `all-completions' (Issue #1530).
+                 ;; with `all-completions' (Bug#1530).
                  (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
@@ -468,7 +468,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (setq candidates (append (list
                                 ;; Unquote helm-pattern
                                 ;; when it is added
-                                ;; as candidate: Why? #2015
+                                ;; as candidate: Why? (bug #2015)
                                 ;; (replace-regexp-in-string
                                 ;;  "\\s\\" "" helm-pattern)
                                 helm-pattern)
@@ -498,7 +498,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
-      ;; Avoid error with candidates with an image as display (#2296).
+      ;; Avoid error with candidates with an image as display (bug #2296).
       (when (equal (get-text-property 0 'display it) "[?]")
         (helm-next-line))))
 
@@ -687,7 +687,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                             ;; and :alistp is nil INPUT is passed to
                             ;; `all-completions' which defeat helm
                             ;; matching functions (multi match, fuzzy
-                            ;; etc...) issue #2134.
+                            ;; etc...) Bug#2134.
                             collection test sort alistp
                             (if (and match-dynamic (null candidates-in-buffer))
                                 helm-pattern ""))))
@@ -709,7 +709,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                                             ;; Input is added to history in completing-read's
                                             ;; and may be regexp-quoted, so unquote it
                                             ;; but check if cand is a string (it may be at this stage
-                                            ;; a symbol or nil) Issue #1553.
+                                            ;; a symbol or nil) Bug#1553.
                                             when (stringp i)
                                             collect (replace-regexp-in-string "\\s\\" "" i))))
                                (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
@@ -793,7 +793,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
       ;; Avoid adding an incomplete input to history.
       (when (and result history del-input)
         (cond ((and (symbolp history) ; History is a symbol.
-                    (not (symbolp (symbol-value history)))) ; Fix Issue #324.
+                    (not (symbolp (symbol-value history)))) ; Fix Bug#324.
                ;; Be sure history is not a symbol with a nil value.
                (helm-aif (symbol-value history) (setcar it result)))
               ((consp history) ; A list with a non--nil value.
@@ -1100,13 +1100,13 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; Note: `minibuffer-with-setup-hook' may setup a lambda
          ;; calling `minibuffer-completion-help' or other minibuffer
          ;; functions we DONT WANT here, in these cases removing the hook
-         ;; (a symbol) have no effect. Issue #448.
+         ;; (a symbol) have no effect. Bug#448.
          ;; Because `minibuffer-completion-table' and
          ;; `minibuffer-completion-predicate' are not bound
          ;; anymore here, these functions should have no effect now,
          ;; except in some rare cases like in `woman-file-name',
          ;; so remove all incompatible functions
-         ;; from `minibuffer-setup-hook' (Issue #1205, #1240).
+         ;; from `minibuffer-setup-hook' (Bug#1205, Bug#1240).
          ;; otherwise helm have not the time to close its initial session.
          (minibuffer-setup-hook
           (cl-loop for h in minibuffer-setup-hook
@@ -1489,7 +1489,7 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
         (file-name-as-directory fname)
       fname)))
 
-;; Read file name handler with history (issue #1652)
+;; Read file name handler with history (Bug#1652)
 (defun helm-read-file-name-handler-1 (prompt dir default-filename
                                       mustmatch initial predicate
                                       name buffer)
@@ -1622,11 +1622,11 @@ Actually does nothing."
       (all-completions "" (or all collection)
                        (lambda (x &optional _y)
                          ;; Second arg _y is needed when
-                         ;; COLLECTION is a hash-table issue
-                         ;; #2231 (C-x 8 RET).
+                         ;; COLLECTION is a hash-table (Bug#2231)
+                         ;; (C-x 8 RET).
                          ;; Elements of COLLECTION may be
                          ;; lists or alists, in this case consider the
-                         ;; car of element (issue #2219 org-refile).
+                         ;; car of element (Bug#2219 org-refile).
                          (let ((elm (if (listp x) (car x) x)))
                            ;; PREDICATE have been already called in
                            ;; initial all-completions, no need to call
@@ -1760,7 +1760,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                                   (if (cdr-safe it) (car it) it)))
       ;; This hook force usage of the display part of candidate with
       ;; its properties, this is needed for lsp-mode in its
-      ;; :exit-function see issue #2265.
+      ;; :exit-function see Bug#2265.
       (add-hook 'helm-before-action-hook 'helm-completion-in-region--selection)
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
@@ -1794,7 +1794,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                  ;; `afun' is a closure to call against each string in `data'.
                  ;; it provide the annotation info for each string.
                  ;; e.g "foo" => "foo <f>" where foo is a function.
-                 ;; See Issue #407.
+                 ;; See Bug#407.
                  (afun (or (plist-get completion-extra-properties :annotation-function)
                            (completion-metadata-get metadata 'annotation-function)))
                  (init-space-suffix (unless (or (memq helm-completion-style '(helm-fuzzy emacs))
@@ -1912,11 +1912,11 @@ Can be used for `completion-in-region-function' by advicing it with an
             (setq string (copy-sequence result))
             (helm-completion-in-region--insert-result
              result start point end base-size))
-        ;; Allow running extra property `:exit-function' (Issues #2265,
-        ;; #2356). Function is called with 'exact if for a unique
+        ;; Allow running extra property `:exit-function' (Bug#2265,
+        ;; Bug#2356). Function is called with 'exact if for a unique
         ;; match which is exact, the return value of `try-completion'
         ;; is t or a string ending with "/" i.e. possibly a directory
-        ;; (issue #2274),
+        ;; (Bug#2274),
         ;; otherwise it is called with 'finished.
         (when (and (stringp string) exit-fun)
           (let ((tcomp (try-completion initial-input collection)))
@@ -1946,7 +1946,7 @@ Be sure to know what you are doing when modifying this.")
          ;; When RESULT have annotation, annotation is displayed
          ;; in it with a display property attached to a space
          ;; added at end of string, take care of removing this
-         ;; space (issue #2360). However keep RESULT intact to
+         ;; space (Bug#2360). However keep RESULT intact to
          ;; pass it to `:exit-function' i.e. Don't store the
          ;; modified string in STRING.
          (choose-completion-string
@@ -1965,7 +1965,7 @@ Be sure to know what you are doing when modifying this.")
          (let ((beg (+ start base-size))
                (sep (or (and
                          ;; If `crm-separator' is a string of length 1
-                         ;; assume it can be used as separator (#2298),
+                         ;; assume it can be used as separator (bug #2298),
                          ;; otherwise it is a regexp and use the value
                          ;; it matches or default to "," if no match.
                          (eq (length crm-separator) 1)
@@ -1975,7 +1975,7 @@ Be sure to know what you are doing when modifying this.")
            ;; regexp use the string the regexp is matching.
            ;; If SEP is not a string, it have been probably bound to a
            ;; symbol or nil through `helm-crm-default-separator' that serve
-           ;; as a flag to say "Please no separator" (Issue #2353 with
+           ;; as a flag to say "Please no separator" (Bug#2353 with
            ;; `magit-completing-read-multiple').
            (if (stringp sep)
                (save-excursion
@@ -2045,11 +2045,11 @@ Note: This mode is incompatible with Emacs23."
                         #'helm--completion-in-region))
         ;; If user have enabled ido-everywhere BEFORE enabling
         ;; helm-mode disable it and warn user about its
-        ;; incompatibility with helm-mode (issue #2085).
+        ;; incompatibility with helm-mode (Bug#2085).
         (helm-mode--disable-ido-maybe)
         ;; If ido-everywhere is not enabled yet anticipate and
         ;; disable it if user attempt to enable it while helm-mode
-        ;; is running (issue #2085).
+        ;; is running (Bug#2085).
         (add-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
         (when (fboundp 'ffap-read-file-or-url-internal)
           ;; `ffap-read-file-or-url-internal' have been removed in

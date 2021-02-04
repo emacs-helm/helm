@@ -406,7 +406,7 @@ Like `this-command' but return the real command, and not
            if (and
                ;; In some case we may have in the way an
                ;; advice compiled resulting in byte-code,
-               ;; ignore it (Issue #691).
+               ;; ignore it (Bug#691).
                (symbolp fn)
                (commandp fn)
                (not (memq fn bl)))
@@ -733,7 +733,7 @@ displayed in BUFNAME."
                      (not (memq fun helm-help-not-interactive-command)))
                 ;; For movement of cursor in help buffer we need to
                 ;; call interactively commands for impaired people
-                ;; using a synthetizer (#1347).
+                ;; using a synthetizer (Bug #1347).
                 (call-interactively fun)
               (funcall fun))))))))
 
@@ -858,7 +858,7 @@ hashtable itself."
   (helm-awhile (helm-basedir (directory-file-name
                               (expand-file-name directory)))
     ;; Break at root to avoid infloop, root is / or on Windows
-    ;; C:/ i.e. <volume>:/ (issue #2308).
+    ;; C:/ i.e. <volume>:/ (Bug#2308).
     (when (string-match-p "\\`[A-Za-z]?:?/\\'" it)
       (cl-return nil))
     (when (cl-loop for r in black-list
@@ -1274,7 +1274,8 @@ Argument ALIST is an alist of associated major modes."
 (defun helm-file-name-sans-extension (filename)
   "Same as `file-name-sans-extension' but remove all extensions."
   (helm-aif (file-name-sans-extension filename)
-      ;; Start searching at index 1 for files beginning with a dot (#1335).
+      ;; Start searching at index 1 for files beginning with a dot
+      ;; (bug#1335).
       (if (string-match "\\." (helm-basename it) 1)
           (helm-file-name-sans-extension it)
           it)))

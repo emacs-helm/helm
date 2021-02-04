@@ -92,7 +92,7 @@ at point."
         (lambda (x)
           (cond ((string-match "\\`~/" helm-ec-target)
                  ;; Strip out the first escape char added by
-                 ;; `comint-quote-filename' before "~" (Issue #1803).
+                 ;; `comint-quote-filename' before "~" (Bug#1803).
                  (substring (comint-quote-filename (abbreviate-file-name x)) 1))
                 ((string-match "\\`/" helm-ec-target)
                  (comint-quote-filename x))
@@ -154,7 +154,7 @@ at point."
               with comps = (all-completions pcomplete-stub table)
               unless comps return (prog1 nil
                                     ;; Don't add final space when
-                                    ;; there is no completion (issue #1990).
+                                    ;; there is no completion (Bug#1990).
                                     (setq helm-eshell--quit-flag t)
                                     (message "No completions of %s" pcomplete-stub))
               for i in comps
@@ -219,7 +219,7 @@ at point."
   (if (and (stringp last)
            (not (string= last ""))
            (not users-comp)
-           ;; Fix completion on "../" see #1832.
+           ;; Fix completion on "../" see bug #1832.
            (or (file-exists-p last)
                (helm-aand
                 (file-name-directory last)
@@ -318,7 +318,7 @@ at point."
                          ;; global to pass it to `helm-quit-hook', this
                          ;; space is added when point is just after
                          ;; previous completion and there is no
-                         ;; more completion, see issue #1832.
+                         ;; more completion, see Bug#1832.
                          (unless (or helm-eshell--quit-flag
                                      (looking-back "/\\'" (1- (point))))
                            (prog1 t (insert " ")))

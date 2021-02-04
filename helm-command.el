@@ -253,7 +253,7 @@ default to `extended-command-history'."
                            (format "%d " helm-M-x-prefix-argument)))
                          "M-x ")))
     (setq helm-M-x--timer (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
-    ;; Fix Issue #2250, add `helm-move-selection-after-hook' which
+    ;; Fix Bug#2250, add `helm-move-selection-after-hook' which
     ;; reset prefix arg to nil only for this helm session.
     (add-hook 'helm-move-selection-after-hook
               'helm-M-x--move-selection-after-hook)
@@ -301,7 +301,7 @@ Save COMMAND to `extended-command-history'."
   (when command
     ;; Avoid having `this-command' set to *exit-minibuffer.
     (setq this-command command
-          ;; Handle C-x z (repeat) Issue #322
+          ;; Handle C-x z (repeat) Bug#322
           real-this-command command)
     ;; If helm-M-x is called with regular emacs completion (kmacro)
     ;; use the value of arg otherwise use helm-current-prefix-arg.

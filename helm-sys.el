@@ -119,7 +119,7 @@ This affects also sorting functions in the same way."
         (when (and (helm--alive-p) (null no-update))
           ;; Fix quitting while process is running
           ;; by binding `with-local-quit' in init function
-          ;; Issue #1521.
+          ;; Bug#1521.
           (helm-force-update
            (cl-ecase helm-top-poll-preselection
              (candidate (replace-regexp-in-string
@@ -340,7 +340,7 @@ Show actions only on line starting by a PID."
   (interactive)
   (helm-top-set-mode-line "CPU")
   ;; Force sorting by CPU even if some versions of top are using by
-  ;; default CPU sorting (Issue #1908).
+  ;; default CPU sorting (Bug#1908).
   (setq helm-top-sort-fn 'helm-top-sort-by-cpu)
   (helm-update (helm-top--preselect-fn)))
 

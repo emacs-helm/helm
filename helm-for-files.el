@@ -174,7 +174,7 @@ Colorize only symlinks, directories and files."
            ;; Call file-attributes only if:
            ;; - file is not remote
            ;; - helm-for-files--tramp-not-fancy is nil and file is remote AND
-           ;; connected. (Issue #1679)
+           ;; connected. (Bug#1679)
            for type = (and (or (null isremote)
                                (and (null helm-for-files-tramp-not-fancy)
                                     (file-remote-p i nil t)))
