@@ -1306,8 +1306,17 @@ hard drive cache is \"cold\", then once the cache is initialized
 searchs are very fast.  You can pass any [[https://github.com/sharkdp/fd#command-line-options][Fd options]] before pattern, e.g. \"-e py foo\".
 
 The [[https://github.com/sharkdp/fd][Fd]] command line can be customized with `helm-fd-switches' user variable.
-Always use --color always as option otherwise you will have no colors.
+Always use =--color always= as option otherwise you will have no colors.
 To customize colors see [[https://github.com/sharkdp/fd#colorized-output][Fd colorized output]].
+
+NOTE:
+Starting from fd version 8.2.1, you have to provide the env var
+LS_COLORS to Emacs to have a colorized output, the easiest way is
+to add to your =~/.profile= file =eval $(dircolors)=.
+Another way is using =setenv= in your init file.
+This is not needed when running Emacs from a terminal either with =emacs -nw=
+or =emacs= because emacs inherit the env vars of this terminal.
+See [[https://github.com/sharkdp/fd/issues/725][fd bug#725]]
 
 Search is (pcre) regexp based (see [[https://docs.rs/regex/1.0.0/regex/#syntax][Regexp syntax]]), multi patterns are _not_ supported.
 
