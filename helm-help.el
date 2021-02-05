@@ -1316,7 +1316,7 @@ to add to your =~/.profile= file =eval $(dircolors)=.
 Another way is using =setenv= in your init file.
 This is not needed when running Emacs from a terminal either with =emacs -nw=
 or =emacs= because emacs inherit the env vars of this terminal.
-See [[https://github.com/sharkdp/fd/issues/725][fd bug#725]]
+See [[https://github.com/sharkdp/fd/issues/725][fd bugref#725]]
 
 Search is (pcre) regexp based (see [[https://docs.rs/regex/1.0.0/regex/#syntax][Regexp syntax]]), multi patterns are _not_ supported.
 
