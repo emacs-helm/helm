@@ -757,14 +757,16 @@ When nil always delete char backward."
   :group 'helm-files
   :type 'boolean)
 
-(defcustom helm-ff-display-image-native (>= emacs-major-version 27)
+(defcustom helm-ff-display-image-native nil
   "Use native `image-mode' when non nil.
 
 You should use this only with Emacs>= 27 and `image-auto-resize'
 enabled to have images resized properly.  When this is enabled,
 you have new commands to zoom in/out images.  See
 `image-transform-resize' and `image-auto-resize'.  Otherwise,
-when nil `image-dired' is used, using imagemagick as backend."
+when nil `image-dired' is used, using imagemagick as backend.
+NOTE: If you see image-mode is eating too much memory, you better have
+to set this to nil (default)."
   :group 'helm-files
   :type 'boolean)
 
