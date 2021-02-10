@@ -948,9 +948,10 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (put 'helm-buffer-switch-other-frame 'helm-only t)
 
 (defun helm-buffers-switch-to-buffer-other-tab (_candidate)
-  (let ((bufs (helm-marked-candidates)))
-    (cl-loop for buf in bufs
-             do (switch-to-buffer-other-tab buf))))
+  (when (fboundp 'switch-to-buffer-other-tab)
+    (let ((bufs (helm-marked-candidates)))
+      (cl-loop for buf in bufs
+               do (switch-to-buffer-other-tab buf)))))
 
 (defun helm-buffers-switch-to-buffer-new-tab ()
   "Run switch to buffer in other tab action from `helm-source-buffers-list'."

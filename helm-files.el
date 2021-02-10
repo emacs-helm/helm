@@ -4095,7 +4095,9 @@ E.g. \"foo:12\"."
             ;; When rotation fails fallback to `image-rotate' with no
             ;; transformation of file.
             (with-selected-window (helm-persistent-action-display-window)
-              (image-rotate angle))
+              (condition-case _err
+                  (with-no-warnings (image-rotate angle))
+                (wrong-number-of-arguments (image-rotate))))
           (helm-ff--display-image-native file))
       ;; Use image-dired to display image.
       (when rotation-failed
