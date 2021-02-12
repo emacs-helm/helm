@@ -111,14 +111,14 @@ algorithm."
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
-          for sym        = (intern cand)
+          for sym        = (intern (if (consp cand) (car cand) cand))
           for disp       = (if (or (eq sym major-mode)
                                    (and (memq sym minor-mode-list)
                                         (boundp sym)
                                         (buffer-local-value sym helm-current-buffer)))
                                (propertize cand 'face 'helm-command-active-mode)
                              cand)
-          unless (get (intern (if (consp cand) (car cand) cand)) 'helm-only)
+          unless (or (get sym 'helm-only) (get sym 'no-helm-mx))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
                        (format "%s (%s)"
