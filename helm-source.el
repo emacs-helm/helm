@@ -1014,33 +1014,40 @@ an eieio class."
                (slot-value source 'header-line)))))
 
 (defun helm-source--header-line (source)
+  "Compute a default header line for SOURCE.
+
+The header line is based on one of `persistent-action-if',
+`persistent-action', or `action' (in this order of precedence)."
   (substitute-command-keys
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
-           (helm-aif (or (slot-value source 'persistent-action)
-                         (slot-value source 'action))
-               (cond ((and (symbolp it)
-                           (functionp it)
-                           (eq it 'identity))
-                      "Do Nothing")
-                     ((and (symbolp it)
-                           (boundp it)
-                           (listp (symbol-value it))
-                           (stringp (caar (symbol-value it))))
-                      (caar (symbol-value it)))
-                     ((or (symbolp it) (functionp it))
-                      (helm-symbol-name it))
-                     ((listp it)
-                      (let ((action (car it)))
-                        ;; It comes from :action ("foo" . function).
-                        (if (stringp (car action))
-                            (car action)
-                            ;; It comes from :persistent-action
-                            ;; (function . 'nosplit) Fix Bug#788.
-                            (if (or (symbolp action)
-                                    (functionp action))
-                                (helm-symbol-name action)))))
-                     (t ""))
-             "")
+           (helm-acond
+            ((slot-value source 'persistent-action-if)
+             (helm-symbol-name it))
+            ((or (slot-value source 'persistent-action)
+                 (slot-value source 'action))
+             (cond ((and (symbolp it)
+                         (functionp it)
+                         (eq it 'identity))
+                    "Do Nothing")
+                   ((and (symbolp it)
+                         (boundp it)
+                         (listp (symbol-value it))
+                         (stringp (caar (symbol-value it))))
+                    (caar (symbol-value it)))
+                   ((or (symbolp it) (functionp it))
+                    (helm-symbol-name it))
+                   ((listp it)
+                    (let ((action (car it)))
+                      ;; It comes from :action ("foo" . function).
+                      (if (stringp (car action))
+                          (car action)
+                        ;; It comes from :persistent-action
+                        ;; (function . 'nosplit) Fix Bug#788.
+                        (if (or (symbolp action)
+                                (functionp action))
+                            (helm-symbol-name action)))))
+                   (t "")))
+            (t ""))
            " (keeping session)")))
 
 (cl-defmethod helm--setup-source ((_source helm-source)))
