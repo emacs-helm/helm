@@ -271,10 +271,4 @@ atoms."
 
 (provide 'helm-adaptive)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-adaptive.el ends here

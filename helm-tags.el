@@ -343,10 +343,4 @@ Create with etags shell command, or visit with `find-tag' or `visit-tags-table'.
 
 (provide 'helm-tags)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-tags.el ends here

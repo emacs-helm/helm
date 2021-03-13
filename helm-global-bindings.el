@@ -119,10 +119,4 @@
 
 (provide 'helm-global-bindings)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-global-bindings.el ends here

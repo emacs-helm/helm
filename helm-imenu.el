@@ -377,10 +377,4 @@ i.e. `derived-mode-p' or it have an association in
 
 (provide 'helm-imenu)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-imenu.el ends here

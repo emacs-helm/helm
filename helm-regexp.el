@@ -129,10 +129,4 @@ i.e. don't replace inside a word, regexp is surrounded with \\bregexp\\b."
 
 (provide 'helm-regexp)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-regexp.el ends here

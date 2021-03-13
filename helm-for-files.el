@@ -300,10 +300,4 @@ searching for is already found."
 
 (provide 'helm-for-files)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-for-files.el ends here

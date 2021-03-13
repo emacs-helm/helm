@@ -783,10 +783,4 @@ To use this bind it to a key in `isearch-mode-map'."
 
 (provide 'helm-occur)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-occur.el ends here

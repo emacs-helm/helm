@@ -167,10 +167,4 @@ are passed to \"find\" literally."
 
 (provide 'helm-find)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-find.el ends here

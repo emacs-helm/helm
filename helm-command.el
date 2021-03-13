@@ -351,10 +351,4 @@ You can get help on each command by persistent action."
 
 (provide 'helm-command)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-command.el ends here

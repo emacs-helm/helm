@@ -368,10 +368,4 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
 (provide 'helm-multi-match)
 
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-multi-match.el ends here

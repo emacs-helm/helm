@@ -1215,10 +1215,4 @@ Args ARGS are keywords provided by `helm-source-in-file'."
 
 (provide 'helm-source)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-source ends here

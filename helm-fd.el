@@ -123,10 +123,4 @@
 
 (provide 'helm-fd)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-fd.el ends here

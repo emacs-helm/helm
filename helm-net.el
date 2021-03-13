@@ -430,10 +430,4 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 
 (provide 'helm-net)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-net.el ends here

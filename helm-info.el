@@ -265,10 +265,4 @@ Info files are made available."
 
 (provide 'helm-info)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-info.el ends here

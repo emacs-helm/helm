@@ -1721,10 +1721,4 @@ With a prefix arg ARG git-grep the whole repository."
 
 (provide 'helm-grep)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-grep.el ends here

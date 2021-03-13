@@ -393,10 +393,4 @@ finally removed."
 
 (provide 'helm-dabbrev)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-dabbrev.el ends here

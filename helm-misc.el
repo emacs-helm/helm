@@ -328,10 +328,4 @@ Default action change TZ environment variable locally to emacs."
 
 (provide 'helm-misc)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-misc.el ends here

@@ -330,10 +330,4 @@ Called with a prefix arg force reloading cache."
 
 (provide 'helm-font)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-font.el ends here

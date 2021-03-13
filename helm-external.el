@@ -208,10 +208,4 @@ You can set your own list of commands with
 
 (provide 'helm-external)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-external ends here

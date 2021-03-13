@@ -2069,10 +2069,4 @@ Note: This mode is incompatible with Emacs23."
 
 (provide 'helm-mode)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-mode.el ends here

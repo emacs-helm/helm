@@ -124,10 +124,4 @@ with the tracker desktop search.")
 
 (provide 'helm-x-files)
 
-;; Local Variables:
-;; byte-compile-warnings: (not obsolete)
-;; coding: utf-8
-;; indent-tabs-mode: nil
-;; End:
-
 ;;; helm-x-files.el ends here
