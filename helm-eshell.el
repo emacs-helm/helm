@@ -204,7 +204,11 @@ at point."
     (lambda ()
       (with-helm-current-buffer
         (cl-loop for c from 0 to (ring-length eshell-history-ring)
-                 collect (eshell-get-history c)))))
+                 for elm = (eshell-get-history c)
+                 unless (and (member elm lst)
+                             eshell-hist-ignoredups)
+                 collect elm into lst
+                 finally return lst))))
    (nomark :initform t)
    (multiline :initform t)
    (keymap :initform helm-eshell-history-map)
