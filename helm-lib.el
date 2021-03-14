@@ -788,24 +788,6 @@ See `helm-help-hkmap' for supported keys and functions."
 
 ;;; List processing
 ;;
-(defun helm-flatten-list (seq &optional omit-nulls)
-  "Return a list of all single elements of sublists in SEQ."
-  (let (result)
-    (cl-labels ((flatten (seq)
-                  (cl-loop
-                        for elm in seq
-                        if (and (or elm
-                                    (null omit-nulls))
-                                (or (atom elm)
-                                    (functionp elm)
-                                    (and (consp elm)
-                                         (cdr elm)
-                                         (atom (cdr elm)))))
-                        do (push elm result)
-                        else do (flatten elm))))
-      (flatten seq))
-    (nreverse result)))
-
 (defun helm-mklist (obj)
   "If OBJ is a list \(but not lambda\), return itself.
 Otherwise make a list with one element."
