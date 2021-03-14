@@ -1075,8 +1075,8 @@ of grep."
 
 (defvar helm-source-grep nil)
 
-(defmethod helm--setup-source ((source helm-grep-class))
-  (call-next-method)
+(cl-defmethod helm--setup-source ((source helm-grep-class))
+  (cl-call-next-method)
   (helm-aif (and helm-follow-mode-persistent
                  (if (eq (slot-value source 'backend) 'git)
                      helm-source-grep-git
@@ -1624,8 +1624,8 @@ returns if available with current AG version."
 
 (defvar helm-source-grep-ag nil)
 
-(defmethod helm--setup-source ((source helm-grep-ag-class))
-  (call-next-method)
+(cl-defmethod helm--setup-source ((source helm-grep-ag-class))
+  (cl-call-next-method)
   (helm-aif (and helm-follow-mode-persistent
                  helm-source-grep-ag
                  (assoc-default 'follow helm-source-grep-ag))

@@ -1206,7 +1206,7 @@ Helm session.  In this case you can add a defmethod called
 
 #+begin_src elisp
 
-    (defmethod helm-setup-user-source ((source helm-moccur-class))
+    (cl-defmethod helm-setup-user-source ((source helm-moccur-class))
       (setf (slot-value source 'follow) -1))
 
 #+end_src

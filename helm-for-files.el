@@ -128,7 +128,7 @@ Be aware that a nil value will make tramp display very slow."
    (migemo :initform t)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)))
 
-(defmethod helm--setup-source :after ((source helm-recentf-source))
+(cl-defmethod helm--setup-source :after ((source helm-recentf-source))
   (setf (slot-value source 'action)
         (append (symbol-value (helm-actions-from-type-file))
                 '(("Delete file(s) from recentf" .

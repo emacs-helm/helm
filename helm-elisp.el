@@ -397,7 +397,7 @@ the same time to variable and a function."
         for annot = (cl-typecase sym
                       (command " (Com)")
                       (class   " (Class)")
-                      (generic " (Gen)")
+                      (cl-generic " (Gen)")
                       (fbound  " (Fun)")
                       (bound   " (Var)")
                       (face    " (Face)"))
@@ -638,7 +638,7 @@ double quote."
             (helm-apropos-init (lambda (x)
                                  (and (fboundp x)
                                       (not (commandp x))
-                                      (not (generic-p x))
+                                      (not (cl-generic-p x))
                                       (not (class-p x))))
                                default))
     :fuzzy-match helm-apropos-fuzzy-match
@@ -673,7 +673,7 @@ double quote."
   (helm-build-in-buffer-source "Generic functions"
     :init (lambda ()
             (helm-apropos-init (lambda (x)
-                                 (generic-p x))
+                                 (cl-generic-p x))
                                default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
@@ -693,7 +693,7 @@ double quote."
     (cond ((class-p sym)
            (setq fn #'helm-describe-function
                  src-name "Describe class"))
-          ((generic-p sym)
+          ((cl-generic-p sym)
            (setq fn #'helm-describe-function
                  src-name "Describe generic function"))
           ((fboundp sym)

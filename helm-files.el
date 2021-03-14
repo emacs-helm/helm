@@ -5463,7 +5463,7 @@ Use FD as backend."
   "Class to define a source in `helm-browse-project' handling non
 VC handled directories.")
 
-(defmethod helm--setup-source :after ((source helm-browse-project-override-inheritor))
+(cl-defmethod helm--setup-source :after ((source helm-browse-project-override-inheritor))
   (let ((actions (slot-value source 'action)))
     (setf (slot-value source 'action)
           (helm-append-at-nth
