@@ -37,7 +37,7 @@ EMACSLOADPATH="../emacs-async:" ./emacs-helm.sh
 
 ## Expected behavior
 
-## Actual behavior (from `emacs-helm.sh` if possible, see note at the bottom)
+## Actual behavior (from `emacs-helm.sh` if possible, see note above)
 
 ## Steps to reproduce (recipe)
 
