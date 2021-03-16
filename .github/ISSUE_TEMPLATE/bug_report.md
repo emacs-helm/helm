@@ -5,6 +5,8 @@ title: ''
 labels: ''
 assignees: ''
 
+---
+
 # Important! Before filing an issue, please consider the following:
 
     * Try to find if your bug is not already reported.
@@ -25,7 +27,7 @@ interfering.
 To run it, simply switch to the directory where Helm is installed and call `./emacs-helm.sh`.
 If necessary you can specify emacs executable path on command line with "-P" option.
 
----
+
 
 ## Expected behavior
 
