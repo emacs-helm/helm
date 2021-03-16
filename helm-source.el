@@ -912,17 +912,11 @@ See `helm-candidates-in-buffer' for more infos.")
 ;;; Internal Builder functions.
 ;;
 ;;
-;; Compat
-(defun helm-object-slots (obj)
-  "Return list of slot names available in OBJ."
-  (cl-check-type obj eieio-object)
-  (mapcar #'eieio-slot-descriptor-name
-	  (eieio-class-slots (eieio--object-class obj))))
-
 (defun helm--create-source (object)
   "[INTERNAL] Build a helm source from OBJECT.
 Where OBJECT is an instance of an eieio class."
-  (cl-loop for s in (helm-object-slots object)
+  (cl-loop for sd in (eieio-class-slots (eieio-object-class object))
+           for s = (eieio-slot-descriptor-name sd)
            for slot-val = (slot-value object s)
            when slot-val
            collect (cons s slot-val)))
