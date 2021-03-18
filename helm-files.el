@@ -94,7 +94,7 @@
 (defvar eshell-current-command)
 (defvar eshell-debug-command)
 (defvar eshell-current-command)
-
+(defvar tramp-archive-enabled)
 
 
 (defgroup helm-files nil
@@ -5619,7 +5619,9 @@ Don't call it from programs, use `helm-find-files-1' instead.
 This is the starting point for nearly all actions you can do on
 files."
   (interactive "P")
-  (let* ((hist            (and arg helm-ff-history (helm-find-files-history nil)))
+  (let* (tramp-archive-enabled ; Disable tramp-archive which is
+                               ; kicking in unexpectedly.
+         (hist            (and arg helm-ff-history (helm-find-files-history nil)))
          (smart-input     (or hist (helm-find-files-initial-input)))
          (default-input   (expand-file-name (helm-current-directory)))
          (input           (cond ((and (null hist)
