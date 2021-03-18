@@ -284,7 +284,7 @@ variable."
   :type 'boolean)
 
 (defcustom helm-ff-allow-non-existing-file-at-point nil
-  "Use file-at-point as initial input in `helm-find-files' even if it doesn't exists."
+  "Use non existing file-at-point as initial input in `helm-find-files'."
   :group 'helm-files
   :type 'boolean)
 
