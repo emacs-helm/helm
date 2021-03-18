@@ -210,7 +210,7 @@ Yellow     => Tramp archive buffer.
 ** Commands
 \\<helm-buffer-map>
 \\[helm-buffer-run-zgrep]\t\tGrep Buffer(s) works as zgrep too (`\\[universal-argument]' to grep all buffers but non-file buffers).
-\\[helm-buffers-run-multi-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
+\\[helm-buffers-run-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
 \\[helm-buffer-switch-other-window]\t\tSwitch to other window.
 \\[helm-buffer-switch-other-frame]\t\tSwitch to other frame.
 \\[helm-buffers-run-browse-project]\t\tBrowse project from buffer.
@@ -807,8 +807,8 @@ If Rsync is available, you can use it to copy/sync files or directories
 with some restrictions though:
 
 - Copying from/to tramp sudo method may not work (permissions).
-- Copying from remote to remote is not supported (rsync restriction), however
-you can mount a remote with sshfs and copy to it (preferred method), otherwise you have to modify
+- Copying from remote to remote is not supported (rsync restriction)
+however you can mount a remote with sshfs and copy to it (best), otherwise you have to modify
 the command line with a prefix arg, see [[https://unix.stackexchange.com/questions/183504/how-to-rsync-files-between-two-remotes][how-to-rsync-files-between-two-remotes]]
 for the command line to use.
 
@@ -1122,71 +1122,54 @@ You may have in some rare cases to refresh directory manually with `\\<helm-map>
 for example when helm-find-files session is running and a file is modified/deleted
 in current visited directory by an external command from outside Emacs.
 
-** Commands \\<helm-find-files-map> \\[helm-ff-run-locate]\t\tRun
-`locate' (`\\[universal-argument]' to specify locate database,
-`M-n' to insert basename of candidate).
-\\[helm-ff-run-browse-project]\t\tBrowse
-project (`\\[universal-argument]' to recurse,
-`\\[universal-argument] \\[universal-argument]' to recurse and
-refresh database).  \\[helm-ff-run-find-sh-command]\t\tRun `find'
-shell command from this directory.  \\[helm-ff-run-grep]\t\tRun
-Grep (`\\[universal-argument]' to recurse).
+** Commands
+\\<helm-find-files-map>
+\\[helm-ff-run-locate]\t\tRun `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
+\\[helm-ff-run-browse-project]\t\tBrowse project (`\\[universal-argument]' to recurse, `\\[universal-argument] \\[universal-argument]' to recurse and refresh database).
+\\[helm-ff-run-find-sh-command]\t\tRun `find' shell command from this directory.
+\\[helm-ff-run-grep]\t\tRun Grep (`\\[universal-argument]' to recurse).
 \\[helm-ff-run-pdfgrep]\t\tRun Pdfgrep on marked files.
-\\[helm-ff-run-zgrep]\t\tRun zgrep (`\\[universal-argument]' to
-recurse).  \\[helm-ff-run-grep-ag]\t\tRun AG grep on current
-directory.  \\[helm-ff-run-git-grep]\t\tRun git-grep on current
-directory.  \\[helm-ff-run-gid]\t\tRun gid (id-utils).
-\\[helm-ff-run-etags]\t\tRun Etags (`\\[universal-argument]' to
-use thing-at-point, `\\[universal-argument]
-\\[universal-argument]' to reload cache).
-\\[helm-ff-run-rename-file]\t\tRename
-Files (`\\[universal-argument]' to follow).
-\\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace
-on marked files.  \\[helm-ff-run-copy-file]\t\tCopy
-Files (`\\[universal-argument]' to follow).
-\\[helm-ff-run-rsync-file]\t\tRsync
-Files (`\\[universal-argument]' to edit command).
-\\[helm-ff-run-byte-compile-file]\t\tByte Compile
-Files (`\\[universal-argument]' to load).
+\\[helm-ff-run-zgrep]\t\tRun zgrep (`\\[universal-argument]' to recurse).
+\\[helm-ff-run-grep-ag]\t\tRun AG grep on current directory.
+\\[helm-ff-run-git-grep]\t\tRun git-grep on current directory.
+\\[helm-ff-run-gid]\t\tRun gid (id-utils).
+\\[helm-ff-run-etags]\t\tRun Etags (`\\[universal-argument]' to use thing-at-point, `\\[universal-argument] \\[universal-argument]' to reload cache).
+\\[helm-ff-run-rename-file]\t\tRename Files (`\\[universal-argument]' to follow).
+\\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace on marked files.
+\\[helm-ff-run-copy-file]\t\tCopy Files (`\\[universal-argument]' to follow).
+\\[helm-ff-run-rsync-file]\t\tRsync Files (`\\[universal-argument]' to edit command).
+\\[helm-ff-run-byte-compile-file]\t\tByte Compile Files (`\\[universal-argument]' to load).
 \\[helm-ff-run-load-file]\t\tLoad Files.
 \\[helm-ff-run-symlink-file]\t\tSymlink Files.
 \\[helm-ff-run-hardlink-file]\t\tHardlink files.
 \\[helm-ff-run-relsymlink-file]\t\tRelative symlink Files.
 \\[helm-ff-run-delete-file]\t\tDelete Files.
 \\[helm-ff-run-touch-files]\t\tTouch files.
-\\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate
-without leaving Helm.  \\[helm-ff-persistent-delete]\t\tDelete
-file without leaving Helm.
+\\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate without leaving Helm.
+\\[helm-ff-persistent-delete]\t\tDelete file without leaving Helm.
 \\[helm-ff-run-switch-to-shell]\t\tSwitch to prefered shell.
-\\[helm-ff-run-eshell-command-on-file]\t\tEshell command on
-file (`\\[universal-argument]' to apply on marked files,
-otherwise treat them sequentially).
+\\[helm-ff-run-eshell-command-on-file]\t\tEshell command on file (`\\[universal-argument]' to apply on marked files, otherwise treat them sequentially).
 \\[helm-ff-run-ediff-file]\t\tEdiff file.
 \\[helm-ff-run-ediff-merge-file]\t\tEdiff merge file.
-\\[helm-ff-run-complete-fn-at-point]\t\tComplete file name at
-point.  \\[helm-ff-run-switch-other-window]\t\tSwitch to other
-window.  \\[helm-ff-run-switch-other-frame]\t\tSwitch to other
-frame.  \\[helm-ff-run-open-file-externally]\t\tOpen file with
-external program (`\\[universal-argument]' to choose).
-\\[helm-ff-run-preview-file-externally]\t\tPreview file with
-external program.
-\\[helm-ff-run-open-file-with-default-tool]\t\tOpen file
-externally with default tool.
+\\[helm-ff-run-complete-fn-at-point]\t\tComplete file name at point.
+\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
+\\[helm-ff-run-switch-other-frame]\t\tSwitch to other frame.
+\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
+\\[helm-ff-run-preview-file-externally]\t\tPreview file with external program.
+\\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
 \\[helm-ff-rotate-left-persistent]\t\tRotate image left.
 \\[helm-ff-rotate-right-persistent]\t\tRotate image right.
 \\[helm-ff-increase-image-size-persistent]\t\tZoom in image.
 \\[helm-ff-decrease-image-size-persistent]\t\tZoom out image.
 \\[helm-find-files-up-one-level]\t\tGo to parent directory.
-\\[helm-find-files-history]\t\tSwitch to the visited-directory
-history.  \\[helm-ff-file-name-history]\t\tSwitch to file name
-history.  \\[helm-ff-properties-persistent]\t\tShow file
-properties in a tooltip.  \\[helm-mark-all]\t\tMark all visible
-candidates.  \\[helm-ff-run-toggle-auto-update]\t\tToggle
-auto-expansion of directories.  \\[helm-unmark-all]\t\tUnmark all
-candidates, visible and invisible ones.
-\\[helm-ff-run-mail-attach-files]\t\tAttach files to message
-buffer.  \\[helm-ff-run-print-file]\t\tPrint
-file, (`\\[universal-argument]' to refresh printer list).
+\\[helm-find-files-history]\t\tSwitch to the visited-directory history.
+\\[helm-ff-file-name-history]\t\tSwitch to file name history.
+\\[helm-ff-properties-persistent]\t\tShow file properties in a tooltip.
+\\[helm-mark-all]\t\tMark all visible candidates.
+\\[helm-ff-run-toggle-auto-update]\t\tToggle auto-expansion of directories.
+\\[helm-unmark-all]\t\tUnmark all candidates, visible and invisible ones.
+\\[helm-ff-run-mail-attach-files]\t\tAttach files to message buffer.
+\\[helm-ff-run-print-file]\t\tPrint file, (`\\[universal-argument]' to refresh printer list).
 \\[helm-enlarge-window]\t\tEnlarge Helm window.
 \\[helm-narrow-window]\t\tNarrow Helm window.
 \\[helm-ff-run-toggle-basename]\t\tToggle basename/fullpath.
