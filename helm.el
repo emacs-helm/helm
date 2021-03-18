@@ -4635,7 +4635,13 @@ emacs-27 to provide such scoring in emacs<27."
          ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
          ,@body
        (helm-log "Using here `helm-while-no-input'")
-       (helm-while-no-input ,@body))))
+       ;; Emacs bug#47205, unexpected dbus-event is triggered on dbus init.
+       ;; Ignoring the dbus-event work on emacs28+; for emacs27 or older
+       ;; version, require tramp-archive can workaround the issue.
+       (let ((while-no-input-ignore-events
+              (cons 'dbus-event while-no-input-ignore-events)))
+         (unless (> emacs-major-version 28) (require 'tramp-archive))
+         (helm-while-no-input ,@body)))))
 
 (defun helm--collect-matches (src-list)
   "Return a list of matches for each source in SRC-LIST.
