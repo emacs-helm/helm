@@ -807,7 +807,10 @@ If Rsync is available, you can use it to copy/sync files or directories
 with some restrictions though:
 
 - Copying from/to tramp sudo method may not work (permissions).
-- Copying from remote to remote is not supported (rsync restriction).
+- Copying from remote to remote is not supported (rsync restriction)
+however you can mount a remote with sshfs and copy to it (best), otherwise you have to modify
+the command line with a prefix arg, see [[https://unix.stackexchange.com/questions/183504/how-to-rsync-files-between-two-remotes][how-to-rsync-files-between-two-remotes]]
+for the command line to use.
 
 This command is mostly useful when copying large files as it is
 fast, asynchronous and provide a progress bar in mode-line.  Each
