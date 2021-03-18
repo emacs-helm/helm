@@ -5635,7 +5635,7 @@ files."
                                 ((and (not (string= smart-input ""))
                                       smart-input))
                                 (t default-input)))
-         (input-as-presel (null (nth 0 (file-attributes input))))
+         (input-as-presel (null (file-directory-p input)))
          (presel          (helm-aif (or hist
                                         (and input-as-presel input)
                                         (buffer-file-name (current-buffer))
