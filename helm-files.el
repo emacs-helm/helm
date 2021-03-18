@@ -4628,20 +4628,23 @@ source is `helm-source-find-files'."
                    ("" nil)
                    (t it))))
     (unless (eq major-mode 'image-mode)
-      (or (and input (or (and (file-remote-p input) input)
-                         (expand-file-name input)))
-          (helm-find-files-input
-           (if (and helm-ff-allow-non-existing-file-at-point
-                    guesser
-                    (not (string-match ffap-url-regexp guesser)))
-               ;; Keep the ability of jumping to numbered lines even
-               ;; when allowing non existing filenames at point.
-               (helm-aand guesser
-                          (thing-at-point 'filename)
-                          (replace-regexp-in-string
-                           ":[0-9]+\\'" "" it))
-             guesser)
-           (thing-at-point 'filename))))))
+      (if input
+          (if (or (file-remote-p input)
+                  (string-match helm-ff-url-regexp input))
+              input
+            (expand-file-name input))
+        (helm-find-files-input
+         (if (and helm-ff-allow-non-existing-file-at-point
+                  guesser
+                  (not (string-match ffap-url-regexp guesser)))
+             ;; Keep the ability of jumping to numbered lines even
+             ;; when allowing non existing filenames at point.
+             (helm-aand guesser
+                        (thing-at-point 'filename)
+                        (replace-regexp-in-string
+                         ":[0-9]+\\'" "" it))
+           guesser)
+         (thing-at-point 'filename))))))
 
 (defun helm-ffap-guesser ()
   "Same as `ffap-guesser' but without gopher and machine support."
