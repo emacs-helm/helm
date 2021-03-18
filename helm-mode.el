@@ -1330,7 +1330,9 @@ Keys description:
          (result (helm
                   :sources (if helm-mode-reverse-history
                                (reverse src-list) src-list)
-                  :input (expand-file-name initial-input)
+                  :input (if (string-match helm-ff-url-regexp initial-input)
+                             initial-input
+                           (expand-file-name initial-input))
                   :prompt prompt
                   :candidate-number-limit candidate-number-limit
                   :resume 'noresume
@@ -1466,7 +1468,9 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        :buffer buf-name
                        :default default-filename
                        ;; Helm handlers should always have a non nil INITIAL arg.
-                       :initial-input (expand-file-name init dir)
+                       :initial-input (if (string-match helm-ff-url-regexp init)
+                                          init
+                                        (expand-file-name init dir))
                        :alistp nil
                        :nomark (null helm-comp-read-use-marked)
                        :marked-candidates helm-comp-read-use-marked
