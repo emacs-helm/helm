@@ -210,7 +210,7 @@ Yellow     => Tramp archive buffer.
 ** Commands
 \\<helm-buffer-map>
 \\[helm-buffer-run-zgrep]\t\tGrep Buffer(s) works as zgrep too (`\\[universal-argument]' to grep all buffers but non-file buffers).
-\\[helm-buffers-run-multi-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
+\\[helm-buffers-run-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
 \\[helm-buffer-switch-other-window]\t\tSwitch to other window.
 \\[helm-buffer-switch-other-frame]\t\tSwitch to other frame.
 \\[helm-buffers-run-browse-project]\t\tBrowse project from buffer.
