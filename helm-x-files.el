@@ -26,7 +26,7 @@
 ;;
 ;;
 (defvar dired-buffers)
-(defvar dired-re-no-dot)
+(defvar directory-files-no-dot-files-regexp)
 (defun helm-files-in-all-dired-candidates ()
   "Return a list of files from live `dired' buffers."
   (save-excursion
@@ -34,7 +34,7 @@
           when (buffer-live-p b)
           append (let ((dir (with-current-buffer b dired-directory)))
                    (if (listp dir) (cdr dir)
-                     (directory-files f t dired-re-no-dot))))))
+                     (directory-files f t directory-files-no-dot-files-regexp))))))
 
 ;; (dired '("~/" "~/.emacs.d/.emacs-custom.el" "~/.emacs.d/.emacs.bmk"))
 

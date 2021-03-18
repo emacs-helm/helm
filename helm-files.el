@@ -4973,7 +4973,7 @@ is nil."
           (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
           (delete-by-moving-to-trash trash))
       (cond ((and (eq (nth 0 file-attrs) t)
-                  (directory-files file t dired-re-no-dot))
+                  (directory-files file t directory-files-no-dot-files-regexp))
              ;; Synchro means persistent deletion from HFF.
              (if synchro
                  (when (or helm-ff-allow-recursive-deletes
