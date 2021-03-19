@@ -1884,6 +1884,7 @@ session just like resume would do.")
 It is generally `helm-current-buffer', but when this one is displayed
 in a dedicated buffer, helm can't start in this window and use another
 window handling a buffer, it is this one we store.")
+(defvar helm--tramp-archive-maybe-loaded nil)
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2805,6 +2806,17 @@ in the source.
            unless (memq key helm-argument-keys)
            collect (cons sym value)))
 
+(defun helm--maybe-load-tramp-archive ()
+  ;; Should fix bug#2393 and bug#2394.  `while-no-input-ignore-events'
+  ;; is also let-bounded in `helm--maybe-use-while-no-input'.
+  (let ((while-no-input-ignore-events
+         (cons 'dbus-event while-no-input-ignore-events)))
+    (unless helm--tramp-archive-maybe-loaded
+      ;; This for Emacs-27 not requiring tramp-archive.
+      (and (boundp 'tramp-archive-enabled)
+           (require 'tramp-archive nil t))
+      (setq helm--tramp-archive-maybe-loaded t))))
+
 ;;; Entry point helper
 (defun helm-internal (&optional
                       sources input
@@ -2819,6 +2831,8 @@ HISTORY args see `helm'."
              nil "Error in %S buffer: Initial input should be a string or nil"
              buffer)
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
+  ;; Launch tramp-archive with dbus-event in `while-no-input-ignore-events'.
+  (helm--maybe-load-tramp-archive)
   ;; Activate the advices.
   ;; Advices will be available only in >=emacs-24.4, but
   ;; allow compiling without errors on lower emacs.
@@ -4640,7 +4654,6 @@ emacs-27 to provide such scoring in emacs<27."
        ;; version, require tramp-archive can workaround the issue.
        (let ((while-no-input-ignore-events
               (cons 'dbus-event while-no-input-ignore-events)))
-         (unless (> emacs-major-version 28) (require 'tramp-archive))
          (helm-while-no-input ,@body)))))
 
 (defun helm--collect-matches (src-list)
