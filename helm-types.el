@@ -23,6 +23,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'helm-source)
 
 (defvar helm-map)
 (defvar helm-mode-line-string)
