@@ -21,6 +21,8 @@
 (require 'helm-help)
 (require 'helm-elisp)
 
+(declare-function list-colors-display "facemenu")
+
 ;;; Customize Face
 ;;
 ;;
@@ -59,6 +61,7 @@
 ;;
 ;;
 (defun helm-colors-init ()
+  (require 'facemenu)
   (unless (helm-candidate-buffer)
     (save-selected-window
       (list-colors-display)
