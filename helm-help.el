@@ -209,27 +209,29 @@ Yellow     => Tramp archive buffer.
 
 ** Commands
 \\<helm-buffer-map>
-\\[helm-buffer-run-zgrep]\t\tGrep Buffer(s) works as zgrep too (`\\[universal-argument]' to grep all buffers but non-file buffers).
-\\[helm-buffers-run-occur]\t\tMulti-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
-\\[helm-buffer-switch-other-window]\t\tSwitch to other window.
-\\[helm-buffer-switch-other-frame]\t\tSwitch to other frame.
-\\[helm-buffers-run-browse-project]\t\tBrowse project from buffer.
-\\[helm-buffer-run-query-replace-regexp]\t\tQuery-replace-regexp in marked buffers.
-\\[helm-buffer-run-query-replace]\t\tQuery-replace in marked buffers.
-\\[helm-buffer-run-ediff]\t\tEdiff current buffer with candidate.  With two marked buffers, ediff those buffers.
-\\[helm-buffer-run-ediff-merge]\t\tEdiff-merge current buffer with candidate.  With two marked buffers, ediff-merge those buffers.
-\\[helm-buffer-diff-persistent]\t\tToggle Diff-buffer with saved file without leaving Helm.
-\\[helm-buffer-revert-persistent]\t\tRevert buffer without leaving Helm.
-\\[helm-buffer-save-persistent]\t\tSave buffer without leaving Helm.
-\\[helm-buffer-run-save-some-buffers]\t\tSave all unsaved buffers.
-\\[helm-buffer-run-kill-buffers]\t\tDelete marked buffers and leave Helm.
-\\[helm-buffer-run-kill-persistent]\t\tDelete buffer without leaving Helm.
-\\[helm-buffer-run-rename-buffer]\t\tRename buffer.
-\\[helm-toggle-all-marks]\t\tToggle all marks.
-\\[helm-mark-all]\t\tMark all.
-\\[helm-toggle-buffers-details]\t\tToggle details.
-\\[helm-buffers-toggle-show-hidden-buffers]\t\tShow hidden buffers.
-\\[helm-buffers-mark-similar-buffers]\t\tMark all buffers of the same type (color) as current buffer.")
+|Keys|Description|
+|-------------+----------|
+|\\[helm-buffer-run-zgrep]|Grep Buffer(s) works as zgrep too (`\\[universal-argument]' to grep all buffers but non-file buffers).
+|\\[helm-buffers-run-occur]|Multi-Occur buffer or marked buffers (`\\[universal-argument]' to toggle force-searching current-buffer).
+|\\[helm-buffer-switch-other-window]|Switch to other window.
+|\\[helm-buffer-switch-other-frame]|Switch to other frame.
+|\\[helm-buffers-run-browse-project]|Browse project from buffer.
+|\\[helm-buffer-run-query-replace-regexp]|Query-replace-regexp in marked buffers.
+|\\[helm-buffer-run-query-replace]|Query-replace in marked buffers.
+|\\[helm-buffer-run-ediff]|Ediff current buffer with candidate.  With two marked buffers, ediff those buffers.
+|\\[helm-buffer-run-ediff-merge]|Ediff-merge current buffer with candidate.  With two marked buffers, ediff-merge those buffers.
+|\\[helm-buffer-diff-persistent]|Toggle Diff-buffer with saved file without leaving Helm.
+|\\[helm-buffer-revert-persistent]|Revert buffer without leaving Helm.
+|\\[helm-buffer-save-persistent]|Save buffer without leaving Helm.
+|\\[helm-buffer-run-save-some-buffers]|Save all unsaved buffers.
+|\\[helm-buffer-run-kill-buffers]|Delete marked buffers and leave Helm.
+|\\[helm-buffer-run-kill-persistent]|Delete buffer without leaving Helm.
+|\\[helm-buffer-run-rename-buffer]|Rename buffer.
+|\\[helm-toggle-all-marks]|Toggle all marks.
+|\\[helm-mark-all]|Mark all.
+|\\[helm-toggle-buffers-details]|Toggle details.
+|\\[helm-buffers-toggle-show-hidden-buffers]|Show hidden buffers.
+|\\[helm-buffers-mark-similar-buffers]|Mark all buffers of the same type (color) as current buffer.")
 
 ;;; Find files help (`helm-find-files')
 ;;
@@ -1124,63 +1126,65 @@ in current visited directory by an external command from outside Emacs.
 
 ** Commands
 \\<helm-find-files-map>
-\\[helm-ff-run-locate]\t\tRun `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
-\\[helm-ff-run-browse-project]\t\tBrowse project (`\\[universal-argument]' to recurse, `\\[universal-argument] \\[universal-argument]' to recurse and refresh database).
-\\[helm-ff-run-find-sh-command]\t\tRun `find' shell command from this directory.
-\\[helm-ff-run-grep]\t\tRun Grep (`\\[universal-argument]' to recurse).
-\\[helm-ff-run-pdfgrep]\t\tRun Pdfgrep on marked files.
-\\[helm-ff-run-zgrep]\t\tRun zgrep (`\\[universal-argument]' to recurse).
-\\[helm-ff-run-grep-ag]\t\tRun AG grep on current directory.
-\\[helm-ff-run-git-grep]\t\tRun git-grep on current directory.
-\\[helm-ff-run-gid]\t\tRun gid (id-utils).
-\\[helm-ff-run-etags]\t\tRun Etags (`\\[universal-argument]' to use thing-at-point, `\\[universal-argument] \\[universal-argument]' to reload cache).
-\\[helm-ff-run-rename-file]\t\tRename Files (`\\[universal-argument]' to follow).
-\\[helm-ff-run-query-replace-fnames-on-marked]\t\tQuery replace on marked files.
-\\[helm-ff-run-copy-file]\t\tCopy Files (`\\[universal-argument]' to follow).
-\\[helm-ff-run-rsync-file]\t\tRsync Files (`\\[universal-argument]' to edit command).
-\\[helm-ff-run-byte-compile-file]\t\tByte Compile Files (`\\[universal-argument]' to load).
-\\[helm-ff-run-load-file]\t\tLoad Files.
-\\[helm-ff-run-symlink-file]\t\tSymlink Files.
-\\[helm-ff-run-hardlink-file]\t\tHardlink files.
-\\[helm-ff-run-relsymlink-file]\t\tRelative symlink Files.
-\\[helm-ff-run-delete-file]\t\tDelete Files.
-\\[helm-ff-run-touch-files]\t\tTouch files.
-\\[helm-ff-run-kill-buffer-persistent]\t\tKill buffer candidate without leaving Helm.
-\\[helm-ff-persistent-delete]\t\tDelete file without leaving Helm.
-\\[helm-ff-run-switch-to-shell]\t\tSwitch to prefered shell.
-\\[helm-ff-run-eshell-command-on-file]\t\tEshell command on file (`\\[universal-argument]' to apply on marked files, otherwise treat them sequentially).
-\\[helm-ff-run-ediff-file]\t\tEdiff file.
-\\[helm-ff-run-ediff-merge-file]\t\tEdiff merge file.
-\\[helm-ff-run-complete-fn-at-point]\t\tComplete file name at point.
-\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
-\\[helm-ff-run-switch-other-frame]\t\tSwitch to other frame.
-\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
-\\[helm-ff-run-preview-file-externally]\t\tPreview file with external program.
-\\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
-\\[helm-ff-rotate-left-persistent]\t\tRotate image left.
-\\[helm-ff-rotate-right-persistent]\t\tRotate image right.
-\\[helm-ff-increase-image-size-persistent]\t\tZoom in image.
-\\[helm-ff-decrease-image-size-persistent]\t\tZoom out image.
-\\[helm-find-files-up-one-level]\t\tGo to parent directory.
-\\[helm-find-files-history]\t\tSwitch to the visited-directory history.
-\\[helm-ff-file-name-history]\t\tSwitch to file name history.
-\\[helm-ff-properties-persistent]\t\tShow file properties in a tooltip.
-\\[helm-mark-all]\t\tMark all visible candidates.
-\\[helm-ff-run-toggle-auto-update]\t\tToggle auto-expansion of directories.
-\\[helm-unmark-all]\t\tUnmark all candidates, visible and invisible ones.
-\\[helm-ff-run-mail-attach-files]\t\tAttach files to message buffer.
-\\[helm-ff-run-print-file]\t\tPrint file, (`\\[universal-argument]' to refresh printer list).
-\\[helm-enlarge-window]\t\tEnlarge Helm window.
-\\[helm-narrow-window]\t\tNarrow Helm window.
-\\[helm-ff-run-toggle-basename]\t\tToggle basename/fullpath.
-\\[helm-ff-run-find-file-as-root]\t\tFind file as root.
-\\[helm-ff-run-find-alternate-file]\t\tFind alternate file.
-\\[helm-ff-run-insert-org-link]\t\tInsert org link.
-\\[helm-ff-bookmark-set]\t\tSet bookmark to current directory.
-\\[helm-find-files-switch-to-bookmark]\t\tJump to bookmark list.
-\\[helm-ff-sort-alpha]\t\tSort alphabetically
-\\[helm-ff-sort-by-newest]\t\tSort by newest
-\\[helm-ff-sort-by-size]\t\tSort by size")
+|Keys|Description
+|-----------+----------|
+|\\[helm-ff-run-locate]|Run `locate' (`\\[universal-argument]' to specify locate database, `M-n' to insert basename of candidate).
+|\\[helm-ff-run-browse-project]|Browse project (`\\[universal-argument]' to recurse, `\\[universal-argument] \\[universal-argument]' to recurse and refresh database).
+|\\[helm-ff-run-find-sh-command]|Run `find' shell command from this directory.
+|\\[helm-ff-run-grep]|Run Grep (`\\[universal-argument]' to recurse).
+|\\[helm-ff-run-pdfgrep]|Run Pdfgrep on marked files.
+|\\[helm-ff-run-zgrep]|Run zgrep (`\\[universal-argument]' to recurse).
+|\\[helm-ff-run-grep-ag]|Run AG grep on current directory.
+|\\[helm-ff-run-git-grep]|Run git-grep on current directory.
+|\\[helm-ff-run-gid]|Run gid (id-utils).
+|\\[helm-ff-run-etags]|Run Etags (`\\[universal-argument]' to use thing-at-point, `\\[universal-argument] \\[universal-argument]' to reload cache).
+|\\[helm-ff-run-rename-file]|Rename Files (`\\[universal-argument]' to follow).
+|\\[helm-ff-run-query-replace-fnames-on-marked]|Query replace on marked files.
+|\\[helm-ff-run-copy-file]|Copy Files (`\\[universal-argument]' to follow).
+|\\[helm-ff-run-rsync-file]|Rsync Files (`\\[universal-argument]' to edit command).
+|\\[helm-ff-run-byte-compile-file]|Byte Compile Files (`\\[universal-argument]' to load).
+|\\[helm-ff-run-load-file]|Load Files.
+|\\[helm-ff-run-symlink-file]|Symlink Files.
+|\\[helm-ff-run-hardlink-file]|Hardlink files.
+|\\[helm-ff-run-relsymlink-file]|Relative symlink Files.
+|\\[helm-ff-run-delete-file]|Delete Files.
+|\\[helm-ff-run-touch-files]|Touch files.
+|\\[helm-ff-run-kill-buffer-persistent]|Kill buffer candidate without leaving Helm.
+|\\[helm-ff-persistent-delete]|Delete file without leaving Helm.
+|\\[helm-ff-run-switch-to-shell]|Switch to prefered shell.
+|\\[helm-ff-run-eshell-command-on-file]|Eshell command on file (`\\[universal-argument]' to apply on marked files, otherwise treat them sequentially).
+|\\[helm-ff-run-ediff-file]|Ediff file.
+|\\[helm-ff-run-ediff-merge-file]|Ediff merge file.
+|\\[helm-ff-run-complete-fn-at-point]|Complete file name at point.
+|\\[helm-ff-run-switch-other-window]|Switch to other window.
+|\\[helm-ff-run-switch-other-frame]|Switch to other frame.
+|\\[helm-ff-run-open-file-externally]|Open file with external program (`\\[universal-argument]' to choose).
+|\\[helm-ff-run-preview-file-externally]|Preview file with external program.
+|\\[helm-ff-run-open-file-with-default-tool]|Open file externally with default tool.
+|\\[helm-ff-rotate-left-persistent]|Rotate image left.
+|\\[helm-ff-rotate-right-persistent]|Rotate image right.
+|\\[helm-ff-increase-image-size-persistent]|Zoom in image.
+|\\[helm-ff-decrease-image-size-persistent]|Zoom out image.
+|\\[helm-find-files-up-one-level]|Go to parent directory.
+|\\[helm-find-files-history]|Switch to the visited-directory history.
+|\\[helm-ff-file-name-history]|Switch to file name history.
+|\\[helm-ff-properties-persistent]|Show file properties in a tooltip.
+|\\[helm-mark-all]|Mark all visible candidates.
+|\\[helm-ff-run-toggle-auto-update]|Toggle auto-expansion of directories.
+|\\[helm-unmark-all]|Unmark all candidates, visible and invisible ones.
+|\\[helm-ff-run-mail-attach-files]|Attach files to message buffer.
+|\\[helm-ff-run-print-file]|Print file, (`\\[universal-argument]' to refresh printer list).
+|\\[helm-enlarge-window]|Enlarge Helm window.
+|\\[helm-narrow-window]|Narrow Helm window.
+|\\[helm-ff-run-toggle-basename]|Toggle basename/fullpath.
+|\\[helm-ff-run-find-file-as-root]|Find file as root.
+|\\[helm-ff-run-find-alternate-file]|Find alternate file.
+|\\[helm-ff-run-insert-org-link]|Insert org link.
+|\\[helm-ff-bookmark-set]|Set bookmark to current directory.
+|\\[helm-find-files-switch-to-bookmark]|Jump to bookmark list.
+|\\[helm-ff-sort-alpha]|Sort alphabetically
+|\\[helm-ff-sort-by-newest]|Sort by newest
+|\\[helm-ff-sort-by-size]|Sort by size")
 
 ;;; Help for file-name-history
 ;;
@@ -1196,7 +1200,7 @@ You can toggle the view of deleted files, see commands below.
 
 ** Commands
 \\<helm-file-name-history-map>
-\\[helm-file-name-history-show-or-hide-deleted]\t\tToggle deleted files view.")
+\\[helm-file-name-history-show-or-hide-deleted]|Toggle deleted files view.")
 
 ;;; Help for `helm-read-file-name'
 ;;
@@ -1286,13 +1290,15 @@ It is useful when some commands are prompting continuously until you enter an em
 
 ** Commands
 \\<helm-read-file-map>
-\\[helm-find-files-up-one-level]\t\tGo to parent directory.
-\\[helm-ff-run-toggle-auto-update]\t\tToggle auto-expansion of directories.
-\\[helm-ff-run-toggle-basename]\t\tToggle basename.
-\\[helm-ff-file-name-history]\t\tFile name history.
-C/\\[helm-cr-empty-string]\t\tReturn empty string unless `must-match' is non-nil.
-\\[helm-next-source]\t\tGo to next source.
-\\[helm-previous-source]\t\tGo to previous source."
+|Keys|Description
+|-----------+----------|
+|\\[helm-find-files-up-one-level]|Go to parent directory.
+|\\[helm-ff-run-toggle-auto-update]|Toggle auto-expansion of directories.
+|\\[helm-ff-run-toggle-basename]|Toggle basename.
+|\\[helm-ff-file-name-history]|File name history.
+|C/\\[helm-cr-empty-string]|Return empty string unless `must-match' is non-nil.
+|\\[helm-next-source]|Go to next source.
+|\\[helm-previous-source]|Go to previous source."
      name name)))
 
 ;;; FD help
@@ -1580,25 +1586,27 @@ OPTIONS
 
 ** Commands
 \\<helm-fd-map>
-\\[helm-ff-run-grep]\t\tRun grep (`\\[universal-argument]' to recurse).
-\\[helm-ff-run-zgrep]\t\tRun zgrep.
-\\[helm-ff-run-pdfgrep]\t\tRun PDFgrep on marked files.
-\\[helm-ff-run-copy-file]\t\tCopy file(s)
-\\[helm-ff-run-rename-file]\t\tRename file(s).
-\\[helm-ff-run-symlink-file]\t\tSymlink file(s).
-\\[helm-ff-run-hardlink-file]\t\tHardlink file(s).
-\\[helm-ff-run-delete-file]\t\tDelete file(s).
-\\[helm-ff-run-byte-compile-file]\t\tByte compile Elisp file(s) (`\\[universal-argument]' to load).
-\\[helm-ff-run-load-file]\t\tLoad Elisp file(s).
-\\[helm-ff-run-ediff-file]\t\tEdiff file.
-\\[helm-ff-run-ediff-merge-file]\t\tEdiff-merge file.
-\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
-\\[helm-ff-properties-persistent]\t\tShow file properties.
-\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
-\\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
-\\[helm-ff-run-insert-org-link]\t\tInsert org link.
-\\[helm-fd-previous-directory]\t\tMove to previous directory.
-\\[helm-fd-next-directory]\tMove to next directory.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-ff-run-grep]|Run grep (`\\[universal-argument]' to recurse).
+|\\[helm-ff-run-zgrep]|Run zgrep.
+|\\[helm-ff-run-pdfgrep]|Run PDFgrep on marked files.
+|\\[helm-ff-run-copy-file]|Copy file(s)
+|\\[helm-ff-run-rename-file]|Rename file(s).
+|\\[helm-ff-run-symlink-file]|Symlink file(s).
+|\\[helm-ff-run-hardlink-file]|Hardlink file(s).
+|\\[helm-ff-run-delete-file]|Delete file(s).
+|\\[helm-ff-run-byte-compile-file]|Byte compile Elisp file(s) (`\\[universal-argument]' to load).
+|\\[helm-ff-run-load-file]|Load Elisp file(s).
+|\\[helm-ff-run-ediff-file]|Ediff file.
+|\\[helm-ff-run-ediff-merge-file]|Ediff-merge file.
+|\\[helm-ff-run-switch-other-window]|Switch to other window.
+|\\[helm-ff-properties-persistent]|Show file properties.
+|\\[helm-ff-run-open-file-externally]|Open file with external program (`\\[universal-argument]' to choose).
+|\\[helm-ff-run-open-file-with-default-tool]|Open file externally with default tool.
+|\\[helm-ff-run-insert-org-link]|Insert org link.
+|\\[helm-fd-previous-directory]|Move to previous directory.
+|\\[helm-fd-next-directory]|Move to next directory.")
 
 ;;; Generic file help - Used by locate.
 ;;
@@ -1648,24 +1656,26 @@ than 1 megabyte:
 
 ** Commands
 \\<helm-generic-files-map>
-\\[helm-ff-run-toggle-basename]\t\tToggle basename.
-\\[helm-ff-run-grep]\t\tRun grep (`\\[universal-argument]' to recurse).
-\\[helm-ff-run-zgrep]\t\tRun zgrep.
-\\[helm-ff-run-pdfgrep]\t\tRun PDFgrep on marked files.
-\\[helm-ff-run-copy-file]\t\tCopy file(s)
-\\[helm-ff-run-rename-file]\t\tRename file(s).
-\\[helm-ff-run-symlink-file]\t\tSymlink file(s).
-\\[helm-ff-run-hardlink-file]\t\tHardlink file(s).
-\\[helm-ff-run-delete-file]\t\tDelete file(s).
-\\[helm-ff-run-byte-compile-file]\t\tByte compile Elisp file(s) (`\\[universal-argument]' to load).
-\\[helm-ff-run-load-file]\t\tLoad Elisp file(s).
-\\[helm-ff-run-ediff-file]\t\tEdiff file.
-\\[helm-ff-run-ediff-merge-file]\t\tEdiff-merge file.
-\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
-\\[helm-ff-properties-persistent]\t\tShow file properties.
-\\[helm-ff-run-open-file-externally]\t\tOpen file with external program (`\\[universal-argument]' to choose).
-\\[helm-ff-run-open-file-with-default-tool]\t\tOpen file externally with default tool.
-\\[helm-ff-run-insert-org-link]\t\tInsert org link.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-ff-run-toggle-basename]|Toggle basename.
+|\\[helm-ff-run-grep]|Run grep (`\\[universal-argument]' to recurse).
+|\\[helm-ff-run-zgrep]|Run zgrep.
+|\\[helm-ff-run-pdfgrep]|Run PDFgrep on marked files.
+|\\[helm-ff-run-copy-file]|Copy file(s)
+|\\[helm-ff-run-rename-file]|Rename file(s).
+|\\[helm-ff-run-symlink-file]|Symlink file(s).
+|\\[helm-ff-run-hardlink-file]|Hardlink file(s).
+|\\[helm-ff-run-delete-file]|Delete file(s).
+|\\[helm-ff-run-byte-compile-file]|Byte compile Elisp file(s) (`\\[universal-argument]' to load).
+|\\[helm-ff-run-load-file]|Load Elisp file(s).
+|\\[helm-ff-run-ediff-file]|Ediff file.
+|\\[helm-ff-run-ediff-merge-file]|Ediff-merge file.
+|\\[helm-ff-run-switch-other-window]|Switch to other window.
+|\\[helm-ff-properties-persistent]|Show file properties.
+|\\[helm-ff-run-open-file-externally]|Open file with external program (`\\[universal-argument]' to choose).
+|\\[helm-ff-run-open-file-with-default-tool]|Open file externally with default tool.
+|\\[helm-ff-run-insert-org-link]|Insert org link.")
 
 ;;; Grep help
 ;;
@@ -1802,13 +1812,15 @@ use a prefix argument.
 
 ** Commands
 \\<helm-grep-map>
-\\[helm-goto-next-file]\t\tNext File.
-\\[helm-goto-precedent-file]\t\tPrevious File.
-\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.
-\\[helm-grep-run-other-window-action]\t\tJump to other window.
-\\[helm-grep-run-other-frame-action]\t\tJump to other frame.
-\\[helm-grep-run-default-action]\t\tRun default action (same as `RET').
-\\[helm-grep-run-save-buffer]\t\tSave to a `helm-grep-mode' enabled buffer.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-goto-next-file]|Next File.
+|\\[helm-goto-precedent-file]|Previous File.
+|\\[helm-yank-text-at-point]|Yank text at point in minibuffer.
+|\\[helm-grep-run-other-window-action]|Jump to other window.
+|\\[helm-grep-run-other-frame-action]|Jump to other frame.
+|\\[helm-grep-run-default-action]|Run default action (same as `RET').
+|\\[helm-grep-run-save-buffer]|Save to a `helm-grep-mode' enabled buffer.")
 
 ;;; PDF grep help
 ;;
@@ -1818,9 +1830,11 @@ use a prefix argument.
 
 ** Commands
 \\<helm-pdfgrep-map>
-\\[helm-goto-next-file]\t\tNext file.
-\\[helm-goto-precedent-file]\t\tPrevious file.
-\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-goto-next-file]|Next file.
+|\\[helm-goto-precedent-file]|Previous file.
+|\\[helm-yank-text-at-point]|Yank text at point in minibuffer.")
 
 ;;; Etags help
 ;;
@@ -1830,9 +1844,11 @@ use a prefix argument.
 
 ** Commands
 \\<helm-etags-map>
-\\[helm-goto-next-file]\t\tNext file.
-\\[helm-goto-precedent-file]\t\tPrevious file.
-\\[helm-yank-text-at-point]\t\tYank text at point in minibuffer.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-goto-next-file]|Next file.
+|\\[helm-goto-precedent-file]|Previous file.
+|\\[helm-yank-text-at-point]|Yank text at point in minibuffer.")
 
 ;;; UCS help
 ;;
@@ -1847,11 +1863,13 @@ leaving Helm.
 
 ** Commands
 \\<helm-ucs-map>
-\\[helm-ucs-persistent-insert]\t\tInsert character.
-\\[helm-ucs-persistent-forward]\t\tForward character.
-\\[helm-ucs-persistent-backward]\t\tBackward character.
-\\[helm-ucs-persistent-delete]\t\tDelete character backward.
-\\[helm-ucs-persistent-insert-space]\t\tInsert space.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-ucs-persistent-insert]|Insert character.
+|\\[helm-ucs-persistent-forward]|Forward character.
+|\\[helm-ucs-persistent-backward]|Backward character.
+|\\[helm-ucs-persistent-delete]|Delete character backward.
+|\\[helm-ucs-persistent-insert-space]|Insert space.")
 
 ;;; Bookmark help
 ;;
@@ -1861,10 +1879,12 @@ leaving Helm.
 
 ** Commands
 \\<helm-bookmark-map>
-\\[helm-bookmark-run-jump-other-window]\t\tJump other window.
-\\[helm-bookmark-run-delete]\t\tDelete bookmark.
-\\[helm-bookmark-run-edit]\t\tEdit bookmark.
-\\[helm-bookmark-toggle-filename]\t\tToggle bookmark location visibility.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-bookmark-run-jump-other-window]|Jump other window.
+|\\[helm-bookmark-run-delete]|Delete bookmark.
+|\\[helm-bookmark-run-edit]|Edit bookmark.
+|\\[helm-bookmark-toggle-filename]|Toggle bookmark location visibility.")
 
 ;;; Eshell command on file help
 ;;
@@ -1958,12 +1978,14 @@ prefix arg to ensure you run only one command on all marked async.
 
 ** Commands
 \\<helm-buffers-ido-virtual-map>
-\\[helm-ff-run-switch-other-window]\t\tSwitch to other window.
-\\[helm-ff-run-switch-other-frame]\t\tSwitch to other frame.
-\\[helm-ff-run-grep]\t\tGrep file.
-\\[helm-ff-run-zgrep]\t\tZgrep file.
-\\[helm-ff-run-delete-file]\t\tDelete file.
-\\[helm-ff-run-open-file-externally]\t\tOpen file externally.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-ff-run-switch-other-window]|Switch to other window.
+|\\[helm-ff-run-switch-other-frame]|Switch to other frame.
+|\\[helm-ff-run-grep]|Grep file.
+|\\[helm-ff-run-zgrep]|Zgrep file.
+|\\[helm-ff-run-delete-file]|Delete file.
+|\\[helm-ff-run-open-file-externally]|Open file externally.")
 
 ;;; Moccur help
 ;;
@@ -2062,9 +2084,11 @@ See [[Moving in `helm-buffer'][Moving in `helm-buffer']].
 
 ** Commands
 \\<helm-occur-map>
-\\[helm-occur-run-goto-line-ow]\t\tGo to line in other window.
-\\[helm-occur-run-goto-line-of]\t\tGo to line in new frame.
-\\[helm-occur-run-save-buffer]\t\tSave results in new buffer.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-occur-run-goto-line-ow]|Go to line in other window.
+|\\[helm-occur-run-goto-line-of]|Go to line in new frame.
+|\\[helm-occur-run-save-buffer]|Save results in new buffer.")
 ;;; Helm Top
 ;;
 ;;
@@ -2073,10 +2097,12 @@ See [[Moving in `helm-buffer'][Moving in `helm-buffer']].
 
 ** Commands
 \\<helm-top-map>
-\\[helm-top-run-sort-by-com]\t\tSort by commands.
-\\[helm-top-run-sort-by-cpu]\t\tSort by CPU usage.
-\\[helm-top-run-sort-by-user]\t\tSort alphabetically by user.
-\\[helm-top-run-sort-by-mem]\t\tSort by memory.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-top-run-sort-by-com]|Sort by commands.
+|\\[helm-top-run-sort-by-cpu]|Sort by CPU usage.
+|\\[helm-top-run-sort-by-user]|Sort alphabetically by user.
+|\\[helm-top-run-sort-by-mem]|Sort by memory.")
 
 ;;; Helm Elisp package
 ;;
@@ -2124,17 +2150,19 @@ marking it (`C-c u' or `RET') .
 
 ** Commands
 \\<helm-el-package-map>
-\\[helm-el-package-show-all]\t\tShow all packages.
-\\[helm-el-package-show-installed]\t\tShow installed packages only.
-\\[helm-el-package-show-uninstalled]\t\tShow non-installed packages only.
-\\[helm-el-package-show-upgrade]\t\tShow upgradable packages only.
-\\[helm-el-package-show-built-in]\t\tShow built-in packages only.
-\\[helm-el-run-package-install]\t\tInstall package(s).
-\\[helm-el-run-package-reinstall]\t\tReinstall package(s).
-\\[helm-el-run-package-uninstall]\t\tUninstall package(s).
-\\[helm-el-run-package-upgrade]\t\tUpgrade package(s).
-\\[helm-el-run-package-upgrade-all]\t\tUpgrade all packages.
-\\[helm-el-run-visit-homepage]\t\tVisit package homepage.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-el-package-show-all]|Show all packages.
+|\\[helm-el-package-show-installed]|Show installed packages only.
+|\\[helm-el-package-show-uninstalled]|Show non-installed packages only.
+|\\[helm-el-package-show-upgrade]|Show upgradable packages only.
+|\\[helm-el-package-show-built-in]|Show built-in packages only.
+|\\[helm-el-run-package-install]|Install package(s).
+|\\[helm-el-run-package-reinstall]|Reinstall package(s).
+|\\[helm-el-run-package-uninstall]|Uninstall package(s).
+|\\[helm-el-run-package-upgrade]|Upgrade package(s).
+|\\[helm-el-run-package-upgrade-all]|Upgrade all packages.
+|\\[helm-el-run-visit-homepage]|Visit package homepage.")
 
 ;;; Helm M-x
 ;;
@@ -2180,8 +2208,10 @@ duplicates in your helm-M-x history set `history-delete-duplicates' to non nil."
 
 ** Commands
 \\<helm-imenu-map>
-\\[helm-imenu-next-section]\t\tGo to next section.
-\\[helm-imenu-previous-section]\t\tGo to previous section.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-imenu-next-section]|Go to next section.
+|\\[helm-imenu-previous-section]|Go to previous section.")
 
 ;;; Helm colors
 ;;
@@ -2191,10 +2221,12 @@ duplicates in your helm-M-x history set `history-delete-duplicates' to non nil."
 
 ** Commands
 \\<helm-color-map>
-\\[helm-color-run-insert-name]\t\tInsert the entry name.
-\\[helm-color-run-kill-name]\t\tKill the entry name.
-\\[helm-color-run-insert-rgb]\t\tInsert entry in RGB format.
-\\[helm-color-run-kill-rgb]\t\tKill entry in RGB format.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-color-run-insert-name]|Insert the entry name.
+|\\[helm-color-run-kill-name]|Kill the entry name.
+|\\[helm-color-run-insert-rgb]|Insert entry in RGB format.
+|\\[helm-color-run-kill-rgb]|Kill entry in RGB format.")
 
 ;;; Helm Semantic
 ;;
@@ -2271,11 +2303,13 @@ by using a prefix argument, i.e. `C-u RET', like the regular `yank' command does
 
 ** Commands
 \\<helm-kill-ring-map>
-\\[helm-next-line]\t\tNext line.
-\\[helm-previous-line]\t\tPrevious line.
-\\[helm-kill-ring-delete]\t\tDelete entry.
-\\[helm-kill-ring-toggle-truncated]\t\tToggle truncated view of candidate.
-\\[helm-kill-ring-kill-selection]\t\tKill non-truncated of selection.")
+|Keys|Description
+|-----------+----------|
+|\\[helm-next-line]|Next line.
+|\\[helm-previous-line]|Previous line.
+|\\[helm-kill-ring-delete]|Delete entry.
+|\\[helm-kill-ring-toggle-truncated]|Toggle truncated view of candidate.
+|\\[helm-kill-ring-kill-selection]|Kill non-truncated of selection.")
 
 ;;; Completing-read
 ;;
@@ -2301,7 +2335,9 @@ It is useful when some commands are prompting continuously until you enter an em
 
 ** Commands
 \\<helm-comp-read-map>
-\\[helm-cr-empty-string]\t\tExit minibuffer with empty string."
+|Keys|Description
+|-----------+----------|
+|\\[helm-cr-empty-string]|Exit minibuffer with empty string."
      com com)))
 
 

@@ -47,6 +47,8 @@
 (declare-function org-content "org.el")
 (declare-function org-mark-ring-goto "org.el")
 (declare-function org-mark-ring-push "org.el")
+(declare-function org-table-p "org-compat.el")
+(declare-function org-table-align "org-table.el")
 (declare-function org-open-at-point "org.el")
 (declare-function wdired-change-to-dired-mode "wdired.el")
 (declare-function wdired-do-perm-changes "wdired.el")
@@ -648,7 +650,13 @@ displayed in BUFNAME."
              (org-mode)
              (org-mark-ring-push) ; Put mark at bob
              (save-excursion
-               (funcall insert-content-fn))
+               (funcall insert-content-fn)
+               (goto-char (point-min))
+               (catch 'table-found
+                 (while (not (eobp))
+                   (forward-line 1)
+                   (when (org-table-p t)
+                     (throw 'table-found (org-table-align))))))
              (buffer-disable-undo)
              (helm-help-event-loop))
         (raise-frame hframe)
