@@ -652,11 +652,10 @@ displayed in BUFNAME."
              (save-excursion
                (funcall insert-content-fn)
                (goto-char (point-min))
-               (catch 'table-found
-                 (while (not (eobp))
-                   (forward-line 1)
-                   (when (org-table-p t)
-                     (throw 'table-found (org-table-align))))))
+               (while (not (eobp))
+                 (forward-line 1)
+                 (when (org-table-p t)
+                   (org-table-align))))
              (buffer-disable-undo)
              (helm-help-event-loop))
         (raise-frame hframe)

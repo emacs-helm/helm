@@ -1591,17 +1591,19 @@ line without executing the persistent action.
 
 ** Frequently Used Commands
 
-\\[helm-toggle-resplit-and-swap-windows]\t\tToggle vertical/horizontal split on first hit and swap Helm window on second hit.
-\\[helm-exchange-minibuffer-and-header-line]\t\tExchange minibuffer and header-line.
-\\[helm-quit-and-find-file]\t\tDrop into `helm-find-files'.
-\\[helm-kill-selection-and-quit]\t\tKill display value of candidate and quit (with prefix arg, kill the real value).
-\\[helm-yank-selection]\t\tYank current selection into pattern.
-\\[helm-copy-to-buffer]\t\tCopy selected candidate at point in current buffer.
-\\[helm-follow-mode]\t\tToggle automatic execution of persistent action.
-\\[helm-follow-action-forward]\tRun persistent action then select next line.
-\\[helm-follow-action-backward]\t\tRun persistent action then select previous line.
-\\[helm-refresh]\t\tRecalculate and redisplay candidates.
-\\[helm-toggle-suspend-update]\t\tToggle candidate updates.
+|Keys|Description
+|-----------+----------|
+|\\[helm-toggle-resplit-and-swap-windows]|Toggle vertical/horizontal split on first hit and swap Helm window on second hit.
+|\\[helm-exchange-minibuffer-and-header-line]|Exchange minibuffer and header-line.
+|\\[helm-quit-and-find-file]|Drop into `helm-find-files'.
+|\\[helm-kill-selection-and-quit]|Kill display value of candidate and quit (with prefix arg, kill the real value).
+|\\[helm-yank-selection]|Yank current selection into pattern.
+|\\[helm-copy-to-buffer]|Copy selected candidate at point in current buffer.
+|\\[helm-follow-mode]|Toggle automatic execution of persistent action.
+|\\[helm-follow-action-forward]|Run persistent action then select next line.
+|\\[helm-follow-action-backward]|Run persistent action then select previous line.
+|\\[helm-refresh]|Recalculate and redisplay candidates.
+|\\[helm-toggle-suspend-update]|Toggle candidate updates.
 
 ** Special yes, no or yes for all answers
 
