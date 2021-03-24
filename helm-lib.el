@@ -49,6 +49,7 @@
 (declare-function org-mark-ring-push "org.el")
 (declare-function org-table-p "org-compat.el")
 (declare-function org-table-align "org-table.el")
+(declare-function org-table-end "org-table.el")
 (declare-function org-open-at-point "org.el")
 (declare-function wdired-change-to-dired-mode "wdired.el")
 (declare-function wdired-do-perm-changes "wdired.el")
@@ -648,14 +649,14 @@ displayed in BUFNAME."
              (when helm-help-full-frame (delete-other-windows))
              (delete-region (point-min) (point-max))
              (org-mode)
-             (org-mark-ring-push) ; Put mark at bob
              (save-excursion
                (funcall insert-content-fn)
                (goto-char (point-min))
-               (while (not (eobp))
-                 (forward-line 1)
+               (while (re-search-forward "^[|]" nil t)
                  (when (org-table-p t)
-                   (org-table-align))))
+                   (org-table-align)
+                   (goto-char (org-table-end)))))
+             (org-mark-ring-push) ; Put mark at bob
              (buffer-disable-undo)
              (helm-help-event-loop))
         (raise-frame hframe)
