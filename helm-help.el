@@ -275,7 +275,7 @@ Note that when deleting char backward, Helm takes care of
 disabling update giving you the opportunity to edit your pattern for
 e.g. renaming a file or creating a new file or directory.
 When `helm-ff-auto-update-initial-value' is non nil you may want to
-disable it temporarily, see [[Toggle auto-completion with `C-c DEL'][Toggle auto-completion with `C-c DEL']] for this.
+disable it temporarily, see [[Toggle auto-completion][Toggle auto-completion]] for this.
 
 **** Use `\\<helm-find-files-map>\\[helm-find-files-down-last-level]' to walk back the resulting tree of all the `\\<helm-find-files-map>\\[helm-find-files-up-one-level]' or DEL you did
 
@@ -1184,7 +1184,9 @@ in current visited directory by an external command from outside Emacs.
 |\\[helm-find-files-switch-to-bookmark]|Jump to bookmark list.
 |\\[helm-ff-sort-alpha]|Sort alphabetically
 |\\[helm-ff-sort-by-newest]|Sort by newest
-|\\[helm-ff-sort-by-size]|Sort by size")
+|\\[helm-ff-sort-by-size]|Sort by size
+|\\[helm-ff-toggle-dirs-only]|Show only directories
+|\\[helm-ff-toggle-files-only]|Show only files")
 
 ;;; Help for file-name-history
 ;;
