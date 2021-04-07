@@ -570,7 +570,9 @@ It is helm `completing-read' equivalent.
 
 - PROMPT is the prompt name to use.
 
-- COLLECTION can be a list, vector, obarray or hash-table.
+- COLLECTION can be a list, alist, vector, obarray or hash-table.
+  For alists and hash-tables their car are use as real value of
+  candidate unless ALISTP is non-nil.
   It can be also a function that receives three arguments:
   the values string, predicate and t. See `all-completions' for more details.
 
@@ -644,7 +646,12 @@ Keys description:
 
 - NOMARK: When non--nil don't allow marking candidates.
 
-- ALISTP: (default is non--nil) See `helm-comp-read-get-candidates'.
+- ALISTP:
+  When non-nil (default) pass the value of (DISPLAY . REAL)
+  candidate in COLLECTION to action when COLLECTION is an alist or a
+  hash-table, otherwise DISPLAY is always returned as result on exit,
+  which is the default when using `completing-read'.
+  See `helm-comp-read-get-candidates'.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
   `helm-source-in-buffer' which is much faster.
