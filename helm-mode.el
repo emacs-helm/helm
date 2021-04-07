@@ -397,7 +397,11 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   ;; only in the context of current-buffer (Bug#1030) .
   (with-helm-current-buffer
     (let ((cands
-           (cond ((vectorp collection)
+           (cond ((and alistp (hash-table-p collection))
+                  (cl-loop for k being the hash-keys of collection
+                           using (hash-values v)
+                           collect (cons k v)))
+                 ((vectorp collection)
                   (all-completions input collection test))
                  ((and (symbolp collection) (boundp collection)
                        ;; Bug#324 history is let-bounded and given
