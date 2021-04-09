@@ -3845,7 +3845,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
     (cond ((and (file-exists-p candidate)
-                (string-match helm-ff--trash-directory-regexp (helm-basedir candidate))
+                (string-match helm-ff--trash-directory-regexp
+                              (helm-basedir (expand-file-name candidate)))
                 (not (member (helm-basename candidate) '("." "..")))
                 (executable-find "trash"))
            (helm-append-at-nth
