@@ -1780,7 +1780,6 @@ in `helm-initialize'.")
   "Internal, store locally `helm-pattern' value for later use in `helm-resume'.")
 (defvar helm--source-name nil)
 (defvar helm-current-source nil)
-(defvar helm-tick-hash (make-hash-table :test 'equal))
 (defvar helm-issued-errors nil)
 (defvar helm--last-log-file nil
   "The name of the log file of the last Helm session.")
@@ -2324,22 +2323,6 @@ Return nil when `helm-buffer' is empty."
                            for source in helm-sources thereis
                            (and (equal (assoc-default 'name source) source-name)
                                 source)))))))))
-
-(defun helm-buffer-is-modified (buffer)
-  "Return non-nil when BUFFER is modified since Helm was invoked."
-  (let* ((buf         (get-buffer buffer))
-         (key         (concat (buffer-name buf) "/" (helm-get-attr 'name)))
-         (source-tick (or (gethash key helm-tick-hash) 0))
-         (buffer-tick (buffer-chars-modified-tick buf))
-         (modifiedp   (/= source-tick buffer-tick)))
-    (puthash key buffer-tick helm-tick-hash)
-    (helm-log "buffer = %S" buffer)
-    (helm-log "modifiedp = %S" modifiedp)
-    modifiedp))
-
-(defun helm-current-buffer-is-modified ()
-  "Check if `helm-current-buffer' is modified since Helm was invoked."
-  (helm-buffer-is-modified helm-current-buffer))
 
 (defun helm-run-after-exit (function &rest args)
   "Execute FUNCTION with ARGS after exiting Helm.
@@ -6079,14 +6062,6 @@ to a list of forms.\n\n")
 
 
 ;; Misc
-(defun helm-kill-buffer-hook ()
-  "Remove tick entry from `helm-tick-hash' and remove buffer from
-`helm-buffers' when killing a buffer."
-  (cl-loop for key being the hash-keys in helm-tick-hash
-           if (string-match (format "^%s/" (regexp-quote (buffer-name))) key)
-           do (remhash key helm-tick-hash))
-  (setq helm-buffers (remove (buffer-name) helm-buffers)))
-(add-hook 'kill-buffer-hook 'helm-kill-buffer-hook)
 
 (defun helm-preselect (candidate-or-regexp &optional source)
   "Move selection to CANDIDATE-OR-REGEXP on Helm start.
