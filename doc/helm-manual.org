@@ -161,7 +161,7 @@ helmized commands.  File completion in ~read-file-name~ family
 doesn’t obey completion-styles and has its own file completion
 implementation. Native Helm commands using ~completion-styles~
 doesn’t obey ~helm-completion-style~ and
-~helm-completion-syles-alist~ (e.g., helm-M-x).
+~helm-completion-syles-alist~ (e.g., ~helm-M-x~).
 
 Also for a better control of styles in native Helm sources (not
 helmized by helm-mode) using :match-dynamic,
@@ -280,8 +280,7 @@ The documentation of default bindings are:
 Helm provides a lot of user variables for extensive customization.
 From any Helm session, type {{{kbd(C-h c)}}}
 to jump to the current source ~custom~ group.  Helm also has a
-special group for faces you can access via ‘M-x customize-group
-RET helm-faces’.
+special group for faces you can access via {{{kbd(M-x customize-group RET helm-faces)}}}.
 
 *Note*: Some sources may not have their group set and default to
 the ~helm~ group.
@@ -920,9 +919,9 @@ The tree is reinitialized each time you browse a new tree with
 
 It behaves differently depending on ~helm-selection~ (current candidate in helm-buffer):
 
-- candidate basename is =.= => Open it in dired.
-- candidate is a directory    => Expand it.
-- candidate is a file         => Open it.
+- candidate basename is =.= :: Open it in dired.
+- candidate is a directory    :: Expand it.
+- candidate is a file         :: Open it.
 
 If you have marked candidates and you press RET on a directory,
 Helm will navigate to this directory.  If you want to exit with
@@ -1006,27 +1005,27 @@ e-mail address.
 
 *** Quick pattern expansion
 
-**** Enter ‘~/’ at end of pattern to quickly reach home directory
+**** Enter =~/= at end of pattern to quickly reach home directory
 
-**** Enter ‘/’ at end of pattern to quickly reach the file system root
+**** Enter =/= at end of pattern to quickly reach the file system root
 
-**** Enter ‘./’ at end of pattern to quickly reach ~default-directory~
+**** Enter =./= at end of pattern to quickly reach ~default-directory~
 
 (As per its value at the beginning of the session.)
 
 If you already are in the ~default-directory~ this will move the cursor to the top.
 
-**** Enter ‘../’ at end of pattern will reach upper directory, moving cursor to the top
+**** Enter =../= at end of pattern will reach upper directory, moving cursor to the top
 
 This is different from using {{{kbd(C-l)}}} in that it moves
 the cursor to the top instead of remaining on the previous subdir name.
 
-**** Enter ‘..name/’ at end of pattern to start a recursive search
+**** Enter =..name/= at end of pattern to start a recursive search
 
 It searches directories matching =name= under the current directory, see the
 "Recursive completion on subdirectories" section below for more details.
 
-**** Any environment variable (e.g. ‘$HOME’) at end of pattern gets expanded
+**** Any environment variable (e.g. =$HOME=) at end of pattern gets expanded
 
 **** Any valid filename yanked after pattern gets expanded
 
@@ -1129,7 +1128,7 @@ when using Tramp, new filename just appears on top of buffer.
   List all the files under this directory and other subdirectories
   (recursion) and this list of files will be cached.
 
-- {{{kbd(C-u C-u kbd(M-x helm-browse-project)}}} ::
+- {{{kbd(C-u C-u M-x helm-browse-project)}}} ::
   Same but the cache is refreshed.
 
 **** You can start a recursive search with =locate=, =find= or =Fd=[fn:5]
@@ -1258,10 +1257,10 @@ however, are provided to make the two prompts more powerfull.
 
 In addition to simple regexps, these shortcuts are available:
 
-- Basename without extension => =%.=
-- Only extension             => =.%=
-- Substring                  => =%:<from>:<to>=
-- Whole basename             => =%=
+- Basename without extension :: =%.=
+- Only extension             :: =.%=
+- Substring                  :: =%:<from>:<to>=
+- Whole basename             :: =%=
 
 **** Syntax of the second prompt
 
@@ -1280,7 +1279,7 @@ In addition to a simple string to use as replacement, here is what you can use:
 - A special character representing a number which is incremented: =\#=.
 
 - Shortcuts for ~upcase~, ~downcase~ and ~capitalize~
-  are available as‘%u’, ‘%d’ and ‘%c’ respectively.
+  are available as=%u=, =%d= and =%c= respectively.
 
 **** Examples
 
@@ -1474,7 +1473,7 @@ directory is created on destination if it doesn’t already exists,
 see rsync documentation for more infos on rsync behavior.  To
 synchronize a directory, mark all in the directory and rsync all
 marked to the destination directory or rsync the directory itself
-to its parent, e.g. remote:/home/you/music => /home/you.
+to its parent, e.g. =remote:/home/you/music= => =/home/you=.
 
 The options are configurable through ~helm-rsync-switches~, but
 you can modify them on the fly when needed by using a prefix arg,
@@ -1529,7 +1528,7 @@ specifying one or more files, use e.g. =alias foo $1= or
 at end =&=, e.g. =alias foo $* &=.
 
 Adding Eshell aliases to your ~eshell-aliases-file~ or using the
-‘alias’ command from Eshell allows you to create personalized
+=alias= command from Eshell allows you to create personalized
 commands not available in ~helm-find-files~ actions and use them
 from {{{kbd(M-!)}}}.
 
@@ -1616,8 +1615,9 @@ without addind the ending =:=, second hit insert the last =:=.
 As soon the last =:= is entered TRAMP will kick in and you should see the list
 of candidates soon after.
 
-When connection fails, be sure to delete your TRAMP connection with M-x
-~helm-delete-tramp-connection~ before retrying.
+When connection fails, be sure to delete your TRAMP connection with
+ {{{kbd(M-x helm-delete-tramp-connection
+)}}} before retrying.
 
 **** Editing local files as root
 
@@ -1645,7 +1645,8 @@ It behaves as follows:
 
 *** Open files in separate windows
 
-When [[Marked candidates][marking]] multiple files or using [[Use the wildcard to select multiple files][wildcard]], helm allow opening all
+When marking multiple files ([[*Marked candidates]]) or using wildcard
+([[*Use the wildcard to select multiple files]]), helm allow opening all
 this files in separate windows using an horizontal layout or a
 vertical layout if you used a prefix arg, when no more windows can be
 displayed in frame, next files are opened in background without being
@@ -1663,9 +1664,9 @@ you can expand archives in the =~/.avfs= directory with {{{kbd(C-j)}}}.
 If your emacs have library tramp-archive.el, you can browse the
 content of archives with emacs and BTW helm-find-files. However this beeing
 experimental and not very fast, helm doesn’t provide an automatic
-expansion and detection of archives, you will have to add the final /
+expansion and detection of archives, you will have to add the final =/=
 manually and may have to force update ({{{kbd(C-c C-u)}}})
-or remove and add again the final / until tramp finish decompressing archive.
+or remove and add again the final =/= until tramp finish decompressing archive.
 
 *** Touch files
 
@@ -1732,11 +1733,11 @@ the freedesktop trash specifications.[fn:9]
 
 *Warning*:
 
-If you have an ENV var XDG_DATA_HOME in your .profile or .bash_profile
-and this var is set to something like $HOME/.local/share (like preconized)
-~move-file-to-trash~ may try to create $HOME/.local/share/Trash (literally)
+If you have an =ENV= var =XDG_DATA_HOME= in your .profile or .bash_profile
+and this var is set to something like =$HOME/.local/share= (like preconized)
+~move-file-to-trash~ may try to create =$HOME/.local/share/Trash= (literally)
 and its subdirs in the directory where you are actually trying to trash files.
-because ~move-file-to-trash~ is interpreting XDG_DATA_HOME literally instead
+because ~move-file-to-trash~ is interpreting =XDG_DATA_HOME= literally instead
 of evaling its value (with ~substitute-in-file-name~).
 
 ***** Trashing remote files with tramp
@@ -1744,7 +1745,7 @@ of evaling its value (with ~substitute-in-file-name~).
 Trashing remote files (or local files with sudo method) is disabled by default
 because tramp is requiring the ’trash’ command to be installed, if you want to
 trash your remote files, customize ~helm-trash-remote-files~.
-The package on most GNU/Linux based distributions is trash-cli[fn:10].
+The package on most GNU/Linux based distributions is =trash-cli=[fn:10].
 
 *Note*:
 When deleting your files with sudo method, your trashed files will not be listed
@@ -1852,19 +1853,19 @@ see [[Helm functions vs helmized Emacs functions]].
 
 *** Navigation
 
-**** Enter ‘~/’ at end of pattern to quickly reach home directory
+**** Enter =~/= at end of pattern to quickly reach home directory
 
-**** Enter ‘/’ at end of pattern to quickly reach the file system root
+**** Enter =/= at end of pattern to quickly reach the file system root
 
-**** Enter ‘./’ at end of pattern to quickly reach ~default-directory~
+**** Enter =./= at end of pattern to quickly reach ~default-directory~
 
 (As per its value at the beginning of the session.)
 
 If you already are in the ~default-directory~ this will move the cursor to the top.
 
-**** Enter ‘../’ at end of pattern will reach upper directory, moving cursor on top
+**** Enter =../= at end of pattern will reach upper directory, moving cursor on top
 
-This is different from using ‘M-x helm-find-files-up-one-level’ in that it moves
+This is different from using {{{kbd(M-x helm-find-files-up-one-level)}}} in that it moves
 the cursor to the top instead of remaining on the previous subdir name.
 
 **** You can complete with partial basename
@@ -1919,7 +1920,7 @@ a directory (e.g ~list-directory~).
 
 You can exit minibuffer with empty string with
 Uses keymap ~helm-read-file--map~, which is not currently defined.
-M-x helm-cr-empty-string.
+{{{kbd(M-x helm-cr-empty-string)}}}.
 It is useful when some commands are prompting continuously until you enter an empty prompt.
 
 ** Commands
@@ -1941,10 +1942,10 @@ It is useful when some commands are prompting continuously until you enter an em
 *** Locate
 
 You can append to the search pattern any of the locate command line options,
-e.g. -b, -e, -n <number>, etc.  See the locate(1) man page for more details.
+e.g. =-b=, =-e=, =-n <number>=, etc.  See the locate(1) man page for more details.
 
 Some other sources (at the moment =recentf= and =file in current directory=)
-support the -b flag for compatibility with locate when they are used with it.
+support the =-b= flag for compatibility with locate when they are used with it.
 
 When you enable fuzzy matching on locate with ~helm-locate-fuzzy-match~, the
 search will be performed on basename only for efficiency (so don’t add =-b= at
@@ -2341,8 +2342,8 @@ of your backend for more infos.
 
 See [[Commands][commands]] below.
 
-Once in that buffer you can use emacs-wgrep[fn:16] to edit your
-changes, for Helm the package name is ‘wgrep-helm’, it is hightly
+Once in that buffer you can use =emacs-wgrep=[fn:16] to edit your
+changes, for Helm the package name is =wgrep-helm=, it is hightly
 recommended.
 
 *** Helm-grep supports multi-matching
@@ -2358,7 +2359,7 @@ the filename in output.
 *** See full path of selected candidate
 
 Add (helm-popup-tip-mode 1) in your init file or enable it
-interactively with M-x helm-popup-tip-mode, however it is
+interactively with {{{kbd(M-x helm-popup-tip-mode,)}}} however it is
 generally enough to just put your mouse cursor over candidate.
 
 *** Open file in other window
@@ -2383,11 +2384,11 @@ SSHFS.
 * Helm GID
 
 Still supported, but mostly deprecated, using AG/RG or Git-grep
-is much more efficient, also ‘id-utils’ seems no more maintained.
+is much more efficient, also =id-utils= seems no more maintained.
 
 ** Tips
 
-Helm-GID reads the database created with the ‘mkid’ command from id-utils.
+Helm-GID reads the database created with the =mkid= command from id-utils.
 The name of the database file can be customized with ~helm-gid-db-file-name~, it
 is usually =ID=.
 
@@ -2620,8 +2621,8 @@ the minibuffer empty, ready to be written to when
 
 *** Yank word at point in minibuffer
 
-Use `{{{kbd(C-w)}}}' as many times as needed, undo with ={{{kbd(C-_)}}}=.  Note that
-={{{kbd(C-w)}}}= and ={{{kbd(C-_)}}}= are not standard keybindings, but bindings
+Use {{{kbd(C-w)}}} as many times as needed, undo with {{{kbd(C-_)}}}.  Note that
+{{{kbd(C-w)}}} and {{{kbd(C-_)}}} are not standard keybindings, but bindings
 provided with special helm feature
 `helm-define-key-with-subkeys'.
 
@@ -2636,7 +2637,7 @@ current-buffer after updating.
 *** Jump to the corresponding line in the searched buffer
 
 You can do this with `\<helm-map’, which is not currently defined.
-M-x helm-execute-persistent-action’ (persistent-action), to do it repeatedly
+{{{kbd(M-x helm-execute-persistent-action’)}}} (persistent-action), to do it repeatedly
 you can use {{{kbd(C-<down>)}}} and {{{kbd(C-<up>)}}} or enable ~helm-follow-mode~ with {{{kbd(C-c C-f)}}}.
 Follow mode is enabled by default in helm-occur.
 
@@ -2644,7 +2645,7 @@ Follow mode is enabled by default in helm-occur.
 
 The command
 Uses keymap ~helm-moccur-map~, which is not currently defined.
-M-x helm-moccur-run-goto-line-ow allow you to switch to buffer
+{{{kbd(M-x helm-moccur-run-goto-line-ow)}}} allow you to switch to buffer
 in other window horizontally or vertically if a prefix arg is supplied.
 
 *** Save the results
@@ -2667,12 +2668,12 @@ Type {{{kbd(g)}}} to update the buffer.
 
 *** Edit a saved buffer
 
-First, install wgrep[fn:17] and then:
+First, install =wgrep=[fn:17] and then:
 
 1. {{{kbd(C-c C-p)}}} (~wgrep-change-to-wgrep-mode~) to edit the buffer(s).
 2. {{{kbd(C-x C-s)}}} to save your changes.
 
-*Tip*: Use the excellent iedit[fn:18] to modify all
+*Tip*: Use the excellent =iedit=[fn:18] to modify all
 occurences at once in the buffer.
 
 *** Search in region
@@ -2788,9 +2789,9 @@ prefix arg will apply to ~self-insert-command~ (e.g. if you type
 {{{kbd(C-u e)}}} =eeee= will be inserted in prompt) so select the
 command you want to execute before specifying prefix arg.
 
-*** Completion styles in helm-M-x
+*** Completion styles in {{{kbd(helm-M-x)}}}
 
-By default helm-M-x use ’helm completion style, if you want to enable fuzzy matching aka flex,
+By default {{{kbd(helm-M-x)}}} use ’helm completion style, if you want to enable fuzzy matching aka flex,
 see [[Completion-styles][Completion-styles]].
 
 *** Duplicate entries in helm-M-x history
@@ -2857,7 +2858,7 @@ To save space, Helm-kill-ring truncates the candidates longer than
 ~helm-kill-ring-max-offset~.
 ‘
 Uses keymap ~helm-kill-ring-map~, which is not currently defined.
-M-x helm-kill-ring-kill-selection’ then saves the whole
+{{{kbd(M-x helm-kill-ring-kill-selection)}}}’ then saves the whole
 text and not the truncated value.  The view of truncated candidates can be
 toggled; see the command list below.
 
@@ -2871,10 +2872,10 @@ Helm-kill-ring session you can navigate to next/previous line with {{{kbd(M-y)}}
 
 It is possible to delete candidates from the kill ring with ‘
 Uses keymap ~helm-kill-ring-map~, which is not currently defined.
-M-x helm-kill-ring-delete’
+{{{kbd(M-x helm-kill-ring-delete)}}}’
 but also persistently with ‘
 Uses keymap ~helm-kill-ring-map~, which is not currently defined.
-M-x helm-kill-ring-run-persistent-delete’.
+{{{kbd(M-x helm-kill-ring-run-persistent-delete)}}}’.
 
 You can concatenate marked candidates and yank them in the current
 buffer, thus creating a new entry in the kill ring.  Candidates are
