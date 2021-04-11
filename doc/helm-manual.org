@@ -65,7 +65,7 @@ variable called generally ~helm-source-<something>~.  In this case
 it is an alist and you can change the attributes (keys) values
 using ~helm-set-attr~ function in your configuration.  Of course
 you have to ensure before calling ~helm-set-attr~ that the file
-containing source is loaded, e.g. with ‘with-eval-after-load’.  Of
+containing source is loaded, e.g. with ~with-eval-after-load~.  Of
 course you can also completely redefine the source but this is
 generally not elegant as it duplicate for its most part code
 already defined in Helm.
@@ -114,16 +114,16 @@ Helm generally fetches its candidates with the :candidates
 function up to ~helm-candidate-number-limit~ and then applies
 match functions to these candidates according to ~helm-pattern~.
 But Helm allows matching candidates directly from the :candidates
-function using its own ‘completion-styles’.
+function using its own ~completion-styles~.
 Helm provides ’helm completion style but also ’helm-flex
 completion style for Emacs<27 that don’t have ’flex completion
 style, otherwise (emacs-27) ’flex completion style is used to
 provide fuzzy aka flex completion.
 By default, like in Emacs vanilla, all completion commands (e.g.,
-‘completion-at-point’) using ‘completion-in-region’ or
-‘completing-read’ use ‘completion-styles’.
+~completion-at-point~) using ~completion-in-region~ or
+~completing-read~ use ~completion-styles~.
 Some Helm native commands like ~helm-M-x~ do use
-‘completion-styles’.  Any Helm sources can use ‘completion-styles’
+~completion-styles~.  Any Helm sources can use ~completion-styles~
 by using :match-dynamic slot and building their :candidates
 function with ~helm-dynamic-completion~.
 
@@ -139,27 +139,27 @@ Example:
 
 #+end_src
 
-By default Helm sets up ‘completion-styles’ and always adds ’helm
+By default Helm sets up ~completion-styles~ and always adds ’helm
 to it.  However the flex completion styles are not added.  This is
 up to the user if she wants to have such completion to enable
 this.
 As specified above use ’flex for emacs-27 and ’helm-flex for
 emacs-26. Anyway, ’helm-flex is not provided in
-‘completion-styles-alist’ if ’flex is present.
+~completion-styles-alist~ if ’flex is present.
 
 Finally Helm provides two user variables to control
-‘completion-styles’ usage: ~helm-completion-style~ and
+~completion-styles~ usage: ~helm-completion-style~ and
 ~helm-completion-syles-alist~.  Both variables are customizable.
 The former allows retrieving previous Helm behavior if needed, by
-setting it to ~helm~ or ~helm-fuzzy~, default being ‘emacs’ which
-allows dynamic completion and usage of ‘completion-styles’.  The
+setting it to ~helm~ or ~helm-fuzzy~, default being ~emacs~ which
+allows dynamic completion and usage of ~completion-styles~.  The
 second allows setting ~helm-completion-style~ per mode and also
-specifying ‘completion-styles’ per mode (see its docstring).  Note
+specifying ~completion-styles~ per mode (see its docstring).  Note
 that these two variables take effect only in helm-mode i.e. in
-all that uses ‘completion-read’ or ‘completion-in-region’, IOW all
-helmized commands.  File completion in ‘read-file-name’ family
+all that uses ~completion-read~ or ~completion-in-region~, IOW all
+helmized commands.  File completion in ~read-file-name~ family
 doesn’t obey completion-styles and has its own file completion
-implementation. Native Helm commands using ‘completion-styles’
+implementation. Native Helm commands using ~completion-styles~
 doesn’t obey ~helm-completion-style~ and
 ~helm-completion-syles-alist~ (e.g., helm-M-x).
 
@@ -176,15 +176,15 @@ Helm because ’helm style supersedes these styles.
 ** Helm mode
 
 ~helm-mode~ toggles Helm completion in native Emacs functions, so
-when you turn ~helm-mode~ on, commands like ‘switch-to-buffer’
+when you turn ~helm-mode~ on, commands like ~switch-to-buffer~
 will use Helm completion instead of the usual Emacs completion
 buffer.
 
 *** What gets or does not get =helmized= when ~helm-mode~ is enabled?
 
 Helm provides generic completion on all Emacs functions using
-‘completing-read’, ‘completion-in-region’ and their derivatives,
-e.g. ‘read-file-name’.  Helm exposes a user variable to control
+~completing-read~, ~completion-in-region~ and their derivatives,
+e.g. ~read-file-name~.  Helm exposes a user variable to control
 which function to use for a specific Emacs command:
 ~helm-completing-read-handlers-alist~.  If the function for a
 specific command is nil, it turns off Helm completion.  See the
@@ -193,7 +193,7 @@ variable documentation for more infos.
 *** Helm functions vs helmized Emacs functions
 
 While there are Helm functions that perform the same completion
-as other helmized Emacs functions, e.g. ‘switch-to-buffer’ and
+as other helmized Emacs functions, e.g. ~switch-to-buffer~ and
 ~helm-buffers-list~, the native Helm functions like
 ~helm-buffers-list~ can receive new features that allow marking
 candidates, have several actions, etc.  Whereas the helmized Emacs
@@ -213,7 +213,7 @@ matching or fuzzy matching (see [[Matching in Helm][Matching in
 Helm]]).
 
 Completion is not done dynamically (against ~helm-pattern~)
-because backend functions (i.e. ‘competion-at-point-functions’)
+because backend functions (i.e. ~competion-at-point-functions~)
 are not aware of Helm matching methods.
 
 By behaving like this, the benefit is that you can fully use Helm
@@ -279,7 +279,7 @@ The documentation of default bindings are:
 
 Helm provides a lot of user variables for extensive customization.
 From any Helm session, type {{{kbd(C-h c)}}}
-to jump to the current source ‘custom’ group.  Helm also has a
+to jump to the current source ~custom~ group.  Helm also has a
 special group for faces you can access via ‘M-x customize-group
 RET helm-faces’.
 
@@ -374,9 +374,9 @@ You can also toggle line numbers with
 {{{kbd(C-c l)}}} in current Helm
 buffer.
 
-Of course when enabling ‘global-display-line-numbers-mode’ Helm
+Of course when enabling ~global-display-line-numbers-mode~ Helm
 buffers will have line numbers as well. (Don’t forget to
-customize ‘display-line-numbers-type’ to relative).
+customize ~display-line-numbers-type~ to relative).
 
 In Emacs versions < to 26 you will have to use linum-relative[fn:1]
 package and ~helm-linum-relative-mode~.
@@ -504,12 +504,12 @@ resumables sources.  {{{kbd(C-c n)}}} is a special key set with
 ~helm-define-key-with-subkeys~ which, after pressing it, allows
 you to keep cycling with further {{{kbd(n)}}}.
 
-*Tip*: You can bound the same key in ‘global-map’ to
+*Tip*: You can bound the same key in ~global-map~ to
      ~helm-cycle-resume~ with ~helm-define-key-with-subkeys~ to
      let you transparently cycle sessions, Helm fired up or not.
      You can also bind the cycling commands to single key
      presses (e.g., {{{kbd(S-<f1>)}}}) this time with a simple
-     ‘define-key’.  (Note that {{{kbd(S-<f1>)}}} is not available in
+     ~define-key~.  (Note that {{{kbd(S-<f1>)}}} is not available in
      terminals.)
 
 *Note*: ~helm-define-key-with-subkeys~ is available only once Helm
@@ -885,7 +885,7 @@ enabled by default to not confuse new users.
 
 You can use <right> and <left> arrows to go down or up one level, to disable
 this customize ~helm-ff-lynx-style-map~.
-Note that using ‘setq’ will NOT work.
+Note that using ~setq~ will NOT work.
 
 **** Use {{{kbd(C-j)}}} (persistent action) on a directory to go down one level
 
@@ -975,7 +975,7 @@ again with fuzzy sorting and no more with sorting methods previously selected.
 
 *** Find file at point
 
-Helm uses ‘ffap’ partially or completely to find file at point depending on the
+Helm uses ~ffap~ partially or completely to find file at point depending on the
 value of ~helm-ff-guess-ffap-filenames~: if non-nil, support is complete
 (annoying), if nil, support is partial.
 
@@ -996,7 +996,7 @@ Helm finds this file at the indicated line number, here 1234.
 **** Find URL at point
 
 When a URL is found at point, Helm expands to that URL only.
-Pressing {{{kbd(RET)}}} opens that URL using ‘browse-url-browser-function’.
+Pressing {{{kbd(RET)}}} opens that URL using ~browse-url-browser-function~.
 
 **** Find e-mail address at point
 
@@ -1010,11 +1010,11 @@ e-mail address.
 
 **** Enter ‘/’ at end of pattern to quickly reach the file system root
 
-**** Enter ‘./’ at end of pattern to quickly reach ‘default-directory’
+**** Enter ‘./’ at end of pattern to quickly reach ~default-directory~
 
 (As per its value at the beginning of the session.)
 
-If you already are in the ‘default-directory’ this will move the cursor to the top.
+If you already are in the ~default-directory~ this will move the cursor to the top.
 
 **** Enter ‘../’ at end of pattern will reach upper directory, moving cursor to the top
 
@@ -1217,7 +1217,7 @@ different subdirectories into one directory.  Files with same name are renamed
 as follows: =foo.txt.~1~=.  Like with the --force option of cp, it is possible
 to backup files in current directory.
 
-This command is available only when ‘dired-async-mode’ is active.
+This command is available only when ~dired-async-mode~ is active.
 
 When using an action that involves an external backend (e.g. grep), using =**=
 is not recommended (even thought it works fine) because it will be slower to
@@ -1250,7 +1250,7 @@ Of course in both styles you can specify one or two =*=.
 Replace different parts of a file basename with something else.
 
 When calling this action you will be prompted twice as with
-‘query-replace’, first for the matching expression of the text to
+~query-replace~, first for the matching expression of the text to
 replace and second for the replacement text.  Several facilities,
 however, are provided to make the two prompts more powerfull.
 
@@ -1279,7 +1279,7 @@ In addition to a simple string to use as replacement, here is what you can use:
 
 - A special character representing a number which is incremented: =\#=.
 
-- Shortcuts for ‘upcase’, ‘downcase’ and ‘capitalize’
+- Shortcuts for ~upcase~, ~downcase~ and ~capitalize~
   are available as‘%u’, ‘%d’ and ‘%c’ respectively.
 
 **** Examples
@@ -1441,13 +1441,13 @@ instead of relying on tramp.
 *** Copying and renaming asynchronously
 
 If you have the async library installed (if you got Helm from MELPA you do), you
-can use it for copying/renaming files by enabling ‘dired-async-mode’.
+can use it for copying/renaming files by enabling ~dired-async-mode~.
 
 Note that even when async is enabled, running a copy/rename action with a prefix
 argument will execute action synchronously. Moreover it will follow the first
 file of the marked files in its destination directory.
 
-When ‘dired-async-mode’ is enabled, an additional action named "Backup files"
+When ~dired-async-mode~ is enabled, an additional action named "Backup files"
 will be available. (Such command is not natively available in Emacs).
 See [[Use the wildcard to select multiple files]] for details.
 
@@ -1528,7 +1528,7 @@ specifying one or more files, use e.g. =alias foo $1= or
 =alias foo $*=, if you want your command to be asynchronous add
 at end =&=, e.g. =alias foo $* &=.
 
-Adding Eshell aliases to your ‘eshell-aliases-file’ or using the
+Adding Eshell aliases to your ~eshell-aliases-file~ or using the
 ‘alias’ command from Eshell allows you to create personalized
 commands not available in ~helm-find-files~ actions and use them
 from {{{kbd(M-!)}}}.
@@ -1588,7 +1588,7 @@ Please refer to TRAMP’s documentation for more details.
 
   : /ssh:192.168.0.4@foo|sudo:192.168.0.4:
 
-*Note*: You can also use ‘tramp-default-proxies-alist’ when connecting often to
+*Note*: You can also use ~tramp-default-proxies-alist~ when connecting often to
 the same hosts.
 
 As a rule of thumb, prefer the scp method unless using multihops (which only
@@ -1631,7 +1631,7 @@ or
 
 *** Attach files to a mail buffer (message-mode)
 
-If you are in a ‘message-mode’ or ‘mail-mode’ buffer, that action will appear
+If you are in a ~message-mode~ or ~mail-mode~ buffer, that action will appear
 in action menu, otherwise it is available at any time with {{{kbd(C-c C-a)}}}.
 It behaves as follows:
 
@@ -1710,10 +1710,10 @@ See [[Trashing files][Trashing files]].
 **** Trashing files
 
 If you want to trash your files instead of deleting them you can
-set ‘delete-by-moving-to-trash’ to non nil, like this your files
+set ~delete-by-moving-to-trash~ to non nil, like this your files
 will be moved to trash instead of beeing deleted.
 
-You can reverse at any time the behavior of ‘delete-by-moving-to-trash’ by using
+You can reverse at any time the behavior of ~delete-by-moving-to-trash~ by using
 a prefix arg with any of the delete files command.
 
 On GNULinux distributions, when navigating to a Trash directory you
@@ -1734,10 +1734,10 @@ the freedesktop trash specifications.[fn:9]
 
 If you have an ENV var XDG_DATA_HOME in your .profile or .bash_profile
 and this var is set to something like $HOME/.local/share (like preconized)
-‘move-file-to-trash’ may try to create $HOME/.local/share/Trash (literally)
+~move-file-to-trash~ may try to create $HOME/.local/share/Trash (literally)
 and its subdirs in the directory where you are actually trying to trash files.
-because ‘move-file-to-trash’ is interpreting XDG_DATA_HOME literally instead
-of evaling its value (with ‘substitute-in-file-name’).
+because ~move-file-to-trash~ is interpreting XDG_DATA_HOME literally instead
+of evaling its value (with ~substitute-in-file-name~).
 
 ***** Trashing remote files with tramp
 
@@ -1754,7 +1754,7 @@ with trash-list until you log in as root.
 
 Checksum is calculated with the md5sum, sha1sum, sha224sum,
 sha256sum, sha384sum and sha512sum when available, otherwise the
-Emacs function ‘secure-hash’ is used but it is slow and may crash
+Emacs function ~secure-hash~ is used but it is slow and may crash
 Emacs and even the whole system as it eats all memory.  So if
 your system doesn’t have the md5 and sha command line tools be
 careful when checking sum of larges files e.g. isos.
@@ -1856,11 +1856,11 @@ see [[Helm functions vs helmized Emacs functions]].
 
 **** Enter ‘/’ at end of pattern to quickly reach the file system root
 
-**** Enter ‘./’ at end of pattern to quickly reach ‘default-directory’
+**** Enter ‘./’ at end of pattern to quickly reach ~default-directory~
 
 (As per its value at the beginning of the session.)
 
-If you already are in the ‘default-directory’ this will move the cursor to the top.
+If you already are in the ~default-directory~ this will move the cursor to the top.
 
 **** Enter ‘../’ at end of pattern will reach upper directory, moving cursor on top
 
@@ -1911,9 +1911,9 @@ Simply write the path in prompt and press {{{kbd(RET)}}}, e.g.
 
 **** To create a new file, enter a filename not ending with =/=
 
-File and directory creation works only with some commands (e.g. ‘find-file’)
+File and directory creation works only with some commands (e.g. ~find-file~)
 and it will not work with others where it is not intended to return a file or
-a directory (e.g ‘list-directory’).
+a directory (e.g ~list-directory~).
 
 *** Exiting minibuffer with empty string
 
@@ -2554,7 +2554,7 @@ you can pass one prefix argument from the command selection buffer.
 
 *Note*: This does not work on remote files.
 
-With two prefix-args the output is printed to the ‘current-buffer’.
+With two prefix-args the output is printed to the ~current-buffer~.
 
 With no prefix argument or a prefix argument value of ’(16) ({{{kbd(C-u C-u)}}})
 the command is called once for each file like this:
@@ -2669,7 +2669,7 @@ Type {{{kbd(g)}}} to update the buffer.
 
 First, install wgrep[fn:17] and then:
 
-1. {{{kbd(C-c C-p)}}} (‘wgrep-change-to-wgrep-mode’) to edit the buffer(s).
+1. {{{kbd(C-c C-p)}}} (~wgrep-change-to-wgrep-mode~) to edit the buffer(s).
 2. {{{kbd(C-x C-s)}}} to save your changes.
 
 *Tip*: Use the excellent iedit[fn:18] to modify all
@@ -2679,7 +2679,7 @@ occurences at once in the buffer.
 
 When searching in current-buffer with ~helm-occur~, if a region
 is found helm will search in this region only.  If you marked
-this region with ‘mark-defun’ the symbol that was at point before
+this region with ~mark-defun~ the symbol that was at point before
 marking defun will be used when ~helm-source-occur~ is member of
 ~helm-sources-using-default-as-input~.
 
@@ -2744,7 +2744,7 @@ marking it ({{{kbd(C-c u)}}} or {{{kbd(RET)}}}) .
 
 (Emacs ≥25)
 
-- The flag =S= that prefixes package names means that the packages belong to ‘package-selected-packages’.
+- The flag =S= that prefixes package names means that the packages belong to ~package-selected-packages~.
 
 - The flag =U= that prefix package names mean that this package is no more needed.
 
@@ -2784,7 +2784,7 @@ The first {{{kbd(C-u)}}} after ~helm-M-x~ clears those prefix arguments.
 started, the prefix argument apply on the next command, so if you
 hit RET, it will apply on the selected command, but if you type a
 new character at prompt to narrow down further candidates, the
-prefix arg will apply to ‘self-insert-command’ (e.g. if you type
+prefix arg will apply to ~self-insert-command~ (e.g. if you type
 {{{kbd(C-u e)}}} =eeee= will be inserted in prompt) so select the
 command you want to execute before specifying prefix arg.
 
@@ -2796,7 +2796,7 @@ see [[Completion-styles][Completion-styles]].
 *** Duplicate entries in helm-M-x history
 
 helm-M-x history obey to history variables, if you have
-duplicates in your helm-M-x history set ‘history-delete-duplicates’ to non nil.
+duplicates in your helm-M-x history set ~history-delete-duplicates~ to non nil.
 
 * Helm Imenu
 
@@ -2861,7 +2861,7 @@ M-x helm-kill-ring-kill-selection’ then saves the whole
 text and not the truncated value.  The view of truncated candidates can be
 toggled; see the command list below.
 
-As opposed to ‘yank’, numeric prefix arguments are ignored with
+As opposed to ~yank~, numeric prefix arguments are ignored with
 ~helm-show-kill-ring~: there is no need for them since selection happens within
 Helm.  Moreover Helm has [[Shortcuts for executing the default action on the n-th candidate][Shortcuts for executing the default action on the n-th candidate]].
 
@@ -2887,9 +2887,9 @@ args.  When you have something else than =\n= as default value for
 To not push a new entry in the kill ring, use {{{kbd(C-c TAB)}}} instead of RET
 (note that you can’t change separator with this).
 
-When inserting candidates with the default action ({{{kbd(RET)}}}), ‘point’ is placed at
-the end of the candidate and ‘mark’ at the beginning.  You can revert this behavior
-by using a prefix argument, i.e. {{{kbd(C-u RET)}}}, like the regular ‘yank’ command does.
+When inserting candidates with the default action ({{{kbd(RET)}}}), ~point~ is placed at
+the end of the candidate and ~mark~ at the beginning.  You can revert this behavior
+by using a prefix argument, i.e. {{{kbd(C-u RET)}}}, like the regular ~yank~ command does.
 
 ** Commands
 
