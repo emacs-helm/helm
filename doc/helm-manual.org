@@ -61,10 +61,10 @@ source is an alist object which is build from various classes, see
 *** Configure sources
 
 You will find in Helm sources already built and bound to a
-variable called generally ‘helm-source-<something>’.  In this case
+variable called generally ~helm-source-<something>~.  In this case
 it is an alist and you can change the attributes (keys) values
-using ‘helm-set-attr’ function in your configuration.  Of course
-you have to ensure before calling ‘helm-set-attr’ that the file
+using ~helm-set-attr~ function in your configuration.  Of course
+you have to ensure before calling ~helm-set-attr~ that the file
 containing source is loaded, e.g. with ‘with-eval-after-load’.  Of
 course you can also completely redefine the source but this is
 generally not elegant as it duplicate for its most part code
@@ -73,7 +73,7 @@ already defined in Helm.
 You will find also sources that are not built and even not bound
 to any variables because they are rebuilded at each start of a
 Helm session.  In this case you can add a defmethod called
-‘helm-setup-user-source’ to your config:
+~helm-setup-user-source~ to your config:
 
 #+begin_src elisp
     (cl-defmethod helm-setup-user-source ((source helm-moccur-class))
@@ -87,9 +87,9 @@ Helm session.  In this case you can add a defmethod called
 
 ** Modify keybindings in Helm
 
-Helm main keymap is ‘helm-map’, all keys bound in this map apply
+Helm main keymap is ~helm-map~, all keys bound in this map apply
 to all Helm sources.  However, most sources have their own keymap,
-with each binding overriding its counterpart in ‘helm-map’, you
+with each binding overriding its counterpart in ~helm-map~, you
 can see all bindings in effect in the [[Commands][Commands]]
 section (available only if the source has its own keymap and
 documentation of course).
@@ -111,8 +111,8 @@ match everything but this.
 *** Completion-styles
 
 Helm generally fetches its candidates with the :candidates
-function up to ‘helm-candidate-number-limit’ and then applies
-match functions to these candidates according to ‘helm-pattern’.
+function up to ~helm-candidate-number-limit~ and then applies
+match functions to these candidates according to ~helm-pattern~.
 But Helm allows matching candidates directly from the :candidates
 function using its own ‘completion-styles’.
 Helm provides ’helm completion style but also ’helm-flex
@@ -122,10 +122,10 @@ provide fuzzy aka flex completion.
 By default, like in Emacs vanilla, all completion commands (e.g.,
 ‘completion-at-point’) using ‘completion-in-region’ or
 ‘completing-read’ use ‘completion-styles’.
-Some Helm native commands like ‘helm-M-x’ do use
+Some Helm native commands like ~helm-M-x~ do use
 ‘completion-styles’.  Any Helm sources can use ‘completion-styles’
 by using :match-dynamic slot and building their :candidates
-function with ‘helm-dynamic-completion’.
+function with ~helm-dynamic-completion~.
 
 Example:
 
@@ -148,45 +148,45 @@ emacs-26. Anyway, ’helm-flex is not provided in
 ‘completion-styles-alist’ if ’flex is present.
 
 Finally Helm provides two user variables to control
-‘completion-styles’ usage: ‘helm-completion-style’ and
-‘helm-completion-syles-alist’.  Both variables are customizable.
+‘completion-styles’ usage: ~helm-completion-style~ and
+~helm-completion-syles-alist~.  Both variables are customizable.
 The former allows retrieving previous Helm behavior if needed, by
-setting it to ‘helm’ or ‘helm-fuzzy’, default being ‘emacs’ which
+setting it to ~helm~ or ~helm-fuzzy~, default being ‘emacs’ which
 allows dynamic completion and usage of ‘completion-styles’.  The
-second allows setting ‘helm-completion-style’ per mode and also
+second allows setting ~helm-completion-style~ per mode and also
 specifying ‘completion-styles’ per mode (see its docstring).  Note
 that these two variables take effect only in helm-mode i.e. in
 all that uses ‘completion-read’ or ‘completion-in-region’, IOW all
 helmized commands.  File completion in ‘read-file-name’ family
 doesn’t obey completion-styles and has its own file completion
 implementation. Native Helm commands using ‘completion-styles’
-doesn’t obey ‘helm-completion-style’ and
-‘helm-completion-syles-alist’ (e.g., helm-M-x).
+doesn’t obey ~helm-completion-style~ and
+~helm-completion-syles-alist~ (e.g., helm-M-x).
 
 Also for a better control of styles in native Helm sources (not
 helmized by helm-mode) using :match-dynamic,
-‘helm-dynamic-completion’ provides a STYLES argument that allows
+~helm-dynamic-completion~ provides a STYLES argument that allows
 specifying explicitely styles for this source.
 
 *Note*: Some old completion styles are not working fine with Helm
 and are disabled by default in
-‘helm-blacklist-completion-styles’.  They are anyway not useful in
+~helm-blacklist-completion-styles~.  They are anyway not useful in
 Helm because ’helm style supersedes these styles.
 
 ** Helm mode
 
-‘helm-mode’ toggles Helm completion in native Emacs functions, so
-when you turn ‘helm-mode’ on, commands like ‘switch-to-buffer’
+~helm-mode~ toggles Helm completion in native Emacs functions, so
+when you turn ~helm-mode~ on, commands like ‘switch-to-buffer’
 will use Helm completion instead of the usual Emacs completion
 buffer.
 
-*** What gets or does not get "helmized" when ‘helm-mode’ is enabled?
+*** What gets or does not get "helmized" when ~helm-mode~ is enabled?
 
 Helm provides generic completion on all Emacs functions using
 ‘completing-read’, ‘completion-in-region’ and their derivatives,
 e.g. ‘read-file-name’.  Helm exposes a user variable to control
 which function to use for a specific Emacs command:
-‘helm-completing-read-handlers-alist’.  If the function for a
+~helm-completing-read-handlers-alist~.  If the function for a
 specific command is nil, it turns off Helm completion.  See the
 variable documentation for more infos.
 
@@ -194,8 +194,8 @@ variable documentation for more infos.
 
 While there are Helm functions that perform the same completion
 as other helmized Emacs functions, e.g. ‘switch-to-buffer’ and
-‘helm-buffers-list’, the native Helm functions like
-‘helm-buffers-list’ can receive new features that allow marking
+~helm-buffers-list~, the native Helm functions like
+~helm-buffers-list~ can receive new features that allow marking
 candidates, have several actions, etc.  Whereas the helmized Emacs
 functions only have Helm completion, Emacs can provide no more
 than one action for this function.  This is the intended behavior.
@@ -212,7 +212,7 @@ allows you to use matching methods provided by Helm, that is multi
 matching or fuzzy matching (see [[Matching in Helm][Matching in
 Helm]]).
 
-Completion is not done dynamically (against ‘helm-pattern’)
+Completion is not done dynamically (against ~helm-pattern~)
 because backend functions (i.e. ‘competion-at-point-functions’)
 are not aware of Helm matching methods.
 
@@ -239,11 +239,11 @@ are available; the most important ones are shown in minibuffer.
 However, due to implementation restrictions, no regular Emacs
 keymap is used (it runs in a loop when reading the help buffer).
 Only simple bindings are available and they are defined in
-‘helm-help-hkmap’, which is a simple alist of (key . function).
+~helm-help-hkmap~, which is a simple alist of (key . function).
 You can define or redefine bindings in help with
-‘helm-help-define-key’ or by adding/removing entries directly in
-‘helm-help-hkmap’.
-See ‘helm-help-hkmap’ for restrictions on bindings and functions.
+~helm-help-define-key~ or by adding/removing entries directly in
+~helm-help-hkmap~.
+See ~helm-help-hkmap~ for restrictions on bindings and functions.
 
 The documentation of default bindings are:
 
@@ -284,7 +284,7 @@ special group for faces you can access via ‘M-x customize-group
 RET helm-faces’.
 
 *Note*: Some sources may not have their group set and default to
-the ‘helm’ group.
+the ~helm~ group.
 
 ** Display Helm in windows and frames
 
@@ -294,10 +294,10 @@ different windows configurations available (See [[Customize Helm][Customize Helm
 When using Emacs in a graphic display (i.e. not in a terminal) you can as
 well display your Helm buffers in separated frames globally for
 all Helm commands or separately for specific Helm commands.
-See ‘helm-display-function’ and ‘helm-commands-using-frame’.
+See ~helm-display-function~ and ~helm-commands-using-frame~.
 
 There is a variable to allow reusing frame instead of deleting
-and creating a new one at each session, see ‘helm-display-buffer-reuse-frame’.
+and creating a new one at each session, see ~helm-display-buffer-reuse-frame~.
 Normally you don’t have to use this, it have been made to workaround
 slow frame popup in Emacs-26, to workaround this slowness in Emacs-26 use instead
 
@@ -333,7 +333,7 @@ you DO NOT need these packages to display helm buffers in frames.
 | C-k[fn:20]   |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
 | C-j          |                  | Persistent action (Execute and keep Helm session)                    |
 
-*Note*: Any of these bindings are from ‘helm-map’ and may be
+*Note*: Any of these bindings are from ~helm-map~ and may be
 overriten by the map specific to the current source in use (each
 source can have its own keymap).
 
@@ -341,12 +341,12 @@ source can have its own keymap).
 
 You can display the action menu in the same window
 as helm candidates (default) or in a side window according to
-‘helm-show-action-window-other-window’ value.
+~helm-show-action-window-other-window~ value.
 
 When the action menu popup, the helm prompt is used to narrow
 down this menu, no more candidates.
 
-When ‘helm-allow-mouse’ is non nil, you can use as well
+When ~helm-allow-mouse~ is non nil, you can use as well
 mouse-3 (right click) in the candidate zone to select actions
 with the mouse once your candidate is selected.
 
@@ -379,7 +379,7 @@ buffers will have line numbers as well. (Don’t forget to
 customize ‘display-line-numbers-type’ to relative).
 
 In Emacs versions < to 26 you will have to use linum-relative[fn:1]
-package and ‘helm-linum-relative-mode’.
+package and ~helm-linum-relative-mode~.
 
 Then when line numbers are enabled with one of the methods above
 the following keys are available[fn:2]:
@@ -396,7 +396,7 @@ keys.
 ** Mouse control in Helm
 
 A basic support for the mouse is provided when the user sets
-‘helm-allow-mouse’ to non-nil.
+~helm-allow-mouse~ to non-nil.
 
 - mouse-1 selects the candidate.
 - mouse-2 executes the default action on selected candidate.
@@ -438,19 +438,19 @@ however.
 
 ** Follow candidates
 
-When ‘helm-follow-mode’ is on ({{{kbd(C-c C-f)}}}
+When ~helm-follow-mode~ is on ({{{kbd(C-c C-f)}}}
 to toggle it), moving up and down Helm session or updating the
 list of candidates will automatically execute the
 persistent-action as specified for the current source.
 
-If ‘helm-follow-mode-persistent’ is non-nil, the state of the
+If ~helm-follow-mode-persistent~ is non-nil, the state of the
 mode will be restored for the following Helm sessions.
 
 If you just want to follow candidates occasionally without
-enabling ‘helm-follow-mode’, you can use
+enabling ~helm-follow-mode~, you can use
 {{{kbd(C-<down>)}}} or
 {{{kbd(C-<up>)}}} instead.  Conversely, when
-‘helm-follow-mode’ is enabled, those commands go to previous/next
+~helm-follow-mode~ is enabled, those commands go to previous/next
 line without executing the persistent action.
 
 ** Frequently Used Commands
@@ -482,37 +482,37 @@ some places for confirmation.
 When using ! you will not be prompted for the same thing in
 current operation any more, e.g. file deletion, file copy etc...
 
-** Moving in ‘helm-buffer’
+** Moving in ~helm-buffer~
 
-You can move in ‘helm-buffer’ with the usual commands used in
+You can move in ~helm-buffer~ with the usual commands used in
 Emacs: ({{{kbd(C-n)}}},
 {{{kbd(C-p)}}}, etc.  See above basic
-commands.  When ‘helm-buffer’ contains more than one source,
+commands.  When ~helm-buffer~ contains more than one source,
 change source with {{{kbd(C-o)}}} and
 {{{kbd(M-o)}}}.
 
 *Note*: When reaching the end of a source,
 {{{kbd(C-n)}}} will *not* go to the next source
-when variable ‘helm-move-to-line-cycle-in-source’ is non-nil, so
+when variable ~helm-move-to-line-cycle-in-source~ is non-nil, so
 you will have to use {{{kbd(C-o)}}} and
 {{{kbd(M-o)}}}.
 
 ** Resume previous session from current Helm session
 
-You can use {{{kbd(C-c n)}}} (‘helm-run-cycle-resume’) to cycle in
+You can use {{{kbd(C-c n)}}} (~helm-run-cycle-resume~) to cycle in
 resumables sources.  {{{kbd(C-c n)}}} is a special key set with
-‘helm-define-key-with-subkeys’ which, after pressing it, allows
+~helm-define-key-with-subkeys~ which, after pressing it, allows
 you to keep cycling with further {{{kbd(n)}}}.
 
 *Tip*: You can bound the same key in ‘global-map’ to
-     ‘helm-cycle-resume’ with ‘helm-define-key-with-subkeys’ to
+     ~helm-cycle-resume~ with ~helm-define-key-with-subkeys~ to
      let you transparently cycle sessions, Helm fired up or not.
      You can also bind the cycling commands to single key
      presses (e.g., {{{kbd(S-<f1>)}}}) this time with a simple
      ‘define-key’.  (Note that {{{kbd(S-<f1>)}}} is not available in
      terminals.)
 
-*Note*: ‘helm-define-key-with-subkeys’ is available only once Helm
+*Note*: ~helm-define-key-with-subkeys~ is available only once Helm
 is loaded.
 
 You can also use
@@ -531,12 +531,12 @@ interactivity, e.g. when quitting Helm accidentally.
 
 You can call {{{kbd(C-x c b)}}} with a prefix argument
 to choose (with completion!) which session you’d like to resume.
-You can also cycle in these sources with ‘helm-cycle-resume’ (see
+You can also cycle in these sources with ~helm-cycle-resume~ (see
 above).
 
 ** Debugging Helm
 
-Helm exposes the special variable ‘helm-debug’: setting it to
+Helm exposes the special variable ~helm-debug~: setting it to
 non-nil will enable Helm logging in a special outline-mode
 buffer.  Helm resets the variable to nil at the end of each
 session.
@@ -548,20 +548,20 @@ use {{{kbd(C-!)}}} to turn off
 updating.  When you are ready turn it on again to resume logging.
 
 Once you exit your Helm session you can access the debug buffer
-with ‘helm-debug-open-last-log’.  It is possible to save logs to
-dated files when ‘helm-debug-root-directory’ is set to a valid
+with ~helm-debug-open-last-log~.  It is possible to save logs to
+dated files when ~helm-debug-root-directory~ is set to a valid
 directory.
 
 *Note*: Be aware that Helm log buffers grow really fast, so use
-‘helm-debug’ only when needed.
+~helm-debug~ only when needed.
 
 ** Writing your own Helm sources
 
 Writing simple sources for your own usage is easy.  When calling
-the ‘helm’ function, the sources are added the :sources slot
+the ~helm~ function, the sources are added the :sources slot
 which can be a symbol or a list of sources.  Sources can be built
 with different EIEIO classes depending on what you want to do.  To
-simplify this, several ‘helm-build-*’ macros are provided.  Below
+simplify this, several ~helm-build-*~ macros are provided.  Below
 there are simple examples to start with.
 
 #+begin_src elisp
@@ -770,7 +770,7 @@ Starting from Helm v1.6.8, you can specify more than one directory.
 
 **** Fuzzy matching
 
-‘helm-buffers-fuzzy-matching’ turns on fuzzy matching on buffer names, but not
+~helm-buffers-fuzzy-matching~ turns on fuzzy matching on buffer names, but not
 on directory names or major modes.  A pattern starting with "^" disables fuzzy
 matching and matches by exact regexp.
 
@@ -807,7 +807,7 @@ matching "w3".
 *** Creating buffers
 
 When creating a new buffer, use {{{kbd(C-u)}}} to choose a mode from a
-list.  This list is customizable, see ‘helm-buffers-favorite-modes’.
+list.  This list is customizable, see ~helm-buffers-favorite-modes~.
 
 *** Killing buffers
 
@@ -815,8 +815,8 @@ You can kill buffers either one by one or all the marked buffers at once.
 
 One kill-buffer command leaves Helm while the other is persistent.  Run the
 persistent kill-buffer command either with the regular
-‘helm-execute-persistent-action’ called with a prefix argument ({{{kbd(C-u C-j)}}})
-or with its specific command ‘helm-buffer-run-kill-persistent’.  See the
+~helm-execute-persistent-action~ called with a prefix argument ({{{kbd(C-u C-j)}}})
+or with its specific command ~helm-buffer-run-kill-persistent~.  See the
 bindings below.
 
 *** Switching to buffers
@@ -878,13 +878,13 @@ Remote buffers are prefixed with ’@’.
 *** Navigation summary
 
 For a better experience you can enable auto completion by setting
-‘helm-ff-auto-update-initial-value’ to non-nil in your init file.  It is not
+~helm-ff-auto-update-initial-value~ to non-nil in your init file.  It is not
 enabled by default to not confuse new users.
 
 **** Navigate with arrow keys
 
 You can use <right> and <left> arrows to go down or up one level, to disable
-this customize ‘helm-ff-lynx-style-map’.
+this customize ~helm-ff-lynx-style-map~.
 Note that using ‘setq’ will NOT work.
 
 **** Use {{{kbd(C-j)}}} (persistent action) on a directory to go down one level
@@ -897,7 +897,7 @@ On a symlinked directory a prefix argument expands to its true name.
 
 {{{kbd(DEL)}}} by default deletes char backward.
 
-But when ‘helm-ff-DEL-up-one-level-maybe’ is non nil {{{kbd(DEL)}}} behaves
+But when ~helm-ff-DEL-up-one-level-maybe~ is non nil {{{kbd(DEL)}}} behaves
 differently depending on the contents of helm-pattern.  It goes up one
 level if the pattern is a directory ending with "/" or disables HFF
 auto update and delete char backward if the pattern is a filename or
@@ -908,7 +908,7 @@ if necessary by deleting "/" at the end of the pattern using
 Note that when deleting char backward, Helm takes care of
 disabling update giving you the opportunity to edit your pattern for
 e.g. renaming a file or creating a new file or directory.
-When ‘helm-ff-auto-update-initial-value’ is non nil you may want to
+When ~helm-ff-auto-update-initial-value~ is non nil you may want to
 disable it temporarily, see [[Toggle auto-completion][Toggle auto-completion]] for this.
 
 **** Use {{{kbd(C-r)}}} to walk back the resulting tree of all the {{{kbd(C-l)}}} or DEL you did
@@ -918,7 +918,7 @@ The tree is reinitialized each time you browse a new tree with
 
 **** {{{kbd(RET)}}} behavior
 
-It behaves differently depending on ‘helm-selection’ (current candidate in helm-buffer):
+It behaves differently depending on ~helm-selection~ (current candidate in helm-buffer):
 
 - candidate basename is "." => Open it in dired.
 - candidate is a directory    => Expand it.
@@ -932,15 +932,15 @@ second time while you are on the root of this directory e.g.
 directory.  You can also exit with default action at any moment
 with {{{kbd(f1)}}}.
 
-Note that when copying, renaming, etc. from ‘helm-find-files’ the
-destination file is selected with ‘helm-read-file-name’.
+Note that when copying, renaming, etc. from ~helm-find-files~ the
+destination file is selected with ~helm-read-file-name~.
 
 **** {{{kbd(TAB)}}} behavior
 
-Normally {{{kbd(TAB)}}} is bound to ‘helm-select-action’ in helm-map which
+Normally {{{kbd(TAB)}}} is bound to ~helm-select-action~ in helm-map which
 display the action menu.
 
-You can change this behavior by setting in ‘helm-find-files-map’
+You can change this behavior by setting in ~helm-find-files-map~
 a new command for {{{kbd(TAB)}}}:
 
     #+begin_src elisp
@@ -948,7 +948,7 @@ a new command for {{{kbd(TAB)}}}:
     #+end_src
 
 It will then behave slighly differently depending of
-‘helm-selection’:
+~helm-selection~:
 
 - candidate basename is "."  :: open the action menu.
 - candidate is a directory     :: expand it (behave as C-j).
@@ -976,11 +976,11 @@ again with fuzzy sorting and no more with sorting methods previously selected.
 *** Find file at point
 
 Helm uses ‘ffap’ partially or completely to find file at point depending on the
-value of ‘helm-ff-guess-ffap-filenames’: if non-nil, support is complete
+value of ~helm-ff-guess-ffap-filenames~: if non-nil, support is complete
 (annoying), if nil, support is partial.
 
 Note that when the variable
-‘helm-ff-allow-non-existing-file-at-point’ is non nil Helm will
+~helm-ff-allow-non-existing-file-at-point~ is non nil Helm will
 insert the filename at point even if file with this name doesn’t
 exists.  If non existing file at point ends with numbers prefixed
 with ":" the ":" and numbers are stripped.
@@ -1049,17 +1049,17 @@ Third hit kills the buffer filename.
 
 *Note*: {{{kbd(C-u C-j)}}} displays the buffer directly.
 
-*** Browse images directories with ‘helm-follow-mode’ and navigate up/down
+*** Browse images directories with ~helm-follow-mode~ and navigate up/down
 
 Before Emacs-27 Helm was using image-dired that works with
 external ImageMagick tools.  From Emacs-27 Helm use native
-display of images with image-mode by default for Emacs-27 (see ‘helm-ff-display-image-native’),
+display of images with image-mode by default for Emacs-27 (see ~helm-ff-display-image-native~),
 this allows automatic resize when changing window size, zooming with {{{kbd(M-+)}}} and {{{kbd(M--)}}}
 and rotate images as before.
 
-You can also use ‘helm-follow-action-forward’ and ‘helm-follow-action-backward’ with
+You can also use ~helm-follow-action-forward~ and ~helm-follow-action-backward~ with
 {{{kbd(C-<down>)}}} and {{{kbd(C-<up>)}}} respectively.
-Note that these commands have different behavior when ‘helm-follow-mode’
+Note that these commands have different behavior when ~helm-follow-mode~
 is enabled (go to next/previous line only).
 
 Use {{{kbd(C-u C-j)}}} to display an image or kill its buffer.
@@ -1074,14 +1074,14 @@ Note this may not work with exotic Helm windows settings such as the ones in Spa
 
   Helm is looking what is used by default to open file
   externally (mailcap files) but have its own variable
-  ‘helm-external-programs-associations’ to store external
+  ~helm-external-programs-associations~ to store external
   applications.  If you call the action or its binding without
   prefix arg Helm will see if there is an application suitable in
-  ‘helm-external-programs-associations’, otherwise it will look in
+  ~helm-external-programs-associations~, otherwise it will look in
   mailcap files.  If you want to specify which external application
   to use (and its options) use a prefix arg.
 
-  Note: What you configure for Helm in ‘helm-external-programs-associations’
+  Note: What you configure for Helm in ~helm-external-programs-associations~
   will take precedence on mailcap files.
 
 - Preview file with external program ({{{kbd(C-c C-v)}}}).
@@ -1144,7 +1144,7 @@ When using locate the Helm buffer remains empty until you type something.
 Regardless Helm uses the basename of the pattern entered in the helm-find-files
 session by default.  Hitting {{{kbd(M-n)}}} should just kick in the
 locate search with this pattern.  If you want Helm to automatically do this, add
-‘helm-source-locate’ to ‘helm-sources-using-default-as-input’.
+~helm-source-locate~ to ~helm-sources-using-default-as-input~.
 
 *Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:6]
 
@@ -1158,7 +1158,7 @@ the final "/".  Helm will then list all possible directories under "foo"
 matching "else".
 
 *Note*: Completion on subdirectories uses "locate" as backend, you can configure
-the command with ‘helm-locate-recursive-dirs-command’.  Because this completion
+the command with ~helm-locate-recursive-dirs-command~.  Because this completion
 uses an index, the directory tree displayed may be out-of-date and not reflect
 the latest change until you update the index (using "updatedb" for "locate").
 
@@ -1166,7 +1166,7 @@ If for some reason you cannot use an index, the "find" command from
 "findutils" can be used instead.  It will be slower though.  You need to pass
 the basedir as first argument of "find" and the subdir as the value for
 ’-(i)regex’ or ’-(i)name’ with the two format specs that are mandatory in
-‘helm-locate-recursive-dirs-command’.
+~helm-locate-recursive-dirs-command~.
 
 Examples:
 
@@ -1226,7 +1226,7 @@ be faster.  However, if you know you have not many files it is reasonable to use
 this, also using not recursive wildcard (e.g. "*.el") is perfectly fine for
 this.
 
-The "**" feature is active by default in the option ‘helm-file-globstar’.  It
+The "**" feature is active by default in the option ~helm-file-globstar~.  It
 is different from the Bash "shopt globstar" feature in that to list files with
 a named extension recursively you would write "**.el" whereas in Bash it would
 be "**/*.el".  Directory selection with "**/" like Bash "shopt globstar"
@@ -1286,7 +1286,7 @@ In addition to a simple string to use as replacement, here is what you can use:
 
 ***** Recursively rename all files with ".JPG" extension to ".jpg"
 
-Use the ‘helm-file-globstar’ feature described in [[Use the wildcard to select multiple files][recursive globbing]]
+Use the ~helm-file-globstar~ feature described in [[Use the wildcard to select multiple files][recursive globbing]]
 by entering "**.JPG" at the end of the Helm-find-files pattern, then hit
 {{{kbd(M-@)}}} and enter "JPG" on first prompt, then "jpg" on second prompt and hit {{{kbd(RET)}}}.
 
@@ -1422,7 +1422,7 @@ See [[Use the wildcard to select multiple files]] section above.
 
 *** Defining default target directory for copying, renaming, etc
 
-You can customize ‘helm-dwim-target’ to behave differently depending on the
+You can customize ~helm-dwim-target~ to behave differently depending on the
 windows open in the current frame.  Default is to provide completion on all
 directories associated to each window.
 
@@ -1476,7 +1476,7 @@ synchronize a directory, mark all in the directory and rsync all
 marked to the destination directory or rsync the directory itself
 to its parent, e.g. remote:/home/you/music => /home/you.
 
-The options are configurable through ‘helm-rsync-switches’, but
+The options are configurable through ~helm-rsync-switches~, but
 you can modify them on the fly when needed by using a prefix arg,
 in this case you will be prompted for modifications.
 
@@ -1486,25 +1486,25 @@ automatically "-e ’ssh -p 2222’" to the rsync command line
 unless you have specified yourself the "-e" option by editing
 rsync command line with a prefix arg (see above).
 
-*** Bookmark the ‘helm-find-files’ session
+*** Bookmark the ~helm-find-files~ session
 
-You can bookmark the ‘helm-find-files’ session with {{{kbd(C-x r m)}}}.
-You can later retrieve these bookmarks by calling ‘helm-filtered-bookmarks’
-or, from the current ‘helm-find-files’ session, by hitting {{{kbd(C-x r b)}}}.
+You can bookmark the ~helm-find-files~ session with {{{kbd(C-x r m)}}}.
+You can later retrieve these bookmarks by calling ~helm-filtered-bookmarks~
+or, from the current ~helm-find-files~ session, by hitting {{{kbd(C-x r b)}}}.
 
-*** Grep files from ‘helm-find-files’
+*** Grep files from ~helm-find-files~
 
-You can grep individual files from ‘helm-find-files’ by using
+You can grep individual files from ~helm-find-files~ by using
 {{{kbd(C-s)}}}.  This same command can also
 recursively grep files from the current directory when called with a prefix
 argument.  In this case you will be prompted for the file extensions to use
 (grep backend) or the types of files to use (ack-grep backend).  See the
-‘helm-grep-default-command’ documentation to set this up.  For compressed files
+~helm-grep-default-command~ documentation to set this up.  For compressed files
 or archives, use zgrep with {{{kbd(M-g z)}}}.
 
 Otherwise you can use recursive commands like {{{kbd(M-g a)}}} or {{{kbd(M-g g)}}}
 that are much faster than using {{{kbd(C-s)}}} with a prefix argument.
-See ‘helm-grep-ag-command’ and ‘helm-grep-git-grep-command’ to set this up.
+See ~helm-grep-ag-command~ and ~helm-grep-git-grep-command~ to set this up.
 
 You can also use "id-utils"’ GID with {{{kbd(M-g i)}}}
 by creating an ID index file with the "mkid" shell command.
@@ -1530,15 +1530,15 @@ at end "&", e.g. "alias foo $* &".
 
 Adding Eshell aliases to your ‘eshell-aliases-file’ or using the
 ‘alias’ command from Eshell allows you to create personalized
-commands not available in ‘helm-find-files’ actions and use them
+commands not available in ~helm-find-files~ actions and use them
 from {{{kbd(M-!)}}}.
 
-Example: You want a command to uncompress some "*.tar.gz" files from ‘helm-find-files’:
+Example: You want a command to uncompress some "*.tar.gz" files from ~helm-find-files~:
 
 1) Create an Eshell alias named, say, "untargz" with the command
 "alias untargz tar zxvf $*".
 
-2) Now from ‘helm-find-files’ select the "*.tar.gz" file (you can also
+2) Now from ~helm-find-files~ select the "*.tar.gz" file (you can also
 mark files if needed) and hit {{{kbd(M-!)}}}.
 
 *Note*: When using marked files with this, the meaning of the prefix argument is
@@ -1563,9 +1563,9 @@ If you want to pass many files inside %s, don’t forget to use a prefix arg.
 You can also use special placeholders in extra-args,
 see the specific info page once you hit {{{kbd(M-!)}}}.
 
-*** Using TRAMP with ‘helm-find-files’ to read remote directories
+*** Using TRAMP with ~helm-find-files~ to read remote directories
 
-‘helm-find-files’ works fine with TRAMP despite some limitations.
+~helm-find-files~ works fine with TRAMP despite some limitations.
 
 - Grepping files is not very well supported when used incrementally.
   See [[Grepping on remote files]].
@@ -1602,10 +1602,10 @@ to complete the pattern in the minibuffer.
 Starting at helm version 2.9.7 it is somewhat possible to
 colorize fnames by listing files without loosing performances with
 external commands (ls and awk) if your system is compatible.
-For this you can use ‘helm-list-dir-external’ as value
-for ‘helm-list-directory-function’.
+For this you can use ~helm-list-dir-external~ as value
+for ~helm-list-directory-function~.
 
-See ‘helm-list-directory-function’ documentation for more infos.
+See ~helm-list-directory-function~ documentation for more infos.
 
 **** Completing host
 
@@ -1617,7 +1617,7 @@ As soon the last ":" is entered TRAMP will kick in and you should see the list
 of candidates soon after.
 
 When connection fails, be sure to delete your TRAMP connection with M-x
-‘helm-delete-tramp-connection’ before retrying.
+~helm-delete-tramp-connection~ before retrying.
 
 **** Editing local files as root
 
@@ -1682,7 +1682,7 @@ You can delete files without quitting helm with
 
 In the second method you can choose to
 make this command asynchronous by customizing
-‘helm-ff-delete-files-function’.
+~helm-ff-delete-files-function~.
 
 *Warning*: When deleting files asynchronously you will NOT be
 WARNED if directories are not empty, that’s mean non empty directories will
@@ -1692,10 +1692,10 @@ A good compromise is to trash your files
 when using asynchronous method (see [[Trashing files][Trashing files]]).
 
 When choosing synchronous delete, you can allow recursive
-deletion of directories with ‘helm-ff-allow-recursive-deletes’.
+deletion of directories with ~helm-ff-allow-recursive-deletes~.
 Note that when trashing (synchronous) you are not asked for recursive deletion.
 
-Note that ‘helm-ff-allow-recursive-deletes’ have no effect when
+Note that ~helm-ff-allow-recursive-deletes~ have no effect when
 deleting asynchronously.
 
 First method (persistent delete) is always synchronous.
@@ -1720,7 +1720,7 @@ You can as well delete files from Trash directories with the ’delete files fro
 action.
 If you want to know where a file will be restored, hit {{{kbd(M-i)}}}, you will find a trash info.
 
-*Tip*: Navigate to your Trash/files directories with ‘helm-find-files’ and set a bookmark
+*Tip*: Navigate to your Trash/files directories with ~helm-find-files~ and set a bookmark
 there with {{{kbd(C-x r m)}}} for fast access to Trash.
 
 *Note*: Restoring files from trash is working only on system using
@@ -1739,7 +1739,7 @@ of evaling its value (with ‘substitute-in-file-name’).
 
 Trashing remote files (or local files with sudo method) is disabled by default
 because tramp is requiring the ’trash’ command to be installed, if you want to
-trash your remote files, customize ‘helm-trash-remote-files’.
+trash your remote files, customize ~helm-trash-remote-files~.
 The package on most GNU/Linux based distributions is trash-cli[fn:10].
 
 *Note*:
@@ -1758,9 +1758,9 @@ careful when checking sum of larges files e.g. isos.
 *** Ignored or boring files
 
 Helm-find-files can ignore files matching
-‘helm-boring-file-regexp-list’ or files that are git ignored, you
-can set this with ‘helm-ff-skip-boring-files’ or
-‘helm-ff-skip-git-ignored-files’.
+~helm-boring-file-regexp-list~ or files that are git ignored, you
+can set this with ~helm-ff-skip-boring-files~ or
+~helm-ff-skip-git-ignored-files~.
 
 *Note*: This will slow down helm, be warned.
 
@@ -1841,7 +1841,7 @@ in current visited directory by an external command from outside Emacs.
 
 This is ‘generic’ read file name completion that have been "helmized"
 because you have enabled [[Helm mode][helm-mode]].
-Don’t confuse this with ‘helm-find-files’ which is a native helm command,
+Don’t confuse this with ~helm-find-files~ which is a native helm command,
 see [[Helm functions vs helmized Emacs functions]].
 
 ** Tips
@@ -1872,7 +1872,7 @@ third character in order to complete it.
 
 *** Persistent actions
 
-By default ‘helm-read-file-name’ uses the persistent actions of ‘helm-find-files’.
+By default ~helm-read-file-name~ uses the persistent actions of ~helm-find-files~.
 
 **** Use {{{kbd(C-u C-j)}}} to display an image
 
@@ -1883,7 +1883,7 @@ Third hit kills the buffer filename.
 
 *Note*: {{{kbd(C-u C-j)}}} displays the buffer directly.
 
-**** Browse images directories with ‘helm-follow-mode’ and navigate up/down
+**** Browse images directories with ~helm-follow-mode~ and navigate up/down
 
 *** Delete characters backward
 
@@ -1914,7 +1914,7 @@ a directory (e.g ‘list-directory’).
 *** Exiting minibuffer with empty string
 
 You can exit minibuffer with empty string with
-Uses keymap ‘helm-read-file--map’, which is not currently defined.
+Uses keymap ~helm-read-file--map~, which is not currently defined.
 M-x helm-cr-empty-string.
 It is useful when some commands are prompting continuously until you enter an empty prompt.
 
@@ -1942,7 +1942,7 @@ e.g. -b, -e, -n <number>, etc.  See the locate(1) man page for more details.
 Some other sources (at the moment "recentf" and "file in current directory")
 support the -b flag for compatibility with locate when they are used with it.
 
-When you enable fuzzy matching on locate with ‘helm-locate-fuzzy-match’, the
+When you enable fuzzy matching on locate with ~helm-locate-fuzzy-match~, the
 search will be performed on basename only for efficiency (so don’t add "-b" at
 prompt).  As soon as you separate the patterns with spaces, fuzzy matching will
 be disabled and search will be done on the full filename.  Note that in
@@ -1962,8 +1962,8 @@ the cache when files have been added/removed in the directory.
 Recursively search files using the "find" shell command.
 
 Candidates are all filenames that match all given globbing patterns.  This
-respects the options ‘helm-case-fold-search’ and
-‘helm-findutils-search-full-path’.
+respects the options ~helm-case-fold-search~ and
+~helm-findutils-search-full-path~.
 
 You can pass arbitrary "find" options directly after a "*" separator.
 For example, this would find all files matching "book" that are larger
@@ -2004,7 +2004,7 @@ your hard drive cache is "cold", then once the cache is initialized
 searchs are very fast.  You can pass any Fd options[fn:12] before
 pattern, e.g. "-e py foo".
 
-The Fd command line can be customized with ‘helm-fd-switches’ user
+The Fd command line can be customized with ~helm-fd-switches~ user
 variable.  Always use =--color always= as option otherwise you will
 have no colors. To customize colors see Fd colorized[fn:13].
 
@@ -2275,7 +2275,7 @@ OPTIONS
 
 ** Commands
 
-Uses keymap ‘helm-fd-map’, which is not currently defined.
+Uses keymap ~helm-fd-map~, which is not currently defined.
 
 | Keys                                        | Description                                        |
 |---------------------------------------------+----------------------------------------------------|
@@ -2320,7 +2320,7 @@ the prefix arg allows you to specify a type of file to search in.
 *** You can use wild cards when selecting files (e.g. "*.el")
 
 Note that a way to grep specific files recursively is to use
-e.g. "**.el" to select files, the variable ‘helm-file-globstar’
+e.g. "**.el" to select files, the variable ~helm-file-globstar~
 controls this (it is non nil by default), however it is much
 slower than using grep recusively (see helm-find-files
 documentation about this feature).
@@ -2333,7 +2333,7 @@ of your backend for more infos.
 
 *** You can grep in different directories by marking files or using wild cards
 
-*** You can save the result in a ‘helm-grep-mode’ buffer
+*** You can save the result in a ~helm-grep-mode~ buffer
 
 See [[Commands][commands]] below.
 
@@ -2384,11 +2384,11 @@ is much more efficient, also ‘id-utils’ seems no more maintained.
 ** Tips
 
 Helm-GID reads the database created with the ‘mkid’ command from id-utils.
-The name of the database file can be customized with ‘helm-gid-db-file-name’, it
+The name of the database file can be customized with ~helm-gid-db-file-name~, it
 is usually "ID".
 
 Helm-GID use the symbol at point as default-input.  This command is also
-accessible from ‘helm-find-files’ which allow you to navigate to another
+accessible from ~helm-find-files~ which allow you to navigate to another
 directory to consult its database.
 
 *Note*: Helm-GID supports multi-matches but only the last pattern entered will be
@@ -2402,15 +2402,15 @@ Helm-AG is different from grep or ack-grep in that it works on a
 directory recursively and not on a list of files.  It is called
 helm-AG but it support several backend, namely AG, RG and PT.
 Nowaday the best backend is Ripgrep aka RG, it is the fastest and
-is actively maintained, see ‘helm-grep-ag-command’ and
-‘helm-grep-ag-pipe-cmd-switches’ to configure it.
+is actively maintained, see ~helm-grep-ag-command~ and
+~helm-grep-ag-pipe-cmd-switches~ to configure it.
 
 You can ignore files and directories with a ".agignore" file, local to a
 directory or global when placed in the home directory. (See the AG man page for
-more details.)  That file follows the same syntax as ‘helm-grep-ignored-files’
-and ‘helm-grep-ignored-directories’.
+more details.)  That file follows the same syntax as ~helm-grep-ignored-files~
+and ~helm-grep-ignored-directories~.
 
-As always you can access Helm AG from ‘helm-find-files’.
+As always you can access Helm AG from ~helm-find-files~.
 
 Starting with version 0.30, AG accepts one or more TYPE arguments on its command
 line.  Helm provides completion on these TYPE arguments when available with your
@@ -2469,7 +2469,7 @@ leaving Helm.
 
 ** Commands
 
-Uses keymap ‘helm-ucs-map’, which is not currently defined.
+Uses keymap ~helm-ucs-map~, which is not currently defined.
 
 | Keys                                 | Description                |
 |--------------------------------------+----------------------------|
@@ -2483,7 +2483,7 @@ Uses keymap ‘helm-ucs-map’, which is not currently defined.
 
 ** Commands
 
-Uses keymap ‘helm-bookmark-map’, which is not currently defined.
+Uses keymap ~helm-bookmark-map~, which is not currently defined.
 
 | Keys                                    | Description                          |
 |-----------------------------------------+--------------------------------------|
@@ -2545,7 +2545,7 @@ Example:
 
     : <command> file1 file2...
 
-Call ‘helm-find-files-eshell-command-on-file’ with one prefix argument.  Otherwise
+Call ~helm-find-files-eshell-command-on-file~ with one prefix argument.  Otherwise
 you can pass one prefix argument from the command selection buffer.
 
 *Note*: This does not work on remote files.
@@ -2571,13 +2571,13 @@ prefix arg to ensure you run only one command on all marked async.
 
 ** Commands
 
-Uses keymap ‘helm-esh-on-file-map’, which is not currently defined.
+Uses keymap ~helm-esh-on-file-map~, which is not currently defined.
 
 * Helm Ido virtual buffers
 
 ** Commands
 
-Uses keymap ‘helm-buffers-ido-virtual-map’, which is not currently defined.
+Uses keymap ~helm-buffers-ido-virtual-map~, which is not currently defined.
 
 | Keys                                 | Description             |
 |--------------------------------------+-------------------------|
@@ -2594,7 +2594,7 @@ Uses keymap ‘helm-buffers-ido-virtual-map’, which is not currently defined.
 
 *** Searching in many buffers
 
-Start from ‘helm-buffers-list’ or ‘helm-mini’, mark some buffers and hit
+Start from ~helm-buffers-list~ or ~helm-mini~, mark some buffers and hit
 Uses keymap ‘helm-buffer-map\[helm-buffers-run-occur].
 A prefix arg will change the behavior of `helm-occur-always-search-in-current'
 i.e. add current buffer or not to the list of buffers to search in.
@@ -2633,13 +2633,13 @@ current-buffer after updating.
 
 You can do this with `\<helm-map’, which is not currently defined.
 M-x helm-execute-persistent-action’ (persistent-action), to do it repeatedly
-you can use {{{kbd(C-<down>)}}} and {{{kbd(C-<up>)}}} or enable ‘helm-follow-mode’ with {{{kbd(C-c C-f)}}}.
+you can use {{{kbd(C-<down>)}}} and {{{kbd(C-<up>)}}} or enable ~helm-follow-mode~ with {{{kbd(C-c C-f)}}}.
 Follow mode is enabled by default in helm-occur.
 
 *** Switch to buffer in other window
 
 The command
-Uses keymap ‘helm-moccur-map’, which is not currently defined.
+Uses keymap ~helm-moccur-map~, which is not currently defined.
 M-x helm-moccur-run-goto-line-ow allow you to switch to buffer
 in other window horizontally or vertically if a prefix arg is supplied.
 
@@ -2649,13 +2649,13 @@ Similarly to Helm-grep, you can save the results with {{{kbd(C-x C-s)}}}.
 Once in the saved buffer, you can edit it, see [[Edit a saved buffer][below]].
 
 Of course if you don’t save the results, you can resume the Helm session with
-‘helm-resume’.
+~helm-resume~.
 
 *** Refresh the resumed session
 
 When the buffer(s) where you ran helm-(m)occur get(s) modified, the Helm buffer
 will flash red as a warning.  You can refresh the buffer by running {{{kbd(C-c C-u)}}}.
-This can be done automatically by customizing ‘helm-moccur-auto-update-on-resume’.
+This can be done automatically by customizing ~helm-moccur-auto-update-on-resume~.
 
 *** Refresh a saved buffer
 
@@ -2673,11 +2673,11 @@ occurences at once in the buffer.
 
 *** Search in region
 
-When searching in current-buffer with ‘helm-occur’, if a region
+When searching in current-buffer with ~helm-occur~, if a region
 is found helm will search in this region only.  If you marked
 this region with ‘mark-defun’ the symbol that was at point before
-marking defun will be used when ‘helm-source-occur’ is member of
-‘helm-sources-using-default-as-input’.
+marking defun will be used when ~helm-source-occur~ is member of
+~helm-sources-using-default-as-input~.
 
 *** Switch to next or previous source
 
@@ -2695,7 +2695,7 @@ See [[Moving in ‘helm-buffer’][Moving in ‘helm-buffer’]].
 
 ** Commands
 
-Uses keymap ‘helm-top-map’, which is not currently defined.
+Uses keymap ~helm-top-map~, which is not currently defined.
 
 | Keys                          | Description                  |
 |-------------------------------+------------------------------|
@@ -2746,7 +2746,7 @@ marking it ({{{kbd(C-c u)}}} or {{{kbd(RET)}}}) .
 
 ** Commands
 
-Uses keymap ‘helm-el-package-map’, which is not currently defined.
+Uses keymap ~helm-el-package-map~, which is not currently defined.
 
 | Keys                                 | Description                       |
 |--------------------------------------+-----------------------------------|
@@ -2770,13 +2770,13 @@ Uses keymap ‘helm-el-package-map’, which is not currently defined.
 
 *** Prefix arguments
 
-You can pass prefix arguments *after* starting ‘helm-M-x’.  A mode-line
+You can pass prefix arguments *after* starting ~helm-M-x~.  A mode-line
 counter will display the number of given prefix arguments.
 
-If you pass prefix arguments before running ‘helm-M-x’, it will be displayed in the prompt.
-The first {{{kbd(C-u)}}} after ‘helm-M-x’ clears those prefix arguments.
+If you pass prefix arguments before running ~helm-M-x~, it will be displayed in the prompt.
+The first {{{kbd(C-u)}}} after ~helm-M-x~ clears those prefix arguments.
 
-*Note*: When you specify prefix arguments once ‘helm-M-x’ is
+*Note*: When you specify prefix arguments once ~helm-M-x~ is
 started, the prefix argument apply on the next command, so if you
 hit RET, it will apply on the selected command, but if you type a
 new character at prompt to narrow down further candidates, the
@@ -2798,7 +2798,7 @@ duplicates in your helm-M-x history set ‘history-delete-duplicates’ to non n
 
 ** Commands
 
-Uses keymap ‘helm-imenu-map’, which is not currently defined.
+Uses keymap ~helm-imenu-map~, which is not currently defined.
 
 | Keys                            | Description             |
 |---------------------------------+-------------------------|
@@ -2809,7 +2809,7 @@ Uses keymap ‘helm-imenu-map’, which is not currently defined.
 
 ** Commands
 
-Uses keymap ‘helm-color-map’, which is not currently defined.
+Uses keymap ~helm-color-map~, which is not currently defined.
 
 |Keys|Description
 |-----------+----------|
@@ -2822,7 +2822,7 @@ Uses keymap ‘helm-color-map’, which is not currently defined.
 
 ** Commands
 
-Uses keymap ‘helm-semantic-map’, which is not currently defined.
+Uses keymap ~helm-semantic-map~, which is not currently defined.
 
 * Helm kmacro
 
@@ -2830,17 +2830,17 @@ Uses keymap ‘helm-semantic-map’, which is not currently defined.
 
 - Start recording a kmacro with {{{kbd(f3)}}}.
 - End the kmacro recording with {{{kbd(f4)}}}.
-- Run ‘helm-execute-kmacro’ to list all your kmacros.
+- Run ~helm-execute-kmacro~ to list all your kmacros.
 
 Use persistent action to run your kmacro as many times as needed.
-You can browse the kmacros with ‘helm-next-line’ and ‘helm-previous-line’.
+You can browse the kmacros with ~helm-next-line~ and ~helm-previous-line~.
 
-*Note*: You can’t record keys running Helm commands except ‘helm-M-x’, under the
+*Note*: You can’t record keys running Helm commands except ~helm-M-x~, under the
 condition that you don’t choose a command using Helm completion.
 
 ** Commands
 
-Uses keymap ‘helm-kmacro-map’, which is not currently defined.
+Uses keymap ~helm-kmacro-map~, which is not currently defined.
 
 * Helm kill ring
 
@@ -2850,34 +2850,34 @@ Every Helm session lets you save a candidate to the kill-ring / clipboard /
 primary-selection with {{{kbd(C-c C-k)}}}.
 
 To save space, Helm-kill-ring truncates the candidates longer than
-‘helm-kill-ring-max-offset’.
+~helm-kill-ring-max-offset~.
 ‘
-Uses keymap ‘helm-kill-ring-map’, which is not currently defined.
+Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 M-x helm-kill-ring-kill-selection’ then saves the whole
 text and not the truncated value.  The view of truncated candidates can be
 toggled; see the command list below.
 
 As opposed to ‘yank’, numeric prefix arguments are ignored with
-‘helm-show-kill-ring’: there is no need for them since selection happens within
+~helm-show-kill-ring~: there is no need for them since selection happens within
 Helm.  Moreover Helm has [[Shortcuts for executing the default action on the n-th candidate][Shortcuts for executing the default action on the n-th candidate]].
 
-It is recommended to globally bind {{{kbd(M-y)}}} to ‘helm-show-kill-ring’.  Once in the
+It is recommended to globally bind {{{kbd(M-y)}}} to ~helm-show-kill-ring~.  Once in the
 Helm-kill-ring session you can navigate to next/previous line with {{{kbd(M-y)}}} and
 {{{kbd(M-u)}}} for convenience.  Of course {{{kbd(M-x helm-next-line)}}} and {{{kbd(M-x helm-previous-line)}}} are still available.
 
 It is possible to delete candidates from the kill ring with ‘
-Uses keymap ‘helm-kill-ring-map’, which is not currently defined.
+Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 M-x helm-kill-ring-delete’
 but also persistently with ‘
-Uses keymap ‘helm-kill-ring-map’, which is not currently defined.
+Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 M-x helm-kill-ring-run-persistent-delete’.
 
 You can concatenate marked candidates and yank them in the current
 buffer, thus creating a new entry in the kill ring.  Candidates are
-concatenated with ‘helm-kill-ring-separator’ as default but you can
+concatenated with ~helm-kill-ring-separator~ as default but you can
 change interactively the separator while yanking by using two prefix
 args.  When you have something else than "\n" as default value for
-‘helm-kill-ring-separator’ and you want to use "\n" from prompt, use
+~helm-kill-ring-separator~ and you want to use "\n" from prompt, use
 {{{kbd(C-q C-j)}}} to enter a newline in prompt.
 
 To not push a new entry in the kill ring, use {{{kbd(C-c TAB)}}} instead of RET
@@ -2889,7 +2889,7 @@ by using a prefix argument, i.e. {{{kbd(C-u RET)}}}, like the regular ‘yank’
 
 ** Commands
 
-Uses keymap ‘helm-kill-ring-map’, which is not currently defined.
+Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 
 | Keys                                | Description                         |
 |-------------------------------------+-------------------------------------|
@@ -2912,9 +2912,9 @@ Uses keymap ‘helm-kill-ring-map’, which is not currently defined.
 * Footnotes
 
 [fn:20] Delete from point to end or all depending on the value of
-‘helm-delete-minibuffer-contents-from-point’.
+~helm-delete-minibuffer-contents-from-point~.
  
-[fn:19] Behavior may change depending context in some source e.g. ‘helm-find-files’. 
+[fn:19] Behavior may change depending context in some source e.g. ~helm-find-files~. 
 
 [fn:1] https://github.com/coldnew/linum-relative
 
