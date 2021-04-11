@@ -15,7 +15,7 @@ Helm narrows down the list of candidates as you type a filter
 pattern.  See [[Matching in Helm][Matching in Helm]].
 
 Helm accepts multiple space-separated patterns, each pattern can
-be negated with "!".
+be negated with =!=.
 
 Helm also supports fuzzy matching in some places when specified, you
 will find several variables to enable fuzzy matching in diverse [[Helm
@@ -102,10 +102,10 @@ sources unless the developer of the source has disabled it or
 have choosen to use fuzzy matching.  Even if a source has fuzzy
 matching enabled, Helm will switch to multi match as soon as it
 detects a space in the pattern.  It may also switch to multi match
-as well if pattern starts with a "^" beginning of line sign.  In
+as well if pattern starts with a =^= beginning of line sign.  In
 those cases each pattern separated with space should be a regexp
 and not a fuzzy pattern.  When using multi match patterns, each
-pattern starting with "!" is interpreted as a negation i.e.
+pattern starting with =!= is interpreted as a negation i.e.
 match everything but this.
 
 *** Completion-styles
@@ -180,7 +180,7 @@ when you turn ~helm-mode~ on, commands like ‘switch-to-buffer’
 will use Helm completion instead of the usual Emacs completion
 buffer.
 
-*** What gets or does not get "helmized" when ~helm-mode~ is enabled?
+*** What gets or does not get =helmized= when ~helm-mode~ is enabled?
 
 Helm provides generic completion on all Emacs functions using
 ‘completing-read’, ‘completion-in-region’ and their derivatives,
@@ -390,7 +390,7 @@ currently selected candidate.
 {{{kbd(C-c <n>)}}}: Execute default action on the n-th candidate after
 current selected candidate.
 
-"n" is limited to 1-9.  For larger jumps use other navigation
+=n= is limited to 1-9.  For larger jumps use other navigation
 keys.
 
 ** Mouse control in Helm
@@ -727,13 +727,13 @@ M-g M-h		helm-minibuffer-history
 **** Major-mode
 
 You can enter a partial major-mode name (e.g. lisp, sh) to narrow down buffers.
-To specify the major-mode, prefix it with "*" e.g. "*lisp".
+To specify the major-mode, prefix it with =*= e.g. =*lisp=.
 
 If you want to match all buffers but the ones with a specific major-mode
-(negation), prefix the major-mode with "!" e.g. "*!lisp".
+(negation), prefix the major-mode with =!= e.g. =*!lisp=.
 
-If you want to specify more than one major-mode, separate them with ",",
-e.g. "*!lisp,!sh,!fun" lists all buffers but the ones in lisp-mode, sh-mode
+If you want to specify more than one major-mode, separate them with =,=,
+e.g. =*!lisp,!sh,!fun= lists all buffers but the ones in lisp-mode, sh-mode
 and fundamental-mode.
 
 Then enter a space followed by a pattern to narrow down to buffers matching this
@@ -741,24 +741,24 @@ pattern.
 
 **** Search inside buffers
 
-If you enter a space and a pattern prefixed by "@", Helm searches for text
+If you enter a space and a pattern prefixed by =@=, Helm searches for text
 matching this pattern *inside* the buffer (i.e. not in the name of the buffer).
 
-Negation are supported i.e. "!".
+Negation are supported i.e. =!=.
 
 When you specify more than one of such patterns, it will match
 buffers with contents matching each of these patterns i.e. AND,
-not OR.  That means that if you specify "@foo @bar" the contents
+not OR.  That means that if you specify =@foo @bar= the contents
 of buffer will have to be matched by foo AND bar.  If you specify
-"@foo @!bar" it means the contents of the buffer have to be
+=@foo @!bar= it means the contents of the buffer have to be
 matched by foo but NOT bar.
 
-If you enter a pattern prefixed with an escaped "@", Helm searches for a
-buffer matching "@pattern" but does not search inside the buffer.
+If you enter a pattern prefixed with an escaped =@=, Helm searches for a
+buffer matching =@pattern= but does not search inside the buffer.
 
 **** Search by directory name
 
-If you prefix the pattern with "/", Helm matches over the directory names
+If you prefix the pattern with =/=, Helm matches over the directory names
 of the buffers.
 
 This feature can be used to narrow down the search to one directory while
@@ -771,38 +771,38 @@ Starting from Helm v1.6.8, you can specify more than one directory.
 **** Fuzzy matching
 
 ~helm-buffers-fuzzy-matching~ turns on fuzzy matching on buffer names, but not
-on directory names or major modes.  A pattern starting with "^" disables fuzzy
+on directory names or major modes.  A pattern starting with =^= disables fuzzy
 matching and matches by exact regexp.
 
 **** Examples
 
 With the following pattern
 
-    : "*lisp ^helm @moc"
+    : *lisp ^helm @moc
 
 Helm narrows down the list by selecting only the buffers that are in lisp mode,
-start with "helm" and which content matches "moc".
+start with =helm= and which content matches =moc=.
 
-Without the "@"
+Without the =@=
 
-    : "*lisp ^helm moc"
+    : *lisp ^helm moc
 
-Helm looks for lisp mode buffers starting with "helm" and containing "moc"
+Helm looks for lisp mode buffers starting with =helm= and containing =moc=
 in their name.
 
 With this other pattern
 
-    : "*!lisp !helm"
+    : *!lisp !helm
 
-Helm narrows down to buffers that are not in "lisp" mode and that do not match
-"helm".
+Helm narrows down to buffers that are not in =lisp= mode and that do not match
+=helm=.
 
 With this last pattern
 
     : /helm/ w3
 
-Helm narrows down to buffers that are in any "helm" subdirectory and
-matching "w3".
+Helm narrows down to buffers that are in any =helm= subdirectory and
+matching =w3=.
 
 *** Creating buffers
 
@@ -899,10 +899,10 @@ On a symlinked directory a prefix argument expands to its true name.
 
 But when ~helm-ff-DEL-up-one-level-maybe~ is non nil {{{kbd(DEL)}}} behaves
 differently depending on the contents of helm-pattern.  It goes up one
-level if the pattern is a directory ending with "/" or disables HFF
+level if the pattern is a directory ending with =/= or disables HFF
 auto update and delete char backward if the pattern is a filename or
 refers to a non existing path.  Going up one level can be disabled
-if necessary by deleting "/" at the end of the pattern using
+if necessary by deleting =/= at the end of the pattern using
 {{{kbd(C-b)}}} and {{{kbd(C-k)}}}.
 
 Note that when deleting char backward, Helm takes care of
@@ -920,7 +920,7 @@ The tree is reinitialized each time you browse a new tree with
 
 It behaves differently depending on ~helm-selection~ (current candidate in helm-buffer):
 
-- candidate basename is "." => Open it in dired.
+- candidate basename is =.= => Open it in dired.
 - candidate is a directory    => Expand it.
 - candidate is a file         => Open it.
 
@@ -928,7 +928,7 @@ If you have marked candidates and you press RET on a directory,
 Helm will navigate to this directory.  If you want to exit with
 RET with default action with these marked candidates, press RET a
 second time while you are on the root of this directory e.g.
-"/home/you/dir/." or press RET on any file which is not a
+=/home/you/dir/.= or press RET on any file which is not a
 directory.  You can also exit with default action at any moment
 with {{{kbd(f1)}}}.
 
@@ -950,7 +950,7 @@ a new command for {{{kbd(TAB)}}}:
 It will then behave slighly differently depending of
 ~helm-selection~:
 
-- candidate basename is "."  :: open the action menu.
+- candidate basename is =.=  :: open the action menu.
 - candidate is a directory     :: expand it (behave as C-j).
 - candidate is a file          :: open action menu.
 
@@ -965,12 +965,12 @@ Changing directory disable filtering.
 
 *** Sort directory contents
 
-When listing a directory without narrowing its contents, i.e. when pattern ends with "/",
+When listing a directory without narrowing its contents, i.e. when pattern ends with =/=,
 you can sort alphabetically, by newest or by size by using respectively
 {{{kbd(S-<f1>)}}}, {{{kbd(S-<f2>)}}} or {{{kbd(S-<f3>)}}}.
 
 *Note*:
-When starting back narrowing i.e. entering something in minibuffer after "/" sorting is done
+When starting back narrowing i.e. entering something in minibuffer after =/= sorting is done
 again with fuzzy sorting and no more with sorting methods previously selected.
 
 *** Find file at point
@@ -983,7 +983,7 @@ Note that when the variable
 ~helm-ff-allow-non-existing-file-at-point~ is non nil Helm will
 insert the filename at point even if file with this name doesn’t
 exists.  If non existing file at point ends with numbers prefixed
-with ":" the ":" and numbers are stripped.
+with =:= the =:= and numbers are stripped.
 
 **** Find file at line number
 
@@ -1001,7 +1001,7 @@ Pressing {{{kbd(RET)}}} opens that URL using ‘browse-url-browser-function’.
 **** Find e-mail address at point
 
 When an e-mail address is found at point, Helm expands to this e-mail address
-prefixed with "mailto:".  Pressing {{{kbd(RET)}}} opens a message buffer with that
+prefixed with =mailto:=.  Pressing {{{kbd(RET)}}} opens a message buffer with that
 e-mail address.
 
 *** Quick pattern expansion
@@ -1023,7 +1023,7 @@ the cursor to the top instead of remaining on the previous subdir name.
 
 **** Enter ‘..name/’ at end of pattern to start a recursive search
 
-It searches directories matching "name" under the current directory, see the
+It searches directories matching =name= under the current directory, see the
 "Recursive completion on subdirectories" section below for more details.
 
 **** Any environment variable (e.g. ‘$HOME’) at end of pattern gets expanded
@@ -1039,7 +1039,7 @@ pattern first ({{{kbd(C-k)}}}).
 
 It starts from the third character of the pattern.
 
-For instance "fob" or "fbr" will complete "foobar" but "fb" needs a
+For instance =fob= or =fbr= will complete =foobar= but =fb= needs a
 third character in order to complete it.
 
 *** {{{kbd(C-j)}}} on a filename expands to that filename in the Helm buffer
@@ -1104,11 +1104,11 @@ In this case use {{{kbd(C-c <backspace>)}}}.
 *** You can create a new directory and a new file at the same time
 
 Simply write the path in the prompt and press {{{kbd(RET)}}}, e.g.
-"~/new/newnew/newnewnew/my_newfile.txt".
+=~/new/newnew/newnewnew/my_newfile.txt=.
 
-*** To create a new directory, append a "/" to the new name and press {{{kbd(RET)}}}
+*** To create a new directory, append a =/= to the new name and press {{{kbd(RET)}}}
 
-*** To create a new file, enter a filename not ending with "/"
+*** To create a new file, enter a filename not ending with =/=
 
 Note that when you enter a new name, this one is prefixed with
 [?] if you are in a writable directory.  If you are in a directory
@@ -1132,11 +1132,11 @@ when using Tramp, new filename just appears on top of buffer.
 - {{{kbd(C-u C-u kbd(M-x helm-browse-project)}}} ::
   Same but the cache is refreshed.
 
-**** You can start a recursive search with "locate", "find" or "Fd"[fn:5]
+**** You can start a recursive search with =locate=, =find= or =Fd=[fn:5]
 
 See "Note" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
-Using "locate", you can enable the local database with a prefix argument. If the
+Using =locate=, you can enable the local database with a prefix argument. If the
 local database doesn’t already exists, you will be prompted for its creation.
 If it exists and you want to refresh it, give it two prefix args.
 
@@ -1151,37 +1151,37 @@ locate search with this pattern.  If you want Helm to automatically do this, add
 **** Recursive completion on subdirectories
 
 Starting from the directory you are currently browsing, it is possible to have
-completion of all directories underneath.  Say you are at "/home/you/foo/" and
-you want to go to "/home/you/foo/bar/baz/somewhere/else", simply type
-"/home/you/foo/..else" and hit {{{kbd(C-j)}}} or enter
-the final "/".  Helm will then list all possible directories under "foo"
-matching "else".
+completion of all directories underneath.  Say you are at =/home/you/foo/= and
+you want to go to =/home/you/foo/bar/baz/somewhere/else=, simply type
+=/home/you/foo/..else= and hit {{{kbd(C-j)}}} or enter
+the final =/=.  Helm will then list all possible directories under =foo=
+matching =else=.
 
-*Note*: Completion on subdirectories uses "locate" as backend, you can configure
+*Note*: Completion on subdirectories uses =locate= as backend, you can configure
 the command with ~helm-locate-recursive-dirs-command~.  Because this completion
 uses an index, the directory tree displayed may be out-of-date and not reflect
-the latest change until you update the index (using "updatedb" for "locate").
+the latest change until you update the index (using =updatedb= for =locate=).
 
-If for some reason you cannot use an index, the "find" command from
-"findutils" can be used instead.  It will be slower though.  You need to pass
-the basedir as first argument of "find" and the subdir as the value for
+If for some reason you cannot use an index, the =find= command from
+=findutils= can be used instead.  It will be slower though.  You need to pass
+the basedir as first argument of =find= and the subdir as the value for
 ’-(i)regex’ or ’-(i)name’ with the two format specs that are mandatory in
 ~helm-locate-recursive-dirs-command~.
 
 Examples:
 
-: "find %s -type d -name ’*%s*’"
-: "find %s -type d -regex .*%s.*$"
+: find %s -type d -name ’*%s*’
+: find %s -type d -regex .*%s.*$
 
-"Fd"[fn:5] command is now also
+=Fd=[fn:5] command is now also
 supported which is regexp based and very fast.  Here is the command
 line to use:
 
-: "fd --hidden --type d .*%s.*$ %s"
+: fd --hidden --type d .*%s.*$ %s
 
 You can use also a glob based search, in this case use the --glob option:
 
-: "fd --hidden --type d --glob ’*%s*’ %s"
+: fd --hidden --type d --glob ’*%s*’ %s
 
 *** Insert filename at point or complete filename at point
 
@@ -1194,56 +1194,56 @@ On insertion (not on completion, i.e. there is nothing at point):
 
 On completion:
 
-- Target starts with "~/" :: insert abbreviate file name.
-- target starts with "/" or "[a-z]:/" :: insert full path.
+- Target starts with =~/= :: insert abbreviate file name.
+- target starts with =/= or =[a-z]:/= :: insert full path.
 - Otherwise :: insert relative file name.
 
 *** Use the wildcard to select multiple files
 
 Use of wildcard is supported to run an action over a set of files.
 
-Example: You can copy all the files with ".el" extension by using "*.el" and
+Example: You can copy all the files with =.el= extension by using =*.el= and
 then run copy action.
 
-Similarly, "**.el" (note the two stars) will recursively select all ".el"
+Similarly, =**.el= (note the two stars) will recursively select all =.el=
 files under the current directory.
 
 Note that when recursively copying files, you may have files with same name
 dispatched across different subdirectories, so when copying them in the same
 directory they will get overwritten.  To avoid this Helm has a special action
-called "backup files" that has the same behavior as the command line "cp -f
+called =backup files= that has the same behavior as the command line "cp -f
 --backup=numbered": it allows you to copy many files with the same name from
 different subdirectories into one directory.  Files with same name are renamed
-as follows: "foo.txt.~1~".  Like with the --force option of cp, it is possible
+as follows: =foo.txt.~1~=.  Like with the --force option of cp, it is possible
 to backup files in current directory.
 
 This command is available only when ‘dired-async-mode’ is active.
 
-When using an action that involves an external backend (e.g. grep), using "**"
+When using an action that involves an external backend (e.g. grep), using =**=
 is not recommended (even thought it works fine) because it will be slower to
 select all the files.  You are better off leaving the backend to do it, it will
 be faster.  However, if you know you have not many files it is reasonable to use
-this, also using not recursive wildcard (e.g. "*.el") is perfectly fine for
+this, also using not recursive wildcard (e.g. =*.el=) is perfectly fine for
 this.
 
-The "**" feature is active by default in the option ~helm-file-globstar~.  It
-is different from the Bash "shopt globstar" feature in that to list files with
-a named extension recursively you would write "**.el" whereas in Bash it would
-be "**/*.el".  Directory selection with "**/" like Bash "shopt globstar"
+The =**= feature is active by default in the option ~helm-file-globstar~.  It
+is different from the Bash =shopt globstar= feature in that to list files with
+a named extension recursively you would write =**.el= whereas in Bash it would
+be =**/*.el=.  Directory selection with =**/= like Bash =shopt globstar=
 option is not supported yet.
 
 Helm supports different styles of wildcards:
 
 - ‘sh’ style, the ones supported by ‘file-expand-wildcards’.
-  e.g. "*.el", "*.[ch]" which match respectively all ".el"
-  files or all ".c" and ".h" files.
+  e.g. =*.el=, =*.[ch]= which match respectively all =.el=
+  files or all =.c= and =.h= files.
 
 - ‘bash’ style (partially) In addition to what allowed in ‘sh’
   style you can specify file extensions that have more than one
-  character like this: "*.{sh,py}" which match ".sh" and
-  ".py" files.
+  character like this: =*.{sh,py}= which match =.sh= and
+  =.py= files.
 
-Of course in both styles you can specify one or two "*".
+Of course in both styles you can specify one or two =*=.
 
 *** Query replace regexp on filenames
 
@@ -1258,16 +1258,16 @@ however, are provided to make the two prompts more powerfull.
 
 In addition to simple regexps, these shortcuts are available:
 
-- Basename without extension => "%."
-- Only extension             => ".%"
-- Substring                  => "%:<from>:<to>"
-- Whole basename             => "%"
+- Basename without extension => =%.=
+- Only extension             => =.%=
+- Substring                  => =%:<from>:<to>=
+- Whole basename             => =%=
 
 **** Syntax of the second prompt
 
 In addition to a simple string to use as replacement, here is what you can use:
 
-- A placeholder refering to what you have selected in the first prompt: "\@".
+- A placeholder refering to what you have selected in the first prompt: =\@=.
 
   After this placeholder you can use a search-and-replace syntax à-la sed:
 
@@ -1275,30 +1275,30 @@ In addition to a simple string to use as replacement, here is what you can use:
 
   You can select a substring from the string represented by the placeholder:
 
-      : "\@:<from>:<to>"
+      : =\@:<from>:<to>=
 
-- A special character representing a number which is incremented: "\#".
+- A special character representing a number which is incremented: =\#=.
 
 - Shortcuts for ‘upcase’, ‘downcase’ and ‘capitalize’
   are available as‘%u’, ‘%d’ and ‘%c’ respectively.
 
 **** Examples
 
-***** Recursively rename all files with ".JPG" extension to ".jpg"
+***** Recursively rename all files with =.JPG= extension to =.jpg=
 
 Use the ~helm-file-globstar~ feature described in [[Use the wildcard to select multiple files][recursive globbing]]
-by entering "**.JPG" at the end of the Helm-find-files pattern, then hit
-{{{kbd(M-@)}}} and enter "JPG" on first prompt, then "jpg" on second prompt and hit {{{kbd(RET)}}}.
+by entering =**.JPG= at the end of the Helm-find-files pattern, then hit
+{{{kbd(M-@)}}} and enter =JPG= on first prompt, then =jpg= on second prompt and hit {{{kbd(RET)}}}.
 
-Alternatively you can enter ".%" at the first prompt, then "jpg" and hit
-{{{kbd(RET)}}}.  Note that when using this instead of using "JPG" at the first prompt,
-all extensions will be renamed to "jpg" even if the extension of one of the
-files is, say, "png".  If you want to keep the original extension you can use
-"%d" at the second prompt (downcase).
+Alternatively you can enter =.%= at the first prompt, then =jpg= and hit
+{{{kbd(RET)}}}.  Note that when using this instead of using =JPG= at the first prompt,
+all extensions will be renamed to =jpg= even if the extension of one of the
+files is, say, =png=.  If you want to keep the original extension you can use
+=%d= at the second prompt (downcase).
 
 ***** Batch-rename files from number 001 to 00x
 
-Use "\#" inside the second prompt.
+Use =\#= inside the second prompt.
 
 Example 1: To rename the files
 
@@ -1316,7 +1316,7 @@ to
     foo-003.jpg
     #+end_example
 
-use "%." as matching regexp and "foo-\#" as replacement string.
+use =%.= as matching regexp and =foo-\#= as replacement string.
 
 Example 2: To rename the files
 
@@ -1334,11 +1334,11 @@ to
     baz-003.jpg
     #+end_example
 
-use as matching regexp "%." and as replacement string "\@-\#".
+use as matching regexp =%.= and as replacement string =\@-\#=.
 
 ***** Replace a substring
 
-Use "%:<from>:<to>".
+Use =%:<from>:<to>=.
 
 Example: To rename files
 
@@ -1356,43 +1356,43 @@ to
     bAz.jpg
     #+end_example
 
-use as matching regexp "%:1:2" and as replacement string "%u" (upcase).
+use as matching regexp =%:1:2= and as replacement string =%u= (upcase).
 
-Note that you *cannot* use "%." and ".%" along with substring replacement.
+Note that you *cannot* use =%.= and =.%= along with substring replacement.
 
 ***** Modify the string from the placeholder (\@)
 
-- By substring, i.e. only using the substring of the placeholder: "\@:<from>:<to>".
+- By substring, i.e. only using the substring of the placeholder: =\@:<from>:<to>=.
   The length of placeholder is used for <to> when unspecified.
 
-  Example 1: "\@:0:2" replaces from the beginning to the second char of the placeholder.
+  Example 1: =\@:0:2= replaces from the beginning to the second char of the placeholder.
 
   Example 2: \@:2: replaces from the second char of the placeholder to the end.
 
-- By search-and-replace: "\@/<regexp>/<replacement>/".
+- By search-and-replace: =\@/<regexp>/<replacement>/=.
 
   Incremental replacement is also handled in <replacement>.
 
-  Example 3: "\@/foo/bar/" replaces "foo" by "bar" in the placeholder.
+  Example 3: =\@/foo/bar/= replaces =foo= by =bar= in the placeholder.
 
-  Example 4: "\@/foo/-\#/" replaces "foo" in the placeholder by 001, 002, etc.
+  Example 4: =\@/foo/-\#/= replaces =foo= in the placeholder by 001, 002, etc.
 
 ***** Clash in replacements (avoid overwriting files)
 
 When performing any of these replacement operations you may end up with same
 names as replacement.  In such cases Helm numbers the file that would otherwise
-overwritten.  For instance, should you remove the "-m<n>" part from the files
-"emacs-m1.txt", "emacs-m2.txt" and "emacs-m3.txt" you would end up with
-three files named "emacs.txt", the second renaming overwriting first file, and
+overwritten.  For instance, should you remove the =-m<n>= part from the files
+=emacs-m1.txt=, =emacs-m2.txt= and =emacs-m3.txt= you would end up with
+three files named =emacs.txt=, the second renaming overwriting first file, and
 the third renaming overwriting second file and so on.  Instead Helm will
-automatically rename the second and third files as "emacs(1).txt" and
-"emacs(2).txt" respectively.
+automatically rename the second and third files as =emacs(1).txt= and
+=emacs(2).txt= respectively.
 
 ***** Query-replace on filenames vs. serial-rename action
 
 Unlike the [[Serial renaming][serial rename]] actions, the files renamed with
 the query-replace action stay in their initial directory and are not moved to
-the current directory.  As such, using "\#" to serial-rename files only makes
+the current directory.  As such, using =\#= to serial-rename files only makes
 sense for files inside the same directory.  It even keeps renaming files
 with an incremental number in the next directories.
 
@@ -1416,7 +1416,7 @@ incrementally.
 You can open a dired buffer containing only marked files with {{{kbd(C-x C-q)}}}.
 With a prefix argument you can open this same dired buffer in wdired mode for
 editing.  Note that wildcards are supported as well, so you can use e.g.
-"*.txt" to select all ".txt" files in the current directory or "**.txt" to
+=*.txt= to select all =.txt= files in the current directory or =**.txt= to
 select all files recursively from the current directory.
 See [[Use the wildcard to select multiple files]] section above.
 
@@ -1466,7 +1466,7 @@ This command is mostly useful when copying large files as it is
 fast, asynchronous and provide a progress bar in mode-line.  Each
 rsync process have its own progress bar, so you can run several
 rsync jobs, they are independents.  If rsync fails you can
-consult the "*helm-rsync<n>*" buffer to see rsync errors.  An
+consult the =*helm-rsync<n>*= buffer to see rsync errors.  An
 help-echo (move mouse over progress bar) is provided to see which
 file is in transfer.  Note that when copying directories, no
 trailing slashes are added to directory names, which mean that
@@ -1482,8 +1482,8 @@ in this case you will be prompted for modifications.
 
 *Note*: When selecting a remote file, if you use the tramp syntax
 for specifying a port, i.e. host#2222, helm will add
-automatically "-e ’ssh -p 2222’" to the rsync command line
-unless you have specified yourself the "-e" option by editing
+automatically =-e ’ssh -p 2222’= to the rsync command line
+unless you have specified yourself the =-e= option by editing
 rsync command line with a prefix arg (see above).
 
 *** Bookmark the ~helm-find-files~ session
@@ -1506,8 +1506,8 @@ Otherwise you can use recursive commands like {{{kbd(M-g a)}}} or {{{kbd(M-g g)}
 that are much faster than using {{{kbd(C-s)}}} with a prefix argument.
 See ~helm-grep-ag-command~ and ~helm-grep-git-grep-command~ to set this up.
 
-You can also use "id-utils"’ GID with {{{kbd(M-g i)}}}
-by creating an ID index file with the "mkid" shell command.
+You can also use =id-utils=’ GID with {{{kbd(M-g i)}}}
+by creating an ID index file with the =mkid= shell command.
 
 All those grep commands use the symbol at point as the default pattern.
 Note that default is different from input (nothing is added to the prompt until
@@ -1524,25 +1524,25 @@ To toggle suspend-update, use {{{kbd(C-!)}}}.
 Setting up aliases in Eshell allows you to set up powerful customized commands.
 
 Your aliases for using eshell command on file should allow
-specifying one or more files, use e.g. "alias foo $1" or
-"alias foo $*", if you want your command to be asynchronous add
-at end "&", e.g. "alias foo $* &".
+specifying one or more files, use e.g. =alias foo $1= or
+=alias foo $*=, if you want your command to be asynchronous add
+at end =&=, e.g. =alias foo $* &=.
 
 Adding Eshell aliases to your ‘eshell-aliases-file’ or using the
 ‘alias’ command from Eshell allows you to create personalized
 commands not available in ~helm-find-files~ actions and use them
 from {{{kbd(M-!)}}}.
 
-Example: You want a command to uncompress some "*.tar.gz" files from ~helm-find-files~:
+Example: You want a command to uncompress some =*.tar.gz= files from ~helm-find-files~:
 
-1) Create an Eshell alias named, say, "untargz" with the command
-"alias untargz tar zxvf $*".
+1) Create an Eshell alias named, say, =untargz= with the command
+=alias untargz tar zxvf $*=.
 
-2) Now from ~helm-find-files~ select the "*.tar.gz" file (you can also
+2) Now from ~helm-find-files~ select the =*.tar.gz= file (you can also
 mark files if needed) and hit {{{kbd(M-!)}}}.
 
 *Note*: When using marked files with this, the meaning of the prefix argument is
-quite subtle.  Say you have "foo", "bar" and "baz" marked; when you run
+quite subtle.  Say you have =foo=, =bar= and =baz= marked; when you run
 the alias command ‘example’ on these files with no prefix argument it will run
 ‘example’ sequentially on each file:
 
@@ -1576,11 +1576,11 @@ see the specific info page once you hit {{{kbd(M-!)}}}.
 
 Please refer to TRAMP’s documentation for more details.
 
-- Connect to host 192.168.0.4 as user "foo":
+- Connect to host 192.168.0.4 as user =foo=:
 
   : /scp:192.168.0.4@foo:
 
-- Connect to host 192.168.0.4 as user "foo" on port 2222:
+- Connect to host 192.168.0.4 as user =foo= on port 2222:
 
   : /scp:192.168.0.4@foo#2222:
 
@@ -1609,11 +1609,11 @@ See ~helm-list-directory-function~ documentation for more infos.
 
 **** Completing host
 
-As soon as you enter the first ":" after method e.g =/scp:= you will
+As soon as you enter the first =:= after method e.g =/scp:= you will
 have some completion about previously used hosts or from your =~/.ssh/config=
 file, hitting {{{kbd(C-j)}}} or {{{kbd(right)}}} on a candidate will insert this host in minibuffer
-without addind the ending ":", second hit insert the last ":".
-As soon the last ":" is entered TRAMP will kick in and you should see the list
+without addind the ending =:=, second hit insert the last =:=.
+As soon the last =:= is entered TRAMP will kick in and you should see the list
 of candidates soon after.
 
 When connection fails, be sure to delete your TRAMP connection with M-x
@@ -1623,7 +1623,11 @@ When connection fails, be sure to delete your TRAMP connection with M-x
 
 Use the sudo method:
 
-: "/sudo:host:" or simply "/sudo::".
+: /sudo:host: 
+
+or 
+
+: simply /sudo::.
 
 *** Attach files to a mail buffer (message-mode)
 
@@ -1652,7 +1656,7 @@ When using two prefix args, files are opened in background without beeing displa
 *** Expand archives as directories in a avfs directory
 
 If you have mounted your filesystem with mountavfs,
-you can expand archives in the "~/.avfs" directory with {{{kbd(C-j)}}}.
+you can expand archives in the =~/.avfs= directory with {{{kbd(C-j)}}}.
 
 *** Tramp archive support (emacs-27+ only)
 
@@ -1671,7 +1675,7 @@ If you need to use something else, use {{{kbd(M-n)}}} and edit
 the date in minibuffer.
 It is also a way to quickly create a new file without opening a buffer, saving it
 and killing it.
-To touch more than one new file, separate you filenames with a comma (",").
+To touch more than one new file, separate you filenames with a comma (=,=).
 If one wants to create (touch) a new file with comma inside the name use a prefix arg,
 this will prevent splitting the name and create multiple files.
 
@@ -1839,7 +1843,7 @@ in current visited directory by an external command from outside Emacs.
 
 * Helm ‘generic’ read file name completion
 
-This is ‘generic’ read file name completion that have been "helmized"
+This is ‘generic’ read file name completion that have been =helmized=
 because you have enabled [[Helm mode][helm-mode]].
 Don’t confuse this with ~helm-find-files~ which is a native helm command,
 see [[Helm functions vs helmized Emacs functions]].
@@ -1867,7 +1871,7 @@ the cursor to the top instead of remaining on the previous subdir name.
 
 It starts from the third character of the pattern.
 
-For instance "fob" or "fbr" will complete "foobar" but "fb" needs a
+For instance =fob= or =fbr= will complete =foobar= but =fb= needs a
 third character in order to complete it.
 
 *** Persistent actions
@@ -1901,11 +1905,11 @@ In this case use {{{kbd(C-c <backspace>)}}}.
 **** You can create a new directory and a new file at the same time
 
 Simply write the path in prompt and press {{{kbd(RET)}}}, e.g.
-"~/new/newnew/newnewnew/my_newfile.txt".
+=~/new/newnew/newnewnew/my_newfile.txt=.
 
-**** To create a new directory, append a "/" at to the new name and press {{{kbd(RET)}}}
+**** To create a new directory, append a =/= at to the new name and press {{{kbd(RET)}}}
 
-**** To create a new file, enter a filename not ending with "/"
+**** To create a new file, enter a filename not ending with =/=
 
 File and directory creation works only with some commands (e.g. ‘find-file’)
 and it will not work with others where it is not intended to return a file or
@@ -1939,16 +1943,16 @@ It is useful when some commands are prompting continuously until you enter an em
 You can append to the search pattern any of the locate command line options,
 e.g. -b, -e, -n <number>, etc.  See the locate(1) man page for more details.
 
-Some other sources (at the moment "recentf" and "file in current directory")
+Some other sources (at the moment =recentf= and =file in current directory=)
 support the -b flag for compatibility with locate when they are used with it.
 
 When you enable fuzzy matching on locate with ~helm-locate-fuzzy-match~, the
-search will be performed on basename only for efficiency (so don’t add "-b" at
+search will be performed on basename only for efficiency (so don’t add =-b= at
 prompt).  As soon as you separate the patterns with spaces, fuzzy matching will
 be disabled and search will be done on the full filename.  Note that in
 multi-match, fuzzy is completely disabled, which means that each pattern is a
-match regexp (i.e. "helm" will match "helm" but "hlm" will *not* match
-"helm").
+match regexp (i.e. =helm= will match =helm= but =hlm= will *not* match
+=helm=).
 
 *Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:11]
 
@@ -1959,14 +1963,14 @@ the cache when files have been added/removed in the directory.
 
 *** Find command
 
-Recursively search files using the "find" shell command.
+Recursively search files using the =find= shell command.
 
 Candidates are all filenames that match all given globbing patterns.  This
 respects the options ~helm-case-fold-search~ and
 ~helm-findutils-search-full-path~.
 
-You can pass arbitrary "find" options directly after a "*" separator.
-For example, this would find all files matching "book" that are larger
+You can pass arbitrary =find= options directly after a =*= separator.
+For example, this would find all files matching =book= that are larger
 than 1 megabyte:
 
     : book * -size +1M
@@ -2000,9 +2004,9 @@ than 1 megabyte:
 
 The Fd[fn:5] command line tool is very fast to search files
 recursively.  You may have to wait several seconds at first usage when
-your hard drive cache is "cold", then once the cache is initialized
+your hard drive cache is =cold=, then once the cache is initialized
 searchs are very fast.  You can pass any Fd options[fn:12] before
-pattern, e.g. "-e py foo".
+pattern, e.g. =-e py foo=.
 
 The Fd command line can be customized with ~helm-fd-switches~ user
 variable.  Always use =--color always= as option otherwise you will
@@ -2317,10 +2321,10 @@ prompted for types (ack-grep) or for wild cards (grep).
 
 the prefix arg allows you to specify a type of file to search in.
 
-*** You can use wild cards when selecting files (e.g. "*.el")
+*** You can use wild cards when selecting files (e.g. =*.el=)
 
 Note that a way to grep specific files recursively is to use
-e.g. "**.el" to select files, the variable ~helm-file-globstar~
+e.g. =**.el= to select files, the variable ~helm-file-globstar~
 controls this (it is non nil by default), however it is much
 slower than using grep recusively (see helm-find-files
 documentation about this feature).
@@ -2328,7 +2332,7 @@ documentation about this feature).
 *** Grep hidden files
 
 You may want to customize your command line for grepping hidden
-files, for AG/RG use "--hidden", see man page
+files, for AG/RG use =--hidden=, see man page
 of your backend for more infos.
 
 *** You can grep in different directories by marking files or using wild cards
@@ -2385,7 +2389,7 @@ is much more efficient, also ‘id-utils’ seems no more maintained.
 
 Helm-GID reads the database created with the ‘mkid’ command from id-utils.
 The name of the database file can be customized with ~helm-gid-db-file-name~, it
-is usually "ID".
+is usually =ID=.
 
 Helm-GID use the symbol at point as default-input.  This command is also
 accessible from ~helm-find-files~ which allow you to navigate to another
@@ -2405,7 +2409,7 @@ Nowaday the best backend is Ripgrep aka RG, it is the fastest and
 is actively maintained, see ~helm-grep-ag-command~ and
 ~helm-grep-ag-pipe-cmd-switches~ to configure it.
 
-You can ignore files and directories with a ".agignore" file, local to a
+You can ignore files and directories with a =.agignore= file, local to a
 directory or global when placed in the home directory. (See the AG man page for
 more details.)  That file follows the same syntax as ~helm-grep-ignored-files~
 and ~helm-grep-ignored-directories~.
@@ -2502,11 +2506,11 @@ Normally the command or alias will be called with file as argument.  For instanc
 
     : <command> candidate_file
 
-But you can also pass an argument or more after "candidate_file" like this:
+But you can also pass an argument or more after =candidate_file= like this:
 
     : <command> %s [extra_args]
 
-"candidate_file" will be added at "%s" and the command will look at this:
+=candidate_file= will be added at =%s= and the command will look at this:
 
     : <command> candidate_file [extra_args]
 
@@ -2515,11 +2519,11 @@ But you can also pass an argument or more after "candidate_file" like this:
 placeholder for file without extension: \@
 placeholder for incremental number:     \#
 
-"candidate_file" will be added at "%s" and \@ but without extension.
+=candidate_file= will be added at =%s= and \@ but without extension.
 
     : <command %s \@>
 
-"candidate_file" will be added at "%s" and \# will be replaced by an incremental number.
+=candidate_file= will be added at =%s= and \# will be replaced by an incremental number.
 
     : <command> %s \#
 
@@ -2561,11 +2565,11 @@ the command is called once for each file like this:
 
 *** Run eshell commands asynchronously
 
-You can run your commands asynchronously by adding "&" at end
-of any commands, e.g. "foo %s &".  You can also directly setup
-your alias in the eshell alias file with e.g. "alias foo $1 &".
+You can run your commands asynchronously by adding =&= at end
+of any commands, e.g. =foo %s &=.  You can also directly setup
+your alias in the eshell alias file with e.g. =alias foo $1 &=.
 
-*Note*: If you use "&" in a command with marked files and your
+*Note*: If you use =&= in a command with marked files and your
 command accept many files as argument don’t forget to pass the
 prefix arg to ensure you run only one command on all marked async.
 
@@ -2603,7 +2607,7 @@ i.e. add current buffer or not to the list of buffers to search in.
 
 Multiple regexp matching is allowed, simply enter a space to separate the regexps.
 
-Matching empty lines is supported with the regexp "^$", you then get the
+Matching empty lines is supported with the regexp =^$=, you then get the
 results displayed as the buffer-name and the line number only.  You can
 save and edit these results, i.e. add text to the empty line.
 
@@ -2710,8 +2714,8 @@ Uses keymap ~helm-top-map~, which is not currently defined.
 
 *** Compile all your packages asynchronously
 
-If you use async (if you have installed Helm from MELPA you do), only "helm",
-"helm-core", and "magit" are compiled asynchronously.  If you want all your
+If you use async (if you have installed Helm from MELPA you do), only =helm=,
+=helm-core=, and =magit= are compiled asynchronously.  If you want all your
 packages compiled asynchronously, add this to your init file:
 
      (setq async-bytecomp-allowed-packages ’(all))
@@ -2728,10 +2732,10 @@ are available for upgrade or simply hit {{{kbd(C-c U)}}} to upgrade them all.
 
 To see upgradable packages hit {{{kbd(M-U)}}}.
 
-Then you can install all upgradable packages with the "upgrade all" action
+Then you can install all upgradable packages with the =upgrade all= action
 ({{{kbd(C-c C-u)}}}), or upgrade only specific packages by marking them and running the
-"upgrade" action (visible only when there are upgradable packages).  Of course
-you can upgrade a single package by just running the "upgrade" action without
+=upgrade= action (visible only when there are upgradable packages).  Of course
+you can upgrade a single package by just running the =upgrade= action without
 marking it ({{{kbd(C-c u)}}} or {{{kbd(RET)}}}) .
 
 *Warning:* You are strongly advised to *restart* Emacs after *upgrading* packages.
@@ -2740,9 +2744,9 @@ marking it ({{{kbd(C-c u)}}} or {{{kbd(RET)}}}) .
 
 (Emacs ≥25)
 
-- The flag "S" that prefixes package names means that the packages belong to ‘package-selected-packages’.
+- The flag =S= that prefixes package names means that the packages belong to ‘package-selected-packages’.
 
-- The flag "U" that prefix package names mean that this package is no more needed.
+- The flag =U= that prefix package names mean that this package is no more needed.
 
 ** Commands
 
@@ -2781,7 +2785,7 @@ started, the prefix argument apply on the next command, so if you
 hit RET, it will apply on the selected command, but if you type a
 new character at prompt to narrow down further candidates, the
 prefix arg will apply to ‘self-insert-command’ (e.g. if you type
-{{{kbd(C-u e)}}} "eeee" will be inserted in prompt) so select the
+{{{kbd(C-u e)}}} =eeee= will be inserted in prompt) so select the
 command you want to execute before specifying prefix arg.
 
 *** Completion styles in helm-M-x
@@ -2876,8 +2880,8 @@ You can concatenate marked candidates and yank them in the current
 buffer, thus creating a new entry in the kill ring.  Candidates are
 concatenated with ~helm-kill-ring-separator~ as default but you can
 change interactively the separator while yanking by using two prefix
-args.  When you have something else than "\n" as default value for
-~helm-kill-ring-separator~ and you want to use "\n" from prompt, use
+args.  When you have something else than =\n= as default value for
+~helm-kill-ring-separator~ and you want to use =\n= from prompt, use
 {{{kbd(C-q C-j)}}} to enter a newline in prompt.
 
 To not push a new entry in the kill ring, use {{{kbd(C-c TAB)}}} instead of RET
