@@ -8,7 +8,37 @@
 
 # #+texinfo: @insertcopying
 
-** Introduction
+* Table Of Contents                                                   :TOC_3:
+- [[#introduction][Introduction]]
+- [[#creating-a-helm-buffer][Creating a Helm buffer]]
+- [[#helm-attributes][Helm attributes]]
+  - [[#looking-up-helm-attributes][Looking up Helm attributes]]
+  - [[#mandatory-attributes][Mandatory attributes]]
+  - [[#optional-but-important-attributes][Optional, but important attributes]]
+  - [[#helm-keywords][~helm~ keywords]]
+    - [[#sources][~:sources~]]
+    - [[#buffer][~:buffer~]]
+    - [[#input][~:input~]]
+- [[#customizing-action-lists][Customizing Action Lists]]
+- [[#creating-a-source][Creating a Source]]
+  - [[#helm-source-sync][~helm-source-sync~]]
+  - [[#helm-source-in-buffer][~helm-source-in-buffer~]]
+  - [[#helm-source-async][~helm-source-async~]]
+  - [[#helm-source-dummy][~helm-source-dummy~]]
+  - [[#helm-source-in-file][~helm-source-in-file~]]
+  - [[#help][Help]]
+  - [[#pre-filtering-lines-in-a-buffer][Pre-filtering lines in a buffer]]
+- [[#creating-a-class][Creating a Class]]
+  - [[#create-your-own-class-inheriting-from-one-of-the-main-classes][Create your own class inheriting from one of the main classes]]
+  - [[#create-your-own-class-and-inherit-from-one-of-helm-type-classes][Create your own class and Inherit from one of helm-type classes]]
+    - [[#creating-a-new-class-using-as-parent-a-class-inheriting-itself-from-a-helm-type--class][Creating a new class using as parent a class inheriting itself from a ~helm-type-*~ class]]
+  - [[#create-your-source-from-your-own-class][Create your source from your own class]]
+  - [[#write-your-own-helm-type-class][Write your own helm-type class]]
+- [[#writing-actions][Writing actions]]
+- [[#writing-persistent-actions][Writing persistent actions]]
+- [[#footnotes][Footnotes]]
+
+* Introduction
 
 The best way to learn how to create a custom Helm command is to  read
 the source code[fn:1] and look at examples.
@@ -18,7 +48,7 @@ source file is fairly short and straightforward.
 
 That being said, we'll try to go over some basic ideas in this manual.
 
-** Creating a Helm buffer
+* Creating a Helm buffer
 
 The ~helm~ function creates a Helm buffer with candidates to select
 and/or take action on. The list of candidates is provided by one or
@@ -36,7 +66,7 @@ An example usage of ~helm~ is below:
 ~helm~ must be called with several keywords arguments, called
 *attributes*.
 
-** Helm attributes
+* Helm attributes
 
 An *attribute* determines Helm behavior.
 
@@ -48,12 +78,12 @@ describing how to build attributes, they have generally the same name
 as attributes but not always e.g the slot ~:data~ exists, but there is
 no such attribute.
 
-*** Looking up Helm attributes
+** Looking up Helm attributes
 
 To learn about /a single/ Helm attribute, use the documentation of the
 class you are using where all slots are documented.
 
-*** Mandatory attributes
+** Mandatory attributes
 
 You have to give at least a name to your source and a list of
 candidates.  The list of candidates is given with a variable
@@ -65,11 +95,11 @@ sources, for in-buffer sources you have to build a buffer using
 sources the candidates-process attribute is used which is a function
 with no arg that returns a process.
 
-*** Optional, but important attributes
+** Optional, but important attributes
 
-*** ~helm~ keywords
+** ~helm~ keywords
 
-**** ~:sources~
+*** ~:sources~
 
 Expects a source of the form:
 
@@ -84,7 +114,7 @@ that is all the ~helm-build-*~ function or the ~helm-make-source~
 function, don't use directly alists when writing sources.  See
 examples in next section.
 
-**** ~:buffer~
+*** ~:buffer~
 
 *Optional but important*.
 
@@ -95,7 +125,7 @@ The name of the buffer should be prefixed with =helm= (e.g. =*helm
 Info*=). This is not mandatory, but it is good practice. It will,
 among other things, allow Helm to automatically hide the buffer.
 
-**** ~:input~
+*** ~:input~
 
 The value for the ~:input~ keyword is used to pre-fill the input of
 the helm window.
@@ -112,7 +142,7 @@ to that word. That word will then be pre-filled in the minibuffer.
 	  :buffer "*helm my autocomplete command*"))
 #+end_src
 
-** Customizing Action Lists
+* Customizing Action Lists
 
 It's possible to change the default list of actions for various
 existing Helm commands. The actions are typically held in variables
@@ -130,7 +160,7 @@ available for the candidate under point.
 Also see ~helm-delete-action-from-source~, and
 ~helm-source-add-action-to-source-if~.
 
-** Creating a Source
+* Creating a Source
 
 Even if you can still create source with alists, helm provides
 convenient basic classes to build sources, and allow you to create
@@ -158,7 +188,7 @@ build your sources quickly, see examples below.
 
 All the different slots are documented in docstring of each classes.
 
-*** ~helm-source-sync~
+** ~helm-source-sync~
 
 Put candidates in a list
 
@@ -171,7 +201,7 @@ Put candidates in a list
 	:buffer "*helm sync source*")
 #+end_src
 
-*** ~helm-source-in-buffer~
+** ~helm-source-in-buffer~
 
 Put candidates in a buffer
 
@@ -184,7 +214,7 @@ Put candidates in a buffer
 	:buffer "*helm buffer source*")
 #+end_src
 
-*** ~helm-source-async~
+** ~helm-source-async~
 
 Get candidates asynchronously using the output of a process.
 
@@ -196,7 +226,7 @@ Get candidates asynchronously using the output of a process.
 	:buffer "*helm async source*")
 #+end_src
 
-*** ~helm-source-dummy~
+** ~helm-source-dummy~
 
 Use ~helm-pattern~ as candidate
 
@@ -211,7 +241,7 @@ Use ~helm-pattern~ as candidate
 	:buffer "*helm test*")
 #+end_src
 
-*** ~helm-source-in-file~
+** ~helm-source-in-file~
 
 Get candidates from the lines of a named file using
 ~helm-source-in-buffer~.
@@ -231,14 +261,14 @@ Get candidates from the lines of a named file using
 
 #+end_src
 
-*** Help
+** Help
 
 To give a specific help to your Helm source, create a variable
 ~helm-<my-source>-help-string~ and bind it in your source with the
 ~helm-message~ slot. It will then appear when you use {{{kbd(C-h m)}}} or
 {{{kbd(C-c ?=)}}}.
 
-*** Pre-filtering lines in a buffer
+** Pre-filtering lines in a buffer
 
 Here's an example of an in-buffer source that pre-filters lines to
 those matching a certain regular expression.  Then the pre-filtered
@@ -280,9 +310,9 @@ And it could be also written using the =:data= slot:
 	  :buffer "*helm hl-todo*"))
 #+end_src
 
-** Creating a Class
+* Creating a Class
 
-*** Create your own class inheriting from one of the main classes
+** Create your own class inheriting from one of the main classes
 
 #+begin_src emacs-lisp
   (defclass my-helm-class (helm-source-sync)
@@ -302,7 +332,7 @@ This is same as creating your source with:
 
 #+end_src
 
-*** Create your own class and Inherit from one of helm-type classes
+** Create your own class and Inherit from one of helm-type classes
 
 Here an example from a helm user that store a list of favorite files
 in a file =~/.fav= to retrieve them quickly:
@@ -316,7 +346,7 @@ in a file =~/.fav= to retrieve them quickly:
 
 #+end_src
 
-**** Creating a new class using as parent a class inheriting itself from a ~helm-type-*~ class
+*** Creating a new class using as parent a class inheriting itself from a ~helm-type-*~ class
 
 Sometimes, you may want to inherit from a class using itself a
 ~helm-type-*~ class but with one or more attributes of this class
@@ -363,7 +393,7 @@ the actions predefined by helm-type-file:
    should see the new action you have added in second position to the
    other file action.
 
-*** Create your source from your own class
+** Create your source from your own class
 
 Once your class is created, you have to use ~helm-make-source~ to
 build your source.
@@ -372,7 +402,7 @@ build your source.
   (helm-make-source "test" 'my-class :action 'foo [...other slots])
 #+end_src
 
-*** Write your own helm-type class
+** Write your own helm-type class
 
 You will find several examples in the =helm-types.el=[fn:3] file.
 
@@ -382,7 +412,7 @@ one which is a before method, use for this the slots ~:primary~ and
 ~:before~ of ~defmethod~. This allows you to override different slots
 of the inheriting type class in your new class.
 
-** Writing actions
+* Writing actions
 
 Actions are specified in the ~:action~ slot of your class, it is an
 alist composed of (ACTION_NAME . FUNCTION), it can be also a symbol
@@ -410,7 +440,7 @@ actions easily, it allow also to create actions with condition, e.g
 		     'bar)
 #+end_src
 
-** Writing persistent actions
+* Writing persistent actions
 
 The way to specify persistent-action is to use the slot
 ~:persistent-action~ to specify the function Helm will run when using
@@ -437,9 +467,9 @@ bound to keys other than {{{kbd(C-j)}}} or {{{kbd(C-z)}}}.
 Then you bind your new persistent action to something else than
 {{{kbd(C-j)}}} or {{{kbd(C-z)}}}.
 
-** COMMENT Conventions
+* COMMENT Conventions
 
-*** TODO Class names
+** TODO Class names
 
 Class names are currently a mess. Need to come up with a better
 convention.
@@ -461,3 +491,5 @@ convention.
 [fn:2] https://github.com/emacs-helm/helm/blob/master/helm-info.el
 
 [fn:3] https://github.com/emacs-helm/helm/blob/master/helm-types.el
+
+#+EXCLUDE_TAGS: TOC_3

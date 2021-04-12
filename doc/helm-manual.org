@@ -6,6 +6,229 @@
 
 # #+texinfo: @insertcopying
 
+* Table Of Contents                                                     :TOC_4:
+- [[#helm-generic-help][Helm Generic Help]]
+  - [[#basics][Basics]]
+  - [[#helm-sources][Helm sources]]
+    - [[#configure-sources][Configure sources]]
+  - [[#modify-keybindings-in-helm][Modify keybindings in Helm]]
+  - [[#matching-in-helm][Matching in Helm]]
+    - [[#completion-styles][Completion-styles]]
+  - [[#helm-mode][Helm mode]]
+    - [[#what-gets-or-does-not-get-helmized-when-helm-mode-is-enabled][What gets or does not get =helmized= when ~helm-mode~ is enabled?]]
+    - [[#helm-functions-vs-helmized-emacs-functions][Helm functions vs helmized Emacs functions]]
+    - [[#completion-behavior-with-helm-and-completion-at-point][Completion behavior with Helm and completion-at-point]]
+  - [[#helm-help][Helm help]]
+  - [[#customize-helm][Customize Helm]]
+  - [[#display-helm-in-windows-and-frames][Display Helm in windows and frames]]
+  - [[#helms-basic-operations-and-default-key-bindings][Helm’s basic operations and default key bindings]]
+  - [[#the-actions-menu][The actions menu]]
+  - [[#action-transformers][Action transformers]]
+  - [[#shortcuts-for-n-th-first-actions][Shortcuts for n-th first actions]]
+  - [[#shortcuts-for-executing-the-default-action-on-the-n-th-candidate][Shortcuts for executing the default action on the n-th candidate]]
+  - [[#mouse-control-in-helm][Mouse control in Helm]]
+  - [[#marked-candidates][Marked candidates]]
+  - [[#follow-candidates][Follow candidates]]
+  - [[#frequently-used-commands][Frequently Used Commands]]
+  - [[#special-yes-no-or-yes-for-all-answers][Special yes, no or yes for all answers]]
+  - [[#moving-in-helm-buffer][Moving in ~helm-buffer~]]
+  - [[#resume-previous-session-from-current-helm-session][Resume previous session from current Helm session]]
+  - [[#global-commands][Global commands]]
+    - [[#resume-helm-session-from-outside-helm][Resume Helm session from outside Helm]]
+  - [[#debugging-helm][Debugging Helm]]
+  - [[#writing-your-own-helm-sources][Writing your own Helm sources]]
+  - [[#helm-map][Helm Map]]
+- [[#helm-buffer][Helm Buffer]]
+  - [[#tips][Tips]]
+    - [[#completion][Completion]]
+      - [[#major-mode][Major-mode]]
+      - [[#search-inside-buffers][Search inside buffers]]
+      - [[#search-by-directory-name][Search by directory name]]
+      - [[#fuzzy-matching][Fuzzy matching]]
+      - [[#examples][Examples]]
+    - [[#creating-buffers][Creating buffers]]
+    - [[#killing-buffers][Killing buffers]]
+    - [[#switching-to-buffers][Switching to buffers]]
+    - [[#saving-buffers][Saving buffers]]
+    - [[#meaning-of-colors-and-prefixes-for-buffers][Meaning of colors and prefixes for buffers]]
+  - [[#commands][Commands]]
+- [[#helm-find-files][Helm Find Files]]
+  - [[#tips-1][Tips]]
+    - [[#navigation-summary][Navigation summary]]
+      - [[#navigate-with-arrow-keys][Navigate with arrow keys]]
+      - [[#use-kbdc-j-persistent-action-on-a-directory-to-go-down-one-level][Use {{{kbd(C-j)}}} (persistent action) on a directory to go down one level]]
+      - [[#use-kbdc-l-or-kbddel-on-a-directory-to-go-up-one-level][Use {{{kbd(C-l)}}} or {{{kbd(DEL)}}} on a directory to go up one level]]
+      - [[#use-kbdc-r-to-walk-back-the-resulting-tree-of-all-the-kbdc-l-or-del-you-did][Use {{{kbd(C-r)}}} to walk back the resulting tree of all the {{{kbd(C-l)}}} or DEL you did]]
+      - [[#kbdret-behavior][{{{kbd(RET)}}} behavior]]
+      - [[#kbdtab-behavior][{{{kbd(TAB)}}} behavior]]
+    - [[#filter-out-files-or-directories][Filter out files or directories]]
+    - [[#sort-directory-contents][Sort directory contents]]
+    - [[#find-file-at-point][Find file at point]]
+      - [[#find-file-at-line-number][Find file at line number]]
+      - [[#find-url-at-point][Find URL at point]]
+      - [[#find-e-mail-address-at-point][Find e-mail address at point]]
+    - [[#quick-pattern-expansion][Quick pattern expansion]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-home-directory][Enter =~/= at end of pattern to quickly reach home directory]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-the-file-system-root][Enter =/= at end of pattern to quickly reach the file system root]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-default-directory][Enter =./= at end of pattern to quickly reach ~default-directory~]]
+      - [[#enter--at-end-of-pattern-will-reach-upper-directory-moving-cursor-to-the-top][Enter =../= at end of pattern will reach upper directory, moving cursor to the top]]
+      - [[#enter-name-at-end-of-pattern-to-start-a-recursive-search][Enter =..name/= at end of pattern to start a recursive search]]
+      - [[#any-environment-variable-eg-home-at-end-of-pattern-gets-expanded][Any environment variable (e.g. =$HOME=) at end of pattern gets expanded]]
+      - [[#any-valid-filename-yanked-after-pattern-gets-expanded][Any valid filename yanked after pattern gets expanded]]
+      - [[#special-case-url-at-point][Special case: URL at point]]
+    - [[#helm-find-files-supports-fuzzy-matching][Helm-find-files supports fuzzy matching]]
+    - [[#kbdc-j-on-a-filename-expands-to-that-filename-in-the-helm-buffer][{{{kbd(C-j)}}} on a filename expands to that filename in the Helm buffer]]
+    - [[#browse-images-directories-with-helm-follow-mode-and-navigate-updown][Browse images directories with ~helm-follow-mode~ and navigate up/down]]
+    - [[#open-files-externally][Open files externally]]
+    - [[#toggle-auto-completion][Toggle auto-completion]]
+    - [[#you-can-create-a-new-directory-and-a-new-file-at-the-same-time][You can create a new directory and a new file at the same time]]
+    - [[#to-create-a-new-directory-append-a--to-the-new-name-and-press-kbdret][To create a new directory, append a =/= to the new name and press {{{kbd(RET)}}}]]
+    - [[#to-create-a-new-file-enter-a-filename-not-ending-with-][To create a new file, enter a filename not ending with =/=]]
+    - [[#recursive-search-from-helm-find-files][Recursive search from Helm-find-files]]
+      - [[#you-can-use-helm-browse-project-see-binding-below][You can use helm-browse-project (see binding below)]]
+      - [[#you-can-start-a-recursive-search-with-locate-find-or-fdfn5][You can start a recursive search with =locate=, =find= or =Fd=[fn:5]]]
+      - [[#recursive-completion-on-subdirectories][Recursive completion on subdirectories]]
+    - [[#insert-filename-at-point-or-complete-filename-at-point][Insert filename at point or complete filename at point]]
+    - [[#use-the-wildcard-to-select-multiple-files][Use the wildcard to select multiple files]]
+    - [[#query-replace-regexp-on-filenames][Query replace regexp on filenames]]
+      - [[#syntax-of-the-first-prompt][Syntax of the first prompt]]
+      - [[#syntax-of-the-second-prompt][Syntax of the second prompt]]
+      - [[#examples-1][Examples]]
+    - [[#serial-renaming][Serial renaming]]
+    - [[#edit-marked-files-in-a-dired-buffer][Edit marked files in a dired buffer]]
+    - [[#defining-default-target-directory-for-copying-renaming-etc][Defining default target directory for copying, renaming, etc]]
+    - [[#copyingrenaming-from-or-to-remote-directories][Copying/Renaming from or to remote directories]]
+    - [[#copying-and-renaming-asynchronously][Copying and renaming asynchronously]]
+    - [[#use-rsync-to-copy-files][Use Rsync to copy files]]
+    - [[#bookmark-the-helm-find-files-session][Bookmark the ~helm-find-files~ session]]
+    - [[#grep-files-from-helm-find-files][Grep files from ~helm-find-files~]]
+      - [[#grepping-on-remote-files][Grepping on remote files]]
+    - [[#execute-eshell-commands-on-files][Execute Eshell commands on files]]
+    - [[#using-tramp-with-helm-find-files-to-read-remote-directories][Using TRAMP with ~helm-find-files~ to read remote directories]]
+      - [[#a-tramp-syntax-crash-course][A TRAMP syntax crash course]]
+      - [[#display-color-for-directories-symlinks-etc-with-tramp][Display color for directories, symlinks etc... with tramp]]
+      - [[#completing-host][Completing host]]
+      - [[#editing-local-files-as-root][Editing local files as root]]
+    - [[#attach-files-to-a-mail-buffer-message-mode][Attach files to a mail buffer (message-mode)]]
+    - [[#open-files-in-separate-windows][Open files in separate windows]]
+    - [[#expand-archives-as-directories-in-a-avfs-directory][Expand archives as directories in a avfs directory]]
+    - [[#tramp-archive-support-emacs-27-only][Tramp archive support (emacs-27+ only)]]
+    - [[#touch-files][Touch files]]
+    - [[#delete-files][Delete files]]
+      - [[#trashing-files][Trashing files]]
+    - [[#checksum-file][Checksum file]]
+    - [[#ignored-or-boring-files][Ignored or boring files]]
+    - [[#helm-find-files-is-using-a-cache][Helm-find-files is using a cache]]
+  - [[#commands-1][Commands]]
+- [[#helm-generic-read-file-name-completion][Helm ‘generic’ read file name completion]]
+  - [[#tips-2][Tips]]
+    - [[#navigation][Navigation]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-home-directory-1][Enter =~/= at end of pattern to quickly reach home directory]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-the-file-system-root-1][Enter =/= at end of pattern to quickly reach the file system root]]
+      - [[#enter--at-end-of-pattern-to-quickly-reach-default-directory-1][Enter =./= at end of pattern to quickly reach ~default-directory~]]
+      - [[#enter--at-end-of-pattern-will-reach-upper-directory-moving-cursor-on-top][Enter =../= at end of pattern will reach upper directory, moving cursor on top]]
+      - [[#you-can-complete-with-partial-basename][You can complete with partial basename]]
+    - [[#persistent-actions][Persistent actions]]
+      - [[#use-kbdc-u-c-j-to-display-an-image][Use {{{kbd(C-u C-j)}}} to display an image]]
+      - [[#kbdc-j-on-a-filename-will-expand-to-this-filename-in-helm-buffer][{{{kbd(C-j)}}} on a filename will expand to this filename in Helm-buffer]]
+      - [[#browse-images-directories-with-helm-follow-mode-and-navigate-updown-1][Browse images directories with ~helm-follow-mode~ and navigate up/down]]
+    - [[#delete-characters-backward][Delete characters backward]]
+    - [[#create-new-directories-and-files][Create new directories and files]]
+      - [[#you-can-create-a-new-directory-and-a-new-file-at-the-same-time-1][You can create a new directory and a new file at the same time]]
+      - [[#to-create-a-new-directory-append-a--at-to-the-new-name-and-press-kbdret][To create a new directory, append a =/= at to the new name and press {{{kbd(RET)}}}]]
+      - [[#to-create-a-new-file-enter-a-filename-not-ending-with--1][To create a new file, enter a filename not ending with =/=]]
+    - [[#exiting-minibuffer-with-empty-string][Exiting minibuffer with empty string]]
+  - [[#commands-2][Commands]]
+- [[#helm-generic-files][Helm Generic files]]
+  - [[#tips-3][Tips]]
+    - [[#locate][Locate]]
+    - [[#browse-project][Browse project]]
+    - [[#find-command][Find command]]
+  - [[#commands-3][Commands]]
+- [[#helm-fd][Helm fd]]
+  - [[#tips-4][Tips]]
+  - [[#commands-4][Commands]]
+- [[#helm-grep][Helm Grep]]
+  - [[#tips-5][Tips]]
+    - [[#meaning-of-the-prefix-argument][Meaning of the prefix argument]]
+      - [[#with-grep-or-ack-grep][With grep or ack-grep]]
+      - [[#with-ag-or-rg][With AG or RG]]
+    - [[#you-can-use-wild-cards-when-selecting-files-eg-el][You can use wild cards when selecting files (e.g. =*.el=)]]
+    - [[#grep-hidden-files][Grep hidden files]]
+    - [[#you-can-grep-in-different-directories-by-marking-files-or-using-wild-cards][You can grep in different directories by marking files or using wild cards]]
+    - [[#you-can-save-the-result-in-a-helm-grep-mode-buffer][You can save the result in a ~helm-grep-mode~ buffer]]
+    - [[#helm-grep-supports-multi-matching][Helm-grep supports multi-matching]]
+    - [[#see-full-path-of-selected-candidate][See full path of selected candidate]]
+    - [[#open-file-in-other-window][Open file in other window]]
+    - [[#performance-over-tramp][Performance over TRAMP]]
+- [[#helm-gid][Helm GID]]
+  - [[#tips-6][Tips]]
+- [[#helm-ag][Helm AG]]
+  - [[#tips-7][Tips]]
+- [[#helm-git-grep][Helm git-grep]]
+  - [[#commands-5][Commands]]
+- [[#helm-pdfgrep-map][Helm PDFgrep Map]]
+  - [[#commands-6][Commands]]
+- [[#helm-etags-map][Helm Etags Map]]
+  - [[#commands-7][Commands]]
+- [[#helm-ucs][Helm UCS]]
+  - [[#tips-8][Tips]]
+  - [[#commands-8][Commands]]
+- [[#helm-bookmark-name][Helm bookmark name]]
+  - [[#commands-9][Commands]]
+- [[#helm-eshell-on-file][Helm Eshell on file]]
+  - [[#tips-9][Tips]]
+    - [[#pass-extra-arguments-after-filename][Pass extra arguments after filename]]
+      - [[#use-placeholders-in-extra-arguments][Use placeholders in extra arguments]]
+    - [[#specify-marked-files-as-arguments][Specify marked files as arguments]]
+    - [[#run-eshell-commands-asynchronously][Run eshell commands asynchronously]]
+  - [[#commands-10][Commands]]
+- [[#helm-ido-virtual-buffers][Helm Ido virtual buffers]]
+  - [[#commands-11][Commands]]
+- [[#helm-moccur][Helm Moccur]]
+  - [[#tips-10][Tips]]
+    - [[#searching-in-many-buffers][Searching in many buffers]]
+    - [[#matching][Matching]]
+    - [[#automatically-match-symbol-at-point][Automatically match symbol at point]]
+    - [[#yank-word-at-point-in-minibuffer][Yank word at point in minibuffer]]
+    - [[#preselection][Preselection]]
+    - [[#jump-to-the-corresponding-line-in-the-searched-buffer][Jump to the corresponding line in the searched buffer]]
+    - [[#switch-to-buffer-in-other-window][Switch to buffer in other window]]
+    - [[#save-the-results][Save the results]]
+    - [[#refresh-the-resumed-session][Refresh the resumed session]]
+    - [[#refresh-a-saved-buffer][Refresh a saved buffer]]
+    - [[#edit-a-saved-buffer][Edit a saved buffer]]
+    - [[#search-in-region][Search in region]]
+    - [[#switch-to-next-or-previous-source][Switch to next or previous source]]
+  - [[#commands-12][Commands]]
+- [[#helm-top][Helm Top]]
+  - [[#commands-13][Commands]]
+- [[#helm-elisp-package][Helm Elisp package]]
+  - [[#tips-11][Tips]]
+    - [[#compile-all-your-packages-asynchronously][Compile all your packages asynchronously]]
+    - [[#upgrade-elisp-packages][Upgrade Elisp packages]]
+    - [[#meaning-of-flags-prefixing-packages][Meaning of flags prefixing packages]]
+  - [[#commands-14][Commands]]
+- [[#helm-m-x][Helm M-x]]
+  - [[#tips-12][Tips]]
+    - [[#you-can-get-help-on-any-command-with-persistent-action-c-j][You can get help on any command with persistent action (C-j)]]
+    - [[#prefix-arguments][Prefix arguments]]
+    - [[#completion-styles-in-kbdhelm-m-x][Completion styles in {{{kbd(helm-M-x)}}}]]
+    - [[#duplicate-entries-in-helm-m-x-history][Duplicate entries in helm-M-x history]]
+- [[#helm-imenu][Helm Imenu]]
+  - [[#commands-15][Commands]]
+- [[#helm-colors][Helm colors]]
+  - [[#commands-16][Commands]]
+- [[#helm-semantic][Helm Semantic]]
+  - [[#commands-17][Commands]]
+- [[#helm-kmacro][Helm kmacro]]
+  - [[#tips-13][Tips]]
+  - [[#commands-18][Commands]]
+- [[#helm-kill-ring][Helm kill ring]]
+  - [[#tips-14][Tips]]
+  - [[#commands-19][Commands]]
+- [[#footnotes][Footnotes]]
+
 * Helm Generic Help
 ** Basics
 
@@ -110,10 +333,10 @@ match everything but this.
 
 *** Completion-styles
 
-Helm generally fetches its candidates with the :candidates
+Helm generally fetches its candidates with the ~:candidates~
 function up to ~helm-candidate-number-limit~ and then applies
 match functions to these candidates according to ~helm-pattern~.
-But Helm allows matching candidates directly from the :candidates
+But Helm allows matching candidates directly from the ~:candidates~
 function using its own ~completion-styles~.
 Helm provides ’helm completion style but also ’helm-flex
 completion style for Emacs<27 that don’t have ’flex completion
@@ -124,7 +347,7 @@ By default, like in Emacs vanilla, all completion commands (e.g.,
 ~completing-read~ use ~completion-styles~.
 Some Helm native commands like ~helm-M-x~ do use
 ~completion-styles~.  Any Helm sources can use ~completion-styles~
-by using :match-dynamic slot and building their :candidates
+by using ~:match-dynamic~ slot and building their ~:candidates~
 function with ~helm-dynamic-completion~.
 
 Example:
@@ -164,7 +387,7 @@ doesn’t obey ~helm-completion-style~ and
 ~helm-completion-syles-alist~ (e.g., ~helm-M-x~).
 
 Also for a better control of styles in native Helm sources (not
-helmized by helm-mode) using :match-dynamic,
+helmized by helm-mode) using ~:match-dynamic~,
 ~helm-dynamic-completion~ provides a STYLES argument that allows
 specifying explicitely styles for this source.
 
@@ -557,7 +780,7 @@ directory.
 ** Writing your own Helm sources
 
 Writing simple sources for your own usage is easy.  When calling
-the ~helm~ function, the sources are added the :sources slot
+the ~helm~ function, the sources are added the ~:sources~ slot
 which can be a symbol or a list of sources.  Sources can be built
 with different EIEIO classes depending on what you want to do.  To
 simplify this, several ~helm-build-*~ macros are provided.  Below
@@ -585,137 +808,132 @@ there are simple examples to start with.
 
 ** Helm Map
 
-#+begin_example
-key             binding
----             -------
-
-C-@		helm-toggle-visible-mark
-C-c		Prefix Command
-C-g		helm-keyboard-quit
-C-h		Prefix Command
-TAB		helm-select-action
-C-j		helm-execute-persistent-action
-C-k		helm-delete-minibuffer-contents
-C-l		helm-recenter-top-bottom-other-window
-RET		helm-maybe-exit-minibuffer
-C-n		helm-next-line
-C-o		helm-next-source
-C-p		helm-previous-line
-C-t		helm-toggle-resplit-and-swap-windows
-C-v		helm-next-page
-C-w		??
-C-x		Prefix Command
-ESC		Prefix Command
-C-SPC		helm-toggle-visible-mark-forward
-C-!		helm-toggle-suspend-update
-C-{		helm-enlarge-window
-C-}		helm-narrow-window
-C-M-<down>	helm-scroll-other-window
-C-M-<up>	helm-scroll-other-window-down
-C-<down>	helm-follow-action-forward
-C-<up>		helm-follow-action-backward
-M-<next>	helm-scroll-other-window
-M-<prior>	helm-scroll-other-window-down
-<XF86Back>	previous-history-element
-<XF86Forward>	next-history-element
-<down>		helm-next-line
-<f1>		??
-<f2>		??
-<f3>		??
-<f4>		??
-<f5>		??
-<f6>		??
-<f7>		??
-<f8>		??
-<f9>		??
-<f10>		??
-<f11>		??
-<f12>		??
-<f13>		??
-<help>		Prefix Command
-<left>		helm-previous-source
-<next>		helm-next-page
-<prior>		helm-previous-page
-<right>		helm-next-source
-<tab>		helm-execute-persistent-action
-<up>		helm-previous-line
-
-<help> m	helm-help
-
-C-h C-d		helm-enable-or-switch-to-debug
-C-h c		helm-customize-group
-C-h m		helm-help
-
-C-c C-f		helm-follow-mode
-C-c TAB		helm-copy-to-buffer
-C-c C-k		helm-kill-selection-and-quit
-C-c C-u		helm-refresh
-C-c C-y		helm-yank-selection
-C-c %		helm-exchange-minibuffer-and-header-line
-C-c -		helm-swap-windows
-C-c 1		helm-execute-selection-action-at-nth-+1
-C-c 2		helm-execute-selection-action-at-nth-+2
-C-c 3		helm-execute-selection-action-at-nth-+3
-C-c 4		helm-execute-selection-action-at-nth-+4
-C-c 5		helm-execute-selection-action-at-nth-+5
-C-c 6		helm-execute-selection-action-at-nth-+6
-C-c 7		helm-execute-selection-action-at-nth-+7
-C-c 8		helm-execute-selection-action-at-nth-+8
-C-c 9		helm-execute-selection-action-at-nth-+9
-C-c >		helm-toggle-truncate-line
-C-c ?		helm-help
-C-c _		helm-toggle-full-frame
-C-c l		helm-display-line-numbers-mode
-C-c n		??
-
-C-x C-b		helm-resume-list-buffers-after-quit
-C-x C-f		helm-quit-and-find-file
-C-x 1		helm-execute-selection-action-at-nth-+1
-C-x 2		helm-execute-selection-action-at-nth-+2
-C-x 3		helm-execute-selection-action-at-nth-+3
-C-x 4		helm-execute-selection-action-at-nth-+4
-C-x 5		helm-execute-selection-action-at-nth-+5
-C-x 6		helm-execute-selection-action-at-nth-+6
-C-x 7		helm-execute-selection-action-at-nth-+7
-C-x 8		helm-execute-selection-action-at-nth-+8
-C-x 9		helm-execute-selection-action-at-nth-+9
-C-x b		helm-resume-previous-session-after-quit
-
-C-M-a		helm-show-all-candidates-in-source
-C-M-e		helm-display-all-sources
-C-M-l		helm-reposition-window-other-window
-C-M-v		helm-scroll-other-window
-C-M-y		helm-scroll-other-window-down
-M-SPC		helm-toggle-visible-mark-backward
-M-(		helm-prev-visible-mark
-M-)		helm-next-visible-mark
-M-<		helm-beginning-of-buffer
-M->		helm-end-of-buffer
-M-U		helm-unmark-all
-M-a		helm-mark-all
-M-g		Prefix Command
-M-m		helm-toggle-all-marks
-M-n		next-history-element
-M-o		helm-previous-source
-M-p		previous-history-element
-M-v		helm-previous-page
-C-M-S-v		helm-scroll-other-window-down
-
-M-g ESC		Prefix Command
-
-M-<		minibuffer-beginning-of-buffer
-  (this binding is currently shadowed)
-M-g		Prefix Command
-M-r		previous-matching-history-element
-M-s		next-matching-history-element
-  (this binding is currently shadowed)
-
-M-g ESC		Prefix Command
-
-M-g M-c		helm-comint-input-ring
-
-M-g M-h		helm-minibuffer-history
-#+end_example
+| *Key*         | *Binding*                                | *Comments*                           |
+|---------------+------------------------------------------+--------------------------------------|
+| C-@           | helm-toggle-visible-mark                 |                                      |
+| C-c           | Prefix Command                           |                                      |
+| C-g           | helm-keyboard-quit                       |                                      |
+| C-h           | Prefix Command                           |                                      |
+| TAB           | helm-select-action                       |                                      |
+| C-j           | helm-execute-persistent-action           |                                      |
+| C-k           | helm-delete-minibuffer-contents          |                                      |
+| C-l           | helm-recenter-top-bottom-other-window    |                                      |
+| RET           | helm-maybe-exit-minibuffer               |                                      |
+| C-n           | helm-next-line                           |                                      |
+| C-o           | helm-next-source                         |                                      |
+| C-p           | helm-previous-line                       |                                      |
+| C-t           | helm-toggle-resplit-and-swap-windows     |                                      |
+| C-v           | helm-next-page                           |                                      |
+| C-w           | ??                                       |                                      |
+| C-x           | Prefix Command                           |                                      |
+| ESC           | Prefix Command                           |                                      |
+| C-SPC         | helm-toggle-visible-mark-forward         |                                      |
+| C-!           | helm-toggle-suspend-update               |                                      |
+| C-{           | helm-enlarge-window                      |                                      |
+| C-}           | helm-narrow-window                       |                                      |
+| C-M-<down>    | helm-scroll-other-window                 |                                      |
+| C-M-<up>      | helm-scroll-other-window-down            |                                      |
+| C-<down>      | helm-follow-action-forward               |                                      |
+| C-<up>        | helm-follow-action-backward              |                                      |
+| M-<next>      | helm-scroll-other-window                 |                                      |
+| M-<prior>     | helm-scroll-other-window-down            |                                      |
+| <XF86Back>    | previous-history-element                 |                                      |
+| <XF86Forward> | next-history-element                     |                                      |
+| <down>        | helm-next-line                           |                                      |
+| <f1>          | ??                                       |                                      |
+| <f2>          | ??                                       |                                      |
+| <f3>          | ??                                       |                                      |
+| <f4>          | ??                                       |                                      |
+| <f5>          | ??                                       |                                      |
+| <f6>          | ??                                       |                                      |
+| <f7>          | ??                                       |                                      |
+| <f8>          | ??                                       |                                      |
+| <f9>          | ??                                       |                                      |
+| <f10>         | ??                                       |                                      |
+| <f11>         | ??                                       |                                      |
+| <f12>         | ??                                       |                                      |
+| <f13>         | ??                                       |                                      |
+| <help>        | Prefix Command                           |                                      |
+| <left>        | helm-previous-source                     |                                      |
+| <next>        | helm-next-page                           |                                      |
+| <prior>       | helm-previous-page                       |                                      |
+| <right>       | helm-next-source                         |                                      |
+| <tab>         | helm-execute-persistent-action           |                                      |
+| <up>          | helm-previous-line                       |                                      |
+|               |                                          |                                      |
+| <help> m      | helm-help                                |                                      |
+|               |                                          |                                      |
+| C-h C-d       | helm-enable-or-switch-to-debug           |                                      |
+| C-h c         | helm-customize-group                     |                                      |
+| C-h m         | helm-help                                |                                      |
+|               |                                          |                                      |
+| C-c C-f       | helm-follow-mode                         |                                      |
+| C-c TAB       | helm-copy-to-buffer                      |                                      |
+| C-c C-k       | helm-kill-selection-and-quit             |                                      |
+| C-c C-u       | helm-refresh                             |                                      |
+| C-c C-y       | helm-yank-selection                      |                                      |
+| C-c %         | helm-exchange-minibuffer-and-header-line |                                      |
+| C-c -         | helm-swap-windows                        |                                      |
+| C-c 1         | helm-execute-selection-action-at-nth-+1  |                                      |
+| C-c 2         | helm-execute-selection-action-at-nth-+2  |                                      |
+| C-c 3         | helm-execute-selection-action-at-nth-+3  |                                      |
+| C-c 4         | helm-execute-selection-action-at-nth-+4  |                                      |
+| C-c 5         | helm-execute-selection-action-at-nth-+5  |                                      |
+| C-c 6         | helm-execute-selection-action-at-nth-+6  |                                      |
+| C-c 7         | helm-execute-selection-action-at-nth-+7  |                                      |
+| C-c 8         | helm-execute-selection-action-at-nth-+8  |                                      |
+| C-c 9         | helm-execute-selection-action-at-nth-+9  |                                      |
+| C-c >         | helm-toggle-truncate-line                |                                      |
+| C-c ?         | helm-help                                |                                      |
+| C-c _         | helm-toggle-full-frame                   |                                      |
+| C-c l         | helm-display-line-numbers-mode           |                                      |
+| C-c n         | ??                                       |                                      |
+|               |                                          |                                      |
+| C-x C-b       | helm-resume-list-buffers-after-quit      |                                      |
+| C-x C-f       | helm-quit-and-find-file                  |                                      |
+| C-x 1         | helm-execute-selection-action-at-nth-+1  |                                      |
+| C-x 2         | helm-execute-selection-action-at-nth-+2  |                                      |
+| C-x 3         | helm-execute-selection-action-at-nth-+3  |                                      |
+| C-x 4         | helm-execute-selection-action-at-nth-+4  |                                      |
+| C-x 5         | helm-execute-selection-action-at-nth-+5  |                                      |
+| C-x 6         | helm-execute-selection-action-at-nth-+6  |                                      |
+| C-x 7         | helm-execute-selection-action-at-nth-+7  |                                      |
+| C-x 8         | helm-execute-selection-action-at-nth-+8  |                                      |
+| C-x 9         | helm-execute-selection-action-at-nth-+9  |                                      |
+| C-x b         | helm-resume-previous-session-after-quit  |                                      |
+|               |                                          |                                      |
+| C-M-a         | helm-show-all-candidates-in-source       |                                      |
+| C-M-e         | helm-display-all-sources                 |                                      |
+| C-M-l         | helm-reposition-window-other-window      |                                      |
+| C-M-v         | helm-scroll-other-window                 |                                      |
+| C-M-y         | helm-scroll-other-window-down            |                                      |
+| M-SPC         | helm-toggle-visible-mark-backward        |                                      |
+| M-(           | helm-prev-visible-mark                   |                                      |
+| M-)           | helm-next-visible-mark                   |                                      |
+| M-<           | helm-beginning-of-buffer                 |                                      |
+| M->           | helm-end-of-buffer                       |                                      |
+| M-U           | helm-unmark-all                          |                                      |
+| M-a           | helm-mark-all                            |                                      |
+| M-g           | Prefix Command                           |                                      |
+| M-m           | helm-toggle-all-marks                    |                                      |
+| M-n           | next-history-element                     |                                      |
+| M-o           | helm-previous-source                     |                                      |
+| M-p           | previous-history-element                 |                                      |
+| M-v           | helm-previous-page                       |                                      |
+| C-M-S-v       | helm-scroll-other-window-down            |                                      |
+|               |                                          |                                      |
+| M-g ESC       | Prefix Command                           |                                      |
+|               |                                          |                                      |
+| M-<           | minibuffer-beginning-of-buffer           | (this binding is currently shadowed) |
+| M-g           | Prefix Command                           |                                      |
+| M-r           | previous-matching-history-element        |                                      |
+| M-s           | next-matching-history-element            | (this binding is currently shadowed) |
+|               |                                          |                                      |
+| M-g ESC       | Prefix Command                           |                                      |
+|               |                                          |                                      |
+| M-g M-c       | helm-comint-input-ring                   |                                      |
+|               |                                          |                                      |
+| M-g M-h       | helm-minibuffer-history                  |                                      |
 
 * Helm Buffer
 
@@ -2958,3 +3176,5 @@ numbers are not displayed.  They are just useless in this case.
 [fn:17] https://github.com/mhayashi1120/Emacs-wgrep
 
 [fn:18] https://github.com/victorhge/iedit
+
+#+EXCLUDE_TAGS: TOC_4
