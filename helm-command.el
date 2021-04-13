@@ -245,7 +245,8 @@ default to `extended-command-history'."
                                     (or history extended-command-history)
                                     (lambda (str) (funcall pred (intern-soft str)))
                                     nil 'nosort t)
-                         (lambda () (helm-comp-read-get-candidates collection pred)))
+                         (lambda () (helm-comp-read-get-candidates
+                                     (or history extended-command-history) pred)))
                        :fuzzy-match (null helm-M-x-use-completion-styles))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :match-dynamic helm-M-x-use-completion-styles
