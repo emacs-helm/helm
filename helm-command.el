@@ -241,19 +241,20 @@ default to `extended-command-history'."
                        :candidates
                        (if helm-M-x-use-completion-styles
                            (helm-dynamic-completion
-                                    ;; A list of strings.
-                                    (or history extended-command-history)
-                                    (lambda (str) (funcall pred (intern-soft str)))
-                                    nil 'nosort t)
-                         (lambda () (helm-comp-read-get-candidates collection pred)))
+                            ;; A list of strings.
+                            (or history extended-command-history)
+                            (lambda (str) (funcall pred (intern-soft str)))
+                            nil 'nosort t)
+                         (lambda () (helm-comp-read-get-candidates
+                                     (or history extended-command-history) pred)))
                        :fuzzy-match (null helm-M-x-use-completion-styles))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :match-dynamic helm-M-x-use-completion-styles
                        :candidates
                        (if helm-M-x-use-completion-styles
                            (helm-dynamic-completion
-                                    collection pred
-                                    nil metadata t)
+                            collection pred
+                            nil metadata t)
                          (lambda () (helm-comp-read-get-candidates collection pred)))
                        :fuzzy-match (null helm-M-x-use-completion-styles))))
          (prompt (concat (cond
