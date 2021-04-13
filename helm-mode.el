@@ -241,7 +241,7 @@ Second call deletes backward char in current-buffer and quits helm completion,
 letting the user start a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
-(defcustom helm-completion-style 'emacs
+(defcustom helm-completion-style 'helm
   "Style of completion to use in `completion-in-region'.
 
 This affects only `completion-at-point' and friends, and
@@ -1052,15 +1052,17 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
      init hist default inherit-input-method
      name buffer)
   "Default `helm-mode' handler for all `completing-read'."
-  (let* ((standard (memq helm-completion-style '(helm helm-fuzzy)))
+  (let* (;; Standard will be used as CANDS-IN-BUFFER arg.
+         (standard (and (memq helm-completion-style '(helm helm-fuzzy)) t))
          (fn (if standard
                  #'helm-completing-read-default-1
                #'helm-completing-read-default-2))
          (helm-mode-fuzzy-match (eq helm-completion-style 'helm-fuzzy)))
-    (apply fn
-           prompt collection test require-match
-           init hist default inherit-input-method
-           name buffer standard)))
+    (funcall fn
+             prompt collection test require-match
+             init hist default inherit-input-method name buffer
+             ;; CANDS-IN-BUFFER
+             standard)))
 
 (defun helm-mode--read-buffer-to-switch (prompt)
   "[INTERNAL] This is used to advice `read-buffer-to-switch'.
