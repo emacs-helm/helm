@@ -2194,8 +2194,10 @@ command you want to execute before specifying prefix arg.
 
 *** Completion styles in helm-M-x
 
-By default helm-M-x use 'helm completion style, if you want to enable fuzzy matching aka flex,
-see [[Completion-styles][Completion-styles]].
+Once helm-M-x-use-completion-styles is set to non nil, helm-M-x
+will use 'helm completion style, if you want to enable fuzzy
+matching aka flex, add flex to completion-styles.
+See [[Completion-styles][Completion-styles]].
 
 *** Duplicate entries in helm-M-x history
 
