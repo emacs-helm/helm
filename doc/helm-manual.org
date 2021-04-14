@@ -7,6 +7,7 @@
 # #+texinfo: @insertcopying
 
 * Table Of Contents                                                     :TOC_4:
+
 - [[#helm-generic-help][Helm Generic Help]]
   - [[#basics][Basics]]
   - [[#helm-sources][Helm sources]]
@@ -230,6 +231,7 @@
 - [[#footnotes][Footnotes]]
 
 * Helm Generic Help
+
 ** Basics
 
 # To navigate in this Help buffer see [[Helm help][here]].
@@ -1841,9 +1843,9 @@ When connection fails, be sure to delete your TRAMP connection with
 
 Use the sudo method:
 
-: /sudo:host: 
+: /sudo:host:
 
-or 
+or
 
 : simply /sudo::.
 
@@ -2531,6 +2533,7 @@ one of them for recursive searches, keeping grep or ack-grep to
 grep individual or marked files.  See [[Helm AG][Helm AG]].
 
 *** Meaning of the prefix argument
+
 **** With grep or ack-grep
 
 Grep recursively, in this case you are
@@ -3034,12 +3037,12 @@ Uses keymap ~helm-imenu-map~, which is not currently defined.
 
 Uses keymap ~helm-color-map~, which is not currently defined.
 
-|Keys|Description
-|-----------+----------|
-|M-x helm-color-run-insert-name|Insert the entry name.
-|M-x helm-color-run-kill-name|Kill the entry name.
-|M-x helm-color-run-insert-rgb|Insert entry in RGB format.
-|M-x helm-color-run-kill-rgb|Kill entry in RGB format.
+| Keys                           | Description                 |
+|--------------------------------+-----------------------------|
+| M-x helm-color-run-insert-name | Insert the entry name.      |
+| M-x helm-color-run-kill-name   | Kill the entry name.        |
+| M-x helm-color-run-insert-rgb  | Insert entry in RGB format. |
+| M-x helm-color-run-kill-rgb    | Kill entry in RGB format.   |
 
 * Helm Semantic
 
@@ -3126,7 +3129,7 @@ Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 
 #+setupfile: doc-setup.org
 
-#+export_file_name: helm.texi
+#+export_file_name: helm-manual.texi
 
 #+texinfo_dir_category: Emacs editing modes
 #+texinfo_dir_title: Helm: (helm)
@@ -3136,8 +3139,8 @@ Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 
 [fn:20] Delete from point to end or all depending on the value of
 ~helm-delete-minibuffer-contents-from-point~.
- 
-[fn:19] Behavior may change depending context in some source e.g. ~helm-find-files~. 
+
+[fn:19] Behavior may change depending context in some source e.g. ~helm-find-files~.
 
 [fn:1] https://github.com/coldnew/linum-relative
 

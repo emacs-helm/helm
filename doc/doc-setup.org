@@ -28,7 +28,7 @@
 # returns major.minor version number.  This is sufficient since bugfix
 # releases are not expected to add features and therefore imply manual
 # modifications.
-#+macro: version (eval (with-current-buffer (find-file-noselect "../lisp/org.el") (org-with-point-at 1 (if (re-search-forward "Version: +\\([0-9.]+\\)" nil t) (mapconcat #'identity (cl-subseq (split-string (match-string-no-properties 1) "\\.") 0 2) ".") (error "Missing \"Version\" keyword in \"org.el\"")))))
+#+macro: version (eval (with-current-buffer (find-file-noselect "../helm.el") (org-with-point-at 1 (if (re-search-forward "Version: +\\([0-9.]+\\)" nil t) (mapconcat #'identity (cl-subseq (split-string (match-string-no-properties 1) "\\.") 0 3) ".") (error "Missing \"Version\" keyword in \"helm.el\"")))))
 
 # The "kbd" macro turns KBD into @kbd{KBD}.  Additionally, it
 # encloses case-sensitive special keys (SPC, RET...) within @key{...}.

@@ -66,10 +66,61 @@ EL			:= $(sort $(wildcard helm*.el))
 # Compiled files
 ELC			:= $(EL:.el=.elc)
 
+# How to make a pdf file from a texinfo file
+TEXI2PDF = texi2pdf --batch --clean --expand
 
-.PHONY: clean autoloads batch-compile
+# How to make a pdf file from a tex file
+PDFTEX = pdftex
+
+# How to create directories with leading path components
+# MKDIR	= mkdir -m 755 -p # try this if you have no install
+# MKDIR	= install -m 755 -d
+
+# How to create the info files from the texinfo file
+MAKEINFO = makeinfo
+
+# How to create the HTML file
+TEXI2HTML = makeinfo --html --number-sections --css-ref "https://www.gnu.org/software/emacs/manual.css"
+
+ORGFILES			:=  doc/helm-bugs.org  doc/helm-devel.org  doc/helm-manual-1.org  doc/helm-manual.org
+TEXIFILES			:= $(ORGFILES:.org=.texi)
+INFOFILES			:= $(ORGFILES:.org=.info)
+HTMLFILES			:= $(ORGFILES:.org=.html)
+PDFFILES			:= $(ORGFILES:.org=.pdf)
+
+.PHONY: clean autoloads batch-compile clean-doc
 
 all: clean autoloads batch-compile
+
+doc:	doc/ox-texinfo.el
+doc: info
+doc: html
+# doc: pdf
+
+pdf: $(PDFFILES)
+html: $(HTMLFILES)
+info: $(INFOFILES)
+texi: $(TEXIFILES)
+
+doc/ox-texinfo.el:
+	wget https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+
+%.texi:		%.org
+	$(EMACS) $(LOADPATH) -l doc/ox-texinfo.el  --file=$< --eval '(org-texinfo-export-to-texinfo)'
+
+%.info:		%.texi
+	$(MAKEINFO) --no-split $< -o $@
+
+# the following two lines work around a bug in some versions of texi2dvi
+%.pdf:		LC_ALL=C
+%.pdf:		LANG=C
+%.pdf:		%.texi
+	$(TEXI2PDF) $<
+%.pdf:		%.tex
+	PDFLATEX=$(PDFTEX) $(TEXI2PDF) $<
+
+%.html:		%.texi
+	$(TEXI2HTML) --no-split -o $@ $<
 
 $(ELC): %.elc: %.el
 	$(EMACS) $(LOADPATH) -f batch-byte-compile $<
@@ -82,7 +133,11 @@ batch-compile:
 	$(EMACS) $(LOADPATH) -f batch-byte-compile $(EL)
 
 # Remove all generated files
-clean:
+clean-doc:
+	rm -f doc/ox-texinfo.el $(TEXIFILES) $(INFOFILES)  $(HTMLFILES) $(PDFFILES)
+
+clean : clean-doc
+clean: clean-doc
 	rm -f $(ELC)
 
 # Make autoloads file
