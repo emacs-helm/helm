@@ -1241,6 +1241,10 @@ match everything but this.
 
 *** Completion-styles
 
+UPDATE: After version 3.7.1 Helm default is to NOT use
+`completion-styles' by default i.e. now `helm-completion-style'
+default to 'helm and no more to 'emacs.
+
 Helm generally fetches its candidates with the :candidates
 function up to `helm-candidate-number-limit' and then applies
 match functions to these candidates according to `helm-pattern'.
