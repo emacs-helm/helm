@@ -2244,42 +2244,46 @@ If NO-UPDATE is non-nil, skip executing `helm-update'."
   (unless no-update (helm-update)))
 
 (defun helm-get-selection (&optional buffer force-display-part source)
-  "Return the currently selected item or nil.
+  "Return the currently selected candidate from BUFFER.
 
 If BUFFER is nil or unspecified, use `helm-buffer' as default value.
-If FORCE-DISPLAY-PART is non-nil, return the display string.
-If FORCE-DISPLAY-PART value is `withprop' the display string is returned
-with its properties."
+
+If FORCE-DISPLAY-PART is non-nil, return the display part of candidate.
+
+If FORCE-DISPLAY-PART value is `withprop' the display part of
+candidate is returned with its properties.
+
+When FORCE-DISPLAY-PART is nil the real part of candidate is returned.
+
+SOURCE default to current-source when unspecified but it is better to
+specify SOURCE when it is already available to avoid to call
+`helm-get-current-source' uselessly.
+
+Note that FORCE-DISPLAY-PART when specified takes precedence over
+`display-to-real' attribute, that's mean don't use FORCE-DISPLAY-PART
+when you want the `display-to-real' function(s) to be applied."
   (setq buffer (or buffer helm-buffer))
   (unless (or (helm-empty-buffer-p buffer)
               (helm-pos-header-line-p))
     (with-current-buffer buffer
-      (let* ((disp-fn (if (eq force-display-part 'withprop)
+      (let* ((beg     (overlay-start helm-selection-overlay))
+             (end     (overlay-end helm-selection-overlay))
+             (disp-fn (if (eq force-display-part 'withprop)
                           'buffer-substring
                         'buffer-substring-no-properties))
-             (selection
-              (or (and (not force-display-part)
-                       (get-text-property (overlay-start
-                                           helm-selection-overlay)
-                                          'helm-realvalue))
-                  ;; It is needed to return properties of DISP in some case,
-                  ;; e.g for `helm-confirm-and-exit-minibuffer',
-                  ;; so use `buffer-substring' here when 'withprop is specified.
-                  (let* ((beg  (overlay-start helm-selection-overlay))
-                         (end  (overlay-end helm-selection-overlay))
-                         ;; If there is no selection at point, the
-                         ;; overlay is at its initial pos, (point-min)
-                         ;; (point-min), that's mean the helm-buffer
-                         ;; is not empty but have no selection yet,
-                         ;; this happen with grep sentinel sending an
-                         ;; error message in helm-buffer when no matches.
-                         (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
-                         (src (or source (helm-get-current-source))))
-                    (helm-aif (and src disp
-                                   (not force-display-part)
-                                   (assoc-default 'display-to-real src))
-                        (helm-apply-functions-from-source source it disp)
-                      disp)))))
+             ;; If there is no selection at point, the
+             ;; overlay is at its initial pos, (point-min)
+             ;; (point-min), that's mean the helm-buffer
+             ;; is not empty but have no selection yet,
+             ;; this happen with grep sentinel sending an
+             ;; error message in helm-buffer when no matches.
+             (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
+             (src  (or source (helm-get-current-source)))
+             (selection (helm-acond (force-display-part disp)
+                                    ((assoc-default 'display-to-real src)
+                                     (helm-apply-functions-from-source source it disp))
+                                    ((get-text-property beg 'helm-realvalue) it)
+                                    (t disp))))
         (unless (equal selection "")
           (helm-log "selection = %S" selection)
           selection)))))
