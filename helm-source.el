@@ -354,6 +354,12 @@
   or filtered-candidate-transformer to give a new value to REAL,
   instead the selected candidate is transformed only when passing it
   to action.
+  Example:
+
+    (helm :sources (helm-build-sync-source \"test\"
+                 :candidates '(a b c d e)
+                 :display-to-real (lambda (c) (concat c \":modified by d-t-r\")))
+      :buffer \"*helm test*\")
 
   Note that this is NOT a transformer,
   so the display will not be modified by this function.")
@@ -367,10 +373,16 @@
 
   Function called with one parameter, the selected candidate.
 
-  The real value of candidates will be shown in display.
-  Note: This have nothing to do with display-to-real.
-  It is unuseful as the same can be performed by using more than
-  one function in transformers, it is kept only for backward compatibility.")
+  The real value of candidates will be shown in display and of course
+  be used by action.
+  Example:
+
+    (helm :sources (helm-build-sync-source \"test\"
+                 :candidates '((\"foo\" . 1) (\"bar\" . 2) (\"baz\". 3))
+                 :real-to-display (lambda (c) (format \"%s\" (1+ c))))
+      :buffer \"*helm test*\")
+
+  Mostly deprecated, kept only for backward compatibility.")
 
    (marked-with-props
     :initarg :marked-with-props
