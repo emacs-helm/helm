@@ -2262,10 +2262,9 @@ specify SOURCE when it is already available to avoid to call
 Note that FORCE-DISPLAY-PART when specified takes precedence over
 `display-to-real' attribute, that's mean don't use FORCE-DISPLAY-PART
 when you want the `display-to-real' function(s) to be applied."
-  (setq buffer (or buffer helm-buffer))
-  (unless (or (helm-empty-buffer-p buffer)
-              (helm-pos-header-line-p))
-    (with-current-buffer buffer
+  (with-current-buffer (or buffer helm-buffer)
+    (unless (or (helm-empty-buffer-p (current-buffer))
+                (helm-pos-header-line-p))
       (let* ((beg     (overlay-start helm-selection-overlay))
              (end     (overlay-end helm-selection-overlay))
              (disp-fn (if (eq force-display-part 'withprop)
