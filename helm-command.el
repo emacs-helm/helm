@@ -246,7 +246,11 @@ default to `extended-command-history'."
                             (lambda (str) (funcall pred (intern-soft str)))
                             nil 'nosort t)
                          (lambda () (helm-comp-read-get-candidates
-                                     (or history extended-command-history) pred)))
+                                     ;; History should be quoted to
+                                     ;; force `helm-comp-read-get-candidates'
+                                     ;; to use predicate against
+                                     ;; symbol and not string.
+                                     (or history 'extended-command-history) pred)))
                        :fuzzy-match (null helm-M-x-use-completion-styles))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :match-dynamic helm-M-x-use-completion-styles
