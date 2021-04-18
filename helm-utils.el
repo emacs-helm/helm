@@ -231,7 +231,8 @@ last position is added to the register `helm-save-pos-before-jump-register'.")
     ("&reg;"    . 174)  ;; ®
     ("&shy;"    . 173)) ;; ­
 
-  "Table of html character entities and values.")
+  "Table of html character entities and values.
+See https://www.freeformatter.com/html-entities.html")
 
 (defvar helm-find-many-files-after-hook nil
   "Hook that runs at end of `helm-find-many-files'.")
