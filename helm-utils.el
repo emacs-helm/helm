@@ -142,6 +142,7 @@ last position is added to the register `helm-save-pos-before-jump-register'.")
     ("&brvbar;" . 166)  ;; ¦
     ("&sect;"   . 167)  ;; §
     ("&uml;"    . 32)   ;; SPC
+    ("&nbsp;"   . 160)  ;;   (non breaking space)
     ("&copy;"   . 169)  ;; ©
     ("&ordf;"   . 97)   ;; a
     ("&laquo;"  . 171)  ;; «
