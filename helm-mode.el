@@ -1667,7 +1667,12 @@ Actually does nothing."
          (prefix (substring beforepoint 0 (car bounds)))
          (suffix (substring afterpoint (cdr bounds)))
          (all (helm-completion--multi-all-completions-1
-               (regexp-quote string) table pred)))
+               ;; Using `regexp-quote' on STRING fixes bug#2355 but
+               ;; breaks regexp matching in multi match, actually with
+               ;; Helm-3.7.1 and emacs-27+ it seems using plain STRING
+               ;; works for both so use it.
+               ;;(regexp-quote string)
+               string table pred)))
     (list all string prefix suffix point)))
 
 ;; The adjust-metadata functions run only in emacs-27, they are NOT
