@@ -236,6 +236,10 @@ default to `extended-command-history'."
                                  .
                                  (lambda (candidates)
                                    (sort candidates #'helm-generic-sort-fn))))))
+         (helm-fuzzy-sort-fn (lambda (candidates _source)
+                               ;; Sort on real candidate otherwise
+                               ;; "symbol (<binding>)" is used when sorting.
+                               (helm-fuzzy-matching-default-sort-fn-1 candidates t)))
          (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
                        :match-dynamic helm-M-x-use-completion-styles
                        :candidates
@@ -250,7 +254,10 @@ default to `extended-command-history'."
                                      ;; force `helm-comp-read-get-candidates'
                                      ;; to use predicate against
                                      ;; symbol and not string.
-                                     (or history 'extended-command-history) pred)))
+                                     (or history 'extended-command-history)
+                                     ;; Ensure using empty string to
+                                     ;; not defeat helm matching fns [1]
+                                     pred nil nil "")))
                        :fuzzy-match (null helm-M-x-use-completion-styles))
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :match-dynamic helm-M-x-use-completion-styles
@@ -259,7 +266,9 @@ default to `extended-command-history'."
                            (helm-dynamic-completion
                             collection pred
                             nil metadata t)
-                         (lambda () (helm-comp-read-get-candidates collection pred)))
+                         (lambda () (helm-comp-read-get-candidates
+                                     ;; [1] Same comment as above.
+                                     collection pred nil nil "")))
                        :fuzzy-match (null helm-M-x-use-completion-styles))))
          (prompt (concat (cond
                           ((eq helm-M-x-prefix-argument '-) "- ")
