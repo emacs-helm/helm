@@ -38,9 +38,8 @@
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-use-completion-styles nil
-  "Use `completion-styles' and dynamic completion when non nil.
-It is disable by default as it is a regression starting from Emacs-27."
+(defcustom helm-M-x-use-completion-styles t
+  "Use `completion-styles' and dynamic completion when non nil."
   :group 'helm-command
   :type 'boolean)
 
