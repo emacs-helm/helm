@@ -73,7 +73,7 @@ TEXI2PDF = texi2pdf --batch --clean --expand
 PDFTEX = pdftex
 
 # How to create directories with leading path components
-# MKDIR	= mkdir -m 755 -p # try this if you have no install
+MKDIR	= mkdir -m 755 -p # try this if you have no install
 # MKDIR	= install -m 755 -d
 
 # How to create the info files from the texinfo file
@@ -82,7 +82,11 @@ MAKEINFO = makeinfo
 # How to create the HTML file
 TEXI2HTML = makeinfo --html --number-sections --css-ref "https://www.gnu.org/software/emacs/manual.css"
 
-ORGFILES			:=  doc/helm-bugs.org  doc/helm-devel.org  doc/helm-manual-1.org  doc/helm-manual.org
+# Name of the program to install info files
+# INSTALL_INFO = ginstall-info # Debian: avoid harmless warning message
+INSTALL_INFO = install-info
+
+ORGFILES			:=  doc/helm-bugs.org  doc/helm-devel.org  doc/helm-manual-1.org  doc/helm-manual.org doc/helm.org
 TEXIFILES			:= $(ORGFILES:.org=.texi)
 INFOFILES			:= $(ORGFILES:.org=.info)
 HTMLFILES			:= $(ORGFILES:.org=.html)
@@ -102,8 +106,12 @@ html: $(HTMLFILES)
 info: $(INFOFILES)
 texi: $(TEXIFILES)
 
+$(TEXIFILES): | doc/ox-texinfo.el
+
 doc/ox-texinfo.el:
 	wget https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+
+%.texi:		doc/ox-texinfo.el
 
 %.texi:		%.org
 	$(EMACS) $(LOADPATH) -l doc/ox-texinfo.el  --file=$< --eval '(org-texinfo-export-to-texinfo)'
@@ -148,6 +156,20 @@ autoloads:
 PREFIX=/usr/local/
 BIN=${PREFIX}bin/
 DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
+
+# On Debian, paths in `Info-default-directory-list' are in the order
+# as below:
+
+# INFODIR	= /usr/local/share/info/
+# INFODIR	= /usr/local/info/
+INFODIR		= /usr/share/info/
+# INFODIR	= /usr/local/share/info/
+
+# /usr/share/info is where Debian puts the info file for EMMS. So,
+# just mimic it.
+
+# For non-standard value of INFODIR, see `Info-directory-list'.
+
 install:
 	test -d ${DESTDIR} || mkdir ${DESTDIR}
 	rm -f ${DESTDIR}*.el
@@ -162,3 +184,18 @@ uninstall:
 	rm -vf ${DESTDIR}*.el
 	rm -vf ${DESTDIR}emacs-helm.sh
 	rm -vf ${BIN}helm
+
+$(DESTDIR)$(infodir)/%.info: doc/%.info
+
+install-info:	$(INFOFILES)
+	if [ ! -d  $(INFODIR) ]; then $(MKDIR) $(INFODIR); else true; fi ;
+	for f in $(INFOFILES:doc/%=%) ; do				\
+		cp doc/$$f $(INFODIR);					\
+		$(INSTALL_INFO) --info-dir=$(INFODIR) $(INFODIR)/$$f;	\
+	done
+
+clean-install-info:
+	for f in $(INFOFILES:doc/%=%) ; do					\
+		$(RM) $(INFODIR)/$$f						\
+		$(INSTALL_INFO) --info-dir=$(INFODIR) --remove $(INFODIR)/$$f;	\
+	done

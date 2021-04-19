@@ -1,3 +1,12 @@
+#+title: Helm Wiki
+# #+subtitle:  Release {{{version}}}
+#+subtitle:  Release 3.6.2
+#+author:    The Helm Developers
+#+date:      {{{modification-time}}}
+#+language:  en
+
+# #+texinfo: @insertcopying
+
 * Table Of Contents                                                   :TOC_4:
 
 - [[#requirements][Requirements]]
@@ -3168,12 +3177,13 @@ that are mentioned in the manual.  For a more complete list, use
 * Export Setup                                                          :noexport:
 
 #+setupfile: doc-setup.org
+# #+options: H:4
 
 #+export_file_name: helm-manual-1.texi
 
-#+texinfo_dir_category: Emacs editing modes
-#+texinfo_dir_title: Helm Manual 1: (helm-manual-1)
-#+texinfo_dir_desc: Emacs incremental and narrowing framework
+#+texinfo_dir_category: Emacs Add-ons
+#+texinfo_dir_title: Helm Wiki: (helm-manual-1)
+#+texinfo_dir_desc: Helm Wiki
 
 * Footnotes
 

@@ -1,7 +1,8 @@
 #+title: How to report Helm Bugs
 # #+subtitle:  Release {{{version}}}
-# #+author:    The Org Mode Developers
-# #+date:      {{{modification-time}}}
+#+subtitle:  Release 3.6.2
+#+author:    The Helm Developers
+#+date:      {{{modification-time}}}
 #+language:  en
 
 # #+texinfo: @insertcopying
@@ -67,11 +68,12 @@ file.
 * Export Setup                                                          :noexport:
 
 #+setupfile: doc-setup.org
+# #+options: H:4
 
 #+export_file_name: helm-bugs.texi
 
-#+texinfo_dir_category: Emacs editing modes
-#+texinfo_dir_title: Reporting Helm Bugs: (report-helm-bugs.org)
+#+texinfo_dir_category: Emacs Add-ons
+#+texinfo_dir_title: Report Helm Bugs: (helm-bugs)
 #+texinfo_dir_desc: Report Helm Bugs
 
 * Footnotes
