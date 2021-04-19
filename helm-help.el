@@ -67,9 +67,10 @@ Find here the documentation of all documented sources."
     (set-buffer buf)
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (cl-loop for elm in helm-help--string-list
-               for str = (helm-interpret-value elm)
-               do (insert (substitute-command-keys str) "\n\n"))
+      (save-excursion
+        (cl-loop for elm in helm-help--string-list
+                 for str = (helm-interpret-value elm)
+                 do (insert (substitute-command-keys str) "\n\n")))
       (org-mode))
     (setq buffer-read-only t)
     (view-mode)))
