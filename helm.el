@@ -4534,7 +4534,8 @@ emacs-27 to provide such scoring in emacs<27."
                           while (< count limit)
                           for target = (if (helm-get-attr 'match-on-real source)
                                            (or (cdr-safe c)
-                                               (get-text-property 0 'helm-realvalue disp))
+                                               (get-text-property 0 'helm-realvalue disp)
+                                               disp)
                                          disp)
                           for prop-part = (get-text-property 0 'match-part target)
                           for part = (and match-part-fn

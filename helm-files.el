@@ -3171,7 +3171,9 @@ debugging purpose."
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
-           (list (cons (format "file-error: Opening directory permission denied `%s'" path)
+           ;; Prefix error message with @@@@ for safety
+           ;; (some files may match file-error See bug#2400) 
+           (list (cons (format "@@@@file-error: Opening directory permission denied `%s'" path)
                        path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
@@ -3320,9 +3322,11 @@ in cache."
                      ;; `helm-find-files-get-candidates' by `file-readable-p'.
                      (file-error
                       (prog1
-                          (list (format "%s:%s"
-                                        (car err)
-                                        (mapconcat 'identity (cdr err) " ")))
+                          ;; Prefix error message with @@@@ for safety
+                          ;; (some files may match file-error See bug#2400) 
+                        (list (format "@@@@%s:%s"
+                                      (car err)
+                                      (mapconcat 'identity (cdr err) " ")))
                         (setq file-error t)))))
              (dot  (concat directory "."))
              (dot2 (concat directory ".."))
@@ -3775,7 +3779,12 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
         (let* ((attr (file-attributes file))
                (type (car attr))
                x-bit)
-          (cond ((string-match "file-error" file) file)
+          (cond (;; Not a file but the message error printed in
+                 ;; helm-buffer. Such a message should not have a
+                 ;; subdir so matching on bol should suffice, but to
+                 ;; be sure use @@@@ as prefix in file-error message
+                 ;; to be safe bug#2400.
+                 (string-match "\\`@@@@file-error:" file) file)
                 (;; A dead symlink.
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
