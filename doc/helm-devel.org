@@ -1,10 +1,9 @@
 #+title: The Helm Developer's Guide
 # #+subtitle:  Release {{{version}}}
-# #+author:    The Org Mode Developers
-# #+date:      {{{modification-time}}}
+#+subtitle:  Release 3.6.2
+#+author:    The Helm Developers
+#+date:      {{{modification-time}}}
 #+language:  en
-
-#+options: H:2
 
 # #+texinfo: @insertcopying
 
@@ -477,12 +476,13 @@ convention.
 * Export Setup                                                          :noexport:
 
 #+setupfile: doc-setup.org
+# #+options: H:4
 
 #+export_file_name: helm-devel.texi
 
-#+texinfo_dir_category: Emacs editing modes
-#+texinfo_dir_title: Helm Development: (helm-devel)
-#+texinfo_dir_desc: Emacs incremental and narrowing framework
+#+texinfo_dir_category: Emacs Add-ons
+#+texinfo_dir_title: Helm Developer's Guide: (helm-devel)
+#+texinfo_dir_desc: Helm Developer's Guide
 
 * Footnotes
 
