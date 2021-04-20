@@ -160,10 +160,10 @@ DESTDIR=${PREFIX}share/emacs/site-lisp/helm/
 # On Debian, paths in `Info-default-directory-list' are in the order
 # as below:
 
-# INFODIR	= /usr/local/share/info/
-# INFODIR	= /usr/local/info/
-INFODIR		= /usr/share/info/
-# INFODIR	= /usr/local/share/info/
+# INFODIR	= /usr/local/share/info
+# INFODIR	= /usr/local/info
+INFODIR		= /usr/share/info
+# INFODIR	= /usr/local/share/info
 
 # /usr/share/info is where Debian puts the info file for EMMS. So,
 # just mimic it.
@@ -195,7 +195,7 @@ install-info:	$(INFOFILES)
 	done
 
 clean-install-info:
-	for f in $(INFOFILES:doc/%=%) ; do					\
-		$(RM) $(INFODIR)/$$f						\
-		$(INSTALL_INFO) --info-dir=$(INFODIR) --remove $(INFODIR)/$$f;	\
+	for f in $(INFOFILES:doc/%=%) ; do						\
+		$(INSTALL_INFO) --remove --info-dir=$(INFODIR) --remove $(INFODIR)/$$f;	\
+		$(RM) $(INFODIR)/$$f;							\
 	done

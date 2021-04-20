@@ -12453,7 +12453,7 @@ that are mentioned in the manual.  For a more complete list, use
 
 * Export Setup                                                          :noexport:
 
-#+setupfile: /home/rameshnedunchezian/src/helm/doc/doc-setup.org
+#+setupfile: doc-setup.org
 #+options: H:4
 
 #+export_file_name: helm.texi
