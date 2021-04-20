@@ -12466,6 +12466,6 @@ that are mentioned in the manual.  For a more complete list, use
 
 #+STARTUP: showeverything
 #+STARTUP: inlineimages
-#+EXCLUDE_TAGS: TOC_4
+#+EXCLUDE_TAGS: TOC_3
 
 # (info (org-texinfo-export-to-info))
