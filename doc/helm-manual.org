@@ -8,7 +8,6 @@
 # #+texinfo: @insertcopying
 
 * Table Of Contents                                                     :TOC_4:
-
 - [[#helm-generic-help][Helm Generic Help]]
   - [[#basics][Basics]]
   - [[#helm-sources][Helm sources]]
