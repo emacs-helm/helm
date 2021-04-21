@@ -40,13 +40,9 @@
   - [[#writing-your-own-helm-sources][Writing your own Helm sources]]
   - [[#helm-map][Helm Map]]
 - [[#helm-buffer][Helm Buffer]]
+  - [[#pattern-matching-in-helm-buffers][Pattern matching in helm-buffers]]
+    - [[#examples][Examples]]
   - [[#tips][Tips]]
-    - [[#completion][Completion]]
-      - [[#major-mode][Major-mode]]
-      - [[#search-inside-buffers][Search inside buffers]]
-      - [[#search-by-directory-name][Search by directory name]]
-      - [[#fuzzy-matching][Fuzzy matching]]
-      - [[#examples][Examples]]
     - [[#creating-buffers][Creating buffers]]
     - [[#killing-buffers][Killing buffers]]
     - [[#switching-to-buffers][Switching to buffers]]
@@ -939,9 +935,92 @@ there are simple examples to start with.
 
 * Helm Buffer
 
+** Pattern matching in helm-buffers
+
+You can filter the buffer list based on one or more of the following
+components:
+
+1. buffer's ~mode-name~
+2. its content
+3. its directory
+4. its name
+
+A buffer match pattern is a space-separated list of one or more
+directives.  Each directive looks like
+
+: <pattern-type><negate-may-be><pattern-value>
+
+=<pattern-type>= determines how the =<pattern-value>= is
+interpreted. =<pattern-type>= can be one of the following:
+
+- =*= :: Partially match =<pattern-value>= against buffer's ~mode-name~
+- =@= :: Partially match =<pattern-value>= against buffer's contents
+- =/= :: Partially match =<pattern-value>= against buffer's directory
+- =^= :: Fuzz-matching.  The description of what the pattern does is
+  not clear.
+- {{{samp({{{unicode(200b)}}})}}} :: an empty string.  Compare =<pattern-value>=
+    against buffer's name.
+
+=<negate-may-be>= determines the truth value of the match.  It can be
+one of the following:
+
+- {{{samp({{{unicode(200b)}}})}}} :: an empty string.  =<pattern-value>= must
+  partially match the corresponding attribute
+
+- =!= ::  Negate the sense of above match.
+
+*** Examples
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+Down below you see some common patterns, and how they are interpreted:
+
+- Match against buffer's ~mode-name~
+
+  - =*lisp= :: List only buffers whose ~mode-name~ name matches =lisp=.
+
+  - =*!lisp= :: List only buffers whose ~mode-name~ name does /not/ match
+    =lisp=.
+
+  - =*!lisp,!sh,!fun= :: List only buffers whose mode name does /not/
+    match any of =lisp=, =sh= or =fun=.
+
+- Match against buffer's content
+
+  - =@foo= :: List only those  buffers that contain =foo=
+
+  - =@!foo= :: List only those buffers that do /not/ contain =foo=.
+
+  - =@foo @bar= :: List only those buffers that contain both =foo= /and/
+    =bar=.
+
+  - =@foo @!bar= :: List only those buffers that contain =foo= but /not/
+    =bar=.
+
+- Match against buffer's directory
+
+  - =/src=  :: List only buffers whose directory matches =src=.
+
+- Match against buffer's name in a fuzzy way
+
+- Match against a combination of above criterion.
+
+  - =*lisp ^helm @moc= :: List only buffers that are in =lisp= mode, whose
+    name starts start with =helm= and contains =moc=.
+
+  - =*lisp ^helm moc= :: List only buffers that are in =lisp= mode, whose
+    name starts start with =helm= and whose name contains =moc=
+
+  - =*!lisp !helm= :: List only buffers that are NOT in =lisp= mode and
+    whose name does NOT match =helm=.
+
+  - =/helm/ w3= ::  List only buffers whose directory matches =helm= and
+    whose name matches =w3=.
+
 ** Tips
 
-*** Completion
+*** COMMENT Completion
 
 **** Major-mode
 
@@ -1024,11 +1103,17 @@ Helm narrows down to buffers that are in any =helm= subdirectory and
 matching =w3=.
 
 *** Creating buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 When creating a new buffer, use {{{kbd(C-u)}}} to choose a mode from a
 list.  This list is customizable, see ~helm-buffers-favorite-modes~.
 
 *** Killing buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 You can kill buffers either one by one or all the marked buffers at once.
 
@@ -1039,6 +1124,9 @@ or with its specific command ~helm-buffer-run-kill-persistent~.  See the
 bindings below.
 
 *** Switching to buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 To switch to a buffer, press RET, to switch to a buffer in another window, select this buffer
 and press {{{kbd(C-c o)}}}, when called with a prefix arg
@@ -1046,6 +1134,9 @@ the buffer will be displayed vertically in other window.
 If you mark more than one buffer, the marked buffers will be displayed in different windows.
 
 *** Saving buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 If buffer is associated to a file and is modified, it is by default colorized in orange,
 see [[Meaning of colors and prefixes for buffers][Meaning of colors and prefixes for buffers]].
@@ -1055,6 +1146,9 @@ and save them with {{{kbd(C-x C-s)}}}.  You can also do this in one step with
 {{{kbd(C-x s)}}}.  Note that you will not be asked for confirmation.
 
 *** Meaning of colors and prefixes for buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 Remote buffers are prefixed with ’@’.
 
@@ -1063,6 +1157,32 @@ Remote buffers are prefixed with ’@’.
 - Orange      ::  Buffer is modified and not saved to disk.
 - Italic      ::  A non-file buffer.
 - Yellow      ::  Tramp archive buffer.
+
+# #+begin_src emacs-lisp
+#   ((helm-buffer-saved-out
+#     (t :extend t :foreground "red" :background "black"))
+#    (helm-buffer-not-saved
+#     (t :extend t :foreground "Indianred2"))
+#    (helm-buffer-modified
+#     (t :extend t :inherit font-lock-comment-face))
+#    (helm-no-file-buffer-modified
+#     (t :extend t :foreground "orange" :background "black"))
+#    (helm-buffer-size
+#     (((background dark))
+#      :extend t :foreground "RosyBrown")
+#     (((background light))
+#      :extend t :foreground "SlateGray"))
+#    (helm-buffer-process
+#     (t :extend t :foreground "Sienna3"))
+#    (helm-buffer-directory
+#     (t :extend t :foreground "DarkRed" :background "LightGray"))
+#    (helm-buffer-file
+#     (t :extend t :inherit font-lock-builtin-face))
+#    (helm-buffer-archive
+#     (t :extend t :foreground "Gold"))
+#    (helm-non-file-buffer
+#     (t :extend t :inherit italic)))
+# #+end_src
 
 ** Commands
 
