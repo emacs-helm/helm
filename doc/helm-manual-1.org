@@ -1,5 +1,13 @@
-* Table Of Contents                                                   :TOC_4:
+#+title: Helm Wiki
+# #+subtitle:  Release {{{version}}}
+#+subtitle:  Release 3.6.2
+#+author:    The Helm Developers
+#+date:      {{{modification-time}}}
+#+language:  en
 
+# #+texinfo: @insertcopying
+
+* Table Of Contents                                                   :TOC_4:
 - [[#requirements][Requirements]]
 - [[#download][Download]]
 - [[#installation-upgrade-and-configuration][Installation, Upgrade, and Configuration]]
@@ -12,7 +20,39 @@
   - [[#helm-interaction-model][Helm interaction model]]
 - [[#general-helm-commands][General Helm Commands]]
   - [[#yanking-text][Yanking text]]
+  - [[#commands-in-keymap-helm-map][Commands in keymap ~helm-map~]]
+    - [[#file][file]]
+    - [[#buffer][buffer]]
+    - [[#page][page]]
+    - [[#line][line]]
+    - [[#source][source]]
+    - [[#minibuffer][minibuffer]]
+    - [[#history][history]]
+    - [[#mark][mark]]
+    - [[#window][window]]
+    - [[#action][action]]
+    - [[#other-mode-p][other-mode-p]]
+    - [[#minor-mode-p][minor-mode-p]]
+    - [[#uncategorized][uncategorized]]
 -  [[#preconfigured-helm-commands][Preconfigured Helm Commands]]
+  - [[#list-of-preconfigured-helm-commands][List of Preconfigured Helm Commands]]
+    - [[#emacs-commands][Emacs Commands]]
+    - [[#listing-buffers][Listing Buffers]]
+    - [[#finding-files][Finding Files]]
+    - [[#locating-files][Locating Files]]
+    - [[#editing][Editing]]
+    - [[#grepping-etc][Grepping etc.]]
+    - [[#navigating-with-tags-etc][Navigating with Tags etc]]
+    - [[#emacs-related-help][Emacs-related Help]]
+    - [[#helm-related-commands][Helm-related Commands]]
+    - [[#completion-at-point][Completion at Point]]
+    - [[#utilities][Utilities]]
+    - [[#emacs-related][Emacs-related]]
+    - [[#bookmarks][Bookmarks]]
+    - [[#gid][GID]]
+    - [[#interface-to-system-related-utilities][Interface to System-related Utilities]]
+    - [[#web-search][Web Search]]
+    - [[#misc][Misc.]]
 - [[#show-helm-commands][Show Helm Commands]]
 - [[#helm-mode][Helm Mode]]
   - [[#customize-helm-mode][Customize helm-mode]]
@@ -21,8 +61,58 @@
   - [[#linum-relative][linum-relative]]
 - [[#helm-workflow-for-files-directories-and-buffers][Helm Workflow for Files, Directories and Buffers]]
 - [[#quick-try-with-emacs-helmsh][Quick Try with =emacs-helm.sh=]]
+- [[#how-to-report-helm-bugs][How to report Helm Bugs]]
+  - [[#confirming-bugs][Confirming bugs]]
+    - [[#emacs-helmsh][=emacs-helm.sh=]]
+    - [[#emacs--q][=emacs -Q=]]
+  - [[#reporting-bugs][Reporting bugs]]
+    - [[#version-info][Version info]]
 - [[#useful-links][Useful links]]
-- [[#contributing-to-the-wiki][Contributing to the Wiki]]
+- [[#file-helm-buffersel][File: helm-buffers.el]]
+  - [[#commands-in-keymap-helm-buffer-map-excludes-parent-keymap][Commands in keymap ~helm-buffer-map~ (excludes parent-keymap)]]
+    - [[#uncategorized--switch][uncategorized ! switch]]
+    - [[#uncategorized--persistent][uncategorized ! persistent]]
+    - [[#uncategorized--buffers][uncategorized ! buffers]]
+    - [[#uncategorized--run--kill][uncategorized ! run ! kill]]
+    - [[#uncategorized--run--ediff][uncategorized ! run ! ediff]]
+    - [[#uncategorized--run--replace][uncategorized ! run ! replace]]
+    - [[#uncategorized--run--buffers][uncategorized ! run ! buffers]]
+    - [[#uncategorized--run--uncategorized][uncategorized ! run ! uncategorized]]
+  - [[#commands-in-keymap-helm-buffer-not-found-map-excludes-parent-keymap][Commands in keymap ~helm-buffer-not-found-map~ (excludes parent-keymap)]]
+    - [[#uncategorized-1][uncategorized]]
+- [[#file-helm-filesel][File: helm-files.el]]
+  - [[#commands-in-keymap-helm-browse-project-map-excludes-parent-keymap][Commands in keymap ~helm-browse-project-map~ (excludes parent-keymap)]]
+  - [[#commands-in-keymap-helm-file-name-history-map-excludes-parent-keymap][Commands in keymap ~helm-file-name-history-map~ (excludes parent-keymap)]]
+    - [[#uncategorized-2][uncategorized]]
+  - [[#commands-in-keymap-helm-find-files-map-excludes-parent-keymap][Commands in keymap ~helm-find-files-map~ (excludes parent-keymap)]]
+    - [[#default-action][Default Action]]
+    - [[#traversing-directories][Traversing Directories]]
+    - [[#finding-and-previewing-files][Finding and Previewing Files]]
+    - [[#switch-to-other-frame--or-window][Switch to other frame  or window]]
+    - [[#file-system-operations][File System Operations]]
+    - [[#links][Links]]
+    - [[#sort][Sort]]
+    - [[#toggle-view][Toggle View]]
+    - [[#image-files][Image files]]
+    - [[#persistent-actions][Persistent Actions]]
+    - [[#history-related][History Related]]
+    - [[#run-grep][Run =grep=]]
+    - [[#run-query-replace][Run query replace]]
+    - [[#file-operations-for-elisp-development][File operations for Elisp Development]]
+    - [[#ediff][Ediff]]
+    - [[#run-programs][Run programs]]
+    - [[#completing-and-inserting-file-names-in-buffers][Completing and Inserting File names in buffers]]
+    - [[#project-related][Project-related]]
+    - [[#eshell][Eshell]]
+    - [[#bookmarks-1][Bookmarks]]
+    - [[#misc-1][Misc.]]
+  - [[#commands-in-keymap-helm-read-file-map-excludes-parent-keymap][Commands in keymap ~helm-read-file-map~ (excludes parent-keymap)]]
+    - [[#uncategorized--files][uncategorized ! files]]
+    - [[#uncategorized--ff][uncategorized ! ff]]
+- [[#main-index][Main Index]]
+- [[#key-index][Key Index]]
+- [[#command-and-function-index][Command and Function Index]]
+- [[#variable-index][Variable Index]]
 - [[#footnotes][Footnotes]]
 
 * Requirements
@@ -3168,12 +3258,13 @@ that are mentioned in the manual.  For a more complete list, use
 * Export Setup                                                          :noexport:
 
 #+setupfile: doc-setup.org
+# #+options: H:4
 
 #+export_file_name: helm-manual-1.texi
 
-#+texinfo_dir_category: Emacs editing modes
-#+texinfo_dir_title: Helm Manual 1: (helm-manual-1)
-#+texinfo_dir_desc: Emacs incremental and narrowing framework
+#+texinfo_dir_category: Emacs Add-ons
+#+texinfo_dir_title: Helm Wiki: (helm-manual-1)
+#+texinfo_dir_desc: Helm Wiki
 
 * Footnotes
 
