@@ -2279,9 +2279,11 @@ when you want the `display-to-real' function(s) to be applied."
              (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
+                                    ;; helm-realvalue always takes precedence
+                                    ;; over display-to-real.
+                                    ((get-text-property beg 'helm-realvalue) it)
                                     ((assoc-default 'display-to-real src)
                                      (helm-apply-functions-from-source source it disp))
-                                    ((get-text-property beg 'helm-realvalue) it)
                                     (t disp))))
         (unless (equal selection "")
           (helm-log "selection = %S" selection)
