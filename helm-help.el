@@ -134,9 +134,11 @@ Starting from Helm v1.6.8, you can specify more than one directory.
 
 **** Fuzzy matching
 
-`helm-buffers-fuzzy-matching' turns on fuzzy matching on buffer names, but not
-on directory names or major modes.  A pattern starting with \"^\" disables fuzzy
-matching and matches by exact regexp.
+`helm-buffers-fuzzy-matching' turns on fuzzy matching on buffer
+names, but not on directory names or major modes.  A pattern
+starting with \"^\" disables fuzzy matching and matching is done
+litteraly IOW do not use regexps (\"^\" or whatever special
+regexp character) when you want to fuzzy match.
 
 **** Examples
 
