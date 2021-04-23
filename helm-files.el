@@ -3776,7 +3776,13 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
-        (let* ((attr (file-attributes file))
+        (let* ((attr (condition-case err
+                         (file-attributes file)
+                       (file-error
+                        ;; Possible error not happening during listing
+                        ;; but when calling file-attributes see error
+                        ;; with sshfs bug#2405 
+                        (message "%s:%s" (car err) (cdr err)) nil)))
                (type (car attr))
                x-bit)
           (cond (;; Not a file but the message error printed in
