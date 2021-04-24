@@ -11,7 +11,7 @@
 - [[#package-helm][Package: helm]]
   - [[#library-helm][Library: helm]]
     - [[#modes-in-library-helm][Modes in library ~helm~]]
-    - [[#commands-in-keymap-helm-map-excludes-parent-keymap][Commands in keymap ~helm-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-map][Commands in keymap ~helm-map~]]
     - [[#commands-in-library-helm-excludes-keymaps][Commands in library ~helm~ (excludes keymaps)]]
     - [[#options-in-library-helm][Options in library =helm=]]
     - [[#hooks-in-library-helm][Hooks in library =helm=]]
@@ -21,24 +21,24 @@
     - [[#options-in-library-helm-adaptive][Options in library =helm-adaptive=]]
     - [[#hooks-in-library-helm-adaptive][Hooks in library =helm-adaptive=]]
   - [[#library-helm-bookmark][Library: helm-bookmark]]
-    - [[#commands-in-keymap-helm-bookmark-find-files-map-excludes-parent-keymap][Commands in keymap ~helm-bookmark-find-files-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-bookmark-map-excludes-parent-keymap][Commands in keymap ~helm-bookmark-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-bookmark-find-files-map][Commands in keymap ~helm-bookmark-find-files-map~]]
+    - [[#commands-in-keymap-helm-bookmark-map][Commands in keymap ~helm-bookmark-map~]]
     - [[#commands-in-library-helm-bookmark-excludes-keymaps][Commands in library ~helm-bookmark~ (excludes keymaps)]]
     - [[#options-in-library-helm-bookmark][Options in library =helm-bookmark=]]
   - [[#library-helm-buffers][Library: helm-buffers]]
-    - [[#commands-in-keymap-helm-buffer-map-excludes-parent-keymap][Commands in keymap ~helm-buffer-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-buffer-not-found-map-excludes-parent-keymap][Commands in keymap ~helm-buffer-not-found-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-buffer-map][Commands in keymap ~helm-buffer-map~]]
+    - [[#commands-in-keymap-helm-buffer-not-found-map][Commands in keymap ~helm-buffer-not-found-map~]]
     - [[#commands-in-library-helm-buffers-excludes-keymaps][Commands in library ~helm-buffers~ (excludes keymaps)]]
     - [[#options-in-library-helm-buffers][Options in library =helm-buffers=]]
   - [[#library-helm-color][Library: helm-color]]
-    - [[#commands-in-keymap-helm-color-map-excludes-parent-keymap][Commands in keymap ~helm-color-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-color-map][Commands in keymap ~helm-color-map~]]
     - [[#commands-in-library-helm-color-excludes-keymaps][Commands in library ~helm-color~ (excludes keymaps)]]
   - [[#library-helm-comint][Library: helm-comint]]
-    - [[#commands-in-keymap-helm-comint-prompts-keymap-excludes-parent-keymap][Commands in keymap ~helm-comint-prompts-keymap~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-comint-prompts-keymap][Commands in keymap ~helm-comint-prompts-keymap~]]
     - [[#commands-in-library-helm-comint-excludes-keymaps][Commands in library ~helm-comint~ (excludes keymaps)]]
     - [[#options-in-library-helm-comint][Options in library =helm-comint=]]
   - [[#library-helm-command][Library: helm-command]]
-    - [[#commands-in-keymap-helm-m-x-map-excludes-parent-keymap][Commands in keymap ~helm-M-x-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-m-x-map][Commands in keymap ~helm-M-x-map~]]
     - [[#commands-in-library-helm-command-excludes-keymaps][Commands in library ~helm-command~ (excludes keymaps)]]
     - [[#options-in-library-helm-command][Options in library =helm-command=]]
     - [[#hooks-in-library-helm-command][Hooks in library =helm-command=]]
@@ -51,7 +51,7 @@
     - [[#commands-in-library-helm-elisp-excludes-keymaps][Commands in library ~helm-elisp~ (excludes keymaps)]]
     - [[#options-in-library-helm-elisp][Options in library =helm-elisp=]]
   - [[#library-helm-elisp-package][Library: helm-elisp-package]]
-    - [[#commands-in-keymap-helm-el-package-map-excludes-parent-keymap][Commands in keymap ~helm-el-package-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-el-package-map][Commands in keymap ~helm-el-package-map~]]
     - [[#commands-in-library-helm-elisp-package-excludes-keymaps][Commands in library ~helm-elisp-package~ (excludes keymaps)]]
     - [[#options-in-library-helm-elisp-package][Options in library =helm-elisp-package=]]
   - [[#library-helm-epa][Library: helm-epa]]
@@ -60,48 +60,48 @@
     - [[#options-in-library-helm-epa][Options in library =helm-epa=]]
     - [[#hooks-in-library-helm-epa][Hooks in library =helm-epa=]]
   - [[#library-helm-eshell][Library: helm-eshell]]
-    - [[#commands-in-keymap-helm-eshell-prompts-keymap-excludes-parent-keymap][Commands in keymap ~helm-eshell-prompts-keymap~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-eshell-prompts-keymap][Commands in keymap ~helm-eshell-prompts-keymap~]]
     - [[#commands-in-library-helm-eshell-excludes-keymaps][Commands in library ~helm-eshell~ (excludes keymaps)]]
     - [[#options-in-library-helm-eshell][Options in library =helm-eshell=]]
     - [[#hooks-in-library-helm-eshell][Hooks in library =helm-eshell=]]
   - [[#library-helm-eval][Library: helm-eval]]
-    - [[#commands-in-keymap-helm-eval-expression-map-excludes-parent-keymap][Commands in keymap ~helm-eval-expression-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-eval-expression-map][Commands in keymap ~helm-eval-expression-map~]]
     - [[#commands-in-library-helm-eval-excludes-keymaps][Commands in library ~helm-eval~ (excludes keymaps)]]
     - [[#options-in-library-helm-eval][Options in library =helm-eval=]]
   - [[#library-helm-external][Library: helm-external]]
     - [[#commands-in-library-helm-external-excludes-keymaps][Commands in library ~helm-external~ (excludes keymaps)]]
     - [[#options-in-library-helm-external][Options in library =helm-external=]]
   - [[#library-helm-fd][Library: helm-fd]]
-    - [[#commands-in-keymap-helm-fd-map-excludes-parent-keymap][Commands in keymap ~helm-fd-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-fd-map][Commands in keymap ~helm-fd-map~]]
     - [[#options-in-library-helm-fd][Options in library =helm-fd=]]
   - [[#library-helm-files][Library: helm-files]]
     - [[#modes-in-library-helm-files][Modes in library ~helm-files~]]
-    - [[#commands-in-keymap-helm-browse-project-map-excludes-parent-keymap][Commands in keymap ~helm-browse-project-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-file-name-history-map-excludes-parent-keymap][Commands in keymap ~helm-file-name-history-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-find-files-map-excludes-parent-keymap][Commands in keymap ~helm-find-files-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-read-file-map-excludes-parent-keymap][Commands in keymap ~helm-read-file-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-browse-project-map][Commands in keymap ~helm-browse-project-map~]]
+    - [[#commands-in-keymap-helm-file-name-history-map][Commands in keymap ~helm-file-name-history-map~]]
+    - [[#commands-in-keymap-helm-find-files-map][Commands in keymap ~helm-find-files-map~]]
+    - [[#commands-in-keymap-helm-read-file-map][Commands in keymap ~helm-read-file-map~]]
     - [[#commands-in-library-helm-files-excludes-keymaps][Commands in library ~helm-files~ (excludes keymaps)]]
     - [[#options-in-library-helm-files][Options in library =helm-files=]]
     - [[#hooks-in-library-helm-files][Hooks in library =helm-files=]]
   - [[#library-helm-find][Library: helm-find]]
-    - [[#commands-in-keymap-helm-find-map-excludes-parent-keymap][Commands in keymap ~helm-find-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-find-map][Commands in keymap ~helm-find-map~]]
     - [[#commands-in-library-helm-find-excludes-keymaps][Commands in library ~helm-find~ (excludes keymaps)]]
     - [[#options-in-library-helm-find][Options in library =helm-find=]]
   - [[#library-helm-font][Library: helm-font]]
-    - [[#commands-in-keymap-helm-ucs-map-excludes-parent-keymap][Commands in keymap ~helm-ucs-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-ucs-map][Commands in keymap ~helm-ucs-map~]]
     - [[#commands-in-library-helm-font-excludes-keymaps][Commands in library ~helm-font~ (excludes keymaps)]]
     - [[#options-in-library-helm-font][Options in library =helm-font=]]
   - [[#library-helm-for-files][Library: helm-for-files]]
     - [[#commands-in-library-helm-for-files-excludes-keymaps][Commands in library ~helm-for-files~ (excludes keymaps)]]
     - [[#options-in-library-helm-for-files][Options in library =helm-for-files=]]
   - [[#library-helm-global-bindings][Library: helm-global-bindings]]
-    - [[#commands-in-keymap-helm-command-map-excludes-parent-keymap][Commands in keymap ~helm-command-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-command-map][Commands in keymap ~helm-command-map~]]
     - [[#options-in-library-helm-global-bindings][Options in library =helm-global-bindings=]]
   - [[#library-helm-grep][Library: helm-grep]]
     - [[#modes-in-library-helm-grep][Modes in library ~helm-grep~]]
-    - [[#commands-in-keymap-helm-grep-map-excludes-parent-keymap][Commands in keymap ~helm-grep-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-grep-mode-map-excludes-parent-keymap][Commands in keymap ~helm-grep-mode-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-pdfgrep-map-excludes-parent-keymap][Commands in keymap ~helm-pdfgrep-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-grep-map][Commands in keymap ~helm-grep-map~]]
+    - [[#commands-in-keymap-helm-grep-mode-map][Commands in keymap ~helm-grep-mode-map~]]
+    - [[#commands-in-keymap-helm-pdfgrep-map][Commands in keymap ~helm-pdfgrep-map~]]
     - [[#commands-in-library-helm-grep-excludes-keymaps][Commands in library ~helm-grep~ (excludes keymaps)]]
     - [[#options-in-library-helm-grep][Options in library =helm-grep=]]
     - [[#hooks-in-library-helm-grep][Hooks in library =helm-grep=]]
@@ -111,7 +111,7 @@
     - [[#commands-in-library-helm-id-utils-excludes-keymaps][Commands in library ~helm-id-utils~ (excludes keymaps)]]
     - [[#options-in-library-helm-id-utils][Options in library =helm-id-utils=]]
   - [[#library-helm-imenu][Library: helm-imenu]]
-    - [[#commands-in-keymap-helm-imenu-map-excludes-parent-keymap][Commands in keymap ~helm-imenu-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-imenu-map][Commands in keymap ~helm-imenu-map~]]
     - [[#commands-in-library-helm-imenu-excludes-keymaps][Commands in library ~helm-imenu~ (excludes keymaps)]]
     - [[#options-in-library-helm-imenu][Options in library =helm-imenu=]]
   - [[#library-helm-info][Library: helm-info]]
@@ -123,7 +123,7 @@
     - [[#options-in-library-helm-lib][Options in library =helm-lib=]]
     - [[#hooks-in-library-helm-lib][Hooks in library =helm-lib=]]
   - [[#library-helm-locate][Library: helm-locate]]
-    - [[#commands-in-keymap-helm-locate-map-excludes-parent-keymap][Commands in keymap ~helm-locate-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-locate-map][Commands in keymap ~helm-locate-map~]]
     - [[#commands-in-library-helm-locate-excludes-keymaps][Commands in library ~helm-locate~ (excludes keymaps)]]
     - [[#options-in-library-helm-locate][Options in library =helm-locate=]]
   - [[#library-helm-man][Library: helm-man]]
@@ -134,7 +134,7 @@
     - [[#options-in-library-helm-misc][Options in library =helm-misc=]]
   - [[#library-helm-mode][Library: helm-mode]]
     - [[#modes-in-library-helm-mode][Modes in library ~helm-mode~]]
-    - [[#commands-in-keymap-helm-comp-read-map-excludes-parent-keymap][Commands in keymap ~helm-comp-read-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-comp-read-map][Commands in keymap ~helm-comp-read-map~]]
     - [[#commands-in-library-helm-mode-excludes-keymaps][Commands in library ~helm-mode~ (excludes keymaps)]]
     - [[#options-in-library-helm-mode][Options in library =helm-mode=]]
     - [[#hooks-in-library-helm-mode][Hooks in library =helm-mode=]]
@@ -148,15 +148,15 @@
     - [[#options-in-library-helm-net][Options in library =helm-net=]]
   - [[#library-helm-occur][Library: helm-occur]]
     - [[#modes-in-library-helm-occur][Modes in library ~helm-occur~]]
-    - [[#commands-in-keymap-helm-occur-map-excludes-parent-keymap][Commands in keymap ~helm-occur-map~ (excludes parent-keymap)]]
-    - [[#commands-in-keymap-helm-occur-mode-map-excludes-parent-keymap][Commands in keymap ~helm-occur-mode-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-occur-map][Commands in keymap ~helm-occur-map~]]
+    - [[#commands-in-keymap-helm-occur-mode-map][Commands in keymap ~helm-occur-mode-map~]]
     - [[#commands-in-library-helm-occur-excludes-keymaps][Commands in library ~helm-occur~ (excludes keymaps)]]
     - [[#options-in-library-helm-occur][Options in library =helm-occur=]]
     - [[#hooks-in-library-helm-occur][Hooks in library =helm-occur=]]
   - [[#library-helm-regexp][Library: helm-regexp]]
     - [[#commands-in-library-helm-regexp-excludes-keymaps][Commands in library ~helm-regexp~ (excludes keymaps)]]
   - [[#library-helm-ring][Library: helm-ring]]
-    - [[#commands-in-keymap-helm-kill-ring-map-excludes-parent-keymap][Commands in keymap ~helm-kill-ring-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-kill-ring-map][Commands in keymap ~helm-kill-ring-map~]]
     - [[#commands-in-library-helm-ring-excludes-keymaps][Commands in library ~helm-ring~ (excludes keymaps)]]
     - [[#options-in-library-helm-ring][Options in library =helm-ring=]]
   - [[#library-helm-semantic][Library: helm-semantic]]
@@ -167,16 +167,16 @@
   - [[#library-helm-source][Library: helm-source]]
   - [[#library-helm-sys][Library: helm-sys]]
     - [[#modes-in-library-helm-sys][Modes in library ~helm-sys~]]
-    - [[#commands-in-keymap-helm-top-map-excludes-parent-keymap][Commands in keymap ~helm-top-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-top-map][Commands in keymap ~helm-top-map~]]
     - [[#commands-in-library-helm-sys-excludes-keymaps][Commands in library ~helm-sys~ (excludes keymaps)]]
     - [[#options-in-library-helm-sys][Options in library =helm-sys=]]
     - [[#hooks-in-library-helm-sys][Hooks in library =helm-sys=]]
   - [[#library-helm-tags][Library: helm-tags]]
-    - [[#commands-in-keymap-helm-etags-map-excludes-parent-keymap][Commands in keymap ~helm-etags-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-etags-map][Commands in keymap ~helm-etags-map~]]
     - [[#commands-in-library-helm-tags-excludes-keymaps][Commands in library ~helm-tags~ (excludes keymaps)]]
     - [[#options-in-library-helm-tags][Options in library =helm-tags=]]
   - [[#library-helm-types][Library: helm-types]]
-    - [[#commands-in-keymap-helm-generic-files-map-excludes-parent-keymap][Commands in keymap ~helm-generic-files-map~ (excludes parent-keymap)]]
+    - [[#commands-in-keymap-helm-generic-files-map][Commands in keymap ~helm-generic-files-map~]]
     - [[#options-in-library-helm-types][Options in library =helm-types=]]
   - [[#library-helm-utils][Library: helm-utils]]
     - [[#modes-in-library-helm-utils][Modes in library ~helm-utils~]]
@@ -288,280 +288,9 @@
 
   See ~fit-window-to-buffer~ for more infos.
 
-*** Commands in keymap ~helm-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-map~
 
-**** minor-mode-p
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c l)}}} (~helm-display-line-numbers-mode~) ::
-
-  #+findex: helm-display-line-numbers-mode @r{(helm-map)}
-
-  #+kindex: C-c l @r{(helm-map)}
-
-  (helm-display-line-numbers-mode &optional ARG)
-
-  Toggle display of line numbers in current Helm buffer.
-
-  If called interactively, toggle ~Helm-Display-Line-Numbers mode~.
-  If the prefix argument is positive, enable the mode, and if it is
-  zero or negative, disable the mode.
-
-  If called from Lisp, toggle the mode if ARG is ~toggle~.  Enable
-  the mode if ARG is nil, omitted, or is a positive number.
-  Disable the mode if ARG is a negative number.
-
-  The mode's hook is called both when the mode is enabled and when
-  it is disabled.
-
-- {{{kbd(C-c C-f)}}} (~helm-follow-mode~) ::
-
-  #+findex: helm-follow-mode @r{(helm-map)}
-
-  #+kindex: C-c C-f @r{(helm-map)}
-
-  (helm-follow-mode &optional ARG)
-
-  Execute persistent action every time the cursor is moved.
-
-  This mode is source local, i.e. It applies on current source only.
-  \<helm-map>
-  This mode can be enabled or disabled interactively at anytime during
-  a helm session with \[helm-follow-mode].
-
-  When enabling interactively ~helm-follow-mode~ in a source, you
-  can keep it enabled for next Emacs sessions by setting
-  ~helm-follow-mode-persistent~ to a non-nil value.
-
-  When ~helm-follow-mode~ is called with a prefix arg and
-  ~helm-follow-mode-persistent~ is non-nil ~helm-follow-mode~ will
-  be persistent only for this Emacs session, but not for the next
-  Emacs sessions, i.e. the current source will not be saved to
-  ~helm-source-names-using-follow~.
-
-  A prefix arg with ~helm-follow-mode~ already enabled will have no
-  effect.
-
-  Note that you can use instead of this mode the commands
-  ~helm-follow-action-forward~ and ~helm-follow-action-backward~ at
-  anytime in all Helm sessions.
-
-  They are bound by default to \[helm-follow-action-forward] and
-  \[helm-follow-action-backward].
-
-**** uncategorized Helm To
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-h C-d)}}} (~helm-enable-or-switch-to-debug~) ::
-
-  #+findex: helm-enable-or-switch-to-debug @r{(helm-map)}
-
-  #+kindex: C-h C-d @r{(helm-map)}
-
-  First hit enable helm debugging, second hit switch to debug buffer.
-
-**** uncategorized Helm Windows
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c -)}}} (~helm-swap-windows~) ::
-
-  #+findex: helm-swap-windows @r{(helm-map)}
-
-  #+kindex: C-c - @r{(helm-map)}
-
-  Swap window holding ~helm-buffer~ with other window.
-
-**** uncategorized Helm Buffer
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(M-<)}}} (~helm-beginning-of-buffer~) ::
-
-  #+findex: helm-beginning-of-buffer @r{(helm-map)}
-
-  #+kindex: M-< @r{(helm-map)}
-
-  Move selection at the top.
-
-- {{{kbd(C-c TAB)}}} (~helm-copy-to-buffer~) ::
-
-  #+findex: helm-copy-to-buffer @r{(helm-map)}
-
-  #+kindex: C-c TAB @r{(helm-map)}
-
-  Copy selection or marked candidates to ~helm-current-buffer~.
-  Note that the real values of candidates are copied and not the
-  display values.
-
-- {{{kbd(M->)}}} (~helm-end-of-buffer~) ::
-
-  #+findex: helm-end-of-buffer @r{(helm-map)}
-
-  #+kindex: M-> @r{(helm-map)}
-
-  Move selection at the bottom.
-
-**** uncategorized Helm Minibuffer
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-k)}}} (~helm-delete-minibuffer-contents~) ::
-
-  #+findex: helm-delete-minibuffer-contents @r{(helm-map)}
-
-  #+kindex: C-k @r{(helm-map)}
-
-  (helm-delete-minibuffer-contents &optional ARG)
-
-  Delete minibuffer contents.
-  When ~helm-delete-minibuffer-contents-from-point~ is non-nil,
-  delete minibuffer contents from point instead of deleting all.
-  With a prefix arg reverse this behaviour.  When at the end of
-  minibuffer, delete all.
-
-- {{{kbd(RET)}}} (~helm-maybe-exit-minibuffer~) ::
-
-  #+findex: helm-maybe-exit-minibuffer @r{(helm-map)}
-
-  #+kindex: RET @r{(helm-map)}
-
-**** uncategorized Helm Line
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c %)}}} (~helm-exchange-minibuffer-and-header-line~) ::
-
-  #+findex: helm-exchange-minibuffer-and-header-line @r{(helm-map)}
-
-  #+kindex: C-c % @r{(helm-map)}
-
-  Display minibuffer in header-line and vice versa for current Helm session.
-
-  This is a toggle command.
-
-**** uncategorized Helm Next
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-n)}}} ::
-- {{{kbd(<down>)}}} (~helm-next-line~) ::
-
-  #+findex: helm-next-line @r{(helm-map)}
-
-  #+kindex: C-n @r{(helm-map)}
-  #+kindex: <down> @r{(helm-map)}
-
-  (helm-next-line &optional ARG)
-
-  Move selection to the next ARG line(s).
-  When numeric prefix arg is > than the number of candidates, then
-  move to the last candidate of current source (i.e. don't move to
-  next source).
-
-- {{{kbd(C-v)}}} ::
-- {{{kbd(<next>)}}} (~helm-next-page~) ::
-
-  #+findex: helm-next-page @r{(helm-map)}
-
-  #+kindex: C-v @r{(helm-map)}
-  #+kindex: <next> @r{(helm-map)}
-
-  Move selection forward with a pageful.
-
-- {{{kbd(<right>)}}} ::
-- {{{kbd(C-o)}}} (~helm-next-source~) ::
-
-  #+findex: helm-next-source @r{(helm-map)}
-
-  #+kindex: <right> @r{(helm-map)}
-  #+kindex: C-o @r{(helm-map)}
-
-  Move selection to the next source.
-
-**** uncategorized Helm Previous
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-p)}}} ::
-- {{{kbd(<up>)}}} (~helm-previous-line~) ::
-
-  #+findex: helm-previous-line @r{(helm-map)}
-
-  #+kindex: C-p @r{(helm-map)}
-  #+kindex: <up> @r{(helm-map)}
-
-  (helm-previous-line &optional ARG)
-
-  Move selection to the ARG previous line(s).
-  Same behavior as ~helm-next-line~ when called with a numeric
-  prefix arg.
-
-- {{{kbd(<prior>)}}} ::
-- {{{kbd(M-v)}}} (~helm-previous-page~) ::
-
-  #+findex: helm-previous-page @r{(helm-map)}
-
-  #+kindex: <prior> @r{(helm-map)}
-  #+kindex: M-v @r{(helm-map)}
-
-  Move selection back with a pageful.
-
-- {{{kbd(<left>)}}} ::
-- {{{kbd(M-o)}}} (~helm-previous-source~) ::
-
-  #+findex: helm-previous-source @r{(helm-map)}
-
-  #+kindex: <left> @r{(helm-map)}
-  #+kindex: M-o @r{(helm-map)}
-
-  Move selection to the previous source.
-
-**** uncategorized Helm All
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-M-e)}}} (~helm-display-all-sources~) ::
-
-  #+findex: helm-display-all-sources @r{(helm-map)}
-
-  #+kindex: C-M-e @r{(helm-map)}
-
-  Display all sources previously hidden by ~helm-set-source-filter~.
-
-- {{{kbd(C-M-a)}}} (~helm-show-all-candidates-in-source~) ::
-
-  #+findex: helm-show-all-candidates-in-source @r{(helm-map)}
-
-  #+kindex: C-M-a @r{(helm-map)}
-
-  (helm-show-all-candidates-in-source ARG)
-
-  Toggle all or only candidate-number-limit cands in current source.
-  With a numeric prefix arg show only the ARG number of candidates.
-  The prefix arg has no effect when toggling to only
-  candidate-number-limit.
-
-- {{{kbd(M-U)}}} (~helm-unmark-all~) ::
-
-  #+findex: helm-unmark-all @r{(helm-map)}
-
-  #+kindex: M-U @r{(helm-map)}
-
-  Unmark all candidates in all sources of current helm session.
-
-**** uncategorized Helm Quit
+**** Most Important
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -575,287 +304,11 @@
   Quit minibuffer in helm.
   If action buffer is displayed, kill it.
 
-- {{{kbd(C-x C-f)}}} (~helm-quit-and-find-file~) ::
+- {{{kbd(RET)}}} (~helm-maybe-exit-minibuffer~) ::
 
-  #+findex: helm-quit-and-find-file @r{(helm-map)}
+  #+findex: helm-maybe-exit-minibuffer @r{(helm-map)}
 
-  #+kindex: C-x C-f @r{(helm-map)}
-
-  Drop into ~helm-find-files~ from ~helm~.
-  If current selection is a buffer or a file, ~helm-find-files~
-  from its directory.
-
-- {{{kbd(C-x C-b)}}} (~helm-resume-list-buffers-after-quit~) ::
-
-  #+findex: helm-resume-list-buffers-after-quit @r{(helm-map)}
-
-  #+kindex: C-x C-b @r{(helm-map)}
-
-  List Helm buffers that can be resumed within a running Helm.
-
-- {{{kbd(C-x b)}}} (~helm-resume-previous-session-after-quit~) ::
-
-  #+findex: helm-resume-previous-session-after-quit @r{(helm-map)}
-
-  #+kindex: C-x b @r{(helm-map)}
-
-  Resume previous Helm session within a running Helm.
-
-**** uncategorized Helm Mark
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(M-a)}}} (~helm-mark-all~) ::
-
-  #+findex: helm-mark-all @r{(helm-map)}
-
-  #+kindex: M-a @r{(helm-map)}
-
-  (helm-mark-all &optional ALL)
-
-  Mark all visible unmarked candidates in current source.
-
-  With a prefix arg mark all visible unmarked candidates in all
-  sources.
-
-- {{{kbd(M-))}}} (~helm-next-visible-mark~) ::
-
-  #+findex: helm-next-visible-mark @r{(helm-map)}
-
-  #+kindex: M-) @r{(helm-map)}
-
-  (helm-next-visible-mark &optional PREV)
-
-  Move next Helm visible mark.
-  If PREV is non-nil move to precedent.
-
-- {{{kbd(M-()}}} (~helm-prev-visible-mark~) ::
-
-  #+findex: helm-prev-visible-mark @r{(helm-map)}
-
-  #+kindex: M-( @r{(helm-map)}
-
-  Move previous helm visible mark.
-
-**** uncategorized Helm Window
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-{)}}} (~helm-enlarge-window~) ::
-
-  #+findex: helm-enlarge-window @r{(helm-map)}
-
-  #+kindex: C-@{ @r{(helm-map)}
-
-  Enlarge helm window.
-
-- {{{kbd(C-})}}} (~helm-narrow-window~) ::
-
-  #+findex: helm-narrow-window @r{(helm-map)}
-
-  #+kindex: C-@} @r{(helm-map)}
-
-  Narrow helm window.
-
-- {{{kbd(C-l)}}} (~helm-recenter-top-bottom-other-window~) ::
-
-  #+findex: helm-recenter-top-bottom-other-window @r{(helm-map)}
-
-  #+kindex: C-l @r{(helm-map)}
-
-  (helm-recenter-top-bottom-other-window &optional ARG)
-
-  Run ~recenter-top-bottom~ in other window.
-  Meaning of prefix ARG is the same as in ~recenter-top-bottom~.
-
-- {{{kbd(C-M-l)}}} (~helm-reposition-window-other-window~) ::
-
-  #+findex: helm-reposition-window-other-window @r{(helm-map)}
-
-  #+kindex: C-M-l @r{(helm-map)}
-
-  (helm-reposition-window-other-window &optional ARG)
-
-  Run ~reposition-window~ in other window.
-  Meaning of prefix ARG is the same as in ~reposition-window~.
-
-- {{{kbd(C-M-<down>)}}} ::
-- {{{kbd(M-<next>)}}} ::
-- {{{kbd(C-M-v)}}} (~helm-scroll-other-window~) ::
-
-  #+findex: helm-scroll-other-window @r{(helm-map)}
-
-  #+kindex: C-M-<down> @r{(helm-map)}
-  #+kindex: M-<next> @r{(helm-map)}
-  #+kindex: C-M-v @r{(helm-map)}
-
-  (helm-scroll-other-window &optional ARG)
-
-  Scroll other window upward ARG many lines.
-  When arg is not provided scroll ~helm-scroll-amount~ lines.
-  See ~scroll-other-window~.
-
-- {{{kbd(C-M-<up>)}}} ::
-- {{{kbd(M-<prior>)}}} ::
-- {{{kbd(C-M-S-v)}}} ::
-- {{{kbd(C-M-y)}}} (~helm-scroll-other-window-down~) ::
-
-  #+findex: helm-scroll-other-window-down @r{(helm-map)}
-
-  #+kindex: C-M-<up> @r{(helm-map)}
-  #+kindex: M-<prior> @r{(helm-map)}
-  #+kindex: C-M-S-v @r{(helm-map)}
-  #+kindex: C-M-y @r{(helm-map)}
-
-  (helm-scroll-other-window-down &optional ARG)
-
-  Scroll other window downward ARG many lines.
-  When arg is not provided scroll ~helm-scroll-amount~ lines.
-  See ~scroll-other-window-down~.
-
-**** uncategorized Helm Toggle Visible
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-@)}}} (~helm-toggle-visible-mark~) ::
-
-  #+findex: helm-toggle-visible-mark @r{(helm-map)}
-
-  #+kindex: C-@ @r{(helm-map)}
-
-  (helm-toggle-visible-mark ARG)
-
-  Toggle Helm visible mark at point ARG times.
-  If ARG is negative toggle backward.
-
-- {{{kbd(M-SPC)}}} (~helm-toggle-visible-mark-backward~) ::
-
-  #+findex: helm-toggle-visible-mark-backward @r{(helm-map)}
-
-  #+kindex: M-SPC @r{(helm-map)}
-
-- {{{kbd(C-SPC)}}} (~helm-toggle-visible-mark-forward~) ::
-
-  #+findex: helm-toggle-visible-mark-forward @r{(helm-map)}
-
-  #+kindex: C-SPC @r{(helm-map)}
-
-**** uncategorized Helm Toggle uncategorized
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(M-m)}}} (~helm-toggle-all-marks~) ::
-
-  #+findex: helm-toggle-all-marks @r{(helm-map)}
-
-  #+kindex: M-m @r{(helm-map)}
-
-  (helm-toggle-all-marks &optional ALL)
-
-  Toggle all marks.
-
-  Mark all visible candidates of current source or unmark all
-  candidates visible or invisible in all sources of current Helm
-  session.
-
-  With a prefix argument mark all candidates in all sources.
-
-- {{{kbd(C-c _)}}} (~helm-toggle-full-frame~) ::
-
-  #+findex: helm-toggle-full-frame @r{(helm-map)}
-
-  #+kindex: C-c _ @r{(helm-map)}
-
-  (helm-toggle-full-frame &optional ARG)
-
-  Toggle ~helm-buffer~ full-frame view.
-
-- {{{kbd(C-t)}}} (~helm-toggle-resplit-and-swap-windows~) ::
-
-  #+findex: helm-toggle-resplit-and-swap-windows @r{(helm-map)}
-
-  #+kindex: C-t @r{(helm-map)}
-
-  Multi key command to re-split and swap Helm window.
-  First call runs ~helm-toggle-resplit-window~,
-  and second call within 1s runs ~helm-swap-windows~.
-
-- {{{kbd(C-!)}}} (~helm-toggle-suspend-update~) ::
-
-  #+findex: helm-toggle-suspend-update @r{(helm-map)}
-
-  #+kindex: C-! @r{(helm-map)}
-
-  Enable or disable display update in helm.
-  This can be useful for example for quietly writing a complex
-  regexp without Helm constantly updating.
-
-- {{{kbd(C-c >)}}} (~helm-toggle-truncate-line~) ::
-
-  #+findex: helm-toggle-truncate-line @r{(helm-map)}
-
-  #+kindex: C-c > @r{(helm-map)}
-
-  Toggle ~truncate-lines~ value in ~helm-buffer~
-
-**** uncategorized Helm Selection
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c C-k)}}} (~helm-kill-selection-and-quit~) ::
-
-  #+findex: helm-kill-selection-and-quit @r{(helm-map)}
-
-  #+kindex: C-c C-k @r{(helm-map)}
-
-  (helm-kill-selection-and-quit ARG)
-
-  Store display value of current selection to kill ring.
-  With a prefix arg use real value of current selection.
-  Display value is shown in ~helm-buffer~ and real value is used to
-  perform actions.
-
-- {{{kbd(C-c C-y)}}} (~helm-yank-selection~) ::
-
-  #+findex: helm-yank-selection @r{(helm-map)}
-
-  #+kindex: C-c C-y @r{(helm-map)}
-
-  (helm-yank-selection ARG)
-
-  Set minibuffer contents to current display selection.
-  With a prefix arg set to real value of current selection.
-
-**** uncategorized Helm Action Follow
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-<up>)}}} (~helm-follow-action-backward~) ::
-
-  #+findex: helm-follow-action-backward @r{(helm-map)}
-
-  #+kindex: C-<up> @r{(helm-map)}
-
-  Go to previous line and execute persistent action.
-
-- {{{kbd(C-<down>)}}} (~helm-follow-action-forward~) ::
-
-  #+findex: helm-follow-action-forward @r{(helm-map)}
-
-  #+kindex: C-<down> @r{(helm-map)}
-
-  Go to next line and execute persistent action.
-
-**** uncategorized Helm Action Execute
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
+  #+kindex: RET @r{(helm-map)}
 
 - {{{kbd(C-j)}}} (~helm-execute-persistent-action~) ::
 
@@ -879,6 +332,15 @@
   ~helm-select-persistent-action-window~ in other window to
   maintain visibility.  The argument SPLIT can be used to force
   splitting inconditionally, it is unused actually.
+
+- {{{kbd(TAB)}}} (~helm-select-action~) ::
+
+  #+findex: helm-select-action @r{(helm-map)}
+
+  #+kindex: TAB @r{(helm-map)}
+
+  Select an action for the currently selected candidate.
+  If action buffer is selected, back to the Helm buffer.
 
 - {{{kbd(C-x 1)}}} (~helm-execute-selection-action-at-nth-+1~) ::
 
@@ -988,34 +450,35 @@
 
   #+kindex: C-c 9 @r{(helm-map)}
 
-**** uncategorized Helm Action uncategorized
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
+- {{{kbd(C-<tab>)}}} ::
+- {{{kbd(C-s)}}} ::
+- {{{kbd(C-h h)}}} ::
+- {{{kbd(C-h C-h)}}} ::
+- {{{kbd(M-s)}}} (~undefined~) ::
 
-- {{{kbd(TAB)}}} (~helm-select-action~) ::
+  #+findex: undefined @r{(helm-map)}
 
-  #+findex: helm-select-action @r{(helm-map)}
+  #+kindex: C-<tab> @r{(helm-map)}
+  #+kindex: C-s @r{(helm-map)}
+  #+kindex: C-h h @r{(helm-map)}
+  #+kindex: C-h C-h @r{(helm-map)}
+  #+kindex: M-s @r{(helm-map)}
 
-  #+kindex: TAB @r{(helm-map)}
+  Beep to tell the user this binding is undefined.
 
-  Select an action for the currently selected candidate.
-  If action buffer is selected, back to the Helm buffer.
+- {{{kbd(C-k)}}} (~helm-delete-minibuffer-contents~) ::
 
-**** uncategorized Helm uncategorized
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
+  #+findex: helm-delete-minibuffer-contents @r{(helm-map)}
 
-- {{{kbd(C-h c)}}} (~helm-customize-group~) ::
+  #+kindex: C-k @r{(helm-map)}
 
-  #+findex: helm-customize-group @r{(helm-map)}
+  (helm-delete-minibuffer-contents &optional ARG)
 
-  #+kindex: C-h c @r{(helm-map)}
-
-  Jump to customization group of current source.
-
-  Default to Helm group when group is not defined in source.
+  Delete minibuffer contents.
+  When ~helm-delete-minibuffer-contents-from-point~ is non-nil,
+  delete minibuffer contents from point instead of deleting all.
+  With a prefix arg reverse this behaviour.  When at the end of
+  minibuffer, delete all.
 
 - {{{kbd(<help> m)}}} ::
 - {{{kbd(C-h m)}}} ::
@@ -1036,6 +499,508 @@
   The global ~helm-help-message~ is always added after this local
   help.
 
+- {{{kbd(C-h c)}}} (~helm-customize-group~) ::
+
+  #+findex: helm-customize-group @r{(helm-map)}
+
+  #+kindex: C-h c @r{(helm-map)}
+
+  Jump to customization group of current source.
+
+  Default to Helm group when group is not defined in source.
+
+**** Minor Modes
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c l)}}} (~helm-display-line-numbers-mode~) ::
+
+  #+findex: helm-display-line-numbers-mode @r{(helm-map)}
+
+  #+kindex: C-c l @r{(helm-map)}
+
+  (helm-display-line-numbers-mode &optional ARG)
+
+  Toggle display of line numbers in current Helm buffer.
+
+  If called interactively, toggle ~Helm-Display-Line-Numbers mode~.
+  If the prefix argument is positive, enable the mode, and if it is
+  zero or negative, disable the mode.
+
+  If called from Lisp, toggle the mode if ARG is ~toggle~.  Enable
+  the mode if ARG is nil, omitted, or is a positive number.
+  Disable the mode if ARG is a negative number.
+
+  The mode's hook is called both when the mode is enabled and when
+  it is disabled.
+
+- {{{kbd(C-c C-f)}}} (~helm-follow-mode~) ::
+
+  #+findex: helm-follow-mode @r{(helm-map)}
+
+  #+kindex: C-c C-f @r{(helm-map)}
+
+  (helm-follow-mode &optional ARG)
+
+  Execute persistent action every time the cursor is moved.
+
+  This mode is source local, i.e. It applies on current source only.
+  \<helm-map>
+  This mode can be enabled or disabled interactively at anytime during
+  a helm session with \[helm-follow-mode].
+
+  When enabling interactively ~helm-follow-mode~ in a source, you
+  can keep it enabled for next Emacs sessions by setting
+  ~helm-follow-mode-persistent~ to a non-nil value.
+
+  When ~helm-follow-mode~ is called with a prefix arg and
+  ~helm-follow-mode-persistent~ is non-nil ~helm-follow-mode~ will
+  be persistent only for this Emacs session, but not for the next
+  Emacs sessions, i.e. the current source will not be saved to
+  ~helm-source-names-using-follow~.
+
+  A prefix arg with ~helm-follow-mode~ already enabled will have no
+  effect.
+
+  Note that you can use instead of this mode the commands
+  ~helm-follow-action-forward~ and ~helm-follow-action-backward~ at
+  anytime in all Helm sessions.
+
+  They are bound by default to \[helm-follow-action-forward] and
+  \[helm-follow-action-backward].
+
+**** Control what is displayed
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c >)}}} (~helm-toggle-truncate-line~) ::
+
+  #+findex: helm-toggle-truncate-line @r{(helm-map)}
+
+  #+kindex: C-c > @r{(helm-map)}
+
+  Toggle ~truncate-lines~ value in ~helm-buffer~
+
+- {{{kbd(C-M-e)}}} (~helm-display-all-sources~) ::
+
+  #+findex: helm-display-all-sources @r{(helm-map)}
+
+  #+kindex: C-M-e @r{(helm-map)}
+
+  Display all sources previously hidden by ~helm-set-source-filter~.
+
+- {{{kbd(C-M-a)}}} (~helm-show-all-candidates-in-source~) ::
+
+  #+findex: helm-show-all-candidates-in-source @r{(helm-map)}
+
+  #+kindex: C-M-a @r{(helm-map)}
+
+  (helm-show-all-candidates-in-source ARG)
+
+  Toggle all or only candidate-number-limit cands in current source.
+  With a numeric prefix arg show only the ARG number of candidates.
+  The prefix arg has no effect when toggling to only
+  candidate-number-limit.
+
+**** Control the layout
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c %)}}} (~helm-exchange-minibuffer-and-header-line~) ::
+
+  #+findex: helm-exchange-minibuffer-and-header-line @r{(helm-map)}
+
+  #+kindex: C-c % @r{(helm-map)}
+
+  Display minibuffer in header-line and vice versa for current Helm session.
+
+  This is a toggle command.
+
+- {{{kbd(C-{)}}} (~helm-enlarge-window~) ::
+
+  #+findex: helm-enlarge-window @r{(helm-map)}
+
+  #+kindex: C-@{ @r{(helm-map)}
+
+  Enlarge helm window.
+
+- {{{kbd(C-})}}} (~helm-narrow-window~) ::
+
+  #+findex: helm-narrow-window @r{(helm-map)}
+
+  #+kindex: C-@} @r{(helm-map)}
+
+  Narrow helm window.
+
+- {{{kbd(C-c -)}}} (~helm-swap-windows~) ::
+
+  #+findex: helm-swap-windows @r{(helm-map)}
+
+  #+kindex: C-c - @r{(helm-map)}
+
+  Swap window holding ~helm-buffer~ with other window.
+
+- {{{kbd(C-c _)}}} (~helm-toggle-full-frame~) ::
+
+  #+findex: helm-toggle-full-frame @r{(helm-map)}
+
+  #+kindex: C-c _ @r{(helm-map)}
+
+  (helm-toggle-full-frame &optional ARG)
+
+  Toggle ~helm-buffer~ full-frame view.
+
+- {{{kbd(C-t)}}} (~helm-toggle-resplit-and-swap-windows~) ::
+
+  #+findex: helm-toggle-resplit-and-swap-windows @r{(helm-map)}
+
+  #+kindex: C-t @r{(helm-map)}
+
+  Multi key command to re-split and swap Helm window.
+  First call runs ~helm-toggle-resplit-window~,
+  and second call within 1s runs ~helm-swap-windows~.
+
+**** Act on Other Window
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-l)}}} (~helm-recenter-top-bottom-other-window~) ::
+
+  #+findex: helm-recenter-top-bottom-other-window @r{(helm-map)}
+
+  #+kindex: C-l @r{(helm-map)}
+
+  (helm-recenter-top-bottom-other-window &optional ARG)
+
+  Run ~recenter-top-bottom~ in other window.
+  Meaning of prefix ARG is the same as in ~recenter-top-bottom~.
+
+- {{{kbd(C-M-l)}}} (~helm-reposition-window-other-window~) ::
+
+  #+findex: helm-reposition-window-other-window @r{(helm-map)}
+
+  #+kindex: C-M-l @r{(helm-map)}
+
+  (helm-reposition-window-other-window &optional ARG)
+
+  Run ~reposition-window~ in other window.
+  Meaning of prefix ARG is the same as in ~reposition-window~.
+
+- {{{kbd(C-M-<down>)}}} ::
+- {{{kbd(M-<next>)}}} ::
+- {{{kbd(C-M-v)}}} (~helm-scroll-other-window~) ::
+
+  #+findex: helm-scroll-other-window @r{(helm-map)}
+
+  #+kindex: C-M-<down> @r{(helm-map)}
+  #+kindex: M-<next> @r{(helm-map)}
+  #+kindex: C-M-v @r{(helm-map)}
+
+  (helm-scroll-other-window &optional ARG)
+
+  Scroll other window upward ARG many lines.
+  When arg is not provided scroll ~helm-scroll-amount~ lines.
+  See ~scroll-other-window~.
+
+- {{{kbd(C-M-<up>)}}} ::
+- {{{kbd(M-<prior>)}}} ::
+- {{{kbd(C-M-S-v)}}} ::
+- {{{kbd(C-M-y)}}} (~helm-scroll-other-window-down~) ::
+
+  #+findex: helm-scroll-other-window-down @r{(helm-map)}
+
+  #+kindex: C-M-<up> @r{(helm-map)}
+  #+kindex: M-<prior> @r{(helm-map)}
+  #+kindex: C-M-S-v @r{(helm-map)}
+  #+kindex: C-M-y @r{(helm-map)}
+
+  (helm-scroll-other-window-down &optional ARG)
+
+  Scroll other window downward ARG many lines.
+  When arg is not provided scroll ~helm-scroll-amount~ lines.
+  See ~scroll-other-window-down~.
+
+**** Navigate
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+***** Move by line
+
+- {{{kbd(C-p)}}} ::
+- {{{kbd(<up>)}}} (~helm-previous-line~) ::
+
+  #+findex: helm-previous-line @r{(helm-map)}
+
+  #+kindex: C-p @r{(helm-map)}
+  #+kindex: <up> @r{(helm-map)}
+
+  (helm-previous-line &optional ARG)
+
+  Move selection to the ARG previous line(s).
+  Same behavior as ~helm-next-line~ when called with a numeric
+  prefix arg.
+
+- {{{kbd(C-n)}}} ::
+- {{{kbd(<down>)}}} (~helm-next-line~) ::
+
+  #+findex: helm-next-line @r{(helm-map)}
+
+  #+kindex: C-n @r{(helm-map)}
+  #+kindex: <down> @r{(helm-map)}
+
+  (helm-next-line &optional ARG)
+
+  Move selection to the next ARG line(s).
+  When numeric prefix arg is > than the number of candidates, then
+  move to the last candidate of current source (i.e. don't move to
+  next source).
+
+***** Move by page
+
+- {{{kbd(<prior>)}}} ::
+- {{{kbd(M-v)}}} (~helm-previous-page~) ::
+
+  #+findex: helm-previous-page @r{(helm-map)}
+
+  #+kindex: <prior> @r{(helm-map)}
+  #+kindex: M-v @r{(helm-map)}
+
+  Move selection back with a pageful.
+
+- {{{kbd(C-v)}}} ::
+- {{{kbd(<next>)}}} (~helm-next-page~) ::
+
+  #+findex: helm-next-page @r{(helm-map)}
+
+  #+kindex: C-v @r{(helm-map)}
+  #+kindex: <next> @r{(helm-map)}
+
+  Move selection forward with a pageful.
+
+***** Move by source
+
+- {{{kbd(<left>)}}} ::
+- {{{kbd(M-o)}}} (~helm-previous-source~) ::
+
+  #+findex: helm-previous-source @r{(helm-map)}
+
+  #+kindex: <left> @r{(helm-map)}
+  #+kindex: M-o @r{(helm-map)}
+
+  Move selection to the previous source.
+
+- {{{kbd(<right>)}}} ::
+- {{{kbd(C-o)}}} (~helm-next-source~) ::
+
+  #+findex: helm-next-source @r{(helm-map)}
+
+  #+kindex: <right> @r{(helm-map)}
+  #+kindex: C-o @r{(helm-map)}
+
+  Move selection to the next source.
+
+***** Move to beginning or end of buffer
+
+- {{{kbd(M-<)}}} (~helm-beginning-of-buffer~) ::
+
+  #+findex: helm-beginning-of-buffer @r{(helm-map)}
+
+  #+kindex: M-< @r{(helm-map)}
+
+  Move selection at the top.
+
+- {{{kbd(M->)}}} (~helm-end-of-buffer~) ::
+
+  #+findex: helm-end-of-buffer @r{(helm-map)}
+
+  #+kindex: M-> @r{(helm-map)}
+
+  Move selection at the bottom.
+
+***** Move by mark
+
+- {{{kbd(M-()}}} (~helm-prev-visible-mark~) ::
+
+  #+findex: helm-prev-visible-mark @r{(helm-map)}
+
+  #+kindex: M-( @r{(helm-map)}
+
+  Move previous helm visible mark.
+
+- {{{kbd(M-))}}} (~helm-next-visible-mark~) ::
+
+  #+findex: helm-next-visible-mark @r{(helm-map)}
+
+  #+kindex: M-) @r{(helm-map)}
+
+  (helm-next-visible-mark &optional PREV)
+
+  Move next Helm visible mark.
+  If PREV is non-nil move to precedent.
+
+****  Mark
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-a)}}} (~helm-mark-all~) ::
+
+  #+findex: helm-mark-all @r{(helm-map)}
+
+  #+kindex: M-a @r{(helm-map)}
+
+  (helm-mark-all &optional ALL)
+
+  Mark all visible unmarked candidates in current source.
+
+  With a prefix arg mark all visible unmarked candidates in all
+  sources.
+
+- {{{kbd(M-U)}}} (~helm-unmark-all~) ::
+
+  #+findex: helm-unmark-all @r{(helm-map)}
+
+  #+kindex: M-U @r{(helm-map)}
+
+  Unmark all candidates in all sources of current helm session.
+
+- {{{kbd(C-@)}}} (~helm-toggle-visible-mark~) ::
+
+  #+findex: helm-toggle-visible-mark @r{(helm-map)}
+
+  #+kindex: C-@ @r{(helm-map)}
+
+  (helm-toggle-visible-mark ARG)
+
+  Toggle Helm visible mark at point ARG times.
+  If ARG is negative toggle backward.
+
+- {{{kbd(M-m)}}} (~helm-toggle-all-marks~) ::
+
+  #+findex: helm-toggle-all-marks @r{(helm-map)}
+
+  #+kindex: M-m @r{(helm-map)}
+
+  (helm-toggle-all-marks &optional ALL)
+
+  Toggle all marks.
+
+  Mark all visible candidates of current source or unmark all
+  candidates visible or invisible in all sources of current Helm
+  session.
+
+  With a prefix argument mark all candidates in all sources.
+
+- {{{kbd(M-SPC)}}} (~helm-toggle-visible-mark-backward~) ::
+
+  #+findex: helm-toggle-visible-mark-backward @r{(helm-map)}
+
+  #+kindex: M-SPC @r{(helm-map)}
+
+- {{{kbd(C-SPC)}}} (~helm-toggle-visible-mark-forward~) ::
+
+  #+findex: helm-toggle-visible-mark-forward @r{(helm-map)}
+
+  #+kindex: C-SPC @r{(helm-map)}
+
+**** Act on Selected Candidates
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c TAB)}}} (~helm-copy-to-buffer~) ::
+
+  #+findex: helm-copy-to-buffer @r{(helm-map)}
+
+  #+kindex: C-c TAB @r{(helm-map)}
+
+  Copy selection or marked candidates to ~helm-current-buffer~.
+  Note that the real values of candidates are copied and not the
+  display values.
+
+- {{{kbd(C-c C-k)}}} (~helm-kill-selection-and-quit~) ::
+
+  #+findex: helm-kill-selection-and-quit @r{(helm-map)}
+
+  #+kindex: C-c C-k @r{(helm-map)}
+
+  (helm-kill-selection-and-quit ARG)
+
+  Store display value of current selection to kill ring.
+  With a prefix arg use real value of current selection.
+  Display value is shown in ~helm-buffer~ and real value is used to
+  perform actions.
+
+- {{{kbd(C-c C-y)}}} (~helm-yank-selection~) ::
+
+  #+findex: helm-yank-selection @r{(helm-map)}
+
+  #+kindex: C-c C-y @r{(helm-map)}
+
+  (helm-yank-selection ARG)
+
+  Set minibuffer contents to current display selection.
+  With a prefix arg set to real value of current selection.
+
+**** Move and Act
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-<up>)}}} (~helm-follow-action-backward~) ::
+
+  #+findex: helm-follow-action-backward @r{(helm-map)}
+
+  #+kindex: C-<up> @r{(helm-map)}
+
+  Go to previous line and execute persistent action.
+
+- {{{kbd(C-<down>)}}} (~helm-follow-action-forward~) ::
+
+  #+findex: helm-follow-action-forward @r{(helm-map)}
+
+  #+kindex: C-<down> @r{(helm-map)}
+
+  Go to next line and execute persistent action.
+
+**** Resume Previous Session (after quitting)
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x b)}}} (~helm-resume-previous-session-after-quit~) ::
+
+  #+findex: helm-resume-previous-session-after-quit @r{(helm-map)}
+
+  #+kindex: C-x b @r{(helm-map)}
+
+  Resume previous Helm session within a running Helm.
+
+**** Suspend Update of Candidates
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-!)}}} (~helm-toggle-suspend-update~) ::
+
+  #+findex: helm-toggle-suspend-update @r{(helm-map)}
+
+  #+kindex: C-! @r{(helm-map)}
+
+  Enable or disable display update in helm.
+  This can be useful for example for quietly writing a complex
+  regexp without Helm constantly updating.
+
+**** Helm Refresh
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
 - {{{kbd(C-c C-u)}}} (~helm-refresh~) ::
 
   #+findex: helm-refresh @r{(helm-map)}
@@ -1044,7 +1009,7 @@
 
   Force recalculation and update of candidates.
 
-**** uncategorized uncategorized
+**** COMMENT uncategorized uncategorized
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -1053,21 +1018,46 @@
 
   #+findex: ezmenu-byte-code-function
 
-- {{{kbd(C-<tab>)}}} ::
-- {{{kbd(C-s)}}} ::
-- {{{kbd(C-h h)}}} ::
-- {{{kbd(C-h C-h)}}} ::
-- {{{kbd(M-s)}}} (~undefined~) ::
+**** Find file after Quit
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: undefined @r{(helm-map)}
+- {{{kbd(C-x C-f)}}} (~helm-quit-and-find-file~) ::
 
-  #+kindex: C-<tab> @r{(helm-map)}
-  #+kindex: C-s @r{(helm-map)}
-  #+kindex: C-h h @r{(helm-map)}
-  #+kindex: C-h C-h @r{(helm-map)}
-  #+kindex: M-s @r{(helm-map)}
+  #+findex: helm-quit-and-find-file @r{(helm-map)}
 
-  Beep to tell the user this binding is undefined.
+  #+kindex: C-x C-f @r{(helm-map)}
+
+  Drop into ~helm-find-files~ from ~helm~.
+  If current selection is a buffer or a file, ~helm-find-files~
+  from its directory.
+
+**** List Buffers after Quitting
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x C-b)}}} (~helm-resume-list-buffers-after-quit~) ::
+
+  #+findex: helm-resume-list-buffers-after-quit @r{(helm-map)}
+
+  #+kindex: C-x C-b @r{(helm-map)}
+
+  List Helm buffers that can be resumed within a running Helm.
+
+**** Debug Helm
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-h C-d)}}} (~helm-enable-or-switch-to-debug~) ::
+
+  #+findex: helm-enable-or-switch-to-debug @r{(helm-map)}
+
+  #+kindex: C-h C-d @r{(helm-map)}
+
+  First hit enable helm debugging, second hit switch to debug buffer.
 
 *** Commands in library ~helm~ (excludes keymaps)
 
@@ -2742,7 +2732,7 @@
 
 ** Library: helm-bookmark
 
-*** Commands in keymap ~helm-bookmark-find-files-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-bookmark-find-files-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -2757,7 +2747,7 @@
 
   Run ~helm-bookmark-browse-project~ from keyboard.
 
-*** Commands in keymap ~helm-bookmark-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-bookmark-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -2878,9 +2868,39 @@
 
 ** Library: helm-buffers
 
-*** Commands in keymap ~helm-buffer-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-buffer-map~
 
-**** uncategorized Switch
+**** Control what you see
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c a)}}} (~helm-buffers-toggle-show-hidden-buffers~) ::
+
+  #+findex: helm-buffers-toggle-show-hidden-buffers @r{(helm-buffer-map)}
+
+  #+kindex: C-c a @r{(helm-buffer-map)}
+
+- {{{kbd(C-])}}} (~helm-toggle-buffers-details~) ::
+
+  #+findex: helm-toggle-buffers-details @r{(helm-buffer-map)}
+
+  #+kindex: C-] @r{(helm-buffer-map)}
+
+**** Browse Project
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x C-d)}}} (~helm-buffers-run-browse-project~) ::
+
+  #+findex: helm-buffers-run-browse-project @r{(helm-buffer-map)}
+
+  #+kindex: C-x C-d @r{(helm-buffer-map)}
+
+  Run ~helm-buffers-browse-project~ from key.
+
+**** Switch to Buffer in other frame, window or tab
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -2901,49 +2921,6 @@
 
   Run switch to other window action from ~helm-source-buffers-list~.
 
-**** uncategorized Persistent
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-=)}}} (~helm-buffer-diff-persistent~) ::
-
-  #+findex: helm-buffer-diff-persistent @r{(helm-buffer-map)}
-
-  #+kindex: C-= @r{(helm-buffer-map)}
-
-  Toggle diff buffer without quitting helm.
-
-- {{{kbd(M-G)}}} (~helm-buffer-revert-persistent~) ::
-
-  #+findex: helm-buffer-revert-persistent @r{(helm-buffer-map)}
-
-  #+kindex: M-G @r{(helm-buffer-map)}
-
-  Revert buffer without quitting helm.
-
-- {{{kbd(C-x C-s)}}} (~helm-buffer-save-persistent~) ::
-
-  #+findex: helm-buffer-save-persistent @r{(helm-buffer-map)}
-
-  #+kindex: C-x C-s @r{(helm-buffer-map)}
-
-  Save buffer without quitting Helm.
-
-**** uncategorized Buffers
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-M-SPC)}}} (~helm-buffers-mark-similar-buffers~) ::
-
-  #+findex: helm-buffers-mark-similar-buffers @r{(helm-buffer-map)}
-
-  #+kindex: C-M-SPC @r{(helm-buffer-map)}
-
-  Mark All buffers that have same property ~type~ than current.
-  I.e. same color.
-
 - {{{kbd(C-c C-t)}}} (~helm-buffers-switch-to-buffer-new-tab~) ::
 
   #+findex: helm-buffers-switch-to-buffer-new-tab @r{(helm-buffer-map)}
@@ -2952,53 +2929,20 @@
 
   Run switch to buffer in other tab action from ~helm-source-buffers-list~.
 
-- {{{kbd(C-c a)}}} (~helm-buffers-toggle-show-hidden-buffers~) ::
-
-  #+findex: helm-buffers-toggle-show-hidden-buffers @r{(helm-buffer-map)}
-
-  #+kindex: C-c a @r{(helm-buffer-map)}
-
-- {{{kbd(C-])}}} (~helm-toggle-buffers-details~) ::
-
-  #+findex: helm-toggle-buffers-details @r{(helm-buffer-map)}
-
-  #+kindex: C-] @r{(helm-buffer-map)}
-
-**** uncategorized Run Kill
+**** Run Occur
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(C-c d)}}} (~helm-buffer-run-kill-persistent~) ::
+- {{{kbd(C-s)}}} (~helm-buffers-run-occur~) ::
 
-  #+findex: helm-buffer-run-kill-persistent @r{(helm-buffer-map)}
+  #+findex: helm-buffers-run-occur @r{(helm-buffer-map)}
 
-  #+kindex: C-c d @r{(helm-buffer-map)}
+  #+kindex: C-s @r{(helm-buffer-map)}
 
-  Kill buffer without quitting Helm.
+  Run ~helm-multi-occur-as-action~ by key.
 
-**** uncategorized Run Ediff
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c =)}}} (~helm-buffer-run-ediff~) ::
-
-  #+findex: helm-buffer-run-ediff @r{(helm-buffer-map)}
-
-  #+kindex: C-c = @r{(helm-buffer-map)}
-
-  Run ediff action from ~helm-source-buffers-list~.
-
-- {{{kbd(M-=)}}} (~helm-buffer-run-ediff-merge~) ::
-
-  #+findex: helm-buffer-run-ediff-merge @r{(helm-buffer-map)}
-
-  #+kindex: M-= @r{(helm-buffer-map)}
-
-  Run ediff action from ~helm-source-buffers-list~.
-
-**** uncategorized Run Replace
+**** Query Replace on Buffers' contents
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -3019,18 +2963,32 @@
 
   Run Query replace regexp action from ~helm-source-buffers-list~.
 
-**** uncategorized Run Buffers
+**** Mark similar Buffers
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(M-D)}}} (~helm-buffer-run-kill-buffers~) ::
+- {{{kbd(C-M-SPC)}}} (~helm-buffers-mark-similar-buffers~) ::
 
-  #+findex: helm-buffer-run-kill-buffers @r{(helm-buffer-map)}
+  #+findex: helm-buffers-mark-similar-buffers @r{(helm-buffer-map)}
 
-  #+kindex: M-D @r{(helm-buffer-map)}
+  #+kindex: C-M-SPC @r{(helm-buffer-map)}
 
-  Run kill buffer action from ~helm-source-buffers-list~.
+  Mark All buffers that have same property ~type~ than current.
+  I.e. same color.
+
+**** Save Buffer
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x C-s)}}} (~helm-buffer-save-persistent~) ::
+
+  #+findex: helm-buffer-save-persistent @r{(helm-buffer-map)}
+
+  #+kindex: C-x C-s @r{(helm-buffer-map)}
+
+  Save buffer without quitting Helm.
 
 - {{{kbd(C-x s)}}} (~helm-buffer-run-save-some-buffers~) ::
 
@@ -3040,23 +2998,83 @@
 
   Save unsaved file buffers without quitting Helm.
 
-- {{{kbd(C-x C-d)}}} (~helm-buffers-run-browse-project~) ::
+**** Run Diff and friends
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: helm-buffers-run-browse-project @r{(helm-buffer-map)}
+- {{{kbd(C-=)}}} (~helm-buffer-diff-persistent~) ::
 
-  #+kindex: C-x C-d @r{(helm-buffer-map)}
+  #+findex: helm-buffer-diff-persistent @r{(helm-buffer-map)}
 
-  Run ~helm-buffers-browse-project~ from key.
+  #+kindex: C-= @r{(helm-buffer-map)}
 
-- {{{kbd(C-s)}}} (~helm-buffers-run-occur~) ::
+  Toggle diff buffer without quitting helm.
 
-  #+findex: helm-buffers-run-occur @r{(helm-buffer-map)}
+- {{{kbd(C-c =)}}} (~helm-buffer-run-ediff~) ::
 
-  #+kindex: C-s @r{(helm-buffer-map)}
+  #+findex: helm-buffer-run-ediff @r{(helm-buffer-map)}
 
-  Run ~helm-multi-occur-as-action~ by key.
+  #+kindex: C-c = @r{(helm-buffer-map)}
 
-**** uncategorized Run uncategorized
+  Run ediff action from ~helm-source-buffers-list~.
+
+- {{{kbd(M-=)}}} (~helm-buffer-run-ediff-merge~) ::
+
+  #+findex: helm-buffer-run-ediff-merge @r{(helm-buffer-map)}
+
+  #+kindex: M-= @r{(helm-buffer-map)}
+
+  Run ediff action from ~helm-source-buffers-list~.
+
+**** Kill Buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c d)}}} (~helm-buffer-run-kill-persistent~) ::
+
+  #+findex: helm-buffer-run-kill-persistent @r{(helm-buffer-map)}
+
+  #+kindex: C-c d @r{(helm-buffer-map)}
+
+  Kill buffer without quitting Helm.
+
+- {{{kbd(M-D)}}} (~helm-buffer-run-kill-buffers~) ::
+
+  #+findex: helm-buffer-run-kill-buffers @r{(helm-buffer-map)}
+
+  #+kindex: M-D @r{(helm-buffer-map)}
+
+  Run kill buffer action from ~helm-source-buffers-list~.
+
+**** Rename Buffer
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-R)}}} (~helm-buffer-run-rename-buffer~) ::
+
+  #+findex: helm-buffer-run-rename-buffer @r{(helm-buffer-map)}
+
+  #+kindex: M-R @r{(helm-buffer-map)}
+
+  Run rename buffer action from ~helm-source-buffers-list~.
+
+**** Revert Buffer
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-G)}}} (~helm-buffer-revert-persistent~) ::
+
+  #+findex: helm-buffer-revert-persistent @r{(helm-buffer-map)}
+
+  #+kindex: M-G @r{(helm-buffer-map)}
+
+  Revert buffer without quitting helm.
+
+**** Goto line
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -3069,13 +3087,10 @@
 
   Switch to buffer at line number.
 
-- {{{kbd(M-R)}}} (~helm-buffer-run-rename-buffer~) ::
-
-  #+findex: helm-buffer-run-rename-buffer @r{(helm-buffer-map)}
-
-  #+kindex: M-R @r{(helm-buffer-map)}
-
-  Run rename buffer action from ~helm-source-buffers-list~.
+**** Run ZGrep
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(M-g s)}}} (~helm-buffer-run-zgrep~) ::
 
@@ -3085,9 +3100,9 @@
 
   Run Grep action from ~helm-source-buffers-list~.
 
-*** Commands in keymap ~helm-buffer-not-found-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-buffer-not-found-map~
 
-**** uncategorized
+**** Create new Buffers in other frame or window
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -3346,7 +3361,7 @@
 
 ** Library: helm-color
 
-*** Commands in keymap ~helm-color-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-color-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -3402,7 +3417,7 @@
 
 ** Library: helm-comint
 
-*** Commands in keymap ~helm-comint-prompts-keymap~ (excludes parent-keymap)
+*** Commands in keymap ~helm-comint-prompts-keymap~
 
 **** uncategorized
 :PROPERTIES:
@@ -3512,7 +3527,7 @@
 
 ** Library: helm-command
 
-*** Commands in keymap ~helm-M-x-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-M-x-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -4029,7 +4044,7 @@
 
 ** Library: helm-elisp-package
 
-*** Commands in keymap ~helm-el-package-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-el-package-map~
 
 **** uncategorized Run
 :PROPERTIES:
@@ -4334,7 +4349,7 @@
 
 ** Library: helm-eshell
 
-*** Commands in keymap ~helm-eshell-prompts-keymap~ (excludes parent-keymap)
+*** Commands in keymap ~helm-eshell-prompts-keymap~
 
 **** uncategorized
 :PROPERTIES:
@@ -4427,7 +4442,7 @@
 
 ** Library: helm-eval
 
-*** Commands in keymap ~helm-eval-expression-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-eval-expression-map~
 
 **** uncategorized Helm
 :PROPERTIES:
@@ -4713,7 +4728,7 @@
 
 ** Library: helm-fd
 
-*** Commands in keymap ~helm-fd-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-fd-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -4794,9 +4809,9 @@
   The mode's hook is called both when the mode is enabled and when
   it is disabled.
 
-*** Commands in keymap ~helm-browse-project-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-browse-project-map~
 
-**** uncategorized
+**** Run Grep on Project
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -4809,9 +4824,9 @@
 
   Run ~helm-grep~ AG from ~helm-browse-project~.
 
-*** Commands in keymap ~helm-file-name-history-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-file-name-history-map~
 
-**** uncategorized
+**** Act on File name history
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -4830,40 +4845,53 @@
 
   #+kindex: C-c d @r{(helm-file-name-history-map)}
 
-*** Commands in keymap ~helm-find-files-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-find-files-map~
 
-**** uncategorized Files
+**** Control filtering behaviour
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(C-r)}}} (~helm-find-files-down-last-level~) ::
+- {{{kbd(C-_)}}} (~helm-ff-undo~) ::
 
-  #+findex: helm-find-files-down-last-level @r{(helm-find-files-map)}
+  #+findex: helm-ff-undo @r{(helm-find-files-map)}
 
-  #+kindex: C-r @r{(helm-find-files-map)}
+  #+kindex: C-_ @r{(helm-find-files-map)}
 
-  Retrieve previous paths reached by ~C-l~ in helm-find-files.
+  Undo minibuffer in ~helm-find-files~.
+  Ensure disabling ~helm-ff-auto-update-flag~ before undoing.
 
-- {{{kbd(M-p)}}} (~helm-find-files-history~) ::
+- {{{kbd(C-<backspace>)}}} ::
+- {{{kbd(C-c DEL)}}} (~helm-ff-run-toggle-auto-update~) ::
 
-  #+findex: helm-find-files-history @r{(helm-find-files-map)}
+  #+findex: helm-ff-run-toggle-auto-update @r{(helm-find-files-map)}
 
-  #+kindex: M-p @r{(helm-find-files-map)}
+  #+kindex: C-<backspace> @r{(helm-find-files-map)}
+  #+kindex: C-c DEL @r{(helm-find-files-map)}
 
-  (helm-find-files-history ARG &key (COMP-READ t))
+**** RET
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  The ~helm-find-files~ history.
-  Show the first ~helm-ff-history-max-length~ elements of
-  ~helm-ff-history~ in an ~helm-comp-read~.
+- {{{kbd(RET)}}} (~helm-ff-RET~) ::
 
-- {{{kbd(C-x r b)}}} (~helm-find-files-switch-to-bookmark~) ::
+  #+findex: helm-ff-RET @r{(helm-find-files-map)}
 
-  #+findex: helm-find-files-switch-to-bookmark @r{(helm-find-files-map)}
+  #+kindex: RET @r{(helm-find-files-map)}
 
-  #+kindex: C-x r b @r{(helm-find-files-map)}
+  Default action for RET in ~helm-find-files~.
 
-  Switch to helm-bookmark for ~helm-find-files~ from ~helm-find-files.~
+  Behave differently depending on ~helm-selection~:
+
+  - candidate basename is "." => open it in dired.
+  - candidate is a directory    => expand it.
+  - candidate is a file         => open it.
+
+**** Move up or down the directory tree
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(<left>)}}} ::
 - {{{kbd(C-l)}}} (~helm-find-files-up-one-level~) ::
@@ -4878,7 +4906,15 @@
   Go up one level like unix command ~cd ..~.
   If prefix numeric arg is given go ARG level up.
 
-**** uncategorized Ff Sort
+- {{{kbd(C-r)}}} (~helm-find-files-down-last-level~) ::
+
+  #+findex: helm-find-files-down-last-level @r{(helm-find-files-map)}
+
+  #+kindex: C-r @r{(helm-find-files-map)}
+
+  Retrieve previous paths reached by ~C-l~ in helm-find-files.
+
+**** Sort the listing
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -4895,18 +4931,13 @@
 
   #+kindex: S-<f2> @r{(helm-find-files-map)}
 
-**** uncategorized Ff Size
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
 - {{{kbd(S-<f3>)}}} (~helm-ff-sort-by-size~) ::
 
   #+findex: helm-ff-sort-by-size @r{(helm-find-files-map)}
 
   #+kindex: S-<f3> @r{(helm-find-files-map)}
 
-**** uncategorized Ff Toggle
+**** List directories or files only
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -4927,7 +4958,191 @@
 
   Show only files in helm-find-files.
 
-**** uncategorized Ff Persistent
+**** Configure display
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-])}}} (~helm-ff-run-toggle-basename~) ::
+
+  #+findex: helm-ff-run-toggle-basename @r{(helm-find-files-map)}
+
+  #+kindex: C-] @r{(helm-find-files-map)}
+
+**** Visit files in other window or frame
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c C-o)}}} (~helm-ff-run-switch-other-frame~) ::
+
+  #+findex: helm-ff-run-switch-other-frame @r{(helm-find-files-map)}
+
+  #+kindex: C-c C-o @r{(helm-find-files-map)}
+
+  Run switch to other frame action from ~helm-source-find-files~.
+
+- {{{kbd(C-c o)}}} (~helm-ff-run-switch-other-window~) ::
+
+  #+findex: helm-ff-run-switch-other-window @r{(helm-find-files-map)}
+
+  #+kindex: C-c o @r{(helm-find-files-map)}
+
+  Run switch to other window action from ~helm-source-find-files~.
+  When a prefix arg is provided, split is done vertically.
+
+- {{{kbd(C-c C-t)}}} (~helm-ff-find-file-other-tab~) ::
+
+  #+findex: helm-ff-find-file-other-tab @r{(helm-find-files-map)}
+
+  #+kindex: C-c C-t @r{(helm-find-files-map)}
+
+  Run find file in other tab action from ~helm-source-buffers-list~.
+
+- {{{kbd(C-c r)}}} (~helm-ff-run-find-file-as-root~) ::
+
+  #+findex: helm-ff-run-find-file-as-root @r{(helm-find-files-map)}
+
+  #+kindex: C-c r @r{(helm-find-files-map)}
+
+**** Kill Buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-K)}}} (~helm-ff-run-kill-buffer-persistent~) ::
+
+  #+findex: helm-ff-run-kill-buffer-persistent @r{(helm-find-files-map)}
+
+  #+kindex: M-K @r{(helm-find-files-map)}
+
+  Execute ~helm-ff-kill-buffer-fname~ without quitting.
+
+**** Open files externally
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x C-v)}}} (~helm-ff-run-find-alternate-file~) ::
+
+  #+findex: helm-ff-run-find-alternate-file @r{(helm-find-files-map)}
+
+  #+kindex: C-x C-v @r{(helm-find-files-map)}
+
+- {{{kbd(C-c C-x)}}} (~helm-ff-run-open-file-externally~) ::
+
+  #+findex: helm-ff-run-open-file-externally @r{(helm-find-files-map)}
+
+  #+kindex: C-c C-x @r{(helm-find-files-map)}
+
+  Run open file externally command action from ~helm-source-find-files~.
+
+- {{{kbd(C-c X)}}} (~helm-ff-run-open-file-with-default-tool~) ::
+
+  #+findex: helm-ff-run-open-file-with-default-tool @r{(helm-find-files-map)}
+
+  #+kindex: C-c X @r{(helm-find-files-map)}
+
+  Run open file externally command action from ~helm-source-find-files~.
+
+- {{{kbd(C-c C-v)}}} (~helm-ff-run-preview-file-externally~) ::
+
+  #+findex: helm-ff-run-preview-file-externally @r{(helm-find-files-map)}
+
+  #+kindex: C-c C-v @r{(helm-find-files-map)}
+
+**** Copy files
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-C)}}} (~helm-ff-run-copy-file~) ::
+
+  #+findex: helm-ff-run-copy-file @r{(helm-find-files-map)}
+
+  #+kindex: M-C @r{(helm-find-files-map)}
+
+  Run Copy file action from ~helm-source-find-files~.
+
+- {{{kbd(M-V)}}} (~helm-ff-run-rsync-file~) ::
+
+  #+findex: helm-ff-run-rsync-file @r{(helm-find-files-map)}
+
+  #+kindex: M-V @r{(helm-find-files-map)}
+
+  Run Rsync file action from ~helm-source-find-files~.
+
+**** Run Query-Replace on Filenames
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-@)}}} (~helm-ff-run-query-replace-fnames-on-marked~) ::
+
+  #+findex: helm-ff-run-query-replace-fnames-on-marked @r{(helm-find-files-map)}
+
+  #+kindex: M-@ @r{(helm-find-files-map)}
+
+- {{{kbd(M-R)}}} (~helm-ff-run-rename-file~) ::
+
+  #+findex: helm-ff-run-rename-file @r{(helm-find-files-map)}
+
+  #+kindex: M-R @r{(helm-find-files-map)}
+
+  Run Rename file action from ~helm-source-find-files~.
+
+**** Run Query-Replace on Buffers' Content
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-%)}}} (~helm-ff-run-query-replace~) ::
+
+  #+findex: helm-ff-run-query-replace @r{(helm-find-files-map)}
+
+  #+kindex: M-% @r{(helm-find-files-map)}
+
+- {{{kbd(C-M-%)}}} (~helm-ff-run-query-replace-regexp~) ::
+
+  #+findex: helm-ff-run-query-replace-regexp @r{(helm-find-files-map)}
+
+  #+kindex: C-M-% @r{(helm-find-files-map)}
+
+**** Touch files
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-T)}}} (~helm-ff-run-touch-files~) ::
+
+  #+findex: helm-ff-run-touch-files @r{(helm-find-files-map)}
+
+  #+kindex: M-T @r{(helm-find-files-map)}
+
+  Used to interactively run touch file action from keyboard.
+
+**** Delete Persistently
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-D)}}} (~helm-ff-run-delete-file~) ::
+
+  #+findex: helm-ff-run-delete-file @r{(helm-find-files-map)}
+
+  #+kindex: M-D @r{(helm-find-files-map)}
+
+  Run Delete file action from ~helm-source-find-files~.
+
+- {{{kbd(C-c d)}}} (~helm-ff-persistent-delete~) ::
+
+  #+findex: helm-ff-persistent-delete @r{(helm-find-files-map)}
+
+  #+kindex: C-c d @r{(helm-find-files-map)}
+
+  Delete current candidate without quitting.
+
+**** Operate on Images
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -4948,22 +5163,6 @@
 
   Increase image size without quitting helm.
 
-- {{{kbd(C-c d)}}} (~helm-ff-persistent-delete~) ::
-
-  #+findex: helm-ff-persistent-delete @r{(helm-find-files-map)}
-
-  #+kindex: C-c d @r{(helm-find-files-map)}
-
-  Delete current candidate without quitting.
-
-- {{{kbd(M-i)}}} (~helm-ff-properties-persistent~) ::
-
-  #+findex: helm-ff-properties-persistent @r{(helm-find-files-map)}
-
-  #+kindex: M-i @r{(helm-find-files-map)}
-
-  Show properties without quitting helm.
-
 - {{{kbd(M-l)}}} (~helm-ff-rotate-left-persistent~) ::
 
   #+findex: helm-ff-rotate-left-persistent @r{(helm-find-files-map)}
@@ -4980,47 +5179,7 @@
 
   Rotate image right without quitting helm.
 
-**** uncategorized Ff File
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c h)}}} (~helm-ff-file-name-history~) ::
-
-  #+findex: helm-ff-file-name-history @r{(helm-find-files-map)}
-
-  #+kindex: C-c h @r{(helm-find-files-map)}
-
-  Switch to ~file-name-history~ without quitting ~helm-find-files~.
-
-- {{{kbd(C-c C-t)}}} (~helm-ff-find-file-other-tab~) ::
-
-  #+findex: helm-ff-find-file-other-tab @r{(helm-find-files-map)}
-
-  #+kindex: C-c C-t @r{(helm-find-files-map)}
-
-  Run find file in other tab action from ~helm-source-buffers-list~.
-
-**** uncategorized Ff Run Toggle
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-<backspace>)}}} ::
-- {{{kbd(C-c DEL)}}} (~helm-ff-run-toggle-auto-update~) ::
-
-  #+findex: helm-ff-run-toggle-auto-update @r{(helm-find-files-map)}
-
-  #+kindex: C-<backspace> @r{(helm-find-files-map)}
-  #+kindex: C-c DEL @r{(helm-find-files-map)}
-
-- {{{kbd(C-])}}} (~helm-ff-run-toggle-basename~) ::
-
-  #+findex: helm-ff-run-toggle-basename @r{(helm-find-files-map)}
-
-  #+kindex: C-] @r{(helm-find-files-map)}
-
-**** uncategorized Ff Run Grep
+**** Run Grep and friends
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -5049,7 +5208,29 @@
 
   #+kindex: M-g a @r{(helm-find-files-map)}
 
-**** uncategorized Ff Run Find
+- {{{kbd(M-g i)}}} (~helm-ff-run-gid~) ::
+
+  #+findex: helm-ff-run-gid @r{(helm-find-files-map)}
+
+  #+kindex: M-g i @r{(helm-find-files-map)}
+
+- {{{kbd(M-g p)}}} (~helm-ff-run-pdfgrep~) ::
+
+  #+findex: helm-ff-run-pdfgrep @r{(helm-find-files-map)}
+
+  #+kindex: M-g p @r{(helm-find-files-map)}
+
+  Run Pdfgrep action from ~helm-source-find-files~.
+
+- {{{kbd(M-g z)}}} (~helm-ff-run-zgrep~) ::
+
+  #+findex: helm-ff-run-zgrep @r{(helm-find-files-map)}
+
+  #+kindex: M-g z @r{(helm-find-files-map)}
+
+  Run Grep action from ~helm-source-find-files~.
+
+**** Run find or locate
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -5062,7 +5243,61 @@
 
   Run find shell command action with key from ~helm-find-files~.
 
-**** uncategorized Ff Run Files
+- {{{kbd(C-x C-f)}}} (~helm-ff-run-locate~) ::
+
+  #+findex: helm-ff-run-locate @r{(helm-find-files-map)}
+
+  #+kindex: C-x C-f @r{(helm-find-files-map)}
+
+  Run locate action from ~helm-source-find-files~.
+
+- {{{kbd(C-/)}}} (~helm-ff-run-fd~) ::
+
+  #+findex: helm-ff-run-fd @r{(helm-find-files-map)}
+
+  #+kindex: C-/ @r{(helm-find-files-map)}
+
+  Run fd shell command action with key from ~helm-find-files~.
+
+**** Show Properties
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-i)}}} (~helm-ff-properties-persistent~) ::
+
+  #+findex: helm-ff-properties-persistent @r{(helm-find-files-map)}
+
+  #+kindex: M-i @r{(helm-find-files-map)}
+
+  Show properties without quitting helm.
+
+**** Browse File name history
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c h)}}} (~helm-ff-file-name-history~) ::
+
+  #+findex: helm-ff-file-name-history @r{(helm-find-files-map)}
+
+  #+kindex: C-c h @r{(helm-find-files-map)}
+
+  Switch to ~file-name-history~ without quitting ~helm-find-files~.
+
+- {{{kbd(M-p)}}} (~helm-find-files-history~) ::
+
+  #+findex: helm-find-files-history @r{(helm-find-files-map)}
+
+  #+kindex: M-p @r{(helm-find-files-map)}
+
+  (helm-find-files-history ARG &key (COMP-READ t))
+
+  The ~helm-find-files~ history.
+  Show the first ~helm-ff-history-max-length~ elements of
+  ~helm-ff-history~ in an ~helm-comp-read~.
+
+**** Attach files to an Email
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -5083,68 +5318,7 @@
 
   Execute ~helm-marked-files-in-dired~ interactively.
 
-- {{{kbd(M-T)}}} (~helm-ff-run-touch-files~) ::
-
-  #+findex: helm-ff-run-touch-files @r{(helm-find-files-map)}
-
-  #+kindex: M-T @r{(helm-find-files-map)}
-
-  Used to interactively run touch file action from keyboard.
-
-**** uncategorized Ff Run Switch
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-c C-o)}}} (~helm-ff-run-switch-other-frame~) ::
-
-  #+findex: helm-ff-run-switch-other-frame @r{(helm-find-files-map)}
-
-  #+kindex: C-c C-o @r{(helm-find-files-map)}
-
-  Run switch to other frame action from ~helm-source-find-files~.
-
-- {{{kbd(C-c o)}}} (~helm-ff-run-switch-other-window~) ::
-
-  #+findex: helm-ff-run-switch-other-window @r{(helm-find-files-map)}
-
-  #+kindex: C-c o @r{(helm-find-files-map)}
-
-  Run switch to other window action from ~helm-source-find-files~.
-  When a prefix arg is provided, split is done vertically.
-
-- {{{kbd(M-e)}}} (~helm-ff-run-switch-to-shell~) ::
-
-  #+findex: helm-ff-run-switch-to-shell @r{(helm-find-files-map)}
-
-  #+kindex: M-e @r{(helm-find-files-map)}
-
-  Run switch to eshell action from ~helm-source-find-files~.
-
-**** uncategorized Ff Run Replace
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(M-%)}}} (~helm-ff-run-query-replace~) ::
-
-  #+findex: helm-ff-run-query-replace @r{(helm-find-files-map)}
-
-  #+kindex: M-% @r{(helm-find-files-map)}
-
-- {{{kbd(M-@)}}} (~helm-ff-run-query-replace-fnames-on-marked~) ::
-
-  #+findex: helm-ff-run-query-replace-fnames-on-marked @r{(helm-find-files-map)}
-
-  #+kindex: M-@ @r{(helm-find-files-map)}
-
-- {{{kbd(C-M-%)}}} (~helm-ff-run-query-replace-regexp~) ::
-
-  #+findex: helm-ff-run-query-replace-regexp @r{(helm-find-files-map)}
-
-  #+kindex: C-M-% @r{(helm-find-files-map)}
-
-**** uncategorized Ff Run File
+**** Operate on Elisp files
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -5157,21 +5331,18 @@
 
   Run Byte compile file action from ~helm-source-find-files~.
 
-- {{{kbd(M-C)}}} (~helm-ff-run-copy-file~) ::
+- {{{kbd(M-L)}}} (~helm-ff-run-load-file~) ::
 
-  #+findex: helm-ff-run-copy-file @r{(helm-find-files-map)}
+  #+findex: helm-ff-run-load-file @r{(helm-find-files-map)}
 
-  #+kindex: M-C @r{(helm-find-files-map)}
+  #+kindex: M-L @r{(helm-find-files-map)}
 
-  Run Copy file action from ~helm-source-find-files~.
+  Run Load file action from ~helm-source-find-files~.
 
-- {{{kbd(M-D)}}} (~helm-ff-run-delete-file~) ::
-
-  #+findex: helm-ff-run-delete-file @r{(helm-find-files-map)}
-
-  #+kindex: M-D @r{(helm-find-files-map)}
-
-  Run Delete file action from ~helm-source-find-files~.
+**** Run Ediff and Emerge
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(C-c =)}}} (~helm-ff-run-ediff-file~) ::
 
@@ -5189,63 +5360,10 @@
 
   Run Ediff merge file action from ~helm-source-find-files~.
 
-- {{{kbd(M-!)}}} (~helm-ff-run-eshell-command-on-file~) ::
-
-  #+findex: helm-ff-run-eshell-command-on-file @r{(helm-find-files-map)}
-
-  #+kindex: M-! @r{(helm-find-files-map)}
-
-  Run eshell command on file action from ~helm-source-find-files~.
-
-- {{{kbd(C-x C-v)}}} (~helm-ff-run-find-alternate-file~) ::
-
-  #+findex: helm-ff-run-find-alternate-file @r{(helm-find-files-map)}
-
-  #+kindex: C-x C-v @r{(helm-find-files-map)}
-
-- {{{kbd(C-c r)}}} (~helm-ff-run-find-file-as-root~) ::
-
-  #+findex: helm-ff-run-find-file-as-root @r{(helm-find-files-map)}
-
-  #+kindex: C-c r @r{(helm-find-files-map)}
-
-- {{{kbd(M-H)}}} (~helm-ff-run-hardlink-file~) ::
-
-  #+findex: helm-ff-run-hardlink-file @r{(helm-find-files-map)}
-
-  #+kindex: M-H @r{(helm-find-files-map)}
-
-  Run Hardlink file action from ~helm-source-find-files~.
-
-- {{{kbd(M-L)}}} (~helm-ff-run-load-file~) ::
-
-  #+findex: helm-ff-run-load-file @r{(helm-find-files-map)}
-
-  #+kindex: M-L @r{(helm-find-files-map)}
-
-  Run Load file action from ~helm-source-find-files~.
-
-- {{{kbd(C-c C-x)}}} (~helm-ff-run-open-file-externally~) ::
-
-  #+findex: helm-ff-run-open-file-externally @r{(helm-find-files-map)}
-
-  #+kindex: C-c C-x @r{(helm-find-files-map)}
-
-  Run open file externally command action from ~helm-source-find-files~.
-
-- {{{kbd(C-c X)}}} (~helm-ff-run-open-file-with-default-tool~) ::
-
-  #+findex: helm-ff-run-open-file-with-default-tool @r{(helm-find-files-map)}
-
-  #+kindex: C-c X @r{(helm-find-files-map)}
-
-  Run open file externally command action from ~helm-source-find-files~.
-
-- {{{kbd(C-c C-v)}}} (~helm-ff-run-preview-file-externally~) ::
-
-  #+findex: helm-ff-run-preview-file-externally @r{(helm-find-files-map)}
-
-  #+kindex: C-c C-v @r{(helm-find-files-map)}
+**** uncategorized Ff Run File
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(C-c p)}}} (~helm-ff-run-print-file~) ::
 
@@ -5255,6 +5373,19 @@
 
   Run Print file action from ~helm-source-find-files~.
 
+**** Link files
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-H)}}} (~helm-ff-run-hardlink-file~) ::
+
+  #+findex: helm-ff-run-hardlink-file @r{(helm-find-files-map)}
+
+  #+kindex: M-H @r{(helm-find-files-map)}
+
+  Run Hardlink file action from ~helm-source-find-files~.
+
 - {{{kbd(M-Y)}}} (~helm-ff-run-relsymlink-file~) ::
 
   #+findex: helm-ff-run-relsymlink-file @r{(helm-find-files-map)}
@@ -5262,22 +5393,6 @@
   #+kindex: M-Y @r{(helm-find-files-map)}
 
   Run Symlink file action from ~helm-source-find-files~.
-
-- {{{kbd(M-R)}}} (~helm-ff-run-rename-file~) ::
-
-  #+findex: helm-ff-run-rename-file @r{(helm-find-files-map)}
-
-  #+kindex: M-R @r{(helm-find-files-map)}
-
-  Run Rename file action from ~helm-source-find-files~.
-
-- {{{kbd(M-V)}}} (~helm-ff-run-rsync-file~) ::
-
-  #+findex: helm-ff-run-rsync-file @r{(helm-find-files-map)}
-
-  #+kindex: M-V @r{(helm-find-files-map)}
-
-  Run Rsync file action from ~helm-source-find-files~.
 
 - {{{kbd(M-S)}}} (~helm-ff-run-symlink-file~) ::
 
@@ -5314,76 +5429,16 @@
 
   Run Etags command action from ~helm-source-find-files~.
 
-- {{{kbd(C-/)}}} (~helm-ff-run-fd~) ::
-
-  #+findex: helm-ff-run-fd @r{(helm-find-files-map)}
-
-  #+kindex: C-/ @r{(helm-find-files-map)}
-
-  Run fd shell command action with key from ~helm-find-files~.
-
-- {{{kbd(M-g i)}}} (~helm-ff-run-gid~) ::
-
-  #+findex: helm-ff-run-gid @r{(helm-find-files-map)}
-
-  #+kindex: M-g i @r{(helm-find-files-map)}
-
 - {{{kbd(C-c @)}}} (~helm-ff-run-insert-org-link~) ::
 
   #+findex: helm-ff-run-insert-org-link @r{(helm-find-files-map)}
 
   #+kindex: C-c @ @r{(helm-find-files-map)}
 
-- {{{kbd(M-K)}}} (~helm-ff-run-kill-buffer-persistent~) ::
-
-  #+findex: helm-ff-run-kill-buffer-persistent @r{(helm-find-files-map)}
-
-  #+kindex: M-K @r{(helm-find-files-map)}
-
-  Execute ~helm-ff-kill-buffer-fname~ without quitting.
-
-- {{{kbd(C-x C-f)}}} (~helm-ff-run-locate~) ::
-
-  #+findex: helm-ff-run-locate @r{(helm-find-files-map)}
-
-  #+kindex: C-x C-f @r{(helm-find-files-map)}
-
-  Run locate action from ~helm-source-find-files~.
-
-- {{{kbd(M-g p)}}} (~helm-ff-run-pdfgrep~) ::
-
-  #+findex: helm-ff-run-pdfgrep @r{(helm-find-files-map)}
-
-  #+kindex: M-g p @r{(helm-find-files-map)}
-
-  Run Pdfgrep action from ~helm-source-find-files~.
-
-- {{{kbd(M-g z)}}} (~helm-ff-run-zgrep~) ::
-
-  #+findex: helm-ff-run-zgrep @r{(helm-find-files-map)}
-
-  #+kindex: M-g z @r{(helm-find-files-map)}
-
-  Run Grep action from ~helm-source-find-files~.
-
-**** uncategorized Ff uncategorized
+**** Manage Helm Find Files Sessioin
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- {{{kbd(RET)}}} (~helm-ff-RET~) ::
-
-  #+findex: helm-ff-RET @r{(helm-find-files-map)}
-
-  #+kindex: RET @r{(helm-find-files-map)}
-
-  Default action for RET in ~helm-find-files~.
-
-  Behave differently depending on ~helm-selection~:
-
-  - candidate basename is "." => open it in dired.
-  - candidate is a directory    => expand it.
-  - candidate is a file         => open it.
 
 - {{{kbd(C-x r m)}}} (~helm-ff-bookmark-set~) ::
 
@@ -5393,18 +5448,97 @@
 
   Record ~helm-find-files~ session in bookmarks.
 
+- {{{kbd(C-x r b)}}} (~helm-find-files-switch-to-bookmark~) ::
+
+  #+findex: helm-find-files-switch-to-bookmark @r{(helm-find-files-map)}
+
+  #+kindex: C-x r b @r{(helm-find-files-map)}
+
+  Switch to helm-bookmark for ~helm-find-files~ from ~helm-find-files.~
+
+**** Run Eshell
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-e)}}} (~helm-ff-run-switch-to-shell~) ::
+
+  #+findex: helm-ff-run-switch-to-shell @r{(helm-find-files-map)}
+
+  #+kindex: M-e @r{(helm-find-files-map)}
+
+  Run switch to eshell action from ~helm-source-find-files~.
+
+- {{{kbd(M-!)}}} (~helm-ff-run-eshell-command-on-file~) ::
+
+  #+findex: helm-ff-run-eshell-command-on-file @r{(helm-find-files-map)}
+
+  #+kindex: M-! @r{(helm-find-files-map)}
+
+  Run eshell command on file action from ~helm-source-find-files~.
+
+*** Commands in keymap ~helm-read-file-map~
+
+**** Control what is displayed
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-])}}} (~helm-ff-run-toggle-basename~) ::
+
+  #+findex: helm-ff-run-toggle-basename @r{(helm-read-file-map)}
+
+  #+kindex: C-] @r{(helm-read-file-map)}
+
+**** RET
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(RET)}}} (~helm-ff-RET~) ::
+
+  #+findex: helm-ff-RET @r{(helm-read-file-map)}
+
+  #+kindex: RET @r{(helm-read-file-map)}
+
+  Default action for RET in ~helm-find-files~.
+
+  Behave differently depending on ~helm-selection~:
+
+  - candidate basename is "." => open it in dired.
+  - candidate is a directory    => expand it.
+  - candidate is a file         => open it.
+
+**** Return empty string
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-<return>)}}} ::
+- {{{kbd(M-RET)}}} (~helm-cr-empty-string~) ::
+
+  #+findex: helm-cr-empty-string @r{(helm-read-file-map)}
+
+  #+kindex: C-<return> @r{(helm-read-file-map)}
+  #+kindex: M-RET @r{(helm-read-file-map)}
+
+  Return empty string.
+
+**** Undo Minibuffer
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
 - {{{kbd(C-_)}}} (~helm-ff-undo~) ::
 
-  #+findex: helm-ff-undo @r{(helm-find-files-map)}
+  #+findex: helm-ff-undo @r{(helm-read-file-map)}
 
-  #+kindex: C-_ @r{(helm-find-files-map)}
+  #+kindex: C-_ @r{(helm-read-file-map)}
 
   Undo minibuffer in ~helm-find-files~.
   Ensure disabling ~helm-ff-auto-update-flag~ before undoing.
 
-*** Commands in keymap ~helm-read-file-map~ (excludes parent-keymap)
-
-**** uncategorized Files
+**** Go up and down directory tree
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -5432,24 +5566,10 @@
   Go up one level like unix command ~cd ..~.
   If prefix numeric arg is given go ARG level up.
 
-**** uncategorized Ff
+**** File name history
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- {{{kbd(RET)}}} (~helm-ff-RET~) ::
-
-  #+findex: helm-ff-RET @r{(helm-read-file-map)}
-
-  #+kindex: RET @r{(helm-read-file-map)}
-
-  Default action for RET in ~helm-find-files~.
-
-  Behave differently depending on ~helm-selection~:
-
-  - candidate basename is "." => open it in dired.
-  - candidate is a directory    => expand it.
-  - candidate is a file         => open it.
 
 - {{{kbd(C-c h)}}} (~helm-ff-file-name-history~) ::
 
@@ -5459,6 +5579,11 @@
 
   Switch to ~file-name-history~ without quitting ~helm-find-files~.
 
+**** Toggle Auto-update
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
 - {{{kbd(C-<backspace>)}}} ::
 - {{{kbd(C-c DEL)}}} (~helm-ff-run-toggle-auto-update~) ::
 
@@ -5466,36 +5591,6 @@
 
   #+kindex: C-<backspace> @r{(helm-read-file-map)}
   #+kindex: C-c DEL @r{(helm-read-file-map)}
-
-- {{{kbd(C-])}}} (~helm-ff-run-toggle-basename~) ::
-
-  #+findex: helm-ff-run-toggle-basename @r{(helm-read-file-map)}
-
-  #+kindex: C-] @r{(helm-read-file-map)}
-
-- {{{kbd(C-_)}}} (~helm-ff-undo~) ::
-
-  #+findex: helm-ff-undo @r{(helm-read-file-map)}
-
-  #+kindex: C-_ @r{(helm-read-file-map)}
-
-  Undo minibuffer in ~helm-find-files~.
-  Ensure disabling ~helm-ff-auto-update-flag~ before undoing.
-
-**** uncategorized uncategorized
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-<return>)}}} ::
-- {{{kbd(M-RET)}}} (~helm-cr-empty-string~) ::
-
-  #+findex: helm-cr-empty-string @r{(helm-read-file-map)}
-
-  #+kindex: C-<return> @r{(helm-read-file-map)}
-  #+kindex: M-RET @r{(helm-read-file-map)}
-
-  Return empty string.
 
 *** Commands in library ~helm-files~ (excludes keymaps)
 
@@ -6496,7 +6591,7 @@
 
 ** Library: helm-find
 
-*** Commands in keymap ~helm-find-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-find-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -6586,7 +6681,7 @@
 
 ** Library: helm-font
 
-*** Commands in keymap ~helm-ucs-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-ucs-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -6798,71 +6893,58 @@
 
 ** Library: helm-global-bindings
 
-*** Commands in keymap ~helm-command-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-command-map~
 
-**** uncategorized All
+**** View Helm Documentation
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(C-c SPC)}}} ::
-- {{{kbd(C-x c C-c SPC)}}} (~helm-all-mark-rings~) ::
+- {{{kbd(h h)}}} ::
+- {{{kbd(C-x c h h)}}} (~helm-documentation~) ::
 
-  #+findex: helm-all-mark-rings @r{(helm-command-map)}
+  #+findex: helm-documentation @r{(helm-command-map)}
 
-  #+kindex: C-c SPC @r{(helm-command-map)}
-  #+kindex: C-x c C-c SPC @r{(helm-command-map)}
+  #+kindex: h h @r{(helm-command-map)}
+  #+kindex: C-x c h h @r{(helm-command-map)}
 
-  Preconfigured ~helm~ for ~helm-source-global-mark-ring~ and ~helm-source-mark-ring~.
+  Preconfigured ~helm~ for Helm documentation.
+  With a prefix arg refresh the documentation.
 
-**** uncategorized Find
+  Find here the documentation of all documented sources.
+
+**** Execute Extended Command
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(/)}}} ::
-- {{{kbd(C-x c /)}}} (~helm-find~) ::
+- {{{kbd(M-x)}}} ::
+- {{{kbd(C-x c M-x)}}} ::
+- {{{kbd(<execute>)}}} ::
+- {{{kbd(<menu>)}}} (~helm-M-x~) ::
 
-  #+findex: helm-find @r{(helm-command-map)}
+  #+findex: helm-M-x @r{(helm-command-map)}
 
-  #+kindex: / @r{(helm-command-map)}
-  #+kindex: C-x c / @r{(helm-command-map)}
+  #+kindex: M-x @r{(helm-command-map)}
+  #+kindex: C-x c M-x @r{(helm-command-map)}
+  #+kindex: <execute> @r{(helm-command-map)}
+  #+kindex: <menu> @r{(helm-command-map)}
 
-  (helm-find ARG)
+  (helm-M-x ARG)
 
-  Preconfigured ~helm~ for the find shell command.
+  Preconfigured ~helm~ for Emacs commands.
+  It is ~helm~ replacement of regular ~M-x~
+  ~execute-extended-command~.
 
-  Recursively find files whose names are matched by all specified
-  globbing PATTERNs under the current directory using the external
-  program specified in ~find-program~ (usually "find").  Every
-  input PATTERN is silently wrapped into two stars: *PATTERN*.
+  Unlike regular ~M-x~ Emacs vanilla ~execute-extended-command~
+  command, the prefix args if needed, can be passed AFTER starting
+  ~helm-M-x~.  When a prefix arg is passed BEFORE starting
+  ~helm-M-x~, the first ~C-u~ while in ~helm-M-x~ session will
+  disable it.
 
-  With prefix argument, prompt for a directory to search.
+  You can get help on each command by persistent action.
 
-  When user option ~helm-findutils-search-full-path~ is non-nil,
-  match against complete paths, otherwise, against file names
-  without directory part.
-
-  The (possibly empty) list of globbing PATTERNs can be followed by
-  the separator "*" plus any number of additional arguments that
-  are passed to "find" literally.
-
-**** uncategorized Imenu
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(i)}}} ::
-- {{{kbd(C-x c i)}}} (~helm-imenu~) ::
-
-  #+findex: helm-imenu @r{(helm-command-map)}
-
-  #+kindex: i @r{(helm-command-map)}
-  #+kindex: C-x c i @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for ~imenu~.
-
-**** uncategorized Files
+**** Find Files
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -6900,295 +6982,57 @@
   This avoids launching locate needlessly when what you are
   searching for is already found.
 
-**** uncategorized Point
+**** Visit recent Files
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(<tab>)}}} ::
-- {{{kbd(C-x c <tab>)}}} (~helm-lisp-completion-at-point~) ::
+- {{{kbd(C-c f)}}} ::
+- {{{kbd(C-x c C-c f)}}} (~helm-recentf~) ::
 
-  #+findex: helm-lisp-completion-at-point @r{(helm-command-map)}
+  #+findex: helm-recentf @r{(helm-command-map)}
 
-  #+kindex: <tab> @r{(helm-command-map)}
-  #+kindex: C-x c <tab> @r{(helm-command-map)}
+  #+kindex: C-c f @r{(helm-command-map)}
+  #+kindex: C-x c C-c f @r{(helm-command-map)}
 
-  Preconfigured Helm for Lisp symbol completion at point.
+  Preconfigured ~helm~ for ~recentf~.
 
-**** uncategorized Select
+**** Run Find
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- {{{kbd(e)}}} ::
-- {{{kbd(C-x c e)}}} (~helm-etags-select~) ::
+- {{{kbd(/)}}} ::
+- {{{kbd(C-x c /)}}} (~helm-find~) ::
 
-  #+findex: helm-etags-select @r{(helm-command-map)}
+  #+findex: helm-find @r{(helm-command-map)}
 
-  #+kindex: e @r{(helm-command-map)}
-  #+kindex: C-x c e @r{(helm-command-map)}
+  #+kindex: / @r{(helm-command-map)}
+  #+kindex: C-x c / @r{(helm-command-map)}
 
-  (helm-etags-select REINIT)
+  (helm-find ARG)
 
-  Preconfigured helm for etags.
-  If called with a prefix argument REINIT
-  or if any of the tag files have been modified, reinitialize cache.
+  Preconfigured ~helm~ for the find shell command.
 
-  This function aggregates three sources of tag files:
+  Recursively find files whose names are matched by all specified
+  globbing PATTERNs under the current directory using the external
+  program specified in ~find-program~ (usually "find").  Every
+  input PATTERN is silently wrapped into two stars: *PATTERN*.
 
-    1) An automatically located file in the parent directories,
-       by ~helm-etags-get-tag-file~.
-    2) ~tags-file-name~, which is commonly set by ~find-tag~ command.
-    3) ~tags-table-list~ which is commonly set by ~visit-tags-table~ command.
+  With prefix argument, prompt for a directory to search.
 
-- {{{kbd(F)}}} ::
-- {{{kbd(C-x c F)}}} (~helm-select-xfont~) ::
+  When user option ~helm-findutils-search-full-path~ is non-nil,
+  match against complete paths, otherwise, against file names
+  without directory part.
 
-  #+findex: helm-select-xfont @r{(helm-command-map)}
+  The (possibly empty) list of globbing PATTERNs can be followed by
+  the separator "*" plus any number of additional arguments that
+  are passed to "find" literally.
 
-  #+kindex: F @r{(helm-command-map)}
-  #+kindex: C-x c F @r{(helm-command-map)}
-
-  Preconfigured ~helm~ to select Xfont.
-
-**** uncategorized Buffers
+**** Run locate
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- {{{kbd(I)}}} ::
-- {{{kbd(C-x c I)}}} (~helm-imenu-in-all-buffers~) ::
-
-  #+findex: helm-imenu-in-all-buffers @r{(helm-command-map)}
-
-  #+kindex: I @r{(helm-command-map)}
-  #+kindex: C-x c I @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for fetching imenu entries in all buffers with similar mode as current.
-  A mode is similar as current if it is the same, it is derived
-  i.e. ~derived-mode-p~ or it have an association in
-  ~helm-imenu-all-buffer-assoc~.
-
-**** uncategorized Expression
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-,)}}} ::
-- {{{kbd(C-x c C-,)}}} (~helm-calcul-expression~) ::
-
-  #+findex: helm-calcul-expression @r{(helm-command-map)}
-
-  #+kindex: C-, @r{(helm-command-map)}
-  #+kindex: C-x c C-, @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for ~helm-source-calculation-result~.
-
-- {{{kbd(C-:)}}} ::
-- {{{kbd(C-x c C-:)}}} (~helm-eval-expression-with-eldoc~) ::
-
-  #+findex: helm-eval-expression-with-eldoc @r{(helm-command-map)}
-
-  #+kindex: C-: @r{(helm-command-map)}
-  #+kindex: C-x c C-: @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for ~helm-source-evaluation-result~ with ~eldoc~ support.
-
-**** uncategorized Info
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(h i)}}} ::
-- {{{kbd(C-x c h i)}}} (~helm-info-at-point~) ::
-
-  #+findex: helm-info-at-point @r{(helm-command-map)}
-
-  #+kindex: h i @r{(helm-command-map)}
-  #+kindex: C-x c h i @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for searching info at point.
-
-- {{{kbd(h r)}}} ::
-- {{{kbd(C-x c h r)}}} (~helm-info-emacs~) ::
-
-  #+findex: helm-info-emacs @r{(helm-command-map)}
-
-  #+kindex: h r @r{(helm-command-map)}
-  #+kindex: C-x c h r @r{(helm-command-map)}
-
-  Predefined helm for emacs info.
-
-- {{{kbd(h g)}}} ::
-- {{{kbd(C-x c h g)}}} (~helm-info-gnus~) ::
-
-  #+findex: helm-info-gnus @r{(helm-command-map)}
-
-  #+kindex: h g @r{(helm-command-map)}
-  #+kindex: C-x c h g @r{(helm-command-map)}
-
-  Predefined helm for gnus info.
-
-**** uncategorized List
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(C-x C-b)}}} ::
-- {{{kbd(C-x c C-x C-b)}}} (~helm-buffers-list~) ::
-
-  #+findex: helm-buffers-list @r{(helm-command-map)}
-
-  #+kindex: C-x C-b @r{(helm-command-map)}
-  #+kindex: C-x c C-x C-b @r{(helm-command-map)}
-
-  Preconfigured ~helm~ to list buffers.
-
-- {{{kbd(@)}}} ::
-- {{{kbd(C-x c @)}}} (~helm-list-elisp-packages~) ::
-
-  #+findex: helm-list-elisp-packages @r{(helm-command-map)}
-
-  #+kindex: @ @r{(helm-command-map)}
-  #+kindex: C-x c @ @r{(helm-command-map)}
-
-  (helm-list-elisp-packages ARG)
-
-  Preconfigured ~helm~ for listing and handling Emacs packages.
-
-- {{{kbd(p)}}} ::
-- {{{kbd(C-x c p)}}} (~helm-list-emacs-process~) ::
-
-  #+findex: helm-list-emacs-process @r{(helm-command-map)}
-
-  #+kindex: p @r{(helm-command-map)}
-  #+kindex: C-x c p @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for Emacs process.
-
-**** uncategorized uncategorized uncategorized uncategorized
-:PROPERTIES:
-:UNNUMBERED: notoc
-:END:
-
-- {{{kbd(M-x)}}} ::
-- {{{kbd(C-x c M-x)}}} ::
-- {{{kbd(<execute>)}}} ::
-- {{{kbd(<menu>)}}} (~helm-M-x~) ::
-
-  #+findex: helm-M-x @r{(helm-command-map)}
-
-  #+kindex: M-x @r{(helm-command-map)}
-  #+kindex: C-x c M-x @r{(helm-command-map)}
-  #+kindex: <execute> @r{(helm-command-map)}
-  #+kindex: <menu> @r{(helm-command-map)}
-
-  (helm-M-x ARG)
-
-  Preconfigured ~helm~ for Emacs commands.
-  It is ~helm~ replacement of regular ~M-x~
-  ~execute-extended-command~.
-
-  Unlike regular ~M-x~ Emacs vanilla ~execute-extended-command~
-  command, the prefix args if needed, can be passed AFTER starting
-  ~helm-M-x~.  When a prefix arg is passed BEFORE starting
-  ~helm-M-x~, the first ~C-u~ while in ~helm-M-x~ session will
-  disable it.
-
-  You can get help on each command by persistent action.
-
-- {{{kbd(a)}}} ::
-- {{{kbd(C-x c a)}}} ::
-- {{{kbd(C-h a)}}} ::
-- {{{kbd(<f1> a)}}} ::
-- {{{kbd(<help> a)}}} (~helm-apropos~) ::
-
-  #+findex: helm-apropos @r{(helm-command-map)}
-
-  #+kindex: a @r{(helm-command-map)}
-  #+kindex: C-x c a @r{(helm-command-map)}
-  #+kindex: C-h a @r{(helm-command-map)}
-  #+kindex: <f1> a @r{(helm-command-map)}
-  #+kindex: <help> a @r{(helm-command-map)}
-
-  (helm-apropos DEFAULT)
-
-  Preconfigured Helm to describe commands, functions, variables and faces.
-  In non interactives calls DEFAULT argument should be provided as
-  a string, i.e. the ~symbol-name~ of any existing symbol.
-
-- {{{kbd(c)}}} ::
-- {{{kbd(C-x c c)}}} (~helm-colors~) ::
-
-  #+findex: helm-colors @r{(helm-command-map)}
-
-  #+kindex: c @r{(helm-command-map)}
-  #+kindex: C-x c c @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for color.
-
-- {{{kbd(M-g a)}}} ::
-- {{{kbd(C-x c M-g a)}}} (~helm-do-grep-ag~) ::
-
-  #+findex: helm-do-grep-ag @r{(helm-command-map)}
-
-  #+kindex: M-g a @r{(helm-command-map)}
-  #+kindex: C-x c M-g a @r{(helm-command-map)}
-
-  (helm-do-grep-ag ARG)
-
-  Preconfigured ~helm~ for grepping with AG in ~default-directory~.
-  With prefix arg prompt for type if available with your AG
-  version.
-
-- {{{kbd(h h)}}} ::
-- {{{kbd(C-x c h h)}}} (~helm-documentation~) ::
-
-  #+findex: helm-documentation @r{(helm-command-map)}
-
-  #+kindex: h h @r{(helm-command-map)}
-  #+kindex: C-x c h h @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for Helm documentation.
-  With a prefix arg refresh the documentation.
-
-  Find here the documentation of all documented sources.
-
-- {{{kbd(C-x r b)}}} ::
-- {{{kbd(C-x c C-x r b)}}} (~helm-filtered-bookmarks~) ::
-
-  #+findex: helm-filtered-bookmarks @r{(helm-command-map)}
-
-  #+kindex: C-x r b @r{(helm-command-map)}
-  #+kindex: C-x c C-x r b @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for bookmarks (filtered by category).
-  Optional source ~helm-source-bookmark-addressbook~ is loaded only
-  if external addressbook-bookmark package is installed.
-
-- {{{kbd(M-g i)}}} ::
-- {{{kbd(C-x c M-g i)}}} (~helm-gid~) ::
-
-  #+findex: helm-gid @r{(helm-command-map)}
-
-  #+kindex: M-g i @r{(helm-command-map)}
-  #+kindex: C-x c M-g i @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for ~gid~ command line of ~ID-Utils~.
-  Need A database created with the command ~mkid~ above
-  ~default-directory~.
-  Need id-utils as dependency which provide ~mkid~, ~gid~ etc..
-  See <https://www.gnu.org/software/idutils/>.
-
-- {{{kbd(C-c g)}}} ::
-- {{{kbd(C-x c C-c g)}}} (~helm-google-suggest~) ::
-
-  #+findex: helm-google-suggest @r{(helm-command-map)}
-
-  #+kindex: C-c g @r{(helm-command-map)}
-  #+kindex: C-x c C-c g @r{(helm-command-map)}
-
-  Preconfigured ~helm~ for Google search with Google suggest.
 
 - {{{kbd(l)}}} ::
 - {{{kbd(C-x c l)}}} (~helm-locate~) ::
@@ -7213,18 +7057,90 @@
   Where db_path is a filename matched by
   ~helm-locate-db-file-regexp~.
 
-- {{{kbd(m)}}} ::
-- {{{kbd(C-x c m)}}} (~helm-man-woman~) ::
+**** List Buffers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: helm-man-woman @r{(helm-command-map)}
+- {{{kbd(C-x C-b)}}} ::
+- {{{kbd(C-x c C-x C-b)}}} (~helm-buffers-list~) ::
 
-  #+kindex: m @r{(helm-command-map)}
-  #+kindex: C-x c m @r{(helm-command-map)}
+  #+findex: helm-buffers-list @r{(helm-command-map)}
 
-  (helm-man-woman ARG)
+  #+kindex: C-x C-b @r{(helm-command-map)}
+  #+kindex: C-x c C-x C-b @r{(helm-command-map)}
 
-  Preconfigured ~helm~ for Man and Woman pages.
-  With a prefix arg reinitialize the cache.
+  Preconfigured ~helm~ to list buffers.
+
+**** Browse kill-ring
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(M-y)}}} ::
+- {{{kbd(C-x c M-y)}}} (~helm-show-kill-ring~) ::
+
+  #+findex: helm-show-kill-ring @r{(helm-command-map)}
+
+  #+kindex: M-y @r{(helm-command-map)}
+  #+kindex: C-x c M-y @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~kill-ring~.
+  It is drop-in replacement of ~yank-pop~.
+
+  First call open the kill-ring browser, next calls move to next line.
+
+**** List Bookmarks
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x r b)}}} ::
+- {{{kbd(C-x c C-x r b)}}} (~helm-filtered-bookmarks~) ::
+
+  #+findex: helm-filtered-bookmarks @r{(helm-command-map)}
+
+  #+kindex: C-x r b @r{(helm-command-map)}
+  #+kindex: C-x c C-x r b @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for bookmarks (filtered by category).
+  Optional source ~helm-source-bookmark-addressbook~ is loaded only
+  if external addressbook-bookmark package is installed.
+
+**** List Registers
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-x r i)}}} ::
+- {{{kbd(C-x c C-x r i)}}} (~helm-register~) ::
+
+  #+findex: helm-register @r{(helm-command-map)}
+
+  #+kindex: C-x r i @r{(helm-command-map)}
+  #+kindex: C-x c C-x r i @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for Emacs registers.
+
+**** Mark Ring
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-c SPC)}}} ::
+- {{{kbd(C-x c C-c SPC)}}} (~helm-all-mark-rings~) ::
+
+  #+findex: helm-all-mark-rings @r{(helm-command-map)}
+
+  #+kindex: C-c SPC @r{(helm-command-map)}
+  #+kindex: C-x c C-c SPC @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~helm-source-global-mark-ring~ and ~helm-source-mark-ring~.
+
+**** Run Occur
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(M-s o)}}} ::
 - {{{kbd(C-x c M-s o)}}} (~helm-occur~) ::
@@ -7250,15 +7166,127 @@
   like vanilla Emacs ~occur~ but have nothing to do with it, the search
   engine beeing completely different and also much faster.
 
-- {{{kbd(C-c f)}}} ::
-- {{{kbd(C-x c C-c f)}}} (~helm-recentf~) ::
+**** Run Grep and friends
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: helm-recentf @r{(helm-command-map)}
+- {{{kbd(M-g a)}}} ::
+- {{{kbd(C-x c M-g a)}}} (~helm-do-grep-ag~) ::
 
-  #+kindex: C-c f @r{(helm-command-map)}
-  #+kindex: C-x c C-c f @r{(helm-command-map)}
+  #+findex: helm-do-grep-ag @r{(helm-command-map)}
 
-  Preconfigured ~helm~ for ~recentf~.
+  #+kindex: M-g a @r{(helm-command-map)}
+  #+kindex: C-x c M-g a @r{(helm-command-map)}
+
+  (helm-do-grep-ag ARG)
+
+  Preconfigured ~helm~ for grepping with AG in ~default-directory~.
+  With prefix arg prompt for type if available with your AG
+  version.
+
+- {{{kbd(M-g i)}}} ::
+- {{{kbd(C-x c M-g i)}}} (~helm-gid~) ::
+
+  #+findex: helm-gid @r{(helm-command-map)}
+
+  #+kindex: M-g i @r{(helm-command-map)}
+  #+kindex: C-x c M-g i @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~gid~ command line of ~ID-Utils~.
+  Need A database created with the command ~mkid~ above
+  ~default-directory~.
+  Need id-utils as dependency which provide ~mkid~, ~gid~ etc..
+  See <https://www.gnu.org/software/idutils/>.
+
+**** Imenu
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(e)}}} ::
+- {{{kbd(C-x c e)}}} (~helm-etags-select~) ::
+
+  #+findex: helm-etags-select @r{(helm-command-map)}
+
+  #+kindex: e @r{(helm-command-map)}
+  #+kindex: C-x c e @r{(helm-command-map)}
+
+  (helm-etags-select REINIT)
+
+  Preconfigured helm for etags.
+  If called with a prefix argument REINIT
+  or if any of the tag files have been modified, reinitialize cache.
+
+  This function aggregates three sources of tag files:
+
+    1) An automatically located file in the parent directories,
+       by ~helm-etags-get-tag-file~.
+    2) ~tags-file-name~, which is commonly set by ~find-tag~ command.
+    3) ~tags-table-list~ which is commonly set by ~visit-tags-table~ command.
+
+- {{{kbd(i)}}} ::
+- {{{kbd(C-x c i)}}} (~helm-imenu~) ::
+
+  #+findex: helm-imenu @r{(helm-command-map)}
+
+  #+kindex: i @r{(helm-command-map)}
+  #+kindex: C-x c i @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~imenu~.
+
+- {{{kbd(I)}}} ::
+- {{{kbd(C-x c I)}}} (~helm-imenu-in-all-buffers~) ::
+
+  #+findex: helm-imenu-in-all-buffers @r{(helm-command-map)}
+
+  #+kindex: I @r{(helm-command-map)}
+  #+kindex: C-x c I @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for fetching imenu entries in all buffers with similar mode as current.
+  A mode is similar as current if it is the same, it is derived
+  i.e. ~derived-mode-p~ or it have an association in
+  ~helm-imenu-all-buffer-assoc~.
+
+**** Lisp Completion at Point
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(<tab>)}}} ::
+- {{{kbd(C-x c <tab>)}}} (~helm-lisp-completion-at-point~) ::
+
+  #+findex: helm-lisp-completion-at-point @r{(helm-command-map)}
+
+  #+kindex: <tab> @r{(helm-command-map)}
+  #+kindex: C-x c <tab> @r{(helm-command-map)}
+
+  Preconfigured Helm for Lisp symbol completion at point.
+
+**** Calculate Expression
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(C-,)}}} ::
+- {{{kbd(C-x c C-,)}}} (~helm-calcul-expression~) ::
+
+  #+findex: helm-calcul-expression @r{(helm-command-map)}
+
+  #+kindex: C-, @r{(helm-command-map)}
+  #+kindex: C-x c C-, @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~helm-source-calculation-result~.
+
+- {{{kbd(C-:)}}} ::
+- {{{kbd(C-x c C-:)}}} (~helm-eval-expression-with-eldoc~) ::
+
+  #+findex: helm-eval-expression-with-eldoc @r{(helm-command-map)}
+
+  #+kindex: C-: @r{(helm-command-map)}
+  #+kindex: C-x c C-: @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for ~helm-source-evaluation-result~ with ~eldoc~ support.
 
 - {{{kbd(r)}}} ::
 - {{{kbd(C-x c r)}}} (~helm-regexp~) ::
@@ -7271,15 +7299,125 @@
   Preconfigured helm to build regexps.
   ~query-replace-regexp~ can be run from there against found regexp.
 
-- {{{kbd(C-x r i)}}} ::
-- {{{kbd(C-x c C-x r i)}}} (~helm-register~) ::
+**** Get help for thing at point
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: helm-register @r{(helm-command-map)}
+- {{{kbd(h i)}}} ::
+- {{{kbd(C-x c h i)}}} (~helm-info-at-point~) ::
 
-  #+kindex: C-x r i @r{(helm-command-map)}
-  #+kindex: C-x c C-x r i @r{(helm-command-map)}
+  #+findex: helm-info-at-point @r{(helm-command-map)}
 
-  Preconfigured ~helm~ for Emacs registers.
+  #+kindex: h i @r{(helm-command-map)}
+  #+kindex: C-x c h i @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for searching info at point.
+
+**** View Emacs manauals
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(h r)}}} ::
+- {{{kbd(C-x c h r)}}} (~helm-info-emacs~) ::
+
+  #+findex: helm-info-emacs @r{(helm-command-map)}
+
+  #+kindex: h r @r{(helm-command-map)}
+  #+kindex: C-x c h r @r{(helm-command-map)}
+
+  Predefined helm for emacs info.
+
+- {{{kbd(h g)}}} ::
+- {{{kbd(C-x c h g)}}} (~helm-info-gnus~) ::
+
+  #+findex: helm-info-gnus @r{(helm-command-map)}
+
+  #+kindex: h g @r{(helm-command-map)}
+  #+kindex: C-x c h g @r{(helm-command-map)}
+
+  Predefined helm for gnus info.
+
+**** Get Elisp Help
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(a)}}} ::
+- {{{kbd(C-x c a)}}} ::
+- {{{kbd(C-h a)}}} ::
+- {{{kbd(<f1> a)}}} ::
+- {{{kbd(<help> a)}}} (~helm-apropos~) ::
+
+  #+findex: helm-apropos @r{(helm-command-map)}
+
+  #+kindex: a @r{(helm-command-map)}
+  #+kindex: C-x c a @r{(helm-command-map)}
+  #+kindex: C-h a @r{(helm-command-map)}
+  #+kindex: <f1> a @r{(helm-command-map)}
+  #+kindex: <help> a @r{(helm-command-map)}
+
+  (helm-apropos DEFAULT)
+
+  Preconfigured Helm to describe commands, functions, variables and faces.
+  In non interactives calls DEFAULT argument should be provided as
+  a string, i.e. the ~symbol-name~ of any existing symbol.
+
+**** List Manpages
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(m)}}} ::
+- {{{kbd(C-x c m)}}} (~helm-man-woman~) ::
+
+  #+findex: helm-man-woman @r{(helm-command-map)}
+
+  #+kindex: m @r{(helm-command-map)}
+  #+kindex: C-x c m @r{(helm-command-map)}
+
+  (helm-man-woman ARG)
+
+  Preconfigured ~helm~ for Man and Woman pages.
+  With a prefix arg reinitialize the cache.
+
+**** List Emacs Processes
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(p)}}} ::
+- {{{kbd(C-x c p)}}} (~helm-list-emacs-process~) ::
+
+  #+findex: helm-list-emacs-process @r{(helm-command-map)}
+
+  #+kindex: p @r{(helm-command-map)}
+  #+kindex: C-x c p @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for Emacs process.
+
+**** List Emacs Lisp Packages
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(@)}}} ::
+- {{{kbd(C-x c @)}}} (~helm-list-elisp-packages~) ::
+
+  #+findex: helm-list-elisp-packages @r{(helm-command-map)}
+
+  #+kindex: @ @r{(helm-command-map)}
+  #+kindex: C-x c @ @r{(helm-command-map)}
+
+  (helm-list-elisp-packages ARG)
+
+  Preconfigured ~helm~ for listing and handling Emacs packages.
+
+**** Resume Helm Session
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(b)}}} ::
 - {{{kbd(C-x c b)}}} (~helm-resume~) ::
@@ -7296,6 +7434,11 @@
   buffers (sessions).  When calling from Lisp, specify a
   ~buffer-name~ as a string with ARG.
 
+**** Run Exernal Command
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
 - {{{kbd(C-c C-x)}}} ::
 - {{{kbd(C-x c C-c C-x)}}} (~helm-run-external-command~) ::
 
@@ -7311,18 +7454,20 @@
   You can set your own list of commands with
   ~helm-external-commands-list~.
 
-- {{{kbd(M-y)}}} ::
-- {{{kbd(C-x c M-y)}}} (~helm-show-kill-ring~) ::
+**** Search the Web
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
-  #+findex: helm-show-kill-ring @r{(helm-command-map)}
+- {{{kbd(C-c g)}}} ::
+- {{{kbd(C-x c C-c g)}}} (~helm-google-suggest~) ::
 
-  #+kindex: M-y @r{(helm-command-map)}
-  #+kindex: C-x c M-y @r{(helm-command-map)}
+  #+findex: helm-google-suggest @r{(helm-command-map)}
 
-  Preconfigured ~helm~ for ~kill-ring~.
-  It is drop-in replacement of ~yank-pop~.
+  #+kindex: C-c g @r{(helm-command-map)}
+  #+kindex: C-x c C-c g @r{(helm-command-map)}
 
-  First call open the kill-ring browser, next calls move to next line.
+  Preconfigured ~helm~ for Google search with Google suggest.
 
 - {{{kbd(s)}}} ::
 - {{{kbd(C-x c s)}}} (~helm-surfraw~) ::
@@ -7336,6 +7481,11 @@
 
   Preconfigured ~helm~ to search PATTERN with search ENGINE.
 
+****  Run Top
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
 - {{{kbd(t)}}} ::
 - {{{kbd(C-x c t)}}} (~helm-top~) ::
 
@@ -7345,6 +7495,11 @@
   #+kindex: C-x c t @r{(helm-command-map)}
 
   Preconfigured ~helm~ for top command.
+
+**** List Unicode names
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 - {{{kbd(8)}}} ::
 - {{{kbd(C-x c 8)}}} (~helm-ucs~) ::
@@ -7359,6 +7514,36 @@
   Preconfigured ~helm~ for ~ucs-names~.
 
   Called with a prefix arg force reloading cache.
+
+**** Select XFont
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(F)}}} ::
+- {{{kbd(C-x c F)}}} (~helm-select-xfont~) ::
+
+  #+findex: helm-select-xfont @r{(helm-command-map)}
+
+  #+kindex: F @r{(helm-command-map)}
+  #+kindex: C-x c F @r{(helm-command-map)}
+
+  Preconfigured ~helm~ to select Xfont.
+
+**** List Colors
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+
+- {{{kbd(c)}}} ::
+- {{{kbd(C-x c c)}}} (~helm-colors~) ::
+
+  #+findex: helm-colors @r{(helm-command-map)}
+
+  #+kindex: c @r{(helm-command-map)}
+  #+kindex: C-x c c @r{(helm-command-map)}
+
+  Preconfigured ~helm~ for color.
 
 *** Options in library =helm-global-bindings=
 
@@ -7405,7 +7590,7 @@
   run, this mode runs the hook ~helm-grep-mode-hook~, as the final or
   penultimate step during initialization.
 
-*** Commands in keymap ~helm-grep-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-grep-map~
 
 **** uncategorized Goto
 :PROPERTIES:
@@ -7481,7 +7666,7 @@
   Disable update and delete ARG chars backward.
   Update is reenabled when idle 1s.
 
-*** Commands in keymap ~helm-grep-mode-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-grep-mode-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -7536,7 +7721,7 @@
 
   (helm-grep-mode-jump-other-window-forward ARG)
 
-*** Commands in keymap ~helm-pdfgrep-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-pdfgrep-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -8113,7 +8298,7 @@
 
 ** Library: helm-imenu
 
-*** Commands in keymap ~helm-imenu-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-imenu-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -9402,7 +9587,7 @@
 
 ** Library: helm-locate
 
-*** Commands in keymap ~helm-locate-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-locate-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -9768,7 +9953,7 @@
 
   Note: This mode is incompatible with Emacs23.
 
-*** Commands in keymap ~helm-comp-read-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-comp-read-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -10661,7 +10846,7 @@
   run, this mode runs the hook ~helm-occur-mode-hook~, as the final or
   penultimate step during initialization.
 
-*** Commands in keymap ~helm-occur-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-occur-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -10692,7 +10877,7 @@
 
   Run moccur save results action from ~helm-moccur~.
 
-*** Commands in keymap ~helm-occur-mode-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-occur-mode-map~
 
 **** uncategorized File
 :PROPERTIES:
@@ -10994,7 +11179,7 @@
 
 ** Library: helm-ring
 
-*** Commands in keymap ~helm-kill-ring-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-kill-ring-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -11307,7 +11492,7 @@
   The mode's hook is called both when the mode is enabled and when
   it is disabled.
 
-*** Commands in keymap ~helm-top-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-top-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -11555,7 +11740,7 @@
 
 ** Library: helm-tags
 
-*** Commands in keymap ~helm-etags-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-etags-map~
 
 **** uncategorized
 :PROPERTIES:
@@ -11685,7 +11870,7 @@
 
 ** Library: helm-types
 
-*** Commands in keymap ~helm-generic-files-map~ (excludes parent-keymap)
+*** Commands in keymap ~helm-generic-files-map~
 
 **** uncategorized Run Files
 :PROPERTIES:

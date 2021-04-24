@@ -86,7 +86,7 @@ TEXI2HTML = makeinfo --html --number-sections --css-ref "https://www.gnu.org/sof
 # INSTALL_INFO = ginstall-info # Debian: avoid harmless warning message
 INSTALL_INFO = install-info
 
-ORGFILES			:=  doc/helm-bugs.org  doc/helm-devel.org  doc/helm-manual-1.org  doc/helm-manual.org doc/helm.org
+ORGFILES			:=  doc/helm-bugs.org  doc/helm-devel.org  doc/helm-manual-1.org  doc/helm-manual.org doc/helm.org doc/helm-classes.org
 TEXIFILES			:= $(ORGFILES:.org=.texi)
 INFOFILES			:= $(ORGFILES:.org=.info)
 HTMLFILES			:= $(ORGFILES:.org=.html)
