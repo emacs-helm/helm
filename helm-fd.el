@@ -23,7 +23,7 @@
 (defvar helm-fd-executable "fd"
   "The fd shell command executable.")
 
-(defcustom helm-fd-switches '("--hidden" "--type" "f" "--type" "d" "--color" "always")
+(defcustom helm-fd-switches '("--no-ignore" "--hidden" "--type" "f" "--type" "d" "--color" "always")
   "A list of options to pass to fd shell command."
   :type '(repeat string)
   :group 'helm-files)
