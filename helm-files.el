@@ -84,6 +84,7 @@
 (declare-function tramp-buffer-name "tramp")
 (declare-function tramp-make-tramp-file-name "tramp")
 (declare-function tramp-cleanup-connection "tramp-cmds")
+(declare-function dired-async-processes "ext:dired-async.el")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -5088,6 +5089,15 @@ When a prefix arg is given, meaning of
     (force-mode-line-update)
     (sit-for 3)
     (force-mode-line-update)))
+
+(defun helm-delete-async-kill-process ()
+  "Kill async process created by helm delete files async."
+  (interactive)
+  (let* ((processes (dired-async-processes))
+         (proc (car (last processes))))
+    (and proc (delete-process proc))
+    (unless (> (length processes) 1)
+      (helm-ff--delete-async-modeline-mode -1))))
 
 (defun helm-delete-marked-files-async (_ignore)
   "Same as `helm-delete-marked-files' but async.
