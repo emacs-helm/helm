@@ -377,25 +377,6 @@ available APPEND is ignored."
 (defun helm-subr-native-elisp-p (object)
   (when (fboundp 'subr-native-elisp-p)
       (subr-native-elisp-p object)))
-
-;; Exit-minibuffer.
-;; This is the original exit-minibuffer function from emacs-27.2 and
-;; prior.
-
-(defun helm--exit-minibuffer-internal ()
-  "Same as `exit-minibuffer' from and prior emacs-27.2.
-New version of `exit-minibuffer' from emacs-28 have unexpected
-behavior and fails in many cases, trying to find a suitable frame or
-whatever for minibuffer."
-  (interactive)
-  ;; If the command that uses this has made modifications in the minibuffer,
-  ;; we don't want them to cause deactivation of the mark in the original
-  ;; buffer.
-  ;; A better solution would be to make deactivate-mark buffer-local
-  ;; (or to turn it into a list of buffers, ...), but in the mean time,
-  ;; this should do the trick in most cases.
-  (setq deactivate-mark nil)
-  (throw 'exit nil))
 
 ;;; Macros helper.
 ;;
