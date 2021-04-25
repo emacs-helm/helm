@@ -114,7 +114,7 @@ doc/ox-texinfo.el:
 %.texi:		doc/ox-texinfo.el
 
 %.texi:		%.org
-	$(EMACS) $(LOADPATH) -l doc/ox-texinfo.el  --file=$< --eval '(org-texinfo-export-to-texinfo)'
+	$(EMACS) $(LOADPATH) -l doc/ox-texinfo.el -l doc/ox-texinfo+.el  --file=$< --eval '(org-texinfo-export-to-texinfo+)'
 
 %.info:		%.texi
 	$(MAKEINFO) --no-split $< -o $@
