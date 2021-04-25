@@ -2594,7 +2594,7 @@ of current source only."
          ,@body)
      (quit (setq quit-flag t)
            (setq helm-quit t)
-           (exit-minibuffer)
+           (helm--exit-minibuffer-internal)
            (keyboard-quit)
            ;; See comment about this in `with-local-quit'.
            (eval '(ignore nil)))))
@@ -5984,7 +5984,7 @@ message 'no match'."
     (setq helm-current-prefix-arg current-prefix-arg))
   (setq helm-exit-status 0)
   (helm-log-run-hook 'helm-exit-minibuffer-hook)
-  (exit-minibuffer))
+  (helm--exit-minibuffer-internal))
 
 (defun helm-keyboard-quit ()
   "Quit minibuffer in helm.
