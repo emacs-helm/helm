@@ -3910,7 +3910,13 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
 (defun helm-cleanup ()
   "Clean up the mess when Helm exit or quit."
   (helm-log "start cleanup")
-  (with-current-buffer helm-buffer
+  (with-selected-window
+      ;; When exiting with `helm-execute-action-at-once-if-one',
+      ;; `helm-window' may not be created and we endup with an error
+      ;; e.g. in eshell completion when only one candidate to complete
+      ;; so fallback to selected-window in such cases.
+      (or (get-buffer-window helm-buffer)
+          (selected-window))
     (let ((frame (selected-frame)))
       (setq cursor-type t)
       ;; Ensure restoring default-value of mode-line to allow user
