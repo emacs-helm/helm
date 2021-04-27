@@ -1,0 +1,39 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-in-buffer'**\n\n
+"helm-source" <|-- "helm-source-in-buffer"
+class "helm-source"
+class "helm-source-in-buffer" {
+	Use this source to make helm
+	sources storing candidates
+	inside a buffer.
+	==
+	__ some interesting slots __
+	init
+	candidates
+	data
+	get-line
+	match
+	migemo
+	search
+	search-strict
+	volatile
+}
+note right of "helm-source-in-buffer"
+	**helm-source-in-buffer**:
+	Use this source to make helm
+	sources storing candidates
+	inside a buffer.
+end note
+"helm-source-in-buffer" <|-- "helm-semantic-source"
+"helm-source-in-buffer" <|-- "helm-file-cache"
+"helm-source-in-buffer" <|-- "helm-list-el-package-source"
+"helm-source-in-buffer" <|-- "helm-source-filtered-bookmarks"
+"helm-source-in-buffer" <|-- "helm-source-basic-bookmarks"
+"helm-source-in-buffer" <|-- "helm-info-source"
+"helm-source-in-buffer" <|-- "helm-browse-project-source"
+"helm-source-in-buffer" <|-- "helm-moccur-class"
+"helm-source-in-buffer" <|-- "helm-locate-subdirs-source"
+"helm-source-in-buffer" <|-- "helm-source-in-file"
+@enduml

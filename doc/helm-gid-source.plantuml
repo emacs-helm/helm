@@ -1,0 +1,26 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-gid-source'**\n\n
+"helm-source-async" <|-- "helm-gid-source"
+class "helm-source-async"
+"helm-source" <|-- "helm-source-async"
+class "helm-source"
+class "helm-gid-source" {
+	__ some interesting slots __
+	action
+	candidate-number-limit
+	candidates-process
+	db-dir
+	filtered-candidate-transformer
+	header-name
+	help-message
+	history
+	nohighlight
+	persistent-action
+	requires-pattern
+}
+note right of "helm-gid-source"
+	**helm-gid-source**
+end note
+@enduml

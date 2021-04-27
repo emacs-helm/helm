@@ -1,0 +1,28 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-file-cache'**\n\n
+"helm-source-in-buffer" <|-- "helm-file-cache"
+"helm-type-file" <|-- "helm-file-cache"
+class "helm-source-in-buffer"
+"helm-source" <|-- "helm-source-in-buffer"
+class "helm-source"
+class "helm-type-file"
+"helm-source" <|-- "helm-type-file"
+class "helm-source"
+class "helm-file-cache" {
+	__ some interesting slots __
+	init
+	candidates
+	data
+	get-line
+	match
+	migemo
+	search
+	search-strict
+	volatile
+}
+note right of "helm-file-cache"
+	**helm-file-cache**
+end note
+@enduml

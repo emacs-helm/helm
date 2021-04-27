@@ -1,0 +1,16 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-locate-override-inheritor'**\n\n
+"helm-type-file" <|-- "helm-locate-override-inheritor"
+class "helm-type-file"
+"helm-source" <|-- "helm-type-file"
+class "helm-source"
+class "helm-locate-override-inheritor" {
+	__ some interesting slots __
+}
+note right of "helm-locate-override-inheritor"
+	**helm-locate-override-inheritor**
+end note
+"helm-locate-override-inheritor" <|-- "helm-locate-source"
+@enduml

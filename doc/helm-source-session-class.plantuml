@@ -1,0 +1,19 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-session-class'**\n\n
+"helm-source-sync" <|-- "helm-source-session-class"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-source-session-class" {
+	__ some interesting slots __
+	action
+	candidates
+	help-message
+	keymap
+}
+note right of "helm-source-session-class"
+	**helm-source-session-class**
+end note
+@enduml

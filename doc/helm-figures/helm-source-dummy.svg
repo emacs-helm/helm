@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="344px" preserveAspectRatio="none" style="width:408px;height:344px;" version="1.1" viewBox="0 0 408 344" width="408px" zoomAndPan="magnify"><defs><filter height="300%" id="f1wsawkhhfwwzl" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="240" x="87.5" y="16.708">Parents and Children of</text><text fill="#000000" font-family="sans-serif" font-size="18" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="217" x="99" y="37.6611">'helm-source-dummy'</text><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="0" x="210.5" y="58.6143"/><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="0" x="210.5" y="79.5674"/><!--MD5=[8da85e6ec6935d54267014e974a66b51]
+class helm-source--><rect fill="#FEFECE" filter="url(#f1wsawkhhfwwzl)" height="48" id="helm-source" style="stroke: #A80036; stroke-width: 1.5;" width="119" x="38.5" y="91.8125"/><ellipse cx="53.5" cy="107.8125" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M56.4688,113.4531 Q55.8906,113.75 55.25,113.8906 Q54.6094,114.0469 53.9063,114.0469 Q51.4063,114.0469 50.0781,112.4063 Q48.7656,110.75 48.7656,107.625 Q48.7656,104.5 50.0781,102.8438 Q51.4063,101.1875 53.9063,101.1875 Q54.6094,101.1875 55.25,101.3438 Q55.9063,101.5 56.4688,101.7969 L56.4688,104.5156 Q55.8438,103.9375 55.25,103.6719 Q54.6563,103.3906 54.0313,103.3906 Q52.6875,103.3906 52,104.4688 Q51.3125,105.5313 51.3125,107.625 Q51.3125,109.7188 52,110.7969 Q52.6875,111.8594 54.0313,111.8594 Q54.6563,111.8594 55.25,111.5938 Q55.8438,111.3125 56.4688,110.7344 L56.4688,113.4531 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="87" x="67.5" y="111.9668">helm-source</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="39.5" x2="156.5" y1="123.8125" y2="123.8125"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="39.5" x2="156.5" y1="131.8125" y2="131.8125"/><!--MD5=[5adfb603e84a1ac071a064f5c8c4d8a3]
+class helm-source-dummy--><rect fill="#FEFECE" filter="url(#f1wsawkhhfwwzl)" height="133.6328" id="helm-source-dummy" style="stroke: #A80036; stroke-width: 1.5;" width="184" x="6" y="199.8125"/><ellipse cx="25.5" cy="215.8125" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M28.4688,221.4531 Q27.8906,221.75 27.25,221.8906 Q26.6094,222.0469 25.9063,222.0469 Q23.4063,222.0469 22.0781,220.4063 Q20.7656,218.75 20.7656,215.625 Q20.7656,212.5 22.0781,210.8438 Q23.4063,209.1875 25.9063,209.1875 Q26.6094,209.1875 27.25,209.3438 Q27.9063,209.5 28.4688,209.7969 L28.4688,212.5156 Q27.8438,211.9375 27.25,211.6719 Q26.6563,211.3906 26.0313,211.3906 Q24.6875,211.3906 24,212.4688 Q23.3125,213.5313 23.3125,215.625 Q23.3125,217.7188 24,218.7969 Q24.6875,219.8594 26.0313,219.8594 Q26.6563,219.8594 27.25,219.5938 Q27.8438,219.3125 28.4688,218.7344 L28.4688,221.4531 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="142" x="40.5" y="219.9668">helm-source-dummy</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="189" y1="231.8125" y2="231.8125"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="12" y="262.8276">accept-empty</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="62" x="12" y="275.6323">candidates</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="172" x="12" y="288.437">filtered-candidate-transformer</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="35" x="12" y="301.2417">match</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="63" x="12" y="314.0464">multimatch</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="40" x="12" y="326.8511">volatile</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="34.5" y1="246.2148" y2="246.2148"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="34.5" y="249.5229">some interesting slots</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="161.5" x2="189" y1="246.2148" y2="246.2148"/><path d="M225.5,254.3125 L225.5,262.8125 L190.36,266.8125 L225.5,270.8125 L225.5,279.4453 A0,0 0 0 0 225.5,279.4453 L396.5,279.4453 A0,0 0 0 0 396.5,279.4453 L396.5,264.3125 L386.5,254.3125 L225.5,254.3125 A0,0 0 0 0 225.5,254.3125 " fill="#FBFB77" filter="url(#f1wsawkhhfwwzl)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M386.5,254.3125 L386.5,264.3125 L396.5,264.3125 L386.5,254.3125 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="150" x="231.5" y="271.3794">helm-source-dummy</text><!--MD5=[08cc1f31d63ae7c2a5398bb390fce2ff]
+reverse link helm-source to helm-source-dummy--><path d="M98,160.3625 C98,172.6425 98,186.2925 98,199.5925 " fill="none" id="helm-source&lt;-helm-source-dummy" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="91,160.0925,98,140.0925,105,160.0925,91,160.0925" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[0824c5f47287e57936a9e4a4b2404911]
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-dummy'**\n\n
+"helm-source" <|- - "helm-source-dummy"
+class "helm-source"
+class "helm-source-dummy" {
+	__ some interesting slots __
+	accept-empty
+	candidates
+	filtered-candidate-transformer
+	match
+	multimatch
+	volatile
+}
+note right of "helm-source-dummy"
+	**helm-source-dummy**
+end note
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 15:52:07 IST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.11-ea+8-post-Debian-1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: IN
+--></g></svg>

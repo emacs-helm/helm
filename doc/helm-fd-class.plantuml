@@ -1,0 +1,23 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-fd-class'**\n\n
+"helm-source-async" <|-- "helm-fd-class"
+class "helm-source-async"
+"helm-source" <|-- "helm-source-async"
+class "helm-source"
+class "helm-fd-class" {
+	__ some interesting slots __
+	action
+	candidate-number-limit
+	candidates-process
+	filtered-candidate-transformer
+	help-message
+	keymap
+	nohighlight
+	requires-pattern
+}
+note right of "helm-fd-class"
+	**helm-fd-class**
+end note
+@enduml

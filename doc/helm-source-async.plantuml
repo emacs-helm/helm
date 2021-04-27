@@ -1,0 +1,28 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-async'**\n\n
+"helm-source" <|-- "helm-source-async"
+class "helm-source"
+class "helm-source-async" {
+	Use this class to define a
+	helm source calling an
+	external process.
+	==
+	__ some interesting slots __
+	candidates-process
+	multimatch
+}
+note right of "helm-source-async"
+	**helm-source-async**:
+	Use this class to define a
+	helm source calling an
+	external process.
+end note
+"helm-source-async" <|-- "helm-mac-spotlight-source"
+"helm-source-async" <|-- "helm-gid-source"
+"helm-source-async" <|-- "helm-fd-class"
+"helm-source-async" <|-- "helm-locate-source"
+"helm-source-async" <|-- "helm-grep-ag-class"
+"helm-source-async" <|-- "helm-grep-class"
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-files-in-current-dir-source'**\n\n
+"helm-source-sync" <|-- "helm-files-in-current-dir-source"
+"helm-type-file" <|-- "helm-files-in-current-dir-source"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-type-file"
+"helm-source" <|-- "helm-type-file"
+class "helm-source"
+class "helm-files-in-current-dir-source" {
+	__ some interesting slots __
+	candidates
+	fuzzy-match
+	match-dynamic
+	match-part
+	match-strict
+	migemo
+	pattern-transformer
+}
+note right of "helm-files-in-current-dir-source"
+	**helm-files-in-current-dir-source**
+end note
+@enduml

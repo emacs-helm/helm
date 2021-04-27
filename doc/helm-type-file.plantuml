@@ -1,0 +1,25 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-type-file'**\n\n
+"helm-source" <|-- "helm-type-file"
+class "helm-source"
+class "helm-type-file" {
+	A class to define helm type
+	file.
+	==
+	__ some interesting slots __
+}
+note right of "helm-type-file"
+	**helm-type-file**:
+	A class to define helm type
+	file.
+end note
+"helm-type-file" <|-- "helm-mac-spotlight-source"
+"helm-type-file" <|-- "helm-files-dired-source"
+"helm-type-file" <|-- "helm-files-in-current-dir-source"
+"helm-type-file" <|-- "helm-recentf-source"
+"helm-type-file" <|-- "helm-file-cache"
+"helm-type-file" <|-- "helm-browse-project-override-inheritor"
+"helm-type-file" <|-- "helm-locate-override-inheritor"
+@enduml

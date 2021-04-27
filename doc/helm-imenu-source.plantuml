@@ -1,0 +1,24 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-imenu-source'**\n\n
+"helm-source-sync" <|-- "helm-imenu-source"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-imenu-source" {
+	__ some interesting slots __
+	action
+	candidate-transformer
+	candidates
+	group
+	help-message
+	keymap
+	nomark
+	persistent-action
+	persistent-help
+}
+note right of "helm-imenu-source"
+	**helm-imenu-source**
+end note
+@enduml

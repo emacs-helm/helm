@@ -1,0 +1,19 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-locate-subdirs-source'**\n\n
+"helm-source-in-buffer" <|-- "helm-locate-subdirs-source"
+class "helm-source-in-buffer"
+"helm-source" <|-- "helm-source-in-buffer"
+class "helm-source"
+class "helm-locate-subdirs-source" {
+	__ some interesting slots __
+	basedir
+	data
+	group
+	subdir
+}
+note right of "helm-locate-subdirs-source"
+	**helm-locate-subdirs-source**
+end note
+@enduml
