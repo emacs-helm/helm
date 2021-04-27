@@ -1,0 +1,593 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename helm-devel.info
+@settitle The Helm Developer's Guide
+@documentencoding UTF-8
+@documentlanguage en
+@set txicodequoteundirected
+@set txicodequotebacktick
+@set MAINTAINERSITE @uref{https://github.com/thierryvolpiatto webpage}
+@set MAINTAINER Thierry Volpiatto
+@set MAINTAINEREMAIL @email{thierry.volpiatto@gmail.com}
+@set MAINTAINERCONTACT @uref{mailto:thierry.volpiatto@gmail.com,contact the maintainer}
+@c %**end of header
+
+@dircategory Emacs Add-ons
+@direntry
+* Helm Developer's Guide: (helm-devel). Helm Developer's Guide.
+@end direntry
+
+@finalout
+@titlepage
+@title The Helm Developer's Guide
+@subtitle Release 3.6.2
+@author The Helm Developers
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top The Helm Developer's Guide
+@end ifnottex
+
+@menu
+* Introduction::
+* Creating a Helm buffer::
+* Helm attributes::
+* Customizing Action Lists::
+* Creating a Source::
+* Creating a Class::
+* Writing actions::
+* Writing persistent actions::
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+Helm attributes
+
+* Looking up Helm attributes::
+* Mandatory attributes::
+* Optional, but important attributes: Optional but important attributes. 
+* @code{helm} keywords::
+
+@code{helm} keywords
+
+* @code{sources}::
+* @code{buffer}::
+* @code{input}::
+
+Creating a Source
+
+* @code{helm-source-sync}::
+* @code{helm-source-in-buffer}::
+* @code{helm-source-async}::
+* @code{helm-source-dummy}::
+* @code{helm-source-in-file}::
+* Help::
+* Pre-filtering lines in a buffer::
+
+Creating a Class
+
+* Create your own class inheriting from one of the main classes::
+* Create your own class and Inherit from one of helm-type classes::
+* Create your source from your own class::
+* Write your own helm-type class::
+
+Create your own class and Inherit from one of helm-type classes
+
+* Creating a new class using as parent a class inheriting itself from a @code{helm-type-*} class::
+
+@end detailmenu
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+The best way to learn how to create a custom Helm command is to  read
+the source code@footnote{@uref{http://blog.codinghorror.com/learn-to-read-the-source-luke/}} and look at examples.
+
+A good place to start is the source file @samp{helm-info.el}@footnote{@uref{https://github.com/emacs-helm/helm/blob/master/helm-info.el}}.  This
+source file is fairly short and straightforward.
+
+That being said, we'll try to go over some basic ideas in this manual.
+
+@node Creating a Helm buffer
+@chapter Creating a Helm buffer
+
+The @code{helm} function creates a Helm buffer with candidates to select
+and/or take action on. The list of candidates is provided by one or
+more @strong{sources}.
+
+An example usage of @code{helm} is below:
+
+@lisp
+(defun my-first-helm-command ()
+  (interactive)
+  (helm :sources 'my-source
+        :buffer "*helm my command*"))
+@end lisp
+
+@code{helm} must be called with several keywords arguments, called
+@strong{attributes}.
+
+@node Helm attributes
+@chapter Helm attributes
+
+An @strong{attribute} determines Helm behavior.
+
+There are a large number of attributes in Helm; some are mandatory,
+while others are optional.
+
+NOTE: When creating sources you are using slots which are keywords
+describing how to build attributes, they have generally the same name
+as attributes but not always e.g the slot @code{:data} exists, but there is
+no such attribute.
+
+@menu
+* Looking up Helm attributes::
+* Mandatory attributes::
+* Optional, but important attributes: Optional but important attributes. 
+* @code{helm} keywords::
+@end menu
+
+@node Looking up Helm attributes
+@section Looking up Helm attributes
+
+To learn about @emph{a single} Helm attribute, use the documentation of the
+class you are using where all slots are documented.
+
+@node Mandatory attributes
+@section Mandatory attributes
+
+You have to give at least a name to your source and a list of
+candidates.  The list of candidates is given with a variable
+containing candidates, a function returning candidates or a list, the
+attribute depend on which class you are using, e.g candidates for sync
+sources, for in-buffer sources you have to build a buffer using
+@code{helm-init-candidates-in-buffer} or for conveniency you can use the
+@code{:data} slot which will build the candidate buffer for you.  In async
+sources the candidates-process attribute is used which is a function
+with no arg that returns a process.
+
+@node Optional but important attributes
+@section Optional, but important attributes
+
+@node @code{helm} keywords
+@section @code{helm} keywords
+
+@menu
+* @code{sources}::
+* @code{buffer}::
+* @code{input}::
+@end menu
+
+@node @code{sources}
+@subsection @code{:sources}
+
+Expects a source of the form:
+
+@itemize
+@item
+Single source (alist)
+
+@item
+Symbol naming the source
+
+@item
+List of sources (alist or symbol)
+@end itemize
+
+Where alists are the resulting value of functions building sources,
+that is all the @code{helm-build-*} function or the @code{helm-make-source}
+function, don't use directly alists when writing sources.  See
+examples in next section.
+
+@node @code{buffer}
+@subsection @code{:buffer}
+
+@strong{Optional but important}.
+
+The value for the @code{:buffer} keyword helps the @code{helm-resume} command
+retrieve the Helm session.
+
+The name of the buffer should be prefixed with @samp{helm} (e.g. @samp{*helm
+Info*}). This is not mandatory, but it is good practice. It will,
+among other things, allow Helm to automatically hide the buffer.
+
+@node @code{input}
+@subsection @code{:input}
+
+The value for the @code{:input} keyword is used to pre-fill the input of
+the helm window.
+
+E.g. if the user is using helm to autocomplete and runs the
+autocomplete command, you could get the word at point and set @code{:input}
+to that word. That word will then be pre-filled in the minibuffer.
+
+@lisp
+(defun my-autocomplete-command ()
+  (interactive)
+  (helm :sources 'my-source
+        :input (word-at-point)
+        :buffer "*helm my autocomplete command*"))
+@end lisp
+
+@node Customizing Action Lists
+@chapter Customizing Action Lists
+
+It's possible to change the default list of actions for various
+existing Helm commands. The actions are typically held in variables
+called @code{helm-type-foo-actions}, for instance @code{helm-type-file-actions},
+so search apropos for those. Each action in the list is the usual cons
+of action label and action function.
+
+Another higher-level approach is to use a pre-defined function such as
+@code{helm-add-action-to-source} or @code{helm-add-action-to-source-if}. These
+functions accept an action label, action function, the source to
+modify (as a class symbol name, such as 'helm-source-ffiles), and for
+the latter, a predicate which determines if the action should be made
+available for the candidate under point.
+
+Also see @code{helm-delete-action-from-source}, and
+@code{helm-source-add-action-to-source-if}.
+
+@node Creating a Source
+@chapter Creating a Source
+
+Even if you can still create source with alists, helm provides
+convenient basic classes to build sources, and allow you to create
+your own classes that inherit from these basics classes.
+
+Here are the basic classes for creating a Helm source:
+
+@table @asis
+@item @code{helm-source-sync}
+Put candidates in a list
+
+@item @code{helm-source-in-buffer}
+Put candidates in a buffer
+
+@item @code{helm-source-async}
+Get candidates asynchronously using the
+output of a process.
+
+@item @code{helm-source-dummy}
+Use @code{helm-pattern} as candidate.
+
+@item @code{helm-source-in-file}
+Get candidates from the lines of a named
+file using @code{helm-source-in-buffer}.
+@end table
+
+For consistency, prefix your source names with @samp{helm-source-}
+(e.g. @code{helm-source-info-emacs}).
+
+For convenience, @code{helm} provide macros prefixed by @samp{helm-build-} to
+build your sources quickly, see examples below.
+
+All the different slots are documented in docstring of each classes.
+
+@menu
+* @code{helm-source-sync}::
+* @code{helm-source-in-buffer}::
+* @code{helm-source-async}::
+* @code{helm-source-dummy}::
+* @code{helm-source-in-file}::
+* Help::
+* Pre-filtering lines in a buffer::
+@end menu
+
+@node @code{helm-source-sync}
+@section @code{helm-source-sync}
+
+Put candidates in a list
+
+@lisp
+(helm-build-sync-source "test"
+  :candidates '(a b c d e))
+
+(helm :sources (helm-build-sync-source "test"
+                 :candidates '(a b c d e))
+      :buffer "*helm sync source*")
+@end lisp
+
+@node @code{helm-source-in-buffer}
+@section @code{helm-source-in-buffer}
+
+Put candidates in a buffer
+
+@lisp
+(helm-build-in-buffer-source "test1"
+  :data '(a b c d e))
+
+(helm :sources (helm-build-in-buffer-source "test1"
+                 :data '(a b c d e))
+      :buffer "*helm buffer source*")
+@end lisp
+
+@node @code{helm-source-async}
+@section @code{helm-source-async}
+
+Get candidates asynchronously using the output of a process.
+
+@lisp
+(helm :sources (helm-build-async-source "test2"
+                 :candidates-process
+                 (lambda ()
+                   (start-process "echo" nil "echo" "a\nb\nc\nd\ne")))
+      :buffer "*helm async source*")
+@end lisp
+
+@node @code{helm-source-dummy}
+@section @code{helm-source-dummy}
+
+Use @code{helm-pattern} as candidate
+
+@lisp
+(defun helm/test-default-action (candidate)
+  (browse-url (format
+               "http://www.google.com/search?q=%s"
+               (url-hexify-string candidate))))
+
+(helm :sources (helm-build-dummy-source "test"
+                 :action '(("Google" . helm/test-default-action)))
+      :buffer "*helm test*")
+@end lisp
+
+@node @code{helm-source-in-file}
+@section @code{helm-source-in-file}
+
+Get candidates from the lines of a named file using
+@code{helm-source-in-buffer}.
+
+@lisp
+(helm :sources (helm-build-in-file-source
+                   "test" "~/.emacs.d/init.el"
+                 :action (lambda (candidate)
+                           (let ((linum (with-helm-buffer
+                                          (get-text-property
+                                           1 'helm-linum
+                                           (helm-get-selection nil 'withprop)))))
+                             (find-file (with-helm-buffer
+                                          (helm-attr 'candidates-file)))
+                             (goto-line linum))))
+      :buffer "*helm test*")
+
+@end lisp
+
+@node Help
+@section Help
+
+To give a specific help to your Helm source, create a variable
+@code{helm-<my-source>-help-string} and bind it in your source with the
+@code{helm-message} slot. It will then appear when you use @kbd{C-h m} or
+@kbd{C-c ?=}.
+
+@node Pre-filtering lines in a buffer
+@section Pre-filtering lines in a buffer
+
+Here's an example of an in-buffer source that pre-filters lines to
+those matching a certain regular expression.  Then the pre-filtered
+lines are narrowed as the user types.  This uses
+@uref{https://github.com/tarsius/hl-todo, hl-todo-mode} which provide
+@samp{hl-todo-regexp} but you could use any regexp to do the same thing.
+The @samp{:init} function switches to the automatically created buffer,
+which is returned by @code{(helm-candidate-buffer 'global)}, then it
+deletes uninteresting lines, after which Helm presents the remaining
+lines to the user.  The @samp{:get-line} function is changed to
+@samp{buffer-substring} so that the properties are preserved in the
+@samp{helm-buffer}.
+
+@lisp
+(defun helm-hl-todo-items ()
+  "Show `hl-todo'-keyword items in buffer."
+  (helm :sources (helm-build-in-buffer-source "hl-todo items"
+                   :init (lambda ()
+                           (with-current-buffer (helm-candidate-buffer 'global)
+                             (insert (with-helm-current-buffer (buffer-string)))
+                             (goto-char (point-min))
+                             (delete-non-matching-lines hl-todo-regexp)))
+                   :get-line #'buffer-substring)
+        :buffer "*helm hl-todo*"))
+@end lisp
+
+And it could be also written using the @samp{:data} slot:
+
+@lisp
+(defun helm-hl-todo-items ()
+  "Show `hl-todo'-keyword items in buffer."
+  (helm :sources (helm-build-in-buffer-source "hl-todo items"
+                   :data (current-buffer)
+                   :candidate-transformer (lambda (candidates)
+                                            (cl-loop for c in candidates
+                                                     when (string-match hl-todo-regexp c)
+                                                     collect c))
+                   :get-line #'buffer-substring)
+        :buffer "*helm hl-todo*"))
+@end lisp
+
+@node Creating a Class
+@chapter Creating a Class
+
+@menu
+* Create your own class inheriting from one of the main classes::
+* Create your own class and Inherit from one of helm-type classes::
+* Create your source from your own class::
+* Write your own helm-type class::
+@end menu
+
+@node Create your own class inheriting from one of the main classes
+@section Create your own class inheriting from one of the main classes
+
+@lisp
+(defclass my-helm-class (helm-source-sync)
+  ((candidates :initform '("foo" "bar" "baz"))))
+
+(helm :sources (helm-make-source "test" 'my-helm-class)
+      :buffer "*helm test*")
+
+@end lisp
+
+This is same as creating your source with:
+
+@lisp
+(helm :sources (helm-build-sync-source "test"
+                 :candidates '("foo" "bar" "baz"))
+      :buffer "*helm test*")
+
+@end lisp
+
+@node Create your own class and Inherit from one of helm-type classes
+@section Create your own class and Inherit from one of helm-type classes
+
+Here an example from a helm user that store a list of favorite files
+in a file @samp{~/.fav} to retrieve them quickly:
+
+@lisp
+(defclass helm-test-fav (helm-source-in-file helm-type-file)
+  ((candidates-file :initform "~/.fav")))
+
+(helm :sources (helm-make-source "test" 'helm-test-fav)
+      :buffer "*helm test*")
+
+@end lisp
+
+@menu
+* Creating a new class using as parent a class inheriting itself from a @code{helm-type-*} class::
+@end menu
+
+@node Creating a new class using as parent a class inheriting itself from a @code{helm-type-*} class
+@subsection Creating a new class using as parent a class inheriting itself from a @code{helm-type-*} class
+
+Sometimes, you may want to inherit from a class using itself a
+@code{helm-type-*} class but with one or more attributes of this class
+slightly modified for your needs.  You may think that you only need to
+create your new class inheriting from the class inheriting itself from
+the @code{helm-type-*} class, but this is not enough.
+
+Here how to do, reusing the example above we modify
+the actions predefined by helm-type-file:
+
+@enumerate
+@item
+Create a fake class:
+
+@lisp
+(defclass helm-override-test-fav (helm-source) ())
+@end lisp
+
+@item
+Create a method for this class
+
+This method is used as a @code{:PRIMARY} method, which mean that the
+similar parent method, if some will not be used, in particular the
+@code{helm-source-in-file} method which calls itself the
+@code{helm-source-in-buffer} method, so to be sure these important
+methods are used, use @code{call-next-method}, see below.
+
+@lisp
+(defmethod helm--setup-source ((source helm-override-test-fav))
+  (call-next-method)
+  (let ((actions (slot-value source 'action)))
+    (setf (slot-value source 'action)
+          (helm-append-at-nth (symbol-value actions)
+                              '(("test" . ignore)) 1))))
+
+@end lisp
+
+@item
+Create now your main class inheriting from your new overriding
+class
+
+@lisp
+(defclass helm-test-fav (helm-source-in-file helm-type-file helm-override-test-fav)
+  ((candidates-file :initform "~/.fav")))
+@end lisp
+
+Now when running helm with a source built from your new class you
+should see the new action you have added in second position to the
+other file action.
+@end enumerate
+
+@node Create your source from your own class
+@section Create your source from your own class
+
+Once your class is created, you have to use @code{helm-make-source} to
+build your source.
+
+@lisp
+(helm-make-source "test" 'my-class :action 'foo [...other slots])
+@end lisp
+
+@node Write your own helm-type class
+@section Write your own helm-type class
+
+You will find several examples in the @samp{helm-types.el}@footnote{@uref{https://github.com/emacs-helm/helm/blob/master/helm-types.el}
+
+} file.
+
+The main thing to remember is to create an empty class and fill it
+using two @samp{defmethod} s, one empty which should be a primary method and
+one which is a before method, use for this the slots @code{:primary} and
+@code{:before} of @code{defmethod}. This allows you to override different slots
+of the inheriting type class in your new class.
+
+@node Writing actions
+@chapter Writing actions
+
+Actions are specified in the @code{:action} slot of your class, it is an
+alist composed of (ACTION_NAME . FUNCTION), it can be also a symbol
+defining a customizable action alist.
+
+@lisp
+(defcustom helm-source-foo
+  '(("Do this" . foo)
+    ("Do that" . bar))
+  "A customizable action list."
+  :group 'helm
+  :type '(alist :key-type string :value-type function))
+
+@end lisp
+
+It is recommended however to use @code{helm-make-actions} to define your
+actions easily, it allow also to create actions with condition, e.g
+
+@lisp
+(helm-make-actions "Do this"
+                   'foo
+                   (lambda ()
+                     (when (featurep 'something)
+                       "Do that"))
+                   'bar)
+@end lisp
+
+@node Writing persistent actions
+@chapter Writing persistent actions
+
+The way to specify persistent-action is to use the slot
+@code{:persistent-action} to specify the function Helm will run when using
+@kbd{C-j} or @kbd{C-z}. If you don't specify this helm will
+run the first action of the action.
+
+You can also specify additional persistent actions, which must be
+bound to keys other than @kbd{C-j} or @kbd{C-z}.
+
+@lisp
+(defun helm-foo-persistent-action ()
+  "Bind a new persistent action 'foo-action to foo function.
+foo function is an action function called with one arg candidate."
+  (interactive)
+  (with-helm-alive-p
+    ;; never split means to not split the helm window when executing
+    ;; this persistent action. If your source is using full frame you
+    ;; will want your helm buffer to split to display a buffer for the
+    ;; persistent action (if it needs one to display something).
+    (helm-attrset 'foo-action '(foo . never-split))
+    (helm-execute-persistent-action 'foo-action)))
+@end lisp
+
+Then you bind your new persistent action to something else than
+@kbd{C-j} or @kbd{C-z}.
+
+@bye

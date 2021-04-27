@@ -1,0 +1,128 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename helm-bugs.info
+@settitle How to report Helm Bugs
+@documentencoding UTF-8
+@documentlanguage en
+@set txicodequoteundirected
+@set txicodequotebacktick
+@set MAINTAINERSITE @uref{https://github.com/thierryvolpiatto webpage}
+@set MAINTAINER Thierry Volpiatto
+@set MAINTAINEREMAIL @email{thierry.volpiatto@gmail.com}
+@set MAINTAINERCONTACT @uref{mailto:thierry.volpiatto@gmail.com,contact the maintainer}
+@c %**end of header
+
+@dircategory Emacs Add-ons
+@direntry
+* Report Helm Bugs: (helm-bugs). Report Helm Bugs.
+@end direntry
+
+@finalout
+@titlepage
+@title How to report Helm Bugs
+@subtitle Release 3.6.2
+@author The Helm Developers
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top How to report Helm Bugs
+@end ifnottex
+
+@menu
+* Confirming bugs::
+* Reporting bugs::
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+Confirming bugs
+
+* @samp{emacs-helm.sh}: @samp{emacs-helmsh}. 
+* @samp{emacs -Q}::
+
+Reporting bugs
+
+* Version info::
+
+@end detailmenu
+@end menu
+
+@node Confirming bugs
+@chapter Confirming bugs
+
+To confirm that a bug is, in fact, a Helm problem, it is important to
+@emph{replicate the behavior with a minimal Emacs configuration}. This
+precludes the possibility that the bug is caused by factors outside of
+Helm.
+
+The easiest and recommended way to do so is through the
+@samp{emacs-helm.sh} script.
+
+@menu
+* @samp{emacs-helm.sh}: @samp{emacs-helmsh}. 
+* @samp{emacs -Q}::
+@end menu
+
+@node @samp{emacs-helmsh}
+@section @samp{emacs-helm.sh}
+
+If your system supports it, you should run the @samp{emacs-helm.sh} script
+to start an Emacs instance with minimal, Helm-specific configuration.
+
+This is useful for debugging, and easier than starting Emacs with
+@samp{emacs -Q} and configuring Helm from scratch.
+
+If Helm is installed via MELPA, the @samp{emacs-helm.sh} script should be
+located at @samp{~/.emacs.d/elpa/helm-<version>/emacs-helm.sh}.
+
+Of course you have to cd to your helm directory and run the script
+from there, an alternative is symlinking it to somewhere in your
+@samp{PATH} e.g. ``~/bin'' (See note at bottom for those that have installed
+from source with @samp{make}).
+
+You can use the -h argument for help:
+
+@example
+$ helm -h
+Usage: helm [-P@} Emacs path [-h@} help [--] EMACS ARGS
+@end example
+
+
+If your emacs binary is not in a standard place i.e. ``emacs'', you can
+specify the path with ``-P''.
+
+@code{Note}: If you have installed Helm from Git and used @samp{make && sudo
+make install} you can run directly @samp{helm} at command line from any
+place i.e. no need to cd to helm directory.
+
+@node @samp{emacs -Q}
+@section @samp{emacs -Q}
+
+If you cannot run the @samp{emacs-helm.sh} script, be sure to reproduce the
+problem with @samp{emacs -Q}, then installing Helm as described in the
+Install section.
+
+@node Reporting bugs
+@chapter Reporting bugs
+
+To report a bug, @uref{https://github.com/emacs-helm/helm/issues, open an
+issue}. Be sure that you've confirmed the bug as described in the
+previous section, and include relevant information for the maintainer
+to identify the bug.
+
+@menu
+* Version info::
+@end menu
+
+@node Version info
+@section Version info
+
+When reporting bugs, it is important to include the Helm version
+number, which can be found in the
+@uref{https://github.com/emacs-helm/helm/blob/master/helm-pkg.el, helm-pkg.el}
+file.
+
+@bye

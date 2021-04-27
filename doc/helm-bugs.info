@@ -1,0 +1,133 @@
+This is helm-bugs.info, produced by makeinfo version 6.7 from
+helm-bugs.texi.
+
+INFO-DIR-SECTION Emacs Add-ons
+START-INFO-DIR-ENTRY
+* Report Helm Bugs: (helm-bugs). Report Helm Bugs.
+END-INFO-DIR-ENTRY
+
+
+File: helm-bugs.info,  Node: Top,  Next: Confirming bugs,  Up: (dir)
+
+How to report Helm Bugs
+***********************
+
+* Menu:
+
+* Confirming bugs::
+* Reporting bugs::
+
+— The Detailed Node Listing —
+
+Confirming bugs
+
+* ‘emacs-helm.sh’: emacs-helmsh.
+* emacs -Q::
+
+Reporting bugs
+
+* Version info::
+
+
+
+File: helm-bugs.info,  Node: Confirming bugs,  Next: Reporting bugs,  Prev: Top,  Up: Top
+
+1 Confirming bugs
+*****************
+
+To confirm that a bug is, in fact, a Helm problem, it is important to
+_replicate the behavior with a minimal Emacs configuration_.  This
+precludes the possibility that the bug is caused by factors outside of
+Helm.
+
+   The easiest and recommended way to do so is through the
+‘emacs-helm.sh’ script.
+
+* Menu:
+
+* ‘emacs-helm.sh’: emacs-helmsh.
+* emacs -Q::
+
+
+File: helm-bugs.info,  Node: emacs-helmsh,  Next: emacs -Q,  Up: Confirming bugs
+
+1.1 ‘emacs-helm.sh’
+===================
+
+If your system supports it, you should run the ‘emacs-helm.sh’ script to
+start an Emacs instance with minimal, Helm-specific configuration.
+
+   This is useful for debugging, and easier than starting Emacs with
+‘emacs -Q’ and configuring Helm from scratch.
+
+   If Helm is installed via MELPA, the ‘emacs-helm.sh’ script should be
+located at ‘~/.emacs.d/elpa/helm-<version>/emacs-helm.sh’.
+
+   Of course you have to cd to your helm directory and run the script
+from there, an alternative is symlinking it to somewhere in your ‘PATH’
+e.g.  “~/bin” (See note at bottom for those that have installed from
+source with ‘make’).
+
+   You can use the -h argument for help:
+
+     $ helm -h
+     Usage: helm [-P} Emacs path [-h} help [--] EMACS ARGS
+
+   If your emacs binary is not in a standard place i.e.  “emacs”, you
+can specify the path with “-P”.
+
+   ‘Note’: If you have installed Helm from Git and used ‘make && sudo
+make install’ you can run directly ‘helm’ at command line from any place
+i.e.  no need to cd to helm directory.
+
+
+File: helm-bugs.info,  Node: emacs -Q,  Prev: emacs-helmsh,  Up: Confirming bugs
+
+1.2 ‘emacs -Q’
+==============
+
+If you cannot run the ‘emacs-helm.sh’ script, be sure to reproduce the
+problem with ‘emacs -Q’, then installing Helm as described in the
+Install section.
+
+
+File: helm-bugs.info,  Node: Reporting bugs,  Prev: Confirming bugs,  Up: Top
+
+2 Reporting bugs
+****************
+
+To report a bug, open an issue
+(https://github.com/emacs-helm/helm/issues).  Be sure that you’ve
+confirmed the bug as described in the previous section, and include
+relevant information for the maintainer to identify the bug.
+
+* Menu:
+
+* Version info::
+
+
+File: helm-bugs.info,  Node: Version info,  Up: Reporting bugs
+
+2.1 Version info
+================
+
+When reporting bugs, it is important to include the Helm version number,
+which can be found in the helm-pkg.el
+(https://github.com/emacs-helm/helm/blob/master/helm-pkg.el) file.
+
+
+
+Tag Table:
+Node: Top202
+Node: Confirming bugs510
+Node: emacs-helmsh1003
+Node: emacs -Q2205
+Node: Reporting bugs2487
+Node: Version info2859
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

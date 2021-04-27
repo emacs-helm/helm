@@ -1,0 +1,874 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename helm-manual-1.info
+@settitle Helm Wiki
+@documentencoding UTF-8
+@documentlanguage en
+@set txicodequoteundirected
+@set txicodequotebacktick
+@set MAINTAINERSITE @uref{https://github.com/thierryvolpiatto webpage}
+@set MAINTAINER Thierry Volpiatto
+@set MAINTAINEREMAIL @email{thierry.volpiatto@gmail.com}
+@set MAINTAINERCONTACT @uref{mailto:thierry.volpiatto@gmail.com,contact the maintainer}
+@c %**end of header
+
+@dircategory Emacs Add-ons
+@direntry
+* Helm Wiki: (helm-manual-1). Helm Wiki.
+@end direntry
+
+@finalout
+@titlepage
+@title Helm Wiki
+@subtitle Release 3.6.2
+@author The Helm Developers
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top Helm Wiki
+@end ifnottex
+
+@menu
+* Requirements::
+* Download::
+* Installation, Upgrade, and Configuration: Installation Upgrade and Configuration. 
+* Introduction::
+* Helm Completion v.s. Emacs Completion: Helm Completion vs Emacs Completion. 
+* General Helm Commands::
+* Preconfigured Helm Commands::
+* Helm Mode::
+* Helm With Other Emacs Extensions::
+* Helm Workflow for Files, Directories and Buffers: Helm Workflow for Files Directories and Buffers. 
+* Quick Try with @samp{emacs-helm.sh}: Quick Try with @samp{emacs-helmsh}. 
+* How to report Helm Bugs::
+* Useful links::
+* Main Index::                   An index of Helm's concepts and features.
+* Key Index::                    Key bindings and where they are described.
+* Command and Function Index::   Command names and some internal functions.
+* Variable Index::               Variables mentioned in the manual.
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+Installation, Upgrade, and Configuration
+
+* Minimal setup using @samp{straight.el}: Minimal setup using @samp{straightel}. 
+* Minimal setup using source::
+* Minimal setup using the Package Manager::
+
+Helm Completion v.s. Emacs Completion
+
+* Helm interaction model::
+
+General Helm Commands
+
+* Yanking text::
+
+Helm Mode
+
+* Customize helm-mode::
+
+Customize helm-mode
+
+* Use helm-mode and ido-mode::
+
+Helm With Other Emacs Extensions
+
+* linum-relative::
+
+How to report Helm Bugs
+
+* Confirming bugs::
+* Reporting bugs::
+
+Confirming bugs
+
+* @samp{emacs-helm.sh}: @samp{emacs-helmsh}. 
+* @samp{emacs -Q}::
+
+Reporting bugs
+
+* Version info::
+
+@end detailmenu
+@end menu
+
+@node Requirements
+@chapter Requirements
+
+Helm 3.6.2 and later require
+
+@itemize
+@item
+@samp{Emacs} version >= 25.1
+@item
+@samp{emacs-async}@footnote{@uref{https://github.com/jwiegley/emacs-async, emacs-async}}
+@item
+@samp{popup-el}@footnote{@uref{https://github.com/auto-complete/popup-el, popup-el}}
+@end itemize
+
+@node Download
+@chapter Download
+
+@table @asis
+@item Home Page
+@uref{https://github.com/emacs-helm/helm}
+
+@item Git Url
+@uref{https://github.com/emacs-helm/helm.git}
+
+git@@github.com:emacs-helm/helm.git
+
+@item Tagged Releases
+@uref{https://github.com/emacs-helm/helm/tags}
+@end table
+
+@node Installation Upgrade and Configuration
+@chapter Installation, Upgrade, and Configuration
+
+@menu
+* Minimal setup using @samp{straight.el}: Minimal setup using @samp{straightel}. 
+* Minimal setup using source::
+* Minimal setup using the Package Manager::
+@end menu
+
+@node Minimal setup using @samp{straightel}
+@section Minimal setup using @samp{straight.el}
+
+@samp{straight.el}@footnote{@uref{https://github.com/raxod502/straight.el}}
+
+Add this to your init file,
+
+@lisp
+(straight-use-package 'helm)
+@end lisp
+
+or
+
+#              :straight t
+#              :config
+#              [@dots{}])
+
+@lisp
+(use-package helm :straight t)
+@end lisp
+
+For further information, see @samp{straight.el}'s user manual.
+
+To upgrade @samp{helm}, do @kbd{M-x straight-pull-package} and restart
+Emacs.  @samp{straight.el} will rebuild helm for you.
+
+@node Minimal setup using source
+@section Minimal setup using source
+
+@enumerate
+@item
+Install the pre-requisites
+
+Install @samp{emacs-async}@footnote{@uref{https://github.com/jwiegley/emacs-async, emacs-async}} and @samp{popup-el}@footnote{@uref{https://github.com/auto-complete/popup-el, popup-el}}.  Ensure that they
+are available in @code{load-path}.
+
+@item
+Download, compile and install the sources
+
+If you are using @samp{git},
+
+@example
+git clone https://github.com/emacs-helm/helm
+cd helm
+make
+sudo make install
+@end example
+
+If you have a tarball@footnote{@uref{https://github.com/emacs-helm/helm/releases}},
+
+@example
+wget https://github.com/emacs-helm/helm/archive/refs/tags/v3.7.1.tar.gz
+tar zxvf v3.7.1.tar.gz
+cd helm-3.7.1/
+make
+sudo make install
+@end example
+@end enumerate
+
+Above steps assume that you have installed @samp{emacs-async} is in a
+standard location.  If this is not the case, you need to tell @samp{make}
+program where it is available using @samp{EMACSLOADPATH}@footnote{Don't forget the final @samp{:} to use an absolute path (like
+@samp{/home/you/foo/bar:}) instead of an abbreviated path like
+(@samp{~/foo/bar:}), specify @samp{EMACSLOADPATH}.}.
+
+@example
+git clone https://github.com/emacs-helm/helm
+cd helm
+EMACSLOADPATH="/path/to/emacs-async:" make
+make
+sudo make install
+@end example
+
+Above steps
+
+@itemize
+@item
+installs @samp{helm} in @samp{/usr/local/share/emacs/site-lisp/helm/}
+
+@item
+creates an executable called @samp{/usr/local/bin/helm}.  This file is in
+fact a symbolic link to to the script @samp{emacs-helm.sh}.
+
+@cindex emacs-helm.sh
+@end itemize
+
+If you want to install @samp{helm} in a path other than @samp{/usr/local/}, pass
+that target path through a @samp{PREFIX} variable.
+
+Add the one of the following to your init file,
+
+@lisp
+(add-to-list 'load-path "/path/to/helm/directory")
+(require 'helm-config)
+@end lisp
+
+or
+
+@lisp
+(add-to-list 'load-path "/path/to/helm/directory")
+(use-package helm :config (require 'helm-config))
+@end lisp
+
+and restart Emacs.
+
+The library @samp{helm-config} loads @samp{helm-autoloads.el}.  This is
+essential for having a working install of @samp{helm}.
+
+@node Minimal setup using the Package Manager
+@section Minimal setup using the Package Manager
+
+Helm is available on MELPA@.@footnote{@uref{https://melpa.org}}
+
+Release version of Helm is available in the stable repository while
+development version is available in the other repo.
+
+Assuming that you have setup @code{package-archives} to include the MELPA,
+you can install Helm with @kbd{M-x package-install @key{RET} helm @key{RET}}.
+
+To upgrade @samp{Helm}, use @code{helm-list-elisp-packages}.  This command is
+the Helm equivalent of Emacs' @samp{list-packages}.  Using
+@code{helm-list-elisp-packages}, ensures that @samp{helm} is compiled in a clean
+environment.@footnote{Helm uses async package to compile itself from Melpa.  Ensure
+that @code{async-bytecomp-package-mode} is enabled by default.  If this
+isn't so, add helm to @code{async-bytecomp-allowed-packages}.}
+
+@node Introduction
+@chapter Introduction
+
+People often think helm is just something like ido(@ref{Top,,,Ido,}) but
+displaying completion in a vertical layout instead of an horizontal
+one, it is not, helm is much more powerful than that.
+
+@itemize
+@item
+Helm is able to complete multiple lists dispatched in different
+sources against a pattern.
+
+@item
+Helm allows executing an unlimited number of actions on candidates.
+
+@item
+Helm allows marking candidates to execute chosen action against this
+set of candidates.
+
+@item
+Helm can display its completion buffer in different window layouts
+and in separate frame.
+@end itemize
+
+Helm is divided in two distinct categories of commands,
+
+@cindex helm native commands
+@cindex helmized commands
+
+@table @asis
+@item @strong{helm natives commands}
+these commands are a fresh implementation
+of an existing Emacs command and enhance them in useful ways.
+
+@item @strong{helmized commands}
+these Emacs native commands modified by
+helm-mode to provide helm completion and only that.
+@end table
+
+When both are provided e.g @code{switch-to-buffer} vs @code{helm-buffers-list}
+you will prefer the native helm commands generally more featured (more
+than one action, allows marking candidates, better display etc@dots{}).
+
+@node Helm Completion vs Emacs Completion
+@chapter Helm Completion v.s. Emacs Completion
+
+Differences between the two often trip up new users.
+
+Emacs completion is based on the @strong{minibuffer}. Helm completion is
+based on the @strong{completion window}.@footnote{@uref{https://github.com/emacs-helm/helm/issues/495, Different way of invoking commands}}  @footnote{@uref{https://groups.google.com/g/emacs-helm/c/zaBbg2tFAuM, Finding files}} @footnote{@uref{https://github.com/emacs-helm/helm/issues/222, Lack of tab completion}}
+
+In standard Emacs, interactivity happens in the @emph{minibuffer}.
+
+@itemize
+@item
+Typing new characters filters candidates in the minibuffer.
+@kbd{<tab>} may try to complete the typed characters with a
+valid candidate.
+
+@item
+Hitting @kbd{@key{RET}} selects the current candidate from the minibuffer.
+@end itemize
+
+In Helm, interactivity happens in the @emph{completion window}, not the
+minibuffer
+
+@itemize
+@item
+Typing new characters filters candidates in the completion window.
+Keep typing until the desired candidate is highlighted, or navigate
+to it using @kbd{C-n}.
+
+@item
+Hitting @kbd{@key{RET}} selects the currently highlighted item in the
+completion window.
+@end itemize
+
+@menu
+* Helm interaction model::
+@end menu
+
+@node Helm interaction model
+@section Helm interaction model
+
+Helm's interactivity makes the @kbd{<tab>} key redundant for
+completion because the selection candidates are already made visible
+in the Helm completion window. So, @strong{tab completion is not
+supported}. In Helm, @kbd{<tab>} is used to view available
+@strong{actions} to be taken on a candidate.
+
+Because the @kbd{<tab>} key is so ingrained in the muscle memory of
+long-time Emacs users, transition to Helm's interactive model
+requires:
+
+@itemize
+@item
+A conscious visual adjustment to look at the completion window, and
+
+@item
+A conscious mental adjustment to avoid using the @kbd{<tab>}
+key for completion and go straight to @kbd{@key{RET}} key to select a
+candidate. Helm's approach to completion provides better visual
+cues, takes fewer keystrokes, and is much faster.
+@end itemize
+
+@node General Helm Commands
+@chapter General Helm Commands
+
+@float Figure
+@image{helm-figures/helm-M-x,,,,.png}
+@caption{A typical @code{helm-M-x} with }
+@end float
+
+Helm's functionality needs only a few general key bindings as shown
+below. These are also documented in the mode line.
+
+@table @asis
+@item @kbd{<tab>} or @kbd{C-i} (@code{helm-select-action})
+lists available actions
+
+@item @kbd{C-j} or @kbd{C-z} (@code{helm-execute-persistent-action})
+invokes the persistent action
+
+@item @kbd{M-@key{SPC}} (@code{helm-toggle-visible-mark-backward})  or @kbd{C-@key{SPC}} (@code{helm-toggle-visible-mark-forward}) or @kbd{C-@@} (@code{helm-toggle-visible-mark})
+marks a candidate
+
+@item @kbd{C-h m} (@code{helm-help})
+displays the embeded help in an org buffer without quitting
+helm session.
+
+@item @kbd{@key{RET}}  
+runs the first action of action list
+@end table
+
+@menu
+* Yanking text::
+@end menu
+
+@node Yanking text
+@section Yanking text
+
+Yank symbol at point from @code{helm-current-buffer} (i.e. buffer where a
+helm command was invoked):
+
+@table @asis
+@item @kbd{C-w} (@code{helm-yank-text-at-point})
+Append word next to
+point to the minibuffer and advance to next word
+
+(helm-yank-text-at-point ARG)
+
+Yank text at point in `helm-current-buffer' into minibuffer.
+
+@item @kbd{C-_} (@code{helm-undo-yank-text-at-point})
+Undo last
+insertion and rewind yank point in @code{helm-current-buffer}
+
+Undo last entry added by `helm-yank-text-at-point'.
+@end table
+
+@node Preconfigured Helm Commands
+@chapter Preconfigured Helm Commands
+
+Invoke @kbd{M-x helm-M-x @key{RET}} and type @samp{helm} to discover Helm
+commands.  The @samp{Menu Bar -> Helm} menu item is another way to discover
+helm commands.
+
+@table @asis
+@item @code{helm-command-prefix-key}
+@vindex helm-command-prefix-key
+
+@strong{Standard Value}: ``C-x c''
+
+The key ‘helm-command-prefix’ is bound to in the global map.
+
+@item @code{helm-minibuffer-history-key}
+@vindex helm-minibuffer-history-key
+
+@strong{Standard Value}: ``C-r''
+
+The key ‘helm-minibuffer-history’ is bound to in minibuffer local maps.
+@end table
+
+@code{helm-command-prefix-key} (default value @kbd{C-x c}) is the
+prefix for the preconfigured helm menu.
+
+@code{helm-command-prefix-key} followed by any regular Emacs key invokes
+the Helm version of the same command.
+
+For example,
+
+@itemize
+@item
+@kbd{C-x c M-x} runs the command @code{helm-M-x}, which is the helm
+version of @kbd{M-x} (@code{execute-extended-command}).
+
+@item
+@kbd{C-x c C-x C-f} runs the command @code{helm-find-files}, which
+is the helm version of @kbd{C-x C-f} (@code{find-file}).
+@end itemize
+
+To run the helm version of a command with a key binding, but without
+also typing @kbd{C-x c}) (@code{helm-command-prefix-key}), add the
+following to your init file.
+
+@lisp
+(global-set-key (kbd "M-x") 'helm-M-x)
+@end lisp
+
+@node Helm Mode
+@chapter Helm Mode
+
+@code{helm-mode} enables Helm completion globally for any Emacs command
+using @code{completing-read} or @code{read-file-name}.
+
+@code{helm-mode} completes with @code{completion-at-point} and implements
+@code{completion-in-region-function} for @code{completing-read-multiple} for
+Emacs 24.4 and later.
+
+Helm provides generic functions for completions to replace
+tab-completion in Emacs with no loss of functionality. To use Helm's
+generic functions, first set them in your init file, e.g.:
+
+@lisp
+(global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-x C-f") #'helm-find-files)
+@end lisp
+
+Then enable @code{helm-mode} with:
+
+@lisp
+(helm-mode 1)
+@end lisp
+
+Or, enable @code{helm-mode} interactively with @kbd{M-x helm-mode}.
+
+@table @asis
+@item @code{helm-mode}
+@vindex helm-mode
+
+(helm-mode &optional ARG)
+
+Toggle generic helm completion.
+
+If called interactively, toggle `Helm mode'.  If the prefix
+argument is positive, enable the mode, and if it is zero or
+negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
+the mode if ARG is nil, omitted, or is a positive number.
+Disable the mode if ARG is a negative number.
+
+The mode's hook is called both when the mode is enabled and when
+it is disabled.
+
+All functions in Emacs that use `completing-read',
+`read-file-name', `completion-in-region' and friends will use helm
+interface when this mode is turned on.
+
+However you can modify this behavior for functions of your choice
+with `helm-completing-read-handlers-alist'.
+
+Called with a positive arg, turn on unconditionally, with a
+negative arg turn off.
+You can toggle it with M-x `helm-mode'.
+
+About `ido-mode':
+DO NOT enable `ido-everywhere' when using `helm-mode'.  Instead of
+using `ido-mode', add the commands where you want to use ido to
+`helm-completing-read-handlers-alist' with `ido' as value.
+
+Note: This mode is incompatible with Emacs23.
+@end table
+
+@menu
+* Customize helm-mode::
+@end menu
+
+@node Customize helm-mode
+@section Customize helm-mode
+
+@table @asis
+@item @code{helm-completing-read-handlers-alist}
+@vindex helm-completing-read-handlers-alist
+
+Completing read functions for specific Emacs commands.
+
+By default ‘helm-mode’ use ‘helm-completing-read-default-handler’ to
+provide helm completion in each ‘completing-read’ or ‘read-file-name’
+found, but other functions can be specified here for specific
+commands. This also allows disabling helm completion for some commands
+when needed.
+
+Each entry is a cons cell like (EMACS_COMMAND . COMPLETING-READ_HANDLER)
+where key and value are symbols.
+
+Each key is an Emacs command that use originaly ‘completing-read’.
+
+Each value maybe a helm function that takes same arguments as
+‘completing-read’ plus NAME and BUFFER, where NAME is the name of the new
+helm source and BUFFER the name of the buffer we will use, but it can
+be also a function not using helm, in this case the function should
+take the same args as ‘completing-read’ and not be prefixed by ``helm-''.
+
+‘helm’ will use the name of the command calling ‘completing-read’ as
+NAME and BUFFER will be computed as well with NAME but prefixed with
+``*helm-mode-''.
+
+This function prefix name must start by ``helm-'' when it uses helm,
+otherwise ‘helm’ assumes the function is not a helm function and
+expects the same args as ‘completing-read’, this allows you to define a
+handler not using helm completion.
+
+Example:
+
+(defun foo/test ()
+  (interactive)
+  (message ``%S'' (completing-read ``test: '' ’(a b c d e))))
+
+(defun helm-foo/test-completing-read-handler (prompt collection
+                                              predicate require-match
+                                              initial-input hist def
+                                              inherit-input-method
+                                              name buffer)
+  (helm-comp-read prompt collection :marked-candidates t
+                                    :name name
+                                    :buffer buffer))
+
+(add-to-list ’helm-completing-read-handlers-alist
+             ’(foo/test . helm-foo/test-completing-read-handler))
+
+We want here to make the regular ‘completing-read’ in ‘foo/test’
+return a list of candidate(s) instead of a single candidate.
+
+Note that this function will be reused for ALL the ‘completing-read’
+of this command, so it should handle all cases. E.g.,
+if first ‘completing-read’ completes against symbols and
+second ‘completing-read’ should handle only buffer,
+your specialized function should handle both.
+
+If the value of an entry is nil completion will fall back to
+Emacs vanilla behaviour.
+Example:
+
+If you want to disable helm completion for ‘describe-function’, use:
+
+(describe-function . nil)
+
+Ido is also supported, you can use ‘ido-completing-read’ and
+‘ido-read-file-name’ as value of an entry or just ’ido.
+Example:
+Enable ido completion for ‘find-file’:
+
+(find-file . ido)
+
+same as
+
+(find-file . ido-read-file-name)
+
+Note that you don’t need to enable ‘ido-mode’ for this to work, see
+‘helm-mode’ documentation.
+@end table
+
+To customize the completion interface or disable completion for
+specific commands in @code{helm-mode}, edit
+@code{helm-completing-read-handlers-alist}. See @kbd{C-h v}
+@code{helm-completing-read-handlers-alist} for details.
+
+@menu
+* Use helm-mode and ido-mode::
+@end menu
+
+@node Use helm-mode and ido-mode
+@subsection Use helm-mode and ido-mode
+
+To use
+@uref{https://www.gnu.org/software/emacs/manual/html_mono/ido.html, Ido}
+for some commands and Helm for others, do not enable
+@code{ido-mode}. Instead, customize @code{helm-completing-read-handlers-alist}
+to specify which command uses Ido.
+
+For example, suppose we want @code{find-file-read-only} to use Ido and
+@code{find-file} to use Helm. Then:
+
+@enumerate
+@item
+In your init file, turn on @code{helm-mode}.
+
+@item
+In the @code{helm-mode} customize group, add a key to
+@code{helm-completing-read-handlers-alist} for @code{find-file-read-only}
+with value @samp{ido}, i.e.
+@end enumerate
+
+@lisp
+(find-file-read-only . ido)
+@end lisp
+
+With @code{helm-mode} active, to use Emacs default completion instead of
+either Helm or Ido, use @code{nil} for the key value:
+
+@lisp
+(find-alternate-file . nil)
+@end lisp
+
+@node Helm With Other Emacs Extensions
+@chapter Helm With Other Emacs Extensions
+
+@menu
+* linum-relative::
+@end menu
+
+@node linum-relative
+@section linum-relative
+
+@code{(helm-linum-relative-mode 1)} enables @code{linum-relative} in Helm. Helm
+buffers then display line numbered candidates before and after the
+current candidate (highlighted line). @kbd{C-x <n>} jumps to @samp{n} lines
+before, before, and @kbd{C-c <n>} jumps to @samp{n} lines after, the current
+candidate.
+
+@node Helm Workflow for Files Directories and Buffers
+@chapter Helm Workflow for Files, Directories and Buffers
+
+Other quick jumping off features of @code{helm-find-files}:
+
+@itemize
+@item
+@kbd{C-x C-d} (@code{helm-browse-project}) shows buffers and files in the
+project.
+
+@item
+@kbd{C-c C-d} with prefix argument shows files in this directory and its
+subdirectories recursively.
+@end itemize
+
+When using @samp{helm-ls-git}@footnote{@uref{https://github.com/emacs-helm/helm-ls-git, helm-ls-git}} and @samp{helm-ls-hg}@footnote{@uref{https://github.com/emacs-helm/helm-ls-hg, helm-ls-hg}} , files under
+version control have a corresponding backend indicator.
+
+@itemize
+@item
+@kbd{C-x C-b} to switch back to the resumed Helm sources.
+
+@item
+@kbd{M-p} to access history of @code{helm-find-files}
+
+@item
+@kbd{C-c h} to access the full history of files (@code{file-name-history})
+
+@item
+@kbd{C-x C-f} switches back to @code{helm-find-files}
+@end itemize
+
+@node Quick Try with @samp{emacs-helmsh}
+@chapter Quick Try with @samp{emacs-helm.sh}
+
+@cindex emacs-helm.sh
+
+To try Helm with a default configurations in a minimal Emacs, run the
+provided @samp{emacs-helm.sh} script in Helm's installation directory.  If
+installed through the Emacs package manager,
+
+@example
+~/.emacs.d/elpa/helm-<VERSION>/emacs-helm.sh
+@end example
+
+@samp{emacs-helm.sh} should also be used when
+@uref{https://github.com/emacs-helm/helm/wiki/Bugs, reporting bugs}.
+
+@strong{Note}: If you have installed from Melpa, for convenience, consider
+creating a symlink of @samp{emacs-helm.sh} to e.g @samp{~/bin}, if you have
+installed from source (make && sudo make install) a symlink named
+@samp{helm} have already been created.
+
+@strong{Note}: For people using a non standard Elpa directory emacs-helm.sh may
+fail because it doesn't find its dependency (emacs-async), here's how
+you can do:
+
+@example
+cd /your/path/to/helm
+make # If not already done.
+EMACSLOADPATH="../emacs-async:" ./emacs-helm.sh
+@end example
+
+But normally @samp{emacs-helm.sh} should work out of the box with
+installations of emacs-async= done with package.el, straight.el or from
+source with the Makefile.
+
+@node How to report Helm Bugs
+@chapter How to report Helm Bugs
+
+@menu
+* Confirming bugs::
+* Reporting bugs::
+@end menu
+
+@node Confirming bugs
+@section Confirming bugs
+
+To confirm that a bug is, in fact, a Helm problem, it is important to
+@emph{replicate the behavior with a minimal Emacs configuration}. This
+precludes the possibility that the bug is caused by factors outside of
+Helm.
+
+The easiest and recommended way to do so is through the
+@samp{emacs-helm.sh} script.
+
+@menu
+* @samp{emacs-helm.sh}: @samp{emacs-helmsh}. 
+* @samp{emacs -Q}::
+@end menu
+
+@node @samp{emacs-helmsh}
+@subsection @samp{emacs-helm.sh}
+
+If your system supports it, you should run the @samp{emacs-helm.sh} script
+to start an Emacs instance with minimal, Helm-specific configuration.
+
+This is useful for debugging, and easier than starting Emacs with
+@samp{emacs -Q} and configuring Helm from scratch.
+
+If Helm is installed via MELPA, the @samp{emacs-helm.sh} script should be
+located at @samp{~/.emacs.d/elpa/helm-<version>/emacs-helm.sh}.
+
+Of course you have to cd to your helm directory and run the script
+from there, an alternative is symlinking it to somewhere in your
+@samp{PATH} e.g. ``~/bin'' (See note at bottom for those that have installed
+from source with @samp{make}).
+
+You can use the -h argument for help:
+
+@example
+$ helm -h
+Usage: helm [-P@} Emacs path [-h@} help [--] EMACS ARGS
+@end example
+
+
+If your emacs binary is not in a standard place i.e. ``emacs'', you can
+specify the path with ``-P''.
+
+@code{Note}: If you have installed Helm from Git and used @samp{make && sudo
+make install} you can run directly @samp{helm} at command line from any
+place i.e. no need to cd to helm directory.
+
+@node @samp{emacs -Q}
+@subsection @samp{emacs -Q}
+
+If you cannot run the @samp{emacs-helm.sh} script, be sure to reproduce the
+problem with @samp{emacs -Q}, then installing Helm as described in the
+Install section.
+
+@node Reporting bugs
+@section Reporting bugs
+
+To report a bug, @uref{https://github.com/emacs-helm/helm/issues, open an
+issue}. Be sure that you've confirmed the bug as described in the
+previous section, and include relevant information for the maintainer
+to identify the bug.
+
+@menu
+* Version info::
+@end menu
+
+@node Version info
+@subsection Version info
+
+When reporting bugs, it is important to include the Helm version
+number, which can be found in the
+@uref{https://github.com/emacs-helm/helm/blob/master/helm-pkg.el, helm-pkg.el}
+file.
+
+@node Useful links
+@chapter Useful links
+
+@itemize
+@item
+@uref{https://github.com/emacs-helm/helm, Helm on GitHub}
+
+@item
+@uref{http://tuhdo.github.io/helm-intro.html, Tuhdo's Helm tutorial}
+
+@item
+@uref{https://groups.google.com/g/emacs-helm, Helm mailing list}
+@end itemize
+
+@node Main Index
+@chapter Main Index
+
+@printindex cp
+
+@node Key Index
+@chapter Key Index
+
+@printindex ky
+
+@node Command and Function Index
+@chapter Command and Function Index
+
+@printindex fn
+
+@node Variable Index
+@chapter Variable Index
+
+This is not a complete index of variables and faces, only the ones
+that are mentioned in the manual.  For a more complete list, use
+@kbd{M-x org-customize} and then click yourself through the tree.
+
+@printindex vr
+
+@bye
