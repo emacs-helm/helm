@@ -10,417 +10,16 @@
 #+texinfo: @defindex hc
 
 * Table Of Contents                                                     :TOC_4:
-- [[#class-helm-source][class: helm-source]]
-  - [[#init][init]]
-  - [[#name][name]]
-  - [[#action][action]]
-  - [[#action-transformer][action-transformer]]
-  - [[#after-init-hook][after-init-hook]]
-  - [[#allow-dups][allow-dups]]
-  - [[#before-init-hook][before-init-hook]]
-  - [[#candidate-number-limit][candidate-number-limit]]
-  - [[#candidate-transformer][candidate-transformer]]
-  - [[#candidates][candidates]]
-  - [[#cleanup][cleanup]]
-  - [[#coerce][coerce]]
-  - [[#delayed][delayed]]
-  - [[#display-to-real][display-to-real]]
-  - [[#filter-one-by-one][filter-one-by-one]]
-  - [[#filtered-candidate-transformer][filtered-candidate-transformer]]
-  - [[#follow][follow]]
-  - [[#follow-delay][follow-delay]]
-  - [[#fuzzy-match][fuzzy-match]]
-  - [[#group][group]]
-  - [[#header-line][header-line]]
-  - [[#header-name][header-name]]
-  - [[#help-message][help-message]]
-  - [[#history][history]]
-  - [[#keymap][keymap]]
-  - [[#marked-with-props][marked-with-props]]
-  - [[#match][match]]
-  - [[#match-on-real][match-on-real]]
-  - [[#match-part][match-part]]
-  - [[#mode-line][mode-line]]
-  - [[#multiline][multiline]]
-  - [[#multimatch][multimatch]]
-  - [[#must-match][must-match]]
-  - [[#nohighlight][nohighlight]]
-  - [[#nomark][nomark]]
-  - [[#pattern-transformer][pattern-transformer]]
-  - [[#persistent-action][persistent-action]]
-  - [[#persistent-action-if][persistent-action-if]]
-  - [[#persistent-help][persistent-help]]
-  - [[#real-to-display][real-to-display]]
-  - [[#redisplay][redisplay]]
-  - [[#requires-pattern][requires-pattern]]
-  - [[#resume][resume]]
-  - [[#update][update]]
-  - [[#volatile][volatile]]
-  - [[#specialized-methods][Specialized Methods:]]
-- [[#class-helm-source-sync][class: helm-source-sync]]
-  - [[#candidates-1][candidates]]
-  - [[#match-dynamic][match-dynamic]]
-  - [[#match-strict][match-strict]]
-  - [[#migemo][migemo]]
-  - [[#specialized-methods-1][Specialized Methods:]]
-- [[#class-helm-source-async][class: helm-source-async]]
-  - [[#candidates-process][candidates-process]]
-  - [[#multimatch-1][multimatch]]
-  - [[#specialized-methods-2][Specialized Methods:]]
-- [[#class-helm-source-in-buffer][class: helm-source-in-buffer]]
-  - [[#init-1][init]]
-  - [[#candidates-2][candidates]]
-  - [[#data][data]]
-  - [[#get-line][get-line]]
-  - [[#match-1][match]]
-  - [[#migemo-1][migemo]]
-  - [[#search][search]]
-  - [[#search-strict][search-strict]]
-  - [[#volatile-1][volatile]]
-  - [[#specialized-methods-3][Specialized Methods:]]
-- [[#class-helm-source-dummy][class: helm-source-dummy]]
-  - [[#accept-empty][accept-empty]]
-  - [[#candidates-3][candidates]]
-  - [[#filtered-candidate-transformer-1][filtered-candidate-transformer]]
-  - [[#match-2][match]]
-  - [[#multimatch-2][multimatch]]
-  - [[#volatile-2][volatile]]
-  - [[#specialized-methods-4][Specialized Methods:]]
-- [[#class-helm-source-in-file][class: helm-source-in-file]]
-  - [[#init-2][init]]
-  - [[#candidates-file][candidates-file]]
-  - [[#get-line-1][get-line]]
-  - [[#specialized-methods-5][Specialized Methods:]]
-- [[#class-helm-type-file][class: helm-type-file]]
-  - [[#specialized-methods-6][Specialized Methods:]]
-- [[#class-helm-type-bookmark][class: helm-type-bookmark]]
-  - [[#specialized-methods-7][Specialized Methods:]]
-- [[#class-helm-type-buffer][class: helm-type-buffer]]
-  - [[#specialized-methods-8][Specialized Methods:]]
-- [[#class-helm-type-function][class: helm-type-function]]
-  - [[#specialized-methods-9][Specialized Methods:]]
-- [[#class-helm-type-command][class: helm-type-command]]
-  - [[#specialized-methods-10][Specialized Methods:]]
-- [[#class-helm-type-timers][class: helm-type-timers]]
-  - [[#specialized-methods-11][Specialized Methods:]]
-- [[#class-helm-files-dired-source][class: helm-files-dired-source]]
-  - [[#candidates-4][candidates]]
-  - [[#match-dynamic-1][match-dynamic]]
-  - [[#match-strict-1][match-strict]]
-  - [[#migemo-2][migemo]]
-  - [[#specialized-methods-12][Specialized Methods:]]
-- [[#class-helm-source-session-class][class: helm-source-session-class]]
-  - [[#action-1][action]]
-  - [[#candidates-5][candidates]]
-  - [[#help-message-1][help-message]]
-  - [[#keymap-1][keymap]]
-  - [[#specialized-methods-13][Specialized Methods:]]
-- [[#class-helm-mac-spotlight-source][class: helm-mac-spotlight-source]]
-  - [[#candidates-process-1][candidates-process]]
-  - [[#multimatch-3][multimatch]]
-  - [[#requires-pattern-1][requires-pattern]]
-  - [[#specialized-methods-14][Specialized Methods:]]
-- [[#class-helm-source-basic-bookmarks][class: helm-source-basic-bookmarks]]
-  - [[#init-3][init]]
-  - [[#candidates-6][candidates]]
-  - [[#data-1][data]]
-  - [[#filtered-candidate-transformer-2][filtered-candidate-transformer]]
-  - [[#get-line-2][get-line]]
-  - [[#match-3][match]]
-  - [[#migemo-3][migemo]]
-  - [[#search-1][search]]
-  - [[#search-strict-1][search-strict]]
-  - [[#volatile-3][volatile]]
-  - [[#specialized-methods-15][Specialized Methods:]]
-- [[#class-helm-source-filtered-bookmarks][class: helm-source-filtered-bookmarks]]
-  - [[#init-4][init]]
-  - [[#candidates-7][candidates]]
-  - [[#data-2][data]]
-  - [[#filtered-candidate-transformer-3][filtered-candidate-transformer]]
-  - [[#get-line-3][get-line]]
-  - [[#match-4][match]]
-  - [[#migemo-4][migemo]]
-  - [[#search-2][search]]
-  - [[#search-strict-2][search-strict]]
-  - [[#volatile-4][volatile]]
-  - [[#specialized-methods-16][Specialized Methods:]]
-- [[#class-helm-bookmark-override-inheritor][class: helm-bookmark-override-inheritor]]
-  - [[#specialized-methods-17][Specialized Methods:]]
-- [[#class-helm-bookmark-find-files-class][class: helm-bookmark-find-files-class]]
-  - [[#init-5][init]]
-  - [[#candidates-8][candidates]]
-  - [[#data-3][data]]
-  - [[#filtered-candidate-transformer-4][filtered-candidate-transformer]]
-  - [[#get-line-4][get-line]]
-  - [[#match-5][match]]
-  - [[#migemo-5][migemo]]
-  - [[#search-3][search]]
-  - [[#search-strict-3][search-strict]]
-  - [[#volatile-5][volatile]]
-  - [[#specialized-methods-18][Specialized Methods:]]
-- [[#class-helm-source-buffers][class: helm-source-buffers]]
-  - [[#init-6][init]]
-  - [[#buffer-list][buffer-list]]
-  - [[#candidates-9][candidates]]
-  - [[#help-message-2][help-message]]
-  - [[#keymap-2][keymap]]
-  - [[#match-6][match]]
-  - [[#match-dynamic-2][match-dynamic]]
-  - [[#match-strict-2][match-strict]]
-  - [[#migemo-6][migemo]]
-  - [[#multimatch-4][multimatch]]
-  - [[#nohighlight-1][nohighlight]]
-  - [[#persistent-action-1][persistent-action]]
-  - [[#resume-1][resume]]
-  - [[#volatile-6][volatile]]
-  - [[#specialized-methods-19][Specialized Methods:]]
-- [[#class-helm-m-x-class][class: helm-M-x-class]]
-  - [[#candidates-10][candidates]]
-  - [[#filtered-candidate-transformer-5][filtered-candidate-transformer]]
-  - [[#help-message-3][help-message]]
-  - [[#keymap-3][keymap]]
-  - [[#match-dynamic-3][match-dynamic]]
-  - [[#match-strict-3][match-strict]]
-  - [[#migemo-7][migemo]]
-  - [[#must-match-1][must-match]]
-  - [[#nomark-1][nomark]]
-  - [[#persistent-help-1][persistent-help]]
-  - [[#specialized-methods-20][Specialized Methods:]]
-- [[#class-helm-absolute-time-timers-class][class: helm-absolute-time-timers-class]]
-  - [[#allow-dups-1][allow-dups]]
-  - [[#candidate-transformer-1][candidate-transformer]]
-  - [[#candidates-11][candidates]]
-  - [[#match-dynamic-4][match-dynamic]]
-  - [[#match-strict-4][match-strict]]
-  - [[#migemo-8][migemo]]
-  - [[#specialized-methods-21][Specialized Methods:]]
-- [[#class-helm-idle-time-timers-class][class: helm-idle-time-timers-class]]
-  - [[#allow-dups-2][allow-dups]]
-  - [[#candidate-transformer-2][candidate-transformer]]
-  - [[#candidates-12][candidates]]
-  - [[#match-dynamic-5][match-dynamic]]
-  - [[#match-strict-5][match-strict]]
-  - [[#migemo-9][migemo]]
-  - [[#specialized-methods-22][Specialized Methods:]]
-- [[#class-helm-list-el-package-source][class: helm-list-el-package-source]]
-  - [[#init-7][init]]
-  - [[#action-2][action]]
-  - [[#action-transformer-1][action-transformer]]
-  - [[#candidate-number-limit-1][candidate-number-limit]]
-  - [[#filtered-candidate-transformer-6][filtered-candidate-transformer]]
-  - [[#get-line-5][get-line]]
-  - [[#group-1][group]]
-  - [[#help-message-4][help-message]]
-  - [[#keymap-4][keymap]]
-  - [[#update-1][update]]
-  - [[#specialized-methods-23][Specialized Methods:]]
-- [[#class-helm-epa][class: helm-epa]]
-  - [[#init-8][init]]
-  - [[#candidates-13][candidates]]
-  - [[#keymap-5][keymap]]
-  - [[#mode-line-1][mode-line]]
-  - [[#specialized-methods-24][Specialized Methods:]]
-- [[#class-helm-esh-source][class: helm-esh-source]]
-  - [[#init-9][init]]
-  - [[#action-3][action]]
-  - [[#candidates-14][candidates]]
-  - [[#filtered-candidate-transformer-7][filtered-candidate-transformer]]
-  - [[#nohighlight-2][nohighlight]]
-  - [[#persistent-action-2][persistent-action]]
-  - [[#specialized-methods-25][Specialized Methods:]]
-- [[#class-helm-eshell-history-source][class: helm-eshell-history-source]]
-  - [[#init-10][init]]
-  - [[#action-4][action]]
-  - [[#candidate-number-limit-2][candidate-number-limit]]
-  - [[#candidates-15][candidates]]
-  - [[#keymap-6][keymap]]
-  - [[#multiline-1][multiline]]
-  - [[#nomark-2][nomark]]
-  - [[#specialized-methods-26][Specialized Methods:]]
-- [[#class-helm-fd-class][class: helm-fd-class]]
-  - [[#action-5][action]]
-  - [[#candidate-number-limit-3][candidate-number-limit]]
-  - [[#candidates-process-2][candidates-process]]
-  - [[#filtered-candidate-transformer-8][filtered-candidate-transformer]]
-  - [[#help-message-5][help-message]]
-  - [[#keymap-7][keymap]]
-  - [[#nohighlight-3][nohighlight]]
-  - [[#requires-pattern-2][requires-pattern]]
-  - [[#specialized-methods-27][Specialized Methods:]]
-- [[#class-helm-source-ffiles][class: helm-source-ffiles]]
-  - [[#init-11][init]]
-  - [[#action-6][action]]
-  - [[#action-transformer-2][action-transformer]]
-  - [[#after-init-hook-1][after-init-hook]]
-  - [[#before-init-hook-1][before-init-hook]]
-  - [[#candidate-number-limit-4][candidate-number-limit]]
-  - [[#candidates-16][candidates]]
-  - [[#cleanup-1][cleanup]]
-  - [[#filtered-candidate-transformer-9][filtered-candidate-transformer]]
-  - [[#group-2][group]]
-  - [[#header-name-1][header-name]]
-  - [[#help-message-6][help-message]]
-  - [[#keymap-8][keymap]]
-  - [[#match-on-real-1][match-on-real]]
-  - [[#migemo-10][migemo]]
-  - [[#mode-line-2][mode-line]]
-  - [[#nohighlight-4][nohighlight]]
-  - [[#persistent-action-if-1][persistent-action-if]]
-  - [[#persistent-help-2][persistent-help]]
-  - [[#update-2][update]]
-  - [[#volatile-7][volatile]]
-  - [[#specialized-methods-28][Specialized Methods:]]
-- [[#class-helm-browse-project-override-inheritor][class: helm-browse-project-override-inheritor]]
-  - [[#specialized-methods-29][Specialized Methods:]]
-- [[#class-helm-browse-project-source][class: helm-browse-project-source]]
-  - [[#init-12][init]]
-  - [[#candidates-17][candidates]]
-  - [[#data-4][data]]
-  - [[#filter-one-by-one-1][filter-one-by-one]]
-  - [[#get-line-6][get-line]]
-  - [[#match-7][match]]
-  - [[#match-part-1][match-part]]
-  - [[#migemo-11][migemo]]
-  - [[#root-dir][root-dir]]
-  - [[#search-4][search]]
-  - [[#search-strict-4][search-strict]]
-  - [[#volatile-8][volatile]]
-  - [[#specialized-methods-30][Specialized Methods:]]
-- [[#class-helm-file-cache][class: helm-file-cache]]
-  - [[#init-13][init]]
-  - [[#candidates-18][candidates]]
-  - [[#data-5][data]]
-  - [[#get-line-7][get-line]]
-  - [[#match-8][match]]
-  - [[#migemo-12][migemo]]
-  - [[#search-5][search]]
-  - [[#search-strict-5][search-strict]]
-  - [[#volatile-9][volatile]]
-  - [[#specialized-methods-31][Specialized Methods:]]
-- [[#class-helm-recentf-source][class: helm-recentf-source]]
-  - [[#init-14][init]]
-  - [[#candidates-19][candidates]]
-  - [[#match-dynamic-6][match-dynamic]]
-  - [[#match-part-2][match-part]]
-  - [[#match-strict-6][match-strict]]
-  - [[#migemo-13][migemo]]
-  - [[#pattern-transformer-1][pattern-transformer]]
-  - [[#persistent-action-3][persistent-action]]
-  - [[#specialized-methods-32][Specialized Methods:]]
-- [[#class-helm-files-in-current-dir-source][class: helm-files-in-current-dir-source]]
-  - [[#candidates-20][candidates]]
-  - [[#fuzzy-match-1][fuzzy-match]]
-  - [[#match-dynamic-7][match-dynamic]]
-  - [[#match-part-3][match-part]]
-  - [[#match-strict-7][match-strict]]
-  - [[#migemo-14][migemo]]
-  - [[#pattern-transformer-2][pattern-transformer]]
-  - [[#specialized-methods-33][Specialized Methods:]]
-- [[#class-helm-grep-class][class: helm-grep-class]]
-  - [[#action-7][action]]
-  - [[#after-init-hook-2][after-init-hook]]
-  - [[#backend][backend]]
-  - [[#before-init-hook-2][before-init-hook]]
-  - [[#candidate-number-limit-5][candidate-number-limit]]
-  - [[#candidates-process-3][candidates-process]]
-  - [[#filtered-candidate-transformer-10][filtered-candidate-transformer]]
-  - [[#group-3][group]]
-  - [[#help-message-7][help-message]]
-  - [[#history-1][history]]
-  - [[#keymap-9][keymap]]
-  - [[#nohighlight-5][nohighlight]]
-  - [[#nomark-3][nomark]]
-  - [[#pcre][pcre]]
-  - [[#persistent-action-4][persistent-action]]
-  - [[#persistent-help-3][persistent-help]]
-  - [[#requires-pattern-3][requires-pattern]]
-  - [[#specialized-methods-34][Specialized Methods:]]
-- [[#class-helm-grep-ag-class][class: helm-grep-ag-class]]
-  - [[#action-8][action]]
-  - [[#candidate-number-limit-6][candidate-number-limit]]
-  - [[#filtered-candidate-transformer-11][filtered-candidate-transformer]]
-  - [[#group-4][group]]
-  - [[#help-message-8][help-message]]
-  - [[#history-2][history]]
-  - [[#keymap-10][keymap]]
-  - [[#nohighlight-6][nohighlight]]
-  - [[#nomark-4][nomark]]
-  - [[#pcre-1][pcre]]
-  - [[#persistent-action-5][persistent-action]]
-  - [[#persistent-help-4][persistent-help]]
-  - [[#requires-pattern-4][requires-pattern]]
-  - [[#specialized-methods-35][Specialized Methods:]]
-- [[#class-helm-gid-source][class: helm-gid-source]]
-  - [[#action-9][action]]
-  - [[#candidate-number-limit-7][candidate-number-limit]]
-  - [[#candidates-process-4][candidates-process]]
-  - [[#db-dir][db-dir]]
-  - [[#filtered-candidate-transformer-12][filtered-candidate-transformer]]
-  - [[#header-name-2][header-name]]
-  - [[#help-message-9][help-message]]
-  - [[#history-3][history]]
-  - [[#nohighlight-7][nohighlight]]
-  - [[#persistent-action-6][persistent-action]]
-  - [[#requires-pattern-5][requires-pattern]]
-  - [[#specialized-methods-36][Specialized Methods:]]
-- [[#class-helm-imenu-source][class: helm-imenu-source]]
-  - [[#action-10][action]]
-  - [[#candidate-transformer-3][candidate-transformer]]
-  - [[#candidates-21][candidates]]
-  - [[#group-5][group]]
-  - [[#help-message-10][help-message]]
-  - [[#keymap-11][keymap]]
-  - [[#nomark-5][nomark]]
-  - [[#persistent-action-7][persistent-action]]
-  - [[#persistent-help-5][persistent-help]]
-  - [[#specialized-methods-37][Specialized Methods:]]
-- [[#class-helm-info-source][class: helm-info-source]]
-  - [[#init-15][init]]
-  - [[#action-11][action]]
-  - [[#display-to-real-1][display-to-real]]
-  - [[#get-line-8][get-line]]
-  - [[#info-file][info-file]]
-  - [[#specialized-methods-38][Specialized Methods:]]
-- [[#class-helm-locate-override-inheritor][class: helm-locate-override-inheritor]]
-  - [[#specialized-methods-39][Specialized Methods:]]
-- [[#class-helm-locate-source][class: helm-locate-source]]
-  - [[#init-16][init]]
-  - [[#candidate-number-limit-8][candidate-number-limit]]
-  - [[#candidates-process-5][candidates-process]]
-  - [[#group-6][group]]
-  - [[#history-4][history]]
-  - [[#multimatch-5][multimatch]]
-  - [[#persistent-action-8][persistent-action]]
-  - [[#redisplay-1][redisplay]]
-  - [[#requires-pattern-6][requires-pattern]]
-  - [[#specialized-methods-40][Specialized Methods:]]
-- [[#class-helm-locate-subdirs-source][class: helm-locate-subdirs-source]]
-  - [[#basedir][basedir]]
-  - [[#data-6][data]]
-  - [[#group-7][group]]
-  - [[#subdir][subdir]]
-  - [[#specialized-methods-41][Specialized Methods:]]
-- [[#class-helm-moccur-class][class: helm-moccur-class]]
-  - [[#buffer-name][buffer-name]]
-  - [[#moccur-buffers][moccur-buffers]]
-  - [[#specialized-methods-42][Specialized Methods:]]
-- [[#class-helm-semantic-source][class: helm-semantic-source]]
-  - [[#init-17][init]]
-  - [[#action-12][action]]
-  - [[#get-line-9][get-line]]
-  - [[#help-message-11][help-message]]
-  - [[#keymap-12][keymap]]
-  - [[#persistent-action-9][persistent-action]]
-  - [[#persistent-help-6][persistent-help]]
-  - [[#specialized-methods-43][Specialized Methods:]]
-- [[#main-index][Main Index]]
-- [[#key-index][Key Index]]
-- [[#command-and-function-index][Command and Function Index]]
-- [[#variable-index][Variable Index]]
-- [[#footnotes][Footnotes]]
-- [[#class-index][Class Index]]
+
+* Overview of Helm Classes
+
+[[./helm-figures/helm-classes.png]]
 
 * class: helm-source
+
+Main interface to define helm sources.
+
+[[./helm-figures/helm-source.png]]
 
 #+hcindex: helm-source
 
@@ -472,16 +71,12 @@
 
   - [[*class: helm-source-sync]]
 
-This class has following slots
+This class has following slots.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -500,10 +95,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -518,10 +109,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -545,10 +132,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -571,10 +154,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -593,10 +172,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -609,10 +184,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -632,10 +203,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -648,10 +215,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -677,10 +240,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -722,10 +281,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -741,10 +296,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -766,10 +317,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -783,10 +330,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -817,10 +360,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -842,10 +381,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -882,10 +417,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -901,10 +432,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -919,10 +446,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -945,10 +468,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm
@@ -961,10 +480,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -982,10 +497,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1002,10 +513,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1019,10 +526,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1042,10 +545,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-map
@@ -1059,10 +558,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1078,10 +573,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1122,10 +613,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1138,10 +625,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1162,10 +645,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1179,10 +658,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1202,10 +677,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -1224,10 +695,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1251,10 +718,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1277,10 +740,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1293,10 +752,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1314,10 +769,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1363,10 +814,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1401,10 +848,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1420,10 +863,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1451,10 +890,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'identity
@@ -1474,10 +909,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   0
@@ -1493,10 +924,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1515,10 +942,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1532,10 +955,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1564,25 +983,32 @@ This class has following slots
 
 * class: helm-source-sync
 
+Use this class to make helm sources using a list of candidates.
+This list should be given as a normal list, a variable handling a list
+or a function returning a list.
+Matching is done basically with ~string-match~ against each candidate.
+
+[[./helm-figures/helm-source-sync.png]]
+
 #+hcindex: helm-source-sync
 
 #+hcindex: helm-source
 
+#+hcindex: helm-source-session-class
+
+#+hcindex: helm-files-dired-source
+
 #+hcindex: helm-imenu-source
+
+#+hcindex: helm-files-in-current-dir-source
+
+#+hcindex: helm-recentf-source
 
 #+hcindex: helm-eshell-history-source
 
 #+hcindex: helm-esh-source
 
 #+hcindex: helm-epa
-
-#+hcindex: helm-source-session-class
-
-#+hcindex: helm-files-dired-source
-
-#+hcindex: helm-files-in-current-dir-source
-
-#+hcindex: helm-recentf-source
 
 #+hcindex: helm-M-x-class
 
@@ -1600,21 +1026,21 @@ This class has following slots
 
 - *children* ::
 
+  - [[*class: helm-source-session-class]]
+
+  - [[*class: helm-files-dired-source]]
+
   - [[*class: helm-imenu-source]]
+
+  - [[*class: helm-files-in-current-dir-source]]
+
+  - [[*class: helm-recentf-source]]
 
   - [[*class: helm-eshell-history-source]]
 
   - [[*class: helm-esh-source]]
 
   - [[*class: helm-epa]]
-
-  - [[*class: helm-source-session-class]]
-
-  - [[*class: helm-files-dired-source]]
-
-  - [[*class: helm-files-in-current-dir-source]]
-
-  - [[*class: helm-recentf-source]]
 
   - [[*class: helm-M-x-class]]
 
@@ -1626,16 +1052,12 @@ This class has following slots
 
   - [[*class: helm-source-buffers]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1677,10 +1099,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -1697,10 +1115,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1721,10 +1135,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1757,15 +1167,27 @@ This class has following slots
 
 * class: helm-source-async
 
+Use this class to define a helm source calling an external process.
+The external process is called typically in a ~start-process~ call to be
+asynchronous.
+
+Note that using multiples asynchronous sources is not fully working,
+expect weird behavior if you try this.
+
+The :candidates slot is not allowed even if described because this class
+inherit from ~helm-source~.
+
+[[./helm-figures/helm-source-async.png]]
+
 #+hcindex: helm-source-async
 
 #+hcindex: helm-source
 
+#+hcindex: helm-mac-spotlight-source
+
 #+hcindex: helm-gid-source
 
 #+hcindex: helm-fd-class
-
-#+hcindex: helm-mac-spotlight-source
 
 #+hcindex: helm-locate-source
 
@@ -1779,11 +1201,11 @@ This class has following slots
 
 - *children* ::
 
+  - [[*class: helm-mac-spotlight-source]]
+
   - [[*class: helm-gid-source]]
 
   - [[*class: helm-fd-class]]
-
-  - [[*class: helm-mac-spotlight-source]]
 
   - [[*class: helm-locate-source]]
 
@@ -1791,16 +1213,12 @@ This class has following slots
 
   - [[*class: helm-grep-class]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates-process
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1823,10 +1241,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1859,15 +1273,29 @@ This class has following slots
 
 * class: helm-source-in-buffer
 
+Use this source to make helm sources storing candidates inside a buffer.
+
+The buffer storing candidates is generated by ~helm-candidate-buffer~ function
+and all search are done in this buffer, results are transfered to the ~helm-buffer~
+when done.
+Contrarily to ~helm-source-sync~ candidates are matched using a function
+like ~re-search-forward~ (see below documentation of ~:search~ slot) which makes
+the search much faster than matching candidates one by one.
+If you want to add search functions to your sources, don't use ~:match~ which
+will raise an error, but ~:search~.
+See ~helm-candidates-in-buffer~ for more infos.
+
+[[./helm-figures/helm-source-in-buffer.png]]
+
 #+hcindex: helm-source-in-buffer
 
 #+hcindex: helm-source
 
 #+hcindex: helm-semantic-source
 
-#+hcindex: helm-list-el-package-source
-
 #+hcindex: helm-file-cache
+
+#+hcindex: helm-list-el-package-source
 
 #+hcindex: helm-source-filtered-bookmarks
 
@@ -1891,9 +1319,9 @@ This class has following slots
 
   - [[*class: helm-semantic-source]]
 
-  - [[*class: helm-list-el-package-source]]
-
   - [[*class: helm-file-cache]]
+
+  - [[*class: helm-list-el-package-source]]
 
   - [[*class: helm-source-filtered-bookmarks]]
 
@@ -1909,16 +1337,12 @@ This class has following slots
 
   - [[*class: helm-source-in-file]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1936,10 +1360,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -1981,10 +1401,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -2001,10 +1417,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2024,10 +1436,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2068,10 +1476,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -2090,10 +1494,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2118,10 +1518,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -2142,10 +1538,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2175,6 +1567,8 @@ This class has following slots
 
 * class: helm-source-dummy
 
+[[./helm-figures/helm-source-dummy.png]]
+
 #+hcindex: helm-source-dummy
 
 #+hcindex: helm-source
@@ -2185,16 +1579,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** accept-empty
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2209,10 +1599,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2254,13 +1640,13 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (_candidates _source) (list helm-pattern))
+  #+begin_src emacs-lisp
+    (lambda
+      (_candidates _source)
+      (list helm-pattern))
+  #+end_src
 
 - :documentation
 
@@ -2292,10 +1678,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2336,10 +1718,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -2358,10 +1736,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2391,6 +1765,10 @@ This class has following slots
 
 * class: helm-source-in-file
 
+The contents of the FILE will be used as candidates in buffer.
+
+[[./helm-figures/helm-source-in-file.png]]
+
 #+hcindex: helm-source-in-file
 
 #+hcindex: helm-source-in-buffer
@@ -2401,20 +1779,36 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (let ((file (helm-get-attr 'candidates-file)) (count 1)) (with-current-buffer (helm-candidate-buffer 'global) (insert-file-contents file) (goto-char (point-min)) (while (not (eobp)) (add-text-properties (point-at-bol) (point-at-eol) `(helm-linum ,count)) (cl-incf count) (forward-line 1)))))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (let
+	  ((file
+	    (helm-get-attr 'candidates-file))
+	   (count 1))
+	(with-current-buffer
+	    (helm-candidate-buffer 'global)
+	  (insert-file-contents file)
+	  (goto-char
+	   (point-min))
+	  (while
+	      (not
+	       (eobp))
+	    (add-text-properties
+	     (point-at-bol)
+	     (point-at-eol)
+	     `(helm-linum ,count))
+	    (cl-incf count)
+	    (forward-line 1)))))
+  #+end_src
 
 - :documentation
 
@@ -2428,10 +1822,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2447,10 +1837,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2482,6 +1868,10 @@ This class has following slots
  ((source helm-source))
 
 * class: helm-type-file
+
+A class to define helm type file.
+
+[[./helm-figures/helm-type-file.png]]
 
 #+hcindex: helm-type-file
 
@@ -2521,7 +1911,7 @@ This class has following slots
 
   - [[*class: helm-locate-override-inheritor]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2545,6 +1935,10 @@ This class has following slots
 
 * class: helm-type-bookmark
 
+A class to define type bookmarks.
+
+[[./helm-figures/helm-type-bookmark.png]]
+
 #+hcindex: helm-type-bookmark
 
 #+hcindex: helm-source
@@ -2563,7 +1957,7 @@ This class has following slots
 
   - [[*class: helm-source-basic-bookmarks]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2587,6 +1981,10 @@ This class has following slots
 
 * class: helm-type-buffer
 
+A class to define type buffer.
+
+[[./helm-figures/helm-type-buffer.png]]
+
 #+hcindex: helm-type-buffer
 
 #+hcindex: helm-source
@@ -2601,7 +1999,7 @@ This class has following slots
 
   - [[*class: helm-source-buffers]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2625,6 +2023,10 @@ This class has following slots
 
 * class: helm-type-function
 
+A class to define helm type function.
+
+[[./helm-figures/helm-type-function.png]]
+
 #+hcindex: helm-type-function
 
 #+hcindex: helm-source
@@ -2635,7 +2037,7 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2659,6 +2061,10 @@ This class has following slots
 
 * class: helm-type-command
 
+A class to define helm type command.
+
+[[./helm-figures/helm-type-command.png]]
+
 #+hcindex: helm-type-command
 
 #+hcindex: helm-source
@@ -2673,7 +2079,7 @@ This class has following slots
 
   - [[*class: helm-M-x-class]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2693,6 +2099,10 @@ This class has following slots
 
 * class: helm-type-timers
 
+A class to define helm type timers.
+
+[[./helm-figures/helm-type-timers.png]]
+
 #+hcindex: helm-type-timers
 
 #+hcindex: helm-source
@@ -2711,7 +2121,7 @@ This class has following slots
 
   - [[*class: helm-absolute-time-timers-class]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -2731,6 +2141,8 @@ This class has following slots
 
 * class: helm-files-dired-source
 
+[[./helm-figures/helm-files-dired-source.png]]
+
 #+hcindex: helm-files-dired-source
 
 #+hcindex: helm-source-sync
@@ -2745,16 +2157,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2796,10 +2204,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -2816,10 +2220,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2840,10 +2240,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2882,6 +2278,8 @@ This class has following slots
 
 * class: helm-source-session-class
 
+[[./helm-figures/helm-source-session-class.png]]
+
 #+hcindex: helm-source-session-class
 
 #+hcindex: helm-source-sync
@@ -2892,16 +2290,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -2925,13 +2319,18 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (cl-delete-if-not (lambda (f) (or (string-match helm-tramp-file-name-regexp f) (file-exists-p f))) (mapcar 'car session-file-alist)))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (cl-delete-if-not
+       (lambda
+	 (f)
+	 (or
+	  (string-match helm-tramp-file-name-regexp f)
+	  (file-exists-p f)))
+       (mapcar 'car session-file-alist)))
+  #+end_src
 
 - :documentation
 
@@ -2969,10 +2368,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-generic-file-help-message
@@ -2986,10 +2381,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3017,6 +2408,8 @@ This class has following slots
 
 * class: helm-mac-spotlight-source
 
+[[./helm-figures/helm-mac-spotlight-source.png]]
+
 #+hcindex: helm-mac-spotlight-source
 
 #+hcindex: helm-source-async
@@ -3031,20 +2424,19 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates-process
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (start-process "mdfind-process" nil "mdfind" helm-pattern))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (start-process "mdfind-process" nil "mdfind" helm-pattern))
+  #+end_src
 
 - :documentation
 
@@ -3064,10 +2456,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3086,10 +2474,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3125,6 +2509,8 @@ This class has following slots
 
 * class: helm-source-basic-bookmarks
 
+[[./helm-figures/helm-source-basic-bookmarks.png]]
+
 #+hcindex: helm-source-basic-bookmarks
 
 #+hcindex: helm-source-in-buffer
@@ -3139,20 +2525,21 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (bookmark-maybe-load-default-file) (helm-init-candidates-in-buffer 'global (bookmark-all-names)))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (bookmark-maybe-load-default-file)
+      (helm-init-candidates-in-buffer 'global
+	(bookmark-all-names)))
+  #+end_src
 
 - :documentation
 
@@ -3166,10 +2553,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3211,10 +2594,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3231,10 +2610,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3271,10 +2646,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring-no-properties
@@ -3293,10 +2664,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3337,10 +2704,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3359,10 +2722,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3387,10 +2746,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3411,10 +2766,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3450,6 +2801,8 @@ This class has following slots
 
 * class: helm-source-filtered-bookmarks
 
+[[./helm-figures/helm-source-filtered-bookmarks.png]]
+
 #+hcindex: helm-source-filtered-bookmarks
 
 #+hcindex: helm-source-in-buffer
@@ -3468,16 +2821,12 @@ This class has following slots
 
   - [[*class: helm-bookmark-find-files-class]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3495,10 +2844,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3540,10 +2885,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3560,10 +2901,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3600,10 +2937,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring-no-properties
@@ -3622,10 +2955,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3666,10 +2995,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3688,10 +3013,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3716,10 +3037,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3740,10 +3057,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3779,6 +3092,8 @@ This class has following slots
 
 * class: helm-bookmark-override-inheritor
 
+[[./helm-figures/helm-bookmark-override-inheritor.png]]
+
 #+hcindex: helm-bookmark-override-inheritor
 
 #+hcindex: helm-source
@@ -3793,7 +3108,7 @@ This class has following slots
 
   - [[*class: helm-bookmark-find-files-class]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -3812,6 +3127,8 @@ This class has following slots
 
 * class: helm-bookmark-find-files-class
 
+[[./helm-figures/helm-bookmark-find-files-class.png]]
+
 #+hcindex: helm-bookmark-find-files-class
 
 #+hcindex: helm-source-filtered-bookmarks
@@ -3826,16 +3143,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3853,10 +3166,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3898,10 +3207,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -3918,10 +3223,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -3958,10 +3259,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring-no-properties
@@ -3980,10 +3277,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4024,10 +3317,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4046,10 +3335,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4074,10 +3359,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4098,10 +3379,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4138,6 +3415,8 @@ This class has following slots
 
 * class: helm-source-buffers
 
+[[./helm-figures/helm-source-buffers.png]]
+
 #+hcindex: helm-source-buffers
 
 #+hcindex: helm-source-sync
@@ -4152,16 +3431,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4180,10 +3455,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   #'helm-buffer-list
@@ -4196,10 +3467,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4241,10 +3508,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-buffer-help-message
@@ -4259,10 +3522,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-buffer-map
@@ -4276,10 +3535,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4320,10 +3575,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4340,10 +3591,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4365,10 +3612,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'nomultimatch
@@ -4388,10 +3631,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4410,10 +3649,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4436,10 +3671,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4485,13 +3716,12 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (setq helm-buffers-in-project-p nil))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (setq helm-buffers-in-project-p nil))
+  #+end_src
 
 - :documentation
 
@@ -4505,10 +3735,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4544,6 +3770,8 @@ This class has following slots
 
 * class: helm-M-x-class
 
+[[./helm-figures/helm-M-x-class.png]]
+
 #+hcindex: helm-M-x-class
 
 #+hcindex: helm-source-sync
@@ -4558,16 +3786,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4609,10 +3833,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-M-x-transformer-no-sort
@@ -4648,10 +3868,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-M-x-help-message
@@ -4666,10 +3882,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-M-x-map
@@ -4683,10 +3895,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4704,10 +3912,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4729,10 +3933,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4751,10 +3951,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4778,10 +3974,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -4794,10 +3986,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4829,6 +4017,8 @@ This class has following slots
 
 * class: helm-absolute-time-timers-class
 
+[[./helm-figures/helm-absolute-time-timers-class.png]]
+
 #+hcindex: helm-absolute-time-timers-class
 
 #+hcindex: helm-source-sync
@@ -4843,16 +4033,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** allow-dups
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4867,13 +4053,16 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (candidates) (cl-loop for timer in candidates collect (cons (helm-elisp--format-timer timer) timer)))
+  #+begin_src emacs-lisp
+    (lambda
+      (candidates)
+      (cl-loop for timer in candidates collect
+	       (cons
+		(helm-elisp--format-timer timer)
+		timer)))
+  #+end_src
 
 - :documentation
 
@@ -4895,10 +4084,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4940,10 +4125,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -4960,10 +4141,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -4984,10 +4161,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5022,6 +4195,8 @@ This class has following slots
 
 * class: helm-idle-time-timers-class
 
+[[./helm-figures/helm-idle-time-timers-class.png]]
+
 #+hcindex: helm-idle-time-timers-class
 
 #+hcindex: helm-source-sync
@@ -5036,16 +4211,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** allow-dups
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5060,13 +4231,16 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (candidates) (cl-loop for timer in candidates collect (cons (helm-elisp--format-timer timer) timer)))
+  #+begin_src emacs-lisp
+    (lambda
+      (candidates)
+      (cl-loop for timer in candidates collect
+	       (cons
+		(helm-elisp--format-timer timer)
+		timer)))
+  #+end_src
 
 - :documentation
 
@@ -5088,10 +4262,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5133,10 +4303,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -5153,10 +4319,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5177,10 +4339,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5215,6 +4373,8 @@ This class has following slots
 
 * class: helm-list-el-package-source
 
+[[./helm-figures/helm-list-el-package-source.png]]
+
 #+hcindex: helm-list-el-package-source
 
 #+hcindex: helm-source-in-buffer
@@ -5225,16 +4385,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5252,10 +4408,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5279,10 +4431,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-el-package--action-transformer
@@ -5305,10 +4453,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   9999
@@ -5321,10 +4465,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5361,10 +4501,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring
@@ -5384,10 +4520,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-el-package
@@ -5400,10 +4532,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5419,10 +4547,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-el-package-map
@@ -5436,10 +4560,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5467,6 +4587,10 @@ This class has following slots
 
 * class: helm-epa
 
+Allow building helm sources for GPG keys.
+
+[[./helm-figures/helm-epa.png]]
+
 #+hcindex: helm-epa
 
 #+hcindex: helm-source-sync
@@ -5477,20 +4601,20 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (require 'epg) (require 'epa))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (require 'epg)
+      (require 'epa))
+  #+end_src
 
 - :documentation
 
@@ -5504,10 +4628,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5549,10 +4669,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-comp-read-map
@@ -5566,10 +4682,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5597,6 +4709,10 @@ This class has following slots
 
 * class: helm-esh-source
 
+Helm class to define source for Eshell completion.
+
+[[./helm-figures/helm-esh-source.png]]
+
 #+hcindex: helm-esh-source
 
 #+hcindex: helm-source-sync
@@ -5607,20 +4723,20 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (setq pcomplete-current-completions nil pcomplete-last-completion-raw nil) (remove-hook 'minibuffer-setup-hook 'eshell-mode))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (setq pcomplete-current-completions nil pcomplete-last-completion-raw nil)
+      (remove-hook 'minibuffer-setup-hook 'eshell-mode))
+  #+end_src
 
 - :documentation
 
@@ -5634,10 +4750,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5660,10 +4772,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5705,10 +4813,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   #'helm-esh-transformer
@@ -5744,10 +4848,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -5769,10 +4869,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5830,6 +4926,10 @@ This class has following slots
 
 * class: helm-eshell-history-source
 
+Helm class to define source for Eshell history.
+
+[[./helm-figures/helm-eshell-history-source.png]]
+
 #+hcindex: helm-eshell-history-source
 
 #+hcindex: helm-source-sync
@@ -5840,20 +4940,19 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (remove-hook 'minibuffer-setup-hook 'eshell-mode))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (remove-hook 'minibuffer-setup-hook 'eshell-mode))
+  #+end_src
 
 - :documentation
 
@@ -5868,13 +4967,14 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (candidate) (eshell-kill-input) (insert candidate))
+  #+begin_src emacs-lisp
+    (lambda
+      (candidate)
+      (eshell-kill-input)
+      (insert candidate))
+  #+end_src
 
 - :documentation
 
@@ -5894,10 +4994,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   9999
@@ -5911,13 +5007,21 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (with-helm-current-buffer (cl-loop for c from 0 to (ring-length eshell-history-ring) for elm = (eshell-get-history c) unless (and (member elm lst) eshell-hist-ignoredups) collect elm into lst finally return lst)))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (with-helm-current-buffer
+	(cl-loop for c from 0 to
+		 (ring-length eshell-history-ring)
+		 for elm =
+		 (eshell-get-history c)
+		 unless
+		 (and
+		  (member elm lst)
+		  eshell-hist-ignoredups)
+		 collect elm into lst finally return lst)))
+  #+end_src
 
 - :documentation
 
@@ -5955,10 +5059,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-eshell-history-map
@@ -5972,10 +5072,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -5994,10 +5090,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6024,6 +5116,8 @@ This class has following slots
 
 * class: helm-fd-class
 
+[[./helm-figures/helm-fd-class.png]]
+
 #+hcindex: helm-fd-class
 
 #+hcindex: helm-source-async
@@ -6034,16 +5128,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6067,10 +5157,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   20000
@@ -6083,10 +5169,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6109,10 +5191,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6149,10 +5227,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-fd-help-message
@@ -6167,10 +5241,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-fd-map
@@ -6184,10 +5254,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6210,10 +5276,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6243,6 +5305,8 @@ This class has following slots
 
 * class: helm-source-ffiles
 
+[[./helm-figures/helm-source-ffiles.png]]
+
 #+hcindex: helm-source-ffiles
 
 #+hcindex: helm-source-sync
@@ -6253,20 +5317,22 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (setq helm-ff-auto-update-flag helm-ff-auto-update-initial-value) (setq helm-ff--auto-update-state helm-ff-auto-update-flag) (helm-set-local-variable 'bookmark-make-record-function #'helm-ff-make-bookmark-record) (require 'helm-external))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (setq helm-ff-auto-update-flag helm-ff-auto-update-initial-value)
+      (setq helm-ff--auto-update-state helm-ff-auto-update-flag)
+      (helm-set-local-variable 'bookmark-make-record-function #'helm-ff-make-bookmark-record)
+      (require 'helm-external))
+  #+end_src
 
 - :documentation
 
@@ -6280,10 +5346,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6307,10 +5369,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-find-files-action-transformer
@@ -6333,10 +5391,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-find-files-after-init-hook
@@ -6354,10 +5408,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6377,10 +5427,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-ff-candidate-number-limit
@@ -6393,10 +5439,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6438,10 +5480,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-find-files-cleanup
@@ -6457,10 +5495,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6497,10 +5531,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-files
@@ -6514,13 +5544,14 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (name) (concat name (substitute-command-keys helm-find-files-doc-header)))
+  #+begin_src emacs-lisp
+    (lambda
+      (name)
+      (concat name
+	      (substitute-command-keys helm-find-files-doc-header)))
+  #+end_src
 
 - :documentation
 
@@ -6533,10 +5564,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6552,10 +5579,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-find-files-map
@@ -6570,10 +5593,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -6586,10 +5605,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6610,13 +5625,11 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (list "File(s)" helm-mode-line-string)
+  #+begin_src emacs-lisp
+    (list "File(s)" helm-mode-line-string)
+  #+end_src
 
 - :documentation
 
@@ -6627,10 +5640,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6653,10 +5662,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6692,10 +5697,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   "Hit1 Expand Candidate, Hit2 or (C-u) Find file"
@@ -6712,13 +5713,12 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (remhash helm-ff-default-directory helm-ff--list-directory-cache))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (remhash helm-ff-default-directory helm-ff--list-directory-cache))
+  #+end_src
 
 - :documentation
 
@@ -6729,10 +5729,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6762,6 +5758,8 @@ This class has following slots
 
 * class: helm-browse-project-override-inheritor
 
+[[./helm-figures/helm-browse-project-override-inheritor.png]]
+
 #+hcindex: helm-browse-project-override-inheritor
 
 #+hcindex: helm-type-file
@@ -6776,7 +5774,7 @@ This class has following slots
 
   - [[*class: helm-browse-project-source]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -6801,6 +5799,11 @@ This class has following slots
 
 * class: helm-browse-project-source
 
+Class to define a source in ~helm-browse-project~ handling non
+VC handled directories.
+
+[[./helm-figures/helm-browse-project-source.png]]
+
 #+hcindex: helm-browse-project-source
 
 #+hcindex: helm-source-in-buffer
@@ -6815,16 +5818,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6842,10 +5841,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -6887,10 +5882,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -6908,13 +5899,20 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (c) (if (with-helm-buffer helm-ff-transformer-show-only-basename) (cons (propertize (helm-basename c) 'face 'helm-ff-file) c) (propertize c 'face 'helm-ff-file)))
+  #+begin_src emacs-lisp
+    (lambda
+      (c)
+      (if
+	  (with-helm-buffer helm-ff-transformer-show-only-basename)
+	  (cons
+	   (propertize
+	    (helm-basename c)
+	    'face 'helm-ff-file)
+	   c)
+	(propertize c 'face 'helm-ff-file)))
+  #+end_src
 
 - :documentation
 
@@ -6934,10 +5932,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring-no-properties
@@ -6956,10 +5950,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7000,13 +5990,16 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (c) (if (with-helm-buffer helm-ff-transformer-show-only-basename) (helm-basename c) c))
+  #+begin_src emacs-lisp
+    (lambda
+      (c)
+      (if
+	  (with-helm-buffer helm-ff-transformer-show-only-basename)
+	  (helm-basename c)
+	c))
+  #+end_src
 
 - :documentation
 
@@ -7022,10 +6015,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7046,10 +6035,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7060,10 +6045,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7088,10 +6069,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7112,10 +6089,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7152,6 +6125,8 @@ This class has following slots
 
 * class: helm-file-cache
 
+[[./helm-figures/helm-file-cache.png]]
+
 #+hcindex: helm-file-cache
 
 #+hcindex: helm-source-in-buffer
@@ -7166,20 +6141,19 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (require 'filecache))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (require 'filecache))
+  #+end_src
 
 - :documentation
 
@@ -7193,10 +6167,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7238,10 +6208,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7258,10 +6224,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7281,10 +6243,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7325,10 +6283,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7347,10 +6301,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7375,10 +6325,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7399,10 +6345,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7438,6 +6380,8 @@ This class has following slots
 
 * class: helm-recentf-source
 
+[[./helm-figures/helm-recentf-source.png]]
+
 #+hcindex: helm-recentf-source
 
 #+hcindex: helm-source-sync
@@ -7452,20 +6396,21 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (require 'recentf) (when helm-turn-on-recentf (recentf-mode 1)))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (require 'recentf)
+      (when helm-turn-on-recentf
+	(recentf-mode 1)))
+  #+end_src
 
 - :documentation
 
@@ -7480,13 +6425,11 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil recentf-list)
+  #+begin_src emacs-lisp
+    (lambda nil recentf-list)
+  #+end_src
 
 - :documentation
 
@@ -7524,10 +6467,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7545,13 +6484,16 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (candidate) (if (or helm-ff-transformer-show-only-basename helm-recentf--basename-flag) (helm-basename candidate) candidate))
+  #+begin_src emacs-lisp
+    (lambda
+      (candidate)
+      (if
+	  (or helm-ff-transformer-show-only-basename helm-recentf--basename-flag)
+	  (helm-basename candidate)
+	candidate))
+  #+end_src
 
 - :documentation
 
@@ -7567,10 +6509,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7592,10 +6530,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -7615,10 +6549,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-recentf-pattern-transformer
@@ -7635,10 +6565,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7703,6 +6629,8 @@ This class has following slots
 
 * class: helm-files-in-current-dir-source
 
+[[./helm-figures/helm-files-in-current-dir-source.png]]
+
 #+hcindex: helm-files-in-current-dir-source
 
 #+hcindex: helm-source-sync
@@ -7717,20 +6645,25 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** candidates
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (with-helm-current-buffer (let ((dir (helm-current-directory))) (when (file-accessible-directory-p dir) (directory-files dir t)))))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (with-helm-current-buffer
+	(let
+	    ((dir
+	      (helm-current-directory)))
+	  (when
+	      (file-accessible-directory-p dir)
+	    (directory-files dir t)))))
+  #+end_src
 
 - :documentation
 
@@ -7768,10 +6701,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -7793,10 +6722,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -7814,13 +6739,16 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (candidate) (if (or helm-ff-transformer-show-only-basename helm-recentf--basename-flag) (helm-basename candidate) candidate))
+  #+begin_src emacs-lisp
+    (lambda
+      (candidate)
+      (if
+	  (or helm-ff-transformer-show-only-basename helm-recentf--basename-flag)
+	  (helm-basename candidate)
+	candidate))
+  #+end_src
 
 - :documentation
 
@@ -7836,10 +6764,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7861,10 +6785,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -7883,10 +6803,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7923,6 +6839,8 @@ This class has following slots
 
 * class: helm-grep-class
 
+[[./helm-figures/helm-grep-class.png]]
+
 #+hcindex: helm-grep-class
 
 #+hcindex: helm-source-async
@@ -7933,16 +6851,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -7966,10 +6880,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-grep-after-init-hook
@@ -7988,10 +6898,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -8007,10 +6913,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8030,10 +6932,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   9999
@@ -8046,10 +6944,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8072,10 +6966,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8112,10 +7002,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-grep
@@ -8128,10 +7014,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8146,10 +7028,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8169,10 +7047,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-grep-map
@@ -8186,10 +7060,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8213,10 +7083,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -8230,10 +7096,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -8246,10 +7108,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8295,10 +7153,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   "Jump to line (~C-u~ Record in mark ring)"
@@ -8314,10 +7168,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8348,6 +7198,8 @@ This class has following slots
 
 * class: helm-grep-ag-class
 
+[[./helm-figures/helm-grep-ag-class.png]]
+
 #+hcindex: helm-grep-ag-class
 
 #+hcindex: helm-source-async
@@ -8358,16 +7210,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8391,10 +7239,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   99999
@@ -8407,10 +7251,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8447,10 +7287,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-grep
@@ -8463,10 +7299,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8481,10 +7313,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8504,10 +7332,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-grep-map
@@ -8521,10 +7345,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8548,10 +7368,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -8565,10 +7381,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -8581,10 +7393,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8630,10 +7438,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   "Jump to line (~C-u~ Record in mark ring)"
@@ -8649,10 +7453,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8683,6 +7483,8 @@ This class has following slots
 
 * class: helm-gid-source
 
+[[./helm-figures/helm-gid-source.png]]
+
 #+hcindex: helm-gid-source
 
 #+hcindex: helm-source-async
@@ -8693,20 +7495,18 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (helm-make-actions "Find File" 'helm-grep-action "Find file other frame" 'helm-grep-other-frame "Save results in grep buffer" 'helm-grep-save-results "Find file other window" 'helm-grep-other-window)
+  #+begin_src emacs-lisp
+    (helm-make-actions "Find File" 'helm-grep-action "Find file other frame" 'helm-grep-other-frame "Save results in grep buffer" 'helm-grep-save-results "Find file other window" 'helm-grep-other-window)
+  #+end_src
 
 - :documentation
 
@@ -8726,10 +7526,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   99999
@@ -8742,10 +7538,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8769,10 +7561,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -8785,10 +7573,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8825,13 +7609,15 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (name) (concat name " [" (helm-get-attr 'db-dir) "]"))
+  #+begin_src emacs-lisp
+    (lambda
+      (name)
+      (concat name " ["
+	      (helm-get-attr 'db-dir)
+	      "]"))
+  #+end_src
 
 - :documentation
 
@@ -8844,10 +7630,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8862,10 +7644,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8884,10 +7662,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8910,10 +7684,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -8959,10 +7729,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   2
@@ -8991,6 +7757,8 @@ This class has following slots
 
 * class: helm-imenu-source
 
+[[./helm-figures/helm-imenu-source.png]]
+
 #+hcindex: helm-imenu-source
 
 #+hcindex: helm-source-sync
@@ -9001,16 +7769,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** action
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9033,10 +7797,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9062,10 +7822,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9107,10 +7863,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-imenu
@@ -9123,10 +7875,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9142,10 +7890,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   helm-imenu-map
@@ -9160,10 +7904,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   t
@@ -9176,10 +7916,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9225,10 +7961,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   "Show this entry"
@@ -9257,6 +7989,8 @@ This class has following slots
 
 * class: helm-info-source
 
+[[./helm-figures/helm-info-source.png]]
+
 #+hcindex: helm-info-source
 
 #+hcindex: helm-source-in-buffer
@@ -9267,16 +8001,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9294,10 +8024,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9320,10 +8046,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9354,10 +8076,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   #'buffer-substring
@@ -9376,10 +8094,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9404,6 +8118,8 @@ This class has following slots
 
 * class: helm-locate-override-inheritor
 
+[[./helm-figures/helm-locate-override-inheritor.png]]
+
 #+hcindex: helm-locate-override-inheritor
 
 #+hcindex: helm-type-file
@@ -9418,7 +8134,7 @@ This class has following slots
 
   - [[*class: helm-locate-source]]
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** Specialized Methods:
 :PROPERTIES:
@@ -9443,6 +8159,8 @@ This class has following slots
 
 * class: helm-locate-source
 
+[[./helm-figures/helm-locate-source.png]]
+
 #+hcindex: helm-locate-source
 
 #+hcindex: helm-source-async
@@ -9457,16 +8175,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9485,10 +8199,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   9999
@@ -9501,10 +8211,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9528,10 +8234,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-locate
@@ -9544,10 +8246,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9567,10 +8265,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   nil
@@ -9589,10 +8283,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9638,13 +8328,11 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (progn helm-locate-fuzzy-sort-fn)
+  #+begin_src emacs-lisp
+    (progn helm-locate-fuzzy-sort-fn)
+  #+end_src
 
 - :documentation
 
@@ -9660,10 +8348,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9700,6 +8384,8 @@ This class has following slots
 
 * class: helm-locate-subdirs-source
 
+[[./helm-figures/helm-locate-subdirs-source.png]]
+
 #+hcindex: helm-locate-subdirs-source
 
 #+hcindex: helm-source-in-buffer
@@ -9710,16 +8396,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** basedir
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9731,10 +8413,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9753,10 +8431,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-locate
@@ -9769,10 +8443,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9797,6 +8467,8 @@ This class has following slots
 
 * class: helm-moccur-class
 
+[[./helm-figures/helm-moccur-class.png]]
+
 #+hcindex: helm-moccur-class
 
 #+hcindex: helm-source-in-buffer
@@ -9807,16 +8479,12 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** buffer-name
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9828,10 +8496,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9856,6 +8520,8 @@ This class has following slots
 
 * class: helm-semantic-source
 
+[[./helm-figures/helm-semantic-source.png]]
+
 #+hcindex: helm-semantic-source
 
 #+hcindex: helm-source-in-buffer
@@ -9866,20 +8532,27 @@ This class has following slots
 
 - *children* ::
 
-This class has following slots
+The following are some interesting slots of this class. Note that not all slots are shown here.
 
 ** init
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda nil (helm-semantic--maybe-set-needs-update) (setq helm-semantic--tags-cache (semantic-fetch-tags)) (with-current-buffer (helm-candidate-buffer 'global) (let ((major-mode (with-helm-current-buffer major-mode))) (helm-semantic--fetch-candidates helm-semantic--tags-cache 0))))
+  #+begin_src emacs-lisp
+    (lambda nil
+      (helm-semantic--maybe-set-needs-update)
+      (setq helm-semantic--tags-cache
+	    (semantic-fetch-tags))
+      (with-current-buffer
+	  (helm-candidate-buffer 'global)
+	(let
+	    ((major-mode
+	      (with-helm-current-buffer major-mode)))
+	  (helm-semantic--fetch-candidates helm-semantic--tags-cache 0))))
+  #+end_src
 
 - :documentation
 
@@ -9893,10 +8566,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9920,10 +8589,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'buffer-substring
@@ -9943,10 +8608,6 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
   'helm-semantic-help-message
@@ -9960,10 +8621,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -9979,13 +8636,14 @@ This class has following slots
 :UNNUMBERED: notoc
 :END:
 
-- :type
-
-  t
-
 - :initform
 
-  (lambda (elm) (helm-semantic-default-action elm t) (helm-highlight-current-line))
+  #+begin_src emacs-lisp
+    (lambda
+      (elm)
+      (helm-semantic-default-action elm t)
+      (helm-highlight-current-line))
+  #+end_src
 
 - :documentation
 
@@ -10026,10 +8684,6 @@ This class has following slots
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-
-- :type
-
-  t
 
 - :initform
 
@@ -10089,9 +8743,7 @@ that are mentioned in the manual.  For a more complete list, use
 
 #+setupfile: doc-setup.org
 #+options: H:4
-
 #+export_file_name: helm-classes.texi
-
 #+texinfo_dir_category: Emacs Add-ons
 #+texinfo_dir_title: Helm Classes: (helm-classes)
 #+texinfo_dir_desc: Helm Classes
@@ -10109,5 +8761,4 @@ that are mentioned in the manual.  For a more complete list, use
 :DESCRIPTION: Index of Helm Classes
 :INDEX: hc
 :END:
-
 #+texinfo: @printindex hc
