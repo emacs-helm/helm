@@ -251,7 +251,7 @@ and vectors, so don't use strings to define them."
     (define-key map (kbd "C-c %")      'helm-exchange-minibuffer-and-header-line)
     (define-key map (kbd "C-c C-y")    'helm-yank-selection)
     (define-key map (kbd "C-c C-k")    'helm-kill-selection-and-quit)
-    (define-key map (kbd "C-c C-i")    'helm-copy-to-buffer)
+    (define-key map (kbd "C-c C-i")    'helm-insert-or-copy)
     (define-key map (kbd "C-c C-f")    'helm-follow-mode)
     (define-key map (kbd "C-c C-u")    'helm-refresh)
     (define-key map (kbd "C-c >")      'helm-toggle-truncate-line)
@@ -1602,7 +1602,7 @@ line without executing the persistent action.
 |\\[helm-quit-and-find-file]|Drop into `helm-find-files'.
 |\\[helm-kill-selection-and-quit]|Kill display value of candidate and quit (with prefix arg, kill the real value).
 |\\[helm-yank-selection]|Yank current selection into pattern.
-|\\[helm-copy-to-buffer]|Copy selected candidate at point in current buffer.
+|\\[helm-insert-or-copy]|Insert or copy marked candidates (C-u) .
 |\\[helm-follow-mode]|Toggle automatic execution of persistent action.
 |\\[helm-follow-action-forward]|Run persistent action then select next line.
 |\\[helm-follow-action-backward]|Run persistent action then select previous line.
@@ -7286,20 +7286,22 @@ perform actions."
      (format "%s" (helm-get-selection nil (not arg))))))
 (put 'helm-kill-selection-and-quit 'helm-only t)
 
-(defun helm-copy-to-buffer ()
-  "Copy selection or marked candidates to `helm-current-buffer'.
-Note that the real values of candidates are copied and not the
-display values."
-  (interactive)
+(defun helm-insert-or-copy (&optional arg)
+  "Insert selection or marked candidates in current buffer.
+
+With a prefix arg copy marked candidates to kill-ring.
+The real value of each candidate is used."
+  (interactive "P")
   (with-helm-alive-p
     (helm-run-after-exit
      (lambda (cands)
        (with-helm-current-buffer
-         (insert (mapconcat (lambda (c)
-                              (format "%s" c))
-                            cands "\n"))))
+         (let ((sels (mapconcat (lambda (c)
+                                  (format "%s" c))
+                                cands "\n")))
+         (if arg (kill-new sels) (insert sels)))))
      (helm-marked-candidates))))
-(put 'helm-copy-to-buffer 'helm-only t)
+(put 'helm-insert-or-copy 'helm-only t)
 
 
 ;;; Follow-mode: Automatic execution of persistent-action
