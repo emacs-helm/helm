@@ -67,9 +67,10 @@ Find here the documentation of all documented sources."
     (set-buffer buf)
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (cl-loop for elm in helm-help--string-list
-               for str = (helm-interpret-value elm)
-               do (insert (substitute-command-keys str) "\n\n"))
+      (save-excursion
+        (cl-loop for elm in helm-help--string-list
+                 for str = (helm-interpret-value elm)
+                 do (insert (substitute-command-keys str) "\n\n")))
       (org-mode))
     (setq buffer-read-only t)
     (view-mode)))
@@ -133,9 +134,11 @@ Starting from Helm v1.6.8, you can specify more than one directory.
 
 **** Fuzzy matching
 
-`helm-buffers-fuzzy-matching' turns on fuzzy matching on buffer names, but not
-on directory names or major modes.  A pattern starting with \"^\" disables fuzzy
-matching and matches by exact regexp.
+`helm-buffers-fuzzy-matching' turns on fuzzy matching on buffer
+names, but not on directory names or major modes.  A pattern
+starting with \"^\" disables fuzzy matching and matching is done
+litteraly IOW do not use regexps (\"^\" or whatever special
+regexp character) when you want to fuzzy match.
 
 **** Examples
 

@@ -84,6 +84,7 @@
 (declare-function tramp-buffer-name "tramp")
 (declare-function tramp-make-tramp-file-name "tramp")
 (declare-function tramp-cleanup-connection "tramp-cmds")
+(declare-function dired-async-processes "ext:dired-async.el")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -3171,7 +3172,9 @@ debugging purpose."
           ((string= path "") (helm-ff-directory-files "/"))
           ;; Check here if directory is accessible (not working on Windows).
           ((and (file-directory-p path) (not (file-readable-p path)))
-           (list (cons (format "file-error: Opening directory permission denied `%s'" path)
+           ;; Prefix error message with @@@@ for safety
+           ;; (some files may match file-error See bug#2400) 
+           (list (cons (format "@@@@file-error: Opening directory permission denied `%s'" path)
                        path)))
           ;; A fast expansion of PATH is made only if `helm-ff-auto-update-flag'
           ;; is enabled.
@@ -3320,9 +3323,11 @@ in cache."
                      ;; `helm-find-files-get-candidates' by `file-readable-p'.
                      (file-error
                       (prog1
-                          (list (format "%s:%s"
-                                        (car err)
-                                        (mapconcat 'identity (cdr err) " ")))
+                          ;; Prefix error message with @@@@ for safety
+                          ;; (some files may match file-error See bug#2400) 
+                        (list (format "@@@@%s:%s"
+                                      (car err)
+                                      (mapconcat 'identity (cdr err) " ")))
                         (setq file-error t)))))
              (dot  (concat directory "."))
              (dot2 (concat directory ".."))
@@ -3772,10 +3777,21 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
-        (let* ((attr (file-attributes file))
+        (let* ((attr (condition-case err
+                         (file-attributes file)
+                       (file-error
+                        ;; Possible error not happening during listing
+                        ;; but when calling file-attributes see error
+                        ;; with sshfs bug#2405 
+                        (message "%s:%s" (car err) (cdr err)) nil)))
                (type (car attr))
                x-bit)
-          (cond ((string-match "file-error" file) file)
+          (cond (;; Not a file but the message error printed in
+                 ;; helm-buffer. Such a message should not have a
+                 ;; subdir so matching on bol should suffice, but to
+                 ;; be sure use @@@@ as prefix in file-error message
+                 ;; to be safe bug#2400.
+                 (string-match "\\`@@@@file-error:" file) file)
                 (;; A dead symlink.
                  (and (stringp type)
                       (not (helm-ff-valid-symlink-p file))
@@ -5073,6 +5089,15 @@ When a prefix arg is given, meaning of
     (force-mode-line-update)
     (sit-for 3)
     (force-mode-line-update)))
+
+(defun helm-delete-async-kill-process ()
+  "Kill async process created by helm delete files async."
+  (interactive)
+  (let* ((processes (dired-async-processes))
+         (proc (car (last processes))))
+    (and proc (delete-process proc))
+    (unless (> (length processes) 1)
+      (helm-ff--delete-async-modeline-mode -1))))
 
 (defun helm-delete-marked-files-async (_ignore)
   "Same as `helm-delete-marked-files' but async.

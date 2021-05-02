@@ -353,7 +353,9 @@
   Avoid recomputing all candidates with candidate-transformer
   or filtered-candidate-transformer to give a new value to REAL,
   instead the selected candidate is transformed only when passing it
-  to action.
+  to action. This works (and make sense) only with plain string
+  candidates, it will NOT work when candidate is a cons cell, in this
+  case the real value of candidate will be used.
   Example:
 
     (helm :sources (helm-build-sync-source \"test\"

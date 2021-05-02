@@ -2279,9 +2279,11 @@ when you want the `display-to-real' function(s) to be applied."
              (disp (unless (= beg end) (funcall disp-fn beg (1- end))))
              (src  (or source (helm-get-current-source)))
              (selection (helm-acond (force-display-part disp)
+                                    ;; helm-realvalue always takes precedence
+                                    ;; over display-to-real.
+                                    ((get-text-property beg 'helm-realvalue) it)
                                     ((assoc-default 'display-to-real src)
                                      (helm-apply-functions-from-source source it disp))
-                                    ((get-text-property beg 'helm-realvalue) it)
                                     (t disp))))
         (unless (equal selection "")
           (helm-log "selection = %S" selection)
@@ -3908,7 +3910,13 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
 (defun helm-cleanup ()
   "Clean up the mess when Helm exit or quit."
   (helm-log "start cleanup")
-  (with-current-buffer helm-buffer
+  (with-selected-window
+      ;; When exiting with `helm-execute-action-at-once-if-one',
+      ;; `helm-window' may not be created and we endup with an error
+      ;; e.g. in eshell completion when only one candidate to complete
+      ;; so fallback to selected-window in such cases.
+      (or (get-buffer-window helm-buffer)
+          (selected-window))
     (let ((frame (selected-frame)))
       (setq cursor-type t)
       ;; Ensure restoring default-value of mode-line to allow user
@@ -4533,6 +4541,8 @@ emacs-27 to provide such scoring in emacs<27."
                           for disp = (helm-candidate-get-display c)
                           while (< count limit)
                           for target = (if (helm-get-attr 'match-on-real source)
+                                           ;; Let's fails on error in
+                                           ;; case next block returns nil.
                                            (or (cdr-safe c)
                                                (get-text-property 0 'helm-realvalue disp))
                                          disp)

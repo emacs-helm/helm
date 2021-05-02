@@ -125,15 +125,15 @@ algorithm."
           unless (or (get sym 'helm-only) (get sym 'no-helm-mx))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (format "%s (%s)"
+                       (format "%s %s"
                                disp (propertize
-                                     local-key
-                                     'face 'helm-M-x-key)))
+                                     " " 'display
+                                     (propertize local-key 'face 'helm-M-x-key))))
                       ((string-match "^M-x" key) disp)
-                      (t (format "%s (%s)"
+                      (t (format "%s %s"
                                  disp (propertize
-                                       key
-                                       'face 'helm-M-x-key))))
+                                       " " 'display
+                                       (propertize key 'face 'helm-M-x-key)))))
                 cand)
           into ls
           finally return

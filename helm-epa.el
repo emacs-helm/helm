@@ -116,6 +116,25 @@
       ("c" 'clear)
       ("d" 'detached))))
 
+(defun helm-epa-collect-keys-from-candidates (candidates)
+  (cl-loop for c in candidates
+           collect (epg-sub-key-id
+                    (car (epg-key-sub-key-list c)))))
+
+(defun helm-epa-collect-id-from-candidates (candidates)
+  (cl-loop for c in candidates
+           collect (epg-user-id-string
+                    (car (epg-key-user-id-list c)))))
+
+(defun helm-epa-success-message (str keys ids)
+  (message str
+           (mapconcat (lambda (pair)
+                        (concat (car pair) " " (cdr pair)))
+                      (cl-loop for k in keys
+                               for i in ids
+                               collect (cons k i))
+                      "\n")))
+
 ;;;###autoload
 (define-minor-mode helm-epa-mode
   "Enable helm completion on gpg keys in epa functions."
@@ -153,11 +172,13 @@
   
 (defun helm-epa-encrypt-file (candidate)
   "Select a file to encrypt with key CANDIDATE."
-  (let ((file (helm-read-file-name "Encrypt file: "))
-        (key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
-        (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
-    (epa-encrypt-file file candidate)
-    (message "File encrypted with key `%s %s'" key id)))
+  (let* ((file (helm-read-file-name "Encrypt file: "))
+         (cands (helm-marked-candidates))
+         (keys (helm-epa-collect-keys-from-candidates cands))
+         (ids  (helm-epa-collect-id-from-candidates cands)))
+    (epa-encrypt-file file cands)
+    (helm-epa-success-message "File encrypted with key(s):\n %s"
+                              keys ids)))
 
 (defun helm-epa-kill-keys-armor (_candidate)
   "Copy marked keys to kill ring."
@@ -197,7 +218,8 @@
 
 (defun helm-epa-mail-encrypt (candidate)
   "Encrypt email with key CANDIDATE."
-  (let (start end)
+  (let ((cands (helm-marked-candidates))
+        start end)
     (save-excursion
       (goto-char (point-min))
       (when (search-forward mail-header-separator nil t)
@@ -209,11 +231,12 @@
 		(select-safe-coding-system start end))))
     ;; Don't let some read-only text stop us from encrypting.
     (let ((inhibit-read-only t)
-          (key (epg-sub-key-id (car (epg-key-sub-key-list candidate))))
-          (id  (epg-user-id-string (car (epg-key-user-id-list candidate)))))
+          (keys (helm-epa-collect-keys-from-candidates cands))
+          (ids  (helm-epa-collect-id-from-candidates cands)))
       (with-no-warnings
-        (epa-encrypt-region start end candidate nil nil))
-      (message "Mail encrypted with key `%s %s'" key id))))
+        (epa-encrypt-region start end cands nil nil))
+      (helm-epa-success-message "Mail encrypted with key(s):\n %s"
+                                keys ids))))
 
 ;;;###autoload
 (defun helm-epa-list-keys ()
