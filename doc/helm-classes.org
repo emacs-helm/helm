@@ -2,7 +2,7 @@
 # #+subtitle:  Release {{{version}}}
 #+subtitle:  Release 3.6.2
 #+author:    The Helm Classes Developers
-#+date:      {{{modification-time}}}
+# #+date:      {{{modification-time}}}
 #+language:  en
 
 # #+texinfo: @insertcopying

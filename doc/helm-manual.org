@@ -2,7 +2,7 @@
 # #+subtitle:  Release {{{version}}}
 #+subtitle:  Release 3.6.2
 #+author:    The Helm Developers
-#+date:      {{{modification-time}}}
+# #+date:      {{{modification-time}}}
 #+language:  en
 
 # #+texinfo: @insertcopying
@@ -542,7 +542,7 @@ you DO NOT need these packages to display helm buffers in frames.
 | C-n          | Down             | Next line                                                            |
 | M-v          | prior            | Previous page                                                        |
 | C-v          | next             | Next page                                                            |
-| Enter[fn:19] |                  | Execute first (default) action / Select [1]                          |
+| Enter[fn:1] |                  | Execute first (default) action / Select [1]                          |
 | M-<          |                  | First line                                                           |
 | M->          |                  | Last line                                                            |
 | C-M-S-v      | M-prior, C-M-y   | Previous page (other-window)                                         |
@@ -550,7 +550,7 @@ you DO NOT need these packages to display helm buffers in frames.
 | Tab          | C-i              | Show action list                                                     |
 | M-o          | left             | Previous source                                                      |
 | C-o          | right            | Next source                                                          |
-| C-k[fn:20]   |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
+| C-k[fn:2]   |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
 | C-j          |                  | Persistent action (Execute and keep Helm session)                    |
 
 *Note*: Any of these bindings are from ~helm-map~ and may be
@@ -598,11 +598,11 @@ Of course when enabling ~global-display-line-numbers-mode~ Helm
 buffers will have line numbers as well. (Don’t forget to
 customize ~display-line-numbers-type~ to relative).
 
-In Emacs versions < to 26 you will have to use linum-relative[fn:1]
+In Emacs versions < to 26 you will have to use linum-relative[fn:3]
 package and ~helm-linum-relative-mode~.
 
 Then when line numbers are enabled with one of the methods above
-the following keys are available[fn:2]:
+the following keys are available[fn:4]:
 
 {{{kbd(C-x <n>)}}}: Execute default action on the n-th candidate before
 currently selected candidate.
@@ -1697,7 +1697,7 @@ See [[*Use the wildcard to select multiple files][Use the wildcard to select mul
  instead its scp method if you want to avoid out of memory
  problems and crash Emacs or the whole system.  Moreover when using
  scp method, you will hit a bug when copying more than 3 files at
- the time.[fn:7]
+ the time.[fn:5]
  The best way actually is using Rsync to copy files from or to
  remote, see [[Use Rsync to copy files][Use Rsync to copy files]].
  Also if you often work on remote you may consider using SSHFS
@@ -1725,7 +1725,7 @@ See [[*Use the wildcard to select multiple files][Use the wildcard to select mul
 
  - Copying from remote to remote is not supported (rsync restriction)
    however you can mount a remote with sshfs and copy to it (best), otherwise you have to modify
-   the command line with a prefix arg.[fn:8]
+   the command line with a prefix arg.[fn:6]
 
  This command is mostly useful when copying large files as it is
  fast, asynchronous and provide a progress bar in mode-line.  Each
@@ -1812,7 +1812,7 @@ See [[*Use the wildcard to select multiple files][Use the wildcard to select mul
  there with {{{kbd(C-x r m)}}} for fast access to Trash.
 
  *Note*: Restoring files from trash is working only on system using
- the freedesktop trash specifications.[fn:9]
+ the freedesktop trash specifications.[fn:7]
 
  *Warning*:
 
@@ -1828,7 +1828,7 @@ See [[*Use the wildcard to select multiple files][Use the wildcard to select mul
  Trashing remote files (or local files with sudo method) is disabled by default
  because tramp is requiring the ’trash’ command to be installed, if you want to
  trash your remote files, customize ~helm-trash-remote-files~.
- The package on most GNU/Linux based distributions is =trash-cli=[fn:10].
+ The package on most GNU/Linux based distributions is =trash-cli=[fn:8].
 
  *Note*:
  When deleting your files with sudo method, your trashed files will not be listed
@@ -1887,7 +1887,7 @@ See [[Use the wildcard to select multiple files]] for details.
 
  - {{{kbd(M-x helm-browse-project)}}} ::
    If the current directory is under version control with either git or hg and
-   helm-ls-git[fn:3] and/or helm-ls-hg[fn:4] are installed, it lists all the files under
+   helm-ls-git[fn:9] and/or helm-ls-hg[fn:10] are installed, it lists all the files under
    version control.  Otherwise it falls back to Helm-find-files.
 
  - {{{kbd(C-u M-x helm-browse-project)}}} ::
@@ -1897,7 +1897,7 @@ See [[Use the wildcard to select multiple files]] for details.
  - {{{kbd(C-u C-u M-x helm-browse-project)}}} ::
    Same but the cache is refreshed.
 
-***** You can start a recursive search with =locate=, =find= or =Fd=[fn:5]
+***** You can start a recursive search with =locate=, =find= or =Fd=[fn:11]
 
  See "Note" in the [[Recursive completion on subdirectories][section on subdirectories]].
 
@@ -1911,7 +1911,7 @@ See [[Use the wildcard to select multiple files]] for details.
  locate search with this pattern.  If you want Helm to automatically do this, add
  ~helm-source-locate~ to ~helm-sources-using-default-as-input~.
 
- *Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:6]
+ *Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:12]
 
 ***** Recursive completion on subdirectories
 
@@ -1938,7 +1938,7 @@ See [[Use the wildcard to select multiple files]] for details.
  : find %s -type d -name ’*%s*’
  : find %s -type d -regex .*%s.*$
 
- =Fd=[fn:5] command is now also
+ =Fd=[fn:11] command is now also
  supported which is regexp based and very fast.  Here is the command
  line to use:
 
@@ -2348,7 +2348,7 @@ multi-match, fuzzy is completely disabled, which means that each pattern is a
 match regexp (i.e. =helm= will match =helm= but =hlm= will *not* match
 =helm=).
 
-*Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:11]
+*Note*: On Windows use Everything with its command line ~es~ as a replacement of locate.[fn:13]
 
 *** Browse project
 
@@ -2396,15 +2396,15 @@ than 1 megabyte:
 
 ** Tips
 
-The Fd[fn:5] command line tool is very fast to search files
+The Fd[fn:11] command line tool is very fast to search files
 recursively.  You may have to wait several seconds at first usage when
 your hard drive cache is =cold=, then once the cache is initialized
-searchs are very fast.  You can pass any Fd options[fn:12] before
+searchs are very fast.  You can pass any Fd options[fn:14] before
 pattern, e.g. =-e py foo=.
 
 The Fd command line can be customized with ~helm-fd-switches~ user
 variable.  Always use =--color always= as option otherwise you will
-have no colors. To customize colors see Fd colorized[fn:13].
+have no colors. To customize colors see Fd colorized[fn:15].
 
 *Note*:
 Starting from fd version 8.2.1, you have to provide the env var
@@ -2412,9 +2412,9 @@ LS_COLORS to Emacs to have a colorized output, the easiest way is
 to add to your =~/.profile= file =eval $(dircolors)=.
 Another way is using =setenv= in your init file.
 This is not needed when running Emacs from a terminal either with =emacs -nw=
-or =emacs= because emacs inherit the env vars of this terminal.[fn:14]
+or =emacs= because emacs inherit the env vars of this terminal.[fn:16]
 
-Search is (pcre) regexp based[fn:15], and multi patterns are _not_ supported.
+Search is (pcre) regexp based[fn:17], and multi patterns are _not_ supported.
 
 ** COMMENT Man page
 
@@ -2736,7 +2736,7 @@ of your backend for more infos.
 
 See [[Commands][commands]] below.
 
-Once in that buffer you can use =emacs-wgrep=[fn:16] to edit your
+Once in that buffer you can use =emacs-wgrep=[fn:18] to edit your
 changes, for Helm the package name is =wgrep-helm=, it is hightly
 recommended.
 
@@ -3062,12 +3062,12 @@ Type {{{kbd(g)}}} to update the buffer.
 
 *** Edit a saved buffer
 
-First, install =wgrep=[fn:17] and then:
+First, install =wgrep=[fn:19] and then:
 
 1. {{{kbd(C-c C-p)}}} (~wgrep-change-to-wgrep-mode~) to edit the buffer(s).
 2. {{{kbd(C-x C-s)}}} to save your changes.
 
-*Tip*: Use the excellent =iedit=[fn:18] to modify all
+*Tip*: Use the excellent =iedit=[fn:20] to modify all
 occurences at once in the buffer.
 
 *** Search in region
@@ -3312,47 +3312,47 @@ Uses keymap ~helm-kill-ring-map~, which is not currently defined.
 
 * Footnotes
 
-[fn:20] Delete from point to end or all depending on the value of
+[fn:1] Behavior may change depending context in some source e.g. ~helm-find-files~.
+
+[fn:2] Delete from point to end or all depending on the value of
 ~helm-delete-minibuffer-contents-from-point~.
 
-[fn:19] Behavior may change depending context in some source e.g. ~helm-find-files~.
+[fn:3] https://github.com/coldnew/linum-relative
 
-[fn:1] https://github.com/coldnew/linum-relative
-
-[fn:2] Note that the key bindings are always available even if line
+[fn:4] Note that the key bindings are always available even if line
 numbers are not displayed.  They are just useless in this case.
 
-[fn:3] https://github.com/emacs-helm/helm-ls-git
+[fn:5] [[https://github.com/emacs-helm/helm/issues/1945][bug#1945]].
 
-[fn:4] https://github.com/emacs-helm/helm-ls-hg
-
-[fn:5] https://github.com/sharkdp/fd
-
-[fn:6] [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
-
-[fn:7] [[https://github.com/emacs-helm/helm/issues/1945][bug#1945]].
-
-[fn:8] [[https://unix.stackexchange.com/questions/183504/how-to-rsync-files-between-two-remotes][how-to-rsync-files-between-two-remotes]]
+[fn:6] [[https://unix.stackexchange.com/questions/183504/how-to-rsync-files-between-two-remotes][how-to-rsync-files-between-two-remotes]]
   for the command line to use.
 
-[fn:9] http://freedesktop.org/wiki/Specifications/trash-spec
+[fn:7] http://freedesktop.org/wiki/Specifications/trash-spec
 
-[fn:10] https://github.com/andreafrancia/trash-cli
+[fn:8] https://github.com/andreafrancia/trash-cli
 
-[fn:11] [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
+[fn:9] https://github.com/emacs-helm/helm-ls-git
 
-[fn:12] https://github.com/sharkdp/fd#command-line-options
+[fn:10] https://github.com/emacs-helm/helm-ls-hg
 
-[fn:13] https://github.com/sharkdp/fd#colorized-output
+[fn:11] https://github.com/sharkdp/fd
 
-[fn:14] https://github.com/sharkdp/fd/issues/725
+[fn:12] [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
 
-[fn:15] https://docs.rs/regex/1.0.0/regex/#syntax
+[fn:13] [[https://github.com/emacs-helm/helm/wiki/Locate#windows][Locate on Windows]]
 
-[fn:16] https://github.com/mhayashi1120/Emacs-wgrep
+[fn:14] https://github.com/sharkdp/fd#command-line-options
 
-[fn:17] https://github.com/mhayashi1120/Emacs-wgrep
+[fn:15] https://github.com/sharkdp/fd#colorized-output
 
-[fn:18] https://github.com/victorhge/iedit
+[fn:16] https://github.com/sharkdp/fd/issues/725
+
+[fn:17] https://docs.rs/regex/1.0.0/regex/#syntax
+
+[fn:18] https://github.com/mhayashi1120/Emacs-wgrep
+
+[fn:19] https://github.com/mhayashi1120/Emacs-wgrep
+
+[fn:20] https://github.com/victorhge/iedit
 
 #+EXCLUDE_TAGS: TOC_4
