@@ -162,7 +162,8 @@ at point."
               for file-cand = (and exp-entry
                                    (if (file-remote-p i) i
                                      (expand-file-name
-                                      i (file-name-directory entry))))
+                                      i (file-name-directory
+                                         (directory-file-name entry)))))
               ;; Compare them to avoid dups.
               for file-entry-p = (and (stringp exp-entry)
                                       (stringp file-cand)
