@@ -1285,7 +1285,7 @@ emacs-26. Anyway, 'helm-flex is not provided in
 
 Finally Helm provides two user variables to control
 `completion-styles' usage: `helm-completion-style' and
-`helm-completion-syles-alist'.  Both variables are customizable.
+`helm-completion-styles-alist'.  Both variables are customizable.
 The former allows retrieving previous Helm behavior if needed, by
 setting it to `helm' or `helm-fuzzy', default being `emacs' which
 allows dynamic completion and usage of `completion-styles'.  The
@@ -1297,7 +1297,7 @@ helmized commands.  File completion in `read-file-name' family
 doesn't obey completion-styles and has its own file completion
 implementation. Native Helm commands using `completion-styles'
 doesn't obey `helm-completion-style' and
-`helm-completion-syles-alist' (e.g., helm-M-x).
+`helm-completion-styles-alist' (e.g., helm-M-x).
 
 Also for a better control of styles in native Helm sources (not
 helmized by helm-mode) using :match-dynamic,
