@@ -1,0 +1,1176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Helm Wiki</title>
+
+<meta name="description" content="Helm Wiki">
+<meta name="keywords" content="Helm Wiki">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="#Top" rel="start" title="Top">
+<link href="#Main-Index" rel="index" title="Main Index">
+<link href="#SEC_Contents" rel="contents" title="Table of Contents">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="https://www.gnu.org/software/emacs/manual.css">
+
+
+</head>
+
+<body lang="en">
+<h1 class="settitle" align="center">Helm Wiki</h1>
+
+
+
+<span id="SEC_Contents"></span>
+<h2 class="contents-heading">Table of Contents</h2>
+
+<div class="contents">
+
+<ul class="no-bullet">
+  <li><a id="toc-Requirements-1" href="#Requirements">1 Requirements</a></li>
+  <li><a id="toc-Download-1" href="#Download">2 Download</a></li>
+  <li><a id="toc-Installation_002c-Upgrade_002c-and-Configuration" href="#Installation-Upgrade-and-Configuration">3 Installation, Upgrade, and Configuration</a>
+  <ul class="no-bullet">
+    <li><a id="toc-Minimal-setup-using-straight_002eel" href="#Minimal-setup-using-straightel">3.1 Minimal setup using &lsquo;<samp>straight.el</samp>&rsquo;</a></li>
+    <li><a id="toc-Minimal-setup-using-source-1" href="#Minimal-setup-using-source">3.2 Minimal setup using source</a></li>
+    <li><a id="toc-Minimal-setup-using-the-Package-Manager-1" href="#Minimal-setup-using-the-Package-Manager">3.3 Minimal setup using the Package Manager</a></li>
+  </ul></li>
+  <li><a id="toc-Introduction-1" href="#Introduction">4 Introduction</a></li>
+  <li><a id="toc-Helm-Completion-v_002es_002e-Emacs-Completion" href="#Helm-Completion-vs-Emacs-Completion">5 Helm Completion v.s. Emacs Completion</a>
+  <ul class="no-bullet">
+    <li><a id="toc-Helm-interaction-model-1" href="#Helm-interaction-model">5.1 Helm interaction model</a></li>
+  </ul></li>
+  <li><a id="toc-General-Helm-Commands-1" href="#General-Helm-Commands">6 General Helm Commands</a>
+  <ul class="no-bullet">
+    <li><a id="toc-Yanking-text-1" href="#Yanking-text">6.1 Yanking text</a></li>
+  </ul></li>
+  <li><a id="toc-Preconfigured-Helm-Commands-1" href="#Preconfigured-Helm-Commands">7 Preconfigured Helm Commands</a></li>
+  <li><a id="toc-Helm-Mode-1" href="#Helm-Mode">8 Helm Mode</a>
+  <ul class="no-bullet">
+    <li><a id="toc-Customize-helm_002dmode-1" href="#Customize-helm_002dmode">8.1 Customize helm-mode</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Use-helm_002dmode-and-ido_002dmode-1" href="#Use-helm_002dmode-and-ido_002dmode">8.1.1 Use helm-mode and ido-mode</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a id="toc-Helm-With-Other-Emacs-Extensions-1" href="#Helm-With-Other-Emacs-Extensions">9 Helm With Other Emacs Extensions</a>
+  <ul class="no-bullet">
+    <li><a id="toc-linum_002drelative-1" href="#linum_002drelative">9.1 linum-relative</a></li>
+  </ul></li>
+  <li><a id="toc-Helm-Workflow-for-Files_002c-Directories-and-Buffers" href="#Helm-Workflow-for-Files-Directories-and-Buffers">10 Helm Workflow for Files, Directories and Buffers</a></li>
+  <li><a id="toc-Quick-Try-with-emacs_002dhelm_002esh" href="#Quick-Try-with-emacs_002dhelmsh">11 Quick Try with &lsquo;<samp>emacs-helm.sh</samp>&rsquo;</a></li>
+  <li><a id="toc-How-to-report-Helm-Bugs-1" href="#How-to-report-Helm-Bugs">12 How to report Helm Bugs</a>
+  <ul class="no-bullet">
+    <li><a id="toc-Confirming-bugs-1" href="#Confirming-bugs">12.1 Confirming bugs</a>
+    <ul class="no-bullet">
+      <li><a id="toc-emacs_002dhelm_002esh" href="#emacs_002dhelmsh">12.1.1 &lsquo;<samp>emacs-helm.sh</samp>&rsquo;</a></li>
+      <li><a id="toc-emacs-_002dQ-1" href="#emacs-_002dQ">12.1.2 &lsquo;<samp>emacs -Q</samp>&rsquo;</a></li>
+    </ul></li>
+    <li><a id="toc-Reporting-bugs-1" href="#Reporting-bugs">12.2 Reporting bugs</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Version-info-1" href="#Version-info">12.2.1 Version info</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a id="toc-Useful-links-1" href="#Useful-links">13 Useful links</a></li>
+  <li><a id="toc-Main-Index-1" href="#Main-Index" rel="index">14 Main Index</a></li>
+  <li><a id="toc-Key-Index-1" href="#Key-Index" rel="index">15 Key Index</a></li>
+  <li><a id="toc-Command-and-Function-Index-1" href="#Command-and-Function-Index" rel="index">16 Command and Function Index</a></li>
+  <li><a id="toc-Variable-Index-1" href="#Variable-Index" rel="index">17 Variable Index</a></li>
+</ul>
+</div>
+
+
+<span id="Top"></span><div class="header">
+<p>
+Next: <a href="#Requirements" accesskey="n" rel="next">Requirements</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-Wiki"></span><h1 class="top">Helm Wiki</h1>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Requirements" accesskey="1">Requirements</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Download" accesskey="2">Download</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Installation-Upgrade-and-Configuration" accesskey="3">Installation, Upgrade, and Configuration</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Introduction" accesskey="4">Introduction</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Helm-Completion-vs-Emacs-Completion" accesskey="5">Helm Completion v.s. Emacs Completion</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#General-Helm-Commands" accesskey="6">General Helm Commands</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Preconfigured-Helm-Commands" accesskey="7">Preconfigured Helm Commands</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Helm-Mode" accesskey="8">Helm Mode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Helm-With-Other-Emacs-Extensions" accesskey="9">Helm With Other Emacs Extensions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Helm-Workflow-for-Files-Directories-and-Buffers">Helm Workflow for Files, Directories and Buffers</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Quick-Try-with-emacs_002dhelmsh">Quick Try with &lsquo;<samp>emacs-helm.sh</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#How-to-report-Helm-Bugs">How to report Helm Bugs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Useful-links">Useful links</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Main-Index" rel="index">Main Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">An index of Helm&rsquo;s concepts and features.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Key-Index" rel="index">Key Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Key bindings and where they are described.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Command-and-Function-Index" rel="index">Command and Function Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Command names and some internal functions.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Variable-Index" rel="index">Variable Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Variables mentioned in the manual.
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+</pre></th></tr><tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">&mdash; The Detailed Node Listing &mdash;
+
+Installation, Upgrade, and Configuration
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-straightel">Minimal setup using &lsquo;<samp>straight.el</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-source">Minimal setup using source</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-the-Package-Manager">Minimal setup using the Package Manager</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Helm Completion v.s. Emacs Completion
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Helm-interaction-model">Helm interaction model</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+General Helm Commands
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Yanking-text">Yanking text</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Helm Mode
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Customize-helm_002dmode">Customize helm-mode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Customize helm-mode
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Use-helm_002dmode-and-ido_002dmode">Use helm-mode and ido-mode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Helm With Other Emacs Extensions
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#linum_002drelative">linum-relative</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+How to report Helm Bugs
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Confirming-bugs">Confirming bugs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Reporting-bugs">Reporting bugs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Confirming bugs
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#emacs_002dhelmsh">&lsquo;<samp>emacs-helm.sh</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#emacs-_002dQ">&lsquo;<samp>emacs -Q</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+Reporting bugs
+
+</pre></th></tr><tr><td align="left" valign="top">&bull; <a href="#Version-info">Version info</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+
+</pre></th></tr></table>
+
+<hr>
+<span id="Requirements"></span><div class="header">
+<p>
+Next: <a href="#Download" accesskey="n" rel="next">Download</a>, Previous: <a href="#Top" accesskey="p" rel="prev">Top</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Requirements-1"></span><h2 class="chapter">1 Requirements</h2>
+
+<p>Helm 3.6.2 and later require
+</p>
+<ul>
+<li> &lsquo;<samp>Emacs</samp>&rsquo; version &gt;= 25.1
+</li><li> &lsquo;<samp>emacs-async</samp>&rsquo;<a id="DOCF1" href="#FOOT1"><sup>1</sup></a>
+</li><li> &lsquo;<samp>popup-el</samp>&rsquo;<a id="DOCF2" href="#FOOT2"><sup>2</sup></a>
+</li></ul>
+
+<hr>
+<span id="Download"></span><div class="header">
+<p>
+Next: <a href="#Installation-Upgrade-and-Configuration" accesskey="n" rel="next">Installation Upgrade and Configuration</a>, Previous: <a href="#Requirements" accesskey="p" rel="prev">Requirements</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Download-1"></span><h2 class="chapter">2 Download</h2>
+
+<dl compact="compact">
+<dt>Home Page</dt>
+<dd><p><a href="https://github.com/emacs-helm/helm">https://github.com/emacs-helm/helm</a>
+</p>
+</dd>
+<dt>Git Url</dt>
+<dd><p><a href="https://github.com/emacs-helm/helm.git">https://github.com/emacs-helm/helm.git</a>
+</p>
+<p>git@github.com:emacs-helm/helm.git
+</p>
+</dd>
+<dt>Tagged Releases</dt>
+<dd><p><a href="https://github.com/emacs-helm/helm/tags">https://github.com/emacs-helm/helm/tags</a>
+</p></dd>
+</dl>
+
+<hr>
+<span id="Installation-Upgrade-and-Configuration"></span><div class="header">
+<p>
+Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Previous: <a href="#Download" accesskey="p" rel="prev">Download</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Installation_002c-Upgrade_002c-and-Configuration"></span><h2 class="chapter">3 Installation, Upgrade, and Configuration</h2>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-straightel" accesskey="1">Minimal setup using &lsquo;<samp>straight.el</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-source" accesskey="2">Minimal setup using source</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Minimal-setup-using-the-Package-Manager" accesskey="3">Minimal setup using the Package Manager</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Minimal-setup-using-straightel"></span><div class="header">
+<p>
+Next: <a href="#Minimal-setup-using-source" accesskey="n" rel="next">Minimal setup using source</a>, Up: <a href="#Installation-Upgrade-and-Configuration" accesskey="u" rel="up">Installation Upgrade and Configuration</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Minimal-setup-using-straight_002eel"></span><h3 class="section">3.1 Minimal setup using &lsquo;<samp>straight.el</samp>&rsquo;</h3>
+
+<p>&lsquo;<samp>straight.el</samp>&rsquo;<a id="DOCF3" href="#FOOT3"><sup>3</sup></a>
+</p>
+<p>Add this to your init file,
+</p>
+<div class="lisp">
+<pre class="lisp">(straight-use-package 'helm)
+</pre></div>
+
+<p>or
+</p>
+<p>#              :straight t
+#              :config
+#              [&hellip;])
+</p>
+<div class="lisp">
+<pre class="lisp">(use-package helm :straight t)
+</pre></div>
+
+<p>For further information, see &lsquo;<samp>straight.el</samp>&rsquo;&rsquo;s user manual.
+</p>
+<p>To upgrade &lsquo;<samp>helm</samp>&rsquo;, do <kbd>M-x straight-pull-package</kbd> and restart
+Emacs.  &lsquo;<samp>straight.el</samp>&rsquo; will rebuild helm for you.
+</p>
+<hr>
+<span id="Minimal-setup-using-source"></span><div class="header">
+<p>
+Next: <a href="#Minimal-setup-using-the-Package-Manager" accesskey="n" rel="next">Minimal setup using the Package Manager</a>, Previous: <a href="#Minimal-setup-using-straightel" accesskey="p" rel="prev">Minimal setup using &lsquo;<samp>straightel</samp>&rsquo;</a>, Up: <a href="#Installation-Upgrade-and-Configuration" accesskey="u" rel="up">Installation Upgrade and Configuration</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Minimal-setup-using-source-1"></span><h3 class="section">3.2 Minimal setup using source</h3>
+
+<ol>
+<li> Install the pre-requisites
+
+<p>Install &lsquo;<samp>emacs-async</samp>&rsquo;<a id="DOCF4" href="#FOOT4"><sup>4</sup></a> and &lsquo;<samp>popup-el</samp>&rsquo;<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.  Ensure that they
+are available in <code>load-path</code>.
+</p>
+</li><li> Download, compile and install the sources
+
+<p>If you are using &lsquo;<samp>git</samp>&rsquo;,
+</p>
+<div class="example">
+<pre class="example">git clone https://github.com/emacs-helm/helm
+cd helm
+make
+sudo make install
+</pre></div>
+
+<p>If you have a tarball<a id="DOCF6" href="#FOOT6"><sup>6</sup></a>,
+</p>
+<div class="example">
+<pre class="example">wget https://github.com/emacs-helm/helm/archive/refs/tags/v3.7.1.tar.gz
+tar zxvf v3.7.1.tar.gz
+cd helm-3.7.1/
+make
+sudo make install
+</pre></div>
+</li></ol>
+
+<p>Above steps assume that you have installed &lsquo;<samp>emacs-async</samp>&rsquo; is in a
+standard location.  If this is not the case, you need to tell &lsquo;<samp>make</samp>&rsquo;
+program where it is available using &lsquo;<samp>EMACSLOADPATH</samp>&rsquo;<a id="DOCF7" href="#FOOT7"><sup>7</sup></a>.
+</p>
+<div class="example">
+<pre class="example">git clone https://github.com/emacs-helm/helm
+cd helm
+EMACSLOADPATH=&quot;/path/to/emacs-async:&quot; make
+make
+sudo make install
+</pre></div>
+
+<p>Above steps
+</p>
+<ul>
+<li> installs &lsquo;<samp>helm</samp>&rsquo; in &lsquo;<samp>/usr/local/share/emacs/site-lisp/helm/</samp>&rsquo;
+
+</li><li> creates an executable called &lsquo;<samp>/usr/local/bin/helm</samp>&rsquo;.  This file is in
+fact a symbolic link to to the script &lsquo;<samp>emacs-helm.sh</samp>&rsquo;.
+
+<span id="index-emacs_002dhelm_002esh"></span>
+</li></ul>
+
+<p>If you want to install &lsquo;<samp>helm</samp>&rsquo; in a path other than &lsquo;<samp>/usr/local/</samp>&rsquo;, pass
+that target path through a &lsquo;<samp>PREFIX</samp>&rsquo; variable.
+</p>
+<p>Add the one of the following to your init file,
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'load-path &quot;/path/to/helm/directory&quot;)
+(require 'helm-config)
+</pre></div>
+
+<p>or
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'load-path &quot;/path/to/helm/directory&quot;)
+(use-package helm :config (require 'helm-config))
+</pre></div>
+
+<p>and restart Emacs.
+</p>
+<p>The library &lsquo;<samp>helm-config</samp>&rsquo; loads &lsquo;<samp>helm-autoloads.el</samp>&rsquo;.  This is
+essential for having a working install of &lsquo;<samp>helm</samp>&rsquo;.
+</p>
+<hr>
+<span id="Minimal-setup-using-the-Package-Manager"></span><div class="header">
+<p>
+Previous: <a href="#Minimal-setup-using-source" accesskey="p" rel="prev">Minimal setup using source</a>, Up: <a href="#Installation-Upgrade-and-Configuration" accesskey="u" rel="up">Installation Upgrade and Configuration</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Minimal-setup-using-the-Package-Manager-1"></span><h3 class="section">3.3 Minimal setup using the Package Manager</h3>
+
+<p>Helm is available on MELPA.<a id="DOCF8" href="#FOOT8"><sup>8</sup></a>
+</p>
+<p>Release version of Helm is available in the stable repository while
+development version is available in the other repo.
+</p>
+<p>Assuming that you have setup <code>package-archives</code> to include the MELPA,
+you can install Helm with <kbd>M-x package-install <span class="key">RET</span> helm <span class="key">RET</span></kbd>.
+</p>
+<p>To upgrade &lsquo;<samp>Helm</samp>&rsquo;, use <code>helm-list-elisp-packages</code>.  This command is
+the Helm equivalent of Emacs&rsquo; &lsquo;<samp>list-packages</samp>&rsquo;.  Using
+<code>helm-list-elisp-packages</code>, ensures that &lsquo;<samp>helm</samp>&rsquo; is compiled in a clean
+environment.<a id="DOCF9" href="#FOOT9"><sup>9</sup></a>
+</p>
+<hr>
+<span id="Introduction"></span><div class="header">
+<p>
+Next: <a href="#Helm-Completion-vs-Emacs-Completion" accesskey="n" rel="next">Helm Completion vs Emacs Completion</a>, Previous: <a href="#Installation-Upgrade-and-Configuration" accesskey="p" rel="prev">Installation Upgrade and Configuration</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Introduction-1"></span><h2 class="chapter">4 Introduction</h2>
+
+<p>People often think helm is just something like ido(<a href="Ido.html#Top">(Ido)Top</a>) but
+displaying completion in a vertical layout instead of an horizontal
+one, it is not, helm is much more powerful than that.
+</p>
+<ul>
+<li> Helm is able to complete multiple lists dispatched in different
+sources against a pattern.
+
+</li><li> Helm allows executing an unlimited number of actions on candidates.
+
+</li><li> Helm allows marking candidates to execute chosen action against this
+set of candidates.
+
+</li><li> Helm can display its completion buffer in different window layouts
+and in separate frame.
+</li></ul>
+
+<p>Helm is divided in two distinct categories of commands,
+</p>
+<span id="index-helm-native-commands"></span>
+<span id="index-helmized-commands"></span>
+
+<dl compact="compact">
+<dt><strong>helm natives commands</strong></dt>
+<dd><p>these commands are a fresh implementation
+of an existing Emacs command and enhance them in useful ways.
+</p>
+</dd>
+<dt><strong>helmized commands</strong></dt>
+<dd><p>these Emacs native commands modified by
+helm-mode to provide helm completion and only that.
+</p></dd>
+</dl>
+
+<p>When both are provided e.g <code>switch-to-buffer</code> vs <code>helm-buffers-list</code>
+you will prefer the native helm commands generally more featured (more
+than one action, allows marking candidates, better display etc&hellip;).
+</p>
+<hr>
+<span id="Helm-Completion-vs-Emacs-Completion"></span><div class="header">
+<p>
+Next: <a href="#General-Helm-Commands" accesskey="n" rel="next">General Helm Commands</a>, Previous: <a href="#Introduction" accesskey="p" rel="prev">Introduction</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-Completion-v_002es_002e-Emacs-Completion"></span><h2 class="chapter">5 Helm Completion v.s. Emacs Completion</h2>
+
+<p>Differences between the two often trip up new users.
+</p>
+<p>Emacs completion is based on the <strong>minibuffer</strong>. Helm completion is
+based on the <strong>completion window</strong>.<a id="DOCF10" href="#FOOT10"><sup>10</sup></a>  <a id="DOCF11" href="#FOOT11"><sup>11</sup></a> <a id="DOCF12" href="#FOOT12"><sup>12</sup></a>
+</p>
+<p>In standard Emacs, interactivity happens in the <em>minibuffer</em>.
+</p>
+<ul>
+<li> Typing new characters filters candidates in the minibuffer.
+<kbd>&lt;tab&gt;</kbd> may try to complete the typed characters with a
+valid candidate.
+
+</li><li> Hitting <kbd><span class="key">RET</span></kbd> selects the current candidate from the minibuffer.
+</li></ul>
+
+<p>In Helm, interactivity happens in the <em>completion window</em>, not the
+minibuffer
+</p>
+<ul>
+<li> Typing new characters filters candidates in the completion window.
+Keep typing until the desired candidate is highlighted, or navigate
+to it using <kbd>C-n</kbd>.
+
+</li><li> Hitting <kbd><span class="key">RET</span></kbd> selects the currently highlighted item in the
+completion window.
+</li></ul>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Helm-interaction-model" accesskey="1">Helm interaction model</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Helm-interaction-model"></span><div class="header">
+<p>
+Up: <a href="#Helm-Completion-vs-Emacs-Completion" accesskey="u" rel="up">Helm Completion vs Emacs Completion</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-interaction-model-1"></span><h3 class="section">5.1 Helm interaction model</h3>
+
+<p>Helm&rsquo;s interactivity makes the <kbd>&lt;tab&gt;</kbd> key redundant for
+completion because the selection candidates are already made visible
+in the Helm completion window. So, <strong>tab completion is not
+supported</strong>. In Helm, <kbd>&lt;tab&gt;</kbd> is used to view available
+<strong>actions</strong> to be taken on a candidate.
+</p>
+<p>Because the <kbd>&lt;tab&gt;</kbd> key is so ingrained in the muscle memory of
+long-time Emacs users, transition to Helm&rsquo;s interactive model
+requires:
+</p>
+<ul>
+<li> A conscious visual adjustment to look at the completion window, and
+
+</li><li> A conscious mental adjustment to avoid using the <kbd>&lt;tab&gt;</kbd>
+key for completion and go straight to <kbd><span class="key">RET</span></kbd> key to select a
+candidate. Helm&rsquo;s approach to completion provides better visual
+cues, takes fewer keystrokes, and is much faster.
+</li></ul>
+
+<hr>
+<span id="General-Helm-Commands"></span><div class="header">
+<p>
+Next: <a href="#Preconfigured-Helm-Commands" accesskey="n" rel="next">Preconfigured Helm Commands</a>, Previous: <a href="#Helm-Completion-vs-Emacs-Completion" accesskey="p" rel="prev">Helm Completion vs Emacs Completion</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="General-Helm-Commands-1"></span><h2 class="chapter">6 General Helm Commands</h2>
+
+<div class="float">
+<img src="helm-figures/helm-M-x.png" alt="helm-figures/helm-M-x">
+
+<div class="float-caption"><p><strong>Figure: </strong>A typical <code>helm-M-x</code> with </p></div></div>
+<p>Helm&rsquo;s functionality needs only a few general key bindings as shown
+below. These are also documented in the mode line.
+</p>
+<dl compact="compact">
+<dt><kbd>&lt;tab&gt;</kbd> or <kbd>C-i</kbd> (<code>helm-select-action</code>)</dt>
+<dd><p>lists available actions
+</p>
+</dd>
+<dt><kbd>C-j</kbd> or <kbd>C-z</kbd> (<code>helm-execute-persistent-action</code>)</dt>
+<dd><p>invokes the persistent action
+</p>
+</dd>
+<dt><kbd>M-<span class="key">SPC</span></kbd> (<code>helm-toggle-visible-mark-backward</code>)  or <kbd>C-<span class="key">SPC</span></kbd> (<code>helm-toggle-visible-mark-forward</code>) or <kbd>C-@</kbd> (<code>helm-toggle-visible-mark</code>)</dt>
+<dd><p>marks a candidate
+</p>
+</dd>
+<dt><kbd>C-h m</kbd> (<code>helm-help</code>)</dt>
+<dd><p>displays the embeded help in an org buffer without quitting
+helm session.
+</p>
+</dd>
+<dt><kbd><span class="key">RET</span></kbd></dt>
+<dd><p>runs the first action of action list
+</p></dd>
+</dl>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Yanking-text" accesskey="1">Yanking text</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Yanking-text"></span><div class="header">
+<p>
+Up: <a href="#General-Helm-Commands" accesskey="u" rel="up">General Helm Commands</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Yanking-text-1"></span><h3 class="section">6.1 Yanking text</h3>
+
+<p>Yank symbol at point from <code>helm-current-buffer</code> (i.e. buffer where a
+helm command was invoked):
+</p>
+<dl compact="compact">
+<dt><kbd>C-w</kbd> (<code>helm-yank-text-at-point</code>)</dt>
+<dd><p>Append word next to
+point to the minibuffer and advance to next word
+</p>
+<p>(helm-yank-text-at-point ARG)
+</p>
+<p>Yank text at point in &lsquo;helm-current-buffer&rsquo; into minibuffer.
+</p>
+</dd>
+<dt><kbd>C-_</kbd> (<code>helm-undo-yank-text-at-point</code>)</dt>
+<dd><p>Undo last
+insertion and rewind yank point in <code>helm-current-buffer</code>
+</p>
+<p>Undo last entry added by &lsquo;helm-yank-text-at-point&rsquo;.
+</p></dd>
+</dl>
+
+<hr>
+<span id="Preconfigured-Helm-Commands"></span><div class="header">
+<p>
+Next: <a href="#Helm-Mode" accesskey="n" rel="next">Helm Mode</a>, Previous: <a href="#General-Helm-Commands" accesskey="p" rel="prev">General Helm Commands</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Preconfigured-Helm-Commands-1"></span><h2 class="chapter">7 Preconfigured Helm Commands</h2>
+
+<p>Invoke <kbd>M-x helm-M-x <span class="key">RET</span></kbd> and type &lsquo;<samp>helm</samp>&rsquo; to discover Helm
+commands.  The &lsquo;<samp>Menu Bar -&gt; Helm</samp>&rsquo; menu item is another way to discover
+helm commands.
+</p>
+<dl compact="compact">
+<dt><code>helm-command-prefix-key</code></dt>
+<dd><span id="index-helm_002dcommand_002dprefix_002dkey"></span>
+
+<p><strong>Standard Value</strong>: &ldquo;C-x c&rdquo;
+</p>
+<p>The key ‘helm-command-prefix’ is bound to in the global map.
+</p>
+</dd>
+<dt><code>helm-minibuffer-history-key</code></dt>
+<dd><span id="index-helm_002dminibuffer_002dhistory_002dkey"></span>
+
+<p><strong>Standard Value</strong>: &ldquo;C-r&rdquo;
+</p>
+<p>The key ‘helm-minibuffer-history’ is bound to in minibuffer local maps.
+</p></dd>
+</dl>
+
+<p><code>helm-command-prefix-key</code> (default value <kbd>C-x c</kbd>) is the
+prefix for the preconfigured helm menu.
+</p>
+<p><code>helm-command-prefix-key</code> followed by any regular Emacs key invokes
+the Helm version of the same command.
+</p>
+<p>For example,
+</p>
+<ul>
+<li> <kbd>C-x c M-x</kbd> runs the command <code>helm-M-x</code>, which is the helm
+version of <kbd>M-x</kbd> (<code>execute-extended-command</code>).
+
+</li><li> <kbd>C-x c C-x C-f</kbd> runs the command <code>helm-find-files</code>, which
+is the helm version of <kbd>C-x C-f</kbd> (<code>find-file</code>).
+</li></ul>
+
+<p>To run the helm version of a command with a key binding, but without
+also typing <kbd>C-x c</kbd>) (<code>helm-command-prefix-key</code>), add the
+following to your init file.
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key (kbd &quot;M-x&quot;) 'helm-M-x)
+</pre></div>
+
+<hr>
+<span id="Helm-Mode"></span><div class="header">
+<p>
+Next: <a href="#Helm-With-Other-Emacs-Extensions" accesskey="n" rel="next">Helm With Other Emacs Extensions</a>, Previous: <a href="#Preconfigured-Helm-Commands" accesskey="p" rel="prev">Preconfigured Helm Commands</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-Mode-1"></span><h2 class="chapter">8 Helm Mode</h2>
+
+<p><code>helm-mode</code> enables Helm completion globally for any Emacs command
+using <code>completing-read</code> or <code>read-file-name</code>.
+</p>
+<p><code>helm-mode</code> completes with <code>completion-at-point</code> and implements
+<code>completion-in-region-function</code> for <code>completing-read-multiple</code> for
+Emacs 24.4 and later.
+</p>
+<p>Helm provides generic functions for completions to replace
+tab-completion in Emacs with no loss of functionality. To use Helm&rsquo;s
+generic functions, first set them in your init file, e.g.:
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key (kbd &quot;M-x&quot;) #'helm-M-x)
+(global-set-key (kbd &quot;C-x r b&quot;) #'helm-filtered-bookmarks)
+(global-set-key (kbd &quot;C-x C-f&quot;) #'helm-find-files)
+</pre></div>
+
+<p>Then enable <code>helm-mode</code> with:
+</p>
+<div class="lisp">
+<pre class="lisp">(helm-mode 1)
+</pre></div>
+
+<p>Or, enable <code>helm-mode</code> interactively with <kbd>M-x helm-mode</kbd>.
+</p>
+<dl compact="compact">
+<dt><code>helm-mode</code></dt>
+<dd><span id="index-helm_002dmode"></span>
+
+<p>(helm-mode &amp;optional ARG)
+</p>
+<p>Toggle generic helm completion.
+</p>
+<p>If called interactively, toggle &lsquo;Helm mode&rsquo;.  If the prefix
+argument is positive, enable the mode, and if it is zero or
+negative, disable the mode.
+</p>
+<p>If called from Lisp, toggle the mode if ARG is &lsquo;toggle&rsquo;.  Enable
+the mode if ARG is nil, omitted, or is a positive number.
+Disable the mode if ARG is a negative number.
+</p>
+<p>The mode&rsquo;s hook is called both when the mode is enabled and when
+it is disabled.
+</p>
+<p>All functions in Emacs that use &lsquo;completing-read&rsquo;,
+&lsquo;read-file-name&rsquo;, &lsquo;completion-in-region&rsquo; and friends will use helm
+interface when this mode is turned on.
+</p>
+<p>However you can modify this behavior for functions of your choice
+with &lsquo;helm-completing-read-handlers-alist&rsquo;.
+</p>
+<p>Called with a positive arg, turn on unconditionally, with a
+negative arg turn off.
+You can toggle it with M-x &lsquo;helm-mode&rsquo;.
+</p>
+<p>About &lsquo;ido-mode&rsquo;:
+DO NOT enable &lsquo;ido-everywhere&rsquo; when using &lsquo;helm-mode&rsquo;.  Instead of
+using &lsquo;ido-mode&rsquo;, add the commands where you want to use ido to
+&lsquo;helm-completing-read-handlers-alist&rsquo; with &lsquo;ido&rsquo; as value.
+</p>
+<p>Note: This mode is incompatible with Emacs23.
+</p></dd>
+</dl>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Customize-helm_002dmode" accesskey="1">Customize helm-mode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Customize-helm_002dmode"></span><div class="header">
+<p>
+Up: <a href="#Helm-Mode" accesskey="u" rel="up">Helm Mode</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Customize-helm_002dmode-1"></span><h3 class="section">8.1 Customize helm-mode</h3>
+
+<dl compact="compact">
+<dt><code>helm-completing-read-handlers-alist</code></dt>
+<dd><span id="index-helm_002dcompleting_002dread_002dhandlers_002dalist"></span>
+
+<p>Completing read functions for specific Emacs commands.
+</p>
+<p>By default ‘helm-mode’ use ‘helm-completing-read-default-handler’ to
+provide helm completion in each ‘completing-read’ or ‘read-file-name’
+found, but other functions can be specified here for specific
+commands. This also allows disabling helm completion for some commands
+when needed.
+</p>
+<p>Each entry is a cons cell like (EMACS_COMMAND . COMPLETING-READ_HANDLER)
+where key and value are symbols.
+</p>
+<p>Each key is an Emacs command that use originaly ‘completing-read’.
+</p>
+<p>Each value maybe a helm function that takes same arguments as
+‘completing-read’ plus NAME and BUFFER, where NAME is the name of the new
+helm source and BUFFER the name of the buffer we will use, but it can
+be also a function not using helm, in this case the function should
+take the same args as ‘completing-read’ and not be prefixed by &ldquo;helm-&rdquo;.
+</p>
+<p>‘helm’ will use the name of the command calling ‘completing-read’ as
+NAME and BUFFER will be computed as well with NAME but prefixed with
+&ldquo;*helm-mode-&rdquo;.
+</p>
+<p>This function prefix name must start by &ldquo;helm-&rdquo; when it uses helm,
+otherwise ‘helm’ assumes the function is not a helm function and
+expects the same args as ‘completing-read’, this allows you to define a
+handler not using helm completion.
+</p>
+<p>Example:
+</p>
+<p>(defun foo/test ()
+  (interactive)
+  (message &ldquo;%S&rdquo; (completing-read &ldquo;test: &rdquo; ’(a b c d e))))
+</p>
+<p>(defun helm-foo/test-completing-read-handler (prompt collection
+                                              predicate require-match
+                                              initial-input hist def
+                                              inherit-input-method
+                                              name buffer)
+  (helm-comp-read prompt collection :marked-candidates t
+                                    :name name
+                                    :buffer buffer))
+</p>
+<p>(add-to-list ’helm-completing-read-handlers-alist
+             ’(foo/test . helm-foo/test-completing-read-handler))
+</p>
+<p>We want here to make the regular ‘completing-read’ in ‘foo/test’
+return a list of candidate(s) instead of a single candidate.
+</p>
+<p>Note that this function will be reused for ALL the ‘completing-read’
+of this command, so it should handle all cases. E.g.,
+if first ‘completing-read’ completes against symbols and
+second ‘completing-read’ should handle only buffer,
+your specialized function should handle both.
+</p>
+<p>If the value of an entry is nil completion will fall back to
+Emacs vanilla behaviour.
+Example:
+</p>
+<p>If you want to disable helm completion for ‘describe-function’, use:
+</p>
+<p>(describe-function . nil)
+</p>
+<p>Ido is also supported, you can use ‘ido-completing-read’ and
+‘ido-read-file-name’ as value of an entry or just ’ido.
+Example:
+Enable ido completion for ‘find-file’:
+</p>
+<p>(find-file . ido)
+</p>
+<p>same as
+</p>
+<p>(find-file . ido-read-file-name)
+</p>
+<p>Note that you don’t need to enable ‘ido-mode’ for this to work, see
+‘helm-mode’ documentation.
+</p></dd>
+</dl>
+
+<p>To customize the completion interface or disable completion for
+specific commands in <code>helm-mode</code>, edit
+<code>helm-completing-read-handlers-alist</code>. See <kbd>C-h v</kbd>
+<code>helm-completing-read-handlers-alist</code> for details.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Use-helm_002dmode-and-ido_002dmode" accesskey="1">Use helm-mode and ido-mode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Use-helm_002dmode-and-ido_002dmode"></span><div class="header">
+<p>
+Up: <a href="#Customize-helm_002dmode" accesskey="u" rel="up">Customize helm-mode</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Use-helm_002dmode-and-ido_002dmode-1"></span><h4 class="subsection">8.1.1 Use helm-mode and ido-mode</h4>
+
+<p>To use
+<a href="https://www.gnu.org/software/emacs/manual/html_mono/ido.html">Ido</a>
+for some commands and Helm for others, do not enable
+<code>ido-mode</code>. Instead, customize <code>helm-completing-read-handlers-alist</code>
+to specify which command uses Ido.
+</p>
+<p>For example, suppose we want <code>find-file-read-only</code> to use Ido and
+<code>find-file</code> to use Helm. Then:
+</p>
+<ol>
+<li> In your init file, turn on <code>helm-mode</code>.
+
+</li><li> In the <code>helm-mode</code> customize group, add a key to
+<code>helm-completing-read-handlers-alist</code> for <code>find-file-read-only</code>
+with value &lsquo;<samp>ido</samp>&rsquo;, i.e.
+</li></ol>
+
+<div class="lisp">
+<pre class="lisp">(find-file-read-only . ido)
+</pre></div>
+
+<p>With <code>helm-mode</code> active, to use Emacs default completion instead of
+either Helm or Ido, use <code>nil</code> for the key value:
+</p>
+<div class="lisp">
+<pre class="lisp">(find-alternate-file . nil)
+</pre></div>
+
+<hr>
+<span id="Helm-With-Other-Emacs-Extensions"></span><div class="header">
+<p>
+Next: <a href="#Helm-Workflow-for-Files-Directories-and-Buffers" accesskey="n" rel="next">Helm Workflow for Files Directories and Buffers</a>, Previous: <a href="#Helm-Mode" accesskey="p" rel="prev">Helm Mode</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-With-Other-Emacs-Extensions-1"></span><h2 class="chapter">9 Helm With Other Emacs Extensions</h2>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#linum_002drelative" accesskey="1">linum-relative</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="linum_002drelative"></span><div class="header">
+<p>
+Up: <a href="#Helm-With-Other-Emacs-Extensions" accesskey="u" rel="up">Helm With Other Emacs Extensions</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="linum_002drelative-1"></span><h3 class="section">9.1 linum-relative</h3>
+
+<p><code>(helm-linum-relative-mode 1)</code> enables <code>linum-relative</code> in Helm. Helm
+buffers then display line numbered candidates before and after the
+current candidate (highlighted line). <kbd>C-x &lt;n&gt;</kbd> jumps to &lsquo;<samp>n</samp>&rsquo; lines
+before, before, and <kbd>C-c &lt;n&gt;</kbd> jumps to &lsquo;<samp>n</samp>&rsquo; lines after, the current
+candidate.
+</p>
+<hr>
+<span id="Helm-Workflow-for-Files-Directories-and-Buffers"></span><div class="header">
+<p>
+Next: <a href="#Quick-Try-with-emacs_002dhelmsh" accesskey="n" rel="next">Quick Try with &lsquo;<samp>emacs-helmsh</samp>&rsquo;</a>, Previous: <a href="#Helm-With-Other-Emacs-Extensions" accesskey="p" rel="prev">Helm With Other Emacs Extensions</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Helm-Workflow-for-Files_002c-Directories-and-Buffers"></span><h2 class="chapter">10 Helm Workflow for Files, Directories and Buffers</h2>
+
+<p>Other quick jumping off features of <code>helm-find-files</code>:
+</p>
+<ul>
+<li> <kbd>C-x C-d</kbd> (<code>helm-browse-project</code>) shows buffers and files in the
+project.
+
+</li><li> <kbd>C-c C-d</kbd> with prefix argument shows files in this directory and its
+subdirectories recursively.
+</li></ul>
+
+<p>When using &lsquo;<samp>helm-ls-git</samp>&rsquo;<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> and &lsquo;<samp>helm-ls-hg</samp>&rsquo;<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> , files under
+version control have a corresponding backend indicator.
+</p>
+<ul>
+<li> <kbd>C-x C-b</kbd> to switch back to the resumed Helm sources.
+
+</li><li> <kbd>M-p</kbd> to access history of <code>helm-find-files</code>
+
+</li><li> <kbd>C-c h</kbd> to access the full history of files (<code>file-name-history</code>)
+
+</li><li> <kbd>C-x C-f</kbd> switches back to <code>helm-find-files</code>
+</li></ul>
+
+<hr>
+<span id="Quick-Try-with-emacs_002dhelmsh"></span><div class="header">
+<p>
+Next: <a href="#How-to-report-Helm-Bugs" accesskey="n" rel="next">How to report Helm Bugs</a>, Previous: <a href="#Helm-Workflow-for-Files-Directories-and-Buffers" accesskey="p" rel="prev">Helm Workflow for Files Directories and Buffers</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Quick-Try-with-emacs_002dhelm_002esh"></span><h2 class="chapter">11 Quick Try with &lsquo;<samp>emacs-helm.sh</samp>&rsquo;</h2>
+
+<span id="index-emacs_002dhelm_002esh-1"></span>
+
+<p>To try Helm with a default configurations in a minimal Emacs, run the
+provided &lsquo;<samp>emacs-helm.sh</samp>&rsquo; script in Helm&rsquo;s installation directory.  If
+installed through the Emacs package manager,
+</p>
+<div class="example">
+<pre class="example">~/.emacs.d/elpa/helm-&lt;VERSION&gt;/emacs-helm.sh
+</pre></div>
+
+<p>&lsquo;<samp>emacs-helm.sh</samp>&rsquo; should also be used when
+<a href="https://github.com/emacs-helm/helm/wiki/Bugs">reporting bugs</a>.
+</p>
+<p><strong>Note</strong>: If you have installed from Melpa, for convenience, consider
+creating a symlink of &lsquo;<samp>emacs-helm.sh</samp>&rsquo; to e.g &lsquo;<samp>~/bin</samp>&rsquo;, if you have
+installed from source (make &amp;&amp; sudo make install) a symlink named
+&lsquo;<samp>helm</samp>&rsquo; have already been created.
+</p>
+<p><strong>Note</strong>: For people using a non standard Elpa directory emacs-helm.sh may
+fail because it doesn&rsquo;t find its dependency (emacs-async), here&rsquo;s how
+you can do:
+</p>
+<div class="example">
+<pre class="example">cd /your/path/to/helm
+make # If not already done.
+EMACSLOADPATH=&quot;../emacs-async:&quot; ./emacs-helm.sh
+</pre></div>
+
+<p>But normally &lsquo;<samp>emacs-helm.sh</samp>&rsquo; should work out of the box with
+installations of emacs-async= done with package.el, straight.el or from
+source with the Makefile.
+</p>
+<hr>
+<span id="How-to-report-Helm-Bugs"></span><div class="header">
+<p>
+Next: <a href="#Useful-links" accesskey="n" rel="next">Useful links</a>, Previous: <a href="#Quick-Try-with-emacs_002dhelmsh" accesskey="p" rel="prev">Quick Try with &lsquo;<samp>emacs-helmsh</samp>&rsquo;</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="How-to-report-Helm-Bugs-1"></span><h2 class="chapter">12 How to report Helm Bugs</h2>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Confirming-bugs" accesskey="1">Confirming bugs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Reporting-bugs" accesskey="2">Reporting bugs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Confirming-bugs"></span><div class="header">
+<p>
+Next: <a href="#Reporting-bugs" accesskey="n" rel="next">Reporting bugs</a>, Up: <a href="#How-to-report-Helm-Bugs" accesskey="u" rel="up">How to report Helm Bugs</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Confirming-bugs-1"></span><h3 class="section">12.1 Confirming bugs</h3>
+
+<p>To confirm that a bug is, in fact, a Helm problem, it is important to
+<em>replicate the behavior with a minimal Emacs configuration</em>. This
+precludes the possibility that the bug is caused by factors outside of
+Helm.
+</p>
+<p>The easiest and recommended way to do so is through the
+&lsquo;<samp>emacs-helm.sh</samp>&rsquo; script.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#emacs_002dhelmsh" accesskey="1">&lsquo;<samp>emacs-helm.sh</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#emacs-_002dQ" accesskey="2">&lsquo;<samp>emacs -Q</samp>&rsquo;</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="emacs_002dhelmsh"></span><div class="header">
+<p>
+Next: <a href="#emacs-_002dQ" accesskey="n" rel="next">&lsquo;<samp>emacs -Q</samp>&rsquo;</a>, Up: <a href="#Confirming-bugs" accesskey="u" rel="up">Confirming bugs</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="emacs_002dhelm_002esh"></span><h4 class="subsection">12.1.1 &lsquo;<samp>emacs-helm.sh</samp>&rsquo;</h4>
+
+<p>If your system supports it, you should run the &lsquo;<samp>emacs-helm.sh</samp>&rsquo; script
+to start an Emacs instance with minimal, Helm-specific configuration.
+</p>
+<p>This is useful for debugging, and easier than starting Emacs with
+&lsquo;<samp>emacs -Q</samp>&rsquo; and configuring Helm from scratch.
+</p>
+<p>If Helm is installed via MELPA, the &lsquo;<samp>emacs-helm.sh</samp>&rsquo; script should be
+located at &lsquo;<samp>~/.emacs.d/elpa/helm-&lt;version&gt;/emacs-helm.sh</samp>&rsquo;.
+</p>
+<p>Of course you have to cd to your helm directory and run the script
+from there, an alternative is symlinking it to somewhere in your
+&lsquo;<samp>PATH</samp>&rsquo; e.g. &ldquo;~/bin&rdquo; (See note at bottom for those that have installed
+from source with &lsquo;<samp>make</samp>&rsquo;).
+</p>
+<p>You can use the -h argument for help:
+</p>
+<div class="example">
+<pre class="example">$ helm -h
+Usage: helm [-P} Emacs path [-h} help [--] EMACS ARGS
+</pre></div>
+
+
+<p>If your emacs binary is not in a standard place i.e. &ldquo;emacs&rdquo;, you can
+specify the path with &ldquo;-P&rdquo;.
+</p>
+<p><code>Note</code>: If you have installed Helm from Git and used &lsquo;<samp>make &amp;&amp; sudo
+make install</samp>&rsquo; you can run directly &lsquo;<samp>helm</samp>&rsquo; at command line from any
+place i.e. no need to cd to helm directory.
+</p>
+<hr>
+<span id="emacs-_002dQ"></span><div class="header">
+<p>
+Previous: <a href="#emacs_002dhelmsh" accesskey="p" rel="prev">&lsquo;<samp>emacs-helmsh</samp>&rsquo;</a>, Up: <a href="#Confirming-bugs" accesskey="u" rel="up">Confirming bugs</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="emacs-_002dQ-1"></span><h4 class="subsection">12.1.2 &lsquo;<samp>emacs -Q</samp>&rsquo;</h4>
+
+<p>If you cannot run the &lsquo;<samp>emacs-helm.sh</samp>&rsquo; script, be sure to reproduce the
+problem with &lsquo;<samp>emacs -Q</samp>&rsquo;, then installing Helm as described in the
+Install section.
+</p>
+<hr>
+<span id="Reporting-bugs"></span><div class="header">
+<p>
+Previous: <a href="#Confirming-bugs" accesskey="p" rel="prev">Confirming bugs</a>, Up: <a href="#How-to-report-Helm-Bugs" accesskey="u" rel="up">How to report Helm Bugs</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Reporting-bugs-1"></span><h3 class="section">12.2 Reporting bugs</h3>
+
+<p>To report a bug, <a href="https://github.com/emacs-helm/helm/issues">open an
+issue</a>. Be sure that you&rsquo;ve confirmed the bug as described in the
+previous section, and include relevant information for the maintainer
+to identify the bug.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Version-info" accesskey="1">Version info</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<span id="Version-info"></span><div class="header">
+<p>
+Up: <a href="#Reporting-bugs" accesskey="u" rel="up">Reporting bugs</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Version-info-1"></span><h4 class="subsection">12.2.1 Version info</h4>
+
+<p>When reporting bugs, it is important to include the Helm version
+number, which can be found in the
+<a href="https://github.com/emacs-helm/helm/blob/master/helm-pkg.el">helm-pkg.el</a>
+file.
+</p>
+<hr>
+<span id="Useful-links"></span><div class="header">
+<p>
+Next: <a href="#Main-Index" accesskey="n" rel="next">Main Index</a>, Previous: <a href="#How-to-report-Helm-Bugs" accesskey="p" rel="prev">How to report Helm Bugs</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Useful-links-1"></span><h2 class="chapter">13 Useful links</h2>
+
+<ul>
+<li> <a href="https://github.com/emacs-helm/helm">Helm on GitHub</a>
+
+</li><li> <a href="http://tuhdo.github.io/helm-intro.html">Tuhdo&rsquo;s Helm tutorial</a>
+
+</li><li> <a href="https://groups.google.com/g/emacs-helm">Helm mailing list</a>
+</li></ul>
+
+<hr>
+<span id="Main-Index"></span><div class="header">
+<p>
+Next: <a href="#Key-Index" accesskey="n" rel="next">Key Index</a>, Previous: <a href="#Useful-links" accesskey="p" rel="prev">Useful links</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Main-Index-1"></span><h2 class="chapter">14 Main Index</h2>
+
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Main-Index_cp_letter-E"><b>E</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Main-Index_cp_letter-H"><b>H</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="index-cp" border="0">
+<tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Main-Index_cp_letter-E">E</th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-emacs_002dhelm_002esh">emacs-helm.sh</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Minimal-setup-using-source">Minimal setup using source</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-emacs_002dhelm_002esh-1">emacs-helm.sh</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Quick-Try-with-emacs_002dhelmsh">Quick Try with &lsquo;<samp>emacs-helmsh</samp>&rsquo;</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Main-Index_cp_letter-H">H</th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helm-native-commands">helm native commands</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Introduction">Introduction</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helmized-commands">helmized commands</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Introduction">Introduction</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Main-Index_cp_letter-E"><b>E</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Main-Index_cp_letter-H"><b>H</b></a>
+ &nbsp; 
+</td></tr></table>
+
+<hr>
+<span id="Key-Index"></span><div class="header">
+<p>
+Next: <a href="#Command-and-Function-Index" accesskey="n" rel="next">Command and Function Index</a>, Previous: <a href="#Main-Index" accesskey="p" rel="prev">Main Index</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Key-Index-1"></span><h2 class="chapter">15 Key Index</h2>
+
+
+<hr>
+<span id="Command-and-Function-Index"></span><div class="header">
+<p>
+Next: <a href="#Variable-Index" accesskey="n" rel="next">Variable Index</a>, Previous: <a href="#Key-Index" accesskey="p" rel="prev">Key Index</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Command-and-Function-Index-1"></span><h2 class="chapter">16 Command and Function Index</h2>
+
+
+<hr>
+<span id="Variable-Index"></span><div class="header">
+<p>
+Previous: <a href="#Command-and-Function-Index" accesskey="p" rel="prev">Command and Function Index</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Main-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Variable-Index-1"></span><h2 class="chapter">17 Variable Index</h2>
+
+<p>This is not a complete index of variables and faces, only the ones
+that are mentioned in the manual.  For a more complete list, use
+<kbd>M-x org-customize</kbd> and then click yourself through the tree.
+</p>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Variable-Index_vr_letter-H"><b>H</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="index-vr" border="0">
+<tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Variable-Index_vr_letter-H">H</th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helm_002dcommand_002dprefix_002dkey"><code>helm-command-prefix-key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Preconfigured-Helm-Commands">Preconfigured Helm Commands</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helm_002dcompleting_002dread_002dhandlers_002dalist"><code>helm-completing-read-handlers-alist</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Customize-helm_002dmode">Customize helm-mode</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helm_002dminibuffer_002dhistory_002dkey"><code>helm-minibuffer-history-key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Preconfigured-Helm-Commands">Preconfigured Helm Commands</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-helm_002dmode"><code>helm-mode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Helm-Mode">Helm Mode</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Variable-Index_vr_letter-H"><b>H</b></a>
+ &nbsp; 
+</td></tr></table>
+
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT1" href="#DOCF1">(1)</a></h3>
+<p><a href="https://github.com/jwiegley/emacs-async">emacs-async</a></p>
+<h5><a id="FOOT2" href="#DOCF2">(2)</a></h3>
+<p><a href="https://github.com/auto-complete/popup-el">popup-el</a></p>
+<h5><a id="FOOT3" href="#DOCF3">(3)</a></h3>
+<p><a href="https://github.com/raxod502/straight.el">https://github.com/raxod502/straight.el</a></p>
+<h5><a id="FOOT4" href="#DOCF4">(4)</a></h3>
+<p><a href="https://github.com/jwiegley/emacs-async">emacs-async</a></p>
+<h5><a id="FOOT5" href="#DOCF5">(5)</a></h3>
+<p><a href="https://github.com/auto-complete/popup-el">popup-el</a></p>
+<h5><a id="FOOT6" href="#DOCF6">(6)</a></h3>
+<p><a href="https://github.com/emacs-helm/helm/releases">https://github.com/emacs-helm/helm/releases</a></p>
+<h5><a id="FOOT7" href="#DOCF7">(7)</a></h3>
+<p>Don&rsquo;t forget the final &lsquo;<samp>:</samp>&rsquo; to use an absolute path (like
+&lsquo;<samp>/home/you/foo/bar:</samp>&rsquo;) instead of an abbreviated path like
+(&lsquo;<samp>~/foo/bar:</samp>&rsquo;), specify &lsquo;<samp>EMACSLOADPATH</samp>&rsquo;.</p>
+<h5><a id="FOOT8" href="#DOCF8">(8)</a></h3>
+<p><a href="https://melpa.org">https://melpa.org</a></p>
+<h5><a id="FOOT9" href="#DOCF9">(9)</a></h3>
+<p>Helm uses async package to compile itself from Melpa.  Ensure
+that <code>async-bytecomp-package-mode</code> is enabled by default.  If this
+isn&rsquo;t so, add helm to <code>async-bytecomp-allowed-packages</code>.</p>
+<h5><a id="FOOT10" href="#DOCF10">(10)</a></h3>
+<p><a href="https://github.com/emacs-helm/helm/issues/495">Different way of invoking commands</a></p>
+<h5><a id="FOOT11" href="#DOCF11">(11)</a></h3>
+<p><a href="https://groups.google.com/g/emacs-helm/c/zaBbg2tFAuM">Finding files</a></p>
+<h5><a id="FOOT12" href="#DOCF12">(12)</a></h3>
+<p><a href="https://github.com/emacs-helm/helm/issues/222">Lack of tab completion</a></p>
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h3>
+<p><a href="https://github.com/emacs-helm/helm-ls-git">helm-ls-git</a></p>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h3>
+<p><a href="https://github.com/emacs-helm/helm-ls-hg">helm-ls-hg</a></p>
+</div>
+<hr>
+
+
+
+</body>
+</html>
