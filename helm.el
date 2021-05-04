@@ -1349,7 +1349,7 @@ matching or fuzzy matching (see [[Matching in Helm][Matching in
 Helm]]).
 
 Completion is not done dynamically (against `helm-pattern')
-because backend functions (i.e. `competion-at-point-functions')
+because backend functions (i.e. `completion-at-point-functions')
 are not aware of Helm matching methods.
 
 By behaving like this, the benefit is that you can fully use Helm
