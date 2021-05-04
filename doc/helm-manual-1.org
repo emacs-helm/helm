@@ -2,7 +2,7 @@
 # #+subtitle:  Release {{{version}}}
 #+subtitle:  Release 3.6.2
 #+author:    The Helm Developers
-#+date:      {{{modification-time}}}
+# #+date:      {{{modification-time}}}
 #+language:  en
 
 # #+texinfo: @insertcopying
@@ -45,13 +45,13 @@
 Helm 3.6.2 and later require
 
   - =Emacs= version >= 25.1
-  - =emacs-async=[fn:1]
-  - =popup-el=[fn:2]
+  - =emacs-async=[fn:xxx1]
+  - =popup-el=[fn:xxx2]
 
 # Helm require an =Emacs= version >= 25.1 starting from version 3.6.2.
 # Helm uses few dependencies, actually only  (mandatory) and
 # popup (facultative) but if you install from
-# Melpa[fn:3] you should not care of this.
+# Melpa[fn:xxx3] you should not care of this.
 
 * Download
 
@@ -75,7 +75,7 @@ Helm 3.6.2 and later require
 
 ** Minimal setup using =straight.el=
 
-=straight.el=[fn:3]
+=straight.el=[fn:xxx3]
 
 Add this to your init file,
 
@@ -110,7 +110,7 @@ Emacs.  =straight.el= will rebuild helm for you.
 
 1. Install the pre-requisites
 
-   Install =emacs-async=[fn:1] and =popup-el=[fn:2].  Ensure that they
+   Install =emacs-async=[fn:xxx1] and =popup-el=[fn:xxx2].  Ensure that they
    are available in ~load-path~.
 
 2. Download, compile and install the sources
@@ -124,7 +124,7 @@ Emacs.  =straight.el= will rebuild helm for you.
        sudo make install
      #+end_src
 
-  If you have a tarball[fn:4],
+  If you have a tarball[fn:xxx4],
 
     #+begin_src sh
       wget https://github.com/emacs-helm/helm/archive/refs/tags/v3.7.1.tar.gz
@@ -136,7 +136,7 @@ Emacs.  =straight.el= will rebuild helm for you.
 
 Above steps assume that you have installed =emacs-async= is in a
 standard location.  If this is not the case, you need to tell =make=
-program where it is available using =EMACSLOADPATH=[fn:5].
+program where it is available using =EMACSLOADPATH=[fn:xxx5].
 
      #+begin_src sh
        git clone https://github.com/emacs-helm/helm
@@ -183,7 +183,7 @@ essential for having a working install of =helm=.
 
 ** Minimal setup using the Package Manager
 
-Helm is available on MELPA.[fn:6]
+Helm is available on MELPA.[fn:xxx6]
 
 Release version of Helm is available in the stable repository while
 development version is available in the other repo.
@@ -194,13 +194,13 @@ you can install Helm with {{{kbd(M-x package-install RET helm RET)}}}.
 To upgrade =Helm=, use ~helm-list-elisp-packages~.  This command is
 the Helm equivalent of Emacs' =list-packages=.  Using
 ~helm-list-elisp-packages~, ensures that =helm= is compiled in a clean
-environment.[fn:7]
+environment.[fn:xxx7]
 
 # Helm upgrades from MELPA encountered errors because of the way the
 # Emacs package manager fetches and compiles updates for existing
 # packages.
 
-# To get around these errors, Helm has =emacs-async=[fn:1] as a
+# To get around these errors, Helm has =emacs-async=[fn:xxx1] as a
 # dependency. =emacs-async= forces compilation in a clean environment,
 # which resolves the compilation errors.
 
@@ -223,7 +223,7 @@ environment.[fn:7]
 
 # Use ~helm-list-elisp-packages~ to upgrade Helm.  If you use
 # ~list-packages~ to upgrade, you may run in to issues either at install
-# time or run time.[fn:8]
+# time or run time.[fn:xxx8]
 
 # * Upgrade or recompile
 
@@ -248,7 +248,7 @@ environment.[fn:7]
 # will likely want to use a delayed method like ~with-eval-after-load~
 # or =use-package= to avoid loading all of Helm at startup.
 
-As example you can have a look at the maintainer helm config[fn:8].
+As example you can have a look at the maintainer helm config[fn:xxx8].
 
 To setup specific variables from the helm session you are in, use
 {{{kbd(C-h c)}}}.
@@ -297,7 +297,7 @@ than one action, allows marking candidates, better display etc...).
 Differences between the two often trip up new users.
 
 Emacs completion is based on the *minibuffer*. Helm completion is
-based on the *completion window*.[fn:9]  [fn:10] [fn:11]
+based on the *completion window*.[fn:xxx9]  [fn:xxx10] [fn:xxx11]
 
 In standard Emacs, interactivity happens in the /minibuffer/.
 
@@ -704,7 +704,7 @@ Other quick jumping off features of ~helm-find-files~:
 - {{{kbd(C-c C-d)}}} with prefix argument shows files in this directory and its
   subdirectories recursively.
 
-When using =helm-ls-git=[fn:12] and =helm-ls-hg=[fn:13] , files under
+When using =helm-ls-git=[fn:xxx12] and =helm-ls-hg=[fn:xxx13] , files under
 version control have a corresponding backend indicator.
 
 - {{{kbd(C-x C-b)}}} to switch back to the resumed Helm sources.
@@ -885,47 +885,49 @@ that are mentioned in the manual.  For a more complete list, use
 
 * Footnotes
 
-[fn:1] [[https://github.com/jwiegley/emacs-async][emacs-async]]
+[fn:xxx1] [[https://github.com/jwiegley/emacs-async][emacs-async]]
 
-[fn:2] [[https://github.com/auto-complete/popup-el][popup-el]]
+[fn:xxx2] [[https://github.com/auto-complete/popup-el][popup-el]]
 
-[fn:3] https://github.com/raxod502/straight.el
+[fn:xxx3] https://github.com/raxod502/straight.el
 
-[fn:4]  https://github.com/emacs-helm/helm/releases
+[fn:xxx4]  https://github.com/emacs-helm/helm/releases
 
-[fn:5] Don't forget the final =:= to use an absolute path (like
+[fn:xxx5] Don't forget the final =:= to use an absolute path (like
 =/home/you/foo/bar:=) instead of an abbreviated path like
 (=~/foo/bar:=), specify =EMACSLOADPATH=.
 
-[fn:6] https://melpa.org
+[fn:xxx6] https://melpa.org
 
-[fn:7] Helm uses async package to compile itself from Melpa.  Ensure
+[fn:xxx7] Helm uses async package to compile itself from Melpa.  Ensure
 that ~async-bytecomp-package-mode~ is enabled by default.  If this
 isn't so, add helm to ~async-bytecomp-allowed-packages~.
 
-[fn:8] https://raw.githubusercontent.com/thierryvolpiatto/emacs-config/main/init-helm.el
+[fn:xxx8] https://raw.githubusercontent.com/thierryvolpiatto/emacs-config/main/init-helm.el
 
-[fn:9] [[https://github.com/emacs-helm/helm/issues/495][Different way of invoking commands]]
+[fn:xxx9] [[https://github.com/emacs-helm/helm/issues/495][Different way of invoking commands]]
 
-[fn:10] [[https://groups.google.com/g/emacs-helm/c/zaBbg2tFAuM][Finding files]]
+[fn:xxx10] [[https://groups.google.com/g/emacs-helm/c/zaBbg2tFAuM][Finding files]]
 
-[fn:11] [[https://github.com/emacs-helm/helm/issues/222][Lack of tab completion]]
+[fn:xxx11] [[https://github.com/emacs-helm/helm/issues/222][Lack of tab completion]]
 
-[fn:12][[https://github.com/emacs-helm/helm-ls-git][helm-ls-git]]
+[fn:xxx12][[https://github.com/emacs-helm/helm-ls-git][helm-ls-git]]
 
-[fn:13] [[https://github.com/emacs-helm/helm-ls-hg][helm-ls-hg]]
+[fn:xxx13] [[https://github.com/emacs-helm/helm-ls-hg][helm-ls-hg]]
 
-[fn:14] helm-core have a new macro foo and helm use now
+[fn:xxx14][[http://melpa.org/#/helm][MELPA]]
+
+
+[fn:xxx15] [[http://stable.melpa.org/#/helm][MELPA Stable]]
+
+[fn:xxx16] https://github.com/emacs-helm/helm/tags
+
+[fn:xxx17] [[http://melpa.org/#/helm][Melpa ]]
+
+[fn:xxx18] helm-core have a new macro foo and helm use now
 this macro, ~list-packages~ will try to install and compile first helm
 and then helm-core resulting in an error like =void function foo...=.
 
-[fn:15] [[http://melpa.org/#/helm][Melpa ]]
-
-[fn:16] https://github.com/emacs-helm/helm/tags
-
-[fn:17] [[http://stable.melpa.org/#/helm][MELPA Stable]]
-
-[fn:18][[http://melpa.org/#/helm][MELPA]]
 
 #+STARTUP: inlineimages
 #+EXCLUDE_TAGS: TOC_4

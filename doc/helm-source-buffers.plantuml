@@ -1,0 +1,33 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-buffers'**\n\n
+"helm-source-sync" <|-- "helm-source-buffers"
+"helm-type-buffer" <|-- "helm-source-buffers"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-type-buffer"
+"helm-source" <|-- "helm-type-buffer"
+class "helm-source"
+class "helm-source-buffers" {
+	__ some interesting slots __
+	init
+	buffer-list
+	candidates
+	help-message
+	keymap
+	match
+	match-dynamic
+	match-strict
+	migemo
+	multimatch
+	nohighlight
+	persistent-action
+	resume
+	volatile
+}
+note right of "helm-source-buffers"
+	**helm-source-buffers**
+end note
+@enduml

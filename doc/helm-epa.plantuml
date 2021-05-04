@@ -1,0 +1,24 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-epa'**\n\n
+"helm-source-sync" <|-- "helm-epa"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-epa" {
+	Allow building helm sources
+	for GPG keys.
+	==
+	__ some interesting slots __
+	init
+	candidates
+	keymap
+	mode-line
+}
+note right of "helm-epa"
+	**helm-epa**:
+	Allow building helm sources
+	for GPG keys.
+end note
+@enduml

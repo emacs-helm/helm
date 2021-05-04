@@ -1,0 +1,72 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source'**\n\n
+class "helm-source" {
+	Main interface to define helm
+	sources.
+	==
+	__ some interesting slots __
+	init
+	name
+	action
+	action-transformer
+	after-init-hook
+	allow-dups
+	before-init-hook
+	candidate-number-limit
+	candidate-transformer
+	candidates
+	cleanup
+	coerce
+	delayed
+	display-to-real
+	filter-one-by-one
+	filtered-candidate-transformer
+	follow
+	follow-delay
+	fuzzy-match
+	group
+	header-line
+	header-name
+	help-message
+	history
+	keymap
+	marked-with-props
+	match
+	match-on-real
+	match-part
+	mode-line
+	multiline
+	multimatch
+	must-match
+	nohighlight
+	nomark
+	pattern-transformer
+	persistent-action
+	persistent-action-if
+	persistent-help
+	real-to-display
+	redisplay
+	requires-pattern
+	resume
+	update
+	volatile
+}
+note right of "helm-source"
+	**helm-source**:
+	Main interface to define helm
+	sources.
+end note
+"helm-source" <|-- "helm-bookmark-override-inheritor"
+"helm-source" <|-- "helm-type-timers"
+"helm-source" <|-- "helm-type-command"
+"helm-source" <|-- "helm-type-function"
+"helm-source" <|-- "helm-type-buffer"
+"helm-source" <|-- "helm-type-bookmark"
+"helm-source" <|-- "helm-type-file"
+"helm-source" <|-- "helm-source-dummy"
+"helm-source" <|-- "helm-source-in-buffer"
+"helm-source" <|-- "helm-source-async"
+"helm-source" <|-- "helm-source-sync"
+@enduml

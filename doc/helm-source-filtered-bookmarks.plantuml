@@ -1,0 +1,30 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-filtered-bookmarks'**\n\n
+"helm-source-in-buffer" <|-- "helm-source-filtered-bookmarks"
+"helm-type-bookmark" <|-- "helm-source-filtered-bookmarks"
+class "helm-source-in-buffer"
+"helm-source" <|-- "helm-source-in-buffer"
+class "helm-source"
+class "helm-type-bookmark"
+"helm-source" <|-- "helm-type-bookmark"
+class "helm-source"
+class "helm-source-filtered-bookmarks" {
+	__ some interesting slots __
+	init
+	candidates
+	data
+	filtered-candidate-transformer
+	get-line
+	match
+	migemo
+	search
+	search-strict
+	volatile
+}
+note right of "helm-source-filtered-bookmarks"
+	**helm-source-filtered-bookmarks**
+end note
+"helm-source-filtered-bookmarks" <|-- "helm-bookmark-find-files-class"
+@enduml

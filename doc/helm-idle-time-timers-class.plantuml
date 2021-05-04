@@ -1,0 +1,25 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-idle-time-timers-class'**\n\n
+"helm-source-sync" <|-- "helm-idle-time-timers-class"
+"helm-type-timers" <|-- "helm-idle-time-timers-class"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-type-timers"
+"helm-source" <|-- "helm-type-timers"
+class "helm-source"
+class "helm-idle-time-timers-class" {
+	__ some interesting slots __
+	allow-dups
+	candidate-transformer
+	candidates
+	match-dynamic
+	match-strict
+	migemo
+}
+note right of "helm-idle-time-timers-class"
+	**helm-idle-time-timers-class**
+end note
+@enduml

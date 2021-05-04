@@ -1,0 +1,37 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-sync'**\n\n
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-source-sync" {
+	Use this class to make helm
+	sources using a list of
+	candidates.
+	==
+	__ some interesting slots __
+	candidates
+	match-dynamic
+	match-strict
+	migemo
+}
+note right of "helm-source-sync"
+	**helm-source-sync**:
+	Use this class to make helm
+	sources using a list of
+	candidates.
+end note
+"helm-source-sync" <|-- "helm-source-session-class"
+"helm-source-sync" <|-- "helm-files-dired-source"
+"helm-source-sync" <|-- "helm-imenu-source"
+"helm-source-sync" <|-- "helm-files-in-current-dir-source"
+"helm-source-sync" <|-- "helm-recentf-source"
+"helm-source-sync" <|-- "helm-eshell-history-source"
+"helm-source-sync" <|-- "helm-esh-source"
+"helm-source-sync" <|-- "helm-epa"
+"helm-source-sync" <|-- "helm-M-x-class"
+"helm-source-sync" <|-- "helm-idle-time-timers-class"
+"helm-source-sync" <|-- "helm-absolute-time-timers-class"
+"helm-source-sync" <|-- "helm-source-ffiles"
+"helm-source-sync" <|-- "helm-source-buffers"
+@enduml

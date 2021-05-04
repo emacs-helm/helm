@@ -109,7 +109,8 @@ texi: $(TEXIFILES)
 $(TEXIFILES): | doc/ox-texinfo.el
 
 doc/ox-texinfo.el:
-	wget https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+	wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+	# test -f doc/ox-texinfo.el || wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
 
 %.texi:		doc/ox-texinfo.el
 
@@ -189,12 +190,15 @@ $(DESTDIR)$(infodir)/%.info: doc/%.info
 
 install-info:	$(INFOFILES)
 	if [ ! -d  $(INFODIR) ]; then $(MKDIR) $(INFODIR); else true; fi ;
+	if [ ! -d  $(INFODIR)/helm-figures ]; then $(MKDIR) $(INFODIR)/helm-figures; else true; fi ;
+	cp -r doc/helm-figures $(INFODIR);
 	for f in $(INFOFILES:doc/%=%) ; do				\
 		cp doc/$$f $(INFODIR);					\
 		$(INSTALL_INFO) --info-dir=$(INFODIR) $(INFODIR)/$$f;	\
 	done
 
 clean-install-info:
+	$(RM) -r $(INFODIR)/helm-figures;
 	for f in $(INFOFILES:doc/%=%) ; do						\
 		$(INSTALL_INFO) --remove --info-dir=$(INFODIR) --remove $(INFODIR)/$$f;	\
 		$(RM) $(INFODIR)/$$f;							\

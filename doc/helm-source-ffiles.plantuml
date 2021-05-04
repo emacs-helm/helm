@@ -1,0 +1,36 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-ffiles'**\n\n
+"helm-source-sync" <|-- "helm-source-ffiles"
+class "helm-source-sync"
+"helm-source" <|-- "helm-source-sync"
+class "helm-source"
+class "helm-source-ffiles" {
+	__ some interesting slots __
+	init
+	action
+	action-transformer
+	after-init-hook
+	before-init-hook
+	candidate-number-limit
+	candidates
+	cleanup
+	filtered-candidate-transformer
+	group
+	header-name
+	help-message
+	keymap
+	match-on-real
+	migemo
+	mode-line
+	nohighlight
+	persistent-action-if
+	persistent-help
+	update
+	volatile
+}
+note right of "helm-source-ffiles"
+	**helm-source-ffiles**
+end note
+@enduml

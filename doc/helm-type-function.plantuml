@@ -1,0 +1,18 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-type-function'**\n\n
+"helm-source" <|-- "helm-type-function"
+class "helm-source"
+class "helm-type-function" {
+	A class to define helm type
+	function.
+	==
+	__ some interesting slots __
+}
+note right of "helm-type-function"
+	**helm-type-function**:
+	A class to define helm type
+	function.
+end note
+@enduml

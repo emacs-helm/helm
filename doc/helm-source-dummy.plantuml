@@ -1,0 +1,19 @@
+@startuml
+skinparam classFontStyle bold
+skinparam captionFontStyle bold
+title **Parents and Children of**\n**'helm-source-dummy'**\n\n
+"helm-source" <|-- "helm-source-dummy"
+class "helm-source"
+class "helm-source-dummy" {
+	__ some interesting slots __
+	accept-empty
+	candidates
+	filtered-candidate-transformer
+	match
+	multimatch
+	volatile
+}
+note right of "helm-source-dummy"
+	**helm-source-dummy**
+end note
+@enduml
