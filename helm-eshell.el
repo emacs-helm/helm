@@ -158,7 +158,7 @@ at point."
                                     (setq helm-eshell--quit-flag t)
                                     (message "No completions of %s" pcomplete-stub))
               for i in comps
-              ;; Transform the related names to abs names.
+              ;; Transform the relative names to abs names.
               for file-cand = (and exp-entry
                                    (if (file-remote-p i) i
                                      (expand-file-name
