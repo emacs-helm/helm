@@ -4019,8 +4019,13 @@ with `helm-ff-trash-list'."
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
   (assoc-default (helm-basename file) trashed-files))
 
-(defun helm-ff-trash-list ()
-  "Return an alist of trashed files basename and dest name."
+(defun helm-ff-trash-list (&optional trash-dir)
+  "Return an alist of trashed files basename and dest name.
+Assume the trash system in use is freedesktop compatible, see
+<http://freedesktop.org/wiki/Specifications/trash-spec> 
+This function is intended to be used from a trash directory i.e. it
+use `helm-ff-default-directory', but it may be used elsewhere by
+specifying the trash directory with TRASH-DIR arg."
   ;; Files owned by root are trashed in /root/.local/share/Trash.
   ;; Files owned by user and trashed by root are trashed in
   ;; /home/.Trash.
@@ -4030,7 +4035,8 @@ with `helm-ff-trash-list'."
                      (expand-file-name
                       ;; helm-ff-default-directory is actually the
                       ;; trash directory.
-                      "info" (helm-basedir (directory-file-name helm-ff-default-directory)))
+                      "info" (helm-basedir (directory-file-name
+                                            (or trash-dir helm-ff-default-directory))))
                      t directory-files-no-dot-files-regexp)
            collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo\\'" "" f))
                          (with-temp-buffer
