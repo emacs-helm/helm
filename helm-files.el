@@ -3913,7 +3913,7 @@ E.g. '(\"delete\" \"deleting\")
 
 ARGS are other arguments to be passed to FN."
   (let ((mkd (helm-marked-candidates))
-        errors)
+        errors aborted)
     (with-helm-display-marked-candidates
         helm-marked-buffer-name
         (helm-ff--count-and-collect-dups (mapcar 'helm-basename mkd))
@@ -3926,22 +3926,29 @@ ARGS are other arguments to be passed to FN."
                        (condition-case err
                            (apply fn f args)
                          (error (push (format "%s" (cadr err)) errors)
-                                nil)))
-              (if errors
-                  (display-warning 'helm
-                                   (with-temp-buffer
-                                     (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
-                                                                 (current-time)))
-                                     (insert (format
-                                              "Failed to %s %s/%s files from trash\n"
-                                              (car names) (length errors) (length mkd)))
-                                     (insert (mapconcat 'identity errors "\n") "\n")
-                                     (buffer-string))
-                                   :error
-                                   "*helm restore warnings*")
-                (message "%s %s files from trash done"
-                         (capitalize (cadr names)) (length mkd))))
-          (message "Restoring files from trash aborted")))))
+                                nil))))
+          (message "%s files from trash aborted" (capitalize (cadr names)))
+          (setq aborted t)))
+    ;; Handle errors from outside the
+    ;; with-helm-display-marked-candidates block otherwise warning is
+    ;; never displayed.
+    (if errors
+        (progn
+          (display-warning 'helm
+                           (with-temp-buffer
+                             (insert (format-time-string "%Y-%m-%d %H:%M:%S\n"
+                                                         (current-time)))
+                             (insert (format
+                                      "Failed to %s %s/%s files from trash\n"
+                                      (car names) (length errors) (length mkd)))
+                             (insert (mapconcat 'identity errors "\n") "\n")
+                             (buffer-string))
+                           :error
+                           "*helm restore warnings*")
+          (message "%s files from trash aborted" (capitalize (cadr names))))
+      (unless aborted
+        (message "%s %s files from trash done"
+                 (capitalize (cadr names)) (length mkd))))))
 
 (defun helm-ff-trash-rm (_candidate)
   "Delete marked-files from a Trash directory.
@@ -4012,8 +4019,13 @@ with `helm-ff-trash-list'."
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
   (assoc-default (helm-basename file) trashed-files))
 
-(defun helm-ff-trash-list ()
-  "Return an alist of trashed files basename and dest name."
+(defun helm-ff-trash-list (&optional trash-dir)
+  "Return an alist of trashed files basename and dest name.
+Assume the trash system in use is freedesktop compatible, see
+<http://freedesktop.org/wiki/Specifications/trash-spec> 
+This function is intended to be used from a trash directory i.e. it
+use `helm-ff-default-directory', but it may be used elsewhere by
+specifying the trash directory with TRASH-DIR arg."
   ;; Files owned by root are trashed in /root/.local/share/Trash.
   ;; Files owned by user and trashed by root are trashed in
   ;; /home/.Trash.
@@ -4023,7 +4035,8 @@ with `helm-ff-trash-list'."
                      (expand-file-name
                       ;; helm-ff-default-directory is actually the
                       ;; trash directory.
-                      "info" (helm-basedir (directory-file-name helm-ff-default-directory)))
+                      "info" (helm-basedir (directory-file-name
+                                            (or trash-dir helm-ff-default-directory))))
                      t directory-files-no-dot-files-regexp)
            collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo\\'" "" f))
                          (with-temp-buffer
