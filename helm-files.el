@@ -497,8 +497,10 @@ currently transfered in an help-echo in mode-line, if you use
 
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
+Should be the directory file name i.e. don't add final slash.
 When nil helm will compute a default value according to freedesktop
-specs."
+specs.
+It is generally \"~/.local/share/Trash\""
   :type 'string
   :group 'helm-files)
 
