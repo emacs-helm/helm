@@ -4965,7 +4965,10 @@ When `helm-trash-default-directory' is set use it as trash directory."
     (expand-file-name "files" xdg-data-dir)))
       
 (defun helm-ff-file-already-trashed (file &optional trash-alist)
-  "Return an error when FILE to trash is already in trash."
+  "Return FILE when it is already in trash.
+
+Optional arg TRASH-ALIST should be an alist as what
+`helm-ff-trash-list' returns."
   (unless (fboundp 'system-move-file-to-trash)
     (let ((trash-files-dir (helm-trash-directory)))
       (cl-loop for (_bn . fn) in (or trash-alist (helm-ff-trash-list trash-files-dir))
