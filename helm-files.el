@@ -494,6 +494,17 @@ currently transfered in an help-echo in mode-line, if you use
   "Percentage unicode sign to use in Rsync reporter."
   :type 'string
   :group 'helm-files)
+
+(defcustom helm-trash-default-directory nil
+  "The default trash directory.
+You probably don't need to set this when using a Linux system using
+standard settings.
+Should be the directory file name i.e. don't add final slash.
+When nil helm will compute a default value according to freedesktop
+specs.
+It is generally \"~/.local/share/Trash\"."
+  :type 'string
+  :group 'helm-files)
 
 ;;; Faces
 ;;
@@ -4941,6 +4952,25 @@ Return non-nil when FILE needs to be trashed."
           (or (and remote helm-trash-remote-files)
               (null remote))))))
 
+(defun helm-trash-directory ()
+  "Try to find a trash directory.
+Return the files subdirectory of trash directory.
+When `helm-trash-default-directory' is set use it as trash directory."
+  (let ((xdg-data-dir
+         (or helm-trash-default-directory
+	     (directory-file-name
+	      (expand-file-name "Trash"
+			        (or (getenv "XDG_DATA_HOME")
+				    "~/.local/share"))))))
+    (expand-file-name "files" xdg-data-dir)))
+      
+(defun helm-ff-refuse-trashing-already-trashed (file &optional trash-alist)
+  "Return an error when FILE to trash is already in trash."
+  (unless (fboundp 'system-move-file-to-trash)
+    (let ((trash-files-dir (helm-trash-directory)))
+      (cl-loop for (_bn . fn) in (or trash-alist (helm-ff-trash-list trash-files-dir))
+               thereis (file-equal-p file fn)))))
+
 (defun helm-ff-quick-delete (_candidate)
   "Delete file CANDIDATE without quitting.
 
@@ -5001,8 +5031,15 @@ is nil."
           (helm--reading-passwd-or-string t)
           (file-attrs (file-attributes file))
           (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
-          (delete-by-moving-to-trash trash))
-      (cond ((and (eq (nth 0 file-attrs) t)
+          (delete-by-moving-to-trash trash)
+          (already-trashed
+           (and trash (helm-ff-refuse-trashing-already-trashed file))))
+      (cond (already-trashed
+             ;; We use message here to avoid exiting loop when
+             ;; deleting more than one file.
+             (message "User error: `%s' is already trashed" file)
+             (sit-for 1.5))
+            ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t directory-files-no-dot-files-regexp))
              ;; Synchro means persistent deletion from HFF.
              (if synchro
@@ -5155,7 +5192,13 @@ directories are always deleted with no warnings."
                          result (length files))))))
          ;; Workaround emacs-26 bug with tramp see
          ;; https://github.com/jwiegley/emacs-async/issues/80.
-         (async-quiet-switch "-q"))
+         (async-quiet-switch "-q")
+         (trash-alist (and trash (helm-ff-trash-list (helm-trash-directory))))
+         (already-trashed
+          (and trash
+               (cl-loop for f in files
+                        when (helm-ff-refuse-trashing-already-trashed f trash-alist)
+                        collect f))))
     (setq helm-ff--trash-flag trash)
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
@@ -5164,6 +5207,7 @@ directories are always deleted with no warnings."
           (message "(No deletions performed)")
         (async-start
          `(lambda ()
+            (require 'cl-lib)
             ;; `delete-by-moving-to-trash' have to be set globally,
             ;; using the TRASH argument of delete-file or
             ;; delete-directory is not enough.
@@ -5171,7 +5215,11 @@ directories are always deleted with no warnings."
             (let ((result 0))
               (dolist (file ',files result)
                 (condition-case err
-                    (cond ((eq (nth 0 (file-attributes file)) t)
+                    (cond ((and ,trash
+                                (cl-loop for f in ',already-trashed
+                                         thereis (file-equal-p f file)))
+                           (error (format "`%s' is already trashed" file)))
+                          ((eq (nth 0 (file-attributes file)) t)
                            (delete-directory file 'recursive ,trash)
                            (setq result (1+ result)))
                           (t (delete-file file ,trash)
