@@ -4999,9 +4999,14 @@ When a prefix arg is given, meaning of
                                   (format "Really %s file `%s'? "
                                           (if trash "Trash" "Delete")
                                           (abbreviate-file-name c)))
-                             (helm-delete-file
-                              c helm-ff-signal-error-on-dot-files 'synchro trash)
-                             (helm-delete-current-selection)
+                             (helm-acase (helm-delete-file
+                                          c helm-ff-signal-error-on-dot-files 'synchro trash)
+                               (skip
+                                (helm-delete-visible-mark (helm-this-visible-mark))
+                                (if (helm-end-of-source-p)
+                                    (helm-previous-line)
+                                  (helm-next-line)))
+                               (t (helm-delete-current-selection)))
                              (message nil)
                              (helm--remove-marked-and-update-mode-line c))))
         (setq helm-marked-candidates nil
@@ -5048,7 +5053,8 @@ is nil."
              ;; We use message here to avoid exiting loop when
              ;; deleting more than one file.
              (message "User error: `%s' is already trashed" file)
-             (sit-for 1.5))
+             (sit-for 1.5)
+             (cl-return 'skip))
             ((and (eq (nth 0 file-attrs) t)
                   (directory-files file t directory-files-no-dot-files-regexp))
              ;; Synchro means persistent deletion from HFF.
