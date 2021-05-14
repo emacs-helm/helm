@@ -5002,6 +5002,8 @@ When a prefix arg is given, meaning of
                              (helm-acase (helm-delete-file
                                           c helm-ff-signal-error-on-dot-files 'synchro trash)
                                (skip
+                                ;; This happens only when trying to
+                                ;; trash a file already trashed.
                                 (helm-delete-visible-mark (helm-this-visible-mark))
                                 (if (helm-end-of-source-p)
                                     (helm-previous-line)
