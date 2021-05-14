@@ -832,6 +832,9 @@ than `helm-candidate-number-limit'.")
 (defvar helm-ff--trash-directory-regexp "\\.?Trash[/0-9]+files/?\\'")
 (defvar helm-ff--show-directories-only nil)
 (defvar helm-ff--show-files-only nil)
+(defvar helm-ff--trashed-files nil
+  "[INTERNAL] Files already trashed are stored here during file deletion.
+This is used only as a let binding.")
 
 ;;; Helm-find-files
 ;;
@@ -4971,7 +4974,8 @@ Optional arg TRASH-ALIST should be an alist as what
 `helm-ff-trash-list' returns."
   (unless (fboundp 'system-move-file-to-trash)
     (let ((trash-files-dir (helm-trash-directory)))
-      (cl-loop for (_bn . fn) in (or trash-alist (helm-ff-trash-list trash-files-dir))
+      (cl-loop for (_bn . fn) in (or trash-alist
+                                     (helm-ff-trash-list trash-files-dir))
                thereis (file-equal-p file fn)))))
 
 (defun helm-ff-quick-delete (_candidate)
@@ -4980,10 +4984,12 @@ Optional arg TRASH-ALIST should be an alist as what
 When a prefix arg is given, meaning of
 `delete-by-moving-to-trash' is the opposite."
   (with-helm-window
-    (let ((marked (helm-marked-candidates)))
+    (let* ((marked (helm-marked-candidates))
+           (trash (helm-ff--delete-by-moving-to-trash (car marked)))
+           (helm-ff--trashed-files
+            (and trash (helm-ff-trash-list (helm-trash-directory)))))
       (unwind-protect
-           (cl-loop with trash = (helm-ff--delete-by-moving-to-trash (car marked))
-                    for c in marked do
+           (cl-loop for c in marked do
                     (progn (helm-preselect
                             (concat "^" (regexp-quote
                                          (if (and helm-ff-transformer-show-only-basename
@@ -5036,7 +5042,8 @@ is nil."
           (trash (or trash (helm-ff--delete-by-moving-to-trash file)))
           (delete-by-moving-to-trash trash)
           (already-trashed
-           (and trash (helm-ff-file-already-trashed file))))
+           (and trash (helm-ff-file-already-trashed
+                       file helm-ff--trashed-files))))
       (cond (already-trashed
              ;; We use message here to avoid exiting loop when
              ;; deleting more than one file.
@@ -5085,6 +5092,8 @@ When a prefix arg is given, meaning of
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (len 0)
          (trash (helm-ff--delete-by-moving-to-trash (car files)))
+         (helm-ff--trashed-files
+          (and trash (helm-ff-trash-list (helm-trash-directory))))
          (prmt (if trash "Trash" "Delete"))
          (old--allow-recursive-deletes helm-ff-allow-recursive-deletes))
     (with-helm-display-marked-candidates
