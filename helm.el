@@ -4011,7 +4011,8 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   (let* ((candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
          ;; See comment in helm-get-cached-candidates (Bug#2113).
-         (inhibit-quit candidate-proc)
+         (inhibit-quit (or candidate-proc
+                           (not (display-graphic-p))))
          cfn-error
          (notify-error
           (lambda (&optional e)
