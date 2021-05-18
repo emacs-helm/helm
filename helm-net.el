@@ -170,8 +170,18 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
         (apply #'call-process "curl"
                nil `(t ,helm-net-curl-log-file) nil request helm-net-curl-switches)
         (funcall parser))
-      (with-current-buffer (url-retrieve-synchronously request)
-        (funcall parser))))
+    (if (display-graphic-p)
+        (with-current-buffer
+            (url-retrieve-synchronously request)
+          (funcall parser))
+      (let ((b (while-no-input (url-retrieve-synchronously request))))
+        (if (and
+             b
+             (not (eq 'input b))
+             (bufferp b))
+            (with-current-buffer b
+              (funcall parser))
+          nil)))))
 
 
 ;;; Google Suggestions
