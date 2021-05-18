@@ -3979,10 +3979,9 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
 ;;
 (defun helm-check-minibuffer-input ()
   "Check minibuffer content."
-  (with-helm-quittable
-    (with-selected-window (or (active-minibuffer-window)
-                              (minibuffer-window))
-      (helm-check-new-input (minibuffer-contents)))))
+  (with-selected-window (or (active-minibuffer-window)
+                            (minibuffer-window))
+    (helm-check-new-input (minibuffer-contents))))
 
 (defun helm-check-new-input (input)
   "Check INPUT string and update the helm buffer if necessary."
