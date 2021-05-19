@@ -4045,23 +4045,15 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
            (helm-transform-candidates candidates source))
           (t (funcall notify-error)))))
 
-(defmacro helm-while-no-input (&rest body)
-  "Same as `while-no-input' but without the `input-pending-p' test."
-  (declare (debug t) (indent 0))
-  (let ((catch-sym (make-symbol "input")))
-    `(with-local-quit
-       (catch ',catch-sym
-         (let ((throw-on-input ',catch-sym))
-           ,@body)))))
-
 (defun helm-get-cached-candidates (source)
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is no cached value yet."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (gethash name helm-candidate-cache))
          ;; Bind inhibit-quit to ensure function terminate in case of
-         ;; quit from helm-while-no-input and processes are added to
+         ;; quit from `while-no-input' and processes are added to
          ;; helm-async-processes for further deletion (Bug#2113).
+         ;; FIXME: Is this still needed now we use plain while-no-input?
          (inhibit-quit (assoc-default 'candidates-process source)))
     (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
@@ -4630,19 +4622,19 @@ emacs-27 to provide such scoring in emacs<27."
                                              'helm-multiline t)))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
-  "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
+  "Wrap BODY in `while-no-input' unless initializing a remote connection."
   `(progn
      (if (and (file-remote-p helm-pattern)
               (not (file-remote-p helm-pattern nil t)))
-         ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
+         ;; Tramp will ask for passwd, don't use `while-no-input'.
          ,@body
-       (helm-log "Using here `helm-while-no-input'")
+       (helm-log "Using here `while-no-input'")
        ;; Emacs bug#47205, unexpected dbus-event is triggered on dbus init.
        ;; Ignoring the dbus-event work on emacs28+; for emacs27 or older
        ;; version, require tramp-archive can workaround the issue.
        (let ((while-no-input-ignore-events
               (cons 'dbus-event while-no-input-ignore-events)))
-         (helm-while-no-input ,@body)))))
+         (while-no-input ,@body)))))
 
 (defun helm--collect-matches (src-list)
   "Return a list of matches for each source in SRC-LIST.
@@ -4734,7 +4726,7 @@ without recomputing them, it should be a list of lists."
                     (setq matches (or candidates (helm--collect-matches sources))))
           ;; If computing matches finished and is not interrupted
           ;; erase the helm-buffer and render results (Fix #1157).
-          (when matches ;; nil only when interrupted by helm-while-no-input.
+          (when matches ;; nil only when interrupted by while-no-input.
             (erase-buffer)             ; [1]
             (cl-loop for src in sources
                      for mtc in matches
