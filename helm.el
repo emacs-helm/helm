@@ -2585,19 +2585,6 @@ of current source only."
                               (helm-pos-header-line-p))
                    do (cl-incf ln)
                    do (forward-line 1) finally return ln))))))
-
-(defmacro with-helm-quittable (&rest body)
-  "If an error occurs in execution of BODY, safely quit helm."
-  (declare (indent 0) (debug t))
-  `(condition-case _v
-       (let (inhibit-quit)
-         ,@body)
-     (quit (setq quit-flag t)
-           (setq helm-quit t)
-           (exit-minibuffer)
-           (keyboard-quit)
-           ;; See comment about this in `with-local-quit'.
-           (eval '(ignore nil)))))
 
 ;; Entry point
 ;; `:allow-nest' is not in this list because it is treated before.
@@ -5070,7 +5057,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 ;;
 (defun helm-output-filter (process output-string)
   "The `process-filter' function for Helm async sources."
-  (with-helm-quittable
+  (with-local-quit
     (helm-output-filter-1 (assoc process helm-async-processes) output-string)))
 
 (defun helm-output-filter-1 (process-assoc output-string)

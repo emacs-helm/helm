@@ -1750,7 +1750,6 @@ broken."
    '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-temp-hook\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-window\\)\\>" 1 font-lock-keyword-face)
-     ("(\\<\\(with-helm-quittable\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-current-buffer\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-buffer\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(with-helm-show-completion\\)\\>" 1 font-lock-keyword-face)
