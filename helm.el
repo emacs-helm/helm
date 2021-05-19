@@ -1807,7 +1807,7 @@ Knowing this exit-status could help restore a window config when
 Helm aborts in some special circumstances.  See
 `helm-exit-minibuffer' and `helm-keyboard-quit'.")
 (defvar helm-minibuffer-confirm-state nil)
-(defvar helm-quit nil)
+(defvar helm--quit nil)
 (defvar helm-buffers nil
   "Helm buffers listed in order of most recently used.")
 (defvar helm-current-position nil
@@ -2853,7 +2853,7 @@ HISTORY args see `helm'."
                   helm--source-name
                   helm-current-source
                   helm-in-persistent-action
-                  helm-quit
+                  helm--quit
                   (helm-buffer (or buffer helm-buffer)))
               (helm-initialize
                resume input default sources)
@@ -2881,7 +2881,7 @@ HISTORY args see `helm'."
                    resume keymap default history)
                 (helm-cleanup))
               (prog1
-                  (unless helm-quit (helm-execute-selection-action))
+                  (unless helm--quit (helm-execute-selection-action))
                 (helm-log (concat "[End session] " (make-string 41 ?-)))))
           (quit
            (helm-restore-position-on-quit)
@@ -3741,7 +3741,7 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
              (ignore))              ; Don't enter the minibuffer loop.
             ((and helm-quit-if-no-candidate
                   (= (helm-get-candidate-number) 0))
-             (setq helm-quit t)
+             (setq helm--quit t)
              (and (functionp helm-quit-if-no-candidate)
                   (funcall helm-quit-if-no-candidate)))
             (t              ; Enter now minibuffer and wait for input.
