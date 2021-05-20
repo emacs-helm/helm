@@ -625,6 +625,7 @@ double quote."
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
+    :display-to-real 'helm-symbolify
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
@@ -644,6 +645,7 @@ double quote."
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
                                          'helm-apropos-default-sort-fn)
+    :display-to-real 'helm-symbolify
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
