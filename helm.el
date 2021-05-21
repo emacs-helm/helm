@@ -4621,6 +4621,22 @@ emacs-27 to provide such scoring in emacs<27."
                           (put-text-property start (point)
                                              'helm-multiline t)))))
 
+(defmacro helm-while-no-input (&rest body)
+  "Same as `while-no-input' but returns either BODY or nil."
+  (declare (debug t) (indent 0))
+  (let ((catch-sym (make-symbol "input")))
+    `(with-local-quit
+       (catch ',catch-sym
+         (let ((throw-on-input ',catch-sym)
+               val)
+           (setq val (progn ,@body))
+           ;; See comments in `while-no-input' about resetting
+           ;; quit-flag.
+           (cond ((eq quit-flag throw-on-input)
+                  (setq quit-flag nil))
+                 (quit-flag nil)
+                 (t val)))))))
+
 (defmacro helm--maybe-use-while-no-input (&rest body)
   "Wrap BODY in `while-no-input' unless initializing a remote connection."
   `(progn
@@ -4635,7 +4651,7 @@ emacs-27 to provide such scoring in emacs<27."
        ;; version, require tramp-archive can workaround the issue.
        (let ((while-no-input-ignore-events
               (cons 'dbus-event while-no-input-ignore-events)))
-         (while-no-input ,@body)))))
+         (helm-while-no-input ,@body)))))
 
 (defun helm--collect-matches (src-list)
   "Return a list of matches for each source in SRC-LIST.
