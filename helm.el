@@ -4051,9 +4051,10 @@ Cache the candidates if there is no cached value yet."
   (let* ((name (assoc-default 'name source))
          (candidate-cache (gethash name helm-candidate-cache))
          ;; Bind inhibit-quit to ensure function terminate in case of
-         ;; quit from `while-no-input' and processes are added to
+         ;; quit from `helm-while-no-input' and processes are added to
          ;; helm-async-processes for further deletion (Bug#2113).
-         ;; FIXME: Is this still needed now we use plain while-no-input?
+         ;; FIXME: Is this still needed now `helm-while-no-input'
+         ;; handles quit-flag?
          (inhibit-quit (assoc-default 'candidates-process source)))
     (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
@@ -4622,7 +4623,8 @@ emacs-27 to provide such scoring in emacs<27."
                                              'helm-multiline t)))))
 
 (defmacro helm-while-no-input (&rest body)
-  "Same as `while-no-input' but returns either BODY or nil."
+  "Same as `while-no-input' but returns either BODY or nil.
+Unlike `while-no-input' this macro ensure to not returns `t'."
   (declare (debug t) (indent 0))
   (let ((catch-sym (make-symbol "input")))
     `(with-local-quit
@@ -4638,13 +4640,13 @@ emacs-27 to provide such scoring in emacs<27."
                  (t val)))))))
 
 (defmacro helm--maybe-use-while-no-input (&rest body)
-  "Wrap BODY in `while-no-input' unless initializing a remote connection."
+  "Wrap BODY in `helm-while-no-input' unless initializing a remote connection."
   `(progn
      (if (and (file-remote-p helm-pattern)
               (not (file-remote-p helm-pattern nil t)))
-         ;; Tramp will ask for passwd, don't use `while-no-input'.
+         ;; Tramp will ask for passwd, don't use `helm-while-no-input'.
          ,@body
-       (helm-log "Using here `while-no-input'")
+       (helm-log "Using here `helm-while-no-input'")
        ;; Emacs bug <https://debbugs.gnu.org/47205>, unexpected
        ;; dbus-event is triggered on dbus init.
        ;; Ignoring the dbus-event work on emacs28+; for emacs27 or older
