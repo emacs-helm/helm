@@ -4040,34 +4040,35 @@ Assume the trash system in use is freedesktop compatible, see
 This function is intended to be used from a trash directory i.e. it
 use `helm-ff-default-directory', but it may be used elsewhere by
 specifying the trash directory with TRASH-DIR arg."
-  ;; Files owned by root are trashed in /root/.local/share/Trash.
-  ;; Files owned by user and trashed by root are trashed in
-  ;; /home/.Trash.
-  ;; Files owned by user and trashed by user are trashed in
-  ;; ~/.local/share/Trash.
-  (cl-loop for f in (directory-files
-                     (expand-file-name
-                      ;; helm-ff-default-directory is actually the
-                      ;; trash directory.
-                      "info" (helm-basedir (directory-file-name
-                                            (or trash-dir helm-ff-default-directory))))
-                     t directory-files-no-dot-files-regexp)
-           collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo\\'" "" f))
-                         (with-temp-buffer
-                           (save-excursion
-                             (insert-file-contents f))
-                           (when (re-search-forward "^path=" nil t)
-                             (let ((path (helm-url-unhex-string
-                                          (buffer-substring-no-properties
-                                           (point) (point-at-eol)))))
-                               (if (string-match "\\`/" path)
-                                   ;; path is absolute
-                                   path
-                                 ;; When path is relative, assume the
-                                 ;; trash directory is located at
-                                 ;; /home/.Trash and path is the
-                                 ;; relative name of file from /home.
-                                 (expand-file-name path "/home"))))))))
+  (unless (fboundp 'system-move-file-to-trash)
+    ;; Files owned by root are trashed in /root/.local/share/Trash.
+    ;; Files owned by user and trashed by root are trashed in
+    ;; /home/.Trash.
+    ;; Files owned by user and trashed by user are trashed in
+    ;; ~/.local/share/Trash.
+    (cl-loop for f in (directory-files
+                       (expand-file-name
+                        ;; helm-ff-default-directory is actually the
+                        ;; trash directory.
+                        "info" (helm-basedir (directory-file-name
+                                              (or trash-dir helm-ff-default-directory))))
+                       t directory-files-no-dot-files-regexp)
+             collect (cons (helm-basename (replace-regexp-in-string "\\.trashinfo\\'" "" f))
+                           (with-temp-buffer
+                             (save-excursion
+                               (insert-file-contents f))
+                             (when (re-search-forward "^path=" nil t)
+                               (let ((path (helm-url-unhex-string
+                                            (buffer-substring-no-properties
+                                             (point) (point-at-eol)))))
+                                 (if (string-match "\\`/" path)
+                                     ;; path is absolute
+                                     path
+                                   ;; When path is relative, assume the
+                                   ;; trash directory is located at
+                                   ;; /home/.Trash and path is the
+                                   ;; relative name of file from /home.
+                                   (expand-file-name path "/home")))))))))
 
 (defun helm-ff-goto-linum (candidate)
   "Find file CANDIDATE and maybe jump to line number found in fname at point.
