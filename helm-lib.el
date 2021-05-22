@@ -395,16 +395,19 @@ available APPEND is ignored."
 
 ;;; Command loop helper
 ;;
+(defconst helm-this-command-black-list
+  '(helm-maybe-exit-minibuffer
+    helm-confirm-and-exit-minibuffer
+    helm-exit-minibuffer
+    exit-minibuffer
+    helm-M-x))
+
 (defun helm-this-command ()
   "Return the actual command in action.
 Like `this-command' but return the real command, and not
 `exit-minibuffer' or other unwanted functions."
-  (cl-loop with bl = '(helm-maybe-exit-minibuffer
-                       helm-confirm-and-exit-minibuffer
-                       helm-exit-minibuffer
-                       exit-minibuffer)
-           for count from 1 to 50
-           for btf = (backtrace-frame count)
+  (cl-loop for count from 1 to 50
+           for btf = (backtrace-frame count this-command)
            for fn = (cl-second btf)
            if (and
                ;; In some case we may have in the way an
@@ -412,7 +415,7 @@ Like `this-command' but return the real command, and not
                ;; ignore it (Bug#691).
                (symbolp fn)
                (commandp fn)
-               (not (memq fn bl)))
+               (not (memq fn helm-this-command-black-list)))
            return fn
            else
            if (and (eq fn 'call-interactively)
