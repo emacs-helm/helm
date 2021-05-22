@@ -4626,7 +4626,7 @@ emacs-27 to provide such scoring in emacs<27."
   "Same as `while-no-input' but returns either BODY or nil.
 Unlike `while-no-input' this macro ensure to not returns `t'."
   (declare (debug t) (indent 0))
-  (helm-with-gensyms (catch-sym)
+  (let ((catch-sym (make-symbol "input")))
     `(with-local-quit
        (catch ',catch-sym
          (let ((throw-on-input ',catch-sym)
