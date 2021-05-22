@@ -3993,7 +3993,7 @@ Trash/info directory."
 
 The Trash directory should be a directory compliant with
 <http://freedesktop.org/wiki/Specifications/trash-spec> and each
-file should have its '*.trashinfo' correspondent file in
+file should have its '*.trashinfo' corresponding file in
 Trash/info directory."
   (let* ((default-directory (file-name-as-directory
                              helm-ff-default-directory))
