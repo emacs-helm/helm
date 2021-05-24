@@ -241,7 +241,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
     :candidates (lambda ()
                   (funcall helm-google-suggest-default-function))
     :action 'helm-google-suggest-actions
-    :volatile t
+    :match-dynamic t
     :keymap helm-map
     :requires-pattern 3))
 
