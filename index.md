@@ -44,8 +44,9 @@
     - [Installing just the helm-core package](#installing-just-the-helm-core-package)
     - [Warning about alternate installation methods](#warning-about-alternate-installation-methods)
     - [Configuration](#configuration)
+    - [General recommandations](#general-recommandations)
     - [Basic usage](#basic-usage)
-    - [Advanced usage](#advanced-usage)
+        - [Windows and frames configuration](#windows-and-frames-configuration)
         - [Matching methods](#matching-methods)
         - [Creating custom helm sources](#creating-custom-helm-sources)
 - [Helm Applications](#helm-applications)
@@ -213,7 +214,7 @@ Helm allows displaying its candidates in several ways, side windows, frames, one
 You will find the documentation with `C-h m` as usual or on wiki, use as well `C-h c` to see the relevant variables you can set.
 Here helm started from emacs-helm.sh script and displaying its candidates in a separate frame:
 
-[Helm displayed in frame](images/helm-displayed-in-a-separate-frame.gif)
+![Helm displayed in frame](images/helm-displayed-in-a-separate-frame.gif)
 
 ### Matching methods
 
