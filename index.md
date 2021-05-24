@@ -150,6 +150,17 @@ Also see helm customizable variables with the customize interface.
 Enabling `helm-mode` will enable helm for many features of emacs
 requiring completions, see below how to enable `helm-mode`.
 
+## General recommandations
+
+- When you have problems like Helm beeing slow or something not working, always fallback to default settings.
+
+- Configure Helm yourself, don't use preconfigured Emacs that configure wrongly Helm for you.
+
+- Refrain installing all Helm packages you find in Melpa, check first if the feature you are looking for is available in Helm.
+
+- Nowaday, there is dozen of completion UI available for Emacs, refrain using many of those in addition with Helm unless you know what you are doing.
+
+
 ## Basic usage
 
 `M-x helm-M-x RET helm-` lists helm commands ready for narrowing and selecting.
@@ -160,7 +171,7 @@ To bind to `M-x`:
 
 - _IMPORTANT:_
 
-In any helm session, as soon there is candidates in the helm buffer
+In any helm session,
 
 `C-h m` pops an org buffer with detailed documentation about current command and more generalized infos about helm.
 
@@ -180,6 +191,8 @@ To make helm-mode start with Emacs init file:
 ```elisp
 (helm-mode 1)
 ```
+NOTE: `helm-mode` is using Emacs `completion-styles` by default, you may want to configure your `completion-styles` for a better experience.
+The recommended setting is to use `(setq completion-styles '(flex))` if flex is available in your Emacs (27+ only) otherwhise use the helm-flex style (emacs-26).
 
 To discover basic helm commands, look at helm menu item in Emacs menu. 
 
@@ -190,35 +203,17 @@ options. `emacs-helm.sh -h` opens an Info screen with more details.
 
 _Note:_ When helm is installed with "make install" 
 you will have a shell command named helm that you can run from any
-places i.e. not only the helm directory
+places i.e. not only from the helm directory
 
 See https://github.com/emacs-helm/helm/wiki#quick-try-with-emacs-helmsh
 
-## Advanced usage
+### Windows and frames configuration
 
-Helm contains many features, some of which are easier to follow
-visually. Here is a demo of `helm-buffers-list` used with
-`helm-moccur`. Demo starts with `Eval: START` in the minibuffer.
+Helm allows displaying its candidates in several ways, side windows, frames, one window etc...
+You will find the documentation with `C-h m` as usual or on wiki, use as well `C-h c` to see the relevant variables you can set.
+Here helm started from emacs-helm.sh script and displaying its candidates in a separate frame:
 
-![helm-buffers-list](images/helm-buffers-list.gif)
-
-- Regexp `*C` selects the C buffers. `*Tcl` in the demo selects TCL
-  buffers, then with `*C` switches back to C buffers.
-- For buffers containing the string "crash", the demo adds a space,
-  then the pattern `@crash`.
-- Matching buffers are then handed over to `helm-moccur` - `moccur`
-  with its own Helm interface. The demo shows switching to a
-  single file, `kexec.c`. Multiple selections can be made with
-  `C-SPC`. `M-a` selects all.
-- Adding characters to the pattern gradually filters (narrows) the
-  available candidates. By adding `memory`, the buffers shown now
-  include those buffers with "crash" and "memory".
-
-With more pattern matching, candidates are narrowed down from the
-initial 253 buffers to 12 as shown in the modeline. 
-
-[Helm Wiki](https://github.com/emacs-helm/helm/wiki) provide
-additional details.
+[Helm displayed in frame](images/helm-displayed-in-a-separate-frame.gif)
 
 ### Matching methods
 
@@ -327,7 +322,7 @@ deprecated or unmaintained. Moreover, many remain out-of-sync with
 helm problems or unstable emacs, please look for comparable features
 within [helm](https://github.com/emacs-helm/helm) and
 [emacs-helm](https://github.com/emacs-helm) before installing such
-extensions.
+extensions e.g. helm-swoop vs helm-occur which is part of Helm.
 
 # Other emacs extensions recommended with helm
 
