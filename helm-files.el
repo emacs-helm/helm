@@ -3366,7 +3366,7 @@ in cache."
                               collect it)
                      helm-ff--list-directory-cache)
           ;; Put an inotify watcher to check directory modifications.
-          (unless (or helm-ff-use-notify
+          (unless (or (null helm-ff-use-notify)
                       (gethash directory helm-ff--file-notify-watchers))
             (condition-case-unless-debug err
                 (puthash directory
