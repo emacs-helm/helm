@@ -4785,7 +4785,7 @@ without recomputing them, it should be a list of lists."
              (helm-aif (assq 'requires-pattern source) (or (cdr it) 1) 0))
          ;; Entering repeatedly these strings (*, ?) takes 100% CPU
          ;; and hang emacs on MacOs preventing deleting backward those
-         ;; characters (Bug#1802). Update it seems it is no more true,
+         ;; characters (Bug#1802). Update: it seems it is no more true,
          ;; thus this affect bug#2423, so let's remove this for now.
          ;; (not (string-match-p "\\`[*]+\\'" helm-pattern))
          ;; These incomplete regexps hang helm forever
