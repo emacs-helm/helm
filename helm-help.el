@@ -1127,6 +1127,12 @@ You may have in some rare cases to refresh directory manually with `\\<helm-map>
 for example when helm-find-files session is running and a file is modified/deleted
 in current visited directory by an external command from outside Emacs.
 
+NOTE: Helm is using file-notify to watch visited directories,
+nowaday most systems come with a notify package but if your
+system doesn't support this, you can turn off file notifications
+by customizing the variable `helm-ff-use-notify'. In this case
+you will have to refresh manually directories when needed with `\\<helm-map>\\[helm-refresh]'.
+
 ** Commands
 \\<helm-find-files-map>
 |Keys|Description

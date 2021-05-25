@@ -3314,6 +3314,18 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
+(defcustom helm-ff-use-notify t
+  "Watch directories visited with `helm-find-files' when non nil.
+If your system have no file notification package available turn this
+to nil to avoid error messages when using `helm-find-files'."
+  :type 'boolean
+  :group 'helm-files
+  :set (lambda (var val)
+	 (set-default var val)
+	 (unless (symbol-value var)
+           (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
+                    do (remhash dir helm-ff--list-directory-cache)))))
+
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3354,13 +3366,16 @@ in cache."
                               collect it)
                      helm-ff--list-directory-cache)
           ;; Put an inotify watcher to check directory modifications.
-          (unless (gethash directory helm-ff--file-notify-watchers)
-            (puthash directory
-                     (file-notify-add-watch
-                      directory
-                      '(change attribute-change)
-                      (helm-ff--inotify-make-callback directory))
-                     helm-ff--file-notify-watchers))))))
+          (unless (or helm-ff-use-notify
+                      (gethash directory helm-ff--file-notify-watchers))
+            (condition-case err
+                (puthash directory
+                         (file-notify-add-watch
+                          directory
+                          '(change attribute-change)
+                          (helm-ff--inotify-make-callback directory))
+                         helm-ff--file-notify-watchers)
+              (file-notify-error "Error: %S %S" (car err) (cdr err))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
