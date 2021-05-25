@@ -3368,14 +3368,14 @@ in cache."
           ;; Put an inotify watcher to check directory modifications.
           (unless (or helm-ff-use-notify
                       (gethash directory helm-ff--file-notify-watchers))
-            (condition-case err
+            (condition-case-unless-debug err
                 (puthash directory
                          (file-notify-add-watch
                           directory
                           '(change attribute-change)
                           (helm-ff--inotify-make-callback directory))
                          helm-ff--file-notify-watchers)
-              (file-notify-error "Error: %S %S" (car err) (cdr err))))))))
+              (file-notify-error (user-error "Error: %S %S" (car err) (cdr err)))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
