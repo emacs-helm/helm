@@ -4831,13 +4831,13 @@ Find inside `require' and `declare-function' sexp."
              when (eq (car (file-attributes cd)) t)
              return cd)))
 
-(cl-defun helm-dired-action (candidate
+(cl-defun helm-dired-action (destination
                              &key action follow (files (dired-get-marked-files)))
-  "Execute ACTION on FILES to CANDIDATE.
+  "Execute ACTION on FILES to DESTINATION.
 Where ACTION is a symbol that can be one of:
 'copy, 'rename, 'symlink,'relsymlink, 'hardlink or 'backup.
 Argument FOLLOW when non-nil specifies to follow FILES to
-destination for the actions copy and rename."
+DESTINATION for the actions copy and rename."
   (require 'dired-async)
   (require 'dired-x) ; For dired-keep-marker-relsymlink
   (when (get-buffer dired-log-buffer) (kill-buffer dired-log-buffer))
@@ -4860,51 +4860,55 @@ destination for the actions copy and rename."
                   (hardlink             dired-keep-marker-hardlink)))
         (dirflag (and (= (length files) 1)
                       (file-directory-p (car files))
-                      (not (file-directory-p candidate))))
+                      (not (file-directory-p destination))))
         (dired-async-state (if (and (boundp 'dired-async-mode)
                                     dired-async-mode)
                                1 -1)))
     (and follow (fboundp 'dired-async-mode) (dired-async-mode -1))
-    (when (and (cdr files) (not (file-directory-p candidate)))
-      (error "%s: target `%s' is not a directory" action candidate))
+    (when (and (cdr files) (not (file-directory-p destination)))
+      (error "%s: target `%s' is not a directory" action destination))
     (unwind-protect
          (dired-create-files
           fn (symbol-name action) files
-          ;; CANDIDATE is the destination.
-          (if (file-directory-p candidate)
-              ;; When CANDIDATE is a directory, build file-name in this directory.
-              ;; Else we use CANDIDATE.
+          (if (file-directory-p destination)
+              ;; When DESTINATION is a directory, build file-name in this directory.
+              ;; Else we use DESTINATION.
               (lambda (from)
-                  (expand-file-name (file-name-nondirectory from) candidate))
-              (lambda (_from) candidate))
+                  (expand-file-name (file-name-nondirectory from) destination))
+              (lambda (_from) destination))
           marker)
       (and (fboundp 'dired-async-mode)
            (dired-async-mode dired-async-state)))
     (push (file-name-as-directory
-           (if (file-directory-p candidate)
-               (expand-file-name candidate)
-             (file-name-directory candidate)))
+           (if (file-directory-p destination)
+               (expand-file-name destination)
+             (file-name-directory destination)))
           helm-ff-history)
     ;; If follow is non--nil we should not be in async mode.
     (when (and follow
                (not (memq action '(symlink relsymlink hardlink)))
                (not (get-buffer dired-log-buffer)))
-      (let ((target (directory-file-name candidate)))
+      (let ((target (directory-file-name destination)))
         (unwind-protect
              (progn
                (setq helm-ff-cand-to-mark
-                     (helm-get-dest-fnames-from-list files candidate dirflag))
+                     (helm-get-dest-fnames-from-list files destination dirflag))
                (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
-               ;; Refresh directory even if helm-ff-cache-mode is
-               ;; enabled, it will not have the time to update
-               ;; destination directory.
-               (helm-ff-directory-files candidate t)
-               (if (and dirflag (eq action 'rename))
-                   (helm-find-files-1 (file-name-directory target)
-                                      (if helm-ff-transformer-show-only-basename
-                                          (helm-basename target) target))
-                 (helm-find-files-1 (file-name-as-directory
-                                     (expand-file-name candidate)))))
+               ;; Wait for the notify callback ends before calling HFF.
+               (run-at-time
+                0.1 nil
+                (lambda ()
+                  (if (and dirflag (eq action 'rename))
+                      (helm-find-files-1 (file-name-directory target)
+                                         (if helm-ff-transformer-show-only-basename
+                                             (helm-basename target) target))
+                    (helm-find-files-1 (if (file-directory-p destination)
+                                           (file-name-as-directory
+                                            (expand-file-name destination))
+                                         (expand-file-name (helm-basedir destination)))
+                                       (if helm-ff-transformer-show-only-basename
+                                           (helm-basename (car files))
+                                         (car files)))))))
           (setq helm-ff-cand-to-mark nil))))))
 
 (defun helm-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
