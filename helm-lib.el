@@ -407,7 +407,7 @@ available APPEND is ignored."
 Like `this-command' but return the real command, and not
 `exit-minibuffer' or other unwanted functions."
   (cl-loop for count from 1 to 50
-           for btf = (backtrace-frame count this-command)
+           for btf = (backtrace-frame count)
            for fn = (cl-second btf)
            if (and
                ;; In some case we may have in the way an
