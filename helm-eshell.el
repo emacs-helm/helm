@@ -163,7 +163,7 @@ at point."
                                    (if (file-remote-p i) i
                                      (expand-file-name
                                       i (file-name-directory
-                                         (if (file-directory-p pcomplete-stub)
+                                         (if (directory-name-p pcomplete-stub)
                                              entry
                                            (directory-file-name entry))))))
               ;; Compare them to avoid dups.
