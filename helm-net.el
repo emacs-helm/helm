@@ -259,7 +259,7 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 
 (defvar helm-browse-url-chromium-program "chromium-browser")
 (defvar helm-browse-url-uzbl-program "uzbl-browser")
-(defvar helm-browse-url-next-program "next")
+(defvar helm-browse-url-nyxt-program "nyxt")
 (defvar helm-browse-url-conkeror-program "conkeror")
 (defvar helm-browse-url-opera-program "opera")
 (defvar helm-browse-url-default-browser-alist
@@ -345,10 +345,10 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
   (helm-generic-browser url helm-browse-url-conkeror-program))
 
 ;;;###autoload
-(defun helm-browse-url-next (url &optional _ignore)
+(defun helm-browse-url-nyxt (url &optional _ignore)
   "Browse URL with next browser."
   (interactive "sURL: ")
-  (helm-generic-browser url helm-browse-url-next-program))
+  (helm-generic-browser url helm-browse-url-nyxt-program))
 
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
