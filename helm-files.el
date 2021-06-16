@@ -3945,7 +3945,17 @@ ARGS are other arguments to be passed to FN."
         errors aborted)
     (with-helm-display-marked-candidates
         helm-marked-buffer-name
-        (helm-ff--count-and-collect-dups (mapcar 'helm-basename mkd))
+        (if (and args (string= (car names) "restore"))
+            (cl-loop for f in mkd
+                     for bd = (helm-basename f)
+                     for assoc = (assoc bd (car args))
+                     when assoc
+                     collect (concat (truncate-string-to-width
+                                      (car assoc) 40 nil nil t)
+                                     " -> "
+                                     (truncate-string-to-width
+                                      (helm-basedir (cdr assoc)) 40 nil nil t)))
+          (helm-ff--count-and-collect-dups (mapcar 'helm-basename mkd)))
         (if (y-or-n-p (format "%s %s files from trash? "
                               (capitalize (car names))
                               (length mkd)))
