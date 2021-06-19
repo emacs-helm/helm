@@ -2870,7 +2870,9 @@ HISTORY args see `helm'."
               ;; helm-read-from-minibuffer).
               (unless helm-execute-action-at-once-if-one
                 (helm-display-buffer helm-buffer resume)
-                (select-window (helm-window)))
+                (select-window (helm-window))
+                (when (and resume helm-visible-mark-overlays)
+                  (set-window-margins (selected-window) 1)))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
