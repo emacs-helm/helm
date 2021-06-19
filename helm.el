@@ -887,6 +887,11 @@ You can toggle later `truncate-lines' with
 \\<helm-map>\\[helm-toggle-truncate-line]."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-visible-mark-prefix "✓"
+  "Prefix used in margin for marked candidates."
+  :group 'helm
+  :type 'string)
 
 ;;; Faces
 ;;
@@ -6960,6 +6965,11 @@ Meaning of prefix ARG is the same as in `reposition-window'."
     (overlay-put o 'source (assoc-default 'name source))
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
     (overlay-put o 'real sel)
+    (overlay-put o 'before-string (propertize " " 'display
+                                              `((margin left-margin)
+                                                ,(propertize
+                                                  helm-visible-mark-prefix
+                                                  'face 'default))))
     (overlay-put o 'visible-mark t)
     (cl-pushnew o helm-visible-mark-overlays)
     (push (cons source sel) helm-marked-candidates)))
@@ -6986,7 +6996,9 @@ If ARG is negative toggle backward."
                          (progn
                            (helm-display-mode-line (helm-get-current-source))
                            (cl-return nil))
-                       (funcall (cdr next-fns))))))))))
+                       (funcall (cdr next-fns)))))
+          (set-window-margins (selected-window)
+                              (if helm-visible-mark-overlays 1 0)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
 (defun helm-toggle-visible-mark-forward ()
@@ -7012,7 +7024,9 @@ With a prefix arg mark all visible unmarked candidates in all
 sources."
   (interactive "P")
   (with-helm-alive-p
-    (with-helm-window ; Using `with-helm-buffer' for some unknow reasons infloop.
+    (with-helm-window ; Using `with-helm-buffer' for some unknow
+                      ; reasons infloop.
+      (set-window-margins (selected-window) 1)
       (if (null all)
           (helm-mark-all-1 t)
         (let ((pos (point)))
@@ -7099,7 +7113,8 @@ starting it is not needed."
         (helm-clear-visible-mark))
       (setq helm-marked-candidates nil)
       (helm-mark-current-line)
-      (helm-display-mode-line (helm-get-current-source)))))
+      (helm-display-mode-line (helm-get-current-source))
+      (set-window-margins (selected-window) 0))))
 (put 'helm-unmark-all 'helm-only t)
 
 (defun helm-toggle-all-marks (&optional all)
