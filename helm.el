@@ -6971,6 +6971,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
                                                   helm-visible-mark-prefix
                                                   'face 'default))))
     (overlay-put o 'visible-mark t)
+    (overlay-put o 'evaporate t)
     (cl-pushnew o helm-visible-mark-overlays)
     (push (cons source sel) helm-marked-candidates)))
 
