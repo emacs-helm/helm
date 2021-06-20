@@ -887,6 +887,11 @@ You can toggle later `truncate-lines' with
 \\<helm-map>\\[helm-toggle-truncate-line]."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-visible-mark-prefix "✓"
+  "Prefix used in margin for marked candidates."
+  :group 'helm
+  :type 'string)
 
 ;;; Faces
 ;;
@@ -2865,7 +2870,9 @@ HISTORY args see `helm'."
               ;; helm-read-from-minibuffer).
               (unless helm-execute-action-at-once-if-one
                 (helm-display-buffer helm-buffer resume)
-                (select-window (helm-window)))
+                (select-window (helm-window))
+                (when (and resume helm-visible-mark-overlays)
+                  (set-window-margins (selected-window) 1)))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
@@ -6957,10 +6964,16 @@ Meaning of prefix ARG is the same as in `reposition-window'."
          (o (make-overlay (point-at-bol) selection-end)))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
-    (overlay-put o 'source (assoc-default 'name source))
+    (overlay-put o 'source source)
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
     (overlay-put o 'real sel)
+    (overlay-put o 'before-string (propertize " " 'display
+                                              `((margin left-margin)
+                                                ,(propertize
+                                                  helm-visible-mark-prefix
+                                                  'face 'default))))
     (overlay-put o 'visible-mark t)
+    (overlay-put o 'evaporate t)
     (cl-pushnew o helm-visible-mark-overlays)
     (push (cons source sel) helm-marked-candidates)))
 
@@ -6986,7 +6999,9 @@ If ARG is negative toggle backward."
                          (progn
                            (helm-display-mode-line (helm-get-current-source))
                            (cl-return nil))
-                       (funcall (cdr next-fns))))))))))
+                       (funcall (cdr next-fns)))))
+          (set-window-margins (selected-window)
+                              (if helm-visible-mark-overlays 1 0)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
 (defun helm-toggle-visible-mark-forward ()
@@ -7012,7 +7027,9 @@ With a prefix arg mark all visible unmarked candidates in all
 sources."
   (interactive "P")
   (with-helm-alive-p
-    (with-helm-window ; Using `with-helm-buffer' for some unknow reasons infloop.
+    (with-helm-window ; Using `with-helm-buffer' for some unknow
+                      ; reasons infloop.
+      (set-window-margins (selected-window) 1)
       (if (null all)
           (helm-mark-all-1 t)
         (let ((pos (point)))
@@ -7099,7 +7116,8 @@ starting it is not needed."
         (helm-clear-visible-mark))
       (setq helm-marked-candidates nil)
       (helm-mark-current-line)
-      (helm-display-mode-line (helm-get-current-source)))))
+      (helm-display-mode-line (helm-get-current-source))
+      (set-window-margins (selected-window) 0))))
 (put 'helm-unmark-all 'helm-only t)
 
 (defun helm-toggle-all-marks (&optional all)
@@ -7185,18 +7203,29 @@ sources."
   (with-current-buffer helm-buffer
     (save-excursion
       (cl-dolist (o helm-visible-mark-overlays)
-        (let ((o-src-str (overlay-get o 'source))
-              (o-str (overlay-get o 'string))
-              beg end)
+        (let* ((source (overlay-get o 'source))
+               (ov-src-name (assoc-default 'name source))
+               (ov-str (overlay-get o 'string))
+               (ov-real (overlay-get o 'real))
+               (ov-ml-str (helm-aif (helm-get-attr 'multiline source)
+                              (if (numberp it)
+                                  ;; Assume display have been computed
+                                  ;; against real e.g. kill-ring.
+                                  (helm--multiline-get-truncated-candidate
+                                   ov-real it)
+                                ov-str)
+                            ov-str))
+               beg end)
           ;; Move point to end of source header line.
           (goto-char (point-min))
-          (search-forward o-src-str nil t)
-          (while (and (search-forward o-str nil t)
+          (search-forward ov-src-name nil t)
+          (while (and (search-forward ov-ml-str nil t)
                       (cl-loop for ov in (overlays-at (point-at-bol 0))
                                never (overlay-get ov 'visible-mark))
-                      (helm-current-source-name= o-src-str))
+                      (helm-current-source-name= ov-src-name))
             (setq beg (match-beginning 0)
-                  end (match-end 0))
+                  end (if (string= ov-ml-str ov-str)
+                          (match-end 0) (1+ (match-end 0))))
             ;; Calculate real value of candidate.
             ;; It can be nil if candidate have only a display value.
             (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
@@ -7206,9 +7235,9 @@ sources."
                   ;; This is needed when some cands have same display names.
                   ;; Using equal allow testing any type of value for real cand.
                   ;; bug#706.
-                  (and (equal (overlay-get o 'real) real)
+                  (and (equal ov-real real)
                        (move-overlay o beg end))
-                (and (equal o-str (buffer-substring beg end))
+                (and (equal ov-str (buffer-substring beg end))
                      (move-overlay o beg end))))))))))
 (add-hook 'helm-after-update-hook 'helm-revive-visible-mark)
 
