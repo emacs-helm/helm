@@ -7210,10 +7210,11 @@ sources."
                (ov-ml-str (helm-aif (helm-get-attr 'multiline source)
                               (if (numberp it)
                                   ;; Assume display have been computed
-                                  ;; against real.
+                                  ;; against real e.g. kill-ring.
                                   (helm--multiline-get-truncated-candidate
                                    ov-real it)
-                                ov-str)))
+                                ov-str)
+                            ov-str))
                beg end)
           ;; Move point to end of source header line.
           (goto-char (point-min))
