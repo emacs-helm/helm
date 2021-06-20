@@ -367,7 +367,7 @@ described above to reproduce your bug.
 # Getting help
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki) and
-[emacs-helm Google group](https://groups.google.com/group/emacs-helm?hl=en)
+[Emacshelm on Reddit](https://www.reddit.com/r/emacshelm/)
 are two readily available locations.
 
 Cheers,<br>
