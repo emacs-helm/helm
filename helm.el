@@ -3648,7 +3648,10 @@ Unuseful when used outside Helm, don't use it.")
       (set (make-local-variable 'buffer-read-only) nil)
       (buffer-disable-undo)
       (erase-buffer)
-      (set (make-local-variable 'helm-map) helm-map)
+      ;; Use this instead of setting helm-map local ensure we have all
+      ;; our keys when helm loose minibuffer focus.  And the map is
+      ;; made local as well AFAIU.
+      (use-local-map helm-map)
       (set (make-local-variable 'helm-source-filter) nil)
       (make-local-variable 'helm-sources)
       (set (make-local-variable 'helm-display-function) nil)
