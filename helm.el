@@ -1024,6 +1024,11 @@ You can toggle later `truncate-lines' with
   "Face for empty line at end of sources in the Helm buffer.
 Allow specifying the height of this line."
   :group 'helm-faces)
+
+(defface helm-mark-prefix
+  `((t :inherit default))
+  "Face for string `helm-visible-mark-prefix'."
+  :group 'helm-faces)
 
 ;;; Variables.
 ;;
@@ -6975,7 +6980,7 @@ Meaning of prefix ARG is the same as in `reposition-window'."
                                               `((margin left-margin)
                                                 ,(propertize
                                                   helm-visible-mark-prefix
-                                                  'face 'default))))
+                                                  'face 'helm-mark-prefix))))
     (overlay-put o 'visible-mark t)
     (overlay-put o 'evaporate t)
     (cl-pushnew o helm-visible-mark-overlays)
