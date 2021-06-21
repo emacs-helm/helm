@@ -888,7 +888,7 @@ You can toggle later `truncate-lines' with
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-visible-mark-prefix "✓"
+(defcustom helm-visible-mark-prefix "*"
   "Prefix used in margin for marked candidates."
   :group 'helm
   :type 'string)
