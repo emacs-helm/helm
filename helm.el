@@ -5071,9 +5071,11 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
   (with-helm-alive-p
     (cl-assert (boundp 'display-line-numbers) nil
                "`display-line-numbers' not available")
-    (with-helm-buffer
-      (setq display-line-numbers
-            (and helm-display-line-numbers-mode 'relative)))))
+    (if helm-display-line-numbers-mode
+        (with-helm-buffer
+          (setq display-line-numbers 'relative))
+      (with-helm-buffer
+        (setq display-line-numbers nil)))))
 (put 'helm-display-line-numbers-mode 'helm-only t)
 
 
