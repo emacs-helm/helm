@@ -9,3 +9,4 @@ ox-texinfo.el
 TAGS
 helm-autoloads.el
 ID
+doc/*
