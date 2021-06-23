@@ -38,8 +38,8 @@
   :group 'helm-command
   :type 'boolean)
 
-(defcustom helm-M-x-use-completion-styles t
-  "Use `completion-styles' and dynamic completion when non nil."
+(defcustom helm-M-x-fuzzy-match t
+  "Helm-M-x fuzzy matching when non nil."
   :group 'helm-command
   :type 'boolean)
 
@@ -244,13 +244,13 @@ default to `extended-command-history'."
                                 ;; Ensure using empty string to
                                 ;; not defeat helm matching fns [1]
                                 pred nil nil ""))
-                       :fuzzy-match t)
+                       :fuzzy-match helm-M-x-fuzzy-match)
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
                        :data (lambda ()
                                (helm-comp-read-get-candidates
                                 ;; [1] Same comment as above.
                                 collection pred nil nil ""))
-                       :fuzzy-match t)))
+                       :fuzzy-match helm-M-x-fuzzy-match)))
          (prompt (concat (cond
                           ((eq helm-M-x-prefix-argument '-) "- ")
                           ((and (consp helm-M-x-prefix-argument)
