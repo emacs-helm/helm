@@ -241,7 +241,7 @@ Second call deletes backward char in current-buffer and quits helm completion,
 letting the user start a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
-(defcustom helm-completion-style 'emacs
+(defcustom helm-completion-style 'helm
   "Style of completion to use in `completion-in-region'.
 
 This affects only `completion-at-point' and friends, and
