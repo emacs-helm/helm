@@ -1251,9 +1251,12 @@ match everything but this.
 
 *** Completion-styles
 
-UPDATE: After version 3.7.1 Helm default is to NOT use
-`completion-styles' by default i.e. now `helm-completion-style'
-default to 'helm and no more to 'emacs.
+UPDATE: At version 3.8.0 Helm default is now to NOT use
+`completion-styles' i.e. now `helm-completion-style' default to
+'helm and no more to 'emacs.
+
+If you want to use `completion-styles' in Helm customize
+`helm-completion-style' to 'emacs.
 
 Helm generally fetches its candidates with the :candidates
 function up to `helm-candidate-number-limit' and then applies
@@ -1264,11 +1267,12 @@ Helm provides 'helm completion style but also 'helm-flex
 completion style for Emacs<27 that don't have 'flex completion
 style, otherwise (emacs-27) 'flex completion style is used to
 provide fuzzy aka flex completion.
-By default, like in Emacs vanilla, all completion commands \(e.g.,
-`completion-at-point') using `completion-in-region' or
-`completing-read' use `completion-styles'.
-Some Helm native commands like `helm-M-x' do use
-`completion-styles'.  Any Helm sources can use `completion-styles'
+
+When using helm-fuzzy as `helm-completion-style' helm use its own
+fuzzy implementation which have nothing to do with emacs `flex'
+style.
+
+Any Helm sources can use `completion-styles'
 by using :match-dynamic slot and building their :candidates
 function with `helm-dynamic-completion'.
 
