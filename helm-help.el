@@ -2201,14 +2201,6 @@ prefix arg will apply to `self-insert-command' (e.g. if you type
 `C-u e' \"eeee\" will be inserted in prompt) so select the
 command you want to execute before specifying prefix arg.
 
-*** Completion styles in helm-M-x
-
-Once `helm-M-x-use-completion-styles' is set to non nil, helm-M-x
-will use `completion-styles', if you want to enable fuzzy
-matching aka flex in addition to 'helm multi match style,
-add 'flex (emacs-27) or helm-flex (emacs-26) to `completion-styles'.
-See [[Completion-styles][Completion-styles]] for more infos.
-
 *** Duplicate entries in helm-M-x history
 
 helm-M-x history obey to history variables, if you have
