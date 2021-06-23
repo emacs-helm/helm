@@ -204,7 +204,7 @@ algorithm."
   (remove-hook 'helm-move-selection-after-hook
                'helm-M-x--move-selection-after-hook))
 
-(defclass helm-M-x-class (helm-source-sync helm-type-command)
+(defclass helm-M-x-class (helm-source-in-buffer helm-type-command)
   ((requires-pattern :initform 0)
    (must-match :initform t)
    (filtered-candidate-transformer :initform 'helm-M-x-transformer-no-sort)
@@ -228,47 +228,29 @@ suitable for `try-completion'.  Arg PREDICATE is a function that
 default to `commandp' see also `try-completion'.  Arg HISTORY
 default to `extended-command-history'."
   (let* ((helm--mode-line-display-prefarg t)
-         (minibuffer-completion-confirm t)
          (pred (or predicate #'commandp))
-         (metadata (unless (assq 'flex completion-styles-alist)
-                     '(metadata (display-sort-function
-                                 .
-                                 (lambda (candidates)
-                                   (sort candidates #'helm-generic-sort-fn))))))
          (helm-fuzzy-sort-fn (lambda (candidates _source)
                                ;; Sort on real candidate otherwise
                                ;; "symbol (<binding>)" is used when sorting.
                                (helm-fuzzy-matching-default-sort-fn-1 candidates t)))
          (sources `(,(helm-make-source "Emacs Commands history" 'helm-M-x-class
-                       :match-dynamic helm-M-x-use-completion-styles
-                       :candidates
-                       (if helm-M-x-use-completion-styles
-                           (helm-dynamic-completion
-                            ;; A list of strings.
-                            (or history extended-command-history)
-                            (lambda (str) (funcall pred (intern-soft str)))
-                            nil 'nosort t)
-                         (lambda () (helm-comp-read-get-candidates
-                                     ;; History should be quoted to
-                                     ;; force `helm-comp-read-get-candidates'
-                                     ;; to use predicate against
-                                     ;; symbol and not string.
-                                     (or history 'extended-command-history)
-                                     ;; Ensure using empty string to
-                                     ;; not defeat helm matching fns [1]
-                                     pred nil nil "")))
-                       :fuzzy-match (null helm-M-x-use-completion-styles))
+                       :data (lambda ()
+                               (helm-comp-read-get-candidates
+                                ;; History should be quoted to
+                                ;; force `helm-comp-read-get-candidates'
+                                ;; to use predicate against
+                                ;; symbol and not string.
+                                (or history 'extended-command-history)
+                                ;; Ensure using empty string to
+                                ;; not defeat helm matching fns [1]
+                                pred nil nil ""))
+                       :fuzzy-match t)
                     ,(helm-make-source "Emacs Commands" 'helm-M-x-class
-                       :match-dynamic helm-M-x-use-completion-styles
-                       :candidates
-                       (if helm-M-x-use-completion-styles
-                           (helm-dynamic-completion
-                            collection pred
-                            nil metadata t)
-                         (lambda () (helm-comp-read-get-candidates
-                                     ;; [1] Same comment as above.
-                                     collection pred nil nil "")))
-                       :fuzzy-match (null helm-M-x-use-completion-styles))))
+                       :data (lambda ()
+                               (helm-comp-read-get-candidates
+                                ;; [1] Same comment as above.
+                                collection pred nil nil ""))
+                       :fuzzy-match t)))
          (prompt (concat (cond
                           ((eq helm-M-x-prefix-argument '-) "- ")
                           ((and (consp helm-M-x-prefix-argument)
