@@ -635,7 +635,8 @@ buffers)."
       (helm-mark-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
-        (message "%s candidates marked" (length helm-marked-candidates))))))
+        (message "%s candidates marked" (length helm-marked-candidates))
+        (set-window-margins (selected-window) 1)))))
 
 (defun helm-buffers-mark-similar-buffers ()
     "Mark All buffers that have same property `type' than current.
