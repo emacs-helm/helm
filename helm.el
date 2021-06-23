@@ -3715,7 +3715,17 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
                                      resize-mini-windows))
            (first-src (car helm-sources))
            (source-process-p (or (assq 'candidates-process src)
-                                 (assq 'candidates-process first-src))))
+                                 (assq 'candidates-process first-src)))
+           ;; As we are using `helm-keyboard-quit' for `C-g' we have
+           ;; to prevent emacs command loop redefining `C-g' during
+           ;; helm-session. This happen only on async source with
+           ;; large output after a certain delay. The effect is that
+           ;; the minibuffer is exited but the helm async process
+           ;; continue running, and because minibuffer is lost `C-g'
+           ;; have no more effect. By binding `inhibit-quit' here we
+           ;; prevent this and allow `C-g' (the helm one aka
+           ;; `helm-keyboard-quit') to quit immediately.
+           (inhibit-quit source-process-p))
       (helm-log "helm-get-candidate-number => %S"
                 (helm-get-candidate-number))
       (helm-log "helm-execute-action-at-once-if-one = %S"
