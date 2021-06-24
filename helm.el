@@ -6024,7 +6024,6 @@ message 'no match'."
 If action buffer is displayed, kill it."
   (interactive)
   (with-helm-alive-p
-    (message "Aborting helm session")
     (when (get-buffer-window helm-action-buffer 'visible)
       (kill-buffer helm-action-buffer))
     (setq helm-exit-status 1)
