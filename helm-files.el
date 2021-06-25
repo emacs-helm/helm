@@ -1520,7 +1520,8 @@ this working."
                        for fcmd = (replace-regexp-in-string
                                    "\\\\@" (regexp-quote (file-name-sans-extension file))
                                    (replace-regexp-in-string
-                                    "\\\\#" (format "%03d" n) command))
+                                    "\\\\#" (format "%03d" n) command t t)
+                                   t t)
                        for com = (if (string-match "%s" fcmd)
                                      ;; [1] This allow to enter other args AFTER filename
                                      ;; i.e <command %s some_more_args>
