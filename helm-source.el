@@ -686,7 +686,7 @@
 
    (group
     :initarg :group
-    :initform helm
+    :initform 'helm
     :custom symbol
     :documentation
     "  The current source group, default to `helm' when not specified."))
