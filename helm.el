@@ -2881,7 +2881,8 @@ HISTORY args see `helm'."
                 (helm-display-buffer helm-buffer resume)
                 (select-window (helm-window))
                 (when (and resume helm-visible-mark-overlays)
-                  (set-window-margins (selected-window) 1)))
+                  (set-window-margins (selected-window)
+                                      (1+ helm-left-margin-width))))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
@@ -7025,7 +7026,9 @@ If ARG is negative toggle backward."
                            (cl-return nil))
                        (funcall (cdr next-fns)))))
           (set-window-margins (selected-window)
-                              (if helm-visible-mark-overlays 1 0)))))))
+                              (if helm-visible-mark-overlays
+                                  (1+ helm-left-margin-width)
+                                helm-left-margin-width)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
 (defun helm-toggle-visible-mark-forward ()
@@ -7053,7 +7056,7 @@ sources."
   (with-helm-alive-p
     (with-helm-window ; Using `with-helm-buffer' for some unknow
                       ; reasons infloop.
-      (set-window-margins (selected-window) 1)
+      (set-window-margins (selected-window) (1+ helm-left-margin-width))
       (if (null all)
           (helm-mark-all-1 t)
         (let ((pos (point)))
@@ -7141,7 +7144,7 @@ starting it is not needed."
       (setq helm-marked-candidates nil)
       (helm-mark-current-line)
       (helm-display-mode-line (helm-get-current-source))
-      (set-window-margins (selected-window) 0))))
+      (set-window-margins (selected-window) helm-left-margin-width))))
 (put 'helm-unmark-all 'helm-only t)
 
 (defun helm-toggle-all-marks (&optional all)
