@@ -5701,7 +5701,8 @@ Key arg DIRECTION can be one of:
                                                   helm-selection-overlay))
                                       (helm-end-of-source-p t)))
                  (helm-end-of-source-p t)))
-    (helm-move--beginning-of-source)))
+    (helm-move--beginning-of-source)
+    (helm-display-source-at-screen-top-maybe 'source)))
 
 (defun helm-move--previous-page-fn ()
   (condition-case nil
