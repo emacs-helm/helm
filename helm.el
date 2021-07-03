@@ -889,7 +889,8 @@ You can toggle later `truncate-lines' with
   :type 'boolean)
 
 (defcustom helm-visible-mark-prefix "*"
-  "Prefix used in margin for marked candidates."
+  "Prefix used in margin for marked candidates.
+Set this to an empty string if you don't want prefix in margin when marking."
   :group 'helm
   :type 'string)
 
@@ -2882,7 +2883,8 @@ HISTORY args see `helm'."
                 (select-window (helm-window))
                 (when (and resume helm-visible-mark-overlays)
                   (set-window-margins (selected-window)
-                                      (1+ helm-left-margin-width))))
+                                      (+ (length helm-visible-mark-prefix)
+                                         helm-left-margin-width))))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
                 (helm--remap-mouse-mode 1)) ; Disable mouse bindings.
@@ -7028,7 +7030,8 @@ If ARG is negative toggle backward."
                        (funcall (cdr next-fns)))))
           (set-window-margins (selected-window)
                               (if helm-visible-mark-overlays
-                                  (1+ helm-left-margin-width)
+                                  (+ (length helm-visible-mark-prefix)
+                                     helm-left-margin-width)
                                 helm-left-margin-width)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
 
@@ -7057,7 +7060,9 @@ sources."
   (with-helm-alive-p
     (with-helm-window ; Using `with-helm-buffer' for some unknow
                       ; reasons infloop.
-      (set-window-margins (selected-window) (1+ helm-left-margin-width))
+      (set-window-margins (selected-window)
+                          (+ (length helm-visible-mark-prefix)
+                             helm-left-margin-width))
       (if (null all)
           (helm-mark-all-1 t)
         (let ((pos (point)))
