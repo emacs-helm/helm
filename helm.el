@@ -889,9 +889,10 @@ You can toggle later `truncate-lines' with
   :type 'boolean)
 
 (defcustom helm-visible-mark-prefix "*"
-  "Prefix used in margin for marked candidates."
+  "Prefix used in margin for marked candidates.
+Set to nil to disable margin marks."
   :group 'helm
-  :type 'string)
+  :type '(choice string (const nil)))
 
 ;;; Faces
 ;;
@@ -6992,11 +6993,12 @@ Meaning of prefix ARG is the same as in `reposition-window'."
     (overlay-put o 'source source)
     (overlay-put o 'string (buffer-substring (overlay-start o) (overlay-end o)))
     (overlay-put o 'real sel)
-    (overlay-put o 'before-string (propertize " " 'display
-                                              `((margin left-margin)
-                                                ,(propertize
-                                                  helm-visible-mark-prefix
-                                                  'face 'helm-mark-prefix))))
+    (when helm-visible-mark-prefix
+      (overlay-put o 'before-string
+                   (propertize " " 'display
+                               `((margin left-margin)
+                                 ,(propertize helm-visible-mark-prefix
+                                              'face 'helm-mark-prefix)))))
     (overlay-put o 'visible-mark t)
     (overlay-put o 'evaporate t)
     (cl-pushnew o helm-visible-mark-overlays)
