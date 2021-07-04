@@ -2883,7 +2883,7 @@ HISTORY args see `helm'."
                 (select-window (helm-window))
                 (when (and resume helm-visible-mark-overlays)
                   (set-window-margins (selected-window)
-                                      (+ (length helm-visible-mark-prefix)
+                                      (+ (string-width helm-visible-mark-prefix)
                                          helm-left-margin-width))))
               ;; We are now in helm-buffer.
               (unless helm-allow-mouse
@@ -7030,7 +7030,7 @@ If ARG is negative toggle backward."
                        (funcall (cdr next-fns)))))
           (set-window-margins (selected-window)
                               (if helm-visible-mark-overlays
-                                  (+ (length helm-visible-mark-prefix)
+                                  (+ (string-width helm-visible-mark-prefix)
                                      helm-left-margin-width)
                                 helm-left-margin-width)))))))
 (put 'helm-toggle-visible-mark 'helm-only t)
@@ -7061,7 +7061,7 @@ sources."
     (with-helm-window ; Using `with-helm-buffer' for some unknow
                       ; reasons infloop.
       (set-window-margins (selected-window)
-                          (+ (length helm-visible-mark-prefix)
+                          (+ (string-width helm-visible-mark-prefix)
                              helm-left-margin-width))
       (if (null all)
           (helm-mark-all-1 t)
