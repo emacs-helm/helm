@@ -38,7 +38,8 @@
     ("Insert character code in hex" . helm-ucs-insert-code)
     ("Kill marked characters"       . helm-ucs-kill-char)
     ("Kill name"                    . helm-ucs-kill-name)
-    ("Kill code"                    . helm-ucs-kill-code))
+    ("Kill code"                    . helm-ucs-kill-code)
+    ("Describe char"                . helm-ucs-describe-char))
   "Actions for `helm-source-ucs'."
   :group 'helm-font
   :type '(alist :key-type string :value-type function))
@@ -237,6 +238,13 @@ name."
 (defun helm-ucs-kill-name (candidate)
   (helm-ucs-save-recentest candidate)
   (kill-new (helm-ucs-match candidate 3)))
+
+;; Describe char
+(defun helm-ucs-describe-char (candidate)
+  "Describe char CANDIDATE."
+  (with-temp-buffer
+    (insert (helm-ucs-match candidate 2))
+    (describe-char (point-min))))
 
 ;; Navigation in current-buffer (persistent)
 
