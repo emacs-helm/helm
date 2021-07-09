@@ -293,7 +293,7 @@ name."
 
 (defvar helm-source-ucs-recent
   (helm-build-sync-source "Recent UCS"
-    :action helm-ucs-actions
+    :action 'helm-ucs-actions
     :candidates (lambda () helm-ucs-recent)
     :help-message helm-ucs-help-message
     :keymap helm-ucs-map
@@ -306,7 +306,7 @@ name."
     :help-message 'helm-ucs-help-message
     :filtered-candidate-transformer
     (lambda (candidates _source) (sort candidates #'helm-generic-sort-fn))
-    :action helm-ucs-actions
+    :action 'helm-ucs-actions
     :persistent-action (lambda (candidate)
                          (helm-ucs-insert-char candidate)
                          (helm-force-update))
