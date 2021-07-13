@@ -987,23 +987,29 @@ Should not be used among other sources.")
 
 Define the directory where you want to start navigating for the
 target directory when copying, renaming, etc..  You can use the
-`default-directory' of `next-window', the current
-`default-directory' or have completion on all the directories
-belonging to each window."
+`default-directory' of `next-window', the visited directory, the
+current `default-directory' or have completion on all the
+directories belonging to each visible windows."
   :group 'helm-files
   :type '(radio :tag "Define default target directory for file actions."
-          (const :tag "Directory belonging to next window" next-window)
-          (const :tag "Completion on directories belonging to each window" completion)
-          (const :tag "Use initial directory or `default-directory'" nil)))
+          (const :tag "Directory belonging to next window"
+                 next-window)
+          (const :tag "Completion on directories belonging to each window"
+                 completion)
+          (const :tag "Use initial directory or `default-directory'"
+                 default-directory)
+          (const :tag "Use visited directory"
+                 nil)))
 
 (defun helm-dwim-target-directory ()
   "Try to return a suitable directory according to `helm-dwim-target'."
-  (with-helm-current-buffer
-    (let* ((wins (remove (get-buffer-window helm-marked-buffer-name)
-                         (window-list)))
-           (num-windows (length wins)))
+  (with-selected-window (get-buffer-window helm-current-buffer)
+    (let ((wins (remove (get-buffer-window helm-marked-buffer-name)
+                        (window-list))))
       (expand-file-name
-       (cond ((and (> num-windows 1)
+       (cond (;; Provide completion on all the directory belonging to
+              ;; visible windows if some.
+              (and (cdr wins)
                    (eq helm-dwim-target 'completion))
               (helm-comp-read "Browse target starting from: "
                               (append (list (or (car-safe helm-ff-history)
@@ -1012,11 +1018,17 @@ belonging to each window."
                                       (cl-loop for w in wins collect
                                                (with-selected-window w
                                                  default-directory)))))
-             ((and (> num-windows 1)
+             ;; Use default-directory of next-window.
+             ((and (cdr wins)
                    (eq helm-dwim-target 'next-window))
               (with-selected-window (next-window)
                 default-directory))
-             ((or (= num-windows 1)
+             ;; Always use default-directory when only one window.
+             ((and (null (cdr wins))
+                   (eq helm-dwim-target 'default-directory))
+              default-directory)
+             ;; Use the visited directory.
+             ((or (null (cdr wins))
                   (null helm-dwim-target))
               ;; Using the car of *ff-history allow
               ;; staying in the directory visited instead of
