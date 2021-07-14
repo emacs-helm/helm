@@ -4944,6 +4944,7 @@ your candidates from `helm-async-outer-limit-hook'."
   "Remove SOURCE from `helm-candidate-cache'."
   (remhash (assoc-default 'name source) helm-candidate-cache))
 
+(defvar helm-drag-mouse-1-fn 'ignore)
 (defun helm-insert-match (match insert-function &optional num source)
   "Insert MATCH into `helm-buffer' with INSERT-FUNCTION.
 If MATCH is a cons cell then insert the car as display with the
@@ -5003,6 +5004,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
   (let ((inhibit-read-only t)
         (map (get-text-property pos 'keymap)))
     (when map
+      (define-key map [drag-mouse-1] helm-drag-mouse-1-fn)
       (define-key map [mouse-2] 'helm-maybe-exit-minibuffer)
       (put-text-property
        helm-selection-point

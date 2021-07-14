@@ -1051,7 +1051,7 @@ directories belonging to each visible windows."
                                    else
                                    collect k)))
 
-(defun helm-find-files-do-action (action)
+(defun helm-find-files-do-action (action &optional target)
   "Generic function for creating actions from `helm-source-find-files'.
 ACTION can be `rsync' or any action supported by `helm-dired-action'."
   (require 'dired-async)
@@ -1089,20 +1089,21 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          ;; If HFF is using a frame use a frame as well.
          (helm-actions-inherit-frame-settings t)
          helm-use-frame-when-more-than-two-windows
-         (dest   (with-helm-display-marked-candidates
-                   helm-marked-buffer-name
-                   (helm-ff--count-and-collect-dups ifiles)
-                   (with-helm-current-buffer
-                     (helm-read-file-name
-                      prompt
-                      :preselect (unless (cdr ifiles)
-                                   (concat
-                                    "^"
-                                    (regexp-quote
-                                     (if helm-ff-transformer-show-only-basename
-                                         (helm-basename cand) cand))))
-                      :initial-input (helm-dwim-target-directory)
-                      :history (helm-find-files-history nil :comp-read nil)))))
+         (dest (or target
+                   (with-helm-display-marked-candidates
+                     helm-marked-buffer-name
+                     (helm-ff--count-and-collect-dups ifiles)
+                     (with-helm-current-buffer
+                       (helm-read-file-name
+                        prompt
+                        :preselect (unless (cdr ifiles)
+                                     (concat
+                                      "^"
+                                      (regexp-quote
+                                       (if helm-ff-transformer-show-only-basename
+                                           (helm-basename cand) cand))))
+                        :initial-input (helm-dwim-target-directory)
+                        :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (helm-basedir dest)))
     (unless (or dest-dir-p (file-directory-p dest-dir))
@@ -4612,6 +4613,26 @@ Show the first `helm-ff-history-max-length' elements of
         helm-ff-history))))
 (put 'helm-find-files-history 'helm-only t)
 
+(defvar helm-ff-drag-mouse-1-default-action 'copy
+  "Default action when dragging files.
+Possible values are `copy', `rsync' or `rename'.")
+
+(defun helm-ff-drag-mouse-1-fn (event)
+  (interactive "e")
+  (let* ((win-or-frame (posn-window (event-end event)))
+         (frame-p (framep win-or-frame))
+         (target (with-selected-window
+                     (if frame-p
+                         (frame-selected-window win-or-frame)
+                       win-or-frame)
+                   default-directory))
+         (ask (and frame-p (cdr (window-list win-or-frame 1)))))
+    (when (or (null ask)
+              (y-or-n-p (format "Copy file(s) to `%s'?" target)))
+      (helm-run-after-exit
+       #'helm-find-files-do-action
+       helm-ff-drag-mouse-1-default-action target))))
+
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
 
@@ -4635,7 +4656,8 @@ Use it for non-interactive calls of `helm-find-files'."
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
                            (expand-file-name tap)))))
-    (helm-set-local-variable 'helm-follow-mode-persistent nil)
+    (helm-set-local-variable 'helm-follow-mode-persistent nil
+                             'helm-drag-mouse-1-fn 'helm-ff-drag-mouse-1-fn)
     (unless helm-source-find-files
       (setq helm-source-find-files (helm-make-source
                                     "Find Files" 'helm-source-ffiles)))
