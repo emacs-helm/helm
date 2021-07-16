@@ -2806,7 +2806,8 @@ in the source.
   ;; Should fix bug#2393 and bug#2394.  `while-no-input-ignore-events'
   ;; is also let-bounded in `helm--maybe-use-while-no-input'.
   (let ((while-no-input-ignore-events
-         (cons 'dbus-event while-no-input-ignore-events)))
+         (and (boundp 'while-no-input-ignore-events)
+              (cons 'dbus-event while-no-input-ignore-events))))
     (unless helm--tramp-archive-maybe-loaded
       ;; This for Emacs-27 not requiring tramp-archive.
       (and (boundp 'tramp-archive-enabled)
@@ -4684,7 +4685,8 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
        ;; Ignoring the dbus-event work on emacs28+; for emacs27 or older
        ;; version, require tramp-archive can workaround the issue.
        (let ((while-no-input-ignore-events
-              (cons 'dbus-event while-no-input-ignore-events)))
+              (and (boundp 'while-no-input-ignore-events)
+                   (cons 'dbus-event while-no-input-ignore-events))))
          (helm-while-no-input ,@body)))))
 
 (defun helm--collect-matches (src-list)
@@ -4971,6 +4973,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
              (put-text-property start end
                                 'helm-realvalue realvalue)))
       (when map
+        (define-key map [drag-mouse-1] 'ignore)
         (define-key map [mouse-1] 'helm-mouse-select-candidate)
         (define-key map [mouse-2] 'ignore)
         (define-key map [mouse-3] 'helm-menu-select-action)
