@@ -4619,19 +4619,28 @@ Possible values are `copy', `rsync' or `rename'.")
 
 (defun helm-ff-drag-mouse-1-fn (event)
   (interactive "e")
+  (cl-assert (memq helm-ff-drag-mouse-1-default-action
+                   '(copy rsync rename)))
   (let* ((win-or-frame (posn-window (event-end event)))
-         (frame-p (framep win-or-frame))
+         (target-frame (if (framep win-or-frame)
+                           (with-selected-window
+                               (get-buffer-window
+                                helm-current-buffer 'visible)
+                             (selected-frame))))
          (target (with-selected-window
-                     (if frame-p
-                         (frame-selected-window win-or-frame)
+                     (if target-frame
+                         (frame-selected-window target-frame)
                        win-or-frame)
                    default-directory))
-         (ask (and frame-p (cdr (window-list win-or-frame 1)))))
+         (ask (and target-frame (cdr (window-list target-frame 1)))))
     (when (or (null ask)
               (y-or-n-p (format "Copy file(s) to `%s'?" target)))
-      (helm-run-after-exit
-       #'helm-find-files-do-action
-       helm-ff-drag-mouse-1-default-action target))))
+      (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
+          (helm-find-files-do-action
+           helm-ff-drag-mouse-1-default-action target)
+        (helm-run-after-exit
+         #'helm-find-files-do-action
+         helm-ff-drag-mouse-1-default-action target)))))
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
