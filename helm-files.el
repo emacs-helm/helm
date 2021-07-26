@@ -4622,11 +4622,8 @@ Possible values are `copy', `rsync' or `rename'.")
   (cl-assert (memq helm-ff-drag-mouse-1-default-action
                    '(copy rsync rename)))
   (let* ((win-or-frame (posn-window (event-end event)))
-         (target-frame (if (framep win-or-frame)
-                           (with-selected-window
-                               (get-buffer-window
-                                helm-current-buffer 'visible)
-                             (selected-frame))))
+         (target-frame (when (framep win-or-frame)
+                         helm-initial-frame))
          (target (with-selected-window
                      (if target-frame
                          (frame-selected-window target-frame)
