@@ -4632,15 +4632,23 @@ Possible values are `copy', `rsync' or `rename'.")
                          (frame-selected-window target-frame)
                        win-or-frame)
                    default-directory))
-         (ask (and target-frame (cdr (window-list target-frame 1)))))
-    (when (or (null ask)
-              (y-or-n-p (format "Copy file(s) to `%s'?" target)))
-      (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
-          (helm-find-files-do-action
-           helm-ff-drag-mouse-1-default-action target)
-        (helm-run-after-exit
-         #'helm-find-files-do-action
-         helm-ff-drag-mouse-1-default-action target)))))
+         win-list
+         (ask (and target-frame
+                   (cdr (setq win-list (window-list target-frame 1))))))
+    (when ask
+      (setq target (x-popup-menu
+                    t (list "Choose target"
+                            (cons ""
+                                  (cl-loop for win in win-list
+                                           for dir = (with-selected-window
+                                                         win default-directory)
+                                           collect (cons  dir dir)))))))
+    (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
+        (helm-find-files-do-action
+         helm-ff-drag-mouse-1-default-action target)
+      (helm-run-after-exit
+       #'helm-find-files-do-action
+       helm-ff-drag-mouse-1-default-action target))))
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
