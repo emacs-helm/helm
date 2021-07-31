@@ -1449,7 +1449,9 @@ Directories expansion is not supported."
                              :skip-subdirs t)
       (helm-aif (helm-wildcard-to-regexp bn)
           (directory-files (helm-basedir pattern) full it)
-        (file-expand-wildcards pattern full)))))
+        (or (file-expand-wildcards pattern full)
+            (directory-files (helm-basedir pattern)
+                             full (wildcard-to-regexp bn)))))))
 
 (defun helm-wildcard-to-regexp (wc)
   "Transform wilcard WC like \"**.{jpg,jpeg}\" in REGEXP."
