@@ -1449,6 +1449,9 @@ Directories expansion is not supported."
                              :skip-subdirs t)
       (helm-aif (helm-wildcard-to-regexp bn)
           (directory-files (helm-basedir pattern) full it)
+        ;; `file-expand-wildcards' fails to expand weird directories
+        ;; like "[ foo.zz ] bar.*.avi", fallback to `directory-files'
+        ;; in such cases.
         (or (file-expand-wildcards pattern full)
             (directory-files (helm-basedir pattern)
                              full (wildcard-to-regexp bn)))))))
