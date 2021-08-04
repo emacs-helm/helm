@@ -3938,7 +3938,7 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
       (or (get-buffer-window helm-buffer)
           (selected-window))
     (let ((frame (selected-frame)))
-      (setq cursor-type t)
+      (setq cursor-type (default-value 'cursor-type))
       ;; Ensure restoring default-value of mode-line to allow user
       ;; using the mouse when helm is inactive (Bug#1517,Bug#2377).
       (setq mode-line-format (default-value 'mode-line-format))
