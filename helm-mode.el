@@ -28,6 +28,9 @@
 (defvar helm-completion--sorting-done)
 (defvar helm-mode)
 
+;; No warnings in Emacs built --without-x
+(declare-function x-file-dialog "xfns.c")
+
 (declare-function ido-mode "ido.el")
 (declare-function helm-apropos-init "helm-elisp")
 (declare-function helm-lisp-completion-persistent-action "helm-elisp")
