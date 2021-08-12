@@ -21,6 +21,9 @@
 (require 'helm)
 (require 'helm-help)
 
+;; No warnings in Emacs built --without-x
+(declare-function x-list-fonts "xfaces.c")
+
 (declare-function helm-generic-sort-fn "helm-utils")
 
 (defgroup helm-font nil
