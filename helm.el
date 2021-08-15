@@ -3366,6 +3366,8 @@ value of `helm-full-frame' or `helm-split-window-default-side'."
 
 ;; Shut up byte-compiler in emacs-26
 (defvar tab-bar-mode)
+;; No warnings in Emacs built --without-x
+(defvar x-display-name)
 
 (defun helm-display-buffer-in-own-frame (buffer &optional resume)
   "Display Helm buffer BUFFER in a separate frame.
