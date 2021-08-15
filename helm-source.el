@@ -148,7 +148,7 @@
 
    (keymap
     :initarg :keymap
-    :initform helm-map
+    :initform 'helm-map
     :custom sexp
     :documentation
     "  Specific keymap for this source.

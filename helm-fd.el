@@ -71,7 +71,7 @@
    (help-message :initform 'helm-fd-help-message)
    (filtered-candidate-transformer :initform 'helm-fd-fct)
    (action :initform 'helm-type-file-actions)
-   (keymap :initform helm-fd-map)))
+   (keymap :initform 'helm-fd-map)))
 
 (defun helm-fd-process ()
   "Initialize fd process in an helm async source."

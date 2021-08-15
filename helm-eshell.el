@@ -214,7 +214,7 @@ at point."
                  finally return lst))))
    (nomark :initform t)
    (multiline :initform t)
-   (keymap :initform helm-eshell-history-map)
+   (keymap :initform 'helm-eshell-history-map)
    (candidate-number-limit :initform 9999)
    (action :initform (lambda (candidate)
                        (eshell-kill-input)

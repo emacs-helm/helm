@@ -385,7 +385,7 @@ See `package-autoremove'."
    (filtered-candidate-transformer :initform 'helm-el-package--transformer)
    (action-transformer :initform 'helm-el-package--action-transformer)
    (help-message :initform 'helm-el-package-help-message)
-   (keymap :initform helm-el-package-map)
+   (keymap :initform 'helm-el-package-map)
    (update :initform 'helm-el-package--update)
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe package" . helm-el-package-describe)

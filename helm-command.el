@@ -211,7 +211,7 @@ algorithm."
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
-   (keymap :initform helm-M-x-map)))
+   (keymap :initform 'helm-M-x-map)))
 
 (defun helm-M-x-read-extended-command (collection &optional predicate history)
   "Read or execute action on command name in COLLECTION or HISTORY.

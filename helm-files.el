@@ -940,7 +940,7 @@ Should not be used among other sources.")
    (cleanup :initform 'helm-find-files-cleanup)
    (migemo :initform t)
    (nohighlight :initform t)
-   (keymap :initform helm-find-files-map)
+   (keymap :initform 'helm-find-files-map)
    (candidate-number-limit :initform 'helm-ff-candidate-number-limit)
    (action-transformer
     :initform 'helm-find-files-action-transformer)

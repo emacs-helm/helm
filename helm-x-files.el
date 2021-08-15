@@ -56,8 +56,8 @@
                               (or (string-match helm-tramp-file-name-regexp f)
                                   (file-exists-p f)))
                             (mapcar 'car session-file-alist))))
-   (keymap       :initform helm-generic-files-map)
-   (help-message :initform helm-generic-file-help-message)
+   (keymap       :initform 'helm-generic-files-map)
+   (help-message :initform 'helm-generic-file-help-message)
    (action       :initform 'helm-type-file-actions)))
 
 (defvar helm-source-session nil

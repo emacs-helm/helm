@@ -1049,7 +1049,7 @@ of grep."
 (defclass helm-grep-class (helm-source-async)
   ((candidates-process :initform 'helm-grep-collect-candidates)
    (filtered-candidate-transformer :initform #'helm-grep-fc-transformer)
-   (keymap :initform helm-grep-map)
+   (keymap :initform 'helm-grep-map)
    (pcre :initarg :pcre :initform nil
          :documentation
          "  Backend is using pcre regexp engine when non-nil.")
@@ -1610,7 +1610,7 @@ returns if available with current AG version."
    (pcre :initarg :pcre :initform t
          :documentation
          "  Backend is using pcre regexp engine when non--nil.")
-   (keymap :initform helm-grep-map)
+   (keymap :initform 'helm-grep-map)
    (history :initform 'helm-grep-ag-history)
    (help-message :initform 'helm-grep-help-message)
    (filtered-candidate-transformer :initform #'helm-grep-fc-transformer)

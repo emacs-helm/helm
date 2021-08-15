@@ -57,8 +57,8 @@
                      (require 'epg)
                      (require 'epa)))
    (candidates :initform 'helm-epa-get-key-list)
-   (keymap :initform helm-comp-read-map)
-   (mode-line :initform helm-comp-read-mode-line))
+   (keymap :initform 'helm-comp-read-map)
+   (mode-line :initform 'helm-comp-read-mode-line))
   "Allow building helm sources for GPG keys.")
 
 (defun helm-epa-get-key-list (&optional keys)

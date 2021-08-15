@@ -869,7 +869,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
 ;;
 ;;
 (defclass helm-absolute-time-timers-class (helm-source-sync helm-type-timers)
-  ((candidates :initform timer-list)
+  ((candidates :initform 'timer-list)
    (allow-dups :initform t)
    (candidate-transformer
     :initform
@@ -881,7 +881,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
   (helm-make-source "Absolute Time Timers" 'helm-absolute-time-timers-class))
 
 (defclass helm-idle-time-timers-class (helm-source-sync helm-type-timers)
-  ((candidates :initform timer-idle-list)
+  ((candidates :initform 'timer-idle-list)
    (allow-dups :initform t)
    (candidate-transformer
     :initform
