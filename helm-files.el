@@ -1927,94 +1927,12 @@ This doesn't replace inside the files, only modify filenames."
                                 nil 'helm-ff-query-replace-history-from
                                 (helm-basename (car candidates))))
            (rep    (read-string (format "Replace regexp `%s' with: " regexp)
-                                nil 'helm-ff-query-replace-history-to))
-           subexp)
+                                nil 'helm-ff-query-replace-history-to)))
       (cl-loop with query = "y"
                with count = 0
-               with target = nil
                for old in candidates
-               for new = (concat (helm-basedir old)
-                                 (helm--replace-regexp-in-buffer-string
-                                  (save-match-data
-                                    (cond ((string= regexp "%.")
-                                           (setq subexp 1)
-                                           (helm-ff--prepare-str-with-regexp
-                                            (setq target (helm-basename old t))))
-                                          ((string= regexp ".%")
-                                           (setq subexp 1)
-                                           (helm-ff--prepare-str-with-regexp
-                                            (setq target (file-name-extension old))))
-                                          ((string= regexp "%")
-                                           (regexp-quote
-                                            (setq target (helm-basename old))))
-                                          ((string-match "%:\\([0-9]+\\):\\([0-9]+\\)" regexp)
-                                           (setq subexp 1)
-                                           (let ((beg (match-string 1 regexp))
-                                                 (end (match-string 2 regexp))
-                                                 (str (helm-basename old)))
-                                             (setq target (substring str
-                                                                     (string-to-number beg)
-                                                                     (string-to-number end)))
-                                             (helm-ff--prepare-str-with-regexp str beg end)))
-                                          (t regexp)))
-                                  (save-match-data
-                                    (cond (;; Handle incremental
-                                           ;; replacement with \# in
-                                           ;; search and replace
-                                           ;; feature in placeholder \@.
-                                           (string-match
-                                            "\\\\@/\\(.*\\)/\\(\\(?99:.*\\)\\\\#\\)/"
-                                            rep)
-                                           (replace-regexp-in-string
-                                            (match-string 1 rep)
-                                            (concat (match-string 99 rep)
-                                                    (format "%03d" (1+ count)))
-                                            target))
-                                          ;; Incremental replacement
-                                          ;; before or after \@.
-                                          ((and (string-match-p "\\\\#" rep)
-                                                (string-match "\\\\@" rep))
-                                           (replace-regexp-in-string
-                                            "\\\\#" (format "%03d" (1+ count))
-                                            (replace-match target t t rep)))
-                                          ;; Simple incremental replacement.
-                                          ((string-match "\\\\#" rep)
-                                           (replace-match
-                                            (format "%03d" (1+ count)) t t rep))
-                                          ;; Substring replacement in placeholder.
-                                          ((string-match
-                                            "\\\\@:\\([0-9]*\\):\\([0-9]*\\)" rep)
-                                           (replace-match (substring
-                                                           target
-                                                           (string-to-number
-                                                            (match-string 1 rep))
-                                                           (pcase (match-string 2 rep)
-                                                             ((pred (string= ""))
-                                                              (length target))
-                                                             (res (string-to-number res))))
-                                                          t t rep))
-                                          ;; Search and replace in
-                                          ;; placeholder. Doesn't
-                                          ;; handle incremental here.
-                                          ((string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
-                                           (replace-match (replace-regexp-in-string
-                                                           (match-string 1 rep)
-                                                           (match-string 2 rep)
-                                                           target t)
-                                                          t t rep))
-                                          ;; Simple replacement by placeholder.
-                                          ((string-match "\\\\@" rep)
-                                           (replace-match target t t rep))
-                                          ;; Replacement with
-                                          ;; upcase, downcase or
-                                          ;; capitalized text.
-                                          ((string= rep "%u") #'upcase)
-                                          ((string= rep "%d") #'downcase)
-                                          ((string= rep "%c") #'capitalize)
-                                          ;; Simple replacement with
-                                          ;; whole replacement regexp.
-                                          (t rep)))
-                                  (helm-basename old) t nil subexp))
+               for new = (helm-ff--query-replace-in-fname-set-new-name
+                          old regexp rep count)
                ;; If `regexp' is not matched in `old'
                ;; `replace-regexp-in-string' will
                ;; return `old' unmodified.
@@ -2041,6 +1959,93 @@ This doesn't replace inside the files, only modify filenames."
   (sit-for 0.1)
   (with-current-buffer (window-buffer (minibuffer-window))
     (delete-minibuffer-contents)))
+
+(defun helm-ff--query-replace-in-fname-set-new-name (old regexp rep count)
+  "Setup a new name for OLD replacing part matching REGEXP with REP.
+COUNT is used for incrementing new name if needed."
+  (let (subexp target)
+    (concat (helm-basedir old)
+            (helm--replace-regexp-in-buffer-string
+             (save-match-data
+               (cond ((string= regexp "%.")
+                      (setq subexp 1)
+                      (helm-ff--prepare-str-with-regexp
+                       (setq target (helm-basename old t))))
+                     ((string= regexp ".%")
+                      (setq subexp 1)
+                      (helm-ff--prepare-str-with-regexp
+                       (setq target (file-name-extension old))))
+                     ((string= regexp "%")
+                      (regexp-quote
+                       (setq target (helm-basename old))))
+                     ((string-match "%:\\([0-9]+\\):\\([0-9]+\\)" regexp)
+                      (setq subexp 1)
+                      (let ((beg (match-string 1 regexp))
+                            (end (match-string 2 regexp))
+                            (str (helm-basename old)))
+                        (setq target (substring str
+                                                (string-to-number beg)
+                                                (string-to-number end)))
+                        (helm-ff--prepare-str-with-regexp str beg end)))
+                     (t regexp)))
+             (save-match-data
+               (cond (;; Handle incremental
+                      ;; replacement with \# in
+                      ;; search and replace
+                      ;; feature in placeholder \@.
+                      (string-match
+                       "\\\\@/\\(.*\\)/\\(\\(?99:.*\\)\\\\#\\)/"
+                       rep)
+                      (replace-regexp-in-string
+                       (match-string 1 rep)
+                       (concat (match-string 99 rep)
+                               (format "%03d" (1+ count)))
+                       target))
+                     ;; Incremental replacement
+                     ;; before or after \@.
+                     ((and (string-match-p "\\\\#" rep)
+                           (string-match "\\\\@" rep))
+                      (replace-regexp-in-string
+                       "\\\\#" (format "%03d" (1+ count))
+                       (replace-match target t t rep)))
+                     ;; Simple incremental replacement.
+                     ((string-match "\\\\#" rep)
+                      (replace-match
+                       (format "%03d" (1+ count)) t t rep))
+                     ;; Substring replacement in placeholder.
+                     ((string-match
+                       "\\\\@:\\([0-9]*\\):\\([0-9]*\\)" rep)
+                      (replace-match (substring
+                                      target
+                                      (string-to-number
+                                       (match-string 1 rep))
+                                      (pcase (match-string 2 rep)
+                                        ((pred (string= ""))
+                                         (length target))
+                                        (res (string-to-number res))))
+                                     t t rep))
+                     ;; Search and replace in
+                     ;; placeholder. Doesn't
+                     ;; handle incremental here.
+                     ((string-match "\\\\@/\\(.*\\)/\\(.*\\)/" rep)
+                      (replace-match (replace-regexp-in-string
+                                      (match-string 1 rep)
+                                      (match-string 2 rep)
+                                      target t)
+                                     t t rep))
+                     ;; Simple replacement by placeholder.
+                     ((string-match "\\\\@" rep)
+                      (replace-match target t t rep))
+                     ;; Replacement with
+                     ;; upcase, downcase or
+                     ;; capitalized text.
+                     ((string= rep "%u") #'upcase)
+                     ((string= rep "%d") #'downcase)
+                     ((string= rep "%c") #'capitalize)
+                     ;; Simple replacement with
+                     ;; whole replacement regexp.
+                     (t rep)))
+             (helm-basename old) t nil subexp))))
 
 (defun helm-ff--prepare-str-with-regexp (str &optional rep1 rep2)
   ;; This is used in `helm-ff-query-replace-on-filenames' to prepare
