@@ -1554,6 +1554,8 @@ this working."
   ;; always match specifier) whereas it should return either a
   ;; single element (CAR DELIM) or DELIM itself if the car of
   ;; DELIM is a process.
+  ;; This prevent running eshell-command async when needed i.e. when
+  ;; command ends with "&".
   ;;
   ;; 6b6f91b357f6fe2f1e0d72f046a1b8d8a2d6d8c3
   ;; Author:     John Wiegley <johnw@newartisans.com>
