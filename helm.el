@@ -138,7 +138,7 @@ and second call within 1s runs `helm-swap-windows'."
 
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
-                                         &optional other-subkeys prompt exit-fn)
+                                         &optional other-subkeys prompt exit-fn delay)
   "Define in MAP a KEY and SUBKEY to COMMAND.
 
 This allows typing KEY to call COMMAND the first time and
@@ -165,34 +165,43 @@ on exit.
 For any other key pressed, run their assigned command as defined
 in MAP and then exit the loop running EXIT-FN, if specified.
 
+If DELAY an integer is specified exit after DELAY seconds.
+
 NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax
 and vectors, so don't use strings to define them."
   (declare (indent 1))
   (define-key map key
     (lambda ()
       (interactive)
-      (unwind-protect
-          (progn
-            (call-interactively command)
-            (while (let ((input (read-key prompt)) other kb com)
-                     (setq last-command-event input)
-                     (cond
-                      ((eq input subkey)
-                       (call-interactively command)
-                       t)
-                      ((setq other (assoc input other-subkeys))
-                       (call-interactively (cdr other))
-                       t)
-                      (t
-                       (setq kb (vector last-command-event))
-                       (setq com (lookup-key map kb))
-                       (if (commandp com)
-                           (call-interactively com)
-                         (setq unread-command-events
-                               (nconc (mapcar 'identity kb)
-                                      unread-command-events)))
-                       nil)))))
-        (and exit-fn (funcall exit-fn))))))
+      (let (timer)
+        (unwind-protect
+            (progn
+              (call-interactively command)
+              (when delay
+                (setq timer (run-with-idle-timer
+                             delay nil (lambda () (keyboard-quit)))))
+              (while (let ((input (read-key prompt)) other kb com)
+                       (setq last-command-event input)
+                       (cond
+                        ((eq input subkey)
+                         (call-interactively command)
+                         (setq last-command command)
+                         t)
+                        ((setq other (assoc input other-subkeys))
+                         (call-interactively (cdr other))
+                         (setq last-command (cdr other))
+                         t)
+                        (t
+                         (setq kb (vector last-command-event))
+                         (setq com (lookup-key map kb))
+                         (if (commandp com)
+                             (call-interactively com)
+                           (setq unread-command-events
+                                 (nconc (mapcar 'identity kb)
+                                        unread-command-events)))
+                         nil)))))
+          (when timer (cancel-timer timer))
+          (and exit-fn (funcall exit-fn)))))))
 
 ;;; Keymap
 ;;
