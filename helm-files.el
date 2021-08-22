@@ -1579,7 +1579,7 @@ this working."
     (setq eshell-current-command command)
     (let* ((delim (catch 'eshell-incomplete
 		    (eshell-resume-eval)))
-           (val (car delim)))
+           (val (car-safe delim)))
       ;; If the return value of `eshell-resume-eval' is wrapped in a
       ;; list, it indicates that the command was run asynchronously.
       ;; In that case, unwrap the value before checking the delimiter
