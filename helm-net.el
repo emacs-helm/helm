@@ -346,7 +346,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 
 ;;;###autoload
 (defun helm-browse-url-nyxt (url &optional _ignore)
-  "Browse URL with next browser."
+  "Browse URL with nyxt browser."
   (interactive "sURL: ")
   (helm-generic-browser url helm-browse-url-nyxt-program))
 
