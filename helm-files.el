@@ -1557,6 +1557,8 @@ this working."
   ;; This prevent running eshell-command async when needed i.e. when
   ;; command ends with "&".
   ;;
+  ;; UPDATE: This have now been merged in Emacs-28.
+  ;;
   ;; 6b6f91b357f6fe2f1e0d72f046a1b8d8a2d6d8c3
   ;; Author:     John Wiegley <johnw@newartisans.com>
   ;; AuthorDate: Fri May 27 02:57:18 2005 +0000
