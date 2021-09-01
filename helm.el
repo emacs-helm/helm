@@ -6446,11 +6446,11 @@ computed by match-part-fn and stored in the match-part property."
         (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))))
 
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
-  (delq nil (cl-loop for i from 1 to limit
-                     until (eobp)
-                     collect (funcall get-line-fn
-                                      (point-at-bol) (point-at-eol))
-                     do (forward-line 1))))
+  (cl-loop repeat limit
+           until (eobp)
+           for line = (funcall get-line-fn (point-at-bol) (point-at-eol))
+           when line collect line
+           do (forward-line 1)))
 
 (defun helm--search-from-candidate-buffer-1 (search-fn)
   ;; We are adding a newline at bob and at eol
