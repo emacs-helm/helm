@@ -608,7 +608,8 @@ from its directory."
                            (buffer-name it)))
             (pkg       (and (stringp sel)
                             (get-text-property 0 'tabulated-list-id sel)))
-            (default-preselection (or (buffer-file-name helm-current-buffer)
+            (default-preselection (or (helm-default-directory)
+                                      (buffer-file-name helm-current-buffer)
                                       default-directory)))
        (cond
          ;; Buffer.
