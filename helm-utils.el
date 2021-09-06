@@ -598,68 +598,31 @@ from its directory."
 (put 'helm-quit-and-find-file 'helm-only t)
 
 (defun helm--quit-and-find-file-default-file (source)
-  (helm-aif (helm-get-attr 'find-file-target)
-      (funcall it source)
-    (let* ((sel       (helm-get-selection nil nil source))
-           (marker    (and (consp sel) (markerp (cdr sel))))
-           (grep-line (and (stringp sel)
-                           (helm-grep-split-line sel)))
-           (occur-fname (helm-aand (numberp sel)
-                                   (helm-get-attr 'buffer-name)
-                                   (buffer-file-name (get-buffer it))))
-           (bmk-name  (and (stringp sel)
-                           (not grep-line)
-                           (replace-regexp-in-string "\\`\\*" "" sel)))
-           (bmk       (and bmk-name (assoc bmk-name bookmark-alist)))
-           (buf       (helm-aif (and (bufferp sel) (get-buffer sel))
-                          (buffer-name it)))
-           (pkg       (and (stringp sel)
-                           (get-text-property 0 'tabulated-list-id sel)))
-           (default-preselection (or (helm-default-directory)
-                                     (buffer-file-name helm-current-buffer)
-                                     default-directory)))
-      (cond
-       ;; Buffer.
-       (buf (or (buffer-file-name sel)
-                (car (rassoc buf dired-buffers))
-                (and (with-current-buffer buf
-                       (eq major-mode 'org-agenda-mode))
-                     org-directory
-                     (expand-file-name org-directory))
-                (with-current-buffer buf
-                  (expand-file-name default-directory))))
-       ;; imenu (marker).
-       (marker
-        (or (buffer-file-name (marker-buffer (cdr sel)))
-            default-preselection))
-       ;; Bookmark.
-       (bmk (helm-aif (bookmark-get-filename bmk)
-                (if (and helm--url-regexp
-                         (string-match helm--url-regexp it))
-                    it (expand-file-name it))
-              (expand-file-name default-directory)))
-       ((and (stringp sel) (or (file-remote-p sel)
-                               (file-exists-p sel)))
-        (expand-file-name sel))
-       ;; Grep.
-       ((and grep-line (file-exists-p (car grep-line)))
-        (expand-file-name (car grep-line)))
-       ;; Occur.
-       ((and occur-fname (file-exists-p occur-fname))
-        (expand-file-name occur-fname))
-       ;; Package (installed).
-       ((and pkg (package-installed-p pkg))
-        (expand-file-name (package-desc-dir pkg)))
-       ;; Url.
-       ((and (stringp sel) helm--url-regexp (string-match helm--url-regexp sel)) sel)
-       ;; Exit brutally from a `with-helm-show-completion'
-       ((and helm-show-completion-overlay
-             (overlayp helm-show-completion-overlay))
-        (delete-overlay helm-show-completion-overlay)
-        (remove-hook 'helm-move-selection-after-hook 'helm-show-completion)
-        (expand-file-name default-preselection))
-       ;; Default.
-       (t (expand-file-name default-preselection))))))
+  (let ((target-fn (helm-get-attr 'find-file-target)))
+    ;; target-fn function may return nil, in this case fallback to default.
+    (helm-aif (and target-fn (funcall target-fn source))
+        it
+      (let* ((sel                  (helm-get-selection nil nil source))
+             (default-preselection (or (helm-default-directory)
+                                       (buffer-file-name helm-current-buffer)
+                                       default-directory)))
+        (cond
+         ((and (stringp sel) (or (file-remote-p sel)
+                                 (file-exists-p sel)))
+          (expand-file-name sel))
+         ;; Url.
+         ((and (stringp sel)
+               helm--url-regexp
+               (string-match helm--url-regexp sel))
+          sel)
+         ;; Exit brutally from a `with-helm-show-completion'
+         ((and helm-show-completion-overlay
+               (overlayp helm-show-completion-overlay))
+          (delete-overlay helm-show-completion-overlay)
+          (remove-hook 'helm-move-selection-after-hook 'helm-show-completion)
+          (expand-file-name default-preselection))
+         ;; Default.
+         (t (expand-file-name default-preselection)))))))
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.

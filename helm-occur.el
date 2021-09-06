@@ -262,7 +262,8 @@ engine beeing completely different and also much faster."
   ((buffer-name :initarg :buffer-name
                 :initform nil)
    (moccur-buffers :initarg :moccur-buffers
-                   :initform nil)))
+                   :initform nil)
+   (find-file-target :initform #'helm-occur-quit-an-find-file-fn)))
 
 (defun helm-occur-build-sources (buffers &optional source-name)
   "Build sources for `helm-occur' for each buffer in BUFFERS list."
@@ -445,6 +446,13 @@ persistent action."
     (helm-execute-persistent-action)))
 (put 'helm-occur-right 'helm-only t)
 
+(defun helm-occur-quit-an-find-file-fn (source)
+  (let* ((sel (helm-get-selection nil nil source))
+         (occur-fname (helm-aand (numberp sel)
+                                 (helm-get-attr 'buffer-name)
+                                 (buffer-file-name (get-buffer it)))))
+    (when (and occur-fname (file-exists-p occur-fname))
+      (expand-file-name occur-fname))))
 
 ;;; helm-occur-mode
 ;;

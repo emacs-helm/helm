@@ -156,6 +156,7 @@ string."
    (keymap :initform 'helm-imenu-map)
    (help-message :initform 'helm-imenu-help-message)
    (action :initform 'helm-imenu-action)
+   (find-file-target :initform #'helm-imenu-quit-and-find-file-fn)
    (group :initform 'helm-imenu)))
 
 (defcustom helm-imenu-fuzzy-match nil
@@ -188,6 +189,11 @@ string."
           (helm-set-pattern "")
           (helm-force-update))
         t)))
+
+(defun helm-imenu-quit-and-find-file-fn (source)
+  (let ((sel (helm-get-selection nil nil source)))
+    (when (and (consp sel) (markerp (cdr sel)))
+      (buffer-file-name (marker-buffer (cdr sel))))))
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."

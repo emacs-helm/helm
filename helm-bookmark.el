@@ -121,7 +121,8 @@
                       (helm-init-candidates-in-buffer
                           'global
                         (bookmark-all-names))))
-    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)))
+    (filtered-candidate-transformer :initform 'helm-bookmark-transformer)
+    (find-file-target :initform #'helm-bookmarks-quit-an-find-file-fn)))
 
 (defvar helm-source-bookmarks
   (helm-make-source "Bookmarks" 'helm-source-basic-bookmarks)
@@ -344,7 +345,18 @@ If `browse-url-browser-function' is set to something else than
 (defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
   ((filtered-candidate-transformer
     :initform '(helm-adaptive-sort
-                helm-highlight-bookmark))))
+                helm-highlight-bookmark))
+   (find-file-target :initform #'helm-bookmarks-quit-an-find-file-fn)))
+
+(defun helm-bookmarks-quit-an-find-file-fn (source)
+  (let* ((sel (helm-get-selection nil nil source))
+         (bmk (assoc (replace-regexp-in-string "\\`\\*" "" sel)
+                     bookmark-alist)))
+    (helm-aif (bookmark-get-filename bmk)
+        (if (and helm--url-regexp
+                 (string-match helm--url-regexp it))
+            it (expand-file-name it))
+      (expand-file-name default-directory))))
 
 ;;; W3m bookmarks.
 ;;

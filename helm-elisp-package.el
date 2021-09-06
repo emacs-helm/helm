@@ -390,7 +390,15 @@ See `package-autoremove'."
    (candidate-number-limit :initform 9999)
    (action :initform '(("Describe package" . helm-el-package-describe)
                        ("Visit homepage" . helm-el-package-visit-homepage)))
+   (find-file-target :initform #'helm-el-package-quit-an-find-file-fn)
    (group :initform 'helm-el-package)))
+
+(defun helm-el-package-quit-an-find-file-fn (source)
+  (let* ((sel (helm-get-selection nil nil source))
+         (pkg (and (stringp sel)
+                   (get-text-property 0 'tabulated-list-id sel))))
+    (when (and pkg (package-installed-p pkg))
+      (expand-file-name (package-desc-dir pkg)))))
 
 (defun helm-el-package--action-transformer (actions candidate)
   (let* ((pkg-desc (get-text-property 0 'tabulated-list-id candidate))
