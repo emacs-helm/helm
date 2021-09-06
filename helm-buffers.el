@@ -30,6 +30,7 @@
 (declare-function helm-browse-project "helm-files")
 
 (defvar dired-buffers)
+(defvar org-directory)
 
 
 (defgroup helm-buffers nil
@@ -320,6 +321,7 @@ Note that this variable is buffer-local.")
    (match :initform 'helm-buffers-match-function)
    (persistent-action :initform 'helm-buffers-list-persistent-action)
    (keymap :initform 'helm-buffer-map)
+   (find-file-target :initform #'helm-buffers-quit-and-find-file-fn)
    (migemo :initform 'nomultimatch)
    (volatile :initform t)
    (nohighlight :initform t)
@@ -1140,6 +1142,21 @@ Can be used by any source that list buffers."
       (if helm-buffers-in-project-p
           (user-error "You are already browsing this project")
           (helm-exit-and-execute-action 'helm-buffers-browse-project))))
+
+(defun helm-buffers-quit-and-find-file-fn (source)
+  (let* ((sel (helm-get-selection nil nil source))
+         (buf (helm-aand (bufferp sel)
+                         (get-buffer sel)
+                         (buffer-name it))))
+    (when buf
+      (or (buffer-file-name sel)
+          (car (rassoc buf dired-buffers))
+          (and (with-current-buffer buf
+                 (eq major-mode 'org-agenda-mode))
+               org-directory
+               (expand-file-name org-directory))
+          (with-current-buffer buf
+            (expand-file-name default-directory))))))
 
 ;;; Candidate Transformers
 ;;
