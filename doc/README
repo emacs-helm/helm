@@ -1,0 +1,24 @@
+Commentary about helm documentation:
+
+This Helm branch allows installing helm info files in diverse formats
+(info, html, pdf) from org files.
+
+However there is some caveats:
+
+1) When calling make info an arbitrary file is installed from remote
+to do the job which may be unsafe if the url change for some reasons.
+
+2) Some manuals fail to build.
+
+3) A lot of manuals contain to much redundant infos e.g. no need to
+have all docstrings repeated in diverse manuals.
+
+4) Info files are installed in /usr/share/info by default whereas they
+should be installed in /usr/local/share/info (see PREFIX).
+
+
+Conclusion:
+
+We need here a simple user manual that at least contain the same infos as
+M-x helm-documentation and that build without pulling from remote
+arbitrary file. In addition another manual more focused on development would be nice.
