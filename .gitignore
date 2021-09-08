@@ -2,11 +2,6 @@
 patch*
 *.patch
 *.diff
-Home.md
-*.info
-*.html
-ox-texinfo.el
 TAGS
 helm-autoloads.el
 ID
-doc/*
