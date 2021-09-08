@@ -108,9 +108,9 @@ texi: $(TEXIFILES)
 
 $(TEXIFILES): | doc/ox-texinfo.el
 
-doc/ox-texinfo.el:
-	wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
-	# test -f doc/ox-texinfo.el || wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+# doc/ox-texinfo.el:
+# wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
+# test -f doc/ox-texinfo.el || wget  https://code.orgmode.org/bzg/org-mode/raw/maint/lisp/ox-texinfo.el -O $@
 
 %.texi:		doc/ox-texinfo.el
 
