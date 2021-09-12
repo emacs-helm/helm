@@ -193,6 +193,21 @@ in `completion-styles-alist' (emacs-26)."
   :group 'helm-mode
   :type 'boolean)
 
+(defcustom helm-read-file-name-use-default-arg-behavior nil
+  "Use emacs vanilla `read-file-name' behavior for default arg.
+
+The behavior of default arg in `read-file-name' and friends is using
+the default arg as default value when initial input is not modified,
+even if this initial input is a valid value i.e. an existing file.
+We expect generally a default arg to be used if nothing is specified
+in the prompt or if what is specified is invalid, but the emacs behavior
+here is really weird, so we use this variable to disable this
+behavior, letting user specify default if needed with `M-n'.
+However we keep the emacs default for `read-file-name' and derived
+fns, this variable affecting only `helm-read-file-name'."
+  :type 'boolean
+  :group 'helm-mode)
+
 (defvar helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
   "Incompatible `minibuffer-setup-hook' functions go here.
 A list of symbols.  `helm-mode' is rejecting all lambda's, byte-code fns
@@ -1370,6 +1385,7 @@ Keys description:
            ((and result
                  (stringp result)
                  (file-equal-p result initial-input)
+                 helm-read-file-name-use-default-arg-behavior
                  default)
             (if (listp default) (car default) default))
            ((and result (listp result))
@@ -1398,6 +1414,7 @@ Keys description:
   "Generic helm replacement of `read-file-name'.
 Don't use it directly, use instead `helm-read-file-name' in your programs."
   (let* ((init (or initial dir default-directory))
+         (helm-read-file-name-use-default-arg-behavior t)
          (current-command (or (helm-this-command) this-command))
          (str-command (if current-command
                           (helm-symbol-name current-command)
