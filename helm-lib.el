@@ -1223,8 +1223,15 @@ See `helm-elisp-show-help'."
     (helm-set-attr 'help-current-symbol candidate)))
 
 (defcustom helm-find-function-default-project nil
-  "Default project to search symbols definitions from `helm-apropos'."
-  :type 'string
+  "Default directories to search symbols definitions from `helm-apropos'.
+A list of directories or a single directory name.
+Helm will allow you selecting one of those directories with `M-n' when
+using a prefix arg with the `find-function' action in `helm-apropos'.
+This is a good idea to add the directory names of the projects you are
+working on to quickly jump to the definitions in the project source
+files instead of jumping to the loaded files located in `load-path'."
+  :type '(choice (repeat string)
+                 string)
   :group 'helm-elisp)
 
 (defun helm-find-function-noselect (func &optional root-dir type)
@@ -1235,8 +1242,11 @@ search in all subdirs of ROOT-DIR, if ROOT-DIR is unspecified ask for
 it with completion.
 TYPE when nil specify function, for other values see `find-function-regexp-alist'."
   (let* ((sym (helm-symbolify func))
-         (dir (or root-dir (read-directory-name "Project directory: "
-                                                helm-find-function-default-project)))
+         (dir (or root-dir (helm-read-file-name
+                            "Project directory: "
+                            :test 'file-directory-p
+                            :default (helm-mklist helm-find-function-default-project)
+                            :must-match t)))
          (find-function-source-path
           (cons dir (helm-walk-directory dir
                                          :directories 'only
