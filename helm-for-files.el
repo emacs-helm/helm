@@ -193,11 +193,18 @@ Colorize only symlinks, directories and files."
                                     'match-part (funcall mp-fn disp)
                                     'help-echo (expand-file-name i))
                         i))
-                 (t (cons (propertize disp
-                                      'face 'helm-ff-file
-                                      'match-part (funcall mp-fn disp)
-                                      'help-echo (expand-file-name i))
-                          i)))))
+                 (t (let* ((ext (file-name-extension disp))
+                           (disp (propertize disp
+                                             'face 'helm-ff-file
+                                             'match-part (funcall mp-fn disp)
+                                             'help-echo (expand-file-name i))))
+                      (when (condition-case _err
+                                (string-match (format "\\.\\(%s\\)$" ext) disp)
+                              (invalid-regexp nil))
+                        (add-face-text-property
+                         (match-beginning 1) (match-end 1)
+                         'helm-ff-file-extension nil disp))
+                      (cons disp i))))))
 
 (defclass helm-files-in-current-dir-source (helm-source-sync helm-type-file)
   ((candidates :initform (lambda ()
