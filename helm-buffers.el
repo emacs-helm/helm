@@ -432,7 +432,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
    (list
     (concat prefix
             (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
-                   (ext (if buf-fname (file-name-extension buf-fname) ""))
+                   (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
                    (buf-name (propertize buf-name 'face face1
                                          'help-echo help-echo
                                          'type type)))

@@ -193,7 +193,7 @@ Colorize only symlinks, directories and files."
                                     'match-part (funcall mp-fn disp)
                                     'help-echo (expand-file-name i))
                         i))
-                 (t (let* ((ext (file-name-extension disp))
+                 (t (let* ((ext (helm-file-name-extension disp))
                            (disp (propertize disp
                                              'face 'helm-ff-file
                                              'match-part (funcall mp-fn disp)

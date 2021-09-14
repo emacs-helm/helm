@@ -1348,6 +1348,13 @@ Argument ALIST is an alist of associated major modes."
           (helm-file-name-sans-extension it)
           it)))
 
+(defsubst helm-file-name-extension (file)
+  "Returns FILE extension if it is not a number."
+  (helm-aif (file-name-extension file)
+      (and (not (string-match "\\`0+\\'" it))
+           (zerop (string-to-number it))
+           it)))
+
 (defun helm-basename (fname &optional ext)
   "Print FNAME with any leading directory components removed.
 If specified, also remove filename extension EXT.

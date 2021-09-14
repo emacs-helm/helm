@@ -3756,13 +3756,6 @@ return directly CANDIDATES."
                when fc collect fc)
     candidates))
 
-(defsubst helm-ff-file-extension (file)
-  "Returns FILE extension if it is not a number."
-  (helm-aif (file-name-extension file)
-      (and (not (string-match "\\`0+\\'" it))
-           (zerop (string-to-number it))
-           it)))
-
 (defun helm-ff-filter-candidate-one-by-one (file &optional reverse skip-boring-check)
   "Transform file in a cons cell like (DISPLAY . REAL).
 DISPLAY is shown as basename of FILE and REAL as full path of FILE.
@@ -3787,7 +3780,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
       ;; Highlight extensions.
       (helm-aif (and (not backup)
                      (not urlp)
-                     (helm-ff-file-extension disp))
+                     (helm-file-name-extension disp))
           (when (condition-case _err
                     (string-match (format "\\.\\(%s\\)\\'" it) disp)
                   (invalid-regexp nil))
@@ -3863,7 +3856,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                 ((stringp type)
                  (let* ((abbrev (abbreviate-file-name type))
                         (len-abbrev (length abbrev)))
-                   (helm-aif (helm-ff-file-extension abbrev)
+                   (helm-aif (helm-file-name-extension abbrev)
                        (when (string-match (format "\\.\\(%s\\)\\'" it) abbrev)
                          (add-face-text-property
                           (match-beginning 1) (match-end 1)
