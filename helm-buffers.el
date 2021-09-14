@@ -431,9 +431,18 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
   (append
    (list
     (concat prefix
-            (propertize buf-name 'face face1
-                        'help-echo help-echo
-                        'type type)))
+            (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
+                   (ext (if buf-fname (file-name-extension buf-fname) ""))
+                   (buf-name (propertize buf-name 'face face1
+                                         'help-echo help-echo
+                                         'type type)))
+              (when (condition-case _err
+                                (string-match (format "\\.\\(%s\\)" ext) buf-name)
+                              (invalid-regexp nil))
+                        (add-face-text-property
+                         (match-beginning 1) (match-end 1)
+                         'helm-ff-file-extension nil buf-name))
+              buf-name)))
    (and details
         (list size mode
               (propertize
