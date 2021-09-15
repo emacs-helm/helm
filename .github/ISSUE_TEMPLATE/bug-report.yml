@@ -25,7 +25,7 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: Helm version
+    id: Helm-version
     attributes:
       label: Helm Version
       description: What version of Helm are you running?
@@ -35,7 +35,7 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: Emacs version
+    id: Emacs-version
     attributes:
       label: Emacs Version
       description: What version of Emacs are you running?
