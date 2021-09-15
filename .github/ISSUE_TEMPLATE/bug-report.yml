@@ -1,0 +1,56 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: recipe
+    attributes:
+      label: How to reproduce?
+      description: Tell us how to reproduce bug step by step?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: dropdown
+    id: Helm version
+    attributes:
+      label: Helm Version
+      description: What version of Helm are you running?
+      options:
+        - Master branch (installed from source or straight)
+        - Last from Melpa (installed with package.el)
+    validations:
+      required: true
+  - type: dropdown
+    id: Emacs version
+    attributes:
+      label: Emacs Version
+      description: What version of Emacs are you running?
+      options:
+        - Emacs-25*
+        - Emacs-26*
+        - Emacs-26.3
+        - Emacs-27.1
+        - Emacs-27.2
+        - Emacs-28.0.50
+    validations:
+      required: true
+  - type: textarea
+    id: backtrace
+    attributes:
+      label: Relevant backtrace (if possible)
+      description: Please copy and paste any relevant backtrace. This will be automatically formatted into code, so no need for backticks.
+      render: text
