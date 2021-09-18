@@ -46,6 +46,19 @@ body:
         - Emacs-28.0.50
     validations:
       required: true
+  - type: dropdown
+    id: Platform
+    attributes:
+      label: OS
+      description: What OS are you running on?
+      options:
+        - GNU/Linux
+        - Freebsd
+        - MacOSX
+        - Windows
+        - Other
+    validations:
+      required: true
   - type: textarea
     id: backtrace
     attributes:
