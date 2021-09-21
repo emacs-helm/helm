@@ -448,7 +448,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
     (helm-acond ((assq major-mode helm-buffer--pretty-names)
                  (cdr it))
                 ((stringp mode-name) mode-name)
-                (t (format-mode-line mode-name)))))
+                (t (format-mode-line mode-name nil nil (get-buffer buf))))))
 
 (defun helm-buffer--details (buffer &optional details)
   (require 'dired)
