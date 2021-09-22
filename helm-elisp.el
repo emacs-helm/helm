@@ -735,8 +735,9 @@ double quote."
   "Preconfigured Helm to describe commands, functions, variables and faces.
 In non interactives calls DEFAULT argument should be provided as
 a string, i.e. the `symbol-name' of any existing symbol."
-  (interactive (list (thing-at-point 'symbol)))
-    (helm :sources
+  (interactive (list (with-syntax-table emacs-lisp-mode-syntax-table
+                       (thing-at-point 'symbol))))
+  (helm :sources
           (mapcar (lambda (func)
                     (funcall func default))
                   helm-apropos-function-list)
