@@ -72,6 +72,7 @@
 (defvar helm-completion-styles-alist)
 (defvar helm-persistent-action-window-buffer)
 (defvar completion-flex-nospace)
+(defvar find-function-source-path)
 
 ;;; User vars.
 ;;
@@ -172,7 +173,8 @@ the customize functions e.g. `customize-set-variable' and NOT
 (defvar helm-suspend-update-flag nil)
 (defvar helm-action-buffer "*helm action*"
   "Buffer showing actions.")
-
+(defvar helm-current-prefix-arg nil
+  "Record `current-prefix-arg' when exiting minibuffer.")
 
 ;;; Compatibility
 ;;
@@ -1241,6 +1243,7 @@ Instead of looking in LOAD-PATH to find library, this function
 search in all subdirs of ROOT-DIR, if ROOT-DIR is unspecified ask for
 it with completion.
 TYPE when nil specify function, for other values see `find-function-regexp-alist'."
+  (require 'find-func)
   (let* ((sym (helm-symbolify func))
          (dir (or root-dir (helm-read-file-name
                             "Project directory: "

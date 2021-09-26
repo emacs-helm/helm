@@ -1781,8 +1781,6 @@ Other sources won't appear in the search results.
 If nil, no filtering is done.
 Don't set this directly, use `helm-set-source-filter' during a
 Helm session to modify it.")
-(defvar helm-current-prefix-arg nil
-  "Record `current-prefix-arg' when exiting minibuffer.")
 (defvar helm-saved-action nil
   "Saved value of the currently selected action by key.")
 (defvar helm-saved-current-source nil
