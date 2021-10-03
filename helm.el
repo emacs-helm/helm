@@ -1912,6 +1912,8 @@ It is generally `helm-current-buffer', but when this one is displayed
 in a dedicated buffer, helm can't start in this window and use another
 window handling a buffer, it is this one we store.")
 (defvar helm--tramp-archive-maybe-loaded nil)
+(defvar helm--original-dedicated-windows-alist nil
+  "[INTERNAL] Store all dedicated windows with their dedicated state on startup")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -2834,6 +2836,13 @@ HISTORY args see `helm'."
                  (null input))
              nil "Error in %S buffer: Initial input should be a string or nil"
              buffer)
+  ;; Set all windows NON dedicated to avoid headaches with PA and
+  ;; helm-window (bug#2243)
+  (cl-loop for win in (window-list nil 1)
+           for state = (window-dedicated-p win)
+           when state
+           do (progn (set-window-dedicated-p win nil)
+                     (push `(,win . ,state) helm--original-dedicated-windows-alist)))
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
   ;; Launch tramp-archive with dbus-event in `while-no-input-ignore-events'.
   (helm--maybe-load-tramp-archive)
@@ -3189,6 +3198,11 @@ frame configuration as per `helm-save-configuration-functions'."
                      (funcall (cdr helm-save-configuration-functions))))
       (restore (funcall (car helm-save-configuration-functions)
                         helm-last-frame-or-window-configuration)
+               ;; Restore dedicated windows (bug#2243).
+               (when helm--original-dedicated-windows-alist
+                 (cl-loop for (win . state) in helm--original-dedicated-windows-alist
+                          do (set-window-dedicated-p win state))
+                 (setq helm--original-dedicated-windows-alist nil))
                ;; Restore frame focus.
                ;; This is needed for minibuffer own-frame config
                ;; when recursive minibuffers are in use.
