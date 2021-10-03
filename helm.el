@@ -2837,7 +2837,7 @@ HISTORY args see `helm'."
              nil "Error in %S buffer: Initial input should be a string or nil"
              buffer)
   ;; Set all windows NON dedicated to avoid headaches with PA and
-  ;; helm-window (bug#2243)
+  ;; helm-window (bug#2443)
   (cl-loop for win in (window-list nil 1)
            for state = (window-dedicated-p win)
            when state
@@ -3198,7 +3198,7 @@ frame configuration as per `helm-save-configuration-functions'."
                      (funcall (cdr helm-save-configuration-functions))))
       (restore (funcall (car helm-save-configuration-functions)
                         helm-last-frame-or-window-configuration)
-               ;; Restore dedicated windows (bug#2243).
+               ;; Restore dedicated windows (bug#2443).
                (when helm--original-dedicated-windows-alist
                  (cl-loop for (win . state) in helm--original-dedicated-windows-alist
                           do (set-window-dedicated-p win state))
