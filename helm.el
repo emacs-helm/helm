@@ -608,7 +608,7 @@ Also when non-nil it overrides the effect of
 
 (defcustom helm-default-display-buffer-functions nil
   "Action functions to pass to `display-buffer'.
-See (info \"(elisp) Action Functions for Buffer Display\").
+See (info \"(elisp) Buffer Display Action Functions\").
 
 It has no effect when `helm-always-two-windows' is non-nil and
 may override other settings like `helm-split-window-inside-p'."
