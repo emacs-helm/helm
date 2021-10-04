@@ -3369,17 +3369,24 @@ Arg ENABLE is the value of `no-other-window' window property."
 It is the default value of `helm-display-function'.
 It uses `switch-to-buffer' or `display-buffer' depending on the
 value of `helm-full-frame' or `helm-split-window-default-side'."
-  (let (pop-up-frames)
+  (let (pop-up-frames
+        (curwin (get-buffer-window helm-current-buffer)))
     (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
             (and (eq helm-split-window-default-side 'same)
                  (one-window-p t)))
         (progn (and (not (minibufferp helm-current-buffer))
+                    ;; side-windows can't be the only window in frame,
+                    ;; emacs refuse to delete other windows when
+                    ;; current is a side-window [1].
+                    (not (window-parameter curwin 'window-side))
                     (delete-other-windows))
                (switch-to-buffer buffer))
       (when (and (or helm-always-two-windows helm-autoresize-mode)
                  (not (eq helm-split-window-default-side 'same))
                  (not (minibufferp helm-current-buffer))
-                 (not helm-split-window-inside-p))
+                 (not helm-split-window-inside-p)
+                 ;; Same comment as in [1].
+                 (not (window-parameter curwin 'window-side)))
         (delete-other-windows))
       (display-buffer
        buffer `(,helm-default-display-buffer-functions
