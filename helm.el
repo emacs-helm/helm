@@ -879,10 +879,16 @@ Fallback to 100 when nil."
   :group 'helm
   :type 'boolean)
 
+(defvaralias 'helm-use-frame-when-dedicated-window
+    'helm-use-frame-when-no-suitable-window)
+
 (defcustom helm-use-frame-when-no-suitable-window nil
   "Display Helm buffer in frame when Helm is started from a dedicated window."
   :group 'helm
   :type 'boolean)
+(make-obsolete-variable 'helm-use-frame-when-dedicated-window
+                        'helm-use-frame-when-no-suitable-window
+                        "3.8.1")
 
 (defcustom helm-default-prompt-display-function
   #'helm-set-default-prompt-display
