@@ -3360,23 +3360,17 @@ Arg ENABLE is the value of `no-other-window' window property."
 It is the default value of `helm-display-function'.
 It uses `switch-to-buffer' or `display-buffer' depending on the
 value of `helm-full-frame' or `helm-split-window-default-side'."
-  (let (pop-up-frames
-        (dedicated-p (window-dedicated-p
-                      (get-buffer-window helm-current-buffer))))
-    (if (and (null (eq dedicated-p t))
-             (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
-                 (and (eq helm-split-window-default-side 'same)
-                      (one-window-p t))))
+  (let (pop-up-frames)
+    (if (or (buffer-local-value 'helm-full-frame (get-buffer buffer))
+            (and (eq helm-split-window-default-side 'same)
+                 (one-window-p t)))
         (progn (and (not (minibufferp helm-current-buffer))
                     (delete-other-windows))
                (switch-to-buffer buffer))
       (when (and (or helm-always-two-windows helm-autoresize-mode)
                  (not (eq helm-split-window-default-side 'same))
                  (not (minibufferp helm-current-buffer))
-                 (not helm-split-window-inside-p)
-                 ;; Prevent deleting OW only when helm-current-buffer
-                 ;; is "strongly" dedicated.
-                 (null (eq dedicated-p t)))
+                 (not helm-split-window-inside-p))
         (delete-other-windows))
       (display-buffer
        buffer `(,helm-default-display-buffer-functions
