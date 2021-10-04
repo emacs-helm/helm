@@ -3201,6 +3201,7 @@ frame configuration as per `helm-save-configuration-functions'."
                ;; Restore dedicated windows (bug#2443).
                (when helm--original-dedicated-windows-alist
                  (cl-loop for (win . state) in helm--original-dedicated-windows-alist
+                          when (window-live-p win)
                           do (set-window-dedicated-p win state))
                  (setq helm--original-dedicated-windows-alist nil))
                ;; Restore frame focus.
