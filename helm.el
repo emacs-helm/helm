@@ -879,7 +879,7 @@ Fallback to 100 when nil."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-use-frame-when-dedicated-window nil
+(defcustom helm-use-frame-when-no-suitable-window nil
   "Display Helm buffer in frame when Helm is started from a dedicated window."
   :group 'helm
   :type 'boolean)
@@ -3304,17 +3304,19 @@ If `helm-initial-frame' has no minibuffer, use
 Fallback to global value of `helm-display-function' when no local
 value found and current command is not in
 `helm-commands-using-frame'."
-  (or (with-helm-buffer helm-display-function)
-      (and (or (memq com helm-commands-using-frame)
-               (and helm-use-frame-when-dedicated-window
-                    (window-dedicated-p (get-buffer-window helm-current-buffer)))
-               (and helm-use-frame-when-more-than-two-windows
-                    (null helm--nested)
-                    (> (length (window-list)) 2))
-               ;; Frame parameter is unreliable for minibuffer on emacs-26.
-               (null (member helm-initial-frame (minibuffer-frame-list))))
-           #'helm-display-buffer-in-own-frame)
-      (default-value 'helm-display-function)))
+  (let ((win (get-buffer-window helm-current-buffer)))
+    (or (with-helm-buffer helm-display-function)
+        (and (or (memq com helm-commands-using-frame)
+                 (and helm-use-frame-when-no-suitable-window
+                      (or (window-dedicated-p win)
+                          (window-parameter win 'window-side)))
+                 (and helm-use-frame-when-more-than-two-windows
+                      (null helm--nested)
+                      (> (length (window-list)) 2))
+                 ;; Frame parameter is unreliable for minibuffer on emacs-26.
+                 (null (member helm-initial-frame (minibuffer-frame-list))))
+             #'helm-display-buffer-in-own-frame)
+        (default-value 'helm-display-function))))
 
 (defun helm-display-buffer (buffer &optional resume)
   "Display BUFFER.
