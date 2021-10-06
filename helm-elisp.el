@@ -31,7 +31,7 @@
 (declare-function helm-describe-face "helm-lib")
 (declare-function helm-read-file-name "helm-mode")
 (declare-function helm-comp-read "helm-mode")
-
+(declare-function helm-M-x-transformer-no-sort "helm-command")
 
 ;;; Customizable values
 
@@ -619,12 +619,15 @@ double quote."
                                     (customize-face (helm-symbolify candidate)))))))
 
 (defun helm-def-source--emacs-commands (&optional default)
+  (require 'helm-command)
   (helm-build-in-buffer-source "Commands"
     :init (lambda ()
             (helm-apropos-init 'commandp default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
-                                         'helm-apropos-default-sort-fn)
+    :filtered-candidate-transformer
+    (append (list #'helm-M-x-transformer-no-sort)
+            (and (null helm-apropos-fuzzy-match)
+                 'helm-apropos-default-sort-fn))
     :display-to-real 'helm-symbolify
     :nomark t
     :persistent-action (lambda (candidate)
