@@ -627,7 +627,7 @@ double quote."
     :filtered-candidate-transformer
     (append (list #'helm-M-x-transformer-no-sort)
             (and (null helm-apropos-fuzzy-match)
-                 'helm-apropos-default-sort-fn))
+                 '(helm-apropos-default-sort-fn)))
     :display-to-real 'helm-symbolify
     :nomark t
     :persistent-action (lambda (candidate)
