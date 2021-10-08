@@ -1533,11 +1533,15 @@ this working."
                        for file = (shell-quote-argument (helm-basename f))
                        ;; \@ => placeholder for file without extension.
                        ;; \# => placeholder for incremental number.
-                       for fcmd = (replace-regexp-in-string
-                                   "\\\\@" (regexp-quote (file-name-sans-extension file))
-                                   (replace-regexp-in-string
-                                    "\\\\#" (format "%03d" n) command t t)
-                                   t t)
+                       for fcmd = (helm-aand command
+                                             (replace-regexp-in-string
+                                              "\\\\#" (format "%03d" n)
+                                              it t t)
+                                             (replace-regexp-in-string
+                                              "\\\\@"
+                                              (regexp-quote
+                                               (file-name-sans-extension file))
+                                              it t t))
                        for com = (if (string-match "%s" fcmd)
                                      ;; [1] This allow to enter other args AFTER filename
                                      ;; i.e <command %s some_more_args>
