@@ -1553,7 +1553,7 @@ this working."
           ;; the advice at this point (see the `eshell-eval-command'
           ;; call in `eshell-command'.) .
           (unless (> emacs-major-version 27)
-            (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command)))))))
+            (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command))))))
 
 (defun helm--advice-eshell-eval-command (command &optional input)
   "Fix return value when command ends with \"&\"."
