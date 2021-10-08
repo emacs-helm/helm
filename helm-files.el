@@ -1504,7 +1504,7 @@ this working."
                 (and alias-value
                      ;; If command is an alias be sure it accept
                      ;; more than one arg i.e $*.
-                     (string-match "\\$\\*$" alias-value)))
+                     (string-match "\\$\\* ?&?\\'" alias-value)))
                (cdr cand-list))
 
           ;; Run eshell-command with ALL marked files as arguments.
