@@ -1515,12 +1515,13 @@ this working."
                 (setq cmd-line (format command mapfiles)) ; See [1]
               (setq cmd-line (format "%s %s" command mapfiles)))
             (eshell-command cmd-line))
+        
+        ;; Run eshell-command sequencially on EACH marked files.
+        ;; To work with tramp handler we have to call
+        ;; COMMAND on basename of each file, using
+        ;; its basedir as `default-directory'.
         (unwind-protect
             (progn
-              ;; Run eshell-command on EACH marked files.
-              ;; To work with tramp handler we have to call
-              ;; COMMAND on basename of each file, using
-              ;; its basedir as `default-directory'.
               (cl-loop for f in cand-list
                        for n from 1
                        for dir = (and (not (string-match helm--url-regexp f))
