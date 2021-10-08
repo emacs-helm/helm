@@ -1516,7 +1516,7 @@ this working."
             (eshell-command
              (if (string-match "%s" command)
                  (format command mapfiles) ; See [1]
-               (format "%s %s" command mapfiles)))))
+               (format "%s %s" command mapfiles))))
         (unwind-protect
             (progn
               ;; Run eshell-command on EACH marked files.
