@@ -1470,9 +1470,11 @@ this working."
                         (helm-comp-read
                          "Command: "
                          (cl-loop for (a c) in (eshell-read-aliases-list)
-                                  ;; Positional arguments may be double
-                                  ;; quoted (Bug#1881).
-                                  when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'" c)
+                                  ;; Allow using aliases with "%s" inside,
+                                  ;; note that these aliases will work
+                                  ;; only when called from
+                                  ;; helm-find-files. 
+                                  when (string-match "%s\\|$1\\|$\\*" c)
                                   collect (propertize a 'help-echo c) into ls
                                   finally return (sort ls 'string<))
                          :buffer "*helm eshell on file*"
@@ -1482,9 +1484,12 @@ this working."
                            "C-h m: Help, \\[universal-argument]: Insert output at point")
                          :help-message 'helm-esh-help-message
                          :input-history
-                         'helm-eshell-command-on-file-input-history))))
-           (alias-value (car (assoc-default command eshell-command-aliases-list)))
-           cmd-line)
+                         'helm-eshell-command-on-file-input-history)))))
+      ;; Command maybe an alias, in this case use its value, but it
+      ;; can be a new command not listed in alias list, in this case
+      ;; use this command as value. 
+      (helm-aif (assoc-default command eshell-command-aliases-list)
+          (setq command (car it)))
       (if (or (equal helm-current-prefix-arg '(16))
               (equal map '(16)))
           ;; Two time C-u from `helm-comp-read' mean print to current-buffer.
@@ -1500,21 +1505,18 @@ this working."
                 (and map (equal map '(4)))
                 ;; One C-u from `helm-comp-read'.
                 (equal helm-current-prefix-arg '(4))
-                ;; An alias that finish with $*
-                (and alias-value
-                     ;; If command is an alias be sure it accept
-                     ;; more than one arg i.e $*.
-                     (string-match "\\$\\*$" alias-value)))
+                ;; If command is an alias be sure it accept
+                ;; more than one arg i.e $*.
+                (string-match "\\$\\*$" command))
                (cdr cand-list))
-
           ;; Run eshell-command with ALL marked files as arguments.
           ;; This wont work on remote files, because tramp handlers depends
           ;; on `default-directory' (limitation).
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
-            (if (string-match "%s" command)
-                (setq cmd-line (format command mapfiles)) ; See [1]
-              (setq cmd-line (format "%s %s" command mapfiles)))
-            (eshell-command cmd-line))
+            (eshell-command
+             (if (string-match "%s" command)
+                 (format command mapfiles) ; See [1]
+               (format "%s %s" command mapfiles)))))
         (unwind-protect
             (progn
               ;; Run eshell-command on EACH marked files.
@@ -1532,11 +1534,14 @@ this working."
                        for file = (shell-quote-argument (helm-basename f))
                        ;; \@ => placeholder for file without extension.
                        ;; \# => placeholder for incremental number.
-                       for fcmd = (replace-regexp-in-string
-                                   "\\\\@" (regexp-quote (file-name-sans-extension file))
-                                   (replace-regexp-in-string
-                                    "\\\\#" (format "%03d" n) command t t)
-                                   t t)
+                       for fcmd = (helm-aand command
+                                             (replace-regexp-in-string
+                                              "\\\\#" (format "%03d" n)
+                                              it t t)
+                                             (replace-regexp-in-string
+                                              "\\\\@" (regexp-quote
+                                                       (file-name-sans-extension file))
+                                              it t t))
                        for com = (if (string-match "%s" fcmd)
                                      ;; [1] This allow to enter other args AFTER filename
                                      ;; i.e <command %s some_more_args>
