@@ -1449,7 +1449,9 @@ You have to setup some aliases in Eshell with the `alias' command
 or by editing yourself the file `eshell-aliases-file' to make
 this working."
   (require 'em-alias) (eshell-read-aliases-list)
-  (advice-add 'eshell-eval-command :override #'helm--advice-eshell-eval-command)
+  (unless (> emacs-major-version 27)
+    ;; This advice have been merged in emacs-28.
+    (advice-add 'eshell-eval-command :override #'helm--advice-eshell-eval-command))
   (when (or eshell-command-aliases-list
             (y-or-n-p "No eshell aliases found, run eshell-command without alias anyway? "))
     (let* ((cand-list (helm-marked-candidates :with-wildcard t))
@@ -1545,7 +1547,8 @@ this working."
           ;; Async process continue running but don't need anymore
           ;; the advice at this point (see the `eshell-eval-command'
           ;; call in `eshell-command'.) .
-          (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command))))))
+          (unless (> emacs-major-version 27)
+            (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command)))))))
 
 (defun helm--advice-eshell-eval-command (command &optional input)
   "Fix return value when command ends with \"&\"."
