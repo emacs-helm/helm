@@ -1520,8 +1520,8 @@ this working."
                      (string-match "\\$\\* ?&?\\'" alias-value)))
                (cdr cand-list))
 
-          ;; Run eshell-command with ALL marked files as arguments.
-          ;; This wont work on remote files, because tramp handlers depends
+          ;; Run eshell-command with ALL marked files as argument.
+          ;; This wont work on remote files, because tramp handlers depend
           ;; on `default-directory' (limitation).
           (let ((mapfiles (mapconcat 'shell-quote-argument cand-list " ")))
             (if (string-match "%s" command)
@@ -1541,8 +1541,9 @@ this working."
                                       (helm-basedir f))
                        ;; We can use basename here as the command will run
                        ;; under default-directory.
-                       ;; This allow running e.g. "tar czvf test.tar.gz
-                       ;; %s/*" without creating an archive expanding from /home.
+                       ;; This allows running e.g.
+                       ;; "tar czvf test.tar.gz %s/*" without creating
+                       ;; an archive expanding from /home.
                        for file = (shell-quote-argument (helm-basename f))
                        ;; \@ => placeholder for file without extension.
                        ;; \# => placeholder for incremental number.
@@ -1556,15 +1557,15 @@ this working."
                                                (file-name-sans-extension file))
                                               it t t))
                        for com = (if (string-match "%s" fcmd)
-                                     ;; [1] This allow to enter other args AFTER filename
+                                     ;; [1] This allows to enter other args AFTER filename
                                      ;; i.e <command %s some_more_args>
                                      (format fcmd file)
                                    (format "%s %s" fcmd file))
                        do (let ((default-directory (or dir default-directory)))
                             (eshell-command com))))
-          ;; Async process continue running but don't need anymore
+          ;; Async process continues running but doesn't need anymore
           ;; the advice at this point (see the `eshell-eval-command'
-          ;; call in `eshell-command'.) .
+          ;; call in `eshell-command').
           (unless (> emacs-major-version 27)
             (advice-remove 'eshell-eval-command #'helm--advice-eshell-eval-command)))))))
 
