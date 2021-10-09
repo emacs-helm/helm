@@ -1416,6 +1416,11 @@ windows layout."
 
 (defvar eshell-command-aliases-list nil)
 (defvar helm-eshell-command-on-file-input-history nil)
+(defcustom helm-ff-eshell-unwanted-aliases nil
+  "A list of eshell aliases to not display."
+  :type '(repeat string)
+  :group 'helm-files)
+
 (cl-defun helm-find-files-eshell-command-on-file-1 (&optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates.
 This is done possibly with an Eshell alias.  If no alias found,
@@ -1475,9 +1480,10 @@ this working."
                           (cl-loop for (a c) in (eshell-read-aliases-list)
                                    for len-key = (length a)
                                    when
-                                   (string-match
-                                    "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'"
-                                    c)
+                                   (and (string-match
+                                         "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'"
+                                         c)
+                                        (not (member a helm-ff-eshell-unwanted-aliases)))
                                    do (when (> len-key len) (setq len len-key))
                                    and collect (list a c))
                           for (a c) in aliases
