@@ -1524,7 +1524,10 @@ this working."
                      ;; If command is an alias be sure it accept
                      ;; more than one arg i.e $*.
                      (string-match "\\$\\* ?&?\\'" alias-value)))
-               (cdr cand-list))
+               (cdr cand-list)
+               (and alias-value
+                     ;; Command is an alias and accept only one arg.
+                     (not (string-match "\\$1 ?&?\\'" alias-value))))
 
           ;; Run eshell-command with ALL marked files as argument.
           ;; This wont work on remote files, because tramp handlers depend
