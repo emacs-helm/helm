@@ -1462,27 +1462,40 @@ this working."
            helm-display-source-at-screen-top
            (helm-actions-inherit-frame-settings t)
            helm-use-frame-when-more-than-two-windows
-           (command (with-helm-display-marked-candidates
-                      helm-marked-buffer-name
-                      (helm-ff--count-and-collect-dups
-                       (mapcar 'helm-basename cand-list))
-                      (with-helm-current-buffer
-                        (helm-comp-read
-                         "Command: "
-                         (cl-loop for (a c) in (eshell-read-aliases-list)
-                                  ;; Positional arguments may be double
-                                  ;; quoted (Bug#1881).
-                                  when (string-match "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'" c)
-                                  collect (propertize a 'help-echo c) into ls
-                                  finally return (sort ls 'string<))
-                         :buffer "*helm eshell on file*"
-                         :name "Eshell command"
-                         :mode-line
-                         '("Eshell alias"
-                           "C-h m: Help, \\[universal-argument]: Insert output at point")
-                         :help-message 'helm-esh-help-message
-                         :input-history
-                         'helm-eshell-command-on-file-input-history))))
+           (command
+            (with-helm-display-marked-candidates
+              helm-marked-buffer-name
+              (helm-ff--count-and-collect-dups
+               (mapcar 'helm-basename cand-list))
+              (with-helm-current-buffer
+                (helm-comp-read
+                 "Command: "
+                 (cl-loop with len = 0
+                          with aliases =
+                          (cl-loop for (a c) in (eshell-read-aliases-list)
+                                   for len-key = (length a)
+                                   when
+                                   (string-match
+                                    "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'"
+                                    c)
+                                   do (when (> len-key len) (setq len len-key))
+                                   and collect (list a c))
+                          for (a c) in aliases
+                          collect (cons
+                                   (concat (propertize
+                                            a 'face 'font-lock-keyword-face)
+                                           (make-string (1+ (- len (length a))) ? )
+                                           c)
+                                   a))
+                 :fc-transformer #'helm-adaptive-sort
+                 :buffer "*helm eshell on file*"
+                 :name "Eshell command"
+                 :mode-line
+                 '("Eshell alias"
+                   "C-h m: Help, \\[universal-argument]: Insert output at point")
+                 :help-message 'helm-esh-help-message
+                 :input-history
+                 'helm-eshell-command-on-file-input-history))))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
            cmd-line)
       (if (or (equal helm-current-prefix-arg '(16))
