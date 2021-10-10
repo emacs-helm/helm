@@ -1481,7 +1481,7 @@ this working."
                                    for len-key = (length a)
                                    when
                                    (and (string-match
-                                         "[\"]?.*\\(\\$1\\|\\$\\*\\)[\"]?\\s-*&?\\'"
+                                         "\\(\\$1\\|\\$\\*\\)"
                                          c)
                                         (not (member a helm-ff-eshell-unwanted-aliases)))
                                    do (when (> len-key len) (setq len len-key))
@@ -1523,11 +1523,11 @@ this working."
                 (and alias-value
                      ;; If command is an alias be sure it accept
                      ;; more than one arg i.e $*.
-                     (string-match "\\$\\* ?&?\\'" alias-value)))
+                     (string-match "\\$\\*" alias-value)))
                (cdr cand-list)
                (and alias-value
                      ;; Command is an alias and accept only one arg.
-                     (not (string-match "\\$1 ?&?\\'" alias-value))))
+                     (not (string-match "\\$1" alias-value))))
 
           ;; Run eshell-command with ALL marked files as argument.
           ;; This wont work on remote files, because tramp handlers depend
