@@ -633,9 +633,6 @@ Keys description:
 
 - CASE-FOLD: Same as `helm-case-fold-search'.
 
-- DEL-INPUT: Boolean, when non--nil (default) remove the partial
-  minibuffer input from HISTORY is present.
-
 - PERSISTENT-ACTION: A function called with one arg i.e candidate.
 
 - PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
