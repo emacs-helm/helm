@@ -560,6 +560,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             reverse-history
                             (requires-pattern 0)
                             history
+                            raw-history
                             input-history
                             (case-fold helm-comp-read-case-fold-search)
                             (persistent-action nil)
@@ -623,6 +624,8 @@ Keys description:
 - HISTORY: A list containing specific history, default is nil.
   When it is non--nil, all elements of HISTORY are displayed in
   a special source before COLLECTION.
+
+- RAW-HISTORY: When non-nil do not unquote history candidates.
 
 - INPUT-HISTORY: A symbol. The minibuffer input history will be
   stored there, if nil or not provided, `minibuffer-history'
@@ -737,14 +740,16 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                        :multiline multiline
                        :match-part match-part
                        :filtered-candidate-transformer
-                       (append '((lambda (candidates sources)
-                                   (cl-loop for i in candidates
-                                            ;; Input is added to history in completing-read's
-                                            ;; and may be regexp-quoted, so unquote it
-                                            ;; but check if cand is a string (it may be at this stage
-                                            ;; a symbol or nil) Bug#1553.
-                                            when (stringp i)
-                                            collect (replace-regexp-in-string "\\s\\" "" i))))
+                       (append `((lambda (candidates _source)
+                                   (if ,raw-history
+                                       candidates
+                                     (cl-loop for i in candidates
+                                              ;; Input is added to history in completing-read's
+                                              ;; and may be regexp-quoted, so unquote it
+                                              ;; but check if cand is a string (it may be at this stage
+                                              ;; a symbol or nil) Bug#1553.
+                                              when (stringp i)
+                                              collect (replace-regexp-in-string "\\s\\" "" i)))))
                                (and hist-fc-transformer (helm-mklist hist-fc-transformer)))
                        :persistent-action persistent-action
                        :persistent-help persistent-help
