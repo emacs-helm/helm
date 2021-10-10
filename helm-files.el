@@ -1553,7 +1553,9 @@ this working."
                        ;; This allows running e.g.
                        ;; "tar czvf test.tar.gz %s/*" without creating
                        ;; an archive expanding from /home.
-                       for file = (shell-quote-argument (helm-basename f))
+                       for file = (shell-quote-argument
+                                   (if (string-match helm--url-regexp f)
+                                       f (helm-basename f)))
                        ;; \@ => placeholder for file without extension.
                        ;; \# => placeholder for incremental number.
                        for fcmd = (helm-aand command
