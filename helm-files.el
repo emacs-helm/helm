@@ -1420,7 +1420,7 @@ windows layout."
   "A list of eshell aliases to not display."
   :type '(repeat string)
   :group 'helm-files)
-
+(defvar helm-eshell-command-on-file-history nil)
 (cl-defun helm-find-files-eshell-command-on-file-1 (&optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates.
 This is done possibly with an Eshell alias.  If no alias found,
@@ -1500,6 +1500,8 @@ this working."
                  '("Eshell alias"
                    "C-h m: Help, \\[universal-argument]: Insert output at point")
                  :help-message 'helm-esh-help-message
+                 :history 'helm-eshell-command-on-file-history
+                 :raw-history t
                  :input-history
                  'helm-eshell-command-on-file-input-history))))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
