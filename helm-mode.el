@@ -562,7 +562,6 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             history
                             input-history
                             (case-fold helm-comp-read-case-fold-search)
-                            (del-input t)
                             (persistent-action nil)
                             (persistent-help "DoNothing")
                             (mode-line helm-comp-read-mode-line)
@@ -700,7 +699,7 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That means you can pass prefix args before or after calling a command
 that use `helm-comp-read'.  See `helm-M-x' for example."
-
+  (cl-assert (symbolp history) nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn `(("Sole action (Identity)"
@@ -825,15 +824,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                          :buffer buffer))
         (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
       ;; Avoid adding an incomplete input to history.
-      (when (and result history del-input)
-        (cond ((and (symbolp history) ; History is a symbol.
-                    (not (symbolp (symbol-value history)))) ; Fix Bug#324.
-               ;; Be sure history is not a symbol with a nil value.
-               (helm-aif (symbol-value history) (setcar it result)))
-              ((consp history) ; A list with a non--nil value.
-               (setcar history result))
-              (t ; Possibly a symbol with a nil value.
-               (set history (list result)))))
+      (when (and result history (symbolp history))
+        (set history (cons result (delete result (symbol-value history)))))
       (or result (helm-mode--keyboard-quit)))))
 
 
