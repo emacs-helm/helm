@@ -699,7 +699,6 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That means you can pass prefix args before or after calling a command
 that use `helm-comp-read'.  See `helm-M-x' for example."
-  (cl-assert (symbolp history) nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn `(("Sole action (Identity)"
@@ -825,7 +824,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                          :history (and (symbolp input-history) input-history)
                          :buffer buffer))
         (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
-      ;; Avoid adding an incomplete input to history.
+      ;; If `history' is a symbol save it.
       (when (and result history (symbolp history))
         (set history (cons result (delete result (symbol-value history)))))
       (or result (helm-mode--keyboard-quit)))))
