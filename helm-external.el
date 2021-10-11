@@ -154,8 +154,7 @@ to use."
                               "Program: " collection
                               :must-match t
                               :name "Open file Externally"
-                              :del-input nil
-                              :history helm-external-command-history)
+                              :history 'helm-external-command-history)
                            ;; Always prompt to set this program as default.
                            (setq def-prog nil))
                          ;; No prefix arg or default program exists.
@@ -180,10 +179,8 @@ to use."
                                  helm-external-programs-associations)))
     (helm-run-or-raise program file)
     (setq helm-external-command-history
-          (cons program
-                (delete program
-                        (cl-loop for i in helm-external-command-history
-                              when (executable-find i) collect i))))))
+          (cl-loop for i in helm-external-command-history
+                   when (executable-find i) collect i))))
 
 ;;;###autoload
 (defun helm-run-external-command (program)
@@ -196,14 +193,12 @@ You can set your own list of commands with
                  "RunProgram: "
                  (helm-external-commands-list-1 'sort)
                  :must-match t
-                 :del-input nil
                  :name "External Commands"
-                 :history helm-external-command-history)))
+                 :history 'helm-external-command-history)))
   (helm-run-or-raise program)
   (setq helm-external-command-history
-        (cons program (delete program
-                              (cl-loop for i in helm-external-command-history
-                                    when (executable-find i) collect i)))))
+        (cl-loop for i in helm-external-command-history
+                 when (executable-find i) collect i)))
 
 
 (provide 'helm-external)

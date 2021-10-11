@@ -402,8 +402,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
      (helm-build-elvi-list)
      :must-match t
      :name "Surfraw Search Engines"
-     :del-input nil
-     :history helm-surfraw-engines-history)))
+     :history 'helm-surfraw-engines-history)))
   (let* ((engine-nodesc (car (split-string engine)))
          (url (if (string= engine-nodesc "duckduckgo")
                   ;; "sr duckduckgo -p foo" is broken, workaround.
@@ -418,9 +417,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
                                           browse-url-browser-function)))
     (if (string= engine-nodesc "W")
         (helm-browse-url helm-home-url)
-      (helm-browse-url url)
-      (setq helm-surfraw-engines-history
-            (cons engine (delete engine helm-surfraw-engines-history))))))
+      (helm-browse-url url))))
 
 ;;;###autoload
 (defun helm-google-suggest ()
