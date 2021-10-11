@@ -712,7 +712,26 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That means you can pass prefix args before or after calling a command
 that use `helm-comp-read'.  See `helm-M-x' for example."
-  (cl-assert (and shistory history (symbolp history))
+  ;; Handle error with HISTORY:
+  ;;
+  ;; Should show helm with one source at first run and save result on
+  ;; exit, should show the history source along candidates source on
+  ;; next run as soon as `test-hist' value is feeded. 
+  ;;     (setq test-hist nil)
+  ;;     (helm-comp-read "test: " '(a b c d e)
+  ;;                     :history 'test-hist)
+  ;;
+  ;; Should run normally as long as `test-hist' is bound and nil. As
+  ;; soon `test-hist' becomes non-nil throw an error.
+  ;;     (helm-comp-read "test: " '(a b c d e)
+  ;;                     :history test-hist)
+  ;;
+  ;; Should run normally.
+  ;;     (completing-read "test: " '(a b c d e))
+  (cl-assert (if shistory
+                 (or (null history)
+                     (and history (symbolp history)))
+               t)
              nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
