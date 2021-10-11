@@ -559,7 +559,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             fuzzy
                             reverse-history
                             (requires-pattern 0)
-                            history
+                            (history nil shistory)
                             raw-history
                             input-history
                             (case-fold helm-comp-read-case-fold-search)
@@ -621,15 +621,28 @@ Keys description:
 
 - REQUIRES-PATTERN: Same as helm attribute, default is 0.
 
-- HISTORY: A list containing specific history, default is nil.
-  When it is non--nil, all elements of HISTORY are displayed in
-  a special source before COLLECTION.
+- HISTORY: A symbol where each result will be saved.
+  If not specified as a symbol an error will popup.
+  When specified, all elements of HISTORY are displayed in
+  a special source before or after COLLECTION according to REVERSE-HISTORY.
+  The main difference with INPUT-HISTORY is that the result of the
+  completion is saved whereas in INPUT-HISTORY it is the minibuffer
+  contents which is saved when you exit.
+  Don't use the same symbol for INPUT-HISTORY and HISTORY.
+  NOTE: As mentionned above this has nothing to do with
+  `minibuffer-history-variable', therefore if you want to save this
+  history persistently, you will have to add this variable to the
+  relevant variable of your favorite tool for persistent emacs session
+  i.e. psession, desktop etc...
 
-- RAW-HISTORY: When non-nil do not unquote history candidates.
+- RAW-HISTORY: When non-nil do not remove backslashs if some in
+  HISTORY candidates.
 
 - INPUT-HISTORY: A symbol. The minibuffer input history will be
   stored there, if nil or not provided, `minibuffer-history'
-  will be used instead.
+  will be used instead.  You can navigate in this history with
+  `M-p' and `M-n'.
+  Don't use the same symbol for INPUT-HISTORY and HISTORY.
 
 - CASE-FOLD: Same as `helm-case-fold-search'.
 
@@ -699,6 +712,8 @@ in `helm-current-prefix-arg', otherwise if prefix args were given before
 `helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
 That means you can pass prefix args before or after calling a command
 that use `helm-comp-read'.  See `helm-M-x' for example."
+  (cl-assert (and shistory history (symbolp history))
+             nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (let ((action-fn `(("Sole action (Identity)"
