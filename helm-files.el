@@ -3304,7 +3304,9 @@ debugging purpose."
   "List directory DIRECTORY.
 
 If DIRECTORY is remote use `helm-list-directory-function',
-otherwise use `directory-files'."
+otherwise use `directory-files'.
+SEL argument is only here for debugging purpose, it default to
+`helm-get-selection'."
   (let* ((remote (file-remote-p directory 'method))
          (helm-list-directory-function
           (if (and remote (not (string= remote "ftp")))
@@ -3336,6 +3338,8 @@ otherwise use `directory-files'."
               directory t directory-files-no-dot-files-regexp)))))
 
 (defun helm-sort-candidates-by (candidates function &optional selection)
+  "Sort CANDIDATES by group related to FUNCTION result.
+E.g. Use it to list CANDIDATES by extensions."
   (let* ((sel  (or selection (helm-get-selection) ""))
          (seen (list (file-name-extension sel)))
          (seq  (copy-sequence candidates))
