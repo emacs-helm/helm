@@ -3351,7 +3351,7 @@ otherwise use `directory-files'."
                (if sel
                    (progn
                      (push (funcall function sel) seen)
-                     (sort lst pred))
+                     (sort (nreverse lst) pred))
                  lst))
              when (null sel) return (nreverse lst))))
 
