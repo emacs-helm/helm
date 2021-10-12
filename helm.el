@@ -2056,15 +2056,12 @@ End:")
 (defmacro with-helm-temp-hook (hook &rest body)
   "Execute temporarily BODY as a function for HOOK."
   (declare (indent 1) (debug t))
-  (helm-with-gensyms (helm--hook)
-    `(progn
-       (defun ,helm--hook ()
-         (unwind-protect
-             (progn ,@body)
-           (remove-hook ,hook (quote ,helm--hook))
-           (fmakunbound (quote ,helm--hook))))
-       (push (cons ',helm--hook ,hook) helm--temp-hooks)
-       (add-hook ,hook (quote ,helm--hook)))))
+  `(letrec ((helm--hook (lambda ()
+                          (unwind-protect
+                               (progn ,@body)
+                            (remove-hook ,hook helm--hook)))))
+     (push (cons helm--hook ,hook) helm--temp-hooks)
+     (add-hook ,hook helm--hook)))
 
 (defmacro with-helm-after-update-hook (&rest body)
   "Execute BODY at end of `helm-update'."
@@ -3996,7 +3993,8 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   ;; may not have been consumed.
   (when helm--temp-hooks
     (cl-loop for (fn . hook) in helm--temp-hooks
-             do (set hook (delete fn (symbol-value hook)))))
+             do (remove-hook hook fn))
+    (setq helm--temp-hooks nil))
   ;; When running helm from a dedicated frame
   ;; with no minibuffer, helm will run in the main frame
   ;; which have a minibuffer, so be sure to disable
