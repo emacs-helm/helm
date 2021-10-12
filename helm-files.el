@@ -437,13 +437,19 @@ slower and less featured (only directories colorized)."
 
 (defcustom helm-ff-initial-sort-method nil
   "Sort method to use when initially listing a directory.
-Note that this doesn't affect the listing when matching inside
-the directory (i.e. filenames)."
+
+It is better to keep this nil globally and turn it on only when needed
+otherwise it may be slightly slower specially with `ext' method which
+BTW is not provided on remote files (helm will fallback on nil in such
+case).
+Note that this have no effect as soon as you start narrowing directory
+i.e. filtering filenames inside directory."
   :group 'helm-files
   :type '(choice
           (const :tag "alphabetically" nil)
           (const :tag "newest" newest)
-          (const :tag "size" size)))
+          (const :tag "size" size)
+          (const :tag "extensions" ext)))
 
 (defcustom helm-ff-rotate-image-program "exiftran"
   "External program used to rotate images.
@@ -710,6 +716,7 @@ It is generally \"~/.local/share/Trash\"."
     (define-key map (kbd "S-<f3>")        'helm-ff-sort-by-size)
     (define-key map (kbd "S-<f4>")        'helm-ff-toggle-dirs-only)
     (define-key map (kbd "S-<f5>")        'helm-ff-toggle-files-only)
+    (define-key map (kbd "S-<f6>")        'helm-ff-sort-by-ext)
     (helm-define-key-with-subkeys map (kbd "DEL") ?\d 'helm-ff-delete-char-backward
                                   '((C-backspace . helm-ff-run-toggle-auto-update)
                                     ([C-c DEL] . helm-ff-run-toggle-auto-update))
@@ -1779,7 +1786,9 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (interactive)
   (unless (eq helm-ff-initial-sort-method 'size)
     (setq helm-ff-initial-sort-method 'size)
-    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update
+     (regexp-quote (helm-get-selection
+                    nil helm-ff-transformer-show-only-basename))))
   (message "Sorting by size"))
 (put 'helm-ff-sort-by-size 'helm-only t)
 
@@ -1787,15 +1796,29 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
   (interactive)
   (unless (eq helm-ff-initial-sort-method 'newest)
     (setq helm-ff-initial-sort-method 'newest)
-    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update
+     (regexp-quote (helm-get-selection
+                    nil helm-ff-transformer-show-only-basename))))
   (message "Sorting by newest"))
 (put 'helm-ff-sort-by-newest 'helm-only t)
+
+(defun helm-ff-sort-by-ext ()
+  (interactive)
+  (unless (eq helm-ff-initial-sort-method 'ext)
+    (setq helm-ff-initial-sort-method 'ext)
+    (helm-force-update
+     (regexp-quote (helm-get-selection
+                    nil helm-ff-transformer-show-only-basename))))
+  (message "Sorting by extensions"))
+(put 'helm-ff-sort-by-ext 'no-helm-mx t)
 
 (defun helm-ff-sort-alpha ()
   (interactive)
   (unless (eq helm-ff-initial-sort-method nil)
     (setq helm-ff-initial-sort-method nil)
-    (helm-force-update (helm-get-selection nil helm-ff-transformer-show-only-basename)))
+    (helm-force-update
+     (regexp-quote (helm-get-selection
+                    nil helm-ff-transformer-show-only-basename))))
   (message "Sorting alphabetically"))
 (put 'helm-ff-sort-alpha 'helm-only t)
 
@@ -3277,7 +3300,7 @@ debugging purpose."
                        (list (helm-ff-filter-candidate-one-by-one path nil t)))
                      (helm-ff-directory-files basedir))))))
 
-(defun helm-list-directory (directory)
+(defun helm-list-directory (directory &optional sel)
   "List directory DIRECTORY.
 
 If DIRECTORY is remote use `helm-list-directory-function',
@@ -3294,13 +3317,47 @@ otherwise use `directory-files'."
                                     "-t" #'file-newer-than-file-p))
                         (size (if (and remote remote-fn-p)
                                   "-S" #'helm-ff-file-larger-that-file-p))
+                        (ext (unless (and remote remote-fn-p)
+                               #'helm-sort-candidates-by))
                         (t nil))))
-    (if remote
-        (funcall helm-list-directory-function directory sort-method)
-      (if sort-method
-          (sort (directory-files directory t directory-files-no-dot-files-regexp)
-                sort-method)
-        (directory-files directory t directory-files-no-dot-files-regexp)))))
+    (cond (remote
+           (funcall helm-list-directory-function directory sort-method))
+          ((memq helm-ff-initial-sort-method '(newest size))
+           (sort (directory-files
+                  directory t directory-files-no-dot-files-regexp)
+                 sort-method))
+          ((eq helm-ff-initial-sort-method 'ext)
+           (funcall sort-method
+                    (directory-files
+                     directory t directory-files-no-dot-files-regexp)
+                    #'file-name-extension
+                    (or sel (helm-get-selection))))
+          (t (directory-files
+              directory t directory-files-no-dot-files-regexp)))))
+
+(defun helm-sort-candidates-by (candidates function &optional selection)
+  (let* ((sel  (or selection (helm-get-selection) ""))
+         (seen (list (file-name-extension sel)))
+         (seq  (copy-sequence candidates))
+         (pred (lambda (s1 _s2)
+                 (let ((ext1 (funcall function s1))
+                       (ext2 (funcall function sel)))
+                   (if (and ext1 ext2)
+                       (equal ext1 ext2)
+                     t)))))
+    (cl-loop for lst = (sort seq pred) then
+             (progn
+               (setq sel (cl-loop for elm in lst thereis
+                                  (and (not (member
+                                             (funcall function elm)
+                                             seen))
+                                       elm)))
+               (if sel
+                   (progn
+                     (push (funcall function sel) seen)
+                     (sort lst pred))
+                 lst))
+             when (null sel) return (nreverse lst))))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
