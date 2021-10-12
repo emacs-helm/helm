@@ -3351,9 +3351,9 @@ otherwise use `directory-files'."
                (if sel
                    (progn
                      (push (funcall function sel) seen)
-                     (sort (nreverse lst) pred))
+                     (sort lst pred))
                  lst))
-             when (null sel) return (nreverse lst))))
+             when (null sel) return lst)))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
