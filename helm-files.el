@@ -1784,41 +1784,37 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
 
 (defun helm-ff-sort-by-size ()
   (interactive)
-  (unless (eq helm-ff-initial-sort-method 'size)
-    (setq helm-ff-initial-sort-method 'size)
-    (helm-force-update
-     (regexp-quote (helm-get-selection
-                    nil helm-ff-transformer-show-only-basename))))
+  (setq helm-ff-initial-sort-method 'size)
+  (helm-force-update
+   (regexp-quote (helm-get-selection
+                  nil helm-ff-transformer-show-only-basename)))
   (message "Sorting by size"))
 (put 'helm-ff-sort-by-size 'helm-only t)
 
 (defun helm-ff-sort-by-newest ()
   (interactive)
-  (unless (eq helm-ff-initial-sort-method 'newest)
-    (setq helm-ff-initial-sort-method 'newest)
-    (helm-force-update
-     (regexp-quote (helm-get-selection
-                    nil helm-ff-transformer-show-only-basename))))
+  (setq helm-ff-initial-sort-method 'newest)
+  (helm-force-update
+   (regexp-quote (helm-get-selection
+                  nil helm-ff-transformer-show-only-basename)))
   (message "Sorting by newest"))
 (put 'helm-ff-sort-by-newest 'helm-only t)
 
 (defun helm-ff-sort-by-ext ()
   (interactive)
-  (unless (eq helm-ff-initial-sort-method 'ext)
-    (setq helm-ff-initial-sort-method 'ext)
-    (helm-force-update
-     (regexp-quote (helm-get-selection
-                    nil helm-ff-transformer-show-only-basename))))
+  (setq helm-ff-initial-sort-method 'ext)
+  (helm-force-update
+   (regexp-quote (helm-get-selection
+                  nil helm-ff-transformer-show-only-basename)))
   (message "Sorting by extensions"))
 (put 'helm-ff-sort-by-ext 'no-helm-mx t)
 
 (defun helm-ff-sort-alpha ()
   (interactive)
-  (unless (eq helm-ff-initial-sort-method nil)
-    (setq helm-ff-initial-sort-method nil)
-    (helm-force-update
-     (regexp-quote (helm-get-selection
-                    nil helm-ff-transformer-show-only-basename))))
+  (setq helm-ff-initial-sort-method nil)
+  (helm-force-update
+   (regexp-quote (helm-get-selection
+                  nil helm-ff-transformer-show-only-basename)))
   (message "Sorting alphabetically"))
 (put 'helm-ff-sort-alpha 'helm-only t)
 
