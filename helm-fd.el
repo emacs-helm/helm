@@ -107,7 +107,7 @@
 (defun helm-fd-fct (candidates _source)
   "The filtered-candidate-transformer function for helm-fd."
   (cl-loop for i in candidates
-           collect (helm--ansi-color-apply i)))
+           collect (ansi-color-apply i)))
 
 (defun helm-fd-1 (directory)
   "Run fd shell command on DIRECTORY with helm interface."

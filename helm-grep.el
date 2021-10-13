@@ -30,7 +30,6 @@
 (declare-function doc-view-goto-page "doc-view" (page))
 (declare-function pdf-view-goto-page "pdf-view" (page &optional window))
 (declare-function helm-mm-split-pattern "helm-multi-match")
-(declare-function helm--ansi-color-apply "helm-lib")
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-occur "helm-occur")
 
@@ -898,7 +897,7 @@ Special commands:
                               (prog1 (split-string (buffer-string) "\n")
                                 (kill-buffer)))
                    for line = (if (string-match-p helm--ansi-color-regexp l)
-                                  (helm--ansi-color-apply l) l)
+                                  (ansi-color-apply l) l)
                    when (string-match helm-grep-split-line-regexp line)
                    do (insert (propertize
                                (car (helm-grep-filter-one-by-one
@@ -1222,7 +1221,7 @@ matching `helm-zgrep-file-extension-regexp' only."
   (let* ((root   (or dir (and helm-grep-default-directory-fn
                               (funcall helm-grep-default-directory-fn))))
          (ansi-p (string-match-p helm--ansi-color-regexp candidate))
-         (line   (if ansi-p (helm--ansi-color-apply candidate) candidate))
+         (line   (if ansi-p (ansi-color-apply candidate) candidate))
          (split  (helm-grep-split-line line))
          (fname  (if (and root split)
                      ;; Filename should always be provided as a local

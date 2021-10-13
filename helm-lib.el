@@ -1816,6 +1816,9 @@ broken."
         (push (substring string start) result))
     (apply 'concat (nreverse result))))
 
+(when (< emacs-major-version 26)
+  (advice-add 'ansi-color-apply :override #'helm--ansi-color-apply))
+
 
 ;;; Fontlock
 (cl-dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
