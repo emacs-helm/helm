@@ -3337,19 +3337,25 @@ SEL argument is only here for debugging purpose, it default to
           (t (directory-files
               directory t directory-files-no-dot-files-regexp)))))
 
-(defun helm-group-candidates-by (candidates function &optional selection)
+(defun helm-group-candidates-by (candidates function &optional selection separate)
   "Sort CANDIDATES by group related to FUNCTION result.
-E.g. Use it to list CANDIDATES by extensions."
-  (cl-loop with sel = (or selection (helm-get-selection))
+E.g. Use it to list CANDIDATES by extensions.
+
+SELECTION specify where to start in CANDIDATES.
+If SEPARATE is non-nil returns a list of groups i.e. a list of lists,
+otherwise a plain list is returned."
+  (cl-loop with sel = (or selection (helm-get-selection) "")
            with lst = (copy-sequence candidates)
            while lst
-           append (cl-loop for c in lst
-                           when (equal (funcall function c)
-                                       (funcall function sel))
-                           collect c into group
-                           and do (setq lst (delete c lst))
-                           finally return (prog1 group
-                                            (setq sel (car lst))))))
+           for group = (cl-loop for c in lst
+                                when (equal (funcall function c)
+                                            (funcall function sel))
+                                collect c into grp
+                                and do (setq lst (delete c lst))
+                                finally return (prog1 grp
+                                                 (setq sel (car lst))))
+           if separate collect group
+           else append group))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
