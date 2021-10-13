@@ -3320,7 +3320,7 @@ SEL argument is only here for debugging purpose, it default to
                         (size (if (and remote remote-fn-p)
                                   "-S" #'helm-ff-file-larger-that-file-p))
                         (ext (unless (and remote remote-fn-p)
-                               #'helm-sort-candidates-by))
+                               #'helm-group-candidates-by))
                         (t nil))))
     (cond (remote
            (funcall helm-list-directory-function directory sort-method))
@@ -3337,31 +3337,19 @@ SEL argument is only here for debugging purpose, it default to
           (t (directory-files
               directory t directory-files-no-dot-files-regexp)))))
 
-(defun helm-sort-candidates-by (candidates function &optional selection)
+(defun helm-group-candidates-by (candidates function &optional selection)
   "Sort CANDIDATES by group related to FUNCTION result.
 E.g. Use it to list CANDIDATES by extensions."
-  (let* ((sel  (or selection (helm-get-selection) ""))
-         (seen (list (file-name-extension sel)))
-         (seq  (copy-sequence candidates))
-         (pred (lambda (s1 _s2)
-                 (let ((ext1 (funcall function s1))
-                       (ext2 (funcall function sel)))
-                   (if (and ext1 ext2)
-                       (equal ext1 ext2)
-                     t)))))
-    (cl-loop for lst = (sort seq pred) then
-             (progn
-               (setq sel (cl-loop for elm in lst thereis
-                                  (and (not (member
-                                             (funcall function elm)
-                                             seen))
-                                       elm)))
-               (if sel
-                   (progn
-                     (push (funcall function sel) seen)
-                     (sort lst pred))
-                 lst))
-             when (null sel) return lst)))
+  (cl-loop with sel = (or selection (helm-get-selection))
+           with lst = (copy-sequence candidates)
+           while lst
+           append (cl-loop for c in lst
+                           when (equal (funcall function c)
+                                       (funcall function sel))
+                           collect c into group
+                           and do (setq lst (remove c lst))
+                           finally return (prog1 group
+                                            (setq sel (car lst))))))
 
 (defsubst helm-ff-file-larger-that-file-p (f1 f2)
   (let ((attr1 (file-attributes f1))
