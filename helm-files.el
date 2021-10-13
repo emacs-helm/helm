@@ -3347,7 +3347,7 @@ E.g. Use it to list CANDIDATES by extensions."
                            when (equal (funcall function c)
                                        (funcall function sel))
                            collect c into group
-                           and do (setq lst (remove c lst))
+                           and do (setq lst (delete c lst))
                            finally return (prog1 group
                                             (setq sel (car lst))))))
 
