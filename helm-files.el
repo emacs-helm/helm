@@ -1784,42 +1784,42 @@ prefix arg shell buffer doesn't exists, create it and switch to it."
 
 (defun helm-ff-sort-by-size ()
   (interactive)
-  (setq helm-ff-initial-sort-method 'size)
-  (helm-force-update
-   (concat (regexp-quote (helm-get-selection
-                          nil helm-ff-transformer-show-only-basename))
-           "$"))
-  (message "Sorting by size"))
+  (let ((helm-ff-initial-sort-method 'size))
+    (helm-force-update
+     (concat (regexp-quote (helm-get-selection
+                            nil helm-ff-transformer-show-only-basename))
+             "$"))
+    (message "Sorting by size")))
 (put 'helm-ff-sort-by-size 'helm-only t)
 
 (defun helm-ff-sort-by-newest ()
   (interactive)
-  (setq helm-ff-initial-sort-method 'newest)
-  (helm-force-update
-   (concat (regexp-quote (helm-get-selection
-                          nil helm-ff-transformer-show-only-basename))
-           "$"))
-  (message "Sorting by newest"))
+  (let ((helm-ff-initial-sort-method 'newest))
+    (helm-force-update
+     (concat (regexp-quote (helm-get-selection
+                            nil helm-ff-transformer-show-only-basename))
+             "$"))
+    (message "Sorting by newest")))
 (put 'helm-ff-sort-by-newest 'helm-only t)
 
 (defun helm-ff-sort-by-ext ()
   (interactive)
-  (setq helm-ff-initial-sort-method 'ext)
-  (helm-force-update
-   (concat (regexp-quote (helm-get-selection
-                          nil helm-ff-transformer-show-only-basename))
-           "$"))
-  (message "Sorting by extensions"))
+  (let ((helm-ff-initial-sort-method 'ext))
+    (helm-force-update
+     (concat (regexp-quote (helm-get-selection
+                            nil helm-ff-transformer-show-only-basename))
+             "$"))
+    (message "Sorting by extensions")))
 (put 'helm-ff-sort-by-ext 'no-helm-mx t)
 
 (defun helm-ff-sort-alpha ()
   (interactive)
-  (setq helm-ff-initial-sort-method nil)
-  (helm-force-update
-   (concat (regexp-quote (helm-get-selection
-                          nil helm-ff-transformer-show-only-basename))
-           "$"))
-  (message "Sorting alphabetically"))
+  (let ((helm-ff-initial-sort-method nil))
+    (helm-force-update
+     (concat (regexp-quote (helm-get-selection
+                            nil helm-ff-transformer-show-only-basename))
+             "$"))
+    (message "Sorting alphabetically")))
 (put 'helm-ff-sort-alpha 'helm-only t)
 
 (defun helm-ff-directories-only (candidates _source)
