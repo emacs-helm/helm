@@ -3333,7 +3333,7 @@ SEL argument is only here for debugging purpose, it default to
                     (directory-files
                      directory t directory-files-no-dot-files-regexp)
                     #'file-name-extension
-                    (or sel (helm-get-selection))))
+                    (or sel (helm-get-selection) "")))
           (t (directory-files
               directory t directory-files-no-dot-files-regexp)))))
 
