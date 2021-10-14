@@ -795,6 +795,11 @@ When filtering directories/files only, switch back to a \"show all\" view
 when moving out of directory when non nil."
   :type 'boolean
   :group 'helm-files)
+
+(defcustom helm-ff-eshell-unwanted-aliases nil
+  "A list of eshell aliases to not display."
+  :type '(repeat string)
+  :group 'helm-files)
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -1421,12 +1426,10 @@ windows layout."
                               (file-name-directory candidate))))
     (helm-etags-select helm-current-prefix-arg)))
 
+;;; Eshell command on file
+;;
 (defvar eshell-command-aliases-list nil)
 (defvar helm-eshell-command-on-file-input-history nil)
-(defcustom helm-ff-eshell-unwanted-aliases nil
-  "A list of eshell aliases to not display."
-  :type '(repeat string)
-  :group 'helm-files)
 (defvar helm-eshell-command-on-file-history nil)
 (cl-defun helm-find-files-eshell-command-on-file-1 (&optional map)
   "Run `eshell-command' on CANDIDATE or marked candidates.
