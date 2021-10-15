@@ -3341,10 +3341,19 @@ SEL argument is only here for debugging purpose, it default to
               directory t directory-files-no-dot-files-regexp)))))
 
 (defun helm-group-candidates-by (candidates function &optional selection separate)
-  "Sort CANDIDATES by group related to FUNCTION result.
-E.g. Use it to list CANDIDATES by extensions.
+  "Group similar items in CANDIDATES according to FUNCTION.
+Items not matching FUNCTION are grouped as well in a separate group.
+
+Example:
+
+    (setq B '(1 2 3 4 5 6 7 8 9))
+
+    (helm-group-candidates-by B #'cl-oddp 2 'separate)
+    => ((2 4 6 8) (1 3 5 7 9))
 
 SELECTION specify where to start in CANDIDATES.
+Similar candidates to SELECTION will be listed on top.
+
 If SEPARATE is non-nil returns a list of groups i.e. a list of lists,
 otherwise a plain list is returned."
   (cl-loop with sel = (or selection (helm-get-selection) "")
