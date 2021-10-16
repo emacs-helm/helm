@@ -368,7 +368,7 @@ described above to reproduce your bug.
 
 [Helm Wiki](https://github.com/emacs-helm/helm/wiki)
 
-Or ask directly on github issues.
+Or ask directly on [Helm discussions](https://github.com/emacs-helm/helm/discussions)
 
 Cheers,<br>
 The Helm Team
