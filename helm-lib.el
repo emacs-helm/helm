@@ -988,6 +988,35 @@ LIST is a list of numbers and NUM a number."
            collect (cons diff i) into res
            minimize diff into min
            finally return (cdr (assq min res))))
+
+(defun helm-group-candidates-by (candidates function &optional selection separate)
+  "Group similar items in CANDIDATES according to FUNCTION.
+Items not matching FUNCTION are grouped as well in a separate group.
+
+Example:
+
+    (setq B '(1 2 3 4 5 6 7 8 9))
+
+    (helm-group-candidates-by B #'cl-oddp 2 'separate)
+    => ((2 4 6 8) (1 3 5 7 9))
+
+SELECTION specify where to start in CANDIDATES.
+Similar candidates to SELECTION will be listed on top.
+
+If SEPARATE is non-nil returns a list of groups i.e. a list of lists,
+otherwise a plain list is returned."
+  (cl-loop with sel = (or selection (helm-get-selection) "")
+           with lst = (copy-sequence candidates)
+           while lst
+           for group = (cl-loop for c in lst
+                                when (equal (funcall function c)
+                                            (funcall function sel))
+                                collect c into grp
+                                and do (setq lst (delete c lst))
+                                finally return (prog1 grp
+                                                 (setq sel (car lst))))
+           if separate collect group
+           else append group))
 
 ;;; Strings processing.
 ;;
