@@ -87,32 +87,39 @@ contents.  Else it calculates all external commands and sets
 If EXE is already running just jump to his window if
 `helm-raise-command' is non-nil.
 When FILE argument is provided run EXE with FILE."
-  (let* ((real-com (car (split-string exe)))
-         (proc     (if file (concat real-com " " file) real-com))
-         process-connection-type)
-    (if (get-process proc)
+  (let* ((real-com  (replace-regexp-in-string
+                     "(" "" (car (split-string exe))))
+         (proc-name (if file (concat real-com " " file) real-com))
+         (file-arg  (shell-quote-argument
+                     (if (eq system-type 'windows-nt)
+                         (helm-w32-prepare-filename file)
+                       (expand-file-name file))))
+         process-connection-type proc)
+    (if (get-process proc-name)
         (if helm-raise-command
             (shell-command  (format helm-raise-command real-com))
           (error "Error: %s is already running" real-com))
       (when (member real-com helm-external-commands-list)
         (message "Starting %s..." real-com)
         (if file
-            (start-process-shell-command
-             proc nil (format "%s %s"
-                              real-com
-                              (shell-quote-argument
-                               (if (eq system-type 'windows-nt)
-                                   (helm-w32-prepare-filename file)
-                                   (expand-file-name file)))))
-          (start-process-shell-command proc nil real-com))
-        (set-process-sentinel
-         (get-process proc)
-         (lambda (process event)
+            (cond ((string-match "%s &)\\'" exe)
+                   (call-process-shell-command (format exe file-arg)))
+                  (t
+                   (setq proc
+                         (start-process-shell-command
+                          proc-name nil (if (string-match "%s" exe)
+                                            (format exe file-arg)
+                                          (format "%s %s" exe file-arg))))))
+          (setq proc (start-process-shell-command proc-name nil exe)))
+        (when proc
+          (set-process-sentinel
+           proc
+           (lambda (process event)
              (when (and (string= event "finished\n")
                         helm-raise-command
                         (not (helm-get-pid-from-process-name real-com)))
                (shell-command  (format helm-raise-command "emacs")))
-             (message "%s process...Finished." process))))
+             (message "%s process...Finished." process)))))
       (setq helm-external-commands-list
             (cons real-com
                   (delete real-com helm-external-commands-list))))))
