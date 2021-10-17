@@ -446,6 +446,10 @@ prefix arg Helm will see if there is an application suitable in
 mailcap files.  If you want to specify which external application
 to use (and its options) use a prefix arg.
 
+If you have to pass arguments after filename use `%s' in your command e.g. \"foo %s -a -b\"
+If you want to detach your program from Emacs, you can use e.g. \"(foo %s &)\" (only supported on Linux/Unix).
+When using `%s' do not quote it (i.e. \"%s\"), helm is already quoting filename argument.
+
 Note: What you configure for Helm in `helm-external-programs-associations'
 will take precedence on mailcap files.
 
@@ -455,8 +459,7 @@ Same as above but doesn't quit Helm session, it is apersistent action.
 
 - Open file externally with default tool (`\\[helm-ff-run-open-file-with-default-tool]').
 
-This uses xdg-open which sucks most of the time, but perhaps it
-works fine on Windows.  This is why it is kept in Helm.
+Use `xdg-open' to open files.
 
 *** Toggle auto-completion
 
