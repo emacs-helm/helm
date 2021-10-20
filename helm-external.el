@@ -90,10 +90,11 @@ When FILE argument is provided run EXE with FILE."
   (let* ((real-com  (replace-regexp-in-string
                      "(" "" (car (split-string exe))))
          (proc-name (if file (concat real-com " " file) real-com))
-         (file-arg  (shell-quote-argument
-                     (if (eq system-type 'windows-nt)
-                         (helm-w32-prepare-filename file)
-                       (expand-file-name file))))
+         (file-arg  (and file
+                         (shell-quote-argument
+                          (if (eq system-type 'windows-nt)
+                              (helm-w32-prepare-filename file)
+                            (expand-file-name file)))))
          process-connection-type proc)
     (if (get-process proc-name)
         (if helm-raise-command
