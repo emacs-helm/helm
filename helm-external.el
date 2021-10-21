@@ -87,8 +87,8 @@ contents.  Else it calculates all external commands and sets
 If EXE is already running just jump to his window if
 `helm-raise-command' is non-nil.
 When FILE argument is provided run EXE with FILE."
-  (let* ((proc-name  (replace-regexp-in-string
-                      "(" "" (car (split-string exe))))
+  (let* ((proc-name (replace-regexp-in-string
+                     "(" "" (car (split-string exe))))
          (fmt-file  (lambda (file)
                       (shell-quote-argument
                        (if (eq system-type 'windows-nt)
@@ -96,6 +96,8 @@ When FILE argument is provided run EXE with FILE."
                          (expand-file-name file)))))
          (file-arg  (and files (mapconcat fmt-file files " ")))
          process-connection-type proc)
+    ;; FIXME We may want to add more files to the current process,
+    ;; with this it just raise the program wihout appending files to it.
     (if (get-process proc-name)
         (if helm-raise-command
             (shell-command  (format helm-raise-command proc-name))
@@ -205,7 +207,7 @@ You can set your own list of commands with
                  :must-match t
                  :name "External Commands"
                  :history 'helm-external-command-history)))
-  (helm-run-or-raise program)
+  (run-at-time 0.1 nil #'helm-run-or-raise program)
   (setq helm-external-command-history
         (cl-loop for i in helm-external-command-history
                  when (executable-find i) collect i)))
