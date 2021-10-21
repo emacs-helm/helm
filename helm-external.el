@@ -82,27 +82,27 @@ contents.  Else it calculates all external commands and sets
                 finally return
                 (if sort (sort completions 'string-lessp) completions)))))
 
-(defun helm-run-or-raise (exe &optional file)
+(defun helm-run-or-raise (exe &optional files)
   "Run asynchronously EXE or jump to the application window.
 If EXE is already running just jump to his window if
 `helm-raise-command' is non-nil.
 When FILE argument is provided run EXE with FILE."
-  (let* ((real-com  (replace-regexp-in-string
-                     "(" "" (car (split-string exe))))
-         (proc-name (if file (concat real-com " " file) real-com))
-         (file-arg  (and file
-                         (shell-quote-argument
-                          (if (eq system-type 'windows-nt)
-                              (helm-w32-prepare-filename file)
-                            (expand-file-name file)))))
+  (let* ((proc-name  (replace-regexp-in-string
+                      "(" "" (car (split-string exe))))
+         (fmt-file  (lambda (file)
+                      (shell-quote-argument
+                       (if (eq system-type 'windows-nt)
+                           (helm-w32-prepare-filename file)
+                         (expand-file-name file)))))
+         (file-arg  (and files (mapconcat fmt-file files " ")))
          process-connection-type proc)
     (if (get-process proc-name)
         (if helm-raise-command
-            (shell-command  (format helm-raise-command real-com))
-          (error "Error: %s is already running" real-com))
-      (when (member real-com helm-external-commands-list)
-        (message "Starting %s..." real-com)
-        (if file
+            (shell-command  (format helm-raise-command proc-name))
+          (error "Error: %s is already running" proc-name))
+      (when (member proc-name helm-external-commands-list)
+        (message "Starting %s..." proc-name)
+        (if files
             (cond ((string-match "%s &)\\'" exe)
                    (call-process-shell-command (format exe file-arg)))
                   (t
@@ -118,12 +118,13 @@ When FILE argument is provided run EXE with FILE."
            (lambda (process event)
              (when (and (string= event "finished\n")
                         helm-raise-command
-                        (not (helm-get-pid-from-process-name real-com)))
+                        (not (helm-get-pid-from-process-name proc-name)))
                (shell-command  (format helm-raise-command "emacs")))
-             (message "%s process...Finished." process)))))
-      (setq helm-external-commands-list
-            (cons real-com
-                  (delete real-com helm-external-commands-list))))))
+             (message "%s process...Finished." process))))))
+    ;; Move command on top list.
+    (setq helm-external-commands-list
+          (cons proc-name
+                (delete proc-name helm-external-commands-list)))))
 
 (defun helm-get-mailcap-for-file (filename)
   "Get the command to use for FILENAME from mailcap files."
@@ -146,13 +147,14 @@ mailcap file.  If nothing found return nil."
            helm-default-external-file-browser)
           (t (helm-get-mailcap-for-file filename)))))
 
-(defun helm-open-file-externally (file)
+(defun helm-open-file-externally (_file)
   "Open FILE with an external program.
 Try to guess which program to use with
 `helm-get-default-program-for-file'.
 If not found or a prefix arg is given query the user which tool
 to use."
-  (let* ((fname      (expand-file-name file))
+  (let* ((files      (helm-marked-candidates :with-wildcard t))
+         (fname      (expand-file-name (car files)))
          (collection (helm-external-commands-list-1 'sort))
          (def-prog   (helm-get-default-program-for-file fname))
          (program    (if (or helm-current-prefix-arg (not def-prog))
@@ -165,8 +167,8 @@ to use."
                               :history 'helm-external-command-history)
                            ;; Always prompt to set this program as default.
                            (setq def-prog nil))
-                         ;; No prefix arg or default program exists.
-                         def-prog)))
+                       ;; No prefix arg or default program exists.
+                       def-prog)))
     (unless (or def-prog ; Association exists, no need to record it.
                 ;; Don't try to record non--filenames associations (e.g urls).
                 (not (file-exists-p fname)))
@@ -185,7 +187,7 @@ to use."
               helm-external-programs-associations)
         (customize-save-variable 'helm-external-programs-associations
                                  helm-external-programs-associations)))
-    (helm-run-or-raise program file)
+    (helm-run-or-raise program files)
     (setq helm-external-command-history
           (cl-loop for i in helm-external-command-history
                    when (executable-find i) collect i))))
