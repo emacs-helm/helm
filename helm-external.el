@@ -103,6 +103,7 @@ When FILE argument is provided run EXE with FILE."
       ;; process (like firefox, transmission etc...).
       (if files
           (cond ((string-match "%s &)\\'" exe)
+                 (message "Starting and detaching `%s' from Emacs" proc-name)
                  (call-process-shell-command (format exe file-arg)))
                 (t
                  (message "Starting %s..." proc-name)
