@@ -208,6 +208,13 @@ to use."
           (cl-loop for i in helm-external-command-history
                    when (executable-find i) collect i))))
 
+(defun helm-run-external-command-action (candidate &optional detached)
+  (helm-run-or-raise candidate nil detached)
+  (setq helm-external-command-history
+        (cons candidate
+              (delete candidate
+                      helm-external-command-history))))
+
 ;;;###autoload
 (defun helm-run-external-command ()
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
@@ -215,10 +222,10 @@ If program is already running try to run `helm-raise-command' if
 defined otherwise exit with error. You can set your own list of
 commands with `helm-external-commands-list'."
   (interactive)
-  (let ((actions '(("Run program" . helm-run-or-raise)
+  (let ((actions '(("Run program" . helm-run-external-command-action)
                    ("Run program detached" .
                     (lambda (candidate)
-                      (helm-run-or-raise candidate nil 'detached))))))
+                      (helm-run-external-command-action candidate 'detached))))))
     (helm :sources `(,(helm-build-in-buffer-source "External Commands history"
                         :data helm-external-command-history
                         :must-match t
@@ -229,6 +236,7 @@ commands with `helm-external-commands-list'."
                         :action actions))
         :buffer "*helm externals commands*"
         :prompt "RunProgram: ")
+    ;; Remove from history no more valid executables. 
     (setq helm-external-command-history
           (cl-loop for i in helm-external-command-history
                    when (executable-find i) collect i))))
