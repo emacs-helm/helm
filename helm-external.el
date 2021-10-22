@@ -121,10 +121,12 @@ this have no effect when FILES arg is specified."
                 (run-at-time 0.1 nil #'shell-command
                              (format helm-raise-command proc-name))
               (error "Error: %s is already running" proc-name))
-          (if detached
+          (if (and detached (not (memq system-type '(windows-nt ms-dos))))
               (progn
                 (message "Starting and detaching `%s' from Emacs" proc-name)
                 (call-process-shell-command (format "(%s &)" exe)))
+            (when detached
+              (user-error "Detaching programs not supported on `%s'" system-type))
             (setq proc (start-process-shell-command proc-name nil exe)))))
       (when proc
         (set-process-sentinel
