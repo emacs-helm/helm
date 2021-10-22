@@ -82,11 +82,13 @@ contents.  Else it calculates all external commands and sets
                 finally return
                 (if sort (sort completions 'string-lessp) completions)))))
 
-(defun helm-run-or-raise (exe &optional files)
+(defun helm-run-or-raise (exe &optional files detached)
   "Run asynchronously EXE or jump to the application window.
 If EXE is already running just jump to his window if
 `helm-raise-command' is non-nil.
-When FILE argument is provided run EXE with FILE."
+When FILE argument is provided run EXE with FILES.
+When argument DETACHED is non nil, run EXE and detach it from Emacs,
+this have no effect when FILES arg is specified."
   (let* ((proc-name (replace-regexp-in-string
                      "(" "" (car (split-string exe))))
          (fmt-file  (lambda (file)
@@ -116,9 +118,14 @@ When FILE argument is provided run EXE with FILE."
         ;; a new process.
         (if (get-process proc-name)
             (if helm-raise-command
-                (shell-command  (format helm-raise-command proc-name))
+                (run-at-time 0.1 nil #'shell-command
+                             (format helm-raise-command proc-name))
               (error "Error: %s is already running" proc-name))
-          (setq proc (start-process-shell-command proc-name nil exe))))
+          (if detached
+              (progn
+                (message "Starting and detaching `%s' from Emacs" proc-name)
+                (call-process-shell-command (format "(%s &)" exe)))
+            (setq proc (start-process-shell-command proc-name nil exe)))))
       (when proc
         (set-process-sentinel
          proc
@@ -200,22 +207,29 @@ to use."
                    when (executable-find i) collect i))))
 
 ;;;###autoload
-(defun helm-run-external-command (program)
+(defun helm-run-external-command ()
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
 If program is already running try to run `helm-raise-command' if
 defined otherwise exit with error. You can set your own list of
 commands with `helm-external-commands-list'."
-  (interactive (list
-                (helm-comp-read
-                 "RunProgram: "
-                 (helm-external-commands-list-1 'sort)
-                 :must-match t
-                 :name "External Commands"
-                 :history 'helm-external-command-history)))
-  (run-at-time 0.1 nil #'helm-run-or-raise program)
-  (setq helm-external-command-history
-        (cl-loop for i in helm-external-command-history
-                 when (executable-find i) collect i)))
+  (interactive)
+  (let ((actions '(("Run program" . helm-run-or-raise)
+                   ("Run program detached" .
+                    (lambda (candidate)
+                      (helm-run-or-raise candidate nil 'detached))))))
+    (helm :sources `(,(helm-build-in-buffer-source "External Commands history"
+                        :data helm-external-command-history
+                        :must-match t
+                        :action actions)
+                     ,(helm-build-in-buffer-source "External Commands"
+                        :data (helm-external-commands-list-1 'sort)
+                        :must-match t
+                        :action actions))
+        :buffer "*helm externals commands*"
+        :prompt "RunProgram: ")
+    (setq helm-external-command-history
+          (cl-loop for i in helm-external-command-history
+                   when (executable-find i) collect i))))
 
 
 (provide 'helm-external)
