@@ -96,37 +96,41 @@ When FILE argument is provided run EXE with FILE."
                          (expand-file-name file)))))
          (file-arg  (and files (mapconcat fmt-file files " ")))
          process-connection-type proc)
-    ;; FIXME We may want to add more files to the current process,
-    ;; with this it just raise the program wihout appending files to it.
-    (if (get-process proc-name)
-        (if helm-raise-command
-            (shell-command  (format helm-raise-command proc-name))
-          (error "Error: %s is already running" proc-name))
-      (when (member proc-name helm-external-commands-list)
-        (message "Starting %s..." proc-name)
-        (if files
-            (cond ((string-match "%s &)\\'" exe)
-                   (call-process-shell-command (format exe file-arg)))
-                  (t
-                   (setq proc
-                         (start-process-shell-command
-                          proc-name nil (if (string-match "%s" exe)
-                                            (format exe file-arg)
-                                          (format "%s %s" exe file-arg))))))
-          (setq proc (start-process-shell-command proc-name nil exe)))
-        (when proc
-          (set-process-sentinel
-           proc
-           (lambda (process event)
-             (when (and (string= event "finished\n")
-                        helm-raise-command
-                        (not (helm-get-pid-from-process-name proc-name)))
-               (shell-command  (format helm-raise-command "emacs")))
-             (message "%s process...Finished." process))))))
-    ;; Move command on top list.
-    (setq helm-external-commands-list
-          (cons proc-name
-                (delete proc-name helm-external-commands-list)))))
+    (when (member proc-name helm-external-commands-list)
+      ;; Allow adding more files to the current process if it is
+      ;; already running (i.e. Don't just raise it without sending
+      ;; files) we assume program doesn't start a new
+      ;; process (like firefox, transmission etc...).
+      (if files
+          (cond ((string-match "%s &)\\'" exe)
+                 (call-process-shell-command (format exe file-arg)))
+                (t
+                 (message "Starting %s..." proc-name)
+                 (setq proc
+                       (start-process-shell-command
+                        proc-name nil (if (string-match "%s" exe)
+                                          (format exe file-arg)
+                                        (format "%s %s" exe file-arg))))))
+        ;; Just jump to the already running program instance or start
+        ;; a new process.
+        (if (get-process proc-name)
+            (if helm-raise-command
+                (shell-command  (format helm-raise-command proc-name))
+              (error "Error: %s is already running" proc-name))
+          (setq proc (start-process-shell-command proc-name nil exe))))
+      (when proc
+        (set-process-sentinel
+         proc
+         (lambda (process event)
+           (when (and (string= event "finished\n")
+                      helm-raise-command
+                      (not (helm-get-pid-from-process-name proc-name)))
+             (shell-command  (format helm-raise-command "emacs")))
+           (message "%s process...Finished." process))))
+      ;; Move command on top list.
+      (setq helm-external-commands-list
+            (cons proc-name
+                  (delete proc-name helm-external-commands-list))))))
 
 (defun helm-get-mailcap-for-file (filename)
   "Get the command to use for FILENAME from mailcap files."
