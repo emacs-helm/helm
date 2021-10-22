@@ -202,9 +202,9 @@ to use."
 ;;;###autoload
 (defun helm-run-external-command (program)
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
-If program is already running exit with error.
-You can set your own list of commands with
-`helm-external-commands-list'."
+If program is already running try to run `helm-raise-command' if
+defined otherwise exit with error. You can set your own list of
+commands with `helm-external-commands-list'."
   (interactive (list
                 (helm-comp-read
                  "RunProgram: "
