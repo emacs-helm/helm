@@ -215,6 +215,24 @@ to use."
               (delete candidate
                       helm-external-command-history))))
 
+(defclass helm-external-commands (helm-source-in-buffer)
+  ((filtered-candidate-transformer
+    :initform (lambda (candidates _source)
+                (cl-loop for c in candidates
+                         if (get-process c)
+                         collect (propertize c 'face 'font-lock-type-face)
+                         else collect c)))
+   (must-match :initform t)
+   (nomark :initform t)
+   (action :initform
+           (helm-make-actions
+            "Run program" 'helm-run-external-command-action
+            (lambda ()
+              (unless (memq system-type '(windows-nt ms-dos))
+                "Run program detached"))
+            (lambda (candidate)
+              (helm-run-external-command-action candidate 'detached))))))
+
 ;;;###autoload
 (defun helm-run-external-command ()
   "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
@@ -222,26 +240,16 @@ If program is already running try to run `helm-raise-command' if
 defined otherwise exit with error. You can set your own list of
 commands with `helm-external-commands-list'."
   (interactive)
-  (let ((actions '(("Run program" . helm-run-external-command-action)
-                   ("Run program detached" .
-                    (lambda (candidate)
-                      (helm-run-external-command-action candidate 'detached))))))
-    (helm :sources `(,(helm-build-in-buffer-source "External Commands history"
-                        :data helm-external-command-history
-                        :must-match t
-                        :nomark t
-                        :action actions)
-                     ,(helm-build-in-buffer-source "External Commands"
-                        :data (helm-external-commands-list-1 'sort)
-                        :must-match t
-                        :nomark t
-                        :action actions))
+  (helm :sources `(,(helm-make-source "External Commands history" 'helm-external-commands
+                      :data helm-external-command-history)
+                    ,(helm-make-source "External Commands" 'helm-external-commands
+                       :data (helm-external-commands-list-1 'sort)))
         :buffer "*helm externals commands*"
         :prompt "RunProgram: ")
-    ;; Remove from history no more valid executables. 
-    (setq helm-external-command-history
-          (cl-loop for i in helm-external-command-history
-                   when (executable-find i) collect i))))
+  ;; Remove from history no more valid executables. 
+  (setq helm-external-command-history
+        (cl-loop for i in helm-external-command-history
+                 when (executable-find i) collect i)))
 
 
 (provide 'helm-external)
