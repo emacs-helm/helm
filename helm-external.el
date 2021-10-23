@@ -86,9 +86,8 @@ contents.  Else it calculates all external commands and sets
   "Run asynchronously EXE or jump to the application window.
 If EXE is already running just jump to his window if
 `helm-raise-command' is non-nil.
-When FILE argument is provided run EXE with FILES.
-When argument DETACHED is non nil, run EXE and detach it from Emacs,
-this have no effect when FILES arg is specified."
+When FILES argument is provided run EXE with FILES.
+When argument DETACHED is non nil, detach process from Emacs."
   (let* ((proc-name (replace-regexp-in-string
                      "(" "" (car (split-string exe))))
          (fmt-file  (lambda (file)
@@ -98,6 +97,8 @@ this have no effect when FILES arg is specified."
                          (expand-file-name file)))))
          (file-arg  (and files (mapconcat fmt-file files " ")))
          process-connection-type proc)
+    (when (and files detached (not (string-match "%s &)\\'" exe)))
+      (setq exe (format "(%s &)" exe)))
     (when (member proc-name helm-external-commands-list)
       ;; Allow adding more files to the current process if it is
       ;; already running (i.e. Don't just raise it without sending
