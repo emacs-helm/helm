@@ -229,10 +229,12 @@ commands with `helm-external-commands-list'."
     (helm :sources `(,(helm-build-in-buffer-source "External Commands history"
                         :data helm-external-command-history
                         :must-match t
+                        :nomark t
                         :action actions)
                      ,(helm-build-in-buffer-source "External Commands"
                         :data (helm-external-commands-list-1 'sort)
                         :must-match t
+                        :nomark t
                         :action actions))
         :buffer "*helm externals commands*"
         :prompt "RunProgram: ")
