@@ -70,7 +70,7 @@ body:
     id: terms
     attributes:
       label: Minimal configuration
-      description: You are using either emacs-helm.sh or a minimal configuration from emacs -Q
+      description: You are using either emacs-helm.sh or a minimal configuration from emacs -Q to reproduce your bug (i.e. No Spacemacs, Doom etc...)
       options:
-        - label: I agree using a minimal configuration 
+        - label: I agree using a minimal configuration
           required: true
