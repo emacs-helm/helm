@@ -820,6 +820,7 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
 ;; seems it is wrong and a simpler regexp is enough, let's try it and
 ;; watch out!
 (defvar helm-tramp-file-name-regexp "\\`/\\([^/:|]+\\):")
+(defvar helm-ff-tramp-method-regexp "[/|]:\\([^:]*\\)")
 (defvar helm-marked-buffer-name "*helm marked*")
 (defvar helm-ff--auto-update-state nil)
 (defvar helm-ff--deleting-char-backward nil)
@@ -2753,6 +2754,7 @@ hitting C-j on \"..\"."
         (unless (or (not (stringp it))
                     (and (string-match helm-tramp-file-name-regexp it)
                          (not (file-remote-p it nil t)))
+                    (string-match helm-ff-tramp-method-regexp it)
                     (file-exists-p it))
           (helm-next-line)))))
 
@@ -3106,8 +3108,10 @@ debugging purpose."
 
 (cl-defun helm-ff--invalid-tramp-name-p (&optional (pattern helm-pattern))
   "Return non-nil when PATTERN is an invalid tramp filename."
-  (string= (helm-ff-set-pattern pattern)
-           "@@TRAMP@@"))
+  (or (string= (helm-ff-set-pattern pattern)
+               "@@TRAMP@@")
+      ;; Tramp methods completion.
+      (string-match helm-ff-tramp-method-regexp pattern)))
 
 (defun helm-ff--tramp-postfixed-p (str)
   (let ((methods (helm-ff--get-tramp-methods))
@@ -3124,6 +3128,10 @@ debugging purpose."
               (setq result nil)
             (setq result it)))))
     result))
+
+(defun helm-ff--tramp-multihops-p (name)
+  (cl-loop for m in (helm-ff--get-tramp-methods)
+           thereis (string-match (format "\\`\\(/%s:.*[|]\\).*" m) name)))
 
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
@@ -3154,6 +3162,8 @@ debugging purpose."
            (expand-file-name "~/"))
           ((string-match "\\`~/" pattern)
            (expand-file-name pattern))
+          ((string-match helm-ff-tramp-method-regexp pattern)
+           pattern)
           ;; Match "/method:maybe_hostname:~"
           ((and (string-match (concat reg "~") pattern)
                 postfixed
@@ -3234,7 +3244,10 @@ debugging purpose."
       ;; At this point the tramp connection is triggered.
       (helm-log
        "Pattern=%S"
-       (setq helm-pattern (helm-ff--transform-pattern-for-completion path)))
+       (setq helm-pattern (if (string-match helm-ff-tramp-method-regexp path)
+                              ;; A tramp method, don't modify pattern.
+                              helm-pattern
+                            (helm-ff--transform-pattern-for-completion path))))
       ;; This have to be set after [1] to allow deleting char backward.
       (setq basedir (or (helm-aand
                          (if (and dir-p helm-ff-auto-update-flag)
@@ -3256,7 +3269,12 @@ debugging purpose."
     (when (and (string-match ":\\'" path)
                (file-remote-p basedir nil t))
       (setq helm-pattern basedir))
-    (cond ((string= path "@@TRAMP@@")
+    (cond ((string-match helm-ff-tramp-method-regexp path) ; Tramp methods
+           (mapcar (lambda (method)
+                     (helm-ff-filter-candidate-one-by-one
+                      (concat "/" ":" method)))
+                   (helm-ff--get-tramp-methods)))
+          ((string= path "@@TRAMP@@")
            (helm-ff--tramp-hostnames)) ; Hostnames completion.
           ((or (and (file-regular-p path)
                     (eq last-repeatable-command 'helm-execute-persistent-action))
@@ -3885,6 +3903,12 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                   ((get-text-property 1 'helm-ff-file file)
                    (add-face-text-property 0 len 'helm-ff-file t disp)
                    (cons disp file))
+                  ((string-match helm-ff-tramp-method-regexp file)
+                   (let ((method (match-string 1 file)))
+                     (cons (propertize (concat "/" method) 'face 'helm-ff-file)
+                           (if (helm-ff--tramp-multihops-p helm-pattern)
+                               (concat (match-string 1 helm-pattern) ":" method)
+                             (concat "/:" method)))))
                   ;; non existing files.
                   (t
                    (add-face-text-property 0 len 'helm-ff-file t disp)
@@ -3963,6 +3987,11 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                 ((and attr (null type))
                  (add-face-text-property 0 len 'helm-ff-file t disp)
                  (cons disp file))
+                ;; A tramp method
+                ((string-match helm-ff-tramp-method-regexp file)
+                 (cons (propertize (concat "/" (match-string 1 file))
+                                   'face 'helm-ff-file)
+                       (concat "/:" (match-string 1 file))))
                 ;; A non--existing file.
                 (t
                  (add-face-text-property 0 len 'helm-ff-file t disp)
@@ -4380,7 +4409,16 @@ file."
           (prog1
               #'ignore
               (message "Helm-follow-mode allowed only on images, disabling")))))
-    (cond ((and (helm-ff--invalid-tramp-name-p)
+    (cond (;; Tramp methods completion.
+           (string-match helm-ff-tramp-method-regexp candidate)
+           (let ((method (match-string 1 candidate)))
+             (cons (lambda (candidate)
+                     (funcall insert-in-minibuffer
+                              (if (helm-ff--tramp-multihops-p candidate)
+                                  (concat (match-string 1 candidate) method ":")
+                                (concat "/" method ":"))))
+                   'never-split)))
+          ((and (helm-ff--invalid-tramp-name-p)
                 (string-match helm-tramp-file-name-regexp candidate))
            (cons (lambda (_candidate)
                    ;; First hit insert hostname and
