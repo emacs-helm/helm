@@ -3071,29 +3071,22 @@ Return nil on valid file name remote or not."
 Argument PATTERN default to `helm-pattern'.  It is here only for
 debugging purpose."
   (when (string-match helm-tramp-file-name-regexp pattern)
-    (let* ((mh-method   (helm-ff--previous-mh-tramp-method pattern))
-           (method      (or (cadr mh-method) (match-string 1 pattern)))
-           (current-mh-host (helm-aif (and mh-method
-                                           (helm-ff--get-host-from-tramp-invalid-fname pattern))
-                                (concat (car mh-method) method ":"
-                                        (car (split-string it "|" t)))))
-           (all-methods (helm-ff--get-tramp-methods))
-           (comps (cl-loop for (f . h) in (tramp-get-completion-function method)
-                           append (cl-loop for e in (funcall f (car h))
-                                           for host = (and (consp e) (cadr e))
-                                           ;; On emacs-27 host may be
-                                           ;; ("root" t) in sudo method.
-                                           when (and (stringp host)
-                                                     (not (member host all-methods)))
-                                           collect (helm-ff-filter-candidate-one-by-one
-                                                    (concat (or (car mh-method) "/")
-                                                            method ":" host))))))
-      (helm-fast-remove-dups
-       (append (and current-mh-host
-                    (list (helm-ff-filter-candidate-one-by-one
-                           current-mh-host)))
-               comps)
-       :test 'equal))))
+    (let* ((mh-method (helm-ff--previous-mh-tramp-method pattern))
+           (method    (or (cadr mh-method) (match-string 1 pattern))))
+      (cl-loop with all-methods = (helm-ff--get-tramp-methods)
+               for (f . h) in (tramp-get-completion-function method)
+               append (cl-loop for e in (funcall f (car h))
+                               for host = (and (consp e) (cadr e))
+                               ;; On emacs-27 host may be
+                               ;; ("root" t) in sudo method.
+                               when (and (stringp host)
+                                         (not (member host all-methods)))
+                               collect (helm-ff-filter-candidate-one-by-one
+                                        (concat (or (car mh-method) "/")
+                                                method ":" host)))
+               into comps
+               finally return
+               (helm-fast-remove-dups comps :test 'equal)))))
 
 (defun helm-ff-before-action-hook-fn ()
   "Exit Helm when user try to execute action on an invalid tramp fname."
