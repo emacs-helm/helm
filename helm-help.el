@@ -478,11 +478,7 @@ Simply write the path in the prompt and press `RET', e.g.
 
 *** To create a new file, enter a filename not ending with \"/\"
 
-Note that when you enter a new name, this one is prefixed with
-\[?] if you are in a writable directory.  If you are in a directory
-where you have no write permission the new file name is not
-prefixed and is colored in red.  There is not such distinction
-when using Tramp, new filename just appears on top of buffer.
+Note that when you enter a new name, this one is prefixed with [?].
 
 *** Recursive search from Helm-find-files
 
@@ -958,6 +954,7 @@ the same hosts.
 As a rule of thumb, prefer the scp method unless using multihops (which only
 works with the ssh method), especially when copying large files.
 
+IMPORTANT:
 You need to hit `C-j' once on top of a directory on the first connection
 to complete the pattern in the minibuffer.
 
@@ -980,6 +977,11 @@ without addind the ending \":\", second hit insert the last \":\".
 As soon the last \":\" is entered TRAMP will kick in and you should see the list
 of candidates soon after.
 
+**** Completion on tramp methods
+
+If you enter \":\" directly after \"/\" or \"|\" you will have completion on tramp methods,
+hitting `\\[helm-execute-persistent-action]' or `right' on a method will insert it in minibuffer.
+ 
 When connection fails, be sure to delete your TRAMP connection with M-x
 `helm-delete-tramp-connection' before retrying.
 
