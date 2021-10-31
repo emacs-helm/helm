@@ -3907,10 +3907,12 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                   ((get-text-property 1 'helm-ff-file file)
                    (add-face-text-property 0 len 'helm-ff-file t disp)
                    (cons disp file))
+                  ;; Tramp methods.
                   ((string-match helm-ff-tramp-method-regexp file)
-                   (let ((method (match-string 1 file)))
-                     (cons (propertize (concat "/" method) 'face 'helm-ff-file)
-                           (if (helm-ff--tramp-multihops-p helm-pattern)
+                   (let ((method (match-string 1 file))
+                         (mh     (helm-ff--tramp-multihops-p helm-pattern)))
+                     (cons (propertize (concat (if mh "" "/") method) 'face 'helm-ff-file)
+                           (if mh
                                (concat (match-string 1 helm-pattern) ":" method)
                              (concat "/:" method)))))
                   ;; non existing files.
@@ -3992,6 +3994,9 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                  (add-face-text-property 0 len 'helm-ff-file t disp)
                  (cons disp file))
                 ;; A tramp method
+                ;; At this point no need to handle multi hops syntax
+                ;; which is considered remote and handled in first
+                ;; cond before.
                 ((string-match helm-ff-tramp-method-regexp file)
                  (cons (propertize (concat "/" (match-string 1 file))
                                    'face 'helm-ff-file)
