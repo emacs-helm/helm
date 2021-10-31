@@ -3107,6 +3107,16 @@ debugging purpose."
       (string-match helm-ff-tramp-method-regexp pattern)))
 
 (defun helm-ff--tramp-postfixed-p (str)
+  "Return non nil when tramp path STR is complete."
+  ;; E.g.:
+  ;; (helm-ff--tramp-postfixed-p "/ssh:foo")
+  ;; => nil
+  ;; (helm-ff--tramp-postfixed-p "/ssh:foo:")
+  ;; => 10
+  ;; (helm-ff--tramp-postfixed-p "/ssh:foo|sudo:")
+  ;; => nil
+  ;; (helm-ff--tramp-postfixed-p "/ssh:foo|sudo::")
+  ;; => 16
   (let ((methods (helm-ff--get-tramp-methods))
         result)
     (save-match-data
