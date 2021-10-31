@@ -3125,9 +3125,10 @@ debugging purpose."
         (helm-awhile (search-forward ":" nil t)
           (if (save-excursion
                 (forward-char -1)
-                (looking-back
-                 (mapconcat (lambda (m) (format "[/|]%s" m)) methods "\\|")
-                 (point-at-bol)))
+                (or (looking-back "[/|]" (1- (point)))
+                    (looking-back
+                     (mapconcat (lambda (m) (format "[/|]%s" m)) methods "\\|")
+                     (point-at-bol))))
               (setq result nil)
             (setq result it)))))
     result))
