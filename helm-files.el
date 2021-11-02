@@ -3334,9 +3334,11 @@ SEL argument is only here for debugging purpose, it default to
 `helm-get-selection'."
   (let* ((remote (file-remote-p directory 'method))
          (helm-list-directory-function
-          (if (and remote (not (string= remote "ftp")))
-              helm-list-directory-function
-            #'helm-list-dir-lisp))
+          (cond ((and remote (string= remote "ftp"))
+                 #'helm-list-dir-lisp)
+                ((and remote (string= remote "adb"))
+                 #'helm-list-dir-adb)
+                (t helm-list-directory-function)))
          (remote-fn-p (eq helm-list-directory-function
                           'helm-list-dir-external))
          (sort-method (cl-case helm-ff-initial-sort-method
@@ -3385,6 +3387,38 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
            collect (propertize it 'helm-ff-dir t)
            else collect (propertize (expand-file-name f directory)
                                     'helm-ff-file t)))
+
+(defun helm-file-name-all-completions-internal (directory)
+  (let ((switches "-1F"))
+    (with-temp-buffer
+      (insert-directory (format "%s*"
+                                (file-name-as-directory directory))
+                        switches t)
+      (split-string
+       (buffer-substring-no-properties (point-min) (point-max))
+       "\n" t))))
+
+(defun helm-list-dir-adb (directory &optional sort-method)
+  "List DIRECTORY with `helm-file-name-all-completions-internal' as backend.
+
+This is used for tramp adb backend.
+
+Add a `helm-ff-dir' property on each fname ending with \"/\"."
+  (cl-loop with files = (helm-file-name-all-completions-internal directory)
+           for f in (sort files (or sort-method 'string-lessp))
+           for split = (split-string f "->" t)
+           for fname = (replace-regexp-in-string " $" "" (car split))
+           for truename = (cadr split)
+           collect (cond ((string-match "/\\'" fname)
+                          (propertize (helm--dir-file-name fname directory)
+                                      'helm-ff-dir t))
+                         (truename
+                          (propertize (expand-file-name
+                                       (substring fname 0 (1- (length fname)))
+                                       directory)
+                                      'helm-ff-sym truename))
+                         (t (propertize (expand-file-name fname directory)
+                                        'helm-ff-file t)))))
 
 (defun helm-list-dir-external (dir &optional sort-method)
   "List directory DIR with external shell command as backend.
