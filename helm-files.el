@@ -3348,7 +3348,8 @@ SEL argument is only here for debugging purpose, it default to
                                #'helm-group-candidates-by))
                         (t nil))))
     (cond (remote
-           (funcall helm-list-directory-function directory sort-method))
+           (ignore-errors
+             (funcall helm-list-directory-function directory sort-method)))
           ((memq helm-ff-initial-sort-method '(newest size))
            (sort (directory-files
                   directory t directory-files-no-dot-files-regexp)
@@ -3378,10 +3379,7 @@ Add a `helm-ff-dir' property on each fname ending with \"/\"."
   (cl-loop for f in (sort (file-name-all-completions "" directory)
                           (or sort-method 'string-lessp))
            unless (or (string= f "")
-                      (member f '("./" "../"))
-                      ;; Ignore the tramp names from /
-                      ;; completion, e.g. ssh: scp: etc...
-                      (char-equal (aref f (1- (length f))) ?:))
+                      (member f '("./" "../" "." "..")))
            if (and (helm--dir-name-p f)
                    (helm--dir-file-name f directory))
            collect (propertize it 'helm-ff-dir t)
