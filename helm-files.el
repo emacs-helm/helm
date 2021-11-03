@@ -4051,7 +4051,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
                         (buffer-substring-no-properties
-                         (point-at-bol) (point-at-eol)))))
+                         (point-at-bol) (point-at-eol))))
+        marked)
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
@@ -4077,7 +4078,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
             '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
               ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
             3))
-          ((string-match "\\.el\\'" (helm-aif (helm-marked-candidates)
+          ((string-match "\\.el\\'" (helm-aif (setq marked (helm-marked-candidates))
                                         (car it) candidate))
            (helm-append-at-nth
             actions
@@ -4086,7 +4087,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
               ("Load File(s) `M-L'" . helm-find-files-load-files))
             2))
           ((string-match (concat (regexp-opt load-suffixes) "\\'")
-                         (helm-aif (helm-marked-candidates)
+                         (helm-aif marked
                              (car it) candidate))
            (helm-append-at-nth
             actions
