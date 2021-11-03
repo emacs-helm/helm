@@ -3476,6 +3476,11 @@ to nil to avoid error messages when using `helm-find-files'."
            (cl-loop for dir being the hash-keys of helm-ff--file-notify-watchers
                     do (remhash dir helm-ff--list-directory-cache)))))
 
+(defcustom helm-ff-inotify-unsupported-methods '("adb")
+  "Tramp methods unsupported by file-notify."
+  :type '(repeat string)
+  :group 'helm-files)
+
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3484,48 +3489,50 @@ filename '.' and '..' even on root directories in Windows
 systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
-  (setq directory (file-name-as-directory
-                   (expand-file-name directory)))
-  (or (and (not force-update)
-           (gethash directory helm-ff--list-directory-cache))
-      (let* (file-error
-             (ls   (condition-case err
-                       (helm-list-directory directory)
-                     ;; Handle file-error from here for Windows
-                     ;; because predicates like `file-readable-p' and friends
-                     ;; seem broken on emacs for Windows systems (always returns t).
-                     ;; This should never be called on GNU/Linux/Unix
-                     ;; as the error is properly intercepted in
-                     ;; `helm-find-files-get-candidates' by `file-readable-p'.
-                     (file-error
-                      (prog1
-                          ;; Prefix error message with @@@@ for safety
-                          ;; (some files may match file-error See bug#2400) 
-                        (list (format "@@@@%s:%s"
-                                      (car err)
-                                      (mapconcat 'identity (cdr err) " ")))
-                        (setq file-error t)))))
-             (dot  (concat directory "."))
-             (dot2 (concat directory ".."))
-             (candidates (append (and (not file-error) (list dot dot2)) ls)))
-        (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
-        (prog1
-            (puthash directory
-                     (cl-loop for f in candidates
-                              when (helm-ff-filter-candidate-one-by-one f)
-                              collect it)
-                     helm-ff--list-directory-cache)
-          ;; Put an inotify watcher to check directory modifications.
-          (unless (or (null helm-ff-use-notify)
-                      (gethash directory helm-ff--file-notify-watchers))
-            (condition-case-unless-debug err
-                (puthash directory
-                         (file-notify-add-watch
-                          directory
-                          '(change attribute-change)
-                          (helm-ff--inotify-make-callback directory))
-                         helm-ff--file-notify-watchers)
-              (file-notify-error (user-error "Error: %S %S" (car err) (cdr err)))))))))
+  (let ((method (file-remote-p directory 'method)))
+    (setq directory (file-name-as-directory
+                     (expand-file-name directory)))
+    (or (and (not force-update)
+             (gethash directory helm-ff--list-directory-cache))
+        (let* (file-error
+               (ls   (condition-case err
+                         (helm-list-directory directory)
+                       ;; Handle file-error from here for Windows
+                       ;; because predicates like `file-readable-p' and friends
+                       ;; seem broken on emacs for Windows systems (always returns t).
+                       ;; This should never be called on GNU/Linux/Unix
+                       ;; as the error is properly intercepted in
+                       ;; `helm-find-files-get-candidates' by `file-readable-p'.
+                       (file-error
+                        (prog1
+                            ;; Prefix error message with @@@@ for safety
+                            ;; (some files may match file-error See bug#2400) 
+                            (list (format "@@@@%s:%s"
+                                          (car err)
+                                          (mapconcat 'identity (cdr err) " ")))
+                          (setq file-error t)))))
+               (dot  (concat directory "."))
+               (dot2 (concat directory ".."))
+               (candidates (append (and (not file-error) (list dot dot2)) ls)))
+          (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
+          (prog1
+              (puthash directory
+                       (cl-loop for f in candidates
+                                when (helm-ff-filter-candidate-one-by-one f)
+                                collect it)
+                       helm-ff--list-directory-cache)
+            ;; Put an inotify watcher to check directory modifications.
+            (unless (or (null helm-ff-use-notify)
+                        (member method helm-ff-inotify-unsupported-methods)
+                        (gethash directory helm-ff--file-notify-watchers))
+              (condition-case-unless-debug err
+                  (puthash directory
+                           (file-notify-add-watch
+                            directory
+                            '(change attribute-change)
+                            (helm-ff--inotify-make-callback directory))
+                           helm-ff--file-notify-watchers)
+                (file-notify-error (user-error "Error: %S %S" (car err) (cdr err))))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
