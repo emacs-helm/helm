@@ -1048,10 +1048,15 @@ directories belonging to each visible windows."
               ;; current.
               (or (car-safe helm-ff-history) default-directory)))))))
 
+(defsubst helm-ff--file-directory-p (file)
+  (if (file-remote-p file)
+      (get-text-property 1 'helm-ff-dir file)
+    (file-directory-p file)))
+
 (defun helm-ff--count-and-collect-dups (files)
   (cl-loop with dups = (make-hash-table :test 'equal)
            for f in files
-           for file = (if (file-directory-p f)
+           for file = (if (helm-ff--file-directory-p f)
                           (concat (helm-basename f) "/")
                           (helm-basename f))
            for count = (gethash file dups)
@@ -1081,7 +1086,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                'helm-rsync-command-history)))))
          (ifiles (mapcar 'expand-file-name ; Allow modify '/foo/.' -> '/foo'
                          (helm-marked-candidates :with-wildcard t)))
-         (cand   (helm-get-selection)) ; Target
+         (cand   (unless (cdr ifiles) (helm-get-selection))) ; preselection.
          (prefarg helm-current-prefix-arg)
          (prompt (format "%s %s file(s) %s: "
                          (if (and (and (fboundp 'dired-async-mode)
@@ -1109,7 +1114,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                      (with-helm-current-buffer
                        (helm-read-file-name
                         prompt
-                        :preselect (unless (cdr ifiles)
+                        :preselect (when cand
                                      (concat
                                       "^"
                                       (regexp-quote
