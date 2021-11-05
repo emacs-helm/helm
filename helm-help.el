@@ -840,6 +840,19 @@ automatically \"-e 'ssh -p 2222'\" to the rsync command line
 unless you have specified yourself the \"-e\" option by editing
 rsync command line with a prefix arg (see above).
 
+*** Access files on Android phones from Helm
+
+Since Android doesn't provide anymore mass storage for USB, it is
+not simple to access files on Android, the best way to do this
+actually seems to use Adb, here some hints to set this up, read
+in addition the Tramp documentation.
+
+1) Install Adb, most distribution provide it.
+2) Enable on your phone USB debug in System/dvlpmnt settings.
+3) From helm-find-files use adb tramp method:
+    /adb::/
+From there you can navigate as usual, mark and copy files etc...
+
 *** Bookmark the `helm-find-files' session
 
 You can bookmark the `helm-find-files' session with `\\[helm-ff-bookmark-set]'.
