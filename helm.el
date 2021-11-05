@@ -2321,24 +2321,22 @@ when you want the `display-to-real' function(s) to be applied."
 It is a function symbol (sole action) or list
 of (action-display . function)."
   (unless (helm-empty-buffer-p (helm-buffer-get))
-    (let ((src (helm-get-current-source)))
-      (helm-aif (helm-get-attr 'action-transformer)
+    (let* ((src                (or source (helm-get-current-source)))
+           (marked             (helm-marked-candidates))
+           (action-transformer (helm-get-attr 'action-transformer src))
+           (actions            (helm-get-attr 'action src 'ignorefn)))
+      (if action-transformer
           (helm-apply-functions-from-source
-           (or source src) it
-           (helm-get-attr 'action nil 'ignorefn)
-           ;; Check if the first given transformer
-           ;; returns the same set of actions for each
-           ;; candidate in marked candidates.
-           ;; If so use the car of marked to determine
-           ;; the set of actions, otherwise use the selection.
-           (if (cl-loop with marked = (helm-marked-candidates)
-                        with act = (car (helm-mklist it))
-                        with acts = (funcall act nil (car marked))
-                        for c in marked
-                        always (equal (funcall act nil c) acts))
-               (car (helm-marked-candidates))
+           src action-transformer actions
+           ;; When there is marked candidates assume the set of
+           ;; candidates user selected contains candidates of the same
+           ;; type so that the actions added by transformer fit with
+           ;; all marked (previously we were looping on each marked
+           ;; but it is too costly for the benefit it brings).
+           (if marked
+               (car marked)
              (helm-get-selection nil nil src)))
-        (helm-get-attr 'action nil 'ignorefn)))))
+        actions))))
 
 (defun helm-get-current-source ()
   "Return the source for the current selection.
@@ -2389,6 +2387,7 @@ i.e. functions called with RET."
   ;; source that inherit actions from type, note that ACTION have to
   ;; be bound to a symbol and not to be an anonymous action
   ;; i.e. lambda or byte-code.
+  
   (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)

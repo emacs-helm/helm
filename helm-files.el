@@ -3645,8 +3645,11 @@ Note that only existing directories are saved here."
         (cl-loop for sel in mkd
               when (and sel
                         (stringp sel)
-                        (file-exists-p sel)
-                        (not (file-directory-p sel)))
+                        ;; If file was one of HFF candidates assume it
+                        ;; is an existing file, so no need to call
+                        ;; file-exists-p which is costly on remote candidates.
+                        ;; (file-exists-p sel)
+                        (not (helm-ff--file-directory-p sel)))
               do
               ;; we use `abbreviate-file-name' here because
               ;; other parts of Emacs seems to,
