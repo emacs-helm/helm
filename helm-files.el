@@ -1469,6 +1469,7 @@ Note:
 You have to setup some aliases in Eshell with the `alias' command
 or by editing yourself the file `eshell-aliases-file' to make
 this working."
+  (require 'helm-adaptive)
   (require 'em-alias) (eshell-read-aliases-list)
   (unless (> emacs-major-version 27)
     ;; This advice have been merged in emacs-28.
