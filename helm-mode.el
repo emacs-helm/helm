@@ -1245,7 +1245,7 @@ See documentation of `completing-read' and `all-completions' for details."
     (prompt
      &key
        (name "Read File Name")
-       (initial-input default-directory)
+       initial-input
        (buffer "*Helm file completions*")
        test
        noret
@@ -1271,7 +1271,7 @@ Keys description:
 
 - NAME: Source name, default to \"Read File Name\".
 
-- INITIAL-INPUT: Where to start reading file name, default to `default-directory'.
+- INITIAL-INPUT: Where to start reading file name, default to `default-directory' or $HOME.
 
 - BUFFER: `helm-buffer' name, defaults to \"*Helm Completions*\".
 
@@ -1302,6 +1302,8 @@ Keys description:
 
 - MODE-LINE: A mode line message, default is `helm-read-file-name-mode-line-string'."
   (require 'tramp)
+  (unless initial-input
+    (setq initial-input (or default-directory (getenv "HOME"))))
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (mapc (lambda (hook)
