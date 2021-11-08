@@ -434,7 +434,7 @@ If SYM is not documented, return \"Not documented\"."
   "Preconfigured Helm to complete file name at point."
   (interactive)
   (require 'helm-mode)
-  (let* ((tap (thing-at-point 'filename))
+  (let* ((tap (or (thing-at-point 'filename) ""))
          beg
          (init (and tap
                     (or force
