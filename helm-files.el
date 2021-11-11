@@ -4340,7 +4340,7 @@ E.g. \"foo:12\"."
                        (list num-arg basename)))
       (setq rotation-failed t))
     ;; Display image in image-mode.
-    (if helm-ff-display-image-native
+    (if (helm-ff-display-image-native-p)
         (if rotation-failed
             ;; When rotation fails fallback to `image-rotate' with no
             ;; transformation of file.
@@ -4390,7 +4390,7 @@ This affects directly file CANDIDATE."
   ;; because they run directly `image--change-size' in a timer without
   ;; taking care of the selected-window.
   (cl-assert (and (fboundp 'image--change-size)
-                  helm-ff-display-image-native)
+                  (helm-ff-display-image-native-p))
              nil "Resizing image not available")
   (if (> arg 0)
       (run-with-idle-timer
@@ -4526,12 +4526,7 @@ file."
           (sound-cand (lambda (candidate) (play-sound-file candidate)))
           ;; An image file and it is the second hit on C-j, display it.
           (image-cand
-           (if (or helm-ff-display-image-native
-                   ;; Image-dired in emacs-29 uses image-mode but
-                   ;; display is no more working with our old
-                   ;; image-dired code, so force usage of
-                   ;; helm-ff-display-image-native.
-                   (fboundp 'image-dired-display-image-mode))
+           (if (helm-ff-display-image-native-p)
                #'helm-ff--display-or-kill-image-native
              (lambda (_candidate)
                (require 'image-dired)
@@ -4603,6 +4598,15 @@ file."
           (t
            (lambda (candidate)
              (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
+
+(defun helm-ff-display-image-native-p ()
+  "Use `helm-ff-display-image-native' when returns `t'."
+  (or helm-ff-display-image-native
+      ;; Image-dired in emacs-29 uses image-mode but
+      ;; display is no more working with our old
+      ;; image-dired code, so force usage of
+      ;; helm-ff-display-image-native.
+      (fboundp 'image-dired-display-image-mode)))
 
 (defun helm-ff--display-or-kill-image-native (candidate)
   ;; Display images in same buffer
