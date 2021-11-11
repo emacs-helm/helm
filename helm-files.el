@@ -4526,7 +4526,12 @@ file."
           (sound-cand (lambda (candidate) (play-sound-file candidate)))
           ;; An image file and it is the second hit on C-j, display it.
           (image-cand
-           (if helm-ff-display-image-native
+           (if (or helm-ff-display-image-native
+                   ;; Image-dired in emacs-29 uses image-mode but
+                   ;; display is no more working with our old
+                   ;; image-dired code, so force usage of
+                   ;; helm-ff-display-image-native.
+                   (fboundp 'image-dired-display-image-mode))
                #'helm-ff--display-or-kill-image-native
              (lambda (_candidate)
                (require 'image-dired)
