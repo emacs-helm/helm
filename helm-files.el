@@ -4617,8 +4617,11 @@ file."
     (helm-ff--display-image-native candidate)))
 
 (defun helm-ff--display-image-native (candidate)
-  (and (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-       (kill-buffer helm-ff-image-native-buffer))
+  (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
+    (kill-buffer helm-ff-image-native-buffer)
+    ;; Avoid hight memory consumption see
+    ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2021-11/msg00879.html.
+    (clear-image-cache))
   (cl-letf (((symbol-function 'message) #'ignore))
     (find-file candidate))
   (with-current-buffer (get-file-buffer candidate)
