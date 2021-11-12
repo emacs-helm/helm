@@ -4600,6 +4600,15 @@ file."
            (lambda (candidate)
              (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
 
+;; Native image display (with image-mode).
+;;
+(defvar helm-ff--image-cache nil)
+
+(defcustom helm-ff-image-cache-max-len 5
+  "The last seen image number to keep in cache."
+  :group 'helm-files
+  :type 'integer)
+
 (defun helm-ff-display-image-native-p ()
   "Use `helm-ff-display-image-native' when returns `t'."
   (or helm-ff-display-image-native
@@ -4626,14 +4635,32 @@ file."
         (kill-buffer helm-ff-image-native-buffer))
     (helm-ff--display-image-native candidate)))
 
+(defun helm-ff-clean-image-cache ()
+  (when helm-ff--image-cache
+    (cl-loop for img in helm-ff--image-cache
+             do (clear-image-cache img)
+             finally do (setq helm-ff--image-cache nil))))
+
 (defun helm-ff--display-image-native (candidate)
   (when (buffer-live-p (get-buffer helm-ff-image-native-buffer))
-    (kill-buffer helm-ff-image-native-buffer)
-    ;; Avoid hight memory consumption see
-    ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2021-11/msg00879.html.
-    (clear-image-cache))
+    (kill-buffer helm-ff-image-native-buffer))
+  ;; Avoid hight memory consumption see
+  ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2021-11/msg00879.html.
+  (when (> (length helm-ff--image-cache)
+           (* helm-ff-image-cache-max-len 2))
+    ;; Only keep the last `helm-ff-image-cache-max-len' images in cache.
+    (cl-loop for img in (butlast helm-ff--image-cache
+                                 (1+ helm-ff-image-cache-max-len))
+             do (clear-image-cache img)
+             (setq helm-ff--image-cache
+                   (delete img helm-ff--image-cache))))
   (cl-letf (((symbol-function 'message) #'ignore))
     (find-file candidate))
+  ;; When going back reuse the cached images.
+  (unless (member candidate helm-ff--image-cache)
+    (setq helm-ff--image-cache
+          (append helm-ff--image-cache
+                  (list (expand-file-name candidate)))))
   (with-current-buffer (get-file-buffer candidate)
     (rename-buffer helm-ff-image-native-buffer)))
 
@@ -4915,7 +4942,8 @@ source is `helm-source-find-files'."
           helm-ff-move-to-first-real-candidate
           helm-ff-clean-initial-input))
   (setq helm-ff--show-directories-only nil
-        helm-ff--show-files-only nil))
+        helm-ff--show-files-only nil)
+  (helm-ff-clean-image-cache))
 
 (defun helm-ff-bookmark ()
   (helm :sources 'helm-source-bookmark-helm-find-files
