@@ -4654,15 +4654,16 @@ file."
              do (clear-image-cache img)
              (setq helm-ff--image-cache
                    (delete img helm-ff--image-cache))))
-  (cl-letf (((symbol-function 'message) #'ignore))
-    (find-file candidate))
-  ;; When going back reuse the cached images.
-  (unless (member candidate helm-ff--image-cache)
-    (setq helm-ff--image-cache
-          (append helm-ff--image-cache
-                  (list (expand-file-name candidate)))))
-  (with-current-buffer (get-file-buffer candidate)
-    (rename-buffer helm-ff-image-native-buffer)))
+  (cl-letf* (((symbol-function 'message) #'ignore)
+             (buf (find-file-noselect candidate t)))
+    ;; When going back reuse the cached images.
+    (unless (member candidate helm-ff--image-cache)
+      (setq helm-ff--image-cache
+            (append helm-ff--image-cache
+                    (list (expand-file-name candidate)))))
+    (with-current-buffer buf
+      (rename-buffer helm-ff-image-native-buffer)
+      (display-buffer buf))))
 
 ;;; Recursive dirs completion
 ;;
