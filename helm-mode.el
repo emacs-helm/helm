@@ -21,6 +21,7 @@
 (require 'helm)
 (require 'helm-lib)
 (require 'helm-files)
+(require 'helm-misc)
 
 (defvar crm-separator)
 (defvar ido-everywhere)
@@ -2138,7 +2139,8 @@ Note: This mode is incompatible with Emacs23."
           ;; emacs-27 and `ffap-read-file-or-url' is fixed, so no need
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
-        (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch))
+        (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch)
+        (helm-minibuffer-history-mode 1))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
       (remove-function read-file-name-function #'helm--generic-read-file-name)
@@ -2147,7 +2149,8 @@ Note: This mode is incompatible with Emacs23."
       (remove-hook 'ido-everywhere-hook #'helm-mode--ido-everywhere-hook)
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
-      (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch))))
+      (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch)
+      (helm-minibuffer-history-mode -1))))
 
 (provide 'helm-mode)
 

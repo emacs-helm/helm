@@ -205,6 +205,67 @@ It is added to `extended-command-history'.
           (const :tag "Confirm" 'confirm)
           (const :tag "Always allow" nil)))
 
+(defcustom helm-minibuffer-history-key "C-r"
+  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
+  :type '(choice (string :tag "Key") (const :tag "no binding"))
+  :group 'helm-mode)
+
+(defconst helm-minibuffer-history-old-key
+  (cl-loop for map in '(minibuffer-local-completion-map
+                        minibuffer-local-filename-completion-map
+                        minibuffer-local-filename-must-match-map ; Emacs 23.1.+
+                        minibuffer-local-isearch-map
+                        minibuffer-local-map
+                        minibuffer-local-must-match-filename-map ; Older Emacsen
+                        minibuffer-local-must-match-map
+                        minibuffer-local-ns-map)
+           collect (cons map (lookup-key (symbol-value map) "\C-r"))))
+
+;;;###autoload
+(define-minor-mode helm-minibuffer-history-mode
+    "Bind `helm-minibuffer-history-key' in al minibuffer maps.
+This mode is enabled by `helm-mode', so there is no need to enable it directly."
+  :group 'helm-misc
+  :global t
+  (if helm-minibuffer-history-mode
+      (let ((key helm-minibuffer-history-key))
+        (cl-dolist (map '(minibuffer-local-completion-map
+                          minibuffer-local-filename-completion-map
+                          minibuffer-local-filename-must-match-map ; Emacs 23.1.+
+                          minibuffer-local-isearch-map
+                          minibuffer-local-map
+                          minibuffer-local-must-match-filename-map ; Older Emacsen
+                          minibuffer-local-must-match-map
+                          minibuffer-local-ns-map))
+          (let ((vmap (and (boundp map) (symbol-value map))))
+            (when (keymapp vmap)
+              (let ((val (and (boundp 'helm-minibuffer-history-key)
+                              (symbol-value 'helm-minibuffer-history-key))))
+                (when val
+                  (define-key vmap
+                      (if (stringp val) (read-kbd-macro val) val)
+                    nil)))
+              (when key
+                (define-key (symbol-value map)
+                    (if (stringp key) (read-kbd-macro key) key)
+                  'helm-minibuffer-history))))))
+    (cl-dolist (map '(minibuffer-local-completion-map
+                      minibuffer-local-filename-completion-map
+                      minibuffer-local-filename-must-match-map
+                      minibuffer-local-isearch-map
+                      minibuffer-local-map
+                      minibuffer-local-must-match-filename-map
+                      minibuffer-local-must-match-map
+                      minibuffer-local-ns-map))
+      (let ((vmap (and (boundp map) (symbol-value map))))
+        (when (keymapp vmap)
+          (let ((val (and (boundp 'helm-minibuffer-history-key)
+                          (symbol-value 'helm-minibuffer-history-key))))
+            (when val
+              (define-key vmap
+                (if (stringp val) (read-kbd-macro val) val)
+                (assoc-default map helm-minibuffer-history-old-key)))))))))
+
 
 ;;; Helm ratpoison UI
 ;;
