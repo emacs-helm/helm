@@ -1,6 +1,6 @@
 ;;; helm-epa.el --- helm interface for epa/epg
 
-;; Copyright (C) 2012 ~ 2020 Thierry Volpiatto <thievol@posteo.net>
+;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto <thievol@posteo.net>
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
