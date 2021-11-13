@@ -864,7 +864,6 @@ This is used only as a let binding.")
    "Query replace contents on marked `M-%'" 'helm-ff-query-replace
    "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
-   "Start diaporama" 'helm-ff-start-diaporama-on-marked
    "Serial rename files" 'helm-ff-serial-rename
    "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
    "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
@@ -4092,7 +4091,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
            (helm-append-at-nth
             actions
             '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
-              ("Rotate image left `M-l'" . helm-ff-rotate-image-left))
+              ("Rotate image left `M-l'" . helm-ff-rotate-image-left)
+              ("Start diaporama with marked" . helm-ff-start-diaporama-on-marked))
             3))
           ((string-match "\\.el\\'" (helm-aif (setq marked (helm-marked-candidates))
                                         (car it) candidate))
