@@ -4726,6 +4726,7 @@ or `\\[helm-ff-diaporama-quit]' to quit"))
   (ignore)
   (setq helm-ff--diaporama-iterator nil)
   (setq helm-ff--diaporama-in-pause nil)
+  (helm-ff-clean-image-cache)
   (quit-window))
 (put 'helm-ff-diaporama-quit 'no-helm-mx t)
 
