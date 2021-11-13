@@ -4688,7 +4688,9 @@ file."
 
 (defun helm-ff-diaporama-loop (iterator)
   (while (sit-for helm-ff-diaporama-default-delay)
-    (message nil)
+    (message (substitute-command-keys
+              "Type `\\[helm-ff-diaporama-pause-or-restart]' to pause \
+or `\\[helm-ff-diaporama-quit]' to quit"))
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
@@ -4714,14 +4716,17 @@ Special commands:
   (ignore)
   (setq helm-ff--diaporama-in-pause (not helm-ff--diaporama-in-pause))
   (if helm-ff--diaporama-in-pause
-      (message "helm diaporama pausing")
-    (message "helm diaporama restarting")
+      (message (substitute-command-keys
+                "Type `\\[helm-ff-diaporama-pause-or-restart]' to restart \
+or `\\[helm-ff-diaporama-quit]' to quit"))
+    (message "Helm Diaporama restarting...")
     (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
 
 (defun helm-ff-diaporama-quit ()
   (interactive)
   (ignore)
   (setq helm-ff--diaporama-iterator nil)
+  (setq helm-ff--diaporama-in-pause nil)
   (quit-window))
 
 ;;; Recursive dirs completion
