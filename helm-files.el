@@ -4670,6 +4670,7 @@ file."
 ;;; Diaporama action
 ;;
 (defvar helm-ff--diaporama-iterator nil)
+(defvar helm-ff--diaporama-in-pause nil)
 
 (defcustom helm-ff-diaporama-default-delay 3
   "Delay in seconds between each image in diaporama."
@@ -4687,6 +4688,7 @@ file."
 
 (defun helm-ff-diaporama-loop (iterator)
   (while (sit-for helm-ff-diaporama-default-delay)
+    (message nil)
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
@@ -4695,8 +4697,7 @@ file."
 (defvar helm-diaporama-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map image-mode-map)
-    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause)
-    (define-key map (kbd "r")   'helm-ff-diaporama-restart)
+    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause-or-restart)
     (define-key map (kbd "q")   'helm-ff-diaporama-quit)
     map))
 
@@ -4708,15 +4709,14 @@ Special commands:
 \\{helm-diaporama-mode-map}
 ")
 
-(defun helm-ff-diaporama-pause ()
+(defun helm-ff-diaporama-pause-or-restart ()
   (interactive)
-  (ignore))
-
-(defun helm-ff-diaporama-restart ()
-  (interactive)
-  ;; Ensure to pause in case this is called directly without pausing.
   (ignore)
-  (helm-ff-diaporama-loop helm-ff--diaporama-iterator))
+  (setq helm-ff--diaporama-in-pause (not helm-ff--diaporama-in-pause))
+  (if helm-ff--diaporama-in-pause
+      (message "helm diaporama pausing")
+    (message "helm diaporama restarting")
+    (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
 
 (defun helm-ff-diaporama-quit ()
   (interactive)
