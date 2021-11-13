@@ -219,6 +219,7 @@ It is added to `extended-command-history'.
                         minibuffer-local-must-match-filename-map ; Older Emacsen
                         minibuffer-local-must-match-map
                         minibuffer-local-ns-map)
+           when (and (boundp map) (symbol-value map))
            collect (cons map (lookup-key (symbol-value map) "\C-r"))))
 
 ;;;###autoload
