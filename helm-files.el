@@ -34,6 +34,7 @@
   (require 'dired-x)
   (require 'image-dired))
 (require 'filenotify)
+(require 'image-mode)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
@@ -863,6 +864,7 @@ This is used only as a let binding.")
    "Query replace contents on marked `M-%'" 'helm-ff-query-replace
    "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
+   "Start diaporama" 'helm-ff-start-diaporama-on-marked
    "Serial rename files" 'helm-ff-serial-rename
    "Serial rename by symlinking files" 'helm-ff-serial-rename-by-symlink
    "Serial rename by copying files" 'helm-ff-serial-rename-by-copying
@@ -4599,7 +4601,7 @@ file."
           (t
            (lambda (candidate)
              (funcall helm-ff-kill-or-find-buffer-fname-fn candidate))))))
-
+
 ;; Native image display (with image-mode).
 ;;
 (defvar helm-ff--image-cache nil)
@@ -4664,6 +4666,63 @@ file."
     (with-current-buffer buf
       (rename-buffer helm-ff-image-native-buffer)
       (display-buffer buf))))
+
+;;; Diaporama action
+;;
+(defvar helm-ff--diaporama-iterator nil)
+
+(defcustom helm-ff-diaporama-default-delay 3
+  "Delay in seconds between each image in diaporama."
+  :group 'helm-files
+  :type 'integer)
+
+(defun helm-ff-start-diaporama-on-marked (_candidate)
+  (let ((marked (helm-marked-candidates :with-wildcard t)))
+    (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
+    (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
+    (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
+    (cl-letf (((symbol-function 'message) #'ignore))
+      (helm-diaporama-mode))
+    (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
+
+(defun helm-ff-diaporama-loop (iterator)
+  (while (sit-for helm-ff-diaporama-default-delay)
+    (helm-ff--display-image-native (helm-iter-next iterator))
+    (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
+    (cl-letf (((symbol-function 'message) #'ignore))
+      (helm-diaporama-mode))))
+
+(defvar helm-diaporama-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map image-mode-map)
+    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause)
+    (define-key map (kbd "r")   'helm-ff-diaporama-restart)
+    (define-key map (kbd "q")   'helm-ff-diaporama-quit)
+    map))
+
+(define-derived-mode helm-diaporama-mode
+    image-mode "helm-image-mode"
+    "Mode to display images from helm-find-files.
+
+Special commands:
+\\{helm-diaporama-mode-map}
+")
+
+(defun helm-ff-diaporama-pause ()
+  (interactive)
+  (ignore))
+
+(defun helm-ff-diaporama-restart ()
+  (interactive)
+  ;; Ensure to pause in case this is called directly without pausing.
+  (ignore)
+  (helm-ff-diaporama-loop helm-ff--diaporama-iterator))
+
+(defun helm-ff-diaporama-quit ()
+  (interactive)
+  (ignore)
+  (setq helm-ff--diaporama-iterator nil)
+  (quit-window))
 
 ;;; Recursive dirs completion
 ;;
