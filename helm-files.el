@@ -4674,6 +4674,7 @@ file."
   :type 'integer)
 
 (defun helm-ff-start-diaporama-on-marked (_candidate)
+  (message "Diaporama started")
   (let ((marked (helm-marked-candidates :with-wildcard t)))
     (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
     (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
