@@ -4706,6 +4706,7 @@ or `\\[helm-ff-diaporama-quit]' to quit"))
 Special commands:
 \\{helm-diaporama-mode-map}
 ")
+(put 'helm-diaporama-mode 'no-helm-mx t)
 
 (defun helm-ff-diaporama-pause-or-restart ()
   (interactive)
@@ -4717,6 +4718,7 @@ Special commands:
 or `\\[helm-ff-diaporama-quit]' to quit"))
     (message "Helm Diaporama restarting...")
     (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
+(put 'helm-ff-diaporama-pause-or-restart 'no-helm-mx t)
 
 (defun helm-ff-diaporama-quit ()
   (interactive)
@@ -4724,6 +4726,7 @@ or `\\[helm-ff-diaporama-quit]' to quit"))
   (setq helm-ff--diaporama-iterator nil)
   (setq helm-ff--diaporama-in-pause nil)
   (quit-window))
+(put 'helm-ff-diaporama-quit 'no-helm-mx t)
 
 ;;; Recursive dirs completion
 ;;
