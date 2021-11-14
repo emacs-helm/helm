@@ -31,7 +31,7 @@
 (declare-function helm-describe-face "helm-lib")
 (declare-function helm-read-file-name "helm-mode")
 (declare-function helm-comp-read "helm-mode")
-(declare-function helm-M-x-transformer-no-sort "helm-command")
+(declare-function helm-M-x-transformer-no-sort-no-props "helm-command")
 
 ;;; Customizable values
 
@@ -625,7 +625,7 @@ double quote."
             (helm-apropos-init 'commandp default))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer
-    (append (list #'helm-M-x-transformer-no-sort)
+    (append (list #'helm-M-x-transformer-no-sort-no-props)
             (and (null helm-apropos-fuzzy-match)
                  '(helm-apropos-default-sort-fn)))
     :display-to-real 'helm-symbolify
