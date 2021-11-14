@@ -433,6 +433,11 @@ TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enl
 and to enlarge it while viewing images.
 Note this may not work with exotic Helm windows settings such as the ones in Spacemacs.
 
+**** Launch a diaporama from marked files
+
+Helm provides an action from `helm-find-files' that allows running a diaporama on marked files.
+Just mark image files and launch diaporama from action menu, bindings are self documented.
+
 *** Open files externally
 
 - Open file with external program (`\\<helm-find-files-map>\\[helm-ff-run-open-file-externally]',`C-u' to choose).
