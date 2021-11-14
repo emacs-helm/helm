@@ -4734,6 +4734,7 @@ Special commands:
       (helm-diaporama-mode))
   (message (substitute-command-keys
               (format helm-ff-diaporama-helper "restart"))))
+(put 'helm-ff-diaporama-next 'no-helm-mx t)
 
 (defun helm-ff-diaporama-previous ()
   (interactive)
@@ -4746,6 +4747,7 @@ Special commands:
       (helm-diaporama-mode))
   (message (substitute-command-keys
             (format helm-ff-diaporama-helper "restart"))))
+(put 'helm-ff-diaporama-previous 'no-helm-mx t)
 
 (defun helm-ff-diaporama-pause-or-restart ()
   (interactive)
