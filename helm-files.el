@@ -4679,11 +4679,12 @@ file."
   :type 'integer)
 
 (defun helm-ff-start-diaporama-on-marked (_candidate)
-  (message "Diaporama started")
   (let ((marked (helm-marked-candidates :with-wildcard t)))
+    (cl-assert (cdr marked) nil "Can't start a diaporama on a single file")
     (setq helm-ff--diaporama-sequence marked)
     (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
     (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
+    (message "Diaporama started on %s files" (length marked))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-diaporama-mode))
