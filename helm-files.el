@@ -4666,7 +4666,12 @@ file."
 ;;; Diaporama action
 ;;
 (defvar helm-ff--diaporama-iterator nil)
+(defvar helm-ff--diaporama-sequence nil)
 (defvar helm-ff--diaporama-in-pause nil)
+(defvar helm-ff-diaporama-helper
+  "Type `\\[helm-ff-diaporama-pause-or-restart]' to %s, \
+`\\[helm-ff-diaporama-next]' for next, `\\[helm-ff-diaporama-previous]' for previous, \
+`\\[helm-ff-diaporama-quit]' to quit")
 
 (defcustom helm-ff-diaporama-default-delay 3
   "Delay in seconds between each image in diaporama."
@@ -4676,6 +4681,7 @@ file."
 (defun helm-ff-start-diaporama-on-marked (_candidate)
   (message "Diaporama started")
   (let ((marked (helm-marked-candidates :with-wildcard t)))
+    (setq helm-ff--diaporama-sequence marked)
     (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
     (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
@@ -4686,8 +4692,7 @@ file."
 (defun helm-ff-diaporama-loop (iterator)
   (while (sit-for helm-ff-diaporama-default-delay)
     (message (substitute-command-keys
-              "Type `\\[helm-ff-diaporama-pause-or-restart]' to pause \
-or `\\[helm-ff-diaporama-quit]' to quit"))
+              (format helm-ff-diaporama-helper "pause")))
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
@@ -4698,6 +4703,8 @@ or `\\[helm-ff-diaporama-quit]' to quit"))
     (set-keymap-parent map image-mode-map)
     (define-key map (kbd "SPC") 'helm-ff-diaporama-pause-or-restart)
     (define-key map (kbd "q")   'helm-ff-diaporama-quit)
+    (define-key map (kbd "n")   'helm-ff-diaporama-next)
+    (define-key map (kbd "p")   'helm-ff-diaporama-previous)
     map))
 
 (define-derived-mode helm-diaporama-mode
@@ -4709,21 +4716,51 @@ Special commands:
 ")
 (put 'helm-diaporama-mode 'no-helm-mx t)
 
+(defun helm-ff-diaporama-sequence-from-current (&optional reverse)
+  (let* ((new-seq  (if reverse
+                       (reverse helm-ff--diaporama-sequence)
+                     helm-ff--diaporama-sequence))
+         (pos      (1+ (cl-position (buffer-file-name) new-seq :test 'equal))))
+    (append (nthcdr pos new-seq) (cl-subseq new-seq 0 pos))))
+
+(defun helm-ff-diaporama-next ()
+  (interactive)
+  (setq helm-ff--diaporama-in-pause t)
+  (setq helm-ff--diaporama-iterator nil)
+  (helm-ff--display-image-native
+   (car (helm-ff-diaporama-sequence-from-current)))
+  (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
+  (cl-letf (((symbol-function 'message) #'ignore))
+      (helm-diaporama-mode))
+  (message (substitute-command-keys
+              (format helm-ff-diaporama-helper "restart"))))
+
+(defun helm-ff-diaporama-previous ()
+  (interactive)
+  (setq helm-ff--diaporama-in-pause t)
+  (setq helm-ff--diaporama-iterator nil)
+  (helm-ff--display-image-native
+   (car (helm-ff-diaporama-sequence-from-current 'reverse)))
+  (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
+  (cl-letf (((symbol-function 'message) #'ignore))
+      (helm-diaporama-mode))
+  (message (substitute-command-keys
+            (format helm-ff-diaporama-helper "restart"))))
+
 (defun helm-ff-diaporama-pause-or-restart ()
   (interactive)
-  (ignore)
   (setq helm-ff--diaporama-in-pause (not helm-ff--diaporama-in-pause))
   (if helm-ff--diaporama-in-pause
       (message (substitute-command-keys
-                "Type `\\[helm-ff-diaporama-pause-or-restart]' to restart \
-or `\\[helm-ff-diaporama-quit]' to quit"))
+                (format helm-ff-diaporama-helper "restart")))
     (message "Helm Diaporama restarting...")
+    (setq helm-ff--diaporama-iterator
+          (helm-iter-circular (helm-ff-diaporama-sequence-from-current)))
     (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
 (put 'helm-ff-diaporama-pause-or-restart 'no-helm-mx t)
 
 (defun helm-ff-diaporama-quit ()
   (interactive)
-  (ignore)
   (setq helm-ff--diaporama-iterator nil)
   (setq helm-ff--diaporama-in-pause nil)
   (helm-ff-clean-image-cache)
