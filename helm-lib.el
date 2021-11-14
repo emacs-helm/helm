@@ -1017,6 +1017,22 @@ otherwise a plain list is returned."
                                                  (setq sel (car lst))))
            if separate collect group
            else append group))
+
+(defun helm-reorganize-sequence-from-elm (sequence elm &optional reverse)
+  "Reorganize SEQUENCE from ELM.
+
+Examples:
+
+    (helm-reorganize-sequence-from-elm '(a b c d e f g h i j k l) 'e)
+    => (f g h i j k l a b c d e)
+    (helm-reorganize-sequence-from-elm '(a b c d e f g h i j k l) 'e t)
+    => (d c b a l k j i h g f e)
+"
+  (let* ((new-seq  (if reverse
+                       (reverse sequence)
+                     sequence))
+         (pos      (1+ (cl-position elm new-seq :test 'equal))))
+    (append (nthcdr pos new-seq) (cl-subseq new-seq 0 pos))))
 
 ;;; Strings processing.
 ;;

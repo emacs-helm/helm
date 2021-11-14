@@ -4697,6 +4697,7 @@ Special commands:
 (put 'helm-diaporama-mode 'no-helm-mx t)
 
 (defun helm-ff-start-diaporama-on-marked (_candidate)
+  "Start a diaporama on marked files."
   (let ((marked (helm-marked-candidates :with-wildcard t)))
     (cl-assert (cdr marked) nil "Can't start a diaporama on a single file")
     (setq helm-ff--diaporama-sequence marked)
@@ -4718,11 +4719,8 @@ Special commands:
       (helm-diaporama-mode))))
 
 (defun helm-ff-diaporama-sequence-from-current (&optional reverse)
-  (let* ((new-seq  (if reverse
-                       (reverse helm-ff--diaporama-sequence)
-                     helm-ff--diaporama-sequence))
-         (pos      (1+ (cl-position (buffer-file-name) new-seq :test 'equal))))
-    (append (nthcdr pos new-seq) (cl-subseq new-seq 0 pos))))
+  (helm-reorganize-sequence-from-elm
+   helm-ff--diaporama-sequence (buffer-file-name) reverse))
 
 (defun helm-ff-diaporama-next ()
   (interactive)
