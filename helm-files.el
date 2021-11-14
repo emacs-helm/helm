@@ -4678,6 +4678,24 @@ file."
   :group 'helm-files
   :type 'integer)
 
+(defvar helm-diaporama-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map image-mode-map)
+    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause-or-restart)
+    (define-key map (kbd "q")   'helm-ff-diaporama-quit)
+    (define-key map (kbd "n")   'helm-ff-diaporama-next)
+    (define-key map (kbd "p")   'helm-ff-diaporama-previous)
+    map))
+
+(define-derived-mode helm-diaporama-mode
+    image-mode "helm-image-mode"
+    "Mode to display images from helm-find-files.
+
+Special commands:
+\\{helm-diaporama-mode-map}
+")
+(put 'helm-diaporama-mode 'no-helm-mx t)
+
 (defun helm-ff-start-diaporama-on-marked (_candidate)
   (let ((marked (helm-marked-candidates :with-wildcard t)))
     (cl-assert (cdr marked) nil "Can't start a diaporama on a single file")
@@ -4698,24 +4716,6 @@ file."
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-diaporama-mode))))
-
-(defvar helm-diaporama-mode-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map image-mode-map)
-    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause-or-restart)
-    (define-key map (kbd "q")   'helm-ff-diaporama-quit)
-    (define-key map (kbd "n")   'helm-ff-diaporama-next)
-    (define-key map (kbd "p")   'helm-ff-diaporama-previous)
-    map))
-
-(define-derived-mode helm-diaporama-mode
-    image-mode "helm-image-mode"
-    "Mode to display images from helm-find-files.
-
-Special commands:
-\\{helm-diaporama-mode-map}
-")
-(put 'helm-diaporama-mode 'no-helm-mx t)
 
 (defun helm-ff-diaporama-sequence-from-current (&optional reverse)
   (let* ((new-seq  (if reverse
