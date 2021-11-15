@@ -4091,7 +4091,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
             actions
             '(("Rotate image right `M-r'" . helm-ff-rotate-image-right)
               ("Rotate image left `M-l'" . helm-ff-rotate-image-left)
-              ("Start diaporama with marked" . helm-ff-start-diaporama-on-marked))
+              ("Start slideshow with marked" . helm-ff-start-slideshow-on-marked))
             3))
           ((string-match "\\.el\\'" candidate)
            (helm-append-at-nth
@@ -4663,122 +4663,122 @@ file."
       (rename-buffer helm-ff-image-native-buffer)
       (display-buffer buf))))
 
-;;; Diaporama action
+;;; Slideshow action
 ;;
-(defvar helm-ff--diaporama-iterator nil)
-(defvar helm-ff--diaporama-sequence nil)
-(defvar helm-ff--diaporama-in-pause nil)
-(defvar helm-ff-diaporama-helper
-  "Type `\\[helm-ff-diaporama-pause-or-restart]' to %s, \
-`\\[helm-ff-diaporama-next]' for next, `\\[helm-ff-diaporama-previous]' for previous, \
-`\\[helm-ff-diaporama-quit]' to quit")
+(defvar helm-ff--slideshow-iterator nil)
+(defvar helm-ff--slideshow-sequence nil)
+(defvar helm-ff--slideshow-in-pause nil)
+(defvar helm-ff-slideshow-helper
+  "Type `\\[helm-ff-slideshow-pause-or-restart]' to %s, \
+`\\[helm-ff-slideshow-next]' for next, `\\[helm-ff-slideshow-previous]' for previous, \
+`\\[helm-ff-slideshow-quit]' to quit")
 
-(defcustom helm-ff-diaporama-default-delay 3
-  "Delay in seconds between each image in diaporama."
+(defcustom helm-ff-slideshow-default-delay 3
+  "Delay in seconds between each image in slideshow."
   :group 'helm-files
   :type 'integer)
 
-(defvar helm-diaporama-mode-map
+(defvar helm-slideshow-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map image-mode-map)
-    (define-key map (kbd "SPC") 'helm-ff-diaporama-pause-or-restart)
-    (define-key map (kbd "q")   'helm-ff-diaporama-quit)
-    (define-key map (kbd "n")   'helm-ff-diaporama-next)
-    (define-key map (kbd "p")   'helm-ff-diaporama-previous)
+    (define-key map (kbd "SPC") 'helm-ff-slideshow-pause-or-restart)
+    (define-key map (kbd "q")   'helm-ff-slideshow-quit)
+    (define-key map (kbd "n")   'helm-ff-slideshow-next)
+    (define-key map (kbd "p")   'helm-ff-slideshow-previous)
     map))
 
-(define-derived-mode helm-diaporama-mode
+(define-derived-mode helm-slideshow-mode
     image-mode "helm-image-mode"
     "Mode to display images from helm-find-files.
 
 Special commands:
-\\{helm-diaporama-mode-map}
+\\{helm-slideshow-mode-map}
 ")
-(put 'helm-diaporama-mode 'no-helm-mx t)
+(put 'helm-slideshow-mode 'no-helm-mx t)
 
-(defun helm-ff-start-diaporama-on-marked (_candidate)
-  "Start a diaporama on marked files."
+(defun helm-ff-start-slideshow-on-marked (_candidate)
+  "Start a slideshow on marked files."
   (let ((marked (helm-marked-candidates :with-wildcard t)))
     (cl-assert (cdr marked) nil "Can't start a slideshow on a single file")
-    (setq helm-ff--diaporama-sequence marked)
-    (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
-    (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
+    (setq helm-ff--slideshow-sequence marked)
+    (setq helm-ff--slideshow-iterator (helm-iter-circular marked))
+    (helm-ff--display-image-native (helm-iter-next helm-ff--slideshow-iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-diaporama-mode))
+      (helm-slideshow-mode))
     (message (concat (format "(1/%s) " (length marked))
                      (substitute-command-keys
-                      (format helm-ff-diaporama-helper "pause"))))
-    (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
+                      (format helm-ff-slideshow-helper "pause"))))
+    (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
 
-(defun helm-ff-diaporama-state ()
+(defun helm-ff-slideshow-state ()
   (format "(%s/%s) "
           (1+ (cl-position
-               (buffer-file-name) helm-ff--diaporama-sequence
+               (buffer-file-name) helm-ff--slideshow-sequence
                :test 'equal))
-          (length helm-ff--diaporama-sequence)))
+          (length helm-ff--slideshow-sequence)))
 
-(defun helm-ff-diaporama-loop (iterator)
-  (while (sit-for helm-ff-diaporama-default-delay)
+(defun helm-ff-slideshow-loop (iterator)
+  (while (sit-for helm-ff-slideshow-default-delay)
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-diaporama-mode))
-    (message (concat (helm-ff-diaporama-state)
+      (helm-slideshow-mode))
+    (message (concat (helm-ff-slideshow-state)
                      (substitute-command-keys
-                      (format helm-ff-diaporama-helper "pause"))))))
+                      (format helm-ff-slideshow-helper "pause"))))))
 
-(defun helm-ff-diaporama-sequence-from-current (&optional reverse)
+(defun helm-ff-slideshow-sequence-from-current (&optional reverse)
   (helm-reorganize-sequence-from-elm
-   helm-ff--diaporama-sequence (buffer-file-name) reverse))
+   helm-ff--slideshow-sequence (buffer-file-name) reverse))
 
-(defun helm-ff-diaporama-next ()
+(defun helm-ff-slideshow-next ()
   (interactive)
-  (setq helm-ff--diaporama-in-pause t)
-  (setq helm-ff--diaporama-iterator nil)
+  (setq helm-ff--slideshow-in-pause t)
+  (setq helm-ff--slideshow-iterator nil)
   (helm-ff--display-image-native
-   (car (helm-ff-diaporama-sequence-from-current)))
+   (car (helm-ff-slideshow-sequence-from-current)))
   (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
   (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-diaporama-mode))
-  (message (concat (helm-ff-diaporama-state)
+      (helm-slideshow-mode))
+  (message (concat (helm-ff-slideshow-state)
                    (substitute-command-keys
-                    (format helm-ff-diaporama-helper "restart")))))
-(put 'helm-ff-diaporama-next 'no-helm-mx t)
+                    (format helm-ff-slideshow-helper "restart")))))
+(put 'helm-ff-slideshow-next 'no-helm-mx t)
 
-(defun helm-ff-diaporama-previous ()
+(defun helm-ff-slideshow-previous ()
   (interactive)
-  (setq helm-ff--diaporama-in-pause t)
-  (setq helm-ff--diaporama-iterator nil)
+  (setq helm-ff--slideshow-in-pause t)
+  (setq helm-ff--slideshow-iterator nil)
   (helm-ff--display-image-native
-   (car (helm-ff-diaporama-sequence-from-current 'reverse)))
+   (car (helm-ff-slideshow-sequence-from-current 'reverse)))
   (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
   (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-diaporama-mode))
-  (message (concat (helm-ff-diaporama-state)
+      (helm-slideshow-mode))
+  (message (concat (helm-ff-slideshow-state)
                    (substitute-command-keys
-                    (format helm-ff-diaporama-helper "restart")))))
-(put 'helm-ff-diaporama-previous 'no-helm-mx t)
+                    (format helm-ff-slideshow-helper "restart")))))
+(put 'helm-ff-slideshow-previous 'no-helm-mx t)
 
-(defun helm-ff-diaporama-pause-or-restart ()
+(defun helm-ff-slideshow-pause-or-restart ()
   (interactive)
-  (setq helm-ff--diaporama-in-pause (not helm-ff--diaporama-in-pause))
-  (if helm-ff--diaporama-in-pause
+  (setq helm-ff--slideshow-in-pause (not helm-ff--slideshow-in-pause))
+  (if helm-ff--slideshow-in-pause
       (message (substitute-command-keys
-                (format helm-ff-diaporama-helper "restart")))
+                (format helm-ff-slideshow-helper "restart")))
     (message "Helm Slideshow restarting...")
-    (setq helm-ff--diaporama-iterator
-          (helm-iter-circular (helm-ff-diaporama-sequence-from-current)))
-    (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
-(put 'helm-ff-diaporama-pause-or-restart 'no-helm-mx t)
+    (setq helm-ff--slideshow-iterator
+          (helm-iter-circular (helm-ff-slideshow-sequence-from-current)))
+    (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
+(put 'helm-ff-slideshow-pause-or-restart 'no-helm-mx t)
 
-(defun helm-ff-diaporama-quit ()
+(defun helm-ff-slideshow-quit ()
   (interactive)
-  (setq helm-ff--diaporama-iterator nil)
-  (setq helm-ff--diaporama-in-pause nil)
+  (setq helm-ff--slideshow-iterator nil)
+  (setq helm-ff--slideshow-in-pause nil)
   (helm-ff-clean-image-cache)
   (quit-window))
-(put 'helm-ff-diaporama-quit 'no-helm-mx t)
+(put 'helm-ff-slideshow-quit 'no-helm-mx t)
 
 ;;; Recursive dirs completion
 ;;
