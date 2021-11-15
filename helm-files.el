@@ -4699,24 +4699,34 @@ Special commands:
 (defun helm-ff-start-diaporama-on-marked (_candidate)
   "Start a diaporama on marked files."
   (let ((marked (helm-marked-candidates :with-wildcard t)))
-    (cl-assert (cdr marked) nil "Can't start a diaporama on a single file")
+    (cl-assert (cdr marked) nil "Can't start a slideshow on a single file")
     (setq helm-ff--diaporama-sequence marked)
     (setq helm-ff--diaporama-iterator (helm-iter-circular marked))
     (helm-ff--display-image-native (helm-iter-next helm-ff--diaporama-iterator))
-    (message "Diaporama started on %s files" (length marked))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-diaporama-mode))
+    (message (concat (format "(1/%s) " (length marked))
+                     (substitute-command-keys
+                      (format helm-ff-diaporama-helper "pause"))))
     (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
+
+(defun helm-ff-diaporama-state ()
+  (format "(%s/%s) "
+          (1+ (cl-position
+               (buffer-file-name) helm-ff--diaporama-sequence
+               :test 'equal))
+          (length helm-ff--diaporama-sequence)))
 
 (defun helm-ff-diaporama-loop (iterator)
   (while (sit-for helm-ff-diaporama-default-delay)
-    (message (substitute-command-keys
-              (format helm-ff-diaporama-helper "pause")))
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
-      (helm-diaporama-mode))))
+      (helm-diaporama-mode))
+    (message (concat (helm-ff-diaporama-state)
+                     (substitute-command-keys
+                      (format helm-ff-diaporama-helper "pause"))))))
 
 (defun helm-ff-diaporama-sequence-from-current (&optional reverse)
   (helm-reorganize-sequence-from-elm
@@ -4731,8 +4741,9 @@ Special commands:
   (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
   (cl-letf (((symbol-function 'message) #'ignore))
       (helm-diaporama-mode))
-  (message (substitute-command-keys
-              (format helm-ff-diaporama-helper "restart"))))
+  (message (concat (helm-ff-diaporama-state)
+                   (substitute-command-keys
+                    (format helm-ff-diaporama-helper "restart")))))
 (put 'helm-ff-diaporama-next 'no-helm-mx t)
 
 (defun helm-ff-diaporama-previous ()
@@ -4744,8 +4755,9 @@ Special commands:
   (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
   (cl-letf (((symbol-function 'message) #'ignore))
       (helm-diaporama-mode))
-  (message (substitute-command-keys
-            (format helm-ff-diaporama-helper "restart"))))
+  (message (concat (helm-ff-diaporama-state)
+                   (substitute-command-keys
+                    (format helm-ff-diaporama-helper "restart")))))
 (put 'helm-ff-diaporama-previous 'no-helm-mx t)
 
 (defun helm-ff-diaporama-pause-or-restart ()
@@ -4754,7 +4766,7 @@ Special commands:
   (if helm-ff--diaporama-in-pause
       (message (substitute-command-keys
                 (format helm-ff-diaporama-helper "restart")))
-    (message "Helm Diaporama restarting...")
+    (message "Helm Slideshow restarting...")
     (setq helm-ff--diaporama-iterator
           (helm-iter-circular (helm-ff-diaporama-sequence-from-current)))
     (helm-ff-diaporama-loop helm-ff--diaporama-iterator)))
