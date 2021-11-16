@@ -41,6 +41,7 @@
 (declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
 (declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
 (declare-function image-dired-update-property "image-dired.el" (prop value))
+(declare-function image-dired-get-thumbnail-image "image-dired.el")
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (declare-function eshell-kill-input "esh-mode")
@@ -684,6 +685,7 @@ It is generally \"~/.local/share/Trash\"."
     (define-key map (kbd "C-c C-x")       'helm-ff-run-open-file-externally)
     (define-key map (kbd "C-c C-v")       'helm-ff-run-preview-file-externally)
     (define-key map (kbd "C-c X")         'helm-ff-run-open-file-with-default-tool)
+    (define-key map (kbd "C-c t")         'helm-ff-toggle-thumbnails)
     (define-key map (kbd "M-!")           'helm-ff-run-eshell-command-on-file)
     (define-key map (kbd "M-@")           'helm-ff-run-query-replace-fnames-on-marked)
     (define-key map (kbd "M-%")           'helm-ff-run-query-replace)
@@ -942,6 +944,7 @@ Should not be used among other sources.")
    (match-on-real :initform t)
    (filtered-candidate-transformer
     :initform '(helm-ff-fct
+                helm-ff-maybe-show-thumbnails
                 ;; These next two have to be called after
                 ;; `helm-ff-fct' as they use only cons cell candidates.
                 helm-ff-directories-only
@@ -4779,6 +4782,42 @@ Special commands:
   (helm-ff-clean-image-cache)
   (quit-window))
 (put 'helm-ff-slideshow-quit 'no-helm-mx t)
+
+;;; Thumbnails view
+;;
+(defvar helm-ff-show-thumbnails nil)
+(defun helm-ff-maybe-show-thumbnails (candidates _source)
+  (require 'image-dired)
+  (if (and helm-ff-show-thumbnails
+           (null (file-remote-p helm-ff-default-directory)))
+      (cl-loop for (disp . img) in candidates
+               for type = (helm-acase (file-name-extension img)
+                            ("png" 'png)
+                            (("jpg" "jpeg") 'jpeg))
+               if type collect
+               (let ((thumbnail (plist-get
+                                 (cdr (image-dired-get-thumbnail-image img))
+                                 :file)))
+                 (cons (concat (propertize " "
+                                           'display `(image
+                                                      :type ,type
+                                                      :margin 5
+                                                      :file ,thumbnail)
+                                           'rear-nonsticky '(display))
+                               disp)
+                       img))
+               else collect (cons disp img))
+    candidates))
+
+(defun helm-ff-toggle-thumbnails ()
+  (interactive)
+  (cl-assert (null (file-remote-p helm-ff-default-directory))
+             nil "Thumbnails show not supported on remote files")
+  (setq helm-ff-show-thumbnails (not helm-ff-show-thumbnails))
+  (helm-update (regexp-quote (replace-regexp-in-string
+                              "\\` *" "" (helm-get-selection nil t)))))
+(put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
+
 
 ;;; Recursive dirs completion
 ;;
