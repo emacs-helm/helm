@@ -433,6 +433,11 @@ TIP: Use `\\<helm-map>\\[helm-toggle-resplit-and-swap-windows]' and `\\[helm-enl
 and to enlarge it while viewing images.
 Note this may not work with exotic Helm windows settings such as the ones in Spacemacs.
 
+**** Show thumbnails
+
+Helm use image-dired to show thumbnails on image files, you can
+toggle the thumbnail view with \\<helm-find-files-map>`\\[helm-ff-toggle-thumbnails]'.
+
 **** Launch a slideshow from marked files
 
 Helm provides an action from `helm-find-files' that allows running a slideshow on marked files.
@@ -1224,7 +1229,8 @@ you will have to refresh manually directories when needed with `\\<helm-map>\\[h
 |\\[helm-ff-sort-by-newest]|Sort by newest
 |\\[helm-ff-sort-by-size]|Sort by size
 |\\[helm-ff-toggle-dirs-only]|Show only directories
-|\\[helm-ff-toggle-files-only]|Show only files")
+|\\[helm-ff-toggle-files-only]|Show only files
+|\\[helm-ff-toggle-thumbnails]|Show thumbnails on image files")
 
 ;;; Help for file-name-history
 ;;
