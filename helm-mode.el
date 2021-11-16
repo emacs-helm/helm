@@ -321,7 +321,9 @@ NOT `setq'."
            (choice ,@(mapcar (lambda (x) (list 'const x))
                              helm-completion--all-styles))))
 
-(defcustom helm-completion-styles-alist '((gud-mode . helm))
+(defcustom helm-completion-styles-alist '((gud-mode . helm)
+                                          ;; See https://github.com/djcb/mu/issues/2181.
+                                          (mu4e-compose-mode . emacs))
   "Allow configuring `helm-completion-style' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
