@@ -4785,10 +4785,10 @@ Special commands:
 
 ;;; Thumbnails view
 ;;
-(defvar helm-ff-show-thumbnails nil)
+(defvar helm-ff--show-thumbnails nil)
 (defun helm-ff-maybe-show-thumbnails (candidates _source)
   (require 'image-dired)
-  (if (and helm-ff-show-thumbnails
+  (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
       (cl-loop for (disp . img) in candidates
                for type = (helm-acase (file-name-extension img)
@@ -4813,7 +4813,7 @@ Special commands:
   (interactive)
   (cl-assert (null (file-remote-p helm-ff-default-directory))
              nil "Thumbnails show not supported on remote files")
-  (setq helm-ff-show-thumbnails (not helm-ff-show-thumbnails))
+  (setq helm-ff--show-thumbnails (not helm-ff--show-thumbnails))
   (helm-update (regexp-quote (replace-regexp-in-string
                               "\\` *" "" (helm-get-selection nil t)))))
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
@@ -5098,7 +5098,7 @@ source is `helm-source-find-files'."
           helm-ff-clean-initial-input))
   (setq helm-ff--show-directories-only nil
         helm-ff--show-files-only nil
-        helm-ff-show-thumbnails nil)
+        helm-ff--show-thumbnails nil)
   (helm-ff-clean-image-cache))
 
 (defun helm-ff-bookmark ()
