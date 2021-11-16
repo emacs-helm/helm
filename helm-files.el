@@ -5097,7 +5097,8 @@ source is `helm-source-find-files'."
           helm-ff-move-to-first-real-candidate
           helm-ff-clean-initial-input))
   (setq helm-ff--show-directories-only nil
-        helm-ff--show-files-only nil)
+        helm-ff--show-files-only nil
+        helm-ff-show-thumbnails nil)
   (helm-ff-clean-image-cache))
 
 (defun helm-ff-bookmark ()
