@@ -4721,6 +4721,10 @@ Special commands:
                :test 'equal))
           (length helm-ff--slideshow-sequence)))
 
+(defun helm-ff-slideshow-sequence-from-current (&optional reverse)
+  (helm-reorganize-sequence-from-elm
+   helm-ff--slideshow-sequence (buffer-file-name) reverse))
+
 (defun helm-ff-slideshow-loop (iterator)
   (while (sit-for helm-ff-slideshow-default-delay)
     (helm-ff--display-image-native (helm-iter-next iterator))
@@ -4731,9 +4735,17 @@ Special commands:
                      (substitute-command-keys
                       (format helm-ff-slideshow-helper "pause"))))))
 
-(defun helm-ff-slideshow-sequence-from-current (&optional reverse)
-  (helm-reorganize-sequence-from-elm
-   helm-ff--slideshow-sequence (buffer-file-name) reverse))
+(defun helm-ff-slideshow-pause-or-restart ()
+  (interactive)
+  (setq helm-ff--slideshow-in-pause (not helm-ff--slideshow-in-pause))
+  (if helm-ff--slideshow-in-pause
+      (message (substitute-command-keys
+                (format helm-ff-slideshow-helper "restart")))
+    (message "Helm Slideshow restarting...")
+    (setq helm-ff--slideshow-iterator
+          (helm-iter-circular (helm-ff-slideshow-sequence-from-current)))
+    (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
+(put 'helm-ff-slideshow-pause-or-restart 'no-helm-mx t)
 
 (defun helm-ff-slideshow-next ()
   (interactive)
@@ -4762,18 +4774,6 @@ Special commands:
                    (substitute-command-keys
                     (format helm-ff-slideshow-helper "restart")))))
 (put 'helm-ff-slideshow-previous 'no-helm-mx t)
-
-(defun helm-ff-slideshow-pause-or-restart ()
-  (interactive)
-  (setq helm-ff--slideshow-in-pause (not helm-ff--slideshow-in-pause))
-  (if helm-ff--slideshow-in-pause
-      (message (substitute-command-keys
-                (format helm-ff-slideshow-helper "restart")))
-    (message "Helm Slideshow restarting...")
-    (setq helm-ff--slideshow-iterator
-          (helm-iter-circular (helm-ff-slideshow-sequence-from-current)))
-    (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
-(put 'helm-ff-slideshow-pause-or-restart 'no-helm-mx t)
 
 (defun helm-ff-slideshow-quit ()
   (interactive)
