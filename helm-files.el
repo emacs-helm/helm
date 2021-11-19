@@ -2704,6 +2704,8 @@ If prefix numeric arg is given go ARG level up."
                         helm-find-files--level-tree)))
           (setq helm-find-files--level-tree-iterator nil)
           (push new-pattern helm-find-files--level-tree)
+          (setq helm-ff--show-thumbnails
+                (member new-pattern helm-ff--thumbnailed-directories))
           (helm-set-pattern new-pattern helm-suspend-update-flag)
           (with-helm-after-update-hook (helm-ff-retrieve-last-expanded)))))))
 (put 'helm-find-files-up-one-level 'helm-only t)
@@ -2719,7 +2721,10 @@ If prefix numeric arg is given go ARG level up."
               (helm-iter-list (cdr helm-find-files--level-tree))))
       (setq helm-find-files--level-tree nil)
       (helm-aif (helm-iter-next helm-find-files--level-tree-iterator)
-          (helm-set-pattern it)
+          (progn
+            (setq helm-ff--show-thumbnails
+                  (member it helm-ff--thumbnailed-directories))
+            (helm-set-pattern it))
         (setq helm-find-files--level-tree-iterator nil)))))
 (put 'helm-find-files-down-last-level 'helm-only t)
 
@@ -4496,11 +4501,13 @@ file."
            (and (file-directory-p candidate) (file-symlink-p candidate))
            (cons (lambda (_candidate)
                    (helm-ff-after-persistent-show-all)
-                   (funcall insert-in-minibuffer
-                            (file-name-as-directory
-                             (if current-prefix-arg
-                                 (file-truename (expand-file-name candidate))
-                               (expand-file-name candidate)))))
+                   (let ((new-dir (file-name-as-directory
+                                   (if current-prefix-arg
+                                       (file-truename (expand-file-name candidate))
+                                     (expand-file-name candidate)))))
+                     (setq helm-ff--show-thumbnails
+                           (member new-dir helm-ff--thumbnailed-directories))
+                     (funcall insert-in-minibuffer new-dir)))
                  'never-split))
           ;; A directory, open it.
           ((file-directory-p candidate)
@@ -4508,8 +4515,11 @@ file."
                    (helm-ff-after-persistent-show-all)
                    (when (string= (helm-basename candidate) "..")
                      (setq helm-ff-last-expanded helm-ff-default-directory))
-                   (funcall insert-in-minibuffer (file-name-as-directory
-                                                  (expand-file-name candidate)))
+                   (let ((new-dir (file-name-as-directory
+                                   (expand-file-name candidate))))
+                     (setq helm-ff--show-thumbnails
+                           (member new-dir helm-ff--thumbnailed-directories))
+                     (funcall insert-in-minibuffer new-dir))
                    (with-helm-after-update-hook (helm-ff-retrieve-last-expanded)))
                  'never-split))
           ;; A symlink file, expand to it's true name. (first hit)
@@ -4786,27 +4796,30 @@ Special commands:
 ;;; Thumbnails view
 ;;
 (defvar helm-ff--show-thumbnails nil)
+(defvar helm-ff--thumbnailed-directories nil)
 (defun helm-ff-maybe-show-thumbnails (candidates _source)
   (require 'image-dired)
   (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
-      (cl-loop for (disp . img) in candidates
-               for type = (helm-acase (file-name-extension img)
-                            ("png" 'png)
-                            (("jpg" "jpeg") 'jpeg))
-               if type collect
-               (let ((thumbnail (plist-get
-                                 (cdr (image-dired-get-thumbnail-image img))
-                                 :file)))
-                 (cons (concat (propertize " "
-                                           'display `(image
-                                                      :type ,type
-                                                      :margin 5
-                                                      :file ,thumbnail)
-                                           'rear-nonsticky '(display))
-                               disp)
-                       img))
-               else collect (cons disp img))
+      (progn
+        (cl-pushnew helm-ff-default-directory helm-ff--thumbnailed-directories :test 'equal)
+        (cl-loop for (disp . img) in candidates
+                 for type = (helm-acase (file-name-extension img)
+                              ("png" 'png)
+                              (("jpg" "jpeg") 'jpeg))
+                 if type collect
+                 (let ((thumbnail (plist-get
+                                   (cdr (image-dired-get-thumbnail-image img))
+                                   :file)))
+                   (cons (concat (propertize " "
+                                             'display `(image
+                                                        :type ,type
+                                                        :margin 5
+                                                        :file ,thumbnail)
+                                             'rear-nonsticky '(display))
+                                 disp)
+                         img))
+                 else collect (cons disp img)))
     candidates))
 
 (defun helm-ff-toggle-thumbnails ()
@@ -5098,7 +5111,8 @@ source is `helm-source-find-files'."
           helm-ff-clean-initial-input))
   (setq helm-ff--show-directories-only nil
         helm-ff--show-files-only nil
-        helm-ff--show-thumbnails nil)
+        helm-ff--show-thumbnails nil
+        helm-ff--thumbnailed-directories nil)
   (helm-ff-clean-image-cache))
 
 (defun helm-ff-bookmark ()
