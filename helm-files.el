@@ -4802,7 +4802,8 @@ Special commands:
   (if (and helm-ff--show-thumbnails
            (null (file-remote-p helm-ff-default-directory)))
       (progn
-        (cl-pushnew helm-ff-default-directory helm-ff--thumbnailed-directories :test 'equal)
+        (cl-pushnew helm-ff-default-directory
+                    helm-ff--thumbnailed-directories :test 'equal)
         (cl-loop for (disp . img) in candidates
                  for type = (helm-acase (file-name-extension img)
                               ("png" 'png)
