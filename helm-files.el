@@ -2825,7 +2825,8 @@ when `helm-pattern' is equal to \"~/\"."
                                ;; `helm-ff-move-to-first-real-candidate'
                                ;; instead of `helm-next-line' (Bug#910).
                                (helm-ff-move-to-first-real-candidate))
-                             (helm-get-selection nil nil src))))
+                             (helm-get-selection nil nil src)))
+               expand-to)
           (when (and (or (and helm-ff-auto-update-flag
                               (null helm-ff--deleting-char-backward)
                               ;; Bug#295
@@ -2861,19 +2862,24 @@ when `helm-pattern' is equal to \"~/\"."
                 ;; and only one candidate is remaining [2],
                 ;; assume candidate is a new directory to expand, and do it.
                 (progn
-                    (helm-set-pattern (file-name-as-directory
-                                       (substring-no-properties cur-cand)))
-                    ;; Reset flags to show all when changing dir.
-                    (helm-ff-after-persistent-show-all))
+                  (setq expand-to (file-name-as-directory
+                                   (substring-no-properties cur-cand)))
+                  (setq helm-ff--show-thumbnails
+                        (member expand-to helm-ff--thumbnailed-directories))
+                  (helm-set-pattern expand-to)
+                  ;; Reset flags to show all when changing dir.
+                  (helm-ff-after-persistent-show-all))
                 ;; The candidate is one of "." or ".."
                 ;; that mean we have entered the last letter of the directory name
                 ;; in prompt, so expansion is already done, just add the "/" at end
                 ;; of name unless helm-pattern ends with "."
                 ;; (i.e we are writing something starting with ".")
                 (unless (string-match "\\`.*[.]\\{1\\}\\'" helm-pattern)
-                  (helm-set-pattern
-                   ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
-                   (expand-file-name (file-name-as-directory helm-pattern)))))
+                  ;; Need to expand-file-name to avoid e.g /ssh:host:./ in prompt.
+                  (setq expand-to (expand-file-name (file-name-as-directory helm-pattern)))
+                  (setq helm-ff--show-thumbnails
+                        (member expand-to helm-ff--thumbnailed-directories))
+                  (helm-set-pattern expand-to)))
             ;; When typing pattern in minibuffer, helm
             ;; expand very fast to a directory matching pattern and
             ;; don't let undo the time to set a boundary, the result
