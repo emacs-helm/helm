@@ -4828,6 +4828,11 @@ Special commands:
   (cl-assert (null (file-remote-p helm-ff-default-directory))
              nil "Thumbnails show not supported on remote files")
   (setq helm-ff--show-thumbnails (not helm-ff--show-thumbnails))
+  (when (and (null helm-ff--show-thumbnails)
+             (member helm-ff-default-directory
+                     helm-ff--thumbnailed-directories))
+    (setq helm-ff--thumbnailed-directories
+          (delete helm-ff-default-directory helm-ff--thumbnailed-directories)))
   (helm-update (regexp-quote (replace-regexp-in-string
                               "\\` *" "" (helm-get-selection nil t)))))
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
