@@ -1436,7 +1436,7 @@ windows layout."
                                 helm-ff-default-directory
                               (file-name-directory candidate))))
     (helm-etags-select helm-current-prefix-arg)))
-
+
 ;;; Eshell command on file
 ;;
 (defvar eshell-command-aliases-list nil)
@@ -2787,7 +2787,7 @@ Ensure disabling `helm-ff-auto-update-flag' before undoing."
           (helm-check-minibuffer-input))
       (setq helm-ff-auto-update-flag old--flag)
       (setq helm-ff--auto-update-state helm-ff-auto-update-flag))))
-
+
 ;;; Auto-update - helm-find-files auto expansion of directories.
 ;;
 ;;
@@ -4124,7 +4124,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
            (helm-append-at-nth
             actions '(("Browse url file" . browse-url-of-file)) 2))
           (t actions))))
-
+
 ;;; Trashing files
 ;;
 (defun helm-ff-trash-action (fn names &rest args)
@@ -5405,7 +5405,7 @@ files to destination."
         (helm-prev-visible-mark)))))
 
 
-;;; Routines for files
+;;; Delete and trash files
 ;;
 ;;
 (defun helm-file-buffers (filename)
@@ -5598,7 +5598,7 @@ When a prefix arg is given, meaning of
                      (cl-incf len))))
             (setq helm-ff-allow-recursive-deletes old--allow-recursive-deletes)))
         (message "%s File(s) %s" len (if trash "trashed" "deleted"))))))
-
+
 ;;; Delete files async
 ;;
 ;;
@@ -6158,7 +6158,10 @@ See `helm-browse-project'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-browse-project)))
 (put 'helm-ff-run-browse-project 'helm-only t)
-
+
+;;; Actions calling helm and main interactive functions.
+;;
+;;
 (defun helm-ff-gid (_candidate)
   (with-helm-default-directory helm-ff-default-directory
       (helm-gid)))
