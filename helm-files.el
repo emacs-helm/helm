@@ -815,7 +815,6 @@ Don't set it directly, use instead `helm-ff-auto-update-initial-value'.")
   "Store last expanded directory or file.")
 (defvar helm-ff-default-directory nil)
 (defvar helm-ff-history nil)
-(defvar helm-ff-cand-to-mark nil)
 (defvar helm-ff-url-regexp
   "\\`\\(news\\(post\\)?:\\|nntp:\\|mailto:\\|file:\\|\\(ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\):/?/?\\).*"
   "Same as `ffap-url-regexp' but match earlier possible url.")
@@ -5345,28 +5344,24 @@ DESTINATION for the actions copy and rename."
     (when (and follow
                (not (memq action '(symlink relsymlink hardlink)))
                (not (get-buffer dired-log-buffer)))
-      (let ((target (directory-file-name destination)))
-        (unwind-protect
-             (progn
-               (setq helm-ff-cand-to-mark
-                     (helm-get-dest-fnames-from-list files destination dirflag))
-               (with-helm-after-update-hook (helm-ff-maybe-mark-candidates))
-               ;; Wait for the notify callback ends before calling HFF.
-               (run-at-time
-                0.1 nil
-                (lambda ()
-                  (if (and dirflag (eq action 'rename))
-                      (helm-find-files-1 (file-name-directory target)
-                                         (if helm-ff-transformer-show-only-basename
-                                             (helm-basename target) target))
-                    (helm-find-files-1 (if (file-directory-p destination)
-                                           (file-name-as-directory
-                                            (expand-file-name destination))
-                                         (expand-file-name (helm-basedir destination)))
-                                       (if helm-ff-transformer-show-only-basename
-                                           (helm-basename (car files))
-                                         (car files)))))))
-          (setq helm-ff-cand-to-mark nil))))))
+      (let ((target        (directory-file-name destination))
+            (cands-to-mark (helm-get-dest-fnames-from-list files destination dirflag)))
+        (with-helm-after-update-hook (helm-ff-maybe-mark-candidates cands-to-mark))
+        ;; Wait for the notify callback ends before calling HFF.
+        (run-at-time
+         0.1 nil
+         (lambda ()
+           (if (and dirflag (eq action 'rename))
+               (helm-find-files-1 (file-name-directory target)
+                                  (if helm-ff-transformer-show-only-basename
+                                      (helm-basename target) target))
+             (helm-find-files-1 (if (file-directory-p destination)
+                                    (file-name-as-directory
+                                     (expand-file-name destination))
+                                  (expand-file-name (helm-basedir destination)))
+                                (if helm-ff-transformer-show-only-basename
+                                    (helm-basename (car files))
+                                  (car files))))))))))
 
 (defun helm-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
   "Transform filenames of FLIST to abs of DEST-CAND.
@@ -5386,20 +5381,20 @@ of transformed members of FLIST."
         collect fname into tmp-list
         finally return (sort tmp-list 'string<)))
 
-(defun helm-ff-maybe-mark-candidates ()
-  "Mark all candidates of list `helm-ff-cand-to-mark'.
+(defun helm-ff-maybe-mark-candidates (seq)
+  "Add visible mark to all candidates in SEQ.
 This is used when copying/renaming/symlinking etc. and following
 files to destination."
   (when (and (string= (assoc-default 'name (helm-get-current-source))
                       (assoc-default 'name helm-source-find-files))
-             helm-ff-cand-to-mark)
+             seq)
     (with-helm-window
-      (while helm-ff-cand-to-mark
-        (if (string= (car helm-ff-cand-to-mark) (helm-get-selection))
+      (while seq
+        (if (string= (car seq) (helm-get-selection))
             (progn
               (helm-make-visible-mark)
               (helm-next-line)
-              (setq helm-ff-cand-to-mark (cdr helm-ff-cand-to-mark)))
+              (setq seq (cdr seq)))
           (helm-next-line)))
       (unless (helm-this-visible-mark)
         (helm-prev-visible-mark)))))
