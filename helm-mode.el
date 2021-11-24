@@ -863,8 +863,11 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
         (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
       ;; If `history' is a symbol save it.
       (when (and result history (symbolp history))
-        (set history (cons (substring-no-properties result)
-                           (delete result (symbol-value history)))))
+        (set history
+             (if (listp result)
+                 (delete-dups (append (mapcar #'substring-no-properties result) (symbol-value history)))
+               (cons (substring-no-properties result)
+                     (delete result (symbol-value history))))))
       (or result (helm-mode--keyboard-quit)))))
 
 
