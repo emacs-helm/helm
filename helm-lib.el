@@ -416,7 +416,9 @@ Like `this-command' but return the real command, and not
                ;; advice compiled resulting in byte-code,
                ;; ignore it (Bug#691).
                (symbolp fn)
-               (commandp fn)
+               (or (commandp fn)
+                   ;; is not interactive, but calls completing-read-default
+                   (eq fn 'read-coding-system))
                (not (memq fn helm-this-command-black-list)))
            return fn
            else
