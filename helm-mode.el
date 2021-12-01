@@ -79,7 +79,8 @@ means helm will use `helm-completing-read-default-handler' when
 `write-region' calls `completing-read' and
 `helm-read-file-name-handler-1' when it calls `read-file-name'.  
 
-Each key is an Emacs command that use originaly `completing-read'.
+Each key is an Emacs command that use originaly `completing-read'
+or/and `read-file-name'.
 
 Each value maybe a helm function that takes same arguments as
 `completing-read' plus NAME and BUFFER, where NAME is the name of the new
