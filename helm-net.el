@@ -262,22 +262,24 @@ Can be \"-new-tab\" (default) or \"-new-window\"."
 (defvar helm-browse-url-nyxt-program "nyxt")
 (defvar helm-browse-url-conkeror-program "conkeror")
 (defvar helm-browse-url-opera-program "opera")
+(defvar helm-browse-url-w3m-program (or (and (boundp 'w3m-command) w3m-command)
+                                        (executable-find "w3m")))
 (defvar helm-browse-url-default-browser-alist
-  `((,(or (and (boundp 'w3m-command) w3m-command)
-          "/usr/bin/w3m") . w3m-browse-url)
-    (,browse-url-firefox-program . browse-url-firefox)
-    (,helm-browse-url-chromium-program . helm-browse-url-chromium)
-    (,helm-browse-url-conkeror-program . helm-browse-url-conkeror)
-    (,helm-browse-url-opera-program . helm-browse-url-opera)
-    (,helm-browse-url-uzbl-program . helm-browse-url-uzbl)
-    (,browse-url-kde-program . browse-url-kde)
-    (,browse-url-gnome-moz-program . browse-url-gnome-moz)
-    (,browse-url-mozilla-program . browse-url-mozilla)
-    (,browse-url-galeon-program . browse-url-galeon)
-    (,browse-url-netscape-program . browse-url-netscape)
-    (,browse-url-xterm-program . browse-url-text-xterm)
+  '((helm-browse-url-w3m-program . w3m-browse-url)
+    (browse-url-firefox-program . browse-url-firefox)
+    (helm-browse-url-chromium-program . helm-browse-url-chromium)
+    (helm-browse-url-conkeror-program . helm-browse-url-conkeror)
+    (helm-browse-url-opera-program . helm-browse-url-opera)
+    (helm-browse-url-uzbl-program . helm-browse-url-uzbl)
+    (helm-browse-url-nyxt-program . helm-browse-url-nyxt)
+    (browse-url-kde-program . browse-url-kde)
+    (browse-url-gnome-moz-program . browse-url-gnome-moz)
+    (browse-url-mozilla-program . browse-url-mozilla)
+    (browse-url-galeon-program . browse-url-galeon)
+    (browse-url-netscape-program . browse-url-netscape)
+    (browse-url-xterm-program . browse-url-text-xterm)
     ("emacs" . eww-browse-url))
-  "*Alist of \(executable . function\) to try to find a suitable url browser.")
+  "Alist of (browse_url_variable . function) to try to find a suitable url browser.")
 
 (cl-defun helm-generic-browser (url cmd-name &rest args)
   "Browse URL with NAME browser."
@@ -353,8 +355,11 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 (defun helm-browse-url-default-browser (url &rest args)
   "Find the first available browser and ask it to load URL."
   (let ((default-browser-fn
-         (cl-loop for (exe . fn) in helm-browse-url-default-browser-alist
-               thereis (and exe (executable-find exe) (fboundp fn) fn))))
+         (cl-loop for (var . fn) in helm-browse-url-default-browser-alist
+                  for exe = (if (stringp var)
+                                var
+                              (and (boundp var) (symbol-value var)))
+                  thereis (and exe (executable-find exe) (fboundp fn) fn))))
     (if default-browser-fn
         (apply default-browser-fn url args)
       (error "No usable browser found"))))
