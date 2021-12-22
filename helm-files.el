@@ -5257,23 +5257,19 @@ source is `helm-source-find-files'."
 Find inside `require' and `declare-function' sexp."
   (require 'find-func)
   (let* ((beg-sexp (save-excursion (search-backward "(" (point-at-bol) t)))
-         (end-sexp (save-excursion (search-forward ")" (point-at-eol) t)))
+         (end-sexp (save-excursion (end-of-defun) (point)))
          (sexp     (and beg-sexp end-sexp
                         (buffer-substring-no-properties
                          (1+ beg-sexp) (1- end-sexp)))))
     (ignore-errors
-      (cond ((and sexp (string-match "require ['].+[^)]" sexp))
-             (find-library-name
-              (replace-regexp-in-string
-               "'\\|)\\|(" ""
-               ;; If require use third arg, ignore it,
-               ;; always use library path found in `load-path'.
-               (cl-second (split-string (match-string 0 sexp))))))
-            ((and sexp (string-match-p "^declare-function" sexp))
-             (find-library-name
-              (replace-regexp-in-string
-               "\"\\|ext:" ""
-               (cl-third (split-string sexp)))))
+      (cond ((and sexp (string-match "require +[']\\([^ )]+\\)" sexp))
+              ;; If require use third arg, ignore it,
+              ;; always use library path found in `load-path'.
+             (find-library-name (car (split-string (match-string 1 sexp)))))
+            ((and sexp (string-match "use-package +\\([^ )]+\\)" sexp))
+             (find-library-name (car (split-string (match-string 1 sexp)))))
+            ((and sexp (string-match "declare-function .+? \"\\(?:ext:\\)?\\([^ )]+\\)\"" sexp))
+             (find-library-name (car (split-string (match-string 1 sexp)))))
             (t nil)))))
 
 
