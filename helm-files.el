@@ -5262,11 +5262,11 @@ Find inside `require' and `declare-function' sexp."
                         (buffer-substring-no-properties
                          (1+ beg-sexp) (1- end-sexp)))))
     (ignore-errors
-      (cond ((and sexp (string-match "require +[']\\([^ )]+\\)" sexp))
+      (cond ((and sexp (string-match "use-package +\\([^ )]+\\)" sexp))
+             (find-library-name (car (split-string (match-string 1 sexp)))))
+            ((and sexp (string-match "require +[']\\([^ )]+\\)" sexp))
               ;; If require use third arg, ignore it,
               ;; always use library path found in `load-path'.
-             (find-library-name (car (split-string (match-string 1 sexp)))))
-            ((and sexp (string-match "use-package +\\([^ )]+\\)" sexp))
              (find-library-name (car (split-string (match-string 1 sexp)))))
             ((and sexp (string-match "declare-function .+? \"\\(?:ext:\\)?\\([^ )]+\\)\"" sexp))
              (find-library-name (car (split-string (match-string 1 sexp)))))
