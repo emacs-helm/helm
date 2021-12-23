@@ -5262,14 +5262,18 @@ Find inside `require' and `declare-function' sexp."
                         (buffer-substring-no-properties
                          (1+ beg-sexp) (1- end-sexp)))))
     (ignore-errors
-      (cond ((and sexp (string-match "use-package +\\([^ )]+\\)" sexp))
-             (find-library-name (car (split-string (match-string 1 sexp)))))
+      (cond (;; Should work only when point is on the use-package line
+             ;; i.e. first line of sexp otherwise it prevents matching
+             ;; urls with helm-find-files (bug #2469).
+             (and sexp (string-match "use-package +\\([^ )\n]+\\)" sexp))
+             (find-library-name (match-string 1 sexp)))
             ((and sexp (string-match "require +[']\\([^ )]+\\)" sexp))
               ;; If require use third arg, ignore it,
               ;; always use library path found in `load-path'.
-             (find-library-name (car (split-string (match-string 1 sexp)))))
+             (find-library-name (match-string 1 sexp)))
+            ;; Assume declare-function sexps are on one line.
             ((and sexp (string-match "declare-function .+? \"\\(?:ext:\\)?\\([^ )]+\\)\"" sexp))
-             (find-library-name (car (split-string (match-string 1 sexp)))))
+             (find-library-name (match-string 1 sexp)))
             (t nil)))))
 
 
