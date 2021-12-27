@@ -1208,6 +1208,7 @@ you will have to refresh manually directories when needed with `\\<helm-map>\\[h
 |\\[helm-ff-rotate-right-persistent]|Rotate image right.
 |\\[helm-ff-increase-image-size-persistent]|Zoom in image.
 |\\[helm-ff-decrease-image-size-persistent]|Zoom out image.
+|\\[helm-ff-toggle-thumbnails]|Show thumbnails on image files.
 |\\[helm-find-files-up-one-level]|Go to parent directory.
 |\\[helm-find-files-history]|Switch to the visited-directory history.
 |\\[helm-ff-file-name-history]|Switch to file name history.
@@ -1225,12 +1226,12 @@ you will have to refresh manually directories when needed with `\\<helm-map>\\[h
 |\\[helm-ff-run-insert-org-link]|Insert org link.
 |\\[helm-ff-bookmark-set]|Set bookmark to current directory.
 |\\[helm-find-files-switch-to-bookmark]|Jump to bookmark list.
-|\\[helm-ff-sort-alpha]|Sort alphabetically
-|\\[helm-ff-sort-by-newest]|Sort by newest
-|\\[helm-ff-sort-by-size]|Sort by size
-|\\[helm-ff-toggle-dirs-only]|Show only directories
-|\\[helm-ff-toggle-files-only]|Show only files
-|\\[helm-ff-toggle-thumbnails]|Show thumbnails on image files")
+|\\[helm-ff-sort-alpha]|Sort alphabetically.
+|\\[helm-ff-sort-by-newest]|Sort by newest.
+|\\[helm-ff-sort-by-size]|Sort by size.
+|\\[helm-ff-toggle-dirs-only]|Show only directories.
+|\\[helm-ff-toggle-files-only]|Show only files.
+|\\[helm-ff-sort-by-ext]|Sort by extensions.")
 
 ;;; Help for file-name-history
 ;;
