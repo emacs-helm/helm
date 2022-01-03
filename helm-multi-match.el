@@ -255,8 +255,6 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
            finally return nil))
 
 (defun helm-mm-3-search (pattern &rest _ignore)
-  (when (stringp pattern)
-    (setq pattern (helm-mm-3-get-patterns pattern)))
   (helm-mm-3-search-base
    pattern 're-search-forward 're-search-forward))
 
@@ -337,8 +335,6 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
                always (funcall predicate (string-match regexp candidate))))))
 
 (defun helm-mm-3p-search (pattern &rest _ignore)
-  (when (stringp pattern)
-    (setq pattern (helm-mm-3-get-patterns pattern)))
   (helm-mm-3-search-base
    pattern 'helm-mm-prefix-search 're-search-forward))
 
