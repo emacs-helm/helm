@@ -4339,7 +4339,11 @@ CANDIDATE.  Contiguous matches get a coefficient of 2."
 
 ;; The flex scoring needs a regexp whereas the fuzzy scoring works
 ;; directly with helm-pattern, so cache the needed regexp for flex
-;; scoring to not (re)compute it at each candidate.
+;; scoring to not (re)compute it at each candidate.  We could reuse
+;; the regexp cached in `helm--fuzzy-regexp-cache' but it is not
+;; exactly the same as the one needed for flex and also it is always
+;; computed against the whole helm-pattern which is not usable for
+;; e.g. file completion.
 (defvar helm--fuzzy-flex-regexp-cache (make-hash-table :test 'equal))
 (defun helm-fuzzy-flex-style-score (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
