@@ -4349,7 +4349,7 @@ A regexp is generated from PATTERN to calculate score."
                   (clrhash helm--fuzzy-flex-regexp-cache)
                   (puthash pattern (helm--mapconcat-pattern pattern)
                            helm--fuzzy-flex-regexp-cache))))
-    (helm-flex--style-score candidate regexp)))
+    (helm-flex--style-score candidate regexp t)))
 
 (defun helm-fuzzy-helm-style-score (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
