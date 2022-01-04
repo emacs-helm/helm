@@ -4328,8 +4328,31 @@ This function is used with sources built with `helm-source-sync'."
                  else do (goto-char eol)
                  finally return nil)))))
 
+(defvar helm-fuzzy-default-score-fn #'helm-fuzzy-flex-style-score)
 (defun helm-score-candidate-for-pattern (candidate pattern)
   "Assign score to CANDIDATE according to PATTERN.
+Score is calculated for contiguous matches found with PATTERN.
+Score is 100 (maximum) if PATTERN is fully matched in CANDIDATE.
+One point bonus is added to score when PATTERN prefix matches
+CANDIDATE.  Contiguous matches get a coefficient of 2."
+  (funcall helm-fuzzy-default-score-fn candidate pattern))
+
+;; The flex scoring needs a regexp whereas the fuzzy scoring works
+;; directly with helm-pattern, so cache the needed regexp for flex
+;; scoring to not (re)compute it at each candidate.
+(defvar helm--fuzzy-flex-regexp-cache (make-hash-table :test 'equal))
+(defun helm-fuzzy-flex-style-score (candidate pattern)
+  "Give a score to CANDIDATE according to PATTERN.
+A regexp is generated from PATTERN to calculate score."
+  (let ((regexp (helm-aif (gethash pattern helm--fuzzy-flex-regexp-cache)
+                    it
+                  (clrhash helm--fuzzy-flex-regexp-cache)
+                  (puthash pattern (helm--mapconcat-pattern pattern)
+                           helm--fuzzy-flex-regexp-cache))))
+    (helm-flex--style-score candidate regexp)))
+
+(defun helm-fuzzy-helm-style-score (candidate pattern)
+  "Give a score to CANDIDATE according to PATTERN.
 Score is calculated for contiguous matches found with PATTERN.
 Score is 100 (maximum) if PATTERN is fully matched in CANDIDATE.
 One point bonus is added to score when PATTERN prefix matches
