@@ -549,7 +549,7 @@ NOTE: Duplicate keys in CLAUSES are deliberately not handled.
 (defsubst helm--mapconcat-pattern (pattern)
   "Transform string PATTERN in regexp for further fuzzy matching.
 E.g.: helm.el$
-     => \"[^h]*h[^e]*e[^l]*l[^m]*m[^.]*[.][^e]*e[^l]*l$\"
+     => \"[^h]*?h[^e]*?e[^l]*?l[^m]*?m[^.]*?[.][^e]*?e[^l]*?l$\"
      ^helm.el$
      => \"helm[.]el$\"."
   (let ((ls (split-string-and-unquote pattern "")))
@@ -564,7 +564,7 @@ E.g.: helm.el$
         (mapconcat (lambda (c)
                      (if (and (string= c "$")
                               (string-match "$\\'" pattern))
-                         c (format "[^%s]*%s" c (regexp-quote c))))
+                         c (format "[^%s]*?%s" c (regexp-quote c))))
                    ls ""))))
 
 (defsubst helm--collect-pairs-in-string (string)
