@@ -4347,9 +4347,13 @@ A regexp is generated from PATTERN to calculate score."
   (let ((regexp (helm-aif (gethash pattern helm--fuzzy-flex-regexp-cache)
                     it
                   (clrhash helm--fuzzy-flex-regexp-cache)
-                  (puthash pattern (helm--mapconcat-pattern pattern)
+                  (puthash pattern (helm--fuzzy-flex-pattern-to-regexp pattern)
                            helm--fuzzy-flex-regexp-cache))))
     (helm-flex--style-score candidate regexp t)))
+
+(defun helm--fuzzy-flex-pattern-to-regexp (pattern)
+  (completion-pcm--pattern->regex
+   (helm-completion--flex-transform-pattern (list pattern)) 'group))
 
 (defun helm-fuzzy-helm-style-score (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
