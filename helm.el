@@ -4508,7 +4508,7 @@ See `helm-fuzzy-default-highlight-match'."
 ;;
 ;; Provide the emacs-27 flex style for emacs<27.
 ;; Reuse the flex scoring algorithm of flex style in emacs-27.
-(defun helm-flex--style-score (str regexp)
+(defun helm-flex--style-score (str regexp &optional score)
   "Score STR candidate according to PATTERN.
 
 REGEXP should be generated from a pattern which is a list like
@@ -4547,10 +4547,11 @@ emacs-27 to provide such scoring in emacs<27."
       (setq start (pop md)))
     (funcall update-score len len)
     (unless (zerop (length str))
-      (put-text-property
-       0 1 'completion-score
-       (/ score-numerator (* len (1+ score-denominator)) 1.0) str)))
-  str)
+      (setq result (/ score-numerator (* len (1+ score-denominator)) 1.0))
+      (put-text-property 0 1 'completion-score result str))
+    (if (and score result)
+        result 
+      str)))
 
 
 ;;; Matching candidates
