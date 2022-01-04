@@ -4543,39 +4543,38 @@ Function extracted from `completion-pcm--hilit-commonality' in
 emacs-27 to provide such scoring in emacs<27."
   ;; Don't modify the string itself.
   (setq str (copy-sequence str))
-  (unless (string-match regexp str)
-    (error "Internal error: %s does not match %s" regexp str))
-  (let* ((md (match-data))
-         (start (pop md))
-         (len (length str))
-         (score-numerator 0)
-         (score-denominator 0)
-         (last-b 0)
-         (update-score
-          (lambda (a b)
-            "Update score variables given match range (A B)."
-            (setq score-numerator (+ score-numerator (- b a)))
-            (unless (or (= a last-b)
-                        (zerop last-b)
-                        (= a (length str)))
-              (setq score-denominator (+ score-denominator
-                                         1
-                                         (expt (- a last-b 1)
-                                               (/ 1.0 3)))))
-            (setq last-b b)))
-         result)
-    (funcall update-score start start)
-    (setq md (cdr md))
-    (while md
-      (funcall update-score start (pop md))
-      (setq start (pop md)))
-    (funcall update-score len len)
-    (unless (zerop (length str))
-      (setq result (/ score-numerator (* len (1+ score-denominator)) 1.0))
-      (put-text-property 0 1 'completion-score result str))
-    (if (and score result)
-        result 
-      str)))
+  (if (string-match regexp str)
+      (let* ((md (match-data))
+             (start (pop md))
+             (len (length str))
+             (score-numerator 0)
+             (score-denominator 0)
+             (last-b 0)
+             (update-score
+              (lambda (a b)
+                "Update score variables given match range (A B)."
+                (setq score-numerator (+ score-numerator (- b a)))
+                (unless (or (= a last-b)
+                            (zerop last-b)
+                            (= a (length str)))
+                  (setq score-denominator (+ score-denominator
+                                             1
+                                             (expt (- a last-b 1)
+                                                   (/ 1.0 3)))))
+                (setq last-b b)))
+             result)
+        (funcall update-score start start)
+        (setq md (cdr md))
+        (while md
+          (funcall update-score start (pop md))
+          (setq start (pop md)))
+        (funcall update-score len len)
+        (unless (zerop (length str))
+          (setq result (/ score-numerator (* len (1+ score-denominator)) 1.0))
+          (put-text-property 0 1 'completion-score result str))
+        (if (and score result) result str))
+    (put-text-property 0 1 'completion-score 0.0 str)
+    (if score 0.0 str)))
 
 
 ;;; Matching candidates
