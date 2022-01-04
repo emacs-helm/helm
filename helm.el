@@ -4562,7 +4562,8 @@ emacs-27 to provide such scoring in emacs<27."
                                          1
                                          (expt (- a last-b 1)
                                                (/ 1.0 3)))))
-            (setq last-b b))))
+            (setq last-b b)))
+         result)
     (funcall update-score start start)
     (setq md (cdr md))
     (while md
