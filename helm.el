@@ -4330,11 +4330,7 @@ This function is used with sources built with `helm-source-sync'."
 
 (defvar helm-fuzzy-default-score-fn #'helm-fuzzy-flex-style-score)
 (defun helm-score-candidate-for-pattern (candidate pattern)
-  "Assign score to CANDIDATE according to PATTERN.
-Score is calculated for contiguous matches found with PATTERN.
-Score is 100 (maximum) if PATTERN is fully matched in CANDIDATE.
-One point bonus is added to score when PATTERN prefix matches
-CANDIDATE.  Contiguous matches get a coefficient of 2."
+  "Assign score to CANDIDATE according to PATTERN."
   (funcall helm-fuzzy-default-score-fn candidate pattern))
 
 ;; The flex scoring needs a regexp whereas the fuzzy scoring works
@@ -4347,7 +4343,9 @@ CANDIDATE.  Contiguous matches get a coefficient of 2."
 (defvar helm--fuzzy-flex-regexp-cache (make-hash-table :test 'equal))
 (defun helm-fuzzy-flex-style-score (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
-A regexp is generated from PATTERN to calculate score."
+A regexp is generated from PATTERN to calculate score.
+Score is calculated with the emacs-27 flex algorithm using
+`helm-flex--style-score'."
   (let ((regexp (helm-aif (gethash pattern helm--fuzzy-flex-regexp-cache)
                     it
                   (clrhash helm--fuzzy-flex-regexp-cache)
@@ -4356,6 +4354,7 @@ A regexp is generated from PATTERN to calculate score."
     (helm-flex--style-score candidate regexp t)))
 
 (defun helm--fuzzy-flex-pattern-to-regexp (pattern)
+  "Return a regexp from PATTERN compatible with emacs-27 flex algorithm."
   (completion-pcm--pattern->regex
    (helm-completion--flex-transform-pattern (list pattern)) 'group))
 
@@ -4540,12 +4539,14 @@ See `helm-fuzzy-default-highlight-match'."
 ;; Provide the emacs-27 flex style for emacs<27.
 ;; Reuse the flex scoring algorithm of flex style in emacs-27.
 (defun helm-flex--style-score (str regexp &optional score)
-  "Score STR candidate according to PATTERN.
+  "Score STR candidate according to REGEXP.
 
 REGEXP should be generated from a pattern which is a list like
 \'(point \"f\" any \"o\" any \"b\" any) for \"fob\" as pattern.
-Such pattern is build with
-`helm-completion--flex-transform-pattern' function.
+Such pattern may be build with
+`helm-completion--flex-transform-pattern' function, and the regexp
+with `completion-pcm--pattern->regex'.  For commodity,
+`helm--fuzzy-flex-pattern-to-regexp' is used to build such regexp. 
 
 Function extracted from `completion-pcm--hilit-commonality' in
 emacs-27 to provide such scoring in emacs<27."
