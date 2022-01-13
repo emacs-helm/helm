@@ -4815,7 +4815,7 @@ Special commands:
                               (("jpg" "jpeg") 'jpeg))
                  if type collect
                  (let ((thumbnail (plist-get
-                                   (cdr (helm-ff-image-dired-get-thumbnail-image img))
+                                   (cdr (helm-ff--image-dired-get-thumbnail-image img))
                                    :file)))
                    (cons (concat (propertize " "
                                              'display `(image
@@ -4828,11 +4828,14 @@ Special commands:
                  else collect (cons disp img)))
     candidates))
 
-(defun helm-ff-image-dired-get-thumbnail-image (file)
+;; Same as `image-dired-get-thumbnail-image' but use
+;; `helm-ff--image-dired-thumb-name' which prevents using sha1 for
+;; thumbnail filenames and also cache thumbnails for further use.
+(defun helm-ff--image-dired-get-thumbnail-image (file)
   "Return the image descriptor for a thumbnail of image file FILE."
   (unless (string-match-p (image-file-name-regexp) file)
     (error "%s is not a valid image file" file))
-  (let* ((thumb-file (helm-ff-image-dired-thumb-name file))
+  (let* ((thumb-file (helm-ff--image-dired-thumb-name file))
 	 (thumb-attr (file-attributes thumb-file)))
     (when (or (not thumb-attr)
 	      (time-less-p (file-attribute-modification-time thumb-attr)
@@ -4842,7 +4845,7 @@ Special commands:
     (create-image thumb-file)))
 
 (defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal))
-(defun helm-ff-image-dired-thumb-name (file)
+(defun helm-ff--image-dired-thumb-name (file)
   (or (gethash file helm-ff-image-dired-thumbnails-cache)
       (puthash
        file
