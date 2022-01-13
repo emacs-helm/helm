@@ -4849,6 +4849,9 @@ Special commands:
   (or (gethash file helm-ff-image-dired-thumbnails-cache)
       (puthash
        file
+       ;; Avoid creating a new thumbnail with sha1 when one created
+       ;; with md5 already exists. See
+       ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=53229
        (cl-letf (((symbol-function 'sha1) #'md5))
          (image-dired-thumb-name file))
        helm-ff-image-dired-thumbnails-cache)))
