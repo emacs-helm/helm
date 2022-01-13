@@ -4815,7 +4815,7 @@ Special commands:
                               (("jpg" "jpeg") 'jpeg))
                  if type collect
                  (let ((thumbnail (plist-get
-                                   (cdr (image-dired-get-thumbnail-image img))
+                                   (cdr (helm-ff-image-dired-get-thumbnail-image img))
                                    :file)))
                    (cons (concat (propertize " "
                                              'display `(image
@@ -4827,6 +4827,28 @@ Special commands:
                          img))
                  else collect (cons disp img)))
     candidates))
+
+(defun helm-ff-image-dired-get-thumbnail-image (file)
+  "Return the image descriptor for a thumbnail of image file FILE."
+  (unless (string-match-p (image-file-name-regexp) file)
+    (error "%s is not a valid image file" file))
+  (let* ((thumb-file (helm-ff-image-dired-thumb-name file))
+	 (thumb-attr (file-attributes thumb-file)))
+    (when (or (not thumb-attr)
+	      (time-less-p (file-attribute-modification-time thumb-attr)
+			   (file-attribute-modification-time
+			    (file-attributes file))))
+      (image-dired-create-thumb file thumb-file))
+    (create-image thumb-file)))
+
+(defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal))
+(defun helm-ff-image-dired-thumb-name (file)
+  (or (gethash file helm-ff-image-dired-thumbnails-cache)
+      (puthash
+       file
+       (cl-letf (((symbol-function 'sha1) #'md5))
+         (image-dired-thumb-name file))
+       helm-ff-image-dired-thumbnails-cache)))
 
 (defun helm-ff-toggle-thumbnails ()
   (interactive)
