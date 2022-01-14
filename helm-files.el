@@ -4847,14 +4847,16 @@ Special commands:
 (defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal))
 (defun helm-ff--image-dired-thumb-name (file)
   (or (gethash file helm-ff-image-dired-thumbnails-cache)
-      (puthash
-       file
-       ;; Avoid creating a new thumbnail with sha1 when one created
-       ;; with md5 already exists. See
-       ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=53229
-       (cl-letf (((symbol-function 'sha1) #'md5))
-         (image-dired-thumb-name file))
-       helm-ff-image-dired-thumbnails-cache)))
+      (let (thumb-name)
+        (puthash
+         file
+         ;; Avoid creating a new thumbnail with sha1 when one created
+         ;; with md5 already exists. See
+         ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=53229
+         (cl-letf (((symbol-function 'sha1) #'md5))
+           (setq thumb-name (image-dired-thumb-name file)))
+         helm-ff-image-dired-thumbnails-cache)
+        thumb-name)))
 
 (defun helm-ff-toggle-thumbnails ()
   (interactive)
