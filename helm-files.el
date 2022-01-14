@@ -4829,8 +4829,7 @@ Special commands:
     candidates))
 
 ;; Same as `image-dired-get-thumbnail-image' but use
-;; `helm-ff--image-dired-thumb-name' which prevents using sha1 for
-;; thumbnail filenames and also cache thumbnails for further use.
+;; `helm-ff--image-dired-thumb-name' which cache thumbnails for further use.
 (defun helm-ff--image-dired-get-thumbnail-image (file)
   "Return the image descriptor for a thumbnail of image file FILE."
   (unless (string-match-p (image-file-name-regexp) file)
@@ -4844,18 +4843,12 @@ Special commands:
       (image-dired-create-thumb file thumb-file))
     (create-image thumb-file)))
 
-(defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal))
+(defvar helm-ff-image-dired-thumbnails-cache (make-hash-table :test 'equal)
+  "Store associations of image_file/thumbnail_file.")
 (defun helm-ff--image-dired-thumb-name (file)
   (or (gethash file helm-ff-image-dired-thumbnails-cache)
-      (let (thumb-name)
-        (puthash
-         file
-         ;; Avoid creating a new thumbnail with sha1 when one created
-         ;; with md5 already exists. See
-         ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=53229
-         (cl-letf (((symbol-function 'sha1) #'md5))
-           (setq thumb-name (image-dired-thumb-name file)))
-         helm-ff-image-dired-thumbnails-cache)
+      (let ((thumb-name (image-dired-thumb-name file)))
+        (puthash file thumb-name helm-ff-image-dired-thumbnails-cache)
         thumb-name)))
 
 (defun helm-ff-toggle-thumbnails ()
