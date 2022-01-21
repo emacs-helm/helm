@@ -1813,19 +1813,6 @@ Actually does nothing."
         (when all (nconc (helm-flex-add-score-as-prop all regexp)
                          (length prefix)))))))
 
-(defun helm-flex-add-score-as-prop (candidates regexp)
-  (cl-loop with case-fold-search = (helm-set-case-fold-search)
-           for cand in candidates
-           collect (helm-flex--style-score cand regexp)))
-
-(defun helm-completion--flex-transform-pattern (pattern)
-  ;; "fob" => '(prefix "f" any "o" any "b" any point)
-  (cl-loop for p in pattern
-           if (stringp p) nconc
-           (cl-loop for str across p
-                    nconc (list (string str) 'any))
-           else nconc (list p)))
-
 ;; Same as emacs-27 completion-substring--all-completions.
 (defun helm-completion--flex-all-completions
     (string table pred point &optional transform-pattern-fn)

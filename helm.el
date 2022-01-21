@@ -4358,6 +4358,19 @@ Score is calculated with the emacs-27 flex algorithm using
   (completion-pcm--pattern->regex
    (helm-completion--flex-transform-pattern (list pattern)) 'group))
 
+(defun helm-flex-add-score-as-prop (candidates regexp)
+  (cl-loop with case-fold-search = (helm-set-case-fold-search)
+           for cand in candidates
+           collect (helm-flex--style-score cand regexp)))
+
+(defun helm-completion--flex-transform-pattern (pattern)
+  ;; "fob" => '(prefix "f" any "o" any "b" any point)
+  (cl-loop for p in pattern
+           if (stringp p) nconc
+           (cl-loop for str across p
+                    nconc (list (string str) 'any))
+           else nconc (list p)))
+
 (defun helm-fuzzy-helm-style-score (candidate pattern)
   "Give a score to CANDIDATE according to PATTERN.
 Score is calculated for contiguous matches found with PATTERN.
