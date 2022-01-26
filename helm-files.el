@@ -4865,6 +4865,19 @@ Special commands:
                               "\\` *" "" (helm-get-selection nil t)))))
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
 
+;;;###autoload
+(defun helm-ff-cleanup-image-dired-dir-and-cache ()
+  "Cleanup `image-dired-dir' directory.
+Delete all thumb files that are no more associated with an existing image file in
+`helm-ff-image-dired-thumbnails-cache'."
+  (interactive)
+  (cl-loop for key being the hash-keys in helm-ff-image-dired-thumbnails-cache
+           using (hash-value val)
+           unless (file-exists-p key) do
+           (progn
+             (message "Deleting %s" val)
+             (delete-file val)
+             (remhash key helm-ff-image-dired-thumbnails-cache))))
 
 ;;; Recursive dirs completion
 ;;
