@@ -1545,7 +1545,7 @@ returns if available with current AG version."
                       (shell-quote-argument directory))))
     (helm-aif (cdr patterns)
         (concat cmd (cl-loop for p in it concat
-                             (format " | %s %s"
+                             (format " | %s -- %s"
                                      pipe-cmd (shell-quote-argument p))))
       cmd)))
 
