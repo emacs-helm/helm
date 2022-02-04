@@ -74,8 +74,10 @@ don't specify the '%e' format spec.
 Helm also support ack-grep and git-grep.  The following is a
 default command example for ack-grep:
 
-\(setq helm-grep-default-command \"ack-grep -Hn --color --smart-case --no-group %e %p %f\"
-       helm-grep-default-recurse-command \"ack-grep -H --color --smart-case --no-group %e %p %f\")
+\(setq helm-grep-default-command
+       \"ack-grep -Hn --color --smart-case --no-group %e -- %p %f\"
+       helm-grep-default-recurse-command
+       \"ack-grep -H --color --smart-case --no-group %e -- %p %f\")
 
 You can ommit the %e spec if you don't want to be prompted for
 types.
