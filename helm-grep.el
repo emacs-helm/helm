@@ -241,7 +241,17 @@ doing."
   "A list of additional parameters to pass to grep-ag pipe command.
 Use parameters compatibles with the backend you are using
 \(i.e. AG for AG, PT for PT or RG for RG)
+Here are the commands where you may want to add switches:
 
+    ag -S --color
+    rg -N -S --color=?
+
+For RG the value of --color= is computed according to the --color=
+value used in `helm-grep-ag-command'.
+
+Note also that by default the \"--\" option is always used, you don't
+need to add it here.
+ 
 You probably don't need to use this unless you know what you are
 doing."
   :group 'helm-grep
@@ -1453,7 +1463,7 @@ non-file buffers."
 ;;  https://github.com/BurntSushi/ripgrep
 
 (defcustom helm-grep-ag-command
-  "ag --line-numbers -S --color --nogroup %s %s %s"
+  "ag --line-numbers -S --color --nogroup %s -- %s %s"
   "The default command for AG, PT or RG.
 
 Takes three format specs, the first for type(s), the second for
@@ -1468,12 +1478,12 @@ colorization of backend, however it is still supported.
 
 For ripgrep here is the command line to use:
 
-    rg --color=always --smart-case --no-heading --line-number %s %s %s
+    rg --color=always --smart-case --no-heading --line-number %s -- %s %s
 
 And to customize colors (always for ripgrep) use something like this:
 
     rg --color=always --colors 'match:bg:yellow' --colors 'match:fg:black'
-\--smart-case --no-heading --line-number %s %s %s
+\--smart-case --no-heading --line-number %s -- %s %s
 
 This will change color for matched items from foreground red (the
 default) to a yellow background with a black foreground.  Note
