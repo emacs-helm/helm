@@ -1,7 +1,4 @@
-;;; helm.el --- Emacs incremental and narrowing framework -*- lexical-binding: t -*-
-
-;; Version: 3.8.3
-;; URL: https://github.com/emacs-helm/helm
+;;; helm.el --- Helm is an Emacs incremental and narrowing framework  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2007         Tamas Patrovics
 ;;               2008 ~ 2011  rubikitch <rubikitch@ruby-lang.org>
@@ -14,7 +11,9 @@
 ;;                         Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
 ;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
-;; URL: http://github.com/emacs-helm/helm
+;; Version: 3.8.4
+;; URL: https://emacs-helm.github.io/helm/
+;; Package-Requires: ((helm-core "3.8.4") (popup "0.5.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
