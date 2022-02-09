@@ -691,6 +691,7 @@ Special commands:
 
 (defun helm-occur-next-error (&optional argp reset)
   "Goto ARGP position from a `helm-occur-mode' buffer.
+RESET non-nil means rewind to the first match.
 This is the `next-error-function' for `helm-occur-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
