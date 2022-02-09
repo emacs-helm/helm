@@ -883,7 +883,9 @@ This is the `next-error-function' for `helm-grep-mode'."
 		   ((< argp 0) (line-beginning-position))
 		   ((> argp 0) (line-end-position))
 		   ((point))))
-  (let ((fun (if (> argp 0) #'next-single-property-change #'previous-single-property-change)))
+  (let ((fun (if (> argp 0)
+                 #'next-single-property-change
+               #'previous-single-property-change)))
     (helm-aif (funcall fun (point) 'helm-grep-fname)
         (progn (goto-char it) (helm-grep-mode-jump))
       (user-error "No more matches"))))
