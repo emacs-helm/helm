@@ -874,6 +874,18 @@ If N is positive go forward otherwise go backward."
         (helm-grep-mode-jump)))))
 (put 'helm-grep-mode-mouse-jump 'helm-only t)
 
+(defun helm-grep-next-error (&optional argp reset)
+  (interactive "p")
+  (goto-char (cond (reset (point-min))
+		   ((< argp 0) (line-beginning-position))
+		   ((> argp 0) (line-end-position))
+		   ((point))))
+  (let ((fun (if (> argp 0) #'next-single-property-change #'previous-single-property-change)))
+    (helm-aif (funcall fun (point) 'helm-grep-fname)
+        (progn (goto-char it) (helm-grep-mode-jump))
+      (user-error "No more matches"))))
+(put 'helm-grep-next-error 'helm-only t)
+
 (define-derived-mode helm-grep-mode
     special-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
@@ -883,7 +895,9 @@ Special commands:
     (set (make-local-variable 'helm-grep-last-cmd-line)
          (with-helm-buffer helm-grep-last-cmd-line))
     (set (make-local-variable 'revert-buffer-function)
-         #'helm-grep-mode--revert-buffer-function))
+         #'helm-grep-mode--revert-buffer-function)
+    (set (make-local-variable 'next-error-function)
+         #'helm-grep-next-error))
 (put 'helm-grep-mode 'helm-only t)
 
 (defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
