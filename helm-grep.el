@@ -875,6 +875,9 @@ If N is positive go forward otherwise go backward."
 (put 'helm-grep-mode-mouse-jump 'helm-only t)
 
 (defun helm-grep-next-error (&optional argp reset)
+  "Goto ARGP position from a `helm-grep-mode' buffer.
+RESET non-nil means rewind to the first match.
+This is the `next-error-function' for `helm-grep-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
 		   ((< argp 0) (line-beginning-position))
