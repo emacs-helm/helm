@@ -684,9 +684,28 @@ Special commands:
     (set (make-local-variable 'revert-buffer-function)
          #'helm-occur-mode--revert-buffer-function)
     (set (make-local-variable 'helm-occur-mode--last-pattern)
-         helm-input))
+         helm-input)
+    (set (make-local-variable 'next-error-function)
+         #'helm-occur-next-error))
 (put 'helm-moccur-mode 'helm-only t)
 
+(defun helm-occur-next-error (&optional argp reset)
+  "Goto ARGP position from a `helm-occur-mode' buffer.
+This is the `next-error-function' for `helm-occur-mode'."
+  (interactive "p")
+  (goto-char (cond (reset (point-min))
+		   ((< argp 0) (line-beginning-position))
+		   ((> argp 0) (line-end-position))
+		   ((point))))
+  (let ((fun (if (> argp 0)
+                 #'next-single-property-change
+               #'previous-single-property-change)))
+    (helm-aif (funcall fun (point) 'buffer-name)
+        (progn
+          (goto-char it)
+          (forward-line 0)
+          (helm-occur-mode-goto-line))
+      (user-error "No more matches"))))
 
 ;;; Resume
 ;;
