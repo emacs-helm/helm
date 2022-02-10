@@ -1287,7 +1287,7 @@ matching `helm-zgrep-file-extension-regexp' only."
   (let ((helm-grep-default-directory-fn
          (or helm-grep-default-directory-fn
              (lambda () (or helm-ff-default-directory
-                            (and (null (eq major-mode 'helm-grep-mode))
+                            (and helm-alive-p
                                  (helm-default-directory))
                             default-directory)))))
     (if (consp candidate)
