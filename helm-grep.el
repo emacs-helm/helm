@@ -891,6 +891,22 @@ This is the `next-error-function' for `helm-grep-mode'."
       (user-error "No more matches"))))
 (put 'helm-grep-next-error 'helm-only t)
 
+;;;###autoload
+(defun helm-revert-next-error-last-buffer ()
+  "Revert last `next-error' buffer from `current-buffer'.
+
+Accept to revert only `helm-grep-mode' or `helm-occur-mode' buffers.
+Use this when you want to revert the `next-error' buffer after
+modifications in `current-buffer'."
+  (interactive)
+  (let ((buffer (next-error-find-buffer)))
+    (if buffer
+        (with-current-buffer buffer
+          (if (memq major-mode '(helm-grep-mode helm-occur-mode))
+              (revert-buffer)
+            (error "No suitable buffer to revert found")))
+      (error "No suitable buffer to revert found"))))
+
 (define-derived-mode helm-grep-mode
     special-mode "helm-grep"
     "Major mode to provide actions in helm grep saved buffer.
