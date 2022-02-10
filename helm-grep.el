@@ -921,7 +921,9 @@ Special commands:
 
 (defun helm-grep-mode--sentinel (process event)
   (when (string= event "finished\n")
-    (with-current-buffer (current-buffer)
+    (with-current-buffer (if (eq major-mode 'helm-grep-mode)
+                             (current-buffer)
+                           (next-error-find-buffer))
       (let ((inhibit-read-only t))
         (save-excursion
           (cl-loop for l in (with-current-buffer (process-buffer process)
