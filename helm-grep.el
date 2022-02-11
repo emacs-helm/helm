@@ -899,11 +899,18 @@ Accept to revert only `helm-grep-mode' or `helm-occur-mode' buffers.
 Use this when you want to revert the `next-error' buffer after
 modifications in `current-buffer'."
   (interactive)
-  (let ((buffer (next-error-find-buffer)))
+  (let ((buffer  (next-error-find-buffer))
+        (linum   (line-number-at-pos))
+        (bufname (buffer-name)))
     (if buffer
         (with-current-buffer buffer
-          (if (memq major-mode '(helm-grep-mode helm-occur-mode))
-              (revert-buffer)
+          (helm-aif (memq major-mode '(helm-grep-mode helm-occur-mode))
+              (progn (revert-buffer)
+                     ;; helm-occur-mode revert fn is synchronous so
+                     ;; reajust from here (it is done with
+                     ;; helm-grep-mode in its sentinel).
+                     (when (eq major-mode (car it))
+                       (helm-grep-goto-closest-from-linum linum bufname)))
             (error "No suitable buffer to revert found")))
       (error "No suitable buffer to revert found"))))
 
