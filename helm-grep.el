@@ -909,7 +909,7 @@ modifications in `current-buffer'."
                      ;; helm-occur-mode revert fn is synchronous so
                      ;; reajust from here (it is done with
                      ;; helm-grep-mode in its sentinel).
-                     (when (eq major-mode (car it))
+                     (when (eq (car it) 'helm-occur-mode)
                        (helm-grep-goto-closest-from-linum linum bufname)))
             (error "No suitable buffer to revert found")))
       (error "No suitable buffer to revert found"))))
