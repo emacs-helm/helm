@@ -975,7 +975,7 @@ Special commands:
   (catch 'break
     (while (re-search-forward (format "^%s:\\([0-9]+\\):" (regexp-quote bufname)) nil t)
       (let ((numline (string-to-number (match-string 1))))
-        (when (<= (- linum numline) 0)
+        (when (< (- linum numline) 0)
           (forward-line -1)
           (throw 'break nil))))))
 
