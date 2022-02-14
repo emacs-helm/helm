@@ -1040,10 +1040,6 @@ If FILE is a directory, open this directory."
     (dired (file-name-directory file))
     (dired-goto-file file)))
 
-(defun helm-require-or-error (feature function)
-  (or (require feature nil t)
-      (error "Need %s to use `%s'." feature function)))
-
 (defun helm-find-file-as-root (candidate)
   (let* ((buf (helm-basename candidate))
          (host (file-remote-p candidate 'host))
