@@ -1769,6 +1769,14 @@ See [[Commands][commands]] below.
 Once in that buffer you can use [[https://github.com/mhayashi1120/Emacs-wgrep][emacs-wgrep]] (external package not bundled with Helm)
 to edit your changes, for Helm the package name is `wgrep-helm', it is hightly recommended.
 
+Type `g' to update (revert) the buffer (after saving your buffer's changes to file).
+
+NOTE: `next-error' is available from this `helm-grep-mode' buffer.
+
+When you are running `next-error' from elsewhere, you can update
+the buffer with `helm-revert-next-error-last-buffer' (up to you
+to bind it to a convenient key).
+
 *** Helm-grep supports multi-matching
 
 \(Starting from version 1.9.4.)
@@ -2044,7 +2052,7 @@ your alias in the eshell alias file with e.g. \"alias foo $1 &\".
 |\\[helm-ff-run-delete-file]|Delete file.
 |\\[helm-ff-run-open-file-externally]|Open file externally.")
 
-;;; Moccur help
+;;; helm-occur help
 ;;
 ;;
 (defvar helm-moccur-help-message
@@ -2115,7 +2123,11 @@ This can be done automatically by customizing `helm-moccur-auto-update-on-resume
 
 *** Refresh a saved buffer
 
-Type `g' to update the buffer.
+Type `g' to update (revert) the buffer.
+
+When you are running `next-error' from elsewhere, you can update
+the buffer with `helm-revert-next-error-last-buffer' (up to you
+to bind it to a convenient key).
 
 *** Edit a saved buffer
 
@@ -2126,6 +2138,8 @@ First, install wgrep (https://github.com/mhayashi1120/Emacs-wgrep) and then:
 
 Tip: Use the excellent iedit (https://github.com/victorhge/iedit) to modify all
 occurences at once in the buffer.
+
+NOTE: `next-error' is available from this `helm-occur-mode' buffer.
 
 *** Search in region
 
