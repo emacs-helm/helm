@@ -1037,14 +1037,13 @@ Special commands:
     ;; `helm-grep-use-ack-p'.
     (call-process (helm-grep-command t) nil t nil "--help-types")
     (goto-char (point-min))
-    (cl-loop while (re-search-forward
-                    "^ *--\\(\\[no\\]\\)\\([^. ]+\\) *\\(.*\\)" nil t)
-             collect (cons (concat (match-string 2)
-                                   " [" (match-string 3) "]")
-                           (match-string 2))
-             collect (cons (concat "no" (match-string 2)
-                                   " [" (match-string 3) "]")
-                           (concat "no" (match-string 2))))))
+    (cl-loop while (re-search-forward "^ +\\([^. ]+\\) +\\(.*\\)" nil t)
+             collect (cons (concat (match-string 1)
+                                   " [" (match-string 2) "]")
+                           (match-string 1))
+             collect (cons (concat "no" (match-string 1)
+                                   " [" (match-string 2) "]")
+                           (concat "no" (match-string 1))))))
 
 (defun helm-grep-ack-types-transformer (candidates _source)
   (cl-loop for i in candidates
