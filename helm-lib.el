@@ -58,6 +58,9 @@
 (declare-function wdired-flag-for-deletion "wdired.el")
 (declare-function wdired-get-filename "wdired.el")
 (declare-function wdired-normalize-filename "wdired.el")
+(declare-function helm-read-file-name "helm-mode.el)"
+(declare-function find-function-library "find-func.el")
+(declare-function find-library-name "find-func.el")
 
 (defvar helm-sources)
 (defvar helm-initial-frame)
