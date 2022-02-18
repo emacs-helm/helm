@@ -508,10 +508,13 @@ It is intended to use as a let-bound variable, DON'T set this globaly.")
                                            (shell-quote-argument x)))
                                helm-grep-ignored-directories " ")))
          (exclude           (unless (helm-grep-use-ack-p)
-                              (if helm-grep-in-recurse
-                                  (concat (or include ignored-files)
-                                          " " ignored-dirs)
-                                ignored-files)))
+                              (let ((inc     (and include
+                                                  (concat include " ")))
+                                    (igfiles (and ignored-files
+                                                  (concat ignored-files " ")))
+                                    (igdirs  (and helm-grep-in-recurse
+                                                  ignored-dirs)))
+                                (concat inc igfiles igdirs))))
          (types             (and (helm-grep-use-ack-p)
                                  ;; When %e format spec is not specified
                                  ;; in `helm-grep-default-command'
