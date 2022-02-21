@@ -804,6 +804,12 @@ when moving out of directory when non nil."
   "A list of eshell aliases to not display."
   :type '(repeat string)
   :group 'helm-files)
+
+(defvar helm-ff-last-expanded-candidate-regexp "^[[:multibyte:]]? ?%s$"
+  "Regexp that retrieve previous candidate when going up one level.
+The default value matching a multibyte char at bol allows prefixing
+candidate with an icon.  The format part will be replaced by the
+display part of the candidate regexp quoted.")
 
 ;; Internal.
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
@@ -2745,7 +2751,10 @@ hitting C-j on \"..\"."
                        (directory-file-name helm-ff-last-expanded))
                     (directory-file-name helm-ff-last-expanded))))
       (with-helm-window
-        (when (re-search-forward (concat "^" (regexp-quote presel) "$") nil t)
+        (when (re-search-forward
+               (format helm-ff-last-expanded-candidate-regexp
+                       (regexp-quote presel))
+               nil t)
           (forward-line 0)
           (helm-mark-current-line)))
       (setq helm-ff-last-expanded nil))))
