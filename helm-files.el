@@ -87,6 +87,8 @@
 (declare-function tramp-make-tramp-file-name "tramp")
 (declare-function tramp-cleanup-connection "tramp-cmds")
 (declare-function dired-async-processes "ext:dired-async.el")
+(declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
+(declare-function all-the-icons-octicon "ext:all-the-icons.el")
 
 (defvar term-char-mode-point-at-process-mark)
 (defvar term-char-mode-buffer-read-only)
@@ -4083,6 +4085,45 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                  (cons (helm-ff-prefix-filename
                           disp nil 'new-file)
                        file))))))))
+
+(defun helm-ff-icons-transformer (candidates _source)
+  "Transformer for HFF that prefix candidates with icons."
+  (cl-loop for (disp . fname) in candidates
+           for icon = (helm-ff-get-icon fname)
+           collect (cons (concat icon disp) fname)))
+
+(defun helm-ff-get-icon (file)
+  "Get icon from all-the-icons for FILE."
+  (concat
+   (cond ((file-directory-p file)
+          ;; We could use `all-the-icons-icon-for-dir' which shows
+          ;; additional stuff e.g. icon for git dir etc... but it
+          ;; looks more costly (additional tests like
+          ;; file-symlink-p, file-exists-p etc...).
+          (all-the-icons-octicon "file-directory"))
+         ((file-exists-p file)
+          (all-the-icons-icon-for-file file)))
+   " "))
+
+(define-minor-mode helm-ff-icon-mode
+    "Display icons from `all-the-icons' package in HFF when enabled."
+  :global t
+  (require 'all-the-icons)
+  (if helm-ff-icon-mode
+      (progn
+        (cl-defmethod helm-setup-user-source :after ((source helm-source-ffiles))
+          (helm-aif (slot-value source 'filtered-candidate-transformer)
+              (setf (slot-value source 'filtered-candidate-transformer)
+                    (append it '(helm-ff-icons-transformer)))))
+        (setq helm-source-find-files
+              (helm-make-source
+                  "Find Files" 'helm-source-ffiles)))
+    (helm-set-attr 'filtered-candidate-transformer
+                   (remove 'helm-ff-icons-transformer
+                           (helm-get-attr
+                            'filtered-candidate-transformer
+                            helm-source-find-files))
+                   helm-source-find-files)))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
