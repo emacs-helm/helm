@@ -992,9 +992,11 @@ Should not be used among other sources.")
     ;; tramp starts and display candidates.  FNAME is here always a
     ;; directory.
     (when (file-directory-p fname)
-      (helm-find-files-1 fname (if helm-ff-transformer-show-only-basename
-                                   (concat "^" (regexp-quote (helm-basename presel)))
-                                 (regexp-quote presel))))))
+      (helm-find-files-1 fname
+                         (format helm-ff-last-expanded-candidate-regexp
+                                 (if helm-ff-transformer-show-only-basename
+                                     (regexp-quote (helm-basename presel))
+                                   (regexp-quote presel)))))))
 
 (defun helm-ff-bookmark-set ()
   "Record `helm-find-files' session in bookmarks."
@@ -5439,15 +5441,17 @@ DESTINATION for the actions copy and rename."
          (lambda ()
            (if (and dirflag (eq action 'rename))
                (helm-find-files-1 (file-name-directory target)
-                                  (if helm-ff-transformer-show-only-basename
-                                      (helm-basename target) target))
+                                  (format helm-ff-last-expanded-candidate-regexp
+                                          (if helm-ff-transformer-show-only-basename
+                                              (helm-basename target) target)))
              (helm-find-files-1 (if (file-directory-p destination)
                                     (file-name-as-directory
                                      (expand-file-name destination))
                                   (expand-file-name (helm-basedir destination)))
-                                (if helm-ff-transformer-show-only-basename
-                                    (helm-basename (car files))
-                                  (car files))))))))))
+                                (format helm-ff-last-expanded-candidate-regexp
+                                        (if helm-ff-transformer-show-only-basename
+                                            (helm-basename (car files))
+                                          (car files)))))))))))
 
 (defun helm-get-dest-fnames-from-list (flist dest-cand rename-dir-flag)
   "Transform filenames of FLIST to abs of DEST-CAND.
@@ -6331,7 +6335,8 @@ files."
     ;; resume would do.
     (let ((helm--executing-helm-action (not (null hist))))
       (helm-find-files-1 input (and presel (null helm-ff-no-preselect)
-                                    (concat "^" (regexp-quote presel)))))))
+                                    (format helm-ff-last-expanded-candidate-regexp
+                                            (regexp-quote presel)))))))
 
 ;;;###autoload
 (defun helm-delete-tramp-connection ()
