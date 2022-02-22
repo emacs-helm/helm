@@ -4107,6 +4107,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
           (all-the-icons-icon-for-file file)))
    " "))
 
+;;;###autoload
 (define-minor-mode helm-ff-icon-mode
     "Display icons from `all-the-icons' package in HFF when enabled."
   :global t
