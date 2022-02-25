@@ -5558,10 +5558,11 @@ When a prefix arg is given, meaning of
       (unwind-protect
            (cl-loop for c in marked do
                     (progn (helm-preselect
-                            (concat "^" (regexp-quote
-                                         (if (and helm-ff-transformer-show-only-basename
-                                                  (not (helm-ff-dot-file-p c)))
-                                             (helm-basename c) c))))
+                            (format helm-ff-last-expanded-candidate-regexp
+                                    (regexp-quote
+                                     (if (and helm-ff-transformer-show-only-basename
+                                              (not (helm-ff-dot-file-p c)))
+                                         (helm-basename c) c))))
                            (when (y-or-n-p
                                   (format "Really %s file `%s'? "
                                           (if trash "Trash" "Delete")
@@ -5583,9 +5584,10 @@ When a prefix arg is given, meaning of
         (helm-force-update
          (let ((presel (helm-get-selection)))
            (when presel
-             (concat "^" (regexp-quote (if (and helm-ff-transformer-show-only-basename
-                                                (not (helm-ff-dot-file-p presel)))
-                                           (helm-basename presel) presel))))))))))
+             (format helm-ff-last-expanded-candidate-regexp
+                     (regexp-quote (if (and helm-ff-transformer-show-only-basename
+                                            (not (helm-ff-dot-file-p presel)))
+                                       (helm-basename presel) presel))))))))))
 
 (defun helm-delete-file (file &optional error-if-dot-file-p synchro trash)
   "Delete FILE after querying the user.
