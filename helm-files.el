@@ -585,6 +585,12 @@ It is generally \"~/.local/share/Trash\"."
   "Face used for file names in `helm-find-files'."
   :group 'helm-files-faces)
 
+(defface helm-ff-nofile
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :inherit helm-ff-file))
+  "Face used for file names in `helm-find-files'."
+  :group 'helm-files-faces)
+
 (defface helm-ff-truename
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit font-lock-string-face))
@@ -4079,11 +4085,11 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                 ;; cond before.
                 ((string-match helm-ff-tramp-method-regexp file)
                  (cons (propertize (concat "/" (match-string 1 file))
-                                   'face 'helm-ff-file)
+                                   'face 'helm-ff-nofile)
                        (concat "/:" (match-string 1 file))))
                 ;; A non--existing file.
                 (t
-                 (add-face-text-property 0 len 'helm-ff-file t disp)
+                 (add-face-text-property 0 len 'helm-ff-nofile t disp)
                  (cons (helm-ff-prefix-filename
                           disp nil 'new-file)
                        file))))))))
@@ -4091,21 +4097,39 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
 (defun helm-ff-icons-transformer (candidates _source)
   "Transformer for HFF that prefix candidates with icons."
   (cl-loop for (disp . fname) in candidates
-           for icon = (helm-ff-get-icon fname)
+           for icon = (helm-ff-get-icon disp fname)
            collect (cons (concat icon disp) fname)))
 
-(defun helm-ff-get-icon (file)
-  "Get icon from all-the-icons for FILE."
-  (concat
-   (cond ((file-directory-p file)
-          ;; We could use `all-the-icons-icon-for-dir' which shows
-          ;; additional stuff e.g. icon for git dir etc... but it
-          ;; looks more costly (additional tests like
-          ;; file-symlink-p, file-exists-p etc...).
-          (all-the-icons-octicon "file-directory"))
-         ((file-exists-p file)
-          (all-the-icons-icon-for-file file)))
-   " "))
+(defun helm-ff-get-icon (disp file)
+  "Get icon from all-the-icons for FILE.
+Arg DISP is the display part of the candidate."
+  (let ((icon (cond ((helm-ff--is-dir-from-disp disp)
+                     ;; We could use `all-the-icons-icon-for-dir' which shows
+                     ;; additional stuff e.g. icon for git dir etc... but it
+                     ;; looks more costly (additional tests like
+                     ;; file-symlink-p, file-exists-p etc...).
+                     (all-the-icons-octicon "file-directory"))
+                    ((helm-ff--is-file-from-disp disp)
+                     (all-the-icons-icon-for-file file)))))
+    (when icon (concat icon " "))))
+
+(defun helm-ff--is-dir-from-disp (disp)
+  "Return the face used for candidate when candidate is a directory."
+  (cl-loop for face in '('helm-ff-directory helm-ff-dotted-directory)
+           thereis (text-property-any 0 (length disp) 'face face disp)))
+
+(defun helm-ff--is-file-from-disp (disp)
+  "Return the face used for candidate when candidate is a file."
+  (cl-loop with len = (length disp)
+           for face in '(helm-ff-file
+                         helm-ff-suid
+                         helm-ff-executable
+                         helm-ff-socket
+                         helm-ff-pipe
+                         helm-ff-symlink
+                         helm-ff-backup-file)
+           when (text-property-any 0 len 'face face disp)
+           return face))
 
 ;;;###autoload
 (define-minor-mode helm-ff-icon-mode
