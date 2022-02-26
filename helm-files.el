@@ -4115,7 +4115,7 @@ Arg DISP is the display part of the candidate."
 
 (defun helm-ff--is-dir-from-disp (disp)
   "Return the face used for candidate when candidate is a directory."
-  (cl-loop for face in '('helm-ff-directory helm-ff-dotted-directory)
+  (cl-loop for face in '(helm-ff-directory helm-ff-dotted-directory)
            thereis (text-property-any 0 (length disp) 'face face disp)))
 
 (defun helm-ff--is-file-from-disp (disp)
