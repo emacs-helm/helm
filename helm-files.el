@@ -4114,7 +4114,8 @@ Arg DISP is the display part of the candidate."
                            ;; `file-directory-p' here but it is
                            ;; limited to symlinks, so it should not
                            ;; degrade too much performances.
-                           (if (and (eq it 'helm-ff-symlink)
+                           (if (and (memq it '(helm-ff-symlink
+                                               helm-ff-dotted-symlink-directory))
                                     (file-directory-p file))
                                (let* ((icon (all-the-icons-match-to-alist
                                              (helm-basename file)
@@ -4131,7 +4132,7 @@ Arg DISP is the display part of the candidate."
            thereis (text-property-any 0 (length disp) 'face face disp)))
 
 (defun helm-ff--is-file-from-disp (disp)
-  "Return the face used for candidate when candidate is a file."
+  "Return the face used for file's candidate or dotted-symlink dirs."
   (cl-loop with len = (length disp)
            for face in '(helm-ff-file
                          helm-ff-suid
@@ -4139,6 +4140,7 @@ Arg DISP is the display part of the candidate."
                          helm-ff-socket
                          helm-ff-pipe
                          helm-ff-symlink
+                         helm-ff-dotted-symlink-directory
                          helm-ff-backup-file)
            when (text-property-any 0 len 'face face disp)
            return face))
