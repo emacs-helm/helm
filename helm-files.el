@@ -3695,13 +3695,16 @@ Note that only existing directories are saved here."
                               (abbreviate-file-name sel)))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
-(defun helm-ff-valid-symlink-p (file)
+(defun helm-ff-valid-symlink-p (file &optional link)
+  "Returns the truename of FILE if it exists.
+If we already know the truename of FILE we can pass it with LINK arg
+to avoid an unnecessary call to `file-truename'."
   (helm-aif (condition-case-unless-debug nil
                 ;; `file-truename' send error
                 ;; on cyclic symlinks (Bug#692).
-                (file-truename file)
+                (or link (file-truename file))
               (error nil))
-      (file-exists-p it)))
+      (and (file-exists-p it) it)))
 
 (defun helm-get-default-mode-for-file (filename)
   "Return the default mode to open FILENAME."
@@ -3746,8 +3749,7 @@ Note that only existing directories are saved here."
                 (format "True name: '%s'\n"
                         (cond ((string-match "^\\.#" (helm-basename candidate))
                                "Autosave symlink")
-                              ((helm-ff-valid-symlink-p candidate)
-                               (file-truename candidate))
+                              ((helm-ff-valid-symlink-p candidate))
                               (t "Invalid Symlink"))))
               (format "Owner: %s: %s\n" owner owner-right)
               (format "Group: %s: %s\n" group group-right)
