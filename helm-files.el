@@ -4032,8 +4032,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                  (string-match "\\`@@@@file-error:" file) file)
                 (;; A dead symlink.
                  (and (stringp type)
-                      ;; Check non existence of link.
-                      (not (file-exists-p type))
+                      (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
                  (add-face-text-property 0 len 'helm-ff-invalid-symlink t disp)
                  (cons disp file))
