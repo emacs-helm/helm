@@ -6027,15 +6027,19 @@ doing.")
 
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop for c in candidates
-           when (cond ((or (file-remote-p c)
-                           (and (fboundp 'tramp-archive-file-name-p)
-                                (tramp-archive-file-name-p c)))
-                       (cons (propertize c 'face 'helm-history-remote) c))
-                      ((file-exists-p c)
-                       (cons (propertize c 'face 'helm-ff-file) c))
-                      (t (unless helm--file-name-history-hide-deleted
-                           (cons (propertize c 'face 'helm-history-deleted) c))))
-           collect it))
+           for disp = (cond ((or (file-remote-p c)
+                                 (and (fboundp 'tramp-archive-file-name-p)
+                                      (tramp-archive-file-name-p c)))
+                             (propertize c 'face 'helm-history-remote))
+                            ((file-exists-p c)
+                             (propertize c 'face 'helm-ff-file))
+                            (t (unless helm--file-name-history-hide-deleted
+                                 (propertize c 'face 'helm-history-deleted))))
+           when disp
+           collect (cons (if helm-ff-icon-mode
+                             (concat (all-the-icons-icon-for-file c) " " disp)
+                           disp)
+                         c)))
 
 (defun helm-ff-file-name-history-ff (candidate)
   (helm-set-pattern
@@ -6065,6 +6069,7 @@ doing.")
                               file-name-history))
             :help-message 'helm-file-name-history-help-message
             :fuzzy-match t
+            :match-on-real t
             :persistent-action 'ignore
             :migemo t
             :filtered-candidate-transformer 'helm-file-name-history-transformer
