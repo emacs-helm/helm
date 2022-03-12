@@ -258,7 +258,9 @@ Useful when you have a old or corrupted
   (interactive)
   (when (y-or-n-p "Really delete all your `helm-adaptive-history'? ")
     (setq helm-adaptive-history nil)
-    (delete-file helm-adaptive-history-file)))
+    (when (and helm-adaptive-history-file
+               (file-exists-p helm-adaptive-history-file))
+      (delete-file helm-adaptive-history-file))))
 
 (defun helm-adaptive-compare (x y)
   "Compare display parts if some of candidates X and Y.
