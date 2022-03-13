@@ -264,7 +264,7 @@ very large directories."
   :group 'helm-files
   :type 'hook)
 
-(defcustom helm-find-files-bookmark-prefix "Helm-find-files: "
+(defcustom helm-find-files-bookmark-prefix nil
   "bookmark name prefix of `helm-find-files' sessions."
   :group 'helm-files
   :type 'string)
