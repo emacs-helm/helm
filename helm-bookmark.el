@@ -49,6 +49,7 @@
             helm-source-bookmark-helm-find-files
             helm-source-bookmark-info
             helm-source-bookmark-gnus
+            helm-source-bookmark-mu4e
             helm-source-bookmark-man
             helm-source-bookmark-images
             helm-source-bookmark-w3m)
@@ -216,6 +217,11 @@ BOOKMARK is a bookmark name or a bookmark record."
       (eq (bookmark-get-handler bookmark) 'gnus-summary-bookmark-jump)
       (eq (bookmark-get-handler bookmark) 'bookmarkp-jump-gnus)))
 
+(defun helm-bookmark-mu4e-bookmark-p (bookmark)
+  "Return non nil if BOOKMARK is a mu4e bookmark.
+BOOKMARK is a bookmark name or a bookmark record."
+  (eq (bookmark-get-handler bookmark) 'mu4e-bookmark-jump))
+
 (defun helm-bookmark-w3m-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a W3m bookmark.
 BOOKMARK is a bookmark name or a bookmark record."
@@ -285,6 +291,7 @@ BOOKMARK is a bookmark name or a bookmark record."
   (cl-loop for pred in '(helm-bookmark-org-file-p
                          helm-bookmark-addressbook-p
                          helm-bookmark-gnus-bookmark-p
+                         helm-bookmark-mu4e-bookmark-p
                          helm-bookmark-w3m-bookmark-p
                          helm-bookmark-woman-man-bookmark-p
                          helm-bookmark-info-bookmark-p
@@ -428,6 +435,18 @@ If `browse-url-browser-function' is set to something else than
             (helm-init-candidates-in-buffer
                 'global (helm-bookmark-gnus-setup-alist)))))
 
+;;; Mu4e
+;;
+(defun helm-bookmark-mu4e-setup-alist ()
+  (helm-bookmark-filter-setup-alist 'helm-bookmark-mu4e-bookmark-p))
+
+(defvar helm-source-bookmark-mu4e
+  (helm-make-source "Bookmark Mu4e" 'helm-source-filtered-bookmarks
+    :init (lambda ()
+            (bookmark-maybe-load-default-file)
+            (helm-init-candidates-in-buffer
+                'global (helm-bookmark-mu4e-setup-alist)))))
+
 ;;; Info
 ;;
 (defun helm-bookmark-info-setup-alist ()
@@ -534,6 +553,8 @@ If `browse-url-browser-function' is set to something else than
                                    (helm-bookmark-w3m-bookmark-p i))
           for isgnus        = (and (fboundp 'helm-bookmark-gnus-bookmark-p)
                                    (helm-bookmark-gnus-bookmark-p i))
+          for ismu4e        = (and (fboundp 'helm-bookmark-mu4e-bookmark-p)
+                                   (helm-bookmark-mu4e-bookmark-p i))
           for isman         = (and (fboundp 'helm-bookmark-man-bookmark-p) ; Man
                                    (helm-bookmark-man-bookmark-p i))
           for iswoman       = (and (fboundp 'helm-bookmark-woman-bookmark-p) ; Woman
@@ -555,7 +576,9 @@ If `browse-url-browser-function' is set to something else than
                              ((and isfile isinfo) (all-the-icons-octicon "info"))
                              (isfile (all-the-icons-icon-for-file isfile))
                              ((or iswoman isman)
-                              (all-the-icons-fileicon "man-page"))))
+                              (all-the-icons-fileicon "man-page"))
+                             ((or isgnus ismu4e)
+                              (all-the-icons-octicon "mail-read"))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
