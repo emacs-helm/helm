@@ -155,15 +155,11 @@
   (let* ((real (helm-get-selection helm-buffer))
          (trunc (if (> (string-width real) bookmark-bmenu-file-column)
                     (helm-substring real bookmark-bmenu-file-column)
-                    real))
-         (loc (bookmark-location real)))
+                    real)))
     (setq helm-bookmark-show-location (not helm-bookmark-show-location))
     (helm-update (if helm-bookmark-show-location
-                           (concat (regexp-quote trunc)
-                                   " +"
-                                   (regexp-quote
-                                    (if (listp loc) (car loc) loc)))
-                           (regexp-quote real)))))
+                     (regexp-quote trunc)
+                   (regexp-quote real)))))
 
 (defun helm-bookmark-toggle-filename ()
   "Toggle bookmark location visibility."
