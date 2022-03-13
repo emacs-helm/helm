@@ -29,6 +29,10 @@
 
 (declare-function helm-browse-project "helm-files" (arg))
 (declare-function addressbook-bookmark-edit "ext:addressbook-bookmark.el" (bookmark))
+(declare-function all-the-icons-fileicon     "ext:all-the-icons.el")
+(declare-function all-the-icons-icon-for-file"ext:all-the-icons.el")
+(declare-function all-the-icons-octicon      "ext:all-the-icons.el")
+
 
 (defgroup helm-bookmark nil
   "Predefined configurations for `helm.el'."
@@ -53,6 +57,11 @@
   "List of sources to use in `helm-filtered-bookmarks'."
   :group 'helm-bookmark
   :type '(repeat (choice symbol)))
+
+(defcustom helm-bookmark-use-icon nil
+  "Display candidates with an icon with `all-the-icons' when non nil."
+  :type 'boolean
+  :group 'helm-bookmark)
 
 
 (defface helm-bookmark-info
@@ -544,12 +553,13 @@ If `browse-url-browser-function' is set to something else than
                           (helm-substring
                            i bookmark-bmenu-file-column)
                         i)
-          for icon = (cond ((and isfile hff)
-                            (all-the-icons-octicon "file-directory"))
-                           ((and isfile isinfo) (all-the-icons-octicon "info"))
-                           (isfile (all-the-icons-icon-for-file isfile))
-                           ((or iswoman isman)
-                            (all-the-icons-fileicon "man-page")))
+          for icon = (when helm-bookmark-use-icon
+                       (cond ((and isfile hff)
+                              (all-the-icons-octicon "file-directory"))
+                             ((and isfile isinfo) (all-the-icons-octicon "info"))
+                             (isfile (all-the-icons-icon-for-file isfile))
+                             ((or iswoman isman)
+                              (all-the-icons-fileicon "man-page"))))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
@@ -612,13 +622,13 @@ If `browse-url-browser-function' is set to something else than
                            (propertize trunc 'face 'helm-bookmark-file
                                        'help-echo isfile)))
           collect (if helm-bookmark-show-location
-                      (cons (concat (propertize " " 'display (concat icon " "))
+                      (cons (concat (and icon (propertize " " 'display (concat icon " ")))
                                     bmk
                                     (propertize
                                      " " 'display
                                      (concat sep (if (listp loc) (car loc) loc))))
                             i)
-                    (cons (concat (propertize " " 'display (concat icon " "))
+                    (cons (concat (and icon (propertize " " 'display (concat icon " ")))
                                   bmk)
                           i)))))
 
@@ -753,6 +763,8 @@ E.g. prepended with *."
 Optional source `helm-source-bookmark-addressbook' is loaded only
 if external addressbook-bookmark package is installed."
   (interactive)
+  (when helm-bookmark-use-icon
+    (require 'all-the-icons))
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"
