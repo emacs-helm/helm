@@ -544,6 +544,12 @@ If `browse-url-browser-function' is set to something else than
                           (helm-substring
                            i bookmark-bmenu-file-column)
                         i)
+          for icon = (cond ((and isfile hff)
+                            (all-the-icons-octicon "file-directory"))
+                           ((and isfile isinfo) (all-the-icons-octicon "info"))
+                           (isfile (all-the-icons-icon-for-file isfile))
+                           ((or iswoman isman)
+                            (all-the-icons-fileicon "man-page")))
           ;; Add a * if bookmark have annotation
           if (and isannotation (not (string-equal isannotation "")))
           do (setq trunc (concat "*" (if helm-bookmark-show-location trunc i)))
@@ -606,9 +612,15 @@ If `browse-url-browser-function' is set to something else than
                            (propertize trunc 'face 'helm-bookmark-file
                                        'help-echo isfile)))
           collect (if helm-bookmark-show-location
-                      (cons (concat bmk sep (if (listp loc) (car loc) loc))
+                      (cons (concat (propertize " " 'display (concat icon " "))
+                                    bmk
+                                    (propertize
+                                     " " 'display
+                                     (concat sep (if (listp loc) (car loc) loc))))
                             i)
-                    (cons bmk i)))))
+                    (cons (concat (propertize " " 'display (concat icon " "))
+                                  bmk)
+                          i)))))
 
 
 ;;; Edit/rename/save bookmarks.

@@ -234,7 +234,19 @@ This is a filtered candidate transformer you can use with the
                        for info = (or (and (assq 'multiline source)
                                            (replace-regexp-in-string
                                             "\n\\'" "" cand))
-                                      cand)
+                                      ;; Some transformers like in
+                                      ;; bookmarks may add a leading
+                                      ;; space to provide additional
+                                      ;; infos like an icon as a
+                                      ;; display prop, strip out this
+                                      ;; leading space for
+                                      ;; comparison. Same for a
+                                      ;; trailing space (helm
+                                      ;; boookmark add bmk location as
+                                      ;; a display prop when
+                                      ;; displaying it).
+                                      (helm-aand (replace-regexp-in-string "\\` " "" cand)
+                                                 (replace-regexp-in-string " \\'" "" it)))
                        when (cl-member info candidates
                                        :test 'helm-adaptive-compare)
                        collect (car it) into sorted
