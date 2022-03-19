@@ -904,12 +904,13 @@ See `helm-candidates-in-buffer' for more infos.")
                        (with-current-buffer (helm-candidate-buffer 'global)
                          (insert-file-contents file)
                          (goto-char (point-min))
-                         (while (not (eobp))
-                           (add-text-properties
-                            (point-at-bol) (point-at-eol)
-                            `(helm-linum ,count))
-                           (cl-incf count)
-                           (forward-line 1))))))
+                         (when (helm-get-attr 'linum)
+                           (while (not (eobp))
+                             (add-text-properties
+                              (point-at-bol) (point-at-eol)
+                              `(helm-linum ,count))
+                             (cl-incf count)
+                             (forward-line 1)))))))
    (get-line :initform #'buffer-substring)
    (candidates-file
     :initarg :candidates-file
@@ -918,7 +919,13 @@ See `helm-candidates-in-buffer' for more infos.")
     :documentation
     "  A filename.
   Each line number of FILE is accessible with helm-linum property
-  from candidate display part."))
+  from candidate display part.")
+   (linum
+    :initarg :linum
+    :initform nil
+    :documentation
+    "  Store line number in each candidate when non nil.
+  Line number is stored in `helm-linum' text property."))
 
   "The contents of the FILE will be used as candidates in buffer.")
 
