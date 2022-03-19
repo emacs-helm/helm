@@ -1167,6 +1167,11 @@ system doesn't support this, you can turn off file notifications
 by customizing the variable `helm-ff-use-notify'. In this case
 you will have to refresh manually directories when needed with `\\<helm-map>\\[helm-refresh]'.
 
+*** Prefix file candidates with icons
+
+If `all-the-icons' package is installed, turning on
+`helm-ff-icon-mode' will show icons before files and directories.
+
 ** Commands
 \\<helm-find-files-map>
 |Keys|Description
@@ -1932,6 +1937,9 @@ leaving Helm.
 (defvar helm-bookmark-help-message
   "* Helm bookmark name
 
+When `helm-bookmark-use-icon' is non nil and `all-the-icons'
+package is installed icons before candidates will be displayed.
+ 
 ** Commands
 \\<helm-bookmark-map>
 |Keys|Description
