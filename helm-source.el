@@ -917,9 +917,7 @@ See `helm-candidates-in-buffer' for more infos.")
     :initform nil
     :custom string
     :documentation
-    "  A filename.
-  Each line number of FILE is accessible with helm-linum property
-  from candidate display part.")
+    "  The file used to fetch candidates.")
    (linum
     :initarg :linum
     :initform nil
