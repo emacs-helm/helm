@@ -6603,9 +6603,9 @@ before running again the init function."
                   (delete (assoc helm--source-name
                                  helm--candidate-buffer-alist)
                           helm--candidate-buffer-alist)))
-      ;; When using global or local as value of CREATE-OR-BUFFER
+      ;; When using global or local as value of BUFFER-SPEC
       ;; create the buffer global-bname or local-bname, otherwise
-      ;; reuse the named buffer.
+      ;; reuse the buffer named BUFFER-SPEC.
       (unless (bufferp buffer-spec)
         ;; Global buffers are killed and recreated.
         (and (eq buffer-spec 'global)
@@ -6615,9 +6615,11 @@ before running again the init function."
         ;; Local buffer, once created are reused and a new one
         ;; is created when `helm-current-buffer' change across sessions.
         (with-current-buffer (get-buffer-create
-                              (cl-ecase buffer-spec
+                              (helm-acase buffer-spec
                                 (global global-bname)
-                                (local  local-bname)))
+                                (local  local-bname)
+                                (t (and (stringp buffer-spec)
+                                        buffer-spec))))
           ;; We need a buffer not read-only to perhaps insert later
           ;; text coming from read-only buffers (Bug#1176).
           (set (make-local-variable 'buffer-read-only) nil)
@@ -6652,11 +6654,7 @@ when initializing a source with `helm-source-in-buffer' class."
   (let ((caching (and (or (stringp buffer-spec)
                           (bufferp buffer-spec))
                       (buffer-live-p (get-buffer buffer-spec))))
-        (buf (helm-candidate-buffer
-              (if (or (stringp buffer-spec)
-                      (bufferp buffer-spec))
-                  (get-buffer-create buffer-spec)
-                buffer-spec)))) ; a symbol 'global or 'local.
+        (buf (helm-candidate-buffer buffer-spec)))
     (unless caching
       (with-current-buffer buf
         (erase-buffer)
