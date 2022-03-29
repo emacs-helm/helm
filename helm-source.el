@@ -242,8 +242,11 @@
     :initform nil
     :custom string
     :documentation
-    "  A string to explain persistent-action of this source. It also
-  accepts a function or a variable name.
+    "  A string to explain persistent-action of this source.
+  It is a facility to display what persistent action does in
+  header-line, once your source is loaded don't use it directly, it will
+  have no effect, use instead `header-line' attribute.
+  It also accepts a function or a variable name.
   It will be displayed in `header-line' or in `minibuffer' depending
   of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.")
 
