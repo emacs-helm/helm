@@ -26,7 +26,7 @@ body:
     id: Helm-version
     attributes:
       label: Helm Version
-      description: I agree using the last Helm version from:
+      description: I agree using the last Helm version from
       options:
         - Master branch
         - Melpa or NonGnuElpa
