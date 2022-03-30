@@ -26,10 +26,10 @@ body:
     id: Helm-version
     attributes:
       label: Helm Version
-      description: What version of Helm are you running?
+      description: I agree using the last Helm version from:
       options:
         - Master branch
-        - Last from Melpa
+        - Melpa or NonGnuElpa
     validations:
       required: true
   - type: dropdown
