@@ -206,6 +206,11 @@ E.g., ((identity . \"foo\") (not . \"bar\"))."
                       (cons 'not (substring pat 1))
                     (cons 'identity pat)))))
 
+(defun helm-mm-regexp-p (string)
+  (string-match-p "[[]*+^$.?\\]" string))
+
+(defvar helm-mm--match-on-diacritics nil)
+
 (cl-defun helm-mm-3-match (candidate &optional (pattern helm-pattern))
   "Check if PATTERN match CANDIDATE.
 When PATTERN contains a space, it is splitted and matching is
@@ -219,12 +224,16 @@ the same cons cell against CANDIDATE.
 I.e. (identity (string-match \"foo\" \"foo bar\")) => t."
   (let ((pat (helm-mm-3-get-patterns pattern)))
     (cl-loop for (predicate . regexp) in pat
+             for re = (if (and (not (helm-mm-regexp-p regexp))
+                               helm-mm--match-on-diacritics)
+                          (char-fold-to-regexp regexp)
+                        regexp)
              always (funcall predicate
                              (condition-case _err
                                  ;; FIXME: Probably do nothing when
                                  ;; using fuzzy leaving the job
                                  ;; to the fuzzy fn.
-                                 (string-match regexp candidate)
+                                 (string-match re candidate)
                                (invalid-regexp nil))))))
 
 (defun helm-mm-3-search-base (pattern searchfn1 searchfn2)

@@ -469,6 +469,9 @@
   in the list of results and then results from the other
   functions, respectively.
 
+  If the special symbol `diacritics' is given as value helm will match
+  diacritics candidates with `char-fold-to-regexp'.
+ 
   This attribute has no effect for asynchronous sources (see
   attribute `candidates'), and sources using `match-dynamic'
   since they perform pattern matching themselves.
@@ -973,19 +976,26 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-search-functions)
 (defvar helm-mm-default-match-functions)
 
+(defun helm-source-default-match-fns (diacritics)
+  (list 'helm-mm-exact-match (lambda (candidate &optional _pattern)
+                               (let ((helm-mm--match-on-diacritics diacritics))
+                                 (helm-mm-match candidate)))))
+  
 (defun helm-source-mm-get-search-or-match-fns (source method)
-  (let ((defmatch         (helm-aif (slot-value source 'match)
-                              (helm-mklist it)))
-        (defmatch-strict  (helm-aif (and (eq method 'match)
-                                         (slot-value source 'match-strict))
-                              (helm-mklist it)))
-        (defsearch        (helm-aif (and (eq method 'search)
-                                         (slot-value source 'search))
-                              (helm-mklist it)))
-        (defsearch-strict (helm-aif (and (eq method 'search-strict)
-                                         (slot-value source 'search-strict))
-                              (helm-mklist it)))
-        (migemo           (slot-value source 'migemo)))
+  (let* (diacritics
+         (defmatch         (helm-aif (slot-value source 'match)
+                               (unless (setq diacritics (eq it 'diacritics))
+                                 (helm-mklist it))))
+         (defmatch-strict  (helm-aif (and (eq method 'match)
+                                          (slot-value source 'match-strict))
+                               (helm-mklist it)))
+         (defsearch        (helm-aif (and (eq method 'search)
+                                          (slot-value source 'search))
+                               (helm-mklist it)))
+         (defsearch-strict (helm-aif (and (eq method 'search-strict)
+                                          (slot-value source 'search-strict))
+                               (helm-mklist it)))
+         (migemo           (slot-value source 'migemo)))
     (cl-case method
       (match (cond (defmatch-strict)
                    (migemo
@@ -993,7 +1003,7 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                             defmatch '(helm-mm-3-migemo-match)))
                    (defmatch
                     (append helm-mm-default-match-functions defmatch))
-                   (t helm-mm-default-match-functions)))
+                   (t (helm-source-default-match-fns diacritics))))
       (search (cond (defsearch-strict)
                     (migemo
                      (append helm-mm-default-search-functions
