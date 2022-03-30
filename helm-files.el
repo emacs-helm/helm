@@ -6026,13 +6026,20 @@ doing.")
     map))
 
 (defun helm-file-name-history-transformer (candidates _source)
-  (cl-loop for c in candidates
+  (cl-loop with lgst = (cl-loop for c in candidates maximize (length c))
+           for c in candidates
+           for last-access = (format-time-string "%d/%m/%Y:%X"
+                                                 (nth 4 (file-attributes c)))
            for disp = (cond ((or (file-remote-p c)
                                  (and (fboundp 'tramp-archive-file-name-p)
                                       (tramp-archive-file-name-p c)))
                              (propertize c 'face 'helm-history-remote))
                             ((file-exists-p c)
-                             (propertize c 'face 'helm-ff-file))
+                             (propertize
+                              c 'display
+                              (concat (propertize c 'face 'helm-ff-file)
+                                      (make-string (- lgst (length c)) ? )
+                                      last-access)))
                             (t (unless helm--file-name-history-hide-deleted
                                  (propertize c 'face 'helm-history-deleted))))
            when disp
