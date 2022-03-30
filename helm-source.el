@@ -1031,11 +1031,14 @@ an eieio class."
 ;;; Methods to build sources.
 ;;
 ;;
-(defun helm-source--persistent-help-string (string source)
+(defun helm-source--persistent-help-string (value source)
+  "Format `persistent-help' VALUE in SOURCE.
+Argument VALUE can be a string, a variable or a function."
   (substitute-command-keys
-   (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
-           (or (format "%s (keeping session)" string)
-               (slot-value source 'header-line)))))
+   (format "\\<helm-map>\\[helm-execute-persistent-action]: %s (keeping session)"
+           (helm-aif value
+               (helm-interpret-value value source)
+             (slot-value source 'header-line)))))
 
 (defun helm-source--header-line (source)
   "Compute a default header line for SOURCE.
