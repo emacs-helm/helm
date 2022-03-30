@@ -43,7 +43,7 @@ body:
         - Emacs-26.3
         - Emacs-27.1
         - Emacs-27.2
-        - Emacs-28.0.50
+        - Emacs-28/29
     validations:
       required: true
   - type: dropdown
