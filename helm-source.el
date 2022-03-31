@@ -976,11 +976,6 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-search-functions)
 (defvar helm-mm-default-match-functions)
 
-(defun helm-source-default-match-fns (diacritics)
-  (list 'helm-mm-exact-match (lambda (candidate &optional _pattern)
-                               (let ((helm-mm--match-on-diacritics diacritics))
-                                 (helm-mm-match candidate)))))
-  
 (defun helm-source-mm-get-search-or-match-fns (source method)
   (let* (diacritics
          (defmatch         (helm-aif (slot-value source 'match)
@@ -1003,7 +998,9 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
                             defmatch '(helm-mm-3-migemo-match)))
                    (defmatch
                     (append helm-mm-default-match-functions defmatch))
-                   (t (helm-source-default-match-fns diacritics))))
+                   (t (if diacritics
+                          (list 'helm-mm-exact-match 'helm-mm-3-match-on-diacritics)
+                        helm-mm-default-match-functions))))
       (search (cond (defsearch-strict)
                     (migemo
                      (append helm-mm-default-search-functions

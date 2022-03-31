@@ -360,6 +360,11 @@ E.g. \"bar foo baz\" will match \"barfoobaz\" or \"barbazfoo\" but not
                (multi3p #'helm-mm-3p-match))))
     (funcall fun candidate pattern)))
 
+(cl-defun helm-mm-3-match-on-diacritics (candidate &optional (pattern helm-pattern))
+  "Same as `helm-mm-3-match' but match on diacritics if possible."
+  (let ((helm-mm--match-on-diacritics t))
+    (helm-mm-match candidate pattern)))
+
 (defun helm-mm-search (pattern &rest _ignore)
   "Search for PATTERN with `helm-mm-matching-method' function."
   (let ((fun (cl-ecase helm-mm-matching-method

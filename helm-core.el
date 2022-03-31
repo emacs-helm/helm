@@ -4465,12 +4465,14 @@ useful when the order of the candidates is meaningful, e.g. with
 `recentf-list'."
   (helm-fuzzy-matching-default-sort-fn-1 candidates nil nil t))
 
-(defun helm--maybe-get-migemo-pattern (pattern)
+(defun helm--maybe-get-migemo-pattern (pattern &optional diacritics)
   (or (and helm-migemo-mode
            (assoc-default pattern helm-mm--previous-migemo-info))
-      pattern))
+      (if diacritics
+          (char-fold-to-regexp pattern)
+        pattern)))
 
-(defun helm-fuzzy-default-highlight-match (candidate)
+(defun helm-fuzzy-default-highlight-match (candidate &optional diacritics)
   "The default function to highlight matches in fuzzy matching.
 Highlight elements in CANDIDATE matching `helm-pattern' according
 to the matching method in use."
@@ -4481,7 +4483,7 @@ to the matching method in use."
     (let* ((pair    (and (consp candidate) candidate))
            (display (helm-stringify (if pair (car pair) candidate)))
            (real    (cdr pair))
-           (regex   (helm--maybe-get-migemo-pattern helm-pattern))
+           (regex   (helm--maybe-get-migemo-pattern helm-pattern diacritics))
            (mp      (pcase (get-text-property 0 'match-part display)
                       ((pred (string= display)) nil)
                       (str str)))
@@ -4510,8 +4512,11 @@ to the matching method in use."
               (when (zerop count)
                 (cl-loop with multi-match = (string-match-p " " helm-pattern)
                          with patterns = (if multi-match
-                                             (mapcar #'helm--maybe-get-migemo-pattern
-                                                     (helm-mm-split-pattern helm-pattern))
+                                             (cl-loop for pat in (helm-mm-split-pattern
+                                                                  helm-pattern)
+                                                      collect
+                                                      (helm--maybe-get-migemo-pattern
+                                                       pat diacritics))
                                            (split-string helm-pattern "" t))
                          for p in patterns
                          ;; Multi matches (regexps patterns).
@@ -4534,12 +4539,14 @@ to the matching method in use."
         (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
       (if real (cons display real) display))))
 
-(defun helm-fuzzy-highlight-matches (candidates _source)
+(defun helm-fuzzy-highlight-matches (candidates source)
   "The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
-  (cl-loop for c in candidates
-           collect (funcall helm-fuzzy-matching-highlight-fn c)))
+  (cl-loop with diac = (memq 'helm-mm-3-match-on-diacritics
+                             (helm-mklist (helm-get-attr 'match source)))
+           for c in candidates
+           collect (funcall helm-fuzzy-matching-highlight-fn c diac)))
 
 
 ;;; helm-flex style
