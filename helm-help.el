@@ -2253,6 +2253,17 @@ marking it (`C-c u' or `RET') .
 
 *** You can get help on any command with persistent action (\\<helm-map>\\[helm-execute-persistent-action])
 
+*** History source
+
+Helm-M-x is displaying two sources, one for the commands
+themselves and one for the command history, more exactly
+`extended-command-history', by default the history source is
+displayed in first position, however you can put if in second
+position if you don't like that by customizing
+`helm-M-x-reverse-history'.
+
+*** Enabled modes are highlighted in helm-M-x
+
 *** Prefix arguments
 
 You can pass prefix arguments *after* starting `helm-M-x'.  A mode-line

@@ -1204,9 +1204,7 @@ are called filtered actions.
 Helm uses what's called sources to provide different kinds of
 completions.  Each Helm session can handle one or more source.  A
 source is an alist object which is build from various classes,
-see [[Writing your own Helm sources][here]] and
-[[https://github.com/emacs-helm/helm/wiki/Developing#creating-a-source][Helm
-wiki]] for more infos.
+see [[Writing your own Helm sources][here]] and [[https://github.com/emacs-helm/helm/wiki/Developing#creating-a-source][Helm wiki]] for more infos.
 
 *** Configure sources
 
