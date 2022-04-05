@@ -1137,11 +1137,10 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                        (helm-read-file-name
                         prompt
                         :preselect (when cand
-                                     (concat
-                                      "^"
-                                      (regexp-quote
-                                       (if helm-ff-transformer-show-only-basename
-                                           (helm-basename cand) cand))))
+                                     (format helm-ff-last-expanded-candidate-regexp
+                                             (regexp-quote
+                                              (if helm-ff-transformer-show-only-basename
+                                                  (helm-basename cand) cand))))
                         :initial-input (helm-dwim-target-directory)
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
