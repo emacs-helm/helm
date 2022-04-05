@@ -903,12 +903,6 @@ You can toggle later `truncate-lines' with
 Set this to an empty string if you don't want prefix in margin when marking."
   :group 'helm
   :type 'string)
-
-(defcustom helm-persistent-action-use-special-display nil
-  "When non nil use user special `display-buffer-alist' config in PA."
-  :type 'boolean
-  :group 'helm)
-
 
 ;;; Faces
 ;;
@@ -6932,15 +6926,10 @@ splitting inconditionally, it is unused actually."
                 (helm-log "current-buffer = %S" (current-buffer))
                 (let ((helm-in-persistent-action t)
                       (same-window-regexps '("."))
-                      (display-buffer-alist (when helm-persistent-action-use-special-display
-                                              display-buffer-alist))
                       display-buffer-function pop-up-windows pop-up-frames
                       special-display-regexps special-display-buffer-names)
-                  (with-selected-window (if helm-persistent-action-use-special-display
-                                            (minibuffer-window)
-                                          (selected-window))
-                    (helm-execute-selection-action-1
-                     selection (or fn (helm-get-actions-from-current-source source)) t))
+                  (helm-execute-selection-action-1
+                   selection (or fn (helm-get-actions-from-current-source source)) t)
                   (unless (helm-action-window)
                     (helm-log-run-hook 'helm-after-persistent-action-hook)))
                 ;; A typical case is when a persistent action delete
