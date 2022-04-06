@@ -5996,18 +5996,6 @@ list."
 ;;; File name history
 ;;
 ;;
-(defvar helm-source-file-name-history
-  (helm-build-sync-source "File Name History"
-    :candidates 'file-name-history
-    :persistent-action #'ignore
-    :filtered-candidate-transformer #'helm-file-name-history-transformer
-    :action 'helm-type-file-actions))
-
-(defvar helm-source--ff-file-name-history nil
-  "[INTERNAL] This source is build to be used with `helm-find-files'.
-Don't use it in your own code unless you know what you are
-doing.")
-
 (defvar helm--file-name-history-hide-deleted nil)
 
 (defun helm-file-name-history-show-or-hide-deleted ()
@@ -6037,7 +6025,7 @@ doing.")
                              (propertize
                               c 'display
                               (concat (propertize c 'face 'helm-ff-file)
-                                      (make-string (- lgst (length c)) ? )
+                                      (make-string (1+ (- lgst (length c))) ? )
                                       last-access)))
                             (t (unless helm--file-name-history-hide-deleted
                                  (propertize c 'face 'helm-history-deleted))))
@@ -6060,37 +6048,34 @@ doing.")
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
-  (unless helm-source--ff-file-name-history
-    (setq helm-source--ff-file-name-history
-          (helm-build-sync-source "File name history"
-            :init (lambda ()
-                    (with-helm-alive-p
-                      (require 'tramp-archive nil t)
-                      (when helm-ff-file-name-history-use-recentf
-                        (require 'recentf)
-                        (or recentf-mode (recentf-mode 1)))))
-            :candidates (lambda ()
-                          (if helm-ff-file-name-history-use-recentf
-                              recentf-list
-                              file-name-history))
-            :help-message 'helm-file-name-history-help-message
-            :fuzzy-match t
-            :match-on-real t
-            :persistent-action 'ignore
-            :migemo t
-            :filtered-candidate-transformer 'helm-file-name-history-transformer
-            :action (helm-make-actions
-                     "Find file" (lambda (candidate)
-                                   (helm-set-pattern
-                                    (expand-file-name candidate))
-                                   (with-helm-after-update-hook (helm-exit-minibuffer)))
-                     "Find file in helm" 'helm-ff-file-name-history-ff)
-            :keymap helm-file-name-history-map)))
-  (with-helm-alive-p
-    (helm :sources 'helm-source--ff-file-name-history
-          :buffer "*helm-file-name-history*"
-          :allow-nest t
-          :resume 'noresume)))
+  (let ((src (helm-build-sync-source "File name history"
+               :init (lambda ()
+                       (with-helm-alive-p
+                         (require 'tramp-archive nil t)
+                         (when helm-ff-file-name-history-use-recentf
+                           (require 'recentf)
+                           (or recentf-mode (recentf-mode 1)))))
+               :candidates (lambda ()
+                             (if helm-ff-file-name-history-use-recentf
+                                 recentf-list
+                               file-name-history))
+               :help-message 'helm-file-name-history-help-message
+               :fuzzy-match t
+               :persistent-action 'ignore
+               :migemo t
+               :filtered-candidate-transformer 'helm-file-name-history-transformer
+               :action (helm-make-actions
+                        "Find file" (lambda (candidate)
+                                      (helm-set-pattern
+                                       (expand-file-name candidate))
+                                      (with-helm-after-update-hook (helm-exit-minibuffer)))
+                        "Find file in helm" 'helm-ff-file-name-history-ff)
+               :keymap helm-file-name-history-map)))
+    (with-helm-alive-p
+      (helm :sources src
+            :buffer "*helm-file-name-history*"
+            :allow-nest t
+            :resume 'noresume))))
 (put 'helm-ff-file-name-history 'helm-only t)
 
 ;;; Browse project
