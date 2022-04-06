@@ -6927,7 +6927,8 @@ splitting inconditionally, it is unused actually."
                 (let ((helm-in-persistent-action t)
                       (same-window-regexps '("."))
                       display-buffer-function pop-up-windows pop-up-frames
-                      special-display-regexps special-display-buffer-names)
+                      special-display-regexps special-display-buffer-names
+                      display-buffer-alist)
                   (helm-execute-selection-action-1
                    selection (or fn (helm-get-actions-from-current-source source)) t)
                   (unless (helm-action-window)
