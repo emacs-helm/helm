@@ -6925,10 +6925,9 @@ splitting inconditionally, it is unused actually."
                    :split (or split helm-onewindow-p)))
                 (helm-log "current-buffer = %S" (current-buffer))
                 (let ((helm-in-persistent-action t)
-                      (same-window-regexps '("."))
+                      (display-buffer-alist '((".*" (display-buffer-same-window))))
                       display-buffer-function pop-up-windows pop-up-frames
-                      special-display-regexps special-display-buffer-names
-                      display-buffer-alist)
+                      special-display-regexps special-display-buffer-names)
                   (helm-execute-selection-action-1
                    selection (or fn (helm-get-actions-from-current-source source)) t)
                   (unless (helm-action-window)
