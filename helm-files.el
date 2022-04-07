@@ -31,17 +31,14 @@
   (require 'thingatpt)
   (require 'ffap)
   (require 'dired-aux)
-  (require 'dired-x)
-  (require 'image-dired))
+  (require 'dired-x))
 (require 'filenotify)
 (require 'image-mode)
+(require 'image-dired)
 
 (declare-function find-library-name "find-func.el" (library))
 (declare-function w32-shell-execute "ext:w32fns.c" (operation document &optional parameters show-flag))
 (declare-function gnus-dired-attach "ext:gnus-dired.el" (files-to-attach))
-(declare-function image-dired-display-image "image-dired.el" (file &optional original-size))
-(declare-function image-dired-update-property "image-dired.el" (prop value))
-(declare-function image-dired-get-thumbnail-image "image-dired.el")
 (declare-function eshell-read-aliases-list "em-alias")
 (declare-function eshell-send-input "esh-mode" (&optional use-region queue-p no-newline))
 (declare-function eshell-kill-input "esh-mode")
@@ -90,6 +87,7 @@
 (declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
 (declare-function all-the-icons-octicon "ext:all-the-icons.el")
 (declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
+(declare-function helm-adaptive-sort "ext:helm-adaptive.el")
 
 (defvar all-the-icons-dir-icon-alist)
 (defvar term-char-mode-point-at-process-mark)
@@ -867,6 +865,8 @@ than `helm-candidate-number-limit'.")
 (defvar helm-ff--trashed-files nil
   "[INTERNAL] Files already trashed are stored here during file deletion.
 This is used only as a let binding.")
+(defvar helm-ff--show-thumbnails nil)
+(defvar helm-ff--thumbnailed-directories nil)
 
 ;;; Helm-find-files
 ;;
@@ -4899,8 +4899,6 @@ Special commands:
 
 ;;; Thumbnails view
 ;;
-(defvar helm-ff--show-thumbnails nil)
-(defvar helm-ff--thumbnailed-directories nil)
 (defun helm-ff-maybe-show-thumbnails (candidates _source)
   (require 'image-dired)
   (if (and helm-ff--show-thumbnails
@@ -4967,8 +4965,8 @@ Special commands:
 ;;;###autoload
 (defun helm-ff-cleanup-image-dired-dir-and-cache ()
   "Cleanup `image-dired-dir' directory.
-Delete all thumb files that are no more associated with an existing image file in
-`helm-ff-image-dired-thumbnails-cache'."
+Delete all thumb files that are no more associated with an existing
+image file in `helm-ff-image-dired-thumbnails-cache'."
   (interactive)
   (cl-loop for key being the hash-keys in helm-ff-image-dired-thumbnails-cache
            using (hash-value val)

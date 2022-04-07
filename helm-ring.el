@@ -495,7 +495,8 @@ This is a command for `helm-kill-ring-map'."
 
 ;;;###autoload
 (defun helm-all-mark-rings ()
-  "Preconfigured `helm' for `helm-source-global-mark-ring' and \
+  "Preconfigured `helm' for mark rings.
+Source used are `helm-source-global-mark-ring' and
 `helm-source-mark-ring'."
   (interactive)
   (helm :sources '(helm-source-mark-ring

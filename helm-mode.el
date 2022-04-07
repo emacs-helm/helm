@@ -295,8 +295,8 @@ There are three possible values to use:
   `completion-styles'.  Note that even in this style, helm allows using
   multi match.  Emacs-27 provides a style called `flex' that can be used
   aside `helm' style (see `completion-styles-alist').  When `flex' style
-  is not available (Emacs<27) helm provides `helm-flex' style which is similar to
-  `flex' and helm fuzzy matching.
+  is not available (Emacs<27) helm provides `helm-flex' style which is
+  similar to `flex' and helm fuzzy matching.
 
 For a better experience with emacs style, if you don't know what to use, set
 `completion-styles' to '(flex) if you are using emacs-27 or to
@@ -692,7 +692,7 @@ Keys description:
 - HIST-FC-TRANSFORMER: A `filtered-candidate-transformer'
   function for the history source.
 
-- MARKED-CANDIDATES: If non--nil return candidate or marked candidates as a list.
+- MARKED-CANDIDATES: If non-nil return candidate or marked candidates as a list.
 
 - NOMARK: When non--nil don't allow marking candidates.
 
@@ -1295,6 +1295,7 @@ See documentation of `completing-read' and `all-completions' for details."
        (persistent-help "Hit1 Expand Candidate, Hit2 or (C-u) Find file")
        (mode-line helm-read-file-name-mode-line-string))
   "Read a file name with helm completion.
+
 It is helm `read-file-name' emulation.
 
 Argument PROMPT is the default prompt to use.
@@ -1303,7 +1304,8 @@ Keys description:
 
 - NAME: Source name, default to \"Read File Name\".
 
-- INITIAL-INPUT: Where to start reading file name, default to `default-directory' or $HOME.
+- INITIAL-INPUT: Where to start reading file name,
+                 default to `default-directory' or $HOME.
 
 - BUFFER: `helm-buffer' name, defaults to \"*Helm Completions*\".
 
@@ -1326,13 +1328,15 @@ Keys description:
 
 - NOMARK: When non--nil don't allow marking candidates.
 
-- ALISTP: Don't use `all-completions' in history (take effect only on history).
+- ALISTP: Don't use `all-completions' in history
+          (take effect only on history).
 
 - PERSISTENT-ACTION-IF: a persistent if action function.
 
 - PERSISTENT-HELP: persistent help message.
 
-- MODE-LINE: A mode line message, default is `helm-read-file-name-mode-line-string'."
+- MODE-LINE: A mode line message, default is
+             `helm-read-file-name-mode-line-string'."
   (require 'tramp)
   (unless initial-input
     (setq initial-input (or default-directory (getenv "HOME"))))

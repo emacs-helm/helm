@@ -20,6 +20,8 @@
 (require 'helm)
 (require 'helm-types)
 
+(declare-function ansi-color-apply "ansi-color.el")
+
 (defvar helm-fd-executable "fd"
   "The fd shell command executable.")
 

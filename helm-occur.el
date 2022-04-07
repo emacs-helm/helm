@@ -126,7 +126,8 @@ Note that when using `buffer-substring' initialization will be slower."
 
 (defcustom helm-occur-keep-closest-position t
   "When non nil select closest candidate from point after update.
-This happen only in `helm-source-occur' which is always related to `current-buffer'."
+This happen only in `helm-source-occur' which is always related to
+`current-buffer'."
   :group 'helm-regexp
   :type 'boolean)
 

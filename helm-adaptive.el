@@ -65,7 +65,8 @@ selection.")
 
 (defvar helm-adaptive-history nil
   "Contains the stored history information.
-Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
+Format: ((SOURCE-NAME
+         (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ...)")
 
 (defconst helm-adaptive-freq-coefficient 5)
 (defconst helm-adaptive-recent-coefficient 2)

@@ -292,7 +292,7 @@ Note that this variable is buffer-local.")
   ;; directly so that each list of candidates is local to source.
   (helm-set-attr 'candidates (funcall (helm-get-attr 'buffer-list)))
   (let ((result (cl-loop with allbufs = (memq 'helm-shadow-boring-buffers
-                                              (helm-attr
+                                              (helm-get-attr
                                                'filtered-candidate-transformer
                                                helm-source-buffers-list))
                          for b in (if allbufs

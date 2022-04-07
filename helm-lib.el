@@ -1111,10 +1111,12 @@ function with SUBEXP specified.
 
 E.g.:
 
-    (helm--replace-regexp-in-buffer-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
+    (helm--replace-regexp-in-buffer-string
+     \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
     => \"eMacs\"
 
-    (replace-regexp-in-string \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
+    (replace-regexp-in-string
+     \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
     => \"eEMACSacs\"
 
 Also START argument behaves as expected unlike
@@ -1290,7 +1292,8 @@ FUNC can be a symbol or a string.
 Instead of looking in LOAD-PATH to find library, this function
 search in all subdirs of ROOT-DIR, if ROOT-DIR is unspecified ask for
 it with completion.
-TYPE when nil specify function, for other values see `find-function-regexp-alist'."
+TYPE when nil specify function, for other values see
+`find-function-regexp-alist'."
   (require 'find-func)
   (let* ((sym (helm-symbolify func))
          (dir (or root-dir (helm-read-file-name
@@ -1697,7 +1700,7 @@ flex or helm-flex completion style if present."
             1 0))))))
 
 (defun helm-dynamic-completion (collection predicate &optional point metadata nomode styles)
-  "Build a function listing the possible completions of `helm-pattern' in COLLECTION.
+  "Build a completion function for `helm-pattern' in COLLECTION.
 
 Only the elements of COLLECTION that satisfy PREDICATE are considered.
 

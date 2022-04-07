@@ -107,8 +107,7 @@
     :action-transformer '(helm-transform-file-load-el
                           helm-transform-file-browse-url)
     :requires-pattern 3)
-  "Source for retrieving files matching the current input pattern \
-with the tracker desktop search.")
+  "Source for the Tracker desktop search engine.")
 
 ;; Spotlight (MacOS X desktop search)
 (defclass helm-mac-spotlight-source (helm-source-async helm-type-file)

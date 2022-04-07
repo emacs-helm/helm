@@ -122,8 +122,10 @@ Look recursively in parents directorys for a
       (expand-file-name helm-etags-tag-file-name current-dir))))
 
 (defun helm-etags-all-tag-files ()
-  "Return files from the following sources:
-  1) An automatically located file in the parent directories, by `helm-etags-get-tag-file'.
+  "Find Etags files.
+Return files from the following sources:
+  1) An automatically located file in the parent directories,
+     by `helm-etags-get-tag-file'.
   2) `tags-file-name', which is commonly set by `find-tag' command.
   3) `tags-table-list' which is commonly set by `visit-tags-table' command."
   (helm-fast-remove-dups

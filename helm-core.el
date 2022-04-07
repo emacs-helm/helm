@@ -95,7 +95,8 @@ See `helm-define-multi-key'."
 
 (defun helm-make-multi-command (functions &optional delay)
   "Return an anonymous multi-key command running FUNCTIONS.
-Run each function in the FUNCTIONS list in turn when called within DELAY seconds."
+Run each function in the FUNCTIONS list in turn when called within
+DELAY seconds."
   (declare (indent 1))
   (let ((funs functions)
         (iter (cl-gensym "helm-iter-key"))
@@ -1758,7 +1759,7 @@ It also accepts function or variable symbol.")
 (defvar helm-autoresize-mode) ;; Undefined in `helm-default-display-buffer'.
 
 (defvar helm-async-outer-limit-hook nil
-  "A hook that runs in async sources when process output comes out of `candidate-number-limit'.
+  "Run in async sources when process output is out of `candidate-number-limit'.
 Should be set locally to `helm-buffer' with `helm-set-local-variable'.")
 
 (defvar helm-quit-hook nil
@@ -4452,11 +4453,11 @@ the candidates."
                       ((> scr1 scr2)))))))))
 
 (defun helm-fuzzy-matching-default-sort-fn (candidates _source)
-  "Default `filtered-candidate-transformer' to sort candidates in fuzzy matching."
+  "Default `filtered-candidate-transformer' to sort in fuzzy matching."
   (helm-fuzzy-matching-default-sort-fn-1 candidates))
 
 (defun helm-fuzzy-matching-sort-fn-preserve-ties-order (candidates _source)
-  "`filtered-candidate-transformer' to sort candidates in fuzzy matching, preserving order of ties.
+  "Same as `helm-fuzzy-matching-default-sort-fn' but preserving order of ties.
 The default function, `helm-fuzzy-matching-default-sort-fn',
 sorts ties by length, shortest first.  This function may be more
 useful when the order of the candidates is meaningful, e.g. with

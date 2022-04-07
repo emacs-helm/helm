@@ -89,7 +89,8 @@ because ack disable it when output is piped.
 
 Same for grep you can use safely the option \"--color=always\" (default).
 You can customize the color of matches using GREP_COLORS env var.
-e.g: \(setenv \"GREP_COLORS\" \"ms=30;43:mc=30;43:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
+e.g: \(setenv \"GREP_COLORS\"
+              \"ms=30;43:mc=30;43:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
 
 To enable ANSI color in git-grep just add \"--color=always\".
 To customize the ANSI color in git-grep, GREP_COLORS have no effect,

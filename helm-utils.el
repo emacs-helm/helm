@@ -45,7 +45,7 @@
 (defvar helm-buffers-maybe-switch-to-tab)
 (defvar helm-ff-transformer-show-only-basename)
 (defvar helm-popup-tip-mode)
-
+(defvar helm-ff-last-expanded-candidate-regexp)
 
 
 (defgroup helm-utils nil
@@ -88,7 +88,8 @@ Possible value are:
                  (const  :tag "Never match" 'never)))
 
 (defcustom helm-buffers-to-resize-on-pa nil
-  "A list of helm buffers where the helm-window should be reduced on persistent actions."
+  "A list of helm buffers where the helm-window should be reduced on PA.
+Where PA means persistent action."
   :group 'helm-utils
   :type '(repeat (choice string)))
 
@@ -104,8 +105,9 @@ Possible value are:
 
 (defcustom helm-html-decode-entities-function #'helm-html-decode-entities-string
   "Function used to decode HTML entities in HTML bookmarks.
-Helm comes by default with `helm-html-decode-entities-string', if you need something
-more sophisticated you can use `w3m-decode-entities-string' if available.
+Helm comes by default with `helm-html-decode-entities-string', if
+you need something more sophisticated you can use
+`w3m-decode-entities-string' if available.
 
 In Emacs itself org-entities seem broken and `xml-substitute-numeric-entities'
 supports only numeric entities."

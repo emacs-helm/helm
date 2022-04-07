@@ -344,7 +344,7 @@ string."
 
 ;;;###autoload
 (defun helm-imenu-in-all-buffers ()
-  "Preconfigured `helm' for fetching imenu entries in all buffers with similar mode as current.
+  "Fetch Imenu entries in all buffers with similar mode as current.
 A mode is similar as current if it is the same, it is derived
 i.e. `derived-mode-p' or it have an association in
 `helm-imenu-all-buffer-assoc'."
