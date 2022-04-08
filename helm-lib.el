@@ -425,6 +425,9 @@ Like `this-command' but return the real command, and not
            else
            if (and (eq fn 'call-interactively)
                    (> (length btf) 2))
+           return (cadr (cdr btf))
+           if (and (eq fn 'command-execute)
+                   (> (length btf) 2))
            return (cadr (cdr btf))))
 
 
