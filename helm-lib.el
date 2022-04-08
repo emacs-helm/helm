@@ -404,8 +404,7 @@ available APPEND is ignored."
   '(helm-maybe-exit-minibuffer
     helm-confirm-and-exit-minibuffer
     helm-exit-minibuffer
-    exit-minibuffer
-    helm-M-x))
+    exit-minibuffer))
 
 (defun helm-this-command ()
   "Return the actual command in action.
