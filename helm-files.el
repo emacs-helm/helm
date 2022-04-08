@@ -5996,6 +5996,13 @@ list."
 ;;
 (defvar helm--file-name-history-hide-deleted nil)
 
+(defvar helm-source-file-name-history
+  (helm-build-sync-source "File Name History"
+    :candidates 'file-name-history
+    :persistent-action #'ignore
+    :filtered-candidate-transformer #'helm-file-name-history-transformer
+    :action 'helm-type-file-actions))
+
 (defun helm-file-name-history-show-or-hide-deleted ()
   (interactive)
   (setq helm--file-name-history-hide-deleted
