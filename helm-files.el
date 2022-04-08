@@ -6020,7 +6020,7 @@ list."
 (defun helm-file-name-history-transformer (candidates _source)
   (cl-loop with lgst = (cl-loop for c in candidates maximize (length c))
            for c in candidates
-           for last-access = (format-time-string "%d/%m/%Y:%X"
+           for last-access = (format-time-string "%d/%m/%Y  %X"
                                                  (nth 4 (file-attributes c)))
            for disp = (cond ((or (file-remote-p c)
                                  (and (fboundp 'tramp-archive-file-name-p)
