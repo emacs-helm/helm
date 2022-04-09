@@ -1075,11 +1075,15 @@ than WIDTH."
 
 (defun helm-get-pid-from-process-name (process-name)
   "Get pid from running process PROCESS-NAME."
-  (cl-loop with process-list = (list-system-processes)
-        for pid in process-list
-        for process = (assoc-default 'comm (process-attributes pid))
-        when (and process (string-match process-name process))
-        return pid))
+  ;; Protect system processes calls (Issue #2497)
+  ;; Ensure `list-system-processes' and `process-attributes' don't run
+  ;; on remote (only Emacs-28/29+).
+  (cl-loop with default-directory = temporary-file-directory
+           with process-list = (list-system-processes)
+           for pid in process-list
+           for process = (assoc-default 'comm (process-attributes pid))
+           when (and process (string-match process-name process))
+           return pid))
 
 (defun helm-ff-find-printers ()
   "Return a list of available printers on Unix systems."
