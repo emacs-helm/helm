@@ -6081,6 +6081,16 @@ list."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ff-file-name-history-ff)))
 
+(defun helm-ff-file-name-history-delete-item (_candidate)
+  (let ((files (helm-marked-candidates)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (helm-ff--count-and-collect-dups files)
+      (when (y-or-n-p "Delete file(s) from history? ")
+        (cl-loop for f in files do
+                 (setq file-name-history (delete f file-name-history))))
+      (message nil))))
+
 (defun helm-ff-file-name-history ()
   "Switch to `file-name-history' without quitting `helm-find-files'."
   (interactive)
@@ -6105,7 +6115,8 @@ list."
                                       (helm-set-pattern
                                        (expand-file-name candidate))
                                       (with-helm-after-update-hook (helm-exit-minibuffer)))
-                        "Find file in helm" 'helm-ff-file-name-history-ff)
+                        "Find file in helm" 'helm-ff-file-name-history-ff
+                        "Delete candidate(s)" 'helm-ff-file-name-history-delete-item)
                :keymap helm-file-name-history-map)))
     (with-helm-alive-p
       (helm :sources src
