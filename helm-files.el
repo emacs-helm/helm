@@ -891,6 +891,7 @@ This is used only as a let binding.")
    "Insert as org link `C-c @'" 'helm-files-insert-as-org-link
    "Find shell command `C-c /'" 'helm-ff-find-sh-command
    "Fd shell command (C-/)" 'helm-ff-fd
+   "Find files in file" 'helm-find-files-in-file
    "Add marked files to file-cache" 'helm-ff-cache-add-file
    "Open file externally `C-c C-x, C-u to choose'" 'helm-open-file-externally
    "Grep File(s) `C-s, C-u Recurse'" 'helm-find-files-grep
@@ -5989,6 +5990,36 @@ list."
   "Remove marked files from `file-cache-alist.'"
   (let ((mkd (helm-marked-candidates)))
     (mapc 'helm-ff-file-cache-remove-file-1 mkd)))
+
+;;; Find files in file
+;;
+;;
+(defclass helm-find-files-in-file-class (helm-source-in-file helm-type-file) ())
+(cl-defmethod helm--setup-source ((source helm-find-files-in-file-class))
+  (helm-aif (slot-value source 'candidate-transformer)
+      (setf (slot-value source 'candidate-transformer)
+            (append (helm-mklist it)
+                    (list (lambda (candidates)
+                            (cl-loop for c in candidates
+                                     when (and (not (string= c ""))
+                                               (file-exists-p c))
+                                     collect c)))))))
+
+(defun helm-find-files-in-file-build-source (file)
+  (helm-make-source
+      (format "Find files in `%s'" (helm-basename file))
+      'helm-find-files-in-file-class
+    :candidates-file file))
+
+(defun helm-find-files-in-file (_file)
+  "Helm action for listing filenames listed in marked files."
+  (require 'helm-for-files)
+  (let ((sources (cl-loop for f in (helm-marked-candidates)
+                          collect (helm-find-files-in-file-build-source f))))
+    (helm :sources sources
+          :quit-if-no-candidate (lambda ()
+                                  (message "No files found in file(s)"))
+          :buffer "*helm find files in files*")))
 
 
 ;;; File name history
