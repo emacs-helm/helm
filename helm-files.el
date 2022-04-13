@@ -3680,19 +3680,24 @@ Note that only existing directories are saved here."
       (let ((mkd (helm-marked-candidates :with-wildcard t))
             (history-delete-duplicates t))
         (cl-loop for sel in mkd
-              when (and sel
-                        (stringp sel)
-                        ;; If file was one of HFF candidates assume it
-                        ;; is an existing file, so no need to call
-                        ;; file-exists-p which is costly on remote candidates.
-                        ;; (file-exists-p sel)
-                        (not (helm-ff--file-directory-p sel)))
-              do
-              ;; we use `abbreviate-file-name' here because
-              ;; other parts of Emacs seems to,
-              ;; and we don't want to introduce duplicates.
-              (add-to-history 'file-name-history
-                              (abbreviate-file-name sel)))))))
+                 when (and sel
+                           (stringp sel)
+                           ;; If file was one of HFF candidates assume it
+                           ;; is an existing file, so no need to call
+                           ;; file-exists-p which is costly on remote candidates.
+                           ;; (file-exists-p sel)
+                           (not (helm-ff--file-directory-p sel))
+                           ;; When creating a new directory previous test
+                           ;; check for file-directory-p BEFORE its
+                           ;; creation, so check for ending slash as
+                           ;; well to know if it is a future directory.
+                           (not (string-match "/\\'" sel)))
+                 do
+                 ;; we use `abbreviate-file-name' here because
+                 ;; other parts of Emacs seems to,
+                 ;; and we don't want to introduce duplicates.
+                 (add-to-history 'file-name-history
+                                 (abbreviate-file-name sel)))))))
 (add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defun helm-ff-valid-symlink-p (file &optional link)
@@ -3952,6 +3957,9 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                     (if (or reverse urlp) file basename))))
          (len (length disp))
          (backup (backup-file-name-p disp)))
+    (when (string-match "/\\'" file)
+      (setq disp (concat disp "/")
+            len (1+ len)))
     ;; We want to filter boring files only on the files coming
     ;; from the output of helm-ff-directory-files not on single
     ;; candidate (Bug#2330).
