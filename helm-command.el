@@ -122,9 +122,11 @@ Return nil if no mode-map found."
       (helm-M-x-get-major-mode-command-alist (symbol-value map-sym)))))
 
 (defun helm-M-x-toggle-short-doc ()
+  "Toggle short doc display in helm-M-x."
   (interactive)
   (setq helm-M-x-show-short-doc (not helm-M-x-show-short-doc))
   (helm-update (concat "^" (helm-get-selection))))
+(put 'helm-M-x-toggle-short-doc 'no-helm-mx t)
 
 (defun helm-M-x-transformer-1 (candidates &optional sort ignore-props)
   "Transformer function to show bindings in emacs commands.
