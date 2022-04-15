@@ -138,44 +138,44 @@ algorithm."
     (cl-loop with max-len = (when helm-M-x-show-short-doc
                               (cl-loop for i in candidates maximize (length i)))
              with local-map = (helm-M-x-current-mode-map-alist)
-          for cand in candidates
-          for local-key  = (car (rassq cand local-map))
-          for key        = (substitute-command-keys (format "\\[%s]" cand))
-          for sym        = (intern (if (consp cand) (car cand) cand))
-          for doc = (when max-len
-                      (helm-get-first-line-documentation (intern-soft cand)))   
-          for disp       = (if (or (eq sym major-mode)
-                                   (and (memq sym minor-mode-list)
-                                        (boundp sym)
-                                        (buffer-local-value sym helm-current-buffer)))
-                               (propertize cand 'face 'helm-command-active-mode)
-                             cand)
-          unless (and (null ignore-props) (or (get sym 'helm-only) (get sym 'no-helm-mx)))
-          collect
-          (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (format "%s %s %s %s"
-                               disp
-                               (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
-                               (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                               (propertize
-                                " " 'display
-                                (propertize local-key 'face 'helm-M-x-key))))
-                      ((string-match "^M-x" key)
-                       (format "%s %s %s"
-                               disp
-                               (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
-                               (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
-                      (t (format "%s %s %s %s"
-                                 disp
-                                 (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
-                                 (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
-                                 (propertize
-                                  " " 'display
-                                  (propertize key 'face 'helm-M-x-key)))))
-                cand)
-          into ls
-          finally return
-          (if sort (sort ls #'helm-generic-sort-fn) ls))))
+             for cand in candidates
+             for local-key  = (car (rassq cand local-map))
+             for key        = (substitute-command-keys (format "\\[%s]" cand))
+             for sym        = (intern (if (consp cand) (car cand) cand))
+             for doc = (when max-len
+                         (helm-get-first-line-documentation (intern-soft cand)))   
+             for disp       = (if (or (eq sym major-mode)
+                                      (and (memq sym minor-mode-list)
+                                           (boundp sym)
+                                           (buffer-local-value sym helm-current-buffer)))
+                                  (propertize cand 'face 'helm-command-active-mode)
+                                cand)
+             unless (and (null ignore-props) (or (get sym 'helm-only) (get sym 'no-helm-mx)))
+             collect
+             (cons (cond ((and (string-match "^M-x" key) local-key)
+                          (format "%s %s %s %s"
+                                  disp
+                                  (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                                  (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                                  (propertize
+                                   " " 'display
+                                   (propertize local-key 'face 'helm-M-x-key))))
+                         ((string-match "^M-x" key)
+                          (format "%s %s %s"
+                                  disp
+                                  (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                                  (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
+                         (t (format "%s %s %s %s"
+                                    disp
+                                    (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                                    (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                                    (propertize
+                                     " " 'display
+                                     (propertize key 'face 'helm-M-x-key)))))
+                   cand)
+             into ls
+             finally return
+             (if sort (sort ls #'helm-generic-sort-fn) ls))))
 
 (defun helm-M-x-transformer (candidates _source)
   "Transformer function for `helm-M-x' candidates."
