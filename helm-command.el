@@ -42,6 +42,22 @@
   "Helm-M-x fuzzy matching when non nil."
   :group 'helm-command
   :type 'boolean)
+
+(defvar helm-M-x-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-comp-read-map)
+    (define-key map (kbd "C-u") nil)
+    (define-key map (kbd "C-u") 'helm-M-x-universal-argument)
+    (define-key map (kbd "C-]") 'helm-M-x-toggle-short-doc)
+    map))
+
+(defcustom helm-M-x-show-short-doc nil
+  "Show short docstring of command when non nil.
+This value can be toggled with
+\\<helm-M-x-map>\\[helm-M-x-toggle-short-doc] while in helm-M-x session."
+  :group 'helm-command
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -63,6 +79,10 @@
   "Face used by `helm-M-x' for activated modes."
   :group 'helm-command-faces)
 
+(defface helm-M-x-short-doc
+    '((t :box (:line-width -1) :foreground "DimGray"))
+    "Face used by `helm-M-x' for short docstring."
+  :group 'helm-command-faces)
 
 (defvar helm-M-x-input-history nil)
 (defvar helm-M-x-prefix-argument nil
@@ -101,6 +121,10 @@ Return nil if no mode-map found."
     (when (and map-sym (boundp map-sym))
       (helm-M-x-get-major-mode-command-alist (symbol-value map-sym)))))
 
+(defun helm-M-x-toggle-short-doc ()
+  (interactive)
+  (setq helm-M-x-show-short-doc (not helm-M-x-show-short-doc))
+  (helm-update (concat "^" (helm-get-selection))))
 
 (defun helm-M-x-transformer-1 (candidates &optional sort ignore-props)
   "Transformer function to show bindings in emacs commands.
@@ -111,11 +135,15 @@ Note that SORT should not be used when fuzzy matching because
 fuzzy matching is running its own sort function with a different
 algorithm."
   (with-helm-current-buffer
-    (cl-loop with local-map = (helm-M-x-current-mode-map-alist)
+    (cl-loop with max-len = (when helm-M-x-show-short-doc
+                              (cl-loop for i in candidates maximize (length i)))
+             with local-map = (helm-M-x-current-mode-map-alist)
           for cand in candidates
           for local-key  = (car (rassq cand local-map))
           for key        = (substitute-command-keys (format "\\[%s]" cand))
           for sym        = (intern (if (consp cand) (car cand) cand))
+          for doc = (when max-len
+                      (helm-get-first-line-documentation (intern-soft cand)))   
           for disp       = (if (or (eq sym major-mode)
                                    (and (memq sym minor-mode-list)
                                         (boundp sym)
@@ -125,15 +153,25 @@ algorithm."
           unless (and (null ignore-props) (or (get sym 'helm-only) (get sym 'no-helm-mx)))
           collect
           (cons (cond ((and (string-match "^M-x" key) local-key)
-                       (format "%s %s"
-                               disp (propertize
-                                     " " 'display
-                                     (propertize local-key 'face 'helm-M-x-key))))
-                      ((string-match "^M-x" key) disp)
-                      (t (format "%s %s"
-                                 disp (propertize
-                                       " " 'display
-                                       (propertize key 'face 'helm-M-x-key)))))
+                       (format "%s %s %s %s"
+                               disp
+                               (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                               (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                               (propertize
+                                " " 'display
+                                (propertize local-key 'face 'helm-M-x-key))))
+                      ((string-match "^M-x" key)
+                       (format "%s %s %s"
+                               disp
+                               (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                               (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
+                      (t (format "%s %s %s %s"
+                                 disp
+                                 (if doc (make-string (+ 2 (- max-len (+ (length cand)))) ? ) "")
+                                 (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
+                                 (propertize
+                                  " " 'display
+                                  (propertize key 'face 'helm-M-x-key)))))
                 cand)
           into ls
           finally return
@@ -174,13 +212,6 @@ algorithm."
         (while (re-search-forward "Preconfigured" nil t)
           (push (substring (helm-cmd--get-current-function-name) 1) results))))
     results))
-
-(defvar helm-M-x-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-comp-read-map)
-    (define-key map (kbd "C-u") nil)
-    (define-key map (kbd "C-u") 'helm-M-x-universal-argument)
-    map))
 
 (defun helm-M-x-universal-argument ()
   "Same as `universal-argument' but for `helm-M-x'."
