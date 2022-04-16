@@ -65,9 +65,10 @@ properly according to your settings."
                                         (cpu . 8)
                                         (user . 1))
   "Allow defining which column to use when sorting output of top/ps command.
-Only com, mem, cpu and user are sorted, so no need to put something else there,
-it will have no effect.
-Note that column numbers are counted from zero, i.e. column 1 is the nth 0 column."
+Only com, mem, cpu and user are sorted, so no need to put something
+else there,it will have no effect.
+Note that column numbers are counted from zero, i.e. column 1 is the
+nth 0 column."
   :group 'helm-sys
   :type '(alist :key-type symbol :value-type (integer :tag "Column number")))
 
