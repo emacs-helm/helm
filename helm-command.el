@@ -125,7 +125,7 @@ Return nil if no mode-map found."
   "Toggle short doc display in helm-M-x."
   (interactive)
   (setq helm-M-x-show-short-doc (not helm-M-x-show-short-doc))
-  (helm-update (concat "^" (helm-get-selection))))
+  (helm-update (concat "^" (helm-get-selection)) (helm-get-current-source)))
 (put 'helm-M-x-toggle-short-doc 'no-helm-mx t)
 
 (defun helm-M-x-transformer-1 (candidates &optional sort ignore-props)
