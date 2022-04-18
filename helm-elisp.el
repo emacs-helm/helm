@@ -32,6 +32,7 @@
 (declare-function helm-read-file-name "helm-mode")
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-M-x-transformer-no-sort-no-props "helm-command")
+(defvar helm-M-x-show-short-doc)
 
 ;;; Customizable values
 
@@ -740,13 +741,14 @@ In non interactives calls DEFAULT argument should be provided as
 a string, i.e. the `symbol-name' of any existing symbol."
   (interactive (list (with-syntax-table emacs-lisp-mode-syntax-table
                        (thing-at-point 'symbol))))
-  (helm :sources
-        (mapcar (lambda (func)
-                  (funcall func default))
-                helm-apropos-function-list)
-        :history 'helm-apropos-history
-        :buffer "*helm apropos*"
-        :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>"))))
+  (let (helm-M-x-show-short-doc)
+    (helm :sources
+          (mapcar (lambda (func)
+                    (funcall func default))
+                  helm-apropos-function-list)
+          :history 'helm-apropos-history
+          :buffer "*helm apropos*"
+          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
 
 
 ;;; Advices
