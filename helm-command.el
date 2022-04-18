@@ -70,7 +70,7 @@ This value can be toggled with
 
 (defface helm-M-x-key
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :foreground "orange" :underline t))
+       :foreground "orange" :box (:line-width -1)))
   "Face used in helm-M-x to show keybinding."
   :group 'helm-command-faces)
 
