@@ -6105,7 +6105,6 @@ list."
   (let ((src (helm-build-sync-source "File name history"
                :init (lambda ()
                        (with-helm-alive-p
-                         (require 'tramp-archive nil t)
                          (when helm-ff-file-name-history-use-recentf
                            (require 'recentf)
                            (or recentf-mode (recentf-mode 1)))))
