@@ -3637,10 +3637,10 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
       ;; FIXME: some multi-match methods may not work here.
       (dir-p (concat (regexp-quote bd) " " (regexp-quote bn)))
       ((or (not (helm-ff-fuzzy-matching-p))
-           (string-match "\\s-" bn))    ; Fall back to multi-match.
-       (concat (regexp-quote bd) bn))
+           (string-match "[ !]" bn))    ; Fall back to multi-match.
+       (concat (regexp-quote bd) " " bn))
       ((or (string-match "[*][.]?.*" bn) ; Allow entering wildcard.
-           (string-match "/$" pattern)     ; Allow mkdir.
+           (string-match "/\\'" pattern)     ; Allow mkdir.
            (string-match helm-ff-url-regexp pattern)
            (and (string= helm-ff-default-directory "/") tramp-p))
        ;; Don't treat wildcards ("*") as regexp char.
