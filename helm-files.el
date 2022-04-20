@@ -3671,35 +3671,6 @@ Note that only existing directories are saved here."
     (push helm-ff-default-directory helm-ff-history)))
 (add-hook 'helm-cleanup-hook 'helm-ff-save-history)
 
-(defun helm-files-save-file-name-history (&optional force)
-  "Save marked files to `file-name-history'."
-  (let* ((src (helm-get-current-source))
-         (src-name (assoc-default 'name src)))
-    (when (or force (helm-file-completion-source-p src)
-              (member src-name helm-files-save-history-extra-sources))
-      (let ((mkd (helm-marked-candidates :with-wildcard t))
-            (history-delete-duplicates t))
-        (cl-loop for sel in mkd
-                 when (and sel
-                           (stringp sel)
-                           ;; If file was one of HFF candidates assume it
-                           ;; is an existing file, so no need to call
-                           ;; file-exists-p which is costly on remote candidates.
-                           ;; (file-exists-p sel)
-                           (not (helm-ff--file-directory-p sel))
-                           ;; When creating a new directory previous test
-                           ;; check for file-directory-p BEFORE its
-                           ;; creation, so check for ending slash as
-                           ;; well to know if it is a future directory.
-                           (not (string-match "/\\'" sel)))
-                 do
-                 ;; we use `abbreviate-file-name' here because
-                 ;; other parts of Emacs seems to,
-                 ;; and we don't want to introduce duplicates.
-                 (add-to-history 'file-name-history
-                                 (abbreviate-file-name sel)))))))
-(add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
-
 (defun helm-ff-valid-symlink-p (file &optional link)
   "Returns the truename of FILE if it exists.
 If we already know the truename of FILE we can pass it with LINK arg
@@ -6034,6 +6005,35 @@ list."
 ;;
 ;;
 (defvar helm--file-name-history-hide-deleted nil)
+
+(defun helm-files-save-file-name-history (&optional force)
+  "Save marked files to `file-name-history'."
+  (let* ((src (helm-get-current-source))
+         (src-name (assoc-default 'name src)))
+    (when (or force (helm-file-completion-source-p src)
+              (member src-name helm-files-save-history-extra-sources))
+      (let ((mkd (helm-marked-candidates :with-wildcard t))
+            (history-delete-duplicates t))
+        (cl-loop for sel in mkd
+                 when (and sel
+                           (stringp sel)
+                           ;; If file was one of HFF candidates assume it
+                           ;; is an existing file, so no need to call
+                           ;; file-exists-p which is costly on remote candidates.
+                           ;; (file-exists-p sel)
+                           (not (helm-ff--file-directory-p sel))
+                           ;; When creating a new directory previous test
+                           ;; check for file-directory-p BEFORE its
+                           ;; creation, so check for ending slash as
+                           ;; well to know if it is a future directory.
+                           (not (string-match "/\\'" sel)))
+                 do
+                 ;; we use `abbreviate-file-name' here because
+                 ;; other parts of Emacs seems to,
+                 ;; and we don't want to introduce duplicates.
+                 (add-to-history 'file-name-history
+                                 (abbreviate-file-name sel)))))))
+(add-hook 'helm-exit-minibuffer-hook 'helm-files-save-file-name-history)
 
 (defvar helm-source-file-name-history
   (helm-build-sync-source "File Name History"
