@@ -6641,6 +6641,13 @@ before running again the init function."
                       (buffer-live-p (get-buffer it))
                       it)))))
 
+(defvar helm-candidate-buffer-longest-len 0
+  "May store the longest length of candidates in a in-buffer source.
+It is a local variable set from `helm-init-candidates-in-buffer' in
+`helm-candidate-buffer'.
+Allow getting the longest length of initial candidates in transformers
+without looping again through the whole list.")
+
 (defun helm-init-candidates-in-buffer (buffer-spec data)
   "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.
 
@@ -6666,9 +6673,13 @@ when initializing a source with `helm-source-in-buffer' class."
         (erase-buffer)
         (cond ((listp data)
                (insert (mapconcat (lambda (i)
-                                    (cond ((symbolp i) (symbol-name i))
-                                          ((numberp i) (number-to-string i))
-                                          (t i)))
+                                    (let ((cand (cond ((symbolp i) (symbol-name i))
+                                                      ((numberp i) (number-to-string i))
+                                                      (t i))))
+                                      (setq-local helm-candidate-buffer-longest-len
+                                                  (max helm-candidate-buffer-longest-len
+                                                       (length cand)))
+                                      cand))
                                   data "\n")))
               ((stringp data) (insert data))))
       buf)))
