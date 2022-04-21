@@ -423,7 +423,8 @@ If SYM is not documented, return \"Not documented\"."
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
              (not (string-match-p "^\n\n" doc)))
-        (car (split-string doc "\n"))
+        ;; Some commands specify key bindings in their first line.
+        (substitute-command-keys (car (split-string doc "\n")))
       "Not documented")))
 
 ;;; File completion.
