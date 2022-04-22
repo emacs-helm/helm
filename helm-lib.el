@@ -97,8 +97,8 @@ already provided by \\<helm-map>\\[next-history-element]."
   :group 'helm)
 
 (defcustom helm-scroll-amount nil
-  "Scroll amount when scrolling other window in a helm session.
-It is used by `helm-scroll-other-window'
+  "Scroll amount when scrolling helm window or other window in a helm session.
+It is used by `helm-scroll-other-window', `helm-scroll-up', `helm-scroll-down'
 and `helm-scroll-other-window-down'.
 
 If you prefer scrolling line by line, set this value to 1."

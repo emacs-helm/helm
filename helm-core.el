@@ -213,8 +213,8 @@ and vectors, so don't use strings to define them."
     (define-key map (kbd "<C-up>")     'helm-follow-action-backward)
     (define-key map (kbd "<prior>")    'helm-previous-page)
     (define-key map (kbd "<next>")     'helm-next-page)
-    (define-key map (kbd "M-v")        'helm-previous-page)
-    (define-key map (kbd "C-v")        'helm-next-page)
+    (define-key map (kbd "M-v")        'helm-scroll-up)
+    (define-key map (kbd "C-v")        'helm-scroll-down)
     (define-key map (kbd "M-<")        'helm-beginning-of-buffer)
     (define-key map (kbd "M->")        'helm-end-of-buffer)
     (define-key map (kbd "C-g")        'helm-keyboard-quit)
@@ -5790,12 +5790,12 @@ Key arg DIRECTION can be one of:
 
 (defun helm-move--previous-page-fn ()
   (condition-case nil
-      (scroll-down)
+      (scroll-down helm-scroll-amount)
     (beginning-of-buffer (goto-char (point-min)))))
 
 (defun helm-move--next-page-fn ()
   (condition-case nil
-      (scroll-up)
+      (scroll-up helm-scroll-amount)
     (end-of-buffer (goto-char (point-max)))))
 
 (defun helm-move--beginning-of-buffer-fn ()
@@ -5885,18 +5885,34 @@ next source)."
     (helm--next-or-previous-line 'next arg)))
 (put 'helm-next-line 'helm-only t)
 
+(defun helm-scroll-up ()
+  "Scroll up helm-buffer by `helm-scroll-amount' lines."
+  (interactive)
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'page :direction 'previous)))
+(put 'helm-scroll-up 'helm-only t)
+
 (defun helm-previous-page ()
   "Move selection back with a pageful."
   (interactive)
   (with-helm-alive-p
-    (helm-move-selection-common :where 'page :direction 'previous)))
+    (let (helm-scroll-amount)
+      (helm-move-selection-common :where 'page :direction 'previous))))
 (put 'helm-previous-page 'helm-only t)
+
+(defun helm-scroll-down ()
+  "Scroll down helm-buffer by `helm-scroll-amount' lines."
+  (interactive)
+  (with-helm-alive-p
+    (helm-move-selection-common :where 'page :direction 'next)))
+(put 'helm-scroll-down 'helm-only t)
 
 (defun helm-next-page ()
   "Move selection forward with a pageful."
   (interactive)
   (with-helm-alive-p
-    (helm-move-selection-common :where 'page :direction 'next)))
+    (let (helm-scroll-amount)
+      (helm-move-selection-common :where 'page :direction 'next))))
 (put 'helm-next-page 'helm-only t)
 
 (defun helm-beginning-of-buffer ()
