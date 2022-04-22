@@ -1771,6 +1771,10 @@ The hook should takes one arg SOURCES.")
 
 (defvar helm-help-buffer-name "*Helm Help*"
   "The name of helm help buffer.")
+
+;; See bug#2503.
+(defvar helm-process-output-split-string-separator "\n"
+  "Separator to use when splitting helm async output.")
 
 ;;; Internal Variables
 ;;
@@ -5205,7 +5209,8 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
 (defun helm-output-filter--process-source (process output-string source limit)
   (cl-dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
-                          (split-string output-string "\n")
+                          (split-string output-string
+                                        helm-process-output-split-string-separator)
                           (assq 'incomplete-line source))
                          source t))
     (setq candidate
