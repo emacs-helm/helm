@@ -283,6 +283,9 @@ Info files are made available."
 (defun helm-info-at-point ()
   "Preconfigured `helm' for searching info at point."
   (interactive)
+  ;; Symbol at point is used as default as long as one of the sources
+  ;; in `helm-info-default-sources' is member of
+  ;; `helm-sources-using-default-as-input'.
   (cl-loop for src in helm-info-default-sources
            for name = (if (symbolp src)
                           (assoc 'name (symbol-value src))
