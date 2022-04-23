@@ -51,6 +51,9 @@ files with `helm-info-at-point'."
 ;;; Build info-index sources with `helm-info-source' class.
 
 (cl-defun helm-info-init (&optional (file (helm-get-attr 'info-file)))
+  "Initialize candidates for info FILE.
+If FILE have nodes, loop through all nodes and accumulate candidates
+found in each node, otherwise scan only the current info buffer."
   ;; Allow reinit candidate buffer when using edebug.
   (helm-aif (and debug-on-error
                  (helm-candidate-buffer))
@@ -59,41 +62,67 @@ files with `helm-info-at-point'."
     (save-selected-window
       (info file " *helm info temp buffer*")
       (let ((tobuf (helm-candidate-buffer 'global))
-            Info-history
-            start end line)
-        (cl-dolist (node (Info-index-nodes))
-          (Info-goto-node node)
-          (goto-char (point-min))
-          (while (search-forward "\n* " nil t)
-            (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
-              (setq start (point-at-bol)
-                    ;; Fix Bug#1503 by getting the invisible
-                    ;; info displayed on next line in long strings.
-                    ;; e.g "* Foo.\n   (line 12)" instead of
-                    ;;     "* Foo.(line 12)"
-                    end (or (save-excursion
-                              (goto-char (point-at-bol))
-                              (re-search-forward "(line +[0-9]+)" nil t))
-                            (point-at-eol))
-                    ;; Long string have a new line inserted before the
-                    ;; invisible spec, remove it.
-                    line (replace-regexp-in-string
-                          "\n" "" (buffer-substring start end)))
-              (with-current-buffer tobuf
-                (insert line)
-                (insert "\n")))))
+            Info-history)
+        (helm-aif (Info-index-nodes)
+            (cl-dolist (node it)
+              (Info-goto-node node)
+              (helm-info-scan-current-buffer tobuf))
+          (helm-info-scan-current-buffer tobuf))
         (bury-buffer)))))
 
+(defun helm-info-scan-current-buffer (tobuf)
+  "Scan current info buffer and print lines to TOBUF.
+Argument TOBUF is the `helm-candidate-buffer'."
+  (let (start end line)
+    (goto-char (point-min))
+    (while (search-forward "\n* " nil t)
+      (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
+        (setq start (point-at-bol)
+              ;; Fix Bug#1503 by getting the invisible
+              ;; info displayed on next line in long strings.
+              ;; e.g "* Foo.\n   (line 12)" instead of
+              ;;     "* Foo.(line 12)"
+              end (or (save-excursion
+                        (goto-char (point-at-bol))
+                        (re-search-forward "(line +[0-9]+)" nil t))
+                      (point-at-eol))
+              ;; Long string have a new line inserted before the
+              ;; invisible spec, remove it.
+              line (replace-regexp-in-string
+                    "\n" "" (buffer-substring start end)))
+        (with-current-buffer tobuf
+          (insert line)
+          (insert "\n"))))))
+
 (defun helm-info-goto (node-line)
+  "The helm-info action to jump to NODE-LINE."
   (Info-goto-node (car node-line))
   (helm-goto-line (cdr node-line)))
 
+(defvar helm-info--node-regexp
+  "^\\* +\\(.+\\):[ \\t]+\\(.*\\)\\(?:[ \\t]*\\)(line +\\([0-9]+\\))"
+  "A regexp that should match file name, node name and line number in
+a line like this:
+
+\* bind:                                  Bash Builtins.       (line  21).")
+
 (defun helm-info-display-to-real (line)
-  (and (string-match
-        ;; This regexp is stolen from Info-apropos-matches
-        "\\* +\\([^\n]*.+[^\n]*\\):[ \t]+\\([^\n]*\\)\\.\\(?:[ \t\n]*(line +\\([0-9]+\\))\\)?" line)
-       (cons (format "(%s)%s" (helm-get-attr 'info-file) (match-string 2 line))
-             (string-to-number (or (match-string 3 line) "1")))))
+  "Transform LINE to an acceptable argument for `info'.
+If line have a node use the node, otherwise use directly first name found."
+  (let (nodename linum)
+    (when (string-match helm-info--node-regexp line)
+      (setq nodename (match-string 2 line)
+            linum    (match-string 3 line)))
+    (if nodename
+        (cons (format "(%s)%s"
+                      (helm-get-attr 'info-file)
+                      (replace-regexp-in-string ":\\'" "" nodename))
+              (string-to-number (or linum "1")))
+      (cons (format "(%s)%s"
+                    (helm-get-attr 'info-file)
+                    (helm-aand (replace-regexp-in-string "^* " "" line)
+                               (replace-regexp-in-string "::?.*\\'" "" it)))
+            1))))
 
 (defclass helm-info-source (helm-source-in-buffer)
   ((info-file :initarg :info-file
