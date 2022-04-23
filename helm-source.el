@@ -44,22 +44,15 @@
 ;;  Make Classes's docstrings more readable by removing al the
 ;;  unnecessary crap.
 
-(defun helm-source--cl--print-table-27 (_header rows)
+(defun helm-source--cl--print-table (&rest args)
   "Advice for `cl--print-table' to make readable class slots docstrings."
-  (let ((format "%s\n\n  Initform=%s\n\n%s"))
-    (dolist (row rows)
-      (setcar row (propertize (car row) 'face 'bold))
-      (setcdr row (nthcdr 1 (cdr row)))
-      (insert "\n* " (apply #'format format row) "\n"))))
-
-(defun helm-source--cl--print-table-28 (_header rows &optional _unused)
-  "Advice for `cl--print-table' to make readable class slots docstrings."
-  (let ((format "%s\n\n  Initform=%s\n\n%s"))
-    (dolist (row rows)
-      (setcar row (propertize (car row) 'face 'bold))
-      (setcdr row (nthcdr 1 (cdr row)))
-      (insert "\n* " (apply #'format format row) "\n"))))
-
+  (cl-flet ((print-rows (rows)
+              (let ((format "%s\n\n  Initform=%s\n\n%s"))
+                (dolist (row rows)
+                  (setcar row (propertize (car row) 'face 'bold))
+                  (setcdr row (nthcdr 1 (cdr row)))
+                  (insert "\n* " (apply #'format format row) "\n")))))
+    (print-rows (cadr args))))
 
 (cl-defgeneric helm--setup-source (source)
   "Prepare slots and handle slot errors before creating a helm source.")
