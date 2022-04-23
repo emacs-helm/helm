@@ -42,7 +42,8 @@
 (declare-function helm-log-run-hook "helm-core.el")
 (declare-function helm-marked-candidates "helm-core.el")
 (declare-function helm-set-case-fold-search "helm-core.el")
-(declare-function helm-source--cl--print-table "helm-source.el")
+(declare-function helm-source--cl--print-table-27 "helm-source.el")
+(declare-function helm-source--cl--print-table-28 "helm-source.el")
 (declare-function helm-update "helm-core.el")
 (declare-function org-content "org.el")
 (declare-function org-mark-ring-goto "org.el")
@@ -1215,11 +1216,14 @@ Example:
 
 (defun helm-describe-class (class)
   "Display documentation of Eieio CLASS, a symbol or a string."
-  (advice-add 'cl--print-table :override #'helm-source--cl--print-table '((depth . 100)))
-  (unwind-protect
-       (let ((helm-describe-function-function 'describe-function))
-         (helm-describe-function class))
-    (advice-remove 'cl--print-table #'helm-source--cl--print-table)))
+  (let ((fun (if (eq emacs-major-version 28)
+                 #'helm-source--cl--print-table-28
+               #'helm-source--cl--print-table-27)))
+    (advice-add 'cl--print-table :override fun '((depth . 100)))
+    (unwind-protect
+         (let ((helm-describe-function-function 'describe-function))
+           (helm-describe-function class))
+      (advice-remove 'cl--print-table fun))))
 
 (defun helm-describe-function (func)
   "Display documentation of FUNC, a symbol or string."
