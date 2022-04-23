@@ -249,7 +249,19 @@ algorithm."
    (persistent-help :initform "Describe this command")
    (help-message :initform 'helm-M-x-help-message)
    (nomark :initform t)
-   (keymap :initform 'helm-M-x-map)))
+   (cleanup :initform #'helm-M-x--unwind-forms)
+   (keymap :initform 'helm-M-x-map)
+   (resume :initform 'helm-M-x-resume-fn)))
+
+(defun helm-M-x-resume-fn ()
+  (when (and helm-M-x--timer (timerp helm-M-x--timer))
+    (cancel-timer helm-M-x--timer)
+    (setq helm-M-x--timer nil))
+  (setq helm-M-x--timer (run-at-time 1 0.1 'helm-M-x--notify-prefix-arg))
+  (setq helm--mode-line-display-prefarg t)
+  ;; Prevent displaying a wrong prefix arg when helm-resume is called
+  ;; from prefix arg.
+  (setq current-prefix-arg nil))
 
 (defun helm-M-x-read-extended-command (collection &optional predicate history)
   "Read or execute action on command name in COLLECTION or HISTORY.
@@ -265,8 +277,8 @@ Arg COLLECTION should be an `obarray' but can be any object
 suitable for `try-completion'.  Arg PREDICATE is a function that
 default to `commandp' see also `try-completion'.  Arg HISTORY
 default to `extended-command-history'."
-  (let* ((helm--mode-line-display-prefarg t)
-         (pred (or predicate #'commandp))
+  (setq helm--mode-line-display-prefarg t)
+  (let* ((pred (or predicate #'commandp))
          (helm-fuzzy-sort-fn (lambda (candidates _source)
                                ;; Sort on real candidate otherwise
                                ;; "symbol (<binding>)" is used when sorting.
