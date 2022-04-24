@@ -2258,9 +2258,16 @@ marking it (`C-c u' or `RET') .
 
 ** Tips
 
-*** You can get help on any command with persistent action (\\<helm-map>\\[helm-execute-persistent-action])
+*** Display docstring without quitting session (persistent action)
 
-*** You can toggle short docstring description with \\<helm-M-x-map>\\[helm-M-x-toggle-short-doc].
+You can get help on any command with persistent action (\\<helm-map>\\[helm-execute-persistent-action])
+
+*** Display short docstring in helm buffer
+
+You can toggle short docstring description with \\<helm-M-x-map>\\[helm-M-x-toggle-short-doc].
+if you want this at startup you can configure `helm-M-x-show-short-doc'.
+
+NOTE: helm-M-x will be slower with this enabled.
 
 *** History source
 
@@ -2271,6 +2278,19 @@ displayed in first position, however you can put it in second
 position if you don't like that by customizing
 `helm-M-x-reverse-history'.
 
+**** Duplicate entries in helm-M-x history
+
+helm-M-x history obey to history variables, if you have
+duplicates in your helm-M-x history set `history-delete-duplicates' to non nil.
+
+**** Number of entries in history
+
+The number of entries saved is controlled by `history-length'
+global value, however if you want a different value for
+`extended-command-history' e.g. 50 you can add to your config:
+
+    (put 'extended-command-history 'history-length 50)
+
 *** Enabled modes are highlighted in helm-M-x
 
 *** Prefix arguments
@@ -2278,8 +2298,9 @@ position if you don't like that by customizing
 You can pass prefix arguments *after* starting `helm-M-x'.  A mode-line
 counter will display the number of given prefix arguments.
 
-If you pass prefix arguments before running `helm-M-x', it will be displayed in the prompt.
-The first `\\[universal-argument]' after `helm-M-x' clears those prefix arguments.
+If you pass prefix arguments before running `helm-M-x', it will
+be displayed in the prompt.
+The first `\\<global-map>\\[universal-argument]' after `helm-M-x' clears those prefix arguments.
 
 NOTE: When you specify prefix arguments once `helm-M-x' is
 started, the prefix argument apply on the next command, so if you
@@ -2287,12 +2308,8 @@ hit RET, it will apply on the selected command, but if you type a
 new character at prompt to narrow down further candidates, the
 prefix arg will apply to `self-insert-command' (e.g. if you type
 `C-u e' \"eeee\" will be inserted in prompt) so select the
-command you want to execute before specifying prefix arg.
+command you want to execute before specifying prefix arg.")
 
-*** Duplicate entries in helm-M-x history
-
-helm-M-x history obey to history variables, if you have
-duplicates in your helm-M-x history set `history-delete-duplicates' to non nil.")
 
 ;;; Helm imenu
 ;;
