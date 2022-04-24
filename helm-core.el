@@ -6338,12 +6338,14 @@ delete minibuffer contents from point instead of deleting all.
 With a prefix arg reverse this behaviour.  When at the end of
 minibuffer, delete all."
   (interactive "P")
-  (let ((str (if helm-delete-minibuffer-contents-from-point
-                 (if (or arg (eobp))
-                     "" (helm-minibuffer-completion-contents))
-               (if (and arg (not (eobp)))
-                   (helm-minibuffer-completion-contents) ""))))
-    (helm--delete-minibuffer-contents-from str)))
+  (with-helm-alive-p
+    (let ((str (if helm-delete-minibuffer-contents-from-point
+                   (if (or arg (eobp))
+                       "" (helm-minibuffer-completion-contents))
+                 (if (and arg (not (eobp)))
+                     (helm-minibuffer-completion-contents) ""))))
+      (helm--delete-minibuffer-contents-from str))))
+(put 'helm-delete-minibuffer-contents 'no-helm-mx t)
 
 
 ;;; helm-source-in-buffer.
