@@ -1473,7 +1473,8 @@ you DO NOT need these packages to display helm buffers in frames.
 
 ** Helm's basic operations and default key bindings
 
-| Key| Command                                                                                                     |
+| Key| Command|
+|----+--------|
 |                                                                                                                  |
 | \\[helm-previous-line]| Previous line                                                                            |
 | \\[helm-next-line]| Next line                                                                                    |
