@@ -1142,7 +1142,7 @@ size of `helm-debug-buffer' grows quickly.")
 \\[helm-help]:Help \
 \\[helm-select-action]:Act \
 \\[helm-maybe-exit-minibuffer]/\
-f1/f2/f-n:NthAct \
+f1..f12:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend \
 \\[helm-customize-group]:Conf"
   "Help string displayed by Helm in the mode-line.
@@ -1473,22 +1473,33 @@ you DO NOT need these packages to display helm buffers in frames.
 
 ** Helm's basic operations and default key bindings
 
-| Key     | Alternative Keys | Command                                                              |
-|---------+------------------+----------------------------------------------------------------------|
-| C-p     | Up               | Previous line                                                        |
-| C-n     | Down             | Next line                                                            |
-| M-v     | prior            | Previous page                                                        |
-| C-v     | next             | Next page                                                            |
-| Enter   |                  | Execute first (default) action / Select [1]                          |
-| M-<     |                  | First line                                                           |
-| M->     |                  | Last line                                                            |
-| C-M-S-v | M-prior, C-M-y   | Previous page (other-window)                                         |
-| C-M-v   | M-next           | Next page (other-window)                                             |
-| Tab     | C-i              | Show action list                                                     |
-| M-o     | left             | Previous source                                                      |
-| C-o     | right            | Next source                                                          |
-| C-k     |                  | Delete pattern (with prefix arg delete from point to end or all [2]) |
-| C-j     |                  | Persistent action (Execute and keep Helm session)                    |
+| Key| Command                                                                                                     |
+|                                                                                                                  |
+| \\[helm-previous-line]| Previous line                                                                            |
+| \\[helm-next-line]| Next line                                                                                    |
+| \\[helm-scroll-up]| Scroll up                                                                                    |
+| \\[helm-scroll-down]| Scroll down                                                                                |
+| \\[helm-scroll-other-window]| Scroll up other-window                                                             |
+| \\[helm-scroll-other-window-down]| Scroll down other-window                                                      |
+| \\[helm-maybe-exit-minibuffer]| Execute first (default) action / Select [1]                                      |
+| \\[helm-beginning-of-buffer]| Goto beginning of buffer                                                           |
+| \\[helm-end-of-buffer]| Goto end of buffer                                                                       |
+| \\[helm-select-action]| Show actions menu                                                                        |
+| \\[helm-previous-source]| Previous source                                                                        |
+| \\[helm-next-source]| Next source                                                                                |
+| \\[helm-delete-minibuffer-contents]| Delete pattern (with prefix arg delete from point to end or all [2])        |
+| \\[helm-execute-persistent-action]| Persistent action (Execute and keep Helm session)                            |
+|\\[helm-toggle-resplit-and-swap-windows]|Rotate or swap windows.                                                  |
+|\\[helm-exchange-minibuffer-and-header-line]|Exchange minibuffer and header-line.                                 |
+|\\[helm-quit-and-find-file]|Drop into `helm-find-files'.                                                          |
+|\\[helm-kill-selection-and-quit]|Kill display value of candidate and quit (with prefix arg, kill the real value). |
+|\\[helm-yank-selection]|Yank current selection into pattern.                                                      |
+|\\[helm-insert-or-copy]|Insert or copy marked candidates (C-u) .                                                  |
+|\\[helm-follow-mode]|Toggle automatic execution of persistent action.                                             |
+|\\[helm-follow-action-forward]|Run persistent action then select next line.                                       |
+|\\[helm-follow-action-backward]|Run persistent action then select previous line.                                  |
+|\\[helm-refresh]|Recalculate and redisplay candidates.                                                            |
+|\\[helm-toggle-suspend-update]|Toggle candidate updates.                                                          |
 
 \[1] Behavior may change depending context in some source e.g. `helm-find-files'.
 
@@ -1616,22 +1627,6 @@ enabling `helm-follow-mode', you can use
 \\[helm-follow-action-backward] instead.  Conversely, when
 `helm-follow-mode' is enabled, those commands go to previous/next
 line without executing the persistent action.
-
-** Frequently Used Commands
-
-|Keys|Description
-|-----------+----------|
-|\\[helm-toggle-resplit-and-swap-windows]|Toggle vertical/horizontal split on first hit and swap Helm window on second hit.
-|\\[helm-exchange-minibuffer-and-header-line]|Exchange minibuffer and header-line.
-|\\[helm-quit-and-find-file]|Drop into `helm-find-files'.
-|\\[helm-kill-selection-and-quit]|Kill display value of candidate and quit (with prefix arg, kill the real value).
-|\\[helm-yank-selection]|Yank current selection into pattern.
-|\\[helm-insert-or-copy]|Insert or copy marked candidates (C-u) .
-|\\[helm-follow-mode]|Toggle automatic execution of persistent action.
-|\\[helm-follow-action-forward]|Run persistent action then select next line.
-|\\[helm-follow-action-backward]|Run persistent action then select previous line.
-|\\[helm-refresh]|Recalculate and redisplay candidates.
-|\\[helm-toggle-suspend-update]|Toggle candidate updates.
 
 ** Special yes, no or yes for all answers
 
