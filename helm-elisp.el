@@ -406,9 +406,11 @@ the same time to variable and a function."
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
-(defun helm-get-first-line-documentation (sym &optional name)
-  "Return first line documentation of symbol SYM.
-If SYM is not documented, return \"Not documented\"."
+(cl-defun helm-get-first-line-documentation (sym &optional name (end-column 72))
+  "Return first line documentation of symbol SYM truncated at END-COLUMN.
+If SYM is not documented, return \"Not documented\".
+Argument NAME allows specifiying what function to use to display
+documentation when SYM name is the same for function and variable."
   (let ((doc (cl-typecase sym
                ((and fboundp boundp)
                 (cond ((string= name "describe-function")
@@ -424,7 +426,9 @@ If SYM is not documented, return \"Not documented\"."
              ;; for CL-style functions.
              (not (string-match-p "^\n\n" doc)))
         ;; Some commands specify key bindings in their first line.
-        (substitute-command-keys (car (split-string doc "\n")))
+        (truncate-string-to-width
+         (substitute-command-keys (car (split-string doc "\n")))
+         end-column nil nil t)
       "Not documented")))
 
 ;;; File completion.
