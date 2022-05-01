@@ -406,7 +406,9 @@ the same time to variable and a function."
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
-(cl-defun helm-get-first-line-documentation (sym &optional name (end-column 72))
+(cl-defun helm-get-first-line-documentation (sym &optional
+                                                   (name "describe-function")
+                                                   (end-column 72))
   "Return first line documentation of symbol SYM truncated at END-COLUMN.
 If SYM is not documented, return \"Not documented\".
 Argument NAME allows specifiying what function to use to display
