@@ -198,6 +198,9 @@ available APPEND is ignored."
 (defun helm--advice-wdired-finish-edit ()
   (interactive)
   (wdired-change-to-dired-mode)
+  ;; `wdired-old-marks' has been removed in emacs-28+.
+  (unless (boundp 'wdired-old-marks)
+    (setq-local wdired-old-marks nil))
   (let ((changes nil)
 	(errors 0)
 	files-deleted
