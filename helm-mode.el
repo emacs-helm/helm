@@ -1149,10 +1149,25 @@ Don't use it directly."
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
   "The `read-buffer-function' for `helm-mode'.
 Affects `switch-to-buffer' `kill-buffer' and related."
-  (helm--completing-read-default
-   prompt (or minibuffer-completion-table
-              (internal-complete-buffer "" nil t))
-   predicate require-match nil nil default))
+  ;; `read-buffer' is using internally `Vbuffer_alist' which is an
+  ;; alist with elements like (BUF-NAME . BUF-OBJ), therefore some
+  ;; predicates in Emacs are working only on such cons cells.
+  ;; However, helm is transforming COLLECTION in a list of strings and
+  ;; such predicates are failing because they expect cons cells (see
+  ;; bug#2506 with `project-switch-to-buffer'), even if they should
+  ;; handle strings as well according to `read-buffer'
+  ;; documentation.
+  (let ((pred (when predicate
+                (lambda (buffer)
+                  (let ((buf (cons buffer (get-buffer buffer))))
+                    (condition-case _err
+                        (funcall predicate buffer)
+                      (wrong-type-argument
+                       (funcall predicate buf))))))))
+    (helm--completing-read-default
+     prompt (or minibuffer-completion-table
+                (internal-complete-buffer "" nil t))
+     pred require-match nil nil default)))
 
 (defun helm-mode--get-default-handler-for (comp-or-file entry)
   ;; Use 'comp for completing-read and 'file for 'read-file-name as
