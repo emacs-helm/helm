@@ -813,7 +813,7 @@ when moving out of directory when non nil."
   :type '(repeat string)
   :group 'helm-files)
 
-(defvar helm-ff-last-expanded-candidate-regexp "^[[:multibyte:]]? ?%s$"
+(defvar helm-ff-last-expanded-candidate-regexp "^[[:multibyte:] ]*%s$"
   "Regexp that retrieve previous candidate when going up one level.
 The default value matching a multibyte char at bol allows prefixing
 candidate with an icon.  The format part will be replaced by the
