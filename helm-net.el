@@ -142,13 +142,14 @@ This is a format string, don't forget the `%s'."
   :group 'helm-net
   :type '(alist :key-type string :value-type function))
 
-(defcustom helm-browse-url-firefox-new-window "-new-tab"
+(defcustom helm-browse-url-firefox-new-window "--new-tab"
   "Allow choosing to browse url in new window or new tab.
-Can be \"-new-tab\" (default) or \"-new-window\"."
+Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
   :group 'helm-net
   :type '(radio
-          (const :tag "New tab" "-new-tab")
-          (const :tag "New window" "-new-window")))
+          (const :tag "New tab" "--new-tab")
+          (const :tag "New window" "--new-window")
+          (const :tag "New private window" "--private-window")))
 
 (defcustom helm-net-curl-switches '("-s" "-L")
   "Arguments list passed to curl when using `helm-net-prefer-curl'."
