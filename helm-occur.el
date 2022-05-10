@@ -247,17 +247,22 @@ engine beeing completely different and also much faster."
 (defun helm-occur-transformer (candidates source)
   "Return CANDIDATES prefixed with line number."
   (cl-loop with buf = (helm-get-attr 'buffer-name source)
-           for c in candidates collect
-           (when (string-match helm-occur--search-buffer-regexp c)
-             (let ((linum (match-string 1 c))
-                   (disp (match-string 2 c)))
-               (cons (format "%s:%s"
-                             (propertize
-                              linum 'face 'helm-grep-lineno
-                              'help-echo (buffer-file-name
-                                          (get-buffer buf)))
-                             disp)
-                     (string-to-number linum))))))
+           for c in candidates
+           for cand = (when (string-match helm-occur--search-buffer-regexp c)
+                        (let ((linum (match-string 1 c))
+                              (disp  (match-string 2 c)))
+                          (when (and disp (not (string= disp "")))
+                            (cons (concat
+                                   (propertize " " 'display
+                                               (concat
+                                                (propertize
+                                                 linum 'face 'helm-grep-lineno
+                                                 'help-echo (buffer-file-name
+                                                             (get-buffer buf)))
+                                                ":"))
+                                   disp)
+                                  (string-to-number linum)))))
+           when cand collect cand))
 
 (defclass helm-moccur-class (helm-source-in-buffer)
   ((buffer-name :initarg :buffer-name
