@@ -823,6 +823,13 @@ inherit from `helm-source'.")
    (match
     :initform '(identity))
 
+   (diacritics
+    :initarg :diacritics
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Ignore diacritics when searching.")
+
    (get-line
     :initarg :get-line
     :initform 'buffer-substring-no-properties
@@ -978,10 +985,11 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-match-functions)
 
 (defun helm-source-mm-get-search-or-match-fns (source method)
-  (let* (diacritics
+  (let* ((diacritics (cl-case method
+                       (match  (eq (slot-value source 'match) 'diacritics))
+                       (search (slot-value source 'diacritics))))
          (defmatch         (helm-aif (slot-value source 'match)
-                               (unless (setq diacritics (eq it 'diacritics))
-                                 (helm-mklist it))))
+                               (unless diacritics (helm-mklist it))))
          (defmatch-strict  (helm-aif (and (eq method 'match)
                                           (slot-value source 'match-strict))
                                (helm-mklist it)))
@@ -994,20 +1002,33 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
          (migemo           (slot-value source 'migemo)))
     (cl-case method
       (match (cond (defmatch-strict)
+                   ((and migemo diacritics)
+                    (append (list 'helm-mm-exact-match
+                                  'helm-mm-3-match-on-diacritics)
+                            defmatch '(helm-mm-3-migemo-match)))
                    (migemo
                     (append helm-mm-default-match-functions
                             defmatch '(helm-mm-3-migemo-match)))
-                   (defmatch
+                   ((and defmatch (not diacritics))
                     (append helm-mm-default-match-functions defmatch))
-                   (t (if diacritics
-                          (list 'helm-mm-exact-match 'helm-mm-3-match-on-diacritics)
-                        helm-mm-default-match-functions))))
+                   (diacritics
+                    (append (list 'helm-mm-exact-match
+                                  'helm-mm-3-match-on-diacritics)))
+                   (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
+                    ((and migemo diacritics)
+                     (append '(helm-mm-exact-search)
+                             defsearch
+                             '(helm-mm-3-migemo-search
+                               helm-mm-3-search-on-diacritics)))
                     (migemo
                      (append helm-mm-default-search-functions
                              defsearch '(helm-mm-3-migemo-search)))
-                    (defsearch
+                    ((and defsearch (not diacritics))
                      (append helm-mm-default-search-functions defsearch))
+                    (diacritics
+                     `(helm-mm-exact-search
+                       ,@defsearch helm-mm-3-search-on-diacritics))
                     (t helm-mm-default-search-functions))))))
 
 

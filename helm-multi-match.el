@@ -245,19 +245,30 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mm-3-get-patterns pattern)
                           pattern)
+           with regex = (cdar pat)
+           with regex1 = (if (and regex
+                                  (not (helm-mm-regexp-p regex))
+                                  helm-mm--match-on-diacritics)
+                             (char-fold-to-regexp regex)
+                           regex)
            when (eq (caar pat) 'not) return
            ;; Pass the job to `helm-search-match-part'.
            (prog1 (list (point-at-bol) (point-at-eol))
              (forward-line 1))
            while (condition-case _err
-                     (funcall searchfn1 (or (cdar pat) "") nil t)
+                     (funcall searchfn1 (or regex1 "") nil t)
                    (invalid-regexp nil))
            for bol = (point-at-bol)
            for eol = (point-at-eol)
-           if (cl-loop for (pred . str) in (cdr pat) always
+           if (cl-loop for (pred . str) in (cdr pat)
+                       for regexp = (if (and (not (helm-mm-regexp-p str))
+                                             helm-mm--match-on-diacritics)
+                                        (char-fold-to-regexp str)
+                                      str)
+                       always
                        (progn (goto-char bol)
                               (funcall pred (condition-case _err
-                                                (funcall searchfn2 str eol t)
+                                                (funcall searchfn2 regexp eol t)
                                               (invalid-regexp nil)))))
            do (goto-char eol) and return t
            else do (goto-char eol)
@@ -266,6 +277,10 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
 (defun helm-mm-3-search (pattern &rest _ignore)
   (helm-mm-3-search-base
    pattern 're-search-forward 're-search-forward))
+
+(defun helm-mm-3-search-on-diacritics (pattern &rest _ignore)
+  (let ((helm-mm--match-on-diacritics t))
+    (helm-mm-3-search pattern)))
 
 ;;; mp-3 with migemo
 ;;  Needs https://github.com/emacs-jp/migemo
@@ -305,6 +320,9 @@ i.e. the sources which have the slot :migemo with non--nil value."
             (push (cons pattern (helm-mm-migemo-get-pattern pattern))
                   helm-mm--previous-migemo-info))))
   (string-match (assoc-default pattern helm-mm--previous-migemo-info) str))
+
+(defun helm-mm-diacritics-string-match (pattern str)
+  (string-match (char-fold-to-regexp pattern) str))
 
 (cl-defun helm-mm-3-migemo-match (candidate &optional (pattern helm-pattern))
   (and helm-migemo-mode

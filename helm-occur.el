@@ -290,6 +290,7 @@ engine beeing completely different and also much faster."
                (when (string-match helm-occur--search-buffer-regexp
                                    candidate)
                  (match-string 2 candidate)))
+             :diacritics t
              :search (lambda (pattern)
                        (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
                          (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))

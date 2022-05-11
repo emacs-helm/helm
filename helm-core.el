@@ -6443,7 +6443,8 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
 
 (defun helm-search-from-candidate-buffer (pattern get-line-fn search-fns
                                                   limit start-point match-part-fn source)
-  (let ((inhibit-read-only t))
+  (let ((inhibit-read-only t)
+        (diacritics (assoc-default 'diacritics source)))
     (helm--search-from-candidate-buffer-1
      (lambda ()
        (cl-loop with hash = (make-hash-table :test 'equal)
@@ -6498,14 +6499,14 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                                     ;; returns a cons cell, collect PATTERN only if it
                                     ;; match the part of CAND specified by
                                     ;; the match-part func.
-                                    (helm-search-match-part cand pattern)))
+                                    (helm-search-match-part cand pattern diacritics)))
                          do (progn
                               (puthash cand iter hash)
                               (helm--maybe-process-filter-one-by-one-candidate cand source)
                               (cl-incf count))
                          and collect cand))))))
 
-(defun helm-search-match-part (candidate pattern)
+(defun helm-search-match-part (candidate pattern diacritics)
   "Match PATTERN only on match-part property value of CANDIDATE.
 
 Because `helm-search-match-part' may be called even if
@@ -6515,8 +6516,9 @@ computed by match-part-fn and stored in the match-part property."
   (let ((part (or (get-text-property 0 'match-part candidate)
                   candidate))
         (fuzzy-regexp (cadr (gethash 'helm-pattern helm--fuzzy-regexp-cache)))
-        (matchfn (if helm-migemo-mode
-                     'helm-mm-migemo-string-match 'string-match)))
+        (matchfn (cond (helm-migemo-mode 'helm-mm-migemo-string-match)
+                       (diacritics 'helm-mm-diacritics-string-match)
+                       (t 'string-match))))
     (if (string-match " " pattern)
         (cl-loop for i in (helm-mm-split-pattern pattern) always
                  (if (string-match "\\`!" i)
