@@ -470,8 +470,8 @@
   in the list of results and then results from the other
   functions, respectively.
 
-  If the special symbol `diacritics' is given as value helm will match
-  diacritics candidates with `char-fold-to-regexp'.
+  If the special symbol `diacritics' is given as value helm will ignore
+  diacritics when matching candidates.
  
   This attribute has no effect for asynchronous sources (see
   attribute `candidates'), and sources using `match-dynamic'
