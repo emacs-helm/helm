@@ -289,7 +289,7 @@ There are three possible values to use:
 - helm, use multi match regular helm completion.
 
 - helm-fuzzy, use fuzzy matching.  Note that as usual when
-  entering a space helm switch to multi matching mode.
+  entering a space helm switches to multi matching mode.
 
 - emacs, use regular Emacs completion according to
   `completion-styles'.  Note that even in this style, helm allows using
