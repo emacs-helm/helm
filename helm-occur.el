@@ -130,6 +130,11 @@ This happen only in `helm-source-occur' which is always related to
 `current-buffer'."
   :group 'helm-regexp
   :type 'boolean)
+
+(defcustom helm-occur-ignore-diacritics nil
+  "When non nil helm-occur will ignore diacritics in patterns."
+  :group 'helm-regexp
+  :type 'boolean)
 
 (defface helm-moccur-buffer
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
@@ -290,7 +295,7 @@ engine beeing completely different and also much faster."
                (when (string-match helm-occur--search-buffer-regexp
                                    candidate)
                  (match-string 2 candidate)))
-             :diacritics t
+             :diacritics helm-occur-ignore-diacritics
              :search (lambda (pattern)
                        (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
                          (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
