@@ -985,6 +985,9 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 (defvar helm-mm-default-match-functions)
 
 (defun helm-source-mm-get-search-or-match-fns (source method)
+  "Prepare match or search functions for class SOURCE.
+Argument METHOD is the matching method used by SOURCE either `match'
+or `search'."
   (let* ((diacritics (cl-case method
                        (match  (eq (slot-value source 'match) 'diacritics))
                        (search (slot-value source 'diacritics))))
