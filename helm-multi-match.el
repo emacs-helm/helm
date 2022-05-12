@@ -207,7 +207,7 @@ E.g., ((identity . \"foo\") (not . \"bar\"))."
                     (cons 'identity pat)))))
 
 (defun helm-mm-regexp-p (string)
-  (string-match-p "[[]*+^$.?\\]" string))
+  (string-match-p "[][*+^$.?]" string))
 
 (defvar helm-mm--match-on-diacritics nil)
 
@@ -322,7 +322,17 @@ i.e. the sources which have the slot :migemo with non--nil value."
   (string-match (assoc-default pattern helm-mm--previous-migemo-info) str))
 
 (defun helm-mm-diacritics-string-match (pattern str)
-  (string-match (char-fold-to-regexp pattern) str))
+  "Check if PATTERN match STR ignoring diacritics.
+
+If PATTERN is a regexp (i.e. `helm-mm-regexp-p') use PATTERN
+unmodified, otherwise transform PATTERN with `char-fold-to-regexp'.
+
+This function is used to search match-part of candidate in in-buffer
+sources."
+  (string-match (if (helm-mm-regexp-p pattern)
+                    pattern
+                  (char-fold-to-regexp pattern))
+                str))
 
 (cl-defun helm-mm-3-migemo-match (candidate &optional (pattern helm-pattern))
   (and helm-migemo-mode
