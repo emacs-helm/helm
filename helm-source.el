@@ -470,14 +470,18 @@
   in the list of results and then results from the other
   functions, respectively.
 
-  If the special symbol `diacritics' is given as value helm will ignore
-  diacritics when matching candidates.
- 
   This attribute has no effect for asynchronous sources (see
   attribute `candidates'), and sources using `match-dynamic'
   since they perform pattern matching themselves.
 
   Note that FUZZY-MATCH slot will overhide value of this slot.")
+
+   (diacritics
+    :initarg :diacritics
+    :initform nil
+    :custom boolean
+    :documentation
+    "  Ignore diacritics when searching.")
 
    (match-on-real
     :initarg :match-on-real
@@ -822,14 +826,7 @@ inherit from `helm-source'.")
 
    (match
     :initform '(identity))
-
-   (diacritics
-    :initarg :diacritics
-    :initform nil
-    :custom boolean
-    :documentation
-    "  Ignore diacritics when searching.")
-
+   
    (get-line
     :initarg :get-line
     :initform 'buffer-substring-no-properties
@@ -988,11 +985,9 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
   "Prepare match or search functions for class SOURCE.
 Argument METHOD is the matching method used by SOURCE either `match'
 or `search'."
-  (let* ((diacritics (cl-case method
-                       (match  (eq (slot-value source 'match) 'diacritics))
-                       (search (slot-value source 'diacritics))))
+  (let* ((diacritics       (slot-value source 'diacritics))
          (defmatch         (helm-aif (slot-value source 'match)
-                               (unless diacritics (helm-mklist it))))
+                               (helm-mklist it)))
          (defmatch-strict  (helm-aif (and (eq method 'match)
                                           (slot-value source 'match-strict))
                                (helm-mklist it)))
