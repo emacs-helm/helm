@@ -190,7 +190,7 @@ will be used."
   :group 'helm-mode
   :type 'function)
 
-(defcustom helm-mode-use-diacritics nil
+(defcustom helm-mode-ignore-diacritics nil
   "Ignore diacritics in completing-read."
   :group 'helm-mode
   :type 'boolean)
@@ -947,7 +947,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
      :input-history history
      :must-match require-match
      :alistp nil
-     :diacritics helm-mode-use-diacritics
+     :diacritics helm-mode-ignore-diacritics
      :help-message #'helm-comp-read-help-message
      :name name
      :requires-pattern (if (and (stringp default)
@@ -1066,7 +1066,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                  (and helm-completion-in-region-default-sort-fn
                       (list helm-completion-in-region-default-sort-fn)))
          :match-dynamic (eq helm-completion-style 'emacs)
-         :diacritics helm-mode-use-diacritics
+         :diacritics helm-mode-ignore-diacritics
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
          :exec-when-only-one exec-when-only-one
          :quit-when-no-cand (eq require-match t)
