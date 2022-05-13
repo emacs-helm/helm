@@ -190,16 +190,10 @@ will be used."
   :group 'helm-mode
   :type 'function)
 
-(defcustom helm-mode-fuzzy-match nil
-  "Enable fuzzy matching in `helm-mode' globally.
-
-This is deprecated, use instead helm-fuzzy as `helm-completion-style' or
-even better 'emacs as `helm-completion-style' and add 'flex to
-`completion-styles' (emacs-27) or 'helm-flex if 'flex is not available
-in `completion-styles-alist' (emacs-26)."
+(defcustom helm-mode-use-diacritics nil
+  "Ignore diacritics in completing-read."
   :group 'helm-mode
   :type 'boolean)
-(make-obsolete-variable 'helm-mode-fuzzy-match 'helm-completion-style "3.6.0")
 
 (defcustom helm-completion-mark-suffix t
   "Push mark at end of suffix when non nil."
@@ -913,7 +907,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                                           (or (car-safe default) default)))
                :filtered-candidate-transformer 'helm-apropos-default-sort-fn
                :help-message #'helm-comp-read-help-message
-               :fuzzy-match helm-mode-fuzzy-match
+               :fuzzy-match (eq helm-completion-style 'helm-fuzzy)
                :persistent-action
                (lambda (candidate)
                  (helm-lisp-completion-persistent-action
@@ -953,6 +947,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
      :input-history history
      :must-match require-match
      :alistp nil
+     :diacritics helm-mode-use-diacritics
      :help-message #'helm-comp-read-help-message
      :name name
      :requires-pattern (if (and (stringp default)
@@ -965,7 +960,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
      :nomark (null helm-comp-read-use-marked)
      :candidates-in-buffer cands-in-buffer
      :exec-when-only-one exec-when-only-one
-     :fuzzy helm-mode-fuzzy-match
+     :fuzzy (eq helm-completion-style 'helm-fuzzy)
      :buffer buffer
      ;; If DEF is not provided, fallback to empty string
      ;; to avoid `thing-at-point' to be appended on top of list
@@ -1071,6 +1066,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                  (and helm-completion-in-region-default-sort-fn
                       (list helm-completion-in-region-default-sort-fn)))
          :match-dynamic (eq helm-completion-style 'emacs)
+         :diacritics helm-mode-use-diacritics
          :fuzzy (eq helm-completion-style 'helm-fuzzy)
          :exec-when-only-one exec-when-only-one
          :quit-when-no-cand (eq require-match t)
@@ -1119,8 +1115,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          (standard (and (memq helm-completion-style '(helm helm-fuzzy)) t))
          (fn (if standard
                  #'helm-completing-read-default-1
-               #'helm-completing-read-default-2))
-         (helm-mode-fuzzy-match (eq helm-completion-style 'helm-fuzzy)))
+               #'helm-completing-read-default-2)))
     (funcall fn
              prompt collection test require-match
              init hist default inherit-input-method name buffer
