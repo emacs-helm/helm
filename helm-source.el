@@ -1007,11 +1007,12 @@ or `search'."
                    (migemo
                     (append helm-mm-default-match-functions
                             defmatch '(helm-mm-3-migemo-match)))
-                   ((and defmatch (not diacritics))
-                    (append helm-mm-default-match-functions defmatch))
                    (diacritics
-                    (append (list 'helm-mm-exact-match
-                                  'helm-mm-3-match-on-diacritics)))
+                    (delq nil
+                          `(helm-mm-exact-match
+                            ,@defmatch helm-mm-3-match-on-diacritics)))
+                   (defmatch
+                    (append helm-mm-default-match-functions defmatch))
                    (t helm-mm-default-match-functions)))
       (search (cond (defsearch-strict)
                     ((and migemo diacritics)
@@ -1022,11 +1023,12 @@ or `search'."
                     (migemo
                      (append helm-mm-default-search-functions
                              defsearch '(helm-mm-3-migemo-search)))
-                    ((and defsearch (not diacritics))
-                     (append helm-mm-default-search-functions defsearch))
                     (diacritics
-                     `(helm-mm-exact-search
-                       ,@defsearch helm-mm-3-search-on-diacritics))
+                     (delq nil
+                           `(helm-mm-exact-search
+                             ,@defsearch helm-mm-3-search-on-diacritics)))
+                    (defsearch
+                     (append helm-mm-default-search-functions defsearch))
                     (t helm-mm-default-search-functions))))))
 
 
