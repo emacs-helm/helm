@@ -586,6 +586,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (name "Helm Completions")
                             header-name
                             candidates-in-buffer
+                            diacritics
                             match-part
                             match-dynamic
                             exec-when-only-one
@@ -819,6 +820,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                   :persistent-action persistent-action
                   :persistent-help persistent-help
                   :fuzzy-match fuzzy
+                  :diacritics diacritics
                   :keymap keymap
                   :must-match must-match
                   :group group
@@ -839,6 +841,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                     :requires-pattern requires-pattern
                     :persistent-action persistent-action
                     :fuzzy-match fuzzy
+                    :diacritics diacritics
                     :keymap keymap
                     :must-match must-match
                     :group group
