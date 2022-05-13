@@ -4325,7 +4325,10 @@ This function is used with sources built with `helm-source-sync'."
 (defvar helm-fuzzy-default-score-fn #'helm-fuzzy-flex-style-score)
 (defun helm-score-candidate-for-pattern (candidate pattern)
   "Assign score to CANDIDATE according to PATTERN."
-  (funcall helm-fuzzy-default-score-fn candidate pattern))
+  ;; Unknown candidates always go on top.
+  (if (equal (get-text-property 0 'display candidate) "[?]")
+      200.00
+    (funcall helm-fuzzy-default-score-fn candidate pattern)))
 
 ;; The flex scoring needs a regexp whereas the fuzzy scoring works
 ;; directly with helm-pattern, so cache the needed regexp for flex

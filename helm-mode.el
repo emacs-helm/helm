@@ -515,7 +515,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
              ;; Unquote helm-pattern when it is added as candidate
              ;; (Bug#2015).
              (let ((pat (replace-regexp-in-string "\\s\\" "" helm-pattern)))
-               (if (or (string= pat "") (helm-cr--pattern-in-candidates-p lst pat))
+               (if (or (string= pat "")
+                       (eq must-match t)
+                       (helm-cr--pattern-in-candidates-p lst pat))
                    lst
                  (append (list (cons (concat (propertize
                                               " " 'display
