@@ -492,51 +492,39 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                  (t (all-completions input collection test)))))
       (if sort-fn (sort cands sort-fn) cands))))
 
-(defun helm-cr--pattern-in-candidates-p (candidates)
-  (or (assoc helm-pattern candidates)
-      (assq (intern helm-pattern) candidates)
-      (member helm-pattern candidates)
-      (member (downcase helm-pattern) candidates)
-      (member (upcase helm-pattern) candidates)))
+(cl-defun helm-cr--pattern-in-candidates-p (candidates &optional (pattern helm-pattern))
+  (or (assoc pattern candidates)
+      (assq (intern pattern) candidates)
+      (member pattern candidates)
+      (member (downcase pattern) candidates)
+      (member (upcase pattern) candidates)))
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source))
-        unknown-pattern)
-    (unless (or (eq must-match t)
-                (string= helm-pattern "")
-                ;; Check if pattern is already member of candidates.
-                (helm-cr--pattern-in-candidates-p candidates))
-      (setq candidates (append (list
-                                ;; Unquote helm-pattern
-                                ;; when it is added
-                                ;; as candidate: Why? (Bug#2015)
-                                ;; (replace-regexp-in-string
-                                ;;  "\\s\\" "" helm-pattern)
-                                helm-pattern)
-                               candidates))
-      ;; Notify pattern have been added to candidates.
-      (setq unknown-pattern t))
+  (let ((must-match (helm-get-attr 'must-match source)))
     (cl-loop for c in candidates
-             for cand = (if (stringp c)
-                            (replace-regexp-in-string "\\s\\" "" c)
-                          c)
-             for pat = (replace-regexp-in-string "\\s\\" "" helm-pattern)
-             if (and (or (equal c pat) (equal c helm-pattern))
-                     unknown-pattern)
-             collect
-             (cons (concat (propertize
-                            " " 'display
-                            (propertize "[?]" 'face 'helm-ff-prefix))
-                           c)
-                   c)
-             into lst
-             else collect (if (and (stringp cand)
-                                   (string-match "\n" cand))
-                              (cons (replace-regexp-in-string "\n" "->" c) c)
-                            c)
-             into lst
-             finally return (helm-fast-remove-dups lst :test 'equal))))
+             for cand = (let ((elm (if (stringp c)
+                                       (replace-regexp-in-string "\\s\\" "" c)
+                                     c)))
+                          (cond ((and (stringp elm)
+                                      (string-match "\n" elm))
+                                 (cons (replace-regexp-in-string "\n" "->" elm) c))
+                                (t c)))
+             collect cand into lst
+             finally return
+             ;; Unquote helm-pattern when it is added as candidate
+             ;; (Bug#2015).
+             (let ((pat (replace-regexp-in-string "\\s\\" "" helm-pattern)))
+               (if (or (string= pat "") (helm-cr--pattern-in-candidates-p lst pat))
+                   lst
+                 (append (list (cons (concat (propertize
+                                              " " 'display
+                                              (propertize "[?]"
+                                                          'face 'helm-ff-prefix
+                                                          'unknown t))
+                                             pat)
+                                     pat))
+                         lst))))))
 
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
