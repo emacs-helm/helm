@@ -4545,8 +4545,7 @@ to the matching method in use."
   "The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
-  (cl-loop with diac = (memq 'helm-mm-3-match-on-diacritics
-                             (helm-mklist (helm-get-attr 'match source)))
+  (cl-loop with diac = (helm-get-attr 'diacritics source)
            for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c diac)))
 
