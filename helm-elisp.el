@@ -909,7 +909,9 @@ a string, i.e. the `symbol-name' of any existing symbol."
   (format "%s repeat=%s %s(%s)"
           (let ((time (timer--time timer)))
             (if (timer--idle-delay timer)
-                (format-time-string "idle-for=%5s" time)
+                (format "idle-for=[%s]"
+                        (format-seconds "%dd %hh %mmin %z%,3ss"
+                                        (time-convert time t)))
               (format-time-string "%m/%d %T" time)))
           (or (timer--repeat-delay timer) "nil")
           (mapconcat 'identity (split-string
