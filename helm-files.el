@@ -2561,7 +2561,7 @@ Same as `dired-do-print' but for Helm."
          (lpr-switches
           (if (and (stringp printer-name)
                    (string< "" printer-name))
-              (cons (concat lpr-printer-switch printer-name)
+              (cons (concat lpr-printer-switch " " printer-name)
                     lpr-switches)
               lpr-switches))
          (command (helm-read-string
@@ -2577,8 +2577,7 @@ Same as `dired-do-print' but for Helm."
                                           (list lpr-switches)
                                           lpr-switches))
                                 " "))))
-         (file-args (mapconcat (lambda (x)
-                                   (format "'%s'" x))
+         (file-args (mapconcat #'shell-quote-argument
                                file-list " "))
          (cmd-line (concat command " " file-args)))
     (if command
