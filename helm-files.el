@@ -4136,16 +4136,17 @@ it from your init file, ensure to call it _after_ your defmethod's
   (require 'all-the-icons)
   (if helm-ff-icon-mode
       (progn
-        (unless helm-source-find-files 
+        (unless helm-source-find-files
           (setq helm-source-find-files
                 (helm-make-source
                     "Find Files" 'helm-source-ffiles)))
-        (helm-set-attr 'filtered-candidate-transformer
-                       (append (helm-get-attr
-                                'filtered-candidate-transformer
-                                helm-source-find-files)
-                               '(helm-ff-icons-transformer))
-                       helm-source-find-files))
+        (let ((fct (helm-get-attr
+                    'filtered-candidate-transformer
+                    helm-source-find-files)))
+          (unless (memq 'helm-ff-icons-transformer fct)
+            (helm-set-attr 'filtered-candidate-transformer
+                           (append fct '(helm-ff-icons-transformer))
+                           helm-source-find-files))))
     (helm-set-attr 'filtered-candidate-transformer
                    (remove 'helm-ff-icons-transformer
                            (helm-get-attr
