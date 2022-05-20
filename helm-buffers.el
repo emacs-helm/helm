@@ -960,11 +960,17 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (helm-exit-and-execute-action 'helm-buffer-switch-buffers-other-window)))
 (put 'helm-buffer-switch-other-window 'helm-only t)
 
+(defun helm-buffer-switch-to-buffer-other-frame (_candidate)
+  "Display marked buffers in other frame."
+  (let ((bufs (helm-marked-candidates)))
+    (select-frame (make-frame))
+    (helm-window-show-buffers bufs)))
+
 (defun helm-buffer-switch-other-frame ()
   "Run switch to other frame action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
-    (helm-exit-and-execute-action 'switch-to-buffer-other-frame)))
+    (helm-exit-and-execute-action 'helm-buffer-switch-to-buffer-other-frame)))
 (put 'helm-buffer-switch-other-frame 'helm-only t)
 
 (defun helm-buffers-switch-to-buffer-other-tab (_candidate)
