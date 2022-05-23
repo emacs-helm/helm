@@ -5141,43 +5141,42 @@ When no suitable place to drop is found ask to drop to
   (interactive "e")
   (cl-assert (memq helm-ff-drag-mouse-1-default-action
                    '(copy rsync rename)))
-  (track-mouse
-    (let* ((win-or-frame (posn-window (event-end event)))
-           (target-frame (when (framep win-or-frame)
-                           (car (mouse-pixel-position))))
-           (target       (with-selected-window
-                             (if target-frame
-                                 (frame-selected-window target-frame)
-                               win-or-frame)
-                           default-directory))
-           (windows      (and target-frame
-                              (remove (helm-window)
-                                      (window-list target-frame 1)))))
-      (when windows
-        (setq target
-              (helm-acond ((cdr windows)
-                           (x-popup-menu
-                            t (list "Choose target"
-                                    (cons ""
-                                          (cl-loop for win in windows
-                                                   for dir = (with-selected-window
-                                                                 win default-directory)
-                                                   collect (cons  dir dir))))))
-                          ((and (eql (window-buffer (car windows))
-                                     helm-current-buffer)
-                                helm-ff-drag-and-drop-default-directory)
-                           (x-popup-menu
-                            t (list "Choose target"
-                                    (cons ""
-                                          (list (cons it it))))))
-                          ((car windows)
-                           (with-selected-window it default-directory)))))
-      (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
-          (helm-find-files-do-action
-           helm-ff-drag-mouse-1-default-action target)
-        (helm-run-after-exit
-         #'helm-find-files-do-action
-         helm-ff-drag-mouse-1-default-action target)))))
+  (let* ((win-or-frame (posn-window (event-end event)))
+         (target-frame (when (framep win-or-frame)
+                         (car (mouse-pixel-position))))
+         (target       (with-selected-window
+                           (if target-frame
+                               (frame-selected-window target-frame)
+                             win-or-frame)
+                         default-directory))
+         (windows      (and target-frame
+                            (remove (helm-window)
+                                    (window-list target-frame 1)))))
+    (when windows
+      (setq target
+            (helm-acond ((cdr windows)
+                         (x-popup-menu
+                          t (list "Choose target"
+                                  (cons ""
+                                        (cl-loop for win in windows
+                                                 for dir = (with-selected-window
+                                                               win default-directory)
+                                                 collect (cons  dir dir))))))
+                        ((and (eql (window-buffer (car windows))
+                                   helm-current-buffer)
+                              helm-ff-drag-and-drop-default-directory)
+                         (x-popup-menu
+                          t (list "Choose target"
+                                  (cons ""
+                                        (list (cons it it))))))
+                        ((car windows)
+                         (with-selected-window it default-directory)))))
+    (if (memq helm-ff-drag-mouse-1-default-action '(copy rsync))
+        (helm-find-files-do-action
+         helm-ff-drag-mouse-1-default-action target)
+      (helm-run-after-exit
+       #'helm-find-files-do-action
+       helm-ff-drag-mouse-1-default-action target))))
 
 (defun helm-find-files-1 (fname &optional preselect)
   "Find FNAME filename with PRESELECT filename preselected.
