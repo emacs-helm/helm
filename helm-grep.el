@@ -16,6 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
+(require 'ansi-color)
 (require 'cl-lib)
 (require 'format-spec)
 (require 'helm)
