@@ -24,7 +24,7 @@
 (require 'helm-grep)
 
 (defvar helm-etags-fuzzy-match)
-(declare-function ring-insert "ring")
+(declare-function xref-push-marker-stack "xref")
 
 
 (defgroup helm-tags nil
@@ -255,8 +255,6 @@ If there is no entry in cache, create one."
          (setq helm-source-etags-select
                 (helm-etags-build-source))))
 
-(defvar find-tag-marker-ring)
-
 (defsubst helm-etags--file-from-tag (fname)
   (cl-loop for ext in
            (cons "" (remove "" tags-compression-info-list))
@@ -280,7 +278,7 @@ If there is no entry in cache, create one."
          (linum (string-to-number (cadr split))))
     (if (null fname)
         (error "file %s not found" fname)
-      (ring-insert find-tag-marker-ring (point-marker))
+      (xref-push-marker-stack)
       (funcall switcher fname)
       (helm-goto-line linum t)
       (when (search-forward elm nil t)
