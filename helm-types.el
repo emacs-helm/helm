@@ -170,10 +170,10 @@
    "Switch to buffer(s)" 'helm-buffer-switch-buffers
    "Switch to buffer(s) other window `C-c o'"
    'helm-buffer-switch-buffers-other-window
-   "Switch to buffer other frame `C-c C-o'"
+   "Switch to buffer(s) other frame `C-c C-o'"
    'helm-buffer-switch-to-buffer-other-frame
    (lambda () (and (fboundp 'tab-bar-mode)
-                   "Switch to buffer other tab `C-c C-t'"))
+                   "Switch to buffer(s) other tab `C-c C-t'"))
    'helm-buffers-switch-to-buffer-other-tab
    "Switch to buffer at line number"
    'helm-switch-to-buffer-at-linum
