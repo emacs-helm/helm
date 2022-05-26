@@ -616,7 +616,9 @@ double quote."
     :action '(("Describe face" . helm-describe-face)
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
-                                    (customize-face (helm-symbolify candidate)))))))
+                                    (customize-face (helm-symbolify candidate))))
+              ("Insert face" . (lambda (_candidate)
+                                 (insert (string-join (helm-marked-candidates) "\n")))))))
 
 (defun helm-def-source--emacs-commands (&optional default)
   (require 'helm-command)
