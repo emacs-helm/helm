@@ -21,7 +21,10 @@
 ;;; Command Keymap
 ;;
 ;;
-(defcustom helm-command-prefix-key "C-x c"
+(defcustom helm-command-prefix-key
+  (when-let ((binding
+              (car (where-is-internal 'Control-X-prefix (list global-map)))))
+    (concat binding [?c]))
   "The key `helm-command-prefix' is bound to in the global map."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
   :group 'helm-config
