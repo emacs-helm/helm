@@ -392,7 +392,7 @@ string."
                                    "Top level")
                                  k))
            for disp1 = (cond
-                        (helm-imenu-show-icons
+                        ((and helm-imenu-show-icons (display-graphic-p))
                          (let* ((icon (assoc-default (car types)
                                                      helm-imenu-icons-mapping))
                                 (icon (if (null icon) "symbol-misc.svg" icon))
