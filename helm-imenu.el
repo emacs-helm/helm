@@ -86,8 +86,8 @@ string."
   :group 'helm-imenu
   :type '(repeat symbol))
 
-(defcustom helm-imenu-show-type-name nil
-  "Display imenu item type name along with the icon."
+(defcustom helm-imenu-show-item-type-name t
+  "Display name of imenu item type along with the icon."
   :group 'helm-imenu
   :type 'boolean)
 
@@ -304,7 +304,7 @@ string."
 
 (defun helm-imenu-icon-for-type (type)
   (require 'all-the-icons)
-  (let ((all-the-icons-scale-factor 1.0)
+  (let ((all-the-icons-scale-factor 0.9)
         (all-the-icons-default-adjust 0.0))
     (helm-acase type
       ;; ("Array" . "symbol-array.svg")
@@ -333,8 +333,8 @@ string."
       ("Folders" (all-the-icons-faicon "folder" :face font-lock-variable-name-face))
       ;; ("Interface" . "symbol-interface.svg")
       ;; ("Interfaces" . "symbol-interface.svg")
-      ;; ("Keyword" . "symbol-keyword.svg")
-      ;; ("Keywords" . "symbol-keyword.svg")
+      ("Keyword" (all-the-icons-octicon "key" :face font-lock-builtin-face))
+      ("Keywords" (all-the-icons-octicon "key" :face font-lock-builtin-face))
       ("Method" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
       ("Methods" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
       ("Defun" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
@@ -367,8 +367,8 @@ string."
       ;; ("Texts" . "symbol-key.svg")
       ;; ("Type" . "symbol-enumerator.svg")
       ;; ("Types" . "symbol-enumerator.svg")
-      ;; ("Type Parameter" . "symbol-parameter.svg")
-      ;; ("Type Parameters" . "symbol-parameter.svg")
+      ("Type Parameter" (all-the-icons-material "code" :face font-lock-type-face))
+      ("Type Parameters" (all-the-icons-material "code" :face font-lock-type-face))
       ;; ("Unit" . "symbol-ruler.svg")
       ;; ("Units" . "symbol-ruler.svg")
       ;; ("Value" . "symbol-enumerator.svg")
@@ -407,7 +407,7 @@ string."
            for disp1 = (mapconcat 'identity (cdr types) helm-imenu-delimiter)
            for disp = (concat (propertize " " 'display type-icon)
                               " "
-                              (if helm-imenu-show-type-name
+                              (if helm-imenu-show-item-type-name
                                   (concat type-name helm-imenu-delimiter)
                                 "")
                               (propertize disp1 'help-echo bufname 'types types))
