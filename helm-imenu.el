@@ -86,8 +86,8 @@ string."
   :group 'helm-imenu
   :type '(repeat symbol))
 
-(defcustom helm-imenu-show-icons t
-  "Display imenu item types by VSCode icons or text format."
+(defcustom helm-imenu-show-type-name nil
+  "Display imenu item type name along with the icon."
   :group 'helm-imenu
   :type 'boolean)
 
@@ -150,81 +150,6 @@ string."
 (make-variable-buffer-local 'helm-cached-imenu-tick)
 
 (defvar helm-imenu--in-all-buffers-cache nil)
-
-(defvar helm-imenu-icons-mapping
-    '(("Array" . "symbol-array.svg")
-      ("Arrays" . "symbol-array.svg")
-      ("Boolean" . "symbol-boolean.svg")
-      ("Booleans" . "symbol-boolean.svg")
-      ("Class" . "symbol-class.svg")
-      ("Classes" . "symbol-class.svg")
-      ("Color" . "symbol-color.svg")
-      ("Colors" . "symbol-color.svg")
-      ("Constant" . "symbol-constant.svg")
-      ("Constants" . "symbol-constant.svg")
-      ("Constructor" . "symbol-method.svg")
-      ("Constructors" . "symbol-method.svg")
-      ("Enum Member" . "symbol-enumerator-member.svg")
-      ("Enum Members" . "symbol-enumerator-member.svg")
-      ("Enum" . "symbol-enumerator.svg")
-      ("Enums" . "symbol-enumerator.svg")
-      ("Event" . "symbol-event.svg")
-      ("Events" . "symbol-event.svg")
-      ("Field" . "symbol-field.svg")
-      ("Fields" . "symbol-field.svg")
-      ("File" . "symbol-file.svg")
-      ("Files" . "symbol-file.svg")
-      ("Folder" . "folder.svg")
-      ("Folders" . "folder.svg")
-      ("Interface" . "symbol-interface.svg")
-      ("Interfaces" . "symbol-interface.svg")
-      ("Keyword" . "symbol-keyword.svg")
-      ("Keywords" . "symbol-keyword.svg")
-      ("Method" . "symbol-method.svg")
-      ("Methods" . "symbol-method.svg")
-      ("Defun" . "symbol-method.svg")
-      ("Defuns" . "symbol-method.svg")
-      ("Fn" . "symbol-method.svg")
-      ("Fns" . "symbol-method.svg")
-      ("Function" . "symbol-method.svg")
-      ("Functions" . "symbol-method.svg")
-      ("Module" . "symbol-namespace.svg")
-      ("Modules" . "symbol-namespace.svg")
-      ("Misc" . "symbol-misc.svg")
-      ("Miscs" . "symbol-misc.svg")
-      ("Module" . "symbol-namespace.svg")
-      ("Modules" . "symbol-namespace.svg")
-      ("Numeric" . "symbol-numeric.svg")
-      ("Numerics" . "symbol-numeric.svg")
-      ("Object" . "symbol-namespace.svg")
-      ("Objects" . "symbol-namespace.svg")
-      ("Operator" . "symbol-operator.svg")
-      ("Operators" . "symbol-operator.svg")
-      ("Property" . "symbol-property.svg")
-      ("Propertys" . "symbol-property.svg")
-      ("Reference" . "references.svg")
-      ("References" . "references.svg")
-      ("Snippet" . "symbol-snippet.svg")
-      ("Snippets" . "symbol-snippet.svg")
-      ("String" . "symbol-string.svg")
-      ("Strings" . "symbol-string.svg")
-      ("Struct" . "symbol-structure.svg")
-      ("Structs" . "symbol-structure.svg")
-      ("Text" . "symbol-key.svg")
-      ("Texts" . "symbol-key.svg")
-      ("Type" . "symbol-enumerator.svg")
-      ("Types" . "symbol-enumerator.svg")
-      ("Type Parameter" . "symbol-parameter.svg")
-      ("Type Parameters" . "symbol-parameter.svg")
-      ("Unit" . "symbol-ruler.svg")
-      ("Units" . "symbol-ruler.svg")
-      ("Value" . "symbol-enumerator.svg")
-      ("Values" . "symbol-enumerator.svg")
-      ("Variable" . "symbol-variable.svg")
-      ("Variables" . "symbol-variable.svg")
-      ("Misc" . "symbol-misc.svg")
-      ("Top level" . "symbol-misc.svg"))
-    "Mapping each Helm-imenu item type to the corresponding VSCode icon.")
 
 
 (defvar helm-source-imenu nil "See (info \"(emacs)Imenu\")")
@@ -377,8 +302,88 @@ string."
         (and prop (push prop lst)))
       lst)))
 
+(defun helm-imenu-icon-for-type (type)
+  (require 'all-the-icons)
+  (helm-acase type
+    ;; ("Array" . "symbol-array.svg")
+    ;; ("Arrays" . "symbol-array.svg")
+    ;; ("Boolean" . "symbol-boolean.svg")
+    ;; ("Booleans" . "symbol-boolean.svg")
+    ;; ("Class" . "symbol-class.svg")
+    ;; ("Classes" . "symbol-class.svg")
+    ;; ("Color" . "symbol-color.svg")
+    ;; ("Colors" . "symbol-color.svg")
+    ;; ("Constant" . "symbol-constant.svg")
+    ;; ("Constants" . "symbol-constant.svg")
+    ;; ("Constructor" . "symbol-method.svg")
+    ;; ("Constructors" . "symbol-method.svg")
+    ;; ("Enum Member" . "symbol-enumerator-member.svg")
+    ;; ("Enum Members" . "symbol-enumerator-member.svg")
+    ;; ("Enum" . "symbol-enumerator.svg")
+    ;; ("Enums" . "symbol-enumerator.svg")
+    ;; ("Event" . "symbol-event.svg")
+    ;; ("Events" . "symbol-event.svg")
+    ;; ("Field" . "symbol-field.svg")
+    ;; ("Fields" . "symbol-field.svg")
+    ;; ("File" . "symbol-file.svg")
+    ;; ("Files" . "symbol-file.svg")
+    ;; ("Folder" . "folder.svg")
+    ;; ("Folders" . "folder.svg")
+    ;; ("Interface" . "symbol-interface.svg")
+    ;; ("Interfaces" . "symbol-interface.svg")
+    ;; ("Keyword" . "symbol-keyword.svg")
+    ;; ("Keywords" . "symbol-keyword.svg")
+    ("Method" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Methods" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Defun" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Defuns" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Fn" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Fns" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Function" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ("Functions" (all-the-icons-faicon "cube-thin" :face font-lock-function-name-face))
+    ;; ("Misc" . "symbol-misc.svg")
+    ;; ("Miscs" . "symbol-misc.svg")
+    ("Module" (all-the-icons-faicon "brackets-curly" :face font-lock-type-face))
+    ("Modules" (all-the-icons-faicon "brackets-curly" :face font-lock-type-face))
+    ;; ("Numeric" . "symbol-numeric.svg")
+    ;; ("Numerics" . "symbol-numeric.svg")
+    ("Object" (all-the-icons-faicon "brackets-curly" :face font-lock-type-face))
+    ("Objects" (all-the-icons-faicon "brackets-curly" :face font-lock-type-face))
+    ;; ("Operator" . "symbol-operator.svg")
+    ;; ("Operators" . "symbol-operator.svg")
+    ;; ("Property" . "symbol-property.svg")
+    ;; ("Propertys" . "symbol-property.svg")
+    ;; ("Reference" . "references.svg")
+    ;; ("References" . "references.svg")
+    ;; ("Snippet" . "symbol-snippet.svg")
+    ;; ("Snippets" . "symbol-snippet.svg")
+    ;; ("String" . "symbol-string.svg")
+    ;; ("Strings" . "symbol-string.svg")
+    ;; ("Struct" . "symbol-structure.svg")
+    ;; ("Structs" . "symbol-structure.svg")
+    ;; ("Text" . "symbol-key.svg")
+    ;; ("Texts" . "symbol-key.svg")
+    ;; ("Type" . "symbol-enumerator.svg")
+    ;; ("Types" . "symbol-enumerator.svg")
+    ;; ("Type Parameter" . "symbol-parameter.svg")
+    ;; ("Type Parameters" . "symbol-parameter.svg")
+    ;; ("Unit" . "symbol-ruler.svg")
+    ;; ("Units" . "symbol-ruler.svg")
+    ;; ("Value" . "symbol-enumerator.svg")
+    ;; ("Values" . "symbol-enumerator.svg")
+    ;; ("Variable" . "symbol-variable.svg")
+    ;; ("Variables" . "symbol-variable.svg")
+    ;; ("Misc" . "symbol-misc.svg")
+    ;; ("Top level" . "symbol-misc.svg")
+    ("Variable"  (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+    ("Variables" (all-the-icons-octicon "book":face font-lock-variable-name-face))
+    ("Function"  (all-the-icons-faicon "language" :face font-lock-function-name-face))
+    ("Types"     (all-the-icons-fileicon "typedoc" :face font-lock-type-face))
+    (t           (all-the-icons-alltheicon "atom"))))
+
 (defun helm-imenu-transformer (candidates)
-  (cl-loop for (k . v) in candidates
+  (cl-loop with type
+           for (k . v) in candidates
            ;; (k . v) == (symbol-name . marker)
            for bufname = (buffer-name
                           (pcase v
@@ -391,51 +396,20 @@ string."
                                      "Function"
                                    "Top level")
                                  k))
-           for disp1 = (cond
-                        ((and helm-imenu-show-icons (display-graphic-p))
-                         (let* ((icon (assoc-default (car types)
-                                                     helm-imenu-icons-mapping))
-                                (icon (if (null icon) "symbol-misc.svg" icon))
-                                (dfw (default-font-width))
-                                (size (cond
-                                       ((integerp company-icon-size)
-                                        company-icon-size)
-                                       ((and (consp company-icon-size)
-                                             (eq 'auto-scale
-                                                 (car company-icon-size)))
-                                        (let ((base-size (cdr company-icon-size))
-                                              (dfh (default-font-height)))
-                                          (min (if (> dfh (* 2 base-size))
-                                                   (* 2 base-size)
-                                                 base-size)
-                                               (* company-icon-margin dfw))))))
-                                (dir (expand-file-name
-                                           (if (equal (frame-parameter
-                                                       nil 'background-mode)
-                                                      'dark)
-                                               "vscode-dark"
-                                             "vscode-light")
-                                           company-icons-root))
-                                (spec (list 'image
-                                            :file (expand-file-name icon dir)
-                                            :type 'svg
-                                            :width size
-                                            :height size
-                                            :ascent 'center))
-                                (type-icon (propertize " " 'display spec)))
-                           (concat type-icon " "
-                                   (mapconcat 'identity (cdr types)
-                                              helm-imenu-delimiter))))
-                        (t
-                         (mapconcat
-                          (lambda (x)
-                            (propertize
-                             x 'face
-                             (cl-loop for (p . f) in helm-imenu-type-faces
-                                      when (string-match p x) return f
-                                      finally return 'default)))
-                          types helm-imenu-delimiter)))
-           for disp = (propertize disp1 'help-echo bufname 'types types)
+           for type-icon = (helm-imenu-icon-for-type (car types))
+           for type-name = (propertize
+                            (car types) 'face
+                            (cl-loop for (p . f) in helm-imenu-type-faces
+                                     when (string-match p (car types))
+                                     return f
+                                     finally return 'default))
+           for disp1 = (mapconcat 'identity (cdr types) helm-imenu-delimiter)
+           for disp = (concat (propertize " " 'display type-icon)
+                              " "
+                              (if helm-imenu-show-type-name
+                                  (concat type-name helm-imenu-delimiter)
+                                "")
+                              (propertize disp1 'help-echo bufname 'types types))
            collect
            (cons disp (cons k v))))
 
