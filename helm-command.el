@@ -342,7 +342,8 @@ default to `extended-command-history'."
     (when (timerp helm-M-x--timer)
       (cancel-timer helm-M-x--timer)
       (setq helm-M-x--timer nil))
-    (setq helm--mode-line-display-prefarg nil)
+    (setq helm--mode-line-display-prefarg nil
+          helm-fuzzy-sort-fn (default-toplevel-value 'helm-fuzzy-sort-fn))
     ;; Be sure to remove it here as well in case of quit.
     (remove-hook 'helm-move-selection-after-hook
                  'helm-M-x--move-selection-after-hook)
