@@ -23,7 +23,6 @@
 (require 'imenu)
 (require 'helm-utils)
 (require 'helm-help)
-(require 'company)
 
 (declare-function which-function "which-func")
 
