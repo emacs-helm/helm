@@ -399,11 +399,16 @@ string."
                                      when (string-match p (car types))
                                      return f
                                      finally return 'default))
-           for disp1 = (mapconcat 'identity (cdr types) helm-imenu-delimiter)
+           for disp1 = (mapconcat 'identity
+                                  (cdr types)
+                                  (propertize helm-imenu-delimiter
+                                              'face 'shadow))
            for disp = (concat (propertize " " 'display type-icon)
                               " "
                               (if helm-imenu-show-item-type-name
-                                  (concat type-name helm-imenu-delimiter)
+                                  (concat type-name
+                                          (propertize helm-imenu-delimiter
+                                                      'face 'shadow))
                                 "")
                               (propertize disp1 'help-echo bufname 'types types))
            collect
