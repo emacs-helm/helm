@@ -84,6 +84,12 @@ string."
   "Extra modes where `helm-imenu-in-all-buffers' should look into."
   :group 'helm-imenu
   :type '(repeat symbol))
+
+(defcustom helm-imenu-show-item-type-name t
+  "Display name of imenu item type along with the icon."
+  :group 'helm-imenu
+  :type 'boolean)
+
 
 ;;; keymap
 (defvar helm-imenu-map
@@ -143,6 +149,7 @@ string."
 (make-variable-buffer-local 'helm-cached-imenu-tick)
 
 (defvar helm-imenu--in-all-buffers-cache nil)
+
 
 (defvar helm-source-imenu nil "See (info \"(emacs)Imenu\")")
 (defvar helm-source-imenu-all nil)
@@ -294,8 +301,85 @@ string."
         (and prop (push prop lst)))
       lst)))
 
+(defun helm-imenu-icon-for-type (type)
+  (require 'all-the-icons)
+  (let ((all-the-icons-scale-factor 1.0)
+        (all-the-icons-default-adjust 0.0))
+    (helm-acase type
+      ("Array" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Array" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Boolean" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Boolean" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Class"  (all-the-icons-octicon "package" :face font-lock-type-face))
+      ("Class"  (all-the-icons-octicon "package" :face font-lock-type-face))
+      ("Color" (all-the-icons-material "color_lens" :face font-lock-builtin-face))
+      ("Colors" (all-the-icons-material "color_lens" :face font-lock-builtin-face))
+      ("Constant" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Constants" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Constructor" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Constructors" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Enum Member"  (all-the-icons-octicon "three-bars" :face font-lock-type-face))
+      ("Enum Members"  (all-the-icons-octicon "three-bars" :face font-lock-type-face))
+      ("Enum"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Enums"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Event"  (all-the-icons-wicon "lightning" :face font-lock-builtin-face))
+      ("Events"  (all-the-icons-wicon "lightning" :face font-lock-builtin-face))
+      ("Field"  (all-the-icons-octicon "three-bars" :face font-lock-type-face))
+      ("Fields"  (all-the-icons-octicon "three-bars" :face font-lock-type-face))
+      ("File" (all-the-icons-faicon "file" :face font-lock-variable-name-face))
+      ("Files" (all-the-icons-faicon "file" :face font-lock-variable-name-face))
+      ("Folder" (all-the-icons-faicon "folder" :face font-lock-variable-name-face))
+      ("Folders" (all-the-icons-faicon "folder" :face font-lock-variable-name-face))
+      ("Interface"  (all-the-icons-octicon "package" :face font-lock-builtin-face))
+      ("Interfaces"  (all-the-icons-octicon "package" :face font-lock-builtin-face))
+      ("Keyword" (all-the-icons-octicon "key" :face font-lock-builtin-face))
+      ("Keywords" (all-the-icons-octicon "key" :face font-lock-builtin-face))
+      ("Method" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Methods" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Defun" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Defuns" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Fn" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Fns" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Function" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Functions" (all-the-icons-faicon "cube" :face font-lock-function-name-face))
+      ("Misc" (all-the-icons-faicon "globe" :face font-lock-function-name-face))
+      ("Miscs" (all-the-icons-faicon "globe" :face font-lock-function-name-face))
+      ("Module" (all-the-icons-faicon "angle-double-right" :face font-lock-builtin-face))
+      ("Modules" (all-the-icons-faicon "angle-double-right" :face font-lock-builtin-face))
+      ("Numeric" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Numeric" (all-the-icons-material "crop" :face font-lock-builtin-face))
+      ("Object" (all-the-icons-faicon "angle-double-right" :face font-lock-builtin-face))
+      ("Objects" (all-the-icons-faicon "angle-double-right" :face font-lock-builtin-face))
+      ("Operator" (all-the-icons-faicon "calculator" :face font-lock-builtin-face))
+      ("Operators" (all-the-icons-faicon "calculator" :face font-lock-builtin-face))
+      ("Property" (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+      ("Propertys" (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+      ("Reference" (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+      ("References" (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+      ("Snippet" (all-the-icons-material "border_style" :face font-lock-variable-name-face))
+      ("Snippet" (all-the-icons-material "border_style" :face font-lock-variable-name-face))
+      ("String" (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
+      ("Strings" (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
+      ("Struct"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Structs"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Text" (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
+      ("Texts" (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
+      ("Top level" (all-the-icons-faicon "globe" :face font-lock-function-name-face))
+      ("Type"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Types"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Type Parameter" (all-the-icons-material "code" :face font-lock-type-face))
+      ("Type Parameters" (all-the-icons-material "code" :face font-lock-type-face))
+      ("Unit" (all-the-icons-faicon "bar-chart" :face font-lock-builtin-face))
+      ("Units" (all-the-icons-faicon "bar-chart" :face font-lock-builtin-face))
+      ("Value"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Values"  (all-the-icons-faicon "cog" :face font-lock-type-face))
+      ("Variable"  (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+      ("Variables" (all-the-icons-octicon "book":face font-lock-variable-name-face))
+      (t (all-the-icons-faicon "globe" :face font-lock-function-name-face)))))
+
 (defun helm-imenu-transformer (candidates)
-  (cl-loop for (k . v) in candidates
+  (cl-loop with type
+           for (k . v) in candidates
            ;; (k . v) == (symbol-name . marker)
            for bufname = (buffer-name
                           (pcase v
@@ -308,17 +392,28 @@ string."
                                      "Function"
                                    "Top level")
                                  k))
-           for disp1 = (mapconcat
-                        (lambda (x)
-                          (propertize
-                           x 'face
-                           (cl-loop for (p . f) in helm-imenu-type-faces
-                                    when (string-match p x) return f
-                                    finally return 'default)))
-                        types helm-imenu-delimiter)
-           for disp = (propertize disp1 'help-echo bufname 'types types)
+           for type-icon = (helm-imenu-icon-for-type (car types))
+           for type-name = (propertize
+                            (car types) 'face
+                            (cl-loop for (p . f) in helm-imenu-type-faces
+                                     when (string-match p (car types))
+                                     return f
+                                     finally return 'default))
+           for disp1 = (mapconcat 'identity
+                                  (cdr types)
+                                  (propertize helm-imenu-delimiter
+                                              'face 'shadow))
+           for disp = (concat (propertize " " 'display type-icon)
+                              " "
+                              (if helm-imenu-show-item-type-name
+                                  (concat type-name
+                                          (propertize helm-imenu-delimiter
+                                                      'face 'shadow))
+                                "")
+                              (propertize disp1 'help-echo bufname 'types types))
            collect
            (cons disp (cons k v))))
+
 
 ;;;###autoload
 (defun helm-imenu ()
