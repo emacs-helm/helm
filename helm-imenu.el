@@ -127,10 +127,11 @@ string."
 (defun helm-imenu-next-or-previous-section (n)
   (with-helm-window
     (let* ((fn (lambda ()
-                 (car (split-string
-                       (buffer-substring
-                        (point-at-bol) (point-at-eol))
-                       helm-imenu-delimiter))))
+                 (let ((str (buffer-substring
+                             (point-at-bol) (point-at-eol)))) 
+                   (if helm-imenu-hide-item-type-name
+                       (get-text-property 1 'type-name str)
+                   (car (split-string str helm-imenu-delimiter))))))
            (curtype (funcall fn))
            (stop-fn (if (> n 0)
                         #'helm-end-of-source-p
@@ -425,7 +426,7 @@ string."
                                                       'face 'shadow)))
                               (propertize disp1 'help-echo bufname 'types types))
            collect
-           (cons disp (cons k v))))
+           (cons (propertize disp 'type-name type-name) (cons k v))))
 
 
 ;;;###autoload
