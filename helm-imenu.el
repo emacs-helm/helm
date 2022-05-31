@@ -422,8 +422,8 @@ string."
                               (if helm-imenu-hide-item-type-name
                                   ""
                                 (concat type-name
-                                          (propertize helm-imenu-delimiter
-                                                      'face 'shadow)))
+                                        (propertize helm-imenu-delimiter
+                                                    'face 'shadow)))
                               (propertize disp1 'help-echo bufname 'types types))
            collect
            (cons (propertize disp 'type-name type-name) (cons k v))))
