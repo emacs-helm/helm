@@ -93,7 +93,9 @@ string."
   :type '(repeat symbol))
 
 (defcustom helm-imenu-hide-item-type-name nil
-  "Hide display name of imenu item type along with the icon when non nil."
+  "Hide display name of imenu item type along with the icon when non nil.
+
+This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view]."
   :group 'helm-imenu
   :type 'boolean)
 
@@ -109,7 +111,25 @@ string."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-<down>") 'helm-imenu-next-section)
     (define-key map (kbd "M-<up>")   'helm-imenu-previous-section)
+    (define-key map (kbd "C-]") 'helm-imenu-toggle-type-view)
     map))
+
+(defun helm-imenu-toggle-type-view ()
+  "Toggle candidate type view."
+  (interactive)
+  (with-helm-window
+    (setq helm-imenu-hide-item-type-name (not helm-imenu-hide-item-type-name))
+    (let* ((sel  (substring (helm-get-selection nil 'withprop)
+                            (if helm-imenu-use-icon 2 0)))
+           (type (get-text-property 1 'type-name sel)))
+      (setq sel (substring-no-properties sel))
+      (helm-force-update (if helm-imenu-hide-item-type-name
+                             (format "^[ ]*%s$"
+                                     (car (last (split-string
+                                                 sel helm-imenu-delimiter t))))
+                           (format "^[ ]*%s / %s$"
+                                   type sel))))))
+(put 'helm-imenu-toggle-type-view 'no-helm-mx t)
 
 (defcustom helm-imenu-lynx-style-map nil
   "Use Arrow keys to jump to occurences."
