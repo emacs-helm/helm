@@ -24,7 +24,14 @@
 (require 'helm-utils)
 (require 'helm-help)
 
+(defvar all-the-icons-default-adjust)
+(defvar all-the-icons-scale-factor)
+
 (declare-function which-function "which-func")
+(declare-function all-the-icons-material "ext:all-the-icons.el")
+(declare-function all-the-icons-octicon  "ext:all-the-icons.el")
+(declare-function all-the-icons-faicon   "ext:all-the-icons.el")
+(declare-function all-the-icons-wicon    "ext:all-the-icons.el")
 
 
 (defgroup helm-imenu nil
@@ -85,8 +92,13 @@ string."
   :group 'helm-imenu
   :type '(repeat symbol))
 
-(defcustom helm-imenu-show-item-type-name t
-  "Display name of imenu item type along with the icon."
+(defcustom helm-imenu-hide-item-type-name nil
+  "Hide display name of imenu item type along with the icon when non nil."
+  :group 'helm-imenu
+  :type 'boolean)
+
+(defcustom helm-imenu-use-icon nil
+  "Display an icon from all-the-icons package when non nil."
   :group 'helm-imenu
   :type 'boolean)
 
@@ -378,8 +390,7 @@ string."
       (t (all-the-icons-faicon "globe" :face font-lock-function-name-face)))))
 
 (defun helm-imenu-transformer (candidates)
-  (cl-loop with type
-           for (k . v) in candidates
+  (cl-loop for (k . v) in candidates
            ;; (k . v) == (symbol-name . marker)
            for bufname = (buffer-name
                           (pcase v
@@ -392,7 +403,8 @@ string."
                                      "Function"
                                    "Top level")
                                  k))
-           for type-icon = (helm-imenu-icon-for-type (car types))
+           for type-icon = (and helm-imenu-use-icon
+                                (helm-imenu-icon-for-type (car types)))
            for type-name = (propertize
                             (car types) 'face
                             (cl-loop for (p . f) in helm-imenu-type-faces
@@ -403,13 +415,14 @@ string."
                                   (cdr types)
                                   (propertize helm-imenu-delimiter
                                               'face 'shadow))
-           for disp = (concat (propertize " " 'display type-icon)
-                              " "
-                              (if helm-imenu-show-item-type-name
-                                  (concat type-name
-                                          (propertize helm-imenu-delimiter
-                                                      'face 'shadow))
+           for disp = (concat (if helm-imenu-use-icon
+                                  (concat (propertize " " 'display type-icon) " ")
                                 "")
+                              (if helm-imenu-hide-item-type-name
+                                  ""
+                                (concat type-name
+                                          (propertize helm-imenu-delimiter
+                                                      'face 'shadow)))
                               (propertize disp1 'help-echo bufname 'types types))
            collect
            (cons disp (cons k v))))
