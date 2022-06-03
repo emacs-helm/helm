@@ -56,14 +56,14 @@ This is used in macro `with-helm-show-completion'."
     callf callf2 cl-callf cl-callf2 fset
     fboundp fmakunbound symbol-function)
   "List of function where quoted function completion happen.
-E.g. give only function names after \(funcall '."
+E.g. give only function names after (funcall '."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
 (defcustom helm-lisp-unquoted-function-list
   '(function defadvice)
   "List of function where unquoted function completion happen.
-E.g. give only function names after \(function ."
+E.g. give only function names after (function ."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 

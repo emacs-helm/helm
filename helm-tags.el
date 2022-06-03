@@ -45,7 +45,7 @@ Don't search tag file deeply if outside this value."
 (defcustom helm-etags-match-part-only 'tag
   "Allow choosing the tag part of CANDIDATE in `helm-source-etags-select'.
 A tag looks like this:
-    filename: \(defun foo
+    filename: (defun foo
 You can choose matching against the tag part (i.e \"(defun foo\"),
 or against the whole candidate (i.e \"(filename:5:(defun foo\")."
   :type '(choice

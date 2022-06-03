@@ -2618,12 +2618,12 @@ of current source only."
 
 PLIST is a list like
 
-\(:key1 val1 :key2 val2 ...\)
+\(:key1 val1 :key2 val2 ...)
 
  or
 
 \(&optional sources input prompt resume preselect
-            buffer keymap default history allow-nest\).
+            buffer keymap default history allow-nest).
 
 ** Keywords
 
@@ -2725,7 +2725,7 @@ session. The `helm-' prefix can be omitted. For example,
 
 \(helm :sources 'helm-source-buffers-list
        :buffer \"*helm buffers*\"
-       :candidate-number-limit 10\)
+       :candidate-number-limit 10)
 
 Starts a Helm session with the variable
 `helm-candidate-number-limit' set to 10.
@@ -2736,7 +2736,7 @@ For backward compatibility, positional parameters are
 supported:
 
 \(helm sources input prompt resume preselect
-       buffer keymap default history allow-nest\)
+       buffer keymap default history allow-nest)
 
 However, the use of non-keyword args is deprecated.
 
