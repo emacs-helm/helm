@@ -34,7 +34,7 @@
   "Locate related Applications and libraries for Helm."
   :group 'helm)
 
-(defcustom helm-locate-db-file-regexp "m?locate\.db$"
+(defcustom helm-locate-db-file-regexp "m?locate\\.db$"
   "Default regexp to match locate database.
 If nil Search in all files."
   :type  'string
