@@ -152,7 +152,7 @@ This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view]
     ("Operator"        . (all-the-icons-faicon "calculator" :face font-lock-builtin-face))
     ("Operators"       . (all-the-icons-faicon "calculator" :face font-lock-builtin-face))
     ("Property"        . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
-    ("Propertys"       . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
+    ("Properties"      . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
     ("Reference"       . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
     ("References"      . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
     ("Snippet"         . (all-the-icons-material "border_style" :face font-lock-variable-name-face))
@@ -164,6 +164,8 @@ This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view]
     ("Text"            . (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
     ("Texts"           . (all-the-icons-material "text_fields" :face font-lock-variable-name-face))
     ("Top level"       . (all-the-icons-faicon "globe" :face font-lock-function-name-face))
+    ("Trait"           . (all-the-icons-octicon "package" :face font-lock-builtin-face))
+    ("Traits"          . (all-the-icons-octicon "package" :face font-lock-builtin-face))
     ("Type"            . (all-the-icons-faicon "cog" :face font-lock-type-face))
     ("Types"           . (all-the-icons-faicon "cog" :face font-lock-type-face))
     ("Type Parameter"  . (all-the-icons-material "code" :face font-lock-type-face))
@@ -228,7 +230,7 @@ The sexp should be an `all-the-icons' function with its args."
   (with-helm-window
     (let* ((fn (lambda ()
                  (let ((str (buffer-substring
-                             (point-at-bol) (point-at-eol)))) 
+                             (point-at-bol) (point-at-eol))))
                    (if helm-imenu-hide-item-type-name
                        (get-text-property 1 'type-name str)
                    (car (split-string str helm-imenu-delimiter))))))
