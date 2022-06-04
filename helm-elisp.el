@@ -1,6 +1,6 @@
 ;;; helm-elisp.el --- Elisp symbols completion for helm. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -361,16 +361,16 @@ other window according to the value of
 
 (defun helm-elisp--show-help-1 (candidate &optional name)
   (let ((sym (intern-soft candidate)))
-    (cl-typecase sym
-      ((and fboundp boundp)
+    (pcase sym
+      ((and (pred fboundp) (pred boundp))
        (if (member name `(,helm-describe-function-function ,helm-describe-variable-function))
            (funcall (intern (format "helm-%s" name)) sym)
            ;; When there is no way to know what to describe
            ;; prefer describe-function.
            (helm-describe-function sym)))
-      (fbound  (helm-describe-function sym))
-      (bound    (helm-describe-variable sym))
-      (face     (helm-describe-face sym)))))
+      ((pred fboundp)  (helm-describe-function sym))
+      ((pred boundp)    (helm-describe-variable sym))
+      ((pred facep)     (helm-describe-face sym)))))
 
 (defun helm-elisp-show-help (candidate &optional name)
   "Show full help for the function CANDIDATE.
@@ -395,13 +395,13 @@ the same time to variable and a function."
   "Helm candidates transformer for Lisp completion."
   (cl-loop for c in candidates
         for sym = (intern c)
-        for annot = (cl-typecase sym
-                      (command " (Com)")
-                      (class   " (Class)")
-                      (cl-generic " (Gen)")
-                      (fbound  " (Fun)")
-                      (bound   " (Var)")
-                      (face    " (Face)"))
+        for annot = (pcase sym
+                      ((pred commandp) " (Com)")
+                      ((pred class-p)   " (Class)")
+                      ((pred cl-generic-p) " (Gen)")
+                      ((pred fboundp)  " (Fun)")
+                      ((pred boundp)   " (Var)")
+                      ((pred facep)    " (Face)"))
         for spaces = (make-string (- helm-lgst-len (length c)) ? )
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
@@ -413,16 +413,18 @@ the same time to variable and a function."
 If SYM is not documented, return \"Not documented\".
 Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
-  (let ((doc (cl-typecase sym
-               ((and fboundp boundp)
-                (cond ((string= name "describe-function")
-                       (documentation sym t))
-                      ((string= name  "describe-variable")
-                       (documentation-property sym 'variable-documentation t))
-                      (t (documentation sym t))))
-               (fbound  (documentation sym t))
-               (bound   (documentation-property sym 'variable-documentation t))
-               (face    (face-documentation sym)))))
+  (let ((doc (pcase sym
+               ((and (pred fboundp) (pred boundp))
+                (pcase name
+                  ("describe-function"
+                   (documentation sym t))
+                  ("describe-variable"
+                   (documentation-property sym 'variable-documentation t))
+                  (_ (documentation sym t))))
+               ((pred fboundp)  (documentation sym t))
+               ((pred boundp)   (documentation-property
+                                 sym 'variable-documentation t))
+               ((pred facep)   (face-documentation sym)))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
