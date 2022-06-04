@@ -3,9 +3,9 @@
 ;; Original Author: rubikitch
 
 ;; Copyright (C) 2008 ~ 2011 rubikitch
-;; Copyright (C) 2011 ~ 2020 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2011 ~ 2020 Thierry Volpiatto 
 
-;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Author: Thierry Volpiatto 
 ;; URL: http://github.com/emacs-helm/helm
 
 ;; This program is free software; you can redistribute it and/or modify
