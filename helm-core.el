@@ -31,8 +31,6 @@
 (require 'helm-lib)
 (require 'helm-multi-match)
 (require 'helm-source)
-;; Soft require this as it is not bundled with helm-core package.
-(require 'helm-global-bindings nil t)
 
 ;; Ensure async-bytecomp is used even with helm-core package.
 (declare-function async-bytecomp-package-mode "ext:async-bytecomp.el")
