@@ -39,19 +39,19 @@
   '((python-mode . semantic-format-tag-summarize)
     (c-mode . semantic-format-tag-concise-prototype-c-mode)
     (emacs-lisp-mode . semantic-format-tag-abbreviate-emacs-lisp-mode))
-  "Function to present a semantic tag according to `major-mode'.
+  "Function to present a semantic tag according to `major-mode\\='.
 
-It is an alist where the `car' of each element is a `major-mode' and
-the `cdr' a `semantic-format-tag-*' function.
+It is an alist where the `car\\=' of each element is a `major-mode\\=' and
+the `cdr\\=' a `semantic-format-tag-*\\=' function.
 
-If no function is found for current `major-mode', fall back to
-`semantic-format-tag-summarize' default function.
+If no function is found for current `major-mode\\=', fall back to
+`semantic-format-tag-summarize\\=' default function.
 
-You can have more or less informations depending of the `semantic-format-tag-*'
+You can have more or less informations depending of the `semantic-format-tag-*\\='
 function you choose.
 
 All the supported functions are prefixed with \"semantic-format-tag-\",
-you have completion on these functions with `C-M i' in the customize interface."
+you have completion on these functions with `C-M i\\=' in the customize interface."
   :group 'helm-semantic
   :type '(alist :key-type symbol :value-type symbol))
 
@@ -153,7 +153,7 @@ you have completion on these functions with `C-M i' in the customize interface."
    (action :initform 'helm-semantic-default-action)))
 
 (defcustom helm-semantic-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-semantic'."
+  "Enable fuzzy matching in `helm-source-semantic\\='."
   :group 'helm-semantic
   :type  'boolean
   :set (lambda (var val)
@@ -164,7 +164,7 @@ you have completion on these functions with `C-M i' in the customize interface."
 
 ;;;###autoload
 (defun helm-semantic (arg)
-  "Preconfigured `helm' for `semantic'.
+  "Preconfigured `helm\\=' for `semantic\\='.
 If ARG is supplied, pre-select symbol at point instead of current."
   (interactive "P")
   (let ((tag (helm-aif (car (semantic-current-tag-parent))
@@ -188,12 +188,12 @@ If ARG is supplied, pre-select symbol at point instead of current."
 
 ;;;###autoload
 (defun helm-semantic-or-imenu (arg)
-  "Preconfigured helm for `semantic' or `imenu'.
+  "Preconfigured helm for `semantic\\=' or `imenu\\='.
 If ARG is supplied, pre-select symbol at point instead of current
 semantic tag in scope.
 
-If `semantic-mode' is active in the current buffer, then use
-semantic for generating tags, otherwise fall back to `imenu'.
+If `semantic-mode\\=' is active in the current buffer, then use
+semantic for generating tags, otherwise fall back to `imenu\\='.
 Fill in the symbol at point by default."
   (interactive "P")
   (unless helm-source-semantic

@@ -22,7 +22,7 @@
 (require 'helm-bookmark)
 
 (defcustom helm-multi-files-toggle-locate-binding "C-c p"
-  "Default binding to switch back and forth locate in `helm-multi-files'."
+  "Default binding to switch back and forth locate in `helm-multi-files\\='."
   :group 'helm-files
   :type 'string)
 
@@ -33,7 +33,7 @@
     helm-source-file-cache
     helm-source-files-in-current-dir
     helm-source-locate)
-  "Your preferred sources for `helm-for-files' and `helm-multi-files'.
+  "Your preferred sources for `helm-for-files\\=' and `helm-multi-files\\='.
 
 When adding a source here it is up to you to ensure the library
 of this source is accessible and properly loaded."
@@ -64,7 +64,7 @@ Be aware that a nil value will make tramp display very slow."
 (defvar helm-source-file-cache nil)
 
 (defcustom helm-file-cache-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-file-cache' when non--nil."
+  "Enable fuzzy matching in `helm-source-file-cache\\=' when non--nil."
   :group 'helm-files
   :type 'boolean
   :set (lambda (var val)
@@ -111,7 +111,7 @@ Be aware that a nil value will make tramp display very slow."
            pattern))))
 
 (defcustom helm-turn-on-recentf t
-  "Automatically turn on `recentf-mode' when non-nil."
+  "Automatically turn on `recentf-mode\\=' when non-nil."
   :group 'helm-files
   :type 'boolean)
 
@@ -138,11 +138,11 @@ Be aware that a nil value will make tramp display very slow."
 
 (defvar helm-source-recentf nil
   "See (info \"(emacs)File Conveniences\").
-Set `recentf-max-saved-items' to a bigger value if default is too
+Set `recentf-max-saved-items\\=' to a bigger value if default is too
 small.")
 
 (defcustom helm-recentf-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-recentf' when non-nil."
+  "Enable fuzzy matching in `helm-source-recentf\\=' when non-nil."
   :group 'helm-files
   :type 'boolean
   :set (lambda (var val)
@@ -226,8 +226,8 @@ Colorize only symlinks, directories and files."
 
 ;;;###autoload
 (defun helm-for-files ()
-  "Preconfigured `helm' for opening files.
-Run all sources defined in `helm-for-files-preferred-list'."
+  "Preconfigured `helm\\=' for opening files.
+Run all sources defined in `helm-for-files-preferred-list\\='."
   (interactive)
   (require 'helm-x-files)
   (unless helm-source-buffers-list
@@ -257,10 +257,10 @@ Run all sources defined in `helm-for-files-preferred-list'."
 
 ;;;###autoload
 (defun helm-multi-files ()
-  "Preconfigured helm like `helm-for-files' but running locate only on demand.
+  "Preconfigured helm like `helm-for-files\\=' but running locate only on demand.
 
 Allow toggling back and forth from locate to others sources with
-`helm-multi-files-toggle-locate-binding' key.
+`helm-multi-files-toggle-locate-binding\\=' key.
 This avoids launching locate needlessly when what you are
 searching for is already found."
   (interactive)
@@ -299,7 +299,7 @@ searching for is already found."
 
 ;;;###autoload
 (defun helm-recentf ()
-  "Preconfigured `helm' for `recentf'."
+  "Preconfigured `helm\\=' for `recentf\\='."
   (interactive)
   (helm :sources 'helm-source-recentf
         :ff-transformer-show-only-basename nil

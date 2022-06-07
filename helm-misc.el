@@ -48,13 +48,13 @@
 (defface helm-time-zone-current
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "green"))
-  "Face used to colorize current time in `helm-world-time'."
+  "Face used to colorize current time in `helm-world-time\\='."
   :group 'helm-misc)
 
 (defface helm-time-zone-home
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "red"))
-  "Face used to colorize home time in `helm-world-time'."
+  "Face used to colorize home time in `helm-world-time\\='."
   :group 'helm-misc)
 
 
@@ -176,8 +176,8 @@
 ;;
 (defun helm-call-interactively (cmd-or-name)
   "Execute CMD-OR-NAME as Emacs command.
-It is added to `extended-command-history'.
-`helm-current-prefix-arg' is used as the command's prefix argument."
+It is added to `extended-command-history\\='.
+`helm-current-prefix-arg\\=' is used as the command\\='s prefix argument."
   (setq extended-command-history
         (cons (helm-stringify cmd-or-name)
               (delete (helm-stringify cmd-or-name) extended-command-history)))
@@ -198,7 +198,7 @@ It is added to `extended-command-history'.
     map))
 
 (defcustom helm-minibuffer-history-must-match t
-  "Allow inserting non matching elements when nil or 'confirm."
+  "Allow inserting non matching elements when nil or \\='confirm."
   :group 'helm-misc
   :type '(choice
           (const :tag "Must match" t)
@@ -206,7 +206,7 @@ It is added to `extended-command-history'.
           (const :tag "Always allow" nil)))
 
 (defcustom helm-minibuffer-history-key "C-r"
-  "The key `helm-minibuffer-history' is bound to in minibuffer local maps."
+  "The key `helm-minibuffer-history\\=' is bound to in minibuffer local maps."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
   :group 'helm-mode)
 
@@ -224,8 +224,8 @@ It is added to `extended-command-history'.
 
 ;;;###autoload
 (define-minor-mode helm-minibuffer-history-mode
-    "Bind `helm-minibuffer-history-key' in al minibuffer maps.
-This mode is enabled by `helm-mode', so there is no need to enable it directly."
+    "Bind `helm-minibuffer-history-key\\=' in al minibuffer maps.
+This mode is enabled by `helm-mode\\=', so there is no need to enable it directly."
   :group 'helm-misc
   :global t
   (if helm-minibuffer-history-mode
@@ -326,7 +326,7 @@ This mode is enabled by `helm-mode', so there is no need to enable it directly."
 
 ;;;###autoload
 (defun helm-world-time ()
-  "Preconfigured `helm' to show world time.
+  "Preconfigured `helm\\=' to show world time.
 Default action change TZ environment variable locally to emacs."
   (interactive)
   (helm-other-buffer 'helm-source-time-world "*helm world time*"))
@@ -339,7 +339,7 @@ Default action change TZ environment variable locally to emacs."
 
 ;;;###autoload
 (defun helm-ratpoison-commands ()
-  "Preconfigured `helm' to execute ratpoison commands."
+  "Preconfigured `helm\\=' to execute ratpoison commands."
   (interactive)
   (helm-other-buffer 'helm-source-ratpoison-commands
                      "*helm ratpoison commands*"))
@@ -353,7 +353,7 @@ Default action change TZ environment variable locally to emacs."
 
 ;;;###autoload
 (defun helm-minibuffer-history ()
-  "Preconfigured `helm' for `minibuffer-history'."
+  "Preconfigured `helm\\=' for `minibuffer-history\\='."
   (interactive)
   (cl-assert (minibuffer-window-active-p (selected-window)) nil
              "Error: Attempt to use minibuffer history outside a minibuffer")

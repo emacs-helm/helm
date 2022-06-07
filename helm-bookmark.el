@@ -35,7 +35,7 @@
 
 
 (defgroup helm-bookmark nil
-  "Predefined configurations for `helm.el'."
+  "Predefined configurations for `helm.el\\='."
   :group 'helm)
 
 (defcustom helm-bookmark-show-location nil
@@ -55,12 +55,12 @@
             helm-source-bookmark-w3m)
           (list 'helm-source-bookmark-uncategorized
                 'helm-source-bookmark-set))
-  "List of sources to use in `helm-filtered-bookmarks'."
+  "List of sources to use in `helm-filtered-bookmarks\\='."
   :group 'helm-bookmark
   :type '(repeat (choice symbol)))
 
 (defcustom helm-bookmark-use-icon nil
-  "Display candidates with an icon with `all-the-icons' when non nil."
+  "Display candidates with an icon with `all-the-icons\\=' when non nil."
   :type 'boolean
   :group 'helm-bookmark)
 
@@ -208,7 +208,7 @@
 ;;; Predicates
 ;;
 (defconst helm-bookmark--non-file-filename "   - no file -"
-  "Name to use for `filename' entry, for non-file bookmarks.")
+  "Name to use for `filename\\=' entry, for non-file bookmarks.")
 
 (defun helm-bookmark-gnus-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a Gnus bookmark.
@@ -274,7 +274,7 @@ This excludes bookmarks of a more specific kind (Info, Gnus, and W3m)."
         (string-suffix-p ".org_archive" filename t))))
 
 (defun helm-bookmark-helm-find-files-p (bookmark)
-  "Return non-nil if BOOKMARK bookmarks a `helm-find-files' session.
+  "Return non-nil if BOOKMARK bookmarks a `helm-find-files\\=' session.
 BOOKMARK is a bookmark name or a bookmark record."
   (eq (bookmark-get-handler bookmark) 'helm-ff-bookmark-jump))
 
@@ -302,7 +302,7 @@ BOOKMARK is a bookmark name or a bookmark record."
            never (funcall pred bookmark)))
 
 (defun helm-bookmark-filter-setup-alist (fn)
-  "Return a filtered `bookmark-alist' sorted alphabetically."
+  "Return a filtered `bookmark-alist\\=' sorted alphabetically."
   (cl-loop for b in bookmark-alist
            for name = (car b)
            when (funcall fn b) collect
@@ -313,8 +313,8 @@ BOOKMARK is a bookmark name or a bookmark record."
 (defvar w3m-async-exec)
 (defun helm-bookmark-jump-w3m (bookmark)
   "Jump to W3m bookmark BOOKMARK, setting a new tab.
-If `browse-url-browser-function' is set to something else than
-`w3m-browse-url' use it."
+If `browse-url-browser-function\\=' is set to something else than
+`w3m-browse-url\\=' use it."
   (require 'helm-net)
   (let* ((file  (or (bookmark-prop-get bookmark 'filename)
                     (bookmark-prop-get bookmark 'url)))
@@ -476,17 +476,17 @@ If `browse-url-browser-function' is set to something else than
 ;;; Helm find files sessions.
 ;;
 (defun helm-bookmark-helm-find-files-setup-alist ()
-  "Specialized filter function for `helm-find-files' bookmarks."
+  "Specialized filter function for `helm-find-files\\=' bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-helm-find-files-p))
 
 (defun helm-bookmark-browse-project (candidate)
-  "Run `helm-browse-project' from action."
+  "Run `helm-browse-project\\=' from action."
   (with-helm-default-directory
       (bookmark-get-filename candidate)
       (helm-browse-project nil)))
 
 (defun helm-bookmark-run-browse-project ()
-  "Run `helm-bookmark-browse-project' from keyboard."
+  "Run `helm-bookmark-browse-project\\=' from keyboard."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-bookmark-browse-project)))
@@ -542,7 +542,7 @@ If `browse-url-browser-function' is set to something else than
 ;;
 
 (defun helm-highlight-bookmark (bookmarks _source)
-  "Used as `filtered-candidate-transformer' to colorize bookmarks."
+  "Used as `filtered-candidate-transformer\\=' to colorize bookmarks."
   (let ((non-essential t))
     (cl-loop for i in bookmarks
           for isfile        = (bookmark-get-filename i)
@@ -656,7 +656,7 @@ If `browse-url-browser-function' is set to something else than
 ;;
 ;;
 (defun helm-bookmark-edit-bookmark (bookmark-name)
-  "Edit bookmark's name and file name, and maybe save them.
+  "Edit bookmark\\='s name and file name, and maybe save them.
 BOOKMARK-NAME is the current (old) name of the bookmark to be
 renamed."
   (let ((bmk (helm-bookmark-get-bookmark-from-name bookmark-name))
@@ -693,12 +693,12 @@ renamed."
       (list new-name new-loc))))
 
 (defun helm-bookmark-maybe-save-bookmark ()
-  "Increment save counter and maybe save `bookmark-alist'."
+  "Increment save counter and maybe save `bookmark-alist\\='."
   (setq bookmark-alist-modification-count (1+ bookmark-alist-modification-count))
   (when (bookmark-time-to-save-p) (bookmark-save)))
 
 (defun helm-bookmark-rename (old &optional new batch)
-  "Change bookmark's name from OLD to NEW.
+  "Change bookmark\\='s name from OLD to NEW.
 Interactively:
  If called from the keyboard, then prompt for OLD.
  If called from the menubar, select OLD from a menu.
@@ -706,7 +706,7 @@ If NEW is nil, then prompt for its string value.
 
 If BATCH is non-nil, then do not rebuild the menu list.
 
-While the user enters the new name, repeated `C-w' inserts
+While the user enters the new name, repeated `C-w\\=' inserts
 consecutive words from the buffer into the new bookmark name."
   (interactive (list (bookmark-completing-read "Old bookmark name")))
   (bookmark-maybe-historicize-string old)
@@ -725,7 +725,7 @@ consecutive words from the buffer into the new bookmark name."
     (helm-bookmark-maybe-save-bookmark) newname))
 
 (defun helm-bookmark-run-edit ()
-  "Run `helm-bookmark-edit-bookmark' from keyboard."
+  "Run `helm-bookmark-edit-bookmark\\=' from keyboard."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-bookmark-edit-bookmark)))
@@ -769,7 +769,7 @@ E.g. prepended with *."
 
 ;;;###autoload
 (defun helm-bookmarks ()
-  "Preconfigured `helm' for bookmarks."
+  "Preconfigured `helm\\=' for bookmarks."
   (interactive)
   (helm :sources '(helm-source-bookmarks
                    helm-source-bookmark-set)
@@ -778,8 +778,8 @@ E.g. prepended with *."
 
 ;;;###autoload
 (defun helm-filtered-bookmarks ()
-  "Preconfigured `helm' for bookmarks (filtered by category).
-Optional source `helm-source-bookmark-addressbook' is loaded only
+  "Preconfigured `helm\\=' for bookmarks (filtered by category).
+Optional source `helm-source-bookmark-addressbook\\=' is loaded only
 if external addressbook-bookmark package is installed."
   (interactive)
   (when helm-bookmark-use-icon

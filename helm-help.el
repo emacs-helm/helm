@@ -20,7 +20,7 @@
 
 
 (defgroup helm-help nil
-  "Embedded help for `helm'."
+  "Embedded help for `helm\\='."
   :group 'helm)
 
 (defface helm-helper
@@ -51,13 +51,13 @@
                                  helm-semantic-help-message
                                  helm-kmacro-help-message
                                  helm-kill-ring-help-message)
-  "A list of help messages (strings) used by `helm-documentation'.")
+  "A list of help messages (strings) used by `helm-documentation\\='.")
 
 (defvar helm-documentation-buffer-name "*helm documentation*")
 
 ;;;###autoload
 (defun helm-documentation ()
-  "Preconfigured `helm' for Helm documentation.
+  "Preconfigured `helm\\=' for Helm documentation.
 With a prefix arg refresh the documentation.
 
 Find here the documentation of all documented sources."
@@ -2478,7 +2478,7 @@ C/\\[helm-cr-empty-string]:Empty \
 f1/f2/f-n:NthAct \
 \\[helm-toggle-suspend-update]:Tog.suspend \
 \\[helm-customize-group]:Conf"
-  "String displayed in mode-line in `helm-source-find-files'.")
+  "String displayed in mode-line in `helm-source-find-files\\='.")
 
 ;;;###autoload
 (defvar helm-top-mode-line "\

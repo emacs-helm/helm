@@ -39,23 +39,23 @@
     (darwin "env COLUMNS=%s ps -axo pid,user,pri,nice,ucomm,tty,start_time,vsz,%%cpu,%%mem,etime,command")
     (t      "env COLUMNS=%s top -b -n 1"))
   "Top command used to display output of top.
-A format string where %s will be replaced with `frame-width'.
+A format string where %s will be replaced with `frame-width\\='.
 
-To use 'top' command, a version supporting batch mode (-b option)
-is needed. On Mac OSX 'top' command doesn't support this, so the
-'ps' command is used instead by default.
+To use \\='top\\=' command, a version supporting batch mode (-b option)
+is needed. On Mac OSX \\='top\\=' command doesn\\='t support this, so the
+\\='ps\\=' command is used instead by default.
 
-Normally 'top' command output have 12 columns, but in some
+Normally \\='top\\=' command output have 12 columns, but in some
 versions you may have less than this, so you can either customize
-top to use 12 columns with the interactives 'f' and 'W' commands
-of top, or modify `helm-top-sort-columns-alist' to fit with the
-number of columns your 'top' command is using.
+top to use 12 columns with the interactives \\='f\\=' and \\='W\\=' commands
+of top, or modify `helm-top-sort-columns-alist\\=' to fit with the
+number of columns your \\='top\\=' command is using.
 
-If you modify 'ps' command be sure that 'pid' comes in first and
+If you modify \\='ps\\=' command be sure that \\='pid\\=' comes in first and
 \"env COLUMNS=%s\" is specified at beginning of command. Ensure
 also that no elements contain spaces (e.g., use start_time and
-not start). Same as for 'top': you can customize
-`helm-top-sort-columns-alist' to make sort commands working
+not start). Same as for \\='top\\=': you can customize
+`helm-top-sort-columns-alist\\=' to make sort commands working
 properly according to your settings."
   :group 'helm-sys
   :type 'string)
@@ -73,21 +73,21 @@ nth 0 column."
   :type '(alist :key-type symbol :value-type (integer :tag "Column number")))
 
 (defcustom helm-top-poll-delay 1.5
-  "Helm top poll after this delay when `helm-top-poll-mode' is enabled.
+  "Helm top poll after this delay when `helm-top-poll-mode\\=' is enabled.
 The minimal delay allowed is 1.5, if less than this helm-top will use 1.5."
   :group 'helm-sys
   :type  'float)
 
 (defcustom helm-top-poll-delay-post-command 1.0
   "Helm top stop polling during this delay.
-This delay is added to `helm-top-poll-delay' after Emacs stops
+This delay is added to `helm-top-poll-delay\\=' after Emacs stops
 being idle."
   :group 'helm-sys
   :type 'float)
 
 (defcustom helm-top-poll-preselection 'linum
-  "Stay on same line or follow candidate when `helm-top-poll' updates display.
-Possible values are 'candidate or 'linum.
+  "Stay on same line or follow candidate when `helm-top-poll\\=' updates display.
+Possible values are \\='candidate or \\='linum.
 This affects also sorting functions in the same way."
   :group'helm-sys
   :type '(radio :tag "Preferred preselection action for helm-top"
@@ -196,7 +196,7 @@ This affects also sorting functions in the same way."
 
 (defvar helm-top--line nil)
 (defun helm-top-transformer (candidates _source)
-  "Transformer for `helm-top'.
+  "Transformer for `helm-top\\='.
 Return empty string for non--valid candidates."
   (cl-loop for disp in candidates collect
         (cond ((string-match "^ *[0-9]+" disp) disp)
@@ -217,7 +217,7 @@ Return empty string for non--valid candidates."
           (helm-next-line)))))
 
 (defun helm-top-action-transformer (actions _candidate)
-  "Action transformer for `top'.
+  "Action transformer for `top\\='.
 Show actions only on line starting by a PID."
   (let ((disp (helm-get-selection nil t)))
     (cond ((string-match "\\` *[0-9]+" disp)
@@ -247,7 +247,7 @@ Show actions only on line starting by a PID."
   (helm-remove-if-not-match "\\`[0-9]+\\'" (helm-marked-candidates)))
 
 (defun helm-top-sh (sig pids)
-  "Run kill shell command with signal SIG on PIDS for `helm-top'."
+  "Run kill shell command with signal SIG on PIDS for `helm-top\\='."
   (message "kill -%s %s exited with status %s"
            sig (mapconcat 'identity pids " ")
            (apply #'call-process
@@ -428,7 +428,7 @@ Show actions only on line starting by a PID."
 
 ;;;###autoload
 (defun helm-top ()
-  "Preconfigured `helm' for top command."
+  "Preconfigured `helm\\=' for top command."
   (interactive)
   (add-hook 'helm-after-update-hook 'helm-top--skip-top-line)
   (unwind-protect
@@ -441,7 +441,7 @@ Show actions only on line starting by a PID."
 
 ;;;###autoload
 (defun helm-list-emacs-process ()
-  "Preconfigured `helm' for Emacs process."
+  "Preconfigured `helm\\=' for Emacs process."
   (interactive)
   (helm-other-buffer 'helm-source-emacs-process "*helm process*"))
 

@@ -28,7 +28,7 @@
 (defvar dired-buffers)
 (defvar directory-files-no-dot-files-regexp)
 (defun helm-files-in-all-dired-candidates ()
-  "Return a list of files from live `dired' buffers."
+  "Return a list of files from live `dired\\=' buffers."
   (save-excursion
     (cl-loop for (f . b) in dired-buffers
           when (buffer-live-p b)
@@ -64,7 +64,7 @@
   "File list from emacs-session.")
 
 (defcustom helm-session-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-session' when non--nil."
+  "Enable fuzzy matching in `helm-source-session\\=' when non--nil."
   :group 'helm-files
   :type 'boolean
   :set (lambda (var val)
@@ -119,7 +119,7 @@
 
 (defvar helm-source-mac-spotlight
   (helm-make-source "mdfind" 'helm-mac-spotlight-source)
-  "Source for retrieving files via Spotlight's command line utility mdfind.")
+  "Source for retrieving files via Spotlight\\='s command line utility mdfind.")
 
 (provide 'helm-x-files)
 

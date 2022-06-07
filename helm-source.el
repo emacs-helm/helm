@@ -45,7 +45,7 @@
 ;;  unnecessary crap.
 
 (defun helm-source--cl--print-table (&rest args)
-  "Advice for `cl--print-table' to make readable class slots docstrings."
+  "Advice for `cl--print-table\\=' to make readable class slots docstrings."
   (cl-flet ((print-rows (rows)
               (let ((format "%s\n\n  Initform=%s\n\n%s"))
                 (dolist (row rows)
@@ -82,7 +82,7 @@
     "  A function returning the display string of the header.
   Its argument is the name of the source. This attribute is useful to
   add an additional information with the source name.
-  It doesn't modify the name of the source.")
+  It doesn\\='t modify the name of the source.")
 
    (init
     :initarg :init
@@ -92,8 +92,8 @@
     "  Function called with no parameters when helm is started.
   It is useful for collecting current state information which can be
   used to create the list of candidates later.
-  Initialization of `candidates-in-buffer' is done here
-  with `helm-init-candidates-in-buffer'.")
+  Initialization of `candidates-in-buffer\\=' is done here
+  with `helm-init-candidates-in-buffer\\='.")
 
    (candidates
     :initarg :candidates
@@ -104,7 +104,7 @@
   It can either be a variable name, a function called with no parameters
   or the actual list of candidates.
 
-  Do NOT use this for asynchronous sources, use `candidates-process'
+  Do NOT use this for asynchronous sources, use `candidates-process\\='
   instead.
 
   The list must be a list whose members are strings, symbols
@@ -123,7 +123,7 @@
   value.
 
   This function, generally should not compute candidates according to
-  `helm-pattern' which defeat all the Helm's matching mechanism
+  `helm-pattern\\=' which defeat all the Helm\\='s matching mechanism
   i.e. multiple pattern matching and/or fuzzy matching.
   If you want to do so, use :match-dynamic slot to be sure matching
   occur only in :candidates function and there is no conflict with
@@ -135,7 +135,7 @@
     :custom function
     :documentation
     "  Function called with no parameters at before \"init\" function
-  when `helm-force-update' is called.")
+  when `helm-force-update\\=' is called.")
 
    (cleanup
     :initarg :cleanup
@@ -153,7 +153,7 @@
     :custom sexp
     :documentation
     "  Specific keymap for this source.
-  default value is `helm-map'.")
+  default value is `helm-map\\='.")
 
    (action
     :initarg :action
@@ -170,7 +170,7 @@
   buffer and the FUNCTION is invoked when an action is
   selected. The first action of the list is the default.
 
-  You should use `helm-make-actions' to build this alist easily.")
+  You should use `helm-make-actions\\=' to build this alist easily.")
 
    (persistent-action
     :initarg :persistent-action
@@ -180,35 +180,35 @@
     "  Can be a either a Function called with one parameter (the
   selected candidate) or a cons cell where first element is this
   same function and second element a symbol (e.g never-split)
-  that inform `helm-execute-persistent-action' to not split his
+  that inform `helm-execute-persistent-action\\=' to not split his
   window to execute this persistent action.
   Example:
 
     (defun foo-persistent-action (candidate)
        (do-something candidate))
 
-    :persistent-action '(foo-persistent-action . never-split) ; Don't split
+    :persistent-action \\='(foo-persistent-action . never-split) ; Don\\='t split
   or
-    :persistent-action 'foo-persistent-action ; Split
+    :persistent-action \\='foo-persistent-action ; Split
 
   When specifying :persistent-action by slot directly, foo-persistent-action
-  will be executed without quitting helm when hitting `C-j'.
+  will be executed without quitting helm when hitting `C-j\\='.
 
   Note that other persistent actions can be defined using other
-  bindings than `C-j' by simply defining an interactive function bound
+  bindings than `C-j\\=' by simply defining an interactive function bound
   to a key in the keymap source.
   The function should create a new attribute in source before calling
-  `helm-execute-persistent-action' on this attribute.
+  `helm-execute-persistent-action\\=' on this attribute.
   Example:
 
      (defun helm-ff-persistent-delete ()
        \"Delete current candidate without quitting.\"
        (interactive)
        (with-helm-alive-p
-         (helm-set-attr 'quick-delete '(helm-ff-quick-delete . never-split))
-         (helm-execute-persistent-action 'quick-delete)))
+         (helm-set-attr \\='quick-delete \\='(helm-ff-quick-delete . never-split))
+         (helm-execute-persistent-action \\='quick-delete)))
 
-  This function is then bound in `helm-find-files-map'.")
+  This function is then bound in `helm-find-files-map\\='.")
 
    (persistent-action-if
     :initarg :persistent-action-if
@@ -222,21 +222,21 @@
 
      (defun foo-persistent-action (candidate)
        (cond (something
-              ;; Don't split helm-window.
+              ;; Don\\='t split helm-window.
               (cons (lambda (_ignore)
                       (do-something candidate))
-                    'no-split))
+                    \\='no-split))
              ;; Split helm-window.
              (something-else
               (lambda (_ignore)
                 (do-something-else candidate)))))
 
-     :persistent-action-if 'foo-persistent-action
+     :persistent-action-if \\='foo-persistent-action
 
-  Here when hitting `C-j' one of the lambda's will be executed
+  Here when hitting `C-j\\=' one of the lambda\\='s will be executed
   depending on something or something-else condition, splitting or not
   splitting as needed.
-  See `helm-find-files-persistent-action-if' definition as another example.")
+  See `helm-find-files-persistent-action-if\\=' definition as another example.")
 
    (persistent-help
     :initarg :persistent-help
@@ -245,11 +245,11 @@
     :documentation
     "  A string to explain persistent-action of this source.
   It is a facility to display what persistent action does in
-  header-line, once your source is loaded don't use it directly, it will
-  have no effect, use instead `header-line' attribute.
+  header-line, once your source is loaded don\\='t use it directly, it will
+  have no effect, use instead `header-line\\=' attribute.
   It also accepts a function or a variable name.
-  It will be displayed in `header-line' or in `minibuffer' depending
-  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.")
+  It will be displayed in `header-line\\=' or in `minibuffer\\=' depending
+  of value of `helm-echo-input-in-header-line\\=' and `helm-display-header-line\\='.")
 
    (help-message
     :initarg :help-message
@@ -257,7 +257,7 @@
     :custom (choice string function)
     :documentation
     "  Help message for this source.
-  If not present, `helm-help-message' value will be used.")
+  If not present, `helm-help-message\\=' value will be used.")
 
    (multiline
     :initarg :multiline
@@ -265,8 +265,8 @@
     :custom (choice boolean integer)
     :documentation
     "  Allow multiline candidates.
-  When non-nil candidates will be separated by `helm-candidate-separator'.
-  You can customize the color of this separator with `helm-separator' face.
+  When non-nil candidates will be separated by `helm-candidate-separator\\='.
+  You can customize the color of this separator with `helm-separator\\=' face.
   Value of multiline can be an integer which specify the maximum size of the
   multiline string to display, if multiline string is longer than this value
   it will be truncated.")
@@ -286,7 +286,7 @@
     :initform nil
     :custom (choice function list)
     :documentation
-    "  It's a function or a list of functions called with one argument
+    "  It\\='s a function or a list of functions called with one argument
   when the completion list from the source is built. The argument
   is the list of candidates retrieved from the source. The
   function should return a transformed list of candidates which
@@ -296,7 +296,7 @@
   This can be used to transform or remove items from the list of
   candidates.
 
-  Note that `candidates' is run already, so the given transformer
+  Note that `candidates\\=' is run already, so the given transformer
   function should also be able to handle candidates with (DISPLAY
   . REAL) format.")
 
@@ -305,12 +305,12 @@
     :initform nil
     :custom (choice function list)
     :documentation
-    "  It has the same format as `candidate-transformer', except the
+    "  It has the same format as `candidate-transformer\\=', except the
   function is called with two parameters: the candidate list and
   the source.
 
   This transformer is run on the candidate list which is already
-  filtered by the current pattern. While `candidate-transformer'
+  filtered by the current pattern. While `candidate-transformer\\='
   is run only once, it is run every time the input pattern is
   changed.
 
@@ -318,14 +318,14 @@
   example, based on the current pattern.
 
   In some cases it may also be more efficent to perform candidate
-  transformation here, instead of with `candidate-transformer'
+  transformation here, instead of with `candidate-transformer\\='
   even if this transformation is done every time the pattern is
   changed.  For example, if a candidate set is very large then
-  `candidate-transformer' transforms every candidate while only
+  `candidate-transformer\\=' transforms every candidate while only
   some of them will actually be displayed due to the limit
-  imposed by `helm-candidate-number-limit'.
+  imposed by `helm-candidate-number-limit\\='.
 
-  Note that `candidates' and `candidate-transformer' is run
+  Note that `candidates\\=' and `candidate-transformer\\=' is run
   already, so the given transformer function should also be able
   to handle candidates with (DISPLAY . REAL) format.")
 
@@ -336,14 +336,14 @@
     :documentation
     "  A transformer function that treat candidates one by one.
   It is called with one arg the candidate.
-  It is faster than `filtered-candidate-transformer' or
-  `candidate-transformer', but should be used only in sources
-  that recompute constantly their candidates, e.g `helm-source-find-files'.
+  It is faster than `filtered-candidate-transformer\\=' or
+  `candidate-transformer\\=', but should be used only in sources
+  that recompute constantly their candidates, e.g `helm-source-find-files\\='.
   Filtering happen early and candidates are treated
   one by one instead of re-looping on the whole list.
-  If used with `filtered-candidate-transformer' or `candidate-transformer'
+  If used with `filtered-candidate-transformer\\=' or `candidate-transformer\\='
   these functions should treat the candidates transformed by the
-  `filter-one-by-one' function in consequence.")
+  `filter-one-by-one\\=' function in consequence.")
 
    (display-to-real
     :initarg :display-to-real
@@ -363,7 +363,7 @@
   Example:
 
     (helm :sources (helm-build-sync-source \"test\"
-                 :candidates '(a b c d e)
+                 :candidates \\='(a b c d e)
                  :display-to-real (lambda (c) (concat c \":modified by d-t-r\")))
       :buffer \"*helm test*\")
 
@@ -384,7 +384,7 @@
   Example:
 
     (helm :sources (helm-build-sync-source \"test\"
-                 :candidates '((\"foo\" . 1) (\"bar\" . 2) (\"baz\". 3))
+                 :candidates \\='((\"foo\" . 1) (\"bar\" . 2) (\"baz\". 3))
                  :real-to-display (lambda (c) (format \"%s\" (1+ c))))
       :buffer \"*helm test*\")
 
@@ -395,16 +395,16 @@
     :initform nil
     :custom (choice boolean symbol)
     :documentation
-    "  Get candidates with their properties in `helm-marked-candidates'.
-  Allow using the FORCE-DISPLAY-PART of `helm-get-selection' in marked
-  candidates, use t or 'withprop to pass it to `helm-get-selection'.")
+    "  Get candidates with their properties in `helm-marked-candidates\\='.
+  Allow using the FORCE-DISPLAY-PART of `helm-get-selection\\=' in marked
+  candidates, use t or \\='withprop to pass it to `helm-get-selection\\='.")
 
    (action-transformer
     :initarg :action-transformer
     :initform nil
     :custom (choice function list)
     :documentation
-    "  It's a function or a list of functions called with two
+    "  It\\='s a function or a list of functions called with two
   arguments when the action list from the source is
   assembled. The first argument is the list of actions, the
   second is the current selection.  If it is a list of functions,
@@ -420,18 +420,18 @@
     :initform nil
     :custom (choice function list)
     :documentation
-    "  It's a function or a list of functions called with one argument
-  before computing matches. Its argument is `helm-pattern'.
-  Functions should return transformed `helm-pattern'.
+    "  It\\='s a function or a list of functions called with one argument
+  before computing matches. Its argument is `helm-pattern\\='.
+  Functions should return transformed `helm-pattern\\='.
 
-  It is useful to change interpretation of `helm-pattern'.")
+  It is useful to change interpretation of `helm-pattern\\='.")
 
    (candidate-number-limit
     :initarg :candidate-number-limit
     :initform nil
     :custom integer
     :documentation
-    "  Override `helm-candidate-number-limit' only for this source.")
+    "  Override `helm-candidate-number-limit\\=' only for this source.")
 
    (volatile
     :initarg :volatile
@@ -439,7 +439,7 @@
     :custom boolean
     :documentation
     "  Indicates the source assembles the candidate list dynamically,
-  so it shouldn't be cached within a single Helm
+  so it shouldn\\='t be cached within a single Helm
   invocation. It is only applicable to synchronous sources,
   because asynchronous sources are not cached.")
 
@@ -450,15 +450,15 @@
     :documentation
     "  List of functions called with one parameter: a candidate. The
   function should return non-nil if the candidate matches the
-  current pattern (see variable `helm-pattern').
+  current pattern (see variable `helm-pattern\\=').
 
-  When using `candidates-in-buffer' its default value is `identity' and
-  don't have to be changed, use the `search' slot instead.
+  When using `candidates-in-buffer\\=' its default value is `identity\\=' and
+  don\\='t have to be changed, use the `search\\=' slot instead.
 
   This attribute allows the source to override the default
-  pattern matching based on `string-match'. It can be used, for
+  pattern matching based on `string-match\\='. It can be used, for
   example, to implement a source for file names and do the
-  pattern matching on the basename of files, since it's more
+  pattern matching on the basename of files, since it\\='s more
   likely one is typing part of the basename when searching for a
   file, instead of some string anywhere else in its path.
 
@@ -471,7 +471,7 @@
   functions, respectively.
 
   This attribute has no effect for asynchronous sources (see
-  attribute `candidates'), and sources using `match-dynamic'
+  attribute `candidates\\='), and sources using `match-dynamic\\='
   since they perform pattern matching themselves.
 
   Note that FUZZY-MATCH slot will overhide value of this slot.")
@@ -497,10 +497,10 @@
     :documentation
     "  Enable fuzzy matching in this source.
   This will overwrite settings in MATCH slot, and for
-  sources built with child class `helm-source-in-buffer' the SEARCH slot.
+  sources built with child class `helm-source-in-buffer\\=' the SEARCH slot.
   This is an easy way of enabling fuzzy matching, but you can use the MATCH
   or SEARCH slots yourself if you want something more elaborated, mixing
-  different type of match (See `helm-source-buffers' class for example).
+  different type of match (See `helm-source-buffers\\=' class for example).
 
   This attribute is not supported for asynchronous sources
   since they perform pattern matching themselves.")
@@ -511,10 +511,10 @@
     :custom (choice list function)
     :documentation
     "  A function or a list of functions to apply to current list
-  of candidates when redisplaying buffer with `helm-redisplay-buffer'.
+  of candidates when redisplaying buffer with `helm-redisplay-buffer\\='.
   This is only interesting for modifying and redisplaying the whole list
   of candidates in async sources.
-  It uses `identity' by default for when async sources are mixed with
+  It uses `identity\\=' by default for when async sources are mixed with
   normal sources, in this case these normal sources are not modified and
   redisplayed as they are.")
 
@@ -523,7 +523,7 @@
     :initform nil
     :custom boolean
     :documentation
-    "  Don't allow marking candidates when this attribute is present.")
+    "  Don\\='t allow marking candidates when this attribute is present.")
 
    (nohighlight
     :initarg :nohighlight
@@ -533,13 +533,13 @@
     "  Disable highlighting matches in this source.
   This will disable generic highlighting of matches,
   but some specialized highlighting can be done from elsewhere,
-  i.e from `filtered-candidate-transformer' or `filter-one-by-one' slots.
+  i.e from `filtered-candidate-transformer\\=' or `filter-one-by-one\\=' slots.
   So use this to either disable completely highlighting in your source,
   or to disable highlighting and use a specialized highlighting matches
   function for this source.
   Remember that this function should run AFTER all filter functions if those
   filter functions are modifying face properties, though it is possible to
-  avoid this by using new `add-face-text-property' in your filter functions.")
+  avoid this by using new `add-face-text-property\\=' in your filter functions.")
 
    (allow-dups
     :initarg :allow-dups
@@ -556,7 +556,7 @@
     "  Allow passing history variable to helm from source.
   It should be a quoted symbol.
   Passing the history variable here have no effect
-  so add it also in the `helm' call with the :history keyword.
+  so add it also in the `helm\\=' call with the :history keyword.
   The main point of adding the variable here
   is to make it available when resuming.")
 
@@ -565,7 +565,7 @@
     :initform nil
     :custom function
     :documentation
-    "  It's a function called with one argument: the selected candidate.
+    "  It\\='s a function called with one argument: the selected candidate.
   This function is intended for type convertion. In normal case,
   the selected candidate (string) is passed to action
   function. If coerce function is specified, it is called just
@@ -579,17 +579,17 @@
     :initform nil
     :custom (choice string sexp)
     :documentation
-    "  Source local `helm-mode-line-string' (included in
-  `mode-line-format'). It accepts also variable/function name.")
+    "  Source local `helm-mode-line-string\\=' (included in
+  `mode-line-format\\='). It accepts also variable/function name.")
 
    (header-line
     :initarg :header-line
     :initform nil
     :custom (choice string function)
     :documentation
-    "  Source local `header-line-format'.
-  It will be displayed in `header-line' or in `minibuffer' depending
-  of value of `helm-echo-input-in-header-line' and `helm-display-header-line'.
+    "  Source local `header-line-format\\='.
+  It will be displayed in `header-line\\=' or in `minibuffer\\=' depending
+  of value of `helm-echo-input-in-header-line\\=' and `helm-display-header-line\\='.
   It accepts also variable/function name.")
 
    (resume
@@ -598,28 +598,28 @@
     :custom function
     :documentation
     "  Function called with no parameters at end of initialization
-  when `helm-resume' is started.
-  If this function try to do something against `helm-buffer', \(e.g updating,
-  searching etc...\) probably you should run it in a timer to ensure
-  `helm-buffer' is ready.")
+  when `helm-resume\\=' is started.
+  If this function try to do something against `helm-buffer\\=', (e.g updating,
+  searching etc...) probably you should run it in a timer to ensure
+  `helm-buffer\\=' is ready.")
 
    (follow
     :initarg :follow
     :initform nil
     :custom integer
     :documentation
-    "  Enable `helm-follow-mode' for this source only.
+    "  Enable `helm-follow-mode\\=' for this source only.
   With a value of 1 enable, a value of -1 or nil disable the mode.
-  See `helm-follow-mode' for more infos.")
+  See `helm-follow-mode\\=' for more infos.")
 
    (follow-delay
     :initarg :follow-delay
     :initform nil
     :custom integer
     :documentation
-    "  `helm-follow-mode' will execute persistent-action after this delay.
-  Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
-  If none of these are found fallback to `helm-input-idle-delay'.")
+    "  `helm-follow-mode\\=' will execute persistent-action after this delay.
+  Otherwise value of `helm-follow-input-idle-delay\\=' is used if non--nil,
+  If none of these are found fallback to `helm-input-idle-delay\\='.")
 
    (multimatch
     :initarg :multimatch
@@ -653,7 +653,7 @@
     :custom symbol
     :documentation
     "  A local hook that run at beginning of initilization of this source.
-  i.e Before the creation of `helm-buffer'.
+  i.e Before the creation of `helm-buffer\\='.
 
   Should be a variable (defined with defvar).
   Can be also an anonymous function or a list of functions
@@ -665,7 +665,7 @@
     :custom symbol
     :documentation
     "  A local hook that run at end of initilization of this source.
-  i.e After the creation of `helm-buffer'.
+  i.e After the creation of `helm-buffer\\='.
 
   Should be a variable.
   Can be also an anonymous function or a list of functions
@@ -677,21 +677,21 @@
     :custom (choice null integer)
     :documentation
     "  This slot have no more effect and is just kept for backward compatibility.
-  Please don't use it.")
+  Please don\\='t use it.")
 
    (must-match
     :initarg :must-match
     :initform nil
     :custom symbol
     :documentation
-    "  Same as `completing-read' require-match arg.
+    "  Same as `completing-read\\=' require-match arg.
   Possible values are:
-  - `t' which prevent exiting with an empty helm-buffer i.e. no matches.
-  - `confirm' which ask for confirmation i.e. need to press a second
+  - `t\\=' which prevent exiting with an empty helm-buffer i.e. no matches.
+  - `confirm\\=' which ask for confirmation i.e. need to press a second
      time RET.
-  - `nil' is the default and is doing nothing i.e. returns nil when
+  - `nil\\=' is the default and is doing nothing i.e. returns nil when
     pressing RET with an empty helm-buffer.
-  - Any other non nil values e.g. `ignore' allow exiting with
+  - Any other non nil values e.g. `ignore\\=' allow exiting with
     minibuffer contents as candidate value (in this case helm-buffer
     is empty).")
 
@@ -700,7 +700,7 @@
     :initform nil
     :custom function
     :documentation
-    "  Determine the target file when running `helm-quit-and-find-file'.
+    "  Determine the target file when running `helm-quit-and-find-file\\='.
   It is a function called with one arg SOURCE.")
 
    (group
@@ -708,7 +708,7 @@
     :initform 'helm
     :custom symbol
     :documentation
-    "  The current source group, default to `helm' when not specified."))
+    "  The current source group, default to `helm\\=' when not specified."))
 
   "Main interface to define helm sources."
   :abstract t)
@@ -723,11 +723,11 @@
     :custom boolean
     :documentation
     "  Enable migemo.
-  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  When multimatch is disabled, you can give the symbol \\='nomultimatch as value
   to force not using generic migemo matching function.
   In this case you have to provide your own migemo matching funtion
-  that kick in when `helm-migemo-mode' is enabled.
-  Otherwise it will be available for this source once `helm-migemo-mode'
+  that kick in when `helm-migemo-mode\\=' is enabled.
+  Otherwise it will be available for this source once `helm-migemo-mode\\='
   is enabled when non-nil.")
 
    (match-strict
@@ -738,7 +738,7 @@
     "  When specifying a match function within a source and
   helm-multi-match is enabled, the result of all matching
   functions will be concatened, which in some cases is not what
-  is wanted. When using `match-strict' only this or these
+  is wanted. When using `match-strict\\=' only this or these
   functions will be used. You can specify those functions as a
   list of functions or a single symbol function.
 
@@ -751,14 +751,14 @@
     :documentation
     "  Disable all helm matching functions when non nil.
   The :candidates function in this case is in charge of fetching
-  candidates dynamically according to `helm-pattern'.
+  candidates dynamically according to `helm-pattern\\='.
   Note that :volatile is automatically enabled when using this, so no
   need to specify it."))
 
   "Use this class to make helm sources using a list of candidates.
 This list should be given as a normal list, a variable handling a list
 or a function returning a list.
-Matching is done basically with `string-match' against each candidate.")
+Matching is done basically with `string-match\\=' against each candidate.")
 
 (defclass helm-source-async (helm-source)
   ((candidates-process
@@ -768,7 +768,7 @@ Matching is done basically with `string-match' against each candidate.")
     :documentation
     "  This attribute is used to define a process as candidate.
   The function called with no arguments must return a process
-  i.e. `processp', it use typically `start-process' or `make-process',
+  i.e. `processp\\=', it use typically `start-process\\=' or `make-process\\=',
   see (info \"(elisp) Asynchronous Processes\").
   
 
@@ -776,19 +776,19 @@ Matching is done basically with `string-match' against each candidate.")
   When building the source at runtime you can give directly a process
   as value, otherwise wrap the process call into a function.
   The process buffer should be nil, otherwise, if you use
-  `helm-buffer' give to the process a sentinel.")
+  `helm-buffer\\=' give to the process a sentinel.")
 
    (multimatch :initform nil))
 
   "Use this class to define a helm source calling an external process.
-The external process is called typically in a `start-process' call to be
+The external process is called typically in a `start-process\\=' call to be
 asynchronous.
 
 Note that using multiples asynchronous sources is not fully working,
 expect weird behavior if you try this.
 
 The :candidates slot is not allowed even if described because this class
-inherit from `helm-source'.")
+inherit from `helm-source\\='.")
 
 (defclass helm-source-in-buffer (helm-source)
   ((init
@@ -799,11 +799,11 @@ inherit from `helm-source'.")
     :initform nil
     :custom (choice list string)
     :documentation
-    "  A string, a list or a buffer that will be used to feed the `helm-candidates-buffer'.
+    "  A string, a list or a buffer that will be used to feed the `helm-candidates-buffer\\='.
   This data will be passed in a function added to the init slot and
-  the buffer will be build with `helm-init-candidates-in-buffer' or directly
-  with `helm-candidates-buffer' if data is a buffer.
-  This is an easy and fast method to build a `candidates-in-buffer' source.")
+  the buffer will be build with `helm-init-candidates-in-buffer\\=' or directly
+  with `helm-candidates-buffer\\=' if data is a buffer.
+  This is an easy and fast method to build a `candidates-in-buffer\\=' source.")
 
    (migemo
     :initarg :migemo
@@ -811,11 +811,11 @@ inherit from `helm-source'.")
     :custom boolean
     :documentation
     "  Enable migemo.
-  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  When multimatch is disabled, you can give the symbol \\='nomultimatch as value
   to force not using generic migemo matching function.
   In this case you have to provide your own migemo matching funtion
-  that kick in when `helm-migemo-mode' is enabled.
-  Otherwise it will be available for this source once `helm-migemo-mode'
+  that kick in when `helm-migemo-mode\\=' is enabled.
+  Otherwise it will be available for this source once `helm-migemo-mode\\='
   is enabled when non-nil.")
 
    (candidates
@@ -832,12 +832,12 @@ inherit from `helm-source'.")
     :initform 'buffer-substring-no-properties
     :custom function
     :documentation
-    "  A function like `buffer-substring-no-properties' or `buffer-substring'.
+    "  A function like `buffer-substring-no-properties\\=' or `buffer-substring\\='.
   This function converts region from point at line-beginning and point
-  at line-end in the `helm-candidate-buffer' to a string which will be displayed
-  in the `helm-buffer', it takes two args BEG and END.
-  By default, `helm-candidates-in-buffer' uses
-  `buffer-substring-no-properties' which does no conversion and doesn't carry
+  at line-end in the `helm-candidate-buffer\\=' to a string which will be displayed
+  in the `helm-buffer\\=', it takes two args BEG and END.
+  By default, `helm-candidates-in-buffer\\=' uses
+  `buffer-substring-no-properties\\=' which does no conversion and doesn\\='t carry
   text properties.")
 
    (search
@@ -845,15 +845,15 @@ inherit from `helm-source'.")
     :initform '(helm-candidates-in-buffer-search-default-fn)
     :custom (choice function list)
     :documentation
-    "  List of functions like `re-search-forward' or `search-forward'.
-  Buffer search function used by `helm-candidates-in-buffer'.
-  By default, `helm-candidates-in-buffer' uses `re-search-forward'.
+    "  List of functions like `re-search-forward\\=' or `search-forward\\='.
+  Buffer search function used by `helm-candidates-in-buffer\\='.
+  By default, `helm-candidates-in-buffer\\=' uses `re-search-forward\\='.
   The function should take one arg PATTERN.
   If your search function needs to handle negation like multimatch,
   this function should returns in such case a cons cell of two integers defining
   the beg and end positions to match in the line previously matched by
-  `re-search-forward' or similar, and move point to next line
-  (See how the `helm-mm-3-search-base' and `helm-fuzzy-search' functions are working).
+  `re-search-forward\\=' or similar, and move point to next line
+  (See how the `helm-mm-3-search-base\\=' and `helm-fuzzy-search\\=' functions are working).
 
   NOTE: FUZZY-MATCH slot will overhide value of this slot.")
 
@@ -865,7 +865,7 @@ inherit from `helm-source'.")
     "  When specifying a search function within a source and
   helm-multi-match is enabled, the result of all searching
   functions will be concatened, which in some cases is not what
-  is wanted. When using `search-strict' only this or these
+  is wanted. When using `search-strict\\=' only this or these
   functions will be used. You can specify those functions as a
   list of functions or a single symbol function.
 
@@ -874,15 +874,15 @@ inherit from `helm-source'.")
 
   "Use this source to make helm sources storing candidates inside a buffer.
 
-The buffer storing candidates is generated by `helm-candidate-buffer' function
-and all search are done in this buffer, results are transfered to the `helm-buffer'
+The buffer storing candidates is generated by `helm-candidate-buffer\\=' function
+and all search are done in this buffer, results are transfered to the `helm-buffer\\='
 when done.
-Contrarily to `helm-source-sync' candidates are matched using a function
-like `re-search-forward' (see below documentation of `:search' slot) which makes
+Contrarily to `helm-source-sync\\=' candidates are matched using a function
+like `re-search-forward\\=' (see below documentation of `:search\\=' slot) which makes
 the search much faster than matching candidates one by one.
-If you want to add search functions to your sources, don't use `:match' which
-will raise an error, but `:search'.
-See `helm-candidates-in-buffer' for more infos.")
+If you want to add search functions to your sources, don\\='t use `:match\\=' which
+will raise an error, but `:search\\='.
+See `helm-candidates-in-buffer\\=' for more infos.")
 
 (defclass helm-source-dummy (helm-source)
   ((candidates
@@ -934,7 +934,7 @@ See `helm-candidates-in-buffer' for more infos.")
     :initform nil
     :documentation
     "  Store line number in each candidate when non nil.
-  Line number is stored in `helm-linum' text property."))
+  Line number is stored in `helm-linum\\=' text property."))
 
   "The contents of the FILE will be used as candidates in buffer.")
 
@@ -960,7 +960,7 @@ Where OBJECT is an instance of an eieio class."
            collect (cons s slot-val)))
 
 (defun helm-make-source (name class &rest args)
-  "Build a `helm' source named NAME with ARGS for CLASS.
+  "Build a `helm\\=' source named NAME with ARGS for CLASS.
 Argument NAME is a string which define the source name, so no need to use
 the keyword :name in your source, NAME will be used instead.
 Argument CLASS is an eieio class object.
@@ -983,8 +983,8 @@ Arguments ARGS are keyword value pairs as defined in CLASS."
 
 (defun helm-source-mm-get-search-or-match-fns (source method)
   "Prepare match or search functions for class SOURCE.
-Argument METHOD is the matching method used by SOURCE either `match'
-or `search'."
+Argument METHOD is the matching method used by SOURCE either `match\\='
+or `search\\='."
   (let* ((diacritics       (slot-value source 'diacritics))
          (defmatch         (helm-aif (slot-value source 'match)
                                (helm-mklist it)))
@@ -1036,8 +1036,8 @@ or `search'."
 ;;
 (cl-defun helm-source-add-action-to-source-if (name fn source predicate
                                                     &optional (index 4))
-  "Same as `helm-add-action-to-source-if' but for SOURCE defined as eieio object.
-You can use this inside a `helm--setup-source' method for a SOURCE defined as
+  "Same as `helm-add-action-to-source-if\\=' but for SOURCE defined as eieio object.
+You can use this inside a `helm--setup-source\\=' method for a SOURCE defined as
 an eieio class."
   (let* ((actions     (slot-value source 'action))
          (action-transformers (slot-value source 'action-transformer))
@@ -1061,7 +1061,7 @@ an eieio class."
 ;;
 ;;
 (defun helm-source--persistent-help-string (value source)
-  "Format `persistent-help' VALUE in SOURCE.
+  "Format `persistent-help\\=' VALUE in SOURCE.
 Argument VALUE can be a string, a variable or a function."
   (substitute-command-keys
    (format "\\<helm-map>\\[helm-execute-persistent-action]: %s (keeping session)"
@@ -1072,8 +1072,8 @@ Argument VALUE can be a string, a variable or a function."
 (defun helm-source--header-line (source)
   "Compute a default header line for SOURCE.
 
-The header line is based on one of `persistent-action-if',
-`persistent-action', or `action' (in this order of precedence)."
+The header line is based on one of `persistent-action-if\\=',
+`persistent-action\\=', or `action\\=' (in this order of precedence)."
   (substitute-command-keys
    (concat "\\<helm-map>\\[helm-execute-persistent-action]: "
            (helm-acond
@@ -1251,33 +1251,33 @@ The header line is based on one of `persistent-action-if',
 ;;  Sources
 (defmacro helm-build-sync-source (name &rest args)
   "Build a synchronous helm source with name NAME.
-Args ARGS are keywords provided by `helm-source-sync'."
+Args ARGS are keywords provided by `helm-source-sync\\='."
   (declare (indent 1))
   `(helm-make-source ,name 'helm-source-sync ,@args))
 
 (defmacro helm-build-async-source (name &rest args)
   "Build a asynchronous helm source with name NAME.
-Args ARGS are keywords provided by `helm-source-async'."
+Args ARGS are keywords provided by `helm-source-async\\='."
   (declare (indent 1))
   `(helm-make-source ,name 'helm-source-async ,@args))
 
 (defmacro helm-build-in-buffer-source (name &rest args)
-  "Build a helm source with name NAME using `candidates-in-buffer' method.
-Args ARGS are keywords provided by `helm-source-in-buffer'."
+  "Build a helm source with name NAME using `candidates-in-buffer\\=' method.
+Args ARGS are keywords provided by `helm-source-in-buffer\\='."
   (declare (indent 1))
   `(helm-make-source ,name 'helm-source-in-buffer ,@args))
 
 (defmacro helm-build-dummy-source (name &rest args)
-  "Build a helm source with name NAME using `dummy' method.
-Args ARGS are keywords provided by `helm-source-dummy'."
+  "Build a helm source with name NAME using `dummy\\=' method.
+Args ARGS are keywords provided by `helm-source-dummy\\='."
   (declare (indent 1))
   `(helm-make-source ,name 'helm-source-dummy ,@args))
 
 (defmacro helm-build-in-file-source (name file &rest args)
-  "Build a helm source with NAME name using `candidates-in-files' method.
+  "Build a helm source with NAME name using `candidates-in-files\\=' method.
 Arg FILE is a filename, the contents of this file will be
 used as candidates in buffer.
-Args ARGS are keywords provided by `helm-source-in-file'."
+Args ARGS are keywords provided by `helm-source-in-file\\='."
   (declare (indent 2))
   `(helm-make-source ,name 'helm-source-in-file
      :candidates-file ,file ,@args))

@@ -43,7 +43,7 @@
     ("Kill name"                    . helm-ucs-kill-name)
     ("Kill code"                    . helm-ucs-kill-code)
     ("Describe char"                . helm-ucs-describe-char))
-  "Actions for `helm-source-ucs'."
+  "Actions for `helm-source-ucs\\='."
   :group 'helm-font
   :type '(alist :key-type string :value-type function))
 
@@ -55,7 +55,7 @@
     (define-key map (kbd "<C-right>")     'helm-ucs-persistent-forward)
     (define-key map (kbd "C-c SPC")       'helm-ucs-persistent-insert-space)
     map)
-  "Keymap for `helm-ucs'.")
+  "Keymap for `helm-ucs\\='.")
 
 (defface helm-ucs-char
   `((((class color) (background dark))
@@ -100,7 +100,7 @@
 (defvar helm-ucs--names nil)
 (defvar helm-ucs-history nil)
 (defvar helm-ucs-recent nil
-  "Ring of recent `helm-ucs' selections.")
+  "Ring of recent `helm-ucs\\=' selections.")
 
 (defun helm-calculate-ucs-alist-max-len (names)
   "Calculate the length of the longest NAMES list candidate."
@@ -118,7 +118,7 @@
            finally return (cons code char)))
 
 (defun helm-calculate-ucs-max-len ()
-  "Calculate the length of the longest `ucs-names' candidate."
+  "Calculate the length of the longest `ucs-names\\=' candidate."
   (let ((ucs-struct (ucs-names)))
     (if (hash-table-p ucs-struct)
         (helm-calculate-ucs-hash-table-max-len ucs-struct)
@@ -172,7 +172,7 @@
 (defun helm-ucs-collect-symbols (ucs-struct)
   "Collect ucs symbols from UCS-STRUCT.
 
-Depending on the Emacs version, the variable `ucs-names' can
+Depending on the Emacs version, the variable `ucs-names\\=' can
 either be an alist or a hash-table."
   (if (hash-table-p ucs-struct)
       (helm-ucs-collect-symbols-hash-table ucs-struct)
@@ -314,18 +314,18 @@ name."
                          (helm-ucs-insert-char candidate)
                          (helm-force-update))
     :keymap helm-ucs-map)
-  "Source for collecting `ucs-names' math symbols.")
+  "Source for collecting `ucs-names\\=' math symbols.")
 
 ;;;###autoload
 (defun helm-select-xfont ()
-  "Preconfigured `helm' to select Xfont."
+  "Preconfigured `helm\\=' to select Xfont."
   (interactive)
   (helm :sources 'helm-source-xfonts
         :buffer "*helm select xfont*"))
 
 ;;;###autoload
 (defun helm-ucs (arg)
-  "Preconfigured `helm' for `ucs-names'.
+  "Preconfigured `helm\\=' for `ucs-names\\='.
 
 Called with a prefix arg force reloading cache."
   (interactive "P")

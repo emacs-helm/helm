@@ -59,49 +59,49 @@
     (write-region . (default helm-read-file-name-handler-1)))
   "Completing read functions for specific Emacs commands.
 
-By default `helm-mode' use `helm-completing-read-default-handler' to
-provide helm completion in each `completing-read' or `read-file-name'
+By default `helm-mode\\=' use `helm-completing-read-default-handler\\=' to
+provide helm completion in each `completing-read\\=' or `read-file-name\\='
 found, but other functions can be specified here for specific
 commands. This also allows disabling helm completion for some commands
 when needed.
 
 Each entry is a cons cell like (EMACS_COMMAND . COMPLETING-READ_HANDLER)
 where key and value are symbols.
-However if a command is using in its definition both a `completing-read' AND
-a `read-file-name' we may want to specify a handler for both of them,
+However if a command is using in its definition both a `completing-read\\=' AND
+a `read-file-name\\=' we may want to specify a handler for both of them,
 this can be done by specifying value as a list of two symbols instead of
 a single symbol where the 1st element of the list specify the handler for the
-`completing-read' and the second the handler for the `read-file-name'.
-Special symbol 'default' means use the default helm handler for either
-`completing-read' or `read-file-name'.
+`completing-read\\=' and the second the handler for the `read-file-name\\='.
+Special symbol \\='default\\=' means use the default helm handler for either
+`completing-read\\=' or `read-file-name\\='.
 e.g. (write-region . (default helm-read-file-name-handler-1))
-means helm will use `helm-completing-read-default-handler' when
-`write-region' calls `completing-read' and
-`helm-read-file-name-handler-1' when it calls `read-file-name'.  
+means helm will use `helm-completing-read-default-handler\\=' when
+`write-region\\=' calls `completing-read\\=' and
+`helm-read-file-name-handler-1\\=' when it calls `read-file-name\\='.  
 
-Each key is an Emacs command that use originaly `completing-read'
-or/and `read-file-name'.
+Each key is an Emacs command that use originaly `completing-read\\='
+or/and `read-file-name\\='.
 
 Each value maybe a helm function that takes same arguments as
-`completing-read' plus NAME and BUFFER, where NAME is the name of the new
+`completing-read\\=' plus NAME and BUFFER, where NAME is the name of the new
 helm source and BUFFER the name of the buffer we will use, but it can
 be also a function not using helm, in this case the function should
-take the same args as `completing-read' and not be prefixed by \"helm-\".
+take the same args as `completing-read\\=' and not be prefixed by \"helm-\".
 
-`helm' will use the name of the command calling `completing-read' as
+`helm\\=' will use the name of the command calling `completing-read\\=' as
 NAME and BUFFER will be computed as well with NAME but prefixed with
 \"*helm-mode-\".
 
 This function prefix name must start by \"helm-\" when it uses helm,
-otherwise `helm' assumes the function is not a helm function and
-expects the same args as `completing-read', this allows you to define a
+otherwise `helm\\=' assumes the function is not a helm function and
+expects the same args as `completing-read\\=', this allows you to define a
 handler not using helm completion.
 
 Example:
 
     (defun foo/test ()
       (interactive)
-      (message \"%S\" (completing-read \"test: \" '(a b c d e))))
+      (message \"%S\" (completing-read \"test: \" \\='(a b c d e))))
 
     (defun helm-foo/test-completing-read-handler (prompt collection
                                                   predicate require-match
@@ -112,31 +112,31 @@ Example:
                                         :name name
                                         :buffer buffer))
 
-    (add-to-list 'helm-completing-read-handlers-alist
-                 '(foo/test . helm-foo/test-completing-read-handler))
+    (add-to-list \\='helm-completing-read-handlers-alist
+                 \\='(foo/test . helm-foo/test-completing-read-handler))
 
 
-We want here to make the regular `completing-read' in `foo/test'
+We want here to make the regular `completing-read\\=' in `foo/test\\='
 return a list of candidate(s) instead of a single candidate.
 
-Note that this function will be reused for ALL the `completing-read'
+Note that this function will be reused for ALL the `completing-read\\='
 of this command, so it should handle all cases. E.g.,
-if first `completing-read' completes against symbols and
-second `completing-read' should handle only buffer,
+if first `completing-read\\=' completes against symbols and
+second `completing-read\\=' should handle only buffer,
 your specialized function should handle both.
 
 If the value of an entry is nil completion will fall back to
 Emacs vanilla behaviour.
 Example:
 
-If you want to disable helm completion for `describe-function', use:
+If you want to disable helm completion for `describe-function\\=', use:
 
     (describe-function . nil)
 
-Ido is also supported, you can use `ido-completing-read' and
-`ido-read-file-name' as value of an entry or just 'ido.
+Ido is also supported, you can use `ido-completing-read\\=' and
+`ido-read-file-name\\=' as value of an entry or just \\='ido.
 Example:
-Enable ido completion for `find-file':
+Enable ido completion for `find-file\\=':
 
     (find-file . ido)
 
@@ -144,33 +144,33 @@ same as
 
     (find-file . ido-read-file-name)
 
-Note that you don't need to enable `ido-mode' for this to work, see
-`helm-mode' documentation."
+Note that you don\\='t need to enable `ido-mode\\=' for this to work, see
+`helm-mode\\=' documentation."
   :group 'helm-mode
   :type '(alist :key-type symbol :value-type symbol))
 
 (defcustom helm-comp-read-case-fold-search helm-case-fold-search
-  "Default Local setting of `helm-case-fold-search' for `helm-comp-read'.
-See `helm-case-fold-search' for more info."
+  "Default Local setting of `helm-case-fold-search\\=' for `helm-comp-read\\='.
+See `helm-case-fold-search\\=' for more info."
   :group 'helm-mode
   :type 'symbol)
 
 (defcustom helm-mode-handle-completion-in-region t
-  "Whether to replace or not `completion-in-region-function'.
-This enables support for `completing-read-multiple' and `completion-at-point'
+  "Whether to replace or not `completion-in-region-function\\='.
+This enables support for `completing-read-multiple\\=' and `completion-at-point\\='
 when non--nil."
   :group 'helm-mode
   :type 'boolean)
 
 (defcustom helm-mode-no-completion-in-region-in-modes nil
-  "A list of modes that do not want helm for `completion-in-region'."
+  "A list of modes that do not want helm for `completion-in-region\\='."
   :group 'helm-mode
   :type 'boolean)
 
 (defcustom helm-mode-reverse-history t
   "Display history source after current source when non nil.
 
-Apply only in `helm-mode' handled commands."
+Apply only in `helm-mode\\=' handled commands."
   :group 'helm-mode
   :type 'boolean)
 
@@ -179,12 +179,12 @@ Apply only in `helm-mode' handled commands."
   "The default sort function to sort candidates in completion-in-region.
 
 When nil no sorting is done.
-The function is a `filtered-candidate-transformer' function which takes
+The function is a `filtered-candidate-transformer\\=' function which takes
 two args CANDIDATES and SOURCE.
-The function must use the flag `helm-completion--sorting-done' and
+The function must use the flag `helm-completion--sorting-done\\=' and
 return CANDIDATES unchanged when the flag is nil.
-See default function `helm-completion-in-region-sort-fn' as example.
-It will be used only when `helm-completion-style' is either Emacs or
+See default function `helm-completion-in-region-sort-fn\\=' as example.
+It will be used only when `helm-completion-style\\=' is either Emacs or
 helm, otherwise when helm-fuzzy style is used, the fuzzy sort function
 will be used."
   :group 'helm-mode
@@ -201,24 +201,24 @@ will be used."
   :type 'boolean)
 
 (defcustom helm-read-file-name-use-default-arg-behavior nil
-  "Use emacs vanilla `read-file-name' behavior for default arg.
+  "Use emacs vanilla `read-file-name\\=' behavior for default arg.
 
-The behavior of default arg in `read-file-name' and friends is using
+The behavior of default arg in `read-file-name\\=' and friends is using
 the default arg as default value when initial input is not modified,
 even if this initial input is a valid value i.e. an existing file.
 We expect generally a default arg to be used if nothing is specified
 in the prompt or if what is specified is invalid, but the emacs behavior
 here is really weird, so we use this variable to disable this
-behavior, letting user specify default if needed with `M-n'.
-However we keep the emacs default for `read-file-name' and derived
-fns, this variable affecting only `helm-read-file-name'."
+behavior, letting user specify default if needed with `M-n\\='.
+However we keep the emacs default for `read-file-name\\=' and derived
+fns, this variable affecting only `helm-read-file-name\\='."
   :type 'boolean
   :group 'helm-mode)
 
 (defvar helm-mode-minibuffer-setup-hook-black-list '(minibuffer-completion-help)
-  "Incompatible `minibuffer-setup-hook' functions go here.
-A list of symbols.  `helm-mode' is rejecting all lambda's, byte-code fns
-and all functions belonging in this list from `minibuffer-setup-hook'.
+  "Incompatible `minibuffer-setup-hook\\=' functions go here.
+A list of symbols.  `helm-mode\\=' is rejecting all lambda\\='s, byte-code fns
+and all functions belonging in this list from `minibuffer-setup-hook\\='.
 This is mainly needed to prevent \"*Completions*\" buffers to popup.")
 
 (defface helm-mode-prefix
@@ -233,7 +233,7 @@ This is mainly needed to prevent \"*Completions*\" buffers to popup.")
     (define-key map (kbd "<C-return>") 'helm-cr-empty-string)
     (define-key map (kbd "M-RET")      'helm-cr-empty-string)
     map)
-  "Keymap for `helm-comp-read'.")
+  "Keymap for `helm-comp-read\\='.")
 
 (defun helm-mode-delete-char-backward-1 ()
   (interactive)
@@ -267,16 +267,16 @@ letting the user start a new completion with a new prefix."
   '(helm-mode-delete-char-backward-1 helm-mode-delete-char-backward-2) 1)
 
 (defcustom helm-completion-style 'helm
-  "Style of completion to use in `completion-in-region'.
+  "Style of completion to use in `completion-in-region\\='.
 
-This affects only `completion-at-point' and friends, and
-the `completing-read' using the default handler
-i.e. `helm-completing-read-default-handler'.
+This affects only `completion-at-point\\=' and friends, and
+the `completing-read\\=' using the default handler
+i.e. `helm-completing-read-default-handler\\='.
 
-NB: This has nothing to do with `completion-styles', it is independent from
-helm, but when using 'emacs as helm-completion-style helm
-will use the `completion-styles' for its completions.
-Up to the user to configure `completion-styles'.
+NB: This has nothing to do with `completion-styles\\=', it is independent from
+helm, but when using \\='emacs as helm-completion-style helm
+will use the `completion-styles\\=' for its completions.
+Up to the user to configure `completion-styles\\='.
 
 There are three possible values to use:
 
@@ -286,25 +286,25 @@ There are three possible values to use:
   entering a space helm switches to multi matching mode.
 
 - emacs, use regular Emacs completion according to
-  `completion-styles'.  Note that even in this style, helm allows using
-  multi match.  Emacs-27 provides a style called `flex' that can be used
-  aside `helm' style (see `completion-styles-alist').  When `flex' style
-  is not available (Emacs<27) helm provides `helm-flex' style which is
-  similar to `flex' and helm fuzzy matching.
+  `completion-styles\\='.  Note that even in this style, helm allows using
+  multi match.  Emacs-27 provides a style called `flex\\=' that can be used
+  aside `helm\\=' style (see `completion-styles-alist\\=').  When `flex\\=' style
+  is not available (Emacs<27) helm provides `helm-flex\\=' style which is
+  similar to `flex\\=' and helm fuzzy matching.
 
-For a better experience with emacs style, if you don't know what to use, set
-`completion-styles' to '(flex) if you are using emacs-27 or to
-\'(helm-flex) if you are using emacs-26 and keep 'emacs as default
-value for `helm-completion-style'.  Advanced users can also have a
-look to `completion-category-overrides' to set styles according to category.
-You can as well use `helm-completion-styles-alist' to override
-`helm-completion-style' in specific modes.
+For a better experience with emacs style, if you don\\='t know what to use, set
+`completion-styles\\=' to \\='(flex) if you are using emacs-27 or to
+\\\='(helm-flex) if you are using emacs-26 and keep \\='emacs as default
+value for `helm-completion-style\\='.  Advanced users can also have a
+look to `completion-category-overrides\\=' to set styles according to category.
+You can as well use `helm-completion-styles-alist\\=' to override
+`helm-completion-style\\=' in specific modes.
 
-Of course when using `helm' of `helm-fuzzy' as `helm-completion-style'
-emacs `completion-styles' have no effect.
+Of course when using `helm\\=' of `helm-fuzzy\\=' as `helm-completion-style\\='
+emacs `completion-styles\\=' have no effect.
 
-Please use custom interface or `customize-set-variable' to set this,
-NOT `setq'."
+Please use custom interface or `customize-set-variable\\=' to set this,
+NOT `setq\\='."
   :group 'helm-mode
   :type '(choice (const :tag "Emacs" emacs)
                  (const :tag "Helm" helm)
@@ -330,16 +330,16 @@ NOT `setq'."
 (defcustom helm-completion-styles-alist '((gud-mode . helm)
                                           ;; See https://github.com/djcb/mu/issues/2181.
                                           (mu4e-compose-mode . emacs))
-  "Allow configuring `helm-completion-style' per mode.
+  "Allow configuring `helm-completion-style\\=' per mode.
 
 Each entry is a cons cell like (mode . style) where style must be a
-suitable value for `helm-completion-style'.
-When specifying emacs as style for a mode, `completion-styles' can be
+suitable value for `helm-completion-style\\='.
+When specifying emacs as style for a mode, `completion-styles\\=' can be
 specified by using a cons cell specifying completion-styles to use
 with helm emacs style, e.g. (foo-mode . (emacs helm flex)) will set
-`completion-styles' to '(helm flex) for foo-mode.  This affects only
+`completion-styles\\=' to \\='(helm flex) for foo-mode.  This affects only
 completions happening in buffers and not minibuffer completions,
-i.e. completing-read's."
+i.e. completing-read\\='s."
   :group 'helm-mode
   :type
   `(alist :key-type (symbol :tag "Major Mode")
@@ -357,13 +357,13 @@ i.e. completing-read's."
 ;;
 ;;
 (defvar helm-comp-read-use-marked nil
-  "[INTERNAL] When non nil `helm-comp-read' will return marked candidates.
+  "[INTERNAL] When non nil `helm-comp-read\\=' will return marked candidates.
 
-Use this ONLY in `let', NOT globally, this allows third party packages
-to use a list as return value when `helm-mode' is enabled, e.g.
+Use this ONLY in `let\\=', NOT globally, this allows third party packages
+to use a list as return value when `helm-mode\\=' is enabled, e.g.
 
     (let ((helm-comp-read-use-marked t))
-      (completing-read \"test: \" '(a b c d e f g)))
+      (completing-read \"test: \" \\='(a b c d e f g)))
 
 ")
 
@@ -385,21 +385,21 @@ to use a list as return value when `helm-mode' is enabled, e.g.
 (cl-defun helm-comp-read-get-candidates (collection &optional
                                                     test sort-fn alistp
                                                     (input helm-pattern))
-  "Convert COLLECTION to list removing elements that don't match TEST.
-See `helm-comp-read' about supported COLLECTION arguments.
+  "Convert COLLECTION to list removing elements that don\\='t match TEST.
+See `helm-comp-read\\=' about supported COLLECTION arguments.
 
 SORT-FN is a predicate to sort COLLECTION.
 
-ALISTP when non--nil will not use `all-completions' to collect
-candidates because it doesn't handle alists correctly for helm.
-i.e In `all-completions' the car of each pair is used as value.
-In helm we want to use the cdr instead like \(display . real\),
+ALISTP when non--nil will not use `all-completions\\=' to collect
+candidates because it doesn\\='t handle alists correctly for helm.
+i.e In `all-completions\\=' the car of each pair is used as value.
+In helm we want to use the cdr instead like (display . real),
 so we return the alist as it is with no transformation by
-`all-completions'.
+`all-completions\\='.
 
 e.g
 
-\(setq A '((a . 1) (b . 2) (c . 3)))
+\(setq A \\='((a . 1) (b . 2) (c . 3)))
 ==>((a . 1) (b . 2) (c . 3))
 \(helm-comp-read \"test: \" A :alistp nil
                               :exec-when-only-one t
@@ -411,19 +411,19 @@ e.g
                               :initial-input \"1\")
 ==>\"1\"
 
-See docstring of `all-completions' for more info.
+See docstring of `all-completions\\=' for more info.
 
 INPUT is the string you want to complete against, defaulting to
-`helm-pattern' which is the value of what you enter in minibuffer.
+`helm-pattern\\=' which is the value of what you enter in minibuffer.
 Note that when using a function as COLLECTION this value will be
 available with the input argument of the function only when using a
-sync source from `helm-comp-read', i.e. not using
-`:candidates-in-buffer', otherwise the function is called only once
-with an empty string as value for `helm-pattern' because
-`helm-pattern' is not yet computed, which is what we want otherwise
+sync source from `helm-comp-read\\=', i.e. not using
+`:candidates-in-buffer\\=', otherwise the function is called only once
+with an empty string as value for `helm-pattern\\=' because
+`helm-pattern\\=' is not yet computed, which is what we want otherwise
 data would not be fully collected at init time.
 
-If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
+If COLLECTION is an `obarray\\=', a TEST should be needed. See `obarray\\='."
   ;; Ensure COLLECTION is computed from `helm-current-buffer'
   ;; because some functions used as COLLECTION work
   ;; only in the context of current-buffer (Bug#1030) .
@@ -494,7 +494,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
       (member (upcase pattern) candidates)))
 
 (defun helm-cr-default-transformer (candidates source)
-  "Default filter candidate function for `helm-comp-read'."
+  "Default filter candidate function for `helm-comp-read\\='."
   (let ((must-match (helm-get-attr 'must-match source)))
     (cl-loop for c in candidates
              for cand = (let ((elm (if (stringp c)
@@ -589,7 +589,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (group 'helm))
   "Read a string in the minibuffer, with helm completion.
 
-It is helm `completing-read' equivalent.
+It is helm `completing-read\\=' equivalent.
 
 - PROMPT is the prompt name to use.
 
@@ -597,18 +597,18 @@ It is helm `completing-read' equivalent.
   For alists and hash-tables their car are use as real value of
   candidate unless ALISTP is non-nil.
   It can be also a function that receives three arguments:
-  the values string, predicate and t. See `all-completions' for more details.
+  the values string, predicate and t. See `all-completions\\=' for more details.
 
 Keys description:
 
 - TEST: A predicate called with one arg i.e candidate.
 
-- INITIAL-INPUT: Same as input arg in `helm'.
+- INITIAL-INPUT: Same as input arg in `helm\\='.
 
-- PRESELECT: See preselect arg of `helm'.
+- PRESELECT: See preselect arg of `helm\\='.
 
 - DEFAULT: This option is used only for compatibility with regular
-  Emacs `completing-read' (Same as DEFAULT arg of `completing-read').
+  Emacs `completing-read\\=' (Same as DEFAULT arg of `completing-read\\=').
 
 - BUFFER: Name of helm-buffer.
 
@@ -628,9 +628,9 @@ Keys description:
   The main difference with INPUT-HISTORY is that the result of the
   completion is saved whereas in INPUT-HISTORY it is the minibuffer
   contents which is saved when you exit.
-  Don't use the same symbol for INPUT-HISTORY and HISTORY.
+  Don\\='t use the same symbol for INPUT-HISTORY and HISTORY.
   NOTE: As mentionned above this has nothing to do with
-  `minibuffer-history-variable', therefore if you want to save this
+  `minibuffer-history-variable\\=', therefore if you want to save this
   history persistently, you will have to add this variable to the
   relevant variable of your favorite tool for persistent emacs session
   i.e. psession, desktop etc...
@@ -639,79 +639,79 @@ Keys description:
   HISTORY candidates.
 
 - INPUT-HISTORY: A symbol. The minibuffer input history will be
-  stored there, if nil or not provided, `minibuffer-history'
+  stored there, if nil or not provided, `minibuffer-history\\='
   will be used instead.  You can navigate in this history with
-  `M-p' and `M-n'.
-  Don't use the same symbol for INPUT-HISTORY and HISTORY.
+  `M-p\\=' and `M-n\\='.
+  Don\\='t use the same symbol for INPUT-HISTORY and HISTORY.
 
-- CASE-FOLD: Same as `helm-case-fold-search'.
+- CASE-FOLD: Same as `helm-case-fold-search\\='.
 
 - PERSISTENT-ACTION: A function called with one arg i.e candidate.
 
 - PERSISTENT-HELP: A string to document PERSISTENT-ACTION.
 
 - MODE-LINE: A string or list to display in mode line.
-  Default is `helm-comp-read-mode-line'.
+  Default is `helm-comp-read-mode-line\\='.
 
-- KEYMAP: A keymap to use in this `helm-comp-read'.
+- KEYMAP: A keymap to use in this `helm-comp-read\\='.
   (the keymap will be shared with history source)
 
 - NAME: The name related to this local source.
 
-- HEADER-NAME: A function to alter NAME, see `helm'.
+- HEADER-NAME: A function to alter NAME, see `helm\\='.
 
-- EXEC-WHEN-ONLY-ONE: Bound `helm-execute-action-at-once-if-one'
+- EXEC-WHEN-ONLY-ONE: Bound `helm-execute-action-at-once-if-one\\='
   to non--nil. (possibles values are t or nil).
 
 - VOLATILE: Use volatile attribute.
 
-- SORT: A predicate to give to `sort' e.g `string-lessp'
+- SORT: A predicate to give to `sort\\=' e.g `string-lessp\\='
   Use this only on small data as it is inefficient.
   If you want to sort faster add a sort function to
   FC-TRANSFORMER.
   Note that FUZZY when enabled is already providing a sort function.
 
-- FC-TRANSFORMER: A `filtered-candidate-transformer' function
+- FC-TRANSFORMER: A `filtered-candidate-transformer\\=' function
   or a list of functions.
 
-- HIST-FC-TRANSFORMER: A `filtered-candidate-transformer'
+- HIST-FC-TRANSFORMER: A `filtered-candidate-transformer\\='
   function for the history source.
 
 - MARKED-CANDIDATES: If non-nil return candidate or marked candidates as a list.
 
-- NOMARK: When non--nil don't allow marking candidates.
+- NOMARK: When non--nil don\\='t allow marking candidates.
 
 - ALISTP:
   When non-nil (default) pass the value of (DISPLAY . REAL)
   candidate in COLLECTION to action when COLLECTION is an alist or a
   hash-table, otherwise DISPLAY is always returned as result on exit,
-  which is the default when using `completing-read'.
-  See `helm-comp-read-get-candidates'.
+  which is the default when using `completing-read\\='.
+  See `helm-comp-read-get-candidates\\='.
 
 - CANDIDATES-IN-BUFFER: when non--nil use a source build with
-  `helm-source-in-buffer' which is much faster.
+  `helm-source-in-buffer\\=' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
 - MATCH-PART: Allow matching only one part of candidate.
-  See match-part documentation in `helm-source'.
+  See match-part documentation in `helm-source\\='.
 
-- MATCH-DYNAMIC: See match-dynamic in `helm-source-sync'
+- MATCH-DYNAMIC: See match-dynamic in `helm-source-sync\\='
   It has no effect when used with CANDIDATES-IN-BUFFER.
 
-- ALLOW-NEST: Allow nesting this `helm-comp-read' in a helm session.
-  See `helm'.
+- ALLOW-NEST: Allow nesting this `helm-comp-read\\=' in a helm session.
+  See `helm\\='.
 
-- MULTILINE: See multiline in `helm-source'.
+- MULTILINE: See multiline in `helm-source\\='.
 
-- COERCE: See coerce in `helm-source'.
+- COERCE: See coerce in `helm-source\\='.
 
-- GROUP: See group in `helm-source'.
+- GROUP: See group in `helm-source\\='.
 
-Any prefix args passed during `helm-comp-read' invocation will be recorded
-in `helm-current-prefix-arg', otherwise if prefix args were given before
-`helm-comp-read' invocation, the value of `current-prefix-arg' will be used.
+Any prefix args passed during `helm-comp-read\\=' invocation will be recorded
+in `helm-current-prefix-arg\\=', otherwise if prefix args were given before
+`helm-comp-read\\=' invocation, the value of `current-prefix-arg\\=' will be used.
 That means you can pass prefix args before or after calling a command
-that use `helm-comp-read'.  See `helm-M-x' for example."
+that use `helm-comp-read\\='.  See `helm-M-x\\=' for example."
   ;; Handle error with HISTORY:
   ;;
   ;; Should show helm with one source at first run and save result on
@@ -895,7 +895,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
 (defun helm-completing-read-symbols
     (prompt _collection test _require-match init
      hist default _inherit-input-method name buffer)
-  "Specialized function for fast symbols completion in `helm-mode'."
+  "Specialized function for fast symbols completion in `helm-mode\\='."
   (require 'helm-elisp)
   (or
    (helm
@@ -929,10 +929,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     (prompt collection test require-match
      init hist default _inherit-input-method
      name buffer &optional cands-in-buffer exec-when-only-one)
-  "Call `helm-comp-read' with same args as `completing-read'.
-Extra optional arg CANDS-IN-BUFFER means use `candidates-in-buffer'
+  "Call `helm-comp-read\\=' with same args as `completing-read\\='.
+Extra optional arg CANDS-IN-BUFFER means use `candidates-in-buffer\\='
 method which is faster.
-It should be used when candidate list doesn't need to be rebuilt dynamically."
+It should be used when candidate list doesn\\='t need to be rebuilt dynamically."
   (let ((history (or (car-safe hist) hist))
         (initial-input (helm-aif (pcase init
                                    ((pred (stringp)) init)
@@ -975,9 +975,9 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
     (prompt collection predicate require-match
      init hist default _inherit-input-method
      name buffer &optional _cands-in-buffer exec-when-only-one)
-  "Call `helm-comp-read' with same args as `completing-read'.
+  "Call `helm-comp-read\\=' with same args as `completing-read\\='.
 
-This handler uses dynamic matching which allows honouring `completion-styles'."
+This handler uses dynamic matching which allows honouring `completion-styles\\='."
   (let* ((history (or (car-safe hist) hist))
          (input (pcase init
                   ((pred (stringp)) init)
@@ -1077,7 +1077,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "Specialized `helm-mode' handler for `find-tag'."
+  "Specialized `helm-mode\\=' handler for `find-tag\\='."
   ;; Some commands like find-tag may use `read-file-name' from inside
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
@@ -1092,7 +1092,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "`helm-mode' handler using sync source as backend."
+  "`helm-mode\\=' handler using sync source as backend."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
                                   name buffer))
@@ -1101,7 +1101,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "`helm-mode' handler using inbuffer source as backend."
+  "`helm-mode\\=' handler using inbuffer source as backend."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
                                   name buffer t))
@@ -1110,7 +1110,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "Default `helm-mode' handler for all `completing-read'."
+  "Default `helm-mode\\=' handler for all `completing-read\\='."
   (let* (;; Standard will be used as CANDS-IN-BUFFER arg.
          (standard (and (memq helm-completion-style '(helm helm-fuzzy)) t))
          (fn (if standard
@@ -1123,8 +1123,8 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
              standard)))
 
 (defun helm-mode--read-buffer-to-switch (prompt)
-  "[INTERNAL] This is used to advice `read-buffer-to-switch'.
-Don't use it directly."
+  "[INTERNAL] This is used to advice `read-buffer-to-switch\\='.
+Don\\='t use it directly."
   ;; `read-buffer-to-switch' is passing `minibuffer-completion-table'
   ;; to `read-buffer' through `minibuffer-setup-hook' which is too
   ;; late to be known by `read-buffer-function', in our case
@@ -1135,8 +1135,8 @@ Don't use it directly."
                  (confirm-nonexistent-file-or-buffer))))
 
 (defun helm--generic-read-buffer (prompt &optional default require-match predicate)
-  "The `read-buffer-function' for `helm-mode'.
-Affects `switch-to-buffer' `kill-buffer' and related."
+  "The `read-buffer-function\\=' for `helm-mode\\='.
+Affects `switch-to-buffer\\=' `kill-buffer\\=' and related."
   ;; `read-buffer' is using internally `Vbuffer_alist' which is an
   ;; alist with elements like (BUF-NAME . BUF-OBJ), therefore some
   ;; predicates in Emacs are working only on such cons cells.
@@ -1175,12 +1175,12 @@ Affects `switch-to-buffer' `kill-buffer' and related."
                          predicate require-match
                          initial-input hist def
                          inherit-input-method)
-  "An helm replacement of `completing-read'.
-This function should be used only as a `completing-read-function'.
+  "An helm replacement of `completing-read\\='.
+This function should be used only as a `completing-read-function\\='.
 
-Don't use it directly, use instead `helm-comp-read' in your programs.
+Don\\='t use it directly, use instead `helm-comp-read\\=' in your programs.
 
-See documentation of `completing-read' and `all-completions' for details."
+See documentation of `completing-read\\=' and `all-completions\\=' for details."
   (let* ((current-command (or (helm-this-command) this-command))
          (str-command     (if current-command
                               (helm-symbol-name current-command)
@@ -1299,7 +1299,7 @@ See documentation of `completing-read' and `all-completions' for details."
        (mode-line helm-read-file-name-mode-line-string))
   "Read a file name with helm completion.
 
-It is helm `read-file-name' emulation.
+It is helm `read-file-name\\=' emulation.
 
 Argument PROMPT is the default prompt to use.
 
@@ -1308,30 +1308,30 @@ Keys description:
 - NAME: Source name, default to \"Read File Name\".
 
 - INITIAL-INPUT: Where to start reading file name,
-                 default to `default-directory' or $HOME.
+                 default to `default-directory\\=' or $HOME.
 
-- BUFFER: `helm-buffer' name, defaults to \"*Helm Completions*\".
+- BUFFER: `helm-buffer\\=' name, defaults to \"*Helm Completions*\".
 
-- TEST: A predicate called with one arg 'candidate'.
+- TEST: A predicate called with one arg \\='candidate\\='.
 
 - NORET: Allow disabling helm-ff-RET (have no effect if helm-ff-RET
-                                      isn't bound to RET).
+                                      isn\\='t bound to RET).
 
-- CASE-FOLD: Same as `helm-case-fold-search'.
+- CASE-FOLD: Same as `helm-case-fold-search\\='.
 
 - PRESELECT: helm preselection.
 
 - HISTORY: Display HISTORY in a special source.
 
-- MUST-MATCH: Can be 'confirm, nil, or t.
+- MUST-MATCH: Can be \\='confirm, nil, or t.
 
 - FUZZY: Enable fuzzy matching when non-nil (Enabled by default).
 
 - MARKED-CANDIDATES: When non--nil return a list of marked candidates.
 
-- NOMARK: When non--nil don't allow marking candidates.
+- NOMARK: When non--nil don\\='t allow marking candidates.
 
-- ALISTP: Don't use `all-completions' in history
+- ALISTP: Don\\='t use `all-completions\\=' in history
           (take effect only on history).
 
 - PERSISTENT-ACTION-IF: a persistent if action function.
@@ -1339,7 +1339,7 @@ Keys description:
 - PERSISTENT-HELP: persistent help message.
 
 - MODE-LINE: A mode line message, default is
-             `helm-read-file-name-mode-line-string'."
+             `helm-read-file-name-mode-line-string\\='."
   (require 'tramp)
   (unless initial-input
     (setq initial-input (or default-directory (getenv "HOME"))))
@@ -1482,8 +1482,8 @@ Keys description:
 
 (cl-defun helm--generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
-  "Generic helm replacement of `read-file-name'.
-Don't use it directly, use instead `helm-read-file-name' in your programs."
+  "Generic helm replacement of `read-file-name\\='.
+Don\\='t use it directly, use instead `helm-read-file-name\\=' in your programs."
   (let* ((init (or initial dir default-directory))
          (helm-read-file-name-use-default-arg-behavior t)
          (current-command (or (helm-this-command) this-command))
@@ -1616,10 +1616,10 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
 (defun helm-read-file-name-handler-1 (prompt dir default-filename
                                       mustmatch initial predicate
                                       name buffer)
-  "A `read-file-name' handler with history.
-Can be added to `helm-completing-read-handlers-alist' for functions
-that need a `read-file-name' function with directory history.
-The `helm-find-files' history `helm-ff-history' is used here."
+  "A `read-file-name\\=' handler with history.
+Can be added to `helm-completing-read-handlers-alist\\=' for functions
+that need a `read-file-name\\=' function with directory history.
+The `helm-find-files\\=' history `helm-ff-history\\=' is used here."
   (let ((helm-always-two-windows t)
         (helm-split-window-default-side
          (if (eq helm-split-window-default-side 'same)
@@ -1655,7 +1655,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
     (sort candidates 'helm-generic-sort-fn)))
 
 (defun helm-mode--completion-in-region-initial-input (str)
-  "Highlight prefix in helm and helm-fuzzy `helm-completion-styles'."
+  "Highlight prefix in helm and helm-fuzzy `helm-completion-styles\\='."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
@@ -1690,7 +1690,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
 ;; Helm multi matching style
 
 (defun helm-completion-try-completion (string table pred point)
-  "The try completion function for `completing-styles-alist'.
+  "The try completion function for `completing-styles-alist\\='.
 Actually does nothing."
   ;; AFAIU the try-completions style functions
   ;; are here to check if what is at point is suitable for TABLE but
@@ -1702,7 +1702,7 @@ Actually does nothing."
   (ignore string table pred point))
 
 (defun helm-completion-all-completions (string table pred point)
-  "The all completions function for `completing-styles-alist'."
+  "The all completions function for `completing-styles-alist\\='."
   ;; FIXME: No need to bind all these value.
   ;; (cl-multiple-value-bind (all _pattern prefix _suffix _carbounds)
   (pcase-let ((`(,all ,_pattern ,prefix ,_suffix ,_carbounds)
@@ -1710,7 +1710,7 @@ Actually does nothing."
     (when all (nconc all (length prefix)))))
 
 (defun helm-completion--multi-all-completions-1 (string collection &optional predicate)
-  "Allow `all-completions' multi matching on its candidates."
+  "Allow `all-completions\\=' multi matching on its candidates."
   ;; Doing an initial call of all-completions on the first element of
   ;; STRING speedup completion and fix file completion when CAPF
   ;; returns relative paths to initial pattern (eshell and shell).
@@ -1800,7 +1800,7 @@ Actually does nothing."
 ;; Helm-flex style.
 ;; This is more or less the same as emacs-27 flex style.
 (defun helm-flex-completion-try-completion (string table pred point)
-  "The try completion function for `completing-styles-alist'."
+  "The try completion function for `completing-styles-alist\\='."
   ;; It is needed here to make minibuffer-complete work in emacs-26,
   ;; e.g. with regular M-x.
   (unless (string-match-p " " string)
@@ -1811,7 +1811,7 @@ Actually does nothing."
       (completion-pcm--merge-try pattern all prefix suffix))))
 
 (defun helm-flex-completion-all-completions (string table pred point)
-  "The all completions function for `completing-styles-alist'."
+  "The all completions function for `completing-styles-alist\\='."
   ;; FIXME: No need to bind all these value.
   (unless (string-match-p " " string)
     (pcase-let ((`(,all ,pattern ,prefix ,_suffix ,_carbounds)
@@ -1852,11 +1852,11 @@ is non-nil."
 ;; Completion-in-region-function
 
 (defun helm--completion-in-region (origfun start end collection &optional predicate)
-  "Helm replacement of `completion--in-region'.
+  "Helm replacement of `completion--in-region\\='.
 
-Can be used for `completion-in-region-function' by advicing it with an
+Can be used for `completion-in-region-function\\=' by advicing it with an
 :around advice to allow passing the old
-`completion-in-region-function' value in ORIGFUN."
+`completion-in-region-function\\=' value in ORIGFUN."
   (cl-declare (special require-match prompt))
   (if (memq major-mode helm-mode-no-completion-in-region-in-modes)
       (funcall origfun start end collection predicate)
@@ -2048,13 +2048,13 @@ Can be used for `completion-in-region-function' by advicing it with an
                        #'helm-mode--advice-lisp--local-variables)))))
 
 (defvar helm-crm-default-separator ","
-  "Default separator for `completing-read-multiple'.
+  "Default separator for `completing-read-multiple\\='.
 
-`crm-separator' will take precedence on this when it is a string composed
+`crm-separator\\=' will take precedence on this when it is a string composed
 of a single character.
 If used globally, it is a string composed of a single character,
 if let-bounded, it can be also nil or a symbol which mean no
-separator.  Don't set this to a string composed of more than one
+separator.  Don\\='t set this to a string composed of more than one
 character.
 Be sure to know what you are doing when modifying this.")
 (defun helm-completion-in-region--insert-result (result start point end base-size)
@@ -2126,21 +2126,21 @@ Be sure to know what you are doing when modifying this.")
 (define-minor-mode helm-mode
     "Toggle generic helm completion.
 
-All functions in Emacs that use `completing-read',
-`read-file-name', `completion-in-region' and friends will use helm
+All functions in Emacs that use `completing-read\\=',
+`read-file-name\\=', `completion-in-region\\=' and friends will use helm
 interface when this mode is turned on.
 
 However you can modify this behavior for functions of your choice
-with `helm-completing-read-handlers-alist'.
+with `helm-completing-read-handlers-alist\\='.
 
 Called with a positive arg, turn on unconditionally, with a
 negative arg turn off.
-You can toggle it with M-x `helm-mode'.
+You can toggle it with M-x `helm-mode\\='.
 
-About `ido-mode':
-DO NOT enable `ido-everywhere' when using `helm-mode'.  Instead of
-using `ido-mode', add the commands where you want to use ido to
-`helm-completing-read-handlers-alist' with `ido' as value.
+About `ido-mode\\=':
+DO NOT enable `ido-everywhere\\=' when using `helm-mode\\='.  Instead of
+using `ido-mode\\=', add the commands where you want to use ido to
+`helm-completing-read-handlers-alist\\=' with `ido\\=' as value.
 
 Note: This mode is incompatible with Emacs23."
   :group 'helm-mode

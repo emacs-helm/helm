@@ -25,16 +25,16 @@
   :group 'helm)
 
 (defcustom helm-gid-program "gid"
-  "Name of gid command (usually `gid').
-For Mac OS X users, if you install GNU coreutils, the name `gid'
-might be occupied by `id' from GNU coreutils, and you should set
+  "Name of gid command (usually `gid\\=').
+For Mac OS X users, if you install GNU coreutils, the name `gid\\='
+might be occupied by `id\\=' from GNU coreutils, and you should set
 it to correct name (or absolute path).  For example, if using
-MacPorts to install id-utils, it should be `gid32'."
+MacPorts to install id-utils, it should be `gid32\\='."
   :group 'helm-id-utils
   :type 'file)
 
 (defcustom helm-gid-db-file-name "ID"
-  "Name of a database file created by `mkid' command from `ID-utils'."
+  "Name of a database file created by `mkid\\=' command from `ID-utils\\='."
   :group 'helm-id-utils
   :type 'string)
 
@@ -101,10 +101,10 @@ MacPorts to install id-utils, it should be `gid32'."
 
 ;;;###autoload
 (defun helm-gid ()
-  "Preconfigured `helm' for `gid' command line of `ID-Utils'.
-Need A database created with the command `mkid' above
-`default-directory'.
-Need id-utils as dependency which provide `mkid', `gid' etc..
+  "Preconfigured `helm\\=' for `gid\\=' command line of `ID-Utils\\='.
+Need A database created with the command `mkid\\=' above
+`default-directory\\='.
+Need id-utils as dependency which provide `mkid\\=', `gid\\=' etc..
 See <https://www.gnu.org/software/idutils/>."
   (interactive)
   (let* ((db (locate-dominating-file

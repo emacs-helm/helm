@@ -32,21 +32,21 @@
 (defcustom helm-raise-command nil
   "A shell command to jump to a window running specific program.
 Need external program wmctrl.
-This will be use with `format', so use something like \"wmctrl -xa %s\"."
+This will be use with `format\\=', so use something like \"wmctrl -xa %s\"."
   :type 'string
   :group 'helm-external)
 
 (defcustom helm-external-programs-associations nil
   "Alist to store externals programs associated with file extension.
 This variable overhide setting in .mailcap file.
-E.g.: '\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
+E.g.: \\='((\"jpg\" . \"gqview\") (\"pdf\" . \"xpdf\")) "
   :type '(alist :key-type string :value-type string)
   :group 'helm-external)
 
 (defcustom helm-default-external-file-browser "nautilus"
   "Default external file browser for your system.
 Directories will be opened externally with it when opening file
-externally in `helm-find-files'.
+externally in `helm-find-files\\='.
 Set to nil if you do not have an external file browser or do not
 want to use it.
 Windows users should set that to \"explorer.exe\"."
@@ -63,9 +63,9 @@ automatically.")
 
 (defun helm-external-commands-list-1 (&optional sort)
   "Returns a list of all external commands the user can execute.
-If `helm-external-commands-list' is non-nil it will return its
+If `helm-external-commands-list\\=' is non-nil it will return its
 contents.  Else it calculates all external commands and sets
-`helm-external-commands-list'."
+`helm-external-commands-list\\='."
   (helm-aif helm-external-commands-list
       it
     (setq helm-external-commands-list
@@ -85,7 +85,7 @@ contents.  Else it calculates all external commands and sets
 (defun helm-run-or-raise (exe &optional files detached)
   "Run asynchronously EXE or jump to the application window.
 If EXE is already running just jump to his window if
-`helm-raise-command' is non-nil.
+`helm-raise-command\\=' is non-nil.
 When FILES argument is provided run EXE with FILES.
 When argument DETACHED is non nil, detach process from Emacs."
   (let* ((proc-name (replace-regexp-in-string
@@ -155,7 +155,7 @@ When argument DETACHED is non nil, detach process from Emacs."
 
 (defun helm-get-default-program-for-file (filename)
   "Try to find a default program to open FILENAME.
-Try first in `helm-external-programs-associations' and then in
+Try first in `helm-external-programs-associations\\=' and then in
 mailcap file.  If nothing found return nil."
   (let* ((ext      (file-name-extension filename))
          (def-prog (assoc-default ext helm-external-programs-associations)))
@@ -167,7 +167,7 @@ mailcap file.  If nothing found return nil."
 (defun helm-open-file-externally (_file)
   "Open FILE with an external program.
 Try to guess which program to use with
-`helm-get-default-program-for-file'.
+`helm-get-default-program-for-file\\='.
 If not found or a prefix arg is given query the user which tool
 to use."
   (let* ((files      (helm-marked-candidates :with-wildcard t))
@@ -236,10 +236,10 @@ to use."
 
 ;;;###autoload
 (defun helm-run-external-command ()
-  "Preconfigured `helm' to run External PROGRAM asyncronously from Emacs.
-If program is already running try to run `helm-raise-command' if
+  "Preconfigured `helm\\=' to run External PROGRAM asyncronously from Emacs.
+If program is already running try to run `helm-raise-command\\=' if
 defined otherwise exit with error. You can set your own list of
-commands with `helm-external-commands-list'."
+commands with `helm-external-commands-list\\='."
   (interactive)
   (helm :sources `(,(helm-make-source "External Commands history" 'helm-external-commands
                       :data helm-external-command-history)

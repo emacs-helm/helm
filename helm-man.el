@@ -47,8 +47,8 @@
 (defcustom helm-man-format-switches (cl-case system-type
                                       ((darwin macos) "%s")
                                       (t "-l %s"))
-  "Arguments to pass to the `manual-entry' function.
-Arguments are passed to `manual-entry' with `format.'"
+  "Arguments to pass to the `manual-entry\\=' function.
+Arguments are passed to `manual-entry\\=' with `format.\\='"
   :group 'helm-man
   :type 'string)
 
@@ -102,7 +102,7 @@ source.")
 
 ;;;###autoload
 (defun helm-man-woman (arg)
-  "Preconfigured `helm' for Man and Woman pages.
+  "Preconfigured `helm\\=' for Man and Woman pages.
 With a prefix arg reinitialize the cache."
   (interactive "P")
   (when arg (setq helm-man--pages nil))

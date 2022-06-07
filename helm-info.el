@@ -44,7 +44,7 @@
     helm-source-info-eieio
     helm-source-info-pages)
   "Default sources to use for looking up symbols at point in Info
-files with `helm-info-at-point'."
+files with `helm-info-at-point\\='."
   :group 'helm-info
   :type '(repeat (choice symbol)))
 
@@ -72,7 +72,7 @@ found in each node, otherwise scan only the current info buffer."
 
 (defun helm-info-scan-current-buffer (tobuf)
   "Scan current info buffer and print lines to TOBUF.
-Argument TOBUF is the `helm-candidate-buffer'."
+Argument TOBUF is the `helm-candidate-buffer\\='."
   (let (start end line)
     (goto-char (point-min))
     (while (search-forward "\n* " nil t)
@@ -107,7 +107,7 @@ a line like this:
 \* bind:                                  Bash Builtins.       (line  21).")
 
 (defun helm-info-display-to-real (line)
-  "Transform LINE to an acceptable argument for `info'.
+  "Transform LINE to an acceptable argument for `info\\='.
 If line have a node use the node, otherwise use directly first name found."
   (let (nodename linum)
     (when (string-match helm-info--node-regexp line)
@@ -140,7 +140,7 @@ If line have a node use the node, otherwise use directly first name found."
 (defun helm-build-info-index-command (name doc source buffer)
   "Define a Helm command NAME with documentation DOC.
 Arg SOURCE will be an existing helm source named
-`helm-source-info-<NAME>' and BUFFER a string buffer name."
+`helm-source-info-<NAME>\\=' and BUFFER a string buffer name."
   (defalias (intern (concat "helm-info-" name))
       (lambda ()
         (interactive)
@@ -152,10 +152,10 @@ Arg SOURCE will be an existing helm source named
 (defun helm-define-info-index-sources (var-value &optional commands)
   "Define Helm sources named helm-source-info-<NAME>.
 Sources are generated for all entries of
-`helm-default-info-index-list'.
+`helm-default-info-index-list\\='.
 If COMMANDS arg is non-nil, also build commands named
-`helm-info-<NAME>'.
-Where NAME is an element of `helm-default-info-index-list'."
+`helm-info-<NAME>\\='.
+Where NAME is an element of `helm-default-info-index-list\\='."
   (cl-loop for str in var-value
            for sym = (intern (concat "helm-source-info-" str))
            do (set sym (helm-build-info-source str))
@@ -177,12 +177,12 @@ Where NAME is an element of `helm-default-info-index-list'."
   "Ring of previously searched Info files.")
 
 (defun helm-get-info-files ()
-  "Return list of Info files to use for `helm-info'.
+  "Return list of Info files to use for `helm-info\\='.
 
 Elements of the list are strings of Info file names without
 extensions (e.g., \"emacs\" for file \"emacs.info.gz\").  Info
 files are found by searching directories in
-`Info-directory-list'."
+`Info-directory-list\\='."
   (info-initialize) ; Build Info-directory-list from INFOPATH (Bug#2118)
   (let ((files (cl-loop for d in (or Info-directory-list
                                      Info-default-directory-list)
@@ -195,13 +195,13 @@ files are found by searching directories in
 
 (defcustom helm-default-info-index-list
   (helm-get-info-files)
-  "Info files to search in with `helm-info'."
+  "Info files to search in with `helm-info\\='."
   :group 'helm-info
   :type  '(repeat (choice string))
   :set   'helm-info-index-set)
 
 (defun helm-info-search-index (candidate)
-  "Search the index of CANDIDATE's Info file using the function
+  "Search the index of CANDIDATE\\='s Info file using the function
 helm-info-<CANDIDATE>."
   (let ((helm-info-function
          (intern-soft (concat "helm-info-" candidate))))
@@ -223,18 +223,18 @@ helm-info-<CANDIDATE>."
 
 ;;;###autoload
 (defun helm-info (&optional refresh)
-  "Preconfigured `helm' for searching Info files' indices.
+  "Preconfigured `helm\\=' for searching Info files\\=' indices.
 
 With a prefix argument \\[universal-argument], set REFRESH to
 non-nil.
 
 Optional parameter REFRESH, when non-nil, re-evaluates
-`helm-default-info-index-list'.  If the variable has been
+`helm-default-info-index-list\\='.  If the variable has been
 customized, set it to its saved value.  If not, set it to its
-standard value. See `custom-reevaluate-setting' for more.
+standard value. See `custom-reevaluate-setting\\=' for more.
 
 REFRESH is useful when new Info files are installed.  If
-`helm-default-info-index-list' has not been customized, the new
+`helm-default-info-index-list\\=' has not been customized, the new
 Info files are made available."
   (interactive "P")
   (let ((default (unless (ring-empty-p helm-info-searched)
@@ -281,7 +281,7 @@ Info files are made available."
 
 ;;;###autoload
 (defun helm-info-at-point ()
-  "Preconfigured `helm' for searching info at point."
+  "Preconfigured `helm\\=' for searching info at point."
   (interactive)
   ;; Symbol at point is used as default as long as one of the sources
   ;; in `helm-info-default-sources' is member of

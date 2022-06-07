@@ -31,13 +31,13 @@
   :group 'helm)
 
 (defcustom helm-kill-ring-threshold 3
-  "Minimum length of a candidate to be listed by `helm-source-kill-ring'."
+  "Minimum length of a candidate to be listed by `helm-source-kill-ring\\='."
   :type 'integer
   :group 'helm-ring)
 
 (defcustom helm-kill-ring-max-offset 400
   "Max number of chars displayed per candidate in kill-ring browser.
-When `t', don't truncate candidate, show all.
+When `t\\=', don\\='t truncate candidate, show all.
 By default it is approximatively the number of bits contained in five lines
 of 80 chars each, i.e. 80*5.
 Note that if you set this to nil multiline will be disabled, i.e. you
@@ -78,7 +78,7 @@ will not have separators between candidates any more."
     (define-key map (kbd "C-c C-k") 'helm-kill-ring-kill-selection)
     (define-key map (kbd "C-c d")   'helm-kill-ring-run-persistent-delete)
     map)
-  "Keymap for `helm-show-kill-ring'.")
+  "Keymap for `helm-show-kill-ring\\='.")
 
 (defvar helm-source-kill-ring
   (helm-build-sync-source "Kill Ring"
@@ -131,7 +131,7 @@ will not have separators between candidates any more."
 
 (defun helm-kill-ring-kill-selection ()
   "Store the real value of candidate in kill-ring.
-Same as `helm-kill-selection-and-quit' called with a prefix arg."
+Same as `helm-kill-selection-and-quit\\=' called with a prefix arg."
   (interactive)
   (helm-kill-selection-and-quit t))
 (put 'helm-kill-ring-kill-selection 'helm-only t)
@@ -152,7 +152,7 @@ Same as `helm-kill-selection-and-quit' called with a prefix arg."
   "Insert concatenated marked candidates in current-buffer.
 
 When two prefix args are given prompt to choose separator, otherwise
-use `helm-kill-ring-separator' as default."
+use `helm-kill-ring-separator\\=' as default."
   (let ((marked (helm-marked-candidates))
         (sep (if (equal helm-current-prefix-arg '(16))
                  (read-string "Separator: ")
@@ -163,11 +163,11 @@ use `helm-kill-ring-separator' as default."
               finally return (concat str (car (last marked)))))))
 
 (defun helm-kill-ring-action-yank-1 (str)
-  "Insert STR in `kill-ring' and set STR to the head.
+  "Insert STR in `kill-ring\\=' and set STR to the head.
 
 When called with a prefix arg, point and mark are exchanged
 without activating region.
-If this action is executed just after `yank', replace with STR as
+If this action is executed just after `yank\\=', replace with STR as
 yanked string."
   (let ((yank-fn (lambda (&optional before yank-pop)
                    (insert-for-yank str)
@@ -229,7 +229,7 @@ yanked string."
 (put 'helm-kill-ring-run-search-from-string 'helm-only t)
 
 (defun helm-kill-ring-action-delete (_candidate)
-  "Delete marked candidates from `kill-ring'."
+  "Delete marked candidates from `kill-ring\\='."
   (cl-loop for c in (helm-marked-candidates)
            do (setq kill-ring
                     (delete c kill-ring))))
@@ -256,9 +256,9 @@ yanked string."
 (put 'helm-kill-ring-run-persistent-delete 'helm-only t)
 
 (defun helm-kill-ring-delete ()
-  "Delete marked candidates from `kill-ring'.
+  "Delete marked candidates from `kill-ring\\='.
 
-This is a command for `helm-kill-ring-map'."
+This is a command for `helm-kill-ring-map\\='."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-kill-ring-action-delete)))
@@ -479,7 +479,7 @@ This is a command for `helm-kill-ring-map'."
 
 ;;;###autoload
 (defun helm-mark-ring ()
-  "Preconfigured `helm' for `helm-source-mark-ring'."
+  "Preconfigured `helm\\=' for `helm-source-mark-ring\\='."
   (interactive)
   (helm :sources 'helm-source-mark-ring
         :resume 'noresume
@@ -487,7 +487,7 @@ This is a command for `helm-kill-ring-map'."
 
 ;;;###autoload
 (defun helm-global-mark-ring ()
-  "Preconfigured `helm' for `helm-source-global-mark-ring'."
+  "Preconfigured `helm\\=' for `helm-source-global-mark-ring\\='."
   (interactive)
   (helm :sources 'helm-source-global-mark-ring
         :resume 'noresume
@@ -495,9 +495,9 @@ This is a command for `helm-kill-ring-map'."
 
 ;;;###autoload
 (defun helm-all-mark-rings ()
-  "Preconfigured `helm' for mark rings.
-Source used are `helm-source-global-mark-ring' and
-`helm-source-mark-ring'."
+  "Preconfigured `helm\\=' for mark rings.
+Source used are `helm-source-global-mark-ring\\=' and
+`helm-source-mark-ring\\='."
   (interactive)
   (helm :sources '(helm-source-mark-ring
                    helm-source-global-mark-ring)
@@ -506,7 +506,7 @@ Source used are `helm-source-global-mark-ring' and
 
 ;;;###autoload
 (defun helm-register ()
-  "Preconfigured `helm' for Emacs registers."
+  "Preconfigured `helm\\=' for Emacs registers."
   (interactive)
   (helm :sources 'helm-source-register
         :resume 'noresume
@@ -514,8 +514,8 @@ Source used are `helm-source-global-mark-ring' and
 
 ;;;###autoload
 (defun helm-show-kill-ring ()
-  "Preconfigured `helm' for `kill-ring'.
-It is drop-in replacement of `yank-pop'.
+  "Preconfigured `helm\\=' for `kill-ring\\='.
+It is drop-in replacement of `yank-pop\\='.
 
 First call open the kill-ring browser, next calls move to next line."
   (interactive)
@@ -529,7 +529,7 @@ First call open the kill-ring browser, next calls move to next line."
 ;;;###autoload
 (defun helm-execute-kmacro ()
   "Preconfigured helm for keyboard macros.
-Define your macros with `f3' and `f4'.
+Define your macros with `f3\\=' and `f4\\='.
 See (info \"(emacs) Keyboard Macros\") for detailed infos.
 This command is useful when used with persistent action."
   (interactive)

@@ -29,12 +29,12 @@
   :group 'helm)
 
 (defcustom helm-M-x-always-save-history nil
-  "`helm-M-x' save command in `extended-command-history' even when it fails."
+  "`helm-M-x\\=' save command in `extended-command-history\\=' even when it fails."
   :group 'helm-command
   :type  'boolean)
 
 (defcustom helm-M-x-reverse-history nil
-  "The history source of `helm-M-x' appear in second position when non-nil."
+  "The history source of `helm-M-x\\=' appear in second position when non-nil."
   :group 'helm-command
   :type 'boolean)
 
@@ -76,17 +76,17 @@ This value can be toggled with
 
 (defface helm-command-active-mode
   '((t :inherit font-lock-builtin-face))
-  "Face used by `helm-M-x' for activated modes."
+  "Face used by `helm-M-x\\=' for activated modes."
   :group 'helm-command-faces)
 
 (defface helm-M-x-short-doc
     '((t :box (:line-width -1) :foreground "DimGray"))
-    "Face used by `helm-M-x' for short docstring."
+    "Face used by `helm-M-x\\=' for short docstring."
   :group 'helm-command-faces)
 
 (defvar helm-M-x-input-history nil)
 (defvar helm-M-x-prefix-argument nil
-  "Prefix argument before calling `helm-M-x'.")
+  "Prefix argument before calling `helm-M-x\\='.")
 (defvar helm-M-x--timer nil)
 (defvar helm-M-x--unwind-forms-done nil)
 
@@ -100,8 +100,8 @@ This value can be toggled with
 
 (defun helm-get-mode-map-from-mode (mode)
   "Guess the mode-map name according to MODE.
-Some modes don't use conventional mode-map name so we need to
-guess mode-map name. E.g. `python-mode' ==> py-mode-map.
+Some modes don\\='t use conventional mode-map name so we need to
+guess mode-map name. E.g. `python-mode\\=' ==> py-mode-map.
 Return nil if no mode-map found."
   (cl-loop ;; Start with a conventional mode-map name.
         with mode-map    = (intern-soft (format "%s-map" mode))
@@ -116,7 +116,7 @@ Return nil if no mode-map found."
         finally return mode-map))
 
 (defun helm-M-x-current-mode-map-alist ()
-  "Return mode-map alist of current `major-mode'."
+  "Return mode-map alist of current `major-mode\\='."
   (let ((map-sym (helm-get-mode-map-from-mode major-mode)))
     (when (and map-sym (boundp map-sym))
       (helm-M-x-get-major-mode-command-alist (symbol-value map-sym)))))
@@ -131,8 +131,8 @@ Return nil if no mode-map found."
 (defun helm-M-x-transformer-1 (candidates &optional sort ignore-props)
   "Transformer function to show bindings in emacs commands.
 Show global bindings and local bindings according to current
-`major-mode'.
-If SORT is non nil sort list with `helm-generic-sort-fn'.
+`major-mode\\='.
+If SORT is non nil sort list with `helm-generic-sort-fn\\='.
 Note that SORT should not be used when fuzzy matching because
 fuzzy matching is running its own sort function with a different
 algorithm."
@@ -181,16 +181,16 @@ algorithm."
              (if sort (sort ls #'helm-generic-sort-fn) ls))))
 
 (defun helm-M-x-transformer (candidates _source)
-  "Transformer function for `helm-M-x' candidates."
+  "Transformer function for `helm-M-x\\=' candidates."
   ;; Generic sort function is handling helm-flex.
   (helm-M-x-transformer-1 candidates (null helm--in-fuzzy)))
 
 (defun helm-M-x-transformer-no-sort (candidates _source)
-  "Transformer function for `helm-M-x' candidates."
+  "Transformer function for `helm-M-x\\=' candidates."
   (helm-M-x-transformer-1 candidates))
 
 (defun helm-M-x-transformer-no-sort-no-props (candidates _source)
-  "Transformer function for `helm-M-x' candidates."
+  "Transformer function for `helm-M-x\\=' candidates."
   (helm-M-x-transformer-1 candidates nil t))
 
 (defun helm-M-x--notify-prefix-arg ()
@@ -217,7 +217,7 @@ algorithm."
     results))
 
 (defun helm-M-x-universal-argument ()
-  "Same as `universal-argument' but for `helm-M-x'."
+  "Same as `universal-argument\\=' but for `helm-M-x\\='."
   (interactive)
   (if helm-M-x-prefix-argument
       (progn (setq helm-M-x-prefix-argument nil)
@@ -266,17 +266,17 @@ algorithm."
 (defun helm-M-x-read-extended-command (collection &optional predicate history)
   "Read or execute action on command name in COLLECTION or HISTORY.
 
-When `helm-M-x-use-completion-styles' is used, Emacs
-`completion-styles' mechanism is used, otherwise standard helm
+When `helm-M-x-use-completion-styles\\=' is used, Emacs
+`completion-styles\\=' mechanism is used, otherwise standard helm
 completion and helm fuzzy matching are used together.
 
 Helm completion is not provided when executing or defining kbd
 macros.
 
-Arg COLLECTION should be an `obarray' but can be any object
-suitable for `try-completion'.  Arg PREDICATE is a function that
-default to `commandp' see also `try-completion'.  Arg HISTORY
-default to `extended-command-history'."
+Arg COLLECTION should be an `obarray\\=' but can be any object
+suitable for `try-completion\\='.  Arg PREDICATE is a function that
+default to `commandp\\=' see also `try-completion\\='.  Arg HISTORY
+default to `extended-command-history\\='."
   (setq helm--mode-line-display-prefarg t)
   (let* ((pred (or predicate #'commandp))
          (helm-fuzzy-sort-fn (lambda (candidates _source)
@@ -355,8 +355,8 @@ default to `extended-command-history'."
 
 (defun helm-M-x-execute-command (command)
   "Execute COMMAND as an editor command.
-COMMAND must be a symbol that satisfies the `commandp' predicate.
-Save COMMAND to `extended-command-history'."
+COMMAND must be a symbol that satisfies the `commandp\\=' predicate.
+Save COMMAND to `extended-command-history\\='."
   (helm-M-x--unwind-forms t)
   (when command
     ;; Avoid having `this-command' set to *exit-minibuffer.
@@ -389,14 +389,14 @@ Save COMMAND to `extended-command-history'."
 
 ;;;###autoload
 (defun helm-M-x (_arg)
-  "Preconfigured `helm' for Emacs commands.
-It is `helm' replacement of regular `M-x'
-`execute-extended-command'.
+  "Preconfigured `helm\\=' for Emacs commands.
+It is `helm\\=' replacement of regular `M-x\\='
+`execute-extended-command\\='.
 
-Unlike regular `M-x' Emacs vanilla `execute-extended-command'
+Unlike regular `M-x\\=' Emacs vanilla `execute-extended-command\\='
 command, the prefix args if needed, can be passed AFTER starting
-`helm-M-x'.  When a prefix arg is passed BEFORE starting
-`helm-M-x', the first `C-u' while in `helm-M-x' session will
+`helm-M-x\\='.  When a prefix arg is passed BEFORE starting
+`helm-M-x\\=', the first `C-u\\=' while in `helm-M-x\\=' session will
 disable it.
 
 You can get help on each command by persistent action."

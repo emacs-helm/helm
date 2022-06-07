@@ -38,12 +38,12 @@
 
 (defcustom helm-etags-tag-file-search-limit 10
   "The limit level of directory to search tag file.
-Don't search tag file deeply if outside this value."
+Don\\='t search tag file deeply if outside this value."
   :type  'number
   :group 'helm-tags)
 
 (defcustom helm-etags-match-part-only 'tag
-  "Allow choosing the tag part of CANDIDATE in `helm-source-etags-select'.
+  "Allow choosing the tag part of CANDIDATE in `helm-source-etags-select\\='.
 A tag looks like this:
     filename: (defun foo
 You can choose matching against the tag part (i.e \"(defun foo\"),
@@ -54,7 +54,7 @@ or against the whole candidate (i.e \"(filename:5:(defun foo\")."
   :group 'helm-tags)
 
 (defcustom helm-etags-execute-action-at-once-if-one t
-  "Whether to jump straight to the selected tag if there's only
+  "Whether to jump straight to the selected tag if there\\='s only
 one match."
   :type 'boolean
   :group 'helm-tags)
@@ -78,7 +78,7 @@ one match."
 ;;
 ;;
 (defun helm-etags-run-switch-other-window ()
-  "Run switch to other window action from `helm-source-etags-select'."
+  "Run switch to other window action from `helm-source-etags-select\\='."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action
@@ -87,7 +87,7 @@ one match."
 (put 'helm-etags-run-switch-other-window 'helm-only t)
 
 (defun helm-etags-run-switch-other-frame ()
-  "Run switch to other frame action from `helm-source-etags-select'."
+  "Run switch to other frame action from `helm-source-etags-select\\='."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action
@@ -113,7 +113,7 @@ one match."
 (defun helm-etags-get-tag-file (&optional directory)
   "Return the path of etags file if found in DIRECTORY.
 Look recursively in parents directorys for a
-`helm-etags-tag-file-name' file."
+`helm-etags-tag-file-name\\=' file."
   ;; Get tag file from `default-directory' or upper directory.
   (let ((current-dir (helm-etags-find-tag-file-directory
                       (or directory default-directory))))
@@ -125,9 +125,9 @@ Look recursively in parents directorys for a
   "Find Etags files.
 Return files from the following sources:
   1) An automatically located file in the parent directories,
-     by `helm-etags-get-tag-file'.
-  2) `tags-file-name', which is commonly set by `find-tag' command.
-  3) `tags-table-list' which is commonly set by `visit-tags-table' command."
+     by `helm-etags-get-tag-file\\='.
+  2) `tags-file-name\\=', which is commonly set by `find-tag\\=' command.
+  3) `tags-table-list\\=' which is commonly set by `visit-tags-table\\=' command."
   (helm-fast-remove-dups
    (delq nil
          (append (list (helm-etags-get-tag-file)
@@ -163,7 +163,7 @@ If not found in CURRENT-DIR search in upper directory."
             (helm-etags-get-tag-file))))
 
 (defun helm-etags-create-buffer (file)
-  "Create the `helm-buffer' based on contents of etags tag FILE."
+  "Create the `helm-buffer\\=' based on contents of etags tag FILE."
   (let* (max
          (split (with-temp-buffer
                   (insert-file-contents file)
@@ -191,7 +191,7 @@ If not found in CURRENT-DIR search in upper directory."
                          (progress-reporter-update progress-reporter count)))))
 
 (defun helm-etags-init ()
-  "Feed `helm-buffer' using `helm-etags-cache' or tag file.
+  "Feed `helm-buffer\\=' using `helm-etags-cache\\=' or tag file.
 If there is no entry in cache, create one."
   (let ((tagfiles (helm-etags-all-tag-files)))
     (when tagfiles
@@ -247,7 +247,7 @@ If there is no entry in cache, create one."
                          (helm-highlight-current-line))))
 
 (defcustom helm-etags-fuzzy-match nil
-  "Use fuzzy matching in `helm-etags-select'."
+  "Use fuzzy matching in `helm-etags-select\\='."
   :group 'helm-tags
   :type 'boolean
   :set (lambda (var val)
@@ -305,9 +305,9 @@ or if any of the tag files have been modified, reinitialize cache.
 This function aggregates three sources of tag files:
 
   1) An automatically located file in the parent directories,
-     by `helm-etags-get-tag-file'.
-  2) `tags-file-name', which is commonly set by `find-tag' command.
-  3) `tags-table-list' which is commonly set by `visit-tags-table' command."
+     by `helm-etags-get-tag-file\\='.
+  2) `tags-file-name\\=', which is commonly set by `find-tag\\=' command.
+  3) `tags-table-list\\=' which is commonly set by `visit-tags-table\\=' command."
   (interactive "P")
   (let ((tag-files (helm-etags-all-tag-files))
         (helm-execute-action-at-once-if-one
