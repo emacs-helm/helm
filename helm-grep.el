@@ -58,19 +58,19 @@ Where:
      whether to use the -i option of grep. (Not mandatory)
      When you specify this spec, helm grep will use smartcase
      that is when a upcase character is found in pattern case will
-     be respected and no '-i' option will be used, otherwise, when
-     no upcase character is found in pattern always use '-i'.
+     be respected and no \\='-i' option will be used, otherwise, when
+     no upcase character is found in pattern always use \\='-i'.
      If you don't want this behavior, don't use this spec and
-     specify or not the '-i' option.
+     specify or not the \\='-i' option.
      Note that with ack-grep this is not needed, just specify
-     the '--smart-case' option.
+     the \\='--smart-case' option.
 
 '%p' format spec is for pattern.           (Mandatory)
 
 '%f' format spec is for filenames.         (Mandatory)
 
 If your grep version doesn't support the --exclude/include args
-don't specify the '%e' format spec.
+don't specify the \\='%e' format spec.
 
 Helm also support ack-grep and git-grep.  The following is a
 default command example for ack-grep:
@@ -153,10 +153,10 @@ GREP_COLORS env var."
 
 (defcustom helm-pdfgrep-default-read-command nil
   "Default command to read pdf files from pdfgrep.
-Where '%f' format spec is filename and '%p' is page number.
+Where \\='%f' format spec is filename and \\='%p' is page number.
 E.g. In Ubuntu you can set it to:
 
-    \"evince --page-label=%p '%f'\"
+    \"evince --page-label=%p \\='%f'\"
 
 If set to nil either `doc-view-mode' or `pdf-view-mode' will be
 used instead of an external command."
@@ -1059,7 +1059,7 @@ Special commands:
 
 (defvar helm-grep-ack-types-cache nil)
 (defun helm-grep-read-ack-type ()
-  "Select types for the '--type' argument of ack-grep."
+  "Select types for the \\='--type' argument of ack-grep."
   (require 'helm-mode)
   (require 'helm-adaptive)
   (setq helm-grep-ack-types-cache (helm-grep-hack-types))
@@ -1099,7 +1099,7 @@ of grep."
         finally return (delq nil (append ext-list glob-list))))
 
 (defun helm-grep-get-file-extensions (files)
-  "Try to return a list of file extensions to pass to '--include' arg of grep."
+  "Try to return a list of file extensions to pass to \\='--include' arg of grep."
   (require 'helm-adaptive)
   (let* ((all-exts (helm-grep-guess-extensions
                     (mapcar 'expand-file-name files)))
@@ -1169,7 +1169,7 @@ of grep."
                                   default-input input (source 'helm-source-grep))
   "Launch helm using backend BACKEND on a list of TARGETS files.
 
-When RECURSE is given and BACKEND is 'grep' use -r option of
+When RECURSE is given and BACKEND is \\='grep' use -r option of
 BACKEND and prompt user for EXTS to set the --include args of
 BACKEND.
 Interactively you can give more than one arg separated by space
@@ -1186,8 +1186,8 @@ Argument DEFAULT-INPUT is use as `default' arg of `helm' and
 INPUT is used as `input' arg of `helm'.  See `helm' docstring.
 
 Arg BACKEND when non-nil specifies which backend to use.
-It is used actually to specify 'zgrep' or 'git'.
-When BACKEND 'zgrep' is used don't prompt for a choice in
+It is used actually to specify \\='zgrep' or \\='git'.
+When BACKEND \\='zgrep' is used don't prompt for a choice in
 recurse, and ignore EXTS, search being made recursively on files
 matching `helm-zgrep-file-extension-regexp' only."
   (let* (non-essential
@@ -1546,7 +1546,7 @@ For ripgrep here is the command line to use:
 
 And to customize colors (always for ripgrep) use something like this:
 
-    rg --color=always --colors 'match:bg:yellow' --colors 'match:fg:black'
+    rg --color=always --colors \\='match:bg:yellow' --colors \\='match:fg:black'
 \--smart-case --no-heading --line-number %s -- %s %s
 
 This will change color for matched items from foreground red (the

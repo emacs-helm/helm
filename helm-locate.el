@@ -91,7 +91,7 @@ space is detected in pattern)."
 (defcustom helm-locate-case-fold-search helm-case-fold-search
   "It have the same meaning as `helm-case-fold-search'.
 The -i option of locate will be used depending of value of
-`helm-pattern' when this is set to 'smart.
+`helm-pattern' when this is set to \\='smart.
 When nil \"-i\" will not be used at all and when non-nil it will
 always be used.
 NOTE: the -i option of the \"es\" command used on windows does
@@ -176,7 +176,7 @@ It should receive the same arguments as
 Prefix arg LOCALDB when (4) search and use a local locate db file
 when it exists or create it, when (16) force update of existing
 db file even if exists.
-It has no effect when locate command is 'es'.  INIT is a string
+It has no effect when locate command is \\='es'.  INIT is a string
 to use as initial input in prompt.
 See `helm-locate-with-db' and `helm-locate'."
   (require 'helm-mode)
@@ -451,7 +451,7 @@ With a prefix arg refresh the database in each project."
 (defun helm-locate (arg)
   "Preconfigured `helm' for Locate.
 Note: you can add locate options after entering pattern.
-See 'man locate' for valid options and also `helm-locate-command'.
+See \\='man locate' for valid options and also `helm-locate-command'.
 
 You can specify a local database with prefix argument ARG.
 With two prefix arg, refresh the current local db or create it if

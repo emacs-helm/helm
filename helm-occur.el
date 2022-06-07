@@ -595,7 +595,7 @@ persistent action."
 
 (defun helm-occur-buffer-substring-with-linums ()
   "Return current-buffer contents as a string with all lines
-numbered.  The property 'buffer-name is added to the whole string."
+numbered.  The property \\='buffer-name is added to the whole string."
   (let ((bufstr (buffer-substring-no-properties (point-min) (point-max)))
         (bufname (buffer-name)))
     (with-temp-buffer

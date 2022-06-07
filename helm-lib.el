@@ -811,7 +811,7 @@ See `helm-help-hkmap' for supported keys and functions."
   "Return a list of all single elements of sublists in SEQ.
 
     Example:
-    (helm-flatten-list '(1 (2 . 3) nil (4 5 (6) 7) 8 (9 . 10)))
+    (helm-flatten-list \\='(1 (2 . 3) nil (4 5 (6) 7) 8 (9 . 10)))
     => (1 2 3 4 5 6 7 8 9 10)"
   (let (result)
     (cl-labels ((flatten
@@ -924,9 +924,9 @@ hashtable itself."
 
 ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
 
-\(helm-transform-mapcar 'upcase '(\"foo\" \"bar\"))
+\(helm-transform-mapcar \\='upcase \\='(\"foo\" \"bar\"))
 => (\"FOO\" \"BAR\")
-\(helm-transform-mapcar 'upcase '((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
+\(helm-transform-mapcar \\='upcase \\='((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
 => ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
 "
   (cl-loop for arg in args
@@ -1001,9 +1001,9 @@ Items not matching FUNCTION are grouped as well in a separate group.
 
 Example:
 
-    (setq B '(1 2 3 4 5 6 7 8 9))
+    (setq B \\='(1 2 3 4 5 6 7 8 9))
 
-    (helm-group-candidates-by B #'cl-oddp 2 'separate)
+    (helm-group-candidates-by B #'cl-oddp 2 \\='separate)
     => ((2 4 6 8) (1 3 5 7 9))
 
 SELECTION specify where to start in CANDIDATES.
@@ -1029,9 +1029,9 @@ otherwise a plain list is returned."
 
 Examples:
 
-    (helm-reorganize-sequence-from-elm '(a b c d e f g h i j k l) 'e)
+    (helm-reorganize-sequence-from-elm \\='(a b c d e f g h i j k l) \\='e)
     => (f g h i j k l a b c d e)
-    (helm-reorganize-sequence-from-elm '(a b c d e f g h i j k l) 'e t)
+    (helm-reorganize-sequence-from-elm \\='(a b c d e f g h i j k l) \\='e t)
     => (d c b a l k j i h g f e)
 "
   (let* ((new-seq  (if reverse
@@ -1119,11 +1119,11 @@ function with SUBEXP specified.
 E.g.:
 
     (helm--replace-regexp-in-buffer-string
-     \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
+     \"e\\\\(m\\\\)acs\" \\='upcase \"emacs\" t nil 1)
     => \"eMacs\"
 
     (replace-regexp-in-string
-     \"e\\\\(m\\\\)acs\" 'upcase \"emacs\" t nil 1)
+     \"e\\\\(m\\\\)acs\" \\='upcase \"emacs\" t nil 1)
     => \"eEMACSacs\"
 
 Also START argument behaves as expected unlike
@@ -1185,7 +1185,7 @@ Example:
 
     (let ((answer (helm-read-answer
                     \"answer [y,n,!,q]: \"
-                    '(\"y\" \"n\" \"!\" \"q\"))))
+                    \\='(\"y\" \"n\" \"!\" \"q\"))))
       (pcase answer
           (\"y\" \"yes\")
           (\"n\" \"no\")
@@ -1728,8 +1728,8 @@ Example:
 
     (helm :sources (helm-build-sync-source \"test\"
                      :candidates (helm-dynamic-completion
-                                  '(foo bar baz foab)
-                                  'symbolp)
+                                  \\='(foo bar baz foab)
+                                  \\='symbolp)
                      :match-dynamic t)
           :buffer \"*helm test*\")
 

@@ -53,8 +53,8 @@
   "Major mode association alist for `helm-imenu-in-all-buffers'.
 Allow `helm-imenu-in-all-buffers' searching in these associated
 buffers even if they are not derived from each other.  The alist
-is bidirectional, i.e. no need to add '((foo . bar) (bar . foo)),
-only '((foo . bar)) is needed."
+is bidirectional, i.e. no need to add \\='((foo . bar) (bar . foo)),
+only \\='((foo . bar)) is needed."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-imenu)
 

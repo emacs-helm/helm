@@ -187,9 +187,9 @@
     (defun foo-persistent-action (candidate)
        (do-something candidate))
 
-    :persistent-action '(foo-persistent-action . never-split) ; Don't split
+    :persistent-action \\='(foo-persistent-action . never-split) ; Don't split
   or
-    :persistent-action 'foo-persistent-action ; Split
+    :persistent-action \\='foo-persistent-action ; Split
 
   When specifying :persistent-action by slot directly, foo-persistent-action
   will be executed without quitting helm when hitting `C-j'.
@@ -205,8 +205,8 @@
        \"Delete current candidate without quitting.\"
        (interactive)
        (with-helm-alive-p
-         (helm-set-attr 'quick-delete '(helm-ff-quick-delete . never-split))
-         (helm-execute-persistent-action 'quick-delete)))
+         (helm-set-attr \\='quick-delete \\='(helm-ff-quick-delete . never-split))
+         (helm-execute-persistent-action \\='quick-delete)))
 
   This function is then bound in `helm-find-files-map'.")
 
@@ -225,13 +225,13 @@
               ;; Don't split helm-window.
               (cons (lambda (_ignore)
                       (do-something candidate))
-                    'no-split))
+                    \\='no-split))
              ;; Split helm-window.
              (something-else
               (lambda (_ignore)
                 (do-something-else candidate)))))
 
-     :persistent-action-if 'foo-persistent-action
+     :persistent-action-if \\='foo-persistent-action
 
   Here when hitting `C-j' one of the lambda's will be executed
   depending on something or something-else condition, splitting or not
@@ -363,7 +363,7 @@
   Example:
 
     (helm :sources (helm-build-sync-source \"test\"
-                 :candidates '(a b c d e)
+                 :candidates \\='(a b c d e)
                  :display-to-real (lambda (c) (concat c \":modified by d-t-r\")))
       :buffer \"*helm test*\")
 
@@ -384,7 +384,7 @@
   Example:
 
     (helm :sources (helm-build-sync-source \"test\"
-                 :candidates '((\"foo\" . 1) (\"bar\" . 2) (\"baz\". 3))
+                 :candidates \\='((\"foo\" . 1) (\"bar\" . 2) (\"baz\". 3))
                  :real-to-display (lambda (c) (format \"%s\" (1+ c))))
       :buffer \"*helm test*\")
 
@@ -397,7 +397,7 @@
     :documentation
     "  Get candidates with their properties in `helm-marked-candidates'.
   Allow using the FORCE-DISPLAY-PART of `helm-get-selection' in marked
-  candidates, use t or 'withprop to pass it to `helm-get-selection'.")
+  candidates, use t or \\='withprop to pass it to `helm-get-selection'.")
 
    (action-transformer
     :initarg :action-transformer
@@ -723,7 +723,7 @@
     :custom boolean
     :documentation
     "  Enable migemo.
-  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  When multimatch is disabled, you can give the symbol \\='nomultimatch as value
   to force not using generic migemo matching function.
   In this case you have to provide your own migemo matching funtion
   that kick in when `helm-migemo-mode' is enabled.
@@ -811,7 +811,7 @@ inherit from `helm-source'.")
     :custom boolean
     :documentation
     "  Enable migemo.
-  When multimatch is disabled, you can give the symbol 'nomultimatch as value
+  When multimatch is disabled, you can give the symbol \\='nomultimatch as value
   to force not using generic migemo matching function.
   In this case you have to provide your own migemo matching funtion
   that kick in when `helm-migemo-mode' is enabled.

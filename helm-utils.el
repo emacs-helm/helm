@@ -719,7 +719,7 @@ Availables keys are:
 - GID-CHANGE: See nth 9 `files-attributes'.
 - INODE: See nth 10 `files-attributes'.
 - DEVICE-NUM: See nth 11 `files-attributes'.
-- DIRED: A line similar to what 'ls -l' return.
+- DIRED: A line similar to what \\='ls -l' return.
 - HUMAN-SIZE: The size in human form, see `helm-file-human-size'.
 - MODE-TYPE, mode-owner,mode-group, mode-other: Split what
   nth 7 `files-attributes' return in four categories.

@@ -150,7 +150,7 @@ This set `ffap-newfile-prompt'."
   :group 'helm-files)
 
 (defcustom helm-ff-avfs-directory "~/.avfs"
-  "The default avfs directory, usually '~/.avfs'.
+  "The default avfs directory, usually \\='~/.avfs'.
 When this is set you will be able to expand archive filenames
 with `C-j' inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
@@ -365,7 +365,7 @@ else."
   :type '(repeat symbol))
 
 (defcustom helm-ff-allow-recursive-deletes nil
-  "When 'always don't prompt for recursive deletion of directories.
+  "When \\='always don't prompt for recursive deletion of directories.
 When nil, will ask for recursive deletion.
 Note that when deleting multiple directories you can answer !
 when prompted to avoid being asked for next directories, so it
@@ -398,17 +398,17 @@ It is the function that will be used when using
   "Allow trashing remote files when non-nil.
 
 Trashing remote files with tramp doesn't work out of the box
-unless the 'trash-cli' package is installed.  This is why trashing
+unless the \\='trash-cli' package is installed.  This is why trashing
 remote files from Helm is disabled by default.
 
-Tramp is using external 'trash' command in its `delete-file' and
+Tramp is using external \\='trash' command in its `delete-file' and
 `delete-directory' handlers when using
 `delete-by-moving-to-trash', which is documented nowhere in
 Emacs.
 
-If you want to enable this you will have to install the 'trash'
+If you want to enable this you will have to install the \\='trash'
 command on remote (and/or locally if you want to trash as root).
-On Ubuntu-based distributions it is 'trash-cli'."
+On Ubuntu-based distributions it is \\='trash-cli'."
   :group 'helm-files
   :type 'boolean)
 
@@ -3526,7 +3526,7 @@ to nil to avoid error messages when using `helm-find-files'."
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
 It is same as `directory-files' but always returns the dotted
-filename '.' and '..' even on root directories in Windows
+filename \\='.' and \\='..' even on root directories in Windows
 systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
@@ -4209,7 +4209,7 @@ it from your init file, ensure to call it _after_ your defmethod's
   "Execute a trash action FN on marked files.
 
 Arg NAMES is a list of strings to pass to messages.
-E.g. '(\"delete\" \"deleting\")
+E.g. \\='(\"delete\" \"deleting\")
 
 ARGS are other arguments to be passed to FN."
   (let ((mkd (helm-marked-candidates))
@@ -4265,7 +4265,7 @@ ARGS are other arguments to be passed to FN."
 
 The Trash directory should be a directory compliant with
 <http://freedesktop.org/wiki/Specifications/trash-spec> and each
-file should have its '*.trashinfo' correspondent file in
+file should have its \\='*.trashinfo' correspondent file in
 Trash/info directory."
   (helm-ff-trash-action 'helm-ff-trash-rm-1 '("delete" "deleting")))
 
@@ -4289,7 +4289,7 @@ Trash/info directory."
 
 The Trash directory should be a directory compliant with
 <http://freedesktop.org/wiki/Specifications/trash-spec> and each
-file should have its '*.trashinfo' corresponding file in
+file should have its \\='*.trashinfo' corresponding file in
 Trash/info directory."
   (let* ((default-directory (file-name-as-directory
                              helm-ff-default-directory))
@@ -5428,7 +5428,7 @@ Find inside `require' and `declare-function' sexp."
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to DESTINATION.
 Where ACTION is a symbol that can be one of:
-'copy, 'rename, 'symlink,'relsymlink, 'hardlink or 'backup.
+'copy, \\='rename, \\='symlink,'relsymlink, \\='hardlink or \\='backup.
 Argument FOLLOW when non-nil specifies to follow FILES to
 DESTINATION for the actions copy and rename."
   (require 'dired-async)

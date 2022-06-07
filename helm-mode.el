@@ -72,7 +72,7 @@ a `read-file-name' we may want to specify a handler for both of them,
 this can be done by specifying value as a list of two symbols instead of
 a single symbol where the 1st element of the list specify the handler for the
 `completing-read' and the second the handler for the `read-file-name'.
-Special symbol 'default' means use the default helm handler for either
+Special symbol \\='default' means use the default helm handler for either
 `completing-read' or `read-file-name'.
 e.g. (write-region . (default helm-read-file-name-handler-1))
 means helm will use `helm-completing-read-default-handler' when
@@ -101,7 +101,7 @@ Example:
 
     (defun foo/test ()
       (interactive)
-      (message \"%S\" (completing-read \"test: \" '(a b c d e))))
+      (message \"%S\" (completing-read \"test: \" \\='(a b c d e))))
 
     (defun helm-foo/test-completing-read-handler (prompt collection
                                                   predicate require-match
@@ -112,8 +112,8 @@ Example:
                                         :name name
                                         :buffer buffer))
 
-    (add-to-list 'helm-completing-read-handlers-alist
-                 '(foo/test . helm-foo/test-completing-read-handler))
+    (add-to-list \\='helm-completing-read-handlers-alist
+                 \\='(foo/test . helm-foo/test-completing-read-handler))
 
 
 We want here to make the regular `completing-read' in `foo/test'
@@ -134,7 +134,7 @@ If you want to disable helm completion for `describe-function', use:
     (describe-function . nil)
 
 Ido is also supported, you can use `ido-completing-read' and
-`ido-read-file-name' as value of an entry or just 'ido.
+`ido-read-file-name' as value of an entry or just \\='ido.
 Example:
 Enable ido completion for `find-file':
 
@@ -274,7 +274,7 @@ the `completing-read' using the default handler
 i.e. `helm-completing-read-default-handler'.
 
 NB: This has nothing to do with `completion-styles', it is independent from
-helm, but when using 'emacs as helm-completion-style helm
+helm, but when using \\='emacs as helm-completion-style helm
 will use the `completion-styles' for its completions.
 Up to the user to configure `completion-styles'.
 
@@ -293,8 +293,8 @@ There are three possible values to use:
   similar to `flex' and helm fuzzy matching.
 
 For a better experience with emacs style, if you don't know what to use, set
-`completion-styles' to '(flex) if you are using emacs-27 or to
-\'(helm-flex) if you are using emacs-26 and keep 'emacs as default
+`completion-styles' to \\='(flex) if you are using emacs-27 or to
+\'(helm-flex) if you are using emacs-26 and keep \\='emacs as default
 value for `helm-completion-style'.  Advanced users can also have a
 look to `completion-category-overrides' to set styles according to category.
 You can as well use `helm-completion-styles-alist' to override
@@ -337,7 +337,7 @@ suitable value for `helm-completion-style'.
 When specifying emacs as style for a mode, `completion-styles' can be
 specified by using a cons cell specifying completion-styles to use
 with helm emacs style, e.g. (foo-mode . (emacs helm flex)) will set
-`completion-styles' to '(helm flex) for foo-mode.  This affects only
+`completion-styles' to \\='(helm flex) for foo-mode.  This affects only
 completions happening in buffers and not minibuffer completions,
 i.e. completing-read's."
   :group 'helm-mode
@@ -363,7 +363,7 @@ Use this ONLY in `let', NOT globally, this allows third party packages
 to use a list as return value when `helm-mode' is enabled, e.g.
 
     (let ((helm-comp-read-use-marked t))
-      (completing-read \"test: \" '(a b c d e f g)))
+      (completing-read \"test: \" \\='(a b c d e f g)))
 
 ")
 
@@ -399,7 +399,7 @@ so we return the alist as it is with no transformation by
 
 e.g
 
-\(setq A '((a . 1) (b . 2) (c . 3)))
+\(setq A \\='((a . 1) (b . 2) (c . 3)))
 ==>((a . 1) (b . 2) (c . 3))
 \(helm-comp-read \"test: \" A :alistp nil
                               :exec-when-only-one t
@@ -1312,7 +1312,7 @@ Keys description:
 
 - BUFFER: `helm-buffer' name, defaults to \"*Helm Completions*\".
 
-- TEST: A predicate called with one arg 'candidate'.
+- TEST: A predicate called with one arg \\='candidate'.
 
 - NORET: Allow disabling helm-ff-RET (have no effect if helm-ff-RET
                                       isn't bound to RET).
@@ -1323,7 +1323,7 @@ Keys description:
 
 - HISTORY: Display HISTORY in a special source.
 
-- MUST-MATCH: Can be 'confirm, nil, or t.
+- MUST-MATCH: Can be \\='confirm, nil, or t.
 
 - FUZZY: Enable fuzzy matching when non-nil (Enabled by default).
 
