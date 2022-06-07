@@ -300,7 +300,7 @@ look to `completion-category-overrides' to set styles according to category.
 You can as well use `helm-completion-styles-alist' to override
 `helm-completion-style' in specific modes.
 
-Of course when using `helm' of `helm-fuzzy' as `helm-completion-style'
+Of course when using `helm' or `helm-fuzzy' as `helm-completion-style'
 emacs `completion-styles' have no effect.
 
 Please use custom interface or `customize-set-variable' to set this,
