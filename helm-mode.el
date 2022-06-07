@@ -294,7 +294,7 @@ There are three possible values to use:
 
 For a better experience with emacs style, if you don't know what to use, set
 `completion-styles' to \\='(flex) if you are using emacs-27 or to
-\'(helm-flex) if you are using emacs-26 and keep \\='emacs as default
+\\='(helm-flex) if you are using emacs-26 and keep \\='emacs as default
 value for `helm-completion-style'.  Advanced users can also have a
 look to `completion-category-overrides' to set styles according to category.
 You can as well use `helm-completion-styles-alist' to override
@@ -393,7 +393,7 @@ SORT-FN is a predicate to sort COLLECTION.
 ALISTP when non--nil will not use `all-completions' to collect
 candidates because it doesn't handle alists correctly for helm.
 i.e In `all-completions' the car of each pair is used as value.
-In helm we want to use the cdr instead like \(display . real\),
+In helm we want to use the cdr instead like (display . real),
 so we return the alist as it is with no transformation by
 `all-completions'.
 

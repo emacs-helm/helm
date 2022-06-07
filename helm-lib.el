@@ -827,7 +827,7 @@ See `helm-help-hkmap' for supported keys and functions."
     (nreverse result)))
 
 (defun helm-mklist (obj)
-  "If OBJ is a list \(but not lambda\), return itself.
+  "If OBJ is a list (but not lambda), return itself.
 Otherwise make a list with one element."
   (if (and (listp obj) (not (functionp obj)))
       obj

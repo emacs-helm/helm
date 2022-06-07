@@ -628,7 +628,7 @@ from its directory."
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
-Args S1 and S2 can be single or \(display . real\) candidates,
+Args S1 and S2 can be single or (display . real) candidates,
 that is sorting is done against real value of candidate."
   (let* ((qpattern (regexp-quote helm-pattern))
          (reg1  (concat "\\_<" qpattern "\\_>"))
@@ -726,7 +726,7 @@ Availables keys are:
 - STRING: When non--nil (default) `helm-file-attributes' return
           more friendly values.
 If you want the same behavior as `files-attributes' ,
-\(but with return values in proplist\) use a nil value for STRING.
+\(but with return values in proplist) use a nil value for STRING.
 However when STRING is non--nil, time and type value are different from what
 you have in `file-attributes'."
   (helm-aif (file-attributes file string)

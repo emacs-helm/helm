@@ -146,7 +146,7 @@ to use once started, e.g.:
 
     (helm-define-key-with-subkeys global-map
        (kbd \"C-x v n\") ?n \\='git-gutter:next-hunk
-       \\='((?p . git-gutter:previous-hunk))\)
+       \\='((?p . git-gutter:previous-hunk)))
 
 In this example, `C-x v n' will run `git-gutter:next-hunk'
 subsequent \"n\" will run this command again and subsequent \"p\"
@@ -400,8 +400,8 @@ Set this value to nil for no limit."
 
 (defcustom helm-exit-idle-delay 0
   "Idle time before exiting minibuffer while Helm is updating.
-Has no affect when helm-buffer is up to date \(i.e. exit without
-delay in this condition\)."
+Has no affect when helm-buffer is up to date (i.e. exit without
+delay in this condition)."
   :group 'helm
   :type 'float)
 
@@ -428,7 +428,7 @@ Specified as a pair of functions, where car is the restore
 function and cdr is the save function.
 
 To save and restore frame configuration, set this variable to
-'\(set-frame-configuration . current-frame-configuration\)
+\\='(set-frame-configuration . current-frame-configuration)
 
 NOTE: This may not work properly with own-frame minibuffer
 settings.  Older versions saves/restores frame configuration, but
@@ -1830,7 +1830,7 @@ Helm aborts in some special circumstances.  See
 (defvar helm-buffers nil
   "Helm buffers listed in order of most recently used.")
 (defvar helm-current-position nil
-  "Cons of \(point . window-start\)  when Helm is invoked.
+  "Cons of (point . window-start)  when Helm is invoked.
 `helm-current-buffer' uses this to restore position after
 `helm-keyboard-quit'")
 (defvar helm-last-frame-or-window-configuration nil
@@ -1840,7 +1840,7 @@ Helm aborts in some special circumstances.  See
 (defvar helm--mode-line-string-real nil) ; The string to display in mode-line.
 (defvar helm-persistent-action-display-window nil)
 (defvar helm-marked-candidates nil
-  "Marked candidates.  List of \(source . real\) pair.")
+  "Marked candidates.  List of (source . real) pair.")
 (defvar helm--mode-line-display-prefarg nil)
 (defvar helm--temp-follow-flag nil
   "[INTERNAL] A simple flag to notify persistent action we are following.")
@@ -2182,7 +2182,7 @@ when predicate helm-ff-candidates-lisp-p returns non-nil:
 \(helm-add-action-to-source-if \"Byte compile file async\"
                               \\='async-byte-compile-file
                               helm-source-find-files
-                              \\='helm-ff-candidates-lisp-p\)."
+                              \\='helm-ff-candidates-lisp-p)."
   (let* ((actions     (helm-get-attr 'action source 'ignorefn))
          (action-transformers (helm-get-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
@@ -2515,7 +2515,7 @@ was deleted and the candidates list not updated."
   "From SOURCE apply FUNCTIONS on ARGS.
 
 This function is used to process filter functions.  When filter is
-a \`filtered-candidate-transformer', we pass to ARGS
+a `filtered-candidate-transformer', we pass to ARGS
 candidates+source whereas when the filter is
 `candidate-transformer' we pass to ARGS candidates only.
 This function is also used to process functions called with no
@@ -4213,8 +4213,8 @@ maybe filtered CANDIDATES."
 This overrides `helm-candidate-number-limit' variable.
 
 E.g.:
-If \(candidate-number-limit\) is in SOURCE, show all candidates in SOURCE.
-If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
+If (candidate-number-limit) is in SOURCE, show all candidates in SOURCE.
+If (candidate-number-limit . 123) is in SOURCE limit candidate to 123."
   (helm-aif (assq 'candidate-number-limit source)
       ;; When assoc value is nil use by default 99999999 otherwise use
       ;; the assoc value, when it is a symbol interpret its value (bug#1831).
@@ -4223,7 +4223,7 @@ If \(candidate-number-limit . 123\) is in SOURCE limit candidate to 123."
 
 (defun helm-candidate-get-display (candidate)
   "Get searched display part from CANDIDATE.
-CANDIDATE is either a string, a symbol, or a \(DISPLAY . REAL\)
+CANDIDATE is either a string, a symbol, or a (DISPLAY . REAL)
 cons cell."
   (cond ((car-safe candidate))
         ((symbolp candidate)
@@ -4769,7 +4769,7 @@ Unlike `while-no-input' this macro ensure to not returns `t'."
   "Return a list of matches for each source in SRC-LIST.
 
 The resulting value is a list of lists, e.g. ((a b c) (c d) (e
-f)) or \(nil nil nil) for three sources when no matches found,
+f)) or (nil nil nil) for three sources when no matches found,
 however this function can be interrupted by new input and in this
 case returns a plain nil i.e. not (nil), in this case
 `helm-update' is not rendering the source, keeping previous
@@ -5673,7 +5673,7 @@ It has no effect if `helm-echo-input-in-header-line' is nil."
 (defun helm-show-candidate-number (&optional name)
   "Used to display candidate number in mode-line.
 You can specify NAME of candidates e.g. \"Buffers\" otherwise it
-is \"Candidate\(s\)\" by default."
+is \"Candidate(s)\" by default."
   (when helm-alive-p
     (unless (helm-empty-source-p)
       ;; Build a fixed width string when candidate-number < 1000
@@ -6672,7 +6672,7 @@ without looping again through the whole list.")
   "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.
 
 Arg BUFFER-SPEC can be a `buffer-name' (stringp), a buffer-spec
-object \(bufferp), or a symbol, either \\='local or \\='global which is
+object (bufferp), or a symbol, either \\='local or \\='global which is
 passed to `helm-candidate-buffer'.
 The most common usage of BUFFER-SPEC is \\='global.
 

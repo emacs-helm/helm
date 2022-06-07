@@ -72,12 +72,12 @@ When nil all buffers are considered related to `current-buffer'."
 
 This allow helm-dabbrev searching in buffers with the associated
 `major-mode'.
-E.g. \(emacs-lisp-mode . lisp-interaction-mode\)
+E.g. (emacs-lisp-mode . lisp-interaction-mode)
 
 will allow searching in the lisp-interaction-mode buffer when
 `current-buffer' is an `emacs-lisp-mode' buffer and vice versa
-i.e. no need to provide \(lisp-interaction-mode .
-emacs-lisp-mode\) association.
+i.e. no need to provide (lisp-interaction-mode .
+emacs-lisp-mode) association.
 
 When nil check is the searched buffer has same `major-mode' than
 the `current-buffer'.

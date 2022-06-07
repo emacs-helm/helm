@@ -80,7 +80,7 @@ If GREP-SPACE is used translate escaped space to \"\\s\" instead of \"\\s-\"."
     (if grep-space "\\s" "\\s-") pattern nil t)))
 
 (defun helm-mm-1-make-regexp (pattern)
-  "Replace spaces in PATTERN with \"\.*\"."
+  "Replace spaces in PATTERN with \".*\"."
   (mapconcat 'identity (helm-mm-split-pattern pattern) ".*"))
 
 

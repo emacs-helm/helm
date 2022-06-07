@@ -274,7 +274,7 @@ of symbol before point."
 
 (defun helm-bounds-of-thing-before-point (&optional regexp)
   "Get the beginning and end position of `helm-thing-before-point'.
-Return a cons \(beg . end\)."
+Return a cons (beg . end)."
   (helm-thing-before-point 'limits regexp))
 
 (defun helm-insert-completion-at-point (beg end str)

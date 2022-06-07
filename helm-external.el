@@ -39,7 +39,7 @@ This will be use with `format', so use something like \"wmctrl -xa %s\"."
 (defcustom helm-external-programs-associations nil
   "Alist to store externals programs associated with file extension.
 This variable overhide setting in .mailcap file.
-E.g.: \\='\(\(\"jpg\" . \"gqview\"\) (\"pdf\" . \"xpdf\"\)\) "
+E.g.: \\='((\"jpg\" . \"gqview\") (\"pdf\" . \"xpdf\")) "
   :type '(alist :key-type string :value-type string)
   :group 'helm-external)
 
