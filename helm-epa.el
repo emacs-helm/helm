@@ -42,13 +42,13 @@
 (declare-function helm-read-file-name       "helm-mode")
 
 (defvar helm-epa--list-only-secrets nil
-  "[INTERNAL] Used to pass MODE argument to `epg-list-keys\\='.")
+  "[INTERNAL] Used to pass MODE argument to `epg-list-keys'.")
 
 (defcustom helm-epa-actions '(("Show key" . epa--show-key)
                               ("encrypt file with key" . helm-epa-encrypt-file)
                               ("Copy keys to kill ring" . helm-epa-kill-keys-armor)
                               ("Delete keys" . helm-epa-delete-keys))
-  "Actions for `helm-epa-list-keys\\='."
+  "Actions for `helm-epa-list-keys'."
   :type '(alist :key-type string :value-type symbol)
   :group 'helm-misc)
 
@@ -62,7 +62,7 @@
   "Allow building helm sources for GPG keys.")
 
 (defun helm-epa-get-key-list (&optional keys)
-  "Build candidate list for `helm-epa-list-keys\\='."
+  "Build candidate list for `helm-epa-list-keys'."
   (cl-loop with all-keys = (or keys (epg-list-keys (epg-make-context epa-protocol)
                                                    nil helm-epa--list-only-secrets))
            for key in all-keys
@@ -87,7 +87,7 @@
                          key)))
 
 (defun helm-epa--select-keys (prompt keys)
-  "A helm replacement for `epa--select-keys\\='."
+  "A helm replacement for `epa--select-keys'."
   (let ((result (helm :sources (helm-make-source "Epa select keys" 'helm-epa
                                  :candidates (lambda ()
                                                (helm-epa-get-key-list keys)))
@@ -105,7 +105,7 @@
       (format "%s: " (replace-regexp-in-string "\\.[\t ]*\\'" "" (car split))))))
 
 (defun helm-epa--read-signature-type ()
-  "A helm replacement for `epa--read-signature-type\\='."
+  "A helm replacement for `epa--read-signature-type'."
   (let ((answer (helm-read-answer "Signature type:
 (n - Create a normal signature)
 (c - Create a cleartext signature)
@@ -241,7 +241,7 @@
 ;;;###autoload
 (defun helm-epa-list-keys ()
   "List all gpg keys.
-This is the helm interface for `epa-list-keys\\='."
+This is the helm interface for `epa-list-keys'."
   (interactive)
   (helm :sources
         (helm-make-source "Epg list keys" 'helm-epa

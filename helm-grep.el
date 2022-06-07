@@ -49,28 +49,28 @@
 
 (defcustom helm-grep-default-command
   "grep --color=always -a -d skip %e -n%cH -e %p %f"
-  "Default grep format command for `helm-do-grep-1\\='.
+  "Default grep format command for `helm-do-grep-1'.
 Where:
-\\='%e\\=' format spec is for --exclude or --include grep options or
+'%e' format spec is for --exclude or --include grep options or
      ack-grep --type option.               (Not mandatory)
 
-\\='%c\\=' format spec is for case-fold-search,
+'%c' format spec is for case-fold-search,
      whether to use the -i option of grep. (Not mandatory)
      When you specify this spec, helm grep will use smartcase
      that is when a upcase character is found in pattern case will
-     be respected and no \\='-i\\=' option will be used, otherwise, when
-     no upcase character is found in pattern always use \\='-i\\='.
-     If you don\\='t want this behavior, don\\='t use this spec and
-     specify or not the \\='-i\\=' option.
+     be respected and no '-i' option will be used, otherwise, when
+     no upcase character is found in pattern always use '-i'.
+     If you don't want this behavior, don't use this spec and
+     specify or not the '-i' option.
      Note that with ack-grep this is not needed, just specify
-     the \\='--smart-case\\=' option.
+     the '--smart-case' option.
 
-\\='%p\\=' format spec is for pattern.           (Mandatory)
+'%p' format spec is for pattern.           (Mandatory)
 
-\\='%f\\=' format spec is for filenames.         (Mandatory)
+'%f' format spec is for filenames.         (Mandatory)
 
-If your grep version doesn\\='t support the --exclude/include args
-don\\='t specify the \\='%e\\=' format spec.
+If your grep version doesn't support the --exclude/include args
+don't specify the '%e' format spec.
 
 Helm also support ack-grep and git-grep.  The following is a
 default command example for ack-grep:
@@ -80,7 +80,7 @@ default command example for ack-grep:
        helm-grep-default-recurse-command
        \"ack-grep -H --color --smart-case --no-group %e -- %p %f\")
 
-You can ommit the %e spec if you don\\='t want to be prompted for
+You can ommit the %e spec if you don't want to be prompted for
 types.
 
 NOTE: Helm for ack-grep support ANSI sequences, so you can remove
@@ -90,7 +90,7 @@ because ack disable it when output is piped.
 
 Same for grep you can use safely the option \"--color=always\" (default).
 You can customize the color of matches using GREP_COLORS env var.
-e.g: (setenv \"GREP_COLORS\"
+e.g: \(setenv \"GREP_COLORS\"
               \"ms=30;43:mc=30;43:sl=01;37:cx=:fn=35:ln=32:bn=32:se=36\")
 
 To enable ANSI color in git-grep just add \"--color=always\".
@@ -103,10 +103,10 @@ you will have to setup this in your .gitconfig:
 Where \"black\" is the foreground and \"yellow\" the background.
 See the git documentation for more infos.
 
-`helm-grep-default-command\\=' and
-`helm-grep-default-recurse-command\\=' are independent, so you can
-enable `helm-grep-default-command\\=' with ack-grep and
-`helm-grep-default-recurse-command\\=' with grep if you want to be
+`helm-grep-default-command' and
+`helm-grep-default-recurse-command' are independent, so you can
+enable `helm-grep-default-command' with ack-grep and
+`helm-grep-default-recurse-command' with grep if you want to be
 faster on recursive grep.
 
 NOTE: Remote grepping is not available with ack-grep, and badly
@@ -117,8 +117,8 @@ NOTE: Remote grepping is not available with ack-grep, and badly
 
 (defcustom helm-grep-default-recurse-command
   "grep --color=always -a -d recurse %e -n%cH -e %p %f"
-  "Default recursive grep format command for `helm-do-grep-1\\='.
-See `helm-grep-default-command\\=' for format specs and infos about
+  "Default recursive grep format command for `helm-do-grep-1'.
+See `helm-grep-default-command' for format specs and infos about
 ack-grep."
   :group 'helm-grep
   :type  'string)
@@ -126,10 +126,10 @@ ack-grep."
 (defcustom helm-default-zgrep-command
   "zgrep --color=always -a -n%cH -e %p %f"
   "Default command for Zgrep.
-See `helm-grep-default-command\\=' for infos on format specs.
+See `helm-grep-default-command' for infos on format specs.
 Option --color=always is supported and can be used safely to
 replace the Helm internal match highlighting.  See
-`helm-grep-default-command\\=' for more infos."
+`helm-grep-default-command' for more infos."
   :group 'helm-grep
   :type  'string)
 
@@ -153,18 +153,18 @@ GREP_COLORS env var."
 
 (defcustom helm-pdfgrep-default-read-command nil
   "Default command to read pdf files from pdfgrep.
-Where \\='%f\\=' format spec is filename and \\='%p\\=' is page number.
+Where '%f' format spec is filename and '%p' is page number.
 E.g. In Ubuntu you can set it to:
 
-    \"evince --page-label=%p \\='%f\\='\"
+    \"evince --page-label=%p '%f'\"
 
-If set to nil either `doc-view-mode\\=' or `pdf-view-mode\\=' will be
+If set to nil either `doc-view-mode' or `pdf-view-mode' will be
 used instead of an external command."
   :group 'helm-grep
   :type  'string)
 
 (defcustom helm-grep-max-length-history 100
-  "Max number of elements to save in `helm-grep-history\\='."
+  "Max number of elements to save in `helm-grep-history'."
   :group 'helm-grep
   :type 'integer)
 
@@ -189,13 +189,13 @@ used instead of an external command."
                                   (unless (string-match-p "/\\'" s)
                                     (concat "*" s)))
                                 completion-ignored-extensions)))
-  "List of file names which `helm-grep\\=' shall exclude."
+  "List of file names which `helm-grep' shall exclude."
   :group 'helm-grep
   :type '(repeat string))
 
 (defcustom helm-grep-ignored-directories
   helm-walk-ignore-directories
-  "List of names of sub-directories which `helm-grep\\=' shall not recurse into."
+  "List of names of sub-directories which `helm-grep' shall not recurse into."
   :group 'helm-grep
   :type '(repeat string))
 
@@ -236,7 +236,7 @@ Here are the commands where you may want to add switches:
     grep --color=always
     ack-grep --smart-case --color
 
-You probably don\\='t need to use this unless you know what you are
+You probably don't need to use this unless you know what you are
 doing."
   :group 'helm-grep
   :type '(repeat string))
@@ -251,12 +251,12 @@ Here are the commands where you may want to add switches:
     rg -N -S --color=?
 
 For RG the value of --color= is computed according to the --color=
-value used in `helm-grep-ag-command\\='.
+value used in `helm-grep-ag-command'.
 
-Note also that by default the \"--\" option is always used, you don\\='t
+Note also that by default the \"--\" option is always used, you don't
 need to add it here.
  
-You probably don\\='t need to use this unless you know what you are
+You probably don't need to use this unless you know what you are
 doing."
   :group 'helm-grep
   :type '(repeat string))
@@ -332,7 +332,7 @@ Have no effect when grep backend use \"--color=\"."
 
 (defcustom helm-grep-use-ioccur-style-keys t
   "Use Arrow keys to jump to occurences.
-Note that if you define this variable with `setq\\=' your change
+Note that if you define this variable with `setq' your change
 will have no effect, use customize instead."
   :group 'helm-grep
   :type  'boolean
@@ -383,7 +383,7 @@ will have no effect, use customize instead."
 (defvar helm-grep-use-zgrep nil)
 (defvar helm-grep-default-directory-fn nil
   "A function that should return a directory to expand candidate to.
-It is intended to use as a let-bound variable, DON\\='T set this globaly.")
+It is intended to use as a let-bound variable, DON'T set this globaly.")
 (defvar helm-pdfgrep-targets nil)
 (defvar helm-grep-last-cmd-line nil)
 (defvar helm-grep-split-line-regexp "^\\([[:lower:][:upper:]]?:?.*?\\):\\([0-9]+\\):\\(.*\\)")
@@ -647,8 +647,8 @@ It is intended to use as a let-bound variable, DON\\='T set this globaly.")
 ;;
 ;;
 (defun helm-grep-action (candidate &optional where)
-  "Define a default action for `helm-do-grep-1\\=' on CANDIDATE.
-WHERE can be `other-window\\=' or `other-frame\\='."
+  "Define a default action for `helm-do-grep-1' on CANDIDATE.
+WHERE can be `other-window' or `other-frame'."
   (let* ((split        (helm-grep-split-line candidate))
          (split-pat    (helm-mm-split-pattern helm-input))
          (lineno       (string-to-number (nth 1 split)))
@@ -703,8 +703,8 @@ WHERE can be `other-window\\=' or `other-frame\\='."
                       helm-grep-history))))))
 
 (defun helm-grep-persistent-action (candidate)
-  "Persistent action for `helm-do-grep-1\\='.
-With a prefix arg record CANDIDATE in `mark-ring\\='."
+  "Persistent action for `helm-do-grep-1'.
+With a prefix arg record CANDIDATE in `mark-ring'."
   (helm-grep-action candidate)
   (helm-highlight-current-line))
 
@@ -776,28 +776,28 @@ If N is positive go forward otherwise go backward."
     (helm-goto-next-or-prec-file 1)))
 
 (defun helm-grep-run-default-action ()
-  "Run grep default action from `helm-do-grep-1\\='."
+  "Run grep default action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-action)))
 (put 'helm-grep-run-default-action 'helm-only t)
 
 (defun helm-grep-run-other-window-action ()
-  "Run grep goto other window action from `helm-do-grep-1\\='."
+  "Run grep goto other window action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-other-window)))
 (put 'helm-grep-run-other-window-action 'helm-only t)
 
 (defun helm-grep-run-other-frame-action ()
-  "Run grep goto other frame action from `helm-do-grep-1\\='."
+  "Run grep goto other frame action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-other-frame)))
 (put 'helm-grep-run-other-frame-action 'helm-only t)
 
 (defun helm-grep-run-save-buffer ()
-  "Run grep save results action from `helm-do-grep-1\\='."
+  "Run grep save results action from `helm-do-grep-1'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-save-results)))
@@ -819,7 +819,7 @@ If N is positive go forward otherwise go backward."
 
 (defvar helm-grep-mode-use-pcre nil)
 (defun helm-grep-save-results-1 ()
-  "Save Helm grep result in a `helm-grep-mode\\=' buffer."
+  "Save Helm grep result in a `helm-grep-mode' buffer."
   (let* ((buf "*hgrep*")
          new-buf
          (pattern (with-helm-buffer helm-input-local))
@@ -880,9 +880,9 @@ If N is positive go forward otherwise go backward."
 (put 'helm-grep-mode-mouse-jump 'helm-only t)
 
 (defun helm-grep-next-error (&optional argp reset)
-  "Goto ARGP position from a `helm-grep-mode\\=' buffer.
+  "Goto ARGP position from a `helm-grep-mode' buffer.
 RESET non-nil means rewind to the first match.
-This is the `next-error-function\\=' for `helm-grep-mode\\='."
+This is the `next-error-function' for `helm-grep-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
 		   ((< argp 0) (line-beginning-position))
@@ -898,11 +898,11 @@ This is the `next-error-function\\=' for `helm-grep-mode\\='."
 
 ;;;###autoload
 (defun helm-revert-next-error-last-buffer ()
-  "Revert last `next-error\\=' buffer from `current-buffer\\='.
+  "Revert last `next-error' buffer from `current-buffer'.
 
-Accept to revert only `helm-grep-mode\\=' or `helm-occur-mode\\=' buffers.
-Use this when you want to revert the `next-error\\=' buffer after
-modifications in `current-buffer\\='."
+Accept to revert only `helm-grep-mode' or `helm-occur-mode' buffers.
+Use this when you want to revert the `next-error' buffer after
+modifications in `current-buffer'."
   (interactive)
   (let ((buffer  (next-error-find-buffer))
         (linum   (line-number-at-pos))
@@ -1059,7 +1059,7 @@ Special commands:
 
 (defvar helm-grep-ack-types-cache nil)
 (defun helm-grep-read-ack-type ()
-  "Select types for the \\='--type\\=' argument of ack-grep."
+  "Select types for the '--type' argument of ack-grep."
   (require 'helm-mode)
   (require 'helm-adaptive)
   (setq helm-grep-ack-types-cache (helm-grep-hack-types))
@@ -1099,7 +1099,7 @@ of grep."
         finally return (delq nil (append ext-list glob-list))))
 
 (defun helm-grep-get-file-extensions (files)
-  "Try to return a list of file extensions to pass to \\='--include\\=' arg of grep."
+  "Try to return a list of file extensions to pass to '--include' arg of grep."
   (require 'helm-adaptive)
   (let* ((all-exts (helm-grep-guess-extensions
                     (mapcar 'expand-file-name files)))
@@ -1140,8 +1140,8 @@ of grep."
             :documentation
             "  The grep backend that will be used.
   It is actually used only as an internal flag
-  and doesn\\='t set the backend by itself.
-  You probably don\\='t want to modify this.")
+  and doesn't set the backend by itself.
+  You probably don't want to modify this.")
    (candidate-number-limit :initform 9999)
    (help-message :initform 'helm-grep-help-message)
    (history :initform 'helm-grep-history)
@@ -1169,7 +1169,7 @@ of grep."
                                   default-input input (source 'helm-source-grep))
   "Launch helm using backend BACKEND on a list of TARGETS files.
 
-When RECURSE is given and BACKEND is \\='grep\\=' use -r option of
+When RECURSE is given and BACKEND is 'grep' use -r option of
 BACKEND and prompt user for EXTS to set the --include args of
 BACKEND.
 Interactively you can give more than one arg separated by space
@@ -1180,16 +1180,16 @@ E.g.:
 From Lisp use the EXTS argument as a list of extensions as above.
 If you are using ack-grep, you will be prompted for --type
 instead and EXTS will be ignored.  If prompt is empty
-`helm-grep-ignored-files\\=' are added to --exclude.
+`helm-grep-ignored-files' are added to --exclude.
 
-Argument DEFAULT-INPUT is use as `default\\=' arg of `helm\\=' and
-INPUT is used as `input\\=' arg of `helm\\='.  See `helm\\=' docstring.
+Argument DEFAULT-INPUT is use as `default' arg of `helm' and
+INPUT is used as `input' arg of `helm'.  See `helm' docstring.
 
 Arg BACKEND when non-nil specifies which backend to use.
-It is used actually to specify \\='zgrep\\=' or \\='git\\='.
-When BACKEND \\='zgrep\\=' is used don\\='t prompt for a choice in
+It is used actually to specify 'zgrep' or 'git'.
+When BACKEND 'zgrep' is used don't prompt for a choice in
 recurse, and ignore EXTS, search being made recursively on files
-matching `helm-zgrep-file-extension-regexp\\=' only."
+matching `helm-zgrep-file-extension-regexp' only."
   (let* (non-essential
          (ack-rec-p (helm-grep-use-ack-p :where 'recursive))
          (exts (and recurse
@@ -1326,7 +1326,7 @@ matching `helm-zgrep-file-extension-regexp\\=' only."
         "")))
 
 (defun helm-grep-filter-one-by-one (candidate &optional pcre)
-  "`filter-one-by-one\\=' transformer function for `helm-do-grep-1\\='."
+  "`filter-one-by-one' transformer function for `helm-do-grep-1'."
   (let ((helm-grep-default-directory-fn
          (or helm-grep-default-directory-fn
              (lambda () (or helm-ff-default-directory
@@ -1351,7 +1351,7 @@ matching `helm-zgrep-file-extension-regexp\\=' only."
              collect (helm-grep--filter-candidate-1 c nil pcre))))
 
 (defun helm-grep-highlight-match (str &optional pcre)
-  "Highlight in string STR all occurences matching `helm-pattern\\='."
+  "Highlight in string STR all occurences matching `helm-pattern'."
   (let (beg end)
     (condition-case-unless-debug nil
         (with-temp-buffer
@@ -1388,7 +1388,7 @@ matching `helm-zgrep-file-extension-regexp\\=' only."
 If one of selected buffers is not a file buffer, it is ignored
 and grep will run on all others file-buffers.
 If only one candidate is selected and it is not a file buffer,
-switch to this buffer and run `helm-occur\\='.
+switch to this buffer and run `helm-occur'.
 If a prefix arg is given run grep on all buffers ignoring
 non-file buffers."
   (let* ((prefarg (or current-prefix-arg helm-current-prefix-arg))
@@ -1546,7 +1546,7 @@ For ripgrep here is the command line to use:
 
 And to customize colors (always for ripgrep) use something like this:
 
-    rg --color=always --colors \\='match:bg:yellow\\=' --colors \\='match:fg:black\\='
+    rg --color=always --colors 'match:bg:yellow' --colors 'match:fg:black'
 \--smart-case --no-heading --line-number %s -- %s %s
 
 This will change color for matched items from foreground red (the
@@ -1568,7 +1568,7 @@ ones to use.
 
 When modifying the default colors of matches with e.g.
 \"--color-match\" option of AG or \"--colors\" option of ripgrep
-you may want to modify as well `helm-grep-ag-pipe-cmd-switches\\='
+you may want to modify as well `helm-grep-ag-pipe-cmd-switches'
 to have all matches colorized with the same color in multi
 match.
 
@@ -1601,7 +1601,7 @@ Ripgrep (rg) types are also supported if this backend is used."
 
 (defun helm-grep-ag-prepare-cmd-line (pattern directory &optional type)
   "Prepare AG command line to search PATTERN in DIRECTORY.
-When TYPE is specified it is one of what `helm-grep-ag-get-types\\='
+When TYPE is specified it is one of what `helm-grep-ag-get-types'
 returns if available with current AG version."
   (let* ((patterns (helm-mm-split-pattern pattern t))
          (pipe-switches (mapconcat 'identity helm-grep-ag-pipe-cmd-switches " "))
@@ -1755,7 +1755,7 @@ When WITH-TYPES is non-nil provide completion on AG types."
   "The git grep default command line.
 The option \"--color=always\" can be used safely.
 The color of matched items can be customized in your .gitconfig
-See `helm-grep-default-command\\=' for more infos.
+See `helm-grep-default-command' for more infos.
 
 The \"--exclude-standard\" and \"--no-index\" switches allow
 skipping unwanted files specified in ~/.gitignore_global and
@@ -1771,7 +1771,7 @@ You have also to enable this in global \".gitconfig\" with
 If DIRECTORY is not inside or part of a git repo exit with error.
 If optional arg ALL is non-nil grep the whole repo otherwise
 start at DIRECTORY.
-Arg DEFAULT is what you will have with `next-history-element\\=',
+Arg DEFAULT is what you will have with `next-history-element',
 arg INPUT is what you will have by default at prompt on startup."
   (require 'vc)
   (let* (helm-grep-default-recurse-command
@@ -1787,7 +1787,7 @@ arg INPUT is what you will have by default at prompt on startup."
 
 ;;;###autoload
 (defun helm-do-grep-ag (arg)
-  "Preconfigured `helm\\=' for grepping with AG in `default-directory\\='.
+  "Preconfigured `helm' for grepping with AG in `default-directory'.
 With prefix arg prompt for type if available with your AG
 version."
   (interactive "P")
@@ -1796,7 +1796,7 @@ version."
 
 ;;;###autoload
 (defun helm-grep-do-git-grep (arg)
-  "Preconfigured `helm\\=' for git-grepping `default-directory\\='.
+  "Preconfigured `helm' for git-grepping `default-directory'.
 With a prefix arg ARG git-grep the whole repository."
   (interactive "P")
   (require 'helm-files)

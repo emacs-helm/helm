@@ -41,13 +41,13 @@
   :group 'helm)
 
 (defcustom helm-turn-on-show-completion t
-  "Display candidate in `current-buffer\\=' while moving selection when non--nil."
+  "Display candidate in `current-buffer' while moving selection when non--nil."
   :group 'helm-elisp
   :type  'boolean)
 
 (defcustom helm-show-completion-min-window-height 7
   "Minimum completion window height used in show completion.
-This is used in macro `with-helm-show-completion\\='."
+This is used in macro `with-helm-show-completion'."
   :group 'helm-elisp
   :type  'integer)
 
@@ -56,7 +56,7 @@ This is used in macro `with-helm-show-completion\\='."
     callf callf2 cl-callf cl-callf2 fset
     fboundp fmakunbound symbol-function)
   "List of function where quoted function completion happen.
-E.g. give only function names after (funcall \\='."
+E.g. give only function names after (funcall '."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
@@ -68,7 +68,7 @@ E.g. give only function names after (function ."
   :type '(repeat (choice symbol)))
 
 (defcustom helm-apropos-fuzzy-match nil
-  "Enable fuzzy matching for `helm-apropos\\=' when non-nil."
+  "Enable fuzzy matching for `helm-apropos' when non-nil."
   :group 'helm-elisp
   :type 'boolean)
 
@@ -76,7 +76,7 @@ E.g. give only function names after (function ."
   "Enable fuzzy matching in emacs-lisp completion when non-nil.
 NOTE: This enables fuzzy matching in Helm native implementation of
 elisp completion, but not on helmized elisp completion, i.e. fuzzy
-completion is not available in `completion-at-point\\='."
+completion is not available in `completion-at-point'."
   :group 'helm-elisp
   :type 'boolean)
 
@@ -86,7 +86,7 @@ completion is not available in `completion-at-point\\='."
                                         helm-def-source--eieio-generic
                                         helm-def-source--emacs-variables
                                         helm-def-source--emacs-faces)
-  "A list of functions that build helm sources to use in `helm-apropos\\='."
+  "A list of functions that build helm sources to use in `helm-apropos'."
   :group 'helm-elisp
   :type '(repeat (choice symbol)))
 
@@ -103,11 +103,11 @@ completion is not available in `completion-at-point\\='."
     #'helm-show-completion-default-display-function)
   "The function used to display helm completion buffer.
 
-This function is used by `with-helm-show-completion\\=', when nil
-fallback to `helm-default-display-buffer\\='.
+This function is used by `with-helm-show-completion', when nil
+fallback to `helm-default-display-buffer'.
 
 Default is to use a separate frame on graphic display and
-`helm-show-completion-default-display-function\\=' on non graphic
+`helm-show-completion-default-display-function' on non graphic
 display."
   :group 'helm-elisp
   :type 'function)
@@ -124,13 +124,13 @@ display."
 (defface helm-lisp-show-completion
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :background "DarkSlateGray"))
-  "Face used for showing candidates in `helm-lisp-completion\\='."
+  "Face used for showing candidates in `helm-lisp-completion'."
   :group 'helm-elisp-faces)
 
 (defface helm-lisp-completion-info
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "red"))
-  "Face used for showing info in `helm-lisp-completion\\='."
+  "Face used for showing info in `helm-lisp-completion'."
   :group 'helm-elisp-faces)
 
 (defcustom helm-elisp-help-function
@@ -143,7 +143,7 @@ display."
                   helm-elisp-show-doc-modeline)))
 
 (defcustom helm-locate-library-fuzzy-match t
-  "Enable fuzzy-matching in `helm-locate-library\\=' when non--nil."
+  "Enable fuzzy-matching in `helm-locate-library' when non--nil."
   :type 'boolean
   :group 'helm-elisp)
 
@@ -188,9 +188,9 @@ display."
 (defmacro with-helm-show-completion (beg end &rest body)
   "Show Helm candidate in an overlay at point.
 BEG and END are the beginning and end position of the current
-completion in `helm-current-buffer\\='.
+completion in `helm-current-buffer'.
 BODY is an Helm call where we want to enable show completion.
-If `helm-turn-on-show-completion\\=' is nil do nothing."
+If `helm-turn-on-show-completion' is nil do nothing."
   (declare (indent 2) (debug t))
   `(unwind-protect
         (if helm-turn-on-show-completion
@@ -273,8 +273,8 @@ of symbol before point."
           (buffer-substring-no-properties beg end))))))
 
 (defun helm-bounds-of-thing-before-point (&optional regexp)
-  "Get the beginning and end position of `helm-thing-before-point\\='.
-Return a cons (beg . end)."
+  "Get the beginning and end position of `helm-thing-before-point'.
+Return a cons \(beg . end\)."
   (helm-thing-before-point 'limits regexp))
 
 (defun helm-insert-completion-at-point (beg end str)
@@ -350,11 +350,11 @@ Return a cons (beg . end)."
   "Show documentation for the function.
 Documentation is shown briefly in mode-line or completely in
 other window according to the value of
-`helm-elisp-help-function\\='."
+`helm-elisp-help-function'."
   (funcall helm-elisp-help-function candidate name))
 
 (defun helm-lisp-completion-persistent-help ()
-  "Return persistent-help according to the value of `helm-elisp-help-function\\='"
+  "Return persistent-help according to the value of `helm-elisp-help-function'"
     (cl-ecase helm-elisp-help-function
       (helm-elisp-show-doc-modeline "Show brief doc in mode-line")
       (helm-elisp-show-help "Toggle show help for the symbol")))
@@ -498,7 +498,7 @@ double quote."
 (defvar helm-apropos-history nil)
 
 (defun helm-apropos-init (test default)
-  "Init candidates buffer for `helm-apropos\\=' sources."
+  "Init candidates buffer for `helm-apropos' sources."
   (require 'helm-help)
   (helm-init-candidates-in-buffer 'global
     (let ((default-symbol (and (stringp default)
@@ -509,7 +509,7 @@ double quote."
         symbols))))
 
 (defun helm-apropos-init-faces (default)
-  "Init candidates buffer for faces for `helm-apropos\\='."
+  "Init candidates buffer for faces for `helm-apropos'."
   (require 'helm-help)
   (with-current-buffer (helm-candidate-buffer 'global)
     (goto-char (point-min))
@@ -607,8 +607,8 @@ double quote."
     :action-transformer 'helm-apropos-action-transformer))
 
 (defun helm-def-source--emacs-faces (&optional default)
-  "Create `helm\\=' source for faces to be displayed with
-`helm-apropos\\='."
+  "Create `helm' source for faces to be displayed with
+`helm-apropos'."
   (helm-build-in-buffer-source "Faces"
     :init (lambda () (helm-apropos-init-faces default))
     :fuzzy-match helm-apropos-fuzzy-match
@@ -747,7 +747,7 @@ double quote."
 (defun helm-apropos (default)
   "Preconfigured Helm to describe commands, functions, variables and faces.
 In non interactives calls DEFAULT argument should be provided as
-a string, i.e. the `symbol-name\\=' of any existing symbol."
+a string, i.e. the `symbol-name' of any existing symbol."
   (interactive (list (with-syntax-table emacs-lisp-mode-syntax-table
                        (thing-at-point 'symbol))))
   (let (helm-M-x-show-short-doc)
@@ -823,7 +823,7 @@ a string, i.e. the `symbol-name\\=' of any existing symbol."
 
 ;;;###autoload
 (defun helm-manage-advice ()
-  "Preconfigured `helm\\=' to disable/enable function advices."
+  "Preconfigured `helm' to disable/enable function advices."
   (interactive)
   (helm-other-buffer 'helm-source-advice "*helm advice*"))
 
@@ -923,7 +923,7 @@ a string, i.e. the `symbol-name\\=' of any existing symbol."
 
 ;;;###autoload
 (defun helm-timers ()
-  "Preconfigured `helm\\=' for timers."
+  "Preconfigured `helm' for timers."
   (interactive)
   (helm :sources '(helm-source-absolute-time-timers
                    helm-source-idle-time-timers)
@@ -980,7 +980,7 @@ a string, i.e. the `symbol-name\\=' of any existing symbol."
 
 ;;;###autoload
 (defun helm-complex-command-history ()
-  "Preconfigured `helm\\=' for complex command history."
+  "Preconfigured `helm' for complex command history."
   (interactive)
   (helm :sources 'helm-source-complex-command-history
         :buffer "*helm complex commands*"))

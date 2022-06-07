@@ -49,7 +49,7 @@
 
 
 (defcustom helm-eshell-fuzzy-match nil
-  "Enable fuzzy matching in `helm-esh-pcomplete\\=' when non-nil."
+  "Enable fuzzy matching in `helm-esh-pcomplete' when non-nil."
   :group 'helm-eshell
   :type 'boolean)
 
@@ -59,14 +59,14 @@
     (set-keymap-parent map helm-map)
     (define-key map (kbd "M-p") 'helm-next-line)
     map)
-  "Keymap for `helm-eshell-history\\='.")
+  "Keymap for `helm-eshell-history'.")
 
 (defvar helm-esh-completion-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (define-key map (kbd "TAB") 'helm-next-line)
     map)
-  "Keymap for `helm-esh-pcomplete\\='.")
+  "Keymap for `helm-esh-pcomplete'.")
 
 (defvar helm-eshell--quit-flag nil)
 
@@ -75,7 +75,7 @@
 (defvar helm-ec-target "")
 (defun helm-ec-insert (_candidate)
   "Replace text at point with CANDIDATE.
-The function that call this should set `helm-ec-target\\=' to thing
+The function that call this should set `helm-ec-target' to thing
 at point."
   (set (make-local-variable 'comint-file-name-quote-list)
        eshell-special-chars-outside-quoting)
@@ -134,7 +134,7 @@ at point."
   "Helm class to define source for Eshell completion.")
 
 (defun helm-esh-get-candidates ()
-  "Get candidates for Eshell completion using `pcomplete\\='."
+  "Get candidates for Eshell completion using `pcomplete'."
   (catch 'pcompleted
     (with-helm-current-buffer
       (let* ((pcomplete-stub)
@@ -259,7 +259,7 @@ at point."
 
 ;;;###autoload
 (defun helm-esh-pcomplete ()
-  "Preconfigured `helm\\=' to provide Helm completion in Eshell."
+  "Preconfigured `helm' to provide Helm completion in Eshell."
   (interactive)
   (let* ((helm-quit-if-no-candidate t)
          (helm-execute-action-at-once-if-one t)
@@ -388,7 +388,7 @@ at point."
     (define-key map (kbd "C-c o")   'helm-eshell-prompts-other-window)
     (define-key map (kbd "C-c C-o") 'helm-eshell-prompts-other-frame)
     map)
-  "Keymap for `helm-eshell-prompt-all\\='.")
+  "Keymap for `helm-eshell-prompt-all'.")
 
 (defvar eshell-prompt-regexp)
 (defvar eshell-highlight-prompt)
@@ -417,7 +417,7 @@ If BUFFER is nil, use current buffer."
 
 (defun helm-eshell-prompts-list-all ()
   "List the prompts of all Eshell buffers.
-See `helm-eshell-prompts-list\\='."
+See `helm-eshell-prompts-list'."
   (cl-loop for b in (buffer-list)
            append (helm-eshell-prompts-list b)))
 
@@ -470,7 +470,7 @@ See `helm-eshell-prompts-list\\='."
 
 ;;;###autoload
 (defun helm-eshell-prompts ()
-  "Pre-configured `helm\\=' to browse the prompts of the current Eshell."
+  "Pre-configured `helm' to browse the prompts of the current Eshell."
   (interactive)
   (if (eq major-mode 'eshell-mode)
       (helm :sources
@@ -483,7 +483,7 @@ See `helm-eshell-prompts-list\\='."
 
 ;;;###autoload
 (defun helm-eshell-prompts-all ()
-  "Pre-configured `helm\\=' to browse the prompts of all Eshell sessions."
+  "Pre-configured `helm' to browse the prompts of all Eshell sessions."
   (interactive)
   (helm :sources
         (helm-build-sync-source "All Eshell prompts"

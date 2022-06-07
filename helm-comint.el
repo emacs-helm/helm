@@ -51,7 +51,7 @@
 
 (defcustom helm-comint-mode-list '(comint-mode slime-repl-mode sly-mrepl-mode sql-interactive-mode)
   "Supported modes for prompt navigation.
-Derived modes (e.g., Geiser\\='s REPL) are automatically supported."
+Derived modes (e.g., Geiser's REPL) are automatically supported."
   :group 'helm-comint
   :type '(repeat (choice symbol)))
 
@@ -68,7 +68,7 @@ Derived modes (e.g., Geiser\\='s REPL) are automatically supported."
 
 (defcustom helm-comint-max-offset 400
   "Max number of chars displayed per candidate in comint-input-ring browser.
-When t, don\\='t truncate candidate, show all.
+When t, don't truncate candidate, show all.
 By default it is approximatively the number of bits contained in
 five lines of 80 chars each i.e 80*5.
 Note that if you set this to nil multiline will be disabled, i.e
@@ -83,7 +83,7 @@ you will not have anymore separators between candidates."
     (define-key map (kbd "C-c o")   'helm-comint-prompts-other-window)
     (define-key map (kbd "C-c C-o") 'helm-comint-prompts-other-frame)
     map)
-  "Keymap for `helm-comint-prompt-all\\='.")
+  "Keymap for `helm-comint-prompt-all'.")
 
 (defun helm-comint-prompts-list (mode &optional buffer)
   "List the prompts in BUFFER in mode MODE.
@@ -110,7 +110,7 @@ If BUFFER is nil, use current buffer."
 
 (defun helm-comint-prompts-list-all (mode)
   "List the prompts of all buffers in mode MODE.
-See `helm-comint-prompts-list\\='."
+See `helm-comint-prompts-list'."
   (cl-loop for b in (buffer-list)
            append (helm-comint-prompts-list mode b)))
 
@@ -163,7 +163,7 @@ See `helm-comint-prompts-list\\='."
 
 ;;;###autoload
 (defun helm-comint-prompts ()
-  "Pre-configured `helm\\=' to browse the prompts of the current comint buffer."
+  "Pre-configured `helm' to browse the prompts of the current comint buffer."
   (interactive)
   (if (apply 'derived-mode-p helm-comint-mode-list)
       (helm :sources
@@ -176,7 +176,7 @@ See `helm-comint-prompts-list\\='."
 
 ;;;###autoload
 (defun helm-comint-prompts-all ()
-  "Pre-configured `helm\\=' to browse the prompts of all comint sessions."
+  "Pre-configured `helm' to browse the prompts of all comint sessions."
   (interactive)
   (if (apply 'derived-mode-p helm-comint-mode-list)
       (helm :sources
@@ -212,11 +212,11 @@ See `helm-comint-prompts-list\\='."
     ;; Multiline does not work for `shell' because of an Emacs bug.
     ;; It works in other REPLs like Geiser.
     :multiline 'helm-comint-max-offset)
-  "Source that provides Helm completion against `comint-input-ring\\='.")
+  "Source that provides Helm completion against `comint-input-ring'.")
 
 ;;;###autoload
 (defun helm-comint-input-ring ()
-  "Preconfigured `helm\\=' that provide completion of `comint\\=' history."
+  "Preconfigured `helm' that provide completion of `comint' history."
   (interactive)
   (when (or (derived-mode-p 'comint-mode)
             (member major-mode helm-comint-mode-list))

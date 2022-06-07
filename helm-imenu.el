@@ -39,7 +39,7 @@
   :group 'helm)
 
 (defcustom helm-imenu-delimiter " / "
-  "Delimit types of candidates and their value in `helm-buffer\\='."
+  "Delimit types of candidates and their value in `helm-buffer'."
   :group 'helm-imenu
   :type 'string)
 
@@ -50,11 +50,11 @@
   :type 'function)
 
 (defcustom helm-imenu-all-buffer-assoc nil
-  "Major mode association alist for `helm-imenu-in-all-buffers\\='.
-Allow `helm-imenu-in-all-buffers\\=' searching in these associated
+  "Major mode association alist for `helm-imenu-in-all-buffers'.
+Allow `helm-imenu-in-all-buffers' searching in these associated
 buffers even if they are not derived from each other.  The alist
-is bidirectional, i.e. no need to add \\='((foo . bar) (bar . foo)),
-only \\='((foo . bar)) is needed."
+is bidirectional, i.e. no need to add '((foo . bar) (bar . foo)),
+only '((foo . bar)) is needed."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-imenu)
 
@@ -64,10 +64,10 @@ only \\='((foo . bar)) is needed."
 When nil all candidates are displayed in a single source.
 
 NOTE: Each source will have as name \"Imenu <buffer-name>\".
-`helm-source-imenu-all\\=' will not be set, however it will continue
+`helm-source-imenu-all' will not be set, however it will continue
 to be used as a flag for using default as input.  If you do not
 want this behavior, remove it from
-`helm-sources-using-default-as-input\\=' even if not using a single
+`helm-sources-using-default-as-input' even if not using a single
 source to display imenu in all buffers."
   :type 'boolean
   :group 'helm-imenu)
@@ -88,7 +88,7 @@ string."
            (sexp :tag "Face"))))
 
 (defcustom helm-imenu-extra-modes nil
-  "Extra modes where `helm-imenu-in-all-buffers\\=' should look into."
+  "Extra modes where `helm-imenu-in-all-buffers' should look into."
   :group 'helm-imenu
   :type '(repeat symbol))
 
@@ -177,7 +177,7 @@ This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view]
     ("Variable"        . (all-the-icons-octicon "book" :face font-lock-variable-name-face))
     ("Variables"       . (all-the-icons-octicon "book":face font-lock-variable-name-face)))
   "An alist of types associated with a sexp returning an icon.
-The sexp should be an `all-the-icons\\=' function with its args."
+The sexp should be an `all-the-icons' function with its args."
   :type '(alist :key-type string :value-type sexp)
   :group 'helm-imenu)
 
@@ -282,7 +282,7 @@ The sexp should be an `all-the-icons\\=' function with its args."
    (group :initform 'helm-imenu)))
 
 (defcustom helm-imenu-fuzzy-match nil
-  "Enable fuzzy matching in `helm-source-imenu\\='."
+  "Enable fuzzy matching in `helm-source-imenu'."
   :group 'helm-imenu
   :type  'boolean
   :set (lambda (var val)
@@ -318,7 +318,7 @@ The sexp should be an `all-the-icons\\=' function with its args."
       (buffer-file-name (marker-buffer (cdr sel))))))
 
 (defun helm-imenu-action (candidate)
-  "Default action for `helm-source-imenu\\='."
+  "Default action for `helm-source-imenu'."
   (helm-log-run-hook 'helm-goto-line-before-hook)
   (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
@@ -331,7 +331,7 @@ The sexp should be an `all-the-icons\\=' function with its args."
     (helm-highlight-current-line)))
 
 (defun helm-imenu-persistent-action (candidate)
-  "Default persistent action for `helm-source-imenu\\='."
+  "Default persistent action for `helm-source-imenu'."
   (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
   (helm-highlight-current-line))
@@ -418,8 +418,8 @@ The sexp should be an `all-the-icons\\=' function with its args."
 
 (defun helm-imenu-icon-for-type (type)
   "Return an icon for type TYPE.
-The icon is found in `helm-imenu-icon-type-alist\\=', if not
-`helm-imenu-default-type-sexp\\=' is evaled to provide a default icon."
+The icon is found in `helm-imenu-icon-type-alist', if not
+`helm-imenu-default-type-sexp' is evaled to provide a default icon."
   (require 'all-the-icons)
   (let ((all-the-icons-scale-factor 1.0)
         (all-the-icons-default-adjust 0.0))
@@ -470,7 +470,7 @@ The icon is found in `helm-imenu-icon-type-alist\\=', if not
 
 ;;;###autoload
 (defun helm-imenu ()
-  "Preconfigured `helm\\=' for `imenu\\='."
+  "Preconfigured `helm' for `imenu'."
   (interactive)
   (require 'which-func)
   (unless helm-source-imenu
@@ -494,8 +494,8 @@ The icon is found in `helm-imenu-icon-type-alist\\=', if not
 (defun helm-imenu-in-all-buffers ()
   "Fetch Imenu entries in all buffers with similar mode as current.
 A mode is similar as current if it is the same, it is derived
-i.e. `derived-mode-p\\=' or it have an association in
-`helm-imenu-all-buffer-assoc\\='."
+i.e. `derived-mode-p' or it have an association in
+`helm-imenu-all-buffer-assoc'."
   (interactive)
   (require 'which-func)
   (unless helm-imenu-in-all-buffers-separate-sources

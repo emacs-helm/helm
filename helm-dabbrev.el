@@ -30,7 +30,7 @@
   "Always search in all buffers when non--nil.
 Note that even if nil, a search in all buffers will occur if the
 length of candidates is <= than
-`helm-dabbrev-max-length-result\\='."
+`helm-dabbrev-max-length-result'."
   :group 'helm-dabbrev
   :type 'boolean)
 
@@ -41,29 +41,29 @@ The higher this number is, the slower the computation of
 candidates will be.  You can use safely a higher value with
 emacs-26+.
 Note that this have nothing to do with
-`helm-candidate-number-limit\\=', this means that computation of
+`helm-candidate-number-limit', this means that computation of
 candidates stop when this value is reached but only
-`helm-candidate-number-limit\\=' candidates are displayed in the
+`helm-candidate-number-limit' candidates are displayed in the
 Helm buffer."
   :group 'helm-dabbrev
   :type 'integer)
 
 (defcustom helm-dabbrev-ignored-buffers-regexps
   '("\\*helm" "\\*Messages" "\\*Echo Area" "\\*Buffer List")
-  "List of regexps matching names of buffers that `helm-dabbrev\\=' should not check."
+  "List of regexps matching names of buffers that `helm-dabbrev' should not check."
   :group 'helm-dabbrev
   :type '(repeat regexp))
 
 (defcustom helm-dabbrev-related-buffer-fn #'helm-dabbrev--same-major-mode-p
-  "A function that decide if a buffer to search in its related to `current-buffer\\='.
+  "A function that decide if a buffer to search in its related to `current-buffer'.
 
-This is actually determined by comparing `major-mode\\=' of the
-buffer to search and the `current-buffer\\='.
+This is actually determined by comparing `major-mode' of the
+buffer to search and the `current-buffer'.
 
 The function take one arg, the buffer which is current, look at
-`helm-dabbrev--same-major-mode-p\\=' for an example.
+`helm-dabbrev--same-major-mode-p' for an example.
 
-When nil all buffers are considered related to `current-buffer\\='."
+When nil all buffers are considered related to `current-buffer'."
   :group 'helm-dabbrev
   :type 'function)
 
@@ -71,19 +71,19 @@ When nil all buffers are considered related to `current-buffer\\='."
   "Major mode association alist.
 
 This allow helm-dabbrev searching in buffers with the associated
-`major-mode\\='.
-E.g. (emacs-lisp-mode . lisp-interaction-mode)
+`major-mode'.
+E.g. \(emacs-lisp-mode . lisp-interaction-mode\)
 
 will allow searching in the lisp-interaction-mode buffer when
-`current-buffer\\=' is an `emacs-lisp-mode\\=' buffer and vice versa
-i.e. no need to provide (lisp-interaction-mode .
-emacs-lisp-mode) association.
+`current-buffer' is an `emacs-lisp-mode' buffer and vice versa
+i.e. no need to provide \(lisp-interaction-mode .
+emacs-lisp-mode\) association.
 
-When nil check is the searched buffer has same `major-mode\\=' than
-the `current-buffer\\='.
+When nil check is the searched buffer has same `major-mode' than
+the `current-buffer'.
 
-This has no effect when `helm-dabbrev-related-buffer-fn\\=' is nil
-or of course bound to a function that doesn\\='t handle this var."
+This has no effect when `helm-dabbrev-related-buffer-fn' is nil
+or of course bound to a function that doesn't handle this var."
   :type '(alist :key-type symbol :value-type symbol)
   :group 'helm-dabbrev)
 
@@ -99,8 +99,8 @@ When nil or 0 disable cycling."
   :type '(choice (const :tag "Cycling disabled" nil) integer))
 
 (defcustom helm-dabbrev-case-fold-search 'smart
-  "Set `case-fold-search\\=' in `helm-dabbrev\\='.
-Same as `helm-case-fold-search\\=' but for `helm-dabbrev\\='.
+  "Set `case-fold-search' in `helm-dabbrev'.
+Same as `helm-case-fold-search' but for `helm-dabbrev'.
 Note that this is not affecting searching in Helm buffer, but the
 initial search for all candidates in buffer(s)."
   :group 'helm-dabbrev
@@ -202,10 +202,10 @@ Argument DIRECTION can be:
     -  (1):  Search forward from point.
     - (-1):  Search backward from point.
     -  (2):  Search forward from the
-             `helm-dabbrev-lineno-around\\='
+             `helm-dabbrev-lineno-around'
              lines after point.
     - (-2):  Search backward from the
-             `helm-dabbrev-lineno-around\\='
+             `helm-dabbrev-lineno-around'
              lines before point."
   (let ((res results)
          after before)
@@ -238,10 +238,10 @@ Argument DIRECTION can be:
 
 (defun helm-dabbrev--search (pattern beg sep-regexp)
   "Search word or symbol at point matching PATTERN.
-Argument BEG is corresponding to the previous `match-beginning\\='
+Argument BEG is corresponding to the previous `match-beginning'
 search.
 The search starts at (1- BEG) with a regexp starting with
-`helm-dabbrev-separator-regexp\\=' followed by PATTERN followed by a
+`helm-dabbrev-separator-regexp' followed by PATTERN followed by a
 regexp matching syntactically any word or symbol.
 The possible false positives matching SEP-REGEXP at end are
 finally removed."

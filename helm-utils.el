@@ -105,11 +105,11 @@ Where PA means persistent action."
 
 (defcustom helm-html-decode-entities-function #'helm-html-decode-entities-string
   "Function used to decode HTML entities in HTML bookmarks.
-Helm comes by default with `helm-html-decode-entities-string\\=', if
+Helm comes by default with `helm-html-decode-entities-string', if
 you need something more sophisticated you can use
-`w3m-decode-entities-string\\=' if available.
+`w3m-decode-entities-string' if available.
 
-In Emacs itself org-entities seem broken and `xml-substitute-numeric-entities\\='
+In Emacs itself org-entities seem broken and `xml-substitute-numeric-entities'
 supports only numeric entities."
   :group 'helm-utils
   :type 'function)
@@ -117,17 +117,17 @@ supports only numeric entities."
 
 (defvar helm-goto-line-before-hook '(helm-save-current-pos-to-mark-ring)
   "Run before jumping to line.
-This hook runs when jumping from `helm-goto-line\\=', `helm-etags-default-action\\=',
-and `helm-imenu-default-action\\='.
+This hook runs when jumping from `helm-goto-line', `helm-etags-default-action',
+and `helm-imenu-default-action'.
 This allows you to retrieve a previous position after using the different helm
 tools for searching (etags, grep, gid, (m)occur etc...).
-By default positions are added to `mark-ring\\='.
+By default positions are added to `mark-ring'.
 You can also add to register by using (or adding)
-`helm-save-pos-to-register-before-jump\\=' instead. In this case
-last position is added to the register `helm-save-pos-before-jump-register\\='.")
+`helm-save-pos-to-register-before-jump' instead. In this case
+last position is added to the register `helm-save-pos-before-jump-register'.")
 
 (defvar helm-save-pos-before-jump-register ?_
-  "The register where `helm-save-pos-to-register-before-jump\\=' saves position.")
+  "The register where `helm-save-pos-to-register-before-jump' saves position.")
 
 (defconst helm-html-entities-alist
   '(("&quot;"   . 34)   ;; "
@@ -237,14 +237,14 @@ last position is added to the register `helm-save-pos-before-jump-register\\='."
 See https://www.freeformatter.com/html-entities.html")
 
 (defvar helm-find-many-files-after-hook nil
-  "Hook that runs at end of `helm-find-many-files\\='.")
+  "Hook that runs at end of `helm-find-many-files'.")
 
 ;;; Faces.
 ;;
 (defface helm-selection-line
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit highlight :distant-foreground "black"))
-  "Face used in the `helm-current-buffer\\=' when jumping to a candidate."
+  "Face used in the `helm-current-buffer' when jumping to a candidate."
   :group 'helm-faces)
 
 (defface helm-match-item
@@ -260,15 +260,15 @@ See https://www.freeformatter.com/html-entities.html")
 (defcustom helm-window-prefer-horizontal-split nil
   "Maybe switch to other window vertically when non nil.
 
-Possible values are t, nil and `decide\\='.
+Possible values are t, nil and `decide'.
 
 When t switch vertically.
 When nil switch horizontally.
-When `decide\\=' try to guess if it is possible to switch vertically
-according to the setting of `split-width-threshold\\=' and the size of
+When `decide' try to guess if it is possible to switch vertically
+according to the setting of `split-width-threshold' and the size of
 the window from where splitting is done.
 
-Note that when using `decide\\=' and `split-width-threshold\\=' is nil, the
+Note that when using `decide' and `split-width-threshold' is nil, the
 behavior is the same as with a nil value."
   :group 'helm-utils
   :type '(choice
@@ -343,9 +343,9 @@ If a prefix arg is given split windows vertically."
 (defun helm-window-default-split-fn (candidates &optional other-window-fn)
   "Split windows in one direction and balance them.
 
-Direction can be controlled via `helm-window-prefer-horizontal-split\\='.
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
 If a prefix arg is given split windows the other direction.
-This function is suitable for `helm-window-show-buffers-function\\='."
+This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
     (switch-to-buffer (car candidates)))
@@ -361,9 +361,9 @@ This function is suitable for `helm-window-show-buffers-function\\='."
 (defun helm-window-alternate-split-fn (candidates &optional other-window-fn)
   "Split windows horizontally and vertically in alternate fashion.
 
-Direction can be controlled via `helm-window-prefer-horizontal-split\\='.
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
 If a prefix arg is given split windows the other direction.
-This function is suitable for `helm-window-show-buffers-function\\='."
+This function is suitable for `helm-window-show-buffers-function'."
   (if other-window-fn
       (funcall other-window-fn (car candidates))
     (switch-to-buffer (car candidates)))
@@ -383,10 +383,10 @@ This function is suitable for `helm-window-show-buffers-function\\='."
   "Make an as-square-as-possible window mosaic of the CANDIDATES buffers.
 
 If rectangular, the long side is in the direction given by
-`helm-window-prefer-horizontal-split\\=': if non-nil, it is horizontal, vertical
+`helm-window-prefer-horizontal-split': if non-nil, it is horizontal, vertical
 otherwise.
 If OTHER-WINDOW-FN is non-nil, current windows are included in the mosaic.
-This function is suitable for `helm-window-show-buffers-function\\='."
+This function is suitable for `helm-window-show-buffers-function'."
   (when other-window-fn
     (setq candidates (append (mapcar 'window-buffer (window-list)) candidates)))
   (delete-other-windows)
@@ -451,9 +451,9 @@ This function is suitable for `helm-window-show-buffers-function\\='."
 
 (defun helm-window-other-window (buffer-or-name &optional balance)
   "Switch to BUFFER-OR-NAME in other window.
-Direction can be controlled via `helm-window-prefer-horizontal-split\\='.
+Direction can be controlled via `helm-window-prefer-horizontal-split'.
 If a prefix arg is given split windows the other direction.
-When argument BALANCE is provided `balance-windows\\='."
+When argument BALANCE is provided `balance-windows'."
   (let* ((helm-window-prefer-horizontal-split
           (if (eq helm-window-prefer-horizontal-split 'decide)
               (and (numberp split-width-threshold)
@@ -470,7 +470,7 @@ When argument BALANCE is provided `balance-windows\\='."
 (cl-defun helm-current-buffer-narrowed-p (&optional
                                           (buffer helm-current-buffer))
   "Check if BUFFER is narrowed.
-Default is `helm-current-buffer\\='."
+Default is `helm-current-buffer'."
   (with-current-buffer buffer
     (let ((beg (point-min))
           (end (point-max))
@@ -514,15 +514,15 @@ Animation is used unless NOANIM is non--nil."
     (helm-highlight-current-line)))
 
 (defun helm-save-pos-to-register-before-jump ()
-  "Save current buffer position to `helm-save-pos-before-jump-register\\='.
-To use this add it to `helm-goto-line-before-hook\\='."
+  "Save current buffer position to `helm-save-pos-before-jump-register'.
+To use this add it to `helm-goto-line-before-hook'."
   (with-helm-current-buffer
     (unless helm-in-persistent-action
       (point-to-register helm-save-pos-before-jump-register))))
 
 (defun helm-save-current-pos-to-mark-ring ()
   "Save current buffer position to mark ring.
-To use this add it to `helm-goto-line-before-hook\\='."
+To use this add it to `helm-goto-line-before-hook'."
   (with-helm-current-buffer
     (unless helm-in-persistent-action
       (set-marker (mark-marker) (point))
@@ -548,7 +548,7 @@ candidate-number-limit."
 (put 'helm-show-all-candidates-in-source 'helm-only t)
 
 (defun helm-display-all-sources ()
-  "Display all sources previously hidden by `helm-set-source-filter\\='."
+  "Display all sources previously hidden by `helm-set-source-filter'."
   (interactive)
   (with-helm-alive-p
     (helm-set-source-filter nil)))
@@ -565,16 +565,16 @@ candidate-number-limit."
           do (forward-line 1))))
 
 (defun helm-handle-winner-boring-buffers ()
-  "Add `helm-buffer\\=' to `winner-boring-buffers\\=' when quitting/exiting helm.
-Add this function to `helm-cleanup-hook\\=' when you don\\='t want to see helm buffers
+  "Add `helm-buffer' to `winner-boring-buffers' when quitting/exiting helm.
+Add this function to `helm-cleanup-hook' when you don't want to see helm buffers
 after running winner-undo/redo."
   (require 'winner)
   (cl-pushnew helm-buffer winner-boring-buffers :test 'equal))
 (add-hook 'helm-cleanup-hook #'helm-handle-winner-boring-buffers)
 
 (defun helm-quit-and-find-file ()
-  "Drop into `helm-find-files\\=' from `helm\\='.
-If current selection is a buffer or a file, `helm-find-files\\='
+  "Drop into `helm-find-files' from `helm'.
+If current selection is a buffer or a file, `helm-find-files'
 from its directory."
   (interactive)
   (with-helm-alive-p
@@ -628,7 +628,7 @@ from its directory."
 
 (defun helm-generic-sort-fn (s1 s2)
   "Sort predicate function for helm candidates.
-Args S1 and S2 can be single or (display . real) candidates,
+Args S1 and S2 can be single or \(display . real\) candidates,
 that is sorting is done against real value of candidate."
   (let* ((qpattern (regexp-quote helm-pattern))
          (reg1  (concat "\\_<" qpattern "\\_>"))
@@ -669,9 +669,9 @@ that is sorting is done against real value of candidate."
 
 (cl-defun helm-file-human-size (size &optional (kbsize helm-default-kbsize))
   "Return a string showing SIZE of a file in human readable form.
-SIZE can be an integer or a float depending on it\\='s value.
-`file-attributes\\=' will take care of that to avoid overflow error.
-KBSIZE is a floating point number, defaulting to `helm-default-kbsize\\='."
+SIZE can be an integer or a float depending on it's value.
+`file-attributes' will take care of that to avoid overflow error.
+KBSIZE is a floating point number, defaulting to `helm-default-kbsize'."
   (cl-loop with result = (cons "B" size)
            for i in '("k" "M" "G" "T" "P" "E" "Z" "Y")
            while (>= (cdr result) kbsize)
@@ -686,7 +686,7 @@ KBSIZE is a floating point number, defaulting to `helm-default-kbsize\\='."
 
 If RECURSIVE is non nil return the size of all files in DIRECTORY and
 its subdirectories.  With arg HUMAN format the size in a human
-readable format,see `helm-file-human-size\\='."
+readable format,see `helm-file-human-size'."
   (cl-loop with files = (if recursive
                             (helm-walk-directory
                              directory
@@ -703,32 +703,32 @@ readable format,see `helm-file-human-size\\='."
     (file &key type links uid gid access-time modif-time
             status size mode gid-change inode device-num dired human-size
             mode-type mode-owner mode-group mode-other (string t))
-  "Return `file-attributes\\=' elements of FILE separately according to key value.
+  "Return `file-attributes' elements of FILE separately according to key value.
 Availables keys are:
-- TYPE: Same as nth 0 `files-attributes\\=' if STRING is nil
+- TYPE: Same as nth 0 `files-attributes' if STRING is nil
         otherwise return either symlink, directory or file (default).
-- LINKS: See nth 1 `files-attributes\\='.
-- UID: See nth 2 `files-attributes\\='.
-- GID: See nth 3 `files-attributes\\='.
-- ACCESS-TIME: See nth 4 `files-attributes\\=', however format time
+- LINKS: See nth 1 `files-attributes'.
+- UID: See nth 2 `files-attributes'.
+- GID: See nth 3 `files-attributes'.
+- ACCESS-TIME: See nth 4 `files-attributes', however format time
                when STRING is non--nil (the default).
-- MODIF-TIME: See nth 5 `files-attributes\\=', same as above.
-- STATUS: See nth 6 `files-attributes\\=', same as above.
-- SIZE: See nth 7 `files-attributes\\='.
-- MODE: See nth 8 `files-attributes\\='.
-- GID-CHANGE: See nth 9 `files-attributes\\='.
-- INODE: See nth 10 `files-attributes\\='.
-- DEVICE-NUM: See nth 11 `files-attributes\\='.
-- DIRED: A line similar to what \\='ls -l\\=' return.
-- HUMAN-SIZE: The size in human form, see `helm-file-human-size\\='.
+- MODIF-TIME: See nth 5 `files-attributes', same as above.
+- STATUS: See nth 6 `files-attributes', same as above.
+- SIZE: See nth 7 `files-attributes'.
+- MODE: See nth 8 `files-attributes'.
+- GID-CHANGE: See nth 9 `files-attributes'.
+- INODE: See nth 10 `files-attributes'.
+- DEVICE-NUM: See nth 11 `files-attributes'.
+- DIRED: A line similar to what 'ls -l' return.
+- HUMAN-SIZE: The size in human form, see `helm-file-human-size'.
 - MODE-TYPE, mode-owner,mode-group, mode-other: Split what
-  nth 7 `files-attributes\\=' return in four categories.
-- STRING: When non--nil (default) `helm-file-attributes\\=' return
+  nth 7 `files-attributes' return in four categories.
+- STRING: When non--nil (default) `helm-file-attributes' return
           more friendly values.
-If you want the same behavior as `files-attributes\\=' ,
-\(but with return values in proplist) use a nil value for STRING.
+If you want the same behavior as `files-attributes' ,
+\(but with return values in proplist\) use a nil value for STRING.
 However when STRING is non--nil, time and type value are different from what
-you have in `file-attributes\\='."
+you have in `file-attributes'."
   (helm-aif (file-attributes file string)
       (let* ((all (cl-destructuring-bind
                         (type links uid gid access-time modif-time
@@ -808,7 +808,7 @@ If STRING is non--nil return instead a space separated string."
           (list :mode-type type :user user :group group :other other))))
 
 (defun helm-format-columns-of-files (files)
-  "Same as `dired-format-columns-of-files\\='.
+  "Same as `dired-format-columns-of-files'.
 Inlined here for compatibility."
   (let ((beg (point)))
     (completion--insert-strings files)
@@ -1034,7 +1034,7 @@ Assume regexp is a pcre based regexp."
                      file))))
 
 (defun helm-open-dired (file)
-  "Open a dired buffer in FILE\\='s directory.
+  "Open a dired buffer in FILE's directory.
 If FILE is a directory, open this directory."
   (require 'dired)
   (if (file-directory-p file)
@@ -1060,8 +1060,8 @@ If FILE is a directory, open this directory."
       (find-file remote-path))))
 
 (defun helm-find-many-files (_ignore)
-  "Simple action that run `find-file\\=' on marked candidates.
-Run `helm-find-many-files-after-hook\\=' at end."
+  "Simple action that run `find-file' on marked candidates.
+Run `helm-find-many-files-after-hook' at end."
   (let ((helm--reading-passwd-or-string t))
     (mapc 'find-file (helm-marked-candidates))
     (helm-log-run-hook 'helm-find-many-files-after-hook)))

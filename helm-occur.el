@@ -32,11 +32,11 @@
 ;;; Internals
 ;;
 (defvar helm-source-occur nil
-  "This will be the name of the source related to `current-buffer\\='.
-Don\\='t use it as it value changes always.")
+  "This will be the name of the source related to `current-buffer'.
+Don't use it as it value changes always.")
 (defvar helm-source-moccur nil
-  "This is just a flag to add to `helm-sources-using-default-as-input\\='.
-Don\\='t set it to any value, it will have no effect.")
+  "This is just a flag to add to `helm-sources-using-default-as-input'.
+Don't set it to any value, it will have no effect.")
 (defvar helm-occur--buffer-list nil)
 (defvar helm-occur--buffer-tick nil)
 (defvar helm-occur-history nil)
@@ -69,9 +69,9 @@ Don\\='t set it to any value, it will have no effect.")
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-occur-use-ioccur-style-keys nil
-  "Similar to `helm-grep-use-ioccur-style-keys\\=' but for multi occur.
+  "Similar to `helm-grep-use-ioccur-style-keys' but for multi occur.
 
-Note that if you define this variable with `setq\\=' your change will
+Note that if you define this variable with `setq' your change will
 have no effect, use customize instead."
   :group 'helm-occur
   :type 'boolean
@@ -97,7 +97,7 @@ have no effect, use customize instead."
 (defcustom helm-occur-auto-update-on-resume nil
   "Allow auto updating helm-occur buffer when outdated.
 noask => Always update without asking
-nil   => Don\\='t update but signal buffer needs update
+nil   => Don't update but signal buffer needs update
 never => Never update and do not signal buffer needs update
 Any other non--nil value update after confirmation."
   :group 'helm-regexp
@@ -108,7 +108,7 @@ Any other non--nil value update after confirmation."
           (const :tag "Update after confirmation" t)))
 
 (defcustom helm-occur-candidate-number-limit 99999
-  "Value of `helm-candidate-number-limit\\=' for helm-occur."
+  "Value of `helm-candidate-number-limit' for helm-occur."
   :group 'helm-occur
   :type 'integer)
 
@@ -116,9 +116,9 @@ Any other non--nil value update after confirmation."
   '((mu4e-headers-mode . buffer-substring))
   "Function to use to display buffer contents for major-mode.
 
-Can be one of `buffer-substring\\=' or `buffer-substring-no-properties\\='.
+Can be one of `buffer-substring' or `buffer-substring-no-properties'.
 
-Note that when using `buffer-substring\\=' initialization will be slower."
+Note that when using `buffer-substring' initialization will be slower."
   :group 'helm-regexp
   :type '(alist :key-type (symbol :tag "Mode")
                 :value-type (radio (const :tag "With text properties" buffer-substring)
@@ -126,8 +126,8 @@ Note that when using `buffer-substring\\=' initialization will be slower."
 
 (defcustom helm-occur-keep-closest-position t
   "When non nil select closest candidate from point after update.
-This happen only in `helm-source-occur\\=' which is always related to
-`current-buffer\\='."
+This happen only in `helm-source-occur' which is always related to
+`current-buffer'."
   :group 'helm-regexp
   :type 'boolean)
 
@@ -183,20 +183,20 @@ This happen only in `helm-source-occur\\=' which is always related to
 
 ;;;###autoload
 (defun helm-occur ()
-    "Preconfigured helm for searching lines matching pattern in `current-buffer\\='.
+    "Preconfigured helm for searching lines matching pattern in `current-buffer'.
 
-When `helm-source-occur\\=' is member of
-`helm-sources-using-default-as-input\\=' which is the default,
+When `helm-source-occur' is member of
+`helm-sources-using-default-as-input' which is the default,
 symbol at point is searched at startup.
 
 When a region is marked search only in this region by narrowing.
 
 To search in multiples buffers start from one of the commands listing
-buffers (i.e. a helm command using `helm-source-buffers-list\\=' like
-`helm-mini\\=') and use the multi occur buffers action.
+buffers (i.e. a helm command using `helm-source-buffers-list' like
+`helm-mini') and use the multi occur buffers action.
 
 This is the helm implementation that collect lines matching pattern
-like vanilla Emacs `occur\\=' but have nothing to do with it, the search
+like vanilla Emacs `occur' but have nothing to do with it, the search
 engine beeing completely different and also much faster."
   (interactive)
   (setq helm-source-occur
@@ -277,7 +277,7 @@ engine beeing completely different and also much faster."
    (find-file-target :initform #'helm-occur-quit-an-find-file-fn)))
 
 (defun helm-occur-build-sources (buffers &optional source-name)
-  "Build sources for `helm-occur\\=' for each buffer in BUFFERS list."
+  "Build sources for `helm-occur' for each buffer in BUFFERS list."
   (cl-loop for buf in buffers
            for bname = (buffer-name buf)
            collect
@@ -334,8 +334,8 @@ engine beeing completely different and also much faster."
              :moccur-buffers buffers)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
-  "Run `helm-occur\\=' on a list of buffers.
-Each buffer\\='s result is displayed in a separated source."
+  "Run `helm-occur' on a list of buffers.
+Each buffer's result is displayed in a separated source."
   (let* ((curbuf (current-buffer))
          (bufs (if helm-occur-always-search-in-current
                    (cons curbuf (remove curbuf buffers))
@@ -410,25 +410,25 @@ METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
 
 (defun helm-occur-goto-line-ow (candidate)
   "Go to CANDIDATE line in other window.
-Same as `helm-occur-goto-line\\=' but go in other window."
+Same as `helm-occur-goto-line' but go in other window."
   (helm-occur-action
    candidate 'buffer-other-window))
 
 (defun helm-occur-goto-line-of (candidate)
   "Go to CANDIDATE line in new frame.
-Same as `helm-occur-goto-line\\=' but go in new frame."
+Same as `helm-occur-goto-line' but go in new frame."
   (helm-occur-action
    candidate 'buffer-other-frame))
 
 (defun helm-occur-run-goto-line-ow ()
-  "Run goto line other window action from `helm-occur\\='."
+  "Run goto line other window action from `helm-occur'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-occur-goto-line-ow)))
 (put 'helm-occur-run-goto-line-ow 'helm-only t)
 
 (defun helm-occur-run-goto-line-of ()
-  "Run goto line new frame action from `helm-occur\\='."
+  "Run goto line new frame action from `helm-occur'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-occur-goto-line-of)))
@@ -441,15 +441,15 @@ Same as `helm-occur-goto-line\\=' but go in new frame."
 (put 'helm-occur-run-default-action 'helm-only t)
 
 (defun helm-occur-run-save-buffer ()
-  "Run moccur save results action from `helm-moccur\\='."
+  "Run moccur save results action from `helm-moccur'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-occur-save-results)))
 (put 'helm-moccur-run-save-buffer 'helm-only t)
 
 (defun helm-occur-right ()
-  "`helm-occur\\=' action for right arrow.
-This is used when `helm-occur-use-ioccur-style-keys\\=' is enabled.
+  "`helm-occur' action for right arrow.
+This is used when `helm-occur-use-ioccur-style-keys' is enabled.
 If follow is enabled (default) go to next source, otherwise execute
 persistent action."
   (interactive)
@@ -514,7 +514,7 @@ persistent action."
   (helm-occur-mode-goto-line-ow-forward-1 (- arg)))
 
 (defun helm-occur-save-results (_candidate)
-  "Save helm moccur results in a `helm-moccur-mode\\=' buffer."
+  "Save helm moccur results in a `helm-moccur-mode' buffer."
   (let ((buf "*hmoccur*")
         new-buf)
     (when (get-buffer buf)
@@ -595,7 +595,7 @@ persistent action."
 
 (defun helm-occur-buffer-substring-with-linums ()
   "Return current-buffer contents as a string with all lines
-numbered.  The property \\='buffer-name is added to the whole string."
+numbered.  The property 'buffer-name is added to the whole string."
   (let ((bufstr (buffer-substring-no-properties (point-min) (point-max)))
         (bufname (buffer-name)))
     (with-temp-buffer
@@ -610,7 +610,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
       (buffer-string))))
 
 (defun helm-occur-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)
-  "The `revert-buffer-function\\=' for `helm-occur-mode\\='."
+  "The `revert-buffer-function' for `helm-occur-mode'."
   (goto-char (point-min))
   (let (pattern)
     (when (re-search-forward "^Occur Results for `\\(.*\\)'" nil t)
@@ -667,7 +667,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
           (message "Reverting buffer done"))))))
 
 (defun helm-occur-filter-one-by-one (candidate)
-  "`filter-one-by-one\\=' function for `helm-source-moccur\\='."
+  "`filter-one-by-one' function for `helm-source-moccur'."
   (require 'helm-grep)
   (let* ((split  (helm-grep-split-line candidate))
          (buf    (car split))
@@ -702,9 +702,9 @@ Special commands:
 (put 'helm-moccur-mode 'helm-only t)
 
 (defun helm-occur-next-error (&optional argp reset)
-  "Goto ARGP position from a `helm-occur-mode\\=' buffer.
+  "Goto ARGP position from a `helm-occur-mode' buffer.
 RESET non-nil means rewind to the first match.
-This is the `next-error-function\\=' for `helm-occur-mode\\='."
+This is the `next-error-function' for `helm-occur-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
 		   ((< argp 0) (line-beginning-position))
@@ -778,9 +778,9 @@ This is the `next-error-function\\=' for `helm-occur-mode\\='."
 ;;
 ;;;###autoload
 (defun helm-occur-from-isearch ()
-  "Invoke `helm-occur\\=' from isearch.
+  "Invoke `helm-occur' from isearch.
 
-To use this bind it to a key in `isearch-mode-map\\='."
+To use this bind it to a key in `isearch-mode-map'."
   (interactive)
   (let ((input (if isearch-regexp
                    isearch-string
@@ -794,14 +794,14 @@ To use this bind it to a key in `isearch-mode-map\\='."
 
 ;;;###autoload
 (defun helm-multi-occur-from-isearch ()
-  "Invoke `helm-multi-occur\\=' from isearch.
+  "Invoke `helm-multi-occur' from isearch.
 
 With a prefix arg, reverse the behavior of
-`helm-moccur-always-search-in-current\\='.
+`helm-moccur-always-search-in-current'.
 The prefix arg can be set before calling
-`helm-multi-occur-from-isearch\\=' or during the buffer selection.
+`helm-multi-occur-from-isearch' or during the buffer selection.
 
-To use this bind it to a key in `isearch-mode-map\\='."
+To use this bind it to a key in `isearch-mode-map'."
   (interactive)
   (let (buf-list
         helm-moccur-always-search-in-current

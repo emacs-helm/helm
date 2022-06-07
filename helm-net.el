@@ -34,7 +34,7 @@
 (defcustom helm-google-suggest-default-browser-function nil
   "The browse url function you prefer to use with Google suggest.
 When nil, use the first browser function available
-See `helm-browse-url-default-browser-alist\\='."
+See `helm-browse-url-default-browser-alist'."
   :group 'helm-net
   :type 'symbol)
 
@@ -45,21 +45,21 @@ See `helm-browse-url-default-browser-alist\\='."
 
 (defcustom helm-surfraw-default-browser-function nil
   "The browse url function you prefer to use with surfraw.
-When nil, fallback to `browse-url-browser-function\\='."
+When nil, fallback to `browse-url-browser-function'."
   :group 'helm-net
   :type 'symbol)
 
 (defcustom helm-google-suggest-url
   "https://encrypted.google.com/complete/search?output=toolbar&q=%s"
   "URL used for looking up Google suggestions.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-google-suggest-search-url
   "https://encrypted.google.com/search?ie=utf-8&oe=utf-8&q=%s"
   "URL used for Google searching.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
@@ -68,14 +68,14 @@ This is a format string, don\\='t forget the `%s\\='."
 
 (defcustom helm-net-prefer-curl nil
   "When non--nil use CURL external program to fetch data.
-Otherwise `url-retrieve-synchronously\\=' is used."
+Otherwise `url-retrieve-synchronously' is used."
   :type 'boolean
   :group 'helm-net)
 
 (defcustom helm-surfraw-duckduckgo-url
   "https://duckduckgo.com/lite/?q=%s&kp=1"
   "The Duckduckgo url.
-This is a format string, don\\='t forget the `%s\\='.
+This is a format string, don't forget the `%s'.
 If you have personal settings saved on duckduckgo you should have
 a personal url, see your settings on duckduckgo."
   :type 'string
@@ -84,35 +84,35 @@ a personal url, see your settings on duckduckgo."
 (defcustom helm-search-suggest-action-wikipedia-url
   "https://en.wikipedia.org/wiki/Special:Search?search=%s"
   "The Wikipedia search url.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-youtube-url
   "https://www.youtube.com/results?aq=f&search_query=%s"
   "The Youtube search url.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-imdb-url
   "http://www.imdb.com/find?s=all&q=%s"
   "The IMDb search url.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-google-maps-url
   "https://maps.google.com/maps?f=q&source=s_q&q=%s"
   "The Google Maps search url.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
 (defcustom helm-search-suggest-action-google-news-url
   "https://www.google.com/search?safe=off&prmd=nvlifd&source=lnms&tbs=nws:1&q=%s"
   "The Google News search url.
-This is a format string, don\\='t forget the `%s\\='."
+This is a format string, don't forget the `%s'."
   :type 'string
   :group 'helm-net)
 
@@ -152,7 +152,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
           (const :tag "New private window" "--private-window")))
 
 (defcustom helm-net-curl-switches '("-s" "-L")
-  "Arguments list passed to curl when using `helm-net-prefer-curl\\='."
+  "Arguments list passed to curl when using `helm-net-prefer-curl'."
   :group 'helm-net
   :type '(repeat string))
 
@@ -235,7 +235,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
 
 (defvar helm-google-suggest-default-function
   'helm-google-suggest-set-candidates
-  "Default function to use in `helm-google-suggest\\='.")
+  "Default function to use in `helm-google-suggest'.")
 
 (defvar helm-source-google-suggest
   (helm-build-sync-source "Google Suggest"
@@ -296,7 +296,7 @@ Can be \"--new-tab\" (default), \"--new-window\" or \"--private-window\"."
 
 ;;;###autoload
 (defun helm-browse-url-firefox (url &optional _ignore)
-  "Same as `browse-url-firefox\\=' but detach from Emacs.
+  "Same as `browse-url-firefox' but detach from Emacs.
 
 So when you quit Emacs you can keep your Firefox session open and
 not be prompted to kill the Firefox process.
@@ -392,7 +392,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 
 ;;;###autoload
 (defun helm-surfraw (pattern engine)
-  "Preconfigured `helm\\=' to search PATTERN with search ENGINE."
+  "Preconfigured `helm' to search PATTERN with search ENGINE."
   (interactive
    (list
     (let* ((default (if (use-region-p)
@@ -427,7 +427,7 @@ NOTE: Probably not supported on some systems (e.g., Windows)."
 
 ;;;###autoload
 (defun helm-google-suggest ()
-  "Preconfigured `helm\\=' for Google search with Google suggest."
+  "Preconfigured `helm' for Google search with Google suggest."
   (interactive)
   (helm-other-buffer 'helm-source-google-suggest "*helm google*"))
 

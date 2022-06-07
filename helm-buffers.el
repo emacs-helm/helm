@@ -42,14 +42,14 @@
   "The regexp list that match boring buffers.
 Buffer candidates matching these regular expression will be
 filtered from the list of candidates if the
-`helm-skip-boring-buffers\\=' candidate transformer is used."
+`helm-skip-boring-buffers' candidate transformer is used."
   :type  '(repeat (choice regexp))
   :group 'helm-buffers)
 
 (defcustom helm-white-buffer-regexp-list nil
   "The regexp list of not boring buffers.
 These buffers will be displayed even if they match one of
-`helm-boring-buffer-regexp-list\\='."
+`helm-boring-buffer-regexp-list'."
   :type '(repeat (choice regexp))
   :group 'helm-buffers)
 
@@ -63,7 +63,7 @@ These buffers will be displayed even if they match one of
 
 (defcustom helm-buffer-max-length 20
   "Max length of buffer names before truncate.
-When disabled (nil) use the longest `buffer-name\\=' length found."
+When disabled (nil) use the longest `buffer-name' length found."
   :group 'helm-buffers
   :type  '(choice (const :tag "Disabled" nil)
            (integer :tag "Length before truncate")))
@@ -76,29 +76,29 @@ When disabled (nil) use the longest `buffer-name\\=' length found."
 (defcustom helm-buffers-fuzzy-matching nil
   "Fuzzy matching buffer names when non-nil.
 Only buffer names are fuzzy matched when this is enabled,
-`major-mode\\=' matching is not affected by this."
+`major-mode' matching is not affected by this."
   :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffer-skip-remote-checking nil
-  "Ignore checking for `file-exists-p\\=' on remote files."
+  "Ignore checking for `file-exists-p' on remote files."
   :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-truncate-lines t
-  "Truncate lines in `helm-buffers-list\\=' when non-nil."
+  "Truncate lines in `helm-buffers-list' when non-nil."
   :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-left-margin-width helm-left-margin-width
-  "`left-margin-width\\=' value for `helm-mini\\=' and `helm-buffers-list\\='."
+  "`left-margin-width' value for `helm-mini' and `helm-buffers-list'."
   :group 'helm-buffers
   :type 'integer)
 
 (defcustom helm-mini-default-sources '(helm-source-buffers-list
                                        helm-source-recentf
                                        helm-source-buffer-not-found)
-  "Default sources list used in `helm-mini\\='.
+  "Default sources list used in `helm-mini'.
 
 When adding a source here it is up to you to ensure the library
 of this source is accessible and properly loaded."
@@ -118,7 +118,7 @@ of this source is accessible and properly loaded."
 (defcustom helm-buffer--pretty-names '((dired-mode . "Dired")
                                        (lisp-interaction-mode . "Lisp Inter"))
   "An alist specifying pretty names for modes.
-Most of the time buffer\\='s `mode-name\\=' is a string so no need to
+Most of the time buffer's `mode-name' is a string so no need to
 add it here as there is no need to compute it, but sometimes it
 may be a mode-line specification which may be costly to compute,
 in this case add here the pretty name as a string to avoid this
@@ -129,7 +129,7 @@ can add your own abbreviation here."
 
 (defcustom helm-buffers-maybe-switch-to-tab nil
   "Switch to buffer in its tab when non nil.
-This has no effect when `tab-bar-mode\\=' is not available."
+This has no effect when `tab-bar-mode' is not available."
   :group 'helm-buffers
   :type 'boolean)
 
@@ -141,15 +141,15 @@ Arg OTHERS handles all the other buffers.
 You can write a function that reorder VISIBLES and OTHERS as you
 want.
 Default function returns OTHERS buffers on top and VISIBLES
-buffer at the end.  See `helm-buffers-reorder-buffer-list\\='."
+buffer at the end.  See `helm-buffers-reorder-buffer-list'."
   :group 'helm-buffers
   :type 'function)
 
 (defcustom helm-buffers-sort-fn helm-fuzzy-sort-fn
-  "The sort function to use in `helm-buffers-list\\='.
+  "The sort function to use in `helm-buffers-list'.
 
-Default to `helm-fuzzy-sort-fn\\=' you can use
-`helm-fuzzy-matching-sort-fn-preserve-ties-order\\=' as alternative if
+Default to `helm-fuzzy-sort-fn' you can use
+`helm-fuzzy-matching-sort-fn-preserve-ties-order' as alternative if
 you want to keep the recentest order when narrowing candidates."
   :type 'function
   :group 'helm-buffers)
@@ -206,25 +206,25 @@ you want to keep the recentest order when narrowing candidates."
 (defface helm-buffer-directory
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "DarkRed" :background "LightGray"))
-  "Face used for directories in `helm-buffers-list\\='."
+  "Face used for directories in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-file
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit font-lock-builtin-face))
-  "Face for buffer file names in `helm-buffers-list\\='."
+  "Face for buffer file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-buffer-archive
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Gold"))
-  "Face for archive file names in `helm-buffers-list\\='."
+  "Face for archive file names in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defface helm-non-file-buffer
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit italic))
-  "Face used for non-file buffers in `helm-buffers-list\\='."
+  "Face used for non-file buffers in `helm-buffers-list'."
   :group 'helm-buffers-faces)
 
 (defvar helm-buffers-tick-counter nil
@@ -371,7 +371,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-c o")   'helm-buffers-not-found-run-switch-ow)
     (define-key map (kbd "C-c C-o") 'helm-buffers-not-found-run-switch-of)
     map)
-  "Keymap for `helm-source-buffer-not-found\\=' source.")
+  "Keymap for `helm-source-buffer-not-found' source.")
 
 (defvar helm-source-buffer-not-found
   (helm-build-dummy-source
@@ -411,7 +411,7 @@ at the end."
 
 (defun helm-buffer-list ()
   "Return the current list of buffers.
-The list is reordered with `helm-buffer-list-reorder-fn\\='."
+The list is reordered with `helm-buffer-list-reorder-fn'."
   (let* ((visibles (helm-buffers-get-visible-buffers))
          (others   (helm-buffer-list-1 visibles)))
     (funcall helm-buffer-list-reorder-fn visibles others)))
@@ -454,7 +454,7 @@ The list is reordered with `helm-buffer-list-reorder-fn\\='."
                'face face2)))))
 
 (defun helm-buffer--format-mode-name (buf)
-  "Prevent using `format-mode-line\\=' as much as possible."
+  "Prevent using `format-mode-line' as much as possible."
   (with-current-buffer buf
     (helm-acond ((assq major-mode helm-buffer--pretty-names)
                  (cdr it))
@@ -650,7 +650,7 @@ buffers)."
         (set-window-margins (selected-window) 1)))))
 
 (defun helm-buffers-mark-similar-buffers ()
-    "Mark All buffers that have same property `type\\=' than current.
+    "Mark All buffers that have same property `type' than current.
 I.e. same color."
   (interactive)
   (with-helm-alive-p
@@ -775,7 +775,7 @@ I.e. same color."
 
 (defun helm-buffer-query-replace-1 (&optional regexp-flag buffers)
   "Query replace in marked buffers.
-If REGEXP-FLAG is given use `query-replace-regexp\\='."
+If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (or buffers (helm-marked-candidates)))
         (helm--reading-passwd-or-string t))
@@ -799,7 +799,7 @@ If REGEXP-FLAG is given use `query-replace-regexp\\='."
   (helm-buffer-query-replace-1))
 
 (defun helm-buffer-toggle-diff (candidate)
-  "Toggle diff buffer CANDIDATE with it\\='s file."
+  "Toggle diff buffer CANDIDATE with it's file."
   (helm-aif (get-buffer-window "*Diff*" 'visible)
       (progn (kill-buffer "*Diff*")
              (set-window-buffer it helm-current-buffer))
@@ -879,7 +879,7 @@ If REGEXP-FLAG is given use `query-replace-regexp\\='."
     (rename-buffer (helm-read-string "New name: " (buffer-name)) t)))
 
 (defun helm-buffer-run-rename-buffer ()
-  "Run rename buffer action from `helm-source-buffers-list\\='."
+  "Run rename buffer action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffers-rename-buffer)))
@@ -919,42 +919,42 @@ If REGEXP-FLAG is given use `query-replace-regexp\\='."
     (message "Killed %s buffer(s)" killed-bufs)))
 
 (defun helm-buffer-run-kill-buffers ()
-  "Run kill buffer action from `helm-source-buffers-list\\='."
+  "Run kill buffer action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-kill-marked-buffers)))
 (put 'helm-buffer-run-kill-buffers 'helm-only t)
 
 (defun helm-buffer-run-grep ()
-  "Run Grep action from `helm-source-buffers-list\\='."
+  "Run Grep action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-grep-buffers)))
 (put 'helm-buffer-run-grep 'helm-only t)
 
 (defun helm-buffer-run-zgrep ()
-  "Run Grep action from `helm-source-buffers-list\\='."
+  "Run Grep action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-zgrep-buffers)))
 (put 'helm-buffer-run-zgrep 'helm-only t)
 
 (defun helm-buffer-run-query-replace-regexp ()
-  "Run Query replace regexp action from `helm-source-buffers-list\\='."
+  "Run Query replace regexp action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-query-replace-regexp)))
 (put 'helm-buffer-run-query-replace-regexp 'helm-only t)
 
 (defun helm-buffer-run-query-replace ()
-  "Run Query replace action from `helm-source-buffers-list\\='."
+  "Run Query replace action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-query-replace)))
 (put 'helm-buffer-run-query-replace 'helm-only t)
 
 (defun helm-buffer-switch-other-window ()
-  "Run switch to other window action from `helm-source-buffers-list\\='."
+  "Run switch to other window action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-switch-buffers-other-window)))
@@ -967,7 +967,7 @@ If REGEXP-FLAG is given use `query-replace-regexp\\='."
     (helm-window-show-buffers bufs)))
 
 (defun helm-buffer-switch-other-frame ()
-  "Run switch to other frame action from `helm-source-buffers-list\\='."
+  "Run switch to other frame action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-buffer-switch-to-buffer-other-frame)))
@@ -980,7 +980,7 @@ If REGEXP-FLAG is given use `query-replace-regexp\\='."
                do (switch-to-buffer-other-tab buf)))))
 
 (defun helm-buffers-switch-to-buffer-new-tab ()
-  "Run switch to buffer in other tab action from `helm-source-buffers-list\\='."
+  "Run switch to buffer in other tab action from `helm-source-buffers-list'."
   (interactive)
   (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
   (with-helm-alive-p
@@ -1002,14 +1002,14 @@ vertically."
     (helm-window-show-buffers buffers t)))
 
 (defun helm-buffer-run-ediff ()
-  "Run ediff action from `helm-source-buffers-list\\='."
+  "Run ediff action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ediff-marked-buffers)))
 (put 'helm-buffer-run-ediff 'helm-only t)
 
 (defun helm-buffer-run-ediff-merge ()
-  "Run ediff action from `helm-source-buffers-list\\='."
+  "Run ediff action from `helm-source-buffers-list'."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-ediff-marked-buffers-merge)))
@@ -1077,8 +1077,8 @@ vertically."
         (switch-to-buffer helm-current-buffer)))))
 
 (defun helm-ediff-marked-buffers (_candidate &optional merge)
-  "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer\\='.
-With optional arg MERGE call `ediff-merge-buffers\\='."
+  "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
+With optional arg MERGE call `ediff-merge-buffers'."
   (let* ((mkd (helm-marked-candidates))
          (lg-lst (length mkd))
          buf1 buf2)
@@ -1098,12 +1098,12 @@ With optional arg MERGE call `ediff-merge-buffers\\='."
       (ediff-buffers buf1 buf2))))
 
 (defun helm-ediff-marked-buffers-merge (candidate)
-  "Ediff merge `helm-current-buffer\\=' with CANDIDATE.
-See `helm-ediff-marked-buffers\\='."
+  "Ediff merge `helm-current-buffer' with CANDIDATE.
+See `helm-ediff-marked-buffers'."
   (helm-ediff-marked-buffers candidate t))
 
 (defun helm-multi-occur-as-action (_candidate)
-  "Multi occur action for `helm-source-buffers-list\\='.
+  "Multi occur action for `helm-source-buffers-list'.
 Can be used by any source that list buffers."
   (let ((helm-occur-always-search-in-current
          (if helm-current-prefix-arg
@@ -1120,7 +1120,7 @@ Can be used by any source that list buffers."
     (helm-multi-occur-1 buffers input)))
 
 (defun helm-buffers-run-occur ()
-  "Run `helm-multi-occur-as-action\\=' by key."
+  "Run `helm-multi-occur-as-action' by key."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-multi-occur-as-action)))
@@ -1152,7 +1152,7 @@ Can be used by any source that list buffers."
     (helm-browse-project helm-current-prefix-arg)))
 
 (defun helm-buffers-run-browse-project ()
-  "Run `helm-buffers-browse-project\\=' from key."
+  "Run `helm-buffers-browse-project' from key."
   (interactive)
   (with-helm-alive-p
       (if helm-buffers-in-project-p
@@ -1178,21 +1178,21 @@ Can be used by any source that list buffers."
 ;;
 ;;
 (defun helm-skip-boring-buffers (buffers _source)
-  "Remove buffers matching `helm-boring-buffer-regexp-list\\=' in BUFFERS.
+  "Remove buffers matching `helm-boring-buffer-regexp-list' in BUFFERS.
 Where BUFFERS is a list of buffer names."
   (helm-skip-entries buffers
                      helm-boring-buffer-regexp-list
                      helm-white-buffer-regexp-list))
 
 (defun helm-shadow-boring-buffers (buffers _source)
-  "Buffers matching `helm-boring-buffer-regexp\\=' will be
-displayed with the `file-name-shadow\\=' face if available."
+  "Buffers matching `helm-boring-buffer-regexp' will be
+displayed with the `file-name-shadow' face if available."
   (helm-shadow-entries buffers helm-boring-buffer-regexp-list))
 
 
 ;;;###autoload
 (defun helm-buffers-list ()
-  "Preconfigured `helm\\=' to list buffers."
+  "Preconfigured `helm' to list buffers."
   (interactive)
   (unless helm-source-buffers-list
     (setq helm-source-buffers-list
@@ -1206,7 +1206,7 @@ displayed with the `file-name-shadow\\=' face if available."
 
 ;;;###autoload
 (defun helm-mini ()
-  "Preconfigured `helm\\=' displaying `helm-mini-default-sources\\='."
+  "Preconfigured `helm' displaying `helm-mini-default-sources'."
   (interactive)
   (require 'helm-x-files)
   (unless helm-source-buffers-list
@@ -1219,7 +1219,7 @@ displayed with the `file-name-shadow\\=' face if available."
         :left-margin-width helm-buffers-left-margin-width))
 
 (defun helm-quit-and-helm-mini ()
-  "Drop into `helm-mini\\=' from `helm\\='."
+  "Drop into `helm-mini' from `helm'."
   (interactive)
   (with-helm-alive-p
     (helm-run-after-exit 'helm-mini)))

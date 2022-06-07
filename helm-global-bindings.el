@@ -26,7 +26,7 @@
 (defcustom helm-command-prefix-key
   (helm-aif (car (where-is-internal 'Control-X-prefix (list global-map)))
       (concat it [?c]))
-  "The key `helm-command-prefix\\=' is bound to in the global map."
+  "The key `helm-command-prefix' is bound to in the global map."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
   :group 'helm-config
   :set

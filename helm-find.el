@@ -108,7 +108,7 @@ I.e. use the -path/ipath arguments of find instead of
                     ,@additional-options))))
 
 (defun helm-find-shell-command-fn ()
-  "Asynchronously fetch candidates for `helm-find\\='.
+  "Asynchronously fetch candidates for `helm-find'.
 Additional find options can be specified after a \"*\"
 separator."
   (let* (process-connection-type
@@ -141,16 +141,16 @@ separator."
 ;;
 ;;;###autoload
 (defun helm-find (arg)
-  "Preconfigured `helm\\=' for the find shell command.
+  "Preconfigured `helm' for the find shell command.
 
 Recursively find files whose names are matched by all specified
 globbing PATTERNs under the current directory using the external
-program specified in `find-program\\=' (usually \"find\").  Every
+program specified in `find-program' (usually \"find\").  Every
 input PATTERN is silently wrapped into two stars: *PATTERN*.
 
 With prefix argument, prompt for a directory to search.
 
-When user option `helm-findutils-search-full-path\\=' is non-nil,
+When user option `helm-findutils-search-full-path' is non-nil,
 match against complete paths, otherwise, against file names
 without directory part.
 

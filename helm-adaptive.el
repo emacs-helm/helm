@@ -32,7 +32,7 @@
   (locate-user-emacs-file "helm-adaptive-history")
   "Path of file where history information is stored.
 When nil history is not saved nor restored after Emacs restart
-unless you save/restore `helm-adaptive-history\\=' with something
+unless you save/restore `helm-adaptive-history' with something
 else like psession or desktop."
   :type 'string
   :group 'helm-adapt)
@@ -166,14 +166,14 @@ Format: ((SOURCE-NAME
                       (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
 
 (defun helm-adaptive-maybe-load-history ()
-  "Load `helm-adaptive-history-file\\=' which contain `helm-adaptive-history\\='.
-Returns nil if `helm-adaptive-history-file\\=' doesn\\='t exist."
+  "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
+Returns nil if `helm-adaptive-history-file' doesn't exist."
   (when (and helm-adaptive-history-file
              (file-readable-p helm-adaptive-history-file))
     (load-file helm-adaptive-history-file)))
 
 (defun helm-adaptive-save-history (&optional arg)
-  "Save history information to the file given by `helm-adaptive-history-file\\='."
+  "Save history information to the file given by `helm-adaptive-history-file'."
   (interactive "p")
   (when helm-adaptive-history-file
     (with-temp-buffer
@@ -190,7 +190,7 @@ Returns nil if `helm-adaptive-history-file\\=' doesn\\='t exist."
 (defun helm-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
 This is a filtered candidate transformer you can use with the
-`filtered-candidate-transformer\\=' attribute."
+`filtered-candidate-transformer' attribute."
   (let* ((source-name (assoc-default 'name source))
          (source-info (assoc source-name helm-adaptive-history)))
     (if source-info
@@ -265,9 +265,9 @@ you should reinitialize it with `helm-reset-adaptive-history'"
 
 ;;;###autoload
 (defun helm-reset-adaptive-history ()
-  "Delete all `helm-adaptive-history\\=' and his file.
+  "Delete all `helm-adaptive-history' and his file.
 Useful when you have a old or corrupted
-`helm-adaptive-history-file\\='."
+`helm-adaptive-history-file'."
   (interactive)
   (when (y-or-n-p "Really delete all your `helm-adaptive-history'? ")
     (setq helm-adaptive-history nil)

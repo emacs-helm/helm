@@ -35,9 +35,9 @@
 (defvar helm-build-regexp-history nil)
 
 (defun helm-query-replace-regexp (_candidate)
-  "Query replace regexp from `helm-regexp\\='.
+  "Query replace regexp from `helm-regexp'.
 With a prefix arg replace only matches surrounded by word boundaries,
-i.e. don\\='t replace inside a word, regexp is surrounded with \\bregexp\\b."
+i.e. don't replace inside a word, regexp is surrounded with \\bregexp\\b."
   (let ((regexp helm-input))
     (apply 'query-replace-regexp
            (helm-query-replace-args regexp))))
@@ -48,11 +48,11 @@ i.e. don\\='t replace inside a word, regexp is surrounded with \\bregexp\\b."
    (prin1-to-string helm-input)))
 
 (defun helm-kill-regexp (_candidate)
-  "Kill regexp as it is in `helm-pattern\\='."
+  "Kill regexp as it is in `helm-pattern'."
   (helm-regexp-kill-new helm-input))
 
 (defun helm-query-replace-args (regexp)
-  "Create arguments of `query-replace-regexp\\=' action in `helm-regexp\\='."
+  "Create arguments of `query-replace-regexp' action in `helm-regexp'."
   (let ((region-only (helm-region-active-p)))
     (list
      regexp
@@ -114,7 +114,7 @@ i.e. don\\='t replace inside a word, regexp is surrounded with \\bregexp\\b."
 ;;;###autoload
 (defun helm-regexp ()
   "Preconfigured helm to build regexps.
-`query-replace-regexp\\=' can be run from there against found regexp."
+`query-replace-regexp' can be run from there against found regexp."
   (interactive)
   (save-restriction
     (when (and (helm-region-active-p)
