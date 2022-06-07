@@ -202,7 +202,7 @@ It is added to `extended-command-history'.
   :group 'helm-misc
   :type '(choice
           (const :tag "Must match" t)
-          (const :tag "Confirm" 'confirm)
+          (const :tag "Confirm" confirm)
           (const :tag "Always allow" nil)))
 
 (defcustom helm-minibuffer-history-key "C-r"

@@ -85,7 +85,7 @@ Possible value are:
                        (integer :tag "Match after"))
                  (const :tag "Match in line only" 0)
                  (integer :tag "Match after or before (+/-)")
-                 (const  :tag "Never match" 'never)))
+                 (const  :tag "Never match" never)))
 
 (defcustom helm-buffers-to-resize-on-pa nil
   "A list of helm buffers where the helm-window should be reduced on PA.

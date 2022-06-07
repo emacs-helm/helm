@@ -470,7 +470,7 @@ into their execution process. See helm-grep.el for an example."
   :group 'helm
   :type '(choice (const :tag "Ignore case" t)
                  (const :tag "Respect case" nil)
-                 (other :tag "Smart" 'smart)))
+                 (other :tag "Smart" smart)))
 
 (defcustom helm-file-name-case-fold-search
   (if (memq system-type
@@ -770,8 +770,8 @@ this."
   :group 'helm
   :type '(choice
           (symbol
-           (const :tag "Fringe" 'left-fringe)
-           (const :tag "Margin" 'left-margin))
+           (const :tag "Fringe" left-fringe)
+           (const :tag "Margin" left-margin))
           integer))
 
 (defcustom helm-tramp-connection-min-time-diff 5

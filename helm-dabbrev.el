@@ -106,7 +106,7 @@ initial search for all candidates in buffer(s)."
   :group 'helm-dabbrev
   :type '(choice (const :tag "Ignore case" t)
           (const :tag "Respect case" nil)
-          (other :tag "Smart" 'smart)))
+          (other :tag "Smart" smart)))
 
 (defvaralias 'helm-dabbrev--regexp 'helm-dabbrev-separator-regexp)
 (make-obsolete-variable 'helm-dabbrev--regexp
