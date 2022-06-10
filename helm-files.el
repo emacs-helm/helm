@@ -717,6 +717,7 @@ It is generally \"~/.local/share/Trash\"."
     (define-key map (kbd "M-+")           'helm-ff-increase-image-size-persistent)
     (define-key map (kbd "M--")           'helm-ff-decrease-image-size-persistent)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-:")           'helm-ff-complete-tramp-methods)
     (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c r")         'helm-ff-run-find-file-as-root)
@@ -745,6 +746,7 @@ It is generally \"~/.local/share/Trash\"."
     (define-key map (kbd "C-]")           'helm-ff-run-toggle-basename)
     (define-key map (kbd "C-.")           'helm-find-files-up-one-level)
     (define-key map (kbd "C-l")           'helm-find-files-up-one-level)
+    (define-key map (kbd "C-:")           'helm-ff-complete-tramp-methods)
     (define-key map (kbd "C-_")           'helm-ff-undo)
     (define-key map (kbd "C-r")           'helm-find-files-down-last-level)
     (define-key map (kbd "C-c h")         'helm-ff-file-name-history)
@@ -3177,6 +3179,36 @@ debugging purpose."
 (defun helm-ff--tramp-multihops-p (name)
   (cl-loop for m in (helm-ff--get-tramp-methods)
            thereis (string-match (format "\\`\\(/%s:.*[|]\\).*" m) name)))
+
+(defun helm-ff-complete-tramp-methods ()
+  "Completion on tramp methods in a nested helm session."
+  (interactive)
+  (with-helm-alive-p
+    (let* (initial-input
+           (str helm-pattern)
+           (pattern (with-temp-buffer
+                      (insert str)
+                      (let ((end (point)) beg)
+                        (when (re-search-backward "[/|]" nil t)
+                          (setq beg (1+ (point)))
+                          (unless (= beg end)
+                            (setq initial-input
+                                  (buffer-substring beg end))
+                            (delete-region beg end))
+                          (buffer-string)))))
+           (collection (helm-ff--get-tramp-methods))
+           (method (helm-comp-read
+                    "Tramp methods: "
+                    (sort collection #'string<)
+                    :initial-input initial-input
+                    :fc-transformer
+                    (lambda (candidates _source)
+                      (cl-loop for c in candidates
+                               collect (propertize c 'face 'helm-ff-file)))
+                    :allow-nest t
+                    :must-match t)))
+      (helm-set-pattern (concat pattern method ":")))))
+(put 'helm-ff-complete-tramp-methods 'no-helm-mx t)
 
 (defun helm-ff-set-pattern (pattern)
   "Handle tramp filenames in `helm-pattern'."
