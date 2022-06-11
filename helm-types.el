@@ -172,6 +172,8 @@
    'helm-buffer-switch-buffers-other-window
    "Switch to buffer(s) other frame `C-c C-o'"
    'helm-buffer-switch-to-buffer-other-frame
+   "Raise buffer frame maybe"
+   'helm-buffers-maybe-raise-buffer-frame
    (lambda () (and (fboundp 'tab-bar-mode)
                    "Switch to buffer(s) other tab `C-c C-t'"))
    'helm-buffers-switch-to-buffer-other-tab

@@ -966,6 +966,14 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
     (select-frame (make-frame))
     (helm-window-show-buffers bufs)))
 
+(defun helm-buffers-maybe-raise-buffer-frame (candidate)
+  "Raise buffer frame handling buffer CANDIDATE and switch to it."
+  (let ((oframe (window-frame (get-buffer-window candidate 0))))
+    (unless (eql oframe (selected-frame))
+      (raise-frame oframe))
+    (with-selected-frame oframe
+      (switch-to-buffer candidate))))
+
 (defun helm-buffer-switch-other-frame ()
   "Run switch to other frame action from `helm-source-buffers-list'."
   (interactive)
