@@ -100,7 +100,7 @@
 (defvar eshell-debug-command)
 (defvar eshell-current-command)
 (defvar tramp-archive-enabled)
-
+(defvar password-cache)
 
 (defgroup helm-files nil
   "Files applications and libraries for Helm."
@@ -5236,7 +5236,10 @@ Use it for non-interactive calls of `helm-find-files'."
                (not (minibuffer-window-active-p (minibuffer-window)))))
          (tap (thing-at-point 'filename))
          (def (and tap (or (file-remote-p tap)
-                           (expand-file-name tap)))))
+                           (expand-file-name tap))))
+         ;; Ensure not being prompted for password each time we
+         ;; navigate to a directory.
+         (password-cache t))
     (helm-set-local-variable 'helm-follow-mode-persistent nil
                              'helm-drag-mouse-1-fn 'helm-ff-drag-mouse-1-fn)
     (unless helm-source-find-files

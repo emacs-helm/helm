@@ -28,6 +28,7 @@
 (defvar completion-flex-nospace)
 (defvar helm-completion--sorting-done)
 (defvar helm-mode)
+(defvar password-cache)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -1368,6 +1369,9 @@ Keys description:
          (helm-ff--RET-disabled noret)
          (minibuffer-completion-predicate test)
          (minibuffer-completing-file-name t)
+         ;; Ensure not being prompted for password each time we
+         ;; navigate to a directory.
+         (password-cache t)
          (helm--completing-file-name t)
          (helm-read-file-name-mode-line-string
           (replace-regexp-in-string "helm-maybe-exit-minibuffer"
