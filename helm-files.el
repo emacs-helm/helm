@@ -1041,7 +1041,11 @@ directories belonging to each visible windows."
 
 (defun helm-dwim-target-directory ()
   "Try to return a suitable directory according to `helm-dwim-target'."
-  (with-selected-window (get-buffer-window helm-current-buffer)
+  (with-selected-window (or
+                         ;; Try next-window if current-buffer has been
+                         ;; killed during this session probably by C-d.
+                         (get-buffer-window helm-current-buffer)
+                         (next-window (helm-window) 1))
     (let ((wins (remove (get-buffer-window helm-marked-buffer-name)
                         (window-list))))
       (expand-file-name
