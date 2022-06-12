@@ -234,6 +234,8 @@ cat > $CONF_FILE <<EOF
 (blink-cursor-mode -1)
 (require 'helm-config)
 (helm-mode 1)
+(with-eval-after-load 'tramp-cache (setq tramp-cache-read-persistent-data t))
+(with-eval-after-load 'auth-source (setq auth-source-save-behavior nil))
 (define-key global-map [remap find-file] 'helm-find-files)
 (define-key global-map [remap occur] 'helm-occur)
 (define-key global-map [remap list-buffers] 'helm-buffers-list)
