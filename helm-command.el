@@ -139,7 +139,7 @@ algorithm."
   (with-helm-current-buffer
     (cl-loop with max-len = (when helm-M-x-show-short-doc
                               (buffer-local-value 'helm-candidate-buffer-longest-len
-                                                  (helm-candidate-buffer)))
+                                                  (get-buffer (helm-candidate-buffer))))
              with local-map = (helm-M-x-current-mode-map-alist)
              for cand in candidates
              for local-key  = (car (rassq cand local-map))
@@ -158,7 +158,7 @@ algorithm."
              (cons (cond ((and (string-match "^M-x" key) local-key)
                           (format "%s%s%s %s"
                                   disp
-                                  (if doc (make-string (+ 4 (- max-len (+ (length cand)))) ? ) "")
+                                  (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
                                   (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                   (propertize
                                    " " 'display
@@ -166,11 +166,11 @@ algorithm."
                          ((string-match "^M-x" key)
                           (format "%s%s%s"
                                   disp
-                                  (if doc (make-string (+ 4 (- max-len (+ (length cand)))) ? ) "")
+                                  (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
                                   (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
                          (t (format "%s%s%s %s"
                                     disp
-                                    (if doc (make-string (+ 4 (- max-len (+ (length cand)))) ? ) "")
+                                    (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
                                     (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                     (propertize
                                      " " 'display
