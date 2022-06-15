@@ -497,6 +497,11 @@ double quote."
 ;;
 (defvar helm-apropos-history nil)
 
+(defcustom helm-apropos-show-short-doc nil
+  "Show short docstring of symbols when non nil."
+  :group 'helm-elisp
+  :type 'boolean)
+
 (defun helm-apropos-init (test default &optional fn)
   "Setup `helm-candidate-buffer' for `helm-apropos' sources.
 A list of symbols fetched with FN is inserted in
@@ -511,6 +516,22 @@ is only used to test DEFAULT."
       (if (and default-symbol (funcall test default-symbol))
           (cons default-symbol symbols)
         symbols))))
+
+(defun helm-apropos-short-doc-transformer (candidates _source)
+  (cl-loop with max-len = (buffer-local-value 'helm-candidate-buffer-longest-len
+                                              (get-buffer (helm-candidate-buffer)))
+           for cand in candidates
+           for doc = (helm-get-first-line-documentation (intern-soft cand))
+           collect (cons (format "%s%s%s"
+                                 cand
+                                 (if doc
+                                     (make-string (+ 4 (if (zerop max-len)
+                                                           max-len
+                                                         (- max-len (string-width cand))))
+                                                  ? )
+                                   "")
+                                 (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
+                         cand)))
 
 (defun helm-apropos-default-sort-fn (candidates _source)
   (if (string= helm-pattern "")
@@ -580,8 +601,12 @@ is only used to test DEFAULT."
             (helm-apropos-init
              (lambda (x) (and (boundp x) (not (keywordp x)))) default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
-                                         'helm-apropos-default-sort-fn)
+    :filtered-candidate-transformer
+    (delq nil (list (and (null helm-apropos-fuzzy-match)
+                         'helm-apropos-default-sort-fn)
+                    (and (null (memq 'helm-apropos helm-commands-using-frame))
+                         helm-apropos-show-short-doc
+                         #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
@@ -600,12 +625,15 @@ is only used to test DEFAULT."
     :init (lambda () (helm-apropos-init 'facep default #'face-list))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer
-    (append (and (null helm-apropos-fuzzy-match)
-                 '(helm-apropos-default-sort-fn))
-            (list
-             (lambda (candidates _source)
-               (cl-loop for c in candidates
-                        collect (propertize c 'face (intern c))))))
+    (delq nil (list
+               (and (null helm-apropos-fuzzy-match)
+                    '(helm-apropos-default-sort-fn))
+               (lambda (candidates _source)
+                 (cl-loop for c in candidates
+                          collect (propertize c 'face (intern c))))
+               (and (null (memq 'helm-apropos helm-commands-using-frame))
+                    helm-apropos-show-short-doc
+                    #'helm-apropos-short-doc-transformer)))
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-face))
@@ -643,8 +671,12 @@ is only used to test DEFAULT."
                                       (not (class-p x))))
                                default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
-                                         'helm-apropos-default-sort-fn)
+    :filtered-candidate-transformer
+    (delq nil (list (and (null helm-apropos-fuzzy-match)
+                         'helm-apropos-default-sort-fn)
+                    (and (null (memq 'helm-apropos helm-commands-using-frame))
+                         helm-apropos-show-short-doc
+                         #'helm-apropos-short-doc-transformer)))
     :display-to-real 'helm-symbolify
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
@@ -660,8 +692,12 @@ is only used to test DEFAULT."
                                  (class-p x))
                                default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
-                                         'helm-apropos-default-sort-fn)
+    :filtered-candidate-transformer
+    (delq nil (list (and (null helm-apropos-fuzzy-match)
+                         'helm-apropos-default-sort-fn)
+                    (and (null (memq 'helm-apropos helm-commands-using-frame))
+                         helm-apropos-show-short-doc
+                         #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
@@ -678,8 +714,12 @@ is only used to test DEFAULT."
                                  (cl-generic-p x))
                                default))
     :fuzzy-match helm-apropos-fuzzy-match
-    :filtered-candidate-transformer (and (null helm-apropos-fuzzy-match)
-                                         'helm-apropos-default-sort-fn)
+    :filtered-candidate-transformer
+    (delq nil (list (and (null helm-apropos-fuzzy-match)
+                         'helm-apropos-default-sort-fn)
+                    (and (null (memq 'helm-apropos helm-commands-using-frame))
+                         helm-apropos-show-short-doc
+                         #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
@@ -737,7 +777,9 @@ In non interactives calls DEFAULT argument should be provided as
 a string, i.e. the `symbol-name' of any existing symbol."
   (interactive (list (with-syntax-table emacs-lisp-mode-syntax-table
                        (thing-at-point 'symbol))))
-  (let (helm-M-x-show-short-doc)
+  (let ((helm-M-x-show-short-doc
+         (and helm-apropos-show-short-doc
+              (null (memq 'helm-apropos helm-commands-using-frame)))))
     (helm :sources
           (mapcar (lambda (func)
                     (funcall func default))
