@@ -497,33 +497,20 @@ double quote."
 ;;
 (defvar helm-apropos-history nil)
 
-(defun helm-apropos-init (test default)
-  "Init candidates buffer for `helm-apropos' sources."
+(defun helm-apropos-init (test default &optional fn)
+  "Setup `helm-candidate-buffer' for `helm-apropos' sources.
+A list of symbols fetched with FN is inserted in
+`helm-candidate-buffer', if FN is not provided symbols are fetched
+against obarray with predicate TEST. When FN is provided predicate TEST
+is only used to test DEFAULT."
   (require 'helm-help)
   (helm-init-candidates-in-buffer 'global
     (let ((default-symbol (and (stringp default)
                                (intern-soft default)))
-          (symbols (all-completions "" obarray test)))
+          (symbols (if fn (funcall fn) (all-completions "" obarray test))))
       (if (and default-symbol (funcall test default-symbol))
           (cons default-symbol symbols)
         symbols))))
-
-(defun helm-apropos-init-faces (default)
-  "Init candidates buffer for faces for `helm-apropos'."
-  (require 'helm-help)
-  (with-current-buffer (helm-candidate-buffer 'global)
-    (goto-char (point-min))
-    (let ((default-symbol (and (stringp default)
-                               (intern-soft default)))
-          (faces (face-list)))
-      (when (and default-symbol (facep default-symbol))
-        (insert (concat default "\n")))
-      (insert
-       (mapconcat #'prin1-to-string
-                  (if default
-                      (cl-remove-if (lambda (sym) (string= sym default)) faces)
-                    faces)
-                  "\n")))))
 
 (defun helm-apropos-default-sort-fn (candidates _source)
   (if (string= helm-pattern "")
@@ -610,7 +597,7 @@ double quote."
   "Create `helm' source for faces to be displayed with
 `helm-apropos'."
   (helm-build-in-buffer-source "Faces"
-    :init (lambda () (helm-apropos-init-faces default))
+    :init (lambda () (helm-apropos-init 'facep default #'face-list))
     :fuzzy-match helm-apropos-fuzzy-match
     :filtered-candidate-transformer
     (append (and (null helm-apropos-fuzzy-match)
