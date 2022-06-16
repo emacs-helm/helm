@@ -284,9 +284,23 @@ See also `helm-locate'."
                     'face 'helm-locate-finish))))
     (force-mode-line-update)))
 
+(defun helm-locate--default-process-coding-system ()
+  "Fix `default-process-coding-system' in locate for Windows systems."
+  ;; This is an attempt to fix issue #1322.
+  (if (and (eq system-type 'windows-nt)
+           (boundp 'w32-ansi-code-page))
+      (let ((code-page-eol
+             (intern (format "cp%s-%s" w32-ansi-code-page "dos"))))
+        (if (ignore-errors (check-coding-system code-page-eol))
+            (cons code-page-eol code-page-eol)
+          default-process-coding-system))
+    default-process-coding-system))
+
 (defun helm-locate-init ()
   "Initialize async locate process for `helm-source-locate'."
-  (let* ((locate-is-es (string-match "\\`es" helm-locate-command))
+  (let* ((default-process-coding-system
+          (helm-locate--default-process-coding-system))
+         (locate-is-es (string-match "\\`es" helm-locate-command))
          (real-locate (string-match "\\`locate" helm-locate-command))
          (case-sensitive-flag (if locate-is-es "-i" ""))
          (ignore-case-flag (if (or locate-is-es
