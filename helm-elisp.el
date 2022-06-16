@@ -498,7 +498,12 @@ double quote."
 (defvar helm-apropos-history nil)
 
 (defcustom helm-apropos-show-short-doc nil
-  "Show short docstring of symbols when non nil."
+  "Show short docstring of symbols when non nil.
+
+NOTE: When displaying helm-apropos in a frame, i.e. when
+`helm-apropos' is member of `helm-commands-using-frame' setting this
+to non nil have no effect, you have first to remove `helm-apropos'
+from `helm-commands-using-frame'."
   :group 'helm-elisp
   :type 'boolean)
 
