@@ -632,7 +632,7 @@ is only used to test DEFAULT."
     :filtered-candidate-transformer
     (delq nil (list
                (and (null helm-apropos-fuzzy-match)
-                    '(helm-apropos-default-sort-fn))
+                    #'helm-apropos-default-sort-fn)
                (lambda (candidates _source)
                  (cl-loop for c in candidates
                           collect (propertize c 'face (intern c))))
