@@ -7638,7 +7638,9 @@ help."
     (with-helm-buffer
       (setq truncate-lines (not truncate-lines))
       (when (helm-get-previous-header-pos)
-        (helm-update (regexp-quote (helm-get-selection nil t)))))))
+        (helm-update (regexp-quote (helm-get-selection nil t))))
+      (message "%sisplaying continuation lines"
+               (if truncate-lines "Not D" "D")))))
 (put 'helm-toggle-truncate-line 'helm-only t)
 
 
