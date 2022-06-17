@@ -791,7 +791,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
                   helm-apropos-function-list)
           :history 'helm-apropos-history
           :buffer "*helm apropos*"
-          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>"))
+          :preselect (and default (concat "^\\_<" (regexp-quote default) "\\_>"))
           :truncate-lines helm-apropos-show-short-doc)))
 
 
