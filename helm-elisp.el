@@ -530,7 +530,7 @@ is only used to test DEFAULT."
            collect (cons (format "%s%s%s"
                                  cand
                                  (if doc
-                                     (make-string (+ 4 (if (zerop max-len)
+                                     (make-string (+ 1 (if (zerop max-len)
                                                            max-len
                                                          (- max-len (string-width cand))))
                                                   ? )

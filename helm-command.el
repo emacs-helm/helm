@@ -158,7 +158,7 @@ algorithm."
              (cons (cond ((and (string-match "^M-x" key) local-key)
                           (format "%s%s%s %s"
                                   disp
-                                  (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
+                                  (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
                                   (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                   (propertize
                                    " " 'display
@@ -166,11 +166,11 @@ algorithm."
                          ((string-match "^M-x" key)
                           (format "%s%s%s"
                                   disp
-                                  (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
+                                  (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
                                   (if doc (propertize doc 'face 'helm-M-x-short-doc) "")))
                          (t (format "%s%s%s %s"
                                     disp
-                                    (if doc (make-string (+ 4 (- max-len (length cand))) ? ) "")
+                                    (if doc (make-string (+ 1 (- max-len (length cand))) ? ) "")
                                     (if doc (propertize doc 'face 'helm-M-x-short-doc) "")
                                     (propertize
                                      " " 'display
