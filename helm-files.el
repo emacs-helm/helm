@@ -3626,6 +3626,22 @@ in cache."
         (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
         (remhash directory helm-ff--file-notify-watchers)))))
 
+(defun helm-ff-tramp-cleanup-hook (vec)
+  "Remove remote directories related to VEC in helm-ff* caches.
+Remove as well all related file-notify watchers.
+
+This is meant to run in `tramp-cleanup-connection-hook'."
+  (cl-loop for key being the hash-keys in helm-ff--list-directory-cache
+           when (equal (file-remote-p key 'method) (cadr vec)) 
+           do (remhash key helm-ff--list-directory-cache))
+  (cl-loop for key being the hash-keys in helm-ff--file-notify-watchers
+           when (equal (file-remote-p key 'method) (cadr vec))
+           do (progn
+                (file-notify-rm-watch
+                 (gethash key helm-ff--file-notify-watchers))
+                (remhash key helm-ff--file-notify-watchers))))
+(add-hook 'tramp-cleanup-connection-hook #'helm-ff-tramp-cleanup-hook)
+
 (defun helm-ff-handle-backslash (fname)
   ;; Allow creation of filenames containing a backslash.
   (cl-loop with bad = '((92 . ""))
