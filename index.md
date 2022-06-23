@@ -39,9 +39,12 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 <i>Thank you! &mdash; Thierry Volpiatto</i>
 </p>
 
-![Support via Paypal](https://www.paypal.me/tvolpiatto)
-![Support via Liberapay](https://liberapay.com/thierryvolpiatto)
+***
 
+[Support via Paypal](https://www.paypal.me/tvolpiatto)
+[Support via Liberapay](https://liberapay.com/thierryvolpiatto)
+
+***
 
 ***
 
