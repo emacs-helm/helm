@@ -22,6 +22,27 @@
   backward compatibility.
 </p>
 
+<h1>Emacs-helm</h1>
+
+<p><img src="https://avatars3.githubusercontent.com/u/1541688?v=3&amp;s=200" alt="Emacs-helm" title="" /></p>
+
+
+<p>
+Maintainance of Helm is a <a href="https://github.com/emacs-helm/helm/commits?author=thierryvolpiatto"><b>Lot of work</b></a>
+I have done freely since 2011.<br>
+As it is taking a lot of my time it starts to be more and more difficult<br>
+maintaining it without financial help.<br> 
+If you feel Helm is making your daily work easier,<br><b>please consider making a donation.</b>
+</p>
+
+<p>
+<i>Thank you! &mdash; Thierry Volpiatto</i>
+</p>
+
+![Support via Paypal](https://www.paypal.me/tvolpiatto)
+![Support via Liberapay](https://liberapay.com/thierryvolpiatto)
+
+
 ***
 
 <p align="center">
