@@ -220,7 +220,8 @@ BOOKMARK is a bookmark name or a bookmark record."
 (defun helm-bookmark-mu4e-bookmark-p (bookmark)
   "Return non nil if BOOKMARK is a mu4e bookmark.
 BOOKMARK is a bookmark name or a bookmark record."
-  (eq (bookmark-get-handler bookmark) 'mu4e-bookmark-jump))
+  (memq (bookmark-get-handler bookmark)
+        '(mu4e-bookmark-jump mu4e--jump-to-bookmark)))
 
 (defun helm-bookmark-w3m-bookmark-p (bookmark)
   "Return non-nil if BOOKMARK is a W3m bookmark.
