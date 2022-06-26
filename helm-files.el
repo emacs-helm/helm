@@ -5483,7 +5483,7 @@ Find inside `require' and `declare-function' sexp."
                              &key action follow (files (dired-get-marked-files)))
   "Execute ACTION on FILES to DESTINATION.
 Where ACTION is a symbol that can be one of:
-'copy, \\='rename, \\='symlink,'relsymlink, \\='hardlink or \\='backup.
+'copy', 'rename', 'symlink', 'relsymlink', 'hardlink' or 'backup'.
 Argument FOLLOW when non-nil specifies to follow FILES to
 DESTINATION for the actions copy and rename."
   (require 'dired-async)
