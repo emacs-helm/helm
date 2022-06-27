@@ -38,6 +38,7 @@
 (declare-function helm-lisp-completion-persistent-action "helm-elisp")
 (declare-function helm-lisp-completion-persistent-help "helm-elisp")
 (declare-function help--symbol-class "help-fns.el")
+(declare-function helm-get-first-line-documentation "helm-elisp")
 
 (defgroup helm-mode nil
   "Enable helm completion."
