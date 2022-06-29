@@ -1045,10 +1045,10 @@ Examples:
 (defun helm-stringify (elm)
   "Return the representation of ELM as a string.
 ELM can be a string, a number or a symbol."
-  (cl-typecase elm
-    (string elm)
-    (number (number-to-string elm))
-    (symbol (symbol-name elm))))
+  (pcase elm
+    ((pred stringp) elm)
+    ((pred numberp) (number-to-string elm))
+    ((pred symbolp) (symbol-name elm))))
 
 (defun helm-substring (str width)
   "Return the substring of string STR from 0 to WIDTH.

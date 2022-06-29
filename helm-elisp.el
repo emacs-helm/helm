@@ -791,10 +791,7 @@ is only used to test DEFAULT."
     (unless (memq 'helm-apropos helm-commands-using-frame)
       (setq helm-M-x-show-short-doc (not helm-M-x-show-short-doc)
             helm-apropos-show-short-doc (not helm-apropos-show-short-doc))
-      (helm-update (concat "^" (pcase (helm-get-selection)
-                                 ((and (pred stringp) str) str)
-                                 ((and (pred symbolp) sym)
-                                  (symbol-name sym))))
+      (helm-update (concat "^" (helm-stringify (helm-get-selection)))
                    (helm-get-current-source)))))
 
 ;;;###autoload
