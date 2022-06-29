@@ -507,6 +507,12 @@ from `helm-commands-using-frame'."
   :group 'helm-elisp
   :type 'boolean)
 
+(defvar helm-apropos-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-]") 'helm-apropos-toggle-details)
+    map))
+
 (defun helm-apropos-init (test default &optional fn)
   "Setup `helm-candidate-buffer' for `helm-apropos' sources.
 A list of symbols fetched with FN is inserted in
@@ -523,20 +529,22 @@ is only used to test DEFAULT."
         symbols))))
 
 (defun helm-apropos-short-doc-transformer (candidates _source)
-  (cl-loop with max-len = (buffer-local-value 'helm-candidate-buffer-longest-len
-                                              (get-buffer (helm-candidate-buffer)))
-           for cand in candidates
-           for doc = (helm-get-first-line-documentation (intern-soft cand))
-           collect (cons (format "%s%s%s"
-                                 cand
-                                 (if doc
-                                     (make-string (+ 1 (if (zerop max-len)
-                                                           max-len
-                                                         (- max-len (string-width cand))))
-                                                  ? )
-                                   "")
-                                 (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
-                         cand)))
+  (if helm-apropos-show-short-doc
+      (cl-loop with max-len = (buffer-local-value 'helm-candidate-buffer-longest-len
+                                                  (get-buffer (helm-candidate-buffer)))
+               for cand in candidates
+               for doc = (helm-get-first-line-documentation (intern-soft cand))
+               collect (cons (format "%s%s%s"
+                                     cand
+                                     (if doc
+                                         (make-string (+ 1 (if (zerop max-len)
+                                                               max-len
+                                                             (- max-len (string-width cand))))
+                                                      ? )
+                                       "")
+                                     (if doc (propertize doc 'face 'helm-M-x-short-doc) ""))
+                             cand))
+    candidates))
 
 (defun helm-apropos-default-sort-fn (candidates _source)
   (if (string= helm-pattern "")
@@ -610,13 +618,13 @@ is only used to test DEFAULT."
     (delq nil (list (and (null helm-apropos-fuzzy-match)
                          'helm-apropos-default-sort-fn)
                     (and (null (memq 'helm-apropos helm-commands-using-frame))
-                         helm-apropos-show-short-doc
                          #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-variable))
     :persistent-help "Toggle describe variable"
+    :keymap helm-apropos-map
     :action '(("Describe variable" . helm-describe-variable)
               ("Find variable" . helm-find-variable)
               ("Info lookup" . helm-info-lookup-symbol)
@@ -637,12 +645,12 @@ is only used to test DEFAULT."
                  (cl-loop for c in candidates
                           collect (propertize c 'face (intern c))))
                (and (null (memq 'helm-apropos helm-commands-using-frame))
-                    helm-apropos-show-short-doc
                     #'helm-apropos-short-doc-transformer)))
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-face))
     :persistent-help "Toggle describe face"
+    :keymap helm-apropos-map
     :action '(("Describe face" . helm-describe-face)
               ("Find face" . helm-find-face-definition)
               ("Customize face" . (lambda (candidate)
@@ -664,6 +672,7 @@ is only used to test DEFAULT."
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe command"
+    :keymap helm-apropos-map
     :action 'helm-type-function-actions))
 
 (defun helm-def-source--emacs-functions (&optional default)
@@ -680,13 +689,13 @@ is only used to test DEFAULT."
     (delq nil (list (and (null helm-apropos-fuzzy-match)
                          'helm-apropos-default-sort-fn)
                     (and (null (memq 'helm-apropos helm-commands-using-frame))
-                         helm-apropos-show-short-doc
                          #'helm-apropos-short-doc-transformer)))
     :display-to-real 'helm-symbolify
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe function"
+    :keymap helm-apropos-map
     :nomark t
     :action 'helm-type-function-actions))
 
@@ -701,13 +710,13 @@ is only used to test DEFAULT."
     (delq nil (list (and (null helm-apropos-fuzzy-match)
                          'helm-apropos-default-sort-fn)
                     (and (null (memq 'helm-apropos helm-commands-using-frame))
-                         helm-apropos-show-short-doc
                          #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-class))
     :persistent-help "Toggle describe class"
+    :keymap helm-apropos-map
     :action '(("Describe Class" . helm-describe-class)
               ("Find Class" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -723,13 +732,13 @@ is only used to test DEFAULT."
     (delq nil (list (and (null helm-apropos-fuzzy-match)
                          'helm-apropos-default-sort-fn)
                     (and (null (memq 'helm-apropos helm-commands-using-frame))
-                         helm-apropos-show-short-doc
                          #'helm-apropos-short-doc-transformer)))
     :nomark t
     :persistent-action (lambda (candidate)
                          (helm-elisp--persistent-help
                           candidate 'helm-describe-function))
     :persistent-help "Toggle describe generic function"
+    :keymap helm-apropos-map
     :action '(("Describe function" . helm-describe-function)
               ("Find function" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
@@ -774,6 +783,19 @@ is only used to test DEFAULT."
   ;; with the fallback source.
   ;; (run-with-idle-timer 0.01 nil #'helm-info-lookup-symbol-1 candidate)
   (helm-info-lookup-symbol-1 candidate))
+
+(defun helm-apropos-toggle-details ()
+  "Toggle details in `helm-apropos'."
+  (interactive)
+  (with-helm-buffer
+    (unless (memq 'helm-apropos helm-commands-using-frame)
+      (setq helm-M-x-show-short-doc (not helm-M-x-show-short-doc)
+            helm-apropos-show-short-doc (not helm-apropos-show-short-doc))
+      (helm-update (concat "^" (pcase (helm-get-selection)
+                                 ((and (pred stringp) str) str)
+                                 ((and (pred symbolp) sym)
+                                  (symbol-name sym))))
+                   (helm-get-current-source)))))
 
 ;;;###autoload
 (defun helm-apropos (default)
