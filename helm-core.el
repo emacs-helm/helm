@@ -97,9 +97,8 @@ Run each function in the FUNCTIONS list in turn when called within
 DELAY seconds."
   (declare (indent 1))
   (let ((funs functions)
-        (iter (cl-gensym "helm-iter-key"))
+        (iter (list nil))
         (timeout delay))
-    (set iter nil)
     (lambda ()
       (interactive)
       (helm-run-multi-key-command funs iter timeout))))
@@ -109,19 +108,19 @@ DELAY seconds."
               (cl-loop for count from 1 to (length functions)
                        collect count)))
         next)
-    (unless (and (symbol-value iterator)
+    (unless (and (car iterator)
                  ;; Reset iterator when another key is pressed.
                  (eq this-command real-last-command))
-      (set iterator (helm-iter-list (funcall fn))))
-    (setq next (helm-iter-next (symbol-value iterator)))
+      (setcar iterator (helm-iter-list (funcall fn))))
+    (setq next (helm-iter-next (car iterator)))
     (unless next
-      (set iterator (helm-iter-list (funcall fn)))
-      (setq next (helm-iter-next (symbol-value iterator))))
-    (and next (symbol-value iterator)
+      (setcar iterator (helm-iter-list (funcall fn)))
+      (setq next (helm-iter-next (car iterator))))
+    (and next (car iterator)
          (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer
                  delay nil (lambda ()
-                             (set iterator nil))))))
+                             (setcar iterator nil))))))
 
 (helm-multi-key-defun helm-toggle-resplit-and-swap-windows
     "Multi key command to re-split and swap Helm window.
