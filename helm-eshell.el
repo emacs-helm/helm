@@ -367,12 +367,12 @@ at point."
 (defface helm-eshell-prompts-promptidx
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "cyan"))
-  "Face used to highlight Eshell prompt index."-faces)
+  "Face used to highlight Eshell prompt index.")
 
 (defface helm-eshell-prompts-buffer-name
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "green"))
-  "Face used to highlight Eshell buffer name."-faces)
+  "Face used to highlight Eshell buffer name.")
 
 (defcustom helm-eshell-prompts-promptidx-p t
   "Show prompt number."
