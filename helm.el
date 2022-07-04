@@ -8,9 +8,9 @@
 
 ;; Authors of anything.el: Tamas Patrovics
 ;;                         rubikitch <rubikitch@ruby-lang.org>
-;;                         Thierry Volpiatto 
+;;                         Thierry Volpiatto
 
-;; Author: Thierry Volpiatto 
+;; Author: Thierry Volpiatto <thievol@posteo.net>
 ;; Version: 3.8.6
 ;; URL: https://emacs-helm.github.io/helm/
 ;; Package-Requires: ((helm-core "3.8.4") (popup "0.5.3"))

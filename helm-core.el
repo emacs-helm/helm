@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2022  Thierry Volpiatto
 
-;; Author: Thierry Volpiatto 
+;; Author: Thierry Volpiatto <thievol@posteo.net>
 ;; URL: https://emacs-helm.github.io/helm/
 ;; Version: 3.8.6
 ;; Package-Requires: ((emacs "25.1") (async "1.9.4"))
