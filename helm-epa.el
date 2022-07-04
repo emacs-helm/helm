@@ -170,7 +170,7 @@
        (signal (car error) (cdr error))))
     (message "Deleting gpg keys done")))
   
-(defun helm-epa-encrypt-file (candidate)
+(defun helm-epa-encrypt-file (_candidate)
   "Select a file to encrypt with key CANDIDATE."
   (let* ((file (helm-read-file-name "Encrypt file: "))
          (cands (helm-marked-candidates))
@@ -216,7 +216,7 @@
       (epa-sign-region start end candidate mode))
     (message "Mail signed with key `%s %s'" key id)))
 
-(defun helm-epa-mail-encrypt (candidate)
+(defun helm-epa-mail-encrypt (_candidate)
   "Encrypt email with key CANDIDATE."
   (let ((cands (helm-marked-candidates))
         start end)
