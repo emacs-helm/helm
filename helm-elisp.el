@@ -413,18 +413,20 @@ the same time to variable and a function."
 If SYM is not documented, return \"Not documented\".
 Argument NAME allows specifiying what function to use to display
 documentation when SYM name is the same for function and variable."
-  (let ((doc (pcase sym
-               ((and (pred fboundp) (pred boundp))
-                (pcase name
-                  ("describe-function"
-                   (documentation sym t))
-                  ("describe-variable"
-                   (documentation-property sym 'variable-documentation t))
-                  (_ (documentation sym t))))
-               ((pred fboundp)  (documentation sym t))
-               ((pred boundp)   (documentation-property
-                                 sym 'variable-documentation t))
-               ((pred facep)   (face-documentation sym)))))
+  (let ((doc (condition-case _err
+                 (pcase sym
+                   ((and (pred fboundp) (pred boundp))
+                    (pcase name
+                      ("describe-function"
+                       (documentation sym t))
+                      ("describe-variable"
+                       (documentation-property sym 'variable-documentation t))
+                      (_ (documentation sym t))))
+                   ((pred fboundp)  (documentation sym t))
+                   ((pred boundp)   (documentation-property
+                                     sym 'variable-documentation t))
+                   ((pred facep)   (face-documentation sym)))
+               (void-function "Void function -- Not documented"))))
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
