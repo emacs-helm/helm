@@ -282,7 +282,6 @@ and vectors, so don't use strings to define them."
     ;; Use `describe-mode' key in `global-map'.
     (cl-dolist (k (where-is-internal #'describe-mode global-map))
       (define-key map k #'helm-help))
-    (define-key map (kbd "C-c ?")    #'helm-help)
     ;; Bind all actions from 1 to 12 to their corresponding nth index+1.
     (cl-loop for n from 0 to 11 do
              (define-key map (kbd (format "<f%s>" (1+ n)))
