@@ -281,12 +281,13 @@ and vectors, so don't use strings to define them."
     ;; Use `describe-mode' key in `global-map'.
     (cl-dolist (k (where-is-internal #'describe-mode global-map))
       (define-key map k #'helm-help))
-    ;; Bind all actions from 1 to 12 to their corresponding nth index+1.
-    (cl-loop for n from 0 to 11 do
-             (define-key map (kbd (format "<f%s>" (1+ n)))
-               `(lambda ()
-                  (interactive)
-                  (helm-select-nth-action ,n))))
+    ;; Bind all actions from f1 to f12, `helm-select-nth-action'
+    ;; counts from 0, i.e. (helm-select-nth-action 0) = action 1.
+    (dotimes (n 11)
+      (define-key map (kbd (format "<f%s>" (1+ n)))
+        (lambda ()
+          (interactive)
+          (helm-select-nth-action n))))
     map)
   "Keymap for helm.")
 
