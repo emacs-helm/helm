@@ -1432,11 +1432,16 @@ unconditionally."
         (file-name-sans-extension (file-name-nondirectory fname))
       (file-name-nondirectory (directory-file-name fname)))))
 
-(defun helm-basedir (fname)
-  "Return the base directory of filename ending by a slash."
+(defun helm-basedir (fname &optional parent)
+  "Return the base directory of filename ending by a slash.
+If PARENT is specified and FNAME is a directory return the parent
+directory of FNAME."
   (helm-aif (and fname
                  (or (and (string= fname "~") "~")
-                     (file-name-directory fname)))
+                     (file-name-directory
+                      (if parent
+                          (directory-file-name fname)
+                        fname))))
       (file-name-as-directory it)))
 
 (defun helm-current-directory ()
