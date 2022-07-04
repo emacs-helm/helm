@@ -40,7 +40,6 @@
 
 (defcustom helm-bookmark-show-location nil
   "Show location of bookmark on display."
-  :group 'helm-bookmark
   :type 'boolean)
 
 (defcustom helm-bookmark-default-filtered-sources
@@ -56,62 +55,52 @@
           (list 'helm-source-bookmark-uncategorized
                 'helm-source-bookmark-set))
   "List of sources to use in `helm-filtered-bookmarks'."
-  :group 'helm-bookmark
   :type '(repeat (choice symbol)))
 
 (defcustom helm-bookmark-use-icon nil
   "Display candidates with an icon with `all-the-icons' when non nil."
-  :type 'boolean
-  :group 'helm-bookmark)
+  :type 'boolean)
 
 
 (defface helm-bookmark-info
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "green"))
-  "Face used for W3m Emacs bookmarks (not w3m bookmarks)."
-  :group 'helm-bookmark)
+  "Face used for W3m Emacs bookmarks (not w3m bookmarks).")
 
 (defface helm-bookmark-w3m
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "yellow"))
-  "Face used for W3m Emacs bookmarks (not w3m bookmarks)."
-  :group 'helm-bookmark)
+  "Face used for W3m Emacs bookmarks (not w3m bookmarks).")
 
 (defface helm-bookmark-gnus
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "magenta"))
-  "Face used for Gnus bookmarks."
-  :group 'helm-bookmark)
+  "Face used for Gnus bookmarks.")
 
 (defface helm-bookmark-man
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Orange4"))
-  "Face used for Woman/man bookmarks."
-  :group 'helm-bookmark)
+  "Face used for Woman/man bookmarks.")
 
 (defface helm-bookmark-file
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Deepskyblue2"))
-  "Face used for file bookmarks."
-  :group 'helm-bookmark)
+  "Face used for file bookmarks.")
 
 (defface helm-bookmark-file-not-found
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Slategray4"))
-  "Face used for file bookmarks."
-  :group 'helm-bookmark)
+  "Face used for file bookmarks.")
 
 (defface helm-bookmark-directory
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit helm-ff-directory))
-  "Face used for file bookmarks."
-  :group 'helm-bookmark)
+  "Face used for file bookmarks.")
 
 (defface helm-bookmark-addressbook
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "tomato"))
-  "Face used for addressbook bookmarks."
-  :group 'helm-bookmark)
+  "Face used for addressbook bookmarks.")
 
 
 (defvar helm-bookmark-map

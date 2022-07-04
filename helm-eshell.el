@@ -50,7 +50,6 @@
 
 (defcustom helm-eshell-fuzzy-match nil
   "Enable fuzzy matching in `helm-esh-pcomplete' when non-nil."
-  :group 'helm-eshell
   :type 'boolean)
 
 
@@ -368,18 +367,15 @@ at point."
 (defface helm-eshell-prompts-promptidx
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "cyan"))
-  "Face used to highlight Eshell prompt index."
-  :group 'helm-eshell-faces)
+  "Face used to highlight Eshell prompt index."-faces)
 
 (defface helm-eshell-prompts-buffer-name
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "green"))
-  "Face used to highlight Eshell buffer name."
-  :group 'helm-eshell-faces)
+  "Face used to highlight Eshell buffer name."-faces)
 
 (defcustom helm-eshell-prompts-promptidx-p t
   "Show prompt number."
-  :group 'helm-eshell
   :type 'boolean)
 
 (defvar helm-eshell-prompts-keymap

@@ -31,7 +31,6 @@
 Note that even if nil, a search in all buffers will occur if the
 length of candidates is <= than
 `helm-dabbrev-max-length-result'."
-  :group 'helm-dabbrev
   :type 'boolean)
 
 (defcustom helm-dabbrev-candidates-number-limit 1000
@@ -45,13 +44,11 @@ Note that this have nothing to do with
 candidates stop when this value is reached but only
 `helm-candidate-number-limit' candidates are displayed in the
 Helm buffer."
-  :group 'helm-dabbrev
   :type 'integer)
 
 (defcustom helm-dabbrev-ignored-buffers-regexps
   '("\\*helm" "\\*Messages" "\\*Echo Area" "\\*Buffer List")
   "List of regexps matching names of buffers that `helm-dabbrev' should not check."
-  :group 'helm-dabbrev
   :type '(repeat regexp))
 
 (defcustom helm-dabbrev-related-buffer-fn #'helm-dabbrev--same-major-mode-p
@@ -64,7 +61,6 @@ The function take one arg, the buffer which is current, look at
 `helm-dabbrev--same-major-mode-p' for an example.
 
 When nil all buffers are considered related to `current-buffer'."
-  :group 'helm-dabbrev
   :type 'function)
 
 (defcustom helm-dabbrev-major-mode-assoc nil
@@ -84,18 +80,15 @@ the `current-buffer'.
 
 This has no effect when `helm-dabbrev-related-buffer-fn' is nil
 or of course bound to a function that doesn't handle this var."
-  :type '(alist :key-type symbol :value-type symbol)
-  :group 'helm-dabbrev)
+  :type '(alist :key-type symbol :value-type symbol))
 
 (defcustom helm-dabbrev-lineno-around 30
   "Search first in this number of lines before and after point."
-  :group 'helm-dabbrev
   :type 'integer)
 
 (defcustom helm-dabbrev-cycle-threshold 5
   "Number of time helm-dabbrev cycle before displaying helm completion.
 When nil or 0 disable cycling."
-  :group 'helm-dabbrev
   :type '(choice (const :tag "Cycling disabled" nil) integer))
 
 (defcustom helm-dabbrev-case-fold-search 'smart
@@ -103,7 +96,6 @@ When nil or 0 disable cycling."
 Same as `helm-case-fold-search' but for `helm-dabbrev'.
 Note that this is not affecting searching in Helm buffer, but the
 initial search for all candidates in buffer(s)."
-  :group 'helm-dabbrev
   :type '(choice (const :tag "Ignore case" t)
           (const :tag "Respect case" nil)
           (other :tag "Smart" smart)))

@@ -27,7 +27,6 @@
 
 (defcustom helm-el-package-initial-filter 'all
   "Show only installed, upgraded or all packages at startup."
-  :group 'helm-el-package
   :type '(radio :tag "Initial filter for elisp packages"
           (const :tag "Show all packages" all)
           (const :tag "Show installed packages" installed)
@@ -36,19 +35,16 @@
 
 (defcustom helm-el-truncate-lines t
   "Truncate lines in `helm-buffer' when non-nil."
-  :group 'helm-el-package
   :type 'boolean)
 
 
 (defcustom helm-el-package-upgrade-on-start nil
   "Show package upgrades on startup when non nil."
-  :group 'helm-el-package
   :type 'boolean)
 
 (defcustom helm-el-package-autoremove-on-start nil
   "Try to autoremove no more needed packages on startup.
 See `package-autoremove'."
-  :group 'helm-el-package
   :type 'boolean)
 
 ;; internals vars

@@ -34,13 +34,11 @@
 When nil history is not saved nor restored after Emacs restart
 unless you save/restore `helm-adaptive-history' with something
 else like psession or desktop."
-  :type 'string
-  :group 'helm-adapt)
+  :type 'string)
 
 (defcustom helm-adaptive-history-length 50
   "Maximum number of candidates stored for a source."
-  :type 'number
-  :group 'helm-adapt)
+  :type 'number)
 
 (defcustom helm-adaptive-sort-by-frequent-recent-usage t
   "Try to sort on an average of frequent and recent usage when non-nil.
@@ -55,7 +53,6 @@ Frequency+recent:
 Even with a low frequency, candidate go up on top. If a candidate
 have a high frequency but it is not used since some time, it goes
 down slowly, but as soon you reuse it it go up on top quickly."
-  :group 'helm-adapt
   :type 'boolean)
 
 ;; Internal
@@ -77,8 +74,6 @@ Format: ((SOURCE-NAME
 ;;;###autoload
 (define-minor-mode helm-adaptive-mode
   "Toggle adaptive sorting in all sources."
-  :group 'helm-adapt
-  :require 'helm-adaptive
   :global t
   (if helm-adaptive-mode
       (progn
