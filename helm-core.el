@@ -99,7 +99,7 @@ DELAY seconds."
   (let ((funs functions)
         (iter (cl-gensym "helm-iter-key"))
         (timeout delay))
-    (eval (list 'defvar iter nil))
+    (set iter nil)
     (lambda ()
       (interactive)
       (helm-run-multi-key-command funs iter timeout))))
