@@ -80,8 +80,8 @@ you will not have anymore separators between candidates."
 (defvar helm-comint-prompts-keymap
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o")   'helm-comint-prompts-other-window)
-    (define-key map (kbd "C-c C-o") 'helm-comint-prompts-other-frame)
+    (define-key map (kbd "C-c o")   #'helm-comint-prompts-other-window)
+    (define-key map (kbd "C-c C-o") #'helm-comint-prompts-other-frame)
     map)
   "Keymap for `helm-comint-prompt-all'.")
 
@@ -165,11 +165,11 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-prompts ()
   "Pre-configured `helm' to browse the prompts of the current comint buffer."
   (interactive)
-  (if (apply 'derived-mode-p helm-comint-mode-list)
+  (if (apply #'derived-mode-p helm-comint-mode-list)
       (helm :sources
             (helm-build-sync-source "Comint prompts"
               :candidates (helm-comint-prompts-list major-mode)
-              :candidate-transformer 'helm-comint-prompts-transformer
+              :candidate-transformer #'helm-comint-prompts-transformer
               :action '(("Go to prompt" . helm-comint-prompts-goto)))
             :buffer "*helm comint prompts*")
     (message "Current buffer is not a comint buffer")))
@@ -178,11 +178,11 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-prompts-all ()
   "Pre-configured `helm' to browse the prompts of all comint sessions."
   (interactive)
-  (if (apply 'derived-mode-p helm-comint-mode-list)
+  (if (apply #'derived-mode-p helm-comint-mode-list)
       (helm :sources
             (helm-build-sync-source "All comint prompts"
               :candidates (helm-comint-prompts-list-all major-mode)
-              :candidate-transformer 'helm-comint-prompts-all-transformer
+              :candidate-transformer #'helm-comint-prompts-all-transformer
               :action (quote (("Go to prompt" . helm-comint-prompts-goto)
                               ("Go to prompt in other window `C-c o`" .
                                helm-comint-prompts-goto-other-window)

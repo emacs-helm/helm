@@ -331,12 +331,12 @@ Return a cons (beg . end)."
                       :fuzzy-match helm-lisp-fuzzy-completion
                       :persistent-help (helm-lisp-completion-persistent-help)
                       :filtered-candidate-transformer
-                      'helm-lisp-completion-transformer
+                      #'helm-lisp-completion-transformer
                       :action (lambda (candidate)
                                 (with-helm-current-buffer
                                   (run-with-timer
                                    0.01 nil
-                                   'helm-insert-completion-at-point
+                                   #'helm-insert-completion-at-point
                                    beg end candidate))))
            :input (if helm-lisp-fuzzy-completion
                       target (concat target " "))
@@ -510,7 +510,7 @@ from `helm-commands-using-frame'."
 (defvar helm-apropos-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-]") 'helm-apropos-toggle-details)
+    (define-key map (kbd "C-]") #'helm-apropos-toggle-details)
     map))
 
 (defun helm-apropos-init (test default &optional fn)
@@ -970,10 +970,11 @@ a string, i.e. the `symbol-name' of any existing symbol."
                                         (time-convert time t)))
               (format-time-string "%m/%d %T" time)))
           (or (timer--repeat-delay timer) "nil")
-          (mapconcat 'identity (split-string
+          (mapconcat #'identity (split-string
                                 (prin1-to-string (timer--function timer))
-                                "\n") " ")
-          (mapconcat 'prin1-to-string (timer--args timer) " ")))
+                                "\n")
+                     " ")
+          (mapconcat #'prin1-to-string (timer--args timer) " ")))
 
 ;;;###autoload
 (defun helm-timers ()

@@ -84,19 +84,19 @@ Format: ((SOURCE-NAME
       (progn
         (unless helm-adaptive-history
           (helm-adaptive-maybe-load-history))
-        (add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
+        (add-hook 'kill-emacs-hook #'helm-adaptive-save-history)
         ;; Should run at beginning of `helm-initial-setup'.
-        (add-hook 'helm-before-initialize-hook 'helm-adaptive-done-reset)
+        (add-hook 'helm-before-initialize-hook #'helm-adaptive-done-reset)
         ;; Should run at beginning of `helm-exit-minibuffer'.
-        (add-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
+        (add-hook 'helm-before-action-hook #'helm-adaptive-store-selection)
         ;; Should run at beginning of `helm-select-action'.
-        (add-hook 'helm-select-action-hook 'helm-adaptive-store-selection))
+        (add-hook 'helm-select-action-hook #'helm-adaptive-store-selection))
     (helm-adaptive-save-history)
     (setq helm-adaptive-history nil)
-    (remove-hook 'kill-emacs-hook 'helm-adaptive-save-history)
-    (remove-hook 'helm-before-initialize-hook 'helm-adaptive-done-reset)
-    (remove-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
-    (remove-hook 'helm-select-action-hook 'helm-adaptive-store-selection)))
+    (remove-hook 'kill-emacs-hook #'helm-adaptive-save-history)
+    (remove-hook 'helm-before-initialize-hook #'helm-adaptive-done-reset)
+    (remove-hook 'helm-before-action-hook #'helm-adaptive-store-selection)
+    (remove-hook 'helm-select-action-hook #'helm-adaptive-store-selection)))
 
 (defun helm-adapt-use-adaptive-p (&optional source-name)
   "Return current source only if it use adaptive history, nil otherwise."

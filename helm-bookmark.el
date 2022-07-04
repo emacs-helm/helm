@@ -117,11 +117,11 @@
 (defvar helm-bookmark-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c o")   'helm-bookmark-run-jump-other-window)
-    (define-key map (kbd "C-c C-o") 'helm-bookmark-run-jump-other-frame)
-    (define-key map (kbd "C-d")     'helm-bookmark-run-delete)
-    (define-key map (kbd "C-]")     'helm-bookmark-toggle-filename)
-    (define-key map (kbd "M-e")     'helm-bookmark-run-edit)
+    (define-key map (kbd "C-c o")   #'helm-bookmark-run-jump-other-window)
+    (define-key map (kbd "C-c C-o") #'helm-bookmark-run-jump-other-frame)
+    (define-key map (kbd "C-d")     #'helm-bookmark-run-delete)
+    (define-key map (kbd "C-]")     #'helm-bookmark-toggle-filename)
+    (define-key map (kbd "M-e")     #'helm-bookmark-run-edit)
     map)
   "Generic Keymap for Emacs bookmark sources.")
 
@@ -338,18 +338,18 @@ If `browse-url-browser-function' is set to something else than
 ;; (`bookmark-w3m-bookmark-jump') will use our handler which open
 ;; the bookmark in a new tab or in an external browser depending
 ;; on `browse-url-browser-function'.
-(defalias 'bookmark-w3m-bookmark-jump 'helm-bookmark-jump-w3m)
+(defalias 'bookmark-w3m-bookmark-jump #'helm-bookmark-jump-w3m)
 
 ;; Provide compatibility with old handlers provided in external
 ;; packages bookmark-extensions.el and bookmark+.
-(defalias 'bmkext-jump-woman 'woman-bookmark-jump)
-(defalias 'bmkext-jump-man 'Man-bookmark-jump)
-(defalias 'bmkext-jump-w3m 'helm-bookmark-jump-w3m)
-(defalias 'bmkext-jump-gnus 'gnus-summary-bookmark-jump)
-(defalias 'bookmarkp-jump-gnus 'gnus-summary-bookmark-jump)
-(defalias 'bookmarkp-jump-w3m 'helm-bookmark-jump-w3m)
-(defalias 'bookmarkp-jump-woman 'woman-bookmark-jump)
-(defalias 'bookmarkp-jump-man 'Man-bookmark-jump)
+(defalias 'bmkext-jump-woman #'woman-bookmark-jump)
+(defalias 'bmkext-jump-man #'Man-bookmark-jump)
+(defalias 'bmkext-jump-w3m #'helm-bookmark-jump-w3m)
+(defalias 'bmkext-jump-gnus #'gnus-summary-bookmark-jump)
+(defalias 'bookmarkp-jump-gnus #'gnus-summary-bookmark-jump)
+(defalias 'bookmarkp-jump-w3m #'helm-bookmark-jump-w3m)
+(defalias 'bookmarkp-jump-woman #'woman-bookmark-jump)
+(defalias 'bookmarkp-jump-man #'Man-bookmark-jump)
 
 
 ;;;; Filtered bookmark sources
@@ -496,7 +496,7 @@ If `browse-url-browser-function' is set to something else than
 (defvar helm-bookmark-find-files-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-bookmark-map)
-    (define-key map (kbd "C-x C-d") 'helm-bookmark-run-browse-project)
+    (define-key map (kbd "C-x C-d") #'helm-bookmark-run-browse-project)
     map))
 
 (defclass helm-bookmark-override-inheritor (helm-source) ())
@@ -717,7 +717,7 @@ consecutive words from the buffer into the new bookmark name."
   (let ((newname  (or new  (read-from-minibuffer
                             "New name: " nil
                             (let ((now-map  (copy-keymap minibuffer-local-map)))
-                              (define-key now-map  "\C-w" 'bookmark-yank-word)
+                              (define-key now-map  "\C-w" #'bookmark-yank-word)
                               now-map)
                             nil 'bookmark-history))))
     (bookmark-set-name old newname)

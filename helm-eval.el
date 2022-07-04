@@ -70,15 +70,15 @@ Should take one arg: the string to display."
 (defvar helm-eval-expression-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "<C-return>") 'helm-eval-new-line-and-indent)
-    (define-key map (kbd "<M-tab>")      'lisp-indent-line)
-    (define-key map (kbd "<C-tab>")    'helm-lisp-completion-at-point)
-    (define-key map (kbd "C-p")        'previous-line)
-    (define-key map (kbd "C-n")        'next-line)
-    (define-key map (kbd "<up>")       'previous-line)
-    (define-key map (kbd "<down>")     'next-line)
-    (define-key map (kbd "<right>")    'forward-char)
-    (define-key map (kbd "<left>")     'backward-char)
+    (define-key map (kbd "<C-return>") #'helm-eval-new-line-and-indent)
+    (define-key map (kbd "<M-tab>")    #'lisp-indent-line)
+    (define-key map (kbd "<C-tab>")    #'helm-lisp-completion-at-point)
+    (define-key map (kbd "C-p")        #'previous-line)
+    (define-key map (kbd "C-n")        #'next-line)
+    (define-key map (kbd "<up>")       #'previous-line)
+    (define-key map (kbd "<down>")     #'next-line)
+    (define-key map (kbd "<right>")    #'forward-char)
+    (define-key map (kbd "<left>")     #'backward-char)
     map))
 
 (defun helm-build-evaluation-result-source ()
@@ -181,10 +181,10 @@ Should take one arg: the string to display."
   (interactive)
   (let ((timer (run-with-idle-timer
                 eldoc-idle-delay 'repeat
-                'helm-eldoc-show-in-eval)))
+                #'helm-eldoc-show-in-eval)))
     (unwind-protect
          (minibuffer-with-setup-hook
-             'helm-eldoc-store-minibuffer
+             #'helm-eldoc-store-minibuffer
            (call-interactively 'helm-eval-expression))
       (and timer (cancel-timer timer))
       (setq helm-eldoc-active-minibuffers-list

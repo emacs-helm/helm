@@ -113,10 +113,10 @@
 (defvar helm-color-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c n") 'helm-color-run-insert-name)
-    (define-key map (kbd "C-c N") 'helm-color-run-kill-name)
-    (define-key map (kbd "C-c r") 'helm-color-run-insert-rgb)
-    (define-key map (kbd "C-c R") 'helm-color-run-kill-rgb)
+    (define-key map (kbd "C-c n") #'helm-color-run-insert-name)
+    (define-key map (kbd "C-c N") #'helm-color-run-kill-name)
+    (define-key map (kbd "C-c r") #'helm-color-run-insert-rgb)
+    (define-key map (kbd "C-c R") #'helm-color-run-kill-rgb)
     map))
 
 (defvar helm-source-colors

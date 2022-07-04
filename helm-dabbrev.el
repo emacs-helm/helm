@@ -120,8 +120,8 @@ initial search for all candidates in buffer(s)."
 (defvar helm-dabbrev-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-/") 'helm-next-line)
-    (define-key map (kbd "M-:") 'helm-previous-line)
+    (define-key map (kbd "M-/") #'helm-next-line)
+    (define-key map (kbd "M-:") #'helm-previous-line)
     map))
 
 ;; Internal
@@ -277,7 +277,7 @@ finally removed."
            (end (point)))
       (run-with-timer
        0.01 nil
-       'helm-insert-completion-at-point
+       #'helm-insert-completion-at-point
        beg end candidate))))
 
 ;;;###autoload
