@@ -1,4 +1,4 @@
-;;; helm-epa.el --- helm interface for epa/epg
+;;; helm-epa.el --- helm interface for epa/epg  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto <thievol@posteo.net>
 
