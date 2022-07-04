@@ -304,7 +304,8 @@ default to `extended-command-history'."
          (prompt (concat (cond
                           ((eq helm-M-x-prefix-argument '-) "- ")
                           ((and (consp helm-M-x-prefix-argument)
-                                (eq (car helm-M-x-prefix-argument) 4)) "C-u ")
+                                (eq (car helm-M-x-prefix-argument) 4))
+                           "C-u ")
                           ((and (consp helm-M-x-prefix-argument)
                                 (integerp (car helm-M-x-prefix-argument)))
                            (format "%d " (car helm-M-x-prefix-argument)))

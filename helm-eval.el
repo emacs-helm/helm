@@ -85,16 +85,17 @@ Should take one arg: the string to display."
   (helm-build-dummy-source "Evaluation Result"
     :multiline t
     :mode-line "C-RET: nl-and-indent, M-tab: reindent, C-tab:complete, C-p/n: next/prec-line."
-    :filtered-candidate-transformer (lambda (_candidates _source)
-                                      (list
-                                       (condition-case nil
-                                           (with-helm-current-buffer
-                                             (pp-to-string
-                                              (if edebug-active
-                                                  (edebug-eval-expression
-                                                   (read helm-pattern))
-                                                  (eval (read helm-pattern)))))
-                                         (error "Error"))))
+    :filtered-candidate-transformer
+    (lambda (_candidates _source)
+      (list
+       (condition-case nil
+           (with-helm-current-buffer
+            (pp-to-string
+             (if edebug-active
+                 (edebug-eval-expression
+                  (read helm-pattern))
+               (eval (read helm-pattern) t))))
+         (error "Error"))))
     :nohighlight t
     :keymap helm-eval-expression-map
     :action '(("Copy result to kill-ring" . (lambda (candidate)
