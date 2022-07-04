@@ -590,7 +590,7 @@ is only used to test DEFAULT."
     (cond ((custom-variable-p sym)
            (append
             actions
-            (let ((standard-value (eval (car (get sym 'standard-value)))))
+            (let ((standard-value (eval (car (get sym 'standard-value)) t)))
               (unless (equal standard-value (symbol-value sym))
                 `(("Reset Variable to default value"
                    . ,(lambda (candidate)
@@ -999,7 +999,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
         ;; an interactive call, See `repeat-complex-command'.
         (add-hook 'called-interactively-p-functions
                   #'helm-complex-command-history--called-interactively-skip)
-        (eval (read helm-sexp--last-sexp)))
+        (eval (read helm-sexp--last-sexp) t))
     (remove-hook 'called-interactively-p-functions
                  #'helm-complex-command-history--called-interactively-skip)))
 
