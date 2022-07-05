@@ -283,7 +283,7 @@ and vectors, so don't use strings to define them."
       (define-key map k #'helm-help))
     ;; Bind all actions from f1 to f12, `helm-select-nth-action'
     ;; counts from 0, i.e. (helm-select-nth-action 0) = action 1.
-    (dotimes (n 11)
+    (dotimes (n 12)
       (define-key map (kbd (format "<f%s>" (1+ n)))
         (lambda ()
           (interactive)
