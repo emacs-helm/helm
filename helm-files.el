@@ -4185,6 +4185,7 @@ NOTE: This mode is building `helm-source-find-files', so if you enable
 it from your init file, ensure to call it _after_ your defmethod's
 `helm-setup-user-source' definitions (if some) to ensure they are called."
   :global t
+  :group 'helm-files
   (require 'all-the-icons)
   (if helm-ff-icon-mode
       (progn
