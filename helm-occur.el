@@ -65,7 +65,6 @@ Don't set it to any value, it will have no effect.")
     ("Save buffer" . helm-occur-save-results)
     )
   "Actions for helm-occur."
-  :group 'helm-occur
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-occur-use-ioccur-style-keys nil
@@ -73,7 +72,6 @@ Don't set it to any value, it will have no effect.")
 
 Note that if you define this variable with `setq' your change will
 have no effect, use customize instead."
-  :group 'helm-occur
   :type 'boolean
   :set (lambda (var val)
          (set var val)
@@ -86,12 +84,10 @@ have no effect, use customize instead."
 
 (defcustom helm-occur-always-search-in-current nil
   "Helm multi occur always search in current buffer when non--nil."
-  :group 'helm-occur
   :type 'boolean)
 
 (defcustom helm-occur-truncate-lines t
   "Truncate lines in occur buffer when non nil."
-  :group 'helm-occur
   :type 'boolean)
 
 (defcustom helm-occur-auto-update-on-resume nil
@@ -100,7 +96,6 @@ noask => Always update without asking
 nil   => Don't update but signal buffer needs update
 never => Never update and do not signal buffer needs update
 Any other non--nil value update after confirmation."
-  :group 'helm-regexp
   :type '(radio :tag "Allow auto updating helm-occur buffer when outdated."
           (const :tag "Always update without asking" noask)
           (const :tag "Never update and do not signal buffer needs update" never)
@@ -109,7 +104,6 @@ Any other non--nil value update after confirmation."
 
 (defcustom helm-occur-candidate-number-limit 99999
   "Value of `helm-candidate-number-limit' for helm-occur."
-  :group 'helm-occur
   :type 'integer)
 
 (defcustom helm-occur-buffer-substring-fn-for-modes
@@ -119,7 +113,6 @@ Any other non--nil value update after confirmation."
 Can be one of `buffer-substring' or `buffer-substring-no-properties'.
 
 Note that when using `buffer-substring' initialization will be slower."
-  :group 'helm-regexp
   :type '(alist :key-type (symbol :tag "Mode")
                 :value-type (radio (const :tag "With text properties" buffer-substring)
                                    (const :tag "Without text properties" buffer-substring-no-properties))))
@@ -128,25 +121,21 @@ Note that when using `buffer-substring' initialization will be slower."
   "When non nil select closest candidate from point after update.
 This happen only in `helm-source-occur' which is always related to
 `current-buffer'."
-  :group 'helm-regexp
   :type 'boolean)
 
 (defcustom helm-occur-ignore-diacritics nil
   "When non nil helm-occur will ignore diacritics in patterns."
-  :group 'helm-regexp
   :type 'boolean)
 
 (defface helm-moccur-buffer
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "DarkTurquoise" :underline t))
-  "Face used to highlight occur buffer names."
-  :group 'helm-occur)
+  "Face used to highlight occur buffer names.")
 
 (defface helm-resume-need-update
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :background "red"))
-  "Face used to flash occur buffer when it needs update."
-  :group 'helm-occur)
+  "Face used to flash occur buffer when it needs update.")
 
 
 (defun helm-occur--select-closest-candidate ()
