@@ -62,45 +62,59 @@
   :type 'boolean)
 
 
+(defgroup helm-bookmark-faces nil
+  "Customize the appearance of helm-bookmark."
+  :prefix "helm-"
+  :group 'helm-bookmark
+  :group 'helm-faces)
+
 (defface helm-bookmark-info
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "green"))
-  "Face used for W3m Emacs bookmarks (not w3m bookmarks).")
+  "Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-w3m
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "yellow"))
-  "Face used for W3m Emacs bookmarks (not w3m bookmarks).")
+  "Face used for W3m Emacs bookmarks (not w3m bookmarks)."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-gnus
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "magenta"))
-  "Face used for Gnus bookmarks.")
+  "Face used for Gnus bookmarks."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-man
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Orange4"))
-  "Face used for Woman/man bookmarks.")
+  "Face used for Woman/man bookmarks."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-file
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Deepskyblue2"))
-  "Face used for file bookmarks.")
+  "Face used for file bookmarks."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-file-not-found
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "Slategray4"))
-  "Face used for file bookmarks.")
+  "Face used for file bookmarks."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-directory
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :inherit helm-ff-directory))
-  "Face used for file bookmarks.")
+  "Face used for file bookmarks."
+  :group 'helm-bookmark-faces)
 
 (defface helm-bookmark-addressbook
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
        :foreground "tomato"))
-  "Face used for addressbook bookmarks.")
+  "Face used for addressbook bookmarks."
+  :group 'helm-bookmark-faces)
 
 
 (defvar helm-bookmark-map
