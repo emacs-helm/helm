@@ -767,7 +767,8 @@ This is the `next-error-function' for `helm-occur-mode'."
                                            (point))
                                          (point-max))))
                    (overlay-put ov 'face 'helm-resume-need-update)
-                   (sit-for 0.3) (delete-overlay ov)
+                   (sit-for 0)
+                   (delete-overlay ov)
                    (message "[Helm occur Buffer outdated (C-c C-u to update)]")))))
             (unless buffer-is-modified
               (with-helm-after-update-hook
