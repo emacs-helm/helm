@@ -24,25 +24,6 @@
 (require 'helm-elisp)
 
 
-(defgroup helm-command nil
-  "Emacs command related Applications and libraries for Helm."
-  :group 'helm)
-
-(defcustom helm-M-x-always-save-history nil
-  "`helm-M-x' save command in `extended-command-history' even when it fails."
-  :group 'helm-command
-  :type  'boolean)
-
-(defcustom helm-M-x-reverse-history nil
-  "The history source of `helm-M-x' appear in second position when non-nil."
-  :group 'helm-command
-  :type 'boolean)
-
-(defcustom helm-M-x-fuzzy-match t
-  "Helm-M-x fuzzy matching when non nil."
-  :group 'helm-command
-  :type 'boolean)
-
 (defvar helm-M-x-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-comp-read-map)
@@ -51,11 +32,27 @@
     (define-key map (kbd "C-]") #'helm-M-x-toggle-short-doc)
     map))
 
+
+(defgroup helm-command nil
+  "Emacs command related Applications and libraries for Helm."
+  :group 'helm)
+
+(defcustom helm-M-x-always-save-history nil
+  "`helm-M-x' save command in `extended-command-history' even when it fails."
+  :type  'boolean)
+
+(defcustom helm-M-x-reverse-history nil
+  "The history source of `helm-M-x' appear in second position when non-nil."
+  :type 'boolean)
+
+(defcustom helm-M-x-fuzzy-match t
+  "Helm-M-x fuzzy matching when non nil."
+  :type 'boolean)
+
 (defcustom helm-M-x-show-short-doc nil
   "Show short docstring of command when non nil.
 This value can be toggled with
 \\<helm-M-x-map>\\[helm-M-x-toggle-short-doc] while in helm-M-x session."
-  :group 'helm-command
   :type 'boolean)
 
 
