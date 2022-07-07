@@ -43,56 +43,47 @@
 Buffer candidates matching these regular expression will be
 filtered from the list of candidates if the
 `helm-skip-boring-buffers' candidate transformer is used."
-  :type  '(repeat (choice regexp))
-  :group 'helm-buffers)
+  :type  '(repeat (choice regexp)))
 
 (defcustom helm-white-buffer-regexp-list nil
   "The regexp list of not boring buffers.
 These buffers will be displayed even if they match one of
 `helm-boring-buffer-regexp-list'."
-  :type '(repeat (choice regexp))
-  :group 'helm-buffers)
+  :type '(repeat (choice regexp)))
 
 (defcustom helm-buffers-favorite-modes '(lisp-interaction-mode
                                          emacs-lisp-mode
                                          text-mode
                                          org-mode)
   "List of preferred mode to open new buffers with."
-  :type '(repeat (choice function))
-  :group 'helm-buffers)
+  :type '(repeat (choice function)))
 
 (defcustom helm-buffer-max-length 20
   "Max length of buffer names before truncate.
 When disabled (nil) use the longest `buffer-name' length found."
-  :group 'helm-buffers
   :type  '(choice (const :tag "Disabled" nil)
            (integer :tag "Length before truncate")))
 
 (defcustom helm-buffer-details-flag t
   "Always show details in buffer list when non-nil."
-  :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-fuzzy-matching nil
   "Fuzzy matching buffer names when non-nil.
 Only buffer names are fuzzy matched when this is enabled,
 `major-mode' matching is not affected by this."
-  :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffer-skip-remote-checking nil
   "Ignore checking for `file-exists-p' on remote files."
-  :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-truncate-lines t
   "Truncate lines in `helm-buffers-list' when non-nil."
-  :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffers-left-margin-width helm-left-margin-width
   "`left-margin-width' value for `helm-mini' and `helm-buffers-list'."
-  :group 'helm-buffers
   :type 'integer)
 
 (defcustom helm-mini-default-sources '(helm-source-buffers-list
@@ -102,18 +93,15 @@ Only buffer names are fuzzy matched when this is enabled,
 
 When adding a source here it is up to you to ensure the library
 of this source is accessible and properly loaded."
-  :group 'helm-buffers
   :type '(repeat (choice symbol)))
 
 (defcustom helm-buffers-end-truncated-string "..."
   "The string to display at end of truncated buffer names."
-  :type 'string
-  :group 'helm-buffers)
+  :type 'string)
 
 (defcustom helm-buffers-column-separator "  "
   "Separator for columns in buffer listing."
-  :type 'string
-  :group 'helm-buffers)
+  :type 'string)
 
 (defcustom helm-buffer--pretty-names '((dired-mode . "Dired")
                                        (lisp-interaction-mode . "Lisp Inter"))
@@ -124,13 +112,11 @@ may be a mode-line specification which may be costly to compute,
 in this case add here the pretty name as a string to avoid this
 costly computation.  Also if some pretty names are too long you
 can add your own abbreviation here."
-  :type '(alist :key-type symbol :value-type string)
-  :group 'helm-buffers)
+  :type '(alist :key-type symbol :value-type string))
 
 (defcustom helm-buffers-maybe-switch-to-tab nil
   "Switch to buffer in its tab when non nil.
 This has no effect when `tab-bar-mode' is not available."
-  :group 'helm-buffers
   :type 'boolean)
 
 (defcustom helm-buffer-list-reorder-fn #'helm-buffers-reorder-buffer-list
@@ -142,7 +128,6 @@ You can write a function that reorder VISIBLES and OTHERS as you
 want.
 Default function returns OTHERS buffers on top and VISIBLES
 buffer at the end.  See `helm-buffers-reorder-buffer-list'."
-  :group 'helm-buffers
   :type 'function)
 
 (defcustom helm-buffers-sort-fn helm-fuzzy-sort-fn
@@ -151,8 +136,8 @@ buffer at the end.  See `helm-buffers-reorder-buffer-list'."
 Default to `helm-fuzzy-sort-fn' you can use
 `helm-fuzzy-matching-sort-fn-preserve-ties-order' as alternative if
 you want to keep the recentest order when narrowing candidates."
-  :type 'function
-  :group 'helm-buffers)
+  :type 'function)
+
 
 ;;; Faces
 ;;
