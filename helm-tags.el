@@ -33,14 +33,12 @@
 
 (defcustom helm-etags-tag-file-name "TAGS"
   "Etags tag file name."
-  :type  'string
-  :group 'helm-tags)
+  :type  'string)
 
 (defcustom helm-etags-tag-file-search-limit 10
   "The limit level of directory to search tag file.
 Don't search tag file deeply if outside this value."
-  :type  'number
-  :group 'helm-tags)
+  :type  'number)
 
 (defcustom helm-etags-match-part-only 'tag
   "Allow choosing the tag part of CANDIDATE in `helm-source-etags-select'.
@@ -50,14 +48,12 @@ You can choose matching against the tag part (i.e \"(defun foo\"),
 or against the whole candidate (i.e \"(filename:5:(defun foo\")."
   :type '(choice
           (const :tag "Match only tag" tag)
-          (const :tag "Match all file+tag" all))
-  :group 'helm-tags)
+          (const :tag "Match all file+tag" all)))
 
 (defcustom helm-etags-execute-action-at-once-if-one t
   "Whether to jump straight to the selected tag if there's only
 one match."
-  :type 'boolean
-  :group 'helm-tags)
+  :type 'boolean)
 
 
 (defgroup helm-tags-faces nil
