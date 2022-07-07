@@ -653,7 +653,8 @@ numbered.  The property \\='buffer-name is added to the whole string."
                            "\n"))))
           (when (fboundp 'wgrep-cleanup-overlays)
             (wgrep-cleanup-overlays (point-min) (point-max)))
-          (message "Reverting buffer done"))))))
+          (message "Reverting buffer done")
+          (when executing-kbd-macro (sit-for 1)))))))
 
 (defun helm-occur-filter-one-by-one (candidate)
   "`filter-one-by-one' function for `helm-source-moccur'."

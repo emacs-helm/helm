@@ -1041,7 +1041,8 @@ Special commands:
             (linum (line-number-at-pos)))
         (with-current-buffer (next-error-find-buffer)
           (helm-grep-goto-closest-from-linum linum bufname))))
-    (message "Reverting buffer done")))
+    (message "Reverting buffer done")
+    (when executing-kbd-macro (sit-for 1))))
 
 (defun helm-grep-goto-closest-from-linum (linum bufname)
   (goto-char (point-min))
