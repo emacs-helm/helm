@@ -171,7 +171,6 @@ faster on recursive grep.
 NOTE: Remote grepping is not available with ack-grep, and badly
       supported with grep because tramp handles badly repeated
       remote processes in a short delay (< to 5s)."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-grep-default-recurse-command
@@ -179,7 +178,6 @@ NOTE: Remote grepping is not available with ack-grep, and badly
   "Default recursive grep format command for `helm-do-grep-1'.
 See `helm-grep-default-command' for format specs and infos about
 ack-grep."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-default-zgrep-command
@@ -189,7 +187,6 @@ See `helm-grep-default-command' for infos on format specs.
 Option --color=always is supported and can be used safely to
 replace the Helm internal match highlighting.  See
 `helm-grep-default-command' for more infos."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-pdfgrep-default-command
@@ -198,7 +195,6 @@ replace the Helm internal match highlighting.  See
 Option \"--color always\" is supported starting Helm version
 1.7.8.  When used matches will be highlighted according to
 GREP_COLORS env var."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-pdfgrep-default-recurse-command
@@ -207,7 +203,6 @@ GREP_COLORS env var."
 Option \"--color always\" is supported starting Helm version
 1.7.8.  When used matches will be highlighted according to
 GREP_COLORS env var."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-pdfgrep-default-read-command nil
@@ -219,28 +214,23 @@ E.g. In Ubuntu you can set it to:
 
 If set to nil either `doc-view-mode' or `pdf-view-mode' will be
 used instead of an external command."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-grep-max-length-history 100
   "Max number of elements to save in `helm-grep-history'."
-  :group 'helm-grep
   :type 'integer)
 
 (defcustom helm-zgrep-file-extension-regexp
   ".*\\(\\.gz\\|\\.bz\\|\\.xz\\|\\.lzma\\)$"
   "Default file extensions zgrep will search in."
-  :group 'helm-grep
   :type 'string)
 
 (defcustom helm-grep-preferred-ext nil
   "This file extension will be preselected for grep."
-  :group 'helm-grep
   :type  'string)
 
 (defcustom helm-grep-save-buffer-name-no-confirm nil
   "When *hgrep* already exists, auto append suffix."
-  :group 'helm-grep
   :type 'boolean)
 
 (defcustom helm-grep-ignored-files
@@ -249,18 +239,15 @@ used instead of an external command."
                                     (concat "*" s)))
                                 completion-ignored-extensions)))
   "List of file names which `helm-grep' shall exclude."
-  :group 'helm-grep
   :type '(repeat string))
 
 (defcustom helm-grep-ignored-directories
   helm-walk-ignore-directories
   "List of names of sub-directories which `helm-grep' shall not recurse into."
-  :group 'helm-grep
   :type '(repeat string))
 
 (defcustom helm-grep-truncate-lines t
   "When nil the grep line that appears will not be truncated."
-  :group 'helm-grep
   :type 'boolean)
 
 (defcustom helm-grep-file-path-style 'basename
@@ -269,7 +256,6 @@ Possible value are:
     basename: displays only the filename, none of the directory path
     absolute: displays absolute path
     relative: displays relative path from root grep directory."
-  :group 'helm-grep
   :type '(choice (const :tag "Basename" basename)
                  (const :tag "Absolute" absolute)
                  (const :tag "Relative" relative)))
@@ -281,7 +267,6 @@ Possible value are:
    "Save results in grep buffer" 'helm-grep-save-results
    "Find file other window (C-u vertically)" 'helm-grep-other-window)
   "Actions for helm grep."
-  :group 'helm-grep
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-grep-pipe-cmd-switches nil
@@ -297,7 +282,6 @@ Here are the commands where you may want to add switches:
 
 You probably don't need to use this unless you know what you are
 doing."
-  :group 'helm-grep
   :type '(repeat string))
 
 (defcustom helm-grep-ag-pipe-cmd-switches nil
@@ -317,7 +301,6 @@ need to add it here.
  
 You probably don't need to use this unless you know what you are
 doing."
-  :group 'helm-grep
   :type '(repeat string))
 
 (defcustom helm-grep-input-idle-delay 0.1
@@ -325,14 +308,12 @@ doing."
 A lower value (default) means Helm will display the results
 faster. Increasing it to a higher value (e.g. 0.6) prevents the
 buffer from flickering when updating."
-  :group 'helm-grep
   :type 'float)
 
 (defcustom helm-grep-use-ioccur-style-keys t
   "Use Arrow keys to jump to occurences.
 Note that if you define this variable with `setq' your change
 will have no effect, use customize instead."
-  :group 'helm-grep
   :type  'boolean
   :set (lambda (var val)
          (set var val)
@@ -391,7 +372,6 @@ match.
 
 Of course you can use several other options, see the man page of the
 backend you are using."
-  :group 'helm-grep
   :type 'string)
 
 (defcustom helm-grep-git-grep-command
@@ -407,7 +387,6 @@ searching files not already staged (not enabled by default).
 
 You have also to enable this in global \".gitconfig\" with
     \"git config --global core.excludesfile ~/.gitignore_global\"."
-  :group 'helm-grep
   :type 'string)
 
 
