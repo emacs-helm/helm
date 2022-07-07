@@ -639,7 +639,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
                           (setq linum (string-to-number (match-string 1))
                                 mpart (match-string 2)))
                      ;; Match part after line number.
-                     when (and mpart (string-match pattern mpart))
+                     when (and mpart (helm-mm-match mpart pattern))
                      for line = (format "%s:%d:%s"
                                         (get-text-property (point) 'buffer-name)
                                         linum
