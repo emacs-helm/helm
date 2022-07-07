@@ -43,6 +43,65 @@
 (defvar tramp-verbose)
 
 
+;;; Internals vars
+;;
+;;
+(defvar helm-rzgrep-cache (make-hash-table :test 'equal))
+(defvar helm-grep-default-function 'helm-grep-init)
+(defvar helm-zgrep-recurse-flag nil)
+(defvar helm-grep-history nil)
+(defvar helm-grep-ag-history nil)
+(defvar helm-grep-last-targets nil)
+(defvar helm-grep-include-files nil)
+(defvar helm-grep-in-recurse nil)
+(defvar helm-grep-use-zgrep nil)
+(defvar helm-grep-default-directory-fn nil
+  "A function that should return a directory to expand candidate to.
+It is intended to use as a let-bound variable, DON'T set this globaly.")
+(defvar helm-pdfgrep-targets nil)
+(defvar helm-grep-last-cmd-line nil)
+(defvar helm-grep-split-line-regexp "^\\([[:lower:][:upper:]]?:?.*?\\):\\([0-9]+\\):\\(.*\\)")
+
+
+;;; Keymaps
+;;
+;;
+(defvar helm-grep-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-<down>") 'helm-goto-next-file)
+    (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
+    (define-key map (kbd "C-c o")    'helm-grep-run-other-window-action)
+    (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
+    (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
+    (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
+    map)
+  "Keymap used in Grep sources.")
+
+(defvar helm-pdfgrep-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-<down>") 'helm-goto-next-file)
+    (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
+    (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
+    map)
+  "Keymap used in pdfgrep.")
+
+(defvar helm-grep-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET")      'helm-grep-mode-jump)
+    (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
+    (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
+    (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
+    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
+    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
+    (define-key map (kbd "M-n")      'helm-grep-mode-jump-other-window-forward)
+    (define-key map (kbd "M-p")      'helm-grep-mode-jump-other-window-backward)
+    (define-key map (kbd "M-N")      'helm-gm-next-file)
+    (define-key map (kbd "M-P")      'helm-gm-precedent-file)
+    map))
+
+
 (defgroup helm-grep nil
   "Grep related Applications and libraries for Helm."
   :group 'helm)
@@ -268,6 +327,89 @@ faster. Increasing it to a higher value (e.g. 0.6) prevents the
 buffer from flickering when updating."
   :group 'helm-grep
   :type 'float)
+
+(defcustom helm-grep-use-ioccur-style-keys t
+  "Use Arrow keys to jump to occurences.
+Note that if you define this variable with `setq' your change
+will have no effect, use customize instead."
+  :group 'helm-grep
+  :type  'boolean
+  :set (lambda (var val)
+         (set var val)
+         (if val
+             (progn
+               (define-key helm-grep-map (kbd "<right>")  'helm-execute-persistent-action)
+               (define-key helm-grep-map (kbd "<left>")   'helm-grep-run-default-action))
+           (define-key helm-grep-map (kbd "<right>") nil)
+           (define-key helm-grep-map (kbd "<left>")  nil))))
+
+(defcustom helm-grep-ag-command
+  "ag --line-numbers -S --color --nogroup %s -- %s %s"
+  "The default command for AG, PT or RG.
+
+Takes three format specs, the first for type(s), the second for
+pattern and the third for directory.
+
+You can use safely \"--color\" (used by default) with AG RG and
+PT.
+
+NOTE: Usage of \"--color=never\" is discouraged as it uses Elisp
+to colorize matched items which is slower than using the native
+colorization of backend, however it is still supported.
+
+For ripgrep here is the command line to use:
+
+    rg --color=always --smart-case --no-heading --line-number %s -- %s %s
+
+And to customize colors (always for ripgrep) use something like this:
+
+    rg --color=always --colors \\='match:bg:yellow' --colors \\='match:fg:black'
+\--smart-case --no-heading --line-number %s -- %s %s
+
+This will change color for matched items from foreground red (the
+default) to a yellow background with a black foreground.  Note
+that your color settings for RG will not work properly with
+multiples pattern if you have configured colors in rg config file
+instead of command line. For more enhanced settings of ansi
+colors see https://github.com/emacs-helm/helm/issues/2313
+
+You must use an output format that fit with helm grep, that is:
+
+    \"filename:line-number:string\"
+
+The option \"--nogroup\" allow this.
+The option \"--line-numbers\" is also mandatory except with
+PT (not supported).
+For RG the options \"--no-heading\" and \"--line-number\" are the
+ones to use.
+
+When modifying the default colors of matches with e.g.
+\"--color-match\" option of AG or \"--colors\" option of ripgrep
+you may want to modify as well `helm-grep-ag-pipe-cmd-switches'
+to have all matches colorized with the same color in multi
+match.
+
+Of course you can use several other options, see the man page of the
+backend you are using."
+  :group 'helm-grep
+  :type 'string)
+
+(defcustom helm-grep-git-grep-command
+  "git --no-pager grep -n%cH --color=always --full-name -e %p -- %f"
+  "The git grep default command line.
+The option \"--color=always\" can be used safely.
+The color of matched items can be customized in your .gitconfig
+See `helm-grep-default-command' for more infos.
+
+The \"--exclude-standard\" and \"--no-index\" switches allow
+skipping unwanted files specified in ~/.gitignore_global and
+searching files not already staged (not enabled by default).
+
+You have also to enable this in global \".gitconfig\" with
+    \"git config --global core.excludesfile ~/.gitignore_global\"."
+  :group 'helm-grep
+  :type 'string)
+
 
 ;;; Faces
 ;;
@@ -313,80 +455,6 @@ Have no effect when grep backend use \"--color=\"."
        :inherit font-lock-type-face))
   "Face used to highlight grep command line when no results."
   :group 'helm-grep-faces)
-
-
-;;; Keymaps
-;;
-;;
-(defvar helm-grep-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-<down>") 'helm-goto-next-file)
-    (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
-    (define-key map (kbd "C-c o")    'helm-grep-run-other-window-action)
-    (define-key map (kbd "C-c C-o")  'helm-grep-run-other-frame-action)
-    (define-key map (kbd "C-x C-s")  'helm-grep-run-save-buffer)
-    (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
-    map)
-  "Keymap used in Grep sources.")
-
-(defcustom helm-grep-use-ioccur-style-keys t
-  "Use Arrow keys to jump to occurences.
-Note that if you define this variable with `setq' your change
-will have no effect, use customize instead."
-  :group 'helm-grep
-  :type  'boolean
-  :set (lambda (var val)
-         (set var val)
-         (if val
-             (progn
-               (define-key helm-grep-map (kbd "<right>")  'helm-execute-persistent-action)
-               (define-key helm-grep-map (kbd "<left>")   'helm-grep-run-default-action))
-           (define-key helm-grep-map (kbd "<right>") nil)
-           (define-key helm-grep-map (kbd "<left>")  nil))))
-
-(defvar helm-pdfgrep-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-<down>") 'helm-goto-next-file)
-    (define-key map (kbd "M-<up>")   'helm-goto-precedent-file)
-    (define-key map (kbd "DEL")      'helm-delete-backward-no-update)
-    map)
-  "Keymap used in pdfgrep.")
-
-(defvar helm-grep-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET")      'helm-grep-mode-jump)
-    (define-key map (kbd "C-o")      'helm-grep-mode-jump-other-window)
-    (define-key map (kbd "<C-down>") 'helm-grep-mode-jump-other-window-forward)
-    (define-key map (kbd "<C-up>")   'helm-grep-mode-jump-other-window-backward)
-    (define-key map (kbd "<M-down>") 'helm-gm-next-file)
-    (define-key map (kbd "<M-up>")   'helm-gm-precedent-file)
-    (define-key map (kbd "M-n")      'helm-grep-mode-jump-other-window-forward)
-    (define-key map (kbd "M-p")      'helm-grep-mode-jump-other-window-backward)
-    (define-key map (kbd "M-N")      'helm-gm-next-file)
-    (define-key map (kbd "M-P")      'helm-gm-precedent-file)
-    map))
-
-
-;;; Internals vars
-;;
-;;
-(defvar helm-rzgrep-cache (make-hash-table :test 'equal))
-(defvar helm-grep-default-function 'helm-grep-init)
-(defvar helm-zgrep-recurse-flag nil)
-(defvar helm-grep-history nil)
-(defvar helm-grep-ag-history nil)
-(defvar helm-grep-last-targets nil)
-(defvar helm-grep-include-files nil)
-(defvar helm-grep-in-recurse nil)
-(defvar helm-grep-use-zgrep nil)
-(defvar helm-grep-default-directory-fn nil
-  "A function that should return a directory to expand candidate to.
-It is intended to use as a let-bound variable, DON'T set this globaly.")
-(defvar helm-pdfgrep-targets nil)
-(defvar helm-grep-last-cmd-line nil)
-(defvar helm-grep-split-line-regexp "^\\([[:lower:][:upper:]]?:?.*?\\):\\([0-9]+\\):\\(.*\\)")
 
 
 ;;; Init
@@ -1526,57 +1594,6 @@ non-file buffers."
 ;;  https://github.com/monochromegane/the_platinum_searcher
 ;;  https://github.com/BurntSushi/ripgrep
 
-(defcustom helm-grep-ag-command
-  "ag --line-numbers -S --color --nogroup %s -- %s %s"
-  "The default command for AG, PT or RG.
-
-Takes three format specs, the first for type(s), the second for
-pattern and the third for directory.
-
-You can use safely \"--color\" (used by default) with AG RG and
-PT.
-
-NOTE: Usage of \"--color=never\" is discouraged as it uses Elisp
-to colorize matched items which is slower than using the native
-colorization of backend, however it is still supported.
-
-For ripgrep here is the command line to use:
-
-    rg --color=always --smart-case --no-heading --line-number %s -- %s %s
-
-And to customize colors (always for ripgrep) use something like this:
-
-    rg --color=always --colors \\='match:bg:yellow' --colors \\='match:fg:black'
-\--smart-case --no-heading --line-number %s -- %s %s
-
-This will change color for matched items from foreground red (the
-default) to a yellow background with a black foreground.  Note
-that your color settings for RG will not work properly with
-multiples pattern if you have configured colors in rg config file
-instead of command line. For more enhanced settings of ansi
-colors see https://github.com/emacs-helm/helm/issues/2313
-
-You must use an output format that fit with helm grep, that is:
-
-    \"filename:line-number:string\"
-
-The option \"--nogroup\" allow this.
-The option \"--line-numbers\" is also mandatory except with
-PT (not supported).
-For RG the options \"--no-heading\" and \"--line-number\" are the
-ones to use.
-
-When modifying the default colors of matches with e.g.
-\"--color-match\" option of AG or \"--colors\" option of ripgrep
-you may want to modify as well `helm-grep-ag-pipe-cmd-switches'
-to have all matches colorized with the same color in multi
-match.
-
-Of course you can use several other options, see the man page of the
-backend you are using."
-  :group 'helm-grep
-  :type 'string)
-
 (defun helm-grep--ag-command ()
   (car (helm-remove-if-match
         "\\`[A-Z]*=" (split-string helm-grep-ag-command))))
@@ -1749,22 +1766,6 @@ When WITH-TYPES is non-nil provide completion on AG types."
 ;;
 ;;
 (defvar helm-source-grep-git nil)
-
-(defcustom helm-grep-git-grep-command
-  "git --no-pager grep -n%cH --color=always --full-name -e %p -- %f"
-  "The git grep default command line.
-The option \"--color=always\" can be used safely.
-The color of matched items can be customized in your .gitconfig
-See `helm-grep-default-command' for more infos.
-
-The \"--exclude-standard\" and \"--no-index\" switches allow
-skipping unwanted files specified in ~/.gitignore_global and
-searching files not already staged (not enabled by default).
-
-You have also to enable this in global \".gitconfig\" with
-    \"git config --global core.excludesfile ~/.gitignore_global\"."
-  :group 'helm-grep
-  :type 'string)
 
 (defun helm-grep-git-1 (directory &optional all default input)
   "Run git-grep on DIRECTORY.
