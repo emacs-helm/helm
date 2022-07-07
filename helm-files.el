@@ -279,8 +279,7 @@ This is used only as a let binding.")
   "Just like `tramp-verbose' but specific to Helm.
 When set to 0 don't show tramp messages in Helm.
 If you want to have the default tramp messages set it to 3."
-  :type 'integer
-  :group 'helm-files)
+  :type 'integer)
 
 (defcustom helm-ff-auto-update-initial-value nil
   "Auto update when only one candidate directory is matched.
@@ -288,48 +287,40 @@ Default value when starting `helm-find-files' is nil to not
 confuse new users.
 For a better experience with `helm-find-files' set this to
 non-nil and use C-<backspace> to toggle it."
-  :group 'helm-files
   :type  'boolean)
 
 (defcustom helm-ff-history-max-length 100
   "Number of elements shown in `helm-find-files' history."
-  :group 'helm-files
   :type 'integer)
 
 (defcustom helm-ff-fuzzy-matching t
   "Enable fuzzy matching for `helm-find-files' when non--nil.
 See `helm-ff--transform-pattern-for-completion' for more info."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-exif-data-program "exiftran"
   "Program used to extract exif data of an image file."
-  :group 'helm-files
   :type 'string)
 
 (defcustom helm-ff-exif-data-program-args "-d"
   "Arguments used for `helm-ff-exif-data-program'."
-  :group 'helm-files
   :type 'string)
 
 (defcustom helm-ff-newfile-prompt-p t
   "Whether Prompt or not when creating new file.
 This set `ffap-newfile-prompt'."
-  :type  'boolean
-  :group 'helm-files)
+  :type  'boolean)
 
 (defcustom helm-ff-avfs-directory "~/.avfs"
   "The default avfs directory, usually \\='~/.avfs'.
 When this is set you will be able to expand archive filenames
 with `C-j' inside an avfs directory mounted with mountavfs.
 See <http://sourceforge.net/projects/avf/>."
-  :type  'string
-  :group 'helm-files)
+  :type  'string)
 
 (defcustom helm-ff-file-compressed-list '("gz" "bz2" "zip" "7z")
   "Minimal list of compressed files extension."
-  :type  '(repeat (choice string))
-  :group 'helm-files)
+  :type  '(repeat (choice string)))
 
 (defcustom helm-ff-printer-list nil
   "A list of available printers on your system.
@@ -338,37 +329,31 @@ Otherwise when nil the variable `printer-name' will be used.
 On Unix based systems (lpstat command needed) you don't need to
 set this, `helm-ff-find-printers' will find a list of available
 printers for you."
-  :type '(repeat (choice string))
-  :group 'helm-files)
+  :type '(repeat (choice string)))
 
 (defcustom helm-ff-transformer-show-only-basename t
   "Show only basename of candidates in `helm-find-files'.
 This can be toggled at anytime from `helm-find-files' with \
 \\<helm-find-files-map>\\[helm-ff-run-toggle-basename]."
-  :type 'boolean
-  :group 'helm-files)
+  :type 'boolean)
 
 (defcustom helm-ff-signal-error-on-dot-files t
   "Signal error when file is `.' or `..' on file deletion when non-nil.
 Default is non-nil.
 WARNING: Setting this to nil is unsafe and can cause deletion of
 a whole tree."
-  :group 'helm-files
   :type  'boolean)
 
 (defcustom helm-ff-search-library-in-sexp nil
   "Search for library in `require' and `declare-function' sexp."
-  :group 'helm-files
   :type  'boolean)
 
 (defcustom helm-tooltip-hide-delay 25
   "Hide tooltips automatically after this many seconds."
-  :group 'helm-files
   :type 'integer)
 
 (defcustom helm-ff-file-name-history-use-recentf nil
   "Use `recentf-list' instead of `file-name-history' in `helm-find-files'."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-skip-boring-files nil
@@ -377,7 +362,6 @@ I.e. the files matching regexps in `helm-boring-file-regexp-list'.
 This takes effect in `helm-find-files' and file completion used by
 `helm-mode' i.e. `helm-read-file-name'.
 Note that when non-nil this will slow down slightly `helm-find-files'."
-  :group 'helm-files
   :type  'boolean)
 
 (defcustom helm-ff-skip-git-ignored-files nil
@@ -386,7 +370,6 @@ This take effect only in `helm-find-files'.
 Check is not done on remote files.
 Note that when non-nil this will slow down slightly
 `helm-find-files'."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-candidate-number-limit 5000
@@ -397,7 +380,6 @@ length of directory will be used instead if it is higher than
 this value.  This is to avoid failing to preselect the previous
 directory/file if this one is situated lower than
 `helm-ff-candidate-number-limit' num candidate."
-  :group 'helm-files
   :type 'integer)
 
 (defcustom helm-ff-up-one-level-preselect t
@@ -411,36 +393,30 @@ candidate in its directory is > to
 It can be helpful to disable this and reduce
 `helm-ff-candidate-number-limit' if you often navigate across
 very large directories."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-files-save-history-extra-sources
   '("Find" "Locate" "Recentf"
     "Files from Current Directory" "File Cache")
   "Extras source that save candidate to `file-name-history'."
-  :group 'helm-files
   :type '(repeat (choice string)))
 
 (defcustom helm-find-files-before-init-hook nil
   "Hook that run before initialization of `helm-find-files'."
-  :group 'helm-files
   :type 'hook)
 
 (defcustom helm-find-files-after-init-hook nil
   "Hook that run after initialization of `helm-find-files'."
-  :group 'helm-files
   :type 'hook)
 
 (defcustom helm-find-files-bookmark-prefix nil
   "bookmark name prefix of `helm-find-files' sessions."
-  :group 'helm-files
   :type 'string)
 
 (defcustom helm-ff-guess-ffap-filenames nil
   "Use ffap to guess local filenames at point in `helm-find-files'.
 This doesn't disable url or mail at point, see
 `helm-ff-guess-ffap-urls' for this."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-guess-ffap-urls t
@@ -449,17 +425,14 @@ This doesn't disable guessing filenames at point, see
 `helm-ff-guess-ffap-filenames' for this.
 See also `ffap-url-unwrap-remote' that may override this
 variable."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-no-preselect nil
   "When non-nil `helm-find-files' starts at root of current directory."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-allow-non-existing-file-at-point nil
   "Use non existing file-at-point as initial input in `helm-find-files'."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-find-files-ignore-thing-at-point nil
@@ -467,17 +440,14 @@ variable."
 I.e. text under cursor in `current-buffer' is ignored.
 Note that when non-nil you will be unable to complete filename at
 point in `current-buffer'."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-substitute-in-filename-stay-on-remote nil
   "Don't switch back to local filesystem when expanding pattern with / or ~/."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-goto-first-real-dired-exceptions '(dired-goto-file)
   "Dired commands that are allowed moving to first real candidate."
-  :group 'helm-files
   :type '(repeat (choice symbol)))
 
 (defcustom helm-mounted-network-directories nil
@@ -487,7 +457,6 @@ When nil `helm-file-on-mounted-network-p' always return nil
 otherwise check if a file is in one of these directories.
 
 Remote filesystem are generally mounted with sshfs."
-  :group 'helm-files
   :type '(repeat string))
 
 (defcustom helm-browse-project-default-find-files-fn
@@ -501,7 +470,6 @@ Remote filesystem are generally mounted with sshfs."
   "The default function to retrieve files in a non-vc directory.
 
 A function that takes a directory name as only arg."
-  :group 'helm-files
   :type 'function)
 
 (defcustom helm-ff-kill-or-find-buffer-fname-fn
@@ -524,13 +492,11 @@ just set this to `ignore' function.
 
 Of course you can also write your own function to do something
 else."
-  :group 'helm-files
   :type 'function)
 
 (defcustom helm-modes-using-escaped-strings
   '(eshell-mode shell-mode term-mode)
   "Modes that requires string's insertion to be escaped."
-  :group 'helm-files
   :type '(repeat symbol))
 
 (defcustom helm-ff-allow-recursive-deletes nil
@@ -539,7 +505,6 @@ When nil, will ask for recursive deletion.
 Note that when deleting multiple directories you can answer !
 when prompted to avoid being asked for next directories, so it
 is probably better to not modify this variable."
-  :group 'helm-files
   :type '(choice
           (const :tag "Delete non-empty directories" t)
           (const :tag "Confirm for each directory" nil)))
@@ -557,7 +522,6 @@ be deleted with no warnings in background!!!
 It is the function that will be used when using
 `\\<helm-find-files-map>\\[helm-ff-run-delete-file]' from
 `helm-find-files'."
-  :group 'helm-files
   :type '(choice (function :tag "Delete files synchronously."
                   helm-delete-marked-files)
                  (function :tag "Delete files asynchronously."
@@ -578,7 +542,6 @@ Emacs.
 If you want to enable this you will have to install the \\='trash'
 command on remote (and/or locally if you want to trash as root).
 On Ubuntu-based distributions it is \\='trash-cli'."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-list-directory-function
@@ -605,8 +568,7 @@ want to connect e.g. on a Freebsd server, you may have failures
 due to the incompatible ls version installed on remote server.  In
 such case use `helm-list-dir-lisp' which works everywhere but is
 slower and less featured (only directories colorized)."
-  :type 'function
-  :group 'helm-files)
+  :type 'function)
 
 (defcustom helm-ff-initial-sort-method nil
   "Sort method to use when initially listing a directory.
@@ -617,7 +579,6 @@ BTW is not provided on remote files (helm will fallback on nil in such
 case).
 Note that this have no effect as soon as you start narrowing directory
 i.e. filtering filenames inside directory."
-  :group 'helm-files
   :type '(choice
           (const :tag "alphabetically" nil)
           (const :tag "newest" newest)
@@ -630,7 +591,6 @@ When nil and `helm-ff-display-image-native' is enabled, fallback to
 `image-rotate' without modification of exif data i.e. rotation is not
 persistent otherwise an error is returned when not using
 `helm-ff-display-image-native' i.e. using image-dired."
-  :group 'helm-files
   :type '(choice
           (const :tag "Mogrify" "mogrify")
           (const :tag "Exiftran" "exiftran")
@@ -640,14 +600,12 @@ persistent otherwise an error is returned when not using
   "Options used with `helm-ff-rotate-image-program'.
 If you are using Mogrify or Jpegtran mandatory option is
 \"-rotate\", with Exiftran mandatory option is \"-i\"."
-  :group 'helm-files
   :type '(repeat string))
 
 (defcustom helm-ff-preferred-shell-mode 'eshell-mode
   "Shell to use to switch to a shell buffer from `helm-find-files'.
 Possible values are `shell-mode', `eshell-mode' and `term-mode'.
 This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding."
-  :group 'helm-files
   :type '(choice
           (const :tag "Use Eshell" eshell-mode)
           (const :tag "Use Shell" shell-mode)
@@ -658,21 +616,18 @@ This affects `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' keybinding
 This is useful if you display the progress bar somewhere else,
 e.g. with minibuffer-line in minibuffer, in this case updating
 mode-line may create flickering in other frame's mode-line."
-  :type 'boolean
-  :group 'helm-files)
+  :type 'boolean)
 
 (defcustom helm-rsync-switches '("-a" "-z" "-h" "-s" "--info=all2")
   "Rsync options to use with HFF Rsync action.
 Note: Using \"--info=all2\" allows having the name of the file
 currently transfered in an help-echo in mode-line, if you use
 \"--info=progress2\" you will not have this information."
-  :type '(repeat string)
-  :group 'helm-files)
+  :type '(repeat string))
 
 (defcustom helm-rsync-percent-sign "％"
   "Percentage unicode sign to use in Rsync reporter."
-  :type 'string
-  :group 'helm-files)
+  :type 'string)
 
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
@@ -682,14 +637,12 @@ Should be the directory file name i.e. don't add final slash.
 When nil helm will compute a default value according to freedesktop
 specs.
 It is generally \"~/.local/share/Trash\"."
-  :type 'string
-  :group 'helm-files)
+  :type 'string)
 
 (defcustom helm-ff-lynx-style-map t
   "Use arrow keys to navigate with `helm-find-files'.
 Note that if you define this variable with `setq' your change
 will have no effect, use customize instead."
-  :group 'helm-files
   :type 'boolean
   :set (lambda (var val)
          (set var val)
@@ -711,7 +664,6 @@ Going up one level works only when pattern is a directory endings
 with \"/\", otherwise this command deletes char backward.
 
 When nil always delete char backward."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-display-image-native t
@@ -725,20 +677,17 @@ when nil `image-dired' is used, using imagemagick as backend.
 NOTE: On Emacs-29 `image-dired' is no more using external program
 image-magick to display image, so this is used inconditionally even
 when value is nil."
-  :group 'helm-files
   :type 'boolean)
 
 (defcustom helm-ff-reset-filters-on-update t
   "Reset filter variables when changing directory.
 When filtering directories/files only, switch back to a \"show all\" view
 when moving out of directory when non nil."
-  :type 'boolean
-  :group 'helm-files)
+  :type 'boolean)
 
 (defcustom helm-ff-eshell-unwanted-aliases nil
   "A list of eshell aliases to not display."
-  :type '(repeat string)
-  :group 'helm-files)
+  :type '(repeat string))
 
 (defcustom helm-find-files-actions
   (helm-make-actions
@@ -801,7 +750,6 @@ when moving out of directory when non nil."
    "Print File `C-c p, C-u to refresh'" 'helm-ff-print
    "Locate `C-x C-f, C-u to specify locate db'" 'helm-ff-locate)
   "Actions for `helm-find-files'."
-  :group 'helm-files
   :type '(alist :key-type string :value-type function))
 
 (defcustom helm-dwim-target nil
@@ -812,7 +760,6 @@ target directory when copying, renaming, etc..  You can use the
 `default-directory' of `next-window', the visited directory, the
 current `default-directory' or have completion on all the
 directories belonging to each visible windows."
-  :group 'helm-files
   :type '(radio :tag "Define default target directory for file actions."
           (const :tag "Directory belonging to next window"
                  next-window)
@@ -828,7 +775,6 @@ directories belonging to each visible windows."
 If your system have no file notification package available turn this
 to nil to avoid error messages when using `helm-find-files'."
   :type 'boolean
-  :group 'helm-files
   :set (lambda (var val)
 	 (set-default var val)
 	 (unless (symbol-value var)
@@ -837,17 +783,18 @@ to nil to avoid error messages when using `helm-find-files'."
 
 (defcustom helm-ff-inotify-unsupported-methods '("adb")
   "Tramp methods unsupported by file-notify."
-  :type '(repeat string)
-  :group 'helm-files)
+  :type '(repeat string))
 
 (defcustom helm-ff-image-cache-max-len 5
   "The last seen image number to keep in cache."
-  :group 'helm-files
   :type 'integer)
 
 (defcustom helm-ff-image-cache-max-len 5
   "The last seen image number to keep in cache."
-  :group 'helm-files
+  :type 'integer)
+
+(defcustom helm-ff-slideshow-default-delay 3
+  "Delay in seconds between each image in slideshow."
   :type 'integer)
 
 
@@ -4834,11 +4781,6 @@ file."
   "Type `\\[helm-ff-slideshow-pause-or-restart]' to %s, \
 `\\[helm-ff-slideshow-next]' for next, `\\[helm-ff-slideshow-previous]' for previous, \
 `\\[helm-ff-slideshow-quit]' to quit")
-
-(defcustom helm-ff-slideshow-default-delay 3
-  "Delay in seconds between each image in slideshow."
-  :group 'helm-files
-  :type 'integer)
 
 (defvar helm-slideshow-mode-map
   (let ((map (make-sparse-keymap)))
