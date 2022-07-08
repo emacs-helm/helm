@@ -37,8 +37,7 @@
 (defcustom helm-locate-db-file-regexp "m?locate\\.db$"
   "Default regexp to match locate database.
 If nil Search in all files."
-  :type  'string
-  :group 'helm-locate)
+  :type  'string)
 
 (defcustom helm-ff-locate-db-filename "locate.db"
   "The basename of the locatedb file you use locally in your directories.
@@ -47,7 +46,6 @@ where you launch locate, it will use this file and will not
 prompt you for a db file.
 Note that this happen only when locate is launched with a prefix
 arg."
-  :group 'helm-locate
   :type 'string)
 
 (defcustom helm-locate-command nil
@@ -79,14 +77,12 @@ Note that the \"-b\" option is added automatically by Helm when
 var `helm-locate-fuzzy-match' is non-nil and switching back from
 multimatch to fuzzy matching (this is done automatically when a
 space is detected in pattern)."
-  :type 'string
-  :group 'helm-locate)
+  :type 'string)
 
 (defcustom helm-locate-create-db-command
   "updatedb -l 0 -o '%s' -U '%s'"
   "Command used to create a locale locate db file."
-  :type 'string
-  :group 'helm-locate)
+  :type 'string)
 
 (defcustom helm-locate-case-fold-search helm-case-fold-search
   "It have the same meaning as `helm-case-fold-search'.
@@ -96,26 +92,22 @@ When nil \"-i\" will not be used at all and when non-nil it will
 always be used.
 NOTE: the -i option of the \"es\" command used on windows does
 the opposite of \"locate\" command."
-  :group 'helm-locate
   :type 'symbol)
 
 (defcustom helm-locate-fuzzy-match nil
   "Enable fuzzy matching in `helm-locate'.
 Note that when this is enabled searching is done on basename."
-  :group 'helm-locate
   :type 'boolean)
 
 (defcustom helm-locate-fuzzy-sort-fn
   #'helm-locate-default-fuzzy-sort-fn
   "Default fuzzy matching sort function for locate."
-  :group 'helm-locate
   :type 'boolean)
 
 (defcustom helm-locate-project-list nil
   "A list of directories, your projects.
 When set, allow browsing recursively files in all directories of
 this list with `helm-projects-find-files'."
-  :group 'helm-locate
   :type '(repeat string))
 
 (defcustom helm-locate-recursive-dirs-command "locate -i -e -A --regex '^%s' '%s.*$'"
@@ -366,12 +358,12 @@ Sort is done on basename of CANDIDATES."
    (history :initform 'helm-file-name-history)
    (persistent-action :initform 'helm-ff-kill-or-find-buffer-fname)
    (candidate-number-limit :initform 9999)
-   (redisplay :initform (progn helm-locate-fuzzy-sort-fn))
-   (group :initform 'helm-locate)))
+   (redisplay :initform (progn helm-locate-fuzzy-sort-fn))))
 
 ;; Override helm-type-file class keymap.
 (cl-defmethod helm--setup-source :after ((source helm-locate-override-inheritor))
-  (setf (slot-value source 'keymap) helm-locate-map))
+  (setf (slot-value source 'keymap) helm-locate-map)
+  (setf (slot-value source 'group) 'helm-locate))
 
 (defvar helm-source-locate
   (helm-make-source "Locate" 'helm-locate-source
