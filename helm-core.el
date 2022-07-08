@@ -308,7 +308,15 @@ and vectors, so don't use strings to define them."
 
 Default to Helm group when group is not defined in source."
   (interactive)
-  (helm-run-after-exit 'helm-customize-group-1 (helm-get-attr 'group)))
+  (let ((source (or (helm-get-current-source)
+                    (helm-comp-read
+                       "Customize variables for: "
+                       (cl-loop for src in (with-helm-buffer helm-sources)
+                                collect `(,(assoc-default 'name src) .
+                                          ,src))
+                       :allow-nest t
+                       :exec-when-only-one t))))
+    (helm-run-after-exit 'helm-customize-group-1 (helm-get-attr 'group source))))
 (put 'helm-customize-group 'helm-only t)
 
 (defun helm--action-at-nth-set-fn-1 (value &optional negative)
