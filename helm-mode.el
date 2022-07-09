@@ -738,6 +738,9 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
              nil "Error: History should be specified as a symbol")
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
+  (unless (memq must-match '(confirm confirm-after-completion t nil))
+    ;; Fix completing-read's using something else than `t' e.g. 1 or whatever.
+    (setq must-match t))
   (let ((action-fn `(("Sole action (Identity)"
                       . (lambda (candidate)
                           (if ,marked-candidates
