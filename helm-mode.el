@@ -1230,57 +1230,63 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; i.e (push ?\t unread-command-events).
          unread-command-events
          (default-handler
-           ;; If nothing is found in
-           ;; helm-completing-read-handlers-alist use default
-           ;; handler.
-           #'helm-completing-read-default-handler))
-    (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
-    (unless (or (not entry) def-com)
-      ;; An entry in *read-handlers-alist exists but have
-      ;; a nil value, so we exit from here, disable `helm-mode'
-      ;; and run the command again with it original behavior.
-      ;; `helm-mode' will be restored on exit.
-      (cl-return-from helm--completing-read-default
-        (unwind-protect
-             (progn
-               (helm-mode -1)
-               (apply completing-read-function def-args))
-          (helm-mode 1))))
-    ;; If we use now `completing-read' we MUST turn off `helm-mode'
-    ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
-    (when (or (eq def-com 'completing-read)
-              ;; All specialized functions are prefixed by "helm"
-              (and (stringp str-defcom)
-                   (not (string-match "^helm" str-defcom))))
-      (helm-mode -1))
-    (unwind-protect
-         (cond (;; An helm specialized function exists, run it.
-                (and def-com helm-mode)
-                (apply def-com others-args))
-               (;; Try to handle `ido-completing-read' everywhere.
-                (and def-com (eq def-com 'ido-completing-read))
-                (setcar (memq collection def-args)
-                        (all-completions "" collection predicate))
-                (apply def-com def-args))
-               (;; User set explicitely `completing-read' or something similar
-                ;; in *read-handlers-alist, use this with exactly the same
-                ;; args as in `completing-read'.
-                ;; If we are here `helm-mode' is now disabled.
-                def-com
-                (apply def-com def-args))
-               (;; Use by default a in-buffer handler unless
-                ;; COLLECTION is a function.
-                t
-                (funcall default-handler
-                         prompt collection predicate require-match
-                         initial-input hist def inherit-input-method
-                         str-command buf-name)))
-      (helm-mode 1)
-      ;; When exiting minibuffer, `this-command' is set to
-      ;; `helm-exit-minibuffer', which is unwanted when starting
-      ;; on another `completing-read', so restore `this-command' to
-      ;; initial value when exiting.
-      (setq this-command current-command))))
+          ;; If nothing is found in
+          ;; helm-completing-read-handlers-alist use default
+          ;; handler.
+          #'helm-completing-read-default-handler))
+    ;; Some functions are calling `minibuffer-complete' within
+    ;; `minibuffer-setup-hook' when calling their `completing-read',
+    ;; like `woman-file-name' (bug #2527). This defeat Helm which is
+    ;; already completing minibuffer, so deactivate
+    ;; minibuffer-complete one time for all.
+    (cl-letf (((symbol-function 'minibuffer-complete) #'ignore))
+      (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
+      (unless (or (not entry) def-com)
+        ;; An entry in *read-handlers-alist exists but have
+        ;; a nil value, so we exit from here, disable `helm-mode'
+        ;; and run the command again with it original behavior.
+        ;; `helm-mode' will be restored on exit.
+        (cl-return-from helm--completing-read-default
+          (unwind-protect
+               (progn
+                 (helm-mode -1)
+                 (apply completing-read-function def-args))
+            (helm-mode 1))))
+      ;; If we use now `completing-read' we MUST turn off `helm-mode'
+      ;; to avoid infinite recursion and CRASH. It will be reenabled on exit.
+      (when (or (eq def-com 'completing-read)
+                ;; All specialized functions are prefixed by "helm"
+                (and (stringp str-defcom)
+                     (not (string-match "^helm" str-defcom))))
+        (helm-mode -1))
+      (unwind-protect
+           (cond (;; An helm specialized function exists, run it.
+                  (and def-com helm-mode)
+                  (apply def-com others-args))
+                 (;; Try to handle `ido-completing-read' everywhere.
+                  (and def-com (eq def-com 'ido-completing-read))
+                  (setcar (memq collection def-args)
+                          (all-completions "" collection predicate))
+                  (apply def-com def-args))
+                 (;; User set explicitely `completing-read' or something similar
+                  ;; in *read-handlers-alist, use this with exactly the same
+                  ;; args as in `completing-read'.
+                  ;; If we are here `helm-mode' is now disabled.
+                  def-com
+                  (apply def-com def-args))
+                 (;; Use by default a in-buffer handler unless
+                  ;; COLLECTION is a function.
+                  t
+                  (funcall default-handler
+                           prompt collection predicate require-match
+                           initial-input hist def inherit-input-method
+                           str-command buf-name)))
+        (helm-mode 1)
+        ;; When exiting minibuffer, `this-command' is set to
+        ;; `helm-exit-minibuffer', which is unwanted when starting
+        ;; on another `completing-read', so restore `this-command' to
+        ;; initial value when exiting.
+        (setq this-command current-command)))))
 
 ;;; Generic read-file-name
 ;;
