@@ -150,7 +150,7 @@ small.")
          (let ((helm-fuzzy-sort-fn 'helm-fuzzy-matching-sort-fn-preserve-ties-order))
            (setq helm-source-recentf
                  (helm-make-source "Recentf" 'helm-recentf-source
-                   :fuzzy-match helm-recentf-fuzzy-match)))))
+                   :fuzzy-match val)))))
 
 
 ;;; Files in current dir
