@@ -3611,8 +3611,6 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
               'vertical 'horizontal))
     (setq helm--window-side-state
           (or helm-split-window-default-side 'below)))
-  ;; Call the init function for sources where appropriate
-  (helm-compute-attr-in-sources 'init sources)
   (setq helm-pattern (or (and helm-maybe-use-default-as-input
                               (or (if (listp default)
                                       (car default) default)
@@ -3620,6 +3618,8 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
                                     (thing-at-point 'symbol))))
                          ""))
   (setq helm-input "")
+  ;; Call the init function for sources where appropriate
+  (helm-compute-attr-in-sources 'init sources)
   (clrhash helm-candidate-cache)
   (helm-create-helm-buffer)
   (helm-clear-visible-mark)
