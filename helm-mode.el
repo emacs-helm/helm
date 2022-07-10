@@ -739,7 +739,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
   (when (get-buffer helm-action-buffer)
     (kill-buffer helm-action-buffer))
   (unless (memq must-match '(confirm confirm-after-completion t nil))
-    ;; Fix completing-read's using something else than `t' e.g. 1 or whatever.
+    ;; Fix completing-read's using something else than `t' e.g. 1 or
+    ;; whatever (bug #2527).
     (setq must-match t))
   (let ((action-fn `(("Sole action (Identity)"
                       . (lambda (candidate)
