@@ -1968,11 +1968,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                                                 (string= input ""))
                                       " "))
                  (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
-                                  (and (helm-mode--in-file-completion-p)
-                                       ;; Probably unneeded at this
-                                       ;; point but never know.
-                                       (setq metadata (append metadata '((category . file))))
-                                       t)
+                                  (helm-mode--in-file-completion-p)
                                   ;; Assume that when `afun' and `predicate' are null
                                   ;; we are in filename completion.
                                   (and (null afun) (null predicate))))
@@ -1993,23 +1989,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                                     metadata))
                                   (last-data (last comps))
                                   (bs (helm-aif (cdr last-data)
-                                          ;; Try to fix eshell completion
-                                          ;; which fails to complete a
-                                          ;; filename not preceded by
-                                          ;; a meaningful
-                                          ;; command like cd or ls
-                                          ;; (bug #2504) so
-                                          ;; try to find the last
-                                          ;; leading / and set
-                                          ;; base-size from it.
-                                          (prog1 (if (and (zerop it) file-comp-p)
-                                                     (or (helm-aand
-                                                          (save-excursion
-                                                            (re-search-backward
-                                                             "/" start t))
-                                                          (- (1+ it) start))
-                                                         it)
-                                                   it)
+                                          (prog1 it
                                             ;; Remove the last element of
                                             ;; comps by side-effect.
                                             (setcdr last-data nil))
