@@ -324,7 +324,8 @@ default to `extended-command-history'."
           (helm :sources sources
                 :prompt prompt
                 :buffer "*helm M-x*"
-                :history 'helm-M-x-input-history))
+                :history 'helm-M-x-input-history
+                :truncate-lines t))
       (helm-M-x--unwind-forms))))
 
 ;; When running a command involving again helm from helm-M-x, the

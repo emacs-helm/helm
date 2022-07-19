@@ -813,7 +813,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
           :history 'helm-apropos-history
           :buffer "*helm apropos*"
           :preselect (and default (concat "^\\_<" (regexp-quote default) "\\_>"))
-          :truncate-lines helm-apropos-show-short-doc)))
+          :truncate-lines t)))
 
 
 ;;; Advices
