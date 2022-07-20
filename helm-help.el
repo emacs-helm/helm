@@ -392,8 +392,8 @@ the cursor to the top instead of remaining on the previous subdir name.
 
 **** Enter `..name/' at end of pattern to start a recursive search
 
-It searches directories matching \"name\" under the current directory, see the
-\"Recursive completion on subdirectories\" section below for more details.
+It searches directories matching \"name\" under the current directory,
+see the [[Recursive completion on subdirectories][Recursive completion on subdirectories]] section below for more details.
 
 **** Any environment variable (e.g. `$HOME') at end of pattern gets expanded
 
@@ -568,14 +568,14 @@ You can use also a glob based search, in this case use the --glob option:
 
 *** Insert filename at point or complete filename at point
 
-On insertion (not on completion, i.e. there is nothing at point):
+On insertion (i.e. there is nothing at point):
 
 - `\\[helm-ff-run-complete-fn-at-point]': insert absolute file name.
 - `\\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert abbreviated file name.
 - `\\[universal-argument] \\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert relative file name.
 - `\\[universal-argument] \\[universal-argument] \\[universal-argument] \\[helm-ff-run-complete-fn-at-point]': insert basename.
 
-On completion:
+On completion (\\[helm-ff-run-complete-fn-at-point]):
 
 - Target starts with \"~/\": insert abbreviate file name.
 - target starts with \"/\" or \"[a-z]:/\": insert full path.
@@ -2308,7 +2308,14 @@ hit RET, it will apply on the selected command, but if you type a
 new character at prompt to narrow down further candidates, the
 prefix arg will apply to `self-insert-command' (e.g. if you type
 `C-u e' \"eeee\" will be inserted in prompt) so select the
-command you want to execute before specifying prefix arg.")
+command you want to execute before specifying prefix arg.
+
+** Commands
+\\<helm-M-x-map>
+|Keys|Description
+|-----------+------------|
+|\\[helm-M-x-universal-argument]|Universal argument for selected command
+|\\[helm-M-x-toggle-short-doc]|Toggle details on commands")
 
 
 ;;; Helm imenu
