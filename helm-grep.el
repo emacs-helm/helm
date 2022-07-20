@@ -914,6 +914,7 @@ If N is positive go forward otherwise go backward."
             (forward-line 1))))
       (helm-grep-mode))
     (pop-to-buffer buf)
+    (setq next-error-last-buffer (get-buffer buf))
     (message "Helm %s Results saved in `%s' buffer" src-name buf)))
 
 (defun helm-grep-mode-mouse-jump (event)
@@ -1042,6 +1043,7 @@ Special commands:
 
 (defun helm-grep-mode-jump ()
   (interactive)
+  (setq next-error-last-buffer (current-buffer))
   (helm-grep-action
    (buffer-substring (point-at-bol) (point-at-eol)))
   (helm-match-line-cleanup-pulse))
@@ -1069,6 +1071,7 @@ Special commands:
 
 (defun helm-grep-mode-jump-other-window ()
   (interactive)
+  (setq next-error-last-buffer (current-buffer))
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
     (condition-case nil
         (progn (helm-grep-action candidate 'other-window)

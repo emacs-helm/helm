@@ -475,11 +475,13 @@ persistent action."
 
 (defun helm-occur-mode-goto-line ()
   (interactive)
+  (setq next-error-last-buffer (current-buffer))
   (helm-aif (get-text-property (point) 'helm-realvalue)
     (progn (helm-occur-goto-line it) (helm-match-line-cleanup-pulse))))
 
 (defun helm-occur-mode-goto-line-ow ()
   (interactive)
+  (setq next-error-last-buffer (current-buffer))
   (helm-aif (get-text-property (point) 'helm-realvalue)
     (progn (helm-occur-goto-line-ow it) (helm-match-line-cleanup-pulse))))
 
@@ -565,6 +567,7 @@ persistent action."
       (buffer-enable-undo)
       (helm-occur-mode))
     (pop-to-buffer buf)
+    (setq next-error-last-buffer (get-buffer buf))
     (message "Helm occur Results saved in `%s' buffer" buf)))
 
 (defun helm-occur-mode-mouse-goto-line (event)
