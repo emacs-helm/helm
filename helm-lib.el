@@ -178,6 +178,8 @@ the customize functions e.g. `customize-set-variable' and NOT
   "Buffer showing actions.")
 (defvar helm-current-prefix-arg nil
   "Record `current-prefix-arg' when exiting minibuffer.")
+(defvar helm-current-error nil
+  "Same as `compilation-current-error' but for helm-occur and helm-grep.")
 
 ;;; Compatibility
 ;;

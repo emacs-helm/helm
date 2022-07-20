@@ -41,7 +41,7 @@
 (defvar helm-grep-git-grep-command)
 (defvar helm-source-grep-git)
 (defvar tramp-verbose)
-
+(defvar helm-current-error)
 
 ;;; Internals vars
 ;;
@@ -933,14 +933,19 @@ RESET non-nil means rewind to the first match.
 This is the `next-error-function' for `helm-grep-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
-		   ((< argp 0) (line-beginning-position))
-		   ((> argp 0) (line-end-position))
+		   ((and (< argp 0) helm-current-error)
+                    (line-beginning-position))
+		   ((and (> argp 0) helm-current-error)
+                    (line-end-position))
 		   ((point))))
   (let ((fun (if (> argp 0)
                  #'next-single-property-change
                #'previous-single-property-change)))
     (helm-aif (funcall fun (point) 'helm-grep-fname)
-        (progn (goto-char it) (helm-grep-mode-jump))
+        (progn
+          (goto-char it)
+          (setq helm-current-error (point-marker))
+          (helm-grep-mode-jump))
       (user-error "No more matches"))))
 (put 'helm-grep-next-error 'helm-only t)
 
@@ -978,7 +983,8 @@ Special commands:
     (set (make-local-variable 'revert-buffer-function)
          #'helm-grep-mode--revert-buffer-function)
     (set (make-local-variable 'next-error-function)
-         #'helm-grep-next-error))
+         #'helm-grep-next-error)
+    (set (make-local-variable 'helm-current-error) nil))
 (put 'helm-grep-mode 'helm-only t)
 
 (defun helm-grep-mode--revert-buffer-function (&optional _ignore-auto _noconfirm)

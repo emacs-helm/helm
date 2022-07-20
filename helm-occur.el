@@ -29,6 +29,8 @@
 (declare-function helm-grep-highlight-match "helm-grep")
 (declare-function helm-comp-read "helm-mode")
 
+(defvar helm-current-error)
+
 ;;; Internals
 ;;
 (defvar helm-source-occur nil
@@ -691,7 +693,8 @@ Special commands:
     (set (make-local-variable 'helm-occur-mode--last-pattern)
          helm-input)
     (set (make-local-variable 'next-error-function)
-         #'helm-occur-next-error))
+         #'helm-occur-next-error)
+    (set (make-local-variable 'helm-current-error) nil))
 (put 'helm-moccur-mode 'helm-only t)
 
 (defun helm-occur-next-error (&optional argp reset)
@@ -700,8 +703,10 @@ RESET non-nil means rewind to the first match.
 This is the `next-error-function' for `helm-occur-mode'."
   (interactive "p")
   (goto-char (cond (reset (point-min))
-		   ((< argp 0) (line-beginning-position))
-		   ((> argp 0) (line-end-position))
+		   ((and (< argp 0) helm-current-error)
+                    (line-beginning-position))
+		   ((and (> argp 0) helm-current-error)
+                    (line-end-position))
 		   ((point))))
   (let ((fun (if (> argp 0)
                  #'next-single-property-change
@@ -710,6 +715,7 @@ This is the `next-error-function' for `helm-occur-mode'."
         (progn
           (goto-char it)
           (forward-line 0)
+          (setq helm-current-error (point-marker))
           (helm-occur-mode-goto-line))
       (user-error "No more matches"))))
 
