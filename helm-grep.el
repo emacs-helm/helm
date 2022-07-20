@@ -725,29 +725,29 @@ WHERE can be `other-window' or `other-frame'."
                         (doc-view-goto-page lineno))))
       (t            (find-file fname)))
     (unless (or (eq where 'grep) (eq where 'pdf))
-      (helm-goto-line lineno))
-    ;; Move point to the nearest matching regexp from bol.
-    (cl-loop for reg in split-pat
-             when (save-excursion
-                    (condition-case _err
-                        (if helm-migemo-mode
-                            (helm-mm-migemo-forward reg (point-at-eol) t)
-                          (re-search-forward reg (point-at-eol) t))
-                      (invalid-regexp nil)))
-             collect (match-beginning 0) into pos-ls
-             finally (when pos-ls (goto-char (apply #'min pos-ls))))
-    ;; Save history
-    (unless (or helm-in-persistent-action
-                (eq major-mode 'helm-grep-mode)
-                (string= helm-pattern ""))
-      (setq helm-grep-history
-            (cons helm-pattern
-                  (delete helm-pattern helm-grep-history)))
-      (when (> (length helm-grep-history)
-               helm-grep-max-length-history)
+      (helm-goto-line lineno)
+      ;; Move point to the nearest matching regexp from bol.
+      (cl-loop for reg in split-pat
+               when (save-excursion
+                      (condition-case _err
+                          (if helm-migemo-mode
+                              (helm-mm-migemo-forward reg (point-at-eol) t)
+                            (re-search-forward reg (point-at-eol) t))
+                        (invalid-regexp nil)))
+               collect (match-beginning 0) into pos-ls
+               finally (when pos-ls (goto-char (apply #'min pos-ls))))
+      ;; Save history
+      (unless (or helm-in-persistent-action
+                  (eq major-mode 'helm-grep-mode)
+                  (string= helm-pattern ""))
         (setq helm-grep-history
-              (delete (car (last helm-grep-history))
-                      helm-grep-history))))))
+              (cons helm-pattern
+                    (delete helm-pattern helm-grep-history)))
+        (when (> (length helm-grep-history)
+                 helm-grep-max-length-history)
+          (setq helm-grep-history
+                (delete (car (last helm-grep-history))
+                        helm-grep-history)))))))
 
 (defun helm-grep-persistent-action (candidate)
   "Persistent action for `helm-do-grep-1'.
