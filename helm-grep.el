@@ -1050,6 +1050,7 @@ Special commands:
 (defun helm-grep-mode-jump ()
   (interactive)
   (setq next-error-last-buffer (current-buffer))
+  (setq-local helm-current-error (point-marker))
   (helm-grep-action
    (buffer-substring (point-at-bol) (point-at-eol)))
   (helm-match-line-cleanup-pulse))
@@ -1078,6 +1079,7 @@ Special commands:
 (defun helm-grep-mode-jump-other-window ()
   (interactive)
   (setq next-error-last-buffer (current-buffer))
+  (setq-local helm-current-error (point-marker))
   (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
     (condition-case nil
         (progn (helm-grep-action candidate 'other-window)

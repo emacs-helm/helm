@@ -478,12 +478,14 @@ persistent action."
 (defun helm-occur-mode-goto-line ()
   (interactive)
   (setq next-error-last-buffer (current-buffer))
+  (setq-local helm-current-error (point-marker))
   (helm-aif (get-text-property (point) 'helm-realvalue)
     (progn (helm-occur-goto-line it) (helm-match-line-cleanup-pulse))))
 
 (defun helm-occur-mode-goto-line-ow ()
   (interactive)
   (setq next-error-last-buffer (current-buffer))
+  (setq-local helm-current-error (point-marker))
   (helm-aif (get-text-property (point) 'helm-realvalue)
     (progn (helm-occur-goto-line-ow it) (helm-match-line-cleanup-pulse))))
 
