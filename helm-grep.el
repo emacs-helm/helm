@@ -944,7 +944,8 @@ This is the `next-error-function' for `helm-grep-mode'."
     (helm-aif (funcall fun (point) 'helm-grep-fname)
         (progn
           (goto-char it)
-          (setq helm-current-error (point-marker))
+          ;; `helm-current-error' is set in
+          ;; `helm-grep-mode-jump'.
           (helm-grep-mode-jump))
       (user-error "No more matches"))))
 (put 'helm-grep-next-error 'helm-only t)

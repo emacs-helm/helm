@@ -717,7 +717,8 @@ This is the `next-error-function' for `helm-occur-mode'."
         (progn
           (goto-char it)
           (forward-line 0)
-          (setq helm-current-error (point-marker))
+          ;; `helm-current-error' is set in
+          ;; `helm-occur-mode-goto-line'.
           (helm-occur-mode-goto-line))
       (user-error "No more matches"))))
 
