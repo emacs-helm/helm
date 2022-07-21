@@ -134,34 +134,35 @@ and second call within 1s runs `helm-swap-windows'."
   (lambda ()
     (interactive)
     (let (timer)
-      (unwind-protect
-           (progn
-             (call-interactively command)
-             (when delay
-               (setq timer (run-with-idle-timer
-                            delay nil (lambda () (keyboard-quit)))))
-             (while (let ((input (read-key prompt)) other kb com)
-                      (setq last-command-event input)
-                      (cond
-                        ((eq input subkey)
-                         (call-interactively command)
-                         (setq last-command command)
-                         t)
-                        ((setq other (assoc input other-subkeys))
-                         (call-interactively (cdr other))
-                         (setq last-command (cdr other))
-                         t)
-                        (t
-                         (setq kb (vector last-command-event))
-                         (setq com (lookup-key map kb))
-                         (if (commandp com)
-                             (call-interactively com)
-                           (setq unread-command-events
-                                 (nconc (mapcar #'identity kb)
-                                        unread-command-events)))
-                         nil)))))
-        (when timer (cancel-timer timer))
-        (and exit-fn (funcall exit-fn))))))
+      (call-interactively command)
+      (unless (or defining-kbd-macro executing-kbd-macro) 
+        (unwind-protect
+             (progn
+               (when delay
+                 (setq timer (run-with-idle-timer
+                              delay nil (lambda () (keyboard-quit)))))
+               (while (let ((input (read-key prompt)) other kb com)
+                        (setq last-command-event input)
+                        (cond
+                          ((eq input subkey)
+                           (call-interactively command)
+                           (setq last-command command)
+                           t)
+                          ((setq other (assoc input other-subkeys))
+                           (call-interactively (cdr other))
+                           (setq last-command (cdr other))
+                           t)
+                          (t
+                           (setq kb (vector last-command-event))
+                           (setq com (lookup-key map kb))
+                           (if (commandp com)
+                               (call-interactively com)
+                             (setq unread-command-events
+                                   (nconc (mapcar #'identity kb)
+                                          unread-command-events)))
+                           nil)))))
+          (when timer (cancel-timer timer))
+          (and exit-fn (funcall exit-fn)))))))
 
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
@@ -195,7 +196,9 @@ in MAP and then exit the loop running EXIT-FN, if specified.
 If DELAY an integer is specified exit after DELAY seconds.
 
 NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax
-and vectors, so don't use strings to define them."
+and vectors, so don't use strings to define them.  While defining
+or executing a kbd macro no SUBKEY or OTHER-SUBKEYS are provided,
+i.e. the loop is not entered after running COMMAND."
   (declare (indent 1))
   (let ((fn (helm-command-with-subkeys
              map subkey command other-subkeys prompt exit-fn delay))
