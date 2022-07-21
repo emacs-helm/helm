@@ -129,6 +129,40 @@ and second call within 1s runs `helm-swap-windows'."
   '(helm-toggle-resplit-window helm-swap-windows) 1)
 (put 'helm-toggle-resplit-and-swap-windows 'helm-only t)
 
+(defun helm-command-with-subkeys (map subkey command
+                                  &optional other-subkeys prompt exit-fn delay)
+  (lambda ()
+    (interactive)
+    (let (timer)
+      (unwind-protect
+           (progn
+             (call-interactively command)
+             (when delay
+               (setq timer (run-with-idle-timer
+                            delay nil (lambda () (keyboard-quit)))))
+             (while (let ((input (read-key prompt)) other kb com)
+                      (setq last-command-event input)
+                      (cond
+                        ((eq input subkey)
+                         (call-interactively command)
+                         (setq last-command command)
+                         t)
+                        ((setq other (assoc input other-subkeys))
+                         (call-interactively (cdr other))
+                         (setq last-command (cdr other))
+                         t)
+                        (t
+                         (setq kb (vector last-command-event))
+                         (setq com (lookup-key map kb))
+                         (if (commandp com)
+                             (call-interactively com)
+                           (setq unread-command-events
+                                 (nconc (mapcar #'identity kb)
+                                        unread-command-events)))
+                         nil)))))
+        (when timer (cancel-timer timer))
+        (and exit-fn (funcall exit-fn))))))
+
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
                                          &optional other-subkeys prompt exit-fn delay)
@@ -163,38 +197,29 @@ If DELAY an integer is specified exit after DELAY seconds.
 NOTE: SUBKEY and OTHER-SUBKEYS bindings support only char syntax
 and vectors, so don't use strings to define them."
   (declare (indent 1))
-  (define-key map key
-    (lambda ()
-      (interactive)
-      (let (timer)
-        (unwind-protect
-            (progn
-              (call-interactively command)
-              (when delay
-                (setq timer (run-with-idle-timer
-                             delay nil (lambda () (keyboard-quit)))))
-              (while (let ((input (read-key prompt)) other kb com)
-                       (setq last-command-event input)
-                       (cond
-                        ((eq input subkey)
-                         (call-interactively command)
-                         (setq last-command command)
-                         t)
-                        ((setq other (assoc input other-subkeys))
-                         (call-interactively (cdr other))
-                         (setq last-command (cdr other))
-                         t)
-                        (t
-                         (setq kb (vector last-command-event))
-                         (setq com (lookup-key map kb))
-                         (if (commandp com)
-                             (call-interactively com)
-                           (setq unread-command-events
-                                 (nconc (mapcar #'identity kb)
-                                        unread-command-events)))
-                         nil)))))
-          (when timer (cancel-timer timer))
-          (and exit-fn (funcall exit-fn)))))))
+  (let ((fn (helm-command-with-subkeys
+             map subkey command other-subkeys prompt exit-fn delay))
+        (com (intern (format "helm-%s-with-subkeys"
+                             (symbol-name command)))))
+    (defalias com fn
+      (concat
+       (format "Run `%s' and bound it to `%s' for subsequent calls."
+               command (if (numberp subkey) (char-to-string subkey) subkey))
+       (if other-subkeys
+           (helm-basic-docstring-from-alist other-subkeys)
+         "")))
+    (define-key map key com)))
+
+(defun helm-basic-docstring-from-alist (alist)
+  (let ((osk (cl-loop for (k . v) in alist
+                      concat (format ",`%s'"
+                                     (if (numberp k) (char-to-string k) k))
+                      into ks
+                      concat (format ",`%s'" v) into kv
+                      finally return (list (substring ks 1)
+                                           (substring kv 1)))))
+    (format "\nBound as well %s to respectively %s."
+            (car osk) (cadr osk))))
 
 ;;; Keymap
 ;;
