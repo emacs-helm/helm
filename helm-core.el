@@ -131,6 +131,7 @@ and second call within 1s runs `helm-swap-windows'."
 
 (defun helm-command-with-subkeys (map subkey command
                                   &optional other-subkeys prompt exit-fn delay)
+  "Return an anonymous interactive command to use with `helm-define-multi-key'."
   (lambda ()
     (interactive)
     (let (timer)
@@ -166,7 +167,9 @@ and second call within 1s runs `helm-swap-windows'."
 
 ;;;###autoload
 (defun helm-define-key-with-subkeys (map key subkey command
-                                         &optional other-subkeys prompt exit-fn delay)
+                                         &optional other-subkeys
+                                           prompt exit-fn delay
+                                           docstring)
   "Define in MAP a KEY and SUBKEY to COMMAND.
 
 This allows typing KEY to call COMMAND the first time and
@@ -205,12 +208,15 @@ i.e. the loop is not entered after running COMMAND."
         (com (intern (format "helm-%s-with-subkeys"
                              (symbol-name command)))))
     (defalias com fn
-      (concat
-       (format "Run `%s' and bound it to `%s' for subsequent calls."
-               command (if (numberp subkey) (char-to-string subkey) subkey))
-       (if other-subkeys
-           (helm-basic-docstring-from-alist other-subkeys)
-         "")))
+      (or docstring
+          ;; When no DOCSTRING, generate a basic one specifying
+          ;; COMMAND, SUBKEY and OTHER-SUBKEYS.
+          (concat
+           (format "Run `%s' and bound it to `%s' for subsequent calls."
+                   command (if (numberp subkey) (char-to-string subkey) subkey))
+           (if other-subkeys
+               (helm-basic-docstring-from-alist other-subkeys)
+             ""))))
     (define-key map key com)))
 
 (defun helm-basic-docstring-from-alist (alist)
