@@ -212,12 +212,12 @@ and vectors, so don't use strings to define them."
 
 (defun helm-basic-docstring-from-alist (alist)
   (let ((osk (cl-loop for (k . v) in alist
-                      concat (format ",`%s'"
-                                     (if (numberp k) (char-to-string k) k))
-                      into ks
-                      concat (format ",`%s'" v) into kv
-                      finally return (list (substring ks 1)
-                                           (substring kv 1)))))
+                      for count from 1
+                      for sep = (if (> count 1) "," "")
+                      for key = (if (numberp k) (char-to-string k) k)
+                      concat (format "%s`%s'" sep key) into ks
+                      concat (format "%s`%s'" sep v) into kv
+                      finally return (list ks kv))))
     (format "\nBound as well %s to respectively %s."
             (car osk) (cadr osk))))
 
