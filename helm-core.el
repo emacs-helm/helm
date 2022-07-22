@@ -220,15 +220,19 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map key com)))
 
 (defun helm-basic-docstring-from-alist (alist)
-  (let ((osk (cl-loop for (k . v) in alist
-                      for count from 1
-                      for sep = (if (> count 1) "," "")
-                      for key = (if (numberp k) (char-to-string k) k)
-                      concat (format "%s`%s'" sep key) into ks
-                      concat (format "%s`%s'" sep v) into kv
-                      finally return (list ks kv))))
-    (format "\nBound as well %s to respectively %s."
-            (car osk) (cadr osk))))
+  (let* ((len (length alist))
+         (osk (cl-loop for (k . v) in alist
+                       for count from 1
+                       for sep = (cond ((and (= count len) (> len 1))
+                                        " and ")
+                                       ((> count 1) ",")
+                                       (t ""))
+                       for key = (if (numberp k) (char-to-string k) k)
+                       concat (format "%s`%s'" sep key) into ks
+                       concat (format "%s`%s'" sep v) into kv
+                       finally return (list ks kv))))
+    (format "\nBound as well %s to %s%s."
+            (car osk) (if (> len 1) "respectively " "") (cadr osk))))
 
 ;;; Keymap
 ;;
