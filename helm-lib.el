@@ -452,21 +452,21 @@ found in SEQ."
               else return index
               finally return ls)))
 
-(defun helm-iter-list (seq)
-  "Return an iterator object from SEQ."
+(defun helm-iter-list (seq &optional cycle)
+  "Return an iterator object from SEQ.
+The iterator die and return nil when it reach end of SEQ.
+When CYCLE is specified the iterator never ends."
   (let ((lis seq))
     (lambda ()
       (let ((elm (car lis)))
-        (setq lis (cdr lis))
+        (setq lis (if cycle
+                      (or (cdr lis) seq)
+                    (cdr lis)))
         elm))))
 
 (defun helm-iter-circular (seq)
   "Infinite iteration on SEQ."
-  (let ((lis seq))
-     (lambda ()
-       (let ((elm (car lis)))
-         (setq lis (pcase lis (`(,_ . ,ll) (or ll seq))))
-         elm))))
+  (helm-iter-list seq 'cycle))
 
 (cl-defun helm-iter-sub-next-circular (seq elm &key (test 'eq))
   "Infinite iteration of SEQ starting at ELM."
