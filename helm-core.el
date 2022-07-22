@@ -111,11 +111,8 @@ DELAY seconds."
     (unless (and (car iterator)
                  ;; Reset iterator when another key is pressed.
                  (eq this-command real-last-command))
-      (setcar iterator (helm-iter-list (funcall fn))))
+      (setcar iterator (helm-iter-circular (funcall fn))))
     (setq next (helm-iter-next (car iterator)))
-    (unless next
-      (setcar iterator (helm-iter-list (funcall fn)))
-      (setq next (helm-iter-next (car iterator))))
     (and next (car iterator)
          (call-interactively (nth (1- next) functions)))
     (when delay (run-with-idle-timer
