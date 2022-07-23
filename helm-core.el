@@ -190,13 +190,6 @@ window handling a buffer, it is this one we store.")
 (defvar helm--tramp-archive-maybe-loaded nil)
 (defvar helm--original-dedicated-windows-alist nil
   "[INTERNAL] Store all dedicated windows with their dedicated state on startup")
-
-;; Easy access to customize
-;;;###autoload
-(defun helm-configuration ()
-  "Customize Helm."
-  (interactive)
-  (customize-group "helm"))
 
 ;;; Multi keys
 ;;
@@ -546,6 +539,13 @@ customize for immediate effect."
 (defgroup helm nil
   "Open Helm."
   :prefix "helm-" :group 'convenience)
+
+;; Easy access to customize
+;;;###autoload
+(defun helm-configuration ()
+  "Customize Helm."
+  (interactive)
+  (customize-group "helm"))
 
 (defcustom helm-completion-window-scroll-margin 5
   "`scroll-margin' to use for Helm completion window.
