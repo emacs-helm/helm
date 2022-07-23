@@ -3697,16 +3697,13 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
 (defun helm--run-init-hooks (hook sources)
   "Run after and before init hooks local to source.
 See :after-init-hook and :before-init-hook in `helm-source'."
-  (cl-loop with sname = (cl-ecase hook
-                          (before-init-hook "h-before-init-hook")
-                          (after-init-hook "h-after-init-hook"))
-           with h = (cl-gensym sname)
-           for s in sources
+  (cl-loop for s in sources
            for hv = (assoc-default hook s)
-           if (and hv (not (symbolp hv)))
-           do (set h hv)
-           and do (helm-log-run-hook h)
-           else do (helm-log-run-hook hv)))
+           if (symbolp hv)
+           do (helm-log-run-hook hv)
+           else return
+           (error "`%s' hook in source `%s' not specified as symbol function"
+                  hook (helm-attr 'name s))))
 
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."
