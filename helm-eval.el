@@ -22,6 +22,8 @@
 (require 'eldoc)
 (require 'edebug)
 
+(declare-function helm-lisp-completion-at-point "helm-elisp.el")
+
 
 (defgroup helm-eval nil
   "Eval related Applications and libraries for Helm."
