@@ -211,11 +211,15 @@ engine beeing completely different and also much faster."
         ;; When user mark defun with `mark-defun' with intention of
         ;; using helm-occur on this region, it is relevant to use the
         ;; thing-at-point located at previous position which have been
-        ;; pushed to `mark-ring'.
-        (setq def (save-excursion
-                    (goto-char (setq pos (car mark-ring)))
-                    (helm-aif (thing-at-point 'symbol) (regexp-quote it))))
-        (narrow-to-region (region-beginning) (region-end)))
+        ;; pushed to `mark-ring', if it's within the active region.
+        (let ((beg (region-beginning))
+              (end (region-end))
+              (prev-pos (car mark-ring)))
+          (when (and prev-pos (>= prev-pos beg) (< prev-pos end))
+            (setq def (save-excursion
+                        (goto-char (setq pos prev-pos))
+                        (helm-aif (thing-at-point 'symbol) (regexp-quote it)))))
+          (narrow-to-region beg end)))
       (unwind-protect
            (helm :sources 'helm-source-occur
                  :buffer "*helm occur*"
