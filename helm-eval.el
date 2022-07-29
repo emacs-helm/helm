@@ -138,7 +138,7 @@ Should take one arg: the string to display."
 (defun helm-show-info-in-mode-line (str)
   "Display string STR in mode-line."
   (save-selected-window
-    (with-current-buffer helm-buffer
+    (with-helm-window
       (let ((mode-line-format (concat " " str)))
         (force-mode-line-update)
         (sit-for helm-show-info-in-mode-line-delay))
