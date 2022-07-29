@@ -118,6 +118,9 @@ Should take one arg: the string to display."
   (with-selected-window (minibuffer-window)
     (push (current-buffer) helm-eldoc-active-minibuffers-list)))
 
+;; From emacs-28.1: As the eldoc API is nowaday a pain to use, try to
+;; provide some eldoc in mode-line the best as possible (may break at
+;; some point).
 (defun helm-eldoc-show-in-eval ()
   "Return eldoc in mode-line for current minibuffer input."
   (let ((buf (window-buffer (active-minibuffer-window))))
@@ -131,8 +134,12 @@ Should take one arg: the string to display."
                    (info-fn (eldoc-fnsym-in-current-sexp))
                    (doc     (or (eldoc-get-var-docstring sym)
                                 (eldoc-get-fnsym-args-string
-                                 (car info-fn) (cadr info-fn)))))
-              (when doc (funcall helm-eldoc-in-minibuffer-show-fn doc)))))
+                                 (car info-fn) (cadr info-fn))))
+                   (all (format "%s: %s"
+                                (propertize (symbol-name (or sym (car info-fn)))
+                                            'face 'font-lock-function-name-face)
+                                doc)))
+              (when doc (funcall helm-eldoc-in-minibuffer-show-fn all)))))
       (error (message "Eldoc in minibuffer error: %S" err) nil))))
 
 (defun helm-show-info-in-mode-line (str)
