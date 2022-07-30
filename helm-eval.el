@@ -127,18 +127,20 @@ Should take one arg: the string to display."
     (condition-case err
         (when (member buf helm-eldoc-active-minibuffers-list)
           (with-current-buffer buf
-            (let* ((sym     (save-excursion
-                              (unless (looking-back ")\\|\"" (1- (point)))
-                                (forward-char -1))
-                              (eldoc-current-symbol)))
-                   (info-fn (eldoc-fnsym-in-current-sexp))
-                   (doc     (or (eldoc-get-var-docstring sym)
+            (let* ((info-fn (eldoc-fnsym-in-current-sexp))
+                   (vsym    (eldoc-current-symbol))
+                   (sym     (car info-fn))
+                   (vardoc  (eldoc-get-var-docstring vsym))
+                   (doc     (or vardoc
                                 (eldoc-get-fnsym-args-string
-                                 (car info-fn) (cadr info-fn))))
-                   (all (format "%s: %s"
-                                (propertize (symbol-name (or sym (car info-fn)))
-                                            'face 'font-lock-function-name-face)
-                                doc)))
+                                 sym (cadr info-fn))))
+                   (all     (format "%s: %s"
+                                    (propertize
+                                     (symbol-name (if vardoc vsym sym))
+                                     'face (if vardoc
+                                               'font-lock-variable-name-face
+                                             'font-lock-function-name-face))
+                                    doc)))
               (when doc (funcall helm-eldoc-in-minibuffer-show-fn all)))))
       (error (message "Eldoc in minibuffer error: %S" err) nil))))
 
