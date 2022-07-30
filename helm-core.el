@@ -266,7 +266,7 @@ and second call within 1s runs `helm-swap-windows'."
 
 (defun helm-command-with-subkeys (map subkey command
                                   &optional other-subkeys prompt exit-fn delay)
-  "Return an anonymous interactive command to use with `helm-define-multi-key'."
+  "Return an anonymous interactive command to use with `helm-define-key-with-subkeys'."
   (lambda ()
     (interactive)
     (let (timer)
