@@ -181,6 +181,8 @@
    'helm-switch-to-buffer-at-linum
    "Browse project `C-x C-d'"
    'helm-buffers-browse-project
+   "Switch to shell"
+   'helm-buffer-switch-to-shell
    "Query replace regexp `C-M-%'"
    'helm-buffer-query-replace-regexp
    "Query replace `M-%'" 'helm-buffer-query-replace

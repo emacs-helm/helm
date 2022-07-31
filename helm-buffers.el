@@ -28,9 +28,11 @@
 
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
+(declare-function helm-ff-switch-to-shell "helm-files")
 
 (defvar dired-buffers)
 (defvar org-directory)
+(defvar helm-ff-default-directory)
 
 
 (defgroup helm-buffers nil
@@ -254,6 +256,7 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "M-R")       #'helm-buffer-run-rename-buffer)
     (define-key map (kbd "M-m")       #'helm-toggle-all-marks)
     (define-key map (kbd "M-a")       #'helm-mark-all)
+    (define-key map (kbd "M-e")       #'helm-buffer-run-switch-to-shell)
     (define-key map (kbd "C-]")       #'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     #'helm-buffers-toggle-show-hidden-buffers)
     (define-key map (kbd "C-M-SPC")   #'helm-buffers-mark-similar-buffers)
@@ -909,6 +912,19 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-kill-marked-buffers)))
 (put 'helm-buffer-run-kill-buffers 'helm-only t)
+
+(defun helm-buffer-switch-to-shell (candidate)
+  (require 'helm-files)
+  (let ((helm-ff-default-directory
+         (with-current-buffer candidate
+           default-directory)))
+    (helm-ff-switch-to-shell nil)))
+
+(defun helm-buffer-run-switch-to-shell ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-buffer-switch-to-shell)))
+(put 'helm-buffer-run-switch-to-shell 'no-helm-mx t)
 
 (defun helm-buffer-run-grep ()
   "Run Grep action from `helm-source-buffers-list'."
