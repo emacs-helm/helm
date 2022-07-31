@@ -2910,6 +2910,7 @@ HISTORY args see `helm'."
            do (progn (set-window-dedicated-p win nil)
                      (push `(,win . ,state) helm--original-dedicated-windows-alist)))
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
+  ;(setq minibuffer-follows-selected-frame (not helm--nested))
   ;; Launch tramp-archive with dbus-event in `while-no-input-ignore-events'.
   (helm--maybe-load-tramp-archive)
   ;; Activate the advices.
@@ -2938,12 +2939,17 @@ HISTORY args see `helm'."
         focus-follows-mouse
         mode-line-in-non-selected-windows
         minibuffer-completion-confirm
+        (ori--minibuffer-follows-selected-frame
+         (default-value 'minibuffer-follows-selected-frame))
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (helm-maybe-use-default-as-input
          (and (null input)
               (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                   (cl-loop for s in (helm-normalize-sources sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
+    ;; This allows giving the focus to a nested helm session which use
+    ;; a frame, like completion in `helm-eval-expression'.
+    (setq minibuffer-follows-selected-frame (not helm--nested))
     (unwind-protect
         (condition-case-unless-debug _v
             (let ( ;; `helm--source-name' is non-`nil'
@@ -2998,6 +3004,8 @@ HISTORY args see `helm'."
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
+      (setq minibuffer-follows-selected-frame
+            ori--minibuffer-follows-selected-frame)
       ;; Prevent error "No buffer named *helm*" triggered by
       ;; `helm-set-local-variable'.
       (setq helm--force-updating-p nil)
@@ -3180,7 +3188,7 @@ Don't use this directly, use instead `helm' with the keyword
           (orig-helm-last-frame-or-window-configuration
            helm-last-frame-or-window-configuration)
           (orig-one-window-p helm-onewindow-p)
-          (helm--nested t))
+          (helm--nested (if helm--buffer-in-new-frame-p 'share t)))
       ;; FIXME Using helm-full-frame here allow showing the new
       ;; helm-buffer in the same window as old helm-buffer, why?
       (helm-set-local-variable 'helm-full-frame t)
@@ -4035,7 +4043,14 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
       ;; Be sure we call cleanup functions from helm-buffer.
       (helm-compute-attr-in-sources 'cleanup)
       ;; Delete or make invisible helm frame.
-      (if (and helm--buffer-in-new-frame-p (null helm--nested))
+      (if (and helm--buffer-in-new-frame-p
+               ;; a helm session running in a frame that runs a nested
+               ;; session share the same frame for both sessions so
+               ;; don't delete the common frame.
+               ;; i.e. helm--nested == t   => delete
+               ;;      helm--nested == nil => delete
+               ;;      helm--nested == share => don't delete
+               (not (eq helm--nested 'share)))
           (progn
             (setq-local helm--last-frame-parameters
                         (helm--get-frame-parameters))
