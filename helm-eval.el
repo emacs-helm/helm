@@ -180,11 +180,12 @@ Should take one arg: the string to display."
 (defun helm-eval-expression (arg)
   "Preconfigured `helm' for `helm-source-evaluation-result'."
   (interactive "P")
-  (helm :sources (helm-build-evaluation-result-source)
-        :input (when arg (thing-at-point 'sexp))
-        :buffer "*helm eval*"
-        :echo-input-in-header-line nil
-        :history 'read-expression-history))
+  (let ((helm-elisp-help-function #'helm-elisp-show-doc-modeline))
+    (helm :sources (helm-build-evaluation-result-source)
+          :input (when arg (thing-at-point 'sexp))
+          :buffer "*helm eval*"
+          :echo-input-in-header-line nil
+          :history 'read-expression-history)))
 
 (defvar eldoc-idle-delay)
 ;;;###autoload
