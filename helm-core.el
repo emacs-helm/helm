@@ -2910,7 +2910,6 @@ HISTORY args see `helm'."
            do (progn (set-window-dedicated-p win nil)
                      (push `(,win . ,state) helm--original-dedicated-windows-alist)))
   (unless helm--nested (setq helm-initial-frame (selected-frame)))
-  ;(setq minibuffer-follows-selected-frame (not helm--nested))
   ;; Launch tramp-archive with dbus-event in `while-no-input-ignore-events'.
   (helm--maybe-load-tramp-archive)
   ;; Activate the advices.
@@ -2940,7 +2939,8 @@ HISTORY args see `helm'."
         mode-line-in-non-selected-windows
         minibuffer-completion-confirm
         (ori--minibuffer-follows-selected-frame
-         (default-value 'minibuffer-follows-selected-frame))
+         (and (boundp 'minibuffer-follows-selected-frame)
+              (default-value 'minibuffer-follows-selected-frame)))
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (helm-maybe-use-default-as-input
          (and (null input)
@@ -2948,8 +2948,12 @@ HISTORY args see `helm'."
                   (cl-loop for s in (helm-normalize-sources sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
     ;; This allows giving the focus to a nested helm session which use
-    ;; a frame, like completion in `helm-eval-expression'.
-    (setq minibuffer-follows-selected-frame (not helm--nested))
+    ;; a frame, like completion in
+    ;; `helm-eval-expression'. Unfortunately
+    ;; `minibuffer-follows-selected-frame' is available only in
+    ;; emacs-28+ (bug#2536).
+    (and ori--minibuffer-follows-selected-frame
+         (setq minibuffer-follows-selected-frame (not helm--nested)))
     (unwind-protect
         (condition-case-unless-debug _v
             (let ( ;; `helm--source-name' is non-`nil'
@@ -3004,8 +3008,9 @@ HISTORY args see `helm'."
       (helm-log "helm-alive-p = %S" (setq helm-alive-p nil))
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
-      (setq minibuffer-follows-selected-frame
-            ori--minibuffer-follows-selected-frame)
+      (and ori--minibuffer-follows-selected-frame
+           (setq minibuffer-follows-selected-frame
+                 ori--minibuffer-follows-selected-frame))
       ;; Prevent error "No buffer named *helm*" triggered by
       ;; `helm-set-local-variable'.
       (setq helm--force-updating-p nil)
