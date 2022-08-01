@@ -3483,7 +3483,9 @@ Function suitable for `helm-display-function',
 See `helm-display-buffer-height' and `helm-display-buffer-width'
 to configure frame size.
 
-Note that this feature is available only with emacs-25+."
+Note that this feature is available only with emacs-25+.
+Note also it is not working properly in helm nested session with emacs
+version < emacs-28."
   (cl-assert (and (fboundp 'window-absolute-pixel-edges)
                   (fboundp 'frame-geometry))
              nil "Helm buffer in own frame is only available starting at emacs-25+")
