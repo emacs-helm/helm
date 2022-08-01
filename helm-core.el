@@ -2953,7 +2953,12 @@ HISTORY args see `helm'."
     ;; `minibuffer-follows-selected-frame' is available only in
     ;; emacs-28+ (bug#2536).
     (and ori--minibuffer-follows-selected-frame
-         (setq minibuffer-follows-selected-frame (not helm--nested)))
+         (setq minibuffer-follows-selected-frame
+               (unless (or helm--nested
+                           ;; Allow keeping initial minibuffer visible
+                           ;; e.g. completion-at-point from  M-:.
+                           (minibufferp helm-current-buffer))
+                 t)))
     (unwind-protect
         (condition-case-unless-debug _v
             (let ( ;; `helm--source-name' is non-`nil'
