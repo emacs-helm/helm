@@ -180,12 +180,7 @@ Should take one arg: the string to display."
 (defun helm-eval-expression (arg)
   "Preconfigured `helm' for `helm-source-evaluation-result'."
   (interactive "P")
-  (let ((helm-elisp-help-function #'helm-elisp-show-doc-modeline)
-        (helm-show-completion-display-function
-         ;; Nested completion in a frame works only in emacs-28+ when
-         ;; minibuffer-follows-selected-frame is available.
-         (and (boundp 'minibuffer-follows-selected-frame)
-              (default-value 'helm-show-completion-display-function))))
+  (let ((helm-elisp-help-function #'helm-elisp-show-doc-modeline))
     (helm :sources (helm-build-evaluation-result-source)
           :input (when arg (thing-at-point 'sexp))
           :buffer "*helm eval*"
