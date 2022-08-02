@@ -655,9 +655,10 @@
     "  A local hook that run at beginning of initilization of this source.
   i.e Before the creation of `helm-buffer'.
 
-  Should be a variable (defined with defvar).
-  Can be also an anonymous function or a list of functions
-  directly added to slot, this is not recommended though.")
+  Should be a variable (a symbol) bound to a list of
+  functions or a single function (see `run-hooks' documentation).
+  Even better is to use `add-hook' to feed this variable.
+  Can be also an anonymous function, though it is not recommended.")
 
    (after-init-hook
     :initarg :after-init-hook
@@ -666,10 +667,11 @@
     :documentation
     "  A local hook that run at end of initilization of this source.
   i.e After the creation of `helm-buffer'.
-
-  Should be a variable.
-  Can be also an anonymous function or a list of functions
-  directly added to slot, this is not recommended though.")
+  
+  Should be a variable (a symbol) bound to a list of
+  functions or a single function (see `run-hooks' documentation).
+  Even better is to use `add-hook' to feed this variable.
+  Can be also an anonymous function, though it is not recommended.")
 
    (delayed
     :initarg :delayed
