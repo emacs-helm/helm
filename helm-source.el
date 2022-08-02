@@ -658,7 +658,8 @@
   Should be a variable (a symbol) bound to a list of
   functions or a single function (see `run-hooks' documentation).
   Even better is to use `add-hook' to feed this variable.
-  Can be also an anonymous function, though it is not recommended.")
+  Usage of an anonymous function, or a list of functions is still
+  supported but not recommended.")
 
    (after-init-hook
     :initarg :after-init-hook
@@ -671,7 +672,8 @@
   Should be a variable (a symbol) bound to a list of
   functions or a single function (see `run-hooks' documentation).
   Even better is to use `add-hook' to feed this variable.
-  Can be also an anonymous function, though it is not recommended.")
+  Usage of an anonymous function, or a list of functions is still
+  supported but not recommended.")
 
    (delayed
     :initarg :delayed
