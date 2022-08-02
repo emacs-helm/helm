@@ -3719,9 +3719,10 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
 See :after-init-hook and :before-init-hook in `helm-source'."
   (cl-loop for s in sources
            for hv = (assoc-default hook s)
-           if (and hv (not (symbolp hv))) ; A lambda.
-           do (funcall hv) ; Should raise an error with a list of lambdas.
-           else do (helm-log-run-hook hv)))
+           do (cl-typecase hv
+                (function (funcall hv))
+                (list (when (= (length hv) 1) (funcall (car hv))))
+                (t (helm-log-run-hook hv)))))
 
 (defun helm-restore-position-on-quit ()
   "Restore position in `helm-current-buffer' when quitting."
