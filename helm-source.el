@@ -1159,7 +1159,16 @@ The header line is based on one of `persistent-action-if',
       (let ((val (if (symbolp it)
                      (symbol-value it)
                    it)))
-        (setf (slot-value source 'requires-pattern) val))))
+        (setf (slot-value source 'requires-pattern) val)))
+  (let ((sname (slot-value source 'name)))
+    (pcase (slot-value source 'before-init-hook)
+      ((or (and (pred (functionp)) (pred (not symbolp)))
+           (pred (consp)))
+       (warn "Helm source `%s': before-init-hook Should be defined as a symbol" sname)))
+    (pcase (slot-value source 'after-init-hook)
+      ((or (and (pred (functionp)) (pred (not symbolp)))
+           (pred (consp)))
+       (warn "Helm source `%s': after-init-hook Should be defined as a symbol" sname)))))
 
 (cl-defmethod helm-setup-user-source ((_source helm-source)))
 
