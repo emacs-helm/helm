@@ -2963,6 +2963,10 @@ HISTORY args see `helm'."
               ;; `helm-eval-expression'. Unfortunately
               ;; `minibuffer-follows-selected-frame' is available only in
               ;; emacs-28+ (bug#2536).
+              ;; When non-nil (the default) the current active
+              ;; minibuffer is used in new frame, which is not what we
+              ;; want in helm when starting from an active minibuffer,
+              ;; either a helm minibuffer or something line M-:. 
               (and ori--minibuffer-follows-selected-frame
                    (setq minibuffer-follows-selected-frame
                          (unless (or helm--nested
