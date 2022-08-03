@@ -3504,7 +3504,7 @@ version < emacs-28."
            (prmt-size (length helm--prompt))
            (line-height (frame-char-height))
            tab-bar-mode
-           (default-frame-alist
+           (new-frame-alist
              (if resume
                  (buffer-local-value 'helm--last-frame-parameters
                                      (get-buffer buffer))
@@ -3556,7 +3556,7 @@ version < emacs-28."
         (with-helm-buffer
           (setq-local helm-echo-input-in-header-line
                       (not (> (cdr pos) half-screen-size)))))
-      (helm-display-buffer-popup-frame buffer default-frame-alist)
+      (helm-display-buffer-popup-frame buffer new-frame-alist)
       ;; When frame size have been modified manually by user restore
       ;; it to default value unless resuming or not using
       ;; `helm-display-buffer-reuse-frame'.
@@ -3589,7 +3589,8 @@ version < emacs-28."
                (frame-live-p helm-popup-frame))
       (delete-frame helm-popup-frame))
     (display-buffer
-     buffer '(display-buffer-pop-up-frame . nil))))
+     buffer `(display-buffer-pop-up-frame
+              . ((pop-up-frame-parameters . ,frame-alist))))))
 
 ;; Ensure to quit helm when user delete helm frame manually.
 ;; If user deletes another frame keep session running.
