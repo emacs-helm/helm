@@ -2947,18 +2947,6 @@ HISTORY args see `helm'."
               (or helm-maybe-use-default-as-input ; it is let-bounded so use it.
                   (cl-loop for s in (helm-normalize-sources sources)
                            thereis (memq s helm-sources-using-default-as-input))))))
-    ;; This allows giving the focus to a nested helm session which use
-    ;; a frame, like completion in
-    ;; `helm-eval-expression'. Unfortunately
-    ;; `minibuffer-follows-selected-frame' is available only in
-    ;; emacs-28+ (bug#2536).
-    (and ori--minibuffer-follows-selected-frame
-         (setq minibuffer-follows-selected-frame
-               (unless (or helm--nested
-                           ;; Allow keeping initial minibuffer visible
-                           ;; e.g. completion-at-point from  M-:.
-                           (minibufferp helm-current-buffer))
-                 t)))
     (unwind-protect
         (condition-case-unless-debug _v
             (let ( ;; `helm--source-name' is non-`nil'
@@ -2970,6 +2958,18 @@ HISTORY args see `helm'."
                   (helm-buffer (or buffer helm-buffer)))
               (helm-initialize
                resume input default sources)
+              ;; This allows giving the focus to a nested helm session which use
+              ;; a frame, like completion in
+              ;; `helm-eval-expression'. Unfortunately
+              ;; `minibuffer-follows-selected-frame' is available only in
+              ;; emacs-28+ (bug#2536).
+              (and ori--minibuffer-follows-selected-frame
+                   (setq minibuffer-follows-selected-frame
+                         (unless (or helm--nested
+                                     ;; Allow keeping initial minibuffer visible
+                                     ;; e.g. completion-at-point from  M-:.
+                                     (minibufferp helm-current-buffer))
+                           t)))
               ;; We don't display helm-buffer here to avoid popping
               ;; up a window or a frame when exiting immediately when
               ;; only one candidate (this avoid having the helm frame
