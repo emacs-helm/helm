@@ -2940,7 +2940,7 @@ HISTORY args see `helm'."
         minibuffer-completion-confirm
         (ori--minibuffer-follows-selected-frame
          (and (boundp 'minibuffer-follows-selected-frame)
-              (default-value 'minibuffer-follows-selected-frame)))
+              (default-toplevel-value 'minibuffer-follows-selected-frame)))
         (input-method-verbose-flag helm-input-method-verbose-flag)
         (helm-maybe-use-default-as-input
          (and (null input)
@@ -3014,8 +3014,8 @@ HISTORY args see `helm'."
       (helm--remap-mouse-mode -1)       ; Reenable mouse bindings.
       (setq helm-alive-p nil)
       (and ori--minibuffer-follows-selected-frame
-           (setq minibuffer-follows-selected-frame
-                 ori--minibuffer-follows-selected-frame))
+           (set-default-toplevel-value 'minibuffer-follows-selected-frame
+                                       ori--minibuffer-follows-selected-frame))
       ;; Prevent error "No buffer named *helm*" triggered by
       ;; `helm-set-local-variable'.
       (setq helm--force-updating-p nil)
