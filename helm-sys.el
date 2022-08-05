@@ -416,6 +416,19 @@ Show actions only on line starting by a PID."
             (let (tabulated-list-use-header-line)
               (list-processes--refresh)))
     :candidates (lambda () (mapcar #'process-name (process-list)))
+    :candidate-transformer
+    (lambda (candidates)
+      (cl-loop for c in candidates
+               for command = (mapconcat
+                              'identity
+                              (process-command (get-process c)) " ")
+               if (and command (not (string= command ""))) collect
+               (cons (concat c " --> "
+                              (mapconcat 'identity
+                                         (process-command (get-process c)) " "))
+                     c)
+               else collect c))
+    :multiline t
     :persistent-action (lambda (elm)
                          (delete-process (get-process elm))
                          (helm-delete-current-selection))
@@ -443,7 +456,9 @@ Show actions only on line starting by a PID."
 (defun helm-list-emacs-process ()
   "Preconfigured `helm' for Emacs process."
   (interactive)
-  (helm-other-buffer 'helm-source-emacs-process "*helm process*"))
+  (helm :sources 'helm-source-emacs-process
+        :truncate-lines t
+        :buffer "*helm process*"))
 
 ;;;###autoload
 (defun helm-xrandr-set ()
