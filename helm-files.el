@@ -797,6 +797,12 @@ to nil to avoid error messages when using `helm-find-files'."
   "Delay in seconds between each image in slideshow."
   :type 'integer)
 
+(defcustom helm-file-name-history-hide-deleted nil
+  "Hide deleted files in file-name-history when non nil.
+
+This can be toggled at any time from `helm-ff-file-name-history' with \
+\\<helm-file-name-history-map>\\[helm-file-name-history-show-or-hide-deleted]."
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -6038,8 +6044,6 @@ list."
 ;;; File name history
 ;;
 ;;
-(defvar helm--file-name-history-hide-deleted nil)
-
 (defun helm-files-save-file-name-history (&optional force)
   "Save marked files to `file-name-history'."
   (let* ((src (helm-get-current-source))
@@ -6078,8 +6082,8 @@ list."
 
 (defun helm-file-name-history-show-or-hide-deleted ()
   (interactive)
-  (setq helm--file-name-history-hide-deleted
-        (not helm--file-name-history-hide-deleted))
+  (setq helm-file-name-history-hide-deleted
+        (not helm-file-name-history-hide-deleted))
   (helm-update))
 (put 'helm-file-name-history-show-or-hide-deleted 'helm-only t)
 
@@ -6105,7 +6109,7 @@ list."
                               (concat (propertize c 'face 'helm-ff-file)
                                       (make-string (1+ (- lgst (length c))) ? )
                                       last-access)))
-                            (t (unless helm--file-name-history-hide-deleted
+                            (t (unless helm-file-name-history-hide-deleted
                                  (propertize c 'face 'helm-history-deleted))))
            when disp
            collect (cons (if helm-ff-icon-mode
