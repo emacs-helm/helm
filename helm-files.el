@@ -6146,6 +6146,8 @@ list."
                          (when helm-ff-file-name-history-use-recentf
                            (require 'recentf)
                            (or recentf-mode (recentf-mode 1)))))
+               :candidate-number-limit (or (get 'file-name-history 'history-length)
+                                           history-length)
                :candidates (lambda ()
                              (if helm-ff-file-name-history-use-recentf
                                  recentf-list
