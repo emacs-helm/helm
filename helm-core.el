@@ -3727,7 +3727,7 @@ See :after-init-hook and :before-init-hook in `helm-source'."
            when hv
            do (pcase hv
                 ((and (pred (functionp))
-                      (pred (not symbolp))) 
+                      (guard (not (symbolp hv)))) 
                  (funcall hv))
                 ((and hook (pred (listp)))
                  (dolist (h hook) (funcall h)))

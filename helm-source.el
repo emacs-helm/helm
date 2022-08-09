@@ -1162,7 +1162,7 @@ The header line is based on one of `persistent-action-if',
         (setf (slot-value source 'requires-pattern) val)))
   (let ((sname (slot-value source 'name)))
     (pcase (slot-value source 'before-init-hook)
-      ((or (and (pred (functionp)) (pred (not symbolp)))
+      ((or (and val (pred (functionp)) (guard (not (symbolp val))))
            (pred (consp)))
        (warn "Helm source `%s': before-init-hook Should be defined as a symbol" sname)))
     (pcase (slot-value source 'after-init-hook)
