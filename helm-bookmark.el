@@ -61,6 +61,15 @@
   "Display candidates with an icon with `all-the-icons' when non nil."
   :type 'boolean)
 
+(defcustom helm-bookmark-default-sort-method 'adaptive
+  "Sort method for `helm-filtered-bookmarks'.
+
+Value can be either \\='native' or \\='adaptive'.
+Changes take effect only when Emacs restart."
+  :type '(choice
+          (symbol :tag "Helm adaptive sort method" adaptive)
+          (symbol :tag "Native bookmark sort method" native)))
+
 
 (defgroup helm-bookmark-faces nil
   "Customize the appearance of helm-bookmark."
@@ -133,7 +142,11 @@
                       (bookmark-maybe-load-default-file)
                       (helm-init-candidates-in-buffer
                           'global
-                        (bookmark-all-names))))
+                        (if (and (fboundp 'bookmark-maybe-sort-alist)
+                                 (fboundp 'bookmark-name-from-full-record))
+                            (mapcar 'bookmark-name-from-full-record
+                                    (bookmark-maybe-sort-alist))
+                          (bookmark-all-names)))))
     (filtered-candidate-transformer :initform 'helm-bookmark-transformer)
     (find-file-target :initform #'helm-bookmarks-quit-an-find-file-fn)))
 
@@ -307,7 +320,10 @@ BOOKMARK is a bookmark name or a bookmark record."
 
 (defun helm-bookmark-filter-setup-alist (fn)
   "Return a filtered `bookmark-alist' sorted alphabetically."
-  (cl-loop for b in bookmark-alist
+  (cl-loop for b in (if (and (fboundp 'bookmark-maybe-sort-alist)
+                             (eq helm-bookmark-default-sort-method 'native))
+                             (bookmark-maybe-sort-alist)
+                      bookmark-alist)
            for name = (car b)
            when (funcall fn b) collect
            (propertize name 'location (bookmark-location name))))
@@ -360,8 +376,10 @@ If `browse-url-browser-function' is set to something else than
 ;;
 (defclass helm-source-filtered-bookmarks (helm-source-in-buffer helm-type-bookmark)
   ((filtered-candidate-transformer
-    :initform '(helm-adaptive-sort
-                helm-highlight-bookmark))
+    :initform (delq nil
+                    `(,(and (eq helm-bookmark-default-sort-method 'adaptive)
+                            'helm-adaptive-sort)
+                       helm-highlight-bookmark)))
    (find-file-target :initform #'helm-bookmarks-quit-an-find-file-fn)))
 
 (defun helm-bookmarks-quit-an-find-file-fn (source)
@@ -542,9 +560,9 @@ If `browse-url-browser-function' is set to something else than
             (helm-init-candidates-in-buffer
                 'global (helm-bookmark-uncategorized-setup-alist)))))
 
+
 ;;; Transformer
 ;;
-
 (defun helm-highlight-bookmark (bookmarks _source)
   "Used as `filtered-candidate-transformer' to colorize bookmarks."
   (let ((non-essential t))
