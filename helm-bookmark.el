@@ -692,24 +692,30 @@ renamed."
   (let* ((helm--reading-passwd-or-string t)
          (bookmark-fname (bookmark-get-filename bookmark-name))
          (bookmark-loc   (bookmark-prop-get bookmark-name 'location))
+         (message-id     (bookmark-prop-get bookmark-name 'message-id))
          (new-name       (read-from-minibuffer "Name: " bookmark-name))
-         (new-loc        (read-from-minibuffer "FileName or Location: "
-                                               (or bookmark-fname
-                                                   (if (consp bookmark-loc)
-                                                       (car bookmark-loc)
-                                                     bookmark-loc))))
-         (docid           (and (eq handler 'mu4e-bookmark-jump)
-                               (read-number "Docid: " (cdr bookmark-loc)))))
-    (when docid
-      (setq new-loc (cons new-loc docid)))
-    (when (and (not (equal new-name "")) (not (equal new-loc ""))
+         (new-loc        (and (or bookmark-fname bookmark-loc)
+                              (read-from-minibuffer "FileName or Location: "
+                                                    (or bookmark-fname
+                                                        (if (consp bookmark-loc)
+                                                            (car bookmark-loc)
+                                                          bookmark-loc)))))
+         (new-message-id (and (memq handler '(mu4e--jump-to-bookmark
+                                              mu4e-bookmark-jump))
+                              (read-string "Message-id: " message-id))))
+    (when (and (not (equal new-name ""))
+               (or (not (equal new-loc ""))
+                   (not (equal new-message-id "")))
                (y-or-n-p "Save changes? "))
       (if bookmark-fname
           (progn
             (helm-bookmark-rename bookmark-name new-name 'batch)
             (bookmark-set-filename new-name new-loc))
         (bookmark-prop-set
-         (bookmark-get-bookmark bookmark-name) 'location new-loc)
+         (bookmark-get-bookmark bookmark-name)
+         (cond (new-loc 'location)
+               (new-message-id 'message-id))
+         (or new-loc new-message-id))
         (helm-bookmark-rename bookmark-name new-name 'batch))
       (helm-bookmark-maybe-save-bookmark)
       (list new-name new-loc))))
