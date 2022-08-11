@@ -322,7 +322,7 @@ BOOKMARK is a bookmark name or a bookmark record."
   "Return a filtered `bookmark-alist' sorted alphabetically."
   (cl-loop for b in (if (and (fboundp 'bookmark-maybe-sort-alist)
                              (eq helm-bookmark-default-sort-method 'native))
-                             (bookmark-maybe-sort-alist)
+                        (bookmark-maybe-sort-alist)
                       bookmark-alist)
            for name = (car b)
            when (funcall fn b) collect
