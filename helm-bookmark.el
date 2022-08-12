@@ -64,12 +64,19 @@
 (defcustom helm-bookmark-default-sort-method 'adaptive
   "Sort method for `helm-filtered-bookmarks'.
 
-Value can be either \\='native' or \\='adaptive'.
-Changes take effect only when Emacs restart."
+Value can be either \\='native' or \\='adaptive'."
   :type '(choice
           (symbol :tag "Helm adaptive sort method" adaptive)
-          (symbol :tag "Native bookmark sort method" native)))
-
+          (symbol :tag "Native bookmark sort method" native))
+  ;; Don't use the :set function until functions and variables below
+  ;; are not loaded i.e. use set-default only for now.
+  :initialize 'custom-initialize-changed
+  :set (lambda (var val)
+         (set var val)
+         (cl-loop for s in (remove 'helm-source-bookmark-set
+                                   helm-bookmark-default-filtered-sources)
+                  for fn = (intern (format "%s-builder" s))
+                  do (set s (funcall fn)))))
 
 (defgroup helm-bookmark-faces nil
   "Customize the appearance of helm-bookmark."
