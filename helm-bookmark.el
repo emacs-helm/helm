@@ -64,7 +64,10 @@
 (defcustom helm-bookmark-default-sort-method 'adaptive
   "Sort method for `helm-filtered-bookmarks'.
 
-Value can be either \\='native' or \\='adaptive'."
+Value can be either \\='native' or \\='adaptive'.
+
+Once you use \\='native' the bookmark variable `bookmark-sort-flag'
+will be honored."
   :type '(choice
           (symbol :tag "Helm adaptive sort method" adaptive)
           (symbol :tag "Native bookmark sort method" native))
