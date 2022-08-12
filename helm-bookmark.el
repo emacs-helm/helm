@@ -392,18 +392,25 @@ If `browse-url-browser-function' is set to something else than
             it (expand-file-name it))
       (expand-file-name default-directory))))
 
+(defun helm-bookmark-build-source (name buildfn &optional class &rest args)
+  (apply #'helm-make-source name
+         (or class 'helm-source-filtered-bookmarks)
+         :init (lambda ()
+                 (bookmark-maybe-load-default-file)
+                 (helm-init-candidates-in-buffer
+                     'global (funcall buildfn)))
+         args))
+
 ;;; W3m bookmarks.
 ;;
 (defun helm-bookmark-w3m-setup-alist ()
   "Specialized filter function for bookmarks w3m."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-w3m-bookmark-p))
 
-(defvar helm-source-bookmark-w3m
-  (helm-make-source "Bookmark W3m" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-w3m-setup-alist)))))
+(defun helm-source-bookmark-w3m-builder ()
+  (helm-bookmark-build-source "Bookmark W3m" #'helm-bookmark-w3m-setup-alist))
+
+(defvar helm-source-bookmark-w3m (helm-source-bookmark-w3m-builder))
 
 ;;; Images
 ;;
@@ -411,12 +418,10 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for images bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-image-bookmark-p))
 
-(defvar helm-source-bookmark-images
-  (helm-make-source "Bookmark Images" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-images-setup-alist)))))
+(defun helm-source-bookmark-images-builder ()
+  (helm-bookmark-build-source "Bookmark Images" #'helm-bookmark-images-setup-alist))
+
+(defvar helm-source-bookmark-images (helm-source-bookmark-images-builder))
 
 ;;; Woman Man
 ;;
@@ -424,12 +429,10 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for bookmarks w3m."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-woman-man-bookmark-p))
 
-(defvar helm-source-bookmark-man
-  (helm-make-source "Bookmark Woman&Man" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-man-setup-alist)))))
+(defun helm-source-bookmark-man-builder ()
+  (helm-bookmark-build-source "Bookmark Woman&Man" #'helm-bookmark-man-setup-alist))
+
+(defvar helm-source-bookmark-man (helm-source-bookmark-man-builder))
 
 ;;; Org files
 ;;
@@ -437,12 +440,10 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for Org file bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-org-file-p))
 
-(defvar helm-source-bookmark-org
-  (helm-make-source " Bookmarked Org files" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-org-setup-alist)))))
+(defun helm-source-bookmark-org-builder ()
+  (helm-bookmark-build-source "Bookmark Org files" #'helm-bookmark-org-setup-alist))
+
+(defvar helm-source-bookmark-org (helm-source-bookmark-org-builder))
 
 ;;; Gnus
 ;;
@@ -450,24 +451,20 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for bookmarks gnus."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-gnus-bookmark-p))
 
-(defvar helm-source-bookmark-gnus
-  (helm-make-source "Bookmark Gnus" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-gnus-setup-alist)))))
+(defun helm-source-bookmark-gnus-builder ()
+  (helm-bookmark-build-source "Bookmark Gnus" #'helm-bookmark-gnus-setup-alist))
+
+(defvar helm-source-bookmark-gnus (helm-source-bookmark-gnus-builder))
 
 ;;; Mu4e
 ;;
 (defun helm-bookmark-mu4e-setup-alist ()
   (helm-bookmark-filter-setup-alist 'helm-bookmark-mu4e-bookmark-p))
 
-(defvar helm-source-bookmark-mu4e
-  (helm-make-source "Bookmark Mu4e" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-mu4e-setup-alist)))))
+(defun helm-source-bookmark-mu4e-builder ()
+  (helm-bookmark-build-source "Bookmark Mu4e" #'helm-bookmark-mu4e-setup-alist))
+
+(defvar helm-source-bookmark-mu4e (helm-source-bookmark-mu4e-builder))
 
 ;;; Info
 ;;
@@ -475,12 +472,10 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for bookmarks info."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-info-bookmark-p))
 
-(defvar helm-source-bookmark-info
-  (helm-make-source "Bookmark Info" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-info-setup-alist)))))
+(defun helm-source-bookmark-info-builder ()
+  (helm-bookmark-build-source "Bookmark Info" #'helm-bookmark-info-setup-alist))
+
+(defvar helm-source-bookmark-info (helm-source-bookmark-info-builder))
 
 ;;; Files and directories
 ;;
@@ -488,12 +483,12 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for bookmarks locals files."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-file-p))
 
+(defun helm-source-bookmark-files&dirs-builder ()
+  (helm-bookmark-build-source
+   "Bookmark Files&Directories" #'helm-bookmark-local-files-setup-alist))
+
 (defvar helm-source-bookmark-files&dirs
-  (helm-make-source "Bookmark Files&Directories" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-local-files-setup-alist)))))
+  (helm-source-bookmark-files&dirs-builder))
 
 ;;; Helm find files sessions.
 ;;
@@ -538,14 +533,16 @@ If `browse-url-browser-function' is set to something else than
                                           helm-bookmark-override-inheritor)
   ())
 
+(defun helm-source-bookmark-helm-find-files-builder ()
+  (helm-bookmark-build-source
+   "Bookmark helm-find-files sessions"
+   #'helm-bookmark-helm-find-files-setup-alist
+   'helm-bookmark-find-files-class
+   :persistent-action (lambda (_candidate) (ignore))
+   :persistent-help "Do nothing"))
+
 (defvar helm-source-bookmark-helm-find-files
-  (helm-make-source "Bookmark helm-find-files sessions" 'helm-bookmark-find-files-class
-      :init (lambda ()
-              (bookmark-maybe-load-default-file)
-              (helm-init-candidates-in-buffer
-                  'global (helm-bookmark-helm-find-files-setup-alist)))
-      :persistent-action (lambda (_candidate) (ignore))
-      :persistent-help "Do nothing"))
+  (helm-source-bookmark-helm-find-files-builder))
 
 ;;; Uncategorized bookmarks
 ;;
@@ -553,12 +550,12 @@ If `browse-url-browser-function' is set to something else than
   "Specialized filter function for uncategorized bookmarks."
   (helm-bookmark-filter-setup-alist 'helm-bookmark-uncategorized-bookmark-p))
 
+(defun helm-source-bookmark-uncategorized-builder ()
+  (helm-bookmark-build-source
+   "Bookmark uncategorized" #'helm-bookmark-uncategorized-setup-alist))
+
 (defvar helm-source-bookmark-uncategorized
-  (helm-make-source "Bookmark uncategorized" 'helm-source-filtered-bookmarks
-    :init (lambda ()
-            (bookmark-maybe-load-default-file)
-            (helm-init-candidates-in-buffer
-                'global (helm-bookmark-uncategorized-setup-alist)))))
+  (helm-source-bookmark-uncategorized-builder))
 
 
 ;;; Transformer
