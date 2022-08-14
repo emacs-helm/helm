@@ -1201,6 +1201,35 @@ Example:
           (cl-return str)
         (message "Please answer by %s" (mapconcat 'identity answer-list ", "))
         (sit-for 1)))))
+
+(defun helm-read-answer-dolist-with-action (prompt list action)
+  "Read answer with PROMPT and execute ACTION on each element of LIST.
+
+Argument PROMPT is a format spec string e.g. \"Do this on %s?\"
+which take each elements of LIST as argument, no need to provide
+the help part i.e. [y,n,!,q] it will be already added.
+
+While looping through LIST, ACTION is executed on each elements
+differently depending of answer:
+
+- y  Execute ACTION on element.
+- n  Skip element.
+- !  Don't ask anymore and execute ACTION on remaining elements.
+- q  Skip all remaining elements."
+  (let (dont-ask)
+    (catch 'break
+      (dolist (elm list)
+        (if dont-ask
+            (funcall action elm)
+          (pcase (helm-read-answer
+                  (format (concat prompt "[y,n,!,q]") elm)
+                  '("y" "n" "!" "q"))
+            ("y" (funcall action elm))
+            ("n" (ignore))
+            ("!" (prog1
+                     (funcall action elm)
+                   (setq dont-ask t)))
+            ("q" (throw 'break nil))))))))
 
 ;;; Symbols routines
 ;;
@@ -1904,6 +1933,7 @@ broken."
      ("(\\<\\(helm-acond\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-aand\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-with-gensyms\\)\\>" 1 font-lock-keyword-face)
+     ("(\\<\\(helm-read-answer-dolist-with-action\\)\\>" 1 font-lock-keyword-face)
      ("(\\<\\(helm-read-answer\\)\\>" 1 font-lock-keyword-face))))
 
 (provide 'helm-lib)

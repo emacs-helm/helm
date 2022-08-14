@@ -5840,10 +5840,9 @@ directories are always deleted with no warnings."
                                               "*helm delete files*"))
                        (delete-file helm-ff-delete-log-file))
                      (when buffers
-                       (dolist (buf buffers)
-                         (let ((last-nonmenu-event t))
-                           (when (y-or-n-p (format "Kill buffer %s, too? " buf))
-                             (kill-buffer buf)))))
+                       (helm-read-answer-dolist-with-action
+                        "Kill buffer `%s', too? "
+                        buffers #'kill-buffer))
                      (run-with-timer
                       0.1 nil
                       (lambda ()
