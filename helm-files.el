@@ -5810,10 +5810,23 @@ directories are always deleted with no warnings."
   (let* ((files (helm-marked-candidates :with-wildcard t))
          (trash (helm-ff--delete-by-moving-to-trash (car files)))
          (prmt (if trash "Trash" "Delete"))
-         (buffers (cl-loop for file in files
-                           for buf = (helm-file-buffers file)
-                           when buf append buf))
-         (callback (lambda (result)
+         buffers callback already-trashed
+         ;; Workaround emacs-26 bug with tramp see
+         ;; https://github.com/jwiegley/emacs-async/issues/80.
+         (async-quiet-switch "-q"))
+    (cl-loop with trash-alist = (and trash (helm-ff-trash-list (helm-trash-directory)))
+             for f in files
+             for buf = (helm-file-buffers f)
+             for trashed = (helm-ff-file-already-trashed f trash-alist)
+             for dot-file-p = (helm-ff-dot-file-p f)
+             when (and helm-ff-signal-error-on-dot-files
+                             dot-file-p)
+             do (cl-return (error "Error: Cannot operate on `.' or `..'"))
+             when buf
+             do (setq buffers (nconc buf buffers))
+             when trashed
+             do (push trashed already-trashed ))
+    (setq callback (lambda (result)
                      (helm-ff--delete-async-modeline-mode -1)
                      (when (file-exists-p helm-ff-delete-log-file)
                        (display-warning 'helm
@@ -5839,15 +5852,6 @@ directories are always deleted with no warnings."
                          'helm-delete-async-message
                          (if trash "Trashing" "Deleting")
                          result (length files))))))
-         ;; Workaround emacs-26 bug with tramp see
-         ;; https://github.com/jwiegley/emacs-async/issues/80.
-         (async-quiet-switch "-q")
-         (trash-alist (and trash (helm-ff-trash-list (helm-trash-directory))))
-         (already-trashed
-          (and trash
-               (cl-loop for f in files
-                        when (helm-ff-file-already-trashed f trash-alist)
-                        collect f))))
     (setq helm-ff--trash-flag trash)
     (with-helm-display-marked-candidates
       helm-marked-buffer-name
