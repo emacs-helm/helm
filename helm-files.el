@@ -5825,7 +5825,7 @@ directories are always deleted with no warnings."
              when buf
              do (setq buffers (nconc buf buffers))
              when trashed
-             do (push trashed already-trashed ))
+             do (push trashed already-trashed))
     (setq callback (lambda (result)
                      (helm-ff--delete-async-modeline-mode -1)
                      (when (file-exists-p helm-ff-delete-log-file)
