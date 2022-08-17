@@ -2230,11 +2230,12 @@ when predicate helm-ff-candidates-lisp-p returns non-nil:
   (let* ((actions     (helm-get-attr 'action source 'ignorefn))
          (action-transformers (helm-get-attr 'action-transformer source))
          (new-action  (list (cons name fn)))
-         (transformer (lambda (actions candidate)
-                        (cond ((funcall predicate candidate)
-                               (helm-append-at-nth
-                                actions new-action index))
-                              (t actions)))))
+         (transformer (lambda (actions _candidate)
+                        (let ((candidate (car (helm-marked-candidates))))
+                          (cond ((funcall predicate candidate)
+                                 (helm-append-at-nth
+                                  actions new-action index))
+                                (t actions))))))
     (when (functionp actions)
       (helm-set-attr 'action (list (cons "Default action" actions)) source))
     (when (or (symbolp action-transformers) (functionp action-transformers))
@@ -2397,9 +2398,7 @@ of (action-display . function)."
            ;; type so that the actions added by transformer fit with
            ;; all marked (previously we were looping on each marked
            ;; but it is too costly for the benefit it brings).
-           (if marked
-               (car marked)
-             (helm-get-selection nil nil src)))
+           (car marked))
         actions))))
 
 (defun helm-get-current-source ()

@@ -1046,11 +1046,12 @@ an eieio class."
   (let* ((actions     (slot-value source 'action))
          (action-transformers (slot-value source 'action-transformer))
          (new-action  (list (cons name fn)))
-         (transformer (lambda (actions candidate)
-                        (cond ((funcall predicate candidate)
-                               (helm-append-at-nth
-                                actions new-action index))
-                              (t actions)))))
+         (transformer (lambda (actions _candidate)
+                        (let ((candidate (car (helm-marked-candidates))))
+                          (cond ((funcall predicate candidate)
+                                 (helm-append-at-nth
+                                  actions new-action index))
+                                (t actions))))))
     (cond ((functionp actions)
            (setf (slot-value source 'action) (list (cons "Default action" actions))))
           ((listp actions)
