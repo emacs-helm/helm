@@ -1185,14 +1185,13 @@ accepted.
 
 Example:
 
-    (let ((answer (helm-read-answer
-                    \"answer [y,n,!,q]: \"
-                    \\='(\"y\" \"n\" \"!\" \"q\"))))
-      (pcase answer
-          (\"y\" \"yes\")
-          (\"n\" \"no\")
-          (\"!\" \"all\")
-          (\"q\" \"quit\")))
+    (pcase (helm-read-answer
+             \"answer [y,n,!,q]: \"
+             \\='(\"y\" \"n\" \"!\" \"q\"))
+       (\"y\" \"yes\")
+       (\"n\" \"no\")
+       (\"!\" \"all\")
+       (\"q\" \"quit\"))
 
 "
   (helm-awhile (read-key (propertize prompt 'face 'minibuffer-prompt))
