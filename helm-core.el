@@ -493,15 +493,14 @@ Default to Helm group when group is not defined in source."
 (put 'helm-customize-group 'helm-only t)
 
 (defun helm--action-at-nth-set-fn-1 (value &optional negative)
-  (cl-loop for n from 1 to 9
-           for key = (format value n)
-           for sym = (make-symbol (format "helm-execute-selection-action-at-nth-+%d" n))
-           for fn = `(lambda ()
-                       (interactive)
-                       (helm-execute-selection-action-at-nth ,(if negative (- n) n)))
-           do (progn
-                (defalias sym fn)
-                (define-key helm-map (kbd key) sym))))
+  (dotimes (n 9)
+    (let ((key (format value (1+ n)))
+          (fn (lambda ()
+                (interactive)
+                (helm-execute-selection-action-at-nth
+                 (if negative (- (1+ n)) (1+ n))))))
+      (define-key helm-map (kbd key) nil)
+      (define-key helm-map (kbd key) fn))))
 
 (defun helm--action-at-nth-set-fn- (var val)
   (set var val)
