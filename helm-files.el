@@ -4952,7 +4952,7 @@ Special commands:
     (setq helm-ff--thumbnailed-directories
           (delete helm-ff-default-directory helm-ff--thumbnailed-directories)))
   (helm-update (regexp-quote (replace-regexp-in-string
-                              "\\` *" "" (helm-get-selection nil t)))))
+                              "\\`[[:multibyte:] ]*" "" (helm-get-selection nil t)))))
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
 
 ;;;###autoload
