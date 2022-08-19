@@ -4104,6 +4104,10 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   ;; `helm-set-local-variable'.
   (setq helm--force-updating-p nil)
   (setq helm--buffer-in-new-frame-p nil)
+  ;; Reset helm-pattern so that value of previous session doesn't
+  ;; interfere with next session (bug#2530).
+  (setq helm-pattern ""
+        helm-input "")
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
   (helm-clean-up-minibuffer))
