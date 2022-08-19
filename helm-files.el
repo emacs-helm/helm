@@ -4775,8 +4775,8 @@ file."
             (append helm-ff--image-cache
                     (list (expand-file-name candidate)))))
     (with-current-buffer buf
-      (rename-buffer helm-ff-image-native-buffer)
-      (display-buffer buf))))
+      (rename-buffer helm-ff-image-native-buffer))
+    (display-buffer buf)))
 
 ;;; Slideshow action
 ;;
