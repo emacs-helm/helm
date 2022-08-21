@@ -265,11 +265,9 @@ available APPEND is ignored."
                          ;; Replace in `dired-directory' files that have
                          ;; been modified with their new name keeping
                          ;; the ones that are unmodified at the same place.
-                         (cl-loop with old-to-rename = (mapcar 'car files-renamed)
-                                  for f in (cdr dired-directory)
-                                  if (member f old-to-rename)
-                                  collect (assoc-default f files-renamed)
-                                  else collect f))))
+                         (cl-loop for f in (cdr dired-directory)
+                                  collect (or (assoc-default f files-renamed)
+                                              f)))))
 	  ;; Re-sort the buffer if all went well.
 	  (unless (> errors 0) (revert-buffer))
 	  (let ((inhibit-read-only t))
