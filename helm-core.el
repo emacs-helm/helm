@@ -3701,18 +3701,19 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
   ;; See bug#2530 and https://github.com/emacs-helm/helm-mu/issues/54.
   ;; Input should have precedence on default.
   (cond (input
-         (setq helm-input input
+         (setq helm-input   input
                helm-pattern input))
-        (default
-         (setq helm-pattern (or (and helm-maybe-use-default-as-input
-                                     (or (if (listp default)
-                                             (car default) default)
-                                         (with-helm-current-buffer
-                                           (thing-at-point 'symbol))))
-                                "")
-               ;; Even if there is default in helm-pattern we want the
+        ((and default helm-maybe-use-default-as-input)
+         (setq helm-pattern (if (listp default)
+                                (car default)
+                              default)
+               ;; Even if helm-pattern is set we want the
                ;; prompt to be empty when using default as input, why
                ;; helm-input is initialized to "".
+               helm-input ""))
+        (helm-maybe-use-default-as-input
+         (setq helm-pattern (with-helm-current-buffer
+                              (thing-at-point 'symbol))
                helm-input "")))
   (helm--fuzzy-match-maybe-set-pattern)
   ;; Call the init function for sources where appropriate
