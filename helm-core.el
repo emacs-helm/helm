@@ -1954,6 +1954,9 @@ The hook should takes one arg SOURCES.")
 ;; See bug#2503.
 (defvar helm-process-output-split-string-separator "\n"
   "Separator to use when splitting helm async output.")
+
+(defvar helm-last-query ""
+  "The value of `helm-pattern' is stored here exit or quit.")
 
 ;; Utility: logging
 (defun helm-log (format-string &rest args)
@@ -4118,8 +4121,10 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   (setq helm--force-updating-p nil)
   (setq helm--buffer-in-new-frame-p nil)
   ;; Reset helm-pattern so that value of previous session doesn't
-  ;; interfere with next session (bug#2530).
-  (setq helm-pattern ""
+  ;; interfere with next session (bug#2530), however store last value
+  ;; of helm-pattern in `helm-last-query'.
+  (setq helm-last-query helm-pattern
+        helm-pattern ""
         helm-input "")
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
