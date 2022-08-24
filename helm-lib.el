@@ -261,13 +261,14 @@ available APPEND is ignored."
                 ((and (consp dired-directory)
                       (cdr dired-directory)
                       files-renamed)
-                 (setcdr dired-directory
-                         ;; Replace in `dired-directory' files that have
-                         ;; been modified with their new name keeping
-                         ;; the ones that are unmodified at the same place.
-                         (cl-loop for f in (cdr dired-directory)
-                                  collect (or (assoc-default f files-renamed)
-                                              f)))))
+                 (setq dired-directory
+                       ;; Replace in `dired-directory' files that have
+                       ;; been modified with their new name keeping
+                       ;; the ones that are unmodified at the same place.
+                       (cons (car dired-directory)
+                             (cl-loop for f in (cdr dired-directory)
+                                      collect (or (assoc-default f files-renamed)
+                                                  f))))))
 	  ;; Re-sort the buffer if all went well.
 	  (unless (> errors 0) (revert-buffer))
 	  (let ((inhibit-read-only t))
