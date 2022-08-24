@@ -3699,6 +3699,7 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
   ;; Some sources like helm-mu are using input to init their
   ;; candidates in init function, so setup initial helm-pattern here.
   ;; See bug#2530 and https://github.com/emacs-helm/helm-mu/issues/54.
+  ;; Input should have precedence on default.
   (cond (input
          (setq helm-input input
                helm-pattern input))
