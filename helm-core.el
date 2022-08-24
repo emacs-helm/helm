@@ -3712,9 +3712,13 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
                ;; helm-input is initialized to "".
                helm-input ""))
         (helm-maybe-use-default-as-input
-         (setq helm-pattern (with-helm-current-buffer
-                              (thing-at-point 'symbol))
-               helm-input "")))
+         (setq helm-pattern (or (with-helm-current-buffer
+                                  (thing-at-point 'symbol))
+                                "")
+               helm-input ""))
+        (t
+         (setq helm-pattern ""
+               helm-input   "")))
   (helm--fuzzy-match-maybe-set-pattern)
   ;; Call the init function for sources where appropriate
   (helm-compute-attr-in-sources 'init sources)
