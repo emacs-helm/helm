@@ -2349,11 +2349,9 @@ Called with a prefix arg open menu unconditionally."
   'helm-find-files-eshell-command-on-file)
 (put 'helm-ff-run-eshell-command-on-file 'helm-only t)
 
-(defun helm-ff-run-ediff-file ()
+(helm-make-command-from-action helm-ff-run-ediff-file
   "Run Ediff file action from `helm-source-find-files'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-find-files-ediff-files)))
+  'helm-find-files-ediff-files)
 (put 'helm-ff-run-ediff-file 'helm-only t)
 
 (helm-make-command-from-action helm-ff-run-ediff-merge-file
@@ -6058,11 +6056,10 @@ list."
   (helm-set-pattern
    (expand-file-name candidate)))
 
-(defun helm-ff-file-name-history-run-ff ()
+(helm-make-command-from-action helm-ff-file-name-history-run-ff
   "Switch back to current HFF session with selection as preselect."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-ff-file-name-history-ff)))
+  'helm-ff-file-name-history-ff)
+(put 'helm-ff-file-name-history-run-ff 'helm-only t)
 
 (defun helm-ff-file-name-history-delete-item (_candidate)
   (let ((files (helm-marked-candidates)))
@@ -6182,11 +6179,9 @@ Use FD as backend."
   (let ((dir (with-helm-buffer (helm-get-attr 'root-dir))))
     (helm-grep-ag dir helm-current-prefix-arg)))
 
-(defun helm-browse-project-run-ag ()
+(helm-make-command-from-action helm-browse-project-run-ag
   "Run `helm-grep' AG from `helm-browse-project'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-browse-project-ag)))
+  'helm-browse-project-ag)
 (put 'helm-browse-project-run-ag 'helm-only t)
 
 (defclass helm-browse-project-override-inheritor (helm-type-file) ())
