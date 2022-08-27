@@ -2120,6 +2120,28 @@ End:")
      (helm-set-local-variable
       'helm-display-function 'helm-display-buffer-in-own-frame)
      ,@body))
+
+(defmacro helm-make-command-from-action (symbol doc action)
+  "Make a command SYMBOL from ACTION with docstring DOC.
+The command SYMBOL will quit helm before execute.
+Argument ACTION should be an existing helm action."
+  (declare (indent defun) (debug t))
+  `(defun ,symbol ()
+     ,doc
+     (interactive)
+     (with-helm-alive-p
+       (helm-exit-and-execute-action ,action))))
+
+(defmacro helm-make-persistent-command-from-action (symbol doc psymbol action)
+  "Make a persistent command SYMBOL bound to PSYMBOL from ACTION."
+  (declare (indent defun) (debug t))
+  `(defun ,symbol ()
+     ,doc
+     (interactive)
+     (with-helm-alive-p
+       (helm-set-attr ,psymbol (cons ,action 'never-split))
+       (helm-execute-persistent-action ,psymbol))))
+
 
 ;;; helm-attributes
 ;;
