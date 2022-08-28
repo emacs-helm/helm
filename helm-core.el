@@ -3894,7 +3894,8 @@ For PRESELECT RESUME KEYMAP DEFAULT HISTORY, see `helm'."
                 helm-execute-action-at-once-if-one)
       (helm-log "helm-quit-if-no-candidate = %S" helm-quit-if-no-candidate)
       (when (and src (helm-resume-p resume))
-        (helm-display-mode-line src))
+        (helm-display-mode-line src)
+        (setq helm-pattern input))
       ;; Reset `helm-pattern' and update
       ;; display if no result found with precedent value of `helm-pattern'
       ;; unless `helm-quit-if-no-candidate' is non-`nil', in this case
