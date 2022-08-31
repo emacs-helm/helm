@@ -533,10 +533,16 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default (default cands)
   (delq nil
-        (cond ((and (stringp default)
-                    (not (string= default ""))
+        (cond ((and (not (equal default ""))
                     (string= helm-pattern ""))
-               (cons default (delete default cands)))
+               (cons default (delete (pcase default
+                                       ((and def (pred (stringp)))
+                                        def)
+                                       ((and def (pred (symbolp)))
+                                        (symbol-name def))
+                                       ((and def (pred (numberp)))
+                                        (number-to-string def)))
+                                     cands)))
               ((and (consp default) (string= helm-pattern ""))
                (append (cl-loop for d in default
                                 ;; Don't convert
