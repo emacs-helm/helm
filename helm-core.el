@@ -4143,12 +4143,9 @@ WARNING: Do not use this mode yourself, it is internal to Helm."
   ;; `helm-set-local-variable'.
   (setq helm--force-updating-p nil)
   (setq helm--buffer-in-new-frame-p nil)
-  ;; Reset helm-pattern so that value of previous session doesn't
-  ;; interfere with next session (bug#2530), however store last value
-  ;; of helm-pattern in `helm-last-query'.
-  (setq helm-last-query helm-pattern
-        helm-pattern ""
-        helm-input "")
+  ;; No need to reinitialize helm-pattern here now it is done only
+  ;; once in init function bug#2530.
+  (setq helm-last-query helm-pattern)
   ;; This is needed in some cases where last input
   ;; is yielded infinitely in minibuffer after helm session.
   (helm-clean-up-minibuffer))
