@@ -87,6 +87,11 @@ Possible value are:
                  (integer :tag "Match after or before (+/-)")
                  (const  :tag "Never match" never)))
 
+(defcustom helm-highlight-only-all-matches nil
+  "If t only highlight if all items matched on the line"
+  :group 'helm-utils
+  :type 'boolean)
+
 (defcustom helm-buffers-to-resize-on-pa nil
   "A list of helm buffers where the helm-window should be reduced on PA.
 Where PA means persistent action."
@@ -872,30 +877,49 @@ Inlined here for compatibility."
                       helm-highlight-matches-around-point-max-lines)
                      (point-at-bol)))))
       (catch 'empty-line
-        (cl-loop with ov
-                 for r in (helm-remove-if-match
-                           "\\`!" (helm-mm-split-pattern
-                                   (if (with-helm-buffer
-                                         ;; Needed for highlighting AG matches.
-                                         (assq 'pcre (helm-get-current-source)))
-                                       (helm--translate-pcre-to-elisp helm-input)
-                                       helm-input)))
-                 do (save-excursion
-                      (goto-char start-match)
+        (let* ((regex-list (helm-remove-if-match
+                            "\\`!" (helm-mm-split-pattern
+                                    (if (with-helm-buffer
+                                          ;; Needed for highlighting AG matches.
+                                          (assq 'pcre (helm-get-current-source)))
+                                        (helm--translate-pcre-to-elisp helm-input)
+                                      helm-input))))
+               (num-regex (length regex-list)))
+          (save-excursion
+            (goto-char start-match)
+            (while (< (point) end-match)
+              (let* ((start-line (line-beginning-position))
+                     (end-line   (line-end-position))
+                     all-matches)
+                (dolist (r regex-list)
+                  (let ((match-list '()))
+                    (save-excursion
+                      (goto-char start-line)
                       (while (condition-case _err
-                                 (and (not (= start-match end-match))
+                                 (and (not (= start-line end-line))
                                       (if helm-migemo-mode
-                                          (helm-mm-migemo-forward r end-match t)
-                                        (re-search-forward r end-match t)))
+                                          (helm-mm-migemo-forward r end-line t)
+                                        (re-search-forward r end-line t)))
                                (invalid-regexp nil))
                         (let ((s (match-beginning 0))
                               (e (match-end 0)))
                           (if (= s e)
                               (throw 'empty-line nil)
-                              (push (setq ov (make-overlay s e))
-                                    helm--match-item-overlays)
-                              (overlay-put ov 'face 'helm-match-item)
-                              (overlay-put ov 'priority 1))))))))
+                            (push (cons s e) match-list)))))
+                    (when match-list
+                      (push match-list all-matches))))
+                (when (and all-matches
+                           (or (not helm-highlight-only-all-matches)
+                               (eql (length all-matches) num-regex)))
+                  (cl-loop for ml in all-matches
+                           do (cl-loop for match in ml
+                                       do (let* ((s (car match))
+                                                 (e (cdr match))
+                                                 (ov (make-overlay s e)))
+                                            (push ov helm--match-item-overlays)
+                                            (overlay-put ov 'face 'helm-match-item)
+                                            (overlay-put ov 'priority 1))))))
+              (forward-line 1))))))
     (recenter)))
 
 (defun helm--translate-pcre-to-elisp (regexp)
