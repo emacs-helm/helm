@@ -920,10 +920,9 @@ Optional arguments START, END and FACE are only here for debugging purpose."
                            (or (not helm-highlight-only-all-matches)
                                (eql (length all-matches) num-regex)))
                   (cl-loop for ml in all-matches
-                           do (cl-loop for match in ml
-                                       do (let* ((s (car match))
-                                                 (e (cdr match))
-                                                 (ov (make-overlay s e)))
+                           do (cl-loop for (s . e) in ml
+                                       for ov = (make-overlay s e)
+                                       do (progn
                                             (push ov helm--match-item-overlays)
                                             (overlay-put ov 'face 'helm-match-item)
                                             (overlay-put ov 'priority 1))))))
