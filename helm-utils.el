@@ -88,7 +88,8 @@ Possible value are:
                  (const  :tag "Never match" never)))
 
 (defcustom helm-highlight-only-all-matches nil
-  "If t only highlight if all items matched on the line"
+  "Highlight only when all items match on the line when non nil.
+See `helm-highlight-current-line'."
   :group 'helm-utils
   :type 'boolean)
 
@@ -825,7 +826,14 @@ Inlined here for compatibility."
 (defvar helm--match-item-overlays nil)
 
 (cl-defun helm-highlight-current-line (&optional start end buf face)
-  "Highlight and underline current position"
+  "Highlight current line and all matching items around it.
+
+The number of lines around matched line where the matching items are
+highlighted are defined by `helm-highlight-matches-around-point-max-lines'.
+When the variable `helm-highlight-only-all-matches' is non nil only
+the lines containing all matches (in case of multi match) are highlighted.
+
+Optional arguments START, END and FACE are only here for debugging purpose."
   (let* ((start (or start (line-beginning-position)))
          (end (or end (1+ (line-end-position))))
          start-match end-match
