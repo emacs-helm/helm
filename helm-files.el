@@ -3205,10 +3205,31 @@ debugging purpose."
           ;; Return PATTERN unchanged.
           (t pattern))))
 
+(defun helm-ff--file-accessible-directory-p (path)
+  ;; Workaround emacs-29 file-error in `tramp-file-name-unify' by
+  ;; using its emacs-28 version instead.
+  ;; We should not need it elsewhere than at start of
+  ;; `helm-find-files-get-candidates' as after this initial call all
+  ;; paths should be absolute. 
+  (cl-letf (((symbol-function 'tramp-file-name-unify)
+             (lambda (vec &optional _localname)
+               (when (tramp-file-name-p vec)
+                 (setq vec (copy-tramp-file-name vec))
+                 (setf (tramp-file-name-localname vec) nil
+	               (tramp-file-name-hop vec) nil))
+               vec)))
+    (file-accessible-directory-p path)))
+
+(defvar helm-ff--file-accessible-directory-p-fn
+  (if (equal (func-arity 'tramp-file-name-unify) '(1 . 2))
+      #'helm-ff--file-accessible-directory-p
+    #'file-accessible-directory-p))
+
 (defun helm-find-files-get-candidates (&optional require-match)
   "Create candidate list for `helm-source-find-files'."
   (let* ((path          (helm-ff-set-pattern helm-pattern))
-         (dir-p         (file-accessible-directory-p path))
+         (dir-p         (funcall
+                         helm-ff--file-accessible-directory-p-fn path))
          basedir
          invalid-basedir
          non-essential
