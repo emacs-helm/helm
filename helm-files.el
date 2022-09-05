@@ -3221,8 +3221,10 @@ debugging purpose."
     (file-accessible-directory-p path)))
 
 (defvar helm-ff--file-accessible-directory-p-fn
-  ;; Handle the emacs-27 case, where `tramp-file-name-unify` isn't defined.
-  (if (and (fboundp 'tramp-file-name-unify) (equal (func-arity 'tramp-file-name-unify) '(1 . 2)))
+  ;; Handle the emacs-27 case, where `tramp-file-name-unify` isn't
+  ;; defined.
+  (if (and (fboundp 'tramp-file-name-unify)
+           (equal (func-arity 'tramp-file-name-unify) '(1 . 2)))
       #'helm-ff--file-accessible-directory-p
     #'file-accessible-directory-p))
 
