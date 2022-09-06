@@ -4546,11 +4546,11 @@ file."
     (helm-set-attr 'candidate-number-limit helm-ff-candidate-number-limit)
     (unless (helm-ff--maybe-follow candidate)
       (when follow
-        (helm-follow-mode -1)
+        (helm-follow-mode -1) (message nil)
         (cl-return-from helm-find-files-persistent-action-if
           (prog1
               #'ignore
-              (message "Helm-follow-mode allowed only on images, disabling")))))
+              (user-error "Can't follow this kind of file")))))
     (cond (;; Tramp methods completion.
            (string-match helm-ff-tramp-method-regexp candidate)
            (let ((method (match-string 1 candidate)))
