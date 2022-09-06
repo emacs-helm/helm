@@ -803,6 +803,10 @@ to nil to avoid error messages when using `helm-find-files'."
 This can be toggled at any time from `helm-ff-file-name-history' with \
 \\<helm-file-name-history-map>\\[helm-file-name-history-show-or-hide-deleted]."
   :type 'boolean)
+
+(defcustom helm-ff-follow-blacklist-file-exts '("gpg" "doc" "docx" "mp3" "ogg")
+  "File extensions we don't want to follow when helm-follow-mode is enabled."
+  :type '(repeat string))
 
 ;;; Faces
 ;;
@@ -4510,6 +4514,13 @@ This affects directly file CANDIDATE."
 
 (defvar helm-ff-sound-file-extensions '("wav" "au"))
 
+(defun helm-ff--maybe-follow (candidate)
+  (let ((file  (file-regular-p candidate))
+        (image (string-match-p (image-file-name-regexp) candidate))
+        (ext   (file-name-extension candidate)))
+    (and file
+         (or image (not (member ext helm-ff-follow-blacklist-file-exts))))))
+    
 (cl-defun helm-find-files-persistent-action-if (candidate)
   "Open subtree CANDIDATE without quitting helm.
 If CANDIDATE is not a directory expand CANDIDATE filename.
@@ -4533,7 +4544,7 @@ file."
                                                             nil fname)
                                        (insert fname))))))
     (helm-set-attr 'candidate-number-limit helm-ff-candidate-number-limit)
-    (unless image-cand
+    (unless (helm-ff--maybe-follow candidate)
       (when follow
         (helm-follow-mode -1)
         (cl-return-from helm-find-files-persistent-action-if
