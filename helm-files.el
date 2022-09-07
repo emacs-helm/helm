@@ -805,7 +805,9 @@ This can be toggled at any time from `helm-ff-file-name-history' with \
   :type 'boolean)
 
 (defcustom helm-ff-follow-blacklist-file-exts '("gpg" "doc" "docx" "mp3" "ogg")
-  "File extensions we don't want to follow when helm-follow-mode is enabled."
+  "File extensions we don't want to follow when helm-follow-mode is enabled.
+Note that image files are always followed even if their extensions is
+present in this list."
   :type '(repeat string))
 
 ;;; Faces
