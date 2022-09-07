@@ -3768,7 +3768,7 @@ in `helm-find-files-persistent-action-if'."
          (buf-name (buffer-name buf))
          (win (get-buffer-window buf))
          (helm--reading-passwd-or-string t))
-    (cond ((and buf win (eq buf (get-buffer helm-current-buffer)))
+    (cond ((and buf win (eql buf (get-buffer helm-current-buffer)))
            (user-error
             "Can't kill `helm-current-buffer' without quitting session"))
           ((and buf win (buffer-modified-p buf))
