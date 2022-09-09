@@ -739,6 +739,7 @@ when moving out of directory when non nil."
    'helm-find-files-rsync
    "Rename file(s) `M-R, C-u to follow'" 'helm-find-files-rename
    "Backup files" 'helm-find-files-backup
+   "Multi copy" 'helm-ff-mcp
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
@@ -6012,6 +6013,43 @@ list."
                                   (message "No files found in file(s)"))
           :buffer "*helm find files in files*")))
 
+(defun helm-ff-mcp (_candidate)
+  "Copy the car of marked candidates to the remaining marked candidates.
+
+The car of marked should be a regular file and the rest of marked (cdr) should
+be directories."
+  (let* ((mkd     (helm-marked-candidates))
+         (file    (car mkd))
+         (targets (cdr mkd))
+         (skipped 0)
+         (copies 0))
+    (cl-assert (file-regular-p file) nil (format "Not a regular file `%s'" file))
+    (cl-assert targets nil (format "No destination specified for file `%s'" file))
+    (when targets
+      (cl-loop for dest in targets
+               for dest-file = (expand-file-name (helm-basename file) dest)
+               for dir-ok = (file-accessible-directory-p dest)
+               for overwrite = (and dir-ok
+                                    (file-exists-p
+                                     (expand-file-name
+                                      (helm-basename file) dest)))
+               for skip = (and overwrite
+                               (null (y-or-n-p
+                                      (format
+                                       "File `%s' already-exists, overwrite? "
+                                       dest-file))))
+               if dir-ok
+               do (if skip
+                      (cl-incf skipped)
+                    (copy-file file (file-name-as-directory dest) overwrite)
+                    (cl-incf copies))
+               else do (progn
+                         (cl-incf skipped)
+                         (message "Access denied `%s'" dest))
+               finally do
+               (message "%s %s of `%s' done, %s skipped"
+                        copies (if (> copies 1) "copies" "copy")
+                        (helm-basename file) skipped)))))
 
 ;;; File name history
 ;;
