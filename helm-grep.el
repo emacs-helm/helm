@@ -325,8 +325,16 @@ will have no effect, use customize instead."
            (define-key helm-grep-map (kbd "<left>")  nil))))
 
 (defcustom helm-grep-ag-command
-  "ag --line-numbers -S --color --nogroup %s -- %s %s"
-  "The default command for AG, PT or RG.
+  (cond ((executable-find "rg")
+         "rg --color=always --smart-case --search-zip --no-heading --line-number %s -- %s %s")
+        ((executable-find "ag")
+         "ag --line-numbers -S --color --nogroup %s -- %s %s"))
+  "The default command for RG or AG.
+
+Prefer RG by default if available.
+
+Update: PT is still mentionned in this documentation but it seems it
+doesn't exists anymore, or at least it is no more maintained.
 
 Takes three format specs, the first for type(s), the second for
 pattern and the third for directory.
