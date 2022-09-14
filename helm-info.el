@@ -100,7 +100,7 @@ Argument TOBUF is the `helm-candidate-buffer'."
   (helm-goto-line (cdr node-line)))
 
 (defvar helm-info--node-regexp
-  "^\\* +\\(.+\\):[ \\t]+\\(.*\\)\\(?:[ \\t]*\\)(line +\\([0-9]+\\))"
+  "^\\* +\\(.+\\):[[:space:]]+\\(.*\\)\\(?:[[:space:]]*\\)(line +\\([0-9]+\\))"
   "A regexp that should match file name, node name and line number in
 a line like this:
 
@@ -109,17 +109,18 @@ a line like this:
 (defun helm-info-display-to-real (line)
   "Transform LINE to an acceptable argument for `info'.
 If line have a node use the node, otherwise use directly first name found."
-  (let (nodename linum)
+  (let ((info-file (helm-get-attr 'info-file))
+        nodename linum)
     (when (string-match helm-info--node-regexp line)
       (setq nodename (match-string 2 line)
             linum    (match-string 3 line)))
     (if nodename
         (cons (format "(%s)%s"
-                      (helm-get-attr 'info-file)
+                      info-file
                       (replace-regexp-in-string ":\\'" "" nodename))
               (string-to-number (or linum "1")))
       (cons (format "(%s)%s"
-                    (helm-get-attr 'info-file)
+                    info-file
                     (helm-aand (replace-regexp-in-string "^* " "" line)
                                (replace-regexp-in-string "::?.*\\'" "" it)))
             1))))
