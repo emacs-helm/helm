@@ -2121,16 +2121,36 @@ End:")
       'helm-display-function 'helm-display-buffer-in-own-frame)
      ,@body))
 
-(defmacro helm-make-command-from-action (symbol doc action)
+(defmacro helm-make-command-from-action (symbol doc action &rest body)
   "Make a command SYMBOL from ACTION with docstring DOC.
 The command SYMBOL will quit helm before execute.
-Argument ACTION should be an existing helm action."
+Argument ACTION should be an existing helm action.
+BODY form will run before calling action.
+
+Example:
+
+    (helm-make-command-from-action foo-command
+        \"Docstring\"
+      \\='foo-action
+      (run body))
+
+will produce a command like this:
+
+    (defun foo-command ()
+      \"docstring\"
+      (interactive)
+      (with-helm-alive-p
+        (run body)
+        (helm-exit-and-execute-action \\='foo-action)))
+
+And automatically put the symbol \\='helm-only on SYMBOL."
   (declare (indent defun) (debug t))
   `(progn
      (defun ,symbol ()
        ,doc
        (interactive)
        (with-helm-alive-p
+         (progn ,@body)
          (helm-exit-and-execute-action ,action)))
      (put ',symbol 'helm-only t)))
 
