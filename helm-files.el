@@ -186,6 +186,7 @@ This is used only as a let binding.")
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
     (when (executable-find "rsync")
       (define-key map (kbd "M-V")         'helm-ff-run-rsync-file))
+    (define-key map (kbd "C-M-c")         'helm-ff-run-mcp)
     (define-key map (kbd "M-B")           'helm-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'helm-ff-run-load-file)
     (define-key map (kbd "M-S")           'helm-ff-run-symlink-file)
@@ -6026,6 +6027,10 @@ be directories."
                (message "%s %s of `%s' done, %s skipped"
                         copies (if (> copies 1) "copies" "copy")
                         (helm-basename file) skipped)))))
+
+(helm-make-command-from-action helm-ff-run-mcp
+    "Copy the car of marked candidates to the remaining marked candidates."
+  'helm-ff-mcp)
 
 ;;; File name history
 ;;
