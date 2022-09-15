@@ -1160,13 +1160,11 @@ Can be used by any source that list buffers."
   (with-current-buffer buf
     (helm-browse-project helm-current-prefix-arg)))
 
-(defun helm-buffers-run-browse-project ()
-  "Run `helm-buffers-browse-project' from key."
-  (interactive)
-  (with-helm-alive-p
-      (if helm-buffers-in-project-p
-          (user-error "You are already browsing this project")
-          (helm-exit-and-execute-action 'helm-buffers-browse-project))))
+(helm-make-command-from-action helm-buffers-run-browse-project
+    "Run `helm-buffers-browse-project' from key."
+  'helm-buffers-browse-project
+  (cl-assert (not helm-buffers-in-project-p)
+             nil "You are already browsing this project"))
 
 (defun helm-buffers-quit-and-find-file-fn (source)
   (let* ((sel (helm-get-selection nil nil source))

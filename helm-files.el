@@ -5827,13 +5827,10 @@ selecting them."
               ;; unspecified e.g user hit C-k foo RET.
               (t (find-file candidate)))))))
 
-(defun helm-ff-find-file-other-tab ()
-  "Run find file in other tab action from `helm-source-buffers-list'."
-  (interactive)
-  (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'find-file-other-tab)))
-(put 'helm-ff-find-file-other-tab 'helm-only t)
+(helm-make-command-from-action helm-ff-find-file-other-tab
+    "Run find file in other tab action from `helm-source-buffers-list'."
+  'find-file-other-tab
+  (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available"))
 
 (defun helm-ff--new-dirs-to-update (path)
   "Collect directories to update when creating new directory PATH."
