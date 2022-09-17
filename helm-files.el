@@ -3449,7 +3449,16 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
+;; This is to fix issue with file-notify.el no more following symlinks
+;; on emacs-29 (regression) with inotify backend at least. Also it
+;; seems inotify is not configured to follow symlinks on other systems
+;; (MacOS) so this should fix as well this issue on such systems see
+;; bug#2542.
+;; Store here associations of (truename . symlink) when opening a
+;; symlinked directory, then add the watch to the truename; When the
+;; watcher ring on the truename remove the symlinked directory from cache.  
 (defvar helm-ff--list-directory-links nil)
+
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3500,12 +3509,16 @@ in cache."
                         (member method helm-ff-inotify-unsupported-methods)
                         (gethash directory helm-ff--file-notify-watchers))
               (condition-case-unless-debug err
-                  (puthash directory
-                           (file-notify-add-watch
-                            (or truename directory)
-                            '(change attribute-change)
-                            (helm-ff--inotify-make-callback (or truename directory)))
-                           helm-ff--file-notify-watchers)
+                  (let ((to-watch (or truename directory)))
+                    ;; Keep adding DIRECTORY to
+                    ;; helm-ff--file-notify-watchers but watch on the
+                    ;; truename and not the symlink as before bug#2542.
+                    (puthash directory
+                             (file-notify-add-watch
+                              to-watch
+                              '(change attribute-change)
+                              (helm-ff--inotify-make-callback to-watch))
+                             helm-ff--file-notify-watchers))
                 (file-notify-error (user-error "Error: %S %S" (car err) (cdr err))))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
@@ -3518,6 +3531,9 @@ in cache."
       ;; etc... AFAIU the desc for this is `changed' and for our
       ;; use case we don't care of this.
       (when (memq desc '(created deleted renamed attribute-changed))
+        ;; Watched directory is the truename which is not in the
+        ;; cache, so remove its associated directory (the symlink)
+        ;; from the cache bug#2542.
         (helm-aif (assoc directory helm-ff--list-directory-links)
             (progn
               (setq target (cdr it))
