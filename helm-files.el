@@ -2605,13 +2605,17 @@ If prefix numeric arg is given go ARG level up."
         (let ((cur-cand (helm-get-selection nil nil src))
               (new-pattern (helm-reduce-file-name helm-pattern arg)))
           ;; Ensure visibility on all candidates for preselection.
-          (helm-set-attr 'candidate-number-limit
-                        (if helm-ff-up-one-level-preselect
-                            (max (gethash new-pattern
-                                          helm-ff--directory-files-length
-                                          helm-ff-candidate-number-limit)
-                                 helm-ff-candidate-number-limit)
-                          helm-ff-candidate-number-limit))
+          (unless (helm-empty-source-p)
+            ;; We may have an empty source in read-file-name when a
+            ;; predicate is used e.g. images and the default is a non
+            ;; file image.
+            (helm-set-attr 'candidate-number-limit
+                           (if helm-ff-up-one-level-preselect
+                               (max (gethash new-pattern
+                                             helm-ff--directory-files-length
+                                             helm-ff-candidate-number-limit)
+                                    helm-ff-candidate-number-limit)
+                             helm-ff-candidate-number-limit)))
           (cond ((file-directory-p helm-pattern)
                  (setq helm-ff-last-expanded helm-ff-default-directory))
                 ((file-exists-p helm-pattern)

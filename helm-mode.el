@@ -1435,6 +1435,7 @@ Keys description:
              :mode-line mode-line
              :help-message 'helm-read-file-name-help-message
              :nohighlight t
+             :candidate-number-limit 'helm-ff-candidate-number-limit
              :candidates
              (lambda ()
                (if test
