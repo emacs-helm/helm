@@ -3449,6 +3449,7 @@ later in the transformer."
         (add-text-properties (point-min) (point-max) '(helm-ff-file t))
         (split-string (buffer-string) "\n" t)))))
 
+(defvar helm-ff--list-directory-links nil)
 (defun helm-ff-directory-files (directory &optional force-update)
   "List contents of DIRECTORY.
 Argument FULL mean absolute path.
@@ -3457,9 +3458,14 @@ filename \\='.' and \\='..' even on root directories in Windows
 systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
-  (let ((method (file-remote-p directory 'method)))
+  (let ((method (file-remote-p directory 'method))
+        (truename (helm-aand (file-symlink-p (directory-file-name directory))
+                             (file-name-as-directory it))))
     (setq directory (file-name-as-directory
                      (expand-file-name directory)))
+    (when truename
+      (cl-pushnew (cons truename directory)
+                  helm-ff--list-directory-links :test 'equal))
     (or (and (not force-update)
              (gethash directory helm-ff--list-directory-cache))
         (let* (file-error
@@ -3496,26 +3502,32 @@ in cache."
               (condition-case-unless-debug err
                   (puthash directory
                            (file-notify-add-watch
-                            directory
+                            (or truename directory)
                             '(change attribute-change)
-                            (helm-ff--inotify-make-callback directory))
+                            (helm-ff--inotify-make-callback (or truename directory)))
                            helm-ff--file-notify-watchers)
                 (file-notify-error (user-error "Error: %S %S" (car err) (cdr err))))))))))
 
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
-    (let ((desc (cadr event)))
+    (let ((desc (cadr event))
+          (target directory))
       ;; `attribute-changed' means permissions have changed, not
       ;; file modifications like file changes, visit
       ;; etc... AFAIU the desc for this is `changed' and for our
       ;; use case we don't care of this.
       (when (memq desc '(created deleted renamed attribute-changed))
+        (helm-aif (assoc directory helm-ff--list-directory-links)
+            (progn
+              (setq target (cdr it))
+              (setq helm-ff--list-directory-links
+                    (delete it helm-ff--list-directory-links))))
         ;; When DIRECTORY is modified remove it from cache.
-        (remhash directory helm-ff--list-directory-cache)
+        (remhash target helm-ff--list-directory-cache)
         ;; Remove watch as well in case of rename or delete.
-        (file-notify-rm-watch (gethash directory helm-ff--file-notify-watchers))
-        (remhash directory helm-ff--file-notify-watchers)))))
+        (file-notify-rm-watch (gethash target helm-ff--file-notify-watchers))
+        (remhash target helm-ff--file-notify-watchers)))))
 
 (defun helm-ff-tramp-cleanup-hook (vec)
   "Remove remote directories related to VEC in helm-ff* caches.
