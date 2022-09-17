@@ -3458,9 +3458,9 @@ filename \\='.' and \\='..' even on root directories in Windows
 systems.
 When FORCE-UPDATE is non nil recompute candidates even if DIRECTORY is
 in cache."
-  (let ((method (file-remote-p directory 'method))
-        (truename (helm-aand (file-symlink-p (directory-file-name directory))
-                             (file-name-as-directory it))))
+  (let* ((method (file-remote-p directory 'method))
+         (dfn (directory-file-name directory))
+         (truename (and (file-symlink-p dfn) (file-truename dfn))))
     (setq directory (file-name-as-directory
                      (expand-file-name directory)))
     (when truename
