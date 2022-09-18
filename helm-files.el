@@ -3525,11 +3525,13 @@ in cache."
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
     (let ((desc (cadr event))
-          (target directory))
+          (target directory)) ; Either truename or directory.
       ;; `attribute-changed' means permissions have changed, not
       ;; file modifications like file changes, visit
       ;; etc... AFAIU the desc for this is `changed' and for our
-      ;; use case we don't care of this.
+      ;; use case we don't care of this. Elemnts of
+      ;; `helm-ff--list-directory-links' are of the form
+      ;; (truename . visited-symlink-directory)
       (when (memq desc '(created deleted renamed attribute-changed))
         ;; Watched directory is the truename which is not in the
         ;; cache, so remove its associated directory (the symlink)
@@ -3539,7 +3541,7 @@ in cache."
               (setq target (cdr it))
               (setq helm-ff--list-directory-links
                     (delete it helm-ff--list-directory-links))))
-        ;; When DIRECTORY is modified remove it from cache.
+        ;; When TARGET is modified remove it from cache.
         (remhash target helm-ff--list-directory-cache)
         ;; Remove watch as well in case of rename or delete.
         (file-notify-rm-watch (gethash target helm-ff--file-notify-watchers))
