@@ -6002,8 +6002,10 @@ be directories."
          (targets (cdr mkd))
          (skipped 0)
          operations)
-    (cl-assert (file-regular-p file) nil (format "Not a regular file `%s'" file))
-    (cl-assert targets nil (format "No destination specified for file `%s'" file))
+    (cl-assert (file-regular-p file) nil (format "ERROR: Not a regular file `%s'" file))
+    (cl-assert targets nil (format "ERROR: No destination specified for file `%s'" file))
+    (cl-assert (cl-loop for f in targets always (file-directory-p f)) nil
+               "ERROR: Destinations must be directories")
     (when targets
       (cl-loop with yes-for-all
                for dest in targets
@@ -6031,25 +6033,26 @@ be directories."
                       (push (list file (file-name-as-directory dest) overwrite) operations)
                     (cl-incf skipped))
                else do (cl-incf skipped))
-      (async-start
-       `(lambda ()
-          (require 'cl-lib)
-          (cl-loop with copies = 0
-                   with skipped = ,skipped
-                   for (file dest overwrite) in ',operations
-                   do (condition-case _err
-                          (progn
-                            (copy-file file dest overwrite)
-                            (cl-incf copies))
-                        (file-error (cl-incf skipped)))
-                   finally return (list file copies skipped)))
-       (lambda (result)
-         (let ((copied (nth 1 result)))
-           (message "Mcp done, %s %s of %s done, %s files skipped"
-                    copied (if (> copied 1)
-                               "copies" "copy")
-                    (helm-basename (nth 0 result))
-                    (nth 2 result))))))))
+      (when operations
+        (async-start
+         `(lambda ()
+            (require 'cl-lib)
+            (cl-loop with copies = 0
+                     with skipped = ,skipped
+                     for (file dest overwrite) in ',operations
+                     do (condition-case _err
+                            (progn
+                              (copy-file file dest overwrite)
+                              (cl-incf copies))
+                          (file-error (cl-incf skipped)))
+                     finally return (list file copies skipped)))
+         (lambda (result)
+           (let ((copied (nth 1 result)))
+             (message "Mcp done, %s %s of %s done, %s files skipped"
+                      copied (if (> copied 1)
+                                 "copies" "copy")
+                      (helm-basename (nth 0 result))
+                      (nth 2 result)))))))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
