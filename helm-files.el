@@ -5992,7 +5992,7 @@ list."
                                   (message "No files found in file(s)"))
           :buffer "*helm find files in files*")))
 
-(defun helm-ff-mcp (_candidate)
+(cl-defun helm-ff-mcp (_candidate)
   "Copy the car of marked candidates to the remaining marked candidates.
 
 The car of marked should be a regular file and the rest of marked (cdr) should
@@ -6005,22 +6005,31 @@ be directories."
     (cl-assert (file-regular-p file) nil (format "Not a regular file `%s'" file))
     (cl-assert targets nil (format "No destination specified for file `%s'" file))
     (when targets
-      (cl-loop for dest in targets
+      (cl-loop with yes-for-all
+               for dest in targets
                for dest-file = (expand-file-name (helm-basename file) dest)
                for dir-ok = (file-accessible-directory-p dest)
-               for overwrite = (and dir-ok
-                                    (file-exists-p
-                                     (expand-file-name
-                                      (helm-basename file) dest)))
-               for skip = (and overwrite
-                               (null (y-or-n-p
-                                      (format
-                                       "File `%s' already-exists, overwrite? "
-                                       dest-file))))
+               for exists = (and dir-ok
+                                 (file-exists-p
+                                  (expand-file-name
+                                   (helm-basename file) dest)))
+               for overwrite = (or (null exists)
+                                   yes-for-all
+                                   (pcase (helm-read-answer
+                                           (format
+                                            "File `%s' already-exists, overwrite (y,n,!,q) ? "
+                                            dest-file)
+                                           '("y" "n" "!" "q"))
+                                     ("y" t)
+                                     ("n" nil)
+                                     ("!" (prog1 t
+                                            (setq yes-for-all t)))
+                                     ("q" (cl-return-from helm-ff-mcp
+                                            (message "Operation aborted")))))
                if dir-ok
-               do (if skip
-                      (cl-incf skipped)
-                    (push (list file (file-name-as-directory dest) overwrite) operations))
+               do (if overwrite
+                      (push (list file (file-name-as-directory dest) overwrite) operations)
+                    (cl-incf skipped))
                else do (cl-incf skipped))
       (async-start
        `(lambda ()
