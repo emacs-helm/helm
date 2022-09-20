@@ -3525,10 +3525,10 @@ in cache."
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
-    (let ((desc (cadr event))
+    (let (watch
+          (desc (cadr event))
           (target directory)) ; Either truename or directory.
-      (when helm-debug
-        (helm-log "Inotify callback" "Event %S called on %S" event directory))
+      (helm-log "Inotify callback" "Event %S called on %S" event directory)
       ;; `attribute-changed' means permissions have changed, not
       ;; file modifications like file changes, visit
       ;; etc... AFAIU the desc for this is `changed' and for our
@@ -3545,10 +3545,15 @@ in cache."
               (setq helm-ff--list-directory-links
                     (delete it helm-ff--list-directory-links))))
         ;; When TARGET is modified remove it from cache.
+        (helm-log "Inotify callback"
+                  "Removing %S from `helm-ff--list-directory-cache'" target)
         (remhash target helm-ff--list-directory-cache)
         ;; Remove watch as well in case of rename or delete.
-        (file-notify-rm-watch (gethash target helm-ff--file-notify-watchers))
-        (remhash target helm-ff--file-notify-watchers)))))
+        (helm-log "Inotify callback"
+                  "Removing %S from `helm-ff--file-notify-watchers'" target)
+        (setq watch (gethash target helm-ff--file-notify-watchers))
+        (remhash target helm-ff--file-notify-watchers)
+        (file-notify-rm-watch watch)))))
 
 (defun helm-ff-tramp-cleanup-hook (vec)
   "Remove remote directories related to VEC in helm-ff* caches.
