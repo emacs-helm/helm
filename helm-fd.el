@@ -84,8 +84,8 @@
          (fd-version (replace-regexp-in-string
                       "\n" ""
                       (shell-command-to-string (concat helm-fd-executable " --version")))))
-    (helm-log "Fd command:\nfd %s" (mapconcat 'identity cmd " "))
-    (helm-log "VERSION: %s" fd-version)
+    (helm-log "helm-fd-process" "Fd command:\nfd %s" (mapconcat 'identity cmd " "))
+    (helm-log "helm-fd-process" "VERSION: %s" fd-version)
     (prog1
         proc
       (set-process-sentinel
@@ -103,7 +103,7 @@
                                      (helm-get-candidate-number))
                                     'face 'helm-fd-finish))))
                     (force-mode-line-update))
-                (helm-log "Error: Fd %s"
+                (helm-log "helm-fd-process sentinel" "Error: Fd %s"
                           (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-fd-fct (candidates _source)

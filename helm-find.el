@@ -116,7 +116,7 @@ separator."
          (cmd (concat (helm-find--build-cmd-line)
                       (if helm-find-noerrors "2> /dev/null" "")))
          (proc (start-file-process-shell-command "hfind" helm-buffer cmd)))
-    (helm-log "Find command:\n%s" cmd)
+    (helm-log "helm-find-shell-command-fn" "Find command:\n%s" cmd)
     (prog1 proc
       (set-process-sentinel
        proc
@@ -125,7 +125,7 @@ separator."
             process event (helm-default-directory))
            (if (string= event "finished\n")
                (helm-locate-update-mode-line "Find")
-             (helm-log "Error: Find %s"
+             (helm-log "helm-find-shell-command-fn sentinel" "Error: Find %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-find-1 (dir)

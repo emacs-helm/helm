@@ -119,7 +119,8 @@ you have completion on these functions with `C-M i' in the customize interface."
 (defun helm-semantic-default-action (_candidate &optional persistent)
   ;; By default, helm doesn't pass on the text properties of the selection.
   ;; Fix this.
-  (helm-log-run-hook 'helm-goto-line-before-hook)
+  (helm-log-run-hook "helm-semantic-default-action"
+                     'helm-goto-line-before-hook)
   (with-current-buffer helm-buffer
     (when (looking-at " ")
       (goto-char (next-single-property-change

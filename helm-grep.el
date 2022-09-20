@@ -625,8 +625,8 @@ Have no effect when grep backend use \"--color=\"."
                              (helm-grep-command)))))
          non-essential)
     ;; Start grep process.
-    (helm-log "Starting Grep process in directory `%s'" default-directory)
-    (helm-log "Command line used was:\n\n%s"
+    (helm-log "helm-grep-init" "Starting Grep process in directory `%s'" default-directory)
+    (helm-log "helm-grep-init" "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd-line 'face 'helm-grep-cmd-line) "\n\n"))
     (prog1            ; This function should return the process first.
         (start-file-process-shell-command
@@ -664,7 +664,7 @@ Have no effect when grep backend use \"--color=\"."
                              ;; that exit with code 1
                              ;; after a certain amount of results.
                              (with-helm-buffer (not (helm-empty-buffer-p)))))
-                    (helm-log "%s process finished with %s results in %fs"
+                    (helm-log "helm-grep-init" "%s process finished with %s results in %fs"
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
@@ -685,6 +685,7 @@ Have no effect when grep backend use \"--color=\"."
                         (helm--bind-mouse-for-selection helm-selection-point))))
                    ;; Catch error output in log.
                    (t (helm-log
+                       "helm-grep-init"
                        "Error: %s %s"
                        proc-name
                        (replace-regexp-in-string "\n" "" event))))))))))
@@ -719,7 +720,7 @@ WHERE can be `other-window' or `other-frame'."
          (fname        (if tramp-fname
                            (concat tramp-fname loc-fname)
                          loc-fname)))
-    (helm-log "helm-grep-action fname: %s" fname )
+    (helm-log "helm-grep-action" "helm-grep-action fname: %s" fname )
     (cl-case where
       (other-window (helm-window-show-buffers
                      (list (find-file-noselect fname)) t))
@@ -812,7 +813,7 @@ If N is positive go forward otherwise go backward."
            (funcall mark-maybe)))
     (unless allow-mode
       (helm-follow-execute-persistent-action-maybe)
-      (helm-log-run-hook 'helm-move-selection-after-hook))))
+      (helm-log-run-hook "helm-goto-next-or-prec-file" 'helm-move-selection-after-hook))))
 
 ;;;###autoload
 (defun helm-goto-precedent-file ()
@@ -1519,8 +1520,8 @@ non-file buffers."
                            fnargs))
          process-connection-type)
     ;; Start pdf grep process.
-    (helm-log "Starting Pdf Grep process in directory `%s'" default-directory)
-    (helm-log "Command line used was:\n\n%s"
+    (helm-log "helm-pdfgrep-init" "Starting Pdf Grep process in directory `%s'" default-directory)
+    (helm-log "helm-pdfgrep-init" "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd-line 'face 'helm-grep-cmd-line) "\n\n"))
     (prog1
         (start-file-process-shell-command
@@ -1542,7 +1543,7 @@ non-file buffers."
                  (force-mode-line-update)
                  (when helm-allow-mouse
                    (helm--bind-mouse-for-selection helm-selection-point)))
-             (helm-log "Error: Pdf grep %s"
+             (helm-log "helm-pdfgrep-init" "Error: Pdf grep %s"
                        (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-do-pdfgrep-1 (only &optional recurse)
@@ -1652,9 +1653,9 @@ returns if available with current AG version."
         (start-time (float-time))
         (proc-name (helm-grep--ag-command)))
     (set (make-local-variable 'helm-grep-last-cmd-line) cmd-line)
-    (helm-log "Starting %s process in directory `%s'"
+    (helm-log "helm-grep-ag-init" "Starting %s process in directory `%s'"
               proc-name directory)
-    (helm-log "Command line used was:\n\n%s"
+    (helm-log "helm-grep-ag-init" "Command line used was:\n\n%s"
               (concat ">>> " cmd-line "\n\n"))
     (prog1
         (start-file-process-shell-command
@@ -1679,7 +1680,7 @@ returns if available with current AG version."
                                      ,(upcase proc-name))
                                     'face 'helm-grep-finish))))))
                  ((string= event "finished\n")
-                  (helm-log "%s process finished with %s results in %fs"
+                  (helm-log "helm-grep-ag-init" "%s process finished with %s results in %fs"
                               proc-name
                               (helm-get-candidate-number)
                               (- (float-time) start-time))
@@ -1699,6 +1700,7 @@ returns if available with current AG version."
                     (when helm-allow-mouse
                       (helm--bind-mouse-for-selection helm-selection-point))))
                  (t (helm-log
+                     "helm-grep-ag-init"
                      "Error: %s %s"
                      proc-name
                      (replace-regexp-in-string "\n" "" event))))))))))

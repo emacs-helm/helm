@@ -319,7 +319,7 @@ The sexp should be an `all-the-icons' function with its args."
 
 (defun helm-imenu-action (candidate)
   "Default action for `helm-source-imenu'."
-  (helm-log-run-hook 'helm-goto-line-before-hook)
+  (helm-log-run-hook "helm-imenu-action" 'helm-goto-line-before-hook)
   (helm-imenu--maybe-switch-to-buffer candidate)
   (imenu candidate)
   ;; If semantic is supported in this buffer

@@ -67,7 +67,7 @@ MacPorts to install id-utils, it should be `gid32'."
                                                0))
                                   'face 'helm-locate-finish))))
                   (force-mode-line-update))
-                (helm-log "Error: Gid %s"
+                (helm-log "helm-gid-candidates-process" "Error: Gid %s"
                           (replace-regexp-in-string "\n" "" event))))))))
 
 (defun helm-gid-filtered-candidate-transformer (candidates _source)

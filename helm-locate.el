@@ -317,8 +317,8 @@ See also `helm-locate'."
                         (shell-quote-argument (car args)))))
          (default-directory (if (file-directory-p default-directory)
                                 default-directory "/")))
-    (helm-log "Starting helm-locate process")
-    (helm-log "Command line used was:\n\n%s"
+    (helm-log "helm-locat-init" "Starting helm-locate process")
+    (helm-log "helm-locat-init" "Command line used was:\n\n%s"
               (concat ">>> " (propertize cmd 'face 'font-lock-comment-face) "\n\n"))
     (prog1
         (start-process-shell-command
@@ -341,7 +341,7 @@ See also `helm-locate'."
                     (helm-redisplay-buffer))
                   (helm-locate-update-mode-line "Locate"))
                  (t
-                  (helm-log "Error: Locate %s"
+                  (helm-log "helm-locat-init" "Error: Locate %s"
                             (replace-regexp-in-string "\n" "" event))))))))))
 
 (defun helm-locate-default-fuzzy-sort-fn (candidates)

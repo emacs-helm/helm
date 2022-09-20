@@ -509,7 +509,8 @@ Default is `helm-current-buffer'."
 (defun helm-goto-line (lineno &optional noanim)
   "Goto LINENO opening only outline headline if needed.
 Animation is used unless NOANIM is non--nil."
-  (helm-log-run-hook 'helm-goto-line-before-hook)
+  (helm-log-run-hook "helm-goto-line"
+                     'helm-goto-line-before-hook)
   (helm-match-line-cleanup)
   (unless helm-alive-p
     (with-helm-current-buffer
@@ -1069,7 +1070,8 @@ If FILE is a directory, open this directory."
 Run `helm-find-many-files-after-hook' at end."
   (let ((helm--reading-passwd-or-string t))
     (mapc 'find-file (helm-marked-candidates))
-    (helm-log-run-hook 'helm-find-many-files-after-hook)))
+    (helm-log-run-hook "helm-find-many-files"
+                       'helm-find-many-files-after-hook)))
 
 (defun helm-read-repeat-string (prompt &optional count)
   "Prompt as many time PROMPT is not empty.

@@ -3232,6 +3232,7 @@ debugging purpose."
               (or (>= (length (helm-basename path)) 3) dir-p)))
       ;; At this point the tramp connection is triggered.
       (helm-log
+       "helm-find-files-get-candidates"
        "Pattern=%S"
        (setq helm-pattern (if (string-match helm-ff-tramp-method-regexp path)
                               ;; A tramp method, don't modify pattern.
@@ -3526,6 +3527,8 @@ in cache."
   (lambda (event)
     (let ((desc (cadr event))
           (target directory)) ; Either truename or directory.
+      (when helm-debug
+        (helm-log "Inotify callback" "Event %S called on %S" event directory))
       ;; `attribute-changed' means permissions have changed, not
       ;; file modifications like file changes, visit
       ;; etc... AFAIU the desc for this is `changed' and for our

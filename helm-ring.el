@@ -301,7 +301,7 @@ This is a command for `helm-kill-ring-map'."
     (helm-aif (marker-buffer candidate)
         (progn
           (switch-to-buffer it)
-          (helm-log-run-hook 'helm-goto-line-before-hook)
+          (helm-log-run-hook "helm-mark-ring-default-action" 'helm-goto-line-before-hook)
           (helm-match-line-cleanup)
           (with-helm-current-buffer
             (unless helm-yank-point (setq helm-yank-point (point))))
