@@ -976,16 +976,6 @@ Only async sources than use a sentinel calling
   :type 'integer
   :group 'helm)
 
-(defcustom helm-debug-root-directory nil
-  "When non-nil, save Helm log messages to a file in this directory.
-When nil log messages are saved to a buffer instead.  Log message
-are saved only when `helm-debug' is non-nil, so setting this
-doesn't enable debugging by itself.
-
-See `helm-log-save-maybe' for more info."
-  :type 'string
-  :group 'helm)
-
 (defcustom helm-show-action-window-other-window nil
   "Show action buffer beside `helm-buffer' when non-nil.
 
@@ -1891,9 +1881,7 @@ use \\<helm-map>\\[helm-toggle-suspend-update] to turn off
 updating.  When you are ready turn it on again to resume logging.
 
 Once you exit your Helm session you can access the debug buffer
-with `helm-debug-open-last-log'.  It is possible to save logs to
-dated files when `helm-debug-root-directory' is set to a valid
-directory.
+with `helm-debug-open-last-log'.
 
 Note: Be aware that Helm log buffers grow really fast, so use
 `helm-debug' only when needed.
@@ -1998,36 +1986,6 @@ E.g. (helm-log-error \"Error %s: %s\" (car err) (cdr err))."
   (let ((msg (apply 'format args)))
     (unless (member msg helm-issued-errors)
       (cl-pushnew msg helm-issued-errors :test 'equal))))
-
-(defun helm-log-save-maybe ()
-  "Save log buffer when `helm-debug-root-directory' is non nil.
-Create `helm-debug-root-directory' directory if necessary.
-Messages are logged to a file named with today's date and time in
-this directory."
-  (when (and (stringp helm-debug-root-directory)
-             (not (file-directory-p helm-debug-root-directory)))
-    (make-directory helm-debug-root-directory t))
-  (when helm-debug
-    (let ((logdir (expand-file-name (concat "helm-debug-"
-                                            (format-time-string "%Y%m%d"))
-                                    helm-debug-root-directory)))
-      (make-directory logdir t)
-      (with-current-buffer (get-buffer-create helm-debug-buffer)
-        (goto-char (point-max))
-        (insert "\
-
-
-Local Variables:
-mode: outline
-End:")
-        (write-region (point-min) (point-max)
-                      (setq helm--last-log-file
-                            (expand-file-name
-                             (format-time-string "%Y%m%d-%H%M%S")
-                             logdir))
-                      nil 'silent)
-        (kill-buffer))))
-  (setq helm-debug nil))
 
 ;;;###autoload
 (defun helm-debug-open-last-log ()
@@ -3059,8 +3017,7 @@ HISTORY args see `helm'."
       ;; Reset helm-pattern so that lambda's using it
       ;; before running helm will not start with its old value.
       (setq helm-pattern "")
-      (setq helm--ignore-errors nil)
-      (helm-log-save-maybe))))
+      (setq helm--ignore-errors nil))))
 
 (defun helm--advice-linum-on ()
   (unless (or (minibufferp)
