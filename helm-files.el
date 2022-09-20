@@ -6001,7 +6001,7 @@ be directories."
          (file    (car mkd))
          (targets (cdr mkd))
          (skipped 0)
-         (copies 0))
+         operations)
     (cl-assert (file-regular-p file) nil (format "Not a regular file `%s'" file))
     (cl-assert targets nil (format "No destination specified for file `%s'" file))
     (when targets
@@ -6020,15 +6020,27 @@ be directories."
                if dir-ok
                do (if skip
                       (cl-incf skipped)
-                    (copy-file file (file-name-as-directory dest) overwrite)
-                    (cl-incf copies))
-               else do (progn
-                         (cl-incf skipped)
-                         (message "Access denied `%s'" dest))
-               finally do
-               (message "%s %s of `%s' done, %s skipped"
-                        copies (if (> copies 1) "copies" "copy")
-                        (helm-basename file) skipped)))))
+                    (push (list file (file-name-as-directory dest) overwrite) operations))
+               else do (cl-incf skipped))
+      (async-start
+       `(lambda ()
+          (require 'cl-lib)
+          (cl-loop with copies = 0
+                   with skipped = ,skipped
+                   for (file dest overwrite) in ',operations
+                   do (condition-case _err
+                          (progn
+                            (copy-file file dest overwrite)
+                            (cl-incf copies))
+                        (file-error (cl-incf skipped)))
+                   finally return (list file copies skipped)))
+       (lambda (result)
+         (let ((copied (nth 1 result)))
+           (message "Mcp done, %s %s of %s done, %s files skipped"
+                    copied (if (> copied 1)
+                               "copies" "copy")
+                    (helm-basename (nth 0 result))
+                    (nth 2 result))))))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
