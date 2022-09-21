@@ -84,6 +84,8 @@
 (declare-function tramp-make-tramp-file-name "tramp")
 (declare-function tramp-cleanup-connection "tramp-cmds")
 (declare-function dired-async-processes "ext:dired-async.el")
+(declare-function dired-async-mode-line-message "ext:dired-async.el")
+(declare-function dired-async--modeline-mode "ext:dired-async.el")
 (declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
 (declare-function all-the-icons-octicon "ext:all-the-icons.el")
 (declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
@@ -6052,11 +6054,19 @@ be directories."
                          finally return (list file copies skipped)))
              (lambda (result)
                (let ((copied (nth 1 result)))
-                 (message "Mcp done, %s %s of %s done, %s files skipped"
-                          copied (if (> copied 1)
-                                     "copies" "copy")
-                          (helm-basename (nth 0 result))
-                          (nth 2 result)))))))))))
+                 (dired-async--modeline-mode -1)
+                 (run-with-idle-timer
+                  0.1 nil
+                  (lambda ()                    
+                    (dired-async-mode-line-message
+                     "Mcp done, %s %s of %s done, %s files skipped"
+                     'dired-async-message
+                     copied
+                     (if (> copied 1)
+                         "copies" "copy")
+                     (helm-basename (nth 0 result))
+                     (nth 2 result)))))))
+            (dired-async--modeline-mode 1)))))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
