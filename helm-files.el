@@ -6044,34 +6044,36 @@ be directories."
         (with-helm-display-marked-candidates
           helm-marked-buffer-name
           (mapcar #'abbreviate-file-name targets)
-          (when (y-or-n-p (format "Copy `%s' to directories?" file))
-            (async-start
-             `(lambda ()
-                (require 'cl-lib)
-                (cl-loop with copies = 0
-                         with skipped = ,skipped
-                         for (file dest overwrite) in ',operations
-                         do (condition-case _err
-                                (progn
-                                  (copy-file file dest overwrite)
-                                  (cl-incf copies))
-                              (file-error (cl-incf skipped)))
-                         finally return (list file copies skipped)))
-             (lambda (result)
-               (let ((copied (nth 1 result)))
-                 (dired-async--modeline-mode -1)
-                 (run-with-idle-timer
-                  0.1 nil
-                  (lambda ()                    
-                    (dired-async-mode-line-message
-                     "Mcp done, %s %s of %s done, %s files skipped"
-                     'dired-async-message
-                     copied
-                     (if (> copied 1)
-                         "copies" "copy")
-                     (helm-basename (nth 0 result))
-                     (nth 2 result)))))))
-            (dired-async--modeline-mode 1)))))))
+          (if (y-or-n-p (format "Copy `%s' to directories?" (helm-basename file)))
+              (progn
+                (async-start
+                 `(lambda ()
+                    (require 'cl-lib)
+                    (cl-loop with copies = 0
+                             with skipped = ,skipped
+                             for (file dest overwrite) in ',operations
+                             do (condition-case _err
+                                    (progn
+                                      (copy-file file dest overwrite)
+                                      (cl-incf copies))
+                                  (file-error (cl-incf skipped)))
+                             finally return (list file copies skipped)))
+                 (lambda (result)
+                   (let ((copied (nth 1 result)))
+                     (dired-async--modeline-mode -1)
+                     (run-with-idle-timer
+                      0.1 nil
+                      (lambda ()                    
+                        (dired-async-mode-line-message
+                         "Mcp done, %s %s of %s done, %s files skipped"
+                         'dired-async-message
+                         copied
+                         (if (> copied 1)
+                             "copies" "copy")
+                         (helm-basename (nth 0 result))
+                         (nth 2 result)))))))
+                (dired-async--modeline-mode 1))
+            (message "Operation aborted")))))))
 
 (helm-make-command-from-action helm-ff-run-mcp
     "Copy the car of marked candidates to the remaining marked candidates."
