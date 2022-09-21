@@ -3499,7 +3499,8 @@ in cache."
                           (setq file-error t)))))
                (dot  (concat directory "."))
                (dot2 (concat directory ".."))
-               (candidates (append (and (not file-error) (list dot dot2)) ls)))
+               (candidates (append (and (not file-error) (list dot dot2)) ls))
+               watcher)
           (puthash directory (+ (length ls) 2) helm-ff--directory-files-length)
           (prog1
               (puthash directory
@@ -3510,9 +3511,20 @@ in cache."
             ;; Put an inotify watcher to check directory modifications.
             (unless (or (null helm-ff-use-notify)
                         (member method helm-ff-inotify-unsupported-methods)
-                        (gethash directory helm-ff--file-notify-watchers))
+                        (helm-aand (setq watcher (gethash
+                                                  directory
+                                                  helm-ff--file-notify-watchers))
+                                   ;; [1] If watcher is invalid enter
+                                   ;; next and delete it.
+                                   (file-notify-valid-p it)))
               (condition-case-unless-debug err
                   (let ((to-watch (or truename directory)))
+                    (when watcher
+                      ;; If watcher is still in cache and we are here,
+                      ;; that's mean test [1] above fails and watcher
+                      ;; is invalid, so delete it.
+                      (file-notify-rm-watch watcher)
+                      (remhash directory helm-ff--file-notify-watchers))
                     ;; Keep adding DIRECTORY to
                     ;; helm-ff--file-notify-watchers but watch on the
                     ;; truename and not the symlink as before bug#2542.
@@ -3527,8 +3539,7 @@ in cache."
 (defun helm-ff--inotify-make-callback (directory)
   "Return a callback for `file-notify-add-watch'."
   (lambda (event)
-    (let (watch
-          (desc (cadr event))
+    (let ((desc (cadr event))
           (target directory)) ; Either truename or directory.
       (helm-log "Inotify callback" "Event %S called on %S" event directory)
       ;; `attribute-changed' means permissions have changed, not
@@ -3549,13 +3560,7 @@ in cache."
         ;; When TARGET is modified remove it from cache.
         (helm-log "Inotify callback"
                   "Removing %S from `helm-ff--list-directory-cache'" target)
-        (remhash target helm-ff--list-directory-cache)
-        ;; Remove watch as well in case of rename or delete.
-        (helm-log "Inotify callback"
-                  "Removing %S from `helm-ff--file-notify-watchers'" target)
-        (setq watch (gethash target helm-ff--file-notify-watchers))
-        (remhash target helm-ff--file-notify-watchers)
-        (file-notify-rm-watch watch)))))
+        (remhash target helm-ff--list-directory-cache)))))
 
 (defun helm-ff-tramp-cleanup-hook (vec)
   "Remove remote directories related to VEC in helm-ff* caches.
