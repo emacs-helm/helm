@@ -73,23 +73,25 @@ one match."
 ;;; Etags
 ;;
 ;;
-(defun helm-etags-run-switch-other-window ()
-  "Run switch to other window action from `helm-source-etags-select'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action
-     (lambda (c)
-       (helm-etags-action-goto 'find-file-other-window c)))))
-(put 'helm-etags-run-switch-other-window 'helm-only t)
+(defun helm-etags-find-file (candidate)
+  "Find file CANDIDATE from helm etags buffer."
+  (helm-etags-action-goto 'find-file candidate))
 
-(defun helm-etags-run-switch-other-frame ()
+(defun helm-etags-find-file-other-window (candidate)
+  "Find file other window from helm etags buffer."
+  (helm-etags-action-goto 'find-file-other-window candidate))
+
+(defun helm-etags-find-file-other-frame (candidate)
+  "Find file other frame from helm etags buffer."
+  (helm-etags-action-goto 'find-file-other-frame candidate))
+
+(helm-make-command-from-action helm-etags-run-switch-other-window
+  "Run switch to other window action from `helm-source-etags-select'."
+  'helm-etags-find-file-other-window)
+
+(helm-make-command-from-action helm-etags-run-switch-other-frame
   "Run switch to other frame action from `helm-source-etags-select'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action
-     (lambda (c)
-       (helm-etags-action-goto 'find-file-other-frame c)))))
-(put 'helm-etags-run-switch-other-frame 'helm-only t)
+  'helm-etags-find-file-other-frame)
 
 (defvar helm-etags-map
   (let ((map (make-sparse-keymap)))
@@ -226,16 +228,9 @@ If there is no entry in cache, create one."
     :fuzzy-match helm-etags-fuzzy-match
     :help-message 'helm-etags-help-message
     :keymap helm-etags-map
-    :action '(("Go to tag" . (lambda (c)
-                               (helm-etags-action-goto 'find-file c)))
-              ("Go to tag in other window" . (lambda (c)
-                                               (helm-etags-action-goto
-                                                'find-file-other-window
-                                                c)))
-              ("Go to tag in other frame" . (lambda (c)
-                                              (helm-etags-action-goto
-                                               'find-file-other-frame
-                                               c))))
+    :action '(("Go to tag" . helm-etags-find-file)
+              ("Go to tag in other window" . helm-etags-find-file-other-window)
+              ("Go to tag in other frame" . helm-etags-find-file-other-frame))
     :group 'helm-tags
     :persistent-help "Go to line"
     :persistent-action (lambda (candidate)

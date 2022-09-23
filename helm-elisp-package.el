@@ -128,11 +128,9 @@ See `package-autoremove'."
                (propertize (symbol-name pkg)
                            'face 'font-lock-keyword-face)))))
 
-(defun helm-el-run-visit-homepage ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-visit-homepage)))
-(put 'helm-el-run-visit-homepage 'helm-only t)
+(helm-make-command-from-action helm-el-run-visit-homepage
+    "Visit package homepage from helm elisp packages."
+  'helm-el-package-visit-homepage)
 
 (defun helm-elisp-package--pkg-name (pkg)
   (if (package-desc-p pkg)
@@ -160,11 +158,9 @@ See `package-autoremove'."
 (defun helm-el-package-install (_candidate)
   (helm-el-package-install-1 (helm-marked-candidates)))
 
-(defun helm-el-run-package-install ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-install)))
-(put 'helm-el-run-package-install 'helm-only t)
+(helm-make-command-from-action helm-el-run-package-install
+    "Install package from helm elisp packages."
+  'helm-el-package-install)
 
 (defun helm-el-package-uninstall-1 (pkg-list &optional force)
   (cl-loop with mkd = pkg-list
@@ -189,11 +185,9 @@ See `package-autoremove'."
 (defun helm-el-package-uninstall (_candidate)
   (helm-el-package-uninstall-1 (helm-marked-candidates) helm-current-prefix-arg))
 
-(defun helm-el-run-package-uninstall ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-uninstall)))
-(put 'helm-el-run-package-uninstall 'helm-only t)
+(helm-make-command-from-action helm-el-run-package-uninstall
+    "Uninstall package from helm elisp packages."
+  'helm-el-package-uninstall)
 
 (defun helm-el-package-menu--find-upgrades ()
   (cl-loop for entry in helm-el-package--tabulated-list
@@ -262,11 +256,9 @@ See `package-autoremove'."
             if (member (symbol-name (package-desc-name pkg)) pkgs)
             collect p)))
 
-(defun helm-el-run-package-upgrade ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-upgrade)))
-(put 'helm-el-run-package-upgrade 'helm-only t)
+(helm-make-command-from-action helm-el-run-package-upgrade
+    "Uninstall package from helm elisp packages."
+  'helm-el-package-upgrade)
 
 (defun helm-el-package-upgrade-all ()
   (if helm-el-package--upgrades
@@ -282,11 +274,9 @@ See `package-autoremove'."
 (defun helm-el-package-upgrade-all-action (_candidate)
   (helm-el-package-upgrade-all))
 
-(defun helm-el-run-package-upgrade-all ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-upgrade-all-action)))
-(put 'helm-el-run-package-upgrade-all 'helm-only t)
+(helm-make-command-from-action helm-el-run-package-upgrade-all
+    "Upgrade all packages from helm elisp packages."
+  'helm-el-package-upgrade-all-action)
 
 (defun helm-el-package--transformer (candidates _source)
   (cl-loop for c in candidates
@@ -460,11 +450,9 @@ See `package-autoremove'."
     (package-install
      (cadr (assq name package-archive-contents)) t)))
 
-(defun helm-el-run-package-reinstall ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-el-package-reinstall)))
-(put 'helm-el-run-package-reinstall 'helm-only t)
+(helm-make-command-from-action helm-el-run-package-reinstall
+    "Reinstall package from helm elisp packages."
+  'helm-el-package-reinstall)
 
 ;;;###autoload
 (defun helm-list-elisp-packages (arg)

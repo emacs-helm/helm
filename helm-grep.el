@@ -831,33 +831,21 @@ If N is positive go forward otherwise go backward."
   (with-helm-window
     (helm-goto-next-or-prec-file 1)))
 
-(defun helm-grep-run-default-action ()
+(helm-make-command-from-action helm-grep-run-default-action
   "Run grep default action from `helm-do-grep-1'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-grep-action)))
-(put 'helm-grep-run-default-action 'helm-only t)
+  'helm-grep-action)
 
-(defun helm-grep-run-other-window-action ()
+(helm-make-command-from-action helm-grep-run-other-window-action
   "Run grep goto other window action from `helm-do-grep-1'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-grep-other-window)))
-(put 'helm-grep-run-other-window-action 'helm-only t)
+  'helm-grep-other-window)
 
-(defun helm-grep-run-other-frame-action ()
+(helm-make-command-from-action helm-grep-run-other-frame-action
   "Run grep goto other frame action from `helm-do-grep-1'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-grep-other-frame)))
-(put 'helm-grep-run-other-frame-action 'helm-only t)
+  'helm-grep-other-frame)
 
-(defun helm-grep-run-save-buffer ()
+(helm-make-command-from-action helm-grep-run-save-buffer
   "Run grep save results action from `helm-do-grep-1'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-grep-save-results)))
-(put 'helm-grep-run-save-buffer 'helm-only t)
+  'helm-grep-save-results)
 
 (defun helm-grep-quit-an-find-file-fn (source)
   (let* ((sel (helm-get-selection nil nil source))

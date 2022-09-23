@@ -415,32 +415,21 @@ Same as `helm-occur-goto-line' but go in new frame."
   (helm-occur-action
    candidate 'buffer-other-frame))
 
-(defun helm-occur-run-goto-line-ow ()
+(helm-make-command-from-action helm-occur-run-goto-line-ow
   "Run goto line other window action from `helm-occur'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-occur-goto-line-ow)))
-(put 'helm-occur-run-goto-line-ow 'helm-only t)
+  'helm-occur-goto-line-ow)
 
-(defun helm-occur-run-goto-line-of ()
+(helm-make-command-from-action helm-occur-run-goto-line-of
   "Run goto line new frame action from `helm-occur'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-occur-goto-line-of)))
-(put 'helm-occur-run-goto-line-of 'helm-only t)
+  'helm-occur-goto-line-of)
 
-(defun helm-occur-run-default-action ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-occur-goto-line)))
-(put 'helm-occur-run-default-action 'helm-only t)
+(helm-make-command-from-action helm-occur-run-default-action
+    "Goto matching line from helm-occur buffer."
+    'helm-occur-goto-line)
 
-(defun helm-occur-run-save-buffer ()
+(helm-make-command-from-action helm-occur-run-save-buffer
   "Run moccur save results action from `helm-moccur'."
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-occur-save-results)))
-(put 'helm-moccur-run-save-buffer 'helm-only t)
+  'helm-occur-save-results)
 
 (defun helm-occur-right ()
   "`helm-occur' action for right arrow.

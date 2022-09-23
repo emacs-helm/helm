@@ -86,29 +86,21 @@
 (defun helm-color-kill-rgb (candidate)
   (kill-new (helm-colors-get-rgb candidate)))
 
-(defun helm-color-run-insert-name ()
+(helm-make-command-from-action helm-color-run-insert-name
   "Insert name of color from `helm-source-colors'."
-  (interactive)
-  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-name)))
-(put 'helm-color-run-insert-name 'helm-only t)
+  'helm-color-insert-name)
 
-(defun helm-color-run-kill-name ()
+(helm-make-command-from-action helm-color-run-kill-name
   "Kill name of color from `helm-source-colors'."
-  (interactive)
-  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-name)))
-(put 'helm-color-run-kill-name 'helm-only t)
+  'helm-color-kill-name)
 
-(defun helm-color-run-insert-rgb ()
+(helm-make-command-from-action helm-color-run-insert-rgb
   "Insert RGB of color from `helm-source-colors'."
-  (interactive)
-  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-insert-rgb)))
-(put 'helm-color-run-insert-rgb 'helm-only t)
+  'helm-color-insert-rgb)
 
-(defun helm-color-run-kill-rgb ()
+(helm-make-command-from-action helm-color-run-kill-rgb
   "Kill RGB of color from `helm-source-colors'."
-  (interactive)
-  (with-helm-alive-p (helm-exit-and-execute-action 'helm-color-kill-rgb)))
-(put 'helm-color-run-kill-rgb 'helm-only t)
+  'helm-color-kill-rgb)
 
 (defvar helm-color-map
   (let ((map (make-sparse-keymap)))
