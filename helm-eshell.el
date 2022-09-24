@@ -452,17 +452,13 @@ See `helm-eshell-prompts-list'."
 (defun helm-eshell-prompts-goto-other-frame (candidate)
   (helm-eshell-prompts-goto candidate 'switch-to-buffer-other-frame))
 
-(defun helm-eshell-prompts-other-window ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-eshell-prompts-goto-other-window)))
-(put 'helm-eshell-prompts-other-window 'helm-only t)
+(helm-make-command-from-action helm-eshell-prompts-other-window
+    "Switch to eshell prompt in other window."
+  'helm-eshell-prompts-goto-other-window)
 
-(defun helm-eshell-prompts-other-frame ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-eshell-prompts-goto-other-frame)))
-(put 'helm-eshell-prompts-other-frame 'helm-only t)
+(helm-make-command-from-action helm-eshell-prompts-other-frame
+    "Switch to eshell prompt in other frame."
+  'helm-eshell-prompts-goto-other-frame)
 
 ;;;###autoload
 (defun helm-eshell-prompts ()

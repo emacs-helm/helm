@@ -149,17 +149,13 @@ See `helm-comint-prompts-list'."
 (defun helm-comint-prompts-goto-other-frame (candidate)
   (helm-comint-prompts-goto candidate 'switch-to-buffer-other-frame))
 
-(defun helm-comint-prompts-other-window ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-comint-prompts-goto-other-window)))
-(put 'helm-comint-prompts-other-window 'helm-only t)
+(helm-make-command-from-action helm-comint-prompts-other-window
+    "Switch to comint prompt in other window."
+  'helm-comint-prompts-goto-other-window)
 
-(defun helm-comint-prompts-other-frame ()
-  (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action 'helm-comint-prompts-goto-other-frame)))
-(put 'helm-comint-prompts-other-frame 'helm-only t)
+(helm-make-command-from-action helm-comint-prompts-other-frame
+    "Switch to comint prompt in other frame."
+  'helm-comint-prompts-goto-other-frame)
 
 ;;;###autoload
 (defun helm-comint-prompts ()
