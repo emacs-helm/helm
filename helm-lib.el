@@ -933,39 +933,46 @@ hashtable itself."
            unless (string-match-p regexp str)
            collect s))
 
-(defun helm-transform-mapcar (function args)
-  "`mapcar' for candidate-transformer.
+(defun helm-transform-mapcar (fn seq)
+  "Apply function FN on all elements of list SEQ.
+When SEQ is a list of cons cells apply FN on the cdr of each element,
+keeping their car unmodified.
 
-ARGS is (cand1 cand2 ...) or ((disp1 . real1) (disp2 . real2) ...)
+Examples:
 
-\(helm-transform-mapcar \\='upcase \\='(\"foo\" \"bar\"))
-=> (\"FOO\" \"BAR\")
-\(helm-transform-mapcar \\='upcase \\='((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
-=> ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
+    (helm-transform-mapcar \\='upcase \\='(\"foo\" \"bar\"))
+    => (\"FOO\" \"BAR\")
+    (helm-transform-mapcar \\='upcase \\='((\"1st\" . \"foo\") (\"2nd\" . \"bar\")))
+    => ((\"1st\" . \"FOO\") (\"2nd\" . \"BAR\"))
 "
-  (cl-loop for arg in args
-        if (consp arg)
-        collect (cons (car arg) (funcall function (cdr arg)))
-        else
-        collect (funcall function arg)))
-
-(defsubst helm-append-1 (elm seq)
-  "Append ELM to SEQ.
-If ELM is not a list transform it in list."
-  (append (helm-mklist elm) seq))
+  (cl-loop for elm in seq
+           if (consp elm)
+           collect (cons (car elm) (funcall fn (cdr elm)))
+           else
+           collect (funcall fn elm)))
 
 (defun helm-append-at-nth (seq elm index)
-  "Append ELM at INDEX in SEQ."
-  (let ((len (length seq)))
-    (setq index (min (max index 0) len))
-    (if (zerop index)
-        (helm-append-1 elm seq)
-      (cl-loop for i in seq
-               for count from 1 collect i
-               when (= count index)
-               if (and (listp elm) (not (functionp elm)))
-               append elm
-               else collect elm))))
+  "Append ELM at INDEX in SEQ.
+When INDEX is > to the SEQ length ELM is added at end of SEQ.
+When INDEX is 0 or negative, ELM is added at beginning of SEQ.
+
+Examples:
+
+    (helm-append-at-nth \\='(a b c d) \\='z 2)
+    =>(a b z c d)
+    (helm-append-at-nth \\='(a b c d) \\='(z) 2)
+    =>(a b z c d)
+    (helm-append-at-nth \\='(a b c d) \\='((x . 1) (y . 2)) 2)
+    =>(a b (x . 1) (y . 2) c d)
+"
+  (setq index (min (max index 0) (length seq))
+        elm   (helm-mklist elm))
+  (if (zerop index)
+      (append elm seq)
+    (let* ((end-part (nthcdr index seq))
+           (len      (length end-part))
+           (beg-part (butlast seq len)))
+      (append beg-part elm end-part))))
 
 (defun helm-take-first-elements (seq n)
   "Return the first N elements of SEQ if SEQ is longer than N.
