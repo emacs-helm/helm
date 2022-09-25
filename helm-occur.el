@@ -273,60 +273,62 @@ engine beeing completely different and also much faster."
 
 (defun helm-occur-build-sources (buffers &optional source-name)
   "Build sources for `helm-occur' for each buffer in BUFFERS list."
-  (cl-loop for buf in buffers
-           for bname = (buffer-name buf)
-           collect
-           (helm-make-source (or source-name bname)
-               'helm-moccur-class
-             :header-name (lambda (name)
-                            (format "HO [%s]" (if (string= name "Helm occur")
-                                                  bname name)))
-             :buffer-name bname
-             :match-part
-             (lambda (candidate)
-               ;; The regexp should match what is in candidate buffer,
-               ;; not what is displayed in helm-buffer e.g. "12 foo"
-               ;; and not "12:foo".
-               (when (string-match helm-occur--search-buffer-regexp
-                                   candidate)
-                 (match-string 2 candidate)))
-             :diacritics helm-occur-ignore-diacritics
-             :search (lambda (pattern)
-                       (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
-                         (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
-                       (condition-case _err
-                           (re-search-forward pattern nil t)
-                         (invalid-regexp nil)))
-             :init `(lambda ()
-                      (with-current-buffer ,buf
-                        (let* ((bsfn (or (cdr (assq
-                                               major-mode
-                                               helm-occur-buffer-substring-fn-for-modes))
-                                         #'buffer-substring-no-properties))
-                               (contents (funcall bsfn (point-min) (point-max))))
-                          (helm-set-attr 'get-line bsfn)
-                          (with-current-buffer (helm-candidate-buffer 'global)
-                            (insert contents)
-                            (goto-char (point-min))
-                            (let ((linum 1))
-                              (insert (format "%s " linum))
-                              (while (re-search-forward "\n" nil t)
-                                (cl-incf linum)
-                                (insert (format "%s " linum))))))))
-             :filtered-candidate-transformer 'helm-occur-transformer
-             :help-message 'helm-moccur-help-message
-             :nomark t
-             :migemo t
-             ;; Needed for resume.
-             :history 'helm-occur-history
-             :candidate-number-limit helm-occur-candidate-number-limit
-             :action 'helm-occur-actions
-             :requires-pattern 2
-             :follow 1
-             :group 'helm-occur
-             :keymap helm-occur-map
-             :resume 'helm-occur-resume-fn
-             :moccur-buffers buffers)))
+  (let (sources)
+    (dolist (buf buffers)
+      (let ((bname (buffer-name buf)))
+        (push (helm-make-source (or source-name bname)
+                  'helm-moccur-class
+                :header-name (lambda (name)
+                               (format "HO [%s]" (if (string= name "Helm occur")
+                                                     bname name)))
+                :buffer-name bname
+                :match-part
+                (lambda (candidate)
+                  ;; The regexp should match what is in candidate buffer,
+                  ;; not what is displayed in helm-buffer e.g. "12 foo"
+                  ;; and not "12:foo".
+                  (when (string-match helm-occur--search-buffer-regexp
+                                      candidate)
+                    (match-string 2 candidate)))
+                :diacritics helm-occur-ignore-diacritics
+                :search (lambda (pattern)
+                          (when (string-match "\\`\\^\\([^ ]*\\)" pattern)
+                            (setq pattern (concat "^[0-9]* \\{1\\}" (match-string 1 pattern))))
+                          (condition-case _err
+                              (re-search-forward pattern nil t)
+                            (invalid-regexp nil)))
+                :init (lambda ()
+                        (with-current-buffer buf
+                          (let* ((bsfn (or (cdr (assq
+                                                 major-mode
+                                                 helm-occur-buffer-substring-fn-for-modes))
+                                           #'buffer-substring-no-properties))
+                                 (contents (funcall bsfn (point-min) (point-max))))
+                            (helm-set-attr 'get-line bsfn)
+                            (with-current-buffer (helm-candidate-buffer 'global)
+                              (insert contents)
+                              (goto-char (point-min))
+                              (let ((linum 1))
+                                (insert (format "%s " linum))
+                                (while (re-search-forward "\n" nil t)
+                                  (cl-incf linum)
+                                  (insert (format "%s " linum))))))))
+                :filtered-candidate-transformer 'helm-occur-transformer
+                :help-message 'helm-moccur-help-message
+                :nomark t
+                :migemo t
+                ;; Needed for resume.
+                :history 'helm-occur-history
+                :candidate-number-limit helm-occur-candidate-number-limit
+                :action 'helm-occur-actions
+                :requires-pattern 2
+                :follow 1
+                :group 'helm-occur
+                :keymap helm-occur-map
+                :resume 'helm-occur-resume-fn
+                :moccur-buffers buffers)
+              sources)))
+    (nreverse sources)))
 
 (defun helm-multi-occur-1 (buffers &optional input)
   "Run `helm-occur' on a list of buffers.
