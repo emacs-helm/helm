@@ -791,13 +791,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
         (user-error "Buffer `%s' is not associated to a file"
                     (buffer-name buf))))))
 
-(defun helm-buffer-diff-persistent ()
+(helm-make-persistent-command-from-action helm-buffer-diff-persistent
   "Toggle diff buffer without quitting helm."
-  (interactive)
-  (with-helm-alive-p
-    (helm-set-attr 'diff-action 'helm-buffer-toggle-diff)
-    (helm-execute-persistent-action 'diff-action)))
-(put 'helm-buffer-diff-persistent 'helm-only t)
+  'diff-action 'helm-buffer-toggle-diff)
 
 (defun helm-revert-buffer (candidate)
   (with-current-buffer candidate
@@ -816,13 +812,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
       (when helm-marked-candidates (helm-unmark-all))
       (helm-force-update preselect))))
 
-(defun helm-buffer-revert-persistent ()
+(helm-make-persistent-command-from-action helm-buffer-revert-persistent
   "Revert buffer without quitting helm."
-  (interactive)
-  (with-helm-alive-p
-    (helm-set-attr 'revert-action '(helm-buffer-revert-and-update . never-split))
-    (helm-execute-persistent-action 'revert-action)))
-(put 'helm-buffer-revert-persistent 'helm-only t)
+  'revert-action 'helm-buffer-revert-and-update)
 
 (defun helm-buffer-save-and-update (_candidate)
   (with-helm-buffer

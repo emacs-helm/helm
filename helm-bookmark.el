@@ -188,14 +188,9 @@ will be honored."
                      (regexp-quote trunc)
                    (regexp-quote real)))))
 
-(defun helm-bookmark-toggle-filename ()
+(helm-make-persistent-command-from-action helm-bookmark-toggle-filename
   "Toggle bookmark location visibility."
-  (interactive)
-  (with-helm-alive-p
-    (helm-set-attr 'toggle-filename
-                  '(helm-bookmark-toggle-filename-1 . never-split))
-    (helm-execute-persistent-action 'toggle-filename)))
-(put 'helm-bookmark-toggle-filename 'helm-only t)
+  'toggle-filename 'helm-bookmark-toggle-filename-1)
 
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark action."
