@@ -254,8 +254,6 @@ Note that this variable is buffer-local.")
     (define-key map (kbd "C-M-%")     #'helm-buffer-run-query-replace-regexp)
     (define-key map (kbd "M-%")       #'helm-buffer-run-query-replace)
     (define-key map (kbd "M-R")       #'helm-buffer-run-rename-buffer)
-    (define-key map (kbd "M-m")       #'helm-toggle-all-marks)
-    (define-key map (kbd "M-a")       #'helm-mark-all)
     (define-key map (kbd "M-e")       #'helm-buffer-run-switch-to-shell)
     (define-key map (kbd "C-]")       #'helm-toggle-buffers-details)
     (define-key map (kbd "C-c a")     #'helm-buffers-toggle-show-hidden-buffers)
@@ -1140,7 +1138,6 @@ displayed with the `file-name-shadow' face if available."
   (helm :sources '(helm-source-buffers-list
                    helm-source-buffer-not-found)
         :buffer "*helm buffers*"
-        :keymap helm-buffer-map
         :truncate-lines helm-buffers-truncate-lines
         :left-margin-width helm-buffers-left-margin-width))
 
