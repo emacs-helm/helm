@@ -34,6 +34,18 @@
 
 ***
 
+<p align="justify">
+  Currently Thierry Volpiatto is (mostly) the only one still maintaining Helm (<a href="https://sachachua.com/blog/2018/09/interview-with-thierry-volpiatto/">a interview</a> with him)
+  This is a lot of work which Thierry have done freely since 2011. It takes a lot of his time and starts to be more and more difficult
+  maintaining it without financial help. Due to that, the development of Helm is stalled and in maintenance mode by now. 
+  If you, and other 59 users, are reading this post now, and did the same thing, then the fundraiser should be done in 1 day and the Helm development can resume.
+  If you feel Helm is making your daily work easier, please consider making a donation. Perhaps for a price of a cup of coffee for each month, you can make this a recurring donation? <a href="https://www.paypal.com/paypalme/tvolpiatto">Support via Paypal</a> or <a href="https://www.paypal.com/paypalme/tvolpiatto">support via Liberapay</a>.
+
+  Thank you! — Helm Community
+</p>
+
+***
+
 <p align="center">
   Helm in action searching with <a href="https://github.com/ggreer/the_silver_searcher"<b>Grep Ag</b></a>
                                    </p>
