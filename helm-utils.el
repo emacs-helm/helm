@@ -683,7 +683,7 @@ readable format,see `helm-file-human-size'."
 (cl-defun helm-file-attributes
     (file &key type links uid gid access-time modif-time
             status size mode gid-change inode device-num dired human-size
-            mode-type mode-owner mode-group mode-other (string t))
+            mode-type mode-owner mode-group mode-other octal (string t))
   "Return `file-attributes' elements of FILE separately according to key value.
 Availables keys are:
 - TYPE: Same as nth 0 `files-attributes' if STRING is nil
@@ -703,7 +703,8 @@ Availables keys are:
 - DIRED: A line similar to what \\='ls -l' return.
 - HUMAN-SIZE: The size in human form, see `helm-file-human-size'.
 - MODE-TYPE, mode-owner,mode-group, mode-other: Split what
-  nth 7 `files-attributes' return in four categories.
+  nth 8 `files-attributes' return in four categories.
+- OCTAL: The octal value of MODE-OWNER+MODE-GROUP+MODE-OTHER.
 - STRING: When non--nil (default) `helm-file-attributes' return
           more friendly values.
 If you want the same behavior as `files-attributes' ,
@@ -740,7 +741,8 @@ you have in `file-attributes'."
                           :gid-change  gid-change
                           :inode       inode
                           :device-num  device-num)))
-             (modes (helm-split-mode-file-attributes (cl-getf all :mode))))
+             (perms (cl-getf all :mode))
+             (modes (helm-split-mode-file-attributes perms)))
         (cond (type        (cl-getf all :type))
               (links       (cl-getf all :links))
               (uid         (cl-getf all :uid))
@@ -749,7 +751,7 @@ you have in `file-attributes'."
               (modif-time  (cl-getf all :modif-time))
               (status      (cl-getf all :status))
               (size        (cl-getf all :size))
-              (mode        (cl-getf all :mode))
+              (mode        perms)
               (gid-change  (cl-getf all :gid-change))
               (inode       (cl-getf all :inode))
               (device-num  (cl-getf all :device-num))
@@ -768,25 +770,42 @@ you have in `file-attributes'."
               (mode-owner (cl-getf modes :user))
               (mode-group (cl-getf modes :group))
               (mode-other (cl-getf modes :other))
+              (octal      (cl-getf modes :octal))
               (t          (append all modes))))))
 
 (defun helm-split-mode-file-attributes (str &optional string)
   "Split mode file attributes STR into a proplist.
 If STRING is non--nil return instead a space separated string."
   (cl-loop with type = (substring str 0 1)
-        with cdr = (substring str 1)
-        for i across cdr
-        for count from 1
-        if (<= count 3)
-        concat (string i) into user
-        if (and (> count 3) (<= count 6))
-        concat (string i) into group
-        if (and (> count 6) (<= count 9))
-        concat (string i) into other
-        finally return
-        (if string
-            (mapconcat 'identity (list type user group other) " ")
-          (list :mode-type type :user user :group group :other other))))
+           with cdr = (substring str 1)
+           for i across cdr
+           for count from 1
+           if (<= count 3)
+           concat (string i) into user
+           if (and (> count 3) (<= count 6))
+           concat (string i) into group
+           if (and (> count 6) (<= count 9))
+           concat (string i) into other
+           finally return
+           (let ((octal (helm-ff-octal-permissions (list user group other))))
+             (if string
+                 (mapconcat 'identity (list type user group other octal) " ")
+               (list :mode-type type :user user
+                     :group group :other other
+                     :octal octal)))))
+
+(defun helm-ff-octal-permissions (perms)
+  "Return the numeric representation of PERMS.
+PERMS is the list of permissions for owner, group and others."
+  (cl-flet ((string-to-octal (str)
+              (cl-loop for c across str
+                       sum (pcase c
+                             (?r 4)
+                             (?w 2)
+                             (?x 1)
+                             (?- 0)))))
+    (cl-loop for str in perms
+             concat (number-to-string (string-to-octal str)))))
 
 (defun helm-format-columns-of-files (files)
   "Same as `dired-format-columns-of-files'.

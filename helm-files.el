@@ -3688,6 +3688,7 @@ to avoid an unnecessary call to `file-truename'."
              (group              (cl-getf it :gid))
              (group-right        (cl-getf it :group))
              (other-right        (cl-getf it :other))
+             (octal              (cl-getf it :octal))
              (trash              (and (helm-ff-trash-file-p candidate)
                                       (helm-ff--get-dest-file-from-trash
                                        (helm-ff-trash-list)
@@ -3717,6 +3718,7 @@ to avoid an unnecessary call to `file-truename'."
               (format "Owner: %s: %s\n" owner owner-right)
               (format "Group: %s: %s\n" group group-right)
               (format "Others: %s\n" other-right)
+              (format "NumMode: %s\n" octal)
               (format "Size: %s\n" size)
               (when (string= type "directory")
                 (format "Size used in directory: %s\n"
