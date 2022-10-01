@@ -663,7 +663,7 @@ INSERT-CONTENT-FN is the function that inserts text to be
 displayed in BUFNAME."
   (let ((winconf (current-frame-configuration))
         (hframe (selected-frame)))
-    (helm-log-run-hook 'helm-help-mode-before-hook)
+    (helm-log-run-hook "helm-help-internal" 'helm-help-mode-before-hook)
     (with-selected-frame helm-initial-frame
       (select-frame-set-input-focus helm-initial-frame)
       (unwind-protect
@@ -685,7 +685,7 @@ displayed in BUFNAME."
              (buffer-disable-undo)
              (helm-help-event-loop))
         (raise-frame hframe)
-        (helm-log-run-hook 'helm-help-mode-after-hook)
+        (helm-log-run-hook "helm-help-internal" 'helm-help-mode-after-hook)
         (setq helm-suspend-update-flag nil)
         (set-frame-configuration winconf)))))
 
