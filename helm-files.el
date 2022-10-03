@@ -4921,6 +4921,15 @@ Special commands:
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
 
 ;;;###autoload
+(defun helm-ff-clear-image-dired-thumbnails-cache ()
+  "Clear `helm-ff-image-dired-thumbnails-cache'.
+You may want to do this after customizing
+`image-dired-thumbnail-storage' which may change the place where
+thumbnail files are stored."
+  (interactive)
+  (clrhash helm-ff-image-dired-thumbnails-cache))
+
+;;;###autoload
 (defun helm-ff-cleanup-image-dired-dir-and-cache ()
   "Cleanup `image-dired-dir' directory.
 Delete all thumb files that are no more associated with an existing
