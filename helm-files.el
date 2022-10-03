@@ -4889,8 +4889,7 @@ Special commands:
     (when (or (not thumb-attr)
 	      (time-less-p (file-attribute-modification-time thumb-attr)
 			   (file-attribute-modification-time
-			    (file-attributes file)))
-              (or helm-current-prefix-arg current-prefix-arg))
+			    (file-attributes file))))
       (image-dired-create-thumb file thumb-file))
     (create-image thumb-file)))
 
