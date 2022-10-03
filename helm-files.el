@@ -4860,9 +4860,14 @@ Special commands:
         (cl-pushnew helm-ff-default-directory
                     helm-ff--thumbnailed-directories :test 'equal)
         (cl-loop for (disp . img) in candidates
-                 for type = (helm-acase (file-name-extension img)
-                              ("png" 'png)
-                              (("jpg" "jpeg") 'jpeg))
+                 for imgtype = (helm-acase (file-name-extension img)
+                                 ("png" 'png)
+                                 (("jpg" "jpeg") 'jpeg))
+                 for type = (if (and imgtype
+                                     (memq image-dired-thumbnail-storage
+                                      '(standard standard-large)))
+                                'png
+                              imgtype)
                  if type collect
                  (let ((thumbnail (plist-get
                                    (cdr (helm-ff--image-dired-get-thumbnail-image img))
