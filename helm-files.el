@@ -197,6 +197,7 @@ This is used only as a let binding.")
     (define-key map (kbd "M-D")           'helm-ff-run-delete-file)
     (define-key map (kbd "M-K")           'helm-ff-run-kill-buffer-persistent)
     (define-key map (kbd "M-T")           'helm-ff-run-touch-files)
+    (define-key map (kbd "M-M")           'helm-ff-run-chmod)
     (define-key map (kbd "C-c d")         'helm-ff-persistent-delete)
     (define-key map (kbd "M-e")           'helm-ff-run-switch-to-shell)
     (define-key map (kbd "C-c i")         'helm-ff-run-complete-fn-at-point)
@@ -751,6 +752,7 @@ when moving out of directory when non nil."
    "Symlink files(s) `M-S, C-u to follow'" 'helm-find-files-symlink
    "Relsymlink file(s) `M-Y, C-u to follow'" 'helm-find-files-relsymlink
    "Hardlink file(s) `M-H, C-u to follow'" 'helm-find-files-hardlink
+   "Change mode on file(s) `M-M'" 'helm-ff-chmod
    "Find file other window `C-c o'" 'helm-find-files-other-window
    "Find file other frame `C-c C-o'" 'find-file-other-frame
    (lambda () (and (fboundp 'tab-bar-mode)
@@ -1367,6 +1369,26 @@ This reproduce the behavior of \"cp --backup=numbered from to\"."
 (defun helm-find-files-hardlink (_candidate)
   "Hardlink files from `helm-find-files'."
   (helm-find-files-do-action 'hardlink))
+
+(defun helm-ff-chmod (_candidate)
+  "Set file mode on marked files.
+If no mode is specified in prompt, default mode will be the mode of
+the car of marked files i.e. the first marked file."
+  (let* ((mkd        (helm-marked-candidates))
+         (model      (car mkd))
+         (default    (helm-file-attributes model :octal t))
+         (mode       (read-file-modes nil model))
+         (smode      (file-modes-number-to-symbolic mode))
+         (candidates (if (string= default (format "%o" mode))
+                         (cdr mkd) mkd)))
+    (with-helm-display-marked-candidates
+      helm-marked-buffer-name
+      (helm-ff--count-and-collect-dups candidates)
+      (when (y-or-n-p (format "Change file mode to `%s'? " smode))
+        (dolist (f candidates)
+          (set-file-modes f mode 'nofollow))
+        (message "Changed file mode to `%s' on %s file(s)"
+                 smode (length candidates))))))
 
 (defun helm-find-files-other-window (_candidate)
   "Keep current-buffer and open files in separate windows.
@@ -2368,6 +2390,10 @@ Called with a prefix arg open menu unconditionally."
 (helm-make-command-from-action helm-ff-run-hardlink-file
     "Run Hardlink file action from `helm-source-find-files'."
   'helm-find-files-hardlink)
+
+(helm-make-command-from-action helm-ff-run-chmod
+    "Run chmod action from `helm-source-find-files'."
+  'helm-ff-chmod)
 
 (defun helm-ff-delete-files (candidate)
   "Delete files default action."
