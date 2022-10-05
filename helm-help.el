@@ -822,6 +822,15 @@ When `dired-async-mode' is enabled, an additional action named \"Backup files\"
 will be available. (Such command is not natively available in Emacs).
 See [[Use the wildcard to select multiple files]] for details.
 
+*** Multiple copies of a file
+
+The command \\<helm-find-files-map>\\[helm-ff-run-mcp] allows
+copying a single file to multiple directories. To use it, mark
+the file you want to copy first and then mark the directories
+where you want to copy file.  For example if you run
+\\[helm-ff-run-mcp] on the marked candidates '(\"foo.txt\" \"bar/\" \"baz\"),
+\"foo.txt\" will be copied to directories \"bar/\" and \"baz/\".
+
 *** Use Rsync to copy files
 
 If Rsync is available, you can use it to copy/sync files or directories
@@ -1196,12 +1205,14 @@ If `all-the-icons' package is installed, turning on
 |\\[helm-ff-run-rename-file]|Rename Files (`\\[universal-argument]' to follow).
 |\\[helm-ff-run-query-replace-fnames-on-marked]|Query replace on marked files.
 |\\[helm-ff-run-copy-file]|Copy Files (`\\[universal-argument]' to follow).
+|\\[helm-ff-run-mcp]|Copy car of marked to remaining directories.
 |\\[helm-ff-run-rsync-file]|Rsync Files (`\\[universal-argument]' to edit command).
 |\\[helm-ff-run-byte-compile-file]|Byte Compile Files (`\\[universal-argument]' to load).
 |\\[helm-ff-run-load-file]|Load Files.
 |\\[helm-ff-run-symlink-file]|Symlink Files.
 |\\[helm-ff-run-hardlink-file]|Hardlink files.
 |\\[helm-ff-run-relsymlink-file]|Relative symlink Files.
+|\\[helm-ff-run-chmod]|Change mode on Files.
 |\\[helm-ff-run-delete-file]|Delete Files.
 |\\[helm-ff-run-touch-files]|Touch files.
 |\\[helm-ff-run-kill-buffer-persistent]|Kill buffer candidate without leaving Helm.
