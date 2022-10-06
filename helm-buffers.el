@@ -606,23 +606,10 @@ buffers)."
            (type (or type
                      (get-text-property
                       0 'type (helm-get-selection nil 'withprop src)))))
-      (save-excursion
-        (goto-char (helm-get-previous-header-pos))
-        (helm-next-line)
-        (let* ((next-head (helm-get-next-header-pos))
-               (end       (and next-head
-                               (save-excursion
-                                 (goto-char next-head)
-                                 (forward-line -1)
-                                 (point))))
-               (maxpoint  (or end (point-max))))
-          (while (< (point) maxpoint)
-            (helm-mark-current-line)
-            (let ((cand (helm-get-selection nil 'withprop src)))
-              (when (and (not (helm-this-visible-mark))
-                         (eq (get-text-property 0 'type cand) type))
-                (helm-make-visible-mark)))
-            (forward-line 1) (end-of-line))))
+      (helm--map-candidates-in-source
+       src #'helm-make-visible-mark
+       (lambda (cand)
+         (eq (get-text-property 0 'type cand) type)))
       (helm-mark-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
