@@ -2609,7 +2609,7 @@ extension."
                (with-helm-window helm-visible-mark-overlays))
           (helm-unmark-all)
           (helm-ff-mark-similar-files-1)))))
-(put 'helm-ff-mark-similar-filess 'helm-only t)
+(put 'helm-ff-mark-similar-files 'helm-only t)
 
 (defun helm-reduce-file-name-1 (fname level)
   ;; This is the old version of helm-reduce-file-name, we still use it
