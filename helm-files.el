@@ -188,6 +188,7 @@ This is used only as a let binding.")
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
     (when (executable-find "rsync")
       (define-key map (kbd "M-V")         'helm-ff-run-rsync-file))
+    (define-key map (kbd "C-M-SPC")       'helm-ff-mark-similar-files)
     (define-key map (kbd "C-M-c")         'helm-ff-run-mcp)
     (define-key map (kbd "M-B")           'helm-ff-run-byte-compile-file)
     (define-key map (kbd "M-L")           'helm-ff-run-load-file)
@@ -2578,6 +2579,37 @@ Emacs and even the whole system as it eats all memory."
     (unless (helm-empty-source-p)
       (helm-ff-toggle-basename))))
 (put 'helm-ff-run-toggle-basename 'helm-only t)
+
+(defun helm-ff-mark-similar-files-1 ()
+  "Mark similar files.
+Files are considered similar if they have the same face and same
+extension."
+  (with-helm-window
+    (let* ((src  (helm-get-current-source))
+           (file (helm-get-selection nil 'withprop src))
+           (face (get-text-property 3 'face file))
+           (ext  (file-name-extension file)))
+      (helm--map-candidates-in-source
+       src #'helm-make-visible-mark
+       (lambda (cand)
+         (and (eq (get-text-property 3 'face cand) face)
+              (equal ext (file-name-extension cand)))))
+      (helm-mark-current-line)
+      (helm-display-mode-line src t)
+      (when helm-marked-candidates
+        (message "%s candidates marked" (length helm-marked-candidates))
+        (set-window-margins (selected-window) 1)))))
+
+(defun helm-ff-mark-similar-files ()
+    "Mark all files similar to selection."
+  (interactive)
+  (with-helm-alive-p
+    (let ((marked (helm-marked-candidates)))
+      (if (and (>= (length marked) 1)
+               (with-helm-window helm-visible-mark-overlays))
+          (helm-unmark-all)
+          (helm-ff-mark-similar-files-1)))))
+(put 'helm-ff-mark-similar-filess 'helm-only t)
 
 (defun helm-reduce-file-name-1 (fname level)
   ;; This is the old version of helm-reduce-file-name, we still use it

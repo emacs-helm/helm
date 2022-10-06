@@ -1447,6 +1447,30 @@ Argument ALIST is an alist of associated major modes."
             (eq (car (rassq cdr-o-assoc-mode alist))
                 cur-maj-mode)))))
 
+;;; Source processing
+;;
+(defun helm--map-candidates-in-source (src fn pred)
+  "Map over all candidates in SRC and execute FN if PRED returns non nil.
+Arg FN is a function called with no arg and PRED is a function called
+with current candidate as arg."
+  (save-excursion
+    (goto-char (helm-get-previous-header-pos))
+    (helm-next-line)
+    (let* ((next-head (helm-get-next-header-pos))
+           (end       (and next-head
+                           (save-excursion
+                             (goto-char next-head)
+                             (forward-line -1)
+                             (point))))
+           (maxpoint  (or end (point-max))))
+      (while (< (point) maxpoint)
+        (helm-mark-current-line)
+        (let ((cand (helm-get-selection nil 'withprop src)))
+          (when (and (not (helm-this-visible-mark))
+                     (funcall pred cand))
+            (funcall fn)))
+        (forward-line 1) (end-of-line)))))
+
 ;;; Files routines
 ;;
 (defun helm-file-name-sans-extension (filename)
