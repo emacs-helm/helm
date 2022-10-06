@@ -1080,6 +1080,18 @@ To touch more than one new file, separate you filenames with a comma (\",\").
 If one wants to create (touch) a new file with comma inside the name use a prefix arg,
 this will prevent splitting the name and create multiple files.
 
+*** Change mode on files (chmod)
+
+When running `\\<helm-find-files-map>\\[helm-ff-run-chmod]' on
+marked files, you can enter the new mode in prompt but you can
+also use the first marked file as model to use it as default.
+For example you can mark a file with mode 777 and mark other
+files with mode 664, press 'RET' and answer 'y', all marked files
+will be changed to 777.
+
+NOTE: Another way to change modes on files in helm-find-files is
+running `\\<helm-find-files-map>\\[helm-ff-run-switch-to-shell]' and use 'chmod' directly.
+
 *** Delete files
 
 You can delete files without quitting helm with
