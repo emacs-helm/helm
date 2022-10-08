@@ -1248,6 +1248,12 @@ differently depending of answer:
                      (funcall action elm)
                    (setq dont-ask t)))
             ("q" (throw 'break nil))))))))
+
+(defsubst helm-string-numberp (str)
+  "Return non nil if string STR represent a number."
+  (cl-assert (stringp str) t)
+  (or (cl-loop for c across str always (char-equal c ?0))
+      (not (zerop (string-to-number str)))))
 
 ;;; Symbols routines
 ;;
@@ -1485,9 +1491,7 @@ with current candidate as arg."
 (defsubst helm-file-name-extension (file)
   "Returns FILE extension if it is not a number."
   (helm-aif (file-name-extension file)
-      (and (not (string-match "\\`0+\\'" it))
-           (zerop (string-to-number it))
-           it)))
+      (and (not (helm-string-numberp it)) it)))
 
 (defun helm-basename (fname &optional ext)
   "Print FNAME with any leading directory components removed.
