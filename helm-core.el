@@ -2585,8 +2585,8 @@ This function is also used to process functions called with no
 args, e.g. init functions.  In this case it is called without
 ARGS.
 See `helm-process-filtered-candidate-transformer'
-\`helm-compute-attr-in-sources' and
-\`helm-process-candidate-transformer'.
+    `helm-compute-attr-in-sources'
+    `helm-process-candidate-transformer'.
 
 Arg FUNCTIONS is either a symbol or a list of functions, each
 function being applied on ARGS and called on the result of the
@@ -2596,11 +2596,11 @@ precedent function.  Return the result of last function call."
         (funs (if (functionp functions) (list functions) functions)))
     (cl-loop with result
              for fn in funs
-             do (setq result (apply fn args))
-             when (and args (cdr funs))
              ;; In filter functions, ARGS is a list of one or two elements where
              ;; the first element is the list of candidates and the second
              ;; a list containing the source.
+             do (setq result (apply fn args))
+             when (and args (cdr funs))
              ;; When more than one fn, set the candidates list to what returns
              ;; this fn to compute the modified candidates with the next fn
              ;; and so on.
