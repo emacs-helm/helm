@@ -1056,17 +1056,23 @@ When using two prefix args, files are opened in background without beeing displa
 
 *** Expand archives as directories in a avfs directory
 
-If you have mounted your filesystem with mountavfs,
+If you have mounted your filesystem with 'mountavfs' command,
 you can expand archives in the \"~/.avfs\" directory with \\<helm-map>\\[helm-execute-persistent-action].
+
+To umount Avfs, use ~fusermount -u ~/.avfs~
+
+NOTE: You need the package 'avfs', on debian like distros use ~apt-get install avfs~.
 
 *** Tramp archive support (emacs-27+ only)
 
-If your emacs have library tramp-archive.el, you can browse the
-content of archives with emacs and BTW helm-find-files. However this beeing
-experimental and not very fast, helm doesn't provide an automatic
-expansion and detection of archives, you will have to add the final /
-manually and may have to force update (\\<helm-map>\\[helm-refresh])
-or remove and add again the final / until tramp finish decompressing archive.
+As Tramp archive often crash Helm and Emacs, Helm does its best
+to disable it, however it is hard to do so as Tramp Archive is
+enabled inconditionally in Emacs.  Here I build my Emacs
+without-dbus to ensure Tramp archive wont kickin unexpectedly.
+
+If you want to browse archives please use [[Expand archives as
+directories in a avfs directory][Avfs]] which is much better and
+stable.
 
 *** Touch files
 
