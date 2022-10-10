@@ -3164,12 +3164,6 @@ Return nil if no `helm-buffer' found."
 (put 'helm-run-cycle-resume 'helm-only t)
 
 
-;;;###autoload
-(defun helm-other-buffer (sources buffer)
-  "Simplified Helm interface with other `helm-buffer'.
-Call `helm' only with SOURCES and BUFFER as args."
-  (helm :sources sources :buffer buffer))
-
 ;;; Nested sessions
 ;;
 ;;
@@ -3239,29 +3233,9 @@ Don't use this directly, use instead `helm' with the keyword
           (helm-display-mode-line (helm-get-current-source)))))))
 
 
-;;; Accessors
+;;; Windows and frames
 ;;
-(defun helm-current-position (save-or-restore)
-  "Save or restore current position in `helm-current-buffer'.
-Argument SAVE-OR-RESTORE is either save or restore."
-  (cl-case save-or-restore
-    (save
-     (helm-log "helm-current-position" "Save position at %S" (cons (point) (window-start)))
-     (setq helm-current-position (cons (point) (window-start))))
-    (restore
-     ;; Maybe `helm-current-buffer' have been deleted
-     ;; during helm session so check if it is here
-     ;; otherwise position in underlying buffer will be lost.
-     (when (get-buffer-window helm-current-buffer 'visible)
-       (helm-log "helm-current-position" "Restore position at  %S in buffer %s"
-                 helm-current-position
-                 (buffer-name (current-buffer)))
-       (goto-char (car helm-current-position))
-       ;; Fix this position with the NOFORCE arg of `set-window-start'
-       ;; otherwise, if there is some other buffer than `helm-current-buffer'
-       ;; one, position will be lost.
-       (set-window-start (selected-window) (cdr helm-current-position) t)))))
-
+;;
 
 (defun helm-frame-or-window-configuration (save-or-restore)
   "Save or restore last frame or window configuration.
@@ -3368,10 +3342,6 @@ Returns nil when window is dedicated."
   (helm-aif (other-window-for-scrolling)
       (and (not (window-dedicated-p it)) it)))
 
-
-;;; Display helm buffer
-;;
-;;
 (defun helm-resolve-display-function (com)
   "Decide which display function to use according to `helm-commands-using-frame'.
 
@@ -3637,6 +3607,27 @@ For RESUME INPUT DEFAULT and SOURCES see `helm'."
     (when (helm-resume-p resume)
       (helm-compute-attr-in-sources 'resume))
     (helm-log "helm-initialize" "end initialization")))
+
+(defun helm-current-position (save-or-restore)
+  "Save or restore current position in `helm-current-buffer'.
+Argument SAVE-OR-RESTORE is either save or restore."
+  (cl-case save-or-restore
+    (save
+     (helm-log "helm-current-position" "Save position at %S" (cons (point) (window-start)))
+     (setq helm-current-position (cons (point) (window-start))))
+    (restore
+     ;; Maybe `helm-current-buffer' have been deleted
+     ;; during helm session so check if it is here
+     ;; otherwise position in underlying buffer will be lost.
+     (when (get-buffer-window helm-current-buffer 'visible)
+       (helm-log "helm-current-position" "Restore position at  %S in buffer %s"
+                 helm-current-position
+                 (buffer-name (current-buffer)))
+       (goto-char (car helm-current-position))
+       ;; Fix this position with the NOFORCE arg of `set-window-start'
+       ;; otherwise, if there is some other buffer than `helm-current-buffer'
+       ;; one, position will be lost.
+       (set-window-start (selected-window) (cdr helm-current-position) t)))))
 
 (defun helm-initialize-overlays (buffer)
   "Initialize Helm overlays in BUFFER."
@@ -7774,6 +7765,12 @@ help."
       (message "%sisplaying continuation lines"
                (if truncate-lines "Not D" "D")))))
 (put 'helm-toggle-truncate-line 'helm-only t)
+
+;;;###autoload
+(defun helm-other-buffer (sources buffer)
+  "Simplified Helm interface with other `helm-buffer'.
+Call `helm' only with SOURCES and BUFFER as args."
+  (helm :sources sources :buffer buffer))
 
 
 (provide 'helm-core)
