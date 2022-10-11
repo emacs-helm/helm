@@ -2589,11 +2589,12 @@ extension."
            (file (helm-get-selection nil 'withprop src))
            (face (get-text-property 3 'face file))
            (ext  (file-name-extension file)))
-      (helm--map-candidates-in-source
-       src #'helm-make-visible-mark
-       (lambda (cand)
-         (and (eq (get-text-property 3 'face cand) face)
-              (equal ext (file-name-extension cand)))))
+      (helm-map-candidates-in-source src
+        (lambda (_cand) (helm-make-visible-mark))
+        (lambda (cand)
+          (and (not (helm-this-visible-mark))
+               (eq (get-text-property 3 'face cand) face)
+               (equal ext (file-name-extension cand)))))
       (helm-mark-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
