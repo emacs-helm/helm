@@ -1458,7 +1458,7 @@ Argument ALIST is an alist of associated major modes."
 (defun helm--map-candidates-in-source (src fn pred)
   "Map over all candidates in SRC and execute FN if PRED returns non nil.
 Arg FN is a function called with no arg and PRED is a function called
-with current candidate as arg."
+with current display part of candidate as arg."
   (save-excursion
     (goto-char (helm-get-previous-header-pos))
     (helm-next-line)
