@@ -755,16 +755,7 @@ you have in `file-attributes'."
               (gid-change  (cl-getf all :gid-change))
               (inode       (cl-getf all :inode))
               (device-num  (cl-getf all :device-num))
-              (dired       (concat
-                            (helm-split-mode-file-attributes
-                             (cl-getf all :mode) t) " "
-                            (number-to-string (cl-getf all :links)) " "
-                            (cl-getf all :uid) ":"
-                            (cl-getf all :gid) " "
-                            (if human-size
-                                (helm-file-human-size (cl-getf all :size))
-                              (int-to-string (cl-getf all :size))) " "
-                            (cl-getf all :modif-time)))
+              (dired       (helm-file-attributes-dired-line all human-size))
               (human-size (helm-file-human-size (cl-getf all :size)))
               (mode-type  (cl-getf modes :mode-type))
               (mode-owner (cl-getf modes :user))
@@ -772,6 +763,18 @@ you have in `file-attributes'."
               (mode-other (cl-getf modes :other))
               (octal      (cl-getf modes :octal))
               (t          (append all modes))))))
+
+(defun helm-file-attributes-dired-line (all &optional human-size)
+  (format "%s %s %s:%s %s %s"
+   (helm-split-mode-file-attributes
+    (cl-getf all :mode) t)
+   (number-to-string (cl-getf all :links))
+   (cl-getf all :uid)
+   (cl-getf all :gid)
+   (if human-size
+       (helm-file-human-size (cl-getf all :size))
+     (int-to-string (cl-getf all :size)))
+   (cl-getf all :modif-time)))
 
 (defun helm-split-mode-file-attributes (str &optional string)
   "Split mode file attributes STR into a proplist.
