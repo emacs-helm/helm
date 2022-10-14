@@ -6255,8 +6255,9 @@ be directories."
                          (when helm-ff-file-name-history-use-recentf
                            (require 'recentf)
                            (or recentf-mode (recentf-mode 1)))))
-               :candidate-number-limit (or (get 'file-name-history 'history-length)
-                                           history-length)
+               :candidate-number-limit (helm-aand (or (get 'file-name-history 'history-length)
+                                                      history-length)
+                                                  (and (numberp it) it))
                :candidates (lambda ()
                              (if helm-ff-file-name-history-use-recentf
                                  recentf-list
