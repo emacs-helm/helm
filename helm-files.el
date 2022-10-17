@@ -4141,12 +4141,13 @@ Arg DISP is the display part of the candidate."
 
 (defun helm-ff--is-dir-from-disp (disp)
   "Return the face used for candidate when candidate is a directory."
-  (cl-loop for face in '(helm-ff-directory helm-ff-dotted-directory)
-           thereis (text-property-any 0 (length disp) 'face face disp)))
+  (cl-loop with faces = (helm-mklist (get-text-property 2 'face disp))
+           for face in '(helm-ff-directory helm-ff-dotted-directory)
+           thereis (memq face faces)))
 
 (defun helm-ff--is-file-from-disp (disp)
   "Return the face used for file's candidate or dotted-symlink dirs."
-  (cl-loop with len = (length disp)
+  (cl-loop with faces = (helm-mklist (get-text-property 2 'face disp))
            for face in '(helm-ff-file
                          helm-ff-suid
                          helm-ff-executable
@@ -4155,7 +4156,7 @@ Arg DISP is the display part of the candidate."
                          helm-ff-symlink
                          helm-ff-dotted-symlink-directory
                          helm-ff-backup-file)
-           when (text-property-any 0 len 'face face disp)
+           when (memq face faces)
            return face))
 
 ;;;###autoload
@@ -5248,7 +5249,8 @@ Use it for non-interactive calls of `helm-find-files'."
                            (expand-file-name tap))))
          ;; Ensure not being prompted for password each time we
          ;; navigate to a directory.
-         (password-cache t))
+         (password-cache t)
+         (minibuffer-completing-file-name t))
     (helm-set-local-variable 'helm-follow-mode-persistent nil
                              'helm-drag-mouse-1-fn 'helm-ff-drag-mouse-1-fn)
     (unless helm-source-find-files
