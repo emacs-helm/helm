@@ -821,6 +821,15 @@ This can be toggled at any time from `helm-ff-file-name-history' with \
 Note that image files are always followed even if their extensions is
 present in this list."
   :type '(repeat string))
+
+(defcustom helm-ff-nohighlight-matches t
+  "Highlight matches in `helm-find-files' when nil."
+  :type 'boolean
+  :initialize 'custom-initialize-changed
+  :set (lambda (var val)
+         (set var val)
+         (setq helm-source-find-files nil)
+         (helm-ff-icon-mode helm-ff-icon-mode)))
 
 ;;; Faces
 ;;
@@ -999,7 +1008,7 @@ Should not be used among other sources.")
    (volatile :initform t)
    (cleanup :initform 'helm-find-files-cleanup)
    (migemo :initform t)
-   (nohighlight :initform t)
+   (nohighlight :initform (progn helm-ff-nohighlight-matches))
    (keymap :initform 'helm-find-files-map)
    (candidate-number-limit :initform 'helm-ff-candidate-number-limit)
    (action-transformer
