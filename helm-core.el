@@ -42,6 +42,7 @@
 (helm--setup-completion-styles-alist)
 
 (declare-function helm-comp-read "helm-mode.el")
+(declare-function helm-mode--in-file-completion-p "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 (declare-function helm-quit-and-find-file "helm-utils.el")
 
@@ -890,8 +891,10 @@ This applies when using `helm-next/previous-line'."
   :group 'helm
   :type 'function)
 
-(defcustom helm-fuzzy-matching-highlight-fn 'helm-fuzzy-default-highlight-match
-  "The function to highlight fuzzy matches."
+(defcustom helm-fuzzy-matching-highlight-fn #'helm-fuzzy-default-highlight-match
+  "The function to highlight fuzzy matches.
+The function must have the same signature as
+`helm-fuzzy-default-highlight-match' which is the default."
   :group 'helm
   :type 'function)
 
@@ -4580,80 +4583,94 @@ useful when the order of the candidates is meaningful, e.g. with
           (char-fold-to-regexp pattern)
         pattern)))
 
-(defun helm-fuzzy-default-highlight-match (candidate &optional diacritics)
+(defun helm-fuzzy-default-highlight-match-1 (candidate &optional pattern diacritics file-comp)
+  (let* ((pair    (and (consp candidate) candidate))
+         (display (helm-stringify (if pair (car pair) candidate)))
+         (real    (cdr pair))
+         (regex   (helm--maybe-get-migemo-pattern pattern diacritics))
+         (mpart   (get-text-property 0 'match-part display))
+         (mp      (cond ((and mpart (string= display mpart)) nil)
+                        (mpart)
+                        (file-comp (file-name-nondirectory display))))
+         (count   0)
+         beg-str end-str)
+    ;; Extract all parts of display keeping original properties.
+    (when (and mp (ignore-errors
+                    ;; Avoid error when candidate is a huge line.
+                    (string-match (regexp-quote mp) display)))
+      (setq beg-str (substring display 0 (match-beginning 0))
+            end-str (substring display (match-end 0) (length display))
+            mp (substring display (match-beginning 0) (match-end 0))))
+    (with-temp-buffer
+      ;; Insert the whole display part and remove non--match-part
+      ;; to keep their original face properties.
+      (insert (propertize (or mp display) 'read-only nil)) ; Fix (bug#1176)
+      (goto-char (point-min))
+      (condition-case nil
+          (progn
+            ;; Try first matching against whole pattern.
+            (while (re-search-forward regex nil t)
+              (cl-incf count)
+              (helm-add-face-text-properties
+               (match-beginning 0) (match-end 0) 'helm-match))
+            ;; If no matches start matching against multiples or fuzzy matches.
+            (when (zerop count)
+              (cl-loop with multi-match = (string-match-p " " pattern)
+                       with patterns = (if multi-match
+                                           (cl-loop for pat in (helm-mm-split-pattern
+                                                                pattern)
+                                                    collect
+                                                    (helm--maybe-get-migemo-pattern
+                                                     pat diacritics))
+                                         (split-string pattern "" t))
+                       for p in patterns
+                       ;; Multi matches (regexps patterns).
+                       if multi-match do
+                       (progn
+                         (while (re-search-forward p nil t)
+                           (helm-add-face-text-properties
+                            (match-beginning 0) (match-end 0)
+                            'helm-match))
+                         (goto-char (point-min)))
+                       ;; Fuzzy matches (literal patterns).
+                       else do
+                       (when (search-forward p nil t)
+                         (helm-add-face-text-properties
+                          (match-beginning 0) (match-end 0)
+                          'helm-match)))))
+        (invalid-regexp nil))
+      ;; Now replace the original match-part with the part
+      ;; with face properties added.
+      (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
+    (if real (cons display real) display)))
+
+(cl-defun helm-fuzzy-default-highlight-match (candidate
+                                              &optional (pattern helm-pattern) diacritics file-comp)
   "The default function to highlight matches in fuzzy matching.
-Highlight elements in CANDIDATE matching `helm-pattern' according
-to the matching method in use."
-  (if (string= helm-pattern "")
+Highlight elements in CANDIDATE matching PATTERN according
+to the matching method in use.  When DIACRITICS is specified, ignore
+diacritics, see `char-fold-to-regexp' for more infos."
+  (if (string= pattern "")
       ;; Empty pattern, do nothing.
       candidate
     ;; Else start highlighting.
-    (let* ((pair    (and (consp candidate) candidate))
-           (display (helm-stringify (if pair (car pair) candidate)))
-           (real    (cdr pair))
-           (regex   (helm--maybe-get-migemo-pattern helm-pattern diacritics))
-           (mp      (pcase (get-text-property 0 'match-part display)
-                      ((pred (string= display)) nil)
-                      (str str)))
-           (count   0)
-           beg-str end-str)
-      ;; Extract all parts of display keeping original properties.
-      (when (and mp (ignore-errors
-                      ;; Avoid error when candidate is a huge line.
-                      (string-match (regexp-quote mp) display)))
-        (setq beg-str (substring display 0 (match-beginning 0))
-              end-str (substring display (match-end 0) (length display))
-              mp (substring display (match-beginning 0) (match-end 0))))
-      (with-temp-buffer
-        ;; Insert the whole display part and remove non--match-part
-        ;; to keep their original face properties.
-        (insert (propertize (or mp display) 'read-only nil)) ; Fix (bug#1176)
-        (goto-char (point-min))
-        (condition-case nil
-            (progn
-              ;; Try first matching against whole pattern.
-              (while (re-search-forward regex nil t)
-                (cl-incf count)
-                (helm-add-face-text-properties
-                 (match-beginning 0) (match-end 0) 'helm-match))
-              ;; If no matches start matching against multiples or fuzzy matches.
-              (when (zerop count)
-                (cl-loop with multi-match = (string-match-p " " helm-pattern)
-                         with patterns = (if multi-match
-                                             (cl-loop for pat in (helm-mm-split-pattern
-                                                                  helm-pattern)
-                                                      collect
-                                                      (helm--maybe-get-migemo-pattern
-                                                       pat diacritics))
-                                           (split-string helm-pattern "" t))
-                         for p in patterns
-                         ;; Multi matches (regexps patterns).
-                         if multi-match do
-                         (progn
-                           (while (re-search-forward p nil t)
-                             (helm-add-face-text-properties
-                              (match-beginning 0) (match-end 0)
-                              'helm-match))
-                           (goto-char (point-min)))
-                         ;; Fuzzy matches (literal patterns).
-                         else do
-                         (when (search-forward p nil t)
-                           (helm-add-face-text-properties
-                            (match-beginning 0) (match-end 0)
-                            'helm-match)))))
-          (invalid-regexp nil))
-        ;; Now replace the original match-part with the part
-        ;; with face properties added.
-        (setq display (if mp (concat beg-str (buffer-string) end-str) (buffer-string))))
-      (if real (cons display real) display))))
+    (helm-fuzzy-default-highlight-match-1 candidate pattern diacritics file-comp)))
 
 (defun helm-fuzzy-highlight-matches (candidates source)
-  "The filtered-candidate-transformer function to highlight fuzzy matches.
+  "Highlight matches in CANDIDATES for SOURCE.
+The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop with diac = (helm-get-attr 'diacritics source)
+           with file-comp-p = (or minibuffer-completing-file-name
+                                  (helm-mode--in-file-completion-p))
+           ;; helm-pattern may have been modified (fuzzy) so ensure to
+           ;; use helm-input which is the raw pattern.
+           with pattern = (if file-comp-p
+                              (file-name-nondirectory helm-input)
+                            helm-input)
            for c in candidates
-           collect (funcall helm-fuzzy-matching-highlight-fn c diac)))
+           collect (funcall helm-fuzzy-matching-highlight-fn c pattern diac file-comp-p)))
 
 
 ;;; helm-flex style
