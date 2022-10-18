@@ -4651,7 +4651,8 @@ Highlight elements in CANDIDATE matching PATTERN according
 to the matching method in use.  When DIACRITICS is specified, ignore
 diacritics, see `char-fold-to-regexp' for more infos."
   (if (string= pattern "")
-      ;; Empty pattern, do nothing.
+      ;; Empty pattern, do nothing.  This is needed when this function
+      ;; is used outside of helm-fuzzy-highlight-matches like in *buffers-list. 
       candidate
     ;; Else start highlighting.
     (helm-fuzzy-default-highlight-match-1 candidate pattern diacritics file-comp)))
@@ -4669,6 +4670,7 @@ See `helm-fuzzy-default-highlight-match'."
            with pattern = (if file-comp-p
                               (file-name-nondirectory helm-input)
                             helm-input)
+           when (string= pattern "") return candidates
            for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c pattern diac file-comp-p)))
 
