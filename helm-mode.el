@@ -1434,7 +1434,7 @@ Keys description:
                            helm-ff-auto-update-flag))
              :mode-line mode-line
              :help-message 'helm-read-file-name-help-message
-             :nohighlight t
+             :nohighlight helm-ff-nohighlight-matches
              :candidate-number-limit 'helm-ff-candidate-number-limit
              :candidates
              (lambda ()
