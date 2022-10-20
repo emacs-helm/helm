@@ -3882,14 +3882,14 @@ return FNAME with display property prefixed with [?]."
           (new-file (concat prefix-new " " fname)))))
 
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
-  (if (or (member real '("." ".."))
-          ;; Incomplete filenames are prefixed with two spaces, the
-          ;; first one beeing propertized with a 'display prop
-          ;; i.e. "[?] foo".
-          (and (string-match-p "\\`\\s-\\{2\\}" disp)
-               (string= real (substring-no-properties disp 2))))
-      900000
-      (helm-score-candidate-for-pattern real pattern)))
+  (cond ((member real '("." "..")) 900000)
+        ((and (string-match-p "\\`\\s-\\{2\\}" disp)
+               (string= real (substring-no-properties disp 2)))
+         ;; Incomplete filenames are prefixed with two spaces, the
+         ;; first one beeing propertized with a 'display prop
+         ;; i.e. "[?] foo".
+         900001)
+        (t (helm-score-candidate-for-pattern real pattern))))
 
 (defun helm-ff-sort-candidates-1 (candidates input)
   "Sort function for `helm-source-find-files'.
