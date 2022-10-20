@@ -4591,7 +4591,10 @@ useful when the order of the candidates is meaningful, e.g. with
          (mpart   (get-text-property 0 'match-part display))
          (mp      (cond ((and mpart (string= display mpart)) nil)
                         (mpart)
-                        (file-comp (file-name-nondirectory display))))
+                        ;; FIXME: This may be wrong when match-on-real
+                        ;; is nil, so we should flag match-on-real on
+                        ;; top and use it.
+                        (file-comp (file-name-nondirectory (or real display)))))
          (count   0)
          beg-str end-str)
     ;; Extract all parts of display keeping original properties.
