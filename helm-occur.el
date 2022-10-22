@@ -120,7 +120,7 @@ Note that when using `buffer-substring' initialization will be slower."
                                    (const :tag "Without text properties" buffer-substring-no-properties))))
 
 (defcustom helm-occur-buffer-substring-default-mode
-  'buffer-substring
+  'buffer-substring-no-properties
   "Default mode for major modes not defined in helm-occur-buffer-substring-fn-for-modes.
 
 Can be one of `buffer-substring' or `buffer-substring-no-properties'.
