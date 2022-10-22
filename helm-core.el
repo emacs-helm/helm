@@ -42,7 +42,6 @@
 (helm--setup-completion-styles-alist)
 
 (declare-function helm-comp-read "helm-mode.el")
-(declare-function helm-mode--in-file-completion-p "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 (declare-function helm-quit-and-find-file "helm-utils.el")
 
@@ -4670,7 +4669,7 @@ See `helm-fuzzy-default-highlight-match'."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop with diac = (helm-get-attr 'diacritics source)
            with file-comp-p = (or minibuffer-completing-file-name
-                                  (helm-mode--in-file-completion-p))
+                                  (helm-guess-filename-at-point))
            ;; helm-pattern may have been modified (fuzzy) so ensure to
            ;; use helm-input which is the raw pattern.
            with pattern = (if file-comp-p

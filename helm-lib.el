@@ -1858,6 +1858,10 @@ Also `helm-completion-style' settings have no effect here,
                           all)))))
       ;; Ensure circular objects are removed.
       (complete-with-action t compsfn helm-pattern predicate))))
+
+(defun helm-guess-filename-at-point ()
+  (with-helm-current-buffer
+    (run-hook-with-args-until-success 'file-name-at-point-functions)))
 
 ;; Yank text at point.
 ;;
