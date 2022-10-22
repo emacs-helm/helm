@@ -1,6 +1,6 @@
 ;;; helm-occur.el --- Incremental Occur for Helm. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto 
+;; Copyright (C) 2012 ~ 2021 Thierry Volpiatto
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -118,6 +118,23 @@ Note that when using `buffer-substring' initialization will be slower."
   :type '(alist :key-type (symbol :tag "Mode")
                 :value-type (radio (const :tag "With text properties" buffer-substring)
                                    (const :tag "Without text properties" buffer-substring-no-properties))))
+
+(defcustom helm-occur-buffer-substring-default-mode
+  'buffer-substring
+  "Default mode for major modes not defined in helm-occur-buffer-substring-fn-for-modes.
+
+Can be one of `buffer-substring' or `buffer-substring-no-properties'.
+
+Note that when using `buffer-substring' initialization will be slower.
+
+If buffer-substring, all buffers with the modes not defined in
+
+helm-occur-buffer-substring-fn-for-modes will be displayed with colors and properties
+
+in the helm-occur buffer"
+
+  :type '(radio (const :tag "With text properties" buffer-substring)
+                                   (const :tag "Without text properties" buffer-substring-no-properties)))
 
 (defcustom helm-occur-keep-closest-position t
   "When non nil select closest candidate from point after update.
@@ -302,7 +319,7 @@ engine beeing completely different and also much faster."
                           (let* ((bsfn (or (cdr (assq
                                                  major-mode
                                                  helm-occur-buffer-substring-fn-for-modes))
-                                           #'buffer-substring-no-properties))
+                                           helm-occur-buffer-substring-default-mode))
                                  (contents (funcall bsfn (point-min) (point-max))))
                             (helm-set-attr 'get-line bsfn)
                             (with-current-buffer (helm-candidate-buffer 'global)
