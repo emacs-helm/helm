@@ -4587,6 +4587,7 @@ useful when the order of the candidates is meaningful, e.g. with
   (let* ((pair    (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real    (cdr pair))
+         (host    (and file-comp (get-text-property 0 'host display)))
          (regex   (helm--maybe-get-migemo-pattern pattern diacritics))
          (mpart   (get-text-property 0 'match-part display))
          (mp      (cond ((and mpart (string= display mpart)) nil)
@@ -4594,9 +4595,10 @@ useful when the order of the candidates is meaningful, e.g. with
                         ;; FIXME: This may be wrong when match-on-real
                         ;; is nil, so we should flag match-on-real on
                         ;; top and use it.
-                        (file-comp (file-name-nondirectory (or real display)))))
+                        (file-comp (file-name-nondirectory (or host real display)))))
          (count   0)
          beg-str end-str)
+    (when host (setq pattern (cadr (split-string pattern ":"))))
     ;; Extract all parts of display keeping original properties.
     (when (and mp (ignore-errors
                     ;; Avoid error when candidate is a huge line.
@@ -4612,10 +4614,11 @@ useful when the order of the candidates is meaningful, e.g. with
       (condition-case nil
           (progn
             ;; Try first matching against whole pattern.
-            (while (re-search-forward regex nil t)
-              (cl-incf count)
-              (helm-add-face-text-properties
-               (match-beginning 0) (match-end 0) 'helm-match))
+            (unless (string= pattern "")
+              (while (re-search-forward regex nil t)
+                (cl-incf count)
+                (helm-add-face-text-properties
+                 (match-beginning 0) (match-end 0) 'helm-match)))
             ;; If no matches start matching against multiples or fuzzy matches.
             (when (zerop count)
               (cl-loop with multi-match = (string-match-p " " pattern)

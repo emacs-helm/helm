@@ -3962,8 +3962,9 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
   (let* ((basename (helm-basename file))
          (dot (helm-ff-dot-file-p file))
          (urlp (string-match-p helm-ff-url-regexp file))
-         ;; Filename with cntrl chars e.g. foo^J
-         (disp (or (helm-ff--get-host-from-tramp-invalid-fname file)
+         (tramp-invalid-fname (helm-ff--get-host-from-tramp-invalid-fname file))
+         (disp (or tramp-invalid-fname
+                   ;; Filename with cntrl chars e.g. foo^J
                    (replace-regexp-in-string
                     "[[:cntrl:]]" "?"
                     (if (or reverse urlp) file basename))))
@@ -3991,47 +3992,49 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
       ;; Handle tramp files with minimal highlighting.
       (if (and (or (string-match-p helm-tramp-file-name-regexp helm-pattern)
                    (helm-file-on-mounted-network-p helm-pattern)))
-          (let* ((hostp (helm-ff--get-host-from-tramp-invalid-fname file)))
-            (helm-acond (;; Dot directories . and ..
-                         dot
-                         (cons (propertize file 'face 'helm-ff-dotted-directory) file))
-                        ;; Directories.
-                        ((get-text-property 1 'helm-ff-dir file)
-                         (cons (propertize disp 'face 'helm-ff-directory) file))
-                        ;; Backup files.
-                        (backup
-                         (cons (propertize disp 'face 'helm-ff-backup-file) file))
-                        ;; Executable files.
-                        ((get-text-property 1 'helm-ff-exe file)
-                         (add-face-text-property 0 len 'helm-ff-executable t disp)
-                         (cons disp file))
-                        ;; Symlinks.
-                        ((get-text-property 1 'helm-ff-sym file)
-                         (add-face-text-property 0 len 'helm-ff-symlink t disp)
-                         (if (stringp it) ; adb method.
-                             (progn
-                               (add-face-text-property 0 (length it) 'helm-ff-truename nil it)
-                               (cons (propertize disp 'display (concat disp " ->" it)) file))
-                           (cons disp file)))
-                        ;; Regular files.
-                        ((get-text-property 1 'helm-ff-file file)
-                         (add-face-text-property 0 len 'helm-ff-file t disp)
-                         (cons disp file))
-                        ;; Tramp methods.
-                        ((string-match helm-ff-tramp-method-regexp file)
-                         (let ((method (match-string 1 file))
-                               (mh     (helm-ff--tramp-multihops-p helm-pattern)))
-                           (cons (propertize (concat (if mh "" "/") method) 'face 'helm-ff-file)
-                                 (if mh
-                                     (concat (match-string 1 helm-pattern) ":" method)
-                                   (concat "/:" method)))))
-                        ;; non existing files.
-                        (t
-                         (add-face-text-property 0 len 'helm-ff-file t disp)
-                         (cons (helm-ff-prefix-filename
-                                disp
-                                hostp (unless hostp 'new-file))
-                               file))))
+          (helm-acond (;; Dot directories . and ..
+                       dot
+                       (cons (propertize file 'face 'helm-ff-dotted-directory) file))
+                      ;; Directories.
+                      ((get-text-property 1 'helm-ff-dir file)
+                       (cons (propertize disp 'face 'helm-ff-directory) file))
+                      ;; Backup files.
+                      (backup
+                       (cons (propertize disp 'face 'helm-ff-backup-file) file))
+                      ;; Executable files.
+                      ((get-text-property 1 'helm-ff-exe file)
+                       (add-face-text-property 0 len 'helm-ff-executable t disp)
+                       (cons disp file))
+                      ;; Symlinks.
+                      ((get-text-property 1 'helm-ff-sym file)
+                       (add-face-text-property 0 len 'helm-ff-symlink t disp)
+                       (if (stringp it) ; adb method.
+                           (progn
+                             (add-face-text-property 0 (length it) 'helm-ff-truename nil it)
+                             (cons (propertize disp 'display (concat disp " ->" it)) file))
+                         (cons disp file)))
+                      ;; Regular files.
+                      ((get-text-property 1 'helm-ff-file file)
+                       (add-face-text-property 0 len 'helm-ff-file t disp)
+                       (cons disp file))
+                      ;; Tramp methods.
+                      ((string-match helm-ff-tramp-method-regexp file)
+                       (let ((method (match-string 1 file))
+                             (mh     (helm-ff--tramp-multihops-p helm-pattern)))
+                         (cons (propertize (concat (if mh "" "/") method) 'face 'helm-ff-file)
+                               (if mh
+                                   (concat (match-string 1 helm-pattern) ":" method)
+                                 (concat "/:" method)))))
+                      ;; non existing files.
+                      (t
+                       (add-face-text-property 0 len 'helm-ff-file t disp)
+                       (helm-aif tramp-invalid-fname
+                           (add-text-properties 0 len `(host ,it) disp))
+                       (cons (helm-ff-prefix-filename
+                              disp
+                              tramp-invalid-fname
+                              (unless tramp-invalid-fname 'new-file))
+                             file)))
 
         ;; Highlight local files showing everything, symlinks, exe,
         ;; dirs etc...
