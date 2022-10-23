@@ -110,31 +110,35 @@ Any other non--nil value update after confirmation."
 
 (defcustom helm-occur-buffer-substring-fn-for-modes
   '((mu4e-headers-mode . buffer-substring))
-  "Function to use to display buffer contents for major-mode.
+  "Function used to display buffer contents per major-mode.
 
-Can be one of `buffer-substring' or `buffer-substring-no-properties'.
+Use this to display lines with their text properties in helm-occur
+buffer. Can be one of `buffer-substring' or `buffer-substring-no-properties'.
+See `helm-occur-buffer-substring-default-mode' to setup this globally. 
 
 Note that when using `buffer-substring' initialization will be slower."
   :type '(alist :key-type (symbol :tag "Mode")
-                :value-type (radio (const :tag "With text properties" buffer-substring)
-                                   (const :tag "Without text properties" buffer-substring-no-properties))))
+                :value-type (radio (const :tag "With text properties"
+                                    buffer-substring)
+                                   (const :tag "Without text properties"
+                                    buffer-substring-no-properties))))
 
 (defcustom helm-occur-buffer-substring-default-mode
   'buffer-substring-no-properties
-  "Default mode for major modes not defined in helm-occur-buffer-substring-fn-for-modes.
+  "Function used to display buffer contents in helm-occur buffer.
 
+Default mode for major modes not defined in
+`helm-occur-buffer-substring-fn-for-modes'.
 Can be one of `buffer-substring' or `buffer-substring-no-properties'.
 
-Note that when using `buffer-substring' initialization will be slower.
+Note that when using `buffer-substring' initialization will be
+slower.  If buffer-substring, all buffers with the modes not
+defined in helm-occur-buffer-substring-fn-for-modes will be
+displayed with colors and properties in the helm-occur buffer"
 
-If buffer-substring, all buffers with the modes not defined in
-
-helm-occur-buffer-substring-fn-for-modes will be displayed with colors and properties
-
-in the helm-occur buffer"
-
-  :type '(radio (const :tag "With text properties" buffer-substring)
-                                   (const :tag "Without text properties" buffer-substring-no-properties)))
+  :type '(radio
+          (const :tag "With text properties" buffer-substring)
+          (const :tag "Without text properties" buffer-substring-no-properties)))
 
 (defcustom helm-occur-keep-closest-position t
   "When non nil select closest candidate from point after update.
