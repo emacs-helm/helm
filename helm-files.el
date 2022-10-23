@@ -2855,7 +2855,7 @@ when `helm-pattern' is equal to \"~/\"."
                      (not history-p) ; Don't try to auto complete in history.
                      (stringp cur-cand)
                      (file-accessible-directory-p cur-cand))
-            (if (and (not (helm-dir-is-dot cur-cand)) ; [1]
+            (if (and (not (helm-ff-dot-file-p cur-cand)) ; [1]
                      ;; Maybe we are here because completed-p is true
                      ;; but check this again to be sure. (Windows fix)
                      (<= candnum 2))    ; [2]
@@ -3712,8 +3712,8 @@ If PATTERN is a valid directory name, return PATTERN unchanged."
                      (helm--mapconcat-pattern bn)
                      (concat ".*" (regexp-quote bn))))))))
 
-(defun helm-dir-is-dot (dir)
-  (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'" dir))
+(defalias 'helm-dir-is-dot 'helm-ff-dot-file-p)
+(make-obsolete 'helm-dir-is-dot 'helm-ff-dot-file-p "3.8.8")
 
 (defun helm-ff-save-history ()
   "Store the last value of `helm-ff-default-directory' in `helm-ff-history'.

@@ -164,7 +164,7 @@ Colorize only symlinks, directories and files."
                             'identity)
            for i in files
            for disp = (if (and helm-ff-transformer-show-only-basename
-                               (not (helm-dir-is-dot i))
+                               (not (helm-ff-dot-file-p i))
                                (not (and helm--url-regexp
                                          (string-match helm--url-regexp i)))
                                (not (string-match helm-ff-url-regexp i)))
