@@ -135,7 +135,6 @@ Note that when using `buffer-substring' initialization will be
 slower.  If buffer-substring, all buffers with the modes not
 defined in helm-occur-buffer-substring-fn-for-modes will be
 displayed with colors and properties in the helm-occur buffer"
-
   :type '(radio
           (const :tag "With text properties" buffer-substring)
           (const :tag "Without text properties" buffer-substring-no-properties)))
