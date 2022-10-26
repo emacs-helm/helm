@@ -4196,12 +4196,13 @@ it from your init file, ensure to call it _after_ your defmethod's
             (helm-set-attr 'filtered-candidate-transformer
                            (append fct '(helm-ff-icons-transformer))
                            helm-source-find-files))))
-    (helm-set-attr 'filtered-candidate-transformer
-                   (remove 'helm-ff-icons-transformer
-                           (helm-get-attr
-                            'filtered-candidate-transformer
-                            helm-source-find-files))
-                   helm-source-find-files)))
+    (when helm-source-find-files
+      (helm-set-attr 'filtered-candidate-transformer
+                     (remove 'helm-ff-icons-transformer
+                             (helm-get-attr
+                              'filtered-candidate-transformer
+                              helm-source-find-files))
+                     helm-source-find-files))))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
