@@ -31,6 +31,11 @@
 (declare-function ring-ref "ring")
 (defvar Info-history)
 (defvar Info-directory-list)
+;; `Info-minibuf-history' is not declared in Emacs, see emacs bug/58786.
+(when (and (> emacs-major-version 28)
+           (not (boundp 'Info-minibuf-history)))
+  (defvar Info-minibuf-history nil))
+
 
 ;;; Customize
 
