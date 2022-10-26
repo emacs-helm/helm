@@ -1460,6 +1460,7 @@ Keys description:
                                                          helm-ff-maybe-show-thumbnails
                                                          helm-ff-sort-candidates
                                                          ,(and helm-ff-icon-mode
+                                                               (featurep 'all-the-icons)
                                                                'helm-ff-icons-transformer)))
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
