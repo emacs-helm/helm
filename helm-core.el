@@ -4594,7 +4594,8 @@ useful when the order of the candidates is meaningful, e.g. with
                         ;; FIXME: This may be wrong when match-on-real
                         ;; is nil, so we should flag match-on-real on
                         ;; top and use it.
-                        (file-comp (file-name-nondirectory (or host real display)))))
+                        (file-comp (file-name-nondirectory
+                                    (or host (and (stringp real) real) display)))))
          (count   0)
          beg-str end-str)
     (when host (setq pattern (cadr (split-string pattern ":"))))
@@ -4668,13 +4669,14 @@ The filtered-candidate-transformer function to highlight fuzzy matches.
 See `helm-fuzzy-default-highlight-match'."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
   (cl-loop with diac = (helm-get-attr 'diacritics source)
-           with file-comp-p = (or minibuffer-completing-file-name
-                                  (helm-guess-filename-at-point))
+           with file-comp-p = (and (not (helm-action-window))
+                                   (or minibuffer-completing-file-name
+                                       (helm-guess-filename-at-point)))
            ;; helm-pattern may have been modified (fuzzy) so ensure to
            ;; use helm-input which is the raw pattern.
            with pattern = (if file-comp-p
                               (file-name-nondirectory helm-input)
-                            helm-input)
+                            helm-pattern)
            when (string= pattern "") return candidates
            for c in candidates
            collect (funcall helm-fuzzy-matching-highlight-fn c pattern diac file-comp-p)))
