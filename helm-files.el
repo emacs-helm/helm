@@ -829,7 +829,8 @@ present in this list."
   :set (lambda (var val)
          (set var val)
          (setq helm-source-find-files nil)
-         (helm-ff-icon-mode helm-ff-icon-mode)))
+         (when helm-ff-icon-mode
+           (helm-ff-icon-mode 1))))
 
 ;;; Faces
 ;;
