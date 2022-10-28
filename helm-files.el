@@ -2810,10 +2810,12 @@ when `helm-pattern' is equal to \"~/\"."
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
                (pat         (helm-ff-set-pattern helm-pattern))
-               (completed-p (string= (file-name-as-directory
-                                      (expand-file-name
-                                       (substitute-in-file-name pat)))
-                                     helm-ff-default-directory))
+               (tramp-tolerate-tilde (equal (file-remote-p pat 'method)
+		                            tramp-adb-method))
+               (completed-p (helm-aand (expand-file-name
+                                        (substitute-in-file-name pat))
+                                       (string= (file-name-as-directory it)
+                                                helm-ff-default-directory)))
                (candnum (helm-get-candidate-number))
                (lt2-p   (and (<= candnum 2)
                              (>= (string-width (helm-basename helm-pattern)) 2)))
