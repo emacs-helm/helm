@@ -29,6 +29,8 @@
 (declare-function helm-comp-read "helm-mode")
 (declare-function helm-browse-project "helm-files")
 (declare-function helm-ff-switch-to-shell "helm-files")
+(declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
+(declare-function all-the-icons-octicon "ext:all-the-icons.el")
 
 (defvar dired-buffers)
 (defvar org-directory)
@@ -139,6 +141,10 @@ Default to `helm-fuzzy-sort-fn' you can use
 `helm-fuzzy-matching-sort-fn-preserve-ties-order' as alternative if
 you want to keep the recentest order when narrowing candidates."
   :type 'function)
+
+(defcustom helm-buffers-show-icons nil
+  "Prefix buffer names with an icon when non nil."
+  :type 'boolean)
 
 
 ;;; Faces
@@ -410,19 +416,26 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
                                   proc details type)
   (append
    (list
-    (concat prefix
-            (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
-                   (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
-                   (buf-name (propertize buf-name 'face face1
-                                         'help-echo help-echo
-                                         'type type)))
-              (when (condition-case _err
-                                (string-match (format "\\.\\(%s\\)" ext) buf-name)
-                              (invalid-regexp nil))
-                        (add-face-text-property
-                         (match-beginning 1) (match-end 1)
-                         'helm-ff-file-extension nil buf-name))
-              buf-name)))
+    (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
+           (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
+           (icon (when helm-buffers-show-icons
+                   (cond ((eq type 'dired)
+                          (all-the-icons-octicon "file-directory"))
+                         (buf-fname
+                          (all-the-icons-icon-for-file buf-fname))
+                         (t (all-the-icons-octicon "star")))))
+           (buf-name (propertize buf-name 'face face1
+                                 'help-echo help-echo
+                                 'type type)))
+      (when (condition-case _err
+                (string-match (format "\\.\\(%s\\)" ext) buf-name)
+              (invalid-regexp nil))
+        (add-face-text-property
+         (match-beginning 1) (match-end 1)
+         'helm-ff-file-extension nil buf-name))
+      (if icon
+          (concat icon " " prefix buf-name)
+        (concat prefix buf-name))))
    (and details
         (list size mode
               (propertize
@@ -516,7 +529,10 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
 Should be called after others transformers i.e. (boring
 buffers)."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
-  (cl-loop for i in buffers
+  (cl-loop with helm-buffers-show-icons = (and (featurep 'all-the-icons)
+                                               (default-toplevel-value
+                                                   'helm-buffers-show-icons))
+           for i in buffers
            for (name size mode meta) = (if helm-buffer-details-flag
                                            (helm-buffer--details i 'details)
                                          (helm-buffer--details i))
