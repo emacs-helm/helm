@@ -577,7 +577,7 @@ buffers)."
                (file-remote-p (with-current-buffer bufname
                                 default-directory)))
       (setq bufname (concat "@ " (helm-url-unhex-string bufname))))
-    (concat "^"
+    (concat "^[[:multibyte:] ]*"
             (if (and (null helm-buffer-details-flag)
                      (numberp helm-buffer-max-length)
                      (> (string-width bufname)
