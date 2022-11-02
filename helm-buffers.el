@@ -32,6 +32,7 @@
 (declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
 (declare-function all-the-icons-octicon "ext:all-the-icons.el")
 
+(defvar all-the-icons-mode-icon-alist)
 (defvar dired-buffers)
 (defvar org-directory)
 (defvar helm-ff-default-directory)
@@ -418,12 +419,15 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
    (list
     (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
            (ext (if buf-fname (helm-file-name-extension buf-fname) ""))
+           (bmode (with-current-buffer buf-name major-mode))
            (icon (when helm-buffers-show-icons
-                   (cond ((eq type 'dired)
-                          (all-the-icons-octicon "file-directory"))
-                         (buf-fname
-                          (all-the-icons-icon-for-file buf-fname))
-                         (t (all-the-icons-octicon "star")))))
+                   (helm-aif (assq bmode all-the-icons-mode-icon-alist)
+                       (apply (cadr it) (cddr it))
+                     (cond ((eq type 'dired)
+                            (all-the-icons-octicon "file-directory"))
+                           (buf-fname
+                            (all-the-icons-icon-for-file buf-fname))
+                           (t (all-the-icons-octicon "star"))))))
            (buf-name (propertize buf-name 'face face1
                                  'help-echo help-echo
                                  'type type)))
