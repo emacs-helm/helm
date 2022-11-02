@@ -572,7 +572,10 @@ buffers)."
                            (get-buffer i)))))
 
 (defun helm-buffer--get-preselection (buffer)
-  (let ((bufname (buffer-name buffer)))
+  (let* ((bufname     (buffer-name buffer))
+         (dispbuf     (car (helm-buffer--details buffer)))
+         (len-dispbuf (string-width dispbuf))
+         (len-prefix  (- len-dispbuf (string-width bufname))))
     (when (and bufname
                (file-remote-p (with-current-buffer bufname
                                 default-directory)))
@@ -580,11 +583,11 @@ buffers)."
     (concat "^[[:multibyte:] ]*"
             (if (and (null helm-buffer-details-flag)
                      (numberp helm-buffer-max-length)
-                     (> (string-width bufname)
-                        helm-buffer-max-length))
+                     (> len-dispbuf helm-buffer-max-length))
                 (regexp-quote
                  (helm-substring-by-width
-                  bufname helm-buffer-max-length
+                  bufname
+                  (- helm-buffer-max-length len-prefix)
                   helm-buffers-end-truncated-string))
               (concat (regexp-quote bufname)
                       (if helm-buffer-details-flag
