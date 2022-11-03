@@ -399,6 +399,14 @@ available APPEND is ignored."
 (defun helm-subr-native-elisp-p (object)
   (when (fboundp 'subr-native-elisp-p)
       (subr-native-elisp-p object)))
+
+;; Available only in emacs-27+
+(unless (fboundp 'proper-list-p) 
+  (defun proper-list-p (seq)
+    "Return OBJECT's length if it is a proper list, nil otherwise."
+    (unless (or (null (consp seq))
+                (cdr (last seq)))
+      (length seq))))
 
 ;;; Macros helper.
 ;;
@@ -841,9 +849,10 @@ See `helm-help-hkmap' for supported keys and functions."
     (nreverse result)))
 
 (defun helm-mklist (obj)
-  "If OBJ is a list (but not lambda), return itself.
-Otherwise make a list with one element."
-  (if (and (listp obj) (not (functionp obj)))
+  "Return OBJ as a list.
+If OBJ is a proper list (but not lambda), return itself.
+Otherwise make a list with one element OBJ."
+  (if (and (listp obj) (proper-list-p obj) (not (functionp obj)))
       obj
     (list obj)))
 
@@ -964,7 +973,10 @@ Examples:
     =>(a b z c d)
     (helm-append-at-nth \\='(a b c d) \\='((x . 1) (y . 2)) 2)
     =>(a b (x . 1) (y . 2) c d)
-"
+
+NOTE: This function uses `append' internally, so ELM is expected to be a list to
+be appended to SEQ, however for convenience ELM can be an atom or a cons cell,
+it will be wrapped inside a list automatically."
   (setq index (min (max index 0) (length seq))
         elm   (helm-mklist elm))
   (if (zerop index)
