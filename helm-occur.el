@@ -148,6 +148,10 @@ This happen only in `helm-source-occur' which is always related to
 (defcustom helm-occur-ignore-diacritics nil
   "When non nil helm-occur will ignore diacritics in patterns."
   :type 'boolean)
+
+(defcustom helm-occur-match-shorthands nil
+  "Transform pattern according to `read-symbol-shorthands' when non nil."
+  :type 'boolean)
 
 (defface helm-moccur-buffer
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
@@ -284,6 +288,26 @@ engine beeing completely different and also much faster."
            when (and disp (not (string= disp "")))
            collect (cons disp (string-to-number linum))))
 
+(defun helm-occur-symbol-shorthands-pattern-transformer (pattern buffer &optional default)
+  "Maybe transform PATTERN to its `read-symbol-shorthands' counterpart in BUFFER.
+If DEFAULT is specified, always transform PATTERN with the cdr of the matched
+shorthand i.e. the one that is interned, otherwise transform pattern with the
+car of the shorthand association.
+When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
+  (if helm-occur-match-shorthands
+      (let ((shorthands (buffer-local-value 'read-symbol-shorthands buffer))
+            (prefix     (and (string-match "\\`\\([^-]+-\\)[^-]*" pattern)
+                             (match-string 1 pattern))))
+        (if (and shorthands prefix)
+            (helm-aif (or (assoc prefix shorthands)
+                          (rassoc prefix shorthands))
+                (if default
+                    (replace-match (cdr it) nil nil pattern 1)
+                  (replace-match (car it) nil nil pattern 1))
+              pattern)
+          pattern))
+    pattern))
+
 (defclass helm-moccur-class (helm-source-in-buffer)
   ((buffer-name :initarg :buffer-name
                 :initform nil)
@@ -317,6 +341,9 @@ engine beeing completely different and also much faster."
                           (condition-case _err
                               (re-search-forward pattern nil t)
                             (invalid-regexp nil)))
+                :pattern-transformer (lambda (pattern)
+                                       (helm-occur-symbol-shorthands-pattern-transformer
+                                        pattern buf))
                 :init (lambda ()
                         (with-current-buffer buf
                           (let* ((bsfn (or (cdr (assq
@@ -387,7 +414,9 @@ Each buffer's result is displayed in a separated source."
         (helm :sources sources
               :buffer "*helm moccur*"
               :history 'helm-occur-history
-              :default (helm-aif (thing-at-point 'symbol) (regexp-quote it))
+              :default (helm-aif (thing-at-point 'symbol)
+                           (helm-occur-symbol-shorthands-pattern-transformer
+                            (regexp-quote it) (current-buffer) t))
               :input input
               :truncate-lines helm-occur-truncate-lines)
       (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))
@@ -410,7 +439,9 @@ METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
     (with-current-buffer buf
       (helm-goto-line lineno)
       ;; Move point to the nearest matching regexp from bol.
-      (cl-loop for reg in split-pat
+      (cl-loop for str in split-pat
+               for reg = (helm-occur-symbol-shorthands-pattern-transformer
+                          str (get-buffer buf))
                when (save-excursion
                       (condition-case _err
                           (if helm-migemo-mode
