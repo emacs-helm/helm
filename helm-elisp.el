@@ -798,15 +798,7 @@ is only used to test DEFAULT."
 
 (defun helm-apropos-get-default ()
   (with-syntax-table emacs-lisp-mode-syntax-table
-    (let* ((rss (buffer-local-value 'read-symbol-shorthands (current-buffer)))
-           (sym (thing-at-point 'symbol))
-           (prefix (when (and sym rss)
-                     (cl-loop for (k . _v) in rss
-                              when (string-match (concat "\\`" k) sym)
-                              return k))))
-      (if prefix
-          (replace-regexp-in-string prefix (cdr (assoc prefix rss)) sym)
-        sym))))
+    (symbol-name (intern-soft (thing-at-point 'symbol)))))
 
 ;;;###autoload
 (defun helm-apropos (default)
