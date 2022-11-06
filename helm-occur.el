@@ -291,10 +291,10 @@ engine beeing completely different and also much faster."
 (defvar helm-occur--gshorthands nil)
 (defun helm-occur-symbol-shorthands-pattern-transformer (pattern buffer gshorthands)
   "Maybe transform PATTERN to its `read-symbol-shorthands' counterpart in BUFFER.
-If DEFAULT is specified, always transform PATTERN with the cdr of the matched
-shorthand i.e. the one that is interned, otherwise transform pattern with the
-car of the shorthand association.
-When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
+
+GSHORTHANDS is the concatenation of all `read-symbol-shorthands' value found in
+all buffers i.e. `buffer-list'.
+When GSHORTHANDS is nil use PATTERN unmodified."
   (if gshorthands
       (let* ((lshorthands (buffer-local-value 'read-symbol-shorthands buffer))
              (prefix (and (string-match "^\\(\\(?:[^-]+-\\)*\\)" pattern)
