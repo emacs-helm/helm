@@ -745,7 +745,9 @@ displayed in BUFNAME."
 
 (defun helm-help-quit ()
   "Quit `helm-help'."
-  (throw 'helm-help-quit nil))
+  (if (get-buffer-window helm-help-buffer-name 'visible)
+      (throw 'helm-help-quit nil)
+    (quit-window)))
 
 (defun helm-help-org-open-at-point ()
   "Calls `org-open-at-point' ignoring errors."
