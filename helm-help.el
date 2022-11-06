@@ -2163,10 +2163,6 @@ You want to know where the definition currently at point ('snu-lines') is used i
 You launch for example helm-mini and start helm-occur on my-tricks.el, helm occur will match immediately
 'sns-lines'.
 
-Note that 'snu-lines' is known because we start from its buffer,
-it will be unknown when you start from another buffer not
-specifiying the shorthand association.
-
 *** Automatically match symbol at point
 
 Helm can automatically match the symbol at point while keeping
