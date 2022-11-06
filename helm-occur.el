@@ -296,7 +296,7 @@ car of the shorthand association.
 When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
   (if helm-occur-match-shorthands
       (let ((shorthands (buffer-local-value 'read-symbol-shorthands buffer))
-            (prefix     (and (string-match "\\`\\(.*-\\)-?.**" pattern)
+            (prefix     (and (string-match "\\`\\(.*-\\)-?.*" pattern)
                              (match-string 1 pattern))))
         (if (and shorthands prefix)
             (helm-aif (or (assoc prefix shorthands)
