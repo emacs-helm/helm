@@ -796,13 +796,24 @@ is only used to test DEFAULT."
       (helm-force-update (concat "^" (helm-stringify (helm-get-selection)))
                          (helm-get-current-source)))))
 
+(defun helm-apropos-get-default ()
+  (with-syntax-table emacs-lisp-mode-syntax-table
+    (let* ((rss (buffer-local-value 'read-symbol-shorthands (current-buffer)))
+           (sym (thing-at-point 'symbol))
+           (prefix (when (and sym rss)
+                     (cl-loop for (k . _v) in rss
+                              when (string-match k sym)
+                              return k))))
+      (if prefix
+          (replace-regexp-in-string prefix (cdr (assoc prefix rss)) sym)
+        sym))))
+
 ;;;###autoload
 (defun helm-apropos (default)
   "Preconfigured Helm to describe commands, functions, variables and faces.
 In non interactives calls DEFAULT argument should be provided as
 a string, i.e. the `symbol-name' of any existing symbol."
-  (interactive (list (with-syntax-table emacs-lisp-mode-syntax-table
-                       (thing-at-point 'symbol))))
+  (interactive (list (helm-apropos-get-default)))
   (let ((helm-M-x-show-short-doc
          (and helm-apropos-show-short-doc
               (null (memq 'helm-apropos helm-commands-using-frame)))))
