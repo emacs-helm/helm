@@ -288,23 +288,22 @@ engine beeing completely different and also much faster."
            when (and disp (not (string= disp "")))
            collect (cons disp (string-to-number linum))))
 
-(defun helm-occur-symbol-shorthands-pattern-transformer (pattern buffer &optional default)
+(defvar helm-occur--gshorthands nil)
+(defun helm-occur-symbol-shorthands-pattern-transformer (pattern buffer gshorthands)
   "Maybe transform PATTERN to its `read-symbol-shorthands' counterpart in BUFFER.
 If DEFAULT is specified, always transform PATTERN with the cdr of the matched
 shorthand i.e. the one that is interned, otherwise transform pattern with the
 car of the shorthand association.
 When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
-  (if helm-occur-match-shorthands
-      (let ((shorthands (buffer-local-value 'read-symbol-shorthands buffer))
-            (prefix     (and (string-match "\\`\\(.*-\\)-?.*" pattern)
-                             (match-string 1 pattern))))
-        (if (and shorthands prefix)
-            (helm-aif (or (assoc prefix shorthands)
-                          (rassoc prefix shorthands))
-                (if default
-                    (replace-match (cdr it) nil nil pattern 1)
-                  (replace-match (car it) nil nil pattern 1))
-              pattern)
+  (if gshorthands
+      (let* ((lshorthands (buffer-local-value 'read-symbol-shorthands buffer))
+             (prefix (and (string-match "^\\(\\(?:[^-]+-\\)*\\)" pattern)
+                          (match-string 1 pattern)))
+             (lgstr (cdr (or (assoc prefix gshorthands)
+                             (rassoc prefix gshorthands)))))
+        (if (and lgstr lshorthands)
+            (concat (car (rassoc lgstr lshorthands))
+                    (replace-regexp-in-string prefix "" pattern))
           pattern))
     pattern))
 
@@ -317,6 +316,14 @@ When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
 
 (defun helm-occur-build-sources (buffers &optional source-name)
   "Build sources for `helm-occur' for each buffer in BUFFERS list."
+  (setq helm-occur--gshorthands nil)
+  (and helm-occur-match-shorthands
+       (setq helm-occur--gshorthands
+             (cl-loop for b in (buffer-list)
+                      for rss = (buffer-local-value
+                                 'read-symbol-shorthands
+                                 b)
+                      when rss append rss)))
   (let (sources)
     (dolist (buf buffers)
       (let ((bname (buffer-name buf)))
@@ -343,7 +350,7 @@ When no `read-symbol-shorthands' local value is found use PATTERN unmodified."
                             (invalid-regexp nil)))
                 :pattern-transformer (lambda (pattern)
                                        (helm-occur-symbol-shorthands-pattern-transformer
-                                        pattern buf))
+                                        pattern buf helm-occur--gshorthands))
                 :init (lambda ()
                         (with-current-buffer buf
                           (let* ((bsfn (or (cdr (assq
@@ -415,8 +422,7 @@ Each buffer's result is displayed in a separated source."
               :buffer "*helm moccur*"
               :history 'helm-occur-history
               :default (helm-aif (thing-at-point 'symbol)
-                           (helm-occur-symbol-shorthands-pattern-transformer
-                            (regexp-quote it) (current-buffer) t))
+                           (regexp-quote it))
               :input input
               :truncate-lines helm-occur-truncate-lines)
       (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))
@@ -441,7 +447,7 @@ METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
       ;; Move point to the nearest matching regexp from bol.
       (cl-loop for str in split-pat
                for reg = (helm-occur-symbol-shorthands-pattern-transformer
-                          str (get-buffer buf))
+                          str (get-buffer buf) helm-occur--gshorthands)
                when (save-excursion
                       (condition-case _err
                           (if helm-migemo-mode
