@@ -2120,7 +2120,7 @@ save and edit these results, i.e. add text to the empty line.
 
 **** Matching shorthands symbols in Elisp code
 
-Helm-occur have a basic support of [[(info \"(elisp) Shorthands\")][read-symbol-shorthands]].
+Helm-occur have a basic support of [[info:elisp#Shorthands][read-symbol-shorthands]].
 You can enable this by customizing =helm-occur-match-shorthands=.
 
 The main usage is when you are in a given buffer with cursor on a
