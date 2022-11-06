@@ -297,8 +297,12 @@ all buffers i.e. `buffer-list'.
 When GSHORTHANDS is nil use PATTERN unmodified."
   (if gshorthands
       (let* ((lshorthands (buffer-local-value 'read-symbol-shorthands buffer))
-             (prefix (and (string-match "^\\(\\(?:[^-]+-\\)*\\)" pattern)
-                          (match-string 1 pattern)))
+             (prefix (cl-loop for (k . v) in gshorthands
+                              if (string-match (concat "\\`" k) pattern)
+                              return k
+                              else
+                              if (string-match (concat "\\`" v) pattern)
+                              return v))
              (lgstr (cdr (or (assoc prefix gshorthands)
                              (rassoc prefix gshorthands)))))
         (if (and lgstr lshorthands)
