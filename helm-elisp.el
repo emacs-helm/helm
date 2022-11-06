@@ -802,7 +802,7 @@ is only used to test DEFAULT."
            (sym (thing-at-point 'symbol))
            (prefix (when (and sym rss)
                      (cl-loop for (k . _v) in rss
-                              when (string-match k sym)
+                              when (string-match (concat "\\`" k) sym)
                               return k))))
       (if prefix
           (replace-regexp-in-string prefix (cdr (assoc prefix rss)) sym)
