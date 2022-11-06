@@ -2118,6 +2118,55 @@ Matching empty lines is supported with the regexp \"^$\", you then get the
 results displayed as the buffer-name and the line number only.  You can
 save and edit these results, i.e. add text to the empty line.
 
+**** Matching shorthands symbols in Elisp code
+
+Helm-occur have a basic support of [[(info \"(elisp) Shorthands\")][read-symbol-shorthands]].
+You can enable this by customizing =helm-occur-match-shorthands=.
+
+The main usage is when you are in a given buffer with cursor on a
+symbol and you want to see where the definition is or where it is
+used in another buffer or other buffers.  Of course matching is
+working on both versions of the definition, the short one and the
+long one.  Here an example reusing the sample files used in the
+Manual:
+
+Here snu.el file with cursor on snu-lines definition:
+
+#+begin_src elisp
+     (defun snu-split (separator s &optional omit-nulls)
+       \"A match-data saving variation on `split-string'.\"
+       (save-match-data (split-string s separator omit-nulls)))
+
+     (defun snu-lines (s)
+       \"Split string S into a list of strings on newline characters.\"
+       (snu-split \"\\\\(\\r\\n\\\\|[\\n\\r]\\\\)\" s))
+
+     ;; Local Variables:
+     ;; read-symbol-shorthands: ((\"snu-\" . \"some-nice-string-utils-\"))
+     ;; End:
+#+end_src
+
+And here the my-tricks.el file reusing snu-lines but under another name:
+
+#+begin_src elisp
+     (defun t-reverse-lines (s)
+       (string-join (reverse (sns-lines s)) \"\\n\"))
+
+     ;; Local Variables:
+     ;; read-symbol-shorthands: ((\"t-\" . \"my-tricks-\")
+     ;;                          (\"sns-\" . \"some-nice-string-utils-\"))
+     ;; End:
+
+#+end_src
+
+You want to know where the definition currently at point ('snu-lines') is used in the my-tricks.el buffer.
+You launch for example helm-mini and start helm-occur on my-tricks.el, helm occur will match immediately
+'sns-lines'.
+
+Note that 'snu-lines' is known because we start from its buffer,
+it will be unknown when you start from another buffer not
+specifiying the shorthand association.
+
 *** Automatically match symbol at point
 
 Helm can automatically match the symbol at point while keeping
