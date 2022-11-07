@@ -427,7 +427,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
                             (all-the-icons-octicon "file-directory"))
                            (buf-fname
                             (all-the-icons-icon-for-file buf-fname))
-                           (t (all-the-icons-octicon "star"))))))
+                           (t (all-the-icons-octicon "star" :v-adjust 0.0))))))
            (buf-name (propertize buf-name 'face face1
                                  'help-echo help-echo
                                  'type type)))
