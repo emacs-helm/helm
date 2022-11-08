@@ -430,7 +430,7 @@ documentation when SYM name is the same for function and variable."
     (if (and doc (not (string= doc ""))
              ;; `documentation' return "\n\n(args...)"
              ;; for CL-style functions.
-             (not (string-match-p "^\n\n" doc)))
+             (not (string-match-p "\\`\n\n" doc)))
         ;; Some commands specify key bindings in their first line.
         (truncate-string-to-width
          (substitute-command-keys (car (split-string doc "\n")))
