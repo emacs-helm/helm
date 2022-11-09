@@ -4586,7 +4586,8 @@ useful when the order of the candidates is meaningful, e.g. with
   (let* ((pair    (and (consp candidate) candidate))
          (display (helm-stringify (if pair (car pair) candidate)))
          (real    (cdr pair))
-         (host    (and file-comp (get-text-property 0 'host display)))
+         (host    (and file-comp (get-text-property
+                                  (max 0 (1- (length display))) 'host display)))
          (regex   (helm--maybe-get-migemo-pattern pattern diacritics))
          (mpart   (get-text-property 0 'match-part display))
          (mp      (cond ((and mpart (string= display mpart)) nil)
