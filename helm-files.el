@@ -4031,8 +4031,8 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                       ;; non existing files.
                       (t
                        (add-face-text-property 0 len 'helm-ff-file t disp)
-                       (helm-aif tramp-invalid-fname
-                           (add-text-properties 0 len `(host ,it) disp))
+                       (when tramp-invalid-fname
+                         (add-text-properties 0 len `(host ,tramp-invalid-fname) disp))
                        (cons (helm-ff-prefix-filename
                               disp
                               tramp-invalid-fname
