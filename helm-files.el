@@ -109,9 +109,11 @@
 ;;
 (defvar helm-ff-last-expanded-candidate-regexp "^[[:multibyte:] ]*%s"
   "Regexp that retrieve previous candidate when going up one level.
-The default value matching a multibyte char at bol allows prefixing
-candidate with an icon.  The format part will be replaced by the
-display part of the candidate regexp quoted.")
+The default value matching a multibyte char at bol allows
+prefixing candidate with an icon.  The format part will be
+replaced by the display part of the candidate regexp quoted.
+This should be used for all preselection code for helm-find-files
+to handle icons.")
 
 (defvar helm-find-files-doc-header " (\\<helm-find-files-map>\\[helm-find-files-up-one-level]: Go up one level)"
   "*The doc that is inserted in the Name header of a find-files or dired source.")
