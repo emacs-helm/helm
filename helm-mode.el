@@ -498,7 +498,14 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source)))
+  (let* ((must-match (helm-get-attr 'must-match source))
+         (annotation-function (plist-get completion-extra-properties
+                                         :annotation-function))
+         (max-len (and annotation-function
+                       (or (buffer-local-value 'helm-candidate-buffer-longest-len
+                                               (get-buffer (helm-candidate-buffer)))
+                           (cl-loop for c in candidates
+                                    maximize (length c))))))
     (cl-loop for c in candidates
              for cand = (let ((elm (if (stringp c)
                                        (replace-regexp-in-string "\\s\\" "" c)
@@ -506,6 +513,23 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                           (cond ((and (stringp elm)
                                       (string-match "\n" elm))
                                  (cons (replace-regexp-in-string "\n" "->" elm) c))
+                                (annotation-function
+                                 (cons
+                                  (propertize
+                                   c 'display
+                                   (replace-regexp-in-string
+                                    "\n" " "
+                                    (concat c
+                                            (make-string
+                                             (+ 1 (if (zerop max-len)
+                                                      max-len
+                                                    (- max-len
+                                                       (string-width c))))
+                                             ? )
+                                            (propertize
+                                             (funcall annotation-function c)
+                                             'face 'completions-annotations))))
+                                  c))
                                 (t c)))
              collect cand into lst
              finally return
