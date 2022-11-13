@@ -4166,7 +4166,7 @@ Arg DISP is the display part of the candidate."
 
 (defun helm-ff--is-file-from-disp (disp)
   "Return the face used for file's candidate or dotted-symlink dirs."
-  (cl-loop with faces = (helm-mklist (get-text-property 1 'face disp))
+  (cl-loop with faces = (helm-mklist (get-text-property 0 'face disp))
            for face in '(helm-ff-file
                          helm-ff-suid
                          helm-ff-executable
