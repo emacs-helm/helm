@@ -626,14 +626,14 @@ buffers)."
 (defun helm-buffers-mark-similar-buffers-1 (&optional type)
   (with-helm-window
     (let* ((src (helm-get-current-source))
-           (type (or type
-                     (get-text-property
-                      0 'type (helm-get-selection nil 'withprop src)))))
+           (sel (helm-get-selection nil 'withprop src))
+           (type (or type (get-text-property
+                           (min 2 (length sel)) 'type sel))))
       (helm-map-candidates-in-source src
         (lambda (_cand) (helm-make-visible-mark))
         (lambda (cand)
           (and (not (helm-this-visible-mark))
-               (eq (get-text-property 0 'type cand) type))))
+               (eq (get-text-property 2 'type cand) type))))
       (helm-mark-current-line)
       (helm-display-mode-line src t)
       (when helm-marked-candidates
