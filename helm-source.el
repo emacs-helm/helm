@@ -498,9 +498,14 @@
     "  Enable fuzzy matching in this source.
   This will overwrite settings in MATCH slot, and for
   sources built with child class `helm-source-in-buffer' the SEARCH slot.
+  This also add a `filtered-candidate-transformer' function to sort candidates
+  (see `helm-fuzzy-sort-fn') according to the score of each candidate which is
+  computed with `helm-fuzzy-default-score-fn'. 
   This is an easy way of enabling fuzzy matching, but you can use the MATCH
   or SEARCH slots yourself if you want something more elaborated, mixing
-  different type of match (See `helm-source-buffers' class for example).
+  different type of match (See `helm-source-buffers' class for example), you
+  will have in this case to provide as well a sort fn
+  in `filtered-candidate-transformer' yourself.
 
   This attribute is not supported for asynchronous sources
   since they perform pattern matching themselves.")
