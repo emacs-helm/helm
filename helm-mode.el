@@ -498,8 +498,19 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source)))
-    (cl-loop for c in candidates
+  (let ((must-match (helm-get-attr 'must-match source))
+        (annotation (plist-get completion-extra-properties
+                               :annotation-function)))
+    ;; Annotation is already handled in completion-in-region and in
+    ;; helm-completing-read-default-2 when emacs style is in use.
+    (cl-loop for c in (if (and annotation
+                               (not helm--completing-region)
+                               (memq helm-completion-style '(helm helm-fuzzy)))
+                          (helm-completion-in-region--initial-filter
+                           ;; Ensure we use the display part of candidates.
+                           (all-completions "" candidates)
+                           annotation nil nil)
+                        candidates)
              for cand = (let ((elm (if (stringp c)
                                        (replace-regexp-in-string "\\s\\" "" c)
                                      c)))
@@ -1912,6 +1923,9 @@ is non-nil."
 
 ;; Completion-in-region-function
 
+(defvar helm--completing-region nil
+  "[INTERNAL] flag let-bounded to nil when completing in region.")
+
 (defun helm--completion-in-region (origfun start end collection &optional predicate)
   "Helm replacement of `completion--in-region'.
 
@@ -1942,6 +1956,7 @@ Can be used for `completion-in-region-function' by advicing it with an
       (unwind-protect
           (let* ((enable-recursive-minibuffers t)
                  (completion-flex-nospace t)
+                 (helm--completing-region t)
                  (completion-styles (helm--prepare-completion-styles))
                  (input (buffer-substring-no-properties start end))
                  (prefix (and (eq helm-completion-style 'emacs) initial-input))
