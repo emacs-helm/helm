@@ -748,7 +748,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                               (helm-marked-candidates)
                               (identity candidate)))))))
     (let* ((minibuffer-completion-predicate test)
-           (minibuffer-completion-table collection)
+           (minibuffer-completion-table
+            (or minibuffer-completion-table collection))
            (helm-read-file-name-mode-line-string
             (replace-regexp-in-string "helm-maybe-exit-minibuffer"
                                       "helm-confirm-and-exit-minibuffer"
@@ -945,7 +946,8 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
                                    ((pred (stringp)) init)
                                    ;; INIT is a cons cell.
                                    (`(,l . ,_ll) l))
-                           it)))
+                           it))
+        (minibuffer-completion-table collection))
     (helm-comp-read
      prompt collection
      :test test
@@ -991,6 +993,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                   ;; INIT is a cons cell.
                   (`(,l . ,_ll) l)))
          (completion-flex-nospace t)
+         (minibuffer-completion-table collection)
          (completion-styles
           (helm--prepare-completion-styles 'nomode))
          (metadata (or (completion-metadata (or input "") collection predicate)
