@@ -102,6 +102,7 @@
 (defvar eshell-debug-command)
 (defvar eshell-current-command)
 (defvar tramp-archive-enabled)
+(defvar tramp-tolerate-tilde)
 (defvar password-cache)
 
 
@@ -2812,6 +2813,8 @@ when `helm-pattern' is equal to \"~/\"."
         (let* ((history-p   (string= (assoc-default 'name src)
                                      "Read File Name History"))
                (pat         (helm-ff-set-pattern helm-pattern))
+               ;; Try to shut up persistent tramp error with adb method when
+               ;; adding tilde to path.
                (tramp-tolerate-tilde (equal (file-remote-p pat 'method)
 		                            tramp-adb-method))
                (completed-p (helm-aand (expand-file-name
