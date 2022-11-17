@@ -53,6 +53,11 @@ Windows users should set that to \"explorer.exe\"."
   :group 'helm-external
   :type  'string)
 
+(defvar helm-open-file-externally-after-hook nil
+  "Hook that run after opening a file with external program.")
+
+(defvar helm-open-file-externally-after-finish-hook nil
+  "Hook that run after external program finish.")
 
 ;;; Internals
 (defvar helm-external-command-history nil)
@@ -136,6 +141,7 @@ When argument DETACHED is non nil, detach process from Emacs."
            (when (and (string= event "finished\n")
                       helm-raise-command
                       (not (helm-get-pid-from-process-name proc-name)))
+             (run-hooks 'helm-open-file-externally-after-finish-hook)
              (shell-command  (format helm-raise-command "emacs")))
            (message "%s process...Finished." process))))
       ;; Move command on top list.
@@ -205,6 +211,7 @@ to use."
         (customize-save-variable 'helm-external-programs-associations
                                  helm-external-programs-associations)))
     (helm-run-or-raise program files)
+    (run-hooks 'helm-open-file-externally-after-hook)
     (setq helm-external-command-history
           (cl-loop for i in helm-external-command-history
                    when (executable-find i) collect i))))
