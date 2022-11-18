@@ -500,10 +500,12 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
   "Default filter candidate function for `helm-comp-read'."
   (let ((must-match (helm-get-attr 'must-match source))
         (annotation (plist-get completion-extra-properties
-                               :annotation-function)))
-    ;; Annotation is already handled in completion-in-region and in
-    ;; helm-completing-read-default-2 when emacs style is in use.
-    (cl-loop for c in (if (and annotation
+                               :annotation-function))
+        (affixation (plist-get completion-extra-properties
+                               :affixation-function)))
+    ;; Annotation and affixation are already handled in completion-in-region and
+    ;; in helm-completing-read-default-2 when emacs style is in use.
+    (cl-loop for c in (if (and (or annotation affixation)
                                (not helm--completing-region)
                                (memq helm-completion-style '(helm helm-fuzzy)))
                           (helm-completion-in-region--initial-filter
