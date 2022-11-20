@@ -224,8 +224,8 @@ the same cons cell against CANDIDATE.
 I.e. (identity (string-match \"foo\" \"foo bar\")) => t."
   (let ((pat (helm-mm-3-get-patterns pattern)))
     (cl-loop for (predicate . regexp) in pat
-             for re = (if (and (not (helm-mm-regexp-p regexp))
-                               helm-mm--match-on-diacritics)
+             for re = (if (and helm-mm--match-on-diacritics
+                               (not (helm-mm-regexp-p regexp)))
                           (char-fold-to-regexp regexp)
                         regexp)
              always (funcall predicate
@@ -247,8 +247,8 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
                           pattern)
            with regex = (cdar pat)
            with regex1 = (if (and regex
-                                  (not (helm-mm-regexp-p regex))
-                                  helm-mm--match-on-diacritics)
+                                  helm-mm--match-on-diacritics
+                                  (not (helm-mm-regexp-p regex)))
                              (char-fold-to-regexp regex)
                            regex)
            when (eq (caar pat) 'not) return
@@ -261,8 +261,8 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
            for bol = (point-at-bol)
            for eol = (point-at-eol)
            if (cl-loop for (pred . str) in (cdr pat)
-                       for regexp = (if (and (not (helm-mm-regexp-p str))
-                                             helm-mm--match-on-diacritics)
+                       for regexp = (if (and helm-mm--match-on-diacritics
+                                             (not (helm-mm-regexp-p str)))
                                         (char-fold-to-regexp str)
                                       str)
                        always
