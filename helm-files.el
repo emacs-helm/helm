@@ -104,7 +104,7 @@
 (defvar tramp-archive-enabled)
 (defvar tramp-tolerate-tilde)
 (defvar password-cache)
-
+(defvar helm-fd-executable)
 
 ;;; Internal vars
 ;;
@@ -473,7 +473,8 @@ Remote filesystem are generally mounted with sshfs."
   :type '(repeat string))
 
 (defcustom helm-browse-project-default-find-files-fn
-  (cond ((executable-find "fd")
+  (cond ((or (executable-find "fd")
+             (executable-find "fdfind"))
          #'helm-browse-project-fd-find-files)
         ((executable-find "rg")
          #'helm-browse-project-rg-find-files)
@@ -6351,10 +6352,14 @@ be directories."
 
 (defun helm-browse-project-find-files-1 (directory program)
   "List files in DIRECTORY recursively with external PROGRAM."
-  (let ((cmd (cl-ecase program
-               (ag "ag --hidden -g '.*' %s")
-               (rg "rg --files --hidden -g '*' %s")
-               (fd "fd --hidden --type f --glob '*' %s"))))
+  (require 'helm-fd)
+  (let* ((fd-exe (or helm-fd-executable
+                     (executable-find "fdfind")
+                     (executable-find "fd")))
+         (cmd (cl-ecase program
+                (ag "ag --hidden -g '.*' %s")
+                (rg "rg --files --hidden -g '*' %s")
+                (fd (concat fd-exe " --hidden --type f --glob '*' %s")))))
     (with-temp-buffer
       (call-process-shell-command
        (format cmd directory)
