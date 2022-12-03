@@ -5170,7 +5170,7 @@ Show the first `helm-ff-history-max-length' elements of
     (when history
       (setq helm-ff-history
             (if (>= (length history) helm-ff-history-max-length)
-                (cl-subseq history 0 helm-ff-history-max-length)
+                (helm-take history helm-ff-history-max-length)
               history))
       (if comp-read
           (let ((src (helm-build-sync-source "Helm Find Files History"

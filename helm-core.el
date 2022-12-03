@@ -4832,8 +4832,7 @@ emacs-27 to provide such scoring in emacs<27."
            ;; display a list of  candidates even with an empty
            ;; pattern.
            (helm--initialize-one-by-one-candidates
-            (helm-take-first-elements
-             (helm-get-cached-candidates source) limit)
+            (helm-take (helm-get-cached-candidates source) limit)
             source)
          ;; Compute candidates according to pattern with their match
          ;; fns.

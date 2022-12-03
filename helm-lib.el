@@ -491,7 +491,7 @@ When CYCLE is specified the iterator never ends."
 (cl-defun helm-iter-sub-next-circular (seq elm &key (test 'eq))
   "Infinite iteration of SEQ starting at ELM."
   (let* ((pos      (1+ (helm-position elm seq :test test)))
-         (sub      (append (nthcdr pos seq) (cl-subseq seq 0 pos)))
+         (sub      (append (nthcdr pos seq) (helm-take seq pos)))
          (iterator (helm-iter-circular sub)))
     (lambda ()
       (helm-iter-next iterator))))
@@ -988,11 +988,23 @@ it will be wrapped inside a list automatically."
            (beg-part (butlast seq len)))
       (append beg-part elm end-part))))
 
-(defun helm-take-first-elements (seq n)
+(cl-defgeneric helm-take (seq n)
   "Return the first N elements of SEQ if SEQ is longer than N.
 It is used for narrowing list of candidates to the
 `helm-candidate-number-limit'."
   (if (> (length seq) n) (cl-subseq seq 0 n) seq))
+
+(cl-defmethod helm-take ((seq list) n)
+  "`helm-take' optimized for lists."
+  (let ((store '()))
+    (if (> n (length seq))
+        seq
+      (while (> (1+ (cl-decf n)) 0)
+        (push (pop seq) store))
+      (nreverse store))))
+
+(defalias 'helm-take-first-elements 'helm-take)
+(make-obsolete 'helm-take-first-elements 'helm-take "3.9.1")
 
 (defun helm-source-by-name (name &optional sources)
   "Get a Helm source in SOURCES by NAME.
@@ -1073,7 +1085,7 @@ Examples:
                        (reverse sequence)
                      sequence))
          (pos      (1+ (cl-position elm new-seq :test 'equal))))
-    (append (nthcdr pos new-seq) (cl-subseq new-seq 0 pos))))
+    (append (nthcdr pos new-seq) (helm-take new-seq pos))))
 
 ;;; Strings processing.
 ;;

@@ -158,7 +158,7 @@ Format: ((SOURCE-NAME
           ;; Truncate history if needed.
           (if (> (length (cdr selection-info)) helm-adaptive-history-length)
               (setcdr selection-info
-                      (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
+                      (helm-take (cdr selection-info) helm-adaptive-history-length))))))))
 
 (defun helm-adaptive-maybe-load-history ()
   "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
