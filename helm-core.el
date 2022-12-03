@@ -7089,9 +7089,8 @@ splitting inconditionally, it is unused actually."
              ;; Is next-window (from helm-window) a suitable window for PA?
              (no-suitable-win
               (helm-aand (not helm--buffer-in-new-frame-p)
-                         (next-window (helm-window) 1 helm-initial-frame)
+                         (get-buffer-window helm-current-buffer)
                          (or (window-dedicated-p it)
-                             (window-parameter it 'no-other-window)
                              (window-parameter it 'window-side))))
              (cursor-in-echo-area t)
              mode-line-in-non-selected-windows)
@@ -7149,7 +7148,6 @@ The symbol `never' is kept for backward compatibility."
                  (with-selected-frame helm-initial-frame
                    (let ((win (selected-window)))
                      (if (or (window-dedicated-p win)
-                             (window-parameter win 'no-other-window)
                              (window-parameter win 'window-side))
                          (next-window win 1)
                        win))))
