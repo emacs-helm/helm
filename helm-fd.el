@@ -83,7 +83,7 @@
 (defun helm-fd-process ()
   "Initialize fd process in an helm async source."
   (let* (process-connection-type
-         (cmd (append helm-fd-switches (split-string helm-pattern " ")))
+         (cmd (append helm-fd-switches (split-string-shell-command helm-pattern)))
          (proc (apply #'start-process "fd" nil helm-fd-executable cmd))
          (start-time (float-time))
          (fd-version (replace-regexp-in-string
