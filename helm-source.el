@@ -761,6 +761,8 @@
     "  Disable all helm matching functions when non nil.
   The :candidates function in this case is in charge of fetching
   candidates dynamically according to `helm-pattern'.
+  If you want to make your :candidates function working with `completion-styles'
+  use the function `helm-dynamic-completion'. 
   Note that :volatile is automatically enabled when using this, so no
   need to specify it."))
 
