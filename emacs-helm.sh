@@ -242,7 +242,7 @@ cat > $CONF_FILE <<EOF
                                (menu-bar-lines . 0)
                                (fullscreen . nil))))
 (blink-cursor-mode -1)
-(require 'helm-config)
+(require 'helm-autoloads)
 (helm-mode 1)
 (with-eval-after-load 'tramp-cache (setq tramp-cache-read-persistent-data t))
 (with-eval-after-load 'auth-source (setq auth-source-save-behavior nil))
