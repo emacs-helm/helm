@@ -141,6 +141,7 @@ will be honored."
     (set-keymap-parent map helm-map)
     (define-key map (kbd "C-c o")   #'helm-bookmark-run-jump-other-window)
     (define-key map (kbd "C-c C-o") #'helm-bookmark-run-jump-other-frame)
+    (define-key map (kbd "C-c C-t") #'helm-bookmark-run-jump-other-tab)
     (define-key map (kbd "C-d")     #'helm-bookmark-run-delete)
     (define-key map (kbd "C-]")     #'helm-bookmark-toggle-filename)
     (define-key map (kbd "M-e")     #'helm-bookmark-run-edit)
@@ -192,23 +193,28 @@ will be honored."
   "Toggle bookmark location visibility."
   'toggle-filename 'helm-bookmark-toggle-filename-1)
 
+(defun helm-bookmark-jump-1 (candidate &optional fn)
+  (let (;; FIXME Why is prefarg necessary here?
+        (current-prefix-arg helm-current-prefix-arg)
+        non-essential)
+    (bookmark-jump candidate fn)))
+
 (defun helm-bookmark-jump (candidate)
   "Jump to bookmark action."
-  (let ((current-prefix-arg helm-current-prefix-arg)
-        non-essential)
-    (bookmark-jump candidate)))
+  (helm-bookmark-jump-1 candidate))
 
 (defun helm-bookmark-jump-other-frame (candidate)
   "Jump to bookmark in other frame action."
-  (let ((current-prefix-arg helm-current-prefix-arg)
-        non-essential)
-    (bookmark-jump candidate 'switch-to-buffer-other-frame)))
+  (helm-bookmark-jump-1 candidate #'switch-to-buffer-other-frame))
 
 (defun helm-bookmark-jump-other-window (candidate)
   "Jump to bookmark in other window action."
-  (let (non-essential)
-    (bookmark-jump-other-window candidate)))
+  (helm-bookmark-jump-1 candidate #'switch-to-buffer-other-window))
 
+(defun helm-bookmark-jump-other-tab (candidate)
+  "Jump to bookmark action."
+  (cl-assert (fboundp 'tab-bar-mode) nil "Tab-bar-mode not available")
+  (helm-bookmark-jump-1 candidate #'switch-to-buffer-other-tab))
 
 ;;; bookmark-set
 ;;
@@ -517,6 +523,8 @@ If `browse-url-browser-function' is set to something else than
     (define-key map (kbd "C-x C-d") #'helm-bookmark-run-browse-project)
     map))
 
+;; Same as `helm-source-filtered-bookmarks' but override actions and keymap
+;; specifically for helm-find-files bookmarks.
 (defclass helm-bookmark-override-inheritor (helm-source) ())
 
 (cl-defmethod helm--setup-source ((source helm-bookmark-override-inheritor))
@@ -525,8 +533,10 @@ If `browse-url-browser-function' is set to something else than
   (setf (slot-value source 'action)
         (helm-append-at-nth
          (cl-loop for (name . action) in helm-type-bookmark-actions
+                  ;; We don't want those actions in helm-find-files bookmarks.
                   unless (memq action '(helm-bookmark-jump-other-frame
-                                        helm-bookmark-jump-other-window))
+                                        helm-bookmark-jump-other-window
+                                        helm-bookmark-jump-other-tab))
                   collect (cons name action))
          '(("Browse project" . helm-bookmark-browse-project)) 1))
   (setf (slot-value source 'keymap) helm-bookmark-find-files-map))
@@ -761,8 +771,12 @@ consecutive words from the buffer into the new bookmark name."
   'helm-bookmark-jump-other-frame)
 
 (helm-make-command-from-action helm-bookmark-run-jump-other-window
-  "Jump to bookmark from keyboard."
+  "Jump to bookmark other window from keyboard."
   'helm-bookmark-jump-other-window)
+
+(helm-make-command-from-action helm-bookmark-run-jump-other-tab
+  "Jump to bookmark other tab from keyboard."
+  'helm-bookmark-jump-other-tab)
 
 (helm-make-command-from-action helm-bookmark-run-delete
   "Delete bookmark from keyboard."

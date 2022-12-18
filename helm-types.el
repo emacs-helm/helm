@@ -135,6 +135,7 @@
    "Jump to bookmark" 'helm-bookmark-jump
    "Jump to BM other window" 'helm-bookmark-jump-other-window
    "Jump to BM other frame" 'helm-bookmark-jump-other-frame
+   "Jump to BM other tab" 'helm-bookmark-jump-other-tab
    "Bookmark edit annotation" 'bookmark-edit-annotation
    "Bookmark show annotation" 'bookmark-show-annotation
    "Delete bookmark(s)" 'helm-delete-marked-bookmarks
