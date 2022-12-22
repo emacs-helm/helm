@@ -83,7 +83,7 @@ you have completion on these functions with `C-M i' in the customize interface."
         (stylefn (or (with-helm-current-buffer
                        (assoc-default major-mode helm-semantic-display-style))
                      #'semantic-format-tag-summarize)))
-    (cl-dolist (tag tags)
+    (dolist (tag tags)
       (when (listp tag)
         (cl-case (setq cur-type (semantic-tag-class tag))
           ((function variable type)

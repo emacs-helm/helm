@@ -69,7 +69,7 @@ found in each node, otherwise scan only the current info buffer."
       (let ((tobuf (helm-candidate-buffer 'global))
             Info-history)
         (helm-aif (Info-index-nodes)
-            (cl-dolist (node it)
+            (dolist (node it)
               (Info-goto-node node)
               (helm-info-scan-current-buffer tobuf))
           (helm-info-scan-current-buffer tobuf))

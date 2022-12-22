@@ -1995,7 +1995,7 @@ broken."
 
 
 ;;; Fontlock
-(cl-dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+(dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
   (font-lock-add-keywords
    mode
    '(("(\\<\\(with-helm-after-update-hook\\)\\>" 1 font-lock-keyword-face)

@@ -5778,7 +5778,7 @@ is nil."
              (delete-directory file nil trash))
             (t (delete-file file trash)))
       (when buffers
-        (cl-dolist (buf buffers)
+        (dolist (buf buffers)
           (when (y-or-n-p (format "Kill buffer %s, too? " buf))
             (kill-buffer buf)))))))
 
@@ -5801,7 +5801,7 @@ When a prefix arg is given, meaning of
           (message "(No deletions performed)")
         (catch 'helm-abort-delete-file
           (unwind-protect
-               (cl-dolist (i files)
+               (dolist (i files)
                  (set-text-properties 0 (length i) nil i)
                  (let ((res (helm-delete-file
                              i helm-ff-signal-error-on-dot-files nil trash)))

@@ -452,7 +452,7 @@ i.e. the loop is not entered after running COMMAND."
       (kbd "C-w") ?\C-w #'helm-yank-text-at-point
       '((?\C-_ . helm-undo-yank-text-at-point)))
     ;; Use `describe-mode' key in `global-map'.
-    (cl-dolist (k (where-is-internal #'describe-mode global-map))
+    (dolist (k (where-is-internal #'describe-mode global-map))
       (define-key map k #'helm-help))
     ;; Bind all actions from f1 to f12, `helm-select-nth-action'
     ;; counts from 0, i.e. (helm-select-nth-action 0) = action 1.
@@ -2621,7 +2621,7 @@ precedent function.  Return the result of last function call."
                           ;; `helm-sources' are local to helm-buffer.
                           (with-helm-buffer helm-sources)))))
     (when sources
-      (cl-dolist (source sources)
+      (dolist (source sources)
         (helm-aif (assoc-default attr source)
             (helm-apply-functions-from-source source it))))))
 
@@ -5092,7 +5092,7 @@ passed as argument to `recenter'."
                  (helm-apply-functions-from-source
                   source 'helm-candidate-buffer))
       (kill-buffer it))
-  (cl-dolist (attr '(update init))
+  (dolist (attr '(update init))
     (helm-aif (assoc-default attr source)
         (helm-apply-functions-from-source source it)))
   (helm-remove-candidate-cache source))
@@ -5339,7 +5339,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output-string source limit)
-  (cl-dolist (candidate (helm-transform-candidates
+  (dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
                           (split-string output-string
                                         helm-process-output-split-string-separator)
@@ -6331,7 +6331,7 @@ If action buffer is displayed, kill it."
   (message "Calculating all helm-related values...")
   (insert "If you debug some variables or forms, set `helm-debug-variables'
 to a list of forms.\n\n")
-  (cl-dolist (v (or vars
+  (dolist (v (or vars
                     helm-debug-variables
                     (apropos-internal "^helm-" 'boundp)))
     (insert "** "
@@ -7492,7 +7492,7 @@ sources."
   "Restore marked candidates when helm updates display."
   (with-current-buffer helm-buffer
     (save-excursion
-      (cl-dolist (o helm-visible-mark-overlays)
+      (dolist (o helm-visible-mark-overlays)
         (let* ((source (overlay-get o 'source))
                (ov-src-name (assoc-default 'name source))
                (ov-str (overlay-get o 'string))

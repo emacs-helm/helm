@@ -790,7 +790,7 @@ E.g. prepended with *."
 
 (defun helm-delete-marked-bookmarks (_ignore)
   "Delete this bookmark or all marked bookmarks."
-  (cl-dolist (i (helm-marked-candidates))
+  (dolist (i (helm-marked-candidates))
     (bookmark-delete (helm-bookmark-get-bookmark-from-name i)
                      'batch)))
 

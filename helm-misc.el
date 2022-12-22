@@ -230,7 +230,7 @@ This mode is enabled by `helm-mode', so there is no need to enable it directly."
   :global t
   (if helm-minibuffer-history-mode
       (let ((key helm-minibuffer-history-key))
-        (cl-dolist (map '(minibuffer-local-completion-map
+        (dolist (map '(minibuffer-local-completion-map
                           minibuffer-local-filename-completion-map
                           minibuffer-local-filename-must-match-map ; Emacs 23.1.+
                           minibuffer-local-isearch-map
@@ -250,7 +250,7 @@ This mode is enabled by `helm-mode', so there is no need to enable it directly."
                 (define-key (symbol-value map)
                     (if (stringp key) (read-kbd-macro key) key)
                   'helm-minibuffer-history))))))
-    (cl-dolist (map '(minibuffer-local-completion-map
+    (dolist (map '(minibuffer-local-completion-map
                       minibuffer-local-filename-completion-map
                       minibuffer-local-filename-must-match-map
                       minibuffer-local-isearch-map
