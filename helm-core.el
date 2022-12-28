@@ -1637,8 +1637,10 @@ slow frame popup in Emacs-26, to workaround this slowness in Emacs-26 use instea
 #+end_src
 
 WARNING:
-There is a package called posframe and also one called helm-posframe,
+There is a package called Posframe and also one called Helm-posframe,
 you DO NOT need these packages to display helm buffers in frames.
+Thus Posframe package use child frames which have no minibuffers
+and are by the way not compatible with Helm.
 
 ** Helm's basic operations and default key bindings
 
