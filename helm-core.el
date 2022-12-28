@@ -1325,18 +1325,12 @@ It is either a string or a list of two string arguments where the
 first string is the name and the second string is displayed in
 the mode-line. When nil, it defaults to `mode-line-format'.")
 
-(defvar helm-minibuffer-set-up-hook nil
+(defvar helm-minibuffer-set-up-hook '(helm-hide-minibuffer-maybe)
   "Hook that runs at minibuffer initialization.
 A hook useful for modifying minibuffer settings in Helm.
 
-An example that hides the minibuffer when using
-`helm-echo-input-in-header-line':
-
-      (add-hook \\='helm-minibuffer-set-up-hook #'helm-hide-minibuffer-maybe)
-
-Note that we check `helm-echo-input-in-header-line' value
-from `helm-buffer' which allows detecting possible local
-value of this var.")
+Uses `helm-hide-minibuffer-maybe' by default which hide minibuffer contents with
+header-line contents when `helm-echo-input-in-header-line' is non nil.")
 
 (defvar helm-help-message
   "* Helm Generic Help
