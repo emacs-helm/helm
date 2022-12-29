@@ -1016,6 +1016,9 @@ Should not be used among other sources.")
    (nohighlight :initform (progn helm-ff-nohighlight-matches))
    (keymap :initform 'helm-find-files-map)
    (candidate-number-limit :initform 'helm-ff-candidate-number-limit)
+   (completing-file-name
+    :initarg :completing-file-name :initform t
+    :documentation "Flag to notify `helm-resume' we are completing filenames.")
    (action-transformer
     :initform 'helm-find-files-action-transformer)
    (action :initform 'helm-find-files-actions)

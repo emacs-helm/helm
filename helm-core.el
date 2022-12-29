@@ -4668,6 +4668,7 @@ See `helm-fuzzy-default-highlight-match'."
   (cl-loop with diac = (helm-get-attr 'diacritics source)
            with file-comp-p = (and (not (helm-action-window))
                                    (or minibuffer-completing-file-name
+                                       (helm-get-attr 'completing-file-name source)
                                        (helm-guess-filename-at-point)))
            ;; helm-pattern may have been modified (fuzzy) so ensure to
            ;; use helm-input which is the raw pattern.
