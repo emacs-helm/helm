@@ -820,6 +820,10 @@ This can be toggled at any time from `helm-ff-file-name-history' with \
 \\<helm-file-name-history-map>\\[helm-file-name-history-show-or-hide-deleted]."
   :type 'boolean)
 
+(defcustom helm-file-name-history-max-length 72
+  "Max length of candidates in helm file name history before truncating."
+  :type 'integer)
+
 (defcustom helm-ff-follow-blacklist-file-exts '("gpg" "doc" "docx" "mp3" "ogg")
   "File extensions we don't want to follow when helm-follow-mode is enabled.
 Note that image files are always followed even if their extensions is
@@ -6237,17 +6241,19 @@ be directories."
     map))
 
 (defun helm-file-name-history-transformer (candidates _source)
-  (cl-loop with lgst = (cl-loop for c in candidates maximize (length c))
-           for c in candidates
-           for disp = (cond ((or (file-remote-p c)
+  (cl-loop with lgst = helm-file-name-history-max-length
+           for elm in candidates
+           for c = (truncate-string-to-width
+                    elm helm-file-name-history-max-length nil nil t)
+           for disp = (cond ((or (file-remote-p elm)
                                  (and (fboundp 'tramp-archive-file-name-p)
                                       (tramp-archive-file-name-p c)))
                              (propertize c 'face 'helm-history-remote))
-                            ((file-exists-p c)
+                            ((file-exists-p elm)
                              (let ((last-access (format-time-string "%d/%m/%Y  %X"
-                                                 (nth 4 (file-attributes c)))))
+                                                 (nth 4 (file-attributes elm)))))
                                (propertize
-                                c 'display
+                                elm 'display
                                 (concat (propertize c 'face 'helm-ff-file)
                                         (make-string (1+ (- lgst (length c))) ? )
                                         last-access))))
