@@ -930,7 +930,9 @@ update Helm."
                 (const :tag "Provide guidance only for complex methods" complex-only)))
 
 (defcustom helm-display-header-line t
-  "Display header-line when non nil."
+  "Display header-line when non nil.
+It has to be non nil when you want to display minibuffer contents in there with
+`helm-echo-input-in-header-line'."
   :group 'helm
   :type 'boolean)
 
@@ -942,7 +944,9 @@ The default is to enable this by default and then toggle
   :type 'boolean)
 
 (defcustom helm-echo-input-in-header-line nil
-  "Send current input to header-line when non-nil."
+  "Send current input to header-line when non-nil.
+Note that `helm-display-header-line' has to be non nil as well for this to take
+effect."
   :group 'helm
   :type 'boolean)
 
