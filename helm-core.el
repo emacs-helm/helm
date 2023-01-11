@@ -350,7 +350,7 @@ i.e. the loop is not entered after running COMMAND."
           ;; COMMAND, SUBKEY and OTHER-SUBKEYS.
           (concat
            (format "Run `%s' and bound it to `%s' for subsequent calls."
-                   command (if (numberp subkey) (char-to-string subkey) subkey))
+                   command (if (numberp subkey) (single-key-description subkey) subkey))
            (if other-subkeys
                (helm-basic-docstring-from-alist other-subkeys)
              ""))))
@@ -364,7 +364,7 @@ i.e. the loop is not entered after running COMMAND."
                                         " and ")
                                        ((> count 1) ",")
                                        (t ""))
-                       for key = (if (numberp k) (char-to-string k) k)
+                       for key = (if (numberp k) (single-key-description k) k)
                        concat (format "%s`%s'" sep key) into ks
                        concat (format "%s`%s'" sep v) into kv
                        finally return (list ks kv))))
