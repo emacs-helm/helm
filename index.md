@@ -39,7 +39,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 
 ***
 
-[Support via Paypal](https://www.paypal.me/tvolpiatto) | [Support via Liberapay](https://liberapay.com/thierryvolpiatto)
+[Support via Patreon](patreon.com/user?u=86324343)
 
 ***
 
