@@ -39,7 +39,7 @@ If you feel Helm is making your daily work easier,<br><b>please consider making 
 
 ***
 
-[Support via Patreon](patreon.com/user?u=86324343)
+[Support via Patreon](https://www.patreon.com/user?u=86324343)
 
 ***
 
