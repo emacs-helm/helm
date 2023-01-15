@@ -5342,7 +5342,7 @@ This will work only in Emacs-26+, i.e. Emacs versions that have
     (helm-output-filter--post-process)))
 
 (defun helm-output-filter--process-source (process output-string source limit)
-  (dolist (candidate (helm-transform-candidates
+  (cl-dolist (candidate (helm-transform-candidates
                          (helm-output-filter--collect-candidates
                           (split-string output-string
                                         helm-process-output-split-string-separator)
