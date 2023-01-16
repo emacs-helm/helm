@@ -3038,13 +3038,10 @@ and should be used carefully elsewhere, or not at all, using
 (defun helm-marked-files-in-dired (_candidate)
   "Open a dired buffer with only marked files.
 
-With a prefix arg toggle dired buffer to wdired mode."
-  (when (< emacs-major-version 29)
-    ;; Fix emacs bug
-    ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2022-08/msg01994.html
-    ;; up to emacs-28.1 and should be fixed in emacs-29+.
-    (advice-add 'wdired-finish-edit :override #'helm--advice-wdired-finish-edit)
-    (advice-add 'wdired-get-filename :override #'helm--advice-wdired-get-filename))
+With a prefix arg toggle dired buffer to wdired mode.
+
+Note: This function works only in Emacs-29+ because Wdired doesn't support
+editing absolute fnames in previous Emacs versions."
   (let* ((marked (helm-marked-candidates :with-wildcard t))
          (current (car marked)))
     (unless (and helm--url-regexp
