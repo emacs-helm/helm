@@ -90,6 +90,7 @@
 (declare-function all-the-icons-octicon "ext:all-the-icons.el")
 (declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
 (declare-function helm-adaptive-sort "ext:helm-adaptive.el")
+(declare-function wfnames-setup-buffer "ext:wfnames.el")
 
 (defvar all-the-icons-dir-icon-alist)
 (defvar term-char-mode-point-at-process-mark)
@@ -178,7 +179,7 @@ This is used only as a let binding.")
     (define-key map (kbd "C-x C-d")       'helm-ff-run-browse-project)
     (define-key map (kbd "C-x r m")       'helm-ff-bookmark-set)
     (define-key map (kbd "C-x r b")       'helm-find-files-switch-to-bookmark)
-    (define-key map (kbd "C-x C-q")       'helm-ff-run-marked-files-in-dired)
+    (define-key map (kbd "C-x C-q")       'helm-ff-run-edit-marked-files)
     (define-key map (kbd "C-s")           'helm-ff-run-grep)
     (define-key map (kbd "M-g s")         'helm-ff-run-grep)
     (define-key map (kbd "M-g p")         'helm-ff-run-pdfgrep)
@@ -709,7 +710,7 @@ when moving out of directory when non nil."
    "Find file in Dired" 'helm-point-file-in-dired
    "View file" 'view-file
    "Query replace fnames on marked `M-@'" 'helm-ff-query-replace-fnames-on-marked
-   "Marked files in dired `C-x C-q, C-u wdired'" 'helm-marked-files-in-dired
+   "Marked files in dired `C-x C-q'" 'helm-ff-edit-marked-files
    "Query replace contents on marked `M-%'" 'helm-ff-query-replace
    "Query replace regexp contents on marked `C-M-%'" 'helm-ff-query-replace-regexp
    "Attach file(s) to mail buffer `C-c C-a'" 'helm-ff-mail-attach-files
@@ -839,6 +840,10 @@ present in this list."
          (setq helm-source-find-files nil)
          (when helm-ff-icon-mode
            (helm-ff-icon-mode 1))))
+
+(defcustom helm-ff-edit-marked-files-fn #'helm-marked-files-in-dired
+  "A function to edit filenames in a special buffer."
+  :type 'function)
 
 ;;; Faces
 ;;
@@ -3045,9 +3050,19 @@ With a prefix arg toggle dired buffer to wdired mode."
         (when (or helm-current-prefix-arg current-prefix-arg)
           (call-interactively 'wdired-change-to-wdired-mode))))))
 
-(helm-make-command-from-action helm-ff-run-marked-files-in-dired
-    "Execute `helm-marked-files-in-dired' interactively."
-  'helm-marked-files-in-dired)
+(defun helm-ff-wfnames (_candidate)
+  "Edit marked fnames with `Wfnames' package."
+  (cl-assert (require 'wfnames nil t) nil "Wfnames package not found")
+  (let ((marked (helm-marked-candidates :with-wildcard t)))
+    (wfnames-setup-buffer marked)))
+
+(defun helm-ff-edit-marked-files (candidate)
+  "Edit marked files with `helm-ff-edit-marked-files-fn' fn."
+  (funcall helm-ff-edit-marked-files-fn candidate))
+
+(helm-make-command-from-action helm-ff-run-edit-marked-files
+    "Execute `helm-ff-edit-marked-files' interactively."
+  'helm-ff-edit-marked-files)
 
 (defun helm-ff--create-tramp-name (fname)
   "Build filename from `helm-pattern' like /su:: or /sudo::."
