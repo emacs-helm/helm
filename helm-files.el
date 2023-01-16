@@ -841,9 +841,14 @@ present in this list."
          (when helm-ff-icon-mode
            (helm-ff-icon-mode 1))))
 
-(defcustom helm-ff-edit-marked-files-fn #'helm-marked-files-in-dired
+(defcustom helm-ff-edit-marked-files-fn (if (< emacs-major-version 29)
+                                            #'helm-ff-wfnames
+                                          #'helm-marked-files-in-dired)
   "A function to edit filenames in a special buffer."
-  :type 'function)
+  :type '(choice (function :tag "Use Wfnames package to edit filenames."
+                  helm-ff-wfnames)
+                 (function :tag "Use Wdired package to edit filenames."
+                  helm-marked-files-in-dired)))
 
 ;;; Faces
 ;;
