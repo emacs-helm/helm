@@ -401,7 +401,7 @@ available APPEND is ignored."
       (subr-native-elisp-p object)))
 
 ;; Available only in emacs-27+
-(unless (fboundp 'proper-list-p) 
+(unless (fboundp 'proper-list-p)
   (defun proper-list-p (seq)
     "Return OBJECT's length if it is a proper list, nil otherwise."
     (unless (or (null (consp seq))
