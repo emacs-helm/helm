@@ -396,6 +396,10 @@ directory/file if this one is situated lower than
 `helm-ff-candidate-number-limit' num candidate."
   :type 'integer)
 
+(defcustom helm-ff-preselect-ignore-large-dirs nil
+  "Preselect directory belonging to current-buffer even if large."
+  :type 'boolean)
+
 (defcustom helm-ff-up-one-level-preselect t
   "Always preselect previous directory when going one level up.
 
@@ -5308,6 +5312,19 @@ Use it for non-interactive calls of `helm-find-files'."
                                     "Find Files" 'helm-source-ffiles)))
     (when (helm-get-attr 'follow helm-source-find-files)
       (helm-set-attr 'follow -1 helm-source-find-files))
+    ;; If preselected candidate is further than `helm-ff-candidate-number-limit'
+    ;; in the directory file list, we have to increase `candidate-number-limit'
+    ;; attr to have this candidate visible for preselection.  NOTE:
+    ;; When HFF has yet not been launched in this directory the maximum length
+    ;; of this directory is unknown and candidate will NOT be selected until
+    ;; next time we call HFF on this same buffer.
+    (helm-aif (and preselect
+                   (not helm-ff-preselect-ignore-large-dirs)
+                   (gethash fname helm-ff--directory-files-length
+                            helm-ff-candidate-number-limit))
+        (helm-set-attr 'candidate-number-limit
+                       (max it helm-ff-candidate-number-limit)
+                       helm-source-find-files))
     (helm-ff-setup-update-hook)
     (add-hook 'helm-resume-after-hook 'helm-ff--update-resume-after-hook)
     (unwind-protect
@@ -6613,7 +6630,8 @@ files."
                               (if (and helm-ff-transformer-show-only-basename
                                        (null hist)
                                        (not (string-match-p "[.]\\{1,2\\}\\'" it)))
-                                  (helm-basename it) it))))
+                                  (helm-basename it)
+                                it))))
     ;; Continue using the same display function as history which used
     ;; probably itself the same display function as inner HFF call,
     ;; i.e. if history was using frame use a frame otherwise use a window.
