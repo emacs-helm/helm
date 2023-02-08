@@ -1732,7 +1732,11 @@ Also `helm-completion-style' settings have no effect here,
     ;; Ensure to disable the evil `ffap-machine-at-point' which may run here as
     ;; `file-name-at-point-functions' contains by default
     ;; `ffap-guess-file-name-at-point' See bug#2574.
-    (let ((ffap-machine-p-known 'accept)) ; Emacs-29 uses 'accept as default.
+    ;; Use same value as in Emacs-29 for next 3 vars to ensure `ffap-machine-p'
+    ;; never ping.
+    (let ((ffap-machine-p-known 'accept)
+          (ffap-machine-p-local 'reject)
+          (ffap-machine-p-unknown 'reject))
       (run-hook-with-args-until-success 'file-name-at-point-functions))))
 
 ;; Yank text at point.
