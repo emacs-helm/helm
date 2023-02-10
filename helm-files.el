@@ -1422,7 +1422,10 @@ the car of marked files i.e. the first marked file."
       (helm-ff--count-and-collect-dups candidates)
       (when (y-or-n-p (format "Change file mode to `%s'? " smode))
         (dolist (f candidates)
-          (set-file-modes f mode 'nofollow))
+          (unless (file-symlink-p f)
+            ;; For now don't use the FLAG arg 'nofollow of `set-file-modes' for
+            ;; Emacs-26 compatibility.
+            (set-file-modes f mode)))
         (message "Changed file mode to `%s' on %s file(s)"
                  smode (length candidates))))))
 
