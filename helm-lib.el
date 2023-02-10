@@ -249,6 +249,46 @@ available APPEND is ignored."
     (unless (or (null (consp seq))
                 (cdr (last seq)))
       (length seq))))
+
+;; Available only in Emacs-28+
+(unless (fboundp 'file-modes-number-to-symbolic)
+  (defun file-modes-number-to-symbolic (mode &optional filetype)
+    "Return a string describing a file's MODE.
+For instance, if MODE is #o700, then it produces `-rwx------'.
+FILETYPE if provided should be a character denoting the type of file,
+such as `?d' for a directory, or `?l' for a symbolic link and will override
+the leading `-' char."
+    (string
+     (or filetype
+         (pcase (lsh mode -12)
+           ;; POSIX specifies that the file type is included in st_mode
+           ;; and provides names for the file types but values only for
+           ;; the permissions (e.g., S_IWOTH=2).
+
+           ;; (#o017 ??) ;; #define S_IFMT  00170000
+           (#o014 ?s) ;; #define S_IFSOCK 0140000
+           (#o012 ?l) ;; #define S_IFLNK  0120000
+           ;; (8  ??)    ;; #define S_IFREG  0100000
+           (#o006  ?b) ;; #define S_IFBLK  0060000
+           (#o004  ?d) ;; #define S_IFDIR  0040000
+           (#o002  ?c) ;; #define S_IFCHR  0020000
+           (#o001  ?p) ;; #define S_IFIFO  0010000
+           (_ ?-)))
+     (if (zerop (logand   256 mode)) ?- ?r)
+     (if (zerop (logand   128 mode)) ?- ?w)
+     (if (zerop (logand    64 mode))
+         (if (zerop (logand  2048 mode)) ?- ?S)
+       (if (zerop (logand  2048 mode)) ?x ?s))
+     (if (zerop (logand    32 mode)) ?- ?r)
+     (if (zerop (logand    16 mode)) ?- ?w)
+     (if (zerop (logand     8 mode))
+         (if (zerop (logand  1024 mode)) ?- ?S)
+       (if (zerop (logand  1024 mode)) ?x ?s))
+     (if (zerop (logand     4 mode)) ?- ?r)
+     (if (zerop (logand     2 mode)) ?- ?w)
+     (if (zerop (logand 512 mode))
+         (if (zerop (logand   1 mode)) ?- ?x)
+       (if (zerop (logand   1 mode)) ?T ?t)))))
 
 ;;; Macros helper.
 ;;
