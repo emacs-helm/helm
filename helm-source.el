@@ -1174,7 +1174,7 @@ The header line is based on one of `persistent-action-if',
            (pred (consp)))
        (warn "Helm source `%s': before-init-hook Should be defined as a symbol" sname)))
     (pcase (slot-value source 'after-init-hook)
-      ((or (and (pred (functionp)) (pred (not symbolp)))
+      ((or (and val (pred (functionp)) (guard (not (symbolp val))))
            (pred (consp)))
        (warn "Helm source `%s': after-init-hook Should be defined as a symbol" sname)))))
 
