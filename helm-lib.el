@@ -242,14 +242,6 @@ available APPEND is ignored."
   (when (fboundp 'subr-native-elisp-p)
       (subr-native-elisp-p object)))
 
-;; Available only in emacs-27+
-(unless (fboundp 'proper-list-p)
-  (defun proper-list-p (seq)
-    "Return OBJECT's length if it is a proper list, nil otherwise."
-    (unless (or (null (consp seq))
-                (cdr (last seq)))
-      (length seq))))
-
 ;; Available only in Emacs-28+
 (unless (fboundp 'file-modes-number-to-symbolic)
   (defun file-modes-number-to-symbolic (mode &optional filetype)
@@ -734,9 +726,8 @@ See `helm-help-hkmap' for supported keys and functions."
 
 (defun helm-mklist (obj)
   "Return OBJ as a list.
-If OBJ is a proper list (but not lambda), return itself.
 Otherwise make a list with one element OBJ."
-  (if (and (listp obj) (proper-list-p obj) (not (functionp obj)))
+  (if (and (listp obj) (not (functionp obj)))
       obj
     (list obj)))
 
