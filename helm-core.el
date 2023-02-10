@@ -1964,7 +1964,7 @@ Use optional arguments ARGS like in `format'."
       (buffer-disable-undo)
       (let ((inhibit-read-only t))
         (goto-char (point-max))
-        (insert (let ((tm (time-convert nil 'list)))
+        (insert (let ((tm (current-time)))
                   (format (concat (if (string-match "Start session" format-string)
                                       "* " "** ")
                                   "%s.%06d (%s)\n %s\n")

@@ -972,7 +972,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
             (if (timer--idle-delay timer)
                 (format "idle-for=[%s]"
                         (format-seconds "%dd %hh %mmin %z%,3ss"
-                                        (time-convert time t)))
+                                        (time-to-seconds time)))
               (format-time-string "%m/%d %T" time)))
           (or (timer--repeat-delay timer) "nil")
           (mapconcat #'identity (split-string
