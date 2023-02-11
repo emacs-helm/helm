@@ -842,16 +842,19 @@ When INDEX is 0 or negative, ELM is added at beginning of SEQ.
 
 Examples:
 
-    (helm-append-at-nth \\='(a b c d) \\='z 2)
-    =>(a b z c d)
     (helm-append-at-nth \\='(a b c d) \\='(z) 2)
     =>(a b z c d)
+
     (helm-append-at-nth \\='(a b c d) \\='((x . 1) (y . 2)) 2)
     =>(a b (x . 1) (y . 2) c d)
 
-NOTE: This function uses `append' internally, so ELM is expected to be a list to
-be appended to SEQ, however for convenience ELM can be an atom or a cons cell,
-it will be wrapped inside a list automatically."
+    But this is not working:
+    (helm-append-at-nth \\='(a b c d) \\='(x . 1) 2)
+    =>Wrong type argument: listp, 1
+
+NOTE: This function uses `append' internally, so ELM is expected
+to be a list to be appended to SEQ, even if for convenience an
+atom is supported as ELM value."
   (setq index (min (max index 0) (length seq))
         elm   (helm-mklist elm))
   (if (zerop index)
