@@ -1109,7 +1109,7 @@ make this command asynchronous by customizing
 
 _WARNING_: When deleting files asynchronously you will NOT be
 WARNED if directories are not empty, that's mean non empty directories will
-be deleted in background without asking.
+be deleted recursively in background without asking.
 
 A good compromise is to trash your files
 when using asynchronous method (see [[Trashing files][Trashing files]]).
@@ -1147,16 +1147,8 @@ Tip: Navigate to your Trash/files directories with `helm-find-files' and set a b
 there with \\<helm-find-files-map>\\[helm-ff-bookmark-set] for fast access to Trash.
 
 NOTE: Restoring files from trash is working only on system using
-the [[http://freedesktop.org/wiki/Specifications/trash-spec][freedesktop trash specifications]].
-
-_WARNING:_
-
-If you have an ENV var XDG_DATA_HOME in your .profile or .bash_profile
-and this var is set to something like $HOME/.local/share (like preconized)
-`move-file-to-trash' may try to create $HOME/.local/share/Trash (literally)
-and its subdirs in the directory where you are actually trying to trash files.
-because `move-file-to-trash' is interpreting XDG_DATA_HOME literally instead
-of evaling its value (with `substitute-in-file-name').
+the
+[[http://freedesktop.org/wiki/Specifications/trash-spec][freedesktop trash specifications]].
 
 ***** Trashing remote files with tramp
 
@@ -1167,15 +1159,15 @@ The package on most GNU/Linux based distributions is trash-cli, it is available 
 
 NOTE:
 When deleting your files with sudo method, your trashed files will not be listed
-with trash-list until you log in as root.
+with trash-list command line until you log in as root.
 
 *** Checksum file
 
 Checksum is calculated with the md5sum, sha1sum, sha224sum,
-sha256sum, sha384sum and sha512sum when available, otherwise the
+sha256sum, sha384sum and sha512sum commands when available, otherwise the
 Emacs function `secure-hash' is used but it is slow and may crash
 Emacs and even the whole system as it eats all memory.  So if
-your system doesn't have the md5 and sha command line tools be
+your system doesn't have the md5sum and sha*sum command line tools be
 careful when checking sum of larges files e.g. isos.
 
 *** Ignored or boring files
