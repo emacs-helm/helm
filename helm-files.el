@@ -4419,14 +4419,15 @@ with `helm-ff-trash-list'."
 (defun helm-ff--get-dest-file-from-trash (trashed-files file)
   (assoc-default (helm-basename file) trashed-files))
 
-(defun helm-ff-trash-list (&optional trash-dir)
+(cl-defun helm-ff-trash-list (&optional (trash-dir nil strash-dir))
   "Return an alist of trashed files basename and dest name.
 Assume the trash system in use is freedesktop compatible, see
 <http://freedesktop.org/wiki/Specifications/trash-spec> 
 This function is intended to be used from a trash directory i.e. it
 use `helm-ff-default-directory', but it may be used elsewhere by
 specifying the trash directory with TRASH-DIR arg."
-  (unless (fboundp 'system-move-file-to-trash)
+  (unless (or (fboundp 'system-move-file-to-trash)
+              (and strash-dir (null trash-dir)))
     ;; Files owned by root are trashed in /root/.local/share/Trash.
     ;; Files owned by user and trashed by root are trashed in
     ;; /home/.Trash.
@@ -5689,22 +5690,26 @@ Return non-nil when FILE needs to be trashed."
 
 (defun helm-trash-directory ()
   "Try to find a trash directory.
-Return the files subdirectory of trash directory.
+Return the \"files\" subdirectory of trash directory.
 When `helm-trash-default-directory' is set use it as trash directory."
-  (let ((xdg-data-dir
-         (or helm-trash-default-directory
-	     (directory-file-name
-	      (expand-file-name "Trash"
-			        (or (getenv "XDG_DATA_HOME")
-				    "~/.local/share"))))))
-    (expand-file-name "files" xdg-data-dir)))
+  (let* ((xdg-data-dir
+          (or helm-trash-default-directory
+	      (directory-file-name
+	       (expand-file-name "Trash"
+			         (or (getenv "XDG_DATA_HOME")
+				     "~/.local/share")))))
+         (trash-files-dir (expand-file-name "files" xdg-data-dir)))
+    ;; Just return nil if the Trash directory is not yet created. It will be
+    ;; created later by `delete-directory'.
+    (and (file-exists-p trash-files-dir) trash-files-dir)))
       
-(defun helm-ff-file-already-trashed (file &optional trash-alist)
+(cl-defun helm-ff-file-already-trashed (file &optional (trash-alist nil strash-alist))
   "Return FILE when it is already in trash.
 
 Optional arg TRASH-ALIST should be an alist as what
 `helm-ff-trash-list' returns."
-  (unless (fboundp 'system-move-file-to-trash)
+  (unless (or (fboundp 'system-move-file-to-trash)
+              (and strash-alist (null trash-alist)))
     (let ((trash-files-dir (helm-trash-directory)))
       (cl-loop for (_bn . fn) in (or trash-alist
                                      (helm-ff-trash-list trash-files-dir))
