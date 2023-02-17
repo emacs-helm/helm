@@ -63,6 +63,10 @@
 (defvar helm-persistent-action-window-buffer)
 (defvar completion-flex-nospace)
 (defvar find-function-source-path)
+(defvar ffap-machine-p-unknown)
+(defvar ffap-machine-p-local)
+(defvar ffap-machine-p-known)
+
 
 ;;; User vars.
 ;;
