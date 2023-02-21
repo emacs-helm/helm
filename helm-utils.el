@@ -800,15 +800,30 @@ If STRING is non--nil return instead a space separated string."
 (defun helm-ff-octal-permissions (perms)
   "Return the numeric representation of PERMS.
 PERMS is the list of permissions for owner, group and others."
+  (if (fboundp 'file-modes-symbolic-to-number)
+      (helm-ff-octal-permissions-1 perms)
+    (helm-ff-octal-permissions-2 perms)))
+
+(defun helm-ff-octal-permissions-1 (perms)
+  (let ((modes (apply 'format "u=%s,g=%s,o=%s" perms)))
+    (format "%o" (file-modes-symbolic-to-number modes))))
+
+(defun helm-ff-octal-permissions-2 (perms)
+  "Return the numeric representation of PERMS.
+PERMS is the list of permissions for owner, group and others."
   (cl-flet ((string-to-octal (str)
               (cl-loop for c across str
                        sum (pcase c
                              (?r 4)
                              (?w 2)
                              (?x 1)
-                             (?- 0)))))
-    (cl-loop for str in perms
-             concat (number-to-string (string-to-octal str)))))
+                             (_ 0)))))
+    (cl-loop with sb = ""
+             for str in perms
+             when (string-match "t" str)
+             do (setq sb "1")
+             concat (number-to-string (string-to-octal str)) into modes
+             finally return (concat sb modes))))
 
 (defun helm-format-columns-of-files (files)
   "Same as `dired-format-columns-of-files'.
