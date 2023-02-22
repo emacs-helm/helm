@@ -800,7 +800,10 @@ If STRING is non--nil return instead a space separated string."
 (defun helm-ff-octal-permissions (perms)
   "Return the numeric representation of PERMS.
 PERMS is the list of permissions for owner, group and others."
-  (let ((modes (apply 'format "u=%s,g=%s,o=%s" perms)))
+  ;; `file-modes-symbolic-to-number' doesn't supports "-" in its MODES argument,
+  ;; e.g. "u=rwx,g=rx,o=" is supported but not "u=rwx,g=r-x,o=---". 
+  (let ((modes (replace-regexp-in-string
+                "-" "" (apply 'format "u=%s,g=%s,o=%s" perms))))
     (format "%o" (file-modes-symbolic-to-number modes))))
 
 (defun helm-format-columns-of-files (files)
