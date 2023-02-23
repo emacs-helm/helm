@@ -776,26 +776,21 @@ you have in `file-attributes'."
      (int-to-string (cl-getf all :size)))
    (cl-getf all :modif-time)))
 
-(defun helm-split-mode-file-attributes (str &optional string)
-  "Split mode file attributes STR into a proplist.
-If STRING is non--nil return instead a space separated string."
-  (cl-loop with type = (substring str 0 1)
-           with cdr = (substring str 1)
-           for i across cdr
-           for count from 1
-           if (<= count 3)
-           concat (string i) into user
-           if (and (> count 3) (<= count 6))
-           concat (string i) into group
-           if (and (> count 6) (<= count 9))
-           concat (string i) into other
-           finally return
-           (let ((octal (helm-ff-octal-permissions (list user group other))))
-             (if string
-                 (mapconcat 'identity (list type user group other octal) " ")
-               (list :mode-type type :user user
-                     :group group :other other
-                     :octal octal)))))
+(defun helm-split-mode-file-attributes (modes &optional string)
+  "Split MODES in a list of modes.
+MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
+  (if (string-match "\\`\\(.\\)\\(...\\)\\(...\\)\\(...\\)\\'" modes)
+      (let* ((type  (match-string 1 modes))
+             (user  (match-string 2 modes))
+             (group (match-string 3 modes))
+             (other (match-string 4 modes))
+             (octal (helm-ff-octal-permissions (list user group other))))
+        (if string
+            (mapconcat 'identity (list type user group other octal) " ")
+          (list :mode-type type :user user
+                :group group :other other
+                :octal octal)))
+    (error "Wrong modes specification for %s" modes)))
 
 (defun helm-ff-octal-permissions (perms)
   "Return the numeric representation of PERMS.
