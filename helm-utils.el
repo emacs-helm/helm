@@ -795,8 +795,9 @@ MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
 (defun helm-ff-octal-permissions (perms)
   "Return the numeric representation of PERMS.
 PERMS is the list of permissions for owner, group and others."
-  ;; `file-modes-symbolic-to-number' doesn't supports "-" in its MODES argument,
-  ;; e.g. "u=rwx,g=rx,o=" is supported but not "u=rwx,g=r-x,o=---". 
+  ;; `file-modes-symbolic-to-number' interpret its MODES argument as what would
+  ;; result when calling such mode on a file with chmod, BTW we have to remove
+  ;; all "-" like read-file-modes does. 
   (let ((modes (replace-regexp-in-string
                 "-" "" (apply 'format "u=%s,g=%s,o=%s" perms))))
     (format "%o" (file-modes-symbolic-to-number modes))))
