@@ -784,7 +784,7 @@ MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
              (user  (match-string 2 modes))
              (group (match-string 3 modes))
              (other (match-string 4 modes))
-             (octal (helm-ff-octal-permissions (list user group other))))
+             (octal (helm-ff-numeric-permissions (list user group other))))
         (if string
             (mapconcat 'identity (list type user group other octal) " ")
           (list :mode-type type :user user
@@ -792,7 +792,7 @@ MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
                 :octal octal)))
     (error "Wrong modes specification for %s" modes)))
 
-(defun helm-ff-octal-permissions (perms)
+(defun helm-ff-numeric-permissions (perms)
   "Return the numeric representation of PERMS.
 PERMS is the list of permissions for owner, group and others."
   ;; `file-modes-symbolic-to-number' interpret its MODES argument as what would
