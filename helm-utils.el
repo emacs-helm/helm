@@ -797,10 +797,11 @@ MODES is same as what (nth 8 (file-attributes \"foo\")) would return."
 PERMS is the list of permissions for owner, group and others."
   ;; `file-modes-symbolic-to-number' interpret its MODES argument as what would
   ;; result when calling such mode on a file with chmod, BTW we have to remove
-  ;; all "-" like read-file-modes does. 
-  (let ((modes (replace-regexp-in-string
-                "-" "" (apply 'format "u=%s,g=%s,o=%s" perms))))
-    (format "%o" (file-modes-symbolic-to-number modes))))
+  ;; all "-" like read-file-modes does.
+  (helm-aand (listp perms)
+             (apply 'format "u=%s,g=%s,o=%s" perms)
+             (replace-regexp-in-string "-" "" it)
+             (format "%o" (file-modes-symbolic-to-number it))))
 
 (defun helm-format-columns-of-files (files)
   "Same as `dired-format-columns-of-files'.
