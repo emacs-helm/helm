@@ -6666,18 +6666,20 @@ computed by match-part-fn and stored in the match-part property."
         (matchfn (cond (helm-migemo-mode 'helm-mm-migemo-string-match)
                        (diacritics 'helm-mm-diacritics-string-match)
                        (t 'string-match))))
-    (if (string-match " " pattern)
-        (cl-loop for i in (helm-mm-split-pattern pattern) always
-                 (if (string-match "\\`!" i)
-                     (not (funcall matchfn (substring i 1) part))
-                   (funcall matchfn i part)))
-      (if (string-match "\\`!" pattern)
-          (if helm--in-fuzzy
-              ;; Fuzzy regexp have already been
-              ;; computed with substring 1.
-              (not (string-match fuzzy-regexp part))
-            (not (funcall matchfn (substring pattern 1) part)))
-        (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))))
+    (condition-case _err
+        (if (string-match " " pattern)
+            (cl-loop for i in (helm-mm-split-pattern pattern) always
+                     (if (string-match "\\`!" i)
+                         (not (funcall matchfn (substring i 1) part))
+                       (funcall matchfn i part)))
+          (if (string-match "\\`!" pattern)
+              (if helm--in-fuzzy
+                  ;; Fuzzy regexp have already been
+                  ;; computed with substring 1.
+                  (not (string-match fuzzy-regexp part))
+                (not (funcall matchfn (substring pattern 1) part)))
+            (funcall matchfn (if helm--in-fuzzy fuzzy-regexp pattern) part)))
+      (invalid-regexp nil))))
 
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
   (cl-loop repeat limit
