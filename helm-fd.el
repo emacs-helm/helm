@@ -84,14 +84,17 @@
   "Initialize fd process in an helm async source."
   (let* (process-connection-type
          (cmd (append helm-fd-switches
-                      (or (and (fboundp #'split-string-shell-command) (split-string-shell-command helm-pattern))
+                      (or (and (fboundp #'split-string-shell-command)
+                               (split-string-shell-command helm-pattern))
                           (split-string helm-pattern))))
          (proc (apply #'start-process "fd" nil helm-fd-executable cmd))
          (start-time (float-time))
          (fd-version (replace-regexp-in-string
                       "\n" ""
-                      (shell-command-to-string (concat helm-fd-executable " --version")))))
-    (helm-log "helm-fd-process" "Fd command:\nfd %s" (mapconcat 'identity cmd " "))
+                      (shell-command-to-string
+                       (concat helm-fd-executable " --version")))))
+    (helm-log "helm-fd-process" "Fd command:\nfd %s"
+              (mapconcat 'identity cmd " "))
     (helm-log "helm-fd-process" "VERSION: %s" fd-version)
     (prog1
         proc
