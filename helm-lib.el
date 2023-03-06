@@ -1652,7 +1652,7 @@ I.e. when using `helm-next-line' and friends in BODY."
                 :test 'equal)))
 
 (defvar helm-blacklist-completion-styles '(emacs21 emacs22))
-(defun helm--prepare-completion-styles (&optional nomode styles)
+(defun helm--prepare-completion-styles (&optional com-or-mode styles)
   "Return a suitable list of styles for `completion-styles'.
 
 When `helm-completion-style' is not `emacs' the Emacs vanilla
@@ -1661,38 +1661,38 @@ default `completion-styles' is used except for
 value for `helm-completion-style'.
 
 If styles are specified in `helm-completion-styles-alist' for a
-particular mode, use these styles unless NOMODE is non nil.
+particular mode, use these styles unless COM-OR-MODE is non nil.
 If STYLES is specified as a list of styles suitable for
 `completion-styles' these styles are used in the given order.
 Otherwise helm style is added to `completion-styles' always after
 flex or helm-flex completion style if present."
   ;; For `helm-completion-style' and `helm-completion-styles-alist'.
   (require 'helm-mode)
-  (if (memq helm-completion-style '(helm helm-fuzzy))
-      ;; Keep default settings, but probably nil is fine as well.
-      '(basic partial-completion emacs22)
-    (or
-     styles
-     (pcase (and (null nomode)
-                 (cdr (assq major-mode helm-completion-styles-alist)))
-       (`(,_l . ,ll) ll))
-     ;; We need to have flex always behind helm, otherwise
-     ;; when matching against e.g. '(foo foobar foao frogo bar
-     ;; baz) with pattern "foo" helm style if before flex will
-     ;; return foo and foobar only defeating flex that would
-     ;; return foo foobar foao and frogo.
-     (let* ((wflex (car (or (assq 'flex completion-styles-alist)
-                            (assq 'helm-flex completion-styles-alist))))
-            (styles (append (and (memq wflex completion-styles)
-                                 (list wflex))
-                            (cl-loop for s in completion-styles
-                                     unless (or (memq s helm-blacklist-completion-styles)
-                                                (memq wflex completion-styles))
-                                     collect s))))
-       (helm-append-at-nth
-        styles '(helm)
-        (if (memq wflex completion-styles)
-            1 0))))))
+  (let ((from (if com-or-mode com-or-mode major-mode)))
+    (if (memq helm-completion-style '(helm helm-fuzzy))
+        ;; Keep default settings, but probably nil is fine as well.
+        '(basic partial-completion emacs22)
+      (or
+       styles
+       (pcase (cdr (assq from helm-completion-styles-alist))
+         (`(,_l . ,ll) ll))
+       ;; We need to have flex always behind helm, otherwise
+       ;; when matching against e.g. '(foo foobar foao frogo bar
+       ;; baz) with pattern "foo" helm style if before flex will
+       ;; return foo and foobar only defeating flex that would
+       ;; return foo foobar foao and frogo.
+       (let* ((wflex (car (or (assq 'flex completion-styles-alist)
+                              (assq 'helm-flex completion-styles-alist))))
+              (styles (append (and (memq wflex completion-styles)
+                                   (list wflex))
+                              (cl-loop for s in completion-styles
+                                       unless (or (memq s helm-blacklist-completion-styles)
+                                                  (memq wflex completion-styles))
+                                       collect s))))
+         (helm-append-at-nth
+          styles '(helm)
+          (if (memq wflex completion-styles)
+              1 0)))))))
 
 (defun helm-dynamic-completion (collection predicate &optional point metadata nomode styles)
   "Build a completion function for `helm-pattern' in COLLECTION.

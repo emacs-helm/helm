@@ -333,16 +333,18 @@ NOT `setq'."
 (defcustom helm-completion-styles-alist '((gud-mode . helm)
                                           ;; See https://github.com/djcb/mu/issues/2181.
                                           (mu4e-compose-mode . emacs))
-  "Allow configuring `helm-completion-style' per mode.
+  "Allow configuring `helm-completion-style' per mode or command.
+
+NOTE: Use a mode for a completion that will be used in a buffer
+i.e. completion-in-region, whereas you have to specify instead a command to
+affect the completing-read trigerred by this command.
 
 Each entry is a cons cell like (mode . style) where style must be a
 suitable value for `helm-completion-style'.
-When specifying emacs as style for a mode, `completion-styles' can be
+When specifying emacs as style for a mode or a command, `completion-styles' can be
 specified by using a cons cell specifying completion-styles to use
 with helm emacs style, e.g. (foo-mode . (emacs helm flex)) will set
-`completion-styles' to \\='(helm flex) for foo-mode.  This affects only
-completions happening in buffers and not minibuffer completions,
-i.e. completing-read's."
+`completion-styles' to \\='(helm flex) for foo-mode."
   :group 'helm-mode
   :type
   `(alist :key-type (symbol :tag "Major Mode")
@@ -1007,8 +1009,8 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                   (`(,l . ,_ll) l)))
          (completion-flex-nospace t)
          (minibuffer-completion-table collection)
-         (completion-styles
-          (helm--prepare-completion-styles 'nomode))
+         ;; (completion-styles
+         ;;  (helm--prepare-completion-styles 'nomode))
          (metadata (or (completion-metadata (or input "") collection predicate)
                        '(metadata)))
          (afun (or (plist-get completion-extra-properties :annotation-function)
@@ -1261,10 +1263,17 @@ See documentation of `completing-read' and `all-completions' for details."
          ;; Disable hack that could be used before `completing-read'.
          ;; i.e (push ?\t unread-command-events).
          unread-command-events
+         ;; Let-bounding here helm-completion-style according to
+         ;; helm-completion-styles-alist allow using helm style per commands.
+         (helm-completion-style (helm-aif (cdr (assq current-command helm-completion-styles-alist))
+                                    (if (cdr-safe it) (car it) it)
+                                  (default-value 'helm-completion-style)))
+         (completion-styles
+          (helm--prepare-completion-styles current-command))
          (default-handler
           ;; If nothing is found in
           ;; helm-completing-read-handlers-alist use default
-          ;; handler.
+          ;; handler which will itself use `helm-completion-style'.
           #'helm-completing-read-default-handler))
     (when (eq def-com 'ido) (setq def-com 'ido-completing-read))
     (unless (or (not entry) def-com)
