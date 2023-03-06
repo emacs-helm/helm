@@ -1661,7 +1661,10 @@ default `completion-styles' is used except for
 value for `helm-completion-style'.
 
 If styles are specified in `helm-completion-styles-alist' for a
-particular mode, use these styles unless COM-OR-MODE is non nil.
+particular mode, use these styles for the corresponding mode.
+If COM-OR-MODE (a mode or a command) is specified it is used to find the
+corresponding styles in `helm-completion-styles-alist'.
+
 If STYLES is specified as a list of styles suitable for
 `completion-styles' these styles are used in the given order.
 Otherwise helm style is added to `completion-styles' always after
