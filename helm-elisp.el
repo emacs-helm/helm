@@ -406,6 +406,7 @@ the same time to variable and a function."
         collect (cons (concat c spaces annot) c) into lst
         finally return (sort lst #'helm-generic-sort-fn)))
 
+;;;###autoload
 (cl-defun helm-get-first-line-documentation (sym &optional
                                                    (name "describe-function")
                                                    (end-column 72))
