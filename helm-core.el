@@ -569,7 +569,7 @@ NOTE: When non-nil (default), disable
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-candidate-number-limit 100
+(defcustom helm-candidate-number-limit 50
   "Global limit for number of candidates displayed.
 When the pattern is empty, the number of candidates shown will be
 as set here instead of the entire list, which may be hundreds or
