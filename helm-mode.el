@@ -511,7 +511,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                                (not helm--completing-region)
                                (memq helm-completion-style '(helm helm-fuzzy)))
                           (helm-completion-in-region--initial-filter
-                           ;; Ensure we use the display part of candidates.
+                           ;; Ensure we use the display part of candidates (if some).
                            (all-completions "" candidates)
                            annotation nil nil)
                         candidates)
