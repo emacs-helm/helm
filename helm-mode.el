@@ -1060,9 +1060,9 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
                              (helm-completion-in-region--initial-filter
-                              (pcase-let ((lst (if (and sort-fn (> (length str) 0))
-                                                   (funcall sort-fn all)
-                                                 all)))
+                              (let ((lst (if (and sort-fn (> (length str) 0))
+                                             (funcall sort-fn all)
+                                           all)))
                                 (if (and default afix)
                                     (prog1 (append (list default)
                                                    (delete default lst))
