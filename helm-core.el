@@ -679,6 +679,16 @@ the same window scheme as the previous session unless
   :group 'helm
   :type 'boolean)
 
+(defcustom helm-split-width-threshold nil
+  "The value of `split-width-threshold' for helm windows.
+This affect the behavior of `helm-split-window-default-fn'.
+When the value is an integer, `split-window-sensibly' is used inconditionally
+and all the helm variables that affect window splitting are ignored."
+  :group 'helm
+  :type '(choice
+           (const :tag "Maybe use `split-window-sensibly'" nil)
+           (integer :tag "Inconditionally use `split-window-sensibly'")))
+
 (defcustom helm-split-window-preferred-function 'helm-split-window-default-fn
   "Default function used for splitting window."
   :group 'helm
@@ -3300,11 +3310,13 @@ to `helm-default-display-buffer' is called from
 `helm-display-buffer' the value of
 `split-window-preferred-function' will be used by
 `display-buffer'."
-  (let* (split-width-threshold
+  (let* ((split-width-threshold (and (integerp helm-split-width-threshold)
+                                     helm-split-width-threshold))
          (win (if (and (fboundp 'window-in-direction)
                        ;; Don't try to split when starting in a minibuffer
                        ;; e.g M-: and try to use helm-show-kill-ring.
-                       (not (minibufferp helm-current-buffer)))
+                       (not (minibufferp helm-current-buffer))
+                       (null helm-split-width-threshold))
                   (if (or (one-window-p t)
                           helm-split-window-inside-p)
                       (split-window
