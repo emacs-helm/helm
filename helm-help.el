@@ -1874,10 +1874,11 @@ Nowaday the best backend is Ripgrep aka RG, it is the fastest and
 is actively maintained, see `helm-grep-ag-command' and
 `helm-grep-ag-pipe-cmd-switches' to configure it.
 
-You can ignore files and directories with a \".agignore\" file, local to a
-directory or global when placed in the home directory. (See the AG man page for
-more details.)  That file follows the same syntax as `helm-grep-ignored-files'
-and `helm-grep-ignored-directories'.
+You can ignore files and directories with a \".agignore\" or
+\".rgignore\" file, local to a directory or global when placed in
+the home directory. (See the AG/RG man pages for more details.)
+Note that `helm-grep-ignored-files'and
+`helm-grep-ignored-directories' have no effect in helm-AG/RG.
 
 As always you can access Helm AG from `helm-find-files'.
 
