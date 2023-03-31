@@ -190,6 +190,7 @@ This is used only as a let binding.")
     (define-key map (kbd "M-.")           'helm-ff-run-etags)
     (define-key map (kbd "M-R")           'helm-ff-run-rename-file)
     (define-key map (kbd "M-C")           'helm-ff-run-copy-file)
+    (define-key map (kbd "M-k")           'helm-ff-run-kill-default-directory)
     (when (executable-find "rsync")
       (define-key map (kbd "M-V")         'helm-ff-run-rsync-file))
     (define-key map (kbd "C-M-SPC")       'helm-ff-mark-similar-files)
@@ -3846,6 +3847,16 @@ to avoid an unnecessary call to `file-truename'."
 (helm-make-persistent-command-from-action helm-ff-persistent-delete
     "Delete current candidate without quitting."
     'quick-delete 'helm-ff-quick-delete)
+
+(defun helm-ff-kill-default-directory (_candidate)
+  (with-helm-window
+    (kill-new helm-ff-default-directory)
+    (message "`%s' copied to kill-ring" helm-ff-default-directory)))
+
+(helm-make-persistent-command-from-action helm-ff-run-kill-default-directory
+    "Kill `helm-ff-default-directory'."
+  'kill-default-directory
+  'helm-ff-kill-default-directory)
 
 (defun helm-ff-dot-file-p (file)
   "Check if FILE is `.' or `..'."
