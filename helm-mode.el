@@ -1684,7 +1684,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
         (helm-split-window-default-side
          (if (eq helm-split-window-default-side 'same)
              'below helm-split-window-default-side))
-        helm-split-window-inside-p
         helm-reuse-last-window-split-state
         ;; Helm handlers should always have a non nil INITIAL arg.
         (init (or initial dir default-directory)))
