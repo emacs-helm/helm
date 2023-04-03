@@ -883,8 +883,8 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                          :history (and (symbolp input-history) input-history)
                          :buffer buffer))
         (remove-hook 'helm-after-update-hook 'helm-comp-read--move-to-first-real-candidate))
-      ;; If `history' is a symbol save it.
-      (when (and result history (symbolp history))
+      ;; If `history' is a symbol save it, except when it is t.
+      (when (and result history (symbolp history) (not (eq history t)))
         (set history
              ;; RESULT may be a a string or a list of strings bug #2461.
              (delete-dups (append (mapcar #'substring-no-properties (helm-mklist result))
