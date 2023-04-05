@@ -43,3 +43,12 @@
 </p>
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
+
+<p>Maintainance of Helm is a lot of work please consider making a donation, thank you!</p>
+
+
+<a href="https://www.patreon.com/user?u=86324343">
+    <img title="Donate monthly using Patreon"
+    alt="Donate monthly using Patreon"
+    style="height: 50px; width: auto;"
+    src="https://github.com/emacs-helm/helm/blob/master/images/patreon-25x.png?raw=true"></a>
