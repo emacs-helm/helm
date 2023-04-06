@@ -101,8 +101,10 @@ Argument TOBUF is the `helm-candidate-buffer'."
 
 (defun helm-info-goto (node-line)
   "The helm-info action to jump to NODE-LINE."
-  (Info-goto-node (car node-line))
-  (helm-goto-line (cdr node-line)))
+  (let ((alive (buffer-live-p (get-buffer "*info*"))))
+    (Info-goto-node (car node-line))
+    (when alive (revert-buffer nil t))
+    (helm-goto-line (cdr node-line))))
 
 (defvar helm-info--node-regexp
   "^\\* +\\(.+\\):[[:space:]]+\\(.*\\)\\(?:[[:space:]]*\\)(line +\\([0-9]+\\))"
