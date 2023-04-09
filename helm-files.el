@@ -5037,6 +5037,11 @@ Special commands:
   (cl-assert (null (file-remote-p helm-ff-default-directory))
              nil "Thumbnails show not supported on remote files")
   (setq helm-ff--show-thumbnails (not helm-ff--show-thumbnails))
+  (when helm-ff--show-thumbnails
+    (message "Loading thumbnails...")
+    (with-helm-after-update-hook
+      (sit-for 1)
+      (message "Loading thumbnails done")))
   (when (and (null helm-ff--show-thumbnails)
              (member helm-ff-default-directory
                      helm-ff--thumbnailed-directories))
