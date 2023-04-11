@@ -20,8 +20,9 @@
 (require 'cl-lib)
 (require 'helm)
 (require 'helm-lib)
-(require 'helm-files)
-(require 'helm-misc)
+(unless (require 'helm-autoloads nil t)
+  (require 'helm-files)
+  (require 'helm-misc))
 
 (defvar crm-separator)
 (defvar ido-everywhere)

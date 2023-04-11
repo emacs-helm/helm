@@ -19,10 +19,10 @@
 
 (require 'cl-lib)
 (require 'helm)
-(require 'helm-help)
-(require 'helm-mode)
-(require 'helm-elisp)
-
+(unless (require 'helm-autoloads nil t)
+  (require 'helm-help)
+  (require 'helm-mode)
+  (require 'helm-elisp))
 
 (defvar helm-M-x-map
   (let ((map (make-sparse-keymap)))
