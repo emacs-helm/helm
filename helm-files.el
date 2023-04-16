@@ -4892,6 +4892,11 @@ Special commands:
 ")
 (put 'helm-slideshow-mode 'no-helm-mx t)
 
+(defun helm-ff-slideshow-help-string (counter-string state)
+  (concat counter-string
+          (substitute-command-keys
+           (format helm-ff-slideshow-helper state))))
+
 (defun helm-ff-start-slideshow-on-marked (_candidate)
   "Start a slideshow on marked files."
   (let ((marked (helm-marked-candidates :with-wildcard t)))
@@ -4902,9 +4907,8 @@ Special commands:
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-slideshow-mode))
-    (message (concat (format "(1/%s) " (length marked))
-                     (substitute-command-keys
-                      (format helm-ff-slideshow-helper "pause"))))
+    (setq mode-line-format (helm-ff-slideshow-help-string
+                            (format "(1/%s) " (length marked)) "pause"))
     (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
 
 (defun helm-ff-slideshow-state ()
@@ -4918,26 +4922,30 @@ Special commands:
   (helm-reorganize-sequence-from-elm
    helm-ff--slideshow-sequence (buffer-file-name) reverse))
 
-(defun helm-ff-slideshow-loop (iterator)
+(defun helm-ff-slideshow-loop (iterator &optional restart)
   (while (sit-for helm-ff-slideshow-default-delay)
     (helm-ff--display-image-native (helm-iter-next iterator))
     (delete-other-windows (get-buffer-window helm-ff-image-native-buffer))
     (cl-letf (((symbol-function 'message) #'ignore))
       (helm-slideshow-mode))
-    (message (concat (helm-ff-slideshow-state)
-                     (substitute-command-keys
-                      (format helm-ff-slideshow-helper "pause"))))))
+    (when restart
+      (message "Helm Slideshow started")
+      (sit-for 1)
+      (message nil)
+      (setq restart nil))
+    (setq mode-line-format
+          (helm-ff-slideshow-help-string
+           (helm-ff-slideshow-state) "pause"))))
 
 (defun helm-ff-slideshow-pause-or-restart ()
   (interactive)
   (setq helm-ff--slideshow-in-pause (not helm-ff--slideshow-in-pause))
   (if helm-ff--slideshow-in-pause
-      (message (substitute-command-keys
-                (format helm-ff-slideshow-helper "restart")))
+      (setq mode-line-format (helm-ff-slideshow-help-string nil "restart"))
     (message "Helm Slideshow restarting...")
     (setq helm-ff--slideshow-iterator
           (helm-iter-circular (helm-ff-slideshow-sequence-from-current)))
-    (helm-ff-slideshow-loop helm-ff--slideshow-iterator)))
+    (helm-ff-slideshow-loop helm-ff--slideshow-iterator 'restart)))
 (put 'helm-ff-slideshow-pause-or-restart 'no-helm-mx t)
 
 (defun helm-ff-slideshow-next ()
