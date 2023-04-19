@@ -447,8 +447,12 @@ toggle the thumbnail view with \\<helm-find-files-map>`\\[helm-ff-toggle-thumbna
 
 **** Launch a slideshow from marked files
 
-Helm provides an action from `helm-find-files' that allows running a slideshow on marked files.
-Just mark image files and launch slideshow from action menu, bindings are self documented.
+Helm provides an action from `helm-find-files' that allows
+running a slideshow on marked files.  Just mark image files and
+launch slideshow from action menu, bindings are self documented
+in mode-line.  NOTE: When hitting any other keys than the ones
+mentionned in mode-line, slideshow will come in pause, to restart
+it you will have to press twice SPACE.
 
 *** Open files externally
 
