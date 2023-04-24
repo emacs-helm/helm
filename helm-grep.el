@@ -1787,6 +1787,18 @@ version."
   (helm-grep-ag (expand-file-name default-directory) arg))
 
 ;;;###autoload
+(defun helm-do-grep-ag-project-root (arg)
+  "Preconfigured `helm' for grepping with AG in `project-root'.
+With prefix arg prompt for type if available with your AG
+version."
+  (interactive "P")
+  ;; (require 'helm-files)
+  (helm-grep-ag-1
+   (expand-file-name
+    (project-root
+     (project-current t))) arg))
+
+;;;###autoload
 (defun helm-grep-do-git-grep (arg)
   "Preconfigured `helm' for git-grepping `default-directory'.
 With a prefix arg ARG git-grep the whole repository."
