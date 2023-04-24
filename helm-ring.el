@@ -124,10 +124,10 @@ will not have separators between candidates any more."
                         (helm-kill-ring--preselect-fn cur-cand)))
            helm-display-source-at-screen-top)
       (helm-set-attr 'multiline
-                    (if helm-kill-ring--truncated-flag
-                        15000000
-                        helm-kill-ring-max-offset))
-        (helm-update presel-fn))))
+                     (if helm-kill-ring--truncated-flag
+                         15000000
+                       helm-kill-ring-max-offset))
+      (helm-update presel-fn))))
 (put 'helm-kill-ring-toggle-truncated 'helm-only t)
 
 (defun helm-kill-ring-kill-selection ()
