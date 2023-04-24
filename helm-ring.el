@@ -121,7 +121,8 @@ will not have separators between candidates any more."
     (setq helm-kill-ring--truncated-flag (not helm-kill-ring--truncated-flag))
     (let* ((cur-cand (helm-get-selection))
            (presel-fn (lambda ()
-                        (helm-kill-ring--preselect-fn cur-cand))))
+                        (helm-kill-ring--preselect-fn cur-cand)))
+           helm-display-source-at-screen-top)
       (helm-set-attr 'multiline
                     (if helm-kill-ring--truncated-flag
                         15000000
@@ -512,6 +513,7 @@ First call open the kill-ring browser, next calls move to next line."
   (let ((enable-recursive-minibuffers t))
     (helm :sources helm-source-kill-ring
           :buffer "*helm kill ring*"
+          ;; :display-source-at-screen-top nil
           :resume 'noresume
           :allow-nest t)))
 
