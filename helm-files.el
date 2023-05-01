@@ -3881,7 +3881,8 @@ in `helm-find-files-persistent-action-if'."
   (let* ((buf      (get-file-buffer candidate))
          (buf-name (buffer-name buf))
          (win (get-buffer-window buf))
-         (helm--reading-passwd-or-string t))
+         (helm--reading-passwd-or-string t)
+         auto-save-default)
     (cond ((and buf win (eql buf (get-buffer helm-current-buffer)))
            (user-error
             "Can't kill `helm-current-buffer' without quitting session"))
