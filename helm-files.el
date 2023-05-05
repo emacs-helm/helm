@@ -3882,6 +3882,8 @@ in `helm-find-files-persistent-action-if'."
          (buf-name (buffer-name buf))
          (win (get-buffer-window buf))
          (helm--reading-passwd-or-string t)
+         ;; Prevent tramp from asking yes-or-no-p for
+         ;; `tramp-allow-unsafe-temporary-files'.
          auto-save-default)
     (cond ((and buf win (eql buf (get-buffer helm-current-buffer)))
            (user-error
