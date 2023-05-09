@@ -6035,7 +6035,7 @@ selecting them."
         (helm--reading-passwd-or-string t))
     (if (cdr marked)
         (if (equal helm-current-prefix-arg '(16))
-            (mapcar 'find-file-noselect marked)
+            (mapc 'find-file-noselect marked)
           ;; If helm-current-prefix-arg is detected split is done
           ;; vertically.
           (helm-window-show-buffers (mapcar 'find-file-noselect marked)))
