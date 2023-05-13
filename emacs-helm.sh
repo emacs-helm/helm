@@ -25,6 +25,7 @@ test -z "$TEMP" && TEMP="/tmp"
 
 CONF_FILE="$TEMP/helm-cfg.el"
 EMACS=emacs
+QUICK=-Q
 TOOLBARS=-1
 LOAD_PACKAGES=
 
@@ -125,6 +126,9 @@ for a in "$@"; do
             shift 1
             LOAD_PACKAGES="$1"
             shift 1
+            ;;
+        -Q | -q)
+            QUICK="$a"
             ;;
         -h)
             usage
@@ -258,4 +262,4 @@ cat > $CONF_FILE <<EOF
 (add-hook 'kill-emacs-hook #'(lambda () (and (file-exists-p "$CONF_FILE") (delete-file "$CONF_FILE"))))
 EOF
 
-$EMACS -Q -l "$CONF_FILE" "$@"
+$EMACS "$QUICK" -l "$CONF_FILE" "$@"
