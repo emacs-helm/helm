@@ -2438,11 +2438,14 @@ command you want to execute before specifying prefix arg.
 - End the kmacro recording with `f4'.
 - Run `helm-execute-kmacro' to list all your kmacros.
 
-Use persistent action to run your kmacro as many times as needed.
-You can browse the kmacros with `helm-next-line' and `helm-previous-line'.
+When you press RET, your macro goes on top of ring and become the
+current macro, hit `f4' for further executions.
+Use `helm-execute-kmacro' again to change eventually your macro to execute.
 
 Note: You can't record keys running Helm commands except `helm-M-x', under the
 condition that you don't choose a command using Helm completion.
+
+See [[info:emacs#Keyboard Macros][Keyboard Macros]] for further infos on macros.
 
 ** Commands
 \\<helm-kmacro-map>")

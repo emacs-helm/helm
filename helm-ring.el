@@ -539,7 +539,8 @@ This command is useful when used with persistent action."
               (cl-loop for c in candidates collect
                        (propertize (help-key-description (car c) nil)
                                    'helm-realvalue c)))
-            :persistent-help "Execute kmacro"
+            :persistent-action 'ignore
+            :persistent-help "Do nothing"
             :help-message 'helm-kmacro-help-message
             :action
             (helm-make-actions
