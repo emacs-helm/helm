@@ -106,6 +106,7 @@
 (defvar tramp-tolerate-tilde)
 (defvar password-cache)
 (defvar helm-fd-executable)
+(defvar wfnames-buffer)
 
 ;;; Internal vars
 ;;
@@ -3064,7 +3065,8 @@ editing absolute fnames in previous Emacs versions."
   "Edit marked fnames with `Wfnames' package."
   (cl-assert (require 'wfnames nil t) nil "Wfnames package not found")
   (let ((marked (helm-marked-candidates :with-wildcard t)))
-    (wfnames-setup-buffer marked)))
+    (wfnames-setup-buffer
+     marked #'switch-to-buffer (buffer-live-p (get-buffer wfnames-buffer)))))
 
 (defun helm-ff-edit-marked-files (candidate)
   "Edit marked files with `helm-ff-edit-marked-files-fn' fn."
