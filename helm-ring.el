@@ -550,15 +550,44 @@ See (info \"(emacs) Keyboard Macros\") for detailed infos."
              "Delete marked macros"
              'helm-kbd-macro-delete-macro
              "Edit marked macro"
-             'helm-kbd-macro-edit-macro)
+             'helm-kbd-macro-edit-macro
+             "Insert kbd macro"
+             'helm-kbd-macro-insert-macro)
             :group 'helm-ring)
           :buffer "*helm kmacro*")))
 
-(defun helm-kbd-macro-execute (candidate)
-  ;; Move candidate on top of list for next use.
+(defun helm-kbd-macro-make-current (candidate)
+  "Make CANDIDATE macro the current one."
   (setq kmacro-ring (delete candidate kmacro-ring))
   (kmacro-push-ring)
-  (kmacro-split-ring-element candidate)
+  (kmacro-split-ring-element candidate))
+
+(defun helm-kbd-macro-insert-macro (candidate)
+  "Insert macro at point in `helm-current-buffer'."
+  (let ((desc (read-string "Describe macro briefly: "))
+        name key)
+    (while (fboundp (setq name (intern (read-string "New name for macro: "))))
+      (message "Symbol `%s' already exists, choose another name" name)
+      (sit-for 1.5))
+    (helm-kbd-macro-make-current candidate)
+    (kmacro-name-last-macro name)
+    (when (y-or-n-p "Bind macro to a new key?")
+      (helm-awhile (key-binding
+                    (setq key (read-key-sequence-vector "Bind macro to key: ")))
+        (message "`%s' already run command `%s', choose another one"
+                 (help-key-description key nil) it)
+        (sit-for 1.5))
+      (global-set-key key name))
+    (with-helm-current-buffer
+      (insert (format ";; %s%s\n"
+                      desc
+                      (and key (format " (bound to `%s')"
+                                       (help-key-description key nil)))))
+      (insert-kbd-macro name (not (null key))))))
+
+(defun helm-kbd-macro-execute (candidate)
+  ;; Move candidate on top of list for next use.
+  (helm-kbd-macro-make-current candidate)
   (kmacro-exec-ring-item
    candidate helm-current-prefix-arg))
 
