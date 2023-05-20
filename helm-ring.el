@@ -521,8 +521,7 @@ First call open the kill-ring browser, next calls move to next line."
 (defun helm-execute-kmacro ()
   "Preconfigured helm for keyboard macros.
 Define your macros with `f3' and `f4'.
-See (info \"(emacs) Keyboard Macros\") for detailed infos.
-This command is useful when used with persistent action."
+See (info \"(emacs) Keyboard Macros\") for detailed infos."
   (interactive)
   (let ((helm-quit-if-no-candidate
          (lambda () (message "No kbd macro has been defined"))))
