@@ -855,6 +855,10 @@ present in this list."
                   helm-ff-wfnames)
                  (function :tag "Use Wdired package to edit filenames."
                   helm-marked-files-in-dired)))
+
+(defcustom helm-ff-ignore-following-on-directory nil
+  "In follow mode ignore silently directories when non nil."
+  :type 'boolean)
 
 ;;; Faces
 ;;
@@ -4640,7 +4644,9 @@ This affects directly file CANDIDATE."
 (defvar helm-ff-sound-file-extensions '("wav" "au"))
 
 (defun helm-ff--maybe-follow (candidate)
-  (let ((file  (file-regular-p candidate))
+  (let ((file  (if helm-ff-ignore-following-on-directory
+                   (file-exists-p candidate)
+                 (file-regular-p candidate)))
         (image (string-match-p (image-file-name-regexp) candidate))
         (ext   (file-name-extension candidate)))
     (and file
