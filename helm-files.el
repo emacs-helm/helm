@@ -1182,6 +1182,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          ;; If HFF is using a frame use a frame as well.
          (helm-actions-inherit-frame-settings t)
          helm-use-frame-when-more-than-two-windows
+         dired-create-destination-dirs
          (dest (or target
                    (with-helm-display-marked-candidates
                      helm-marked-buffer-name
