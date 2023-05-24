@@ -1182,7 +1182,6 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          ;; If HFF is using a frame use a frame as well.
          (helm-actions-inherit-frame-settings t)
          helm-use-frame-when-more-than-two-windows
-         dired-create-destination-dirs
          (dest (or target
                    (with-helm-display-marked-candidates
                      helm-marked-buffer-name
@@ -1196,12 +1195,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                               (if helm-ff-transformer-show-only-basename
                                                   (helm-basename cand) cand))))
                         :initial-input (helm-dwim-target-directory)
-                        :history (helm-find-files-history nil :comp-read nil))))))
-         (dest-dir-p (file-directory-p dest))
-         (dest-dir   (helm-basedir dest)))
-    (unless (or dest-dir-p (file-directory-p dest-dir))
-      (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
-        (make-directory dest-dir t)))
+                        :history (helm-find-files-history nil :comp-read nil)))))))
     (if (eq action 'rsync)
         (helm-rsync-copy-files ifiles dest rsync-switches)
       (helm-dired-action
