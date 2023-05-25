@@ -1196,7 +1196,16 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                               (if helm-ff-transformer-show-only-basename
                                                   (helm-basename cand) cand))))
                         :initial-input (helm-dwim-target-directory)
-                        :history (helm-find-files-history nil :comp-read nil)))))))
+                        :history (helm-find-files-history nil :comp-read nil))))))
+         (dest-dir-p (file-directory-p dest))
+         (dest-dir   (helm-basedir dest)))
+    ;; We still need to handle directory creation for Emacs version < 27.1 that
+    ;; doesn't have `dired-create-destination-dirs'.
+    (unless (or (boundp 'dired-create-destination-dirs)
+                dest-dir-p
+                (file-directory-p dest-dir))
+      (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
+        (make-directory dest-dir t)))
     (if (eq action 'rsync)
         (helm-rsync-copy-files ifiles dest rsync-switches)
       (helm-dired-action
