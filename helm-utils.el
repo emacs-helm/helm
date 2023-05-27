@@ -282,11 +282,13 @@ behavior is the same as with a nil value."
            (const :tag "Split window horizontally" nil)
            (symbol :tag "Guess how to split window" 'decide)))
 
-(defcustom helm-window-show-buffers-function #'helm-window-default-split-fn
+(defcustom helm-window-show-buffers-function #'helm-window-decide-split-fn
   "The default function to use when opening several buffers at once.
 It is typically used to rearrange windows."
   :group 'helm-utils
   :type '(choice
+          (function :tag "Decide how to split according to number of candidates"
+                    helm-window-decide-split-fn)
           (function :tag "Split windows vertically or horizontally"
                     helm-window-default-split-fn)
           (function :tag "Split in alternate windows"
@@ -345,6 +347,15 @@ If a prefix arg is given split windows vertically."
            ;; Buf names are separated with "," in TAB-NAMES
            ;; e.g. '("tab-bar.el" "*scratch*, helm-buffers.el").
            thereis (member buffer-name (split-string name ", " t))))
+
+(defun helm-window-decide-split-fn (candidates &optional other-window-fn)
+  "Try to find the best split window fn according to the number of CANDIDATES."
+  (let ((fn (cond ((> (length candidates) 3)
+                   #'helm-window-mosaic-fn)
+                  ((> (length candidates) 2)
+                   #'helm-window-alternate-split-fn)
+                  (t #'helm-window-default-split-fn))))
+    (funcall fn candidates other-window-fn)))
 
 (defun helm-window-default-split-fn (candidates &optional other-window-fn)
   "Split windows in one direction and balance them.
