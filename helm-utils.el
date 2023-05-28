@@ -1,6 +1,6 @@
 ;;; helm-utils.el --- Utilities Functions for helm. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2012 ~ 2023 Thierry Volpiatto 
+;; Copyright (C) 2012 ~ 2023 Thierry Volpiatto
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -506,7 +506,7 @@ Default is `helm-current-buffer'."
                    #'outline-show-subtree)
                   ((and (boundp 'hs-minor-mode)
                     hs-minor-mode)
-                   #'hs-show-block)
+                   #'hs-show-all)
                   ((and (boundp 'markdown-mode-map)
                         (derived-mode-p 'markdown-mode))
                    #'markdown-show-entry)))
