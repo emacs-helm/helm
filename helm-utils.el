@@ -28,6 +28,7 @@
 (declare-function outline-show-subtree "outline")
 (declare-function org-reveal "org")
 (declare-function hs-show-block "hideshow.el")
+(declare-function hs-show-all "hideshow.el")
 (declare-function tab-bar-tabs "tab-bar")
 (declare-function tab-bar-select-tab "tab-bar")
 (declare-function dired-goto-file "dired")
