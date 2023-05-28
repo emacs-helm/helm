@@ -5620,7 +5620,10 @@ DESTINATION for the actions copy and rename."
                                     dired-async-mode)
                                1 -1)))
     (and follow (fboundp 'dired-async-mode) (dired-async-mode -1))
-    (when (and (cdr files) (not (file-directory-p destination)))
+    ;; When dired-create-destination-dirs is available (emacs-27.1+) such error
+    ;; is handled later in dired-create-files.
+    (when (and (null (boundp 'dired-create-destination-dirs))
+               (cdr files) (not (file-directory-p destination)))
       (error "%s: target `%s' is not a directory" action destination))
     (unwind-protect
          (dired-create-files
