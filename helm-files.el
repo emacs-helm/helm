@@ -711,6 +711,10 @@ when moving out of directory when non nil."
   "A list of eshell aliases to not display."
   :type '(repeat string))
 
+(defcustom helm-eshell-on-file-reverse-history t
+  "History source in *eshell-command-on-file appears on top when non nil."
+  :type 'boolean)
+
 (defcustom helm-find-files-actions
   (helm-make-actions
    "Find File" 'helm-find-file-or-marked
@@ -1621,6 +1625,7 @@ this working."
                  :help-message 'helm-esh-help-message
                  :history 'helm-eshell-command-on-file-history
                  :raw-history t
+                 :reverse-history helm-eshell-on-file-reverse-history
                  :input-history
                  'helm-eshell-command-on-file-input-history))))
            (alias-value (car (assoc-default command eshell-command-aliases-list)))
