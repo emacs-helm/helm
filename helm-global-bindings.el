@@ -84,12 +84,7 @@
     (define-key map (kbd "@")         'helm-list-elisp-packages)
     map))
 
-;; Don't override the keymap we just defined with an empty
-;; keymap.  This also protect bindings changed by the user.
-(defvar helm-command-prefix)
-(define-prefix-command 'helm-command-prefix)
 (fset 'helm-command-prefix helm-command-map)
-(setq  helm-command-prefix helm-command-map)
 
 
 ;;; Menu
