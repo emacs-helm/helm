@@ -1277,6 +1277,9 @@ TYPE when nil specify function, for other values see
                        ((defvar defface)
                         (or (symbol-file sym it)
                             (help-C-file-name sym 'var)))
+                       ;; Sometimes e.g. with prefix key symbols
+                       ;; `find-function-library' returns a list of only one
+                       ;; element, the symbol itself i.e. no library.
                        (t (cdr (find-function-library sym)))))
          (library (and symbol-lib
                        (find-library-name
