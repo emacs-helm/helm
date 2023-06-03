@@ -1278,9 +1278,12 @@ TYPE when nil specify function, for other values see
                         (or (symbol-file sym it)
                             (help-C-file-name sym 'var)))
                        (t (cdr (find-function-library sym)))))
-         (library (find-library-name
-                   (helm-basename symbol-lib t))))
-    (find-function-search-for-symbol sym type library)))
+         (library (and symbol-lib
+                       (find-library-name
+                        (helm-basename symbol-lib t)))))
+    (if library
+        (find-function-search-for-symbol sym type library)
+      (error "Don't know where `%s' is defined" sym))))
 
 (defun helm-find-function (func)
   "Try to jump to FUNC definition.
