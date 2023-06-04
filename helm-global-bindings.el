@@ -30,7 +30,12 @@
 (defcustom helm-command-prefix-key
   (helm-aif (car (where-is-internal 'Control-X-prefix (list global-map)))
       (concat it [?c]))
-  "The key `helm-command-prefix' is bound to in the global map."
+  "The prefix key used to call Helm commands from the `global-map'.
+
+Its default value is `C-x c'.
+This key is bound to the function `helm-command-prefix' in the global map.
+The definition of `helm-command-prefix' is the keymap `helm-command-map'.
+Using `setq' to modify this variable will have no effect."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
   :group 'helm-global-bindings
   :set
