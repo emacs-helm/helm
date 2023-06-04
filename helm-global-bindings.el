@@ -39,12 +39,10 @@ Using `setq' to modify this variable will have no effect."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
   :set
   (lambda (var key)
-    (when (and (boundp var) (symbol-value var))
-      (define-key (current-global-map)
-          (read-kbd-macro (symbol-value var)) nil))
+    (helm-aif (and (boundp var) (symbol-value var))
+        (global-unset-key (read-kbd-macro it)))
     (when key
-      (define-key (current-global-map)
-          (read-kbd-macro key) 'helm-command-prefix))
+      (global-set-key (read-kbd-macro key) 'helm-command-prefix))
     (set var key)))
 
 (defvar helm-command-map
