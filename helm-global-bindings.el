@@ -37,7 +37,6 @@ This key is bound to the function `helm-command-prefix' in the global map.
 The definition of `helm-command-prefix' is the keymap `helm-command-map'.
 Using `setq' to modify this variable will have no effect."
   :type '(choice (string :tag "Key") (const :tag "no binding"))
-  :group 'helm-global-bindings
   :set
   (lambda (var key)
     (when (and (boundp var) (symbol-value var))
