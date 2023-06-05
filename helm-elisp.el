@@ -929,15 +929,18 @@ a string, i.e. the `symbol-name' of any existing symbol."
 
 (defun helm-set-variable (var)
   "Set VAR value interactively."
-  (let* ((sym (helm-symbolify var))
-         (val (default-value sym)))
-    (set-default sym (eval-minibuffer
-                      (format "Set `%s': " var)
-                      (if (or (stringp val)
-                              (memq val '(nil t))
-                              (numberp val))
-                          (prin1-to-string val)
-                        (format "'%s" (prin1-to-string val)))))))
+  (let* ((sym  (helm-symbolify var))
+         (val  (default-value sym))
+         (strv (prin1-to-string val)))
+    (if (> (length strv) 25)
+        (helm-edit-variable var)
+      (set-default sym (eval-minibuffer
+                        (format "Set `%s': " var)
+                        (if (or (stringp val)
+                                (memq val '(nil t))
+                                (numberp val))
+                            strv
+                          (format "'%s" strv)))))))
 
 
 ;;; Elisp Timers.

@@ -1308,6 +1308,56 @@ using LOAD-PATH."
       (when place
         (switch-to-buffer (car place)) (goto-char (cdr place))))))
 
+(defvar helm-edit-variable-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") 'helm-set-variable-from-pp-buffer)
+    (define-key map (kbd "C-c C-k") 'helm-edit-variable-quit)
+    map))
+
+(define-derived-mode helm-edit-variable-mode
+    emacs-lisp-mode "helm-edit-variable"
+    "A mode to edit variables values.
+
+Special commands:
+\\{helm-edit-variable-mode-map}")
+
+(defvar helm-pretty-print-buffer-name "*pretty print output*")
+(defvar helm-pretty-print-current-symbol nil)
+(defun helm-edit-variable (var)
+  (let* ((sym (intern-soft var))
+         (val (symbol-value sym)))
+    (prog1
+        (pp-display-expression val helm-pretty-print-buffer-name)
+      (with-current-buffer helm-pretty-print-buffer-name
+        (erase-buffer)
+        (helm-edit-variable-mode)
+        (goto-char (point-min))
+        (insert (format ";;; Edit variable `%s' and hit C-c C-c when done\n" sym)
+                ";;; Abort with C-c C-k\n\n")
+        (set (make-local-variable 'helm-pretty-print-current-symbol) sym)))))
+
+(defun helm-set-variable-from-pp-buffer ()
+  (interactive)
+  (with-current-buffer helm-pretty-print-buffer-name
+    (goto-char (point-min))
+    (forward-line 3)
+    (let ((val (symbol-value helm-pretty-print-current-symbol)))
+      (save-excursion
+        (if (or (stringp val)
+                (memq val '(nil t))
+                (numberp val))
+            (set helm-pretty-print-current-symbol (read (current-buffer)))
+          (set helm-pretty-print-current-symbol `(,@(read (current-buffer))))))
+      (if (equal val (symbol-value helm-pretty-print-current-symbol))
+          (message "No changes done")
+        (message "`%s' value modified" helm-pretty-print-current-symbol))
+      (quit-window t))))
+
+(defun helm-edit-variable-quit ()
+  "Quit edit variable buffer."
+  (interactive)
+  (quit-window t))
+
 (defun helm-find-face-definition (face)
   "Try to jump to FACE definition.
 With a prefix arg ask for the project directory to search in instead of
