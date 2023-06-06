@@ -926,7 +926,10 @@ a string, i.e. the `symbol-name' of any existing symbol."
                    :action (helm-actions-from-type-file))
         :ff-transformer-show-only-basename nil
         :buffer "*helm locate library*"))
-
+
+;;; Modify variables from Helm
+;;
+;;
 (defun helm-set-variable (var)
   "Set VAR value interactively."
   (let* ((sym  (helm-symbolify var))
@@ -941,6 +944,77 @@ a string, i.e. the `symbol-name' of any existing symbol."
                                 (numberp val))
                             strv
                           (format "'%s" strv)))))))
+
+(defvar helm-edit-variable-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") 'helm-set-variable-from-pp-buffer)
+    (define-key map (kbd "C-c C-k") 'helm-edit-variable-quit)
+    (define-key map (kbd "C-c =")   'helm-edit-variable-toggle-diff)
+    map))
+
+(define-derived-mode helm-edit-variable-mode
+    emacs-lisp-mode "helm-edit-variable"
+    "A mode to edit variables values.
+
+Special commands:
+\\{helm-edit-variable-mode-map}")
+
+(defvar helm-pretty-print-temp-file-name
+  (expand-file-name "helm-edit-variable.el" temporary-file-directory))
+(defvar helm-pretty-print-buffer-name "*pretty print output*")
+(defvar helm-pretty-print-current-symbol nil)
+(defun helm-edit-variable (var)
+  (let* ((sym (intern-soft var))
+         (val (symbol-value sym))
+         (pp  (pp-to-string val)))
+    (with-current-buffer (get-buffer-create helm-pretty-print-buffer-name)
+      (erase-buffer)
+      (helm-edit-variable-mode)
+      ;; Any number of lines starting with ";;;" + one empty line.
+      (insert (format ";;; Edit variable `%s' and hit C-c C-c when done\n" sym)
+              ";;; Abort with C-c C-k\n\n")
+      (set (make-local-variable 'helm-pretty-print-current-symbol) sym)
+      (save-excursion (insert pp))
+      (write-region
+       (point-min) (point-max) helm-pretty-print-temp-file-name nil 1)
+      (setq buffer-file-name helm-pretty-print-temp-file-name))
+    (display-buffer helm-pretty-print-buffer-name)))
+
+(defun helm-edit-variable-toggle-diff ()
+  (interactive)
+  (if (get-buffer-window "*Diff*" 'visible)
+      (kill-buffer "*Diff*")
+    (diff-buffer-with-file)))
+
+(defun helm-set-variable-from-pp-buffer ()
+  (interactive)
+  (with-current-buffer helm-pretty-print-buffer-name
+    (goto-char (point-min))
+    (when (re-search-forward "^$" nil t)
+      (forward-line 1))
+    (let ((val (symbol-value helm-pretty-print-current-symbol)))
+      (save-excursion
+        (if (or (arrayp val)
+                (memq val '(nil t))
+                (numberp val)
+                (looking-at "[`']"))
+            (set-default helm-pretty-print-current-symbol
+                         (read (current-buffer)))
+          (set-default helm-pretty-print-current-symbol
+                       `(,@(read (current-buffer))))))
+      (if (equal val (symbol-value helm-pretty-print-current-symbol))
+          (message "No changes done")
+        (message "`%s' value modified" helm-pretty-print-current-symbol))
+      (helm-edit-variable-quit))))
+
+(defun helm-edit-variable-quit ()
+  "Quit edit variable buffer."
+  (interactive)
+  (delete-file helm-pretty-print-temp-file-name)
+  (set-buffer-modified-p nil)
+  (quit-window t)
+  (helm-aif (get-buffer-window "*Diff*" 'visible)
+      (quit-window t it)))
 
 
 ;;; Elisp Timers.
