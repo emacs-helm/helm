@@ -1375,7 +1375,9 @@ Special commands:
   (interactive)
   (delete-file helm-pretty-print-temp-file-name)
   (set-buffer-modified-p nil)
-  (quit-window t))
+  (quit-window t)
+  (helm-aif (get-buffer-window "*Diff*" 'visible)
+      (quit-window t it)))
 
 (defun helm-find-face-definition (face)
   "Try to jump to FACE definition.
