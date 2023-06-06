@@ -966,13 +966,17 @@ Special commands:
 (defun helm-edit-variable (var)
   (let* ((sym (intern-soft var))
          (val (symbol-value sym))
-         (pp  (pp-to-string val)))
+         (pp  (pp-to-string val))
+         start)
     (with-current-buffer (get-buffer-create helm-pretty-print-buffer-name)
       (erase-buffer)
       (helm-edit-variable-mode)
+      (setq start (point))
       ;; Any number of lines starting with ";;;" + one empty line.
       (insert (format ";;; Edit variable `%s' and hit C-c C-c when done\n" sym)
               ";;; Abort with C-c C-k\n\n")
+      (add-text-properties start (1- (point)) '(read-only t))
+      (add-text-properties (1- (point)) (point) '(read-only t rear-nonsticky t))
       (set (make-local-variable 'helm-pretty-print-current-symbol) sym)
       (save-excursion (insert pp))
       (write-region
