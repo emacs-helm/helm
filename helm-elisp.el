@@ -936,7 +936,7 @@ a string, i.e. the `symbol-name' of any existing symbol."
         (helm-edit-variable var)
       (set-default sym (eval-minibuffer
                         (format "Set `%s': " var)
-                        (if (or (stringp val)
+                        (if (or (arrayp val)
                                 (memq val '(nil t))
                                 (numberp val))
                             strv

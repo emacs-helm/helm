@@ -1330,6 +1330,7 @@ Special commands:
     (with-current-buffer (get-buffer-create helm-pretty-print-buffer-name)
       (erase-buffer)
       (helm-edit-variable-mode)
+      ;; Any number of lines starting with ";;;" + one empty line.
       (insert (format ";;; Edit variable `%s' and hit C-c C-c when done\n" sym)
               ";;; Abort with C-c C-k\n\n")
       (set (make-local-variable 'helm-pretty-print-current-symbol) sym)
@@ -1340,14 +1341,18 @@ Special commands:
   (interactive)
   (with-current-buffer helm-pretty-print-buffer-name
     (goto-char (point-min))
-    (forward-line 3)
+    (when (re-search-forward "^$" nil t)
+      (forward-line 1))
     (let ((val (symbol-value helm-pretty-print-current-symbol)))
       (save-excursion
-        (if (or (stringp val)
+        (if (or (arrayp val)
                 (memq val '(nil t))
-                (numberp val))
-            (set helm-pretty-print-current-symbol (read (current-buffer)))
-          (set helm-pretty-print-current-symbol `(,@(read (current-buffer))))))
+                (numberp val)
+                (looking-at "[`']"))
+            (set-default helm-pretty-print-current-symbol
+                         (read (current-buffer)))
+          (set-default helm-pretty-print-current-symbol
+                       `(,@(read (current-buffer))))))
       (if (equal val (symbol-value helm-pretty-print-current-symbol))
           (message "No changes done")
         (message "`%s' value modified" helm-pretty-print-current-symbol))
