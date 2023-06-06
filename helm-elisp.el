@@ -981,12 +981,17 @@ Special commands:
     (display-buffer helm-pretty-print-buffer-name)))
 
 (defun helm-edit-variable-toggle-diff ()
+  "Show diff in edit variable buffer."
   (interactive)
   (if (get-buffer-window "*Diff*" 'visible)
       (kill-buffer "*Diff*")
     (diff-buffer-with-file)))
 
 (defun helm-set-variable-from-pp-buffer ()
+  "Set variable associated with buffer to buffer contents.
+
+The associated variable is the local variable
+`helm-pretty-print-current-symbol'."
   (interactive)
   (with-current-buffer helm-pretty-print-buffer-name
     (goto-char (point-min))
