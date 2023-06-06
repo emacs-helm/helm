@@ -1312,6 +1312,7 @@ using LOAD-PATH."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") 'helm-set-variable-from-pp-buffer)
     (define-key map (kbd "C-c C-k") 'helm-edit-variable-quit)
+    (define-key map (kbd "C-c =")   'helm-edit-variable-toggle-diff)
     map))
 
 (define-derived-mode helm-edit-variable-mode
@@ -1321,6 +1322,8 @@ using LOAD-PATH."
 Special commands:
 \\{helm-edit-variable-mode-map}")
 
+(defvar helm-pretty-print-temp-file-name
+  (expand-file-name "helm-edit-variable.el" temporary-file-directory))
 (defvar helm-pretty-print-buffer-name "*pretty print output*")
 (defvar helm-pretty-print-current-symbol nil)
 (defun helm-edit-variable (var)
@@ -1334,8 +1337,17 @@ Special commands:
       (insert (format ";;; Edit variable `%s' and hit C-c C-c when done\n" sym)
               ";;; Abort with C-c C-k\n\n")
       (set (make-local-variable 'helm-pretty-print-current-symbol) sym)
-      (save-excursion (insert pp)))
+      (save-excursion (insert pp))
+      (write-region
+       (point-min) (point-max) helm-pretty-print-temp-file-name nil 1)
+      (setq buffer-file-name helm-pretty-print-temp-file-name))
     (display-buffer helm-pretty-print-buffer-name)))
+
+(defun helm-edit-variable-toggle-diff ()
+  (interactive)
+  (if (get-buffer-window "*Diff*" 'visible)
+      (kill-buffer "*Diff*")
+    (diff-buffer-with-file)))
 
 (defun helm-set-variable-from-pp-buffer ()
   (interactive)
@@ -1356,11 +1368,13 @@ Special commands:
       (if (equal val (symbol-value helm-pretty-print-current-symbol))
           (message "No changes done")
         (message "`%s' value modified" helm-pretty-print-current-symbol))
-      (quit-window t))))
+      (helm-edit-variable-quit))))
 
 (defun helm-edit-variable-quit ()
   "Quit edit variable buffer."
   (interactive)
+  (delete-file helm-pretty-print-temp-file-name)
+  (set-buffer-modified-p nil)
   (quit-window t))
 
 (defun helm-find-face-definition (face)
