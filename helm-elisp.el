@@ -978,6 +978,11 @@ Special commands:
       (add-text-properties start (1- (point)) '(read-only t))
       (add-text-properties (1- (point)) (point) '(read-only t rear-nonsticky t))
       (set (make-local-variable 'helm-pretty-print-current-symbol) sym)
+      (add-hook 'kill-buffer-hook
+                (lambda ()
+                  (when (file-exists-p helm-pretty-print-temp-file-name)
+                    (delete-file helm-pretty-print-temp-file-name)))
+                nil t)
       (save-excursion (insert pp))
       (write-region
        (point-min) (point-max) helm-pretty-print-temp-file-name nil 1)
@@ -1019,7 +1024,6 @@ The associated variable is the local variable
 (defun helm-edit-variable-quit ()
   "Quit edit variable buffer."
   (interactive)
-  (delete-file helm-pretty-print-temp-file-name)
   (set-buffer-modified-p nil)
   (quit-window t)
   (helm-aif (get-buffer-window "*Diff*" 'visible)
