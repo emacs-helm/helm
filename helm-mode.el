@@ -1536,9 +1536,24 @@ Keys description:
                  dir)))
   (if (and fname (consp fname))
       (setq fname (cl-loop for f in fname
-                           collect (expand-file-name f dir)))
+                           collect (if (file-name-absolute-p fname)
+                                       (expand-file-name
+                                        f (helm-mode-root-dir dir))
+                                     (expand-file-name fname dir))))
       (if (file-name-absolute-p fname)
-          fname (expand-file-name fname dir))))
+          (if (file-remote-p fname)
+              fname
+            (substitute-in-file-name
+             (concat (helm-mode-root-dir dir) fname)))
+        (expand-file-name fname dir))))
+
+(defun helm-mode-root-dir (dir)
+  (if (file-remote-p dir)
+      (let* ((host        (file-remote-p dir 'host))
+             (method      (file-remote-p dir 'method))
+             (user        (file-remote-p dir 'user)))
+        (format "/%s:%s@%s:/" method user host))
+    "/"))
 
 (cl-defun helm--generic-read-file-name
     (prompt &optional dir default-filename mustmatch initial predicate)
@@ -1649,7 +1664,14 @@ Don't use it directly, use instead `helm-read-file-name' in your programs."
                        ;; Helm handlers should always have a non nil INITIAL arg.
                        :initial-input (if (string-match helm-ff-url-regexp init)
                                           init
-                                        (expand-file-name init dir))
+                                        (if (file-name-absolute-p init)
+                                            (if (file-remote-p init)
+                                                init
+                                              (substitute-in-file-name
+                                               (concat (helm-mode-root-dir
+                                                        (or dir init))
+                                                       init)))
+                                          (expand-file-name init dir)))
                        :alistp nil
                        :nomark (null helm-comp-read-use-marked)
                        :marked-candidates helm-comp-read-use-marked
