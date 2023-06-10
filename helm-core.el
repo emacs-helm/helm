@@ -1,4 +1,4 @@
-;;; helm-core.el --- Development files for Helm  -*- lexical-binding: t; -*-
+;;; helm-core.el --- Development files for Helm  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022 ~ 2023  Thierry Volpiatto
 

@@ -1369,7 +1369,7 @@ a directory \(e.g `list-directory').
 
 *** Exiting minibuffer with empty string
 
-You can exit minibuffer with empty string with \\<helm-read-file--map>\\[helm-cr-empty-string].
+You can exit minibuffer with empty string with \\<helm-read-file-map>\\[helm-cr-empty-string].
 It is useful when some commands are prompting continuously until you enter an empty prompt.
 
 ** Commands
