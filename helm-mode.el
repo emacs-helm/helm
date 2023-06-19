@@ -59,7 +59,8 @@
     (dired-do-hardlink . helm-read-file-name-handler-1)
     (basic-save-buffer . helm-read-file-name-handler-1)
     (write-file . (default helm-read-file-name-handler-1))
-    (write-region . (default helm-read-file-name-handler-1)))
+    (write-region . (default helm-read-file-name-handler-1))
+    (all-the-icons-insert . helm-mode-all-the-icons-handler))
   "Completing read functions for specific Emacs commands.
 
 By default `helm-mode' use `helm-completing-read-default-handler' to
@@ -1120,6 +1121,19 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          :quit-when-no-cand (eq require-match t)
          :must-match require-match)
       (setq helm-completion--sorting-done nil))))
+
+(defun helm-mode-all-the-icons-handler (prompt collection test require-match
+                                        init hist default inherit-input-method
+                                        name buffer)
+  "A special `completing-read' handler for `all-the-icons-insert'."
+  (let ((cands (cl-loop for (desc . str) in collection
+                        collect (cons (concat str
+                                              " "
+                                              (substring-no-properties desc))
+                                      desc))))
+    (helm-completing-read-default-1 prompt cands test require-match
+                                    init hist default inherit-input-method
+                                    name buffer t nil t 'buffer-substring)))
 
 (defun helm-completing-read-default-find-tag
     (prompt collection test require-match
