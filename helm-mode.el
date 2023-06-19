@@ -1126,11 +1126,23 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                                         init hist default inherit-input-method
                                         name buffer)
   "A special `completing-read' handler for `all-the-icons-insert'."
-  (let ((cands (cl-loop for (desc . str) in collection
-                        collect (cons (concat str
-                                              " "
-                                              (substring-no-properties desc))
-                                      desc))))
+  (let* ((max-len 0)
+         (cands (cl-loop for (desc . str) in collection
+                         for descnp = (substring-no-properties desc)
+                         for sdesc = (when (string-match
+                                            "\\(.*\\)[[:blank:]]+\\(\\[.*\\]\\)" descnp)
+                                       (match-string 1 descnp))
+                         for sdesc2 = (match-string 2 descnp)
+                         do (setq max-len (max max-len (string-width sdesc)))
+                         collect (cons (concat sdesc " " str " " sdesc2) desc)))
+         (fn (lambda ()
+               (with-helm-buffer
+                 (save-excursion
+                   (goto-char (point-min))
+                   (helm-skip-header-and-separator-line 'next)
+                   (while (re-search-forward "^[[:alnum:]_-]+" nil t)
+                     (insert (make-string (- max-len (current-column)) ? )))))))
+         (helm-after-update-hook (append helm-after-update-hook `(,fn))))
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
                                     name buffer t nil t 'buffer-substring)))
