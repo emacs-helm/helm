@@ -1127,6 +1127,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                                         name buffer)
   "A special `completing-read' handler for `all-the-icons-insert'."
   (let* ((max-len 0)
+         sname
          (cands (cl-loop for (desc . str) in collection
                          ;; When the FAMILY argument is passed to
                          ;; `all-the-icons-insert' DESC is the name of icon only
@@ -1135,8 +1136,18 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                          for descnp = (substring-no-properties desc)
                          for sdesc = (if (string-match
                                           "\\(.*\\)[[:blank:]]+\\(\\[.*\\]\\)" descnp)
+                                         ;; This is all-the-icons-insert function.
                                          (match-string 1 descnp)
-                                       descnp)
+                                       ;; This is one of
+                                       ;; all-the-icons-insert-<family>
+                                       ;; functions, extract the family name.
+                                       (prog1 descnp
+                                         (unless sname
+                                           (setq sname (plist-get
+                                                        (get-text-property
+                                                         0 'font-lock-face
+                                                         (get-text-property 0 'display desc))
+                                                        :family)))))
                          for sdesc2 = (match-string 2 descnp)
                          do (setq max-len (max max-len (string-width sdesc)))
                          collect (cons (concat sdesc " " str " " sdesc2) desc)))
@@ -1150,7 +1161,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
          (helm-after-update-hook (append helm-after-update-hook `(,fn))))
     (helm-completing-read-default-1 prompt cands test require-match
                                     init hist default inherit-input-method
-                                    name buffer t nil t 'buffer-substring)))
+                                    (or sname name) buffer t nil t 'buffer-substring)))
 
 (defun helm-completing-read-default-find-tag
     (prompt collection test require-match
