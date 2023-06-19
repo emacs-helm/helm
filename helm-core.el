@@ -6860,6 +6860,9 @@ when initializing a source with `helm-source-in-buffer' class."
                (insert (mapconcat (lambda (i)
                                     (let ((cand (cond ((symbolp i) (symbol-name i))
                                                       ((numberp i) (number-to-string i))
+                                                      ((consp i) (propertize
+                                                                  (car i)
+                                                                  'helm-realvalue (cdr i)))
                                                       (t i))))
                                       (setq-local helm-candidate-buffer-longest-len
                                                   (max helm-candidate-buffer-longest-len

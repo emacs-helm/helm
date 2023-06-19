@@ -964,8 +964,7 @@ method which is faster.
 
 EXEC-WHEN-ONLY-ONE allow exiting when COLLECTION contains only one candidate.
 
-ALISTP is same as `helm-comp-read' :alistp slot, don't use it with
-CANDS-IN-BUFFER.
+ALISTP is same as `helm-comp-read' :alistp slot.
 
 When using CANDS-IN-BUFFER, GET-LINE can be specified to exit with candidate
 handling properties, see `helm-comp-read'.
