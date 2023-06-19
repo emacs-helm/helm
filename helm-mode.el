@@ -1128,10 +1128,15 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
   "A special `completing-read' handler for `all-the-icons-insert'."
   (let* ((max-len 0)
          (cands (cl-loop for (desc . str) in collection
+                         ;; When the FAMILY argument is passed to
+                         ;; `all-the-icons-insert' DESC is the name of icon only
+                         ;; otherwise it is "name  [family]" with unpredictable
+                         ;; spaces or tab numbers between name and [family].
                          for descnp = (substring-no-properties desc)
-                         for sdesc = (when (string-match
-                                            "\\(.*\\)[[:blank:]]+\\(\\[.*\\]\\)" descnp)
-                                       (match-string 1 descnp))
+                         for sdesc = (if (string-match
+                                          "\\(.*\\)[[:blank:]]+\\(\\[.*\\]\\)" descnp)
+                                         (match-string 1 descnp)
+                                       descnp)
                          for sdesc2 = (match-string 2 descnp)
                          do (setq max-len (max max-len (string-width sdesc)))
                          collect (cons (concat sdesc " " str " " sdesc2) desc)))
