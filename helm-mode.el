@@ -588,6 +588,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                             (name "Helm Completions")
                             header-name
                             candidates-in-buffer
+                            get-line
                             diacritics
                             match-part
                             match-dynamic
@@ -710,6 +711,9 @@ Keys description:
   `helm-source-in-buffer' which is much faster.
   Argument VOLATILE have no effect when CANDIDATES-IN-BUFFER is non--nil.
 
+- GET-LINE: Specify the :get-line slot of `helm-source-in-buffer', has no effect
+  when CANDIDATES-IN-BUFFER is nil.
+ 
 - MATCH-PART: Allow matching only one part of candidate.
   See match-part documentation in `helm-source'.
 
@@ -840,6 +844,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
            (src-1 (helm-build-in-buffer-source name
                     :data get-candidates
                     :match-part match-part
+                    :get-line get-line
                     :multiline multiline
                     :header-name header-name
                     :filtered-candidate-transformer
@@ -951,11 +956,22 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
 (defun helm-completing-read-default-1
     (prompt collection test require-match
      init hist default _inherit-input-method
-     name buffer &optional cands-in-buffer exec-when-only-one)
+     name buffer &optional cands-in-buffer exec-when-only-one alistp get-line)
   "Call `helm-comp-read' with same args as `completing-read'.
+
 Extra optional arg CANDS-IN-BUFFER means use `candidates-in-buffer'
 method which is faster.
-It should be used when candidate list doesn't need to be rebuilt dynamically."
+
+EXEC-WHEN-ONLY-ONE allow exiting when COLLECTION contains only one candidate.
+
+ALISTP is same as `helm-comp-read' :alistp slot, don't use it with
+CANDS-IN-BUFFER.
+
+When using CANDS-IN-BUFFER, GET-LINE can be specified to exit with candidate
+handling properties, see `helm-comp-read'.
+
+This handler should be used when candidate list doesn't need to be rebuilt
+dynamically otherwise see `helm-completing-read-default-2'."
   (let ((history (or (car-safe hist) hist))
         (initial-input (helm-aif (pcase init
                                    ((pred (stringp)) init)
@@ -970,7 +986,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
      :reverse-history helm-mode-reverse-history
      :input-history history
      :must-match require-match
-     :alistp nil
+     :alistp alistp
      :diacritics helm-mode-ignore-diacritics
      :help-message #'helm-comp-read-help-message
      :name name
@@ -983,6 +999,7 @@ It should be used when candidate list doesn't need to be rebuilt dynamically."
      :quit-when-no-cand (eq require-match t)
      :nomark (null helm-comp-read-use-marked)
      :candidates-in-buffer cands-in-buffer
+     :get-line get-line
      :exec-when-only-one exec-when-only-one
      :fuzzy (eq helm-completion-style 'helm-fuzzy)
      :buffer buffer
