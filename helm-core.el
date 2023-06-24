@@ -7734,7 +7734,8 @@ source or `helm-follow-input-idle-delay' or
                  (or (and helm-input-idle-delay
                           (max helm-input-idle-delay 0.01))
                      0.01))))
-    (when (and (not (get-buffer-window helm-action-buffer 'visible))
+    (when (and (not helm--in-update) ; Wait end of update.
+               (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-pos-header-line-p))
                (or (helm-follow-mode-p src)
                    (and helm-follow-mode-persistent
