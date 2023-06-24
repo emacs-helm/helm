@@ -7728,14 +7728,15 @@ This happen after: DELAY or the \\='follow-attr value of current
 source or `helm-follow-input-idle-delay' or
 `helm-input-idle-delay' secs."
   (let* ((src (helm-get-current-source))
-         (at (or delay
-                 (assoc-default 'follow-delay src)
-                 helm-follow-input-idle-delay
-                 (or (and helm-input-idle-delay
-                          (max helm-input-idle-delay 0.01))
-                     0.01))))
-    (when (and (not helm--in-update) ; Wait end of update.
-               (not (get-buffer-window helm-action-buffer 'visible))
+         (at (if helm--in-update
+                 (or (assoc-default 'follow-delay-in-update src) 1)
+               (or delay
+                   (assoc-default 'follow-delay src)
+                   helm-follow-input-idle-delay
+                   (or (and helm-input-idle-delay
+                            (max helm-input-idle-delay 0.01))
+                       0.01)))))
+    (when (and (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-pos-header-line-p))
                (or (helm-follow-mode-p src)
                    (and helm-follow-mode-persistent

@@ -626,6 +626,13 @@
   Otherwise value of `helm-follow-input-idle-delay' is used if non--nil,
   If none of these are found fallback to `helm-input-idle-delay'.")
 
+   (follow-delay-in-update
+    :initarg :follow-delay-in-update
+    :initform nil
+    :custom integer
+    :documentation
+    "  Same as `follow-delay' but only while updating source.")
+
    (multimatch
     :initarg :multimatch
     :initform t
