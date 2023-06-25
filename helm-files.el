@@ -1027,7 +1027,6 @@ Should not be used among other sources.")
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache)))
    (match-on-real :initform t)
-   (follow-delay-in-update :initform 1.5)
    (filtered-candidate-transformer
     :initform '(helm-ff-fct
                 helm-ff-maybe-show-thumbnails
