@@ -7733,8 +7733,11 @@ source or `helm-follow-input-idle-delay' or
                  helm-follow-input-idle-delay
                  (or (and helm-input-idle-delay
                           (max helm-input-idle-delay 0.01))
-                     0.01))))
-    (when (and (not helm--in-update) ; Wait end of update.
+                     0.01)))
+         (suspend (and helm--in-update
+                       ;; Specific to helm-find-files.
+                       (assoc-default 'suspend-follow-in-update src))))
+    (when (and (not suspend)
                (not (get-buffer-window helm-action-buffer 'visible))
                (not (helm-pos-header-line-p))
                (or (helm-follow-mode-p src)

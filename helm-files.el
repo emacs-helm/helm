@@ -1045,6 +1045,10 @@ Should not be used among other sources.")
    (nohighlight :initform (progn helm-ff-nohighlight-matches))
    (keymap :initform 'helm-find-files-map)
    (candidate-number-limit :initform 'helm-ff-candidate-number-limit)
+   (suspend-follow-in-update
+    :initarg :suspend-follow-in-update
+    :initform t
+    :documentation "Prevent following candidate when updating.")
    (completing-file-name
     :initarg :completing-file-name :initform t
     :documentation "Flag to notify `helm-resume' we are completing filenames.")
