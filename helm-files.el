@@ -3978,7 +3978,7 @@ return FNAME with display property prefixed with [+]."
                (string= real (substring-no-properties disp 2)))
          ;; Incomplete filenames are prefixed with two spaces, the
          ;; first one beeing propertized with a 'display prop
-         ;; i.e. "[?] foo".
+         ;; i.e. "[+] foo".
          900001)
         (t (helm-score-candidate-for-pattern real pattern))))
 

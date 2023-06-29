@@ -499,7 +499,7 @@ Simply write the path in the prompt and press `RET', e.g.
 
 *** To create a new file, enter a filename not ending with \"/\"
 
-Note that when you enter a new name, this one is prefixed with [?].
+Note that when you enter a new name, this one is prefixed with [+].
 
 *** Recursive search from Helm-find-files
 

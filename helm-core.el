@@ -6213,14 +6213,14 @@ message \\='no match'."
                (minibuffer-message " [confirm]"))
               ;; When require-match is strict (i.e. `t'), buffer
               ;; should be either empty or in read-file-name have an
-              ;; unknown candidate ([?] prefix), if it's not the case
+              ;; unknown candidate ([+] prefix), if it's not the case
               ;; fix it in helm-mode but not here.
               ((and (or empty-buffer-p unknown)
                     (eq minibuffer-completion-confirm t))
                (minibuffer-message " [No match]"))
               (empty-buffer-p
                ;; This is used when helm-buffer is totally empty,
-               ;; i.e. the [?] have not been added because must-match
+               ;; i.e. the [+] have not been added because must-match
                ;; is used from outside helm-comp-read i.e. from a helm
                ;; source built with :must-match.
                (setq helm-saved-selection helm-pattern
