@@ -89,6 +89,7 @@
 (declare-function all-the-icons-icon-for-file "ext:all-the-icons.el")
 (declare-function all-the-icons-octicon "ext:all-the-icons.el")
 (declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
+(declare-function all-the-icons-material "ext:all-the-icons.el")
 (declare-function helm-adaptive-sort "ext:helm-adaptive.el")
 (declare-function wfnames-setup-buffer "ext:wfnames.el")
 
@@ -3937,23 +3938,39 @@ in `helm-find-files-persistent-action-if'."
 
 (defun helm-ff-prefix-filename (fname &optional file-or-symlinkp new-file)
   "Add display property to FNAME.
-Display property presents a string maybe prefixed with [?] or [@].
+Display property presents a string maybe prefixed with [+] or [@].
 If FILE-OR-SYMLINKP is non-nil this means we assume FNAME is an
 existing filename or valid symlink and there is no need to test
 it.
 NEW-FILE when non-nil means FNAME is a non existing file and
-return FNAME with display property prefixed with [?]."
-  (let* ((prefix-new (propertize
-                      " " 'display
-                      (propertize "[?]" 'face 'helm-ff-prefix)))
-         (prefix-url (propertize
-                      " " 'display
-                      (propertize "[@]" 'face 'helm-ff-prefix))))
+return FNAME with display property prefixed with [+]."
+  (let (prefix-new prefix-url)
     (cond (file-or-symlinkp fname)
           ((or (string-match helm-ff-url-regexp fname)
-               (and helm--url-regexp (string-match helm--url-regexp fname)))
+               (and helm--url-regexp
+                    (string-match helm--url-regexp fname)))
+           (setq prefix-url
+                 (if helm-ff-icon-mode
+                     (helm-acase (match-string 1 fname)
+                       ("mailto:"
+                        (all-the-icons-octicon "mail"))
+                       (t (all-the-icons-octicon "link-external")))
+                   (propertize
+                    " " 'display
+                    (propertize "[@]" 'face 'helm-ff-prefix))))
+           (add-text-properties 0 1 '(helm-url t) prefix-url)
            (concat prefix-url " " fname))
-          (new-file (concat prefix-new " " fname)))))
+          (new-file
+           (setq prefix-new
+                 (if helm-ff-icon-mode
+                     (if (string-match "/\\'" fname)
+                         (all-the-icons-material "create_new_folder")
+                       (all-the-icons-material "note_add"))
+                   (propertize
+                    " " 'display
+                    (propertize "[+]" 'face 'helm-ff-prefix))))
+           (add-text-properties 0 1 '(helm-new-file t) prefix-new)
+           (concat prefix-new " " fname)))))
 
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
   (cond ((member real '("." "..")) 900000)

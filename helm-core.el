@@ -4452,7 +4452,7 @@ This function is used with sources built with `helm-source-sync'."
 (defun helm-score-candidate-for-pattern (candidate pattern)
   "Assign score to CANDIDATE according to PATTERN."
   ;; Unknown candidates always go on top.
-  (if (equal (get-text-property 0 'display candidate) "[?]")
+  (if (get-text-property 0 'helm-new-file candidate)
       200.00
     (funcall helm-fuzzy-default-score-fn candidate pattern)))
 
@@ -7390,7 +7390,7 @@ starting it is not needed."
                      (maxpoint  (or end (point-max))))
                 (while (< (point) maxpoint)
                   (helm-mark-current-line)
-                  (let* ((prefix (get-text-property (point-at-bol) 'display))
+                  (let* ((prefix (get-text-property (point-at-bol) 'helm-new-file))
                          (cand   (helm-get-selection
                                   nil (helm-get-attr 'marked-with-props src)
                                   src))
@@ -7403,7 +7403,7 @@ starting it is not needed."
                             ;; RFN. Display may be an image. See
                             ;; https://github.com/yyoncho/helm-treemacs-icons/issues/5
                             ;; and also Bug#2296.
-                            (equal prefix "[?]")
+                            prefix
                             (and filecomp-p
                                  (or
                                   ;; autosave files
