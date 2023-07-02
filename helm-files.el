@@ -3936,22 +3936,24 @@ in `helm-find-files-persistent-action-if'."
     "Run open file externally without quitting helm."
   'open-file-externally 'helm-ff-persistent-open-file-externally)
 
-(defun helm-ff-prefix-filename (fname &optional file-or-symlinkp new-file)
-  "Add display property to FNAME.
-Display property presents a string maybe prefixed with [+] or [@].
-If FILE-OR-SYMLINKP is non-nil this means we assume FNAME is an
-existing filename or valid symlink and there is no need to test
-it.
-NEW-FILE when non-nil means FNAME is a non existing file and
-return FNAME with display property prefixed with [+]."
+(defun helm-ff-prefix-filename (disp fname &optional new-file)
+  "Return DISP maybe prefixed with a string or an icon.
+
+Arg FNAME is the real filename whereas DISP is the display part of candidate.
+
+Icons are used when `helm-ff-icon-mode' is enabled.
+
+When NEW-FILE is non nil, returns a string prefixed with
+[+] or [@] or a special icon, otherwise DISP is
+returned prefixed with its icon or unchanged."
   (let (prefix-new prefix-url)
-    (cond (file-or-symlinkp fname)
-          ((or (string-match helm-ff-url-regexp fname)
-               (and helm--url-regexp
-                    (string-match helm--url-regexp fname)))
+    (cond ((and new-file
+                (or (string-match helm-ff-url-regexp disp)
+                    (and helm--url-regexp
+                         (string-match helm--url-regexp disp))))
            (setq prefix-url
                  (if helm-ff-icon-mode
-                     (helm-acase (match-string 1 fname)
+                     (helm-acase (match-string 1 disp)
                        ("mailto:"
                         (all-the-icons-octicon "mail"))
                        (t (all-the-icons-octicon "link-external")))
@@ -3959,18 +3961,19 @@ return FNAME with display property prefixed with [+]."
                     " " 'display
                     (propertize "[@]" 'face 'helm-ff-prefix))))
            (add-text-properties 0 1 '(helm-url t) prefix-url)
-           (concat prefix-url " " fname))
+           (concat prefix-url " " disp))
           (new-file
            (setq prefix-new
                  (if helm-ff-icon-mode
-                     (if (string-match "/\\'" fname)
+                     (if (string-match "/\\'" disp)
                          (all-the-icons-material "create_new_folder")
                        (all-the-icons-material "note_add"))
                    (propertize
                     " " 'display
                     (propertize "[+]" 'face 'helm-ff-prefix))))
            (add-text-properties 0 1 '(helm-new-file t) prefix-new)
-           (concat prefix-new " " fname)))))
+           (concat prefix-new " " disp))
+          (t (concat (helm-ff-get-icon disp fname) disp)))))
 
 (defun helm-ff-score-candidate-for-pattern (real disp pattern)
   (cond ((member real '("." "..")) 900000)
@@ -4085,17 +4088,26 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (helm-file-on-mounted-network-p helm-pattern)))
           (helm-acond (;; Dot directories . and ..
                        dot
-                       (cons (propertize file 'face 'helm-ff-dotted-directory) file))
+                       (cons (helm-ff-prefix-filename
+                              (propertize file 'face 'helm-ff-dotted-directory)
+                              file)
+                             file))
                       ;; Directories.
                       ((get-text-property 1 'helm-ff-dir file)
-                       (cons (propertize disp 'face 'helm-ff-directory) file))
+                       (cons (helm-ff-prefix-filename
+                              (propertize disp 'face 'helm-ff-directory)
+                              file)
+                             file))
                       ;; Backup files.
                       (backup
-                       (cons (propertize disp 'face 'helm-ff-backup-file) file))
+                       (cons (helm-ff-prefix-filename
+                              (propertize disp 'face 'helm-ff-backup-file)
+                              file)
+                             file))
                       ;; Executable files.
                       ((get-text-property 1 'helm-ff-exe file)
                        (add-face-text-property 0 len 'helm-ff-executable t disp)
-                       (cons disp file))
+                       (cons (helm-ff-prefix-filename disp file) file))
                       ;; Symlinks.
                       ((get-text-property 1 'helm-ff-sym file)
                        (add-face-text-property 0 len 'helm-ff-symlink t disp)
@@ -4103,11 +4115,11 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                            (progn
                              (add-face-text-property 0 (length it) 'helm-ff-truename nil it)
                              (cons (propertize disp 'display (concat disp " ->" it)) file))
-                         (cons disp file)))
+                         (cons (helm-ff-prefix-filename disp file) file)))
                       ;; Regular files.
                       ((get-text-property 1 'helm-ff-file file)
                        (add-face-text-property 0 len 'helm-ff-file t disp)
-                       (cons disp file))
+                       (cons (helm-ff-prefix-filename disp file) file))
                       ;; Tramp methods.
                       ((string-match helm-ff-tramp-method-regexp file)
                        (let ((method (match-string 1 file))
@@ -4123,7 +4135,7 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                          (add-text-properties 0 len `(host ,tramp-invalid-fname) disp))
                        (cons (helm-ff-prefix-filename
                               disp
-                              tramp-invalid-fname
+                              file
                               (unless tramp-invalid-fname 'new-file))
                              file)))
 
@@ -4149,16 +4161,25 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                       (not (helm-ff-valid-symlink-p file))
                       (not (string-match "^\\.#" basename)))
                  (add-face-text-property 0 len 'helm-ff-invalid-symlink t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; A dotted directory symlinked.
                 ((and dot (stringp type))
-                 (cons (propertize file 'face 'helm-ff-dotted-symlink-directory) file))
+                 (cons (helm-ff-prefix-filename
+                        (propertize file 'face 'helm-ff-dotted-symlink-directory)
+                        file)
+                       file))
                 ;; A dotted directory.
                 (dot
-                 (cons (propertize file 'face 'helm-ff-dotted-directory) file))
+                 (cons (helm-ff-prefix-filename
+                        (propertize file 'face 'helm-ff-dotted-directory)
+                        file)
+                       file))
                 ;; Backup files.
                 (backup
-                 (cons (propertize disp 'face 'helm-ff-backup-file) file))
+                 (cons (helm-ff-prefix-filename
+                        (propertize disp 'face 'helm-ff-backup-file)
+                        file)
+                       file))
                 ;; A symlink.
                 ((stringp type)
                  (let* ((abbrev (abbreviate-file-name type))
@@ -4173,32 +4194,35 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                    (add-face-text-property 0 len 'helm-ff-symlink nil disp)
                    ;; As we use match-on-real we can use this safely,
                    ;; abbrev will not be matched.
-                   (cons (concat disp " -> " abbrev)
+                   (cons (concat (helm-ff-prefix-filename disp file) " -> " abbrev)
                          file)))
                 ;; A directory.
                 ((eq t type)
-                 (cons (propertize disp 'face 'helm-ff-directory) file))
+                 (cons (helm-ff-prefix-filename
+                        (propertize disp 'face 'helm-ff-directory)
+                        file)
+                       file))
                 ;; A character device file.
                 ((and attr (string-match
                             "\\`[cp]" (setq x-bit (substring (nth 8 attr) 0 4))))
                  (add-face-text-property 0 len 'helm-ff-pipe t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; A socket file.
                 ((and attr (string-match "\\`[s]" x-bit))
                  (add-face-text-property 0 len 'helm-ff-socket t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; An executable file.
                 ((and attr (string-match "x\\'" x-bit))
                  (add-face-text-property 0 len 'helm-ff-executable t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; An executable file with suid
                 ((and attr (string-match "s\\'" x-bit))
                  (add-face-text-property 0 len 'helm-ff-suid t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; A file.
                 ((and attr (null type))
                  (add-face-text-property 0 len 'helm-ff-file t disp)
-                 (cons disp file))
+                 (cons (helm-ff-prefix-filename disp file) file))
                 ;; A tramp method
                 ;; At this point no need to handle multi hops syntax
                 ;; which is considered remote and handled in first
@@ -4210,39 +4234,33 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
                 ;; A non--existing file.
                 (t
                  (add-face-text-property 0 len 'helm-ff-nofile t disp)
-                 (cons (helm-ff-prefix-filename
-                          disp nil 'new-file)
+                 (cons (helm-ff-prefix-filename disp file 'new-file)
                        file))))))))
-
-(defun helm-ff-icons-transformer (candidates _source)
-  "Transformer for HFF that prefix candidates with icons."
-  (cl-loop for (disp . fname) in candidates
-           for icon = (helm-ff-get-icon disp fname)
-           collect (cons (concat icon disp) fname)))
 
 (defun helm-ff-get-icon (disp file)
   "Get icon from all-the-icons for FILE.
 Arg DISP is the display part of the candidate."
-  (let ((icon (helm-acond (;; Non symlink directories.
-                           (helm-ff--is-dir-from-disp disp)
-                           (all-the-icons-octicon "file-directory"))
-                          (;; All files, symlinks may be symlink directories.
-                           (helm-ff--is-file-from-disp disp)
-                           ;; Detect symlink directories. We must call
-                           ;; `file-directory-p' here but it is
-                           ;; limited to symlinks, so it should not
-                           ;; degrade too much performances.
-                           (if (and (memq it '(helm-ff-symlink
-                                               helm-ff-dotted-symlink-directory))
-                                    (file-directory-p file))
-                               (let* ((icon (all-the-icons-match-to-alist
-                                             (helm-basename file)
-                                             all-the-icons-dir-icon-alist))
-                                      (args (cdr icon)))
-                                 (apply #'all-the-icons-octicon
-                                        "file-symlink-directory" (cdr args)))
-                             (all-the-icons-icon-for-file file))))))
-    (when icon (concat icon " "))))
+  (when helm-ff-icon-mode
+    (let ((icon (helm-acond (;; Non symlink directories.
+                             (helm-ff--is-dir-from-disp disp)
+                             (all-the-icons-octicon "file-directory"))
+                            (;; All files, symlinks may be symlink directories.
+                             (helm-ff--is-file-from-disp disp)
+                             ;; Detect symlink directories. We must call
+                             ;; `file-directory-p' here but it is
+                             ;; limited to symlinks, so it should not
+                             ;; degrade too much performances.
+                             (if (and (memq it '(helm-ff-symlink
+                                                 helm-ff-dotted-symlink-directory))
+                                      (file-directory-p file))
+                                 (let* ((icon (all-the-icons-match-to-alist
+                                               (helm-basename file)
+                                               all-the-icons-dir-icon-alist))
+                                        (args (cdr icon)))
+                                   (apply #'all-the-icons-octicon
+                                          "file-symlink-directory" (cdr args)))
+                               (all-the-icons-icon-for-file file))))))
+      (when icon (concat icon " ")))))
 
 (defun helm-ff--is-dir-from-disp (disp)
   "Return the face used for candidate when candidate is a directory."
@@ -4273,27 +4291,8 @@ it from your init file, ensure to call it _after_ your defmethod's
 `helm-setup-user-source' definitions (if some) to ensure they are called."
   :global t
   :group 'helm-files
-  (if helm-ff-icon-mode
-      (progn
-        (require 'all-the-icons)
-        (unless helm-source-find-files
-          (setq helm-source-find-files
-                (helm-make-source
-                    "Find Files" 'helm-source-ffiles)))
-        (let ((fct (helm-get-attr
-                    'filtered-candidate-transformer
-                    helm-source-find-files)))
-          (unless (memq 'helm-ff-icons-transformer fct)
-            (helm-set-attr 'filtered-candidate-transformer
-                           (append fct '(helm-ff-icons-transformer))
-                           helm-source-find-files))))
-    (when helm-source-find-files
-      (helm-set-attr 'filtered-candidate-transformer
-                     (remove 'helm-ff-icons-transformer
-                             (helm-get-attr
-                              'filtered-candidate-transformer
-                              helm-source-find-files))
-                     helm-source-find-files))))
+  (require 'all-the-icons)
+  (clrhash helm-ff--list-directory-cache))
 
 (defun helm-find-files-action-transformer (actions candidate)
   "Action transformer for `helm-source-find-files'."
