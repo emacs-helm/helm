@@ -1541,10 +1541,7 @@ Keys description:
              :match-on-real t
              :filtered-candidate-transformer (delq nil `(helm-ff-fct
                                                          helm-ff-maybe-show-thumbnails
-                                                         helm-ff-sort-candidates
-                                                         ,(and helm-ff-icon-mode
-                                                               (featurep 'all-the-icons)
-                                                               'helm-ff-icons-transformer)))
+                                                         helm-ff-sort-candidates))
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
