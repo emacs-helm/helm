@@ -4238,11 +4238,16 @@ If SKIP-BORING-CHECK is non nil don't filter boring files."
 
 (defun helm-ff-get-icon (disp file)
   "Get icon from all-the-icons for FILE.
-Arg DISP is the display part of the candidate."
+Arg DISP is the display part of the candidate.
+Arg FILE is the real part of candidate, a filename with no props."
   (when helm-ff-icon-mode
     (let ((icon (helm-acond (;; Non symlink directories.
                              (helm-ff--is-dir-from-disp disp)
-                             (all-the-icons-octicon "file-directory"))
+                             (helm-aif (all-the-icons-match-to-alist
+                                        (helm-basename file)
+                                        all-the-icons-dir-icon-alist)
+                                 (apply (car it) (cdr it))
+                               (all-the-icons-octicon "file-directory")))
                             (;; All files, symlinks may be symlink directories.
                              (helm-ff--is-file-from-disp disp)
                              ;; Detect symlink directories. We must call
@@ -4252,12 +4257,7 @@ Arg DISP is the display part of the candidate."
                              (if (and (memq it '(helm-ff-symlink
                                                  helm-ff-dotted-symlink-directory))
                                       (file-directory-p file))
-                                 (let* ((icon (all-the-icons-match-to-alist
-                                               (helm-basename file)
-                                               all-the-icons-dir-icon-alist))
-                                        (args (cdr icon)))
-                                   (apply #'all-the-icons-octicon
-                                          "file-symlink-directory" (cdr args)))
+                                 (all-the-icons-octicon "file-symlink-directory")
                                (all-the-icons-icon-for-file file))))))
       (when icon (concat icon " ")))))
 
