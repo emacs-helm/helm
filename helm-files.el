@@ -849,9 +849,8 @@ present in this list."
   :initialize 'custom-initialize-changed
   :set (lambda (var val)
          (set var val)
-         (setq helm-source-find-files nil)
-         (when helm-ff-icon-mode
-           (helm-ff-icon-mode 1))))
+         ;; Force rebuilding the source to remove the highlight match FCT.
+         (setq helm-source-find-files nil)))
 
 (defcustom helm-ff-edit-marked-files-fn (if (< emacs-major-version 29)
                                             #'helm-ff-wfnames
@@ -4284,14 +4283,13 @@ Arg DISP is the display part of the candidate."
 
 ;;;###autoload
 (define-minor-mode helm-ff-icon-mode
-    "Display icons from `all-the-icons' package in HFF when enabled.
-
-NOTE: This mode is building `helm-source-find-files', so if you enable
-it from your init file, ensure to call it _after_ your defmethod's
-`helm-setup-user-source' definitions (if some) to ensure they are called."
+    "Display icons from `all-the-icons' package in HFF when enabled."
   :global t
   :group 'helm-files
-  (require 'all-the-icons)
+  (when helm-ff-icon-mode
+    (unless (require 'all-the-icons nil t)
+      (setq helm-ff-icon-mode nil)
+      (user-error "All The Icons package is not installed")))
   (clrhash helm-ff--list-directory-cache))
 
 (defun helm-find-files-action-transformer (actions candidate)
@@ -5350,8 +5348,6 @@ When no suitable place to drop is found ask to drop to
 
 Use it for non-interactive calls of `helm-find-files'."
   (require 'tramp)
-  (unless (featurep 'all-the-icons)
-    (helm-ff-icon-mode -1))
   ;; Resolve FNAME now outside of helm.
   ;; [FIXME] When `helm-find-files-1' is used directly from lisp
   ;; and FNAME is an abbreviated path, for some reasons
