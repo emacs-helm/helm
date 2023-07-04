@@ -4289,7 +4289,7 @@ Arg DISP is the display part of the candidate."
   (when helm-ff-icon-mode
     (unless (require 'all-the-icons nil t)
       (setq helm-ff-icon-mode nil)
-      (user-error "All The Icons package is not installed")))
+      (message "All The Icons package is not installed")))
   (clrhash helm-ff--list-directory-cache))
 
 (defun helm-find-files-action-transformer (actions candidate)
