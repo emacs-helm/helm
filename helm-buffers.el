@@ -144,8 +144,13 @@ you want to keep the recentest order when narrowing candidates."
   :type 'function)
 
 (defcustom helm-buffers-show-icons nil
-  "Prefix buffer names with an icon when non nil."
-  :type 'boolean)
+  "Prefix buffer names with an icon when non nil.
+Don't use `setq' to set this."
+  :type 'boolean
+  :set (lambda (var val)
+         (if (featurep 'all-the-icons)
+             (set var val)
+           (set var nil))))
 
 
 ;;; Faces
@@ -533,10 +538,7 @@ The list is reordered with `helm-buffer-list-reorder-fn'."
 Should be called after others transformers i.e. (boring
 buffers)."
   (cl-assert helm-fuzzy-matching-highlight-fn nil "Wrong type argument functionp: nil")
-  (cl-loop with helm-buffers-show-icons = (and (featurep 'all-the-icons)
-                                               (default-toplevel-value
-                                                   'helm-buffers-show-icons))
-           for i in buffers
+  (cl-loop for i in buffers
            for (name size mode meta) = (if helm-buffer-details-flag
                                            (helm-buffer--details i 'details)
                                          (helm-buffer--details i))

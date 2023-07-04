@@ -58,8 +58,13 @@
   :type '(repeat (choice symbol)))
 
 (defcustom helm-bookmark-use-icon nil
-  "Display candidates with an icon with `all-the-icons' when non nil."
-  :type 'boolean)
+  "Display candidates with an icon with `all-the-icons' when non nil.
+Don't use `setq' to set this."
+  :type 'boolean
+  :set (lambda (var val)
+         (if (featurep 'all-the-icons)
+             (set var val)
+           (set var nil))))
 
 (defcustom helm-bookmark-default-sort-method 'adaptive
   "Sort method for `helm-filtered-bookmarks'.
@@ -810,8 +815,6 @@ E.g. prepended with *."
 Optional source `helm-source-bookmark-addressbook' is loaded only
 if external addressbook-bookmark package is installed."
   (interactive)
-  (when helm-bookmark-use-icon
-    (require 'all-the-icons))
   (helm :sources helm-bookmark-default-filtered-sources
         :prompt "Search Bookmark: "
         :buffer "*helm filtered bookmarks*"

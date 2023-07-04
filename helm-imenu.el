@@ -95,14 +95,25 @@ string."
 (defcustom helm-imenu-hide-item-type-name nil
   "Hide display name of imenu item type along with the icon when non nil.
 
-This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view]."
+This value can be toggled with \\<helm-imenu-map>\\[helm-imenu-toggle-type-view].
+Don't use `setq' to set this."
   :group 'helm-imenu
-  :type 'boolean)
+  :type 'boolean
+  :set (lambda (var val)
+         (if (featurep 'all-the-icons)
+             (set var val)
+           (set var nil))))
 
 (defcustom helm-imenu-use-icon nil
-  "Display an icon from all-the-icons package when non nil."
+  "Display an icon from all-the-icons package when non nil.
+
+Don't use `setq' to set this."
   :group 'helm-imenu
-  :type 'boolean)
+  :type 'boolean
+  :set (lambda (var val)
+         (if (featurep 'all-the-icons)
+             (set var val)
+           (set var nil))))
 
 (defcustom helm-imenu-icon-type-alist
   '(("Array"           . (all-the-icons-material "crop" :face font-lock-builtin-face))
@@ -420,7 +431,6 @@ The sexp should be an `all-the-icons' function with its args."
   "Return an icon for type TYPE.
 The icon is found in `helm-imenu-icon-type-alist', if not
 `helm-imenu-default-type-sexp' is evaled to provide a default icon."
-  (require 'all-the-icons)
   (let ((all-the-icons-scale-factor 1.0)
         (all-the-icons-default-adjust 0.0))
     (or (helm-aand (assoc-default
