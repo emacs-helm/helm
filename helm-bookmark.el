@@ -32,6 +32,9 @@
 (declare-function all-the-icons-fileicon     "ext:all-the-icons.el")
 (declare-function all-the-icons-icon-for-file"ext:all-the-icons.el")
 (declare-function all-the-icons-octicon      "ext:all-the-icons.el")
+(declare-function all-the-icons-match-to-alist "ext:all-the-icons.el")
+
+(defvar all-the-icons-dir-icon-alist)
 
 
 (defgroup helm-bookmark nil
@@ -608,7 +611,11 @@ If `browse-url-browser-function' is set to something else than
                         i)
           for icon = (when helm-bookmark-use-icon
                        (cond ((and isfile hff)
-                              (all-the-icons-octicon "file-directory"))
+                              (helm-aif (all-the-icons-match-to-alist
+                                         (helm-basename isfile)
+                                         all-the-icons-dir-icon-alist)
+                                  (apply (car it) (cdr it))
+                                (all-the-icons-octicon "file-directory")))
                              ((and isfile isinfo) (all-the-icons-octicon "info"))
                              (isfile (all-the-icons-icon-for-file isfile))
                              ((or iswoman isman)
