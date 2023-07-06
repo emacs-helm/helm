@@ -611,9 +611,12 @@ If `browse-url-browser-function' is set to something else than
                         i)
           for icon = (when helm-bookmark-use-icon
                        (cond ((and isfile hff)
-                              (helm-aif (all-the-icons-match-to-alist
-                                         (helm-basename isfile)
-                                         all-the-icons-dir-icon-alist)
+                              (helm-aif (or (all-the-icons-match-to-alist
+                                             (helm-basename (helm-basedir isfile t))
+                                             all-the-icons-dir-icon-alist)
+                                            (all-the-icons-match-to-alist
+                                             (helm-basename isfile)
+                                             all-the-icons-dir-icon-alist))
                                   (apply (car it) (cdr it))
                                 (all-the-icons-octicon "file-directory")))
                              ((and isfile isinfo) (all-the-icons-octicon "info"))
