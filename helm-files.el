@@ -5045,16 +5045,18 @@ Special commands:
                  (let ((thumbnail (plist-get
                                    (cdr (helm-ff--image-dired-get-thumbnail-image img))
                                    :file)))
-                   (cons (concat (propertize " "
-                                             'display `(image
-                                                        :type ,type
-                                                        :margin 5
-                                                        :file ,thumbnail)
-                                             'rear-nonsticky '(display))
-                                 disp)
-                         img))
-                 else collect (cons disp img)))
-    candidates))
+                   ;; When icons are displayed the leading space handling disp
+                   ;; prop is already here, just replace icon with the thumbnail.
+                   (unless helm-ff-icon-mode (setq disp (concat " " disp)))
+                   (add-text-properties 0 1 `(display (image
+                                                       :type ,type
+                                                       :margin 5
+                                                       :file ,thumbnail)
+                                                      rear-nonsticky '(display))
+                                        disp)
+                   (cons disp img))
+                   else collect (cons disp img)))
+        candidates))
 
 ;; Same as `image-dired-get-thumbnail-image' but use
 ;; `helm-ff--image-dired-thumb-name' which cache thumbnails for further use.
@@ -5094,8 +5096,9 @@ Special commands:
                      helm-ff--thumbnailed-directories))
     (setq helm-ff--thumbnailed-directories
           (delete helm-ff-default-directory helm-ff--thumbnailed-directories)))
-  (helm-update (regexp-quote (replace-regexp-in-string
-                              "\\`[[:multibyte:] ]*" "" (helm-get-selection nil t)))))
+  (helm-force-update (regexp-quote (replace-regexp-in-string
+                                    "\\`[[:multibyte:] ]*" ""
+                                    (helm-get-selection nil t)))))
 (put 'helm-ff-toggle-thumbnails 'no-helm-mx t)
 
 ;;;###autoload
