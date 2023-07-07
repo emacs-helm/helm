@@ -5442,6 +5442,10 @@ source is `helm-source-find-files'."
           helm-ff-update-when-only-one-matched
           helm-ff-move-to-first-real-candidate
           helm-ff-clean-initial-input))
+  (maphash (lambda (k _v)
+             (when (member k helm-ff--thumbnailed-directories)
+               (remhash k helm-ff--list-directory-cache)))
+           helm-ff--list-directory-cache)
   (setq helm-ff--show-directories-only nil
         helm-ff--show-files-only nil
         helm-ff--show-thumbnails nil
