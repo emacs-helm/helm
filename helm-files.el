@@ -5065,11 +5065,11 @@ Special commands:
   (unless (string-match-p (image-file-name-regexp) file)
     (error "%s is not a valid image file" file))
   (let* ((thumb-file (helm-ff--image-dired-thumb-name file))
-	 (thumb-attr (file-attributes thumb-file)))
+         (thumb-attr (file-attributes thumb-file)))
     (when (or (not thumb-attr)
-	      (time-less-p (file-attribute-modification-time thumb-attr)
-			   (file-attribute-modification-time
-			    (file-attributes file))))
+              (time-less-p (file-attribute-modification-time thumb-attr)
+                           (file-attribute-modification-time
+                            (file-attributes file))))
       (image-dired-create-thumb file thumb-file))
     (create-image thumb-file)))
 
