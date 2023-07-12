@@ -852,10 +852,13 @@ present in this list."
          ;; Force rebuilding the source to remove the highlight match FCT.
          (setq helm-source-find-files nil)))
 
-(defcustom helm-ff-edit-marked-files-fn (if (< emacs-major-version 29)
-                                            #'helm-ff-wfnames
-                                          #'helm-marked-files-in-dired)
-  "A function to edit filenames in a special buffer."
+(defcustom helm-ff-edit-marked-files-fn #'helm-ff-wfnames
+  "A function to edit filenames in a special buffer.
+
+By default `wfnames' package is used to avoid wdired which doesn't
+always work with all emacs versions and also is quite clumsy about
+default-directory among other things.
+If you still want to use it, helm is still providing `helm-marked-files-in-dired'."
   :type '(choice (function :tag "Use Wfnames package to edit filenames."
                   helm-ff-wfnames)
                  (function :tag "Use Wdired package to edit filenames."
