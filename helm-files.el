@@ -1010,6 +1010,25 @@ If you still want to use it, helm is still providing `helm-marked-files-in-dired
   "Face used for rsync mode-line indicator."
   :group 'helm-files-faces)
 
+(defface helm-ff-rsync-progress-1
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "orange" :foreground "black"))
+  "Face used for rsync progress bar percentage."
+  :group 'helm-files-faces)
+
+(defface helm-ff-rsync-progress-2
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "orange"))
+  "Face used for rsync progress bar progress."
+  :group 'helm-files-faces)
+
+(defface helm-ff-rsync-progress-3
+  `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+       :background "white"))
+  "Face used for rsync progress bar background."
+  :group 'helm-files-faces)
+
+
 
 ;;; Helm-find-files
 ;;
@@ -1399,9 +1418,9 @@ DEST must be a directory.  SWITCHES when unspecified default to
       (helm-aif (and percent (ceiling (/ percent 4)))
           (format "%s%s%s"
                   (propertize (format "%s%s" percent helm-rsync-percent-sign)
-                              'face '(:background "orange" :foreground "black"))
-                  (propertize (make-string it ? ) 'face '(:background "orange"))
-                  (propertize (make-string (- 25 it) ? ) 'face '(:background "white")))
+                              'face 'helm-ff-rsync-progress-1)
+                  (propertize (make-string it ? ) 'face 'helm-ff-rsync-progress-2)
+                  (propertize (make-string (- 25 it) ? ) 'face 'helm-ff-rsync-progress-3))
         ""))))
     
 (defun helm-ff-kill-rsync-process (process)
