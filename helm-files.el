@@ -652,6 +652,13 @@ currently transfered in an help-echo in mode-line, if you use
   "Percentage unicode sign to use in Rsync reporter."
   :type 'string)
 
+(defcustom helm-ff-rsync-progress-bar-style 'bar
+  "Style of progress-bar for rsync action.
+Value can be either bar or text."
+  :type '(choice
+          (const :tag "Progress bar as a bar" 'bar)
+          (const :tag "Progress bar with text" 'text)))
+
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
 You probably don't need to set this when using a Linux system using
@@ -1252,12 +1259,17 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         ;; instead of sending empty string.
         (unless (equal it "")
           (push (cons proc it) helm-rsync--last-progress-bar-alist))
-        (format " [%s]" (propertize
-                         (or (assoc-default proc helm-rsync--last-progress-bar-alist)
-                             ;; Avoid (wrong-type-argument stringp
-                             ;; nil) when process is not ready.
-                             "")
-                         'face 'helm-ff-rsync-progress)))))
+        (if (eq helm-ff-rsync-progress-bar-style 'text)
+            (format " [%s]" (propertize
+                             (or (assoc-default proc helm-rsync--last-progress-bar-alist)
+                                 ;; Avoid (wrong-type-argument stringp
+                                 ;; nil) when process is not ready.
+                                 "")
+                             'face 'helm-ff-rsync-progress))
+          (format " %s" (or (assoc-default proc helm-rsync--last-progress-bar-alist)
+                            ;; Avoid (wrong-type-argument stringp
+                            ;; nil) when process is not ready.
+                            ""))))))
 
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
@@ -1359,13 +1371,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
                        (buffer-substring-no-properties
                         (point) (point-at-eol))))))
       ;; Now format the string for the mode-line.
-      (let ((ml-str (mapconcat 'identity
-                               (split-string
-                                (replace-regexp-in-string
-                                 "%" helm-rsync-percent-sign
-                                 progbar)
-                                " " t)
-                               " ")))
+      (let ((ml-str (helm-ff--rsync-mode-line-string progbar)))
         (setq ml-str (propertize ml-str 'help-echo
                                  (format "%s->%s" (process-name proc) fname)))
         ;; Now associate the formatted
@@ -1378,6 +1384,26 @@ DEST must be a directory.  SWITCHES when unspecified default to
     (unless helm-rsync-no-mode-line-update
       (force-mode-line-update))))
 
+(defun helm-ff--rsync-mode-line-string (progbar)
+  (let (percent) 
+    (if (eq helm-ff-rsync-progress-bar-style 'text)
+        (mapconcat 'identity
+                   (split-string
+                    (replace-regexp-in-string
+                     "%" helm-rsync-percent-sign
+                     progbar)
+                    " " t)
+                   " ")
+      (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
+                         (setq percent (string-to-number (match-string 1 progbar)))))
+      (helm-aif (and percent (ceiling (/ percent 4)))
+          (format "%s%s%s"
+                  (propertize (format "%s%s" percent helm-rsync-percent-sign)
+                              'face '(:background "orange" :foreground "black"))
+                  (propertize (make-string it ? ) 'face '(:background "orange"))
+                  (propertize (make-string (- 25 it) ? ) 'face '(:background "white")))
+        ""))))
+    
 (defun helm-ff-kill-rsync-process (process)
   "Kill rsync process PROCESS.
 
