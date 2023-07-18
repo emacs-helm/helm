@@ -654,7 +654,8 @@ currently transfered in an help-echo in mode-line, if you use
 
 (defcustom helm-ff-rsync-progress-bar-style 'text
   "Style of progress-bar for rsync action.
-Value can be either bar or text."
+Value can be either bar or text.
+Progress bar is inaccurate on non graphic displays, use text instead."
   :type '(choice
           (const :tag "Progress bar as a bar" 'bar)
           (const :tag "Progress bar with text" 'text)))
