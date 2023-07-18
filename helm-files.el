@@ -1429,13 +1429,16 @@ DEST must be a directory.  SWITCHES when unspecified default to
               (speed   (nth 2 infos))
               (remain  (nth 3 infos))))
       (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
-                         (setq percent (string-to-number (match-string 1 progbar)))))
+                         (setq percent (string-to-number
+                                        (match-string 1 progbar)))))
       (helm-aif percent
           (format "%s%s%s%s"
                   (propertize (capitalize (process-name proc))
                               'face 'helm-ff-rsync-progress-1)
-                  (propertize " " 'display `(space :width ,(list it)) 'face 'helm-ff-rsync-progress-2)
-                  (propertize " " 'display `(space :width ,(list (- 100 percent))) 'face 'helm-ff-rsync-progress-3)
+                  (propertize " " 'display `(space :width ,(list it))
+                              'face 'helm-ff-rsync-progress-2)
+                  (propertize " " 'display `(space :width ,(list (- 100 percent)))
+                              'face 'helm-ff-rsync-progress-3)
                   (propertize info 'face 'helm-ff-rsync-progress-1))
         ""))))
     
