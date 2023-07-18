@@ -1424,7 +1424,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
     (if (eq helm-ff-rsync-progress-bar-style 'text)
         (mapconcat 'identity infos " ")
       (setq info
-            (cl-case helm-ff-rsync-progress-bar-info
+            (cl-ecase helm-ff-rsync-progress-bar-info
               (size    (nth 0 infos))
               (percent (nth 1 infos))
               (speed   (nth 2 infos))
