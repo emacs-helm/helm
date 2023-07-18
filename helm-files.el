@@ -662,6 +662,9 @@ Progress bar is inaccurate on non graphic displays, use text instead."
 
 (defcustom helm-ff-rsync-progress-bar-info 'percent
   "The type of info shown at end of rsync progress bar.
+
+Valid value are percent, size, speed and remain, any other value raise an
+error.
 Have no effect when `helm-ff-rsync-progress-bar-style' is text."
   :type '(choice
           (const :tag "Show the amount of data copied" size)
