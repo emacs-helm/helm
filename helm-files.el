@@ -659,6 +659,15 @@ Value can be either bar or text."
           (const :tag "Progress bar as a bar" 'bar)
           (const :tag "Progress bar with text" 'text)))
 
+(defcustom helm-ff-rsync-progress-bar-info 'percent
+  "The type of info shown at end of rsync progress bar.
+Have no effect when `helm-ff-rsync-progress-bar-style' is text."
+  :type '(choice
+          (const :tag "Show the amount of data copied" size)
+          (const :tag "Show the percentage of data copied" percent)
+          (const :tag "Show the current speed of transfer" speed)
+          (const :tag "Show the time remaining" remain)))
+
 (defcustom helm-trash-default-directory nil
   "The default trash directory.
 You probably don't need to set this when using a Linux system using
@@ -1404,15 +1413,21 @@ DEST must be a directory.  SWITCHES when unspecified default to
       (force-mode-line-update t))))
 
 (defun helm-ff--rsync-mode-line-string (progbar proc)
-  (let (percent) 
+  ;; progbar == "          2,83G  92%   98,65MB/s    0:00:02  "
+  (let ((infos (split-string
+                (replace-regexp-in-string
+                 "%" helm-rsync-percent-sign
+                 progbar)
+                " " t))
+        percent info) 
     (if (eq helm-ff-rsync-progress-bar-style 'text)
-        (mapconcat 'identity
-                   (split-string
-                    (replace-regexp-in-string
-                     "%" helm-rsync-percent-sign
-                     progbar)
-                    " " t)
-                   " ")
+        (mapconcat 'identity infos " ")
+      (setq info
+            (cl-case helm-ff-rsync-progress-bar-info
+              (size    (nth 0 infos))
+              (percent (nth 1 infos))
+              (speed   (nth 2 infos))
+              (remain  (nth 3 infos))))
       (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
                          (setq percent (string-to-number (match-string 1 progbar)))))
       (helm-aif percent
@@ -1421,7 +1436,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
                               'face 'helm-ff-rsync-progress-1)
                   (propertize " " 'display `(space :width ,(list it)) 'face 'helm-ff-rsync-progress-2)
                   (propertize " " 'display `(space :width ,(list (- 100 percent))) 'face 'helm-ff-rsync-progress-3)
-                  (propertize (format "%s%s" percent helm-rsync-percent-sign) 'face 'helm-ff-rsync-progress-1))
+                  (propertize info 'face 'helm-ff-rsync-progress-1))
         ""))))
     
 (defun helm-ff-kill-rsync-process (process)
