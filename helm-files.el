@@ -1012,8 +1012,8 @@ If you still want to use it, helm is still providing `helm-marked-files-in-dired
 
 (defface helm-ff-rsync-progress-1
   `((t ,@(and (>= emacs-major-version 27) '(:extend t))
-       :background "orange" :foreground "black"))
-  "Face used for rsync progress bar percentage."
+       :background "CadetBlue" :foreground "black"))
+  "Face used for rsync progress bar percentage and proc name."
   :group 'helm-files-faces)
 
 (defface helm-ff-rsync-progress-2
@@ -1390,7 +1390,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
                        (buffer-substring-no-properties
                         (point) (point-at-eol))))))
       ;; Now format the string for the mode-line.
-      (let ((ml-str (helm-ff--rsync-mode-line-string progbar)))
+      (let ((ml-str (helm-ff--rsync-mode-line-string progbar proc)))
         (setq ml-str (propertize ml-str 'help-echo
                                  (format "%s->%s" (process-name proc) fname)))
         ;; Now associate the formatted
@@ -1401,9 +1401,9 @@ DEST must be a directory.  SWITCHES when unspecified default to
                 (push (cons proc ml-str) helm-rsync-progress-str-alist)))))
     ;; Finally update mode-line.
     (unless helm-rsync-no-mode-line-update
-      (force-mode-line-update))))
+      (force-mode-line-update t))))
 
-(defun helm-ff--rsync-mode-line-string (progbar)
+(defun helm-ff--rsync-mode-line-string (progbar proc)
   (let (percent) 
     (if (eq helm-ff-rsync-progress-bar-style 'text)
         (mapconcat 'identity
@@ -1415,12 +1415,13 @@ DEST must be a directory.  SWITCHES when unspecified default to
                    " ")
       (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
                          (setq percent (string-to-number (match-string 1 progbar)))))
-      (helm-aif (and percent (ceiling (/ percent 4)))
-          (format "%s%s%s"
-                  (propertize (format "%s%s" percent helm-rsync-percent-sign)
+      (helm-aif percent
+          (format "%s%s%s%s"
+                  (propertize (capitalize (process-name proc))
                               'face 'helm-ff-rsync-progress-1)
-                  (propertize (make-string it ? ) 'face 'helm-ff-rsync-progress-2)
-                  (propertize (make-string (- 25 it) ? ) 'face 'helm-ff-rsync-progress-3))
+                  (propertize " " 'display `(space :width ,(list it)) 'face 'helm-ff-rsync-progress-2)
+                  (propertize " " 'display `(space :width ,(list (- 100 percent))) 'face 'helm-ff-rsync-progress-3)
+                  (propertize (format "%s%s" percent helm-rsync-percent-sign) 'face 'helm-ff-rsync-progress-1))
         ""))))
     
 (defun helm-ff-kill-rsync-process (process)
