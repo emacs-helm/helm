@@ -1303,7 +1303,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                             ;; nil) when process is not ready.
                             ""))))))
 
-(defun helm-ff--rsync-mode-line-string (progbar proc)
+(defun helm-ff--rsync-progress-bar (progbar proc)
   ;; progbar == "          2,83G  92%   98,65MB/s    0:00:02  "
   (let ((infos (split-string
                 (replace-regexp-in-string
@@ -1433,7 +1433,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
                        (buffer-substring-no-properties
                         (point) (point-at-eol))))))
       ;; Now format the string for the mode-line.
-      (let ((ml-str (helm-ff--rsync-mode-line-string progbar proc)))
+      (let ((ml-str (helm-ff--rsync-progress-bar progbar proc)))
         (setq ml-str (propertize ml-str 'help-echo
                                  (format "%s->%s" (process-name proc) fname)))
         ;; Now associate the formatted
