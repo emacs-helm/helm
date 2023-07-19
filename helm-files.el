@@ -660,13 +660,14 @@ Progress bar is inaccurate on non graphic displays, use text instead."
           (const :tag "Progress bar as a bar" 'bar)
           (const :tag "Progress bar with text" 'text)))
 
-(defcustom helm-ff-rsync-progress-bar-info 'percent
-  "The type of info shown at end of rsync progress bar.
+(defcustom helm-ff-rsync-progress-bar-info '(percent)
+  "Infos shown at end of Rsync progress bar.
 
-Valid value are percent, size, speed and remain, any other value raise an
-error.
-Have no effect when `helm-ff-rsync-progress-bar-style' is text."
-  :type '(choice
+Valid value is a list containing one or more elements from
+percent, size, speed and remain.  When set to nil show nothing at end of
+progress bar.
+This Has no effect when `helm-ff-rsync-progress-bar-style' is text."
+  :type '(set :tag "Check zero or more items to show at end of Rsync progress bar"
           (const :tag "Show the amount of data copied" size)
           (const :tag "Show the percentage of data copied" percent)
           (const :tag "Show the current speed of transfer" speed)
@@ -1314,11 +1315,14 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
     (if (eq helm-ff-rsync-progress-bar-style 'text)
         (mapconcat 'identity infos " ")
       (setq info
-            (cl-ecase helm-ff-rsync-progress-bar-info
-              (size    (nth 0 infos))
-              (percent (nth 1 infos))
-              (speed   (nth 2 infos))
-              (remain  (nth 3 infos))))
+            (mapconcat (lambda (x)
+               (pcase x
+                 (`size    (nth 0 infos))
+                 (`percent (nth 1 infos))
+                 (`speed   (nth 2 infos))
+                 (`remain  (nth 3 infos))))
+             (helm-mklist helm-ff-rsync-progress-bar-info)
+             ", "))
       (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
                          (setq percent (string-to-number
                                         (match-string 1 progbar)))))
