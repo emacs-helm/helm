@@ -1316,13 +1316,13 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
         (mapconcat 'identity infos " ")
       (setq info
             (mapconcat (lambda (x)
-               (pcase x
-                 (`size    (nth 0 infos))
-                 (`percent (nth 1 infos))
-                 (`speed   (nth 2 infos))
-                 (`remain  (nth 3 infos))))
-             (helm-mklist helm-ff-rsync-progress-bar-info)
-             ", "))
+                         (pcase x
+                           (`size    (nth 0 infos))
+                           (`percent (nth 1 infos))
+                           (`speed   (nth 2 infos))
+                           (`remain  (nth 3 infos))))
+                       (helm-mklist helm-ff-rsync-progress-bar-info)
+                       ", "))
       (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
                          (setq percent (string-to-number
                                         (match-string 1 progbar)))))
