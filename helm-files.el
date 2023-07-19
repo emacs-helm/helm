@@ -1303,6 +1303,36 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                             ;; nil) when process is not ready.
                             ""))))))
 
+(defun helm-ff--rsync-mode-line-string (progbar proc)
+  ;; progbar == "          2,83G  92%   98,65MB/s    0:00:02  "
+  (let ((infos (split-string
+                (replace-regexp-in-string
+                 "%" helm-rsync-percent-sign
+                 progbar)
+                " " t))
+        percent info) 
+    (if (eq helm-ff-rsync-progress-bar-style 'text)
+        (mapconcat 'identity infos " ")
+      (setq info
+            (cl-ecase helm-ff-rsync-progress-bar-info
+              (size    (nth 0 infos))
+              (percent (nth 1 infos))
+              (speed   (nth 2 infos))
+              (remain  (nth 3 infos))))
+      (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
+                         (setq percent (string-to-number
+                                        (match-string 1 progbar)))))
+      (helm-aif percent
+          (format "%s%s%s%s"
+                  (propertize (capitalize (process-name proc))
+                              'face 'helm-ff-rsync-progress-1)
+                  (propertize " " 'display `(space :width ,(list it))
+                              'face 'helm-ff-rsync-progress-2)
+                  (propertize " " 'display `(space :width ,(list (- 100 percent)))
+                              'face 'helm-ff-rsync-progress-3)
+                  (propertize info 'face 'helm-ff-rsync-progress-1))
+        ""))))
+
 (defun helm-rsync-mode-line (proc)
   "Add Rsync progress to the mode line."
   (or global-mode-string (setq global-mode-string '("")))
@@ -1416,36 +1446,6 @@ DEST must be a directory.  SWITCHES when unspecified default to
     (unless helm-rsync-no-mode-line-update
       (force-mode-line-update t))))
 
-(defun helm-ff--rsync-mode-line-string (progbar proc)
-  ;; progbar == "          2,83G  92%   98,65MB/s    0:00:02  "
-  (let ((infos (split-string
-                (replace-regexp-in-string
-                 "%" helm-rsync-percent-sign
-                 progbar)
-                " " t))
-        percent info) 
-    (if (eq helm-ff-rsync-progress-bar-style 'text)
-        (mapconcat 'identity infos " ")
-      (setq info
-            (cl-ecase helm-ff-rsync-progress-bar-info
-              (size    (nth 0 infos))
-              (percent (nth 1 infos))
-              (speed   (nth 2 infos))
-              (remain  (nth 3 infos))))
-      (setq percent (and (string-match "\\([0-9]+\\)%" progbar)
-                         (setq percent (string-to-number
-                                        (match-string 1 progbar)))))
-      (helm-aif percent
-          (format "%s%s%s%s"
-                  (propertize (capitalize (process-name proc))
-                              'face 'helm-ff-rsync-progress-1)
-                  (propertize " " 'display `(space :width ,(list it))
-                              'face 'helm-ff-rsync-progress-2)
-                  (propertize " " 'display `(space :width ,(list (- 100 percent)))
-                              'face 'helm-ff-rsync-progress-3)
-                  (propertize info 'face 'helm-ff-rsync-progress-1))
-        ""))))
-    
 (defun helm-ff-kill-rsync-process (process)
   "Kill rsync process PROCESS.
 
