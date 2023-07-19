@@ -1310,7 +1310,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                  "%" helm-rsync-percent-sign
                  progbar)
                 " " t))
-        percent info) 
+        percent info)
     (if (eq helm-ff-rsync-progress-bar-style 'text)
         (mapconcat 'identity infos " ")
       (setq info
