@@ -1329,12 +1329,15 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
       (helm-aif percent
           (format "%s%s%s%s"
                   (propertize (capitalize (process-name proc))
+                              'display '(height 0.9)
                               'face 'helm-ff-rsync-progress-1)
                   (propertize " " 'display `(space :width ,(list it))
                               'face 'helm-ff-rsync-progress-2)
                   (propertize " " 'display `(space :width ,(list (- 100 percent)))
                               'face 'helm-ff-rsync-progress-3)
-                  (propertize info 'face 'helm-ff-rsync-progress-1))
+                  (propertize info
+                              'display '(height 0.9)
+                              'face 'helm-ff-rsync-progress-1))
         ""))))
 
 (defun helm-rsync-mode-line (proc)
