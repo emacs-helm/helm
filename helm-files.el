@@ -1328,7 +1328,9 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                                         (match-string 1 progbar)))))
       (if percent
           (format "%s%s%s%s"
-                  (propertize (capitalize (process-name proc))
+                  (propertize (capitalize (replace-regexp-in-string
+                                           "<\\([0-9]+\\)>" "(\\1)"
+                                           (process-name proc)))
                               'display '(height 0.9)
                               'face 'helm-ff-rsync-progress-1)
                   (propertize " " 'display `(space :width ,(list percent))
