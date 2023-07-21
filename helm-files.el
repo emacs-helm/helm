@@ -652,7 +652,7 @@ currently transfered in an help-echo in mode-line, if you use
   "Percentage unicode sign to use in Rsync reporter."
   :type 'string)
 
-(defcustom helm-ff-rsync-progress-bar-style 'text
+(defcustom helm-ff-rsync-progress-bar-style (if (display-graphic-p) 'bar 'text)
   "Style of progress-bar for rsync action.
 Value can be either bar or text.
 Progress bar is inaccurate on non graphic displays, use text instead."
