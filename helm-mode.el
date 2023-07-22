@@ -501,21 +501,13 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (defun helm-cr-default-transformer (candidates source)
   "Default filter candidate function for `helm-comp-read'."
-  (let ((must-match (helm-get-attr 'must-match source))
-        (annotation (plist-get completion-extra-properties
-                               :annotation-function))
-        (affixation (plist-get completion-extra-properties
-                               :affixation-function)))
+  (let ((must-match (helm-get-attr 'must-match source)))
     ;; Annotation and affixation are already handled in completion-in-region and
     ;; in helm-completing-read-default-2 when emacs style is in use.
-    (cl-loop for c in (if (and (or annotation affixation)
-                               (not helm--completing-region)
-                               (memq helm-completion-style '(helm helm-fuzzy)))
-                          (helm-completion-in-region--initial-filter
-                           ;; Ensure we use the display part of candidates (if some).
-                           (all-completions "" candidates)
-                           annotation nil nil)
-                        candidates)
+    ;; For helm-completing-read-default-1 we handle them in an extra FCT; This
+    ;; allows extracting annotation and affixation from metadata which is not
+    ;; accessible from here.
+    (cl-loop for c in candidates
              for cand = (let ((elm (if (stringp c)
                                        (replace-regexp-in-string "\\s\\" "" c)
                                      c)))
@@ -972,13 +964,20 @@ handling properties, see `helm-comp-read'.
 
 This handler should be used when candidate list doesn't need to be rebuilt
 dynamically otherwise see `helm-completing-read-default-2'."
-  (let ((history (or (car-safe hist) hist))
-        (initial-input (helm-aif (pcase init
-                                   ((pred (stringp)) init)
-                                   ;; INIT is a cons cell.
-                                   (`(,l . ,_ll) l))
-                           it))
-        (minibuffer-completion-table collection))
+  (let* ((history (or (car-safe hist) hist))
+         (initial-input (helm-aif (pcase init
+                                    ((pred (stringp)) init)
+                                    ;; INIT is a cons cell.
+                                    (`(,l . ,_ll) l))
+                            it))
+         (minibuffer-completion-table collection)
+         (metadata (or (completion-metadata (or initial-input "") collection test)
+                       '(metadata)))
+         (afun (or (plist-get completion-extra-properties :annotation-function)
+                   (completion-metadata-get metadata 'annotation-function)))
+         (afix (or (plist-get completion-extra-properties :affixation-function)
+                   (completion-metadata-get metadata 'affixation-function)))
+         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file)))
     (helm-comp-read
      prompt collection
      :test test
@@ -996,6 +995,11 @@ dynamically otherwise see `helm-completing-read-default-2'."
                                     (eq require-match
                                         'confirm-after-completion)))
                            1 0)
+     :fc-transformer (append '(helm-cr-default-transformer)
+                             (and (or afun afix)
+                                  (list (lambda (candidates _source)
+                                          (helm-completion-in-region--initial-filter
+                                           candidates afun afix file-comp-p))))) 
      :quit-when-no-cand (eq require-match t)
      :nomark (null helm-comp-read-use-marked)
      :candidates-in-buffer cands-in-buffer
