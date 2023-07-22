@@ -1369,9 +1369,9 @@ DEST must be a directory.  SWITCHES when unspecified default to
                        collect (helm-rsync-remote2rsync f))
         dest (helm-rsync-remote2rsync dest))
   (let* ((buf (generate-new-buffer-name helm-rsync-process-buffer))
-         (port (when (helm-aand (file-remote-p dest 'host)
-                                (string-match "#\\([0-9]+\\)" it))
-                 (match-string 1)))
+         (host (file-remote-p dest 'host))
+         (port (when (and host (string-match "#\\([0-9]+\\)" host))
+                 (match-string 1 host)))
          (proc (start-process-shell-command
                 "rsync" buf
                 (format "rsync %s"
