@@ -1384,10 +1384,10 @@ DEST must be a directory.  SWITCHES when unspecified default to
                                       ;; unless user already specified
                                       ;; it himself with the -e option
                                       ;; by editing command.
-                                      (and switches
-                                           (cl-loop for arg in switches never
-                                                    (string-match-p
-                                                     "\\`-e" arg)))
+                                      switches
+                                      (cl-loop for arg in switches never
+                                               (string-match-p
+                                                "\\`-e" arg))
                                       (list (format "-e 'ssh -p %s'"
                                                     port)))
                                  files (list dest))
