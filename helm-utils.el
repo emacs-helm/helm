@@ -686,7 +686,9 @@ readable format,see `helm-file-human-size'."
                              directory
                              :path 'full
                              :directories t)
-                          (directory-files directory t))
+                          (directory-files
+                           directory t
+                           directory-files-no-dot-files-regexp))
            for file in files
            sum (nth 7 (file-attributes file)) into total
            finally return (if human
