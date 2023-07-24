@@ -494,6 +494,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 
 (cl-defun helm-cr--pattern-in-candidates-p (candidates &optional (pattern helm-pattern))
   (or (assoc pattern candidates)
+      (assoc (concat " " pattern) candidates)
       (assq (intern pattern) candidates)
       (member pattern candidates)
       (member (downcase pattern) candidates)
@@ -995,11 +996,11 @@ dynamically otherwise see `helm-completing-read-default-2'."
                                     (eq require-match
                                         'confirm-after-completion)))
                            1 0)
-     :fc-transformer (append '(helm-cr-default-transformer)
-                             (and (or afun afix)
+     :fc-transformer (append (and (or afun afix)
                                   (list (lambda (candidates _source)
                                           (helm-completion-in-region--initial-filter
-                                           candidates afun afix file-comp-p))))) 
+                                           candidates afun afix file-comp-p))))
+                             '(helm-cr-default-transformer))
      :quit-when-no-cand (eq require-match t)
      :nomark (null helm-comp-read-use-marked)
      :candidates-in-buffer cands-in-buffer
