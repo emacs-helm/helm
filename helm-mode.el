@@ -978,7 +978,14 @@ dynamically otherwise see `helm-completing-read-default-2'."
                    (completion-metadata-get metadata 'annotation-function)))
          (afix (or (plist-get completion-extra-properties :affixation-function)
                    (completion-metadata-get metadata 'affixation-function)))
-         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file)))
+         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
+         (sort-fn (or
+                   ;; Emacs-27+
+                   (completion-metadata-get
+                    metadata 'display-sort-function)
+                   ;; Emacs-26
+                   (lambda (candidates)
+                     (sort candidates #'helm-generic-sort-fn)))))
     (helm-comp-read
      prompt collection
      :test test
@@ -996,10 +1003,17 @@ dynamically otherwise see `helm-completing-read-default-2'."
                                     (eq require-match
                                         'confirm-after-completion)))
                            1 0)
-     :fc-transformer (append (and (or afun afix)
-                                  (list (lambda (candidates _source)
-                                          (helm-completion-in-region--initial-filter
-                                           candidates afun afix file-comp-p))))
+     :fc-transformer (append (list (lambda (candidates _source)
+                                     (helm-completion-in-region--initial-filter
+                                      (let* ((all (copy-sequence candidates))
+                                             (lst (if (and sort-fn (> (length helm-pattern) 0))
+                                                     (funcall sort-fn all)
+                                                   all)))
+                                        (if (and default (string= helm-pattern ""))
+                                            (append (list default)
+                                                    (delete default lst))
+                                          lst))
+                                      afun afix file-comp-p)))
                              '(helm-cr-default-transformer))
      :quit-when-no-cand (eq require-match t)
      :nomark (null helm-comp-read-use-marked)
