@@ -439,6 +439,8 @@ i.e. the loop is not entered after running COMMAND."
     (define-key map (kbd "C-c l")      #'helm-display-line-numbers-mode)
     (define-key map (kbd "M-p")        #'previous-history-element)
     (define-key map (kbd "M-n")        #'next-history-element)
+    ;; Unbind `previous-matching-history-element' which is non sense for helm.
+    (define-key map (kbd "M-r")        #'undefined)
     (define-key map (kbd "C-!")        #'helm-toggle-suspend-update)
     (define-key map (kbd "C-x b")      #'helm-resume-previous-session-after-quit)
     (define-key map (kbd "C-x C-b")    #'helm-resume-list-buffers-after-quit)
