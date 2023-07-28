@@ -951,7 +951,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     (prompt collection test require-match
      init hist default _inherit-input-method
      name buffer &optional cands-in-buffer exec-when-only-one alistp get-line)
-  "Call `helm-comp-read' with same args as `completing-read'.
+  "Helm `completing-read' handler not rebuilding its candidates dynamically.
+
+It is used usually with helm or helm-fuzzy `helm-completion-style'.
+Call `helm-comp-read' with same args as `completing-read'.
 
 Extra optional arg CANDS-IN-BUFFER means use `candidates-in-buffer'
 method which is faster.
@@ -964,7 +967,7 @@ When using CANDS-IN-BUFFER, GET-LINE can be specified to exit with candidate
 handling properties, see `helm-comp-read'.
 
 This handler should be used when candidate list doesn't need to be rebuilt
-dynamically otherwise see `helm-completing-read-default-2'."
+dynamically otherwise use `helm-completing-read-default-2'."
   (let* ((history (or (car-safe hist) hist))
          (initial-input (helm-aif (pcase init
                                     ((pred (stringp)) init)
@@ -1035,8 +1038,10 @@ dynamically otherwise see `helm-completing-read-default-2'."
     (prompt collection predicate require-match
      init hist default _inherit-input-method
      name buffer &optional _cands-in-buffer exec-when-only-one)
-  "Call `helm-comp-read' with same args as `completing-read'.
+  "Helm `completing-read' handler with dynamic matching.
 
+Call `helm-comp-read' with same args as `completing-read'.
+For the meaning of optional args see `helm-completing-read-default-1'.
 This handler uses dynamic matching which allows honouring `completion-styles'."
   (let* ((history (or (car-safe hist) hist))
          (input (pcase init
@@ -1144,7 +1149,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
 (defun helm-mode-all-the-icons-handler (prompt collection test require-match
                                         init hist default inherit-input-method
                                         name buffer)
-  "A special `completing-read' handler for `all-the-icons-insert'."
+  "Helm `completing-read' handler for `all-the-icons-insert'."
   (let* ((max-len 0)
          sname
          (cands (cl-loop for (desc . str) in collection
@@ -1186,7 +1191,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "Specialized `helm-mode' handler for `find-tag'."
+  "Helm `completing-read' handler for `find-tag'."
   ;; Some commands like find-tag may use `read-file-name' from inside
   ;; the calculation of collection. in this case it clash with
   ;; candidates-in-buffer that reuse precedent data (files) which is wrong.
@@ -1201,7 +1206,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "`helm-mode' handler using sync source as backend."
+  "Helm `completing-read' handler using sync source as backend."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
                                   name buffer))
@@ -1210,7 +1215,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "`helm-mode' handler using inbuffer source as backend."
+  "Helm `completing-read' handler using inbuffer source as backend."
   (helm-completing-read-default-1 prompt collection test require-match
                                   init hist default inherit-input-method
                                   name buffer t))
@@ -1219,7 +1224,10 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
     (prompt collection test require-match
      init hist default inherit-input-method
      name buffer)
-  "Default `helm-mode' handler for all `completing-read'."
+  "Default Helm `completing-read' handler.
+
+Use either `helm-completing-read-default-1' or `helm-completing-read-default-2'
+according to `helm-completion-style'."
   (let* (;; Standard will be used as CANDS-IN-BUFFER arg.
          (standard (and (memq helm-completion-style '(helm helm-fuzzy)) t))
          (fn (if standard
