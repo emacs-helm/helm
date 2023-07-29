@@ -1298,7 +1298,10 @@ ARG-LIST is a list of arguments to pass to HANDLER."
   ;; minibuffer-complete one time for all [1].
   (cl-letf (((symbol-function 'minibuffer-complete) #'ignore))
     (apply handler arg-list)))
-  
+
+(defvar helm-comp-read-require-match-overrides '((describe-function . t))
+  "Allow overriding REQUIRE-MATCH completing-read arg for a specific function.")
+
 (cl-defun helm--completing-read-default
     (prompt collection &optional
                          predicate require-match
@@ -1319,7 +1322,10 @@ See documentation of `completing-read' and `all-completions' for details."
                                 helm-completing-read-handlers-alist))
          (def-com         (helm-mode--get-default-handler-for 'comp entry))
          (str-defcom      (and def-com (helm-symbol-name def-com)))
-         (def-args        (list prompt collection predicate require-match
+         (def-args        (list prompt collection predicate
+                                (helm-aif (assq current-command
+                                          helm-comp-read-require-match-overrides)
+                                    (cdr it) require-match)
                                 initial-input hist def inherit-input-method))
          ;; Append the two extra args needed to set the buffer and source name
          ;; in helm specialized functions.
