@@ -657,8 +657,8 @@ currently transfered in an help-echo in mode-line, if you use
 Value can be either bar or text.
 Progress bar is inaccurate on non graphic displays, use text instead."
   :type '(choice
-          (const :tag "Progress bar as a bar" 'bar)
-          (const :tag "Progress bar with text" 'text)))
+          (const :tag "Progress bar as a bar" bar)
+          (const :tag "Progress bar with text" text)))
 
 (defcustom helm-ff-rsync-progress-bar-info '(percent)
   "Infos shown at end of Rsync progress bar.
