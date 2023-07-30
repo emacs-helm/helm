@@ -46,8 +46,10 @@
 (declare-function helm-comp-read "helm-mode.el")
 (declare-function custom-unlispify-tag-name "cus-edit.el")
 (declare-function helm-quit-and-find-file "helm-utils.el")
+(declare-function linum-mode "linum.el")
 
 (defvar helm-marked-buffer-name)
+(defvar display-buffer-function)
 
 
 ;;; Internal Variables
