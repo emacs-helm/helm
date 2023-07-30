@@ -232,7 +232,7 @@
 (defcustom helm-type-function-actions
   (helm-make-actions
    "Describe function" 'helm-describe-function
-   "Find function" 'helm-find-function
+   "Find function (C-u for source)" 'helm-find-function
    "Info lookup" 'helm-info-lookup-symbol
    "Debug on entry" 'debug-on-entry
    "Cancel debug on entry" 'cancel-debug-on-entry

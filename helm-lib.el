@@ -1295,8 +1295,13 @@ using LOAD-PATH."
   (if (not helm-current-prefix-arg)
       (find-function (helm-symbolify func))
     (let ((place (helm-find-function-noselect func)))
-      (when place
-        (switch-to-buffer (car place)) (goto-char (cdr place))))))
+      (if (cdr place)
+          (progn
+            (switch-to-buffer (car place)) (goto-char (cdr place)))
+        (helm-aif (car place)
+            (message "Couldn't find Function `%s' in `%s'"
+                     func (buffer-name it))
+          (message "Couldn't find Function `%s'" func))))))
 
 (defun helm-find-variable (var)
   "Try to jump to VAR definition.

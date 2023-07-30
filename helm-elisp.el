@@ -721,7 +721,7 @@ is only used to test DEFAULT."
     :persistent-help "Toggle describe class"
     :keymap helm-apropos-map
     :action '(("Describe Class" . helm-describe-class)
-              ("Find Class" . helm-find-function)
+              ("Find Class (C-u for source)" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
 
 (defun helm-def-source--eieio-generic (&optional default)
@@ -743,7 +743,7 @@ is only used to test DEFAULT."
     :persistent-help "Toggle describe generic function"
     :keymap helm-apropos-map
     :action '(("Describe function" . helm-describe-function)
-              ("Find function" . helm-find-function)
+              ("Find function (C-u for source)" . helm-find-function)
               ("Info lookup" . helm-info-lookup-symbol))))
 
 (defun helm-info-lookup-fallback-source (candidate)
