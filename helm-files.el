@@ -1251,11 +1251,14 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
          (dest-dir-p (file-directory-p dest))
          (dest-dir   (helm-basedir dest)))
     ;; We still need to handle directory creation for Emacs version < 27.1 that
-    ;; doesn't have `dired-create-destination-dirs'.
-    (unless (or (boundp 'dired-create-destination-dirs)
+    ;; doesn't have `dired-create-destination-dirs' and for rsync as well.
+    (unless (or (and (boundp 'dired-create-destination-dirs)
+                     (null (eq action 'rsync)))
                 dest-dir-p
                 (file-directory-p dest-dir))
       (when (y-or-n-p (format "Create directory `%s'? " dest-dir))
+        ;; When saying No here with rsync, `helm-rsync-copy-files' will raise an
+        ;; error about dest not existing.
         (make-directory dest-dir t)))
     (if (eq action 'rsync)
         (helm-rsync-copy-files ifiles dest rsync-switches)
