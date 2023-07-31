@@ -18,9 +18,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'helm)
-(require 'helm-lib)
-(require 'helm-utils)
 (require 'info)
 
 (declare-function Info-index-nodes "info" (&optional file))
