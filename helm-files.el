@@ -1249,7 +1249,7 @@ ACTION can be `rsync' or any action supported by `helm-dired-action'."
                         :initial-input (helm-dwim-target-directory)
                         :history (helm-find-files-history nil :comp-read nil))))))
          (dest-dir-p (file-directory-p dest))
-         (dest-dir   (helm-basedir dest)))
+         (dest-dir   (if dest-dir-p dest (helm-basedir dest))))
     ;; We still need to handle directory creation for Emacs version < 27.1 that
     ;; doesn't have `dired-create-destination-dirs' and for rsync as well.
     (unless (or (and (boundp 'dired-create-destination-dirs)
