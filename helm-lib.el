@@ -930,7 +930,7 @@ Example:
 
     (setq B \\='(1 2 3 4 5 6 7 8 9))
 
-    (helm-group-candidates-by B #'cl-oddp 2 \\='separate)
+    (helm-group-candidates-by B #\\='cl-oddp 2 \\='separate)
     => ((2 4 6 8) (1 3 5 7 9))
 
 SELECTION specify where to start in CANDIDATES.
