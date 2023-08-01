@@ -18,7 +18,6 @@
 ;;; Code:
 
 (require 'helm-lib) ; For helm-aif (bug #2520).
-(require 'helm-info)
 
 
 ;;; Command Keymap
