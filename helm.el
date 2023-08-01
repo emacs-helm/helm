@@ -36,7 +36,7 @@
 ;;; Code:
 
 (require 'helm-core)
-(require 'helm-info)
+(require 'helm-info) ; Build info sources and commands (bug #2608).
 (require 'helm-global-bindings)
 
 (provide 'helm)
