@@ -39,6 +39,7 @@
 (declare-function helm-init-candidates-in-buffer "helm-core.el")
 (declare-function helm-interpret-value "helm-core.el")
 (declare-function helm-fuzzy-highlight-matches "helm-core.el")
+(declare-function helm-marked-candidates "helm-core.el")
 
 ;;; Advice Emacs fn
 ;;  Make Classes's docstrings more readable by removing al the

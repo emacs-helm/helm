@@ -40,6 +40,7 @@
 (declare-function helm-log-run-hook "helm-core.el")
 (declare-function helm-marked-candidates "helm-core.el")
 (declare-function helm-set-case-fold-search "helm-core.el")
+(declare-function helm-get-previous-header-pos "helm-core.el")
 (declare-function helm-source--cl--print-table "helm-source.el")
 (declare-function helm-update "helm-core.el")
 (declare-function org-content "org.el")
