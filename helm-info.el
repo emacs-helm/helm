@@ -18,9 +18,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'helm)
-(require 'helm-lib)
-(require 'helm-utils)
 (require 'info)
 
 (declare-function Info-index-nodes "info" (&optional file))
@@ -101,6 +98,7 @@ Argument TOBUF is the `helm-candidate-buffer'."
 
 (defun helm-info-goto (node-line)
   "The helm-info action to jump to NODE-LINE."
+  (require 'helm-utils)
   (let ((alive (buffer-live-p (get-buffer "*info*"))))
     (Info-goto-node (car node-line))
     (when alive (revert-buffer nil t))

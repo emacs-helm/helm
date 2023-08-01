@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'helm-core)
+(require 'helm-info)
 (require 'helm-global-bindings)
 
 (provide 'helm)
