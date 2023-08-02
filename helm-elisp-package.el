@@ -284,10 +284,13 @@ See `package-autoremove'."
            for id = (get-text-property 0 'tabulated-list-id c)
            for name = (and id (package-desc-name id))
            for desc = (package-desc-status id)
+           ;; 'source' means package installed with `package-vc-install' (only
+           ;; Emacs-29+).
            for built-in-p = (and (package-built-in-p name)
                                  (not (member desc '("available" "new"
-                                                     "installed" "dependency"))))
-           for installed-p = (member desc '("installed" "dependency"))
+                                                     "installed" "dependency"
+                                                     "source"))))
+           for installed-p = (member desc '("installed" "dependency" "source"))
            for upgrade-p = (assq name helm-el-package--upgrades)
            for user-installed-p = (memq name package-selected-packages)
            do (when (and user-installed-p (not upgrade-p))
