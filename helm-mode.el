@@ -1834,6 +1834,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
   "Same as `help--symbol-completion-table-affixation' but for helm.
 
 Return a list of cons cells of the form (disp . real)."
+  (require 'help-fns)
   (mapcar (lambda (c)
             (let* ((s   (intern c))
                    (doc (ignore-errors
