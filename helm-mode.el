@@ -1007,7 +1007,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                         'confirm-after-completion)))
                            1 0)
      :fc-transformer (append (list (lambda (candidates _source)
-                                     (helm-completion-in-region--initial-filter
+                                     (helm-completion--initial-filter
                                       (let* ((all (copy-sequence candidates))
                                              (lst (if (and sort-fn (> (length helm-pattern) 0))
                                                      (funcall sort-fn all)
@@ -1100,7 +1100,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                      (append (and default
                                   (memq helm-completion-style '(helm helm-fuzzy))
                                   (list default))
-                             (helm-completion-in-region--initial-filter
+                             (helm-completion--initial-filter
                               (let ((lst (if (and sort-fn (> (length str) 0))
                                              (funcall sort-fn all)
                                            all)))
@@ -1847,7 +1847,7 @@ Return a list of cons cells of the form (disp . real)."
                       ""))))
           completions))
 
-(defun helm-completion-in-region--initial-filter (comps afun afix file-comp-p)
+(defun helm-completion--initial-filter (comps afun afix file-comp-p)
   "Compute COMPS with function AFUN or AFIX unless FILE-COMP-P non nil.
 
 If both AFUN and AFIX are provided only AFIX is used.
@@ -2180,7 +2180,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                              (unless base-size (setq base-size bs))
                              (setq helm-completion--sorting-done (and sort-fn t))
                              (setq all (copy-sequence comps))
-                             (helm-completion-in-region--initial-filter
+                             (helm-completion--initial-filter
                               (if (and sort-fn (> (length str) 0))
                                   (funcall sort-fn all)
                                 all)
