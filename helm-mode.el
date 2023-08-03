@@ -1869,7 +1869,8 @@ When FILE-COMP-P is provided only filter out dot files."
       (cl-loop for f in comps
                unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
                collect f)
-    (cond (afix (helm--symbol-completion-table-affixation comps))
+    (cond (afix (cl-loop for (comp prefix suffix) in (funcall afix comps)
+                         collect (cons (concat prefix comp suffix) comp)))
           (afun
            ;; Add annotation at end of
            ;; candidate if needed, e.g. foo<f>, this happen when
