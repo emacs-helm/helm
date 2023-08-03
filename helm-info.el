@@ -176,7 +176,6 @@ Where NAME is an element of `helm-default-info-index-list'."
                str (format "Predefined helm for %s info." str)
                sym (format "*helm info %s*" str))))
 
-;;;###autoload
 (defun helm-info-index-set (var value)
   (set var value)
   (helm-define-info-index-sources value t))
