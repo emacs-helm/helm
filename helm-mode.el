@@ -1830,7 +1830,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm--symbol-completion-table-affixation (completions)
+(defun helm--advice-help--symbol-completion-table-affixation (completions)
   "Same as `help--symbol-completion-table-affixation' but for helm.
 
 Return a list of cons cells of the form (disp . real)."
