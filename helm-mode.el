@@ -1831,9 +1831,11 @@ The `helm-find-files' history `helm-ff-history' is used here."
     str))
 
 (defun helm--advice-help--symbol-completion-table-affixation (completions)
-  "Same as `help--symbol-completion-table-affixation' but for helm.
+  "Override advice for `help--symbol-completion-table-affixation'.
 
-Return a list of cons cells of the form (disp . real)."
+This advice is used in helm completion by `helm-mode'.
+It uses `helm-get-first-line-documentation' which allow providing documentation
+for `describe-variable' symbols."
   (require 'help-fns)
   (mapcar (lambda (c)
             (let* ((s   (intern c))
