@@ -1839,15 +1839,12 @@ Return a list of cons cells of the form (disp . real)."
             (let* ((s   (intern c))
                    (doc (ignore-errors
                           (helm-get-first-line-documentation s))))
-              (cons (concat (propertize
-                             (format "%-4s" (help--symbol-class s))
-                             'face 'completions-annotations)
-                            c
-                            (if doc
-                                (propertize (format " -- %s" doc)
-                                            'face 'completions-annotations)
-                              ""))
-                    c)))
+              (list c (propertize
+                       (format "%-4s" (help--symbol-class s))
+                       'face 'completions-annotations)
+                    (if doc (propertize (format " -- %s" doc)
+                                        'face 'completions-annotations)
+                      ""))))
           completions))
 
 (defun helm-completion-in-region--initial-filter (comps afun afix file-comp-p)
@@ -2381,6 +2378,8 @@ Note: This mode is incompatible with Emacs23."
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
         (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch)
+        (advice-add 'help--symbol-completion-table-affixation
+                    :override #'helm--advice-help--symbol-completion-table-affixation)
         (helm-minibuffer-history-mode 1))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
@@ -2391,6 +2390,8 @@ Note: This mode is incompatible with Emacs23."
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
       (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch)
+      (advice-remove 'help--symbol-completion-table-affixation
+                     #'helm--advice-help--symbol-completion-table-affixation)
       (helm-minibuffer-history-mode -1))))
 
 (provide 'helm-mode)
