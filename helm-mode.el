@@ -1839,12 +1839,24 @@ for `describe-variable' symbols."
   (require 'help-fns)
   (mapcar (lambda (c)
             (let* ((s   (intern c))
+                   ;; When using in-buffer implementation we should have the
+                   ;; longest len to align documentation for free.
+                   (max-len (buffer-local-value
+                             'helm-candidate-buffer-longest-len
+                             (get-buffer (or (helm-candidate-buffer)
+                                             ;; Return 0 in this case and don't
+                                             ;; fail with a nil arg with
+                                             ;; get-buffer.
+                                             helm-buffer))))
+                   (sep (if (or (zerop max-len) (null max-len))
+                            " --" ; Default separator.
+                          (make-string (- max-len (length c)) ? )))
                    (doc (ignore-errors
                           (helm-get-first-line-documentation s))))
               (list c (propertize
                        (format "%-4s" (help--symbol-class s))
                        'face 'completions-annotations)
-                    (if doc (propertize (format " -- %s" doc)
+                    (if doc (propertize (format "%s%s" sep doc)
                                         'face 'completions-annotations)
                       ""))))
           completions))
