@@ -36,8 +36,16 @@
 ;;; Code:
 
 (require 'helm-core)
-(require 'helm-info) ; Build info sources and commands (bug #2608).
 (require 'helm-global-bindings)
+
+;; Build info sources and commands once called (bug #2608). We need to autoload
+;; only these commands which are bound in helm-global-bindings, if we add more
+;; helm-info* commands to helm-global-bindings we will have to autoload them
+;; here. Requiring helm-info here instead will make recursive require to helm so
+;; don't do that.
+(autoload 'helm-info-emacs "helm-info" nil t)
+(autoload 'helm-info-gnus "helm-info" nil t)
+(autoload 'helm-info-at-point "helm-info" nil t)
 
 (provide 'helm)
 
