@@ -1841,14 +1841,18 @@ for `describe-variable' symbols."
             (let* ((s   (intern c))
                    ;; When using in-buffer implementation we should have the
                    ;; longest len to align documentation for free.
-                   (max-len (buffer-local-value
-                             'helm-candidate-buffer-longest-len
-                             (get-buffer (or (helm-candidate-buffer)
-                                             ;; Return 0 in this case and don't
-                                             ;; fail with a nil arg with
-                                             ;; get-buffer.
-                                             helm-buffer))))
-                   (sep (if (or (zerop max-len) (null max-len))
+                   ;; Check for style as well in case user switches to emacs
+                   ;; style and a candidate buffer remains (with its local vars
+                   ;; still available).
+                   (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
+                                 (buffer-local-value
+                                  'helm-candidate-buffer-longest-len
+                                  (get-buffer (or (helm-candidate-buffer)
+                                                  ;; Return 0 in this case and don't
+                                                  ;; fail with a nil arg with
+                                                  ;; get-buffer.
+                                                  helm-buffer)))))
+                   (sep (if (or (null max-len) (zerop max-len))
                             " --" ; Default separator.
                           (make-string (- max-len (length c)) ? )))
                    (doc (ignore-errors
