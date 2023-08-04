@@ -1845,9 +1845,9 @@ It affects all describe-* functions.
 It uses `helm-get-first-line-documentation' which allow providing documentation
 for `describe-variable' symbols and align properly documentation when helm style
 is used."
-  (lambda (c)
+  (lambda (comp)
     (require 'help-fns)
-    (let* ((s (intern c))
+    (let* ((sym (intern comp))
            ;; When using in-buffer implementation we should have the
            ;; longest len to align documentation for free.
            ;; Check for style as well in case user switches to emacs
@@ -1863,12 +1863,12 @@ is used."
                                           helm-buffer)))))
            (sep (if (or (null max-len) (zerop max-len))
                     " --"               ; Default separator.
-                  (make-string (- max-len (length c)) ? )))
+                  (make-string (- max-len (length comp)) ? )))
            (doc (ignore-errors
-                  (helm-get-first-line-documentation s))))
-      (list c
+                  (helm-get-first-line-documentation sym))))
+      (list comp
             (propertize
-             (format "%-4s" (help--symbol-class s))
+             (format "%-4s" (help--symbol-class sym))
              'face 'completions-annotations)
             (if doc (propertize (format "%s%s" sep doc)
                                 'face 'completions-annotations)
