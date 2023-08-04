@@ -1879,17 +1879,16 @@ is used."
 
 If both AFUN and AFIX are provided only AFIX is used.
 When FILE-COMP-P is provided only filter out dot files."
-  ;; Filter out dot files in file completion. Normally COMPS should be a list of
-  ;; string but in some cases it is given as a list of strings containing a list
-  ;; of string e.g. ("a" "b" "c" ("d" "e" "f")) ; This happen in rgrep
-  ;; (bug#2607) and highlight-* fns (bug #2610), so ensure the list is flattened to
-  ;; avoid e.g. wrong-type argument: stringp '("d" "e" "f")
-  ;; FIXME: If this create a new bug with completion-in-region, flatten COMPS
-  ;; directly in the caller i.e. helm-completing-read-default-1.
+  ;; COMPS may be a list of strings or a table composed of different tables made
+  ;; with `completion-table-merge'. This happen in rgrep (bug#2607), highlight-*
+  ;; fns (bug #2610) and presumably in many other places, so ensure the table is
+  ;; flattened to avoid having sublist in candidates list instead of
+  ;; strings. e.g. ("a" "b" "c" ("d" "e")) => ("a" "b" "c" "d" "e") .
   (setq comps (helm-fast-remove-dups
-               (helm-flatten-list comps)
+               (helm-comp-read-get-candidates comps)
                :test 'equal))
   (if file-comp-p
+      ;; Filter out dot files in file completion.
       (cl-loop for f in comps
                unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
                collect f)
