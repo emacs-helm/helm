@@ -1841,7 +1841,7 @@ the speed avoiding one useless loop on complete list of candidates.
 
 This advice is used in helm completion by `helm-mode'.
 It returns a function and not a list of completions.
-It affects all describe-* functions.
+It affects actually describe-variable/function/command/symbol functions.
 It uses `helm-get-first-line-documentation' which allow providing documentation
 for `describe-variable' symbols and align properly documentation when helm style
 is used."
