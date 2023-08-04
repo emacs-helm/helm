@@ -67,7 +67,7 @@ found in each node, otherwise scan only the current info buffer."
                  (helm-candidate-buffer))
       (kill-buffer it))
   (unless (helm-candidate-buffer)
-    (save-selected-window
+    (save-window-excursion
       (info file " *helm info temp buffer*")
       (let ((tobuf (helm-candidate-buffer 'global))
             Info-history)
