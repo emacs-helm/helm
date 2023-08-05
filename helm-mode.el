@@ -1836,7 +1836,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
     str))
 
 (defun helm--symbol-completion-table-affixation (_completions)
-  "Override advice for `help--symbol-completion-table-affixation'.
+  "Override `help--symbol-completion-table-affixation'.
 
 Normally affixation functions use COMPLETIONS as arg, and return a list of
 modified COMPLETIONS. Now we allow affixations functions to return a
@@ -1844,8 +1844,8 @@ function instead, just like annotation functions. The function should return a
 list of three elements like (comp prefix suffix). This increase significantly
 the speed avoiding one useless loop on complete list of candidates.
 
-This advice is used in helm completion by `helm-mode'.
-It returns a function and not a list of completions.
+Returns a function and not a list of completions.
+
 It affects actually describe-variable/function/command/symbol functions.
 It uses `helm-get-first-line-documentation' which allow providing documentation
 for `describe-variable' symbols and align properly documentation when helm style
