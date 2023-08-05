@@ -1830,7 +1830,7 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm--advice-help--symbol-completion-table-affixation (_completions)
+(defun helm--symbol-completion-table-affixation (_completions)
   "Override advice for `help--symbol-completion-table-affixation'.
 
 Normally affixation functions use COMPLETIONS as arg, and return a list of
@@ -1893,6 +1893,8 @@ When FILE-COMP-P is provided only filter out dot files."
       (cl-loop for f in comps
                unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
                collect f)
+    (when (eq afix 'help--symbol-completion-table-affixation)
+      (setq afix 'helm--symbol-completion-table-affixation))
     (cond (afix (let ((affixations (funcall afix comps)))
                   (if (functionp affixations)
                       (cl-loop for comp in comps
@@ -2413,8 +2415,6 @@ Note: This mode is incompatible with Emacs23."
           ;; to advice it.
           (advice-add 'ffap-read-file-or-url :override #'helm-advice--ffap-read-file-or-url))
         (advice-add 'read-buffer-to-switch :override #'helm-mode--read-buffer-to-switch)
-        (advice-add 'help--symbol-completion-table-affixation
-                    :override #'helm--advice-help--symbol-completion-table-affixation)
         (helm-minibuffer-history-mode 1))
     (progn
       (remove-function completing-read-function #'helm--completing-read-default)
@@ -2425,8 +2425,6 @@ Note: This mode is incompatible with Emacs23."
       (when (fboundp 'ffap-read-file-or-url-internal)
         (advice-remove 'ffap-read-file-or-url #'helm-advice--ffap-read-file-or-url))
       (advice-remove 'read-buffer-to-switch #'helm-mode--read-buffer-to-switch)
-      (advice-remove 'help--symbol-completion-table-affixation
-                     #'helm--advice-help--symbol-completion-table-affixation)
       (helm-minibuffer-history-mode -1))))
 
 (provide 'helm-mode)
