@@ -1911,12 +1911,16 @@ When FILE-COMP-P is provided only filter out dot files."
                   (if (functionp affixations)
                       (cl-loop for comp in comps
                                for cand = (funcall affixations comp)
-                               collect (cons (concat (nth 1 cand)  ;prefix
-                                                     (nth 0 cand)  ;comp
-                                                     (nth 2 cand)) ;suffix
+                               collect (cons (propertize (concat (nth 1 cand)  ;prefix
+                                                                 (nth 0 cand)  ;comp
+                                                                 (nth 2 cand)) ;suffix
+                                                         'match-part (nth 0 cand)) 
                                              comp))
                     (cl-loop for (comp prefix suffix) in affixations
-                             collect (cons (concat prefix comp suffix) comp)))))
+                             collect (cons (propertize
+                                            (concat prefix comp suffix)
+                                            'match-part comp)
+                                           comp)))))
           (afun
            ;; Add annotation at end of
            ;; candidate if needed, e.g. foo<f>, this happen when
