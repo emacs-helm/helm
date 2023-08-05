@@ -436,7 +436,7 @@ documentation when SYM name is the same for function and variable."
         (truncate-string-to-width
          (substitute-command-keys (car (split-string doc "\n")))
          end-column nil nil t)
-      (if (symbol-function sym)
+      (if (or (symbol-function sym) (boundp sym) (facep sym))
           "Not documented"
         ;; Symbol exist but has no definition yet e.g.
         ;; (advice-add 'foo-test :override (lambda () (message "invalid
