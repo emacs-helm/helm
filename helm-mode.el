@@ -230,6 +230,11 @@ This is mainly needed to prevent \"*Completions*\" buffers to popup.")
        (:background "red" :foreground "black")))
   "Face used for prefix completion."
   :group 'helm-mode)
+
+(defface helm-completion-invalid
+    '((t :inherit font-lock-property-name-face))
+  "Face used to highlight invalid functions."
+  :group 'helm-mode)
 
 (defvar helm-comp-read-map
   (let ((map (make-sparse-keymap)))
@@ -1865,10 +1870,17 @@ is used."
                     " --"               ; Default separator.
                   (make-string (- max-len (length comp)) ? )))
            (doc (ignore-errors
-                  (helm-get-first-line-documentation sym))))
-      (list comp
+                  (helm-get-first-line-documentation sym)))
+           (symbol-class (help--symbol-class sym)))
+      (list (if (or (symbol-function sym) (boundp sym) (facep sym))
+                comp
+              ;; Not already defined function. To test add an advice on a non
+              ;; existing function.
+              (propertize comp 'face 'helm-completion-invalid))
             (propertize
-             (format "%-4s" (help--symbol-class sym))
+             (format "%-4s" (or (and (not (string= symbol-class ""))
+                                     symbol-class)
+                                "i"))
              'face 'completions-annotations)
             (if doc (propertize (format "%s%s" sep doc)
                                 'face 'completions-annotations)

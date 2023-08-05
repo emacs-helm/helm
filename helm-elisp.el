@@ -436,7 +436,12 @@ documentation when SYM name is the same for function and variable."
         (truncate-string-to-width
          (substitute-command-keys (car (split-string doc "\n")))
          end-column nil nil t)
-      "Not documented")))
+      (if (symbol-function sym)
+          "Not documented"
+        ;; Symbol exist but has no definition yet e.g.
+        ;; (advice-add 'foo-test :override (lambda () (message "invalid
+        ;; function"))) and foo-test is not already defined.
+        "Not already defined"))))
 
 ;;; File completion.
 ;;
