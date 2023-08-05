@@ -270,7 +270,18 @@ and second call within 1s runs `helm-swap-windows'."
 
 (defun helm-command-with-subkeys (map subkey command
                                   &optional other-subkeys prompt exit-fn delay)
-  "Return an anonymous interactive command to use with `helm-define-key-with-subkeys'."
+  "Build a command that run COMMAND when SUBKEY is read.
+
+The command runs a loop reading keys and exit when user stops typing after DELAY
+seconds.  After this DELAY EXIT-FN run if specified.
+
+Arg OTHER-SUBKEYS should be an alist composed of (command . short-key) where
+command is another command than COMMAND bound to short-key.
+
+A PROMPT can be used to describe bindings of COMMAND and OTHER-SUBKEYS.
+ 
+Return an anonymous interactive command to use with
+`helm-define-key-with-subkeys'."
   (lambda ()
     (interactive)
     (let (timer)
