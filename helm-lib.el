@@ -286,6 +286,11 @@ the leading `-' char."
      (if (zerop (logand 512 mode))
          (if (zerop (logand   1 mode)) ?- ?x)
        (if (zerop (logand   1 mode)) ?T ?t)))))
+
+(unless (and (fboundp 'pos-bol) (fboundp 'pos-eol))
+  (defalias 'pos-bol 'line-beginning-position)
+  (defalias 'pos-eol 'line-end-position))
+
 
 ;;; Macros helper.
 ;;
@@ -985,7 +990,7 @@ Handle multibyte characters by moving by columns."
     (save-excursion
       (insert str))
     (move-to-column width)
-    (buffer-substring (point-at-bol) (point))))
+    (buffer-substring (pos-bol) (point))))
 
 (defun helm-substring-by-width (str width &optional endstr)
   "Truncate string STR to end at column WIDTH.
@@ -1036,7 +1041,7 @@ than WIDTH."
 
 (defun helm-current-line-contents ()
   "Current line string without properties."
-  (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
+  (buffer-substring-no-properties (pos-bol) (pos-eol)))
 
 (defun helm--replace-regexp-in-buffer-string (regexp rep str &optional fixedcase literal subexp start)
   "Replace REGEXP by REP in string STR.

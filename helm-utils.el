@@ -529,7 +529,7 @@ Animation is used unless NOANIM is non--nil."
     (with-helm-current-buffer
       (unless helm-yank-point (setq helm-yank-point (point)))))
   (goto-char (point-min))
-  (helm-goto-char (point-at-bol lineno))
+  (helm-goto-char (pos-bol lineno))
   (unless noanim
     (helm-highlight-current-line)))
 
@@ -555,7 +555,7 @@ To use this add it to `helm-goto-line-before-hook'."
     (cl-loop with pos
           while (setq pos (next-single-property-change (point) 'helm-header))
           do (goto-char pos)
-          collect (buffer-substring-no-properties (point-at-bol)(point-at-eol))
+          collect (buffer-substring-no-properties (pos-bol)(pos-eol))
           do (forward-line 1))))
 
 (defun helm-handle-winner-boring-buffers ()
@@ -891,12 +891,12 @@ Optional arguments START, END and FACE are only here for debugging purpose."
                    (save-excursion
                      (forward-line
                       (- (car helm-highlight-matches-around-point-max-lines)))
-                     (point-at-bol))
+                     (pos-bol))
                    end-match
                    (save-excursion
                      (forward-line
                       (cdr helm-highlight-matches-around-point-max-lines))
-                     (point-at-bol))))
+                     (pos-bol))))
             ((or (null helm-highlight-matches-around-point-max-lines)
                  (zerop helm-highlight-matches-around-point-max-lines))
              (setq start-match start
@@ -906,7 +906,7 @@ Optional arguments START, END and FACE are only here for debugging purpose."
                    (save-excursion
                      (forward-line
                       helm-highlight-matches-around-point-max-lines)
-                     (point-at-bol))
+                     (pos-bol))
                    end-match start))
             ((> helm-highlight-matches-around-point-max-lines 0)
              (setq start-match start
@@ -914,7 +914,7 @@ Optional arguments START, END and FACE are only here for debugging purpose."
                    (save-excursion
                      (forward-line
                       helm-highlight-matches-around-point-max-lines)
-                     (point-at-bol)))))
+                     (pos-bol)))))
       (catch 'empty-line
         (let* ((regex-list (helm-remove-if-match
                             "\\`!" (helm-mm-split-pattern
@@ -1036,7 +1036,7 @@ Assume regexp is a pcre based regexp."
            (lambda ()
              (save-selected-window
                (with-helm-window
-                 (helm-aif (get-text-property (point-at-bol) 'help-echo)
+                 (helm-aif (get-text-property (pos-bol) 'help-echo)
                      (popup-tip (concat " " (abbreviate-file-name
                                              (replace-regexp-in-string "\n.*" "" it)))
                                 :around nil

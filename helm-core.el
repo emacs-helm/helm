@@ -2586,7 +2586,7 @@ was deleted and the candidates list not updated."
     (with-helm-window
       (or (helm-empty-buffer-p)
           (and (helm-end-of-source-p)
-               (eq (point-at-bol) (point-at-eol))
+               (eq (pos-bol) (pos-eol))
                (or
                 (save-excursion
                   (forward-line -1)
@@ -2683,7 +2683,7 @@ of current source only."
                                   (or (helm-pos-header-line-p) (eobp))
                                 (eobp)))
                    ;; Don't count empty lines maybe added by popup (bug#1370).
-                   unless (or (eq (point-at-bol) (point-at-eol))
+                   unless (or (eq (pos-bol) (pos-eol))
                               (helm-pos-header-line-p))
                    do (cl-incf ln)
                    do (forward-line 1) finally return ln))))))
@@ -3501,8 +3501,8 @@ version < emacs-28."
                  (tool-bar-lines . 0)
                  (left . ,(- (car pos)
                              (* (frame-char-width)
-                                (if (< (- (point) (point-at-bol)) prmt-size)
-                                    (- (point) (point-at-bol))
+                                (if (< (- (point) (pos-bol)) prmt-size)
+                                    (- (point) (pos-bol))
                                   prmt-size))))
                  ;; Try to put frame at the best possible place.
                  ;; Frame should be below point if enough
@@ -4431,7 +4431,7 @@ This function is used with sources built with `helm-source-sync'."
           ;; the position of line and go ahead,
           ;; letting `helm-search-match-part' checking if
           ;; pattern match against this line.
-          (prog1 (list (point-at-bol) (point-at-eol))
+          (prog1 (list (pos-bol) (pos-eol))
             (forward-line 1))
         ;; We could use here directly `re-search-forward'
         ;; on the regexp produced by `helm--mapconcat-pattern',
@@ -4444,8 +4444,8 @@ This function is used with sources built with `helm-source-sync'."
         ;; then search the corresponding line with the whole regexp,
         ;; which increase dramatically the speed of the search.
         (cl-loop while (re-search-forward partial-regexp nil t)
-                 for bol = (point-at-bol)
-                 for eol = (point-at-eol)
+                 for bol = (pos-bol)
+                 for eol = (pos-eol)
                  if (progn (goto-char bol)
                            (re-search-forward regexp eol t))
                  do (goto-char eol) and return t
@@ -5188,7 +5188,7 @@ If MATCH is a cons cell then insert the car as display with the
 cdr stored as real value in a `helm-realvalue' text property.
 Args NUM and SOURCE are also stored as text property when
 specified as respectively `helm-cand-num' and `helm-cur-source'."
-  (let ((start     (point-at-bol (point)))
+  (let ((start     (pos-bol (point)))
         (dispvalue (helm-candidate-get-display match))
         (realvalue (cdr-safe match))
         (map       (when helm-allow-mouse (make-sparse-keymap)))
@@ -5197,7 +5197,7 @@ specified as respectively `helm-cand-num' and `helm-cur-source'."
     (when (and (stringp dispvalue)
                (not (zerop (length dispvalue))))
       (funcall insert-function dispvalue)
-      (setq end (point-at-eol))
+      (setq end (pos-eol))
       ;; Some strings may handle another keymap prop.
       (remove-text-properties start end '(keymap nil))
       (put-text-property start end 'read-only nil)
@@ -5295,10 +5295,10 @@ additional info after the source name by overlay."
       (put-text-property start (point) 'helm-header-separator t)))
   (let ((start (point)))
     (insert name)
-    (put-text-property (point-at-bol)
-                       (point-at-eol) 'helm-header t)
+    (put-text-property (pos-bol)
+                       (pos-eol) 'helm-header t)
     (when display-string
-      (overlay-put (make-overlay (point-at-bol) (point-at-eol))
+      (overlay-put (make-overlay (pos-bol) (pos-eol))
                    'display display-string))
     (insert "\n")
     (add-text-properties start (point) '(face helm-source-header
@@ -5309,8 +5309,8 @@ additional info after the source name by overlay."
 (defun helm-insert-candidate-separator ()
   "Insert separator of candidates into the Helm buffer."
   (insert (propertize helm-candidate-separator 'face 'helm-separator))
-  (put-text-property (point-at-bol)
-                     (point-at-eol) 'helm-candidate-separator t)
+  (put-text-property (pos-bol)
+                     (pos-eol) 'helm-candidate-separator t)
   (insert "\n"))
 
 (defun helm-init-relative-display-line-numbers ()
@@ -5666,7 +5666,7 @@ DIRECTION is either \\='next or \\='previous."
                 (or (helm-pos-header-line-p)
                     (helm-pos-candidate-separator-p)))
       (forward-line (if (and (eq direction 'previous)
-                             (not (eq (point-at-bol) (point-min))))
+                             (not (eq (pos-bol) (point-min))))
                         -1 1)))))
 
 (defun helm-display-mode-line (source &optional force)
@@ -6170,7 +6170,7 @@ marking candidates."
     (when resumep
       (goto-char helm-selection-point))
     (move-overlay
-     helm-selection-overlay (point-at-bol)
+     helm-selection-overlay (pos-bol)
      (if (helm-pos-multiline-p)
          (let ((header-pos (helm-get-next-header-pos))
                (separator-pos (helm-get-next-candidate-separator-pos)))
@@ -6180,7 +6180,7 @@ marking candidates."
                     separator-pos)
                header-pos
                (point-max)))
-       (1+ (point-at-eol))))
+       (1+ (pos-eol))))
     (setq helm-selection-point (overlay-start helm-selection-overlay))
     (when (and helm-allow-mouse (null nomouse))
       (helm--bind-mouse-for-selection helm-selection-point))))
@@ -6331,12 +6331,12 @@ If action buffer is displayed, kill it."
 
 (defun helm-pos-header-line-p ()
   "Return t if the current line is a header line."
-  (or (get-text-property (point-at-bol) 'helm-header)
-      (get-text-property (point-at-bol) 'helm-header-separator)))
+  (or (get-text-property (pos-bol) 'helm-header)
+      (get-text-property (pos-bol) 'helm-header-separator)))
 
 (defun helm-pos-candidate-separator-p ()
   "Return t if the current line is a candidate separator."
-  (get-text-property (point-at-bol) 'helm-candidate-separator))
+  (get-text-property (pos-bol) 'helm-candidate-separator))
 
 
 ;;; Debugging
@@ -6422,17 +6422,17 @@ Optional argument SOURCE is a Helm source object."
   (with-helm-window
     (cond ((helm-pos-multiline-p)
            (helm-aif (helm-get-next-candidate-separator-pos)
-               (delete-region (point-at-bol)
-                              (1+ (progn (goto-char it) (point-at-eol))))
+               (delete-region (pos-bol)
+                              (1+ (progn (goto-char it) (pos-eol))))
              ;; last candidate
              (goto-char (helm-get-previous-candidate-separator-pos))
-             (delete-region (point-at-bol) (point-max)))
+             (delete-region (pos-bol) (point-max)))
            (when (helm-end-of-source-p)
              (goto-char (or (helm-get-previous-candidate-separator-pos)
                             (point-min)))
              (forward-line 1)))
           (t
-           (delete-region (point-at-bol) (1+ (point-at-eol)))
+           (delete-region (pos-bol) (1+ (pos-eol)))
            (when (helm-end-of-source-p t)
              (let ((headp (save-excursion
                             (forward-line -1)
@@ -6446,7 +6446,7 @@ Optional argument SOURCE is a Helm source object."
     (if (and (helm-pos-multiline-p) (null at-point))
         (null (helm-get-next-candidate-separator-pos))
       (forward-line (if at-point 0 n))
-      (or (eq (point-at-bol) (point-at-eol))
+      (or (eq (pos-bol) (pos-eol))
           (helm-pos-header-line-p)
           (if (< n 0) (bobp) (eobp))))))
 
@@ -6466,7 +6466,7 @@ Optional argument SOURCE is a Helm source object."
       (funcall func)
       (forward-line 0)
       (and realvalue
-           (put-text-property (point) (point-at-eol)
+           (put-text-property (point) (pos-eol)
                               'helm-realvalue realvalue))
       (and multiline
            (put-text-property (point)
@@ -6647,7 +6647,7 @@ To customize `helm-candidates-in-buffer' behaviour, use `search',
                          for cand = (apply get-line-fn
                                            (if (and pos-lst (listp pos-lst))
                                                pos-lst
-                                             (list (point-at-bol) (point-at-eol))))
+                                             (list (pos-bol) (pos-eol))))
                          when (and match-part-fn
                                    (not (get-text-property 0 'match-part cand)))
                          do (setq cand
@@ -6703,7 +6703,7 @@ computed by match-part-fn and stored in the match-part property."
 (defun helm-initial-candidates-from-candidate-buffer (get-line-fn limit)
   (cl-loop repeat limit
            until (eobp)
-           for line = (funcall get-line-fn (point-at-bol) (point-at-eol))
+           for line = (funcall get-line-fn (pos-bol) (pos-eol))
            when line collect line
            do (forward-line 1)))
 
@@ -7271,8 +7271,8 @@ Meaning of prefix ARG is the same as in `reposition-window'."
                                 (helm-get-next-header-pos)
                                 (point-max))
                           ;; Not multiline
-                          (1+ (point-at-eol))))
-         (o (make-overlay (point-at-bol) selection-end)))
+                          (1+ (pos-eol))))
+         (o (make-overlay (pos-bol) selection-end)))
     (overlay-put o 'priority 0)
     (overlay-put o 'face   'helm-visible-mark)
     (overlay-put o 'source source)
@@ -7394,7 +7394,7 @@ starting it is not needed."
                      (maxpoint  (or end (point-max))))
                 (while (< (point) maxpoint)
                   (helm-mark-current-line)
-                  (let* ((prefix (get-text-property (point-at-bol) 'helm-new-file))
+                  (let* ((prefix (get-text-property (pos-bol) 'helm-new-file))
                          (cand   (helm-get-selection
                                   nil (helm-get-attr 'marked-with-props src)
                                   src))
@@ -7537,7 +7537,7 @@ sources."
           (goto-char (point-min))
           (search-forward ov-src-name nil t)
           (while (and (search-forward ov-ml-str nil t)
-                      (cl-loop for ov in (overlays-at (point-at-bol 0))
+                      (cl-loop for ov in (overlays-at (pos-bol 0))
                                never (overlay-get ov 'visible-mark))
                       (helm-current-source-name= ov-src-name))
             (setq beg (match-beginning 0)
@@ -7545,7 +7545,7 @@ sources."
                           (match-end 0) (1+ (match-end 0))))
             ;; Calculate real value of candidate.
             ;; It can be nil if candidate have only a display value.
-            (let ((real (get-text-property (point-at-bol 0) 'helm-realvalue)))
+            (let ((real (get-text-property (pos-bol 0) 'helm-realvalue)))
               (if real
                   ;; Check if real value of current candidate is the same
                   ;; than the one stored in overlay.

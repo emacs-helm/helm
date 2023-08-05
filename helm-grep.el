@@ -712,7 +712,7 @@ WHERE can be `other-window' or `other-frame'."
                                    (if (eq major-mode 'helm-grep-mode)
                                        (current-buffer)
                                        helm-buffer)
-                                 (get-text-property (point-at-bol)
+                                 (get-text-property (pos-bol)
                                                     'helm-grep-fname))
                                (car split)))
          (tramp-fname  (file-remote-p (or helm-ff-default-directory
@@ -740,8 +740,8 @@ WHERE can be `other-window' or `other-frame'."
                when (save-excursion
                       (condition-case _err
                           (if helm-migemo-mode
-                              (helm-mm-migemo-forward reg (point-at-eol) t)
-                            (re-search-forward reg (point-at-eol) t))
+                              (helm-mm-migemo-forward reg (pos-eol) t)
+                            (re-search-forward reg (pos-eol) t))
                         (invalid-regexp nil)))
                collect (match-beginning 0) into pos-ls
                finally (when pos-ls (goto-char (apply #'min pos-ls))))
@@ -779,7 +779,7 @@ If N is positive go forward otherwise go backward."
                          (eq major-mode 'helm-moccur-mode)
                          (eq major-mode 'helm-occur-mode)))
          (sel (if allow-mode
-                  (buffer-substring (point-at-bol) (point-at-eol))
+                  (buffer-substring (pos-bol) (pos-eol))
                 (helm-get-selection nil t)))
          (current-line-list  (helm-grep-split-line sel))
          (current-fname      (nth 0 current-line-list))
@@ -793,13 +793,13 @@ If N is positive go forward otherwise go backward."
         (forward-line n) ; Go forward or backward depending of n value.
         ;; Exit when current-fname is not matched or in `helm-grep-mode'
         ;; the line is not a grep line i.e 'fname:num:tag'.
-        (setq sel (buffer-substring (point-at-bol) (point-at-eol)))
+        (setq sel (buffer-substring (pos-bol) (pos-eol)))
         (when helm-allow-mouse
           (helm--mouse-reset-selection-help-echo))
         (unless (or (string= current-fname
                              (car (helm-grep-split-line sel)))
                     (and (eq major-mode 'helm-grep-mode)
-                         (not (get-text-property (point-at-bol) 'helm-grep-fname))))
+                         (not (get-text-property (pos-bol) 'helm-grep-fname))))
           (funcall mark-maybe)
           (throw 'break nil))))
     (cond ((and (> n 0) (eobp))
@@ -807,7 +807,7 @@ If N is positive go forward otherwise go backward."
            (forward-line 0)
            (funcall mark-maybe))
           ((and (< n 0) (bobp))
-           (helm-aif (next-single-property-change (point-at-bol) 'helm-grep-fname)
+           (helm-aif (next-single-property-change (pos-bol) 'helm-grep-fname)
                (goto-char it)
              (forward-line 1))
            (funcall mark-maybe)))
@@ -898,7 +898,7 @@ If N is positive go forward otherwise go backward."
                     (buffer-substring (point) (point-max)))))
         (save-excursion
           (while (not (eobp))
-            (add-text-properties (point-at-bol) (point-at-eol)
+            (add-text-properties (pos-bol) (pos-eol)
                                  `(keymap ,map
                                           help-echo ,(concat
                                                       (get-text-property
@@ -1050,7 +1050,7 @@ Special commands:
   (setq next-error-last-buffer (current-buffer))
   (setq-local helm-current-error (point-marker))
   (helm-grep-action
-   (buffer-substring (point-at-bol) (point-at-eol)))
+   (buffer-substring (pos-bol) (pos-eol)))
   (helm-match-line-cleanup-pulse))
 
 (defun helm-grep-mode-jump-other-window-1 (arg)
@@ -1060,7 +1060,7 @@ Special commands:
                   (eq last-command 'helm-grep-mode-jump-other-window-backward))
           (forward-line arg))
         (save-selected-window
-          (helm-grep-action (buffer-substring (point-at-bol) (point-at-eol))
+          (helm-grep-action (buffer-substring (pos-bol) (pos-eol))
                             'other-window)
           (helm-match-line-cleanup-pulse)
           (recenter)))
@@ -1078,7 +1078,7 @@ Special commands:
   (interactive)
   (setq next-error-last-buffer (current-buffer))
   (setq-local helm-current-error (point-marker))
-  (let ((candidate (buffer-substring (point-at-bol) (point-at-eol))))
+  (let ((candidate (buffer-substring (pos-bol) (pos-eol))))
     (condition-case nil
         (progn (helm-grep-action candidate 'other-window)
                (helm-match-line-cleanup-pulse))

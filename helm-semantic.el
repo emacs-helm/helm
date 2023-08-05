@@ -124,7 +124,7 @@ you have completion on these functions with `C-M i' in the customize interface."
   (with-current-buffer helm-buffer
     (when (looking-at " ")
       (goto-char (next-single-property-change
-                  (point-at-bol) 'semantic-tag nil (point-at-eol))))
+                  (pos-bol) 'semantic-tag nil (pos-eol))))
     (let ((tag (get-text-property (point) 'semantic-tag)))
       (semantic-go-to-tag tag)
       (unless persistent

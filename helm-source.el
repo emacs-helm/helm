@@ -930,7 +930,7 @@ See `helm-candidates-in-buffer' for more infos.")
                          (when (helm-get-attr 'linum)
                            (while (not (eobp))
                              (add-text-properties
-                              (point-at-bol) (point-at-eol)
+                              (pos-bol) (pos-eol)
                               `(helm-linum ,count))
                              (cl-incf count)
                              (forward-line 1)))))))

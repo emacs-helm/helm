@@ -84,16 +84,16 @@ Argument TOBUF is the `helm-candidate-buffer'."
   (let (start end line)
     (goto-char (point-min))
     (while (search-forward "\n* " nil t)
-      (unless (search-forward "Menu:\n" (1+ (point-at-eol)) t)
-        (setq start (point-at-bol)
+      (unless (search-forward "Menu:\n" (1+ (pos-eol)) t)
+        (setq start (pos-bol)
               ;; Fix Bug#1503 by getting the invisible
               ;; info displayed on next line in long strings.
               ;; e.g "* Foo.\n   (line 12)" instead of
               ;;     "* Foo.(line 12)"
               end (or (save-excursion
-                        (goto-char (point-at-bol))
+                        (goto-char (pos-bol))
                         (re-search-forward "(line +[0-9]+)" nil t))
-                      (point-at-eol))
+                      (pos-eol))
               ;; Long string have a new line inserted before the
               ;; invisible spec, remove it.
               line (replace-regexp-in-string

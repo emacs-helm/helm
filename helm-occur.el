@@ -179,7 +179,7 @@ This happen only in `helm-source-occur' which is always related to
                     end (point-max))
             (helm-awhile (helm-get-next-header-pos)
               (when (string= name (buffer-substring-no-properties
-                                   (point-at-bol) (point-at-eol)))
+                                   (pos-bol) (pos-eol)))
                 (forward-line 1)
                 (setq beg (point)
                       end (or (helm-get-next-header-pos) (point-max)))
@@ -455,8 +455,8 @@ METHOD can be one of buffer, buffer-other-window, buffer-other-frame."
                when (save-excursion
                       (condition-case _err
                           (if helm-migemo-mode
-                              (helm-mm-migemo-forward reg (point-at-eol) t)
-                            (re-search-forward reg (point-at-eol) t))
+                              (helm-mm-migemo-forward reg (pos-eol) t)
+                            (re-search-forward reg (pos-eol) t))
                         (invalid-regexp nil)))
                collect (match-beginning 0) into pos-ls
                finally (when pos-ls (goto-char (apply #'min pos-ls)))))))
@@ -597,8 +597,8 @@ persistent action."
           (forward-line -2)
           (while (not (eobp))
             (if (helm-pos-header-line-p)
-                (let ((beg (point-at-bol))
-                      (end (point-at-eol)))
+                (let ((beg (pos-bol))
+                      (end (pos-eol)))
                   (set-text-properties beg (1+ end) nil)
                   (delete-region (1- beg) end))
               (helm-aif (setq buf-name (assoc-default
@@ -609,10 +609,10 @@ persistent action."
                                         'face 'helm-moccur-buffer
                                         'helm-realvalue (get-text-property (point) 'helm-realvalue)))
                     (add-text-properties
-                     (point-at-bol) (point-at-eol)
+                     (pos-bol) (pos-eol)
                      `(buffer-name ,buf-name))
                     (add-text-properties
-                     (point-at-bol) (point-at-eol)
+                     (pos-bol) (pos-eol)
                      `(keymap ,map
                               help-echo ,(concat
                                           (buffer-file-name
@@ -698,7 +698,7 @@ numbered.  The property \\='buffer-name is added to the whole string."
                                 ;; `helm-mm-search' puts point at eol.
                                 (forward-line 0)
                                 (re-search-forward "^\\([0-9]*\\)\\s-\\{1\\}\\(.*\\)$"
-                                                   (point-at-eol) t))
+                                                   (pos-eol) t))
                           (setq linum (string-to-number (match-string 1))
                                 mpart (match-string 2)))
                      ;; Match part after line number.

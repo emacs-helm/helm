@@ -1443,7 +1443,7 @@ DEST must be a directory.  SWITCHES when unspecified default to
         (when (re-search-backward "^[^[:cntrl:]]" nil t)
           (setq fname (helm-basename
                        (buffer-substring-no-properties
-                        (point) (point-at-eol))))))
+                        (point) (pos-eol))))))
       ;; Now format the string for the mode-line.
       (let ((ml-str (helm-ff--rsync-progress-bar progbar proc)))
         (setq ml-str (propertize ml-str 'help-echo
@@ -3134,7 +3134,7 @@ and should be used carefully elsewhere, or not at all, using
                                     (string-match-p "/[[:alpha:]]:/" match))
                                 (1+ (match-beginning 0))
                                 (match-beginning 0)))
-                 (buffer-substring-no-properties (point) (point-at-eol)))
+                 (buffer-substring-no-properties (point) (pos-eol)))
                fname)))))
 
 (defun helm-point-file-in-dired (file)
@@ -3212,7 +3212,7 @@ editing absolute fnames in previous Emacs versions."
                      "\\):")
              nil t)
         (list
-         (buffer-substring-no-properties (point-at-bol) (match-beginning 2))
+         (buffer-substring-no-properties (pos-bol) (match-beginning 2))
          (buffer-substring-no-properties (match-beginning 2) (match-end 2)))))))
 
 (defun helm-ff--get-host-from-tramp-invalid-fname (fname)
@@ -3297,7 +3297,7 @@ debugging purpose."
                 (or (looking-back "[/|]" (1- (point)))
                     (looking-back
                      (mapconcat (lambda (m) (format "[/|]%s" m)) methods "\\|")
-                     (point-at-bol))))
+                     (pos-bol))))
               (setq result nil)
             (setq result it)))))
     result))
@@ -3651,13 +3651,13 @@ later in the transformer."
             (helm-acase (match-string 0)
               ("*" (replace-match "")
                    (put-text-property
-                    (point-at-bol) (point-at-eol) 'helm-ff-exe t))
+                    (pos-bol) (pos-eol) 'helm-ff-exe t))
               ("@" (replace-match "")
                    (put-text-property
-                    (point-at-bol) (point-at-eol) 'helm-ff-sym t))
+                    (pos-bol) (pos-eol) 'helm-ff-sym t))
               ("/" (replace-match "")
                    (put-text-property
-                    (point-at-bol) (point-at-eol) 'helm-ff-dir t))
+                    (pos-bol) (pos-eol) 'helm-ff-dir t))
               (("=" "|" ">") (replace-match "")))))
         (while (re-search-forward "[\"]" nil t)
           (replace-match ""))
@@ -4379,7 +4379,7 @@ Arg FILE is the real part of candidate, a filename with no props."
   "Action transformer for `helm-source-find-files'."
   (let ((str-at-point (with-helm-current-buffer
                         (buffer-substring-no-properties
-                         (point-at-bol) (point-at-eol)))))
+                         (pos-bol) (pos-eol)))))
     (when (file-regular-p candidate)
       (setq actions (helm-append-at-nth
                      actions '(("Checksum File" . helm-ff-checksum)) 4)))
@@ -4578,7 +4578,7 @@ specifying the trash directory with TRASH-DIR arg."
                              (when (re-search-forward "^path=" nil t)
                                (let ((path (helm-url-unhex-string
                                             (buffer-substring-no-properties
-                                             (point) (point-at-eol)))))
+                                             (point) (pos-eol)))))
                                  (if (string-match "\\`/" path)
                                      ;; path is absolute
                                      path
@@ -4594,7 +4594,7 @@ Line number should be added at end of fname preceded with \":\".
 E.g. \"foo:12\"."
   (let ((linum (with-helm-current-buffer
                  (let ((str (buffer-substring-no-properties
-                             (point-at-bol) (point-at-eol))))
+                             (pos-bol) (pos-eol))))
                    (when (string-match ":\\([0-9]+:?\\)" str)
                      (match-string 1 str))))))
     (find-file candidate)
@@ -5291,7 +5291,7 @@ arg."
                                          (save-excursion
                                            (when (re-search-backward
                                                   (regexp-quote guess)
-                                                  (point-at-bol) t)
+                                                  (pos-bol) t)
                                              (point))))
                               it (point)))
              (full-path-p (and (stringp guess)
@@ -5666,7 +5666,7 @@ source is `helm-source-find-files'."
   "Try to find library path at point.
 Find inside `require' and `declare-function' sexp."
   (require 'find-func)
-  (let* ((beg-sexp (save-excursion (search-backward "(" (point-at-bol) t)))
+  (let* ((beg-sexp (save-excursion (search-backward "(" (pos-bol) t)))
          (end-sexp (save-excursion (ignore-errors (end-of-defun)) (point)))
          (sexp     (and beg-sexp end-sexp
                         (buffer-substring-no-properties

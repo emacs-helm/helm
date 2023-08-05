@@ -200,7 +200,7 @@ algorithm."
   (save-excursion
     (beginning-of-defun)
     (cadr (split-string (buffer-substring-no-properties
-                         (point-at-bol) (point-at-eol))))))
+                         (pos-bol) (pos-eol))))))
 
 (defun helm-cmd--get-preconfigured-commands (&optional dir)
   (let* ((helm-dir (or dir (helm-basedir (locate-library "helm"))))

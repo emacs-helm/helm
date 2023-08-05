@@ -241,7 +241,7 @@ The sexp should be an `all-the-icons' function with its args."
   (with-helm-window
     (let* ((fn (lambda ()
                  (let ((str (buffer-substring
-                             (point-at-bol) (point-at-eol))))
+                             (pos-bol) (pos-eol))))
                    (if helm-imenu-hide-item-type-name
                        (get-text-property 1 'type-name str)
                    (car (split-string str helm-imenu-delimiter))))))
@@ -311,7 +311,7 @@ The sexp should be an `all-the-icons' function with its args."
   (let ((cur (helm-get-selection))
         (mb (with-helm-current-buffer
               (save-excursion
-                (goto-char (point-at-bol))
+                (goto-char (pos-bol))
                  (point-marker)))))
     ;; Happen when cursor is on the line where a definition is. This
     ;; prevent jumping to the definition where we are already, instead

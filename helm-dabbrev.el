@@ -237,7 +237,7 @@ The search starts at (1- BEG) with a regexp starting with
 regexp matching syntactically any word or symbol.
 The possible false positives matching SEP-REGEXP at end are
 finally removed."
-  (let ((eol (point-at-eol)))
+  (let ((eol (pos-eol)))
     (save-excursion
       (goto-char (1- beg))
       (when (re-search-forward

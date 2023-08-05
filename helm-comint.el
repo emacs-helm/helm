@@ -102,7 +102,7 @@ If BUFFER is nil, use current buffer."
                                   (funcall it)
                                 (comint-next-prompt 1)))
               (push (list (buffer-substring-no-properties
-                           it (point-at-eol))
+                           it (pos-eol))
                           it (buffer-name) count)
                     result)
               (setq count (1+ count))))
@@ -218,7 +218,7 @@ See `helm-comint-prompts-list'."
             (member major-mode helm-comint-mode-list))
     (helm :sources 'helm-source-comint-input-ring
           :input (buffer-substring-no-properties (comint-line-beginning-position)
-                                                 (point-at-eol))
+                                                 (pos-eol))
           :buffer "*helm comint history*")))
 
 (provide 'helm-comint)

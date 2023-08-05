@@ -405,7 +405,7 @@ If BUFFER is nil, use current buffer."
                            (get-text-property (match-beginning 0) 'read-only))
                       (null eshell-highlight-prompt))
               (push (list (buffer-substring-no-properties
-                           it (point-at-eol))
+                           it (pos-eol))
                           it (buffer-name) count)
                     result)
               (setq count (1+ count))))

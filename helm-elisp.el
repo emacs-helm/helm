@@ -223,7 +223,7 @@ If `helm-turn-on-show-completion' is nil do nothing."
                     (or
                      (and (eq (char-before) ?\ )
                           (save-excursion
-                            (skip-syntax-backward " " (point-at-bol))
+                            (skip-syntax-backward " " (pos-bol))
                             (memq (symbol-at-point)
                                   helm-lisp-unquoted-function-list)))
                      (and (eq (char-before) ?\')
@@ -241,7 +241,7 @@ If `helm-turn-on-show-completion' is nil do nothing."
                     (and (eq (char-before) ?\')
                          (save-excursion
                            (forward-char (if (funcall fn-sym-p) -2 -1))
-                           (skip-syntax-backward " " (point-at-bol))
+                           (skip-syntax-backward " " (pos-bol))
                            (memq (symbol-at-point)
                                  helm-lisp-quoted-function-list)))
                     (eq (char-before) ?\())) ; no paren before str.
@@ -263,7 +263,7 @@ of symbol before point."
   (save-excursion
     (let (beg
           (end (point))
-          (boundary (field-beginning nil nil (point-at-bol))))
+          (boundary (field-beginning nil nil (pos-bol))))
       (if (re-search-backward (or regexp "\\_<") boundary t)
           (setq beg (match-end 0))
         (setq beg boundary))
@@ -458,7 +458,7 @@ documentation when SYM name is the same for function and variable."
                     (or force
                         (save-excursion
                           (end-of-line)
-                          (search-backward tap (point-at-bol) t)
+                          (search-backward tap (pos-bol) t)
                           (setq beg (point))
                           (looking-back "[^'`( ]" (1- (point)))))
                     (expand-file-name
@@ -494,7 +494,7 @@ double quote."
   (let* ((tap (thing-at-point 'filename)))
     (if (and tap (save-excursion
                    (end-of-line)
-                   (search-backward tap (point-at-bol) t)
+                   (search-backward tap (pos-bol) t)
                    (looking-back "[^'`( ]" (1- (point)))))
         (helm-complete-file-name-at-point)
       (helm-lisp-completion-at-point))))

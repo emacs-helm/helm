@@ -241,7 +241,7 @@ I.e. (identity (string-match \"foo\" \"foo bar\")) => t."
 This is the search function for `candidates-in-buffer' enabled sources.
 Use the same method as `helm-mm-3-match' except it search in buffer
 instead of matching on a string.
-i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
+i.e (identity (re-search-forward \"foo\" (pos-eol) t)) => t."
   (cl-loop with pat = (if (stringp pattern)
                           (helm-mm-3-get-patterns pattern)
                           pattern)
@@ -253,13 +253,13 @@ i.e (identity (re-search-forward \"foo\" (point-at-eol) t)) => t."
                            regex)
            when (eq (caar pat) 'not) return
            ;; Pass the job to `helm-search-match-part'.
-           (prog1 (list (point-at-bol) (point-at-eol))
+           (prog1 (list (pos-bol) (pos-eol))
              (forward-line 1))
            while (condition-case _err
                      (funcall searchfn1 (or regex1 "") nil t)
                    (invalid-regexp nil))
-           for bol = (point-at-bol)
-           for eol = (point-at-eol)
+           for bol = (pos-bol)
+           for eol = (pos-eol)
            if (cl-loop for (pred . str) in (cdr pat)
                        for regexp = (if (and helm-mm--match-on-diacritics
                                              (not (helm-mm-regexp-p str)))
