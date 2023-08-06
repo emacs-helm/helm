@@ -1016,9 +1016,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
      :name name
      :requires-pattern (if (and (stringp default)
                                 (string= default "")
-                                (or (eq require-match 'confirm)
-                                    (eq require-match
-                                        'confirm-after-completion)))
+                                (memq require-match
+                                      '(confirm confirm-after-completion)))
                            1 0)
      :fc-transformer (append (list (lambda (candidates _source)
                                      (helm-completion--initial-filter
