@@ -1020,13 +1020,14 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                 (memq require-match
                                       '(confirm confirm-after-completion)))
                            1 0)
-     :fc-transformer (append (list (lambda (candidates _source)
-                                     (helm-completion--initial-filter
-                                      (let ((all (copy-sequence candidates)))
-                                        (if (and sort-fn (> (length helm-pattern) 0))
-                                            (funcall sort-fn all)
-                                          candidates))
-                                      afun afix file-comp-p)))
+     :fc-transformer (append (and (or afix afun file-comp-p)
+                                  (list (lambda (candidates _source)
+                                          (helm-completion--initial-filter
+                                           (let ((all (copy-sequence candidates)))
+                                             (if (and sort-fn (> (length helm-pattern) 0))
+                                                 (funcall sort-fn all)
+                                               candidates))
+                                           afun afix file-comp-p))))
                              '(helm-cr-default-transformer))
      :quit-when-no-cand (eq require-match t)
      :nomark (null helm-comp-read-use-marked)
