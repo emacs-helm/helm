@@ -1018,7 +1018,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                 (memq require-match
                                       '(confirm confirm-after-completion)))
                            1 0)
-     :fc-transformer (append (and (or afix afun file-comp-p)
+     :fc-transformer (append (and (or afix afun file-comp-p sort-fn)
                                   (list (lambda (candidates _source)
                                           (helm-completion--initial-filter
                                            (let ((all (copy-sequence candidates)))
@@ -1894,7 +1894,9 @@ is used."
   "Compute COMPS with function AFUN or AFIX unless FILE-COMP-P non nil.
 
 If both AFUN and AFIX are provided only AFIX is used.
-When FILE-COMP-P is provided only filter out dot files."
+When FILE-COMP-P is provided only filter out dot files.
+
+When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
   ;; Filter out dot files in file completion. Normally COMPS should be a list of
   ;; string but in some cases it is given as a list of strings containing a list
   ;; of string e.g. ("a" "b" "c" ("d" "e" "f")) ; This happen in rgrep
@@ -1902,9 +1904,10 @@ When FILE-COMP-P is provided only filter out dot files."
   ;; avoid e.g. wrong-type argument: stringp '("d" "e" "f")
   ;; FIXME: If this create a new bug with completion-in-region, flatten COMPS
   ;; directly in the caller i.e. helm-completing-read-default-1.
-  (setq comps (helm-fast-remove-dups
-               (helm-flatten-list comps)
-               :test 'equal))
+  (when (or afix afun file-comp-p)
+    (setq comps (helm-fast-remove-dups
+                 (helm-flatten-list comps)
+                 :test 'equal)))
   (if file-comp-p
       (cl-loop for f in comps
                unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
