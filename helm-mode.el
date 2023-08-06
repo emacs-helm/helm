@@ -998,10 +998,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
          (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
          (sort-fn (unless (eq helm-completion-style 'helm-fuzzy)
                     (or
-                     ;; Emacs-27+
                      (completion-metadata-get
                       metadata 'display-sort-function)
-                     ;; Emacs-26
                      (lambda (candidates)
                        (sort candidates #'helm-generic-sort-fn))))))
     (helm-comp-read
