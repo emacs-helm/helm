@@ -539,12 +539,9 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
                        (eq must-match t)
                        (helm-cr--pattern-in-candidates-p lst pat))
                    lst
-                 (append (list (cons (concat (propertize
-                                              " " 'display
-                                              (propertize "[?]"
-                                                          'face 'helm-ff-prefix
-                                                          'unknown t))
-                                             pat)
+                 (append (list (cons (helm-aand (propertize "[?]" 'face 'helm-ff-prefix)
+                                                (propertize " " 'display it 'unknown t)
+                                                (concat it pat))
                                      pat))
                          lst))))))
 
