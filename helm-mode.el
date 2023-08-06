@@ -151,7 +151,16 @@ same as
 Note that you don't need to enable `ido-mode' for this to work, see
 `helm-mode' documentation."
   :group 'helm-mode
-  :type '(alist :key-type symbol :value-type symbol))
+  :type '(alist
+          :key-type symbol
+          :value-type (choice
+                       function
+                       (list :tag "Specify the completing-read and read-file-name handlers"
+                        (choice
+                         (const :tag "Use default helm completing-read handler" default)
+                         (function :tag "Use this helm completing-read function"))
+                        (function :tag "Use this helm read file name function"))
+                       (other :tag "Disabled" nil))))
 
 (defcustom helm-comp-read-case-fold-search helm-case-fold-search
   "Default Local setting of `helm-case-fold-search' for `helm-comp-read'.
