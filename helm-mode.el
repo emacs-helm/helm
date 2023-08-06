@@ -996,13 +996,14 @@ dynamically otherwise use `helm-completing-read-default-2'."
          (afix (or (plist-get completion-extra-properties :affixation-function)
                    (completion-metadata-get metadata 'affixation-function)))
          (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
-         (sort-fn (or
-                   ;; Emacs-27+
-                   (completion-metadata-get
-                    metadata 'display-sort-function)
-                   ;; Emacs-26
-                   (lambda (candidates)
-                     (sort candidates #'helm-generic-sort-fn)))))
+         (sort-fn (unless (eq helm-completion-style 'helm-fuzzy)
+                    (or
+                     ;; Emacs-27+
+                     (completion-metadata-get
+                      metadata 'display-sort-function)
+                     ;; Emacs-26
+                     (lambda (candidates)
+                       (sort candidates #'helm-generic-sort-fn))))))
     (helm-comp-read
      prompt collection
      :test test
