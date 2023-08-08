@@ -548,7 +548,7 @@ If COLLECTION is an `obarray', a TEST should be needed. See `obarray'."
 (defun helm-comp-read--move-to-first-real-candidate ()
   (helm-aif (helm-get-selection nil 'withprop)
       ;; Avoid error with candidates with an image as display (Bug#2296).
-      (when (get-text-property 0 'helm-new-file it)
+      (when (helm-candidate-prefixed-p it)
         (helm-next-line))))
 
 (defun helm-cr-default (default cands)

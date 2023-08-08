@@ -4467,8 +4467,7 @@ This function is used with sources built with `helm-source-sync'."
 (defun helm-score-candidate-for-pattern (candidate pattern)
   "Assign score to CANDIDATE according to PATTERN."
   ;; Unknown candidates always go on top.
-  (if (or (get-text-property 0 'helm-new-file candidate)
-          (get-text-property 0 'unknown candidate))
+  (if (helm-candidate-prefixed-p candidate)
       200.00
     (funcall helm-fuzzy-default-score-fn candidate pattern)))
 
@@ -7406,7 +7405,8 @@ starting it is not needed."
                      (maxpoint  (or end (point-max))))
                 (while (< (point) maxpoint)
                   (helm-mark-current-line)
-                  (let* ((prefix (get-text-property (pos-bol) 'helm-new-file))
+                  (let* ((prefix (or (get-text-property (pos-bol) 'helm-new-file)
+                                     (get-text-property (pos-bol) 'unknown)))
                          (cand   (helm-get-selection
                                   nil (helm-get-attr 'marked-with-props src)
                                   src))

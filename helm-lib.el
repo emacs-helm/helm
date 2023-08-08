@@ -1656,6 +1656,16 @@ I.e. when using `helm-next-line' and friends in BODY."
     (let (helm-follow-mode-persistent)
       (progn ,@body))))
 
+(defun helm-candidate-prefixed-p (candidate)
+  "Return non nil when CANDIDATE is prefixed.
+
+Candidates files are prefixed with [+] or a specific icon when candidate is a
+non existing file, in other places candidates may be prefixed with an unknown
+symbol [?], these candidate have the text property <helm-new-file> or <unknown>
+property."
+  (or (get-text-property 0 'helm-new-file candidate)
+      (get-text-property 0 'unknown candidate)))
+
 ;; Completion styles related functions
 ;;
 (defun helm--setup-completion-styles-alist ()
