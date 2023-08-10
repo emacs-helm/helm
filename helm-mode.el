@@ -961,7 +961,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
   '((buffer . (metadata
                (affixation-function . helm-completing-read-buffer-affix)
                (category . buffer)
-               (flags . (helm-completing-read--buffer-lgst-mode)))))
+               (flags . (helm-completing-read--buffer-lgst-mode))))
+    (symbol-help . (metadata
+                    (affixation-function . helm--symbol-completion-table-affixation)
+                    (category . symbol-help))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -1982,8 +1985,6 @@ When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
       (cl-loop for f in comps
                unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
                collect f)
-    (when (eq afix 'help--symbol-completion-table-affixation)
-      (setq afix 'helm--symbol-completion-table-affixation))
     (cond (afix (let ((affixations (funcall afix comps)))
                   (if (functionp affixations)
                       (cl-loop for comp in comps
