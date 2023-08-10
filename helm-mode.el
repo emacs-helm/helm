@@ -954,6 +954,7 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     :default (or default ""))
      (helm-mode--keyboard-quit)))
 
+
 ;;; Extra metadata for completions-detailed
 ;;
 ;;
@@ -1021,6 +1022,57 @@ behavior as emacs vanilla.")
                             'font-lock-doc-face))
               prefix suffix)))))
 
+(defun helm--symbol-completion-table-affixation (_completions)
+  "Override `help--symbol-completion-table-affixation'.
+
+Normally affixation functions use COMPLETIONS as arg, and return a list of
+modified COMPLETIONS. Now we allow affixations functions to return a
+function instead, just like annotation functions. The function should return a
+list of three elements like (comp prefix suffix). This increase significantly
+the speed avoiding one useless loop on complete list of candidates.
+
+Returns a function and not a list of completions.
+
+It affects actually describe-variable/function/command/symbol functions.
+It uses `helm-get-first-line-documentation' which allow providing documentation
+for `describe-variable' symbols and align properly documentation when helm style
+is used."
+  (lambda (comp)
+    (require 'help-fns)
+    (let* ((sym (intern comp))
+           ;; When using in-buffer implementation we should have the
+           ;; longest len to align documentation for free.
+           ;; Check for style as well in case user switches to emacs
+           ;; style and a candidate buffer remains (with its local vars
+           ;; still available).
+           (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
+                         (buffer-local-value
+                          'helm-candidate-buffer-longest-len
+                          (get-buffer (or (helm-candidate-buffer)
+                                          ;; Return 0 in this case and don't
+                                          ;; fail with a nil arg with
+                                          ;; get-buffer.
+                                          helm-buffer)))))
+           (sep (if (or (null max-len) (zerop max-len))
+                    " --"               ; Default separator.
+                  (make-string (- max-len (length comp)) ? )))
+           (doc (ignore-errors
+                  (helm-get-first-line-documentation sym)))
+           (symbol-class (help--symbol-class sym)))
+      (list (if (or (symbol-function sym) (boundp sym) (facep sym))
+                comp
+              ;; Not already defined function. To test add an advice on a non
+              ;; existing function.
+              (propertize comp 'face 'helm-completion-invalid))
+            (propertize
+             (format "%-4s" (or (and (not (string= symbol-class ""))
+                                     symbol-class)
+                                "i"))
+             'face 'completions-annotations)
+            (if doc (propertize (format "%s%s" sep doc)
+                                'face 'completions-annotations)
+              "")))))
+
 ;;; Generic completing read
 ;;
 ;;
@@ -1911,57 +1963,6 @@ The `helm-find-files' history `helm-ff-history' is used here."
   (if (memq helm-completion-style '(helm helm-fuzzy))
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
-
-(defun helm--symbol-completion-table-affixation (_completions)
-  "Override `help--symbol-completion-table-affixation'.
-
-Normally affixation functions use COMPLETIONS as arg, and return a list of
-modified COMPLETIONS. Now we allow affixations functions to return a
-function instead, just like annotation functions. The function should return a
-list of three elements like (comp prefix suffix). This increase significantly
-the speed avoiding one useless loop on complete list of candidates.
-
-Returns a function and not a list of completions.
-
-It affects actually describe-variable/function/command/symbol functions.
-It uses `helm-get-first-line-documentation' which allow providing documentation
-for `describe-variable' symbols and align properly documentation when helm style
-is used."
-  (lambda (comp)
-    (require 'help-fns)
-    (let* ((sym (intern comp))
-           ;; When using in-buffer implementation we should have the
-           ;; longest len to align documentation for free.
-           ;; Check for style as well in case user switches to emacs
-           ;; style and a candidate buffer remains (with its local vars
-           ;; still available).
-           (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
-                         (buffer-local-value
-                          'helm-candidate-buffer-longest-len
-                          (get-buffer (or (helm-candidate-buffer)
-                                          ;; Return 0 in this case and don't
-                                          ;; fail with a nil arg with
-                                          ;; get-buffer.
-                                          helm-buffer)))))
-           (sep (if (or (null max-len) (zerop max-len))
-                    " --"               ; Default separator.
-                  (make-string (- max-len (length comp)) ? )))
-           (doc (ignore-errors
-                  (helm-get-first-line-documentation sym)))
-           (symbol-class (help--symbol-class sym)))
-      (list (if (or (symbol-function sym) (boundp sym) (facep sym))
-                comp
-              ;; Not already defined function. To test add an advice on a non
-              ;; existing function.
-              (propertize comp 'face 'helm-completion-invalid))
-            (propertize
-             (format "%-4s" (or (and (not (string= symbol-class ""))
-                                     symbol-class)
-                                "i"))
-             'face 'completions-annotations)
-            (if doc (propertize (format "%s%s" sep doc)
-                                'face 'completions-annotations)
-              "")))))
 
 (defun helm-completion--initial-filter (comps afun afix file-comp-p)
   "Compute COMPS with function AFUN or AFIX unless FILE-COMP-P non nil.
