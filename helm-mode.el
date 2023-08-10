@@ -985,6 +985,8 @@ behavior as emacs vanilla.")
 
 (defvar helm-completing-read-command-categories
   '(("customize-variable" . symbol-help)
+    ("find-function" . symbol-help)
+    ("find-variable" . symbol-help)
     ("kill-buffer" . buffer))
   "An alist to specify metadata category by command.
 
