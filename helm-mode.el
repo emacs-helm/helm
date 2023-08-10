@@ -1076,20 +1076,24 @@ is used."
                   (make-string (- max-len (length comp)) ? )))
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
-           (symbol-class (help--symbol-class sym)))
+           (symbol-class (help--symbol-class sym))
+           (group (helm-group-p sym)))
       (list
        ;; Symbol (comp).
        (if (or (symbol-function sym) (boundp sym)
-               (facep sym) (helm-group-p sym))
+               (facep sym) group)
            comp
          ;; Not already defined function. To test add an advice on a non
          ;; existing function.
          (propertize comp 'face 'helm-completion-invalid))
        ;; Prefix.
        (helm-aand (propertize
-                   (format "%-4s" (or (and (not (string= symbol-class ""))
-                                           symbol-class)
-                                      "i"))
+                   (format "%-4s" (cond ((and symbol-class group)
+                                         (concat "g" symbol-class))
+                                        ((and (not (string= symbol-class ""))
+                                              symbol-class))
+                                        (group "g")
+                                        (t "i")))
                    'face 'completions-annotations)
                   (propertize " " 'display it))
        ;; Suffix.
