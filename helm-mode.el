@@ -1020,7 +1020,8 @@ behavior as emacs vanilla.")
                comp 'face (if fname
                               'font-lock-builtin-face
                             'font-lock-doc-face))
-              prefix suffix)))))
+              (propertize " " 'display prefix)
+              (propertize " " 'display suffix))))))
 
 (defun helm--symbol-completion-table-affixation (_completions)
   "Override `help--symbol-completion-table-affixation'.
