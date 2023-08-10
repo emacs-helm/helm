@@ -244,8 +244,13 @@ engine beeing completely different and also much faster."
                         (goto-char (setq pos prev-pos))
                         (helm-aif (thing-at-point 'symbol) (regexp-quote it)))))
           (narrow-to-region beg end)))
-      (unwind-protect
+      (let ((helm-initial-input nil))
+        (unless def
+          (setq helm-initial-input (helm-aif (thing-at-point 'symbol)
+                                       (regexp-quote it))))
+        (unwind-protect
            (helm :sources 'helm-source-occur
+                 :input helm-initial-input
                  :buffer "*helm occur*"
                  :history 'helm-occur-history
                  :default (or def (helm-aif (thing-at-point 'symbol)
@@ -256,7 +261,7 @@ engine beeing completely different and also much faster."
                                                  (or pos (point)))))
                  :truncate-lines helm-occur-truncate-lines)
         (deactivate-mark t)
-        (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate)))))
+        (remove-hook 'helm-after-update-hook 'helm-occur--select-closest-candidate))))))
 
 ;;;###autoload
 (defun helm-occur-visible-buffers ()
