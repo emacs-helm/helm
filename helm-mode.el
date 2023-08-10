@@ -965,7 +965,10 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
                (flags . (helm-completing-read--buffer-lgst-mode))))
     (symbol-help . (metadata
                     (affixation-function . helm--symbol-completion-table-affixation)
-                    (category . symbol-help))))
+                    (category . symbol-help)))
+    (package . (metadata
+                (affixation-function . helm-completion-package-affix)
+                (category . package))))
   "Extra metadata for completing-read.
 
 Alist composed of (CATEGORY . METADATA).
@@ -988,7 +991,9 @@ behavior as emacs vanilla.")
     ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
     ("find-variable" . symbol-help)
-    ("kill-buffer" . buffer))
+    ("kill-buffer" . buffer)
+    ("package-install" . package)
+    ("describe-package" . package))
   "An alist to specify metadata category by command.
 
 Some commands provide a completion-table with no category specified in metadata,
@@ -1093,6 +1098,20 @@ is used."
                        (format "%s%s" sep doc) 'face 'completions-annotations)
                       (propertize " " 'display it))
          "")))))
+
+(defun helm-completion-package-affix (_completions)
+  (lambda (comp)
+    (let* ((sym (intern-soft comp))
+           (desc (package-desc-summary (package-get-descriptor sym)))
+           (sep (make-string (1+ (- (buffer-local-value
+                                     'helm-candidate-buffer-longest-len
+                                     (get-buffer (helm-candidate-buffer)))
+                                    (length comp)))
+                             ? )))
+      (list comp
+            ""
+            (helm-aand (propertize (concat sep desc) 'face 'font-lock-warning-face)
+                       (propertize " " 'display it))))))
 
 ;;; Generic completing read
 ;;
