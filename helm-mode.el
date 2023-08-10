@@ -985,6 +985,7 @@ behavior as emacs vanilla.")
 
 (defvar helm-completing-read-command-categories
   '(("customize-variable" . symbol-help)
+    ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
     ("find-variable" . symbol-help)
     ("kill-buffer" . buffer))
@@ -1073,7 +1074,8 @@ is used."
            (symbol-class (help--symbol-class sym)))
       (list
        ;; Symbol (comp).
-       (if (or (symbol-function sym) (boundp sym) (facep sym))
+       (if (or (symbol-function sym) (boundp sym)
+               (facep sym) (helm-group-p sym))
            comp
          ;; Not already defined function. To test add an advice on a non
          ;; existing function.

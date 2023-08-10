@@ -423,6 +423,8 @@ documentation when SYM name is the same for function and variable."
                       ("describe-variable"
                        (documentation-property sym 'variable-documentation t))
                       (_ (documentation sym t))))
+                   ((pred helm-group-p) (documentation-property
+                                         sym 'group-documentation t))
                    ((pred fboundp)  (documentation sym t))
                    ((pred boundp)   (documentation-property
                                      sym 'variable-documentation t))
@@ -436,7 +438,7 @@ documentation when SYM name is the same for function and variable."
         (truncate-string-to-width
          (substitute-command-keys (car (split-string doc "\n")))
          end-column nil nil t)
-      (if (or (symbol-function sym) (boundp sym) (facep sym))
+      (if (or (symbol-function sym) (boundp sym) (facep sym) (helm-group-p sym))
           "Not documented"
         ;; Symbol exist but has no definition yet e.g.
         ;; (advice-add 'foo-test :override (lambda () (message "invalid
