@@ -1060,19 +1060,26 @@ is used."
            (doc (ignore-errors
                   (helm-get-first-line-documentation sym)))
            (symbol-class (help--symbol-class sym)))
-      (list (if (or (symbol-function sym) (boundp sym) (facep sym))
-                comp
-              ;; Not already defined function. To test add an advice on a non
-              ;; existing function.
-              (propertize comp 'face 'helm-completion-invalid))
-            (propertize
-             (format "%-4s" (or (and (not (string= symbol-class ""))
-                                     symbol-class)
-                                "i"))
-             'face 'completions-annotations)
-            (if doc (propertize (format "%s%s" sep doc)
-                                'face 'completions-annotations)
-              "")))))
+      (list
+       ;; Symbol (comp).
+       (if (or (symbol-function sym) (boundp sym) (facep sym))
+           comp
+         ;; Not already defined function. To test add an advice on a non
+         ;; existing function.
+         (propertize comp 'face 'helm-completion-invalid))
+       ;; Prefix.
+       (helm-aand (propertize
+                   (format "%-4s" (or (and (not (string= symbol-class ""))
+                                           symbol-class)
+                                      "i"))
+                   'face 'completions-annotations)
+                  (propertize " " 'display it))
+       ;; Suffix.
+       (if doc
+           (helm-aand (propertize
+                       (format "%s%s" sep doc) 'face 'completions-annotations)
+                      (propertize " " 'display it))
+         "")))))
 
 ;;; Generic completing read
 ;;
