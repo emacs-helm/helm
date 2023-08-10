@@ -1338,6 +1338,12 @@ using LOAD-PATH."
 See `kill-new' for argument REPLACE."
   (kill-new (helm-stringify candidate) replace))
 
+(defun helm-group-p (symbol)
+  "Return non nil when SYMBOL is a group."
+  (or (and (get symbol 'custom-loads)
+           (not (get symbol 'custom-autoload)))
+      (get symbol 'custom-group)))
+
 
 ;;; Modes
 ;;
