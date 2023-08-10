@@ -954,6 +954,69 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
     :default (or default ""))
      (helm-mode--keyboard-quit)))
 
+;;; Extra metadata for completions-detailed
+;;
+;;
+(defvar helm-completing-read-extra-metadata
+  '((buffer . (metadata
+               (affixation-function . helm-completing-read-buffer-affix)
+               (category . buffer)
+               (flags . (helm-completing-read--buffer-lgst-mode)))))
+  "Extra metadata for completing-read.
+
+Alist composed of (CATEGORY . METADATA).
+CATEGORY is extracted from original metadata and METADATA is a list composed
+like this:
+    (metadata (affixation-function . fun)
+              (annotation-function . fun)
+              (category . category)
+              (flags . flags))
+
+FLAGS is a list of variables to renitialize to nil when exiting or quitting.
+
+It is used to add `affixation-function' or `annotation-function' if original
+metadata doesn't have some and `completions-detailed' is non nil.
+When using emacs as `helm-completion-style', this has no effect, keeping same
+behavior as emacs vanilla.")
+
+(defvar helm-completing-read--buffer-lgst-mode nil)
+(defun helm-completing-read-buffer-affix (completions)
+  (let ((len-mode (or helm-completing-read--buffer-lgst-mode
+                      (cl-loop for bname in completions
+                               maximize (with-current-buffer bname
+                                          (length (symbol-name major-mode)))))))
+    (lambda (comp)
+      (let* ((fname (buffer-file-name (get-buffer comp)))
+             (prefix (propertize
+                      (if fname " f " "nf ")
+                      'face 'font-lock-property-name-face))
+             (mode (with-current-buffer comp
+                     (propertize
+                      (symbol-name major-mode) 'face 'font-lock-warning-face)))
+             (size (helm-buffer-size (get-buffer comp)))
+             (len (buffer-local-value
+                   'helm-candidate-buffer-longest-len
+                   (helm-candidate-buffer)))
+             (suffix (format "%s%s%s%s%s(in %s)"
+                             (make-string (1+ (- len (length comp))) ? )
+                             (propertize size
+                                         'face 'helm-buffer-size)
+                             (make-string (- 7 (length size)) ? )
+                             mode
+                             (make-string (1+ (- len-mode (length mode))) ? )
+                             (helm-aif fname
+                                 (propertize
+                                  (abbreviate-file-name (file-name-directory it))
+                                  'face 'font-lock-type-face)
+                               (propertize
+                                (with-current-buffer comp
+                                  (abbreviate-file-name default-directory))
+                                'face 'font-lock-doc-face)))))
+        (list (propertize
+               comp 'face (if fname
+                              'font-lock-builtin-face
+                            'font-lock-doc-face))
+              prefix suffix)))))
 
 ;;; Generic completing read
 ;;
@@ -998,46 +1061,57 @@ dynamically otherwise use `helm-completing-read-default-2'."
                      (completion-metadata-get
                       metadata 'display-sort-function)
                      (lambda (candidates)
-                       (sort candidates #'helm-generic-sort-fn))))))
-    (helm-comp-read
-     prompt collection
-     :test test
-     :history history
-     :reverse-history helm-mode-reverse-history
-     :input-history history
-     :must-match require-match
-     :alistp alistp
-     :diacritics helm-mode-ignore-diacritics
-     :help-message #'helm-comp-read-help-message
-     :name name
-     :requires-pattern (if (and (stringp default)
-                                (string= default "")
-                                (memq require-match
-                                      '(confirm confirm-after-completion)))
-                           1 0)
-     :fc-transformer (append (and (or afix afun file-comp-p sort-fn)
-                                  (list (lambda (candidates _source)
-                                          (helm-completion--initial-filter
-                                           (if (and sort-fn (> (length helm-pattern) 0))
-                                               (funcall sort-fn candidates)
-                                             candidates)
-                                           afun afix file-comp-p))))
-                             '(helm-cr-default-transformer))
-     :quit-when-no-cand (eq require-match t)
-     :nomark (null helm-comp-read-use-marked)
-     :candidates-in-buffer cands-in-buffer
-     :get-line get-line
-     :exec-when-only-one exec-when-only-one
-     :fuzzy (eq helm-completion-style 'helm-fuzzy)
-     :buffer buffer
-     ;; If DEF is not provided, fallback to empty string
-     ;; to avoid `thing-at-point' to be appended on top of list
-     :default (or default "")
-     ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
-     ;; if regexp-quote is not used.
-     ;; when init is added to history, it will be unquoted by
-     ;; helm-comp-read.
-     :initial-input initial-input)))
+                       (sort candidates #'helm-generic-sort-fn)))))
+         flags)
+    (helm-aif (and completions-detailed
+                   (assoc-default (completion-metadata-get metadata 'category)
+                                  helm-completing-read-extra-metadata))
+        (progn
+          (setq metadata it)
+          (setq afun (completion-metadata-get metadata 'annotation-function)
+                afix (completion-metadata-get metadata 'affixation-function)
+                flags (completion-metadata-get metadata 'flags))))
+    (unwind-protect
+         (helm-comp-read
+          prompt collection
+          :test test
+          :history history
+          :reverse-history helm-mode-reverse-history
+          :input-history history
+          :must-match require-match
+          :alistp alistp
+          :diacritics helm-mode-ignore-diacritics
+          :help-message #'helm-comp-read-help-message
+          :name name
+          :requires-pattern (if (and (stringp default)
+                                     (string= default "")
+                                     (memq require-match
+                                           '(confirm confirm-after-completion)))
+                                1 0)
+          :fc-transformer (append (and (or afix afun file-comp-p sort-fn)
+                                       (list (lambda (candidates _source)
+                                               (helm-completion--initial-filter
+                                                (if (and sort-fn (> (length helm-pattern) 0))
+                                                    (funcall sort-fn candidates)
+                                                  candidates)
+                                                afun afix file-comp-p))))
+                                  '(helm-cr-default-transformer))
+          :quit-when-no-cand (eq require-match t)
+          :nomark (null helm-comp-read-use-marked)
+          :candidates-in-buffer cands-in-buffer
+          :get-line get-line
+          :exec-when-only-one exec-when-only-one
+          :fuzzy (eq helm-completion-style 'helm-fuzzy)
+          :buffer buffer
+          ;; If DEF is not provided, fallback to empty string
+          ;; to avoid `thing-at-point' to be appended on top of list
+          :default (or default "")
+          ;; Fail with special characters (e.g in gnus "nnimap+gmail:")
+          ;; if regexp-quote is not used.
+          ;; when init is added to history, it will be unquoted by
+          ;; helm-comp-read.
+          :initial-input initial-input)
+      (dolist (f flags) (set f nil)))))
 
 (defun helm-completing-read-default-2
     (prompt collection predicate require-match
