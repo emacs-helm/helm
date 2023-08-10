@@ -983,6 +983,15 @@ metadata doesn't have some and `completions-detailed' is non nil.
 When using emacs as `helm-completion-style', this has no effect, keeping same
 behavior as emacs vanilla.")
 
+(defvar helm-completing-read-command-categories
+  '(("customize-variable" . symbol-help)
+    ("kill-buffer" . buffer))
+  "An alist to specify metadata category by command.
+
+Some commands provide a completion-table with no category specified in metadata,
+we allow here specifying the category of the completion provided by a specific
+command.  The command should be specified as a string and the category as a symbol.")
+
 (defvar helm-completing-read--buffer-lgst-mode nil)
 (defun helm-completing-read-buffer-affix (completions)
   (let ((len-mode (or helm-completing-read--buffer-lgst-mode
@@ -1126,6 +1135,10 @@ dynamically otherwise use `helm-completing-read-default-2'."
                      (lambda (candidates)
                        (sort candidates #'helm-generic-sort-fn)))))
          flags)
+    (helm-aif (assoc-default name helm-completing-read-command-categories)
+        (unless (completion-metadata-get metadata 'category)
+          (setq metadata
+                `(metadata (category . ,it)))))
     (helm-aif (and completions-detailed
                    (assoc-default (completion-metadata-get metadata 'category)
                                   helm-completing-read-extra-metadata))
