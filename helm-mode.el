@@ -2313,10 +2313,8 @@ Can be used for `completion-in-region-function' by advicing it with an
                                                 (string= input ""))
                                       " "))
                  (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
-                                  (helm-guess-filename-at-point)
-                                  ;; Assume that when `afun' and `predicate' are null
-                                  ;; we are in filename completion.
-                                  (and (null afun) (null predicate))))
+                                  (eq (plist-get completion-extra-properties :category) 'file)
+                                  (helm-guess-filename-at-point)))
                  ;; `completion-all-completions' store the base-size in the last `cdr',
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
                  base-size
