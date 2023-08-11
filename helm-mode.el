@@ -1007,14 +1007,20 @@ command.  The command should be specified as a string and the category as a symb
                                maximize (with-current-buffer bname
                                           (length (symbol-name major-mode)))))))
     (lambda (comp)
-      (let* ((fname (buffer-file-name (get-buffer comp)))
-             (prefix (propertize
-                      (if fname " f " "nf ")
-                      'face 'font-lock-property-name-face))
+      (let* ((buf (get-buffer comp))
+             (fname (buffer-file-name buf))
+             (modified (and fname (buffer-modified-p buf)))
+             (prefix (cond (modified
+                            (propertize
+                             "fm " 'face 'font-lock-comment-face))
+                           (fname
+                            (propertize
+                             " f " 'face 'font-lock-property-name-face))
+                           (t (propertize "nf " 'face 'font-lock-doc-face))))
              (mode (with-current-buffer comp
                      (propertize
                       (symbol-name major-mode) 'face 'font-lock-warning-face)))
-             (size (helm-buffer-size (get-buffer comp)))
+             (size (helm-buffer-size buf))
              (len (buffer-local-value
                    'helm-candidate-buffer-longest-len
                    (helm-candidate-buffer)))
