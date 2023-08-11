@@ -2025,7 +2025,7 @@ If both AFUN and AFIX are provided only AFIX is used.
 When FILE-COMP-P is provided only filter out dot files.
 
 When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
-  ;; Filter out dot files in file completion. Normally COMPS should be a list of
+  ;; Normally COMPS should be a list of
   ;; string but in some cases it is given as a list of strings containing a list
   ;; of string e.g. ("a" "b" "c" ("d" "e" "f")) ; This happen in rgrep
   ;; (bug#2607) and highlight-* fns (bug #2610), so ensure the list is flattened to
@@ -2036,43 +2036,48 @@ When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
     (setq comps (helm-fast-remove-dups
                  (helm-flatten-list comps)
                  :test 'equal)))
-  (if file-comp-p
-      (cl-loop for f in comps
-               unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
-               collect f)
-    (cond (afix (let ((affixations (funcall afix comps)))
-                  (if (functionp affixations)
-                      (cl-loop for comp in comps
-                               for cand = (funcall affixations comp)
-                               collect (cons (propertize (concat (nth 1 cand)  ;prefix
-                                                                 (nth 0 cand)  ;comp
-                                                                 (nth 2 cand)) ;suffix
-                                                         'match-part (nth 0 cand)) 
-                                             comp))
-                    (cl-loop for (comp prefix suffix) in affixations
-                             collect (cons (propertize
-                                            (concat prefix comp suffix)
-                                            'match-part comp)
-                                           comp)))))
-          (afun
-           ;; Add annotation at end of
-           ;; candidate if needed, e.g. foo<f>, this happen when
-           ;; completing against a quoted symbol.
-           (mapcar (lambda (s)
-                     (let ((ann (funcall afun s)))
-                       (if ann
-                           (cons
-                            (concat
-                             s
-                             (propertize
-                              " " 'display
-                              (propertize
-                               ann
-                               'face 'completions-annotations)))
-                            s)
-                         s)))
-                   comps))
-          (t comps))))
+  ;; Filter out dot files in file completion.
+  ;; We were previously exiting directly without handling afix and afun, but
+  ;; maybe some file completion tables have an afix or afun in their metadata so
+  ;; let them a chance to run these functions if some.
+  (when file-comp-p
+    (setq comps
+          (cl-loop for f in comps
+                   unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
+                   collect f)))
+  (cond (afix (let ((affixations (funcall afix comps)))
+                (if (functionp affixations)
+                    (cl-loop for comp in comps
+                             for cand = (funcall affixations comp)
+                             collect (cons (propertize (concat (nth 1 cand) ;prefix
+                                                               (nth 0 cand) ;comp
+                                                               (nth 2 cand)) ;suffix
+                                                       'match-part (nth 0 cand)) 
+                                           comp))
+                  (cl-loop for (comp prefix suffix) in affixations
+                           collect (cons (propertize
+                                          (concat prefix comp suffix)
+                                          'match-part comp)
+                                         comp)))))
+        (afun
+         ;; Add annotation at end of
+         ;; candidate if needed, e.g. foo<f>, this happen when
+         ;; completing against a quoted symbol.
+         (mapcar (lambda (s)
+                   (let ((ann (funcall afun s)))
+                     (if ann
+                         (cons
+                          (concat
+                           s
+                           (propertize
+                            " " 'display
+                            (propertize
+                             ann
+                             'face 'completions-annotations)))
+                          s)
+                       s)))
+                 comps))
+        (t comps)))
 
 ;; Helm multi matching style
 
