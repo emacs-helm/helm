@@ -1112,7 +1112,8 @@ is used."
 (defun helm-completion-package-affix (_completions)
   (lambda (comp)
     (let* ((sym (intern-soft comp))
-           (desc (package-desc-summary (package-get-descriptor sym)))
+           (desc (helm-aand (package-get-descriptor sym)
+                            (package-desc-summary it)))
            (sep (make-string (1+ (- (buffer-local-value
                                      'helm-candidate-buffer-longest-len
                                      (get-buffer (helm-candidate-buffer)))
@@ -1120,8 +1121,10 @@ is used."
                              ? )))
       (list comp
             ""
-            (helm-aand (propertize (concat sep desc) 'face 'font-lock-warning-face)
-                       (propertize " " 'display it))))))
+            (or (helm-aand desc
+                           (propertize (concat sep it) 'face 'font-lock-warning-face)
+                           (propertize " " 'display it))
+                "")))))
 
 ;;; Generic completing read
 ;;
