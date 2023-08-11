@@ -135,8 +135,7 @@ fuzzy matching is running its own sort function with a different
 algorithm."
   (with-helm-current-buffer
     (cl-loop with max-len = (when helm-M-x-show-short-doc
-                              (buffer-local-value 'helm-candidate-buffer-longest-len
-                                                  (get-buffer (helm-candidate-buffer))))
+                              (helm-in-buffer-get-longest-candidate))
              with local-map = (helm-M-x-current-mode-map-alist)
              for cand in candidates
              for local-key  = (car (rassq cand local-map))

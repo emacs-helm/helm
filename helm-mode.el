@@ -1021,9 +1021,7 @@ command.  The command should be specified as a string and the category as a symb
                      (propertize
                       (symbol-name major-mode) 'face 'font-lock-warning-face)))
              (size (helm-buffer-size buf))
-             (len (buffer-local-value
-                   'helm-candidate-buffer-longest-len
-                   (helm-candidate-buffer)))
+             (len (helm-in-buffer-get-longest-candidate))
              (suffix (format "%s%s%s%s%s(in %s)"
                              (make-string (1+ (- len (length comp))) ? )
                              (propertize size
@@ -1070,13 +1068,7 @@ is used."
            ;; style and a candidate buffer remains (with its local vars
            ;; still available).
            (max-len (and (memq helm-completion-style '(helm helm-fuzzy))
-                         (buffer-local-value
-                          'helm-candidate-buffer-longest-len
-                          (get-buffer (or (helm-candidate-buffer)
-                                          ;; Return 0 in this case and don't
-                                          ;; fail with a nil arg with
-                                          ;; get-buffer.
-                                          helm-buffer)))))
+                         (helm-in-buffer-get-longest-candidate)))
            (sep (if (or (null max-len) (zerop max-len))
                     " --"               ; Default separator.
                   (make-string (- max-len (length comp)) ? )))
@@ -1114,9 +1106,7 @@ is used."
     (let* ((sym (intern-soft comp))
            (desc (helm-aand (package-get-descriptor sym)
                             (package-desc-summary it)))
-           (sep (make-string (1+ (- (buffer-local-value
-                                     'helm-candidate-buffer-longest-len
-                                     (get-buffer (helm-candidate-buffer)))
+           (sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                     (length comp)))
                              ? )))
       (list comp

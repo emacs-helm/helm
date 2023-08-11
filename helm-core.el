@@ -6848,6 +6848,14 @@ It is a local variable set from `helm-init-candidates-in-buffer' in
 Allow getting the longest length of initial candidates in transformers
 without looping again through the whole list.")
 
+(defsubst helm-in-buffer-get-longest-candidate ()
+  "Return the longest candidate recorded in `helm-candidate-buffer'."
+  (helm-aif (helm-candidate-buffer)
+      (buffer-local-value
+       'helm-candidate-buffer-longest-len
+       (get-buffer it))
+    0))
+
 (defun helm-init-candidates-in-buffer (buffer-spec data)
   "Register BUFFER-SPEC with DATA for a helm candidates-in-buffer session.
 
