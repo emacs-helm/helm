@@ -2921,6 +2921,7 @@ Ensure disabling `helm-ff-auto-update-flag' before undoing."
           (helm-check-minibuffer-input))
       (setq helm-ff-auto-update-flag old--flag)
       (setq helm-ff--auto-update-state helm-ff-auto-update-flag))))
+(put 'helm-ff-undo 'helm-only t)
 
 ;;; Auto-update - helm-find-files auto expansion of directories.
 ;;
