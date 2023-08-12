@@ -29,6 +29,7 @@
 (defvar helm-completion--sorting-done)
 (defvar helm-mode)
 (defvar password-cache)
+(defvar package--builtins)
 
 ;; No warnings in Emacs built --without-x
 (declare-function x-file-dialog "xfns.c")
@@ -40,6 +41,8 @@
 (declare-function help--symbol-class "help-fns.el")
 (declare-function helm-get-first-line-documentation "helm-elisp")
 (declare-function package-desc-summary   "package")
+(declare-function package-built-in-p "package")
+(declare-function package-desc-status "package")
 (declare-function package-get-descriptor "package")
 
 (defgroup helm-mode nil
@@ -1106,13 +1109,21 @@ is used."
 (defun helm-completion-package-affix (_completions)
   (lambda (comp)
     (let* ((sym (intern-soft comp))
-           (desc (helm-aand (package-get-descriptor sym)
-                            (package-desc-summary it)))
+           (id (package-get-descriptor sym))
+           (built-in (package-built-in-p sym))
+           (status (and id (package-desc-status id)))
+           (desc (if built-in
+                     (aref (assoc-default sym package--builtins) 2)
+                   (and id (package-desc-summary id))))
            (sep (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                     (length comp)))
                              ? )))
       (list comp
-            ""
+            (propertize
+             (if status
+                 (format "%s " (substring status 0 1))
+               "b ")
+              'face 'font-lock-property-name-face)
             (or (helm-aand desc
                            (propertize (concat sep it) 'face 'font-lock-warning-face)
                            (propertize " " 'display it))
