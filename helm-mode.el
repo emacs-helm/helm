@@ -998,6 +998,8 @@ behavior as emacs vanilla.")
     ("find-variable" . symbol-help)
     ("kill-buffer" . buffer)
     ("package-install" . package)
+    ("package-vc-install" . package)
+    ("package-vc-checkout" . package)
     ("describe-package" . package))
   "An alist to specify metadata category by command.
 
