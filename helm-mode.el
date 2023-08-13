@@ -996,7 +996,7 @@ behavior as emacs vanilla.")
     ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
     ("find-variable" . symbol-help)
-    ("find-library" . file) ; FIXME needs a special category library.
+    ("find-library" . library)
     ("kill-buffer" . buffer)
     ("package-install" . package)
     ("package-vc-install" . package)
@@ -1170,7 +1170,6 @@ dynamically otherwise use `helm-completing-read-default-2'."
          (afix (or (plist-get completion-extra-properties :affixation-function)
                    (completion-metadata-get metadata 'affixation-function)))
          (category (completion-metadata-get metadata 'category))
-         (file-comp-p (eq category 'file))
          (sort-fn (unless (eq helm-completion-style 'helm-fuzzy)
                     (or
                      (completion-metadata-get
@@ -1181,8 +1180,7 @@ dynamically otherwise use `helm-completing-read-default-2'."
     (helm-aif (assoc-default name helm-completing-read-command-categories)
         (unless (completion-metadata-get metadata 'category)
           (setq metadata `(metadata (category . ,it))
-                category it
-                file-comp-p (eq category 'file))))
+                category it)))
     (helm-aif (and completions-detailed
                    (assoc-default category helm-completing-read-extra-metadata))
         (progn
@@ -1207,13 +1205,13 @@ dynamically otherwise use `helm-completing-read-default-2'."
                                      (memq require-match
                                            '(confirm confirm-after-completion)))
                                 1 0)
-          :fc-transformer (append (and (or afix afun file-comp-p sort-fn)
+          :fc-transformer (append (and (or afix afun (memq category '(file library)) sort-fn)
                                        (list (lambda (candidates _source)
                                                (helm-completion--initial-filter
                                                 (if (and sort-fn (> (length helm-pattern) 0))
                                                     (funcall sort-fn candidates)
                                                   candidates)
-                                                afun afix file-comp-p))))
+                                                afun afix category))))
                                   '(helm-cr-default-transformer))
           :quit-when-no-cand (eq require-match t)
           :nomark (null helm-comp-read-use-marked)
@@ -1256,7 +1254,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                    (completion-metadata-get metadata 'annotation-function)))
          (afix (or (plist-get completion-extra-properties :affixation-function)
                    (completion-metadata-get metadata 'affixation-function)))
-         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
+         (category (completion-metadata-get metadata 'category))
          (compfn (lambda (str _predicate _action)
                    (let* ((completion-ignore-case (helm-set-case-fold-search))
                           (comps
@@ -1307,7 +1305,7 @@ This handler uses dynamic matching which allows honouring `completion-styles'."
                                                    (delete default lst))
                                       (setq default nil))
                                   lst))
-                              afun afix file-comp-p)))))
+                              afun afix category)))))
          (data (if (memq helm-completion-style '(helm helm-fuzzy))
                    (funcall compfn (or input "") nil nil)
                  compfn))
@@ -2028,13 +2026,14 @@ The `helm-find-files' history `helm-ff-history' is used here."
       (propertize str 'read-only t 'face 'helm-mode-prefix 'rear-nonsticky t)
     str))
 
-(defun helm-completion--initial-filter (comps afun afix file-comp-p)
-  "Compute COMPS with function AFUN or AFIX unless FILE-COMP-P non nil.
+(defun helm-completion--initial-filter (comps afun afix category)
+  "Compute COMPS with function AFIX or AFUN.
 
-If both AFUN and AFIX are provided only AFIX is used.
-When FILE-COMP-P is provided only filter out dot files.
+When CATEGORY is file or library remove dot files from COMPS.
 
-When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
+If both AFUN and AFIX are provided, AFIX takes precedence.
+
+When AFUN, AFIX are nil and CATEGORY is not file return COMPS unmodified."
   ;; Normally COMPS should be a list of
   ;; string but in some cases it is given as a list of strings containing a list
   ;; of string e.g. ("a" "b" "c" ("d" "e" "f")) ; This happen in rgrep
@@ -2042,7 +2041,7 @@ When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
   ;; avoid e.g. wrong-type argument: stringp '("d" "e" "f")
   ;; FIXME: If this create a new bug with completion-in-region, flatten COMPS
   ;; directly in the caller i.e. helm-completing-read-default-1.
-  (when (or afix afun file-comp-p)
+  (when (or afix afun (memq category '(file library)))
     (setq comps (helm-fast-remove-dups
                  (helm-flatten-list comps)
                  :test 'equal)))
@@ -2050,7 +2049,7 @@ When AFUN, AFIX and FILE-COMP-P are nil return COMPS unmodified."
   ;; We were previously exiting directly without handling afix and afun, but
   ;; maybe some file completion tables have an afix or afun in their metadata so
   ;; let them a chance to run these functions if some.
-  (when file-comp-p
+  (when (memq category '(file library))
     (setq comps
           (cl-loop for f in comps
                    unless (string-match "\\`\\.\\{1,2\\}/\\'" f)
@@ -2327,8 +2326,9 @@ Can be used for `completion-in-region-function' by advicing it with an
                                                 (string-suffix-p " " input)
                                                 (string= input ""))
                                       " "))
-                 (file-comp-p (or (eq (completion-metadata-get metadata 'category) 'file)
-                                  (eq (plist-get completion-extra-properties :category) 'file)
+                 (category (or (eq (completion-metadata-get metadata 'category) 'file)
+                               (eq (plist-get completion-extra-properties :category) 'file)))
+                 (file-comp-p (or (eq category 'file)
                                   (helm-guess-filename-at-point)))
                  ;; `completion-all-completions' store the base-size in the last `cdr',
                  ;; so data looks like this: '(a b c d . 0) and (last data) == (d . 0).
@@ -2383,7 +2383,7 @@ Can be used for `completion-in-region-function' by advicing it with an
                               (if (and sort-fn (> (length str) 0))
                                   (funcall sort-fn all)
                                 all)
-                              afun afix file-comp-p))))
+                              afun afix category))))
                  (data (if (memq helm-completion-style '(helm helm-fuzzy))
                            (funcall compfn input nil nil)
                          compfn))
