@@ -965,14 +965,14 @@ that use `helm-comp-read'.  See `helm-M-x' for example."
 ;;
 (defvar helm-completing-read-extra-metadata
   '((buffer . (metadata
-               (affixation-function . helm-completing-read-buffer-affix)
+               (affixation-function . helm-completing-read-buffer-affixation)
                (category . buffer)
                (flags . (helm-completing-read--buffer-lgst-mode))))
     (symbol-help . (metadata
-                    (affixation-function . helm--symbol-completion-table-affixation)
+                    (affixation-function . helm-symbol-completion-table-affixation)
                     (category . symbol-help)))
     (package . (metadata
-                (affixation-function . helm-completion-package-affix)
+                (affixation-function . helm-completion-package-affixation)
                 (category . package))))
   "Extra metadata for completing-read.
 
@@ -1009,7 +1009,7 @@ we allow here specifying the category of the completion provided by a specific
 command.  The command should be specified as a string and the category as a symbol.")
 
 (defvar helm-completing-read--buffer-lgst-mode nil)
-(defun helm-completing-read-buffer-affix (completions)
+(defun helm-completing-read-buffer-affixation (completions)
   (let ((len-mode (or helm-completing-read--buffer-lgst-mode
                       (cl-loop for bname in completions
                                maximize (with-current-buffer bname
@@ -1052,7 +1052,7 @@ command.  The command should be specified as a string and the category as a symb
               (propertize " " 'display prefix)
               (propertize " " 'display suffix))))))
 
-(defun helm--symbol-completion-table-affixation (_completions)
+(defun helm-symbol-completion-table-affixation (_completions)
   "Override `help--symbol-completion-table-affixation'.
 
 Normally affixation functions use COMPLETIONS as arg, and return a list of
@@ -1109,7 +1109,7 @@ is used."
                       (propertize " " 'display it))
          "")))))
 
-(defun helm-completion-package-affix (_completions)
+(defun helm-completion-package-affixation (_completions)
   (lambda (comp)
     (let* ((sym (intern-soft comp))
            (id (package-get-descriptor sym))
