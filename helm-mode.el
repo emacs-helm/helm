@@ -996,6 +996,7 @@ behavior as emacs vanilla.")
     ("customize-group" . symbol-help)
     ("find-function" . symbol-help)
     ("find-variable" . symbol-help)
+    ("find-library" . file) ; FIXME needs a special category library.
     ("kill-buffer" . buffer)
     ("package-install" . package)
     ("package-vc-install" . package)
@@ -1168,7 +1169,8 @@ dynamically otherwise use `helm-completing-read-default-2'."
                    (completion-metadata-get metadata 'annotation-function)))
          (afix (or (plist-get completion-extra-properties :affixation-function)
                    (completion-metadata-get metadata 'affixation-function)))
-         (file-comp-p (eq (completion-metadata-get metadata 'category) 'file))
+         (category (completion-metadata-get metadata 'category))
+         (file-comp-p (eq category 'file))
          (sort-fn (unless (eq helm-completion-style 'helm-fuzzy)
                     (or
                      (completion-metadata-get
@@ -1178,11 +1180,11 @@ dynamically otherwise use `helm-completing-read-default-2'."
          flags)
     (helm-aif (assoc-default name helm-completing-read-command-categories)
         (unless (completion-metadata-get metadata 'category)
-          (setq metadata
-                `(metadata (category . ,it)))))
+          (setq metadata `(metadata (category . ,it))
+                category it
+                file-comp-p (eq category 'file))))
     (helm-aif (and completions-detailed
-                   (assoc-default (completion-metadata-get metadata 'category)
-                                  helm-completing-read-extra-metadata))
+                   (assoc-default category helm-completing-read-extra-metadata))
         (progn
           (setq metadata it)
           (setq afun (completion-metadata-get metadata 'annotation-function)
