@@ -47,6 +47,8 @@
     ["Emacs Manual index" helm-info-emacs t]
     ["Gnus Manual index" helm-info-gnus t]
     ["Helm documentation" helm-documentation t])
+   ("Elpa"
+    ["Elisp packages" helm-packages t])
    ("Tools"
     ["Occur" helm-occur t]
     ["Grep current directory with AG" helm-do-grep-ag t]

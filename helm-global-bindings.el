@@ -83,6 +83,7 @@ Using `setq' to modify this variable will have no effect."
     (define-key map (kbd "C-c C-x")   'helm-run-external-command)
     (define-key map (kbd "b")         'helm-resume)
     (define-key map (kbd "M-g i")     'helm-gid)
+    (define-key map (kbd "@")         'helm-packages)
     map)
   "Default keymap for \\[helm-command-prefix] commands.
 The normal global definition of the character \\[helm-command-prefix] indirects to this keymap.")
