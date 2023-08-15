@@ -26,13 +26,16 @@
 ;;
 ;;
 (defun helm-packages-upgrade (_candidate)
+  "Helm action for upgrading marked packages."
   (let ((mkd (helm-marked-candidates)))
     (mapc #'package-upgrade mkd)))
 
 (defun helm-packages-describe (candidate)
+  "Helm action for describing package CANDIDATE."
   (describe-package candidate))
 
 (defun helm-packages-visit-homepage (candidate)
+  "Helm action for visiting package CANDIDATE home page."
   (let* ((id (package-get-descriptor candidate))
          (name (package-desc-name id))
          (extras (package-desc-extras id))
@@ -44,27 +47,38 @@
                            'face 'font-lock-keyword-face)))))
 
 (defun helm-packages-package-reinstall (_candidate)
+  "Helm action for reinstalling marked packages."
   (let ((mkd (helm-marked-candidates)))
     (mapc #'package-reinstall mkd)))
 
 (defun helm-packages-delete-1 (packages &optional force)
+  "Run `package-delete' on PACKAGES.
+If FORCE is non nil force deleting packages."
   (mapc (lambda (x)
           (package-delete (package-get-descriptor x) force))
         packages))
 
 (defun helm-packages-uninstall (_candidate)
+  "Helm action for uninstalling marked packages.
+Unlike `helm-packages-delete' this will refuse to delete packages when they are
+needed by others packages as dependencies."
   (let ((mkd (helm-marked-candidates)))
     (helm-packages-delete-1 mkd)))
 
 (defun helm-packages-delete (_candidate)
+  "Helm action for deleting marked packages.
+Unlike `helm-packages-uninstall' this delete packages even when they are needed
+as dependencies."
   (let ((mkd (helm-marked-candidates)))
     (helm-packages-delete-1 mkd 'force)))
 
 (defun helm-packages-recompile (_candidate)
+  "Helm action for recompiling marked packages."
   (let ((mkd (helm-marked-candidates)))
     (mapc #'package-recompile mkd)))
 
 (defun helm-packages-install (_candidate)
+  "Helm action for installing marked packages."
   (let ((mkd (helm-marked-candidates)))
     (mapc #'package-install mkd)))
 
@@ -72,6 +86,7 @@
 ;;
 ;;
 (defun helm-packages-transformer (candidates _source)
+  "Transformer function for `helm-packages'."
   (cl-loop for c in candidates
            for sym = (intern-soft c)
            for archive = (assq sym package-archive-contents)
@@ -98,6 +113,7 @@
 
 ;;;###autoload
 (defun helm-packages (&optional arg)
+  "Helm interface to list packages."
   (interactive "P")
   (package-initialize)
   (when arg
