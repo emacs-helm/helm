@@ -1769,9 +1769,9 @@ Keys description:
                        (remhash helm-ff-default-directory
                                 helm-ff--list-directory-cache))
              :match-on-real t
-             :filtered-candidate-transformer (delq nil `(helm-ff-fct
-                                                         helm-ff-maybe-show-thumbnails
-                                                         helm-ff-sort-candidates))
+             :filtered-candidate-transformer '(helm-ff-fct
+                                               helm-ff-maybe-show-thumbnails
+                                               helm-ff-sort-candidates)
              :persistent-action-if persistent-action-if
              :persistent-help persistent-help
              :volatile t
