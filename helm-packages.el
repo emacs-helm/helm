@@ -172,6 +172,18 @@ as dependencies."
                           (sort candidates #'helm-generic-sort-fn)))
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
+                                ("Install packages(s)" . helm-packages-install)))
+                    (helm-build-in-buffer-source "Built-in packages"
+                      :data (cl-loop for p in package--builtins
+                                     when (package-desc-p (package-get-descriptor (car p)))
+                                     collect (car p))
+                      :coerce #'helm-symbolify
+                      :filtered-candidate-transformer
+                      '(helm-packages-transformer
+                        (lambda (candidates _source)
+                          (sort candidates #'helm-generic-sort-fn)))
+                      :action '(("Describe package" . helm-packages-describe)
+                                ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))))
           :buffer "*helm test*")))
 
