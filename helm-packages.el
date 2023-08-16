@@ -155,7 +155,7 @@ as dependencies."
                                 ("Reinstall package(s)" . helm-packages-package-reinstall)
                                 ("Recompile package(s)" . helm-packages-recompile)
                                 ("Uninstall package(s)" . helm-packages-uninstall)))
-                    (helm-build-in-buffer-source "Other packages"
+                    (helm-build-in-buffer-source "Available external packages"
                       :data (cl-loop for p in package-archive-contents
                                      for sym = (car p)
                                      for id = (package-get-descriptor sym)
@@ -173,7 +173,7 @@ as dependencies."
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install)))
-                    (helm-build-in-buffer-source "Built-in packages"
+                    (helm-build-in-buffer-source "Available built-in packages"
                       :data (cl-loop for p in package--builtins
                                      when (package-desc-p (package-get-descriptor (car p)))
                                      collect (car p))
