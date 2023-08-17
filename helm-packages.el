@@ -96,11 +96,20 @@ as dependencies."
            for version = (and id (mapconcat #'number-to-string (package-desc-version id) "."))
            for description = (and id (package-desc-summary id))
            for disp = (format "%s%s%s%s%s%s%s%s%s"
-                              (propertize c 'face 'font-lock-keyword-face 'match-part c)
+                              (propertize
+                               c
+                               'face (if (equal status "dependency")
+                                         font-lock-type-face
+                                       'font-lock-keyword-face)
+                               'match-part c)
                               (make-string (1+ (- (helm-in-buffer-get-longest-candidate)
                                                   (length c)))
                                            ? )
-                              (or status "")
+                              (propertize
+                               (or status "")
+                               'face (if (equal status "dependency")
+                                         'bold-italic
+                                       'default))
                               (make-string (1+ (- 10 (length status))) ? )
                               (or provider "")
                               (make-string (1+ (- 10 (length provider))) ? )
