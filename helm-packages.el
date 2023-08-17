@@ -162,7 +162,7 @@ as dependencies."
                                      for status = (package-desc-status id)
                                      unless (or (and id (member
                                                          status
-                                                         '("installed" "dependency")))
+                                                         '("installed" "dependency" "source")))
                                                 (and id (assoc sym package--builtins)))
                                      nconc (list (car p)))
                       :coerce #'helm-symbolify
@@ -175,6 +175,8 @@ as dependencies."
                                 ("Install packages(s)" . helm-packages-install)))
                     (helm-build-in-buffer-source "Available built-in packages"
                       :data (cl-loop for p in package--builtins
+                                     ;; Show only builtins that are available as
+                                     ;; well on (m)elpa. 
                                      when (package-desc-p (package-get-descriptor (car p)))
                                      collect (car p))
                       :coerce #'helm-symbolify
@@ -185,7 +187,7 @@ as dependencies."
                       :action '(("Describe package" . helm-packages-describe)
                                 ("Visit homepage" . helm-packages-visit-homepage)
                                 ("Install packages(s)" . helm-packages-install))))
-          :buffer "*helm test*")))
+          :buffer "*helm packages*")))
 
 (provide 'helm-packages)
 
