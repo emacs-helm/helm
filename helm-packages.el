@@ -176,7 +176,9 @@ as dependencies."
                     (helm-build-in-buffer-source "Available built-in packages"
                       :data (cl-loop for p in package--builtins
                                      ;; Show only builtins that are available as
-                                     ;; well on (m)elpa. 
+                                     ;; well on (m)elpa. Other builtins don't
+                                     ;; have a package-descriptor, the format is
+                                     ;; (sym . [version reqs summary]).
                                      when (package-desc-p (package-get-descriptor (car p)))
                                      collect (car p))
                       :coerce #'helm-symbolify
